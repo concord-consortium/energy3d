@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Sealed: true
+Main-Class: cc.househeat.MainApplication
+Class-Path: ardor3d-core-0.6.jar ardor3d-jogl-0.6.jar google-collect-1.0-rc1.jar jogl.jar gluegen-rt.jar ardor3d-awt-0.6.jar guice-1.0.jar
