@@ -38,6 +38,7 @@ import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
@@ -48,6 +49,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -78,7 +80,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //	private final static float CUBE_ROTATE_SPEED = 1;
 //	private final Vector3 rotationAxis = new Vector3(1, 1, 0);
 //	private double angle = 0;
-	private Mesh box;
+	private Mesh floor;
 //	private final Matrix3 rotation = new Matrix3();
 
 	private static final int MOVE_SPEED = 4;
@@ -109,6 +111,29 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
 		logicalLayer.registerInput(canvas, pl);
 
+        /**
+         * Create a ZBuffer to display pixels closest to the camera above farther ones.
+         */
+        final ZBufferState buf = new ZBufferState();
+        buf.setEnabled(true);
+        buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
+        root.setRenderState(buf);
+
+        // ---- LIGHTS
+        /** Set up a basic, default light. */
+        final PointLight light = new PointLight();
+        light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
+        light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
+        light.setLocation(new Vector3(100, 100, 100));
+        light.setEnabled(true);
+
+        /** Attach the light to a lightState and the lightState to rootNode. */
+        LightState _lightState = new LightState();
+        _lightState.setEnabled(true);
+        _lightState.attach(light);
+        root.setRenderState(_lightState);
+        
+        
 		//		initScene();
 
 		//		registerInputTriggers();
@@ -162,10 +187,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		root.attachChild(axis);
 
 		// make floor
-		box = new Quad("Floor", 100, 100);
-		box.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
+		floor = new Quad("Floor", 100, 100);
+		floor.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
 		//		box.setRotation(new Matrix3().fromAngles(-90 * MathUtils.DEG_TO_RAD, 0, 0));
-		root.attachChild(box);
+		root.attachChild(floor);
 
 		BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
@@ -173,8 +198,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		blendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
 		blendState.setTestEnabled(true);
 		blendState.setTestFunction(BlendState.TestFunction.GreaterThan);
-		box.setRenderState(blendState);
-		box.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		floor.setRenderState(blendState);
+		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 
 		//		Quad q2 = new Quad("Front", 1, 1);
 		//		q2.setDefaultColor(new ColorRGBA(1, 0, 0, 0));
@@ -301,7 +326,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					return;
 				if (drawn == null || drawn.isDrawCompleted()) {
 					if (operation == DRAW_LINES)
-						drawn = new DrawnLines();
+						drawn = new DrawnWall();
 					else if (operation == DRAW_RECTANGLE)
 						drawn = new DrawnRectangle();
 					root.attachChild(drawn.getRoot());
@@ -590,26 +615,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		// Do the pick
 		pickResults.clear();
-		PickingUtil.findPick(root, pickRay, pickResults);
+		PickingUtil.findPick(floor, pickRay, pickResults);
 		Ray3.releaseTempInstance(pickRay);
 
 		if (pickResults.getNumber() > 0) {
-			// picked something, show label.
-			//                    _text.getSceneHints().setCullHint(CullHint.Never);
-
-			// set our text to the name of the ancestor of this object that is right under the _root node.
 			final PickData pick = pickResults.getPickData(0);
 			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
-			if (intersectionRecord.getNumberOfIntersection() > 0) {
+			if (intersectionRecord.getNumberOfIntersections() > 0) {
 				v = intersectionRecord.getIntersectionPoint(0);
-				//		        System.out.println(v);		        
-			}
-			//                    final Spatial topLevel = getTopLevel(pick.getTargetMesh());
-			//                    _text.setText(topLevel.getName());
+//				System.out.println("INTERSECTION");
+			} 
+//			else
+//				System.out.println("NO INTERSECTION");
 		} else {
-			// No pick, clear label.
-			//                    _text.getSceneHints().setCullHint(CullHint.Always);
-			//                    _text.setText("");
+//			System.out.println("NO INTERSECTION");
 		}
 		return v;
 	}
