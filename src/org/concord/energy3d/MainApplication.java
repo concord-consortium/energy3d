@@ -1,6 +1,6 @@
-package cc.househeat;
+package org.concord.energy3d;
 
-import cc.househeat.model.SceneManager;
+import org.concord.energy3d.model.SceneManager;
 
 public class MainApplication {
 

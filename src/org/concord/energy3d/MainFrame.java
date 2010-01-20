@@ -1,4 +1,4 @@
-package cc.energy3d;
+package org.concord.energy3d;
 
 import java.awt.BorderLayout;
 
@@ -11,7 +11,8 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
-import cc.energy3d.model.SceneManager;
+import org.concord.energy3d.model.SceneManager;
+
 
 public class MainFrame extends JFrame {
 

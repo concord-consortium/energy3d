@@ -1,16 +1,19 @@
-package cc.househeat.model;
+package org.concord.energy3d.model;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.annotation.MainThread;
+import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
+import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
@@ -60,6 +63,8 @@ import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
@@ -119,19 +124,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
         buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
         root.setRenderState(buf);
 
-        // ---- LIGHTS
-        /** Set up a basic, default light. */
-        final PointLight light = new PointLight();
-        light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
-        light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
-        light.setLocation(new Vector3(100, 100, 100));
-        light.setEnabled(true);
-
-        /** Attach the light to a lightState and the lightState to rootNode. */
-        LightState _lightState = new LightState();
-        _lightState.setEnabled(true);
-        _lightState.attach(light);
-        root.setRenderState(_lightState);
+//        // ---- LIGHTS
+//        /** Set up a basic, default light. */
+//        final PointLight light = new PointLight();
+//        light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
+//        light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
+//        light.setLocation(new Vector3(100, 100, 100));
+//        light.setEnabled(true);
+//
+//        /** Attach the light to a lightState and the lightState to rootNode. */
+//        LightState _lightState = new LightState();
+//        _lightState.setEnabled(true);
+//        _lightState.attach(light);
+//        root.setRenderState(_lightState);
         
         
 		//		initScene();
@@ -178,6 +183,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		buf.setEnabled(true);
 		buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
 		root.setRenderState(buf);
+		
+        AWTImageLoader.registerLoader();
+
+        try {
+            SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
+                    "cc/energy3d/images/"));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
+//            srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
+//                    "com/ardor3d/example/media/models/"));
+//            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, srl);
+        } catch (final URISyntaxException ex) {
+            ex.printStackTrace();
+        }
+		
 
 		// Set up a reusable pick results
 		pickResults = new PrimitivePickResults();

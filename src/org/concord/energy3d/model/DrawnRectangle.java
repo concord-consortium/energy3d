@@ -1,4 +1,4 @@
-package cc.househeat.model;
+package org.concord.energy3d.model;
 
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.shape.Quad;

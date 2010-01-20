@@ -1,4 +1,4 @@
-package cc.househeat.model;
+package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.LinkedList;
