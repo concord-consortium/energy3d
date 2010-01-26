@@ -95,7 +95,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private int rotationSign = 1;
 
 	private PickResults pickResults;
-	private Drawn drawn = null;
+	private HousePart drawn = null;
 
 	private int operation = SELECT;
 
@@ -188,7 +188,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
         try {
             SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
-                    "cc/energy3d/images/"));
+                    "org/concord/energy3d/images/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
 //            srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
 //                    "com/ardor3d/example/media/models/"));
@@ -345,10 +345,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					return;
 				if (drawn == null || drawn.isDrawCompleted()) {
 					if (operation == DRAW_LINES)
-						drawn = new DrawnWall();
-					else if (operation == DRAW_RECTANGLE)
-						drawn = new DrawnRectangle();
+						drawn = new Wall();
+//					else if (operation == DRAW_RECTANGLE)
+//						drawn.editPoint(0);
+//						drawn = new DrawnRectangle();
 					root.attachChild(drawn.getRoot());
+					House.getInstance().add(drawn);
 				}
 				Vector3 v = computeMousePoint(inputStates);
 				if (v != null)
@@ -360,7 +362,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (operation != SELECT) {
 					Vector3 v = computeMousePoint(inputStates);
-					if (drawn != null && v != null)
+					if (drawn != null && v != null && !drawn.isDrawCompleted())
 						drawn.setPreviewPoint(v);
 				}
 			}
@@ -618,6 +620,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setOperation(int operation) {
 		this.operation = operation;
+		if (operation == DRAW_RECTANGLE)
+			drawn.editPoint(0);
 	}
 
 	public int getOperation() {
@@ -651,5 +655,33 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 		return v;
 	}
+	
+	private Vector3 findMouseSelection(final TwoInputStates inputStates) {
+		Vector3 v = null;
+		// Put together a pick ray
+		final Vector2 pos = Vector2.fetchTempInstance().set(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY());
+		final Ray3 pickRay = Ray3.fetchTempInstance();
+		canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
+		Vector2.releaseTempInstance(pos);
+
+		// Do the pick
+		pickResults.clear();
+		PickingUtil.findPick(floor, pickRay, pickResults);
+		Ray3.releaseTempInstance(pickRay);
+
+		if (pickResults.getNumber() > 0) {
+			final PickData pick = pickResults.getPickData(0);
+			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
+			if (intersectionRecord.getNumberOfIntersections() > 0) {
+				v = intersectionRecord.getIntersectionPoint(0);
+//				System.out.println("INTERSECTION");
+			} 
+//			else
+//				System.out.println("NO INTERSECTION");
+		} else {
+//			System.out.println("NO INTERSECTION");
+		}
+		return v;
+	}	
 
 }
