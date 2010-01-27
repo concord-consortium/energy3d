@@ -3,27 +3,48 @@ package org.concord.energy3d.model;
 import java.util.ArrayList;
 
 import com.ardor3d.math.Vector3;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.event.DirtyType;
+import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart {
 	protected final Node root = new Node();
+	protected final Node pointsRoot = new Node();
 	protected boolean drawCompleted = false;
 	protected final ArrayList<Vector3> points;
 	private final int numOfDrawPoints;
 	private int editPointIndex = -1;
-	
 
 	public HousePart(int n) {
 		numOfDrawPoints = n;
 		points = new ArrayList<Vector3>(n);
-	}
-
-	public boolean isDrawCompleted() {
-		return drawCompleted;
+		Vector3 origin = new Vector3();
+		for (int i=0; i<n ; i++) {
+			Sphere pointShape = new Sphere("Point", origin, 5, 5, 0.05);
+			pointsRoot.attachChild(pointShape);
+			pointShape.setUserData(i);
+			pointShape.updateModelBound();
+			
+		}
+		root.attachChild(pointsRoot);
+		root.setUserData(this);
 	}
 
 	public Node getRoot() {
 		return root;
+	}
+	
+	public boolean isDrawCompleted() {
+		return drawCompleted;
+	}
+	
+	public void showPoints() {
+		root.attachChild(pointsRoot);
+	}
+	
+	public void hidePoints() {
+		root.detachChild(pointsRoot);
 	}
 
 	public void addPoint(Vector3 p) {

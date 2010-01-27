@@ -10,6 +10,7 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -22,7 +23,7 @@ public class Wall extends HousePart {
 		super(2);
 		Mesh mesh = new Mesh("Wall");
 		root.attachChild(mesh);
-		mesh.getMeshData().setIndexMode(IndexMode.QuadStrip);
+		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
 		mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
@@ -42,6 +43,9 @@ public class Wall extends HousePart {
 		vertexBuffer.position(i * 2 * 3);
 		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		vertexBuffer.put(p.getXf()).put(p.getYf()).put(WALL_HEIGHT);
+		
+//		vertexBuffer.put(p.getXf()).put(p.getYf()).put((i%2==0) ? p.getZf() : WALL_HEIGHT);
+//		vertexBuffer.put(p.getXf()).put(p.getYf()).put((i%2==1) ? p.getZf() : WALL_HEIGHT);		
 
 //		if (i == 0) {
 //			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
@@ -54,6 +58,10 @@ public class Wall extends HousePart {
 		textureBuffer.position(i * 2 * 2);
 		textureBuffer.put(TEXTURE_SCALE).put(0);
 		textureBuffer.put(TEXTURE_SCALE).put(1);
+		
+		// draw spheres for points
+		pointsRoot.getChild(i).setTranslation(p);
+		
 	}
 
 }
