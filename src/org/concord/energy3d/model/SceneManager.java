@@ -62,7 +62,6 @@ import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
-import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.common.base.Predicate;
@@ -332,7 +331,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	@Override
 	public boolean renderUnto(Renderer renderer) {
 		renderer.draw(root);
-		Debugger.drawBounds(root, renderer, true);
+//		Debugger.drawBounds(root, renderer, true);
 		return true;
 	}
 
