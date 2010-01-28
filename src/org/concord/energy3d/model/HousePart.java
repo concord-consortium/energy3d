@@ -3,9 +3,7 @@ package org.concord.energy3d.model;
 import java.util.ArrayList;
 
 import com.ardor3d.math.Vector3;
-import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart {
@@ -21,7 +19,7 @@ public abstract class HousePart {
 		points = new ArrayList<Vector3>(n);
 		Vector3 origin = new Vector3();
 		for (int i=0; i<n ; i++) {
-			Sphere pointShape = new Sphere("Point", origin, 5, 5, 0.05);
+			Sphere pointShape = new Sphere("Point", origin, 5, 5, 0.1);
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(i);
 			pointShape.updateModelBound();
@@ -33,6 +31,10 @@ public abstract class HousePart {
 
 	public Node getRoot() {
 		return root;
+	}
+	
+	public void complete() {
+		drawCompleted = true;
 	}
 	
 	public boolean isDrawCompleted() {

@@ -305,10 +305,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		try {
 			frameHandler.init();
 
-			while (!_exit) {				
+			while (!_exit) {
 				frameHandler.updateFrame();
 				Thread.yield();
-				
+
 			}
 			// grab the graphics context so cleanup will work out.
 			canvas.getCanvasRenderer().setCurrentContext();
@@ -332,7 +332,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	@Override
 	public boolean renderUnto(Renderer renderer) {
 		renderer.draw(root);
-//		Debugger.drawBounds(root, renderer, true);
+		Debugger.drawBounds(root, renderer, true);
 		return true;
 	}
 
@@ -344,7 +344,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (operation == SELECT) {
-					selectHousePart(inputStates, true);
+					if (drawn.isDrawCompleted())
+						selectHousePart(inputStates, true);
+					else
+						drawn.complete();
 					return;
 				}
 				if (drawn == null || drawn.isDrawCompleted()) {
@@ -364,14 +367,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (operation != SELECT) {
-					Vector3 v = findMousePoint(inputStates);
-					if (drawn != null && v != null && !drawn.isDrawCompleted())
-						drawn.setPreviewPoint(v);
-					else {
-						selectHousePart(inputStates, false);
-					}
+				// if (operation != SELECT) {
+				Vector3 v = findMousePoint(inputStates);
+				if (drawn != null && v != null && !drawn.isDrawCompleted())
+					drawn.setPreviewPoint(v);
+				else {
+					selectHousePart(inputStates, false);
 				}
+				// }
 			}
 		}));
 
@@ -663,7 +666,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Mesh findMouseSelection(final TwoInputStates inputStates) {
 		pick(inputStates, housePartsNode);
 
-		// System.out.println(pickResults.getNumber());
+		System.out.println(pickResults.getNumber());
 		if (pickResults.getNumber() > 0) {
 			final PickData pick = pickResults.getPickData(0);
 			// System.out.println(pick.getTargetMesh());
@@ -681,9 +684,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private void selectHousePart(final TwoInputStates inputStates, boolean edit) {
 		Mesh selectedMesh = findMouseSelection(inputStates);
-//		if (selectedMesh == null)
-//			return;					
-		Object data = (selectedMesh == null) ? null : selectedMesh.getParent().getUserData();
+		// if (selectedMesh == null)
+		// return;
+		Object data = null;
+		if (selectedMesh != null) {
+			data = selectedMesh.getUserData();
+			if (data == null)
+				data = selectedMesh.getParent().getUserData();
+		}
 		if (data == null || data instanceof HousePart) {
 			HousePart housePart = (HousePart) data;
 			if (lastHoveredObject != null && lastHoveredObject != housePart) {
@@ -700,5 +708,4 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 	}
 
-	
 }
