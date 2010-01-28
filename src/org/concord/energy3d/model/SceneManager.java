@@ -702,8 +702,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				lastHoveredObject = housePart;
 			}
 		} else if (edit && data instanceof Integer) {
-			HousePart housePart = (HousePart) selectedMesh.getParent().getParent().getUserData();
-			housePart.editPoint((Integer) data);
+			drawn = (HousePart) selectedMesh.getParent().getParent().getUserData();
+			drawn.editPoint((Integer) data);
 		}
 	}
 
