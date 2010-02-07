@@ -1,0 +1,5 @@
+Version 0.1
+- draw walls
+- draw edit points
+- edit by dragging edit points
+- *snap walls to eachother

@@ -342,36 +342,49 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private void registerInputTriggers() {
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				MouseState mouseState = inputStates.getCurrent().getMouseState();
 				if (operation == SELECT) {
 					if (drawn.isDrawCompleted())
-						selectHousePart(inputStates, true);
+						selectHousePart(mouseState.getX(), mouseState.getY(), true);
 					else
 						drawn.complete();
 					return;
 				}
+				Vector3 v = findMousePoint(mouseState.getX(), mouseState.getY());
+				int x = mouseState.getX();
+				int y = mouseState.getY();
 				if (drawn == null || drawn.isDrawCompleted()) {
-					if (operation == DRAW_LINES)
-						drawn = new Wall();
+					if (operation == DRAW_LINES) {
+						
+						if (v != null) {
+							
+							drawn = new Wall(x, y);
+							
 					// else if (operation == DRAW_RECTANGLE)
 					// drawn.editPoint(0);
 					// drawn = new DrawnRectangle();
 					housePartsNode.attachChild(drawn.getRoot());
 					House.getInstance().add(drawn);
-				}
-				Vector3 v = findMousePoint(inputStates);
-				if (v != null)
-					drawn.addPoint(v);
+						}
+					}
+				} else
+					drawn.addPoint(x, y);
+					
 			}
 		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				// if (operation != SELECT) {
-				Vector3 v = findMousePoint(inputStates);
-				if (drawn != null && v != null && !drawn.isDrawCompleted())
-					drawn.setPreviewPoint(v);
+				MouseState mouseState = inputStates.getCurrent().getMouseState();
+//				Vector3 v = findMousePoint(mouseState.getX(), mouseState.getY());
+				int x = inputStates.getCurrent().getMouseState().getX();
+				int y = inputStates.getCurrent().getMouseState().getY();				
+//				if (drawn != null && v != null && !drawn.isDrawCompleted())
+				if (drawn != null && !drawn.isDrawCompleted())
+					drawn.setPreviewPoint(x, y);
 				else {
-					selectHousePart(inputStates, false);
+					selectHousePart(mouseState.getX(), mouseState.getY(), false);
 				}
 				// }
 			}
@@ -637,9 +650,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return operation;
 	}
 
-	private void pick(final TwoInputStates inputStates, Spatial target) {
+	private void pick(int x, int y, Spatial target) {
 		// Put together a pick ray
-		final Vector2 pos = Vector2.fetchTempInstance().set(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY());
+		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
 		final Ray3 pickRay = Ray3.fetchTempInstance();
 		canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
 		Vector2.releaseTempInstance(pos);
@@ -650,8 +663,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Ray3.releaseTempInstance(pickRay);
 	}
 
-	private Vector3 findMousePoint(final TwoInputStates inputStates) {
-		pick(inputStates, floor);
+	public Vector3 findMousePoint(int x, int y) {
+		pick(x, y, floor);
 
 		if (pickResults.getNumber() > 0) {
 			final PickData pick = pickResults.getPickData(0);
@@ -662,8 +675,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return null;
 	}
 
-	private Mesh findMouseSelection(final TwoInputStates inputStates) {
-		pick(inputStates, housePartsNode);
+	private Mesh findMouseSelection(int x, int y) {
+		pick(x, y, housePartsNode);
 
 		System.out.println(pickResults.getNumber());
 		if (pickResults.getNumber() > 0) {
@@ -681,8 +694,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return null;
 	}
 
-	private void selectHousePart(final TwoInputStates inputStates, boolean edit) {
-		Mesh selectedMesh = findMouseSelection(inputStates);
+	private void selectHousePart(int x, int y, boolean edit) {
+		Mesh selectedMesh = findMouseSelection(x, y);
 		// if (selectedMesh == null)
 		// return;
 		Object data = null;
