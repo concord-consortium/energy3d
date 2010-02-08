@@ -4,6 +4,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.example.ExampleBase;
@@ -96,6 +97,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private PickResults pickResults;
 	private HousePart drawn = null;
+	private ArrayList<Wall> walls = new ArrayList<Wall>();
 
 	private int operation = SELECT;
 	protected HousePart lastHoveredObject;
@@ -719,5 +721,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn.editPoint((Integer) data);
 		}
 	}
+
+//	public ArrayList<Wall> getWalls() {
+//		return walls;
+//	}
 
 }

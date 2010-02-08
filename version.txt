@@ -1,5 +1,11 @@
 Version 0.1
 - draw walls
 - draw edit points
-- edit by dragging edit points
-- *snap walls to eachother
+- edit base points of a wall by dragging its edit points
+- edit height of a wall by dragging its upper edit points.
+	- this was done using "closest points" algorithm of two lines in 3D to computer closest point to mouse cursor that resides on the vertical line based at current edit point.
+- snap walls to eachother
+	- query a list of all drawn walls and find closest snap point within 0.5 radius (to be customized).
+	- for base of wall, snapped point will be used as new coordinates.
+	- for height of wall, snapped point will be used as closest coordinate and before computing wall heigh
+	

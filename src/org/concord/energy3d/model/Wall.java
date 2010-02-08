@@ -112,6 +112,7 @@ public class Wall extends HousePart {
 //			points.set(editPointIndex, p);
 			if (editPointIndex == 0 || editPointIndex == 2) {
 				if (p != null) {
+					p = snap(p);
 				points.set(editPointIndex, p);
 				points.set((editPointIndex == 0) ? 1 : 3, getUpperPoint(p));
 				}
@@ -121,7 +122,8 @@ public class Wall extends HousePart {
 			} else if (editPointIndex == 1 || editPointIndex == 3) {
 				int lower = (editPointIndex == 1) ? 0 : 2;
 //				WALL_HEIGHT = points.get(0).subtract(p, null).length();
-				WALL_HEIGHT = findAltitude(points.get(lower), x, y);
+				Vector3 base = points.get(lower);
+				WALL_HEIGHT = findHeight(base, snap(findUpperPoint(base, x, y)));
 				p = points.get(1);
 				points.set(1, new Vector3(p.getX(), p.getY(), WALL_HEIGHT));
 				p = points.get(3);
@@ -138,6 +140,27 @@ public class Wall extends HousePart {
 		}
 //			
 		draw();
+	}
+	
+	private Vector3 snap(Vector3 p) {
+		Vector3 closest = null;
+		double closestDistance = Double.MAX_VALUE;
+		for (HousePart housePart: House.getInstance().getParts()) {
+			if (housePart instanceof Wall && housePart != this) {
+				Wall wall = (Wall)housePart;
+				for (Vector3 p2 : wall.getPoints()) {
+					double distance = p.distance(p2);
+					if (distance < closestDistance) {
+						closest = p2;
+						closestDistance = distance;
+					}						
+				}
+			}
+		}
+		if (closestDistance < 0.5)
+			return closest;
+		else
+			return p;
 	}
 	
 //	@Override

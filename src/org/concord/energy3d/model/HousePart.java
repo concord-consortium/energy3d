@@ -100,24 +100,28 @@ public abstract class HousePart {
 //		draw();
 	}
 	
-	protected double findAltitude(Vector3 p, int x, int y) {
+	protected Vector3 findUpperPoint(Vector3 base, int x, int y) {
 		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
 		final Ray3 pickRay = Ray3.fetchTempInstance();
 		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
 		Vector2.releaseTempInstance(pos);
 		
-		Vector3 closest = LineLineIntersect(p, p.add(new Vector3(0, 0, 1), null), pickRay.getOrigin(), pickRay.getOrigin().add(pickRay.getDirection(), null));
+		Vector3 closest = LineLineIntersect(base, base.add(new Vector3(0, 0, 1), null), pickRay.getOrigin(), pickRay.getOrigin().add(pickRay.getDirection(), null));
 		
 		Ray3.releaseTempInstance(pickRay);
 		
-		Vector3 subtract = closest.subtract(p, null);
+		return closest;
+
+	}
+
+	protected double findHeight(Vector3 base, Vector3 upperPoint) {
+		Vector3 subtract = upperPoint.subtract(base, null);
 		if (subtract.dot(0, 0, -1) >= 0)
 			return 0.1;
 		else
 			return subtract.length();
-
 	}
-
+	
 	Vector3 LineLineIntersect(
 			ReadOnlyVector3 p1,ReadOnlyVector3 p2,ReadOnlyVector3 p3,ReadOnlyVector3 p4)
 			{
@@ -158,5 +162,9 @@ public abstract class HousePart {
 
 
 	protected abstract void draw();
+
+	public ArrayList<Vector3> getPoints() {
+		return points;
+	}
 
 }

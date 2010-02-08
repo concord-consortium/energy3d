@@ -32,4 +32,8 @@ public class House {
 		return parts.size();
 	}
 
+	public ArrayList<HousePart> getParts() {
+		return parts;
+	}
+
 }
