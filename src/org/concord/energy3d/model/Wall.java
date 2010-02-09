@@ -73,7 +73,7 @@ public class Wall extends HousePart {
 	public void addPoint(int x, int y) {
 		if (drawCompleted)
 			throw new RuntimeException("Drawing of this object is already completed");
-		Vector3 p = SceneManager.getInstance().findMousePoint(x, y);
+		Vector3 p = snap(SceneManager.getInstance().findMousePoint(x, y));
 		if (points.isEmpty()) {
 			points.add(p);
 			addUpperPoint(p);
@@ -102,6 +102,7 @@ public class Wall extends HousePart {
 //			throw new RuntimeException("Drawing of this object is already completed");
 		Vector3 p = SceneManager.getInstance().findMousePoint(x, y);
 		if (editPointIndex == -1) {
+			p = snap(p);
 //			draw(p, points.size());
 //			draw();
 			points.set(points.size()-2, p);

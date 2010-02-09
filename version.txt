@@ -8,4 +8,4 @@ Version 0.1
 	- query a list of all drawn walls and find closest snap point within 0.5 radius (to be customized).
 	- for base of wall, snapped point will be used as new coordinates.
 	- for height of wall, snapped point will be used as closest coordinate and before computing wall heigh
-	
+- allow snap for when creating walls as well as when editing walls
