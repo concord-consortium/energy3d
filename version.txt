@@ -9,3 +9,8 @@ Version 0.1
 	- for base of wall, snapped point will be used as new coordinates.
 	- for height of wall, snapped point will be used as closest coordinate and before computing wall heigh
 - allow snap for when creating walls as well as when editing walls
+- draw doors
+	- based points can only be at bottom of target wall
+	- height of door adjusts equaly at both ends
+	- rotate/translate door points everytime the target wall is edited
+	 

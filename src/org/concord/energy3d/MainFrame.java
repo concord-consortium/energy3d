@@ -102,7 +102,7 @@ public class MainFrame extends JFrame {
 			lineButton.setText("Line");
 			lineButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.DRAW_LINES);
+					SceneManager.getInstance().setOperation(SceneManager.DRAW_WALL);
 				}
 			});
 		}
@@ -120,7 +120,7 @@ public class MainFrame extends JFrame {
 			rectangleButton.setText("Rectangle");
 			rectangleButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.DRAW_RECTANGLE);
+					SceneManager.getInstance().setOperation(SceneManager.DRAW_DOOR);
 				}
 			});
 		}

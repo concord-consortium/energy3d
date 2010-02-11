@@ -11,38 +11,34 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.extension.SwitchNode;
 import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart {
 	protected final Node root = new Node();
-	protected final Node pointsRoot = new Node();
+	protected final SwitchNode pointsRoot = new SwitchNode("Edit Points");
 	protected boolean drawCompleted = false;
 	protected final ArrayList<Vector3> points;
-	protected final int numOfDrawPoints, numofEditPoints;
+	protected final int numOfDrawPoints, numOfEditPoints;
 	protected int editPointIndex = -1;
 	protected PickResults pickResults;
 
-	public HousePart(int x, int y, int numOfDrawPoints, int numOfEditPoints) {
+	public HousePart(int numOfDrawPoints, int numOfEditPoints) {
 		this.numOfDrawPoints = numOfDrawPoints;
-		this.numofEditPoints = numOfEditPoints;
+		this.numOfEditPoints = numOfEditPoints;
 		points = new ArrayList<Vector3>(numOfDrawPoints);
 		// Set up a reusable pick results
 		pickResults = new PrimitivePickResults();
 		pickResults.setCheckDistance(true);
-		
-//		points.add(firstPoint);
-		final Vector3 origin = new Vector3();		
+
+		final Vector3 origin = new Vector3();
 		for (int i = 0; i < numOfEditPoints; i++) {
 			Sphere pointShape = new Sphere("Point", origin, 5, 5, 0.1);
-//			pointShape.setTranslation(firstPoint);
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
-			pointShape.updateModelBound();
-
+			pointShape.updateModelBound(); // important
 		}
 		root.attachChild(pointsRoot);
-//		root.setUserData(this);
-		addPoint(x, y);
 	}
 
 	public Node getRoot() {
@@ -57,71 +53,53 @@ public abstract class HousePart {
 		return drawCompleted;
 	}
 
+	public ArrayList<Vector3> getPoints() {
+		return points;
+	}
+
 	public void showPoints() {
-		root.attachChild(pointsRoot);
+		// root.attachChild(pointsRoot);
+		pointsRoot.setAllVisible();
 	}
 
 	public void hidePoints() {
-		root.detachChild(pointsRoot);
+		// root.detachChild(pointsRoot);
+		pointsRoot.setAllNonVisible();
 	}
 
-//	public void addPoint(Vector3 p) {
-//		if (drawCompleted)
-//			throw new RuntimeException("Drawing of this object is already completed");
-//		if (editPointIndex == -1) {
-//			draw(p, points.size());
-//			points.add(p);
-//		} else
-//			draw(p, editPointIndex);
-//
-//		if (points.size() >= numOfDrawPoints)
-//			drawCompleted = true;
-//	}
-
-	public void addPoint(int x, int y) {
-		if (drawCompleted)
-			throw new RuntimeException("Drawing of this object is already completed");
-			
-		Vector3 p = SceneManager.getInstance().findMousePoint(x, y);
-			draw();
-			points.add(p);
-
-		if (points.size() >= numOfDrawPoints)
-			drawCompleted = true;
-	}
-	
 	public void editPoint(int i) {
 		editPointIndex = i;
 		drawCompleted = false;
 	}
 
-	public void setPreviewPoint(int x, int y) {
-//		if (drawCompleted)
-//			throw new RuntimeException("Drawing of this object is already completed");
-//		if (editPointIndex == -1)
-////			draw(p, points.size());
-////			draw();
-//			points.set(points.size()-1, p);
-//		else
-////			draw(p, editPointIndex);
-//			points.set(editPointIndex, p);
-//			
-//		draw();
-	}
-	
-	protected Vector3 findUpperPoint(Vector3 base, int x, int y) {
+	protected Vector3 closestPoint(Vector3 p1, Vector3 p2, int x, int y) {
 		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
 		final Ray3 pickRay = Ray3.fetchTempInstance();
 		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
 		Vector2.releaseTempInstance(pos);
-		
-		Vector3 closest = closestPoint(base, base.add(new Vector3(0, 0, 1), null), pickRay.getOrigin(), pickRay.getOrigin().add(pickRay.getDirection(), null));
-		
+
+		Vector3 closest = closestPoint(p1, p2, pickRay.getOrigin(), pickRay.getOrigin().add(pickRay.getDirection(), null));
+
 		Ray3.releaseTempInstance(pickRay);
-		
+
 		return closest;
 
 	}
+	
+//	protected Vector3 findUpperPoint(Vector3 base, int x, int y) {
+//		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
+//		final Ray3 pickRay = Ray3.fetchTempInstance();
+//		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
+//		Vector2.releaseTempInstance(pos);
+//
+//		Vector3 closest = closestPoint(base, base.add(new Vector3(0, 0, 1), null), pickRay.getOrigin(), pickRay.getOrigin().add(pickRay.getDirection(), null));
+//
+//		Ray3.releaseTempInstance(pickRay);
+//
+//		return closest;
+//
+//	}
+	
 
 	protected double findHeight(Vector3 base, Vector3 upperPoint) {
 		Vector3 subtract = upperPoint.subtract(base, null);
@@ -130,42 +108,40 @@ public abstract class HousePart {
 		else
 			return subtract.length();
 	}
-	
-	protected Vector3 closestPoint(ReadOnlyVector3 p1,ReadOnlyVector3 p2,ReadOnlyVector3 p3,ReadOnlyVector3 p4) {
+
+	protected Vector3 closestPoint(ReadOnlyVector3 p1, ReadOnlyVector3 p2, ReadOnlyVector3 p3, ReadOnlyVector3 p4) {
 		final double EPS = 0.0001;
-		Vector3 p13,p43,p21;
-			   double d1343,d4321,d1321,d4343,d2121;
-			   double numer,denom;
+		Vector3 p13, p43, p21;
+		double d1343, d4321, d1321, d4343, d2121;
+		double numer, denom;
 
-			   p13 = p1.subtract(p3, null);
-			   p43 = p4.subtract(p3, null);
-			   if (Math.abs(p43.getX()) < EPS && Math.abs(p43.getY()) < EPS && Math.abs(p43.getZ())  < EPS)
-			      return null;
-			   p21 = p2.subtract(p1, null);
-			   if (Math.abs(p21.length())  < EPS)
-			      return null;
+		p13 = p1.subtract(p3, null);
+		p43 = p4.subtract(p3, null);
+		if (Math.abs(p43.getX()) < EPS && Math.abs(p43.getY()) < EPS && Math.abs(p43.getZ()) < EPS)
+			return null;
+		p21 = p2.subtract(p1, null);
+		if (Math.abs(p21.length()) < EPS)
+			return null;
 
-			   d1343 = p13.getX() * p43.getX() + p13.getY() * p43.getY() + p13.getZ() * p43.getZ();
-			   d4321 = p43.getX() * p21.getX() + p43.getY() * p21.getY() + p43.getZ() * p21.getZ();
-			   d1321 = p13.getX() * p21.getX() + p13.getY() * p21.getY() + p13.getZ() * p21.getZ();
-			   d4343 = p43.getX() * p43.getX() + p43.getY() * p43.getY() + p43.getZ() * p43.getZ();
-			   d2121 = p21.getX() * p21.getX() + p21.getY() * p21.getY() + p21.getZ() * p21.getZ();
+		d1343 = p13.getX() * p43.getX() + p13.getY() * p43.getY() + p13.getZ() * p43.getZ();
+		d4321 = p43.getX() * p21.getX() + p43.getY() * p21.getY() + p43.getZ() * p21.getZ();
+		d1321 = p13.getX() * p21.getX() + p13.getY() * p21.getY() + p13.getZ() * p21.getZ();
+		d4343 = p43.getX() * p43.getX() + p43.getY() * p43.getY() + p43.getZ() * p43.getZ();
+		d2121 = p21.getX() * p21.getX() + p21.getY() * p21.getY() + p21.getZ() * p21.getZ();
 
-			   denom = d2121 * d4343 - d4321 * d4321;
-			   if (Math.abs(denom) < EPS)
-			      return null;
-			   numer = d1343 * d4321 - d1321 * d4343;
+		denom = d2121 * d4343 - d4321 * d4321;
+		if (Math.abs(denom) < EPS)
+			return null;
+		numer = d1343 * d4321 - d1321 * d4343;
 
-			   double mua = numer / denom;
-			   double mub = (d1343 + d4321 * (mua)) / d4343;
+		double mua = numer / denom;
+		// double mub = (d1343 + d4321 * (mua)) / d4343;
 
-			   Vector3 pa = new Vector3(p1.getX() + mua * p21.getX(), p1.getY() + mua * p21.getY(), p1.getZ() + mua * p21.getZ());
-//			   Vector3 pb = new Vector3(p3.getX() + mub * p43.getX(), p3.getY() + mub * p43.getY(), p3.getZ() + mub * p43.getZ());
+		Vector3 pa = new Vector3(p1.getX() + mua * p21.getX(), p1.getY() + mua * p21.getY(), p1.getZ() + mua * p21.getZ());
+		// Vector3 pb = new Vector3(p3.getX() + mub * p43.getX(), p3.getY() + mub * p43.getY(), p3.getZ() + mub * p43.getZ());
 
-			   return pa;
-			}	
-	
-//	protected abstract void draw(Vector3 p, int i);
+		return pa;
+	}
 
 	protected void pick(int x, int y, Spatial target) {
 		// Put together a pick ray
@@ -180,11 +156,31 @@ public abstract class HousePart {
 		Ray3.releaseTempInstance(pickRay);
 	}
 
+	protected Vector3 snap(Vector3 p) {
+		Vector3 closest = null;
+		double closestDistance = Double.MAX_VALUE;
+		for (HousePart housePart : House.getInstance().getParts()) {
+			if (housePart instanceof Wall && housePart != this) {
+				Wall wall = (Wall) housePart;
+				for (Vector3 p2 : wall.getPoints()) {
+					double distance = p.distance(p2);
+					if (distance < closestDistance) {
+						closest = p2;
+						closestDistance = distance;
+					}
+				}
+			}
+		}
+		if (closestDistance < 0.5)
+			return closest;
+		else
+			return p;
+	}
+
+	public abstract void addPoint(int x, int y);
+
+	public abstract void setPreviewPoint(int x, int y);
 
 	protected abstract void draw();
-
-	public ArrayList<Vector3> getPoints() {
-		return points;
-	}
 
 }
