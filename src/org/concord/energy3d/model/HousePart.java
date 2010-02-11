@@ -2,11 +2,15 @@ package org.concord.energy3d.model;
 
 import java.util.ArrayList;
 
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart {
@@ -16,23 +20,28 @@ public abstract class HousePart {
 	protected final ArrayList<Vector3> points;
 	protected final int numOfDrawPoints, numofEditPoints;
 	protected int editPointIndex = -1;
+	protected PickResults pickResults;
 
 	public HousePart(int x, int y, int numOfDrawPoints, int numOfEditPoints) {
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numofEditPoints = numOfEditPoints;
 		points = new ArrayList<Vector3>(numOfDrawPoints);
+		// Set up a reusable pick results
+		pickResults = new PrimitivePickResults();
+		pickResults.setCheckDistance(true);
+		
 //		points.add(firstPoint);
 		final Vector3 origin = new Vector3();		
 		for (int i = 0; i < numOfEditPoints; i++) {
 			Sphere pointShape = new Sphere("Point", origin, 5, 5, 0.1);
 //			pointShape.setTranslation(firstPoint);
 			pointsRoot.attachChild(pointShape);
-			pointShape.setUserData(i);
+			pointShape.setUserData(new UserData(this, i));
 			pointShape.updateModelBound();
 
 		}
 		root.attachChild(pointsRoot);
-		root.setUserData(this);
+//		root.setUserData(this);
 		addPoint(x, y);
 	}
 
@@ -106,7 +115,7 @@ public abstract class HousePart {
 		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
 		Vector2.releaseTempInstance(pos);
 		
-		Vector3 closest = LineLineIntersect(base, base.add(new Vector3(0, 0, 1), null), pickRay.getOrigin(), pickRay.getOrigin().add(pickRay.getDirection(), null));
+		Vector3 closest = closestPoint(base, base.add(new Vector3(0, 0, 1), null), pickRay.getOrigin(), pickRay.getOrigin().add(pickRay.getDirection(), null));
 		
 		Ray3.releaseTempInstance(pickRay);
 		
@@ -122,9 +131,7 @@ public abstract class HousePart {
 			return subtract.length();
 	}
 	
-	Vector3 LineLineIntersect(
-			ReadOnlyVector3 p1,ReadOnlyVector3 p2,ReadOnlyVector3 p3,ReadOnlyVector3 p4)
-			{
+	protected Vector3 closestPoint(ReadOnlyVector3 p1,ReadOnlyVector3 p2,ReadOnlyVector3 p3,ReadOnlyVector3 p4) {
 		final double EPS = 0.0001;
 		Vector3 p13,p43,p21;
 			   double d1343,d4321,d1321,d4343,d2121;
@@ -159,6 +166,19 @@ public abstract class HousePart {
 			}	
 	
 //	protected abstract void draw(Vector3 p, int i);
+
+	protected void pick(int x, int y, Spatial target) {
+		// Put together a pick ray
+		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
+		final Ray3 pickRay = Ray3.fetchTempInstance();
+		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
+		Vector2.releaseTempInstance(pos);
+
+		// Do the pick
+		pickResults.clear();
+		PickingUtil.findPick(target, pickRay, pickResults);
+		Ray3.releaseTempInstance(pickRay);
+	}
 
 
 	protected abstract void draw();

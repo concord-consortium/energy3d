@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import javax.print.attribute.standard.Fidelity;
 
@@ -18,6 +19,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static double WALL_HEIGHT = 0.5f;
+	private ArrayList<HousePart> children = new ArrayList<HousePart>();
 	private Mesh mesh = new Mesh("Wall");
 	private FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(4);
 	private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);	
@@ -39,7 +41,13 @@ public class Wall extends HousePart {
 		ts.setTexture(TextureManager.load("brick_wall.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
 		mesh.setRenderState(ts);
 		
+		mesh.setUserData(new UserData(this));
+		
 		draw();
+	}
+	
+	public void addChild(HousePart housePart) {
+		children.add(housePart);
 	}
 
 //	@Override
@@ -217,6 +225,9 @@ public class Wall extends HousePart {
 		
 		
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+		
+		for (HousePart child : children)
+			child.draw();
 
 //		pointsRoot.getChild(0).setTranslation(points.get(0));
 	}

@@ -358,17 +358,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (drawn == null || drawn.isDrawCompleted()) {
 					if (operation == DRAW_LINES) {
 						
-						if (v != null) {
-							
+						if (v != null) {							
 							drawn = new Wall(x, y);
 							
 					// else if (operation == DRAW_RECTANGLE)
 					// drawn.editPoint(0);
 					// drawn = new DrawnRectangle();
-					housePartsNode.attachChild(drawn.getRoot());
-					House.getInstance().add(drawn);
+						}
+					} else if (operation == DRAW_RECTANGLE) {
+						if (v != null) {							
+							drawn = new Door(x, y);
 						}
 					}
+					housePartsNode.attachChild(drawn.getRoot());
+					House.getInstance().add(drawn);					
 				} else
 					drawn.addPoint(x, y);
 					
@@ -644,8 +647,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setOperation(int operation) {
 		this.operation = operation;
-		if (operation == DRAW_RECTANGLE)
-			drawn.editPoint(0);
 	}
 
 	public int getOperation() {
@@ -696,32 +697,56 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return null;
 	}
 
+//	private void selectHousePart(int x, int y, boolean edit) {
+//		Mesh selectedMesh = findMouseSelection(x, y);
+//		// if (selectedMesh == null)
+//		// return;
+//		Object data = null;
+//		if (selectedMesh != null) {
+//			data = selectedMesh.getUserData();
+//			if (data == null)
+//				data = selectedMesh.getParent().getUserData();
+//		}
+//		if (data == null || data instanceof HousePart) {
+//			HousePart housePart = (HousePart) data;
+//			if (lastHoveredObject != null && lastHoveredObject != housePart) {
+//				lastHoveredObject.hidePoints();
+//				lastHoveredObject = null;
+//			}
+//			if (housePart != null) {
+//				housePart.showPoints();
+//				lastHoveredObject = housePart;
+//			}
+//		} else if (edit && data instanceof Integer) {
+//			drawn = (HousePart) selectedMesh.getParent().getParent().getUserData();
+//			drawn.editPoint((Integer) data);
+//		}
+//	}
+
 	private void selectHousePart(int x, int y, boolean edit) {
 		Mesh selectedMesh = findMouseSelection(x, y);
-		// if (selectedMesh == null)
-		// return;
-		Object data = null;
-		if (selectedMesh != null) {
-			data = selectedMesh.getUserData();
-			if (data == null)
-				data = selectedMesh.getParent().getUserData();
-		}
-		if (data == null || data instanceof HousePart) {
-			HousePart housePart = (HousePart) data;
+		UserData data = null;
+		if (selectedMesh != null)
+			data = (UserData)selectedMesh.getUserData();
+		if (selectedMesh == null || data == null) {
+			if (lastHoveredObject != null) {
+				lastHoveredObject.hidePoints();
+				lastHoveredObject = null;
+			}			
+		} else if (data.getPointIndex() == -1) {
+			HousePart housePart = data.getHousePart();
 			if (lastHoveredObject != null && lastHoveredObject != housePart) {
 				lastHoveredObject.hidePoints();
 				lastHoveredObject = null;
 			}
-			if (housePart != null) {
 				housePart.showPoints();
 				lastHoveredObject = housePart;
-			}
-		} else if (edit && data instanceof Integer) {
-			drawn = (HousePart) selectedMesh.getParent().getParent().getUserData();
-			drawn.editPoint((Integer) data);
+		} else if (edit) {
+			drawn = data.getHousePart();
+			drawn.editPoint(data.getPointIndex());
 		}
 	}
-
+	
 //	public ArrayList<Wall> getWalls() {
 //		return walls;
 //	}
