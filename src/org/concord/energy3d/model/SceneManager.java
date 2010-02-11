@@ -29,8 +29,9 @@ import com.ardor3d.input.logical.KeyHeldCondition;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.KeyReleasedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
-import com.ardor3d.input.logical.MouseButtonClickedCondition;
 import com.ardor3d.input.logical.MouseButtonCondition;
+import com.ardor3d.input.logical.MouseButtonPressedCondition;
+import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.MouseMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
@@ -283,7 +284,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void registerInputTriggers() {
-		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.LEFT), new TriggerAction() {
+		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
 				if (operation == SELECT) {
@@ -307,6 +308,30 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 
+		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				MouseState mouseState = inputStates.getCurrent().getMouseState();
+				if (operation == SELECT) {
+					if (drawn == null || drawn.isDrawCompleted())
+						selectHousePart(mouseState.getX(), mouseState.getY(), true);
+					else
+						drawn.complete();
+					return;
+				}
+
+				drawn.addPoint(mouseState.getX(), mouseState.getY());
+
+				if (drawn.isDrawCompleted()) {
+					if (operation == DRAW_WALL) {
+						drawn = new Wall();
+					} else if (operation == DRAW_DOOR) {
+						drawn = new Door();
+					}
+					addHousePart(drawn);
+				}
+			}
+		}));
+		
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				MouseState mouseState = inputStates.getCurrent().getMouseState();

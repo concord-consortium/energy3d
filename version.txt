@@ -13,4 +13,6 @@ Version 0.1
 	- based points can only be at bottom of target wall
 	- height of door adjusts equaly at both ends
 	- rotate/translate door points everytime the target wall is edited
-	 
+- User can now drag mouse to draw walls and door.
+	- easier than multiple clicks
+	- viewpoint changes as mouse dragged 

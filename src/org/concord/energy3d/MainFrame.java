@@ -99,7 +99,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton getLineButton() {
 		if (lineButton == null) {
 			lineButton = new JToggleButton();
-			lineButton.setText("Line");
+			lineButton.setText("Wall");
 			lineButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.DRAW_WALL);
@@ -117,7 +117,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton getRectangleButton() {
 		if (rectangleButton == null) {
 			rectangleButton = new JToggleButton();
-			rectangleButton.setText("Rectangle");
+			rectangleButton.setText("Door");
 			rectangleButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.DRAW_DOOR);
