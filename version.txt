@@ -15,4 +15,7 @@ Version 0.1
 	- rotate/translate door points everytime the target wall is edited
 - User can now drag mouse to draw walls and door.
 	- easier than multiple clicks
-	- viewpoint changes as mouse dragged 
+	- viewpoint changes as mouse dragged
+- Roof
+	- select a wall, automatically detect all connected walls, extract upper point of connected walls, finally generate polygon of wall
+	  

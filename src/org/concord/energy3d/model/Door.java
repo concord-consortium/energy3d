@@ -10,6 +10,7 @@ import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -20,7 +21,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Door extends HousePart {
 	private double doorHeight = 0.5f;
 	private Wall wall;
-	private Mesh mesh = new Mesh("Wall");
+	private Mesh mesh = new Mesh("Door");
 	private FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(4);
 	private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
 
@@ -75,7 +76,7 @@ public class Door extends HousePart {
 				Vector3 wallFirstPoint = wall.getPoints().get(0);
 				Vector3 wallx = wall.getPoints().get(2).subtract(wallFirstPoint, null);
 				p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
-				p = snap(p);
+//				p = snap(p);
 				// convert from absolute coordinates to relative-to-wall coordinates
 				p = convertToWallRelative(p);
 
@@ -87,7 +88,8 @@ public class Door extends HousePart {
 			int lower = (editPointIndex == 1) ? 0 : 2;
 			Vector3 base = points.get(lower);
 			Vector3 absoluteBase = convertFromWallRelativeToAbsolute(base);
-			doorHeight = findHeight(absoluteBase, snap(closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y)));
+//			doorHeight = findHeight(absoluteBase, snap(closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y)));
+			doorHeight = findHeight(absoluteBase, closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y));
 			points.set(1, getUpperPoint(points.get(1)));
 			points.set(3, getUpperPoint(points.get(3)));
 		}
@@ -120,6 +122,7 @@ public class Door extends HousePart {
 	}
 
 	public Vector3 findMousePoint(int x, int y) {
+		pickResults.clear();
 		for (HousePart housePart : House.getInstance().getParts())
 			if (housePart instanceof Wall && housePart != this)
 				pick(x, y, ((Wall) housePart).getRoot());
@@ -131,9 +134,11 @@ public class Door extends HousePart {
 				UserData data = (UserData) pick.getTargetMesh().getUserData();
 				if (data == null || !(data.getHousePart() instanceof Wall))
 					throw new RuntimeException("Door can only be placed on a wall!");
-				if (wall != null && data.getHousePart() != wall)
+				if (wall != null && data.getHousePart() != wall && points.size() > 2)
 					throw new RuntimeException("Door points cannot be placed on multiple walls!");
-				if (wall == null) {
+				if (wall == null || wall != data.getHousePart()) {
+					if (wall != null)
+						wall.removeChild(this);
 					wall = (Wall) data.getHousePart();
 					wall.addChild(this);
 				}
@@ -166,6 +171,12 @@ public class Door extends HousePart {
 			textureBuffer.put(0).put(1);
 			textureBuffer.put(1).put(0);
 			textureBuffer.put(1).put(1);
+			
+//	        // Add a clip state to the scene.
+//	        final ClipState cs = new ClipState();
+//	        cs.setEnableClipPlane(0, true);
+//	        cs.setClipPlaneEquation(0, 1, 0, 0, 0);
+//	        wall.getRoot().setRenderState(cs);			
 
 			// force bound update
 			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);

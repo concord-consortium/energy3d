@@ -24,6 +24,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton selectButton = null;
 	private JToggleButton lineButton = null;
 	private JToggleButton rectangleButton = null;
+	private JToggleButton roofButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -63,11 +64,13 @@ public class MainFrame extends JFrame {
 			appToolbar.addSeparator();
 			appToolbar.add(getLineButton());
 			appToolbar.add(getRectangleButton());
+			appToolbar.add(getRoofButton());
 			
 			ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
 			bg.add(lineButton);
 			bg.add(rectangleButton);
+			bg.add(roofButton);
 		}
 		return appToolbar;
 	}
@@ -125,6 +128,24 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return rectangleButton;
+	}
+
+	/**
+	 * This method initializes roofButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JToggleButton getRoofButton() {
+		if (roofButton == null) {
+			roofButton = new JToggleButton();
+			roofButton.setText("Roof");
+			roofButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.DRAW_ROOF);
+				}
+			});
+		}
+		return roofButton;
 	}
 
 	/**

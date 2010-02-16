@@ -71,6 +71,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public static final int SELECT = 0;
 	public static final int DRAW_WALL = 1;
 	public static final int DRAW_DOOR = 2;
+	public static final int DRAW_ROOF = 3;
 
 	private static SceneManager instance = null;
 	private final Container panel;
@@ -579,6 +580,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Wall();
 		else if (operation == DRAW_DOOR)
 			drawn = new Door();
+		else if (operation == DRAW_ROOF)
+			drawn = new Roof();
 
 		if (drawn != null)
 			addHousePart(drawn);

@@ -151,7 +151,7 @@ public abstract class HousePart {
 		Vector2.releaseTempInstance(pos);
 
 		// Do the pick
-		pickResults.clear();
+//		pickResults.clear();
 		PickingUtil.findPick(target, pickRay, pickResults);
 		Ray3.releaseTempInstance(pickRay);
 	}

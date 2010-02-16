@@ -48,6 +48,10 @@ public class Wall extends HousePart {
 		children.add(housePart);
 	}
 
+	public boolean removeChild(HousePart housePart) {
+		return children.remove(housePart);
+	}
+
 	public void addPoint(int x, int y) {
 		if (drawCompleted)
 			throw new RuntimeException("Drawing of this object is already completed");
