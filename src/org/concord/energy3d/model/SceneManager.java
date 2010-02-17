@@ -595,6 +595,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private void removeHousePart(HousePart drawn) {
 		housePartsNode.detachChild(drawn.getRoot());
 		House.getInstance().remove(drawn);
+		if (drawn instanceof Wall)
+			((Wall)drawn).destroy();
 	}
 
 	public int getOperation() {

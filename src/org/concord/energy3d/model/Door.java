@@ -172,11 +172,11 @@ public class Door extends HousePart {
 			textureBuffer.put(1).put(0);
 			textureBuffer.put(1).put(1);
 			
-//	        // Add a clip state to the scene.
-//	        final ClipState cs = new ClipState();
-//	        cs.setEnableClipPlane(0, true);
-//	        cs.setClipPlaneEquation(0, 1, 0, 0, 0);
-//	        wall.getRoot().setRenderState(cs);			
+	        // Add a clip state to the scene.
+	        final ClipState cs = new ClipState();
+	        cs.setEnableClipPlane(0, true);
+	        cs.setClipPlaneEquation(0, 1, 0, 0, 0);
+	        wall.getRoot().setRenderState(cs);			
 
 			// force bound update
 			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);

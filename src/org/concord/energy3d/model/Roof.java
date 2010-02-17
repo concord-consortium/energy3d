@@ -4,10 +4,8 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.poly2tri.Poly2Tri;
-import org.poly2tri.triangulation.TriangulationPoint;
-import org.poly2tri.triangulation.delaunay.sweep.DTSweepConstraint;
-import org.poly2tri.triangulation.point.TPoint;
-import org.poly2tri.triangulation.sets.PointSet;
+import org.poly2tri.polygon.Polygon;
+import org.poly2tri.polygon.PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.CollisionTreeManager;
@@ -103,67 +101,107 @@ public class Roof extends HousePart {
 	protected void draw() {
 		if (wall == null)
 			return;
-		final double SNAP_DISTANCE = 0.1;
-		ArrayList<TriangulationPoint> wallUpperPoints = new ArrayList<TriangulationPoint>();
-		wallUpperPoints.add(new TPoint(0, 0));		
+//		final double SNAP_DISTANCE = 0.1;
+		ArrayList<PolygonPoint> wallUpperPoints = new ArrayList<PolygonPoint>();
+//		 wallUpperPoints.add(new PolygonPoint(0, 0));
 		avg = new Vector3();
-		wallUpperPoints.add(toPoint(wall.getPoints().get(1)));
-		wallUpperPoints.add(toPoint(wall.getPoints().get(3)));
-		ArrayList<Wall> unexploredWalls = new ArrayList<Wall>();
-		ArrayList<Wall> exploredWalls = new ArrayList<Wall>();
-		unexploredWalls.add(this.wall);
-		while (!unexploredWalls.isEmpty()) {
-			Wall currentWall = unexploredWalls.get(0);
-			for (HousePart part : House.getInstance().getParts()) {
-				if (part instanceof Wall && part != currentWall && !exploredWalls.contains(part)) {
-					Wall wall = (Wall) part;
-					boolean found = false;
-					for (Vector3 pThis : currentWall.getPoints())
-						if (found)
-							break;
-						else
-							for (Vector3 pOther : wall.getPoints())
-								if (pThis.distance(pOther) < SNAP_DISTANCE) {
-									wallUpperPoints.add(toPoint(wall.getPoints().get(1)));
-									wallUpperPoints.add(toPoint(wall.getPoints().get(3)));
-									found = true;
-									unexploredWalls.add(wall);
-									break;
-								}
-				}
-			}
-			unexploredWalls.remove(currentWall);
-			exploredWalls.add(currentWall);
-		}
-		
-		avg.multiplyLocal(1f/(wallUpperPoints.size()-1));
-		TPoint roofUpperPoint = new TPoint(avg.getX(), avg.getY(), avg.getZ()+roofHeight);
-		wallUpperPoints.set(0, roofUpperPoint);
-		
-		for (TriangulationPoint p : wallUpperPoints) {
-			if (p != roofUpperPoint) {
-				roofUpperPoint.addEdge(new DTSweepConstraint(roofUpperPoint, p));
-			}
+//		addPointToPolygon(wallUpperPoints, wall.getPoints().get(1));
+//		addPointToPolygon(wallUpperPoints, wall.getPoints().get(3));
+//		ArrayList<Wall> unexploredWalls = new ArrayList<Wall>();
+//		ArrayList<Wall> exploredWalls = new ArrayList<Wall>();
+//		unexploredWalls.add(this.wall);
+//		while (!unexploredWalls.isEmpty()) {
+//			Wall currentWall = unexploredWalls.get(0);
+//			for (HousePart part : House.getInstance().getParts()) {
+//				if (part instanceof Wall && part != currentWall && !exploredWalls.contains(part)) {
+//					Wall wall = (Wall) part;
+//					boolean found = false;
+//					for (Vector3 pThis : currentWall.getPoints())
+//						if (found)
+//							break;
+//						else
+//							for (Vector3 pOther : wall.getPoints())
+//								if (pThis.distance(pOther) < SNAP_DISTANCE) {
+//									addPointToPolygon(wallUpperPoints, wall.getPoints().get(1));
+//									addPointToPolygon(wallUpperPoints, wall.getPoints().get(3));
+//									found = true;
+//									unexploredWalls.add(wall);
+//									break;
+//								}
+//				}
+//			}
+//			unexploredWalls.remove(currentWall);
+//			exploredWalls.add(currentWall);
+//		}
+
+		exploreWallNeighbors(wallUpperPoints, wall);
+		avg.multiplyLocal(1f / (wallUpperPoints.size() - 1));
+		PolygonPoint roofUpperPoint = new PolygonPoint(avg.getX(), avg.getY(), avg.getZ() + roofHeight);
+//		 wallUpperPoints.set(0, roofUpperPoint);
+
+		System.out.println("Polygon Points:");
+		for (PolygonPoint p : wallUpperPoints) {
+			// if (p != roofUpperPoint) {
+			// roofUpperPoint.addEdge(new DTSweepConstraint(roofUpperPoint, p));
+			// }
+			System.out.println(p.getXf() + "\t" + p.getYf() + "\t" + p.getZf());
 		}
 
-//		if (vertexBuffer.capacity() != wallUpperPoints.size() * 3)
-//			vertexBuffer = BufferUtils.createVector3Buffer(wallUpperPoints.size() * 3);
+		// if (vertexBuffer.capacity() != wallUpperPoints.size() * 3)
+		// vertexBuffer = BufferUtils.createVector3Buffer(wallUpperPoints.size() * 3);
 
 		// vertexBuffer.position(0);
 		// for (Vector3 p : wallUpperPoints)
 		// vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
-		PointSet ps = new PointSet(wallUpperPoints);
+		Polygon ps = new Polygon(wallUpperPoints);
+		ps.addSteinerPoint(roofUpperPoint);
 		Poly2Tri.triangulate(ps);
 		ArdorMeshMapper.updateTriangleMesh(mesh, ps);
 
 		// force bound update
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
+	
+	private void exploreWallNeighbors(ArrayList<PolygonPoint> poly, Wall startWall) {
+		Wall currentWall = startWall;
+		Wall prevWall = null;
+		while (currentWall != null) {
+			Snap next = currentWall.next(prevWall);
+			prevWall = currentWall;
+			if (next == null)
+				break;
+			currentWall = (Wall)next.getHousePart();
+//			if (currentWall == startWall)
+//				break;
+		}
+		
+		prevWall = null;
+		while (currentWall != null) {
+			Snap next = currentWall.next(prevWall);
+			int pointIndex = 0;
+			if (next != null)
+				pointIndex = next.getPointIndex();
+			pointIndex = pointIndex*2+1;
+			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex == 1 ? 3 : 1));
+			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex));
+			prevWall = currentWall;
+			if (next == null)
+				break;
+			currentWall = (Wall)next.getHousePart();
+//			if (currentWall == startWall)
+//				break;
+		}
+		
+//		poly.add(poly.get(1));
+	}
 
-	private TPoint toPoint(Vector3 p) {
-		avg.addLocal(p);
-		return new TPoint(p.getX(), p.getY(), p.getZ());
+	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
+		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+		if (!poly.contains(polygonPoint)) {
+			avg.addLocal(p);
+			poly.add(polygonPoint);
+		}
 	}
 
 }

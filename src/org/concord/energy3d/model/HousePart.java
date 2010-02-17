@@ -156,25 +156,34 @@ public abstract class HousePart {
 		Ray3.releaseTempInstance(pickRay);
 	}
 
-	protected Vector3 snap(Vector3 p) {
-		Vector3 closest = null;
+	protected Snap snap(Vector3 p) {
+		Vector3 closestPoint = null;
 		double closestDistance = Double.MAX_VALUE;
+		Wall closestWall = null;
+		int closestPointIndex = -1;
 		for (HousePart housePart : House.getInstance().getParts()) {
 			if (housePart instanceof Wall && housePart != this) {
 				Wall wall = (Wall) housePart;
+				int i = 0;
 				for (Vector3 p2 : wall.getPoints()) {
 					double distance = p.distance(p2);
 					if (distance < closestDistance) {
-						closest = p2;
+						closestPoint = p2;
 						closestDistance = distance;
+						closestWall = wall;
+						closestPointIndex = i;
 					}
+					i++;
 				}
 			}
 		}
-		if (closestDistance < 0.5)
-			return closest;
-		else
-			return p;
+		if (closestDistance < 0.5) {
+//			return closest;
+			p.set(closestPoint);
+			return new Snap(closestWall, closestPointIndex);
+		} else {
+			return null;
+		}
 	}
 
 	public abstract void addPoint(int x, int y);

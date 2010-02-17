@@ -1,21 +1,25 @@
 Version 0.1
+
 - draw walls
 - draw edit points
 - edit base points of a wall by dragging its edit points
 - edit height of a wall by dragging its upper edit points.
 	- this was done using "closest points" algorithm of two lines in 3D to computer closest point to mouse cursor that resides on the vertical line based at current edit point.
-- snap walls to eachother
+- snap walls to each other
 	- query a list of all drawn walls and find closest snap point within 0.5 radius (to be customized).
 	- for base of wall, snapped point will be used as new coordinates.
 	- for height of wall, snapped point will be used as closest coordinate and before computing wall heigh
 - allow snap for when creating walls as well as when editing walls
 - draw doors
 	- based points can only be at bottom of target wall
-	- height of door adjusts equaly at both ends
-	- rotate/translate door points everytime the target wall is edited
+	- height of door adjusts equally at both ends
+	- rotate/translate door points every time the target wall is edited
 - User can now drag mouse to draw walls and door.
 	- easier than multiple clicks
 	- viewpoint changes as mouse dragged
 - Roof
 	- select a wall, automatically detect all connected walls, extract upper point of connected walls, finally generate polygon of wall
-	  
+	- when snapping walls, record and store the neighboring walls. 
+	- Refer to neighboring data when making roof to properly generate polygons.	  
+	- Can now draw roof of non-convex houses.
+	

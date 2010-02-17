@@ -21,6 +21,7 @@ public class Wall extends HousePart {
 	private Mesh mesh = new Mesh("Wall");
 	private FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(4);
 	private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
+	private Snap[] neighbor = new Snap[2];
 
 	public Wall() {
 		super(2, 4);
@@ -63,11 +64,11 @@ public class Wall extends HousePart {
 			setPreviewPoint(x, y);
 		}
 	}
-	
+
 	private void allocateNewPoint() {
 		Vector3 p = new Vector3();
 		points.add(p);
-		points.add(p);		
+		points.add(p);
 	}
 
 	private Vector3 getUpperPoint(Vector3 p) {
@@ -78,15 +79,20 @@ public class Wall extends HousePart {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			Vector3 p = SceneManager.getInstance().findMousePoint(x, y);
 			if (p != null) {
-				p = snap(p);
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
+				Snap snap = snap(p);
+				setNeighbor(index == 0 ? 0 : 1, snap);
+				if (snap != null)
+					((Wall)snap.getHousePart()).setNeighbor(snap.getPointIndex(), new Snap(this, index));
 				points.set(index, p);
 				points.set(index + 1, getUpperPoint(p));
 			}
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
 			int lower = (editPointIndex == 1) ? 0 : 2;
 			Vector3 base = points.get(lower);
-			wallHeight = findHeight(base, snap(closestPoint(base, base.add(0, 0, 1, null), x, y)));
+			Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
+//			neighbor[1] = snap(closestPoint);
+			wallHeight = findHeight(base, closestPoint);
 			points.set(1, getUpperPoint(points.get(1)));
 			points.set(3, getUpperPoint(points.get(3)));
 
@@ -121,11 +127,38 @@ public class Wall extends HousePart {
 
 			// force bound update
 			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
-			
+
 			for (HousePart child : children)
 				child.draw();
 		}
-		
+
+	}
+
+	public Snap next(Wall previous) {
+		for (int i = 0; i < neighbor.length; i++)
+			if (neighbor[i] != null && neighbor[i].getHousePart() != previous)
+				return new Snap(neighbor[i].getHousePart(), i);
+		return null;
+	}
+
+	private void setNeighbor(int pointIndex, Snap snap) {
+		int i = pointIndex < 2 ? 0 : 1;
+//		if (neighbor[i] != null && !neighbor[i].equals(snap))
+//			((Wall)neighbor[i].getHousePart()).removeNeighbor(this);
+		if (neighbor[i] == null)
+			neighbor[i] = snap;
+	}
+	
+	private void removeNeighbor(Wall wall) {
+		for (int i=0; i<neighbor.length; i++)
+			if (neighbor[i] != null && neighbor[i].getHousePart() == wall)
+				neighbor[i] = null;
+	}
+	
+	public void destroy() {
+		for (int i=0; i<neighbor.length; i++)
+			if (neighbor[i] != null)
+				((Wall)neighbor[i].getHousePart()).removeNeighbor(this);
 	}
 
 }
