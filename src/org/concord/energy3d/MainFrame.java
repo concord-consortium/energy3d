@@ -25,6 +25,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton lineButton = null;
 	private JToggleButton rectangleButton = null;
 	private JToggleButton roofButton = null;
+	private JToggleButton windowButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -64,12 +65,14 @@ public class MainFrame extends JFrame {
 			appToolbar.addSeparator();
 			appToolbar.add(getLineButton());
 			appToolbar.add(getRectangleButton());
+			appToolbar.add(getWindowButton());
 			appToolbar.add(getRoofButton());
 			
 			ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
 			bg.add(lineButton);
 			bg.add(rectangleButton);
+			bg.add(windowButton);
 			bg.add(roofButton);
 		}
 		return appToolbar;
@@ -149,6 +152,24 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
+	 * This method initializes windowButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getWindowButton() {
+		if (windowButton == null) {
+			windowButton = new JToggleButton();
+			windowButton.setText("Window");
+			windowButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.DRAW_WINDOW);
+				}
+			});
+		}
+		return windowButton;
+	}
+
+	/**
 		 * @param args
 		 */
 	public static void main(String[] args) {
@@ -192,7 +213,7 @@ public class MainFrame extends JFrame {
 		if (jContentPane == null) {
 			jContentPane = new JPanel();
 			jContentPane.setLayout(new BorderLayout());
-			jContentPane.setVisible(false);
+//			jContentPane.setVisible(false);
 			jContentPane.add(getAppToolbar(), BorderLayout.NORTH);
 		}
 		return jContentPane;

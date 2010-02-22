@@ -41,6 +41,7 @@ import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
@@ -51,6 +52,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -72,6 +74,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public static final int DRAW_WALL = 1;
 	public static final int DRAW_DOOR = 2;
 	public static final int DRAW_ROOF = 3;
+	public static final int DRAW_WINDOW = 4;
 
 	private static SceneManager instance = null;
 	private final Container panel;
@@ -163,11 +166,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
 		root.setRenderState(buf);
 
-		/** Attach the light to a lightState and the lightState to rootNode. */
-		// final LightState lightState = new LightState();
-		// lightState.setEnabled(true);
-		// lightState.attach(light);
-		// root.setRenderState(lightState);
+        /** Set up a basic, default light. */
+        final PointLight light = new PointLight();
+        light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
+        light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
+        light.setLocation(new Vector3(100, 100, 100));
+        light.setEnabled(true);
+        
+//		/** Attach the light to a lightState and the lightState to rootNode. */
+//		final LightState lightState = new LightState();
+//		lightState.setEnabled(true);
+//		lightState.attach(light);
+//		root.setRenderState(lightState);
 
 		// Set up a reusable pick results
 		pickResults = new PrimitivePickResults();
@@ -311,6 +321,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (operation == DRAW_ROOF)
+					return;
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
 				if (operation == SELECT) {
 					if (drawn == null || drawn.isDrawCompleted())
@@ -580,6 +592,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Wall();
 		else if (operation == DRAW_DOOR)
 			drawn = new Door();
+		else if (operation == DRAW_WINDOW)
+			drawn = new Window();
 		else if (operation == DRAW_ROOF)
 			drawn = new Roof();
 

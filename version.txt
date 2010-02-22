@@ -10,16 +10,20 @@ Version 0.1
 	- for base of wall, snapped point will be used as new coordinates.
 	- for height of wall, snapped point will be used as closest coordinate and before computing wall heigh
 - allow snap for when creating walls as well as when editing walls
-- draw doors
+- draw Doors
 	- based points can only be at bottom of target wall
 	- height of door adjusts equally at both ends
 	- rotate/translate door points every time the target wall is edited
 - User can now drag mouse to draw walls and door.
 	- easier than multiple clicks
 	- viewpoint changes as mouse dragged
-- Roof
+- draw Roof
 	- select a wall, automatically detect all connected walls, extract upper point of connected walls, finally generate polygon of wall
 	- when snapping walls, record and store the neighboring walls. 
 	- Refer to neighboring data when making roof to properly generate polygons.	  
 	- Can now draw roof of non-convex houses.
-	
+- draw Window
+	- can be added anywhere on wall
+	- *TODO: do not allow window height to exceed height of wall
+- draw both doors and windows with an offset so that they are always rendered in front of wall
+ 

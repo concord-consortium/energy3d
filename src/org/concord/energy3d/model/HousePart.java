@@ -104,7 +104,7 @@ public abstract class HousePart {
 	protected double findHeight(Vector3 base, Vector3 upperPoint) {
 		Vector3 subtract = upperPoint.subtract(base, null);
 		if (subtract.dot(0, 0, -1) >= 0)
-			return 0.1;
+			return 0;
 		else
 			return subtract.length();
 	}
@@ -156,7 +156,7 @@ public abstract class HousePart {
 		Ray3.releaseTempInstance(pickRay);
 	}
 
-	protected Snap snap(Vector3 p) {
+	protected Snap snap(Vector3 p, int index) {
 		Vector3 closestPoint = null;
 		double closestDistance = Double.MAX_VALUE;
 		Wall closestWall = null;
@@ -180,7 +180,7 @@ public abstract class HousePart {
 		if (closestDistance < 0.5) {
 //			return closest;
 			p.set(closestPoint);
-			return new Snap(closestWall, closestPointIndex);
+			return new Snap(closestWall, closestPointIndex, index);
 		} else {
 			return null;
 		}

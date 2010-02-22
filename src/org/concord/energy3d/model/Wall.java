@@ -2,6 +2,13 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.poly2tri.Poly2Tri;
+import org.poly2tri.polygon.Polygon;
+import org.poly2tri.polygon.PolygonPoint;
+import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
+import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
@@ -27,6 +34,7 @@ public class Wall extends HousePart {
 		super(2, 4);
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+//		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
 		mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
@@ -80,10 +88,10 @@ public class Wall extends HousePart {
 			Vector3 p = SceneManager.getInstance().findMousePoint(x, y);
 			if (p != null) {
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
-				Snap snap = snap(p);
+				Snap snap = snap(p, index);
 				setNeighbor(index == 0 ? 0 : 1, snap);
 				if (snap != null)
-					((Wall)snap.getHousePart()).setNeighbor(snap.getPointIndex(), new Snap(this, index));
+					((Wall)snap.getHousePart()).setNeighbor(snap.getOtherPointIndex(), new Snap(this, index, snap.getOtherPointIndex()));
 				points.set(index, p);
 				points.set(index + 1, getUpperPoint(p));
 			}
@@ -105,10 +113,12 @@ public class Wall extends HousePart {
 		boolean drawable = points.size() >= 4;
 
 		vertexBuffer.position(0);
+		
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = points.get(i);
 			if (drawable)
 				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+//				polyPoints.add(new ArdorVector3PolygonPoint(p));
 
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
@@ -124,6 +134,33 @@ public class Wall extends HousePart {
 			textureBuffer.put(0).put(TEXTURE_SCALE_Y);
 			textureBuffer.put(TEXTURE_SCALE_X).put(0);
 			textureBuffer.put(TEXTURE_SCALE_X).put(TEXTURE_SCALE_Y);
+						
+//			ArrayList<PolygonPoint> polyPoints = new ArrayList<PolygonPoint>();
+//			polyPoints.add(new PolygonPoint(0,0,0));
+////			polyPoints.add(new PolygonPoint(1,0,0));
+////			polyPoints.add(new PolygonPoint(1,1,0));
+////			polyPoints.add(new PolygonPoint(0,1,0));
+//			Vector3 p;
+//			p = points.get(0);
+//			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+//			p = points.get(1);
+//			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+//			p = points.get(2);
+//			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+//			p = points.get(3);
+//			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+//			Polygon ps = new Polygon(polyPoints );
+//			try {
+//				Poly2Tri.triangulate(ps);
+//				ArdorMeshMapper.updateTriangleMesh(mesh, ps);
+//				ArdorMeshMapper.updateVertexNormals(mesh, ps.getTriangles());
+//				ArdorMeshMapper.updateFaceNormals(mesh, ps.getTriangles());
+//				ArdorMeshMapper.updateTextureCoordinates(mesh, 1, 0);			
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+////				mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+//			}
 
 			// force bound update
 			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
@@ -135,9 +172,13 @@ public class Wall extends HousePart {
 	}
 
 	public Snap next(Wall previous) {
-		for (int i = 0; i < neighbor.length; i++)
-			if (neighbor[i] != null && neighbor[i].getHousePart() != previous)
-				return new Snap(neighbor[i].getHousePart(), i);
+//		for (int i = 0; i < neighbor.length; i++)
+//			if (neighbor[i] != null && neighbor[i].getHousePart() != previous)
+//				return new Snap(neighbor[i].getHousePart(), i);
+		for (Snap s : neighbor)
+			if (s != null && s.getHousePart() != previous)
+				return s;
+
 		return null;
 	}
 

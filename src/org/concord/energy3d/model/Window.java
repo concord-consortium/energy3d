@@ -20,14 +20,14 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Door extends HousePart {
+public class Window extends HousePart {
 	private double doorHeight = 0.5f;
 	private Wall wall;
 	private Mesh mesh = new Mesh("Door");
 	private FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(4);
 	private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
 
-	public Door() {
+	public Window() {
 		super(3, 4);
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
@@ -41,15 +41,16 @@ public class Door extends HousePart {
 
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("door.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
+		ts.setTexture(TextureManager.load("window1.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
 		mesh.setRenderState(ts);
-
+		
 		OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
 		offsetState.setFactor(-1);
 		mesh.setRenderState(offsetState);
 		
 		
+
 		mesh.setUserData(new UserData(this));
 
 		allocateNewPoint();
@@ -81,11 +82,16 @@ public class Door extends HousePart {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			Vector3 p = findMousePoint(x, y);
 			if (p != null) {
-				Vector3 wallFirstPoint = wall.getPoints().get(0);
-				Vector3 wallx = wall.getPoints().get(2).subtract(wallFirstPoint, null);
-				p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
-				// p = snap(p);
-				// convert from absolute coordinates to relative-to-wall coordinates
+				if (points.size() <=  2) {
+					doorHeight = points.get(0).getZ() + 0.25; 
+				} else {
+					Vector3 wallFirstPoint = wall.getPoints().get(0);
+					Vector3 wallx = wall.getPoints().get(2).subtract(wallFirstPoint, null);
+					p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
+					p.setZ(points.get(0).getZ());
+					// p = snap(p);
+					// convert from absolute coordinates to relative-to-wall coordinates
+				}
 				p = convertToWallRelative(p);
 
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
@@ -97,7 +103,7 @@ public class Door extends HousePart {
 			Vector3 base = points.get(lower);
 			Vector3 absoluteBase = convertFromWallRelativeToAbsolute(base);
 			// doorHeight = findHeight(absoluteBase, snap(closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y)));
-			doorHeight = findHeight(absoluteBase, closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y));
+			doorHeight = findHeight(absoluteBase, closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y)) + absoluteBase.getZ();
 			points.set(1, getUpperPoint(points.get(1)));
 			points.set(3, getUpperPoint(points.get(3)));
 		}
@@ -106,7 +112,7 @@ public class Door extends HousePart {
 	}
 
 	private Vector3 convertToWallRelative(Vector3 p) {
-		System.out.println("p = " + p);
+		// System.out.println("p = " + p);
 		ArrayList<Vector3> wallPoints = wall.getPoints();
 		Vector3 origin = wallPoints.get(0);
 		p = p.subtract(origin, null);
@@ -114,7 +120,7 @@ public class Door extends HousePart {
 		Vector3 wally = wallPoints.get(1).subtract(origin, null).normalize(null);
 		// Vector3 pointOnWall = new Vector3(wallx.dot(p.normalize(null))*p.length(), 0, wally.dot(p.normalize(null))*p.length());
 		Vector3 pointOnWall = new Vector3(wallx.dot(p), 0, wally.dot(p));
-		System.out.println("to Wall = " + pointOnWall);
+		// System.out.println("to Wall = " + pointOnWall);
 		return pointOnWall;
 	}
 
@@ -181,7 +187,7 @@ public class Door extends HousePart {
 			textureBuffer.put(1).put(1);
 
 			// Add a clip state to the scene.
-//			clip();
+			// clip();
 
 			// force bound update
 			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
@@ -192,15 +198,15 @@ public class Door extends HousePart {
 	private void clip() {
 		final ClipState cs = new ClipState();
 		int i = 0;
-		
+
 		Vector3 p1 = convertFromWallRelativeToAbsolute(points.get(0));
 		Vector3 p2 = convertFromWallRelativeToAbsolute(points.get(1));
 		Vector3 p3 = convertFromWallRelativeToAbsolute(points.get(2));
 		Vector3 p4 = convertFromWallRelativeToAbsolute(points.get(3));
 
 		addClipPlate(cs, 1, p1, p2, p3, true);
-//		addClipPlate(cs, 2, p3, p4, p1, true);
-//		addClipPlate(cs, i, p1, p2, p3);
+		// addClipPlate(cs, 2, p3, p4, p1, true);
+		// addClipPlate(cs, i, p1, p2, p3);
 		wall.getRoot().setRenderState(cs);
 		wall.getRoot().updateGeometricState(0);
 	}
@@ -210,19 +216,18 @@ public class Door extends HousePart {
 		Vector3 normal = p1p3.cross(p2.subtract(p1, null), null);
 		normal.normalizeLocal();
 		p3 = p1.add(normal, null);
-//		normal = p1p2;
+		// normal = p1p2;
 		p1p3.normalizeLocal();
 		if (neg)
-		p1p3.negateLocal();
-		
+			p1p3.negateLocal();
 
 		double D = p1.getX() * (p2.getY() * p3.getZ() - p3.getY() * p2.getZ()) + p2.getX() * (p3.getY() * p1.getZ() - p1.getY() * p3.getZ()) + p3.getX() * (p1.getY() * p2.getZ() - p2.getY() * p1.getZ());
 		System.out.println(normal);
 		System.out.println(D);
 		cs.setEnableClipPlane(i, true);
-		int fac = neg?-1:1;
-		cs.setClipPlaneEquation(i, p1p3.getX(), p1p3.getY(), p1p3.getZ(), (neg?1:-1)*2*D);
-//		cs.setClipPlaneEquation(0, -1, 0, 0, 1);
+		int fac = neg ? -1 : 1;
+		cs.setClipPlaneEquation(i, p1p3.getX(), p1p3.getY(), p1p3.getZ(), (neg ? 1 : -1) * 2 * D);
+		// cs.setClipPlaneEquation(0, -1, 0, 0, 1);
 	}
 
 }
