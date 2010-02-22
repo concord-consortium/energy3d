@@ -2,13 +2,6 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.List;
-
-import org.poly2tri.Poly2Tri;
-import org.poly2tri.polygon.Polygon;
-import org.poly2tri.polygon.PolygonPoint;
-import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
-import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;

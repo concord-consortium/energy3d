@@ -10,7 +10,6 @@ import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.TextureState;
@@ -193,41 +192,6 @@ public class Window extends HousePart {
 			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		}
 
-	}
-
-	private void clip() {
-		final ClipState cs = new ClipState();
-		int i = 0;
-
-		Vector3 p1 = convertFromWallRelativeToAbsolute(points.get(0));
-		Vector3 p2 = convertFromWallRelativeToAbsolute(points.get(1));
-		Vector3 p3 = convertFromWallRelativeToAbsolute(points.get(2));
-		Vector3 p4 = convertFromWallRelativeToAbsolute(points.get(3));
-
-		addClipPlate(cs, 1, p1, p2, p3, true);
-		// addClipPlate(cs, 2, p3, p4, p1, true);
-		// addClipPlate(cs, i, p1, p2, p3);
-		wall.getRoot().setRenderState(cs);
-		wall.getRoot().updateGeometricState(0);
-	}
-
-	private void addClipPlate(final ClipState cs, int i, Vector3 p1, Vector3 p2, Vector3 p3, boolean neg) {
-		Vector3 p1p3 = p3.subtract(p1, null);
-		Vector3 normal = p1p3.cross(p2.subtract(p1, null), null);
-		normal.normalizeLocal();
-		p3 = p1.add(normal, null);
-		// normal = p1p2;
-		p1p3.normalizeLocal();
-		if (neg)
-			p1p3.negateLocal();
-
-		double D = p1.getX() * (p2.getY() * p3.getZ() - p3.getY() * p2.getZ()) + p2.getX() * (p3.getY() * p1.getZ() - p1.getY() * p3.getZ()) + p3.getX() * (p1.getY() * p2.getZ() - p2.getY() * p1.getZ());
-		System.out.println(normal);
-		System.out.println(D);
-		cs.setEnableClipPlane(i, true);
-		int fac = neg ? -1 : 1;
-		cs.setClipPlaneEquation(i, p1p3.getX(), p1p3.getY(), p1p3.getZ(), (neg ? 1 : -1) * 2 * D);
-		// cs.setClipPlaneEquation(0, -1, 0, 0, 1);
 	}
 
 }

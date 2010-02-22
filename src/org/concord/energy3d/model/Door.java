@@ -106,7 +106,7 @@ public class Door extends HousePart {
 	}
 
 	private Vector3 convertToWallRelative(Vector3 p) {
-		System.out.println("p = " + p);
+//		System.out.println("p = " + p);
 		ArrayList<Vector3> wallPoints = wall.getPoints();
 		Vector3 origin = wallPoints.get(0);
 		p = p.subtract(origin, null);
@@ -114,7 +114,7 @@ public class Door extends HousePart {
 		Vector3 wally = wallPoints.get(1).subtract(origin, null).normalize(null);
 		// Vector3 pointOnWall = new Vector3(wallx.dot(p.normalize(null))*p.length(), 0, wally.dot(p.normalize(null))*p.length());
 		Vector3 pointOnWall = new Vector3(wallx.dot(p), 0, wally.dot(p));
-		System.out.println("to Wall = " + pointOnWall);
+//		System.out.println("to Wall = " + pointOnWall);
 		return pointOnWall;
 	}
 
