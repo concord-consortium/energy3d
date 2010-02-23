@@ -106,8 +106,10 @@ public class Window extends HousePart {
 			points.set(1, getUpperPoint(points.get(1)));
 			points.set(3, getUpperPoint(points.get(3)));
 		}
-		if (wall != null)
+		if (wall != null) {
 			draw();
+			wall.draw();
+		}
 	}
 
 	private Vector3 convertToWallRelative(Vector3 p) {
@@ -123,7 +125,7 @@ public class Window extends HousePart {
 		return pointOnWall;
 	}
 
-	private Vector3 convertFromWallRelativeToAbsolute(Vector3 p) {
+	public Vector3 convertFromWallRelativeToAbsolute(Vector3 p) {
 		ArrayList<Vector3> wallPoints = wall.getPoints();
 		Vector3 origin = wallPoints.get(0);
 		// p = p.subtract(origin, null);
@@ -168,13 +170,13 @@ public class Window extends HousePart {
 		vertexBuffer.position(0);
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = convertFromWallRelativeToAbsolute(points.get(i));
-			if (drawable)
-				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+//			if (drawable)
+//				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
 			pointsRoot.setVisible(i, true);
-			pointsRoot.updateGeometricState(0, true);
+			pointsRoot.updateGeometricState(0);
 		}
 
 		if (drawable) {

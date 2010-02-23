@@ -12,6 +12,8 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
+import com.ardor3d.image.Texture;
+import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.InputState;
@@ -44,6 +46,7 @@ import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -52,6 +55,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -59,8 +63,11 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
+import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.scenegraph.shape.Sphere.TextureMode;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.ReadOnlyTimer;
+import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -184,6 +191,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		root.attachChild(createAxis());
 		root.attachChild(createFloor());
+		root.attachChild(createSky());
 
 		registerInputTriggers();
 
@@ -254,6 +262,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return floor;
 	}
 
+	private Mesh createSky() {
+//		Dome sky = new Dome("Sky", 100, 100, 100);
+		Sphere sky = new Sphere("Sky", 100, 100, 100);
+		sky.setTextureMode(TextureMode.Polar);
+		sky.setRotation(new Quaternion(1, 0, 0, 1));
+		sky.setTranslation(0, 0, 10);
+		// Add a texture to the box.
+		final TextureState ts = new TextureState();
+		ts.setTexture(TextureManager.load("sky2.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));		
+		sky.setRenderState(ts);
+
+		return sky;
+	}
+	
 	private Node createAxis() {
 		final int axisLen = 50;
 		Node axis = new Node("Axis");

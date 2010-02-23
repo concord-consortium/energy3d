@@ -3,6 +3,14 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import org.poly2tri.Poly2Tri;
+import org.poly2tri.polygon.Polygon;
+import org.poly2tri.polygon.PolygonPoint;
+import org.poly2tri.position.AnyToXYTransform;
+import org.poly2tri.position.XYToAnyTransform;
+import org.poly2tri.triangulation.TriangulationPoint;
+import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
+
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -19,6 +27,7 @@ public class Wall extends HousePart {
 	private double wallHeight = 0.8f;
 	private ArrayList<HousePart> children = new ArrayList<HousePart>();
 	private Mesh mesh = new Mesh("Wall");
+	private Mesh backMesh = new Mesh("Wall (Back)");
 	private FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(4);
 	private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
 	private Snap[] neighbor = new Snap[2];
@@ -31,6 +40,11 @@ public class Wall extends HousePart {
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
 		mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
+//		root.attachChild(backMesh);
+//		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+//		backMesh.getMeshData().setVertexBuffer(vertexBuffer);
+//		backMesh.getMeshData().setTextureBuffer(textureBuffer, 0);
+		
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
@@ -40,6 +54,7 @@ public class Wall extends HousePart {
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("brick_wall.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
 		mesh.setRenderState(ts);
+		backMesh.setRenderState(ts);
 
 		mesh.setUserData(new UserData(this));
 
@@ -109,8 +124,8 @@ public class Wall extends HousePart {
 		
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = points.get(i);
-			if (drawable)
-				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+//			if (drawable)
+//				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 //				polyPoints.add(new ArdorVector3PolygonPoint(p));
 
 			// update location of point spheres
@@ -127,34 +142,96 @@ public class Wall extends HousePart {
 			textureBuffer.put(0).put(TEXTURE_SCALE_Y);
 			textureBuffer.put(TEXTURE_SCALE_X).put(0);
 			textureBuffer.put(TEXTURE_SCALE_X).put(TEXTURE_SCALE_Y);
+			
+			Vector3 normal = points.get(3).subtract(points.get(1), null).cross(points.get(2).subtract(points.get(1), null), null).normalize(null);
+			
 						
-//			ArrayList<PolygonPoint> polyPoints = new ArrayList<PolygonPoint>();
+			ArrayList<PolygonPoint> polyPoints = new ArrayList<PolygonPoint>();
 //			polyPoints.add(new PolygonPoint(0,0,0));
-////			polyPoints.add(new PolygonPoint(1,0,0));
-////			polyPoints.add(new PolygonPoint(1,1,0));
-////			polyPoints.add(new PolygonPoint(0,1,0));
-//			Vector3 p;
-//			p = points.get(0);
-//			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-//			p = points.get(1);
-//			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-//			p = points.get(2);
-//			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-//			p = points.get(3);
-//			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-//			Polygon ps = new Polygon(polyPoints );
-//			try {
-//				Poly2Tri.triangulate(ps);
-//				ArdorMeshMapper.updateTriangleMesh(mesh, ps);
-//				ArdorMeshMapper.updateVertexNormals(mesh, ps.getTriangles());
-//				ArdorMeshMapper.updateFaceNormals(mesh, ps.getTriangles());
-//				ArdorMeshMapper.updateTextureCoordinates(mesh, 1, 0);			
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-////				mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-//			}
+//			polyPoints.add(new PolygonPoint(1,0,0));
+//			polyPoints.add(new PolygonPoint(1,1,0));
+//			polyPoints.add(new PolygonPoint(0,1,0));
 
+			Vector3 p;
+			p = points.get(0);
+			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+			p = points.get(2);
+			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+			p = points.get(3);
+			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+			p = points.get(1);
+			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+			
+//			polyPoints.add(new PolygonPoint(-1,-1));
+//			polyPoints.add(new PolygonPoint(-1,1));
+//			polyPoints.add(new PolygonPoint(1,1));
+//			polyPoints.add(new PolygonPoint(1,0.9));
+			
+			try {
+			    Vector3 v = normal;
+			    AnyToXYTransform toXY = new AnyToXYTransform(v.getX(),v.getY(),v.getZ());
+			    XYToAnyTransform fromXY = new XYToAnyTransform(v.getX(),v.getY(),v.getZ());
+//			        
+			    for (TriangulationPoint tp : polyPoints)
+			    	toXY.transform( tp );
+			    
+			    Polygon polygon = new Polygon(polyPoints );	
+			    
+			    for (HousePart child : children) {
+//			    	if (!child.isDrawCompleted())
+//			    		continue;
+			    	Window win = (Window) child;
+			    	PolygonPoint pp;
+			    	ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
+			    	ArrayList<Vector3> points = child.getPoints();
+					p = win.convertFromWallRelativeToAbsolute(points.get(0));
+					pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+					toXY.transform(pp);
+					holePoints.add(pp);
+					p = win.convertFromWallRelativeToAbsolute(points.get(2));
+					pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+					toXY.transform(pp);
+					holePoints.add(pp);
+					p = win.convertFromWallRelativeToAbsolute(points.get(3));
+					pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+					toXY.transform(pp);
+					holePoints.add(pp);
+					p = win.convertFromWallRelativeToAbsolute(points.get(1));
+					pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+					toXY.transform(pp);
+					holePoints.add(pp);
+					polygon.addHole(new Polygon(holePoints));
+			    	
+			    }
+			    
+//			    ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
+//			    holePoints.add(new PolygonPoint(0, 0));
+//			    holePoints.add(new PolygonPoint(0, 0.5));
+//			    holePoints.add(new PolygonPoint(0.5, 0.5));
+//			    holePoints.add(new PolygonPoint(0.5, 0));
+//			    
+//			    Polygon hole = new Polygon(holePoints );
+//			    polygon.addHole(hole);
+				Poly2Tri.triangulate(polygon);
+				
+//				for (TriangulationPoint tp : polygon.getPoint().getTriangles().get.getPoint().getPoints())
+//					fromXY.transform( tp );
+				
+				ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
+				ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
+				ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
+				ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, 0);			
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+//				mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+			}
+
+//			root.detachChild(backMesh);
+//			backMesh = (Mesh) mesh..clone();
+//			backMesh.setTranslation(0, 0.1, 0);
+//			root.attachChild(backMesh);
+			
 			// force bound update
 			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 

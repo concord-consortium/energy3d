@@ -174,7 +174,7 @@ public class Roof extends HousePart {
 		ArdorMeshMapper.updateTriangleMesh(mesh, ps);
 		ArdorMeshMapper.updateVertexNormals(mesh, ps.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, ps.getTriangles());
-		ArdorMeshMapper.updateTextureCoordinates(mesh, 1, 0);
+		ArdorMeshMapper.updateTextureCoordinates(mesh, ps.getTriangles(), 1, 0);
 		// mesh.setRandomColors();
 
 		for (int i = 0; i < points.size(); i++) {
