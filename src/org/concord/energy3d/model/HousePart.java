@@ -86,6 +86,7 @@ public abstract class HousePart {
 
 	}
 	
+	
 //	protected Vector3 findUpperPoint(Vector3 base, int x, int y) {
 //		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
 //		final Ray3 pickRay = Ray3.fetchTempInstance();

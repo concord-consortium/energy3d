@@ -15,6 +15,6 @@
 	<classpathentry kind="lib" path="exe/slf4j-api-1.5.10.jar"/>
 	<classpathentry kind="lib" path="exe/slf4j-nop-1.5.10.jar"/>
 	<classpathentry kind="lib" path="exe/poly2tri-core-0.1.0-SNAPSHOT.jar" sourcepath="exe/poly2tri-core-0.1.0-SNAPSHOT-sources.jar"/>
-	<classpathentry kind="lib" path="exe/poly2tri-ardor3d-0.1.1-SNAPSHOT.jar" sourcepath="exe/poly2tri-ardor3d-0.1.0-SNAPSHOT-sources (1).jar"/>
+	<classpathentry kind="lib" path="exe/poly2tri-ardor3d-0.1.1-SNAPSHOT.jar" sourcepath="exe/poly2tri-ardor3d-0.1.0-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

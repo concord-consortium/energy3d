@@ -666,16 +666,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Mesh findMouseSelection(int x, int y) {
 		pick(x, y, housePartsNode);
 
-		System.out.println(pickResults.getNumber());
+//		System.out.println(pickResults.getNumber());
 		if (pickResults.getNumber() > 0) {
 			final PickData pick = pickResults.getPickData(0);
 			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
 			if (intersectionRecord.getNumberOfIntersections() > 0) {
-				System.out.println("PICK");
+//				System.out.println("PICK");
 				return pick.getTargetMesh();
 			}
 		}
-		System.out.println("NO PICK");
+//		System.out.println("NO PICK");
 		return null;
 	}
 
