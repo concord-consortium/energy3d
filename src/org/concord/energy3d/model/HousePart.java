@@ -181,7 +181,7 @@ public abstract class HousePart {
 		if (closestDistance < 0.5) {
 //			return closest;
 			p.set(closestPoint);
-			return new Snap(closestWall, closestPointIndex, index);
+			return new Snap(closestWall, index, closestPointIndex);
 		} else {
 			return null;
 		}
