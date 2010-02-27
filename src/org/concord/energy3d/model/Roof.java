@@ -197,7 +197,7 @@ public class Roof extends HousePart {
 			prevWall = currentWall;
 			if (next == null)
 				break;
-			currentWall = (Wall) next.getHousePart();
+			currentWall = (Wall) next.getNeighbor();
 			if (currentWall == startWall)
 				break;
 		}
@@ -215,7 +215,7 @@ public class Roof extends HousePart {
 			prevWall = currentWall;
 			if (next == null)
 				break;
-			currentWall = (Wall) next.getHousePart();
+			currentWall = (Wall) next.getNeighbor();
 			if (currentWall == startWall)
 				break;
 		}

@@ -26,4 +26,11 @@ Version 0.1
 	- can be added anywhere on wall
 	- *TODO: do not allow window height to exceed height of wall
 - draw both doors and windows with an offset so that they are always rendered in front of wall
- 
+- cut holes inside wall when drawing window
+- draw wall thickness
+	- draw back face polygon
+	- draw surrounding thickness
+	- automatically draw back face of wall behind the front page based on camera view point
+	- automatically calculate which side should be interior of wall if two walls are snapped together
+- fix texture problem in wall
+  

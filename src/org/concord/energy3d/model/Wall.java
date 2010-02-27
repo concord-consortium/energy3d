@@ -133,7 +133,7 @@ public class Wall extends HousePart {
 //		System.out.println("drawing neighbors:");
 		for (Snap neighbor : this.neighbor)
 		if (neighbor != null)
-				neighbor.getHousePart().draw();
+				neighbor.getNeighbor().draw();
 		
 	}
 
@@ -145,10 +145,6 @@ public class Wall extends HousePart {
 
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = points.get(i);
-			// if (drawable)
-			// vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			// polyPoints.add(new ArdorVector3PolygonPoint(p));
-
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
 			pointsRoot.setVisible(i, true);
@@ -158,11 +154,11 @@ public class Wall extends HousePart {
 			final float TEXTURE_SCALE_X = (float) points.get(2).subtract(points.get(0), null).length();
 			final float TEXTURE_SCALE_Y = (float) points.get(3).subtract(points.get(2), null).length();
 			// texture coords
-			textureBuffer.position(0);
-			textureBuffer.put(0).put(0);
-			textureBuffer.put(0).put(TEXTURE_SCALE_Y);
-			textureBuffer.put(TEXTURE_SCALE_X).put(0);
-			textureBuffer.put(TEXTURE_SCALE_X).put(TEXTURE_SCALE_Y);
+//			textureBuffer.position(0);
+//			textureBuffer.put(0).put(0);
+//			textureBuffer.put(0).put(TEXTURE_SCALE_Y);
+//			textureBuffer.put(TEXTURE_SCALE_X).put(0);
+//			textureBuffer.put(TEXTURE_SCALE_X).put(TEXTURE_SCALE_Y);
 
 //			Vector3 normal = points.get(3).subtract(points.get(1), null).cross(points.get(2).subtract(points.get(1), null), null).normalize(null);
 			Vector3 normal = points.get(2).subtract(points.get(0), null).cross(points.get(1).subtract(points.get(0), null), null).normalize(null);
@@ -306,8 +302,8 @@ public class Wall extends HousePart {
 		if (neighbor == null)
 			neighbor = this.neighbor[1];
 
-		if (neighbor != null && neighbor.getHousePart().getPoints().size() >= 4) {
-			Wall otherWall = (Wall) neighbor.getHousePart();
+		if (neighbor != null && neighbor.getNeighbor().getPoints().size() >= 4) {
+			Wall otherWall = (Wall) neighbor.getNeighbor();
 			ArrayList<Vector3> otherPoints = otherWall.getPoints();
 			int otherPointIndex = neighbor.getNeighborPointIndex();
 			Vector3 a = otherPoints.get(otherPointIndex);
@@ -345,7 +341,7 @@ public class Wall extends HousePart {
 		// if (neighbor[i] != null && neighbor[i].getHousePart() != previous)
 		// return new Snap(neighbor[i].getHousePart(), i);
 		for (Snap s : neighbor)
-			if (s != null && s.getHousePart() != previous)
+			if (s != null && s.getNeighbor() != previous)
 				return s;
 
 		return null;
@@ -361,15 +357,15 @@ public class Wall extends HousePart {
 			return;
 		
 		if (oldNeighbor != null)
-			 ((Wall)oldNeighbor.getHousePart()).removeNeighbor(oldNeighbor.getNeighborPointIndex(), pointIndex, this);
+			 ((Wall)oldNeighbor.getNeighbor()).removeNeighbor(oldNeighbor.getNeighborPointIndex(), pointIndex, this);
 
 		if (newNeighbor != null)
-		((Wall) newNeighbor.getHousePart()).setNeighbor(newNeighbor.getNeighborPointIndex(), new Snap(this, newNeighbor.getNeighborPointIndex(), newNeighbor.getThisPointIndex()), false);
+		((Wall) newNeighbor.getNeighbor()).setNeighbor(newNeighbor.getNeighborPointIndex(), new Snap(this, newNeighbor.getNeighborPointIndex(), newNeighbor.getThisPointIndex()), false);
 	}
 	
 	private void removeNeighbor(int pointIndex, int requestingPointIndex, Wall wall) {
 		int i = pointIndex < 2 ? 0 : 1;
-		if (neighbor[i] != null && neighbor[i].getHousePart() == wall && neighbor[i].getNeighborPointIndex() == requestingPointIndex)
+		if (neighbor[i] != null && neighbor[i].getNeighbor() == wall && neighbor[i].getNeighborPointIndex() == requestingPointIndex)
 			neighbor[i] = null;
 		
 //		for (int i = 0; i < neighbor.length; i++)
@@ -382,7 +378,7 @@ public class Wall extends HousePart {
 		for (int i = 0; i < neighbor.length; i++)
 			if (neighbor[i] != null)
 //				((Wall) neighbor[i].getHousePart()).removeNeighbor(this);
-				((Wall) neighbor[i].getHousePart()).setNeighbor(neighbor[i].getNeighborPointIndex(), null, false); //.removeNeighbor(this);
+				((Wall) neighbor[i].getNeighbor()).setNeighbor(neighbor[i].getNeighborPointIndex(), null, false); //.removeNeighbor(this);
 	}
 
 //	public ReadOnlyVector3 getNormal() {

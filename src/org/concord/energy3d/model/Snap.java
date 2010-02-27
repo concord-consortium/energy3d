@@ -1,18 +1,18 @@
 package org.concord.energy3d.model;
 
 public class Snap {
-	private HousePart housePart;
+	private HousePart neighbor;
 	private int neighborPointIndex;
 	private int thisPointIndex;
 	
-	public Snap(HousePart housePart, int thisPointIndex, int neighborPointIndex) {
-		this.housePart = housePart;
+	public Snap(HousePart neighbor, int thisPointIndex, int neighborPointIndex) {
+		this.neighbor = neighbor;
 		this.neighborPointIndex = neighborPointIndex;
 		this.thisPointIndex = thisPointIndex;
 	}
 
-	public HousePart getHousePart() {
-		return housePart;
+	public HousePart getNeighbor() {
+		return neighbor;
 	}
 
 	public int getNeighborPointIndex() {
@@ -23,15 +23,11 @@ public class Snap {
 		return thisPointIndex;
 	}
 	
-//	public void setThisPointIndex(int thisPointIndex) {
-//		this.thisPointIndex = thisPointIndex;
-//	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Snap) {
 			Snap s = (Snap)obj;
-			return housePart == s.getHousePart() && neighborPointIndex == s.getNeighborPointIndex();
+			return neighbor == s.getNeighbor() && neighborPointIndex == s.getNeighborPointIndex();
 		} else
 			return false;
 	}
