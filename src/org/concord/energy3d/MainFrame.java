@@ -22,10 +22,12 @@ public class MainFrame extends JFrame {
 	private JMenu fileMenu = null;
 	private JToolBar appToolbar = null;
 	private JToggleButton selectButton = null;
-	private JToggleButton lineButton = null;
-	private JToggleButton rectangleButton = null;
+	private JToggleButton wallButton = null;
+	private JToggleButton doorButton = null;
 	private JToggleButton roofButton = null;
 	private JToggleButton windowButton = null;
+	private JToggleButton foundationButton = null;
+	private JToggleButton lightButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -63,15 +65,19 @@ public class MainFrame extends JFrame {
 			appToolbar = new JToolBar();
 			appToolbar.add(getSelectButton());
 			appToolbar.addSeparator();
-			appToolbar.add(getLineButton());
-			appToolbar.add(getRectangleButton());
+			appToolbar.add(getFoundationButton());
+			appToolbar.add(getWallButton());
+			appToolbar.add(getDoorButton());
 			appToolbar.add(getWindowButton());
 			appToolbar.add(getRoofButton());
+			appToolbar.addSeparator();
+			appToolbar.add(getLightButton());
 			
 			ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
-			bg.add(lineButton);
-			bg.add(rectangleButton);
+			bg.add(foundationButton);
+			bg.add(wallButton);
+			bg.add(doorButton);
 			bg.add(windowButton);
 			bg.add(roofButton);
 		}
@@ -98,39 +104,39 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes lineButton	
+	 * This method initializes wallButton	
 	 * 	
 	 * @return javax.swing.JToggleButton	
 	 */
-	private JToggleButton getLineButton() {
-		if (lineButton == null) {
-			lineButton = new JToggleButton();
-			lineButton.setText("Wall");
-			lineButton.addActionListener(new java.awt.event.ActionListener() {
+	private JToggleButton getWallButton() {
+		if (wallButton == null) {
+			wallButton = new JToggleButton();
+			wallButton.setText("Wall");
+			wallButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.DRAW_WALL);
 				}
 			});
 		}
-		return lineButton;
+		return wallButton;
 	}
 
 	/**
-	 * This method initializes rectangleButton	
+	 * This method initializes doorButton	
 	 * 	
 	 * @return javax.swing.JToggleButton	
 	 */
-	private JToggleButton getRectangleButton() {
-		if (rectangleButton == null) {
-			rectangleButton = new JToggleButton();
-			rectangleButton.setText("Door");
-			rectangleButton.addActionListener(new java.awt.event.ActionListener() {
+	private JToggleButton getDoorButton() {
+		if (doorButton == null) {
+			doorButton = new JToggleButton();
+			doorButton.setText("Door");
+			doorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.DRAW_DOOR);
 				}
 			});
 		}
-		return rectangleButton;
+		return doorButton;
 	}
 
 	/**
@@ -167,6 +173,42 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return windowButton;
+	}
+
+	/**
+	 * This method initializes foundationButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getFoundationButton() {
+		if (foundationButton == null) {
+			foundationButton = new JToggleButton();
+			foundationButton.setText("Foundation");
+			foundationButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.DRAW_FOUNDATION);
+				}
+			});
+		}
+		return foundationButton;
+	}
+
+	/**
+	 * This method initializes lightButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getLightButton() {
+		if (lightButton == null) {
+			lightButton = new JToggleButton();
+			lightButton.setText("Light");
+			lightButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setLighting(lightButton.isSelected());
+				}
+			});
+		}
+		return lightButton;
 	}
 
 	/**

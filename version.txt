@@ -33,4 +33,8 @@ Version 0.1
 	- automatically draw back face of wall behind the front page based on camera view point
 	- automatically calculate which side should be interior of wall if two walls are snapped together
 - fix texture problem in wall
+- do not draw wall thickness on joints that are attached to other walls
+- add Foundation
+- add lighting switch to dynamically enable/disable lighting
+- delete objects
   

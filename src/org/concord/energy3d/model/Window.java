@@ -82,12 +82,13 @@ public class Window extends HousePart {
 			Vector3 p = findMousePoint(x, y);
 			if (p != null) {
 				if (points.size() <=  2) {
-					doorHeight = points.get(0).getZ() + 0.25; 
+					doorHeight = points.get(0).getZ() + 0.25 + wall.getPoints().get(0).getZ(); 
 				} else {
 					Vector3 wallFirstPoint = wall.getPoints().get(0);
 					Vector3 wallx = wall.getPoints().get(2).subtract(wallFirstPoint, null);
 					p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
-					p.setZ(points.get(0).getZ());
+					p.setZ(points.get(0).getZ() + wall.getPoints().get(0).getZ());
+					System.out.println("z = " + p.getZ());
 					// p = snap(p);
 					// convert from absolute coordinates to relative-to-wall coordinates
 				}
@@ -150,7 +151,8 @@ public class Window extends HousePart {
 				if (data == null || !(data.getHousePart() instanceof Wall))
 					throw new RuntimeException("Door can only be placed on a wall!");
 				if (wall != null && data.getHousePart() != wall && points.size() > 2)
-					throw new RuntimeException("Door points cannot be placed on multiple walls!");
+//					throw new RuntimeException("Door points cannot be placed on multiple walls!");
+					return null;
 				if (wall == null || wall != data.getHousePart()) {
 					if (wall != null)
 						wall.removeChild(this);

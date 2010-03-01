@@ -55,8 +55,11 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.LightState;
+import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -81,6 +84,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public static final int DRAW_DOOR = 2;
 	public static final int DRAW_ROOF = 3;
 	public static final int DRAW_WINDOW = 4;
+	public static final int DRAW_FOUNDATION = 5;
 
 	private static SceneManager instance = null;
 	private final Container panel;
@@ -105,6 +109,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private int operation = SELECT;
 	protected HousePart lastHoveredObject;
+	private LightState lightState;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -174,16 +179,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
         /** Set up a basic, default light. */
         final PointLight light = new PointLight();
-        light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
-        light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
-        light.setLocation(new Vector3(100, 100, 100));
+//        light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
+//        light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
+        light.setDiffuse(new ColorRGBA(1, 1, 1, 1));
+        light.setAmbient(new ColorRGBA(0.75f, 0.75f, 0.75f, 1.0f));
+        
+        light.setLocation(new Vector3(5, -5, 10));
         light.setEnabled(true);
         
-//		/** Attach the light to a lightState and the lightState to rootNode. */
-//		final LightState lightState = new LightState();
-//		lightState.setEnabled(true);
-//		lightState.attach(light);
-//		root.setRenderState(lightState);
+		lightState = new LightState();
+		lightState.setEnabled(false);
+		lightState.attach(light);
+		root.setRenderState(lightState);
 
 		// Set up a reusable pick results
 		pickResults = new PrimitivePickResults();
@@ -203,7 +210,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			frameHandler.init();
 
 			while (!_exit) {
-				frameHandler.updateFrame();
+				try {
+					frameHandler.updateFrame();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				Thread.yield();
 
 			}
@@ -258,6 +269,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		blendState.setTestFunction(BlendState.TestFunction.GreaterThan);
 		floor.setRenderState(blendState);
 		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		
+		// Add a material to the box, to show both vertex color and lighting/shading.
+		 final MaterialState ms = new MaterialState();
+		 ms.setColorMaterial(ColorMaterial.Diffuse);
+		 floor.setRenderState(ms);		
 
 		return floor;
 	}
@@ -378,7 +394,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}
 		}));
-
+		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DELETE), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				removeHousePart(drawn);
+				drawn = null;
+			}
+		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.ESCAPE), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				for (HousePart part : House.getInstance().getParts())
+					part.hidePoints();
+			}
+		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				moveForward(source, tpf);
@@ -617,6 +644,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Window();
 		else if (operation == DRAW_ROOF)
 			drawn = new Roof();
+		else if (operation == DRAW_FOUNDATION)
+			drawn = new Foundation();
 
 		if (drawn != null)
 			addHousePart(drawn);
@@ -628,6 +657,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void removeHousePart(HousePart drawn) {
+		if (drawn == null)
+			return;
 		housePartsNode.detachChild(drawn.getRoot());
 		House.getInstance().remove(drawn);
 		if (drawn instanceof Wall)
@@ -652,16 +683,36 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public Vector3 findMousePoint(int x, int y) {
-		pick(x, y, floor);
+		return findMousePoint(x, y, null, null);
+//		pick(x, y, floor);
+//
+//		if (pickResults.getNumber() > 0) {
+//			final PickData pick = pickResults.getPickData(0);
+//			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
+//			if (intersectionRecord.getNumberOfIntersections() > 0)
+//				return intersectionRecord.getIntersectionPoint(0);
+//		}
+//		return null;
+	}
+	
+	public Vector3 findMousePoint(int x, int y, Class<?> typeOfHousePart, HousePart except) {
+		pickResults.clear();
+		if (typeOfHousePart == null)
+			pick(x, y, floor);
+		else
+			for (HousePart housePart : House.getInstance().getParts())
+				if (typeOfHousePart.isInstance(housePart) && housePart != except)
+					pick(x, y, housePart.getRoot());
 
 		if (pickResults.getNumber() > 0) {
 			final PickData pick = pickResults.getPickData(0);
 			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
-			if (intersectionRecord.getNumberOfIntersections() > 0)
+			if (intersectionRecord.getNumberOfIntersections() > 0) {
 				return intersectionRecord.getIntersectionPoint(0);
+			}
 		}
 		return null;
-	}
+	}	
 
 	private Mesh findMouseSelection(int x, int y) {
 		pick(x, y, housePartsNode);
@@ -697,10 +748,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 			housePart.showPoints();
 			lastHoveredObject = housePart;
+			if (edit)
+				drawn = data.getHousePart();
 		} else if (edit) {
 			drawn = data.getHousePart();
 			drawn.editPoint(data.getPointIndex());
 		}
+	}
+
+	public void setLighting(boolean enable) {
+		lightState.setEnabled(enable);		
+		root.updateWorldRenderStates(true);
 	}
 
 }
