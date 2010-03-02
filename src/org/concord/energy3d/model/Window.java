@@ -8,12 +8,16 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.intersection.PickData;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.TextureManager;
@@ -32,21 +36,32 @@ public class Window extends HousePart {
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
 		mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
+		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
+
+		// Transparency
+		mesh.setDefaultColor(new ColorRGBA(0, 0.8f, 0.8f, 0.5f));
+		BlendState blendState = new BlendState();
+		blendState.setBlendEnabled(true);
+		blendState.setTestEnabled(true);
+		mesh.setRenderState(blendState);
+		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
+		ms.setMaterialFace(MaterialFace.FrontAndBack);
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
 
-		// Add a texture to the box.
-		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("window1.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
-		mesh.setRenderState(ts);
+//		// Add a texture to the box.
+//		final TextureState ts = new TextureState();
+//		ts.setTexture(TextureManager.load("window1.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
+//		mesh.setRenderState(ts);
 		
-		OffsetState offsetState = new OffsetState();
-		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(-1);
-		mesh.setRenderState(offsetState);
+//		OffsetState offsetState = new OffsetState();
+//		offsetState.setTypeEnabled(OffsetType.Fill, true);
+//		offsetState.setFactor(-1);
+//		mesh.setRenderState(offsetState);
+
 		
 		
 
@@ -57,7 +72,8 @@ public class Window extends HousePart {
 
 	public void addPoint(int x, int y) {
 		if (drawCompleted)
-			throw new RuntimeException("Drawing of this object is already completed");
+			return;
+//			throw new RuntimeException("Drawing of this object is already completed");
 
 		if (points.size() >= numOfEditPoints)
 			drawCompleted = true;
@@ -109,6 +125,7 @@ public class Window extends HousePart {
 		}
 		if (wall != null) {
 			draw();
+			showPoints();
 			wall.draw();
 		}
 	}
@@ -168,18 +185,32 @@ public class Window extends HousePart {
 	@Override
 	protected void draw() {
 		boolean drawable = points.size() >= 4;
-
+		
 		vertexBuffer.position(0);
+		Vector3[] convertedPoints = new Vector3[4];
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = convertFromWallRelativeToAbsolute(points.get(i));
-//			if (drawable)
-//				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			convertedPoints[i] = p;
+			if (drawable) {
+				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+				
+			}
 
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
-			pointsRoot.setVisible(i, true);
+//			pointsRoot.setVisible(i, true);
 			pointsRoot.updateGeometricState(0);
 		}
+		
+		if (drawable) {
+			Vector3 normal = convertedPoints[2].subtract(convertedPoints[0], null).crossLocal(convertedPoints[1].subtract(convertedPoints[0], null)).normalizeLocal();
+			normal.negateLocal();
+			System.out.println("normal = " + normal);
+			mesh.getMeshData().getNormalBuffer().position(0);
+			for (int i=0; i < points.size(); i++)
+				mesh.getMeshData().getNormalBuffer().put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		}
+
 
 		if (drawable) {
 			// texture coords

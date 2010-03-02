@@ -28,7 +28,8 @@ public class Foundation extends HousePart {
 	@Override
 	public void addPoint(int x, int y) {
 		if (drawCompleted)
-			throw new RuntimeException("Drawing of this object is already completed");
+			return;
+//			throw new RuntimeException("Drawing of this object is already completed");
 
 		if (points.size() >= numOfEditPoints)
 			drawCompleted = true;
@@ -45,12 +46,14 @@ public class Foundation extends HousePart {
 	
 	@Override
 	public void setPreviewPoint(int x, int y) {
-		Vector3 p = SceneManager.getInstance().findMousePoint(x, y);
-		if (p != null) {
+		PickedHousePart pick = SceneManager.getInstance().findMousePoint(x, y);
+		if (pick != null) {
+			Vector3 p = pick.getPoint();
 			int index = (editPointIndex == -1) ? points.size() - 1 : editPointIndex;
 			points.set(index, p);
 		}
 		draw();
+		showPoints();
 	}
 
 	@Override
@@ -61,7 +64,7 @@ public class Foundation extends HousePart {
 			Vector3 p = points.get(i);
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
-			pointsRoot.setVisible(i, true);
+//			pointsRoot.setVisible(i, true);
 		}
 
 		if (drawable) {

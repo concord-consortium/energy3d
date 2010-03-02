@@ -57,7 +57,8 @@ public class Door extends HousePart {
 
 	public void addPoint(int x, int y) {
 		if (drawCompleted)
-			throw new RuntimeException("Drawing of this object is already completed");
+			return;
+//			throw new RuntimeException("Drawing of this object is already completed");
 
 		if (points.size() >= numOfEditPoints)
 			drawCompleted = true;
@@ -101,8 +102,10 @@ public class Door extends HousePart {
 			points.set(1, getUpperPoint(points.get(1)));
 			points.set(3, getUpperPoint(points.get(3)));
 		}
-		if (wall != null)
+		if (wall != null) {
 			draw();
+			showPoints();
+		}
 	}
 
 	private Vector3 convertToWallRelative(Vector3 p) {
@@ -168,7 +171,7 @@ public class Door extends HousePart {
 
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
-			pointsRoot.setVisible(i, true);
+//			pointsRoot.setVisible(i, true);
 			pointsRoot.updateGeometricState(0, true);
 		}
 

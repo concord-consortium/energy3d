@@ -60,11 +60,13 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.scenegraph.shape.Sphere.TextureMode;
@@ -120,7 +122,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.panel = panel;
 		root.attachChild(housePartsNode);
 
-		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
+		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 8, false, false);
 		renderer = new JoglCanvasRenderer(this);
 		canvas = new JoglAwtCanvas(settings, renderer);
 		frameHandler = new FrameHandler(new Timer());
@@ -177,16 +179,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
 		root.setRenderState(buf);
 
-        /** Set up a basic, default light. */
-        final PointLight light = new PointLight();
-//        light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
-//        light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
-        light.setDiffuse(new ColorRGBA(1, 1, 1, 1));
-        light.setAmbient(new ColorRGBA(0.75f, 0.75f, 0.75f, 1.0f));
-        
-        light.setLocation(new Vector3(5, -5, 10));
-        light.setEnabled(true);
-        
+		/** Set up a basic, default light. */
+		final PointLight light = new PointLight();
+		// light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
+		// light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
+		light.setDiffuse(new ColorRGBA(1, 1, 1, 1));
+		light.setAmbient(new ColorRGBA(0.75f, 0.75f, 0.75f, 1.0f));
+
+		// light.setLocation(new Vector3(5, -5, 10));
+		light.setLocation(new Vector3(0, -20, 10));
+		light.setEnabled(true);
+
 		lightState = new LightState();
 		lightState.setEnabled(false);
 		lightState.attach(light);
@@ -263,35 +266,43 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
-		blendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-		blendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+		// blendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+		// blendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
 		blendState.setTestEnabled(true);
-		blendState.setTestFunction(BlendState.TestFunction.GreaterThan);
+		// blendState.setTestFunction(BlendState.TestFunction.GreaterThan);
 		floor.setRenderState(blendState);
 		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-		
+
 		// Add a material to the box, to show both vertex color and lighting/shading.
-		 final MaterialState ms = new MaterialState();
-		 ms.setColorMaterial(ColorMaterial.Diffuse);
-		 floor.setRenderState(ms);		
+		final MaterialState ms = new MaterialState();
+		ms.setColorMaterial(ColorMaterial.Diffuse);
+		ms.setMaterialFace(MaterialFace.FrontAndBack);
+		floor.setRenderState(ms);
 
 		return floor;
 	}
 
 	private Mesh createSky() {
-//		Dome sky = new Dome("Sky", 100, 100, 100);
+		// Dome sky = new Dome("Sky", 100, 100, 10);
+		// sky.setDefaultColor(ColorRGBA.RED);
 		Sphere sky = new Sphere("Sky", 100, 100, 100);
 		sky.setTextureMode(TextureMode.Polar);
 		sky.setRotation(new Quaternion(1, 0, 0, 1));
 		sky.setTranslation(0, 0, 10);
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("sky2.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));		
+		ts.setTexture(TextureManager.load("sky2.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
 		sky.setRenderState(ts);
+
+		// Add a material to the box, to show both vertex color and lighting/shading.
+		final MaterialState ms = new MaterialState();
+		ms.setColorMaterial(ColorMaterial.Diffuse);
+		ms.setMaterialFace(MaterialFace.FrontAndBack);
+		sky.setRenderState(ms);
 
 		return sky;
 	}
-	
+
 	private Node createAxis() {
 		final int axisLen = 50;
 		Node axis = new Node("Axis");
@@ -338,21 +349,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (operation == SELECT) {
 					if (drawn == null || drawn.isDrawCompleted())
 						selectHousePart(mouseState.getX(), mouseState.getY(), true);
-					else
-						drawn.complete();
+//					else
+//						drawn.complete();
 					return;
 				}
 
 				drawn.addPoint(mouseState.getX(), mouseState.getY());
 
-				if (drawn.isDrawCompleted()) {
-					if (operation == DRAW_WALL) {
-						drawn = new Wall();
-					} else if (operation == DRAW_DOOR) {
-						drawn = new Door();
-					}
-					addHousePart(drawn);
-				}
+//				if (drawn.isDrawCompleted()) {
+//					if (operation == DRAW_WALL) {
+//						drawn = new Wall();
+//					} else if (operation == DRAW_DOOR) {
+//						drawn = new Door();
+//					}
+//					addHousePart(drawn);
+//				}
 			}
 		}));
 
@@ -362,26 +373,27 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					return;
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
 				if (operation == SELECT) {
-					if (drawn == null || drawn.isDrawCompleted())
-						selectHousePart(mouseState.getX(), mouseState.getY(), true);
-					else
+//					if (drawn == null || drawn.isDrawCompleted())
+//						selectHousePart(mouseState.getX(), mouseState.getY(), true);
+//					else
 						drawn.complete();
 					return;
 				}
 
 				drawn.addPoint(mouseState.getX(), mouseState.getY());
-
+				
 				if (drawn.isDrawCompleted()) {
-					if (operation == DRAW_WALL) {
-						drawn = new Wall();
-					} else if (operation == DRAW_DOOR) {
-						drawn = new Door();
-					}
-					addHousePart(drawn);
+//					if (operation == DRAW_WALL) {
+//						drawn = new Wall();
+//					} else if (operation == DRAW_DOOR) {
+//						drawn = new Door();
+//					}
+					drawn = newHousePart();
+//					addHousePart(drawn);
 				}
 			}
 		}));
-		
+
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
@@ -634,8 +646,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.operation = operation;
 		if (drawn != null && !drawn.isDrawCompleted())
 			removeHousePart(drawn);
+		drawn = newHousePart();
+	}
 
-		drawn = null;
+	private HousePart newHousePart() {
+		HousePart drawn = null;
 		if (operation == DRAW_WALL)
 			drawn = new Wall();
 		else if (operation == DRAW_DOOR)
@@ -649,6 +664,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (drawn != null)
 			addHousePart(drawn);
+		return drawn;
 	}
 
 	private void addHousePart(HousePart drawn) {
@@ -662,7 +678,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		housePartsNode.detachChild(drawn.getRoot());
 		House.getInstance().remove(drawn);
 		if (drawn instanceof Wall)
-			((Wall)drawn).destroy();
+			((Wall) drawn).destroy();
 	}
 
 	public int getOperation() {
@@ -677,64 +693,80 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Vector2.releaseTempInstance(pos);
 
 		// Do the pick
-		pickResults.clear();
+//		pickResults.clear();
 		PickingUtil.findPick(target, pickRay, pickResults);
 		Ray3.releaseTempInstance(pickRay);
 	}
 
-	public Vector3 findMousePoint(int x, int y) {
-		return findMousePoint(x, y, null, null);
-//		pick(x, y, floor);
-//
-//		if (pickResults.getNumber() > 0) {
-//			final PickData pick = pickResults.getPickData(0);
-//			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
-//			if (intersectionRecord.getNumberOfIntersections() > 0)
-//				return intersectionRecord.getIntersectionPoint(0);
-//		}
-//		return null;
+	public PickedHousePart findMousePoint(int x, int y) {
+		return findMousePoint(x, y, floor);
+		// pick(x, y, floor);
+		//
+		// if (pickResults.getNumber() > 0) {
+		// final PickData pick = pickResults.getPickData(0);
+		// final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
+		// if (intersectionRecord.getNumberOfIntersections() > 0)
+		// return intersectionRecord.getIntersectionPoint(0);
+		// }
+		// return null;
 	}
-	
-	public Vector3 findMousePoint(int x, int y, Class<?> typeOfHousePart, HousePart except) {
+	public PickedHousePart findMousePoint(int x, int y, Spatial target) {
 		pickResults.clear();
-		if (typeOfHousePart == null)
-			pick(x, y, floor);
-		else
+		pick(x, y, target);
+
+		return getPickResult();
+	}
+
+	public PickedHousePart findMousePoint(int x, int y, Class<?> typeOfHousePart, HousePart except) {
+		pickResults.clear();
+//		if (typeOfHousePart == null)
+//			pick(x, y, floor);
+//		else
 			for (HousePart housePart : House.getInstance().getParts())
 				if (typeOfHousePart.isInstance(housePart) && housePart != except)
 					pick(x, y, housePart.getRoot());
 
+		return getPickResult();
+	}
+
+	private PickedHousePart getPickResult() {
 		if (pickResults.getNumber() > 0) {
 			final PickData pick = pickResults.getPickData(0);
 			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
 			if (intersectionRecord.getNumberOfIntersections() > 0) {
-				return intersectionRecord.getIntersectionPoint(0);
+				Object obj = pick.getTargetMesh().getUserData();
+				UserData userData = null;
+				if (obj instanceof UserData)
+					userData = (UserData) obj;
+				return new PickedHousePart(userData, intersectionRecord.getIntersectionPoint(0));
 			}
 		}
-		return null;
-	}	
-
-	private Mesh findMouseSelection(int x, int y) {
-		pick(x, y, housePartsNode);
-
-//		System.out.println(pickResults.getNumber());
-		if (pickResults.getNumber() > 0) {
-			final PickData pick = pickResults.getPickData(0);
-			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
-			if (intersectionRecord.getNumberOfIntersections() > 0) {
-//				System.out.println("PICK");
-				return pick.getTargetMesh();
-			}
-		}
-//		System.out.println("NO PICK");
 		return null;
 	}
 
+//	private Mesh findMouseSelection(int x, int y) {
+//		pickResults.clear();
+//		pick(x, y, housePartsNode);
+//
+//		// System.out.println(pickResults.getNumber());
+//		if (pickResults.getNumber() > 0) {
+//			final PickData pick = pickResults.getPickData(0);
+//			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
+//			if (intersectionRecord.getNumberOfIntersections() > 0) {
+//				// System.out.println("PICK");
+//				return pick.getTargetMesh();
+//			}
+//		}
+//		// System.out.println("NO PICK");
+//		return null;
+//	}
+
 	private void selectHousePart(int x, int y, boolean edit) {
-		Mesh selectedMesh = findMouseSelection(x, y);
+//		Mesh selectedMesh = findMouseSelection(x, y);
+		PickedHousePart selectedMesh = findMousePoint(x, y, housePartsNode);
 		UserData data = null;
 		if (selectedMesh != null)
-			data = (UserData) selectedMesh.getUserData();
+			data = selectedMesh.getUserData();
 		if (selectedMesh == null || data == null) {
 			if (lastHoveredObject != null) {
 				lastHoveredObject.hidePoints();
@@ -757,7 +789,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setLighting(boolean enable) {
-		lightState.setEnabled(enable);		
+		lightState.setEnabled(enable);
 		root.updateWorldRenderStates(true);
 	}
 

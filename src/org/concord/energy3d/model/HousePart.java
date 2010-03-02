@@ -22,6 +22,7 @@ public abstract class HousePart {
 	protected final int numOfDrawPoints, numOfEditPoints;
 	protected int editPointIndex = -1;
 	protected PickResults pickResults;
+	protected HousePart container = null;
 
 	public HousePart(int numOfDrawPoints, int numOfEditPoints) {
 		this.numOfDrawPoints = numOfDrawPoints;
@@ -59,7 +60,9 @@ public abstract class HousePart {
 
 	public void showPoints() {
 		// root.attachChild(pointsRoot);
-		pointsRoot.setAllVisible();
+//		pointsRoot.setAllVisible();
+		for (int i=0; i<points.size(); i++)
+			pointsRoot.setVisible(i, true);
 	}
 
 	public void hidePoints() {

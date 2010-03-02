@@ -37,4 +37,8 @@ Version 0.1
 - add Foundation
 - add lighting switch to dynamically enable/disable lighting
 - delete objects
+- enable Anti-Aliasing
+- allow wall to be inserted on one platform only
+- make findPoint(..) generic to return PickedHousePart object
+
   

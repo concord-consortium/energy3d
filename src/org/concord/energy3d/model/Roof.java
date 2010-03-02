@@ -60,7 +60,8 @@ public class Roof extends HousePart {
 	@Override
 	public void addPoint(int x, int y) {
 		if (drawCompleted)
-			throw new RuntimeException("Drawing of this object is already completed");
+			return;
+//			throw new RuntimeException("Drawing of this object is already completed");
 
 		if (points.size() >= numOfEditPoints)
 			drawCompleted = true;
@@ -81,6 +82,7 @@ public class Roof extends HousePart {
 			// points.set(0, new Vector3(avg.getX(), avg.getY(), avg.getZ() + roofHeight));
 		}
 		draw();
+		showPoints();
 
 	}
 

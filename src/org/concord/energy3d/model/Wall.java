@@ -86,7 +86,8 @@ public class Wall extends HousePart {
 
 	public void addPoint(int x, int y) {
 		if (drawCompleted)
-			throw new RuntimeException("Drawing of this object is already completed");
+			return;
+//			throw new RuntimeException("Drawing of this object is already completed");
 
 		if (points.size() >= numOfEditPoints)
 			drawCompleted = true;
@@ -108,8 +109,15 @@ public class Wall extends HousePart {
 
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
-			Vector3 p = SceneManager.getInstance().findMousePoint(x, y, Foundation.class, null);
-			if (p != null) {
+			PickedHousePart picked = null;
+			if (container == null || points.size() < 4)
+				picked = SceneManager.getInstance().findMousePoint(x, y, Foundation.class, null);
+			else
+				picked = SceneManager.getInstance().findMousePoint(x, y, container.getRoot());
+			if (picked != null) {
+				container = picked.getUserData().getHousePart();
+				Vector3 p = picked.getPoint();
+//				if (p != null) {
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				Snap snap = snap(p, index);
 				setNeighbor(index, snap, true);
@@ -127,6 +135,7 @@ public class Wall extends HousePart {
 
 		}
 		draw();
+		showPoints();
 
 		for (Snap neighbor : this.neighbor)
 			if (neighbor != null)
@@ -144,7 +153,7 @@ public class Wall extends HousePart {
 			Vector3 p = points.get(i);
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
-			pointsRoot.setVisible(i, true);
+//			pointsRoot.setVisible(i, true);
 		}
 
 		if (drawable) {
@@ -178,7 +187,7 @@ public class Wall extends HousePart {
 				for (HousePart child : children) {
 					if (child instanceof Window) {
 						Window win = (Window) child;
-						if (win.getPoints().size() < 2)
+						if (win.getPoints().size() < 4)
 							continue;
 						PolygonPoint pp;
 						ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
