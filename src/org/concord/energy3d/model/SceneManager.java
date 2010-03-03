@@ -60,13 +60,11 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.scenegraph.shape.Sphere.TextureMode;
@@ -276,7 +274,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
-		ms.setMaterialFace(MaterialFace.FrontAndBack);
+//		ms.setMaterialFace(MaterialFace.FrontAndBack);
 		floor.setRenderState(ms);
 
 		return floor;
@@ -297,15 +295,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
-		ms.setMaterialFace(MaterialFace.FrontAndBack);
+//		ms.setColorMaterialFace(MaterialFace.FrontAndBack);
 		sky.setRenderState(ms);
 
 		return sky;
 	}
 
-	private Node createAxis() {
+	private Spatial createAxis() {
 		final int axisLen = 50;
-		Node axis = new Node("Axis");
+//		Node axis = new Node("Axis");
 
 		FloatBuffer verts = BufferUtils.createVector3Buffer(12);
 		verts.put(0).put(0).put(0);
@@ -335,11 +333,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		colors.put(0).put(0).put(1).put(0);
 		colors.put(0).put(0).put(1).put(0);
 
-		Line line = new Line("Axis", verts, null, colors, null);
-		line.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-		axis.attachChild(line);
+		Line lines = new Line("Axis", verts, null, colors, null);
+		lines.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+//		axis.attachChild(line);
 
-		return axis;
+		return lines;
 	}
 
 	private void registerInputTriggers() {
@@ -376,6 +374,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //					if (drawn == null || drawn.isDrawCompleted())
 //						selectHousePart(mouseState.getX(), mouseState.getY(), true);
 //					else
+					if (drawn != null)
 						drawn.complete();
 					return;
 				}
@@ -388,6 +387,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //					} else if (operation == DRAW_DOOR) {
 //						drawn = new Door();
 //					}
+					drawn.hidePoints();
 					drawn = newHousePart();
 //					addHousePart(drawn);
 				}
@@ -481,7 +481,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		logicalLayer.registerTrigger(new InputTrigger(mouseMovedAndOneButtonPressed, new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (operation == SELECT) {
+				if (operation == SELECT && drawn.isDrawCompleted()) {
 					final MouseState mouseState = inputStates.getCurrent().getMouseState();
 
 					turn(source, mouseState.getDx() * tpf * -MOUSE_TURN_SPEED);
@@ -717,13 +717,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return getPickResult();
 	}
 
-	public PickedHousePart findMousePoint(int x, int y, Class<?> typeOfHousePart, HousePart except) {
+//	public PickedHousePart findMousePoint(int x, int y, Class<?> typeOfHousePart, HousePart except) {
+	public PickedHousePart findMousePoint(int x, int y, Class<?> typeOfHousePart) {
 		pickResults.clear();
 //		if (typeOfHousePart == null)
 //			pick(x, y, floor);
 //		else
 			for (HousePart housePart : House.getInstance().getParts())
-				if (typeOfHousePart.isInstance(housePart) && housePart != except)
+				if (typeOfHousePart.isInstance(housePart)) // && housePart != except)
 					pick(x, y, housePart.getRoot());
 
 		return getPickResult();

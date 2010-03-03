@@ -26,7 +26,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Wall extends HousePart {
 	private double wallHeight = 0.8f;
 	private double wallThickness = 0.1;
-	private ArrayList<HousePart> children = new ArrayList<HousePart>();
+//	private ArrayList<HousePart> children = new ArrayList<HousePart>();
 	private Mesh mesh = new Mesh("Wall");
 	private Mesh backMesh = new Mesh("Wall (Back)");
 	private Mesh surroundMesh = new Mesh("Wall (Surround)");
@@ -73,35 +73,35 @@ public class Wall extends HousePart {
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
 
-		allocateNewPoint();
+//		allocateNewPoint();
 	}
 
-	public void addChild(HousePart housePart) {
-		children.add(housePart);
-	}
+//	public void addChild(HousePart housePart) {
+//		children.add(housePart);
+//	}
+//
+//	public boolean removeChild(HousePart housePart) {
+//		return children.remove(housePart);
+//	}
 
-	public boolean removeChild(HousePart housePart) {
-		return children.remove(housePart);
-	}
+//	public void addPoint(int x, int y) {
+//		if (drawCompleted)
+//			return;
+////			throw new RuntimeException("Drawing of this object is already completed");
+//
+//		if (points.size() >= numOfEditPoints)
+//			drawCompleted = true;
+//		else {
+//			allocateNewPoint();
+//			setPreviewPoint(x, y);
+//		}
+//	}
 
-	public void addPoint(int x, int y) {
-		if (drawCompleted)
-			return;
-//			throw new RuntimeException("Drawing of this object is already completed");
-
-		if (points.size() >= numOfEditPoints)
-			drawCompleted = true;
-		else {
-			allocateNewPoint();
-			setPreviewPoint(x, y);
-		}
-	}
-
-	private void allocateNewPoint() {
-		Vector3 p = new Vector3();
-		points.add(p);
-		points.add(p);
-	}
+//	private void allocateNewPoint() {
+//		Vector3 p = new Vector3();
+//		points.add(p);
+//		points.add(p);
+//	}
 
 	private Vector3 getUpperPoint(Vector3 p) {
 		return new Vector3(p.getX(), p.getY(), wallHeight);
@@ -109,13 +109,9 @@ public class Wall extends HousePart {
 
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
-			PickedHousePart picked = null;
-			if (container == null || points.size() < 4)
-				picked = SceneManager.getInstance().findMousePoint(x, y, Foundation.class, null);
-			else
-				picked = SceneManager.getInstance().findMousePoint(x, y, container.getRoot());
+			PickedHousePart picked = pick(x, y, Foundation.class);
 			if (picked != null) {
-				container = picked.getUserData().getHousePart();
+//				container = picked.getUserData().getHousePart();
 				Vector3 p = picked.getPoint();
 //				if (p != null) {
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
@@ -157,8 +153,8 @@ public class Wall extends HousePart {
 		}
 
 		if (drawable) {
-			final float TEXTURE_SCALE_X = (float) points.get(2).subtract(points.get(0), null).length();
-			final float TEXTURE_SCALE_Y = (float) points.get(3).subtract(points.get(2), null).length();
+//			final float TEXTURE_SCALE_X = (float) points.get(2).subtract(points.get(0), null).length();
+//			final float TEXTURE_SCALE_Y = (float) points.get(3).subtract(points.get(2), null).length();
 
 			// Vector3 normal = points.get(3).subtract(points.get(1), null).cross(points.get(2).subtract(points.get(1), null), null).normalize(null);
 			Vector3 normal = points.get(2).subtract(points.get(0), null).cross(points.get(1).subtract(points.get(0), null), null).normalize(null);

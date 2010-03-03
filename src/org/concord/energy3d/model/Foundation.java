@@ -14,7 +14,7 @@ public class Foundation extends HousePart {
 	public Foundation() {
 		super(2, 2);
 		root.attachChild(mesh);
-		allocateNewPoint();
+//		allocateNewPoint();
 		
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
@@ -25,24 +25,24 @@ public class Foundation extends HousePart {
 		mesh.setUserData(userData);		
 	}
 
-	@Override
-	public void addPoint(int x, int y) {
-		if (drawCompleted)
-			return;
-//			throw new RuntimeException("Drawing of this object is already completed");
+//	@Override
+//	public void addPoint(int x, int y) {
+//		if (drawCompleted)
+//			return;
+////			throw new RuntimeException("Drawing of this object is already completed");
+//
+//		if (points.size() >= numOfEditPoints)
+//			drawCompleted = true;
+//		else {
+//			allocateNewPoint();
+//			setPreviewPoint(x, y);
+//		}		
+//	}
 
-		if (points.size() >= numOfEditPoints)
-			drawCompleted = true;
-		else {
-			allocateNewPoint();
-			setPreviewPoint(x, y);
-		}		
-	}
-
-	private void allocateNewPoint() {
-		Vector3 p = new Vector3();
-		points.add(p);
-	}
+//	private void allocateNewPoint() {
+//		Vector3 p = new Vector3();
+//		points.add(p);
+//	}
 	
 	@Override
 	public void setPreviewPoint(int x, int y) {
@@ -64,7 +64,6 @@ public class Foundation extends HousePart {
 			Vector3 p = points.get(i);
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
-//			pointsRoot.setVisible(i, true);
 		}
 
 		if (drawable) {

@@ -3,26 +3,25 @@ package org.concord.energy3d.model;
 import java.util.ArrayList;
 
 import com.ardor3d.intersection.PickResults;
-import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.extension.SwitchNode;
 import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart {
 	protected final Node root = new Node();
 	protected final SwitchNode pointsRoot = new SwitchNode("Edit Points");
-	protected boolean drawCompleted = false;
-	protected final ArrayList<Vector3> points;
 	protected final int numOfDrawPoints, numOfEditPoints;
+	protected final ArrayList<Vector3> points;
+	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
+	protected boolean drawCompleted = false;
 	protected int editPointIndex = -1;
-	protected PickResults pickResults;
 	protected HousePart container = null;
+	private PickResults pickResults;
 
 	public HousePart(int numOfDrawPoints, int numOfEditPoints) {
 		this.numOfDrawPoints = numOfDrawPoints;
@@ -34,12 +33,13 @@ public abstract class HousePart {
 
 		final Vector3 origin = new Vector3();
 		for (int i = 0; i < numOfEditPoints; i++) {
-			Sphere pointShape = new Sphere("Point", origin, 5, 5, 0.1);
+			Sphere pointShape = new Sphere("Point", origin, 20, 20, 0.1);
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
 			pointShape.updateModelBound(); // important
 		}
 		root.attachChild(pointsRoot);
+		allocateNewPoint();
 	}
 
 	public Node getRoot() {
@@ -57,16 +57,21 @@ public abstract class HousePart {
 	public ArrayList<Vector3> getPoints() {
 		return points;
 	}
+	
+	public void addChild(HousePart housePart) {
+		children.add(housePart);
+	}
+
+	public boolean removeChild(HousePart housePart) {
+		return children.remove(housePart);
+	}	
 
 	public void showPoints() {
-		// root.attachChild(pointsRoot);
-//		pointsRoot.setAllVisible();
 		for (int i=0; i<points.size(); i++)
 			pointsRoot.setVisible(i, true);
 	}
 
 	public void hidePoints() {
-		// root.detachChild(pointsRoot);
 		pointsRoot.setAllNonVisible();
 	}
 
@@ -89,22 +94,6 @@ public abstract class HousePart {
 
 	}
 	
-	
-//	protected Vector3 findUpperPoint(Vector3 base, int x, int y) {
-//		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
-//		final Ray3 pickRay = Ray3.fetchTempInstance();
-//		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-//		Vector2.releaseTempInstance(pos);
-//
-//		Vector3 closest = closestPoint(base, base.add(new Vector3(0, 0, 1), null), pickRay.getOrigin(), pickRay.getOrigin().add(pickRay.getDirection(), null));
-//
-//		Ray3.releaseTempInstance(pickRay);
-//
-//		return closest;
-//
-//	}
-	
-
 	protected double findHeight(Vector3 base, Vector3 upperPoint) {
 		Vector3 subtract = upperPoint.subtract(base, null);
 		if (subtract.dot(0, 0, -1) >= 0)
@@ -147,18 +136,54 @@ public abstract class HousePart {
 		return pa;
 	}
 
-	protected void pick(int x, int y, Spatial target) {
-		// Put together a pick ray
-		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
-		final Ray3 pickRay = Ray3.fetchTempInstance();
-		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-		Vector2.releaseTempInstance(pos);
-
-		// Do the pick
-//		pickResults.clear();
-		PickingUtil.findPick(target, pickRay, pickResults);
-		Ray3.releaseTempInstance(pickRay);
+//	protected void pick(int x, int y, Spatial target) {
+//		// Put together a pick ray
+//		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
+//		final Ray3 pickRay = Ray3.fetchTempInstance();
+//		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
+//		Vector2.releaseTempInstance(pos);
+//
+//		// Do the pick
+////		pickResults.clear();
+//		PickingUtil.findPick(target, pickRay, pickResults);
+//		Ray3.releaseTempInstance(pickRay);
+//	}
+	
+	protected PickedHousePart pick(int x, int y, Class<? extends HousePart> typeOfHousePart) {
+		PickedHousePart picked = null;
+		if (container == null || points.size() < 4)
+			picked = SceneManager.getInstance().findMousePoint(x, y, typeOfHousePart);
+		else
+			picked = SceneManager.getInstance().findMousePoint(x, y, container.getRoot());
+		if (picked != null)
+			if (container == null || container != picked.getUserData().getHousePart()) {
+				if (container != null)
+					container.removeChild(this);
+				container = picked.getUserData().getHousePart();
+				container.addChild(this);
+			}		
+		return picked;
 	}
+	
+	protected Vector3 convertToWallRelative(Vector3 p) {
+		ArrayList<Vector3> wallPoints = container.getPoints();
+		Vector3 origin = wallPoints.get(0);
+		p = p.subtract(origin, null);
+		Vector3 wallx = wallPoints.get(2).subtract(origin, null).normalize(null);
+		Vector3 wally = wallPoints.get(1).subtract(origin, null).normalize(null);
+		Vector3 pointOnWall = new Vector3(wallx.dot(p), 0, wally.dot(p));
+		return pointOnWall;
+	}
+
+	protected Vector3 convertFromWallRelativeToAbsolute(Vector3 p) {
+		ArrayList<Vector3> wallPoints = container.getPoints();
+		Vector3 origin = wallPoints.get(0);
+		Vector3 wallx = wallPoints.get(2).subtract(origin, null).normalize(null);
+		Vector3 wally = wallPoints.get(1).subtract(origin, null).normalize(null);
+		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply(p.getZ(), null), null);
+		return pointOnSpace;
+	}	
+	
 
 	protected Snap snap(Vector3 p, int index) {
 		Vector3 closestPoint = null;
@@ -182,15 +207,29 @@ public abstract class HousePart {
 			}
 		}
 		if (closestDistance < 0.5) {
-//			return closest;
 			p.set(closestPoint);
 			return new Snap(closestWall, index, closestPointIndex);
-		} else {
+		} else
 			return null;
-		}
 	}
 
-	public abstract void addPoint(int x, int y);
+	public void addPoint(int x, int y) {
+		if (drawCompleted)
+			throw new RuntimeException("Drawing of this object is already completed");
+
+		if (points.size() >= numOfEditPoints)
+			drawCompleted = true;
+		else {
+			allocateNewPoint();
+			setPreviewPoint(x, y);
+		}
+	}	
+
+	private void allocateNewPoint() {
+		Vector3 p = new Vector3();
+		for (int i=0; i<numOfEditPoints/numOfDrawPoints; i++)
+			points.add(p);
+	}
 
 	public abstract void setPreviewPoint(int x, int y);
 

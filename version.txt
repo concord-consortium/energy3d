@@ -40,5 +40,10 @@ Version 0.1
 - enable Anti-Aliasing
 - allow wall to be inserted on one platform only
 - make findPoint(..) generic to return PickedHousePart object
-
-  
+- hide the points after the draw is completed
+- add automatic pick() to superclass HousePart
+	- automatically update container/children upon pick/insert even for those objects that don't need to know their container or children
+- move addPoint(..) and allocateNewPoint(..) to superclass in order to automate it
+- prevent camera view direction from moving when editing/dragging object points
+- cleaned the code
+	  
