@@ -46,4 +46,9 @@ Version 0.1
 - move addPoint(..) and allocateNewPoint(..) to superclass in order to automate it
 - prevent camera view direction from moving when editing/dragging object points
 - cleaned the code
+- remember previous wall height and use it as default height of next wall
+- snap when changing wall height
+- BUG: mouse would select edit point of first added object regardless of visibility (ie. editing at point of intersection of two walls)
+	- select the behind object if already selected and if the pick distance is not too much from the front object (0.1)
+	- now it will select if hovering mouse near edit point, even if does not touch the object :)
 	  

@@ -38,7 +38,6 @@ import com.ardor3d.input.logical.MouseMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
-import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -274,7 +273,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
-//		ms.setMaterialFace(MaterialFace.FrontAndBack);
+		// ms.setMaterialFace(MaterialFace.FrontAndBack);
 		floor.setRenderState(ms);
 
 		return floor;
@@ -295,7 +294,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
-//		ms.setColorMaterialFace(MaterialFace.FrontAndBack);
+		// ms.setColorMaterialFace(MaterialFace.FrontAndBack);
 		sky.setRenderState(ms);
 
 		return sky;
@@ -303,7 +302,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private Spatial createAxis() {
 		final int axisLen = 50;
-//		Node axis = new Node("Axis");
+		// Node axis = new Node("Axis");
 
 		FloatBuffer verts = BufferUtils.createVector3Buffer(12);
 		verts.put(0).put(0).put(0);
@@ -335,7 +334,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		Line lines = new Line("Axis", verts, null, colors, null);
 		lines.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-//		axis.attachChild(line);
+		// axis.attachChild(line);
 
 		return lines;
 	}
@@ -347,21 +346,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (operation == SELECT) {
 					if (drawn == null || drawn.isDrawCompleted())
 						selectHousePart(mouseState.getX(), mouseState.getY(), true);
-//					else
-//						drawn.complete();
+					// else
+					// drawn.complete();
 					return;
 				}
 
 				drawn.addPoint(mouseState.getX(), mouseState.getY());
 
-//				if (drawn.isDrawCompleted()) {
-//					if (operation == DRAW_WALL) {
-//						drawn = new Wall();
-//					} else if (operation == DRAW_DOOR) {
-//						drawn = new Door();
-//					}
-//					addHousePart(drawn);
-//				}
+				// if (drawn.isDrawCompleted()) {
+				// if (operation == DRAW_WALL) {
+				// drawn = new Wall();
+				// } else if (operation == DRAW_DOOR) {
+				// drawn = new Door();
+				// }
+				// addHousePart(drawn);
+				// }
 			}
 		}));
 
@@ -371,25 +370,25 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					return;
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
 				if (operation == SELECT) {
-//					if (drawn == null || drawn.isDrawCompleted())
-//						selectHousePart(mouseState.getX(), mouseState.getY(), true);
-//					else
+					// if (drawn == null || drawn.isDrawCompleted())
+					// selectHousePart(mouseState.getX(), mouseState.getY(), true);
+					// else
 					if (drawn != null)
 						drawn.complete();
 					return;
 				}
 
 				drawn.addPoint(mouseState.getX(), mouseState.getY());
-				
+
 				if (drawn.isDrawCompleted()) {
-//					if (operation == DRAW_WALL) {
-//						drawn = new Wall();
-//					} else if (operation == DRAW_DOOR) {
-//						drawn = new Door();
-//					}
+					// if (operation == DRAW_WALL) {
+					// drawn = new Wall();
+					// } else if (operation == DRAW_DOOR) {
+					// drawn = new Door();
+					// }
 					drawn.hidePoints();
 					drawn = newHousePart();
-//					addHousePart(drawn);
+					// addHousePart(drawn);
 				}
 			}
 		}));
@@ -403,6 +402,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					drawn.setPreviewPoint(x, y);
 				else {
 					selectHousePart(mouseState.getX(), mouseState.getY(), false);
+
 				}
 			}
 		}));
@@ -481,7 +481,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		logicalLayer.registerTrigger(new InputTrigger(mouseMovedAndOneButtonPressed, new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (operation == SELECT && drawn.isDrawCompleted()) {
+				if (operation == SELECT && (drawn == null || drawn.isDrawCompleted())) {
 					final MouseState mouseState = inputStates.getCurrent().getMouseState();
 
 					turn(source, mouseState.getDx() * tpf * -MOUSE_TURN_SPEED);
@@ -693,7 +693,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Vector2.releaseTempInstance(pos);
 
 		// Do the pick
-//		pickResults.clear();
+		// pickResults.clear();
 		PickingUtil.findPick(target, pickRay, pickResults);
 		Ray3.releaseTempInstance(pickRay);
 	}
@@ -710,6 +710,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// }
 		// return null;
 	}
+
 	public PickedHousePart findMousePoint(int x, int y, Spatial target) {
 		pickResults.clear();
 		pick(x, y, target);
@@ -717,63 +718,111 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return getPickResult();
 	}
 
-//	public PickedHousePart findMousePoint(int x, int y, Class<?> typeOfHousePart, HousePart except) {
+	// public PickedHousePart findMousePoint(int x, int y, Class<?> typeOfHousePart, HousePart except) {
 	public PickedHousePart findMousePoint(int x, int y, Class<?> typeOfHousePart) {
 		pickResults.clear();
-//		if (typeOfHousePart == null)
-//			pick(x, y, floor);
-//		else
-			for (HousePart housePart : House.getInstance().getParts())
-				if (typeOfHousePart.isInstance(housePart)) // && housePart != except)
-					pick(x, y, housePart.getRoot());
+		// if (typeOfHousePart == null)
+		// pick(x, y, floor);
+		// else
+		for (HousePart housePart : House.getInstance().getParts())
+			if (typeOfHousePart.isInstance(housePart)) // && housePart != except)
+				pick(x, y, housePart.getRoot());
 
 		return getPickResult();
 	}
 
+	// private PickedHousePart getPickResult() {
+	// if (pickResults.getNumber() > 0) {
+	// final PickData pick = pickResults.getPickData(0);
+	// final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
+	// if (intersectionRecord.getNumberOfIntersections() > 0) {
+	// Object obj = pick.getTargetMesh().getUserData();
+	// UserData userData = null;
+	// if (obj instanceof UserData)
+	// userData = (UserData) obj;
+	// return new PickedHousePart(userData, intersectionRecord.getIntersectionPoint(0));
+	// }
+	// }
+	// return null;
+	// }
+
 	private PickedHousePart getPickResult() {
-		if (pickResults.getNumber() > 0) {
-			final PickData pick = pickResults.getPickData(0);
-			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
-			if (intersectionRecord.getNumberOfIntersections() > 0) {
+		PickedHousePart pickedHousePart = null;
+		double polyDist = Double.MAX_VALUE;
+		double pointDist = Double.MAX_VALUE;
+		for (int i = 0; i < pickResults.getNumber(); i++) {
+			final PickData pick = pickResults.getPickData(i);
+			if (pick.getIntersectionRecord().getNumberOfIntersections() > 0) {
 				Object obj = pick.getTargetMesh().getUserData();
 				UserData userData = null;
 				if (obj instanceof UserData)
 					userData = (UserData) obj;
-				return new PickedHousePart(userData, intersectionRecord.getIntersectionPoint(0));
+				boolean set = pickedHousePart == null;
+				// if housePart of this pick is same as current drawn AND distance difference between this pick and best pick is not much then pick current shape instead of closest shape
+//				if (!set)
+//					set = userData != null && userData.getHousePart() == drawn && pick.getClosestDistance() - dist < 0.1;
+//				double distance = Double.MAX_VALUE;
+				if (userData != null && pick.getClosestDistance() - polyDist < 0.1)
+				for (Vector3 p : userData.getHousePart().getPoints()) {
+					double distance = p.distance(pick.getIntersectionRecord().getIntersectionPoint(0));
+					if (userData.getHousePart() == drawn)
+						distance -= 0.1;
+					if (distance < pointDist) {
+//						pointDist = distance;
+//						if (pick.getClosestDistance() - polyDist < 0.1) {
+							set = true;
+							pointDist = distance;
+//						}
+					}
+				}
+				if (set) {
+					pickedHousePart = new PickedHousePart(userData, pick.getIntersectionRecord().getIntersectionPoint(0));
+					polyDist = pick.getClosestDistance();
+//					pointDist = distance;
+				}
+//				if (userData != null && currentDrawnFoundNearby)
+//					return pickedHousePart;
 			}
 		}
-		return null;
+		return pickedHousePart;
 	}
 
-//	private Mesh findMouseSelection(int x, int y) {
-//		pickResults.clear();
-//		pick(x, y, housePartsNode);
-//
-//		// System.out.println(pickResults.getNumber());
-//		if (pickResults.getNumber() > 0) {
-//			final PickData pick = pickResults.getPickData(0);
-//			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
-//			if (intersectionRecord.getNumberOfIntersections() > 0) {
-//				// System.out.println("PICK");
-//				return pick.getTargetMesh();
-//			}
-//		}
-//		// System.out.println("NO PICK");
-//		return null;
-//	}
+	// private Mesh findMouseSelection(int x, int y) {
+	// pickResults.clear();
+	// pick(x, y, housePartsNode);
+	//
+	// // System.out.println(pickResults.getNumber());
+	// if (pickResults.getNumber() > 0) {
+	// final PickData pick = pickResults.getPickData(0);
+	// final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
+	// if (intersectionRecord.getNumberOfIntersections() > 0) {
+	// // System.out.println("PICK");
+	// return pick.getTargetMesh();
+	// }
+	// }
+	// // System.out.println("NO PICK");
+	// return null;
+	// }
 
 	private void selectHousePart(int x, int y, boolean edit) {
-//		Mesh selectedMesh = findMouseSelection(x, y);
+		// Mesh selectedMesh = findMouseSelection(x, y);
 		PickedHousePart selectedMesh = findMousePoint(x, y, housePartsNode);
 		UserData data = null;
 		if (selectedMesh != null)
 			data = selectedMesh.getUserData();
-		if (selectedMesh == null || data == null) {
+
+		// System.out.println("Pick: " + data.getPointIndex());
+
+		if (data == null) {
 			if (lastHoveredObject != null) {
 				lastHoveredObject.hidePoints();
 				lastHoveredObject = null;
 			}
-		} else if (data.getPointIndex() == -1) {
+		} else if (edit && data.getPointIndex() != -1) {
+			drawn = data.getHousePart();
+			drawn.editPoint(data.getPointIndex());
+			System.out.println("Selected: " + x + "," + y + " " + drawn);
+		} else { // if (data.getPointIndex() == -1) {
 			HousePart housePart = data.getHousePart();
 			if (lastHoveredObject != null && lastHoveredObject != housePart) {
 				lastHoveredObject.hidePoints();
@@ -781,11 +830,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 			housePart.showPoints();
 			lastHoveredObject = housePart;
-			if (edit)
-				drawn = data.getHousePart();
-		} else if (edit) {
+			// if (edit)
 			drawn = data.getHousePart();
-			drawn.editPoint(data.getPointIndex());
+			System.out.println("Selected: " + x + "," + y + " " + drawn);
 		}
 	}
 

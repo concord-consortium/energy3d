@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
@@ -17,14 +18,17 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
-	private double doorHeight = 0.5f;
+	private static double defaultDoorHeight = 1.5f;
+	private double doorHeight = defaultDoorHeight;
 //	private Wall wall;
 	private Mesh mesh = new Mesh("Door");
 	private FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(4);
 	private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
+	protected final ArrayList<Vector3> abspoints;
 
 	public Door() {
-		super(3, 4);
+		super(2, 4);
+		abspoints = new ArrayList<Vector3>(4);
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
@@ -97,6 +101,7 @@ public class Door extends HousePart {
 			Vector3 absoluteBase = convertFromWallRelativeToAbsolute(base);
 			// doorHeight = findHeight(absoluteBase, snap(closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y)));
 			doorHeight = findHeight(absoluteBase, closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y));
+			defaultDoorHeight = doorHeight;
 			points.set(1, getUpperPoint(points.get(1)));
 			points.set(3, getUpperPoint(points.get(3)));
 		}
@@ -164,6 +169,10 @@ public class Door extends HousePart {
 		vertexBuffer.position(0);
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = convertFromWallRelativeToAbsolute(points.get(i));
+			if (i < abspoints.size())
+				abspoints.set(i, p);
+			else
+				abspoints.add(p);
 			if (drawable)
 				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
@@ -185,5 +194,12 @@ public class Door extends HousePart {
 		}
 
 	}
+
+	@Override
+	public ArrayList<Vector3> getPoints() {
+		return abspoints;
+	}
+	
+	
 
 }

@@ -24,6 +24,7 @@ public abstract class HousePart {
 	private PickResults pickResults;
 
 	public HousePart(int numOfDrawPoints, int numOfEditPoints) {
+//		System.out.println("Creating " + this + "...");
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
 		points = new ArrayList<Vector3>(numOfDrawPoints);
@@ -67,12 +68,19 @@ public abstract class HousePart {
 	}	
 
 	public void showPoints() {
-		for (int i=0; i<points.size(); i++)
+		for (int i=0; i<points.size(); i++) {
 			pointsRoot.setVisible(i, true);
+//			((Sphere)pointsRoot.getChild(i)).updateModelBound();
+		}
 	}
 
 	public void hidePoints() {
 		pointsRoot.setAllNonVisible();
+//		for (int i=0; i<points.size(); i++) {
+//			pointsRoot.setVisible(i, true);
+//			((Sphere)pointsRoot.getChild(i)).setModelBound(null);
+//			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
+//		}		
 	}
 
 	public void editPoint(int i) {

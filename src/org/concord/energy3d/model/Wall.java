@@ -24,9 +24,10 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
-	private double wallHeight = 0.8f;
+	private static double defaultWallHeight = 0.8f;
+	private double wallHeight = defaultWallHeight;
 	private double wallThickness = 0.1;
-//	private ArrayList<HousePart> children = new ArrayList<HousePart>();
+	// private ArrayList<HousePart> children = new ArrayList<HousePart>();
 	private Mesh mesh = new Mesh("Wall");
 	private Mesh backMesh = new Mesh("Wall (Back)");
 	private Mesh surroundMesh = new Mesh("Wall (Surround)");
@@ -73,47 +74,47 @@ public class Wall extends HousePart {
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
 
-//		allocateNewPoint();
+		// allocateNewPoint();
 	}
 
-//	public void addChild(HousePart housePart) {
-//		children.add(housePart);
-//	}
-//
-//	public boolean removeChild(HousePart housePart) {
-//		return children.remove(housePart);
-//	}
+	// public void addChild(HousePart housePart) {
+	// children.add(housePart);
+	// }
+	//
+	// public boolean removeChild(HousePart housePart) {
+	// return children.remove(housePart);
+	// }
 
-//	public void addPoint(int x, int y) {
-//		if (drawCompleted)
-//			return;
-////			throw new RuntimeException("Drawing of this object is already completed");
-//
-//		if (points.size() >= numOfEditPoints)
-//			drawCompleted = true;
-//		else {
-//			allocateNewPoint();
-//			setPreviewPoint(x, y);
-//		}
-//	}
+	// public void addPoint(int x, int y) {
+	// if (drawCompleted)
+	// return;
+	// // throw new RuntimeException("Drawing of this object is already completed");
+	//
+	// if (points.size() >= numOfEditPoints)
+	// drawCompleted = true;
+	// else {
+	// allocateNewPoint();
+	// setPreviewPoint(x, y);
+	// }
+	// }
 
-//	private void allocateNewPoint() {
-//		Vector3 p = new Vector3();
-//		points.add(p);
-//		points.add(p);
-//	}
+	// private void allocateNewPoint() {
+	// Vector3 p = new Vector3();
+	// points.add(p);
+	// points.add(p);
+	// }
 
 	private Vector3 getUpperPoint(Vector3 p) {
-		return new Vector3(p.getX(), p.getY(), wallHeight);
+		return new Vector3(p.getX(), p.getY(), wallHeight + points.get(0).getZ());
 	}
 
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			PickedHousePart picked = pick(x, y, Foundation.class);
 			if (picked != null) {
-//				container = picked.getUserData().getHousePart();
+				// container = picked.getUserData().getHousePart();
 				Vector3 p = picked.getPoint();
-//				if (p != null) {
+				// if (p != null) {
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				Snap snap = snap(p, index);
 				setNeighbor(index, snap, true);
@@ -124,8 +125,9 @@ public class Wall extends HousePart {
 			int lower = (editPointIndex == 1) ? 0 : 2;
 			Vector3 base = points.get(lower);
 			Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
+			snap(closestPoint, -1);
 			// neighbor[1] = snap(closestPoint);
-			wallHeight = findHeight(base, closestPoint);
+			defaultWallHeight = wallHeight = findHeight(base, closestPoint);
 			points.set(1, getUpperPoint(points.get(1)));
 			points.set(3, getUpperPoint(points.get(3)));
 
@@ -149,12 +151,12 @@ public class Wall extends HousePart {
 			Vector3 p = points.get(i);
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
-//			pointsRoot.setVisible(i, true);
+			// pointsRoot.setVisible(i, true);
 		}
 
 		if (drawable) {
-//			final float TEXTURE_SCALE_X = (float) points.get(2).subtract(points.get(0), null).length();
-//			final float TEXTURE_SCALE_Y = (float) points.get(3).subtract(points.get(2), null).length();
+			// final float TEXTURE_SCALE_X = (float) points.get(2).subtract(points.get(0), null).length();
+			// final float TEXTURE_SCALE_Y = (float) points.get(3).subtract(points.get(2), null).length();
 
 			// Vector3 normal = points.get(3).subtract(points.get(1), null).cross(points.get(2).subtract(points.get(1), null), null).normalize(null);
 			Vector3 normal = points.get(2).subtract(points.get(0), null).cross(points.get(1).subtract(points.get(0), null), null).normalize(null);
@@ -222,7 +224,7 @@ public class Wall extends HousePart {
 				Poly2Tri.triangulate(polygon);
 				ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
 				ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
-//				ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
+				// ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
 				ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
 
 				Poly2Tri.triangulate(polygon);
@@ -288,13 +290,13 @@ public class Wall extends HousePart {
 		Vector3 p2 = Vector3.fetchTempInstance();
 		int[] order;
 		if (neighbor[0] != null)
-			order = new int[] {1, 3, 2};
+			order = new int[] { 1, 3, 2 };
 		else if (neighbor[1] != null)
-			order = new int[] {0, 1, 3};
+			order = new int[] { 0, 1, 3 };
 		else if (neighbor[0] != null && neighbor[0] != null)
-			order = new int[] {1, 3};
+			order = new int[] { 1, 3 };
 		else
-			order = new int[] {0, 1, 3, 2};
+			order = new int[] { 0, 1, 3, 2 };
 
 		Vector3 sideNormal = thickness.cross(0, 0, 1, null).normalizeLocal();
 		for (int i : order) {
@@ -315,7 +317,7 @@ public class Wall extends HousePart {
 				normalBuffer.put(sideNormal.getXf()).put(sideNormal.getYf()).put(sideNormal.getZf());
 			}
 		}
-		
+
 		while (vertexBuffer.position() < vertexBuffer.capacity())
 			vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 		Vector3.releaseTempInstance(p2);
