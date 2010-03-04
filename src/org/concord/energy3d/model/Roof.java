@@ -120,6 +120,7 @@ public class Roof extends HousePart {
 		avg = new Vector3();
 		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall)container);
 		avg.multiplyLocal(1f / (wallUpperPoints.size()));
+		shiftToOutterEdge(wallUpperPoints);
 		points.get(0).set(avg.getX(), avg.getY(), avg.getZ() + roofHeight);
 		PolygonPoint roofUpperPoint = new PolygonPoint(avg.getX(), avg.getY(), avg.getZ() + roofHeight);
 
@@ -148,6 +149,7 @@ public class Roof extends HousePart {
 		// force bound update
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
+
 
 	private ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
 		ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
@@ -183,6 +185,16 @@ public class Roof extends HousePart {
 
 		// poly.add(poly.get(1));
 		return poly;
+	}
+
+	private void shiftToOutterEdge(ArrayList<PolygonPoint> wallUpperPoints) {
+		final double edgeLenght = 0.3;
+		Vector3 op = new Vector3();
+		for (PolygonPoint p : wallUpperPoints) {
+			op.set(p.getX(), p.getY(), 0).subtractLocal(avg.getX(), avg.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
+			op.addLocal(p.getX(), p.getY(), p.getZ());
+			p.set(op.getX(), op.getY(), op.getZ());
+		}
 	}
 
 	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {

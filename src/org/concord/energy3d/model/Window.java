@@ -16,7 +16,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Window extends HousePart {
 	private double height = 0.5f;
 //	private Wall wall;
-	private Mesh mesh = new Mesh("Door");
+	private Mesh mesh = new Mesh("Window");
 	private FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(4);
 	private FloatBuffer normalBuffer = BufferUtils.createVector3Buffer(4);
 //	private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
@@ -194,9 +194,10 @@ public class Window extends HousePart {
 //			textureBuffer.put(1).put(0);
 //			textureBuffer.put(1).put(1);
 
-			// force bound update
-			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		}
+		// force bound update
+		root.updateGeometricState(0);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
 	}
 

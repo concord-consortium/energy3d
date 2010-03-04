@@ -18,7 +18,7 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
-	private static double defaultDoorHeight = 1.5f;
+	private static double defaultDoorHeight = 0.5f;
 	private double doorHeight = defaultDoorHeight;
 //	private Wall wall;
 	private Mesh mesh = new Mesh("Door");

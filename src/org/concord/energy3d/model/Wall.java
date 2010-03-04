@@ -24,7 +24,7 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
-	private static double defaultWallHeight = 0.8f;
+	private static double defaultWallHeight = 1f;
 	private double wallHeight = defaultWallHeight;
 	private double wallThickness = 0.1;
 	// private ArrayList<HousePart> children = new ArrayList<HousePart>();
@@ -110,7 +110,7 @@ public class Wall extends HousePart {
 
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
-			PickedHousePart picked = pick(x, y, Foundation.class);
+			PickedHousePart picked = pick(x, y, new Class<?>[] {Foundation.class, null}); //Foundation.class);
 			if (picked != null) {
 				// container = picked.getUserData().getHousePart();
 				Vector3 p = picked.getPoint();
@@ -243,7 +243,8 @@ public class Wall extends HousePart {
 
 			// force bound update
 			root.updateGeometricState(0);
-			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+//			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+			CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
 			for (HousePart child : children)
 				child.draw();

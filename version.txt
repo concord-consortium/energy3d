@@ -51,4 +51,9 @@ Version 0.1
 - BUG: mouse would select edit point of first added object regardless of visibility (ie. editing at point of intersection of two walls)
 	- select the behind object if already selected and if the pick distance is not too much from the front object (0.1)
 	- now it will select if hovering mouse near edit point, even if does not touch the object :)
+- BUG: mouse would select the mesh itself instead of edit points due to mesh being closer to center of edit points
+	- fixed by giving priority to edit points when comparing
+- draw roof with an offset with respect to walls to make it look more realistic
+- allow putting walls (or any other object) on a list of possible containers, i.e. on Foundation or directly on floor
+
 	  

@@ -21,4 +21,7 @@ public class UserData {
 		return pointIndex;
 	}
 
+	public String toString() {
+		return housePart + " index = " + pointIndex;
+	}
 }

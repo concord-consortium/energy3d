@@ -22,6 +22,7 @@ public abstract class HousePart {
 	protected int editPointIndex = -1;
 	protected HousePart container = null;
 	private PickResults pickResults;
+	private boolean firstPointInserted = false;
 
 	public HousePart(int numOfDrawPoints, int numOfEditPoints) {
 //		System.out.println("Creating " + this + "...");
@@ -32,15 +33,19 @@ public abstract class HousePart {
 		pickResults = new PrimitivePickResults();
 		pickResults.setCheckDistance(true);
 
+//		hidePoints();
 		final Vector3 origin = new Vector3();
 		for (int i = 0; i < numOfEditPoints; i++) {
 			Sphere pointShape = new Sphere("Point", origin, 20, 20, 0.1);
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
-			pointShape.updateModelBound(); // important
+//			pointShape.updateModelBound(); // important
 		}
+//		pointsRoot.setAllVisible();
 		root.attachChild(pointsRoot);
+//		root.updateGeometricState(0);
 		allocateNewPoint();
+		
 	}
 
 	public Node getRoot() {
@@ -70,8 +75,12 @@ public abstract class HousePart {
 	public void showPoints() {
 		for (int i=0; i<points.size(); i++) {
 			pointsRoot.setVisible(i, true);
-//			((Sphere)pointsRoot.getChild(i)).updateModelBound();
+//			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
+			((Sphere)pointsRoot.getChild(i)).updateModelBound();
 		}
+//		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
+//		root.updateWorldBound(true);
+//		root.updateGeometricState(0);
 	}
 
 	public void hidePoints() {
@@ -81,6 +90,7 @@ public abstract class HousePart {
 //			((Sphere)pointsRoot.getChild(i)).setModelBound(null);
 //			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
 //		}		
+//		root.updateGeometricState(0);
 	}
 
 	public void editPoint(int i) {
@@ -156,19 +166,36 @@ public abstract class HousePart {
 //		PickingUtil.findPick(target, pickRay, pickResults);
 //		Ray3.releaseTempInstance(pickRay);
 //	}
+
+	protected PickedHousePart pick(int x, int y) {		
+		return pick(x, y, (Class<? extends HousePart>)null);
+	}
 	
-	protected PickedHousePart pick(int x, int y, Class<? extends HousePart> typeOfHousePart) {
+	protected PickedHousePart pick(int x, int y, Class<?>[] typesOfHousePart) {
+		for (Class<?> c : typesOfHousePart) {
+			PickedHousePart picked = pick(x, y, c);
+			if (picked != null)
+				return picked;
+		}
+		return null;			
+	}
+	
+	protected PickedHousePart pick(int x, int y, Class<?> typeOfHousePart) {
 		PickedHousePart picked = null;
-		if (container == null || points.size() < 4)
+//		if (container == null || points.size() < 4)
+		if (!firstPointInserted)
 			picked = SceneManager.getInstance().findMousePoint(x, y, typeOfHousePart);
 		else
-			picked = SceneManager.getInstance().findMousePoint(x, y, container.getRoot());
+			picked = SceneManager.getInstance().findMousePoint(x, y, container == null ? null : container.getRoot());
 		if (picked != null)
-			if (container == null || container != picked.getUserData().getHousePart()) {
+			if (container == null || picked.getUserData() == null || container != picked.getUserData().getHousePart()) {
 				if (container != null)
 					container.removeChild(this);
-				container = picked.getUserData().getHousePart();
-				container.addChild(this);
+				if (picked.getUserData() != null) {
+					container = picked.getUserData().getHousePart();
+					container.addChild(this);
+				} else
+					container = null;
 			}		
 		return picked;
 	}
@@ -222,6 +249,7 @@ public abstract class HousePart {
 	}
 
 	public void addPoint(int x, int y) {
+		firstPointInserted = true;
 		if (drawCompleted)
 			throw new RuntimeException("Drawing of this object is already completed");
 

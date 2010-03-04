@@ -18,4 +18,8 @@ public class PickedHousePart {
 	public Vector3 getPoint() {
 		return point;
 	}
+	
+	public String toString() {
+		return userData + " @" + point;
+	}
 }
