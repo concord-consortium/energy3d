@@ -13,6 +13,8 @@ import javax.swing.SwingUtilities;
 
 import org.concord.energy3d.model.SceneManager;
 
+import com.ardor3d.framework.jogl.JoglAwtCanvas;
+
 
 public class MainFrame extends JFrame {
 
@@ -28,6 +30,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton windowButton = null;
 	private JToggleButton foundationButton = null;
 	private JToggleButton lightButton = null;
+	private JToggleButton topViewButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -72,6 +75,7 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getRoofButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
+			appToolbar.add(getTopViewButton());
 			
 			ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
@@ -209,6 +213,28 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return lightButton;
+	}
+
+	/**
+	 * This method initializes topViewButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getTopViewButton() {
+		if (topViewButton == null) {
+			topViewButton = new JToggleButton();
+			topViewButton.setText("Top View");
+			topViewButton.addItemListener(new java.awt.event.ItemListener() {
+				public void itemStateChanged(java.awt.event.ItemEvent e) {
+					JoglAwtCanvas canvas = SceneManager.getInstance().getCanvas();
+					if (topViewButton.isSelected())
+						SceneManager.getInstance().topCameraView(canvas);
+					else
+						SceneManager.getInstance().resetCamera(canvas);
+				}
+			});
+		}
+		return topViewButton;
 	}
 
 	/**

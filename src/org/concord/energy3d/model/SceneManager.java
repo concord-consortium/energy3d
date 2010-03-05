@@ -25,6 +25,7 @@ import com.ardor3d.input.awt.AwtFocusWrapper;
 import com.ardor3d.input.awt.AwtKeyboardWrapper;
 import com.ardor3d.input.awt.AwtMouseManager;
 import com.ardor3d.input.awt.AwtMouseWrapper;
+import com.ardor3d.input.control.FirstPersonControl;
 import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyHeldCondition;
@@ -49,6 +50,7 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.Camera.ProjectionMode;
@@ -145,7 +147,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 				final Camera camera = renderer.getCamera();
 				if (camera != null) {
-					// camera.setFrustumPerspective(fovY, aspect, near, far);
+//					 camera.setFrustumPerspective(fovY, aspect, near, far);
 					camera.resize(size.width, size.height);
 				}
 			}
@@ -162,9 +164,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return;
 		}
 		camera.resize(size.width, size.height);
-		camera.setProjectionMode(ProjectionMode.Parallel);
-//		resetCamera(canvas);
-		topCameraView(canvas);
+//		camera.setProjectionMode(ProjectionMode.Parallel);
+		resetCamera(canvas);
+//		topCameraView(canvas);
 
 		AWTImageLoader.registerLoader();
 
@@ -365,6 +367,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void registerInputTriggers() {
+//		FirstPersonControl.setupTriggers(logicalLayer, new Vector3(0, 0, 1), true);
+		
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
@@ -523,7 +527,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		source.getCanvasRenderer().getCamera().lookAt(Vector3.ZERO, Vector3.UNIT_Y);
 	}
 
-	private void resetCamera(final Canvas source) {
+	public void resetCamera(final Canvas source) {
 		// final Vector3 loc = new Vector3(1.0f, 1.0f, 5.0f);
 		// final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		// final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
@@ -536,24 +540,46 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
 		final Vector3 dir = new Vector3(0.0f, 1.0f, 0.0f);
 
-		source.getCanvasRenderer().getCamera().setFrame(loc, left, up, dir);
+		Camera camera = source.getCanvasRenderer().getCamera();
+		camera.setFrame(loc, left, up, dir);
+
+		float scale = 0.5f;
+		camera.setFrustumTop(scale);
+		camera.setFrustumBottom(-scale);
+		camera.setFrustumLeft(-scale);
+		camera.setFrustumRight(scale);
+		
+		camera.setProjectionMode(ProjectionMode.Perspective);
+		camera.update();
 	}
 
-	private void topCameraView(final Canvas source) {
+	public void topCameraView(final Canvas source) {
 		// final Vector3 loc = new Vector3(1.0f, 1.0f, 5.0f);
 		// final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		// final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
 		// final Vector3 dir = new Vector3(-1.0f, 0.0f, -1.0f);
 
 		isTopView = true;
+//		root.setScale(0.1);
+//		renderer.getCamera().setLocation(0, 0, 100);
 		
-		final Vector3 loc = new Vector3(0, 0, 5);
+		final Vector3 loc = new Vector3(0, 0, 50);
 		final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
-		final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
+		final Vector3 up = new Vector3(0.0f, -1.0f, 0.0f);
 		final Vector3 dir = new Vector3(0.0f, 0.0f, -1.0f);
 
-		source.getCanvasRenderer().getCamera().setFrame(loc, left, up, dir);
-		source.getCanvasRenderer().getCamera().setProjectionMode(ProjectionMode.Parallel);
+		Camera camera = source.getCanvasRenderer().getCamera();
+		camera.setFrame(loc, left, up, dir);
+		camera.setProjectionMode(ProjectionMode.Parallel);
+//		camera.setFrustum(1, 2, -0.5, 0.5, 0.5, -0.5)
+		double scale = 4;
+		double ratio = (double)camera.getWidth() / camera.getHeight();
+		camera.setFrustumTop(scale);
+		camera.setFrustumBottom(-scale);
+		camera.setFrustumLeft(-scale*ratio);
+		camera.setFrustumRight(scale*ratio);
+		
+		camera.update();
 	}
 	
 	private void toggleRotation() {
@@ -875,4 +901,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		root.updateWorldRenderStates(true);
 	}
 
+	// TODO
+    public static FirstPersonControl setupTriggers(final LogicalLayer layer, final ReadOnlyVector3 upAxis,
+            final boolean dragOnly) {
+
+        final FirstPersonControl control = new FirstPersonControl(upAxis);
+        control.setupKeyboardTriggers(layer);
+        control.setupMouseTriggers(layer, dragOnly);
+        return control;
+    }
+	
 }

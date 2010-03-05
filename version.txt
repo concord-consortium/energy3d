@@ -55,5 +55,6 @@ Version 0.1
 	- fixed by giving priority to edit points when comparing
 - draw roof with an offset with respect to walls to make it look more realistic
 - allow putting walls (or any other object) on a list of possible containers, i.e. on Foundation or directly on floor
+- add option to switch the view of the scene to Top View in Parallel perspective and allow inserting walls to draw house plan
 
 	  
