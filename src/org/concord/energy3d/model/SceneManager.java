@@ -110,6 +110,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private int operation = SELECT;
 	protected HousePart lastHoveredObject;
 	private LightState lightState;
+	
+	private boolean isTopView = false;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -122,7 +124,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 8, false, false);
 		renderer = new JoglCanvasRenderer(this);
-		canvas = new JoglAwtCanvas(settings, renderer);
+		canvas = new JoglAwtCanvas(settings, renderer);		
 		frameHandler = new FrameHandler(new Timer());
 		frameHandler.addCanvas(canvas);
 
@@ -160,7 +162,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return;
 		}
 		camera.resize(size.width, size.height);
-		resetCamera(canvas);
+		camera.setProjectionMode(ProjectionMode.Parallel);
+//		resetCamera(canvas);
+		topCameraView(canvas);
 
 		AWTImageLoader.registerLoader();
 
@@ -471,6 +475,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				resetCamera(source);
 			}
 		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ONE), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				topCameraView(source);
+			}
+		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.NINE), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				lookAtZero(source);
@@ -520,6 +529,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
 		// final Vector3 dir = new Vector3(-1.0f, 0.0f, -1.0f);
 
+		isTopView = true;
+		
 		final Vector3 loc = new Vector3(1.0f, -5.0f, 1.0f);
 		final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		final Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
@@ -528,6 +539,23 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		source.getCanvasRenderer().getCamera().setFrame(loc, left, up, dir);
 	}
 
+	private void topCameraView(final Canvas source) {
+		// final Vector3 loc = new Vector3(1.0f, 1.0f, 5.0f);
+		// final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
+		// final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
+		// final Vector3 dir = new Vector3(-1.0f, 0.0f, -1.0f);
+
+		isTopView = true;
+		
+		final Vector3 loc = new Vector3(0, 0, 5);
+		final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
+		final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
+		final Vector3 dir = new Vector3(0.0f, 0.0f, -1.0f);
+
+		source.getCanvasRenderer().getCamera().setFrame(loc, left, up, dir);
+		source.getCanvasRenderer().getCamera().setProjectionMode(ProjectionMode.Parallel);
+	}
+	
 	private void toggleRotation() {
 		rotationSign *= -1;
 	}
