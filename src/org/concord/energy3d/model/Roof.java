@@ -22,19 +22,27 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Roof extends HousePart {
+	private static final long serialVersionUID = 1L;
 	private double roofHeight = 0.5;
-	private Mesh mesh = new Mesh("Roof");
-//	private Wall wall;
-	private FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(4);
-	private Vector3 avg;
+	private transient Mesh mesh; // = new Mesh("Roof");
+	// private Wall wall;
+	private transient FloatBuffer vertexBuffer; // = BufferUtils.createVector3Buffer(4);
+	private transient Vector3 avg;
 
 	// private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
 
 	public Roof() {
 		super(1, 1);
+		// points.add(new Vector3());
+	}
+
+	protected void init() {
+		super.init();
+		mesh = new Mesh("Roof");
+		vertexBuffer = BufferUtils.createVector3Buffer(4);
 		root.attachChild(mesh);
-		 mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		 mesh.getMeshData().setVertexBuffer(vertexBuffer);
+		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		mesh.getMeshData().setVertexBuffer(vertexBuffer);
 		// mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
@@ -48,34 +56,30 @@ public class Roof extends HousePart {
 		mesh.setRenderState(ts);
 
 		mesh.setUserData(new UserData(this));
-
-//		points.add(new Vector3());
 	}
 
-//	protected void allocateNewPoint() {
-//	}
+	// protected void allocateNewPoint() {
+	// }
 
-//	@Override
-//	public void addPoint(int x, int y) {
-//		if (drawCompleted)
-//			return;
-////			throw new RuntimeException("Drawing of this object is already completed");
-//
-//		if (points.size() >= numOfEditPoints)
-//			drawCompleted = true;
-//		else {
-//			// points.add(new Vector3());
-//			setPreviewPoint(x, y);
-//		}
-//	}
+	// @Override
+	// public void addPoint(int x, int y) {
+	// if (drawCompleted)
+	// return;
+	// // throw new RuntimeException("Drawing of this object is already completed");
+	//
+	// if (points.size() >= numOfEditPoints)
+	// drawCompleted = true;
+	// else {
+	// // points.add(new Vector3());
+	// setPreviewPoint(x, y);
+	// }
+	// }
 
-	
-	
 	@Override
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1) {
-//			selectWall(x, y);
-			pick(x, y, Wall.class);			
+			// selectWall(x, y);
+			pick(x, y, Wall.class);
 		} else {
 			Vector3 base = avg;
 			Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
@@ -86,39 +90,42 @@ public class Roof extends HousePart {
 
 	}
 
-//	public void selectWall(int x, int y) {
-//		pickResults.clear();
-//		for (HousePart housePart : House.getInstance().getParts())
-//			if (housePart instanceof Wall && housePart != this)
-//				pick(x, y, ((Wall) housePart).getRoot());
-//
-//		if (pickResults.getNumber() > 0) {
-//			final PickData pick = pickResults.getPickData(0);
-//			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
-//			if (intersectionRecord.getNumberOfIntersections() > 0) {
-//				UserData data = (UserData) pick.getTargetMesh().getUserData();
-//				if (data == null || !(data.getHousePart() instanceof Wall))
-//					throw new RuntimeException("Door can only be placed on a wall!");
-//				if (wall != null && data.getHousePart() != wall && points.size() > 2)
-//					throw new RuntimeException("Door points cannot be placed on multiple walls!");
-//				if (wall == null || wall != data.getHousePart()) {
-//					if (wall != null)
-//						wall.removeChild(this);
-//					wall = (Wall) data.getHousePart();
-//					wall.addChild(this);
-//				}
-//				return;
-//			}
-//		}
-//	}
+	// public void selectWall(int x, int y) {
+	// pickResults.clear();
+	// for (HousePart housePart : House.getInstance().getParts())
+	// if (housePart instanceof Wall && housePart != this)
+	// pick(x, y, ((Wall) housePart).getRoot());
+	//
+	// if (pickResults.getNumber() > 0) {
+	// final PickData pick = pickResults.getPickData(0);
+	// final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
+	// if (intersectionRecord.getNumberOfIntersections() > 0) {
+	// UserData data = (UserData) pick.getTargetMesh().getUserData();
+	// if (data == null || !(data.getHousePart() instanceof Wall))
+	// throw new RuntimeException("Door can only be placed on a wall!");
+	// if (wall != null && data.getHousePart() != wall && points.size() > 2)
+	// throw new RuntimeException("Door points cannot be placed on multiple walls!");
+	// if (wall == null || wall != data.getHousePart()) {
+	// if (wall != null)
+	// wall.removeChild(this);
+	// wall = (Wall) data.getHousePart();
+	// wall.addChild(this);
+	// }
+	// return;
+	// }
+	// }
+	// }
 
 	@Override
 	protected void draw() {
+		if (root == null)
+			init();
+
 		if (container == null)
 			return;
-//		ArrayList<PolygonPoint> wallUpperPoints = new ArrayList<PolygonPoint>();
+		// ArrayList<PolygonPoint> wallUpperPoints = new ArrayList<PolygonPoint>();
 		avg = new Vector3();
-		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall)container);
+		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
 		avg.multiplyLocal(1f / (wallUpperPoints.size()));
 		shiftToOutterEdge(wallUpperPoints);
 		points.get(0).set(avg.getX(), avg.getY(), avg.getZ() + roofHeight);
@@ -149,7 +156,6 @@ public class Roof extends HousePart {
 		// force bound update
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
-
 
 	private ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
 		ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();

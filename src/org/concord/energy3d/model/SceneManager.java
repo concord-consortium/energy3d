@@ -96,7 +96,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final LogicalLayer logicalLayer;
 	private boolean _exit = false;
 	protected final Node root = new Node("Root");
-	private final Node housePartsNode = new Node("House Parts");
+	private final Node housePartsNode = House.root; //new Node("House Parts");
 
 	private Mesh floor;
 
@@ -211,7 +211,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //		Wall w2 = testWall(0, 2, 2, 2);
 //		Wall w3 = testWall(2, 2, 2, 0);
 		
-		
+		House.getInstance();
 		
 
 		registerInputTriggers();

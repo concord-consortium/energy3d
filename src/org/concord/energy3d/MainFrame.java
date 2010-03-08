@@ -11,9 +11,11 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
+import org.concord.energy3d.model.House;
 import org.concord.energy3d.model.SceneManager;
 
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
+import javax.swing.JButton;
 
 
 public class MainFrame extends JFrame {
@@ -31,6 +33,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton foundationButton = null;
 	private JToggleButton lightButton = null;
 	private JToggleButton topViewButton = null;
+	private JButton testButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -76,6 +79,7 @@ public class MainFrame extends JFrame {
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
 			appToolbar.add(getTopViewButton());
+			appToolbar.add(getTestButton());
 			
 			ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
@@ -235,6 +239,24 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return topViewButton;
+	}
+
+	/**
+	 * This method initializes testButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getTestButton() {
+		if (testButton == null) {
+			testButton = new JButton();
+			testButton.setText("Save");
+			testButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					House.getInstance().save();
+				}
+			});
+		}
+		return testButton;
 	}
 
 	/**

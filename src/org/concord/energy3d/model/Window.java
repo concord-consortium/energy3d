@@ -14,20 +14,29 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
+	private static final long serialVersionUID = 1L;
 	private double height = 0.5f;
-//	private Wall wall;
-	private Mesh mesh = new Mesh("Window");
-	private FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(4);
-	private FloatBuffer normalBuffer = BufferUtils.createVector3Buffer(4);
-//	private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
+	// private Wall wall;
+	private transient Mesh mesh; // = new Mesh("Window");
+	private transient FloatBuffer vertexBuffer; // = BufferUtils.createVector3Buffer(4);
+	private transient FloatBuffer normalBuffer; // = BufferUtils.createVector3Buffer(4);
+
+	// private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
 
 	public Window() {
 		super(2, 4);
+	}
+
+	protected void init() {
+		super.init();
+		mesh = new Mesh("Window");
+		vertexBuffer = BufferUtils.createVector3Buffer(4);
+		normalBuffer = BufferUtils.createVector3Buffer(4);		
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
 		mesh.getMeshData().setNormalBuffer(normalBuffer);
-//		mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
+		// mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
 		// Transparency
 		mesh.setDefaultColor(new ColorRGBA(0, 0.5f, 0.5f, 0.5f));
@@ -39,42 +48,41 @@ public class Window extends HousePart {
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
-//		ms.setMaterialFace(MaterialFace.FrontAndBack);
+		// ms.setMaterialFace(MaterialFace.FrontAndBack);
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
 
-//		// Add a texture to the box.
-//		final TextureState ts = new TextureState();
-//		ts.setTexture(TextureManager.load("window1.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
-//		mesh.setRenderState(ts);
-		
-//		OffsetState offsetState = new OffsetState();
-//		offsetState.setTypeEnabled(OffsetType.Fill, true);
-//		offsetState.setFactor(-1);
-//		mesh.setRenderState(offsetState);
+		// // Add a texture to the box.
+		// final TextureState ts = new TextureState();
+		// ts.setTexture(TextureManager.load("window1.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
+		// mesh.setRenderState(ts);
+
+		// OffsetState offsetState = new OffsetState();
+		// offsetState.setTypeEnabled(OffsetType.Fill, true);
+		// offsetState.setFactor(-1);
+		// mesh.setRenderState(offsetState);
 
 		mesh.setUserData(new UserData(this));
-
 	}
 
-//	public void addPoint(int x, int y) {
-//		if (drawCompleted)
-//			return;
-////			throw new RuntimeException("Drawing of this object is already completed");
-//
-//		if (points.size() >= numOfEditPoints)
-//			drawCompleted = true;
-//		else {
-//			allocateNewPoint();
-//			setPreviewPoint(x, y);
-//		}
-//	}
+	// public void addPoint(int x, int y) {
+	// if (drawCompleted)
+	// return;
+	// // throw new RuntimeException("Drawing of this object is already completed");
+	//
+	// if (points.size() >= numOfEditPoints)
+	// drawCompleted = true;
+	// else {
+	// allocateNewPoint();
+	// setPreviewPoint(x, y);
+	// }
+	// }
 
-//	private void allocateNewPoint() {
-//		Vector3 p = new Vector3();
-//		points.add(p);
-//		points.add(p);
-//	}
+	// private void allocateNewPoint() {
+	// Vector3 p = new Vector3();
+	// points.add(p);
+	// points.add(p);
+	// }
 
 	private Vector3 getUpperPoint(Vector3 p) {
 		return new Vector3(p.getX(), p.getY(), height);
@@ -82,12 +90,12 @@ public class Window extends HousePart {
 
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
-//			Vector3 p = findMousePoint(x, y);
-			PickedHousePart picked = pick(x, y, Wall.class);			
+			// Vector3 p = findMousePoint(x, y);
+			PickedHousePart picked = pick(x, y, Wall.class);
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
-				if (points.size() <=  2) {
-					height = points.get(0).getZ() + 0.25 + container.getPoints().get(0).getZ(); 
+				if (points.size() <= 2) {
+					height = points.get(0).getZ() + 0.25 + container.getPoints().get(0).getZ();
 				} else {
 					Vector3 wallFirstPoint = container.getPoints().get(0);
 					Vector3 wallx = container.getPoints().get(2).subtract(wallFirstPoint, null);
@@ -115,55 +123,58 @@ public class Window extends HousePart {
 		}
 	}
 
-//	private Vector3 convertToWallRelative(Vector3 p) {
-//		ArrayList<Vector3> wallPoints = container.getPoints();
-//		Vector3 origin = wallPoints.get(0);
-//		p = p.subtract(origin, null);
-//		Vector3 wallx = wallPoints.get(2).subtract(origin, null).normalize(null);
-//		Vector3 wally = wallPoints.get(1).subtract(origin, null).normalize(null);
-//		Vector3 pointOnWall = new Vector3(wallx.dot(p), 0, wally.dot(p));
-//		return pointOnWall;
-//	}
-//
-//	public Vector3 convertFromWallRelativeToAbsolute(Vector3 p) {
-//		ArrayList<Vector3> wallPoints = container.getPoints();
-//		Vector3 origin = wallPoints.get(0);
-//		Vector3 wallx = wallPoints.get(2).subtract(origin, null).normalize(null);
-//		Vector3 wally = wallPoints.get(1).subtract(origin, null).normalize(null);
-//		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply(p.getZ(), null), null);
-//		return pointOnSpace;
-//	}
+	// private Vector3 convertToWallRelative(Vector3 p) {
+	// ArrayList<Vector3> wallPoints = container.getPoints();
+	// Vector3 origin = wallPoints.get(0);
+	// p = p.subtract(origin, null);
+	// Vector3 wallx = wallPoints.get(2).subtract(origin, null).normalize(null);
+	// Vector3 wally = wallPoints.get(1).subtract(origin, null).normalize(null);
+	// Vector3 pointOnWall = new Vector3(wallx.dot(p), 0, wally.dot(p));
+	// return pointOnWall;
+	// }
+	//
+	// public Vector3 convertFromWallRelativeToAbsolute(Vector3 p) {
+	// ArrayList<Vector3> wallPoints = container.getPoints();
+	// Vector3 origin = wallPoints.get(0);
+	// Vector3 wallx = wallPoints.get(2).subtract(origin, null).normalize(null);
+	// Vector3 wally = wallPoints.get(1).subtract(origin, null).normalize(null);
+	// Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply(p.getZ(), null), null);
+	// return pointOnSpace;
+	// }
 
-//	public Vector3 findMousePoint(int x, int y) {
-//		pickResults.clear();
-//		for (HousePart housePart : House.getInstance().getParts())
-//			if (housePart instanceof Wall && housePart != this)
-//				pick(x, y, ((Wall) housePart).getRoot());
-//
-//		if (pickResults.getNumber() > 0) {
-//			final PickData pick = pickResults.getPickData(0);
-//			final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
-//			if (intersectionRecord.getNumberOfIntersections() > 0) {
-//				UserData data = (UserData) pick.getTargetMesh().getUserData();
-//				if (data == null || !(data.getHousePart() instanceof Wall))
-//					throw new RuntimeException("Door can only be placed on a wall!");
-//				if (wall != null && data.getHousePart() != wall && points.size() > 2)
-//					throw new RuntimeException("Door points cannot be placed on multiple walls!");
-////					return null;
-//				if (wall == null || wall != data.getHousePart()) {
-//					if (wall != null)
-//						wall.removeChild(this);
-//					wall = (Wall) data.getHousePart();
-//					wall.addChild(this);
-//				}
-//				return intersectionRecord.getIntersectionPoint(0);
-//			}
-//		}
-//		return null;
-//	}
+	// public Vector3 findMousePoint(int x, int y) {
+	// pickResults.clear();
+	// for (HousePart housePart : House.getInstance().getParts())
+	// if (housePart instanceof Wall && housePart != this)
+	// pick(x, y, ((Wall) housePart).getRoot());
+	//
+	// if (pickResults.getNumber() > 0) {
+	// final PickData pick = pickResults.getPickData(0);
+	// final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
+	// if (intersectionRecord.getNumberOfIntersections() > 0) {
+	// UserData data = (UserData) pick.getTargetMesh().getUserData();
+	// if (data == null || !(data.getHousePart() instanceof Wall))
+	// throw new RuntimeException("Door can only be placed on a wall!");
+	// if (wall != null && data.getHousePart() != wall && points.size() > 2)
+	// throw new RuntimeException("Door points cannot be placed on multiple walls!");
+	// // return null;
+	// if (wall == null || wall != data.getHousePart()) {
+	// if (wall != null)
+	// wall.removeChild(this);
+	// wall = (Wall) data.getHousePart();
+	// wall.addChild(this);
+	// }
+	// return intersectionRecord.getIntersectionPoint(0);
+	// }
+	// }
+	// return null;
+	// }
 
 	@Override
 	protected void draw() {
+		if (root == null)
+			init();
+
 		final boolean drawable = points.size() >= 4;
 		vertexBuffer.position(0);
 		Vector3[] convertedPoints = new Vector3[4];
@@ -177,22 +188,22 @@ public class Window extends HousePart {
 			pointsRoot.getChild(i).setTranslation(p);
 			pointsRoot.updateGeometricState(0);
 		}
-		
+
 		if (drawable) {
 			Vector3 normal = convertedPoints[2].subtract(convertedPoints[0], null).crossLocal(convertedPoints[1].subtract(convertedPoints[0], null)).normalizeLocal();
 			normal.negateLocal();
 			normalBuffer.position(0);
-			for (int i=0; i < points.size(); i++)
+			for (int i = 0; i < points.size(); i++)
 				normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
 		}
 
 		if (drawable) {
-//			// texture coords
-//			textureBuffer.position(0);
-//			textureBuffer.put(0).put(0);
-//			textureBuffer.put(0).put(1);
-//			textureBuffer.put(1).put(0);
-//			textureBuffer.put(1).put(1);
+			// // texture coords
+			// textureBuffer.position(0);
+			// textureBuffer.put(0).put(0);
+			// textureBuffer.put(0).put(1);
+			// textureBuffer.put(1).put(0);
+			// textureBuffer.put(1).put(1);
 
 		}
 		// force bound update

@@ -1,6 +1,9 @@
 package org.concord.energy3d.model;
 
-public class Snap {
+import java.io.Serializable;
+
+public class Snap implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private HousePart neighbor;
 	private int neighborPointIndex;
 	private int thisPointIndex;

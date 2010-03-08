@@ -20,23 +20,37 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.extension.SwitchNode;
+import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
+	private static final long serialVersionUID = 1L;
 	private static double defaultWallHeight = 1f;
 	private double wallHeight = defaultWallHeight;
 	private double wallThickness = 0.1;
 	// private ArrayList<HousePart> children = new ArrayList<HousePart>();
-	private Mesh mesh = new Mesh("Wall");
-	private Mesh backMesh = new Mesh("Wall (Back)");
-	private Mesh surroundMesh = new Mesh("Wall (Surround)");
-	private FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(4);
-	private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
+	private transient Mesh mesh; // = new Mesh("Wall");
+	private transient Mesh backMesh; // = new Mesh("Wall (Back)");
+	private transient Mesh surroundMesh; // = new Mesh("Wall (Surround)");
+	private transient FloatBuffer vertexBuffer; // = BufferUtils.createVector3Buffer(4);
+	private transient FloatBuffer textureBuffer; // = BufferUtils.createVector2Buffer(4);
 	private Snap[] neighbor = new Snap[2];
 
 	public Wall() {
 		super(2, 4);
+
+	}
+	
+	protected void init() {
+		super.init();
+		mesh = new Mesh("Wall");
+		backMesh = new Mesh("Wall (Back)");
+		surroundMesh = new Mesh("Wall (Surround)");
+		vertexBuffer = BufferUtils.createVector3Buffer(4);
+		textureBuffer = BufferUtils.createVector2Buffer(4);
+		
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		// mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
@@ -74,7 +88,7 @@ public class Wall extends HousePart {
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
 
-		// allocateNewPoint();
+		// allocateNewPoint();		
 	}
 
 	// public void addChild(HousePart housePart) {
@@ -151,6 +165,7 @@ public class Wall extends HousePart {
 			Vector3 p = points.get(i);
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
+//			((Sphere)pointsRoot.getChild(i)).updateWorldBound(false);			
 			// pointsRoot.setVisible(i, true);
 		}
 
@@ -242,6 +257,11 @@ public class Wall extends HousePart {
 			}
 
 			// force bound update
+			mesh.updateModelBound();
+			backMesh.updateModelBound();
+			surroundMesh.updateModelBound();
+//			pointsRoot.updateWorldBound(false);
+			root.updateWorldBound(true);
 			root.updateGeometricState(0);
 //			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 			CollisionTreeManager.INSTANCE.removeCollisionTree(root);

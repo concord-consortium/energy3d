@@ -8,11 +8,17 @@ import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.TextureManager;
 
 public class Foundation extends HousePart {
+	private static final long serialVersionUID = 1L;
 	private double foundationHeight = 0.1;
-	private Box mesh = new Box("Foundation", new Vector3(), new Vector3());
+	private transient Box mesh; // = new Box("Foundation", new Vector3(), new Vector3());
 
 	public Foundation() {
 		super(2, 2);
+	
+	}
+	protected void init() {
+		super.init();
+		mesh = new Box("Foundation", new Vector3(), new Vector3());
 		root.attachChild(mesh);
 //		allocateNewPoint();
 		
@@ -22,9 +28,8 @@ public class Foundation extends HousePart {
 		mesh.setRenderState(ts);		
 		
 		UserData userData = new UserData(this);
-		mesh.setUserData(userData);		
+		mesh.setUserData(userData);			
 	}
-
 //	@Override
 //	public void addPoint(int x, int y) {
 //		if (drawCompleted)

@@ -1,5 +1,6 @@
 package org.concord.energy3d.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.ardor3d.intersection.PickResults;
@@ -12,16 +13,17 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.extension.SwitchNode;
 import com.ardor3d.scenegraph.shape.Sphere;
 
-public abstract class HousePart {
-	protected final Node root = new Node();
-	protected final SwitchNode pointsRoot = new SwitchNode("Edit Points");
+public abstract class HousePart implements Serializable {
+	private static final long serialVersionUID = 1L;
+	protected transient Node root; // = new Node();
+	protected transient SwitchNode pointsRoot; // = new SwitchNode("Edit Points");
 	protected final int numOfDrawPoints, numOfEditPoints;
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
+	protected HousePart container = null;
 	protected boolean drawCompleted = false;
 	protected int editPointIndex = -1;
-	protected HousePart container = null;
-	private PickResults pickResults;
+	private transient PickResults pickResults;
 	private boolean firstPointInserted = false;
 
 	public HousePart(int numOfDrawPoints, int numOfEditPoints) {
@@ -29,6 +31,16 @@ public abstract class HousePart {
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
 		points = new ArrayList<Vector3>(numOfDrawPoints);
+		init();
+		
+		allocateNewPoint();
+		
+	}
+	
+	protected void init() {
+		root = new Node("House Part");
+		pointsRoot = new SwitchNode("Edit Points");
+		
 		// Set up a reusable pick results
 		pickResults = new PrimitivePickResults();
 		pickResults.setCheckDistance(true);
@@ -39,16 +51,18 @@ public abstract class HousePart {
 			Sphere pointShape = new Sphere("Point", origin, 20, 20, 0.1);
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
-//			pointShape.updateModelBound(); // important
+			pointShape.updateModelBound(); // important
 		}
 //		pointsRoot.setAllVisible();
 		root.attachChild(pointsRoot);
-//		root.updateGeometricState(0);
-		allocateNewPoint();
-		
+//		root.updateGeometricState(0);		
 	}
 
 	public Node getRoot() {
+		if (root == null) {
+			init();
+			draw();
+		}
 		return root;
 	}
 
@@ -76,7 +90,8 @@ public abstract class HousePart {
 		for (int i=0; i<points.size(); i++) {
 			pointsRoot.setVisible(i, true);
 //			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
-			((Sphere)pointsRoot.getChild(i)).updateModelBound();
+//			((Sphere)pointsRoot.getChild(i)).updateModelBound();
+//			((Sphere)pointsRoot.getChild(i)).updateWorldBound(false);
 		}
 //		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 //		root.updateWorldBound(true);

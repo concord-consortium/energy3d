@@ -18,16 +18,26 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
+	private static final long serialVersionUID = 1L;
 	private static double defaultDoorHeight = 0.5f;
 	private double doorHeight = defaultDoorHeight;
 //	private Wall wall;
-	private Mesh mesh = new Mesh("Door");
-	private FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(4);
-	private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
-	protected final ArrayList<Vector3> abspoints;
+	private transient Mesh mesh; // = new Mesh("Door");
+	private transient FloatBuffer vertexBuffer; // = BufferUtils.createVector3Buffer(4);
+	private transient FloatBuffer textureBuffer; // = BufferUtils.createVector2Buffer(4);
+	protected transient ArrayList<Vector3> abspoints;
 
 	public Door() {
 		super(2, 4);
+
+
+//		allocateNewPoint();
+	}
+	protected void init() {
+		super.init();
+		mesh = new Mesh("Door");
+		vertexBuffer = BufferUtils.createVector3Buffer(4);
+		textureBuffer = BufferUtils.createVector2Buffer(4);		
 		abspoints = new ArrayList<Vector3>(4);
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
@@ -50,11 +60,9 @@ public class Door extends HousePart {
 		mesh.setRenderState(offsetState);
 		
 		
-		mesh.setUserData(new UserData(this));
-
-//		allocateNewPoint();
+		mesh.setUserData(new UserData(this));		
 	}
-
+	
 //	public void addPoint(int x, int y) {
 //		if (drawCompleted)
 //			return;
@@ -164,6 +172,8 @@ public class Door extends HousePart {
 
 	@Override
 	protected void draw() {
+		if (root == null)
+			init();
 		boolean drawable = points.size() >= 4;
 
 		vertexBuffer.position(0);
