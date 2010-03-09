@@ -60,5 +60,6 @@ Version 0.1
 - save and load houses to and from files
 - Bug: reducing polygon counts would result in Exception (moving walls back and forth to attach them)
 	- mesh.getMeshData().updateVertexCount();
-
+- added "R" key for rotation animations
+- improve door shading when lighting enabled
 	  

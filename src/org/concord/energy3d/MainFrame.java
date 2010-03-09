@@ -11,8 +11,8 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
-import org.concord.energy3d.model.House;
-import org.concord.energy3d.model.SceneManager;
+import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import javax.swing.JButton;
@@ -252,7 +252,7 @@ public class MainFrame extends JFrame {
 			testButton.setText("Save");
 			testButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					House.getInstance().save();
+					Scene.getInstance().save();
 				}
 			});
 		}

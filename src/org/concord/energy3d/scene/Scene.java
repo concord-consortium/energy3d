@@ -1,4 +1,4 @@
-package org.concord.energy3d.model;
+package org.concord.energy3d.scene;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,32 +9,34 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.concord.energy3d.model.HousePart;
+
 import com.ardor3d.scenegraph.Node;
 
-public class House implements Serializable {
+public class Scene implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static final Node root = new Node("House Root");
-	private static House instance;
+	private static Scene instance;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
 
-	public static House getInstance() {
+	public static Scene getInstance() {
 		if (instance == null) {
-			instance = new House();
+			instance = new Scene();
 			try {
 				ObjectInputStream in = new ObjectInputStream(new FileInputStream("house.ser"));
-				instance = (House)in.readObject();
+				instance = (Scene)in.readObject();
 				in.close();
 				for (HousePart housePart : instance.getParts())
 					root.attachChild(housePart.getRoot());
 			} catch (Exception e) {
 				e.printStackTrace();
-				instance = new House();
+				instance = new Scene();
 			}
 		}
 		return instance;
 	}
 
-	private House() {
+	private Scene() {
 
 	}
 

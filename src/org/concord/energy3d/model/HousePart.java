@@ -3,6 +3,9 @@ package org.concord.energy3d.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
+
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
@@ -240,7 +243,7 @@ public abstract class HousePart implements Serializable {
 		double closestDistance = Double.MAX_VALUE;
 		Wall closestWall = null;
 		int closestPointIndex = -1;
-		for (HousePart housePart : House.getInstance().getParts()) {
+		for (HousePart housePart : Scene.getInstance().getParts()) {
 			if (housePart instanceof Wall && housePart != this) {
 				Wall wall = (Wall) housePart;
 				int i = 0;

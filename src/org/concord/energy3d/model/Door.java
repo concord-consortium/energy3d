@@ -19,12 +19,13 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static double defaultDoorHeight = 0.5f;
+	private static double defaultDoorHeight = 0.8f;
 	private double doorHeight = defaultDoorHeight;
 //	private Wall wall;
-	private transient Mesh mesh; // = new Mesh("Door");
-	private transient FloatBuffer vertexBuffer; // = BufferUtils.createVector3Buffer(4);
-	private transient FloatBuffer textureBuffer; // = BufferUtils.createVector2Buffer(4);
+	private transient Mesh mesh;
+	private transient FloatBuffer vertexBuffer;
+	private transient FloatBuffer normalBuffer;
+	private transient FloatBuffer textureBuffer;
 	protected transient ArrayList<Vector3> abspoints;
 
 	public Door() {
@@ -37,11 +38,13 @@ public class Door extends HousePart {
 		super.init();
 		mesh = new Mesh("Door");
 		vertexBuffer = BufferUtils.createVector3Buffer(4);
-		textureBuffer = BufferUtils.createVector2Buffer(4);		
+		normalBuffer = BufferUtils.createVector3Buffer(4);
+		textureBuffer = BufferUtils.createVector2Buffer(4);
 		abspoints = new ArrayList<Vector3>(4);
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
+		mesh.getMeshData().setNormalBuffer(normalBuffer);
 		mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
@@ -177,8 +180,10 @@ public class Door extends HousePart {
 		boolean drawable = points.size() >= 4;
 
 		vertexBuffer.position(0);
+		Vector3[] convertedPoints = new Vector3[4];
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = convertFromWallRelativeToAbsolute(points.get(i));
+			convertedPoints[i] = p;
 			if (i < abspoints.size())
 				abspoints.set(i, p);
 			else
@@ -190,6 +195,16 @@ public class Door extends HousePart {
 			pointsRoot.getChild(i).setTranslation(p);
 			pointsRoot.updateGeometricState(0, true);
 		}
+		
+		// compute normals
+		if (drawable) {
+			Vector3 normal = convertedPoints[2].subtract(convertedPoints[0], null).crossLocal(convertedPoints[1].subtract(convertedPoints[0], null)).normalizeLocal();
+			normal.negateLocal();
+			normalBuffer.position(0);
+			for (int i = 0; i < points.size(); i++)
+				normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		}
+		
 
 		if (drawable) {
 			// texture coords

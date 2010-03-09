@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.polygon.Polygon;
 import org.poly2tri.polygon.PolygonPoint;
-import org.poly2tri.triangulation.delaunay.DelaunayTriangle;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.CollisionTreeManager;
@@ -25,16 +24,12 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private double roofHeight = 0.5;
-	private transient Mesh mesh; // = new Mesh("Roof");
-	// private Wall wall;
-	private transient FloatBuffer vertexBuffer; // = BufferUtils.createVector3Buffer(4);
+	private transient Mesh mesh;
+	private transient FloatBuffer vertexBuffer;
 	private transient Vector3 avg;
-
-	// private FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(4);
 
 	public Roof() {
 		super(1, 1);
-		// points.add(new Vector3());
 	}
 
 	protected void init() {
@@ -44,7 +39,6 @@ public class Roof extends HousePart {
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
-		// mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
@@ -59,27 +53,9 @@ public class Roof extends HousePart {
 		mesh.setUserData(new UserData(this));
 	}
 
-	// protected void allocateNewPoint() {
-	// }
-
-	// @Override
-	// public void addPoint(int x, int y) {
-	// if (drawCompleted)
-	// return;
-	// // throw new RuntimeException("Drawing of this object is already completed");
-	//
-	// if (points.size() >= numOfEditPoints)
-	// drawCompleted = true;
-	// else {
-	// // points.add(new Vector3());
-	// setPreviewPoint(x, y);
-	// }
-	// }
-
 	@Override
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1) {
-			// selectWall(x, y);
 			pick(x, y, Wall.class);
 		} else {
 			Vector3 base = avg;
@@ -91,32 +67,6 @@ public class Roof extends HousePart {
 
 	}
 
-	// public void selectWall(int x, int y) {
-	// pickResults.clear();
-	// for (HousePart housePart : House.getInstance().getParts())
-	// if (housePart instanceof Wall && housePart != this)
-	// pick(x, y, ((Wall) housePart).getRoot());
-	//
-	// if (pickResults.getNumber() > 0) {
-	// final PickData pick = pickResults.getPickData(0);
-	// final IntersectionRecord intersectionRecord = pick.getIntersectionRecord();
-	// if (intersectionRecord.getNumberOfIntersections() > 0) {
-	// UserData data = (UserData) pick.getTargetMesh().getUserData();
-	// if (data == null || !(data.getHousePart() instanceof Wall))
-	// throw new RuntimeException("Door can only be placed on a wall!");
-	// if (wall != null && data.getHousePart() != wall && points.size() > 2)
-	// throw new RuntimeException("Door points cannot be placed on multiple walls!");
-	// if (wall == null || wall != data.getHousePart()) {
-	// if (wall != null)
-	// wall.removeChild(this);
-	// wall = (Wall) data.getHousePart();
-	// wall.addChild(this);
-	// }
-	// return;
-	// }
-	// }
-	// }
-
 	@Override
 	protected void draw() {
 		if (root == null)
@@ -124,7 +74,6 @@ public class Roof extends HousePart {
 
 		if (container == null)
 			return;
-		// ArrayList<PolygonPoint> wallUpperPoints = new ArrayList<PolygonPoint>();
 		avg = new Vector3();
 		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
 		avg.multiplyLocal(1f / (wallUpperPoints.size()));
@@ -132,20 +81,19 @@ public class Roof extends HousePart {
 		points.get(0).set(avg.getX(), avg.getY(), avg.getZ() + roofHeight);
 		PolygonPoint roofUpperPoint = new PolygonPoint(avg.getX(), avg.getY(), avg.getZ() + roofHeight);
 
-		System.out.println("Polygon Points:");
-		for (PolygonPoint p : wallUpperPoints) {
-			System.out.println(p.getXf() + "\t" + p.getYf() + "\t" + p.getZf());
-		}
+//		System.out.println("Polygon Points:");
+//		for (PolygonPoint p : wallUpperPoints) {
+//			System.out.println(p.getXf() + "\t" + p.getYf() + "\t" + p.getZf());
+//		}
 
 		Polygon ps = new Polygon(wallUpperPoints);
 		ps.addSteinerPoint(roofUpperPoint);
 		Poly2Tri.triangulate(ps);
 
-		System.out.println("Triangulated Points:");
-		for (DelaunayTriangle t : ps.getTriangles()) {
-			t.printDebug();
-//			System.out.println(t..getXf() + "\t" + p.getYf() + "\t" + p.getZf());
-		}
+//		System.out.println("Triangulated Points:");
+//		for (DelaunayTriangle t : ps.getTriangles()) {
+//			t.printDebug();
+//		}
 		
 		ArdorMeshMapper.updateTriangleMesh(mesh, ps);
 		ArdorMeshMapper.updateVertexNormals(mesh, ps.getTriangles());
@@ -199,8 +147,15 @@ public class Roof extends HousePart {
 				break;
 		}
 
-		// poly.add(poly.get(1));
 		return poly;
+	}
+	
+	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
+		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+		if (!poly.contains(polygonPoint)) {
+			avg.addLocal(p);
+			poly.add(polygonPoint);
+		}
 	}
 
 	private void shiftToOutterEdge(ArrayList<PolygonPoint> wallUpperPoints) {
@@ -210,14 +165,6 @@ public class Roof extends HousePart {
 			op.set(p.getX(), p.getY(), 0).subtractLocal(avg.getX(), avg.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
 			op.addLocal(p.getX(), p.getY(), p.getZ());
 			p.set(op.getX(), op.getY(), op.getZ());
-		}
-	}
-
-	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
-		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-		if (!poly.contains(polygonPoint)) {
-			avg.addLocal(p);
-			poly.add(polygonPoint);
 		}
 	}
 

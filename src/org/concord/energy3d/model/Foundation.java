@@ -1,5 +1,7 @@
 package org.concord.energy3d.model;
 
+import org.concord.energy3d.scene.SceneManager;
+
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.Vector3;

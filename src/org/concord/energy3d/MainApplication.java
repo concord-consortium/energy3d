@@ -1,6 +1,6 @@
 package org.concord.energy3d;
 
-import org.concord.energy3d.model.SceneManager;
+import org.concord.energy3d.scene.SceneManager;
 
 public class MainApplication {
 

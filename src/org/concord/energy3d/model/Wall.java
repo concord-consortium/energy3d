@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.polygon.Polygon;
 import org.poly2tri.polygon.PolygonPoint;
@@ -20,8 +21,6 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.extension.SwitchNode;
-import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -30,12 +29,11 @@ public class Wall extends HousePart {
 	private static double defaultWallHeight = 1f;
 	private double wallHeight = defaultWallHeight;
 	private double wallThickness = 0.1;
-	// private ArrayList<HousePart> children = new ArrayList<HousePart>();
-	private transient Mesh mesh; // = new Mesh("Wall");
-	private transient Mesh backMesh; // = new Mesh("Wall (Back)");
-	private transient Mesh surroundMesh; // = new Mesh("Wall (Surround)");
-	private transient FloatBuffer vertexBuffer; // = BufferUtils.createVector3Buffer(4);
-	private transient FloatBuffer textureBuffer; // = BufferUtils.createVector2Buffer(4);
+	private transient Mesh mesh;
+	private transient Mesh backMesh;
+	private transient Mesh surroundMesh;
+	private transient FloatBuffer vertexBuffer;
+	private transient FloatBuffer textureBuffer;
 	private Snap[] neighbor = new Snap[2];
 
 	public Wall() {
@@ -87,36 +85,7 @@ public class Wall extends HousePart {
 		mesh.setUserData(userData);
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
-
-		// allocateNewPoint();		
 	}
-
-	// public void addChild(HousePart housePart) {
-	// children.add(housePart);
-	// }
-	//
-	// public boolean removeChild(HousePart housePart) {
-	// return children.remove(housePart);
-	// }
-
-	// public void addPoint(int x, int y) {
-	// if (drawCompleted)
-	// return;
-	// // throw new RuntimeException("Drawing of this object is already completed");
-	//
-	// if (points.size() >= numOfEditPoints)
-	// drawCompleted = true;
-	// else {
-	// allocateNewPoint();
-	// setPreviewPoint(x, y);
-	// }
-	// }
-
-	// private void allocateNewPoint() {
-	// Vector3 p = new Vector3();
-	// points.add(p);
-	// points.add(p);
-	// }
 
 	private Vector3 getUpperPoint(Vector3 p) {
 		return new Vector3(p.getX(), p.getY(), wallHeight + points.get(0).getZ());
@@ -165,15 +134,9 @@ public class Wall extends HousePart {
 			Vector3 p = points.get(i);
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
-//			((Sphere)pointsRoot.getChild(i)).updateWorldBound(false);			
-			// pointsRoot.setVisible(i, true);
 		}
 
 		if (drawable) {
-			// final float TEXTURE_SCALE_X = (float) points.get(2).subtract(points.get(0), null).length();
-			// final float TEXTURE_SCALE_Y = (float) points.get(3).subtract(points.get(2), null).length();
-
-			// Vector3 normal = points.get(3).subtract(points.get(1), null).cross(points.get(2).subtract(points.get(1), null), null).normalize(null);
 			Vector3 normal = points.get(2).subtract(points.get(0), null).cross(points.get(1).subtract(points.get(0), null), null).normalize(null);
 
 			ArrayList<PolygonPoint> polyPoints = new ArrayList<PolygonPoint>();
@@ -239,7 +202,6 @@ public class Wall extends HousePart {
 				Poly2Tri.triangulate(polygon);
 				ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
 				ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
-				// ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
 				ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
 
 				Poly2Tri.triangulate(polygon);
@@ -260,10 +222,8 @@ public class Wall extends HousePart {
 			mesh.updateModelBound();
 			backMesh.updateModelBound();
 			surroundMesh.updateModelBound();
-//			pointsRoot.updateWorldBound(false);
 			root.updateWorldBound(true);
 			root.updateGeometricState(0);
-//			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 			CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
 			for (HousePart child : children)
