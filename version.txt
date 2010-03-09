@@ -56,5 +56,7 @@ Version 0.1
 - draw roof with an offset with respect to walls to make it look more realistic
 - allow putting walls (or any other object) on a list of possible containers, i.e. on Foundation or directly on floor
 - add option to switch the view of the scene to Top View in Parallel perspective and allow inserting walls to draw house plan
+- make HousePart object serializable and initialize them in init() method
+- save and load houses to and from files
 
 	  
