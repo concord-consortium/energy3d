@@ -58,5 +58,7 @@ Version 0.1
 - add option to switch the view of the scene to Top View in Parallel perspective and allow inserting walls to draw house plan
 - make HousePart object serializable and initialize them in init() method
 - save and load houses to and from files
+- Bug: reducing polygon counts would result in Exception (moving walls back and forth to attach them)
+	- mesh.getMeshData().updateVertexCount();
 
 	  

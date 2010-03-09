@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.polygon.Polygon;
 import org.poly2tri.polygon.PolygonPoint;
+import org.poly2tri.triangulation.delaunay.DelaunayTriangle;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.CollisionTreeManager;
@@ -139,10 +140,19 @@ public class Roof extends HousePart {
 		Polygon ps = new Polygon(wallUpperPoints);
 		ps.addSteinerPoint(roofUpperPoint);
 		Poly2Tri.triangulate(ps);
+
+		System.out.println("Triangulated Points:");
+		for (DelaunayTriangle t : ps.getTriangles()) {
+			t.printDebug();
+//			System.out.println(t..getXf() + "\t" + p.getYf() + "\t" + p.getZf());
+		}
+		
 		ArdorMeshMapper.updateTriangleMesh(mesh, ps);
 		ArdorMeshMapper.updateVertexNormals(mesh, ps.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, ps.getTriangles());
 		ArdorMeshMapper.updateTextureCoordinates(mesh, ps.getTriangles(), 1, 0);
+		
+		mesh.getMeshData().updateVertexCount();
 		// mesh.setRandomColors();
 
 		for (int i = 0; i < points.size(); i++) {
