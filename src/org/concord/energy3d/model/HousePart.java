@@ -55,9 +55,12 @@ public abstract class HousePart implements Serializable {
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
 			pointShape.updateModelBound(); // important
+//			pointShape.updateWorldBound(true);
 		}
-//		pointsRoot.setAllVisible();
+		pointsRoot.setAllVisible();
+//		pointsRoot.updateWorldBound(false);
 		root.attachChild(pointsRoot);
+//		pointsRoot.setAllNonVisible();
 //		root.updateGeometricState(0);		
 	}
 

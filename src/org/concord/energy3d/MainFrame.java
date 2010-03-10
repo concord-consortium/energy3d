@@ -33,7 +33,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton foundationButton = null;
 	private JToggleButton lightButton = null;
 	private JToggleButton topViewButton = null;
-	private JButton testButton = null;
+	private JButton saveButton = null;
+	private JButton newButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -79,7 +80,8 @@ public class MainFrame extends JFrame {
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
 			appToolbar.add(getTopViewButton());
-			appToolbar.add(getTestButton());
+			appToolbar.add(getNewButton());
+			appToolbar.add(getSaveButton());
 			
 			ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
@@ -242,21 +244,39 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes testButton	
+	 * This method initializes saveButton	
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
-	private JButton getTestButton() {
-		if (testButton == null) {
-			testButton = new JButton();
-			testButton.setText("Save");
-			testButton.addActionListener(new java.awt.event.ActionListener() {
+	private JButton getSaveButton() {
+		if (saveButton == null) {
+			saveButton = new JButton();
+			saveButton.setText("Save");
+			saveButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					Scene.getInstance().save();
 				}
 			});
 		}
-		return testButton;
+		return saveButton;
+	}
+
+	/**
+	 * This method initializes newButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getNewButton() {
+		if (newButton == null) {
+			newButton = new JButton();
+			newButton.setText("New");
+			newButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					Scene.getInstance().newFile();
+				}
+			});
+		}
+		return newButton;
 	}
 
 	/**

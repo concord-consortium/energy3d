@@ -62,4 +62,10 @@ Version 0.1
 	- mesh.getMeshData().updateVertexCount();
 - added "R" key for rotation animations
 - improve door shading when lighting enabled
-	  
+- using FirstPersonControl for better navigation
+- using Q and Z for up and down navigation
+- bug found with ardor3D switchNode, picking won't work if initially invisible
+- allow picking of base wall point when in TopView mode (otherwise cannot edit walls in top view).
+- adjust aspect ratio when resizing
+- add "new" button clear the scene 
+ 

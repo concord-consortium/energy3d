@@ -27,6 +27,7 @@ import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
+import com.ardor3d.input.KeyboardState;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.PhysicalLayer;
@@ -34,6 +35,7 @@ import com.ardor3d.input.awt.AwtFocusWrapper;
 import com.ardor3d.input.awt.AwtKeyboardWrapper;
 import com.ardor3d.input.awt.AwtMouseManager;
 import com.ardor3d.input.awt.AwtMouseWrapper;
+import com.ardor3d.input.control.FirstPersonControl;
 import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyHeldCondition;
@@ -83,6 +85,7 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.common.base.Predicate;
@@ -105,14 +108,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean _exit = false;
 	protected final Node root = new Node("Root");
 	private final Node housePartsNode = Scene.root; // new Node("House Parts");
+	
 
 	private Mesh floor;
 
-	private static final int MOVE_SPEED = 4;
-	private static final double TURN_SPEED = 0.5;
-	private final Matrix3 _incr = new Matrix3();
-	private static final double MOUSE_TURN_SPEED = 0.1;
-	private int rotationSign = 0;
+	private static final int MOVE_SPEED = 10;
+	// private static final double TURN_SPEED = 0.5;
+	// private final Matrix3 _incr = new Matrix3();
+	// private static final double MOUSE_TURN_SPEED = 0.1;
+	private boolean rot = false;
 
 	private PickResults pickResults;
 	private HousePart drawn = null;
@@ -122,7 +126,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private LightState lightState;
 	private double angle;
 	private Matrix3 rotate = new Matrix3();
-	private ReadOnlyVector3 axis = new Vector3(0, 0, 1);
+	private boolean topView;
+	// private ReadOnlyVector3 axis = new Vector3(0, 0, 1);
+	private FirstPersonControl control;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -157,6 +163,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final Camera camera = renderer.getCamera();
 				if (camera != null) {
 					camera.resize(size.width, size.height);
+					resizeCamera(camera);
 				}
 			}
 		});
@@ -263,14 +270,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final double tpf = timer.getTimePerFrame();
 		logicalLayer.checkTriggers(tpf);
 
-		if (rotationSign != 0) {
+		if (rot) {
 			// Update the angle using the current tpf to rotate at a constant speed.
 			angle += timer.getTimePerFrame() * 50;
 			// Wrap the angle to keep it inside 0-360 range
 			angle %= 360;
 
 			// Update the rotation matrix using the angle and rotation axis.
-			rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, axis);
+			rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
 			// Update the box rotation using the rotation matrix.
 			root.setRotation(rotate);
 		}
@@ -288,7 +295,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	@Override
 	public boolean renderUnto(Renderer renderer) {
 		renderer.draw(root);
-		// Debugger.drawBounds(root, renderer, true);
+//		Debugger.drawBounds(root, renderer, true);
 		return true;
 	}
 
@@ -376,7 +383,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void registerInputTriggers() {
-		// FirstPersonControl.setupTriggers(logicalLayer, new Vector3(0, 0, 1), true);
+		control = new FirstPersonControl(Vector3.UNIT_Z) {
+			@Override
+			protected void rotate(Camera camera, double dx, double dy) {
+				if (operation == SELECT && (drawn == null || drawn.isDrawCompleted()) && !topView)
+					super.rotate(camera, dx, dy);
+			}
+		};
+		control.setupKeyboardTriggers(logicalLayer);
+		control.setupMouseTriggers(logicalLayer, true);
+		control.setMoveSpeed(MOVE_SPEED);
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -384,10 +400,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (operation == SELECT) {
 					if (drawn == null || drawn.isDrawCompleted())
 						selectHousePart(mouseState.getX(), mouseState.getY(), true);
-					return;
-				}
-
-				drawn.addPoint(mouseState.getX(), mouseState.getY());
+				} else
+					drawn.addPoint(mouseState.getX(), mouseState.getY());
 			}
 		}));
 
@@ -416,6 +430,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final MouseState mouseState = inputStates.getCurrent().getMouseState();
 				int x = mouseState.getX();
 				int y = mouseState.getY();
+//				System.out.println(drawn + " " + drawn.isDrawCompleted());
 				if (drawn != null && !drawn.isDrawCompleted()) {
 					drawn.setPreviewPoint(x, y);
 				} else {
@@ -431,59 +446,80 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.ESCAPE), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				for (HousePart part : Scene.getInstance().getParts())
-					part.hidePoints();
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				moveForward(source, tpf);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.S), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				moveBack(source, tpf);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.A), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				turnLeft(source, tpf);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.D), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				turnRight(source, tpf);
+				hideAllEditPoints();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Q), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				moveLeft(source, tpf);
+				moveUpDown(source, tpf, true);
 			}
 		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.E), new TriggerAction() {
+		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				moveRight(source, tpf);
+				moveUpDown(source, tpf, false);
 			}
 		}));
-
-		// logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
+		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (topView)
+					moveUpDown(source, tpf, true);
+			}
+		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.S), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (topView)
+					moveUpDown(source, tpf, false);
+			}
+		}));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
 		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// exit.exit();
+		// moveForward(source, tpf);
 		// }
 		// }));
-
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.S), new TriggerAction() {
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// moveBack(source, tpf);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.A), new TriggerAction() {
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// turnLeft(source, tpf);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.D), new TriggerAction() {
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// turnRight(source, tpf);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Q), new TriggerAction() {
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// moveLeft(source, tpf);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.E), new TriggerAction() {
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// moveRight(source, tpf);
+		// }
+		// }));
+		//
+		// // logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
+		// // public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// // exit.exit();
+		// // }
+		// // }));
+		//
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				toggleRotation();
 			}
 		}));
-
-		logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.U), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				toggleRotation();
-			}
-		}));
-
+		//
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.U), new TriggerAction() {
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// toggleRotation();
+		// }
+		// }));
+		//
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				resetCamera(source);
@@ -499,38 +535,43 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				lookAtZero(source);
 			}
 		}));
+		//
+		// final Predicate<TwoInputStates> mouseMovedAndOneButtonPressed = Predicates.and(TriggerConditions.mouseMoved(), Predicates.or(TriggerConditions.leftButtonDown(), TriggerConditions.rightButtonDown()));
+		//
+		// logicalLayer.registerTrigger(new InputTrigger(mouseMovedAndOneButtonPressed, new TriggerAction() {
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// if (operation == SELECT && (drawn == null || drawn.isDrawCompleted())) {
+		// final MouseState mouseState = inputStates.getCurrent().getMouseState();
+		//
+		// turn(source, mouseState.getDx() * tpf * -MOUSE_TURN_SPEED);
+		// rotateUpDown(source, mouseState.getDy() * tpf * -MOUSE_TURN_SPEED);
+		// }
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new MouseButtonCondition(ButtonState.DOWN, ButtonState.DOWN, ButtonState.UNDEFINED), new TriggerAction() {
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// moveForward(source, tpf);
+		// }
+		// }));
+		//
+		// logicalLayer.registerTrigger(new InputTrigger(new MouseButtonCondition(ButtonState.DOWN, ButtonState.DOWN, ButtonState.UNDEFINED), new TriggerAction() {
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// moveForward(source, tpf);
+		// }
+		// }));
+		//
+		// logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
+		// public void perform(Canvas source, TwoInputStates inputStates, double tpf) {
+		// final InputState current = inputStates.getCurrent();
+		//
+		// System.out.println("Key character pressed: " + current.getKeyboardState().getKeyEvent().getKeyChar());
+		// }
+		// }));
+	}
 
-		final Predicate<TwoInputStates> mouseMovedAndOneButtonPressed = Predicates.and(TriggerConditions.mouseMoved(), Predicates.or(TriggerConditions.leftButtonDown(), TriggerConditions.rightButtonDown()));
-
-		logicalLayer.registerTrigger(new InputTrigger(mouseMovedAndOneButtonPressed, new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (operation == SELECT && (drawn == null || drawn.isDrawCompleted())) {
-					final MouseState mouseState = inputStates.getCurrent().getMouseState();
-
-					turn(source, mouseState.getDx() * tpf * -MOUSE_TURN_SPEED);
-					rotateUpDown(source, mouseState.getDy() * tpf * -MOUSE_TURN_SPEED);
-				}
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonCondition(ButtonState.DOWN, ButtonState.DOWN, ButtonState.UNDEFINED), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				moveForward(source, tpf);
-			}
-		}));
-
-		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonCondition(ButtonState.DOWN, ButtonState.DOWN, ButtonState.UNDEFINED), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				moveForward(source, tpf);
-			}
-		}));
-
-		logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
-			public void perform(Canvas source, TwoInputStates inputStates, double tpf) {
-				final InputState current = inputStates.getCurrent();
-
-				System.out.println("Key character pressed: " + current.getKeyboardState().getKeyEvent().getKeyChar());
-			}
-		}));
+	private void hideAllEditPoints() {
+		for (HousePart part : Scene.getInstance().getParts())
+			part.hidePoints();
 	}
 
 	private void lookAtZero(final Canvas source) {
@@ -538,6 +579,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void resetCamera(final Canvas source) {
+		topView = false;
 		final Vector3 loc = new Vector3(1.0f, -5.0f, 1.0f);
 		final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		final Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
@@ -546,17 +588,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Camera camera = source.getCanvasRenderer().getCamera();
 		camera.setFrame(loc, left, up, dir);
 
-		float scale = 0.5f;
-		camera.setFrustumTop(scale);
-		camera.setFrustumBottom(-scale);
-		camera.setFrustumLeft(-scale);
-		camera.setFrustumRight(scale);
-
 		camera.setProjectionMode(ProjectionMode.Perspective);
-		camera.update();
+
+//		float scale = 0.5f;
+		resizeCamera(camera);
 	}
 
 	public void topCameraView(final Canvas source) {
+		topView = true;
 		final Vector3 loc = new Vector3(0, 0, 50);
 		final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		final Vector3 up = new Vector3(0.0f, -1.0f, 0.0f);
@@ -565,129 +604,143 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Camera camera = source.getCanvasRenderer().getCamera();
 		camera.setFrame(loc, left, up, dir);
 		camera.setProjectionMode(ProjectionMode.Parallel);
-		double scale = 4;
-		double ratio = (double) camera.getWidth() / camera.getHeight();
+//		float scale = 4;
+//		double ratio = (double) camera.getWidth() / camera.getHeight();
+//		camera.setFrustumTop(scale);
+//		camera.setFrustumBottom(-scale);
+//		camera.setFrustumLeft(-scale * ratio);
+//		camera.setFrustumRight(scale * ratio);
+//		camera.update();
+		resizeCamera(camera);
+	}
+
+	private void resizeCamera(final Camera camera) {
+		final double scale = topView ? 4 : 0.5;
+		final double ratio = (double) camera.getWidth() / camera.getHeight();
 		camera.setFrustumTop(scale);
 		camera.setFrustumBottom(-scale);
-		camera.setFrustumLeft(-scale * ratio);
-		camera.setFrustumRight(scale * ratio);
-
+		camera.setFrustumLeft(-scale*ratio);
+		camera.setFrustumRight(scale*ratio);
 		camera.update();
 	}
 
 	private void toggleRotation() {
-		rotationSign = rotationSign == 0 ? 1 : 0; // *= -1;
+		rot = !rot;
 	}
 
-	private void rotateUpDown(final Canvas canvas, final double speed) {
-		final Camera camera = canvas.getCanvasRenderer().getCamera();
+	// private void rotateUpDown(final Canvas canvas, final double speed) {
+	// final Camera camera = canvas.getCanvasRenderer().getCamera();
+	//
+	// final Vector3 temp = Vector3.fetchTempInstance();
+	// _incr.fromAngleNormalAxis(speed, camera.getLeft());
+	//
+	// _incr.applyPost(camera.getLeft(), temp);
+	// camera.setLeft(temp);
+	//
+	// _incr.applyPost(camera.getDirection(), temp);
+	// camera.setDirection(temp);
+	//
+	// _incr.applyPost(camera.getUp(), temp);
+	// camera.setUp(temp);
+	//
+	// Vector3.releaseTempInstance(temp);
+	//
+	// camera.normalize();
+	//
+	// }
+	//
+	// private void turnRight(final Canvas canvas, final double tpf) {
+	// turn(canvas, -TURN_SPEED * tpf);
+	// }
+	//
+	// private void turn(final Canvas canvas, final double speed) {
+	// final Camera camera = canvas.getCanvasRenderer().getCamera();
+	//
+	// final Vector3 temp = Vector3.fetchTempInstance();
+	// _incr.fromAngleNormalAxis(speed, camera.getUp());
+	//
+	// _incr.applyPost(camera.getLeft(), temp);
+	// camera.setLeft(temp);
+	//
+	// _incr.applyPost(camera.getDirection(), temp);
+	// camera.setDirection(temp);
+	//
+	// _incr.applyPost(camera.getUp(), temp);
+	// camera.setUp(temp);
+	// Vector3.releaseTempInstance(temp);
+	//
+	// camera.normalize();
+	// }
+	//
+	// private void turnLeft(final Canvas canvas, final double tpf) {
+	// turn(canvas, TURN_SPEED * tpf);
+	// }
+	//
+	// private void moveForward(final Canvas canvas, final double tpf) {
+	// final Camera camera = canvas.getCanvasRenderer().getCamera();
+	// final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
+	// final Vector3 dir = Vector3.fetchTempInstance();
+	// // if (camera.getProjectionMode() == ProjectionMode.Perspective) {
+	// // dir.set(camera.getDirection());
+	// // } else {
+	// // // move up if in parallel mode
+	// dir.set(camera.getUp());
+	// // }
+	// dir.multiplyLocal(MOVE_SPEED * tpf);
+	// loc.addLocal(dir);
+	// camera.setLocation(loc);
+	// Vector3.releaseTempInstance(loc);
+	// Vector3.releaseTempInstance(dir);
+	// }
 
-		final Vector3 temp = Vector3.fetchTempInstance();
-		_incr.fromAngleNormalAxis(speed, camera.getLeft());
-
-		_incr.applyPost(camera.getLeft(), temp);
-		camera.setLeft(temp);
-
-		_incr.applyPost(camera.getDirection(), temp);
-		camera.setDirection(temp);
-
-		_incr.applyPost(camera.getUp(), temp);
-		camera.setUp(temp);
-
-		Vector3.releaseTempInstance(temp);
-
-		camera.normalize();
-
-	}
-
-	private void turnRight(final Canvas canvas, final double tpf) {
-		turn(canvas, -TURN_SPEED * tpf);
-	}
-
-	private void turn(final Canvas canvas, final double speed) {
-		final Camera camera = canvas.getCanvasRenderer().getCamera();
-
-		final Vector3 temp = Vector3.fetchTempInstance();
-		_incr.fromAngleNormalAxis(speed, camera.getUp());
-
-		_incr.applyPost(camera.getLeft(), temp);
-		camera.setLeft(temp);
-
-		_incr.applyPost(camera.getDirection(), temp);
-		camera.setDirection(temp);
-
-		_incr.applyPost(camera.getUp(), temp);
-		camera.setUp(temp);
-		Vector3.releaseTempInstance(temp);
-
-		camera.normalize();
-	}
-
-	private void turnLeft(final Canvas canvas, final double tpf) {
-		turn(canvas, TURN_SPEED * tpf);
-	}
-
-	private void moveForward(final Canvas canvas, final double tpf) {
+	private void moveUpDown(final Canvas canvas, final double tpf, boolean up) {
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
 		final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
 		final Vector3 dir = Vector3.fetchTempInstance();
-		if (camera.getProjectionMode() == ProjectionMode.Perspective) {
-			dir.set(camera.getDirection());
-		} else {
-			// move up if in parallel mode
-			dir.set(camera.getUp());
-		}
-		dir.multiplyLocal(MOVE_SPEED * tpf);
+
+		dir.set(camera.getUp());
+
+		if (topView)
+			up = !up;
+
+		dir.multiplyLocal((up ? 1 : -1) * MOVE_SPEED * tpf);
 		loc.addLocal(dir);
 		camera.setLocation(loc);
 		Vector3.releaseTempInstance(loc);
 		Vector3.releaseTempInstance(dir);
 	}
 
-	private void moveLeft(final Canvas canvas, final double tpf) {
-		final Camera camera = canvas.getCanvasRenderer().getCamera();
-		final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
-		final Vector3 dir = Vector3.fetchTempInstance();
-
-		dir.set(camera.getLeft());
-
-		dir.multiplyLocal(MOVE_SPEED * tpf);
-		loc.addLocal(dir);
-		camera.setLocation(loc);
-		Vector3.releaseTempInstance(loc);
-		Vector3.releaseTempInstance(dir);
-	}
-
-	private void moveRight(final Canvas canvas, final double tpf) {
-		final Camera camera = canvas.getCanvasRenderer().getCamera();
-		final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
-		final Vector3 dir = Vector3.fetchTempInstance();
-
-		dir.set(camera.getLeft());
-
-		dir.multiplyLocal(-MOVE_SPEED * tpf);
-		loc.addLocal(dir);
-		camera.setLocation(loc);
-		Vector3.releaseTempInstance(loc);
-		Vector3.releaseTempInstance(dir);
-	}
-
-	private void moveBack(final Canvas canvas, final double tpf) {
-		final Camera camera = canvas.getCanvasRenderer().getCamera();
-		final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
-		final Vector3 dir = Vector3.fetchTempInstance();
-		if (camera.getProjectionMode() == ProjectionMode.Perspective) {
-			dir.set(camera.getDirection());
-		} else {
-			// move up if in parallel mode
-			dir.set(camera.getUp());
-		}
-		dir.multiplyLocal(-MOVE_SPEED * tpf);
-		loc.addLocal(dir);
-		camera.setLocation(loc);
-		Vector3.releaseTempInstance(loc);
-		Vector3.releaseTempInstance(dir);
-	}
+	//
+	// private void moveRight(final Canvas canvas, final double tpf) {
+	// final Camera camera = canvas.getCanvasRenderer().getCamera();
+	// final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
+	// final Vector3 dir = Vector3.fetchTempInstance();
+	//
+	// dir.set(camera.getLeft());
+	//
+	// dir.multiplyLocal(-MOVE_SPEED * tpf);
+	// loc.addLocal(dir);
+	// camera.setLocation(loc);
+	// Vector3.releaseTempInstance(loc);
+	// Vector3.releaseTempInstance(dir);
+	// }
+	//
+	// private void moveBack(final Canvas canvas, final double tpf) {
+	// final Camera camera = canvas.getCanvasRenderer().getCamera();
+	// final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
+	// final Vector3 dir = Vector3.fetchTempInstance();
+	// if (camera.getProjectionMode() == ProjectionMode.Perspective) {
+	// dir.set(camera.getDirection());
+	// } else {
+	// // move up if in parallel mode
+	// dir.set(camera.getUp());
+	// }
+	// dir.multiplyLocal(-MOVE_SPEED * tpf);
+	// loc.addLocal(dir);
+	// camera.setLocation(loc);
+	// Vector3.releaseTempInstance(loc);
+	// Vector3.releaseTempInstance(dir);
+	// }
 
 	public void setOperation(int operation) {
 		this.operation = operation;
@@ -804,6 +857,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				pointDist = pointDist_i;
 			}
 		}
+//		if (pickedHousePart.getUserData() == null)
+			System.out.println(pickedHousePart);
 		return pickedHousePart;
 	}
 
@@ -820,7 +875,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		} else if (edit && data.getPointIndex() != -1) {
 			drawn = data.getHousePart();
-			drawn.editPoint(data.getPointIndex());
+			int pointIndex = data.getPointIndex();
+			if (topView)
+				pointIndex -= 1;
+			drawn.editPoint(pointIndex);
 		} else {
 			HousePart housePart = data.getHousePart();
 			if (lastHoveredObject != null && lastHoveredObject != housePart) {

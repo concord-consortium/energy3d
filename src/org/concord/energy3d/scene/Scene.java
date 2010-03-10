@@ -73,4 +73,9 @@ public class Scene implements Serializable {
 		
 	}
 
+	public void newFile() {
+		root.detachAllChildren();
+		parts.clear();
+	}
+
 }

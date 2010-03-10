@@ -92,6 +92,7 @@ public class Wall extends HousePart {
 	}
 
 	public void setPreviewPoint(int x, int y) {
+		System.out.println("moving wall...");
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			PickedHousePart picked = pick(x, y, new Class<?>[] {Foundation.class, null}); //Foundation.class);
 			if (picked != null) {
@@ -134,6 +135,7 @@ public class Wall extends HousePart {
 			Vector3 p = points.get(i);
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
+//			pointsRoot.getChild(i).updateWorldBound(true);
 		}
 
 		if (drawable) {
@@ -219,10 +221,10 @@ public class Wall extends HousePart {
 			}
 
 			// force bound update
-			mesh.updateModelBound();
-			backMesh.updateModelBound();
-			surroundMesh.updateModelBound();
-			root.updateWorldBound(true);
+//			mesh.updateModelBound();
+//			backMesh.updateModelBound();
+//			surroundMesh.updateModelBound();
+//			root.updateWorldBound(true);
 			root.updateGeometricState(0);
 			CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
