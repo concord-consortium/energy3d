@@ -77,6 +77,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.scenegraph.shape.Sphere.TextureMode;
@@ -309,7 +310,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createFloor() {
-		floor = new Quad("Floor", 100, 100);
+		floor = new Quad("Floor", 200, 200);
 		floor.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
 
 		BlendState blendState = new BlendState();
@@ -327,14 +328,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createSky() {
-		// Dome sky = new Dome("Sky", 100, 100, 10);
-		Sphere sky = new Sphere("Sky", 100, 100, 100);
-		sky.setTextureMode(TextureMode.Polar);
+		 Dome sky = new Dome("Sky", 100, 100, 100);
+//		Sphere sky = new Sphere("Sky", 100, 100, 100);
+//		sky.setTextureMode(TextureMode.Polar);
 		sky.setRotation(new Quaternion(1, 0, 0, 1));
-		sky.setTranslation(0, 0, 10);
+//		sky.setTranslation(0, 0, 10);
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("sky2.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
+		ts.setTexture(TextureManager.load("sky5.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
 		sky.setRenderState(ts);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
