@@ -68,4 +68,6 @@ Version 0.1
 - allow picking of base wall point when in TopView mode (otherwise cannot edit walls in top view).
 - adjust aspect ratio when resizing
 - add "new" button clear the scene 
+- fixed "texture dimension must be power of two" error in older video cards
+- new sky texture
  
