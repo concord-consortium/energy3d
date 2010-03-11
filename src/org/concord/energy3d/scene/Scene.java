@@ -21,17 +21,8 @@ public class Scene implements Serializable {
 
 	public static Scene getInstance() {
 		if (instance == null) {
-			instance = new Scene();
-			try {
-				ObjectInputStream in = new ObjectInputStream(new FileInputStream("house.ser"));
-				instance = (Scene)in.readObject();
-				in.close();
-				for (HousePart housePart : instance.getParts())
-					root.attachChild(housePart.getRoot());
-			} catch (Exception e) {
-				e.printStackTrace();
-				instance = new Scene();
-			}
+//			instance = new Scene();
+			open();
 		}
 		return instance;
 	}
@@ -76,6 +67,19 @@ public class Scene implements Serializable {
 	public void newFile() {
 		root.detachAllChildren();
 		parts.clear();
+	}
+
+	public static void open() {
+		try {
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream("house.ser"));
+			instance = (Scene)in.readObject();
+			in.close();
+			for (HousePart housePart : instance.getParts())
+				root.attachChild(housePart.getRoot());
+		} catch (Exception e) {
+			e.printStackTrace();
+			instance = new Scene();
+		}		
 	}
 
 }

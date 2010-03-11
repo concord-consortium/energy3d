@@ -35,6 +35,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton topViewButton = null;
 	private JButton saveButton = null;
 	private JButton newButton = null;
+	private JButton openButton = null;
+	private JToggleButton rotAnimButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -70,6 +72,10 @@ public class MainFrame extends JFrame {
 	private JToolBar getAppToolbar() {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
+			appToolbar.add(getNewButton());
+			appToolbar.add(getOpenButton());
+			appToolbar.add(getSaveButton());
+			appToolbar.addSeparator();
 			appToolbar.add(getSelectButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getFoundationButton());
@@ -79,9 +85,8 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getRoofButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
+			appToolbar.add(getRotAnimButton());
 			appToolbar.add(getTopViewButton());
-			appToolbar.add(getNewButton());
-			appToolbar.add(getSaveButton());
 			
 			ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
@@ -277,6 +282,42 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return newButton;
+	}
+
+	/**
+	 * This method initializes openButton	
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getOpenButton() {
+		if (openButton == null) {
+			openButton = new JButton();
+			openButton.setText("Open");
+			openButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					Scene.open();
+				}
+			});
+		}
+		return openButton;
+	}
+
+	/**
+	 * This method initializes rotAnimButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getRotAnimButton() {
+		if (rotAnimButton == null) {
+			rotAnimButton = new JToggleButton();
+			rotAnimButton.setText("Rotate Anim");
+			rotAnimButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().toggleRotation();
+				}
+			});
+		}
+		return rotAnimButton;
 	}
 
 	/**

@@ -619,7 +619,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		camera.update();
 	}
 
-	private void toggleRotation() {
+	public void toggleRotation() {
 		rot = !rot;
 	}
 

@@ -70,11 +70,16 @@ Version 0.1
 - add "new" button clear the scene 
 - fixed "texture dimension must be power of two" error in older video cards
 - new sky texture
-
 - adjust color of interior wall
 - adjust color of thickness wall
 - adjust color of windows
 - add grids snap constraints
 - adjust navigation speed
 - add mouse wheel support for navigation
+- resized/compressed images for faster loading
+- added animated rotation button
+
+TODO:
+-move windows
+ 
  
