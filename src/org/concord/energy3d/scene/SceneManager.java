@@ -335,7 +335,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //		sky.setTranslation(0, 0, 10);
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("sky5.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
+		ts.setTexture(TextureManager.load("sky6.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
 		sky.setRenderState(ts);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
