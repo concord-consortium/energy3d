@@ -16,6 +16,7 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
@@ -59,11 +60,13 @@ public class Wall extends HousePart {
 		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		backMesh.getMeshData().setVertexBuffer(vertexBuffer);
 		backMesh.getMeshData().setTextureBuffer(textureBuffer, 0);
+		backMesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 
 		root.attachChild(surroundMesh);
 		surroundMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
+		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		// surroundMesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.

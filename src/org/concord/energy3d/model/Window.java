@@ -36,7 +36,7 @@ public class Window extends HousePart {
 		// mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
 		// Transparency
-		mesh.setDefaultColor(new ColorRGBA(0, 0.5f, 0.5f, 0.5f));
+		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.4f, 0.5f, 0.7f));
 		BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
 		blendState.setTestEnabled(true);
@@ -46,7 +46,7 @@ public class Window extends HousePart {
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		// ms.setMaterialFace(MaterialFace.FrontAndBack);
-		ms.setColorMaterial(ColorMaterial.Diffuse);
+		ms.setColorMaterial(ColorMaterial.AmbientAndDiffuse);
 		mesh.setRenderState(ms);
 
 		// // Add a texture to the box.

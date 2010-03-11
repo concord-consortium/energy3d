@@ -14,7 +14,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.extension.SwitchNode;
-import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart implements Serializable {
@@ -266,8 +265,11 @@ public abstract class HousePart implements Serializable {
 		if (closestDistance < 0.5) {
 			p.set(closestPoint);
 			return new Snap(closestWall, index, closestPointIndex);
-		} else
+		} else {
+			final double C = 1.0;
+			p.set(Math.round(p.getX() * C) / C, Math.round(p.getY() * C) / C, p.getZ()); 
 			return null;
+		}
 	}
 
 	public void addPoint(int x, int y) {

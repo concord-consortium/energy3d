@@ -24,10 +24,7 @@ import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
-import com.ardor3d.input.ButtonState;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
-import com.ardor3d.input.KeyboardState;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.PhysicalLayer;
@@ -36,18 +33,15 @@ import com.ardor3d.input.awt.AwtKeyboardWrapper;
 import com.ardor3d.input.awt.AwtMouseManager;
 import com.ardor3d.input.awt.AwtMouseWrapper;
 import com.ardor3d.input.control.FirstPersonControl;
-import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyHeldCondition;
 import com.ardor3d.input.logical.KeyPressedCondition;
-import com.ardor3d.input.logical.KeyReleasedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
-import com.ardor3d.input.logical.MouseButtonCondition;
 import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.MouseMovedCondition;
+import com.ardor3d.input.logical.MouseWheelMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
-import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
@@ -61,7 +55,6 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.Camera.ProjectionMode;
@@ -79,18 +72,13 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
-import com.ardor3d.scenegraph.shape.Sphere;
-import com.ardor3d.scenegraph.shape.Sphere.TextureMode;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
-import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 	public static final int SELECT = 0;
@@ -113,7 +101,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private Mesh floor;
 
-	private static final int MOVE_SPEED = 10;
+	private static final int MOVE_SPEED = 5;
 	// private static final double TURN_SPEED = 0.5;
 	// private final Matrix3 _incr = new Matrix3();
 	// private static final double MOUSE_TURN_SPEED = 0.1;
@@ -347,7 +335,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Spatial createAxis() {
-		final int axisLen = 50;
+		final int axisLen = 100;
 
 		FloatBuffer verts = BufferUtils.createVector3Buffer(12);
 		verts.put(0).put(0).put(0);
@@ -385,6 +373,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private void registerInputTriggers() {
 		control = new FirstPersonControl(Vector3.UNIT_Z) {
+			
 			@Override
 			protected void rotate(Camera camera, double dx, double dy) {
 				if (operation == SELECT && (drawn == null || drawn.isDrawCompleted()) && !topView)
@@ -536,6 +525,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				lookAtZero(source);
 			}
 		}));
+		logicalLayer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				move(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
+			}
+		}));
 		//
 		// final Predicate<TwoInputStates> mouseMovedAndOneButtonPressed = Predicates.and(TriggerConditions.mouseMoved(), Predicates.or(TriggerConditions.leftButtonDown(), TriggerConditions.rightButtonDown()));
 		//
@@ -677,22 +671,22 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// turn(canvas, TURN_SPEED * tpf);
 	// }
 	//
-	// private void moveForward(final Canvas canvas, final double tpf) {
-	// final Camera camera = canvas.getCanvasRenderer().getCamera();
-	// final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
-	// final Vector3 dir = Vector3.fetchTempInstance();
-	// // if (camera.getProjectionMode() == ProjectionMode.Perspective) {
-	// // dir.set(camera.getDirection());
-	// // } else {
-	// // // move up if in parallel mode
-	// dir.set(camera.getUp());
-	// // }
-	// dir.multiplyLocal(MOVE_SPEED * tpf);
-	// loc.addLocal(dir);
-	// camera.setLocation(loc);
-	// Vector3.releaseTempInstance(loc);
-	// Vector3.releaseTempInstance(dir);
-	// }
+	 private void move(final Canvas canvas, final double tpf, int val) {
+	 final Camera camera = canvas.getCanvasRenderer().getCamera();
+	 final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
+	 final Vector3 dir = Vector3.fetchTempInstance();
+	 // if (camera.getProjectionMode() == ProjectionMode.Perspective) {
+	 // dir.set(camera.getDirection());
+	 // } else {
+	 // // move up if in parallel mode
+	 dir.set(camera.getDirection());
+	 // }
+	 dir.multiplyLocal(-val * MOVE_SPEED * 10 * tpf);
+	 loc.addLocal(dir);
+	 camera.setLocation(loc);
+	 Vector3.releaseTempInstance(loc);
+	 Vector3.releaseTempInstance(dir);
+	 }
 
 	private void moveUpDown(final Canvas canvas, final double tpf, boolean up) {
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
