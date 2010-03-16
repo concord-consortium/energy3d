@@ -76,7 +76,7 @@ public class Scene implements Serializable {
 			in.close();
 			for (HousePart housePart : instance.getParts())
 				root.attachChild(housePart.getRoot());
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			instance = new Scene();
 		}		

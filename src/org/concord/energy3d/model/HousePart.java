@@ -18,6 +18,7 @@ import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private static boolean snapToGrid = false;
 	protected transient Node root; // = new Node();
 	protected transient SwitchNode pointsRoot; // = new SwitchNode("Edit Points");
 	protected final int numOfDrawPoints, numOfEditPoints;
@@ -29,6 +30,14 @@ public abstract class HousePart implements Serializable {
 	private transient PickResults pickResults;
 	private boolean firstPointInserted = false;
 
+	public static boolean isSnapToGrid() {
+		return snapToGrid;
+	}
+	
+	public static void setSnapToGrid(boolean snapToGrid) {
+		HousePart.snapToGrid = snapToGrid;
+	}
+	
 	public HousePart(int numOfDrawPoints, int numOfEditPoints) {
 //		System.out.println("Creating " + this + "...");
 		this.numOfDrawPoints = numOfDrawPoints;
@@ -266,8 +275,10 @@ public abstract class HousePart implements Serializable {
 			p.set(closestPoint);
 			return new Snap(closestWall, index, closestPointIndex);
 		} else {
-			final double C = 1.0;
-			p.set(Math.round(p.getX() * C) / C, Math.round(p.getY() * C) / C, p.getZ()); 
+			if (snapToGrid) {
+				final double C = 2.0;
+				p.set(Math.round(p.getX() * C) / C, Math.round(p.getY() * C) / C, p.getZ());
+			}
 			return null;
 		}
 	}

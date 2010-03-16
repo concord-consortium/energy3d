@@ -78,6 +78,13 @@ Version 0.1
 - add mouse wheel support for navigation
 - resized/compressed images for faster loading
 - added animated rotation button
+- Bug: except thrown due to not updating vertex count of walls when moving
+- added snap to Grid button
+- package in jar with "Add directories" option to allow finding image resources
+
+- compile in jdk 5.0 for Mac compatibility
+- release as version 0.1 
+
 
 TODO:
 -move windows

@@ -11,6 +11,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
@@ -37,6 +38,7 @@ public class MainFrame extends JFrame {
 	private JButton newButton = null;
 	private JButton openButton = null;
 	private JToggleButton rotAnimButton = null;
+	private JToggleButton gridButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -87,6 +89,7 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getLightButton());
 			appToolbar.add(getRotAnimButton());
 			appToolbar.add(getTopViewButton());
+			appToolbar.add(getGridButton());
 			
 			ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
@@ -318,6 +321,24 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return rotAnimButton;
+	}
+
+	/**
+	 * This method initializes gridButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getGridButton() {
+		if (gridButton == null) {
+			gridButton = new JToggleButton();
+			gridButton.setText("Grid");
+			gridButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					HousePart.setSnapToGrid(gridButton.isSelected());
+				}
+			});
+		}
+		return gridButton;
 	}
 
 	/**

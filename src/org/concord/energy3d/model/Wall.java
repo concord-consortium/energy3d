@@ -95,7 +95,7 @@ public class Wall extends HousePart {
 	}
 
 	public void setPreviewPoint(int x, int y) {
-		System.out.println("moving wall...");
+//		System.out.println("moving wall...");
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			PickedHousePart picked = pick(x, y, new Class<?>[] {Foundation.class, null}); //Foundation.class);
 			if (picked != null) {
@@ -208,10 +208,12 @@ public class Wall extends HousePart {
 				ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
 				ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
 				ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
+				mesh.getMeshData().updateVertexCount();
 
 				Poly2Tri.triangulate(polygon);
 				ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
 				ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
+				backMesh.getMeshData().updateVertexCount();
 
 				Vector3 n = decideThicknessNormal();
 

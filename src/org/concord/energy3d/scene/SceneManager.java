@@ -2,7 +2,7 @@ package org.concord.energy3d.scene;
 
 import java.awt.Container;
 import java.awt.Dimension;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.FloatBuffer;
 
 import org.concord.energy3d.model.Door;
@@ -172,9 +172,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		AWTImageLoader.registerLoader();
 
 		try {
-			SimpleResourceLocator srl = new SimpleResourceLocator(SceneManager.class.getClassLoader().getResource("org/concord/energy3d/images/"));
+			URL resource = SceneManager.class.getClassLoader().getResource("org/concord/energy3d/images/");
+			System.out.println(resource);
+			SimpleResourceLocator srl = new SimpleResourceLocator(resource);
 			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-		} catch (final URISyntaxException ex) {
+		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
 
@@ -281,14 +283,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// _canvas.close();
 	}
 
-	@Override
+//	@Override
 	public boolean renderUnto(Renderer renderer) {
 		renderer.draw(root);
 //		Debugger.drawBounds(root, renderer, true);
 		return true;
 	}
 
-	@Override
+//	@Override
 	public PickResults doPick(Ray3 pickRay) {
 		return null;
 	}
@@ -853,7 +855,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}
 //		if (pickedHousePart.getUserData() == null)
-			System.out.println(pickedHousePart);
+//			System.out.println(pickedHousePart);
 		return pickedHousePart;
 	}
 
