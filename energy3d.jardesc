@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
     <jar path="Energy3D/exe/energy3d.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/Energy3D/SolarHouse.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/Energy3D/energy3d.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="false" mainClassHandleIdentifier="=Energy3D/src&lt;org.concord.energy3d{MainApplication.java[MainApplication" manifestLocation="/Energy3D/manifest.mf" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
@@ -11,8 +11,15 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=Energy3D/src"/>
+        <file path="/Energy3D/src/org/concord/energy3d/images/roof2.jpg"/>
+        <file path="/Energy3D/src/org/concord/energy3d/images/wall7.jpg"/>
+        <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.scene"/>
+        <file path="/Energy3D/src/org/concord/energy3d/images/concrete.jpg"/>
+        <file path="/Energy3D/src/org/concord/energy3d/images/sky6.jpg"/>
+        <file path="/Energy3D/src/org/concord/energy3d/images/door.jpg"/>
+        <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.model"/>
         <javaElement handleIdentifier="=ardor3d-jogl/src\/main\/java"/>
+        <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d"/>
         <javaElement handleIdentifier="=ardor3d-awt/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-core/src\/main\/java"/>
     </selectedElements>

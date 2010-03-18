@@ -7,8 +7,8 @@ import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.polygon.Polygon;
 import org.poly2tri.polygon.PolygonPoint;
-import org.poly2tri.position.AnyToXYTransform;
-import org.poly2tri.position.XYToAnyTransform;
+import org.poly2tri.transform.coordinate.AnyToXYTransform;
+import org.poly2tri.transform.coordinate.XYToAnyTransform;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
@@ -80,7 +80,10 @@ public class Wall extends HousePart {
 
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("brick_wall.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
+		ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
+//        final Texture texture = createTexture();
+//        texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
+//		ts.setTexture(texture);
 		mesh.setRenderState(ts);
 		// backMesh.setRenderState(ts);
 
@@ -89,6 +92,45 @@ public class Wall extends HousePart {
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
 	}
+	
+//    private Texture createTexture() {
+//        final Texture3D tex = new Texture3D();
+//        tex.setMinificationFilter(MinificationFilter.BilinearNoMipMaps);
+//        tex.setTextureKey(TextureKey.getKey(null, false, Format.RGBA8, MinificationFilter.BilinearNoMipMaps));
+//        final Image img = new Image();
+//        final int C = 10;
+//        img.setWidth(C);
+//        img.setHeight(C);
+//        img.setDepth(C);
+//        img.setFormat(Format.RGB8);
+//
+//        final List<ByteBuffer> data = Lists.newArrayList();
+//        for (int i = 0; i < C; i++) {
+//        	int size = C * C * 3;
+//			final ByteBuffer layer = BufferUtils.createByteBuffer(size);
+//        	for (int j=0; j<size; j++)
+////        		layer.put((byte)(Math.random()*255));
+//        		
+//        	if (i == 0 && j == 0) {
+////        		layer.position(size/2);
+//        		layer.put((byte)255);
+//        	} else
+//        		layer.put((byte)0);
+//        	layer.rewind();
+//        	Image colorImage = new Image(Image.Format.RGB8, C, C, layer);
+//            data.add(colorImage.getData(0));
+//        }
+//        img.setData(data);
+//        tex.setImage(img);
+//        tex.setWrap(WrapMode.Clamp);
+//        Matrix4 m = new Matrix4();
+////        m.setValue(3, 3, 2);
+////        m.setValue(3, 1, 1);
+//        m.setValue(3, 3, 5);
+////		tex.setTextureMatrix(m);
+////        tex.setBorderColor(1, 0, 0, 0);
+//        return tex;
+//    }	
 
 	private Vector3 getUpperPoint(Vector3 p) {
 		return new Vector3(p.getX(), p.getY(), wallHeight + points.get(0).getZ());

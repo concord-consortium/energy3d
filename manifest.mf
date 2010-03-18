@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Sealed: true
 Main-Class: org.concord.energy3d.MainApplication
-Class-Path: google-collect-1.0.jar jogl.jar gluegen-rt.jar poly2tri-core-0.1.0-SNAPSHOT.jar poly2tri-ardor3d-0.1.1-SNAPSHOT.jar slf4j-api-1.5.10.jar slf4j-nop-1.5.10.jar 
+Class-Path: google-collect-1.0.jar jogl.jar gluegen-rt.jar poly2tri-core-0.1.0-SNAPSHOT.jar poly2tri-ardor3d-0.1.0-SNAPSHOT.jar slf4j-api-1.5.10.jar slf4j-nop-1.5.10.jar 

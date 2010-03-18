@@ -81,8 +81,9 @@ Version 0.1
 - Bug: except thrown due to not updating vertex count of walls when moving
 - added snap to Grid button
 - package in jar with "Add directories" option to allow finding image resources
-
 - compile in jdk 5.0 for Mac compatibility
+- resize images to power of 2 for compatibility with older video cards
+- new wall brick texture
 - release as version 0.1 
 
 
