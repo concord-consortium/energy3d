@@ -1,4 +1,4 @@
-Version 0.1
+Version 0.1 (Released March 18, 2010)
 
 - draw walls
 - draw edit points
@@ -86,8 +86,21 @@ Version 0.1
 - new wall brick texture
 - release as version 0.1 
 
+**********************************************************************************************
+Version 0.2 
+
+- add Texture3D for InfraRed simulation
+- render 3d heat grids on the walls
+- render 3d heat grids on the entire house
+- animate heat simulation by generating random heat point at each frame
+
+
+- clip the back wall mesh according to angle between neighboring wall 
+
 
 TODO:
--move windows
+- move windows
+- bug with inserting window on near-90 degrees wall with respect to viewer
+
  
  

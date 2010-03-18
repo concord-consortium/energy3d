@@ -1,7 +1,9 @@
 package org.concord.energy3d.model;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.Poly2Tri;
@@ -14,16 +16,24 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.Texture.EnvironmentalMapMode;
+import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
+import com.google.common.collect.Lists;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
@@ -110,9 +120,7 @@ public class Wall extends HousePart {
 //			final ByteBuffer layer = BufferUtils.createByteBuffer(size);
 //        	for (int j=0; j<size; j++)
 ////        		layer.put((byte)(Math.random()*255));
-//        		
-//        	if (i == 0 && j == 0) {
-////        		layer.position(size/2);
+//        	if (i == 0 && j == 0 || (i == C-1 && j == size-1)) {
 //        		layer.put((byte)255);
 //        	} else
 //        		layer.put((byte)0);
@@ -122,13 +130,10 @@ public class Wall extends HousePart {
 //        }
 //        img.setData(data);
 //        tex.setImage(img);
-//        tex.setWrap(WrapMode.Clamp);
-//        Matrix4 m = new Matrix4();
-////        m.setValue(3, 3, 2);
-////        m.setValue(3, 1, 1);
-//        m.setValue(3, 3, 5);
-////		tex.setTextureMatrix(m);
-////        tex.setBorderColor(1, 0, 0, 0);
+//        tex.setWrap(WrapMode.BorderClamp);
+////        tex.setEnvPlaneS(new Vector4(0.5, 0, 0, 0));
+////        tex.setEnvPlaneT(new Vector4(0, 0.5, 0, 0));
+////        tex.setEnvPlaneR(new Vector4(0, 0, 0.5, 0));        
 //        return tex;
 //    }	
 
@@ -252,14 +257,7 @@ public class Wall extends HousePart {
 				ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
 				mesh.getMeshData().updateVertexCount();
 
-				Poly2Tri.triangulate(polygon);
-				ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
-				ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
-				backMesh.getMeshData().updateVertexCount();
-
-				Vector3 n = decideThicknessNormal();
-
-				backMesh.setTranslation(n);
+				Vector3 n = drawBackMesh(polygon, fromXY);
 
 				drawSurroundMesh(n);
 
@@ -279,6 +277,46 @@ public class Wall extends HousePart {
 				child.draw();
 		}
 
+	}
+
+	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
+//		Vector3 dir = points.get(2).subtract(points.get(0), null).normalizeLocal(); //.multiplyLocal(0.5);
+//		System.out.println(dir);
+//		TriangulationPoint p;
+//		double angle;
+//		double scale;
+//		if (neighbor[0] != null) {
+//			int neighborPointIndex = neighbor[0].getNeighborPointIndex();
+//			ArrayList<Vector3> points2 = neighbor[0].getNeighbor().getPoints();
+//			Vector3 dir2 = points2.get(neighborPointIndex == 0 ? 2 : 0).subtract(points2.get(neighborPointIndex), null).normalizeLocal();
+//			angle = dir2.smallestAngleBetween(dir);
+//			System.out.println("dir2 = " + dir2);
+//			System.out.println("angle = " + angle);
+//			scale = (Math.PI - angle)/Math.PI;
+//			dir.multiplyLocal(wallHeight / Math.tan(angle));
+//			p = polygon.getPoints().get(0);
+//			p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
+//			p = polygon.getPoints().get(3);
+//			p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());			
+//		}
+//	
+////			if (neighbor[0] != null) {
+////			dir.negateLocal();
+////			p = polygon.getPoints().get(1);
+////			p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
+////			p = polygon.getPoints().get(2);
+////			p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());			
+////		}
+
+		Poly2Tri.triangulate(polygon);
+		ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
+		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
+		backMesh.getMeshData().updateVertexCount();
+
+		Vector3 n = decideThicknessNormal();
+
+		backMesh.setTranslation(n);
+		return n;
 	}
 
 	private Vector3 decideThicknessNormal() {

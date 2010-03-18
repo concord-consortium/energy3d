@@ -260,6 +260,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void update(final ReadOnlyTimer timer) {
 		final double tpf = timer.getTimePerFrame();
 		logicalLayer.checkTriggers(tpf);
+		
+		Scene.getInstance().init();
 
 		if (rot) {
 			// Update the angle using the current tpf to rotate at a constant speed.
