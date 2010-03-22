@@ -93,9 +93,8 @@ Version 0.2
 - render 3d heat grids on the walls
 - render 3d heat grids on the entire house
 - animate heat simulation by generating random heat point at each frame
-
-
-- clip the back wall mesh according to angle between neighboring wall 
+- compute the reduced width of back wall according to angle between neighboring wall to 
+	clip the portion that sticks out when the angle between two walls is less than 90 degrees 
 
 
 TODO:

@@ -1,9 +1,7 @@
 package org.concord.energy3d.model;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.Poly2Tri;
@@ -16,24 +14,16 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.CollisionTreeManager;
-import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.image.Texture.EnvironmentalMapMode;
-import com.ardor3d.image.Texture.MinificationFilter;
-import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
@@ -45,13 +35,13 @@ public class Wall extends HousePart {
 	private transient Mesh surroundMesh;
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer textureBuffer;
-	private Snap[] neighbor = new Snap[2];
+	private Snap[] neighbors = new Snap[2];
 
 	public Wall() {
 		super(2, 4);
 
 	}
-	
+
 	protected void init() {
 		super.init();
 		mesh = new Mesh("Wall");
@@ -59,7 +49,7 @@ public class Wall extends HousePart {
 		surroundMesh = new Mesh("Wall (Surround)");
 		vertexBuffer = BufferUtils.createVector3Buffer(4);
 		textureBuffer = BufferUtils.createVector2Buffer(4);
-		
+
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		// mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
@@ -91,9 +81,9 @@ public class Wall extends HousePart {
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
-//        final Texture texture = createTexture();
-//        texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
-//		ts.setTexture(texture);
+		// final Texture texture = createTexture();
+		// texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
+		// ts.setTexture(texture);
 		mesh.setRenderState(ts);
 		// backMesh.setRenderState(ts);
 
@@ -102,49 +92,49 @@ public class Wall extends HousePart {
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
 	}
-	
-//    private Texture createTexture() {
-//        final Texture3D tex = new Texture3D();
-//        tex.setMinificationFilter(MinificationFilter.BilinearNoMipMaps);
-//        tex.setTextureKey(TextureKey.getKey(null, false, Format.RGBA8, MinificationFilter.BilinearNoMipMaps));
-//        final Image img = new Image();
-//        final int C = 10;
-//        img.setWidth(C);
-//        img.setHeight(C);
-//        img.setDepth(C);
-//        img.setFormat(Format.RGB8);
-//
-//        final List<ByteBuffer> data = Lists.newArrayList();
-//        for (int i = 0; i < C; i++) {
-//        	int size = C * C * 3;
-//			final ByteBuffer layer = BufferUtils.createByteBuffer(size);
-//        	for (int j=0; j<size; j++)
-////        		layer.put((byte)(Math.random()*255));
-//        	if (i == 0 && j == 0 || (i == C-1 && j == size-1)) {
-//        		layer.put((byte)255);
-//        	} else
-//        		layer.put((byte)0);
-//        	layer.rewind();
-//        	Image colorImage = new Image(Image.Format.RGB8, C, C, layer);
-//            data.add(colorImage.getData(0));
-//        }
-//        img.setData(data);
-//        tex.setImage(img);
-//        tex.setWrap(WrapMode.BorderClamp);
-////        tex.setEnvPlaneS(new Vector4(0.5, 0, 0, 0));
-////        tex.setEnvPlaneT(new Vector4(0, 0.5, 0, 0));
-////        tex.setEnvPlaneR(new Vector4(0, 0, 0.5, 0));        
-//        return tex;
-//    }	
+
+	// private Texture createTexture() {
+	// final Texture3D tex = new Texture3D();
+	// tex.setMinificationFilter(MinificationFilter.BilinearNoMipMaps);
+	// tex.setTextureKey(TextureKey.getKey(null, false, Format.RGBA8, MinificationFilter.BilinearNoMipMaps));
+	// final Image img = new Image();
+	// final int C = 10;
+	// img.setWidth(C);
+	// img.setHeight(C);
+	// img.setDepth(C);
+	// img.setFormat(Format.RGB8);
+	//
+	// final List<ByteBuffer> data = Lists.newArrayList();
+	// for (int i = 0; i < C; i++) {
+	// int size = C * C * 3;
+	// final ByteBuffer layer = BufferUtils.createByteBuffer(size);
+	// for (int j=0; j<size; j++)
+	// // layer.put((byte)(Math.random()*255));
+	// if (i == 0 && j == 0 || (i == C-1 && j == size-1)) {
+	// layer.put((byte)255);
+	// } else
+	// layer.put((byte)0);
+	// layer.rewind();
+	// Image colorImage = new Image(Image.Format.RGB8, C, C, layer);
+	// data.add(colorImage.getData(0));
+	// }
+	// img.setData(data);
+	// tex.setImage(img);
+	// tex.setWrap(WrapMode.BorderClamp);
+	// // tex.setEnvPlaneS(new Vector4(0.5, 0, 0, 0));
+	// // tex.setEnvPlaneT(new Vector4(0, 0.5, 0, 0));
+	// // tex.setEnvPlaneR(new Vector4(0, 0, 0.5, 0));
+	// return tex;
+	// }
 
 	private Vector3 getUpperPoint(Vector3 p) {
 		return new Vector3(p.getX(), p.getY(), wallHeight + points.get(0).getZ());
 	}
 
 	public void setPreviewPoint(int x, int y) {
-//		System.out.println("moving wall...");
+		// System.out.println("moving wall...");
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
-			PickedHousePart picked = pick(x, y, new Class<?>[] {Foundation.class, null}); //Foundation.class);
+			PickedHousePart picked = pick(x, y, new Class<?>[] { Foundation.class, null }); // Foundation.class);
 			if (picked != null) {
 				// container = picked.getUserData().getHousePart();
 				Vector3 p = picked.getPoint();
@@ -169,7 +159,7 @@ public class Wall extends HousePart {
 		draw();
 		showPoints();
 
-		for (Snap neighbor : this.neighbor)
+		for (Snap neighbor : this.neighbors)
 			if (neighbor != null)
 				neighbor.getNeighbor().draw();
 
@@ -185,7 +175,7 @@ public class Wall extends HousePart {
 			Vector3 p = points.get(i);
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
-//			pointsRoot.getChild(i).updateWorldBound(true);
+			// pointsRoot.getChild(i).updateWorldBound(true);
 		}
 
 		if (drawable) {
@@ -266,10 +256,10 @@ public class Wall extends HousePart {
 			}
 
 			// force bound update
-//			mesh.updateModelBound();
-//			backMesh.updateModelBound();
-//			surroundMesh.updateModelBound();
-//			root.updateWorldBound(true);
+			// mesh.updateModelBound();
+			// backMesh.updateModelBound();
+			// surroundMesh.updateModelBound();
+			// root.updateWorldBound(true);
 			root.updateGeometricState(0);
 			CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
@@ -280,33 +270,14 @@ public class Wall extends HousePart {
 	}
 
 	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
-//		Vector3 dir = points.get(2).subtract(points.get(0), null).normalizeLocal(); //.multiplyLocal(0.5);
-//		System.out.println(dir);
-//		TriangulationPoint p;
-//		double angle;
-//		double scale;
-//		if (neighbor[0] != null) {
-//			int neighborPointIndex = neighbor[0].getNeighborPointIndex();
-//			ArrayList<Vector3> points2 = neighbor[0].getNeighbor().getPoints();
-//			Vector3 dir2 = points2.get(neighborPointIndex == 0 ? 2 : 0).subtract(points2.get(neighborPointIndex), null).normalizeLocal();
-//			angle = dir2.smallestAngleBetween(dir);
-//			System.out.println("dir2 = " + dir2);
-//			System.out.println("angle = " + angle);
-//			scale = (Math.PI - angle)/Math.PI;
-//			dir.multiplyLocal(wallHeight / Math.tan(angle));
-//			p = polygon.getPoints().get(0);
-//			p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
-//			p = polygon.getPoints().get(3);
-//			p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());			
-//		}
-//	
-////			if (neighbor[0] != null) {
-////			dir.negateLocal();
-////			p = polygon.getPoints().get(1);
-////			p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
-////			p = polygon.getPoints().get(2);
-////			p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());			
-////		}
+		Vector3 dir = points.get(2).subtract(points.get(0), null).normalizeLocal();
+		if (neighbors[0] != null)
+			reduceBackMeshWidth(polygon, dir, 0);
+
+		if (neighbors[1] != null) {
+			dir.negateLocal();
+			reduceBackMeshWidth(polygon, dir, 1);
+		}
 
 		Poly2Tri.triangulate(polygon);
 		ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
@@ -319,6 +290,19 @@ public class Wall extends HousePart {
 		return n;
 	}
 
+	private void reduceBackMeshWidth(Polygon polygon, final Vector3 dir, final int neighbor) {
+		final int neighborPointIndex = neighbors[neighbor].getNeighborPointIndex();
+		ArrayList<Vector3> points2 = neighbors[neighbor].getNeighbor().getPoints();
+		Vector3 dir2 = points2.get(neighborPointIndex == 0 ? 2 : 0).subtract(points2.get(neighborPointIndex), null).normalizeLocal();
+		final double angle = Math.max(0.1, dir2.smallestAngleBetween(dir) / 2);
+		// System.out.println(angle);
+		dir.multiplyLocal(wallThickness * Math.sin(Math.PI / 2 - angle) / Math.sin(angle));
+		TriangulationPoint p = polygon.getPoints().get(neighbor == 0 ? 0 : 1);
+		p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
+		p = polygon.getPoints().get(neighbor == 0 ? 3 : 2);
+		p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
+	}
+
 	private Vector3 decideThicknessNormal() {
 		FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
 		normalBuffer.position(0);
@@ -328,9 +312,9 @@ public class Wall extends HousePart {
 		Vector3 n = p02.crossLocal(p01).normalizeLocal();
 		n.multiplyLocal(wallThickness);
 
-		Snap neighbor = this.neighbor[0];
+		Snap neighbor = this.neighbors[0];
 		if (neighbor == null)
-			neighbor = this.neighbor[1];
+			neighbor = this.neighbors[1];
 
 		if (neighbor != null && neighbor.getNeighbor().getPoints().size() >= 4) {
 			Wall otherWall = (Wall) neighbor.getNeighbor();
@@ -357,11 +341,11 @@ public class Wall extends HousePart {
 		normalBuffer.position(0);
 		Vector3 p2 = Vector3.fetchTempInstance();
 		int[] order;
-		if (neighbor[0] != null)
+		if (neighbors[0] != null)
 			order = new int[] { 1, 3, 2 };
-		else if (neighbor[1] != null)
+		else if (neighbors[1] != null)
 			order = new int[] { 0, 1, 3 };
-		else if (neighbor[0] != null && neighbor[0] != null)
+		else if (neighbors[0] != null && neighbors[0] != null)
 			order = new int[] { 1, 3 };
 		else
 			order = new int[] { 0, 1, 3, 2 };
@@ -392,7 +376,7 @@ public class Wall extends HousePart {
 	}
 
 	public Snap next(Wall previous) {
-		for (Snap s : neighbor)
+		for (Snap s : neighbors)
 			if (s != null && s.getNeighbor() != previous)
 				return s;
 		return null;
@@ -400,9 +384,9 @@ public class Wall extends HousePart {
 
 	private void setNeighbor(int pointIndex, Snap newNeighbor, boolean updateNeighbors) {
 		int i = pointIndex < 2 ? 0 : 1;
-		Snap oldNeighbor = neighbor[i];
+		Snap oldNeighbor = neighbors[i];
 		if (updateNeighbors || oldNeighbor == null) // do not update if already has neighbor, unless this update was initiated by this wall
-			neighbor[i] = newNeighbor;
+			neighbors[i] = newNeighbor;
 
 		if (!updateNeighbors || oldNeighbor == newNeighbor || (oldNeighbor != null && oldNeighbor.equals(newNeighbor)))
 			return;
@@ -416,15 +400,15 @@ public class Wall extends HousePart {
 
 	private void removeNeighbor(int pointIndex, int requestingPointIndex, Wall wall) {
 		int i = pointIndex < 2 ? 0 : 1;
-		if (neighbor[i] != null && neighbor[i].getNeighbor() == wall && neighbor[i].getNeighborPointIndex() == requestingPointIndex)
-			neighbor[i] = null;
+		if (neighbors[i] != null && neighbors[i].getNeighbor() == wall && neighbors[i].getNeighborPointIndex() == requestingPointIndex)
+			neighbors[i] = null;
 		draw();
 	}
 
 	public void destroy() {
-		for (int i = 0; i < neighbor.length; i++)
-			if (neighbor[i] != null)
-				((Wall) neighbor[i].getNeighbor()).setNeighbor(neighbor[i].getNeighborPointIndex(), null, false); // .removeNeighbor(this);
+		for (int i = 0; i < neighbors.length; i++)
+			if (neighbors[i] != null)
+				((Wall) neighbors[i].getNeighbor()).setNeighbor(neighbors[i].getNeighborPointIndex(), null, false); // .removeNeighbor(this);
 	}
 
 }
