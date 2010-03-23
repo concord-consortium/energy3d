@@ -22,7 +22,7 @@ import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
@@ -259,9 +259,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	@MainThread
 	public void update(final ReadOnlyTimer timer) {
 		final double tpf = timer.getTimePerFrame();
-		logicalLayer.checkTriggers(tpf);
-		
-		Scene.getInstance().init();
+		logicalLayer.checkTriggers(tpf);				
 
 		if (rot) {
 			// Update the angle using the current tpf to rotate at a constant speed.
@@ -275,6 +273,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			root.setRotation(rotate);
 		}
 		root.updateGeometricState(tpf);
+		
+			Scene.getInstance().updateTexture();
+//		Scene.getInstance().init();
 
 		// if (drawn != null)
 		// drawn.getRoot().updateGeometricState(tpf, true);
@@ -287,6 +288,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 //	@Override
 	public boolean renderUnto(Renderer renderer) {
+		Scene.getInstance().renderTexture(renderer);
+//		Scene.getInstance().init();
 		renderer.draw(root);
 //		Debugger.drawBounds(root, renderer, true);
 		return true;
@@ -327,7 +330,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //		sky.setTranslation(0, 0, 10);
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("sky6.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
+		ts.setTexture(TextureManager.load("sky6.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		sky.setRenderState(ts);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.

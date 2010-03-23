@@ -14,16 +14,26 @@ import java.util.List;
 import org.concord.energy3d.model.HousePart;
 
 import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.ImageDataType;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture3D;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.EnvironmentalMapMode;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.image.util.AWTImageLoader;
+import com.ardor3d.image.util.GeneratedImageFactory;
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.TextureKey;
+import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
 
@@ -32,6 +42,7 @@ public class Scene implements Serializable {
 	public static final Node root = new Node("House Root");
 	private static Scene instance;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
+	private double RADIUS = 0;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -46,29 +57,126 @@ public class Scene implements Serializable {
 	}
 	
     public void init() {
-//    	System.out.println("Scene.init()");
-//		final TextureState ts = new TextureState();
-//        final Texture texture = createTexture();
-//        texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
-//		ts.setTexture(texture);
+    	System.out.println("Scene.init()");
+		TextureState ts;
+		ts = (TextureState)root.getLocalRenderState(StateType.Texture);
+		if (ts == null) {
+			ts = new TextureState();
+			root.setRenderState(ts);
+		}
+		C = 50;
+		size = C * C * C * 3;
+		tex = new Texture3D();
+		texBuffer = BufferUtils.createByteBuffer(size);
+		
+        final Texture texture = createTexture();
+        texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
+		ts.setTexture(texture);
 //		root.clearRenderState(StateType.Texture);
 //		root.setRenderState(ts);  
+		ts.setNeedsRefresh(true);
 //		root.updateWorldRenderStates(true);
 //		root.updateGeometricState(0);
 	}
+    
+    int C; // = 20;
+    int size; // = C * C * C * 3;
+    ByteBuffer texBuffer;// = BufferUtils.createByteBuffer(size);
+    Texture3D tex; // = new Texture3D();
+    
+    public void updateTexture() {
+    	int color = (int)(Math.random() * 3);
+    	texBuffer.position(0);
+//    	for (int i = 0; i < size-3; i+=3) {
+//    		int r = color == 0 ? 255 : 0; 
+//    		int g = color == 1 ? 255 : 0;
+//    		int b = color == 2 ? 255 : 0;
+//    		texBuffer.put((byte)r).put((byte)g).put((byte)b);
+//    	}
+    	
+        for (int i = 0; i < C; i++) {
+            for (int j = 0; j < C * C * 3; j+=3) {
+            	int x = j/3/C;
+            	int y = (j % (C*3)) / 3;
+            	int z = (i);
+            	byte val = (byte)(RADIUS/new Vector3(x, y, z).subtractLocal(0, 0, 0).length());
+            	RADIUS = (RADIUS + 0.005)%100000;
+//            	System.out.println(RADIUS);
+            	texBuffer.position(i*C*C*3+j+0);
+            	texBuffer.put(val);
+            }
+        }    	
+    	
+    	texBuffer.rewind();
+//    	renderer.updateTexture3DSubImage(tex, 0, 0, 0, C, C, C, texBuffer, 0, 0, 0, C, C);
+//        final Image nextImage = AWTImageLoader.makeArdor3dImage(img, false);
+//        final Texture nextTexture = TextureManager.loadFromImage(nextImage,
+//                Texture.MinificationFilter.Trilinear);
+//        final TextureState ts = (TextureState) root.getLocalRenderState(RenderState.StateType.Texture);
+//        ts.setTexture(nextTexture);
+    }
+    
+    public void renderTexture(Renderer renderer) {
+    	texBuffer.rewind();
+    	renderer.updateTexture3DSubImage(tex, 0, 0, 0, C, C, C, texBuffer, 0, 0, 0, C, C);
+    }    
 
-	private Texture createTexture() {
+    private Texture createTexture() {
+//        final Texture3D tex = new Texture3D();
+        tex.setMinificationFilter(MinificationFilter.BilinearNoMipMaps);
+        tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.BilinearNoMipMaps));
+        
+        final int size = C * C * 3;
+        final Image img = new Image();
+        img.setWidth(C);
+        img.setHeight(C);
+        img.setDepth(C);
+
+        final List<ByteBuffer> data = Lists.newArrayList();
+        for (int i = 0; i < C; i++) {
+            final Image colorImage = GeneratedImageFactory.createSolidColorImage(ColorRGBA.BLACK, false, C);            
+            ByteBuffer data_i = colorImage.getData(0);			
+            for (int j = 0; j < size; j+=3) {
+            	int x = j/3/C;
+            	int y = (j % (C*3)) / 3;
+            	int z = (i);
+            	byte val = (byte)(RADIUS/new Vector3(x, y, z).subtractLocal(0, 0, 0).length());
+            	RADIUS = (RADIUS + 0.005)%100000;
+//            	System.out.println(RADIUS);
+            	data_i.position(j+0);
+            	data_i.put(val);
+            }
+            
+            data_i.rewind();
+            data.add(data_i);
+            if (i == 0) {
+                img.setDataFormat(colorImage.getDataFormat());
+                img.setDataType(colorImage.getDataType());
+            }
+        }
+        int ii = (int)(Math.random() * C);
+        int jj = (int)(Math.random() * size);
+        data.get(ii).put(jj, (byte)255);
+        System.out.println("heat point = " + ii + "," + jj);
+        
+        img.setData(data);
+        tex.setImage(img);
+        tex.setWrap(WrapMode.BorderClamp);
+        return tex;
+    }    
+	private Texture createTexture1() {
         final Texture3D tex = new Texture3D();
         tex.setMinificationFilter(MinificationFilter.BilinearNoMipMaps);
-        tex.setTextureKey(TextureKey.getKey(null, false, Format.RGBA8, MinificationFilter.BilinearNoMipMaps));
+//        tex.setTextureKey(TextureKey.getKey(null, false, TextureStoreFormat.RGBA8, MinificationFilter.BilinearNoMipMaps));
+        tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.BilinearNoMipMaps));
         final Image img = new Image();
         final int C = 10;
         img.setWidth(C);
         img.setHeight(C);
         img.setDepth(C);
-        img.setFormat(Format.RGB8);
+//        img.setFormat(Format.RGB8);
 
-        final int size = C * C * 3;
+        final int size = C * C * 4;
         int ii = (int)(Math.random() * C);
         int jj = (int)(Math.random() * size);
         System.out.println("heat point = " + ii + "," + jj);
@@ -82,15 +190,17 @@ public class Scene implements Serializable {
         	} else
         		layer.put((byte)0);
         	layer.rewind();
-        	Image colorImage = new Image(Image.Format.RGB8, C, C, layer);
+//        	Image colorImage = new Image(ImageDataFormat.RGBA, ImageDataType.Byte, C, C, layer, null);
+        	final Image colorImage = GeneratedImageFactory.createSolidColorImage(ColorRGBA.randomColor(null), false, C);        	
             data.add(colorImage.getData(0));
+            if (i == 0) {
+                img.setDataFormat(ImageDataFormat.RGBA);
+                img.setDataType(ImageDataType.Byte);
+            }            
         }
         img.setData(data);
         tex.setImage(img);
         tex.setWrap(WrapMode.BorderClamp);
-//        tex.setEnvPlaneS(new Vector4(0.5, 0, 0, 0));
-//        tex.setEnvPlaneT(new Vector4(0, 0.5, 0, 0));
-//        tex.setEnvPlaneR(new Vector4(0, 0, 0.5, 0));        
         return tex;
     }		
 

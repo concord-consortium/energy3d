@@ -15,7 +15,7 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -80,12 +80,8 @@ public class Wall extends HousePart {
 
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
-		// final Texture texture = createTexture();
-		// texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
-		// ts.setTexture(texture);
-		mesh.setRenderState(ts);
-		// backMesh.setRenderState(ts);
+		ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+//		mesh.setRenderState(ts);
 
 		UserData userData = new UserData(this);
 		mesh.setUserData(userData);

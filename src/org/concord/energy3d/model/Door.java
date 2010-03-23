@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
@@ -54,7 +54,7 @@ public class Door extends HousePart {
 
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("door.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
+		ts.setTexture(TextureManager.load("door.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		mesh.setRenderState(ts);
 
 		OffsetState offsetState = new OffsetState();

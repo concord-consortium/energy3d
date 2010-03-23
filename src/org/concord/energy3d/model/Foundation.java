@@ -3,7 +3,7 @@ package org.concord.energy3d.model;
 import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.shape.Box;
@@ -26,7 +26,7 @@ public class Foundation extends HousePart {
 		
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true));
+		ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		mesh.setRenderState(ts);		
 		
 		UserData userData = new UserData(this);
