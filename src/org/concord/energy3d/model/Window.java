@@ -72,8 +72,12 @@ public class Window extends HousePart {
 			PickedHousePart picked = pick(x, y, Wall.class);
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
-				if (points.size() <= 2) {
+				if (points.size() == 2 || editPointIndex == 0) {
 					height = points.get(0).getZ() + 0.25 + container.getPoints().get(0).getZ();
+					if (points.size() != 2) {
+						points.get(2).setZ(p.getZ());
+						points.set(3, getUpperPoint(points.get(2)));
+					}
 				} else {
 					Vector3 wallFirstPoint = container.getPoints().get(0);
 					Vector3 wallx = container.getPoints().get(2).subtract(wallFirstPoint, null);
@@ -142,6 +146,13 @@ public class Window extends HousePart {
 		root.updateGeometricState(0);
 		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
+	}
+	
+	public void delete() {
+		if (container != null) {
+			container.children.remove(this);
+			container.draw();
+		}
 	}
 
 }

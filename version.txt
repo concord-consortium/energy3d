@@ -96,9 +96,12 @@ Version 0.2
 - compute the reduced width of back wall according to angle between neighboring wall to 
 	clip the portion that sticks out when the angle between two walls is less than 90 degrees 
 - animate heat simulation by updating Texture 3D with growing red circles at each frame
+- show 4 edit points for foundation object instead of just 2
+- remove wall hole after deleting window
+- allow moving window up/down using lower left edit point
+ 
 
 TODO:
-- move windows
 - bug with inserting window on near-90 degrees wall with respect to viewer
 
  

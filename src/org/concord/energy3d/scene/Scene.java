@@ -46,7 +46,6 @@ public class Scene implements Serializable {
 	}
 
 	private Scene() {
-		init();
 	}
 	
     public void init() {
@@ -70,12 +69,12 @@ public class Scene implements Serializable {
 		ts.setNeedsRefresh(true);
 	}
     
-    int C; // = 20;
-    int size; // = C * C * C * 3;
-    ByteBuffer texBuffer;// = BufferUtils.createByteBuffer(size);
-    Texture3D tex; // = new Texture3D();
+    transient int C; // = 20;
+    transient int size; // = C * C * C * 3;
+    transient ByteBuffer texBuffer;// = BufferUtils.createByteBuffer(size);
+    transient Texture3D tex; // = new Texture3D();
     
-    public void updateTexture() {
+    public void updateTexture() { 
     	texBuffer.position(0);
 //    	int color = (int)(Math.random() * 3);
 //    	for (int i = 0; i < size-3; i+=3) {
@@ -235,10 +234,10 @@ public class Scene implements Serializable {
 			for (HousePart housePart : instance.getParts())
 				root.attachChild(housePart.getRoot());
 		} catch (Throwable e) {
-			e.printStackTrace();
+			System.out.println("Energy3D saved file not found...creating a new file...");			
 			instance = new Scene();
 		}
-		instance.init();
+//		instance.init();
 	}
 
 }

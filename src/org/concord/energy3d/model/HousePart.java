@@ -42,7 +42,7 @@ public abstract class HousePart implements Serializable {
 //		System.out.println("Creating " + this + "...");
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
-		points = new ArrayList<Vector3>(numOfDrawPoints);
+		points = new ArrayList<Vector3>(numOfEditPoints);
 		init();
 		
 		allocateNewPoint();
@@ -89,6 +89,10 @@ public abstract class HousePart implements Serializable {
 		return drawCompleted;
 	}
 
+	public boolean isFirstPointInserted() {
+		return firstPointInserted;
+	}
+	
 	public ArrayList<Vector3> getPoints() {
 		return points;
 	}
@@ -221,7 +225,7 @@ public abstract class HousePart implements Serializable {
 			if (container == null || picked.getUserData() == null || container != picked.getUserData().getHousePart()) {
 				if (container != null)
 					container.removeChild(this);
-				if (picked.getUserData() != null) {
+				if (picked.getUserData() != null && picked.getUserData().getHousePart().isDrawCompleted()) {
 					container = picked.getUserData().getHousePart();
 					container.addChild(this);
 				} else
@@ -302,8 +306,13 @@ public abstract class HousePart implements Serializable {
 			points.add(p);
 	}
 
+	public void delete() {
+		
+	}
+
 	public abstract void setPreviewPoint(int x, int y);
 
 	protected abstract void draw();
+
 
 }

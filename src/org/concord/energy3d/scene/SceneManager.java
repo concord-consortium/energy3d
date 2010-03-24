@@ -274,7 +274,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 		root.updateGeometricState(tpf);
 		
-			Scene.getInstance().updateTexture();
+//			Scene.getInstance().updateTexture();
 //		Scene.getInstance().init();
 
 		// if (drawn != null)
@@ -288,7 +288,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 //	@Override
 	public boolean renderUnto(Renderer renderer) {
-		Scene.getInstance().renderTexture(renderer);
+//		if (!Scene.getInstance().getParts().isEmpty())
+//			Scene.getInstance().renderTexture(renderer);
 //		Scene.getInstance().init();
 		renderer.draw(root);
 //		Debugger.drawBounds(root, renderer, true);
@@ -779,8 +780,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return;
 		housePartsNode.detachChild(drawn.getRoot());
 		Scene.getInstance().remove(drawn);
-		if (drawn instanceof Wall)
-			((Wall) drawn).destroy();
+//		if (drawn instanceof Wall)
+		drawn.delete();
 	}
 
 	public int getOperation() {

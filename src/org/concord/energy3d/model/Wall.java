@@ -138,6 +138,8 @@ public class Wall extends HousePart {
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				Snap snap = snap(p, index);
 				setNeighbor(index, snap, true);
+				if (index == 2)		// make sure z of 2nd base point is same as 2st (needed for platform picking side)
+					p.setZ(points.get(0).getZ());
 				points.set(index, p);
 				points.set(index + 1, getUpperPoint(p));
 			}
@@ -267,10 +269,10 @@ public class Wall extends HousePart {
 
 	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
 		Vector3 dir = points.get(2).subtract(points.get(0), null).normalizeLocal();
-		if (neighbors[0] != null)
+		if (neighbors[0] != null && neighbors[0].getNeighbor().isFirstPointInserted())
 			reduceBackMeshWidth(polygon, dir, 0);
 
-		if (neighbors[1] != null) {
+		if (neighbors[1] != null && neighbors[1].getNeighbor().isFirstPointInserted()) {
 			dir.negateLocal();
 			reduceBackMeshWidth(polygon, dir, 1);
 		}
@@ -401,7 +403,7 @@ public class Wall extends HousePart {
 		draw();
 	}
 
-	public void destroy() {
+	public void delete() {
 		for (int i = 0; i < neighbors.length; i++)
 			if (neighbors[i] != null)
 				((Wall) neighbors[i].getNeighbor()).setNeighbor(neighbors[i].getNeighborPointIndex(), null, false); // .removeNeighbor(this);

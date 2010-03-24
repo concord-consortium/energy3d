@@ -15,7 +15,7 @@ public class Foundation extends HousePart {
 	private transient Box mesh; // = new Box("Foundation", new Vector3(), new Vector3());
 
 	public Foundation() {
-		super(2, 2);
+		super(2, 4);
 	
 	}
 	protected void init() {
@@ -46,8 +46,9 @@ public class Foundation extends HousePart {
 //		}		
 //	}
 
-//	private void allocateNewPoint() {
+//	protected void allocateNewPoint() {
 //		Vector3 p = new Vector3();
+//		points.add(p);
 //		points.add(p);
 //	}
 	
@@ -55,9 +56,19 @@ public class Foundation extends HousePart {
 	public void setPreviewPoint(int x, int y) {
 		PickedHousePart pick = SceneManager.getInstance().findMousePoint(x, y);
 		if (pick != null) {
-			Vector3 p = pick.getPoint();
-			int index = (editPointIndex == -1) ? points.size() - 1 : editPointIndex;
+			final double H = 0; //foundationHeight;
+			Vector3 p = pick.getPoint().addLocal(0, 0, H);
+			int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 			points.set(index, p);
+			if (points.size() == 4) {
+				if (index == 0 || index == 2) {
+					points.get(1).set(points.get(0).getX(), points.get(2).getY(), H);
+					points.get(3).set(points.get(2).getX(), points.get(0).getY(), H);
+				} else {
+					points.get(0).set(points.get(1).getX(), points.get(3).getY(), H);
+					points.get(2).set(points.get(3).getX(), points.get(1).getY(), H);					
+				}
+			}
 		}
 		draw();
 		showPoints();
@@ -65,7 +76,7 @@ public class Foundation extends HousePart {
 
 	@Override
 	protected void draw() {
-		boolean drawable = points.size() >= 2;
+		boolean drawable = points.size() == 4;
 
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = points.get(i);
@@ -74,7 +85,7 @@ public class Foundation extends HousePart {
 		}
 
 		if (drawable) {
-			mesh.setData(points.get(0), points.get(1).add(0, 0, foundationHeight, null));
+			mesh.setData(points.get(0), points.get(2).add(0, 0, foundationHeight, null));
 		}
 	}
 
