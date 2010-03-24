@@ -95,7 +95,7 @@ Version 0.2
 - animate heat simulation by generating random heat point at each frame
 - compute the reduced width of back wall according to angle between neighboring wall to 
 	clip the portion that sticks out when the angle between two walls is less than 90 degrees 
-
+- animate heat simulation by updating Texture 3D with growing red circles at each frame
 
 TODO:
 - move windows

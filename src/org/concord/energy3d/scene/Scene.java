@@ -14,26 +14,19 @@ import java.util.List;
 import org.concord.energy3d.model.HousePart;
 
 import com.ardor3d.image.Image;
-import com.ardor3d.image.ImageDataFormat;
-import com.ardor3d.image.ImageDataType;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture3D;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.EnvironmentalMapMode;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture.WrapMode;
-import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.image.util.GeneratedImageFactory;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.TextureKey;
-import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
 
@@ -70,13 +63,11 @@ public class Scene implements Serializable {
 		texBuffer = BufferUtils.createByteBuffer(size);
 		
         final Texture texture = createTexture();
+//        texture.setApply(ApplyMode.Combine);
+//        texture.setCombineFuncRGB(combineFuncRGB)
         texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
 		ts.setTexture(texture);
-//		root.clearRenderState(StateType.Texture);
-//		root.setRenderState(ts);  
 		ts.setNeedsRefresh(true);
-//		root.updateWorldRenderStates(true);
-//		root.updateGeometricState(0);
 	}
     
     int C; // = 20;
@@ -85,8 +76,8 @@ public class Scene implements Serializable {
     Texture3D tex; // = new Texture3D();
     
     public void updateTexture() {
-    	int color = (int)(Math.random() * 3);
     	texBuffer.position(0);
+//    	int color = (int)(Math.random() * 3);
 //    	for (int i = 0; i < size-3; i+=3) {
 //    		int r = color == 0 ? 255 : 0; 
 //    		int g = color == 1 ? 255 : 0;
@@ -108,12 +99,6 @@ public class Scene implements Serializable {
         }    	
     	
     	texBuffer.rewind();
-//    	renderer.updateTexture3DSubImage(tex, 0, 0, 0, C, C, C, texBuffer, 0, 0, 0, C, C);
-//        final Image nextImage = AWTImageLoader.makeArdor3dImage(img, false);
-//        final Texture nextTexture = TextureManager.loadFromImage(nextImage,
-//                Texture.MinificationFilter.Trilinear);
-//        final TextureState ts = (TextureState) root.getLocalRenderState(RenderState.StateType.Texture);
-//        ts.setTexture(nextTexture);
     }
     
     public void renderTexture(Renderer renderer) {
@@ -164,45 +149,45 @@ public class Scene implements Serializable {
         tex.setWrap(WrapMode.BorderClamp);
         return tex;
     }    
-	private Texture createTexture1() {
-        final Texture3D tex = new Texture3D();
-        tex.setMinificationFilter(MinificationFilter.BilinearNoMipMaps);
-//        tex.setTextureKey(TextureKey.getKey(null, false, TextureStoreFormat.RGBA8, MinificationFilter.BilinearNoMipMaps));
-        tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.BilinearNoMipMaps));
-        final Image img = new Image();
-        final int C = 10;
-        img.setWidth(C);
-        img.setHeight(C);
-        img.setDepth(C);
-//        img.setFormat(Format.RGB8);
-
-        final int size = C * C * 4;
-        int ii = (int)(Math.random() * C);
-        int jj = (int)(Math.random() * size);
-        System.out.println("heat point = " + ii + "," + jj);
-        final List<ByteBuffer> data = Lists.newArrayList();
-        for (int i = 0; i < C; i++) {
-			final ByteBuffer layer = BufferUtils.createByteBuffer(size);
-        	for (int j=0; j<size; j++)
-//        		layer.put((byte)(Math.random()*255));
-        	if (i == ii && j == jj) {
-        		layer.put((byte)255);
-        	} else
-        		layer.put((byte)0);
-        	layer.rewind();
-//        	Image colorImage = new Image(ImageDataFormat.RGBA, ImageDataType.Byte, C, C, layer, null);
-        	final Image colorImage = GeneratedImageFactory.createSolidColorImage(ColorRGBA.randomColor(null), false, C);        	
-            data.add(colorImage.getData(0));
-            if (i == 0) {
-                img.setDataFormat(ImageDataFormat.RGBA);
-                img.setDataType(ImageDataType.Byte);
-            }            
-        }
-        img.setData(data);
-        tex.setImage(img);
-        tex.setWrap(WrapMode.BorderClamp);
-        return tex;
-    }		
+//	private Texture createTexture1() {
+//        final Texture3D tex = new Texture3D();
+//        tex.setMinificationFilter(MinificationFilter.BilinearNoMipMaps);
+////        tex.setTextureKey(TextureKey.getKey(null, false, TextureStoreFormat.RGBA8, MinificationFilter.BilinearNoMipMaps));
+//        tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.BilinearNoMipMaps));
+//        final Image img = new Image();
+//        final int C = 10;
+//        img.setWidth(C);
+//        img.setHeight(C);
+//        img.setDepth(C);
+////        img.setFormat(Format.RGB8);
+//
+//        final int size = C * C * 4;
+//        int ii = (int)(Math.random() * C);
+//        int jj = (int)(Math.random() * size);
+//        System.out.println("heat point = " + ii + "," + jj);
+//        final List<ByteBuffer> data = Lists.newArrayList();
+//        for (int i = 0; i < C; i++) {
+//			final ByteBuffer layer = BufferUtils.createByteBuffer(size);
+//        	for (int j=0; j<size; j++)
+////        		layer.put((byte)(Math.random()*255));
+//        	if (i == ii && j == jj) {
+//        		layer.put((byte)255);
+//        	} else
+//        		layer.put((byte)0);
+//        	layer.rewind();
+////        	Image colorImage = new Image(ImageDataFormat.RGBA, ImageDataType.Byte, C, C, layer, null);
+//        	final Image colorImage = GeneratedImageFactory.createSolidColorImage(ColorRGBA.randomColor(null), false, C);        	
+//            data.add(colorImage.getData(0));
+//            if (i == 0) {
+//                img.setDataFormat(ImageDataFormat.RGBA);
+//                img.setDataType(ImageDataType.Byte);
+//            }            
+//        }
+//        img.setData(data);
+//        tex.setImage(img);
+//        tex.setWrap(WrapMode.BorderClamp);
+//        return tex;
+//    }		
 
 	public boolean add(HousePart e) {
 		return parts.add(e);

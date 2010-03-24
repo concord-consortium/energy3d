@@ -81,7 +81,7 @@ public class Wall extends HousePart {
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-//		mesh.setRenderState(ts);
+		mesh.setRenderState(ts);
 
 		UserData userData = new UserData(this);
 		mesh.setUserData(userData);
