@@ -17,7 +17,6 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -107,8 +106,8 @@ public class Roof extends HousePart {
 			Vector3 p = points.get(i);
 			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
-			((Sphere) pointsRoot.getChild(i)).updateModelBound();
-			pointsRoot.setVisible(i, true);
+//			((Sphere) pointsRoot.getChild(i)).updateModelBound();
+//			pointsRoot.setVisible(i, true);
 		}
 
 		// force bound update

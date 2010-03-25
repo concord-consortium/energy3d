@@ -99,10 +99,13 @@ Version 0.2
 - show 4 edit points for foundation object instead of just 2
 - remove wall hole after deleting window
 - allow moving window up/down using lower left edit point
+- fixed problem with one side of wall not clipping properly when the wall has more than 1 neighboring wall
+- fixed problem with switchNode not being pickable by using simple Node and SceneHint
+- fixed bug with picking after anim-rotation by rotating camera instead of the scene 
  
 
 TODO:
-- bug with inserting window on near-90 degrees wall with respect to viewer
+
 
  
  

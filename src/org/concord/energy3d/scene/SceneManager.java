@@ -263,12 +263,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (rot) {
 			// Update the angle using the current tpf to rotate at a constant speed.
-			angle += timer.getTimePerFrame() * 50;
+			angle = 1; //timer.getTimePerFrame() * 50;
 			// Wrap the angle to keep it inside 0-360 range
 			angle %= 360;
 
 			// Update the rotation matrix using the angle and rotation axis.
 			rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
+			
+			renderer.getCamera().setLocation(rotate.applyPre(renderer.getCamera().getLocation(), null));
+			renderer.getCamera().lookAt(0, 0, 0, Vector3.UNIT_Z);
+			
 			// Update the box rotation using the rotation matrix.
 			root.setRotation(rotate);
 		}
@@ -291,7 +295,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //		if (!Scene.getInstance().getParts().isEmpty())
 //			Scene.getInstance().renderTexture(renderer);
 //		Scene.getInstance().init();
-		renderer.draw(root);
+			renderer.draw(root);
 //		Debugger.drawBounds(root, renderer, true);
 		return true;
 	}
@@ -590,6 +594,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		Camera camera = source.getCanvasRenderer().getCamera();
 		camera.setFrame(loc, left, up, dir);
+//		camera.lookAt(0, 0, 0, Vector3.UNIT_Z);
 
 		camera.setProjectionMode(ProjectionMode.Perspective);
 
@@ -837,12 +842,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			UserData userData = null;
 			if (obj instanceof UserData)
 				userData = (UserData) obj;
-			PickedHousePart picked_i = new PickedHousePart(userData, pick.getIntersectionRecord().getIntersectionPoint(0));
+			Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
+//			Vector3 intersectionPoint = root.getTransform().applyInverse(pick.getIntersectionRecord().getIntersectionPoint(0));
+			PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
 			double polyDist_i = pick.getClosestDistance();
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {
 				for (Vector3 p : userData.getHousePart().getPoints()) {
-					pointDist_i = p.distance(pick.getIntersectionRecord().getIntersectionPoint(0));
+					pointDist_i = p.distance(intersectionPoint);
 					if (userData.getHousePart() == drawn)
 						pointDist_i -= 0.1;
 					if (pointDist_i < pointDist && (userData.getPointIndex() != -1 || pickedHousePart == null || pickedHousePart.getUserData().getPointIndex() == -1)

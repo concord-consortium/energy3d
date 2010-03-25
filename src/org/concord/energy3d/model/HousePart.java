@@ -13,14 +13,14 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.extension.SwitchNode;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static boolean snapToGrid = false;
 	protected transient Node root; // = new Node();
-	protected transient SwitchNode pointsRoot; // = new SwitchNode("Edit Points");
+	protected transient Node pointsRoot; // = new SwitchNode("Edit Points");
 	protected final int numOfDrawPoints, numOfEditPoints;
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
@@ -51,7 +51,7 @@ public abstract class HousePart implements Serializable {
 	
 	protected void init() {
 		root = new Node("House Part");
-		pointsRoot = new SwitchNode("Edit Points");
+		pointsRoot = new Node("Edit Points");
 		
 		// Set up a reusable pick results
 		pickResults = new PrimitivePickResults();
@@ -64,9 +64,10 @@ public abstract class HousePart implements Serializable {
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
 			pointShape.updateModelBound(); // important
+			pointShape.getSceneHints().setCullHint(CullHint.Always);
 //			pointShape.updateWorldBound(true);
 		}
-		pointsRoot.setAllVisible();
+//		pointsRoot.setAllVisible();
 //		pointsRoot.updateWorldBound(false);
 		root.attachChild(pointsRoot);
 //		pointsRoot.setAllNonVisible();
@@ -106,19 +107,24 @@ public abstract class HousePart implements Serializable {
 	}	
 
 	public void showPoints() {
-		for (int i=0; i<points.size(); i++) {
-			pointsRoot.setVisible(i, true);
+//		pointsRoot.getSceneHints().setCullHint(CullHint.Inherit);
+		for (int i=0; i<points.size(); i++)
+			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
+//			pointsRoot.setVisible(i, true);
 //			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
 //			((Sphere)pointsRoot.getChild(i)).updateModelBound();
 //			((Sphere)pointsRoot.getChild(i)).updateWorldBound(false);
-		}
+//		}
 //		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 //		root.updateWorldBound(true);
 //		root.updateGeometricState(0);
 	}
 
 	public void hidePoints() {
-		pointsRoot.setAllNonVisible();
+//		pointsRoot.getSceneHints().setCullHint(CullHint.Always);
+		for (int i=0; i<points.size(); i++)
+			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);		
+//		pointsRoot.setAllNonVisible();
 //		for (int i=0; i<points.size(); i++) {
 //			pointsRoot.setVisible(i, true);
 //			((Sphere)pointsRoot.getChild(i)).setModelBound(null);
@@ -184,7 +190,7 @@ public abstract class HousePart implements Serializable {
 
 		Vector3 pa = new Vector3(p1.getX() + mua * p21.getX(), p1.getY() + mua * p21.getY(), p1.getZ() + mua * p21.getZ());
 		// Vector3 pb = new Vector3(p3.getX() + mub * p43.getX(), p3.getY() + mub * p43.getY(), p3.getZ() + mub * p43.getZ());
-
+		
 		return pa;
 	}
 

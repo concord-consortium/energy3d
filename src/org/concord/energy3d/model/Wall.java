@@ -33,8 +33,8 @@ public class Wall extends HousePart {
 	private transient Mesh mesh;
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
-	private transient FloatBuffer vertexBuffer;
-	private transient FloatBuffer textureBuffer;
+//	private transient FloatBuffer vertexBuffer;
+//	private transient FloatBuffer textureBuffer;
 	private Snap[] neighbors = new Snap[2];
 
 	public Wall() {
@@ -47,19 +47,17 @@ public class Wall extends HousePart {
 		mesh = new Mesh("Wall");
 		backMesh = new Mesh("Wall (Back)");
 		surroundMesh = new Mesh("Wall (Surround)");
-		vertexBuffer = BufferUtils.createVector3Buffer(4);
-		textureBuffer = BufferUtils.createVector2Buffer(4);
 
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		// mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		mesh.getMeshData().setVertexBuffer(vertexBuffer);
-		mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
+		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 
 		root.attachChild(backMesh);
 		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		backMesh.getMeshData().setVertexBuffer(vertexBuffer);
-		backMesh.getMeshData().setTextureBuffer(textureBuffer, 0);
+		backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		backMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		backMesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 
 		root.attachChild(surroundMesh);
@@ -167,13 +165,8 @@ public class Wall extends HousePart {
 	protected void draw() {
 		boolean drawable = points.size() >= 4 && !points.get(0).equals(points.get(2));
 
-		vertexBuffer.position(0);
-
 		for (int i = 0; i < points.size(); i++) {
-			Vector3 p = points.get(i);
-			// update location of point spheres
-			pointsRoot.getChild(i).setTranslation(p);
-			// pointsRoot.getChild(i).updateWorldBound(true);
+			pointsRoot.getChild(i).setTranslation(points.get(i));
 		}
 
 		if (drawable) {
@@ -272,8 +265,8 @@ public class Wall extends HousePart {
 		if (neighbors[0] != null && neighbors[0].getNeighbor().isFirstPointInserted())
 			reduceBackMeshWidth(polygon, dir, 0);
 
-		if (neighbors[1] != null && neighbors[1].getNeighbor().isFirstPointInserted()) {
-			dir.negateLocal();
+		if (neighbors[1] != null && neighbors[1].getNeighbor().isFirstPointInserted()) {			
+			dir.normalizeLocal().negateLocal();
 			reduceBackMeshWidth(polygon, dir, 1);
 		}
 
@@ -339,12 +332,12 @@ public class Wall extends HousePart {
 		normalBuffer.position(0);
 		Vector3 p2 = Vector3.fetchTempInstance();
 		int[] order;
-		if (neighbors[0] != null)
+		if (neighbors[0] != null && neighbors[0] != null)
+			order = new int[] { 1, 3 };
+		else if (neighbors[0] != null)
 			order = new int[] { 1, 3, 2 };
 		else if (neighbors[1] != null)
 			order = new int[] { 0, 1, 3 };
-		else if (neighbors[0] != null && neighbors[0] != null)
-			order = new int[] { 1, 3 };
 		else
 			order = new int[] { 0, 1, 3, 2 };
 
