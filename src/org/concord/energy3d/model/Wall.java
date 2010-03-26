@@ -22,6 +22,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -33,6 +34,7 @@ public class Wall extends HousePart {
 	private transient Mesh mesh;
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
+	private transient Mesh invisibleMesh;
 //	private transient FloatBuffer vertexBuffer;
 //	private transient FloatBuffer textureBuffer;
 	private Snap[] neighbors = new Snap[2];
@@ -47,13 +49,13 @@ public class Wall extends HousePart {
 		mesh = new Mesh("Wall");
 		backMesh = new Mesh("Wall (Back)");
 		surroundMesh = new Mesh("Wall (Surround)");
+		invisibleMesh = new Mesh("Wall (Invisible)");
 
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		// mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
-
+		
 		root.attachChild(backMesh);
 		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
@@ -65,6 +67,12 @@ public class Wall extends HousePart {
 		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
 		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
+		
+		root.attachChild(invisibleMesh);
+		invisibleMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		invisibleMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
+		
 		// surroundMesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
@@ -85,6 +93,7 @@ public class Wall extends HousePart {
 		mesh.setUserData(userData);
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
+		invisibleMesh.setUserData(userData);
 	}
 
 	// private Texture createTexture() {
@@ -174,7 +183,19 @@ public class Wall extends HousePart {
 
 			ArrayList<PolygonPoint> polyPoints = new ArrayList<PolygonPoint>();
 
+			FloatBuffer invisibleVertexBuffer = invisibleMesh.getMeshData().getVertexBuffer();
+			invisibleVertexBuffer.rewind();
 			Vector3 p;
+			
+			p = points.get(0);
+			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = points.get(1);
+			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = points.get(2);
+			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = points.get(3);
+			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			
 			p = points.get(0);
 			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 			p = points.get(2);
@@ -184,6 +205,7 @@ public class Wall extends HousePart {
 			p = points.get(1);
 			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 
+			
 			try {
 				AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 				XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
@@ -201,19 +223,23 @@ public class Wall extends HousePart {
 						PolygonPoint pp;
 						ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
 						ArrayList<Vector3> points = child.getPoints();
-						p = win.convertFromWallRelativeToAbsolute(points.get(0));
+//						p = win.convertFromWallRelativeToAbsolute(points.get(0));
+						p = points.get(0);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
 						holePoints.add(pp);
-						p = win.convertFromWallRelativeToAbsolute(points.get(2));
+//						p = win.convertFromWallRelativeToAbsolute(points.get(2));
+						p = points.get(2);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
 						holePoints.add(pp);
-						p = win.convertFromWallRelativeToAbsolute(points.get(3));
+//						p = win.convertFromWallRelativeToAbsolute(points.get(3));
+						p = points.get(3);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
 						holePoints.add(pp);
-						p = win.convertFromWallRelativeToAbsolute(points.get(1));
+//						p = win.convertFromWallRelativeToAbsolute(points.get(1));
+						p = points.get(1);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
 						holePoints.add(pp);

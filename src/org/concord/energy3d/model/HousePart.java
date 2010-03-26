@@ -13,7 +13,6 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart implements Serializable {
@@ -29,6 +28,7 @@ public abstract class HousePart implements Serializable {
 	protected int editPointIndex = -1;
 	private transient PickResults pickResults;
 	private boolean firstPointInserted = false;
+	protected transient ArrayList<Vector3> abspoints;
 
 	public static boolean isSnapToGrid() {
 		return snapToGrid;
@@ -50,6 +50,7 @@ public abstract class HousePart implements Serializable {
 	}
 	
 	protected void init() {
+		abspoints = new ArrayList<Vector3>(numOfEditPoints);
 		root = new Node("House Part");
 		pointsRoot = new Node("Edit Points");
 		
@@ -64,7 +65,7 @@ public abstract class HousePart implements Serializable {
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
 			pointShape.updateModelBound(); // important
-			pointShape.getSceneHints().setCullHint(CullHint.Always);
+//			pointShape.getSceneHints().setCullHint(CullHint.Always);
 //			pointShape.updateWorldBound(true);
 		}
 //		pointsRoot.setAllVisible();
@@ -107,29 +108,29 @@ public abstract class HousePart implements Serializable {
 	}	
 
 	public void showPoints() {
-//		pointsRoot.getSceneHints().setCullHint(CullHint.Inherit);
-		for (int i=0; i<points.size(); i++)
-			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
-//			pointsRoot.setVisible(i, true);
-//			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
-//			((Sphere)pointsRoot.getChild(i)).updateModelBound();
-//			((Sphere)pointsRoot.getChild(i)).updateWorldBound(false);
-//		}
-//		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
-//		root.updateWorldBound(true);
-//		root.updateGeometricState(0);
+////		pointsRoot.getSceneHints().setCullHint(CullHint.Inherit);
+//		for (int i=0; i<points.size(); i++)
+//			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
+////			pointsRoot.setVisible(i, true);
+////			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
+////			((Sphere)pointsRoot.getChild(i)).updateModelBound();
+////			((Sphere)pointsRoot.getChild(i)).updateWorldBound(false);
+////		}
+////		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
+////		root.updateWorldBound(true);
+////		root.updateGeometricState(0);
 	}
 
 	public void hidePoints() {
-//		pointsRoot.getSceneHints().setCullHint(CullHint.Always);
-		for (int i=0; i<points.size(); i++)
-			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);		
-//		pointsRoot.setAllNonVisible();
-//		for (int i=0; i<points.size(); i++) {
-//			pointsRoot.setVisible(i, true);
-//			((Sphere)pointsRoot.getChild(i)).setModelBound(null);
-//			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
-//		}		
+////		pointsRoot.getSceneHints().setCullHint(CullHint.Always);
+//		for (int i=0; i<points.size(); i++)
+//			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);		
+////		pointsRoot.setAllNonVisible();
+////		for (int i=0; i<points.size(); i++) {
+////			pointsRoot.setVisible(i, true);
+////			((Sphere)pointsRoot.getChild(i)).setModelBound(null);
+////			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
+////		}		
 //		root.updateGeometricState(0);
 	}
 
@@ -307,9 +308,10 @@ public abstract class HousePart implements Serializable {
 	}	
 
 	private void allocateNewPoint() {
-		Vector3 p = new Vector3();
-		for (int i=0; i<numOfEditPoints/numOfDrawPoints; i++)
-			points.add(p);
+		for (int i=0; i<numOfEditPoints/numOfDrawPoints; i++) {	
+			points.add(new Vector3());
+			abspoints.add(new Vector3());
+		}
 	}
 
 	public void delete() {

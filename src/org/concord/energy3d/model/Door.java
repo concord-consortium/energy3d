@@ -26,7 +26,7 @@ public class Door extends HousePart {
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer normalBuffer;
 	private transient FloatBuffer textureBuffer;
-	protected transient ArrayList<Vector3> abspoints;
+//	protected transient ArrayList<Vector3> abspoints;
 
 	public Door() {
 		super(2, 4);
@@ -40,7 +40,7 @@ public class Door extends HousePart {
 		vertexBuffer = BufferUtils.createVector3Buffer(4);
 		normalBuffer = BufferUtils.createVector3Buffer(4);
 		textureBuffer = BufferUtils.createVector2Buffer(4);
-		abspoints = new ArrayList<Vector3>(4);
+//		abspoints = new ArrayList<Vector3>(4);
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
@@ -184,10 +184,11 @@ public class Door extends HousePart {
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = convertFromWallRelativeToAbsolute(points.get(i));
 			convertedPoints[i] = p;
-			if (i < abspoints.size())
-				abspoints.set(i, p);
-			else
-				abspoints.add(p);
+//			if (i < abspoints.size())
+//				abspoints.set(i, p);
+//			else
+//				abspoints.add(p);
+			abspoints.get(i).set(p);
 			if (drawable)
 				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 

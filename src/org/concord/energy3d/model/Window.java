@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.ColorRGBA;
@@ -15,7 +16,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private double height = 0.5f;
+	private double height = 0.30f;
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer normalBuffer;
@@ -62,9 +63,9 @@ public class Window extends HousePart {
 		mesh.setUserData(new UserData(this));
 	}
 
-	private Vector3 getUpperPoint(Vector3 p) {
-		return new Vector3(p.getX(), p.getY(), height);
-	}
+//	private Vector3 getUpperPoint(Vector3 p) {
+//		return new Vector3(p.getX(), p.getY(), height);
+//	}
 
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
@@ -73,10 +74,12 @@ public class Window extends HousePart {
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
 				if (points.size() == 2 || editPointIndex == 0) {
-					height = points.get(0).getZ() + 0.25 + container.getPoints().get(0).getZ();
+//					height = points.get(0).getZ() + 0.25 + container.getPoints().get(0).getZ();
 					if (points.size() != 2) {
 						points.get(2).setZ(p.getZ());
-						points.set(3, getUpperPoint(points.get(2)));
+//						points.set(3, getUpperPoint(points.get(2)));
+//						points.set(3, getUpperPoint(points.get(2)));
+						points.get(3).set(points.get(2)).setZ(p.getZ()+height);
 					}
 				} else {
 					Vector3 wallFirstPoint = container.getPoints().get(0);
@@ -84,19 +87,23 @@ public class Window extends HousePart {
 					p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
 					p.setZ(points.get(0).getZ() + container.getPoints().get(0).getZ());
 				}
-				p = convertToWallRelative(p);
+				Vector3 p_rel = convertToWallRelative(p);
 
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
-				points.set(index, p);
-				points.set(index + 1, getUpperPoint(p));
+//				points.set(index, p);
+//				points.set(index + 1, getUpperPoint(p));
+				points.get(index).set(p_rel);
+				points.get(index+1).set(p_rel).setZ(p.getZ() + height);
 			}
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
 			int lower = (editPointIndex == 1) ? 0 : 2;
 			Vector3 base = points.get(lower);
 			Vector3 absoluteBase = convertFromWallRelativeToAbsolute(base);
-			height = findHeight(absoluteBase, closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y)) + absoluteBase.getZ();
-			points.set(1, getUpperPoint(points.get(1)));
-			points.set(3, getUpperPoint(points.get(3)));
+			height = findHeight(absoluteBase, closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y)); // + absoluteBase.getZ();
+			points.get(1).setZ(height + absoluteBase.getZ());
+			points.get(3).setZ(height + absoluteBase.getZ());
+//			points.set(1, getUpperPoint(points.get(1)));
+//			points.set(3, getUpperPoint(points.get(3)));
 		}
 		if (container != null) {
 			draw();
@@ -116,6 +123,7 @@ public class Window extends HousePart {
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = convertFromWallRelativeToAbsolute(points.get(i));
 			convertedPoints[i] = p;
+			abspoints.get(i).set(p);
 			if (drawable)
 				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
@@ -154,5 +162,13 @@ public class Window extends HousePart {
 			container.draw();
 		}
 	}
+	
+	@Override
+	public ArrayList<Vector3> getPoints() {
+		if (root == null)
+			init();
+		return abspoints;
+	}
+	
 
 }

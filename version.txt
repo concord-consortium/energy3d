@@ -102,10 +102,11 @@ Version 0.2
 - fixed problem with one side of wall not clipping properly when the wall has more than 1 neighboring wall
 - fixed problem with switchNode not being pickable by using simple Node and SceneHint
 - fixed bug with picking after anim-rotation by rotating camera instead of the scene 
- 
+
+- fixed problem with not being able to move/resize window when the cursor falls within window hole
+- fixed problem with window height reseting itself when moved
+- updated getPoints() method in Window so that it returns absolute coords instead of relative
+
 
 TODO:
-
-
- 
- 
+- fix problem with lower left edit point not pickable sometimes
