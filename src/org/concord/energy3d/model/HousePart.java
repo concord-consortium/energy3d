@@ -18,7 +18,8 @@ import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private static boolean snapToGrid = false;
+	private static boolean snapToObjects = true;
+	private static boolean snapToGrids = false;	
 	protected transient Node root; // = new Node();
 	protected transient Node pointsRoot; // = new SwitchNode("Edit Points");
 	protected final int numOfDrawPoints, numOfEditPoints;
@@ -32,49 +33,59 @@ public abstract class HousePart implements Serializable {
 	protected transient ArrayList<Vector3> abspoints;
 	protected double height;
 
-	public static boolean isSnapToGrid() {
-		return snapToGrid;
+	public static boolean isSnapToObjects() {
+		return snapToObjects;
 	}
 	
-	public static void setSnapToGrid(boolean snapToGrid) {
-		HousePart.snapToGrid = snapToGrid;
+	public static void setSnapToObjects(boolean snapToObjects) {
+		HousePart.snapToObjects = snapToObjects;
 	}
-	
+
+	public static boolean isSnapToGrids() {
+		return snapToGrids;
+	}
+
+	public static void setSnapToGrids(boolean snapToGrid) {
+		HousePart.snapToGrids = snapToGrid;
+	}
+
 	public HousePart(int numOfDrawPoints, int numOfEditPoints) {
-//		System.out.println("Creating " + this + "...");
+		// System.out.println("Creating " + this + "...");
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
 		points = new ArrayList<Vector3>(numOfEditPoints);
 		init();
-		
+
 		allocateNewPoint();
-		
+
 	}
-	
+
 	protected void init() {
 		abspoints = new ArrayList<Vector3>(numOfEditPoints);
+		for (int i = 0; i < points.size(); i++)
+			abspoints.add(new Vector3());
 		root = new Node("House Part");
 		pointsRoot = new Node("Edit Points");
-		
+
 		// Set up a reusable pick results
 		pickResults = new PrimitivePickResults();
 		pickResults.setCheckDistance(true);
 
-//		hidePoints();
+		// hidePoints();
 		final Vector3 origin = new Vector3();
 		for (int i = 0; i < numOfEditPoints; i++) {
-			Sphere pointShape = new Sphere("Point", origin, 20, 20, 0.1);
+			Sphere pointShape = new Sphere("Point", origin, 8, 8, 0.03);
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
 			pointShape.updateModelBound(); // important
 			pointShape.getSceneHints().setCullHint(CullHint.Always);
-//			pointShape.updateWorldBound(true);
+			// pointShape.updateWorldBound(true);
 		}
-//		pointsRoot.setAllVisible();
-//		pointsRoot.updateWorldBound(false);
+		// pointsRoot.setAllVisible();
+		// pointsRoot.updateWorldBound(false);
 		root.attachChild(pointsRoot);
-//		pointsRoot.setAllNonVisible();
-//		root.updateGeometricState(0);		
+		// pointsRoot.setAllNonVisible();
+		// root.updateGeometricState(0);
 	}
 
 	public Node getRoot() {
@@ -96,48 +107,48 @@ public abstract class HousePart implements Serializable {
 	public boolean isFirstPointInserted() {
 		return firstPointInserted;
 	}
-	
+
 	public ArrayList<Vector3> getPoints() {
 		return points;
 	}
-	
+
 	public void addChild(HousePart housePart) {
 		children.add(housePart);
 	}
 
 	public boolean removeChild(HousePart housePart) {
 		return children.remove(housePart);
-	}	
-	
+	}
+
 	public double getHeight() {
 		return height;
 	}
 
 	public void showPoints() {
-////		pointsRoot.getSceneHints().setCullHint(CullHint.Inherit);
-		for (int i=0; i<points.size(); i++)
+		// // pointsRoot.getSceneHints().setCullHint(CullHint.Inherit);
+		for (int i = 0; i < points.size(); i++)
 			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
-////			pointsRoot.setVisible(i, true);
-////			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
-////			((Sphere)pointsRoot.getChild(i)).updateModelBound();
-////			((Sphere)pointsRoot.getChild(i)).updateWorldBound(false);
-////		}
-////		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
-////		root.updateWorldBound(true);
-////		root.updateGeometricState(0);
+		// // pointsRoot.setVisible(i, true);
+		// // CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
+		// // ((Sphere)pointsRoot.getChild(i)).updateModelBound();
+		// // ((Sphere)pointsRoot.getChild(i)).updateWorldBound(false);
+		// // }
+		// // CollisionTreeManager.INSTANCE.removeCollisionTree(root);
+		// // root.updateWorldBound(true);
+		// // root.updateGeometricState(0);
 	}
 
 	public void hidePoints() {
-////		pointsRoot.getSceneHints().setCullHint(CullHint.Always);
-		for (int i=0; i<points.size(); i++)
-			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);		
-////		pointsRoot.setAllNonVisible();
-////		for (int i=0; i<points.size(); i++) {
-////			pointsRoot.setVisible(i, true);
-////			((Sphere)pointsRoot.getChild(i)).setModelBound(null);
-////			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
-////		}		
-//		root.updateGeometricState(0);
+		// // pointsRoot.getSceneHints().setCullHint(CullHint.Always);
+		for (int i = 0; i < points.size(); i++)
+			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
+		// // pointsRoot.setAllNonVisible();
+		// // for (int i=0; i<points.size(); i++) {
+		// // pointsRoot.setVisible(i, true);
+		// // ((Sphere)pointsRoot.getChild(i)).setModelBound(null);
+		// // CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
+		// // }
+		// root.updateGeometricState(0);
 	}
 
 	public void editPoint(int i) {
@@ -158,7 +169,7 @@ public abstract class HousePart implements Serializable {
 		return closest;
 
 	}
-	
+
 	protected double findHeight(Vector3 base, Vector3 upperPoint) {
 		Vector3 subtract = upperPoint.subtract(base, null);
 		if (subtract.dot(0, 0, -1) >= 0)
@@ -197,56 +208,61 @@ public abstract class HousePart implements Serializable {
 
 		Vector3 pa = new Vector3(p1.getX() + mua * p21.getX(), p1.getY() + mua * p21.getY(), p1.getZ() + mua * p21.getZ());
 		// Vector3 pb = new Vector3(p3.getX() + mub * p43.getX(), p3.getY() + mub * p43.getY(), p3.getZ() + mub * p43.getZ());
-		
+
 		return pa;
 	}
 
-//	protected void pick(int x, int y, Spatial target) {
-//		// Put together a pick ray
-//		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
-//		final Ray3 pickRay = Ray3.fetchTempInstance();
-//		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-//		Vector2.releaseTempInstance(pos);
-//
-//		// Do the pick
-////		pickResults.clear();
-//		PickingUtil.findPick(target, pickRay, pickResults);
-//		Ray3.releaseTempInstance(pickRay);
-//	}
+	// protected void pick(int x, int y, Spatial target) {
+	// // Put together a pick ray
+	// final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
+	// final Ray3 pickRay = Ray3.fetchTempInstance();
+	// SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
+	// Vector2.releaseTempInstance(pos);
+	//
+	// // Do the pick
+	// // pickResults.clear();
+	// PickingUtil.findPick(target, pickRay, pickResults);
+	// Ray3.releaseTempInstance(pickRay);
+	// }
 
-	protected PickedHousePart pick(int x, int y) {		
-		return pick(x, y, (Class<? extends HousePart>)null);
+	protected PickedHousePart pick(int x, int y) {
+		return pick(x, y, (Class<? extends HousePart>) null);
 	}
-	
+
 	protected PickedHousePart pick(int x, int y, Class<?>[] typesOfHousePart) {
 		for (Class<?> c : typesOfHousePart) {
 			PickedHousePart picked = pick(x, y, c);
 			if (picked != null)
 				return picked;
 		}
-		return null;			
+		return null;
 	}
-	
+
 	protected PickedHousePart pick(int x, int y, Class<?> typeOfHousePart) {
 		PickedHousePart picked = null;
-//		if (container == null || points.size() < 4)
+		// if (container == null || points.size() < 4)
 		if (!firstPointInserted)
 			picked = SceneManager.getInstance().findMousePoint(x, y, typeOfHousePart);
 		else
 			picked = SceneManager.getInstance().findMousePoint(x, y, container == null ? null : container.getRoot());
-		if (picked != null)
-			if (container == null || picked.getUserData() == null || container != picked.getUserData().getHousePart()) {
+
+		if (!firstPointInserted) {
+			UserData userData = null;
+			if (picked != null)
+				userData = picked.getUserData();
+			if (container == null || userData == null || container != userData.getHousePart()) {
 				if (container != null)
 					container.removeChild(this);
-				if (picked.getUserData() != null && picked.getUserData().getHousePart().isDrawCompleted()) {
-					container = picked.getUserData().getHousePart();
+				if (userData != null && userData.getHousePart().isDrawCompleted()) {
+					container = userData.getHousePart();
 					container.addChild(this);
 				} else
 					container = null;
-			}		
+			}
+		}
 		return picked;
 	}
-	
+
 	protected Vector3 convertToWallRelative(Vector3 p) {
 		ArrayList<Vector3> wallPoints = container.getPoints();
 		Vector3 origin = wallPoints.get(0);
@@ -264,10 +280,11 @@ public abstract class HousePart implements Serializable {
 		Vector3 wally = wallPoints.get(1).subtract(origin, null).normalize(null);
 		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply(p.getZ(), null), null);
 		return pointOnSpace;
-	}	
-	
+	}
 
 	protected Snap snap(Vector3 p, int index) {
+		if (!snapToObjects)
+			return null;
 		Vector3 closestPoint = null;
 		double closestDistance = Double.MAX_VALUE;
 		Wall closestWall = null;
@@ -292,12 +309,20 @@ public abstract class HousePart implements Serializable {
 			p.set(closestPoint);
 			return new Snap(closestWall, index, closestPointIndex);
 		} else {
-			if (snapToGrid) {
-				final double C = 2.0;
-				p.set(Math.round(p.getX() * C) / C, Math.round(p.getY() * C) / C, p.getZ());
-			}
 			return null;
 		}
+	}
+	
+	protected Vector3 grid(Vector3 p, double gridSize) {
+		return grid(p, gridSize, true);
+	}
+	
+	protected Vector3 grid(Vector3 p, double gridSize, boolean snapToZ) {
+		if (snapToGrids) {
+//			final double C = 2.0;
+			p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+		}
+		return p;
 	}
 
 	public void addPoint(int x, int y) {
@@ -311,23 +336,21 @@ public abstract class HousePart implements Serializable {
 			allocateNewPoint();
 			setPreviewPoint(x, y);
 		}
-	}	
+	}
 
 	private void allocateNewPoint() {
-		for (int i=0; i<numOfEditPoints/numOfDrawPoints; i++) {	
+		for (int i = 0; i < numOfEditPoints / numOfDrawPoints; i++) {
 			points.add(new Vector3());
 			abspoints.add(new Vector3());
 		}
 	}
 
 	public void delete() {
-		
+
 	}
 
 	public abstract void setPreviewPoint(int x, int y);
 
 	protected abstract void draw();
-
-
 
 }

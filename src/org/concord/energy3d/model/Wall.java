@@ -29,6 +29,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private static final double GRID_SIZE = 0.5; 
 	private static double defaultWallHeight = 1f;
 //	private double height = defaultWallHeight;
 	private double wallThickness = 0.1;
@@ -153,6 +154,8 @@ public class Wall extends HousePart {
 				// if (p != null) {
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				Snap snap = snap(p, index);
+				if (snap == null)
+				    p = grid(p, GRID_SIZE, false);
 				setNeighbor(index, snap, true);
 				if (index == 2)		// make sure z of 2nd base point is same as 2st (needed for platform picking side)
 					p.setZ(points.get(0).getZ());
@@ -163,7 +166,9 @@ public class Wall extends HousePart {
 			int lower = (editPointIndex == 1) ? 0 : 2;
 			Vector3 base = points.get(lower);
 			Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
-			snap(closestPoint, -1);
+			Snap snap = snap(closestPoint, -1);
+            if (snap == null)
+                closestPoint = grid(closestPoint, GRID_SIZE);			
 			// neighbor[1] = snap(closestPoint);
 			defaultWallHeight = height = findHeight(base, closestPoint);
 			points.set(1, getUpperPoint(points.get(1)));

@@ -11,6 +11,7 @@ import com.ardor3d.util.TextureManager;
 
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private static final double GRID_SIZE = 0.5;
 //	private double height = 0.1;
 	private transient Box mesh; // = new Box("Foundation", new Vector3(), new Vector3());
 
@@ -58,6 +59,7 @@ public class Foundation extends HousePart {
 		if (pick != null) {
 			final double H = 0; //foundationHeight;
 			Vector3 p = pick.getPoint().addLocal(0, 0, H);
+			p = grid(p, GRID_SIZE);
 			int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 			points.get(index).set(p);
 			if (points.size() == 4) {

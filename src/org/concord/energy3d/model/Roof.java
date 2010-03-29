@@ -22,6 +22,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private static final double GRID_SIZE = 0.5;
 //	private double height = 0.5;
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
@@ -59,8 +60,9 @@ public class Roof extends HousePart {
 			pick(x, y, Wall.class);
 		} else {
 			Vector3 base = avg;
-			Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
-			height = findHeight(base, closestPoint);
+			Vector3 p = closestPoint(base, base.add(0, 0, 1, null), x, y);
+			p = grid(p, GRID_SIZE);
+			height = findHeight(base, p);
 		}
 		draw();
 		showPoints();

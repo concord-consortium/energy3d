@@ -19,6 +19,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private static final double GRID_SIZE = 0.25;
 	private static double defaultDoorHeight = 0.8f;
 //	private double height = defaultDoorHeight;
 //	private Wall wall;
@@ -60,6 +61,7 @@ public class Door extends HousePart {
 		OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
 		offsetState.setFactor(-1);
+		offsetState.setUnits(-1);
 		mesh.setRenderState(offsetState);
 		
 		
@@ -89,6 +91,12 @@ public class Door extends HousePart {
 		return new Vector3(p.getX(), p.getY(), height);
 	}
 
+	@Override
+	public void addPoint(int x, int y) {
+		if (container != null)
+			super.addPoint(x, y);
+	}
+	
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 //			Vector3 p = findMousePoint(x, y);
@@ -98,6 +106,7 @@ public class Door extends HousePart {
 				Vector3 wallFirstPoint = container.getPoints().get(0);
 				Vector3 wallx = container.getPoints().get(2).subtract(wallFirstPoint, null);
 				p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
+				p = grid(p, GRID_SIZE);
 				// p = snap(p);
 				// convert from absolute coordinates to relative-to-wall coordinates
 				p = convertToWallRelative(p);
@@ -111,7 +120,9 @@ public class Door extends HousePart {
 			Vector3 base = points.get(lower);
 			Vector3 absoluteBase = convertFromWallRelativeToAbsolute(base);
 			// doorHeight = findHeight(absoluteBase, snap(closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y)));
-			height = findHeight(absoluteBase, closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y));
+			Vector3 p = closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y);
+			p = grid(p, GRID_SIZE);
+			height = findHeight(absoluteBase, p);
 			defaultDoorHeight = height;
 			points.set(1, getUpperPoint(points.get(1)));
 			points.set(3, getUpperPoint(points.get(3)));

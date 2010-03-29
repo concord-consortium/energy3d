@@ -210,6 +210,7 @@ public class Scene implements Serializable {
 	
 	public void save() {
 		try {
+			System.out.println("Saving...done.");
 			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("house.ser"));
 			out.writeObject(this);
 			out.close();
@@ -233,8 +234,11 @@ public class Scene implements Serializable {
 			in.close();
 			for (HousePart housePart : instance.getParts())
 				root.attachChild(housePart.getRoot());
-		} catch (Throwable e) {
+		} catch (FileNotFoundException e) {
 			System.out.println("Energy3D saved file not found...creating a new file...");			
+			instance = new Scene();
+		} catch (Throwable e) {
+			e.printStackTrace();
 			instance = new Scene();
 		}
 //		instance.init();

@@ -887,7 +887,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (edit && data.getPointIndex() != -1) {
 			drawn = data.getHousePart();
 			int pointIndex = data.getPointIndex();
-			if (topView)
+			if (topView && drawn instanceof Wall)
 				pointIndex -= 1;
 			drawn.editPoint(pointIndex);
 		} else {

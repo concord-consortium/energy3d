@@ -334,7 +334,7 @@ public class MainFrame extends JFrame {
 			gridButton.setText("Grid");
 			gridButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					HousePart.setSnapToGrid(gridButton.isSelected());
+					HousePart.setSnapToGrids(gridButton.isSelected());
 				}
 			});
 		}

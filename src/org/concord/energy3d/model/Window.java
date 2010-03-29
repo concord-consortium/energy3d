@@ -16,6 +16,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private static final double GRID_SIZE = 0.25;
 //	private double height = 0.30f;
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
@@ -68,6 +69,12 @@ public class Window extends HousePart {
 //		return new Vector3(p.getX(), p.getY(), height);
 //	}
 
+	@Override
+	public void addPoint(int x, int y) {
+		if (container != null)
+			super.addPoint(x, y);
+	}
+
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			// Vector3 p = findMousePoint(x, y);
@@ -75,6 +82,7 @@ public class Window extends HousePart {
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
 				if (points.size() == 2 || editPointIndex == 0) {
+					p = grid(p, GRID_SIZE);
 //					height = points.get(0).getZ() + 0.25 + container.getPoints().get(0).getZ();
 					if (points.size() != 2) {
 						points.get(2).setZ(p.getZ());
@@ -87,6 +95,7 @@ public class Window extends HousePart {
 					Vector3 wallx = container.getPoints().get(2).subtract(wallFirstPoint, null);
 					p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
 					p.setZ(points.get(0).getZ() + container.getPoints().get(0).getZ());
+					p = grid(p, GRID_SIZE);					
 				}
 				Vector3 p_rel = convertToWallRelative(p);
 
@@ -100,7 +109,9 @@ public class Window extends HousePart {
 			int lower = (editPointIndex == 1) ? 0 : 2;
 			Vector3 base = points.get(lower);
 			Vector3 absoluteBase = convertFromWallRelativeToAbsolute(base);
-			height = findHeight(absoluteBase, closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y)); // + absoluteBase.getZ();
+			Vector3 p = closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y);
+			p = grid(p, GRID_SIZE);
+			height = findHeight(absoluteBase, p); // + absoluteBase.getZ();
 			points.get(1).setZ(height + absoluteBase.getZ());
 			points.get(3).setZ(height + absoluteBase.getZ());
 //			points.set(1, getUpperPoint(points.get(1)));
@@ -171,6 +182,7 @@ public class Window extends HousePart {
 			init();
 		return abspoints;
 	}
+	
 	
 
 }
