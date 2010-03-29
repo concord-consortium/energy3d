@@ -22,13 +22,14 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private double roofHeight = 0.5;
+//	private double height = 0.5;
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 	private transient Vector3 avg;
 
 	public Roof() {
 		super(1, 1);
+		height = 0.5;
 	}
 
 	protected void init() {
@@ -59,7 +60,7 @@ public class Roof extends HousePart {
 		} else {
 			Vector3 base = avg;
 			Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
-			roofHeight = findHeight(base, closestPoint);
+			height = findHeight(base, closestPoint);
 		}
 		draw();
 		showPoints();
@@ -77,8 +78,8 @@ public class Roof extends HousePart {
 		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
 		avg.multiplyLocal(1f / (wallUpperPoints.size()));
 		shiftToOutterEdge(wallUpperPoints);
-		points.get(0).set(avg.getX(), avg.getY(), avg.getZ() + roofHeight);
-		PolygonPoint roofUpperPoint = new PolygonPoint(avg.getX(), avg.getY(), avg.getZ() + roofHeight);
+		points.get(0).set(avg.getX(), avg.getY(), avg.getZ() + height);
+		PolygonPoint roofUpperPoint = new PolygonPoint(avg.getX(), avg.getY(), avg.getZ() + height);
 
 //		System.out.println("Polygon Points:");
 //		for (PolygonPoint p : wallUpperPoints) {
@@ -111,6 +112,7 @@ public class Roof extends HousePart {
 		}
 
 		// force bound update
+		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
 
@@ -130,7 +132,7 @@ public class Roof extends HousePart {
 
 		startWall = currentWall;
 		prevWall = null;
-		while (currentWall != null) {
+		while (currentWall != null && currentWall.isFirstPointInserted()) {
 			Snap next = currentWall.next(prevWall);
 			int pointIndex = 0;
 			if (next != null)

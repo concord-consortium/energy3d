@@ -16,13 +16,14 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private double height = 0.30f;
+//	private double height = 0.30f;
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer normalBuffer;
 
 	public Window() {
 		super(2, 4);
+		height = 0.30;
 	}
 
 	protected void init() {
@@ -151,7 +152,8 @@ public class Window extends HousePart {
 
 		}
 		// force bound update
-		root.updateGeometricState(0);
+		mesh.updateModelBound();
+//		root.updateGeometricState(0);
 		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
 	}

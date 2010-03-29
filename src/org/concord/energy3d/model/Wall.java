@@ -23,13 +23,14 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static double defaultWallHeight = 1f;
-	private double wallHeight = defaultWallHeight;
+//	private double height = defaultWallHeight;
 	private double wallThickness = 0.1;
 	private transient Mesh mesh;
 	private transient Mesh backMesh;
@@ -41,7 +42,7 @@ public class Wall extends HousePart {
 
 	public Wall() {
 		super(2, 4);
-
+		height = defaultWallHeight;
 	}
 
 	protected void init() {
@@ -55,18 +56,24 @@ public class Wall extends HousePart {
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
+		mesh.setModelBound(null);
+		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		
 		root.attachChild(backMesh);
 		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		backMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		backMesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
+		backMesh.setModelBound(null);
+		backMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 
 		root.attachChild(surroundMesh);
 		surroundMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
 		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
+		surroundMesh.setModelBound(null);
+		surroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		
 		root.attachChild(invisibleMesh);
 		invisibleMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
@@ -131,7 +138,7 @@ public class Wall extends HousePart {
 	// }
 
 	private Vector3 getUpperPoint(Vector3 p) {
-		return new Vector3(p.getX(), p.getY(), wallHeight + points.get(0).getZ());
+		return new Vector3(p.getX(), p.getY(), height + points.get(0).getZ());
 	}
 
 	public void setPreviewPoint(int x, int y) {
@@ -141,6 +148,8 @@ public class Wall extends HousePart {
 			if (picked != null) {
 				// container = picked.getUserData().getHousePart();
 				Vector3 p = picked.getPoint();
+				if (container != null)
+					p.setZ(container.getHeight());
 				// if (p != null) {
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				Snap snap = snap(p, index);
@@ -156,7 +165,7 @@ public class Wall extends HousePart {
 			Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
 			snap(closestPoint, -1);
 			// neighbor[1] = snap(closestPoint);
-			defaultWallHeight = wallHeight = findHeight(base, closestPoint);
+			defaultWallHeight = height = findHeight(base, closestPoint);
 			points.set(1, getUpperPoint(points.get(1)));
 			points.set(3, getUpperPoint(points.get(3)));
 
@@ -277,7 +286,11 @@ public class Wall extends HousePart {
 			// backMesh.updateModelBound();
 			// surroundMesh.updateModelBound();
 			// root.updateWorldBound(true);
-			root.updateGeometricState(0);
+//			mesh.updateModelBound();
+//			backMesh.updateModelBound();
+//			surroundMesh.updateModelBound();
+			invisibleMesh.updateModelBound();
+//			root.updateGeometricState(0);
 			CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
 			for (HousePart child : children)
@@ -358,7 +371,7 @@ public class Wall extends HousePart {
 		normalBuffer.position(0);
 		Vector3 p2 = Vector3.fetchTempInstance();
 		int[] order;
-		if (neighbors[0] != null && neighbors[0] != null)
+		if (neighbors[0] != null && neighbors[1] != null)
 			order = new int[] { 1, 3 };
 		else if (neighbors[0] != null)
 			order = new int[] { 1, 3, 2 };

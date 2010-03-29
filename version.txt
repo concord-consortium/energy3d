@@ -106,7 +106,10 @@ Version 0.2
 - fixed problem with not being able to move/resize window when the cursor falls within window hole
 - fixed problem with window height reseting itself when moved
 - updated getPoints() method in Window so that it returns absolute coords instead of relative
+- fix problem with lower left edit point not pickable sometimes
+- Ardor3D was updated to address incorrect bounds problem
+- fixed problem with inserting wall start point on the edge of a Foundation
 
 
 TODO:
-- fix problem with lower left edit point not pickable sometimes
+

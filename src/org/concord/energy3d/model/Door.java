@@ -20,7 +20,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static double defaultDoorHeight = 0.8f;
-	private double doorHeight = defaultDoorHeight;
+//	private double height = defaultDoorHeight;
 //	private Wall wall;
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
@@ -30,7 +30,7 @@ public class Door extends HousePart {
 
 	public Door() {
 		super(2, 4);
-
+		height = defaultDoorHeight;
 
 //		allocateNewPoint();
 	}
@@ -86,7 +86,7 @@ public class Door extends HousePart {
 //	}
 
 	private Vector3 getUpperPoint(Vector3 p) {
-		return new Vector3(p.getX(), p.getY(), doorHeight);
+		return new Vector3(p.getX(), p.getY(), height);
 	}
 
 	public void setPreviewPoint(int x, int y) {
@@ -111,8 +111,8 @@ public class Door extends HousePart {
 			Vector3 base = points.get(lower);
 			Vector3 absoluteBase = convertFromWallRelativeToAbsolute(base);
 			// doorHeight = findHeight(absoluteBase, snap(closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y)));
-			doorHeight = findHeight(absoluteBase, closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y));
-			defaultDoorHeight = doorHeight;
+			height = findHeight(absoluteBase, closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y));
+			defaultDoorHeight = height;
 			points.set(1, getUpperPoint(points.get(1)));
 			points.set(3, getUpperPoint(points.get(3)));
 		}
@@ -209,13 +209,14 @@ public class Door extends HousePart {
 
 		if (drawable) {
 			// texture coords
-			textureBuffer.position(0);
+			textureBuffer.rewind();
 			textureBuffer.put(0).put(0);
 			textureBuffer.put(0).put(1);
 			textureBuffer.put(1).put(0);
 			textureBuffer.put(1).put(1);
 
 			// force bound update
+			mesh.updateModelBound();
 			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		}
 

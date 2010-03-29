@@ -13,6 +13,7 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart implements Serializable {
@@ -29,6 +30,7 @@ public abstract class HousePart implements Serializable {
 	private transient PickResults pickResults;
 	private boolean firstPointInserted = false;
 	protected transient ArrayList<Vector3> abspoints;
+	protected double height;
 
 	public static boolean isSnapToGrid() {
 		return snapToGrid;
@@ -65,7 +67,7 @@ public abstract class HousePart implements Serializable {
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
 			pointShape.updateModelBound(); // important
-//			pointShape.getSceneHints().setCullHint(CullHint.Always);
+			pointShape.getSceneHints().setCullHint(CullHint.Always);
 //			pointShape.updateWorldBound(true);
 		}
 //		pointsRoot.setAllVisible();
@@ -106,11 +108,15 @@ public abstract class HousePart implements Serializable {
 	public boolean removeChild(HousePart housePart) {
 		return children.remove(housePart);
 	}	
+	
+	public double getHeight() {
+		return height;
+	}
 
 	public void showPoints() {
 ////		pointsRoot.getSceneHints().setCullHint(CullHint.Inherit);
-//		for (int i=0; i<points.size(); i++)
-//			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
+		for (int i=0; i<points.size(); i++)
+			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
 ////			pointsRoot.setVisible(i, true);
 ////			CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
 ////			((Sphere)pointsRoot.getChild(i)).updateModelBound();
@@ -123,8 +129,8 @@ public abstract class HousePart implements Serializable {
 
 	public void hidePoints() {
 ////		pointsRoot.getSceneHints().setCullHint(CullHint.Always);
-//		for (int i=0; i<points.size(); i++)
-//			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);		
+		for (int i=0; i<points.size(); i++)
+			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);		
 ////		pointsRoot.setAllNonVisible();
 ////		for (int i=0; i<points.size(); i++) {
 ////			pointsRoot.setVisible(i, true);
@@ -321,6 +327,7 @@ public abstract class HousePart implements Serializable {
 	public abstract void setPreviewPoint(int x, int y);
 
 	protected abstract void draw();
+
 
 
 }

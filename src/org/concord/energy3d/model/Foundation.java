@@ -11,12 +11,12 @@ import com.ardor3d.util.TextureManager;
 
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private double foundationHeight = 0.1;
+//	private double height = 0.1;
 	private transient Box mesh; // = new Box("Foundation", new Vector3(), new Vector3());
 
 	public Foundation() {
 		super(2, 4);
-	
+		height = 0.1;
 	}
 	protected void init() {
 		super.init();
@@ -59,7 +59,7 @@ public class Foundation extends HousePart {
 			final double H = 0; //foundationHeight;
 			Vector3 p = pick.getPoint().addLocal(0, 0, H);
 			int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
-			points.set(index, p);
+			points.get(index).set(p);
 			if (points.size() == 4) {
 				if (index == 0 || index == 2) {
 					points.get(1).set(points.get(0).getX(), points.get(2).getY(), H);
@@ -68,6 +68,8 @@ public class Foundation extends HousePart {
 					points.get(0).set(points.get(1).getX(), points.get(3).getY(), H);
 					points.get(2).set(points.get(3).getX(), points.get(1).getY(), H);					
 				}
+			} else {
+				points.get(index+1).set(p);
 			}
 		}
 		draw();
@@ -85,7 +87,7 @@ public class Foundation extends HousePart {
 		}
 
 		if (drawable) {
-			mesh.setData(points.get(0), points.get(2).add(0, 0, foundationHeight, null));
+			mesh.setData(points.get(0), points.get(2).add(0, 0, height, null));
 		}
 	}
 

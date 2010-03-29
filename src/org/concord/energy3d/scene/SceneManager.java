@@ -77,7 +77,6 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
-import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
@@ -297,7 +296,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //			Scene.getInstance().renderTexture(renderer);
 //		Scene.getInstance().init();
 			renderer.draw(root);
-		Debugger.drawBounds(root, renderer, true);
+//		Debugger.drawBounds(root, renderer, true);
 		return true;
 	}
 
@@ -422,6 +421,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				drawn.addPoint(mouseState.getX(), mouseState.getY());
 
 				if (drawn.isDrawCompleted()) {
+//					Scene.root.updateWorldBound(true);
 					drawn.hidePoints();
 					drawn = newHousePart();
 				}
