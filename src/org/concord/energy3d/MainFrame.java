@@ -40,6 +40,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton rotAnimButton = null;
 	private JToggleButton gridButton = null;
 	private JToggleButton snapButton = null;
+	private JToggleButton floorButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -86,6 +87,7 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getDoorButton());
 			appToolbar.add(getWindowButton());
 			appToolbar.add(getRoofButton());
+			appToolbar.add(getFloorButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
 			appToolbar.add(getRotAnimButton());
@@ -100,6 +102,7 @@ public class MainFrame extends JFrame {
 			bg.add(doorButton);
 			bg.add(windowButton);
 			bg.add(roofButton);
+			bg.add(floorButton);
 		}
 		return appToolbar;
 	}
@@ -360,6 +363,24 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return snapButton;
+	}
+
+	/**
+	 * This method initializes floorButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getFloorButton() {
+		if (floorButton == null) {
+			floorButton = new JToggleButton();
+			floorButton.setText("Floor");
+			floorButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.DRAW_FLOOR);
+				}
+			});
+		}
+		return floorButton;
 	}
 
 	/**

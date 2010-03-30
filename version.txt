@@ -117,5 +117,7 @@ Version 0.2
 - Fixed problem with not making holes in the wall after opening a saved work
 - Fixed problem with wall showing through the roof when roof is flat 
 - Fixed window 2nd point
+- Add Floor
+
 
 TODO:

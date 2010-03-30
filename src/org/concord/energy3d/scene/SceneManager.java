@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.FloatBuffer;
 
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PickedHousePart;
@@ -87,6 +88,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public static final int DRAW_ROOF = 3;
 	public static final int DRAW_WINDOW = 4;
 	public static final int DRAW_FOUNDATION = 5;
+	public static final int DRAW_FLOOR = 6;
 
 	private static SceneManager instance = null;
 	private final Container panel;
@@ -768,6 +770,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Window();
 		else if (operation == DRAW_ROOF)
 			drawn = new Roof();
+		else if (operation == DRAW_FLOOR)
+			drawn = new Floor();
 		else if (operation == DRAW_FOUNDATION)
 			drawn = new Foundation();
 
