@@ -167,7 +167,7 @@ public class Roof extends HousePart {
 		for (PolygonPoint p : wallUpperPoints) {
 			op.set(p.getX(), p.getY(), 0).subtractLocal(avg.getX(), avg.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
 			op.addLocal(p.getX(), p.getY(), p.getZ());
-			p.set(op.getX(), op.getY(), op.getZ());
+			p.set(op.getX(), op.getY(), op.getZ()+0.01);
 		}
 	}
 

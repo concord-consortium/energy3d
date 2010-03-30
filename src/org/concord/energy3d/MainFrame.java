@@ -39,6 +39,7 @@ public class MainFrame extends JFrame {
 	private JButton openButton = null;
 	private JToggleButton rotAnimButton = null;
 	private JToggleButton gridButton = null;
+	private JToggleButton snapButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -90,6 +91,7 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getRotAnimButton());
 			appToolbar.add(getTopViewButton());
 			appToolbar.add(getGridButton());
+			appToolbar.add(getSnapButton());
 			
 			ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
@@ -339,6 +341,25 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return gridButton;
+	}
+
+	/**
+	 * This method initializes snapButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getSnapButton() {
+		if (snapButton == null) {
+			snapButton = new JToggleButton();
+			snapButton.setText("Snap");
+			snapButton.setSelected(true);
+			snapButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					HousePart.setSnapToObjects(snapButton.isSelected());
+				}
+			});
+		}
+		return snapButton;
 	}
 
 	/**

@@ -63,7 +63,7 @@ public abstract class HousePart implements Serializable {
 	protected void init() {
 		abspoints = new ArrayList<Vector3>(numOfEditPoints);
 		for (int i = 0; i < points.size(); i++)
-			abspoints.add(new Vector3());
+			abspoints.add(points.get(i).clone());
 		root = new Node("House Part");
 		pointsRoot = new Node("Edit Points");
 

@@ -16,7 +16,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.25;
+	private static final double GRID_SIZE = 0.15;
 //	private double height = 0.30f;
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
@@ -29,9 +29,11 @@ public class Window extends HousePart {
 
 	protected void init() {
 		super.init();
+		for (int i = 0; i < points.size(); i++)
+			abspoints.get(i).set(convertFromWallRelativeToAbsolute(abspoints.get(i)));		
 		mesh = new Mesh("Window");
 		vertexBuffer = BufferUtils.createVector3Buffer(4);
-		normalBuffer = BufferUtils.createVector3Buffer(4);		
+		normalBuffer = BufferUtils.createVector3Buffer(4);
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
@@ -83,13 +85,10 @@ public class Window extends HousePart {
 				Vector3 p = picked.getPoint();
 				if (points.size() == 2 || editPointIndex == 0) {
 					p = grid(p, GRID_SIZE);
-//					height = points.get(0).getZ() + 0.25 + container.getPoints().get(0).getZ();
-					if (points.size() != 2) {
-						points.get(2).setZ(p.getZ());
-//						points.set(3, getUpperPoint(points.get(2)));
-//						points.set(3, getUpperPoint(points.get(2)));
-						points.get(3).set(points.get(2)).setZ(p.getZ()+height);
-					}
+//					if (points.size() != 2) {
+//						points.get(2).setZ(p.getZ());
+//						points.get(3).set(points.get(2)).setZ(p.getZ()+height);
+//					}
 				} else {
 					Vector3 wallFirstPoint = container.getPoints().get(0);
 					Vector3 wallx = container.getPoints().get(2).subtract(wallFirstPoint, null);
@@ -104,6 +103,14 @@ public class Window extends HousePart {
 //				points.set(index + 1, getUpperPoint(p));
 				points.get(index).set(p_rel);
 				points.get(index+1).set(p_rel).setZ(p.getZ() + height);
+				
+				if (editPointIndex == 0 && points.size() != 2) {
+//					points.get(2).setZ(p.getZ());
+//					points.get(3).set(points.get(2)).setZ(p.getZ()+height);
+					points.get(2).setZ(p_rel.getZ());
+					points.get(3).setZ(p.getZ()+height);			
+				}
+				
 			}
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
 			int lower = (editPointIndex == 1) ? 0 : 2;

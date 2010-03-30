@@ -114,6 +114,8 @@ Version 0.2
 - fixed flickering door when rotating wall
 - implement Grid snap for all objects
 - allow disable Grid snap in z direction for some objects (ie. wall on Foundation)
+- Fixed problem with not making holes in the wall after opening a saved work
+- Fixed problem with wall showing through the roof when roof is flat 
+- Fixed window 2nd point
 
 TODO:
-
