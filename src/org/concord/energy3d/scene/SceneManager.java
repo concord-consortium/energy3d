@@ -11,6 +11,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Roof2;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -82,13 +83,23 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
-	public static final int SELECT = 0;
-	public static final int DRAW_WALL = 1;
-	public static final int DRAW_DOOR = 2;
-	public static final int DRAW_ROOF = 3;
-	public static final int DRAW_WINDOW = 4;
-	public static final int DRAW_FOUNDATION = 5;
-	public static final int DRAW_FLOOR = 6;
+	public enum Operation {
+		SELECT,
+		DRAW_WALL,
+		DRAW_DOOR,
+		DRAW_ROOF,
+		DRAW_ROOF_HIP,
+		DRAW_WINDOW,
+		DRAW_FOUNDATION,
+		DRAW_FLOOR		
+	}
+//	public static final int SELECT = 0;
+//	public static final int DRAW_WALL = 1;
+//	public static final int DRAW_DOOR = 2;
+//	public static final int DRAW_ROOF = 3;
+//	public static final int DRAW_WINDOW = 4;
+//	public static final int DRAW_FOUNDATION = 5;
+//	public static final int DRAW_FLOOR = 6;
 
 	private static SceneManager instance = null;
 	private final Container panel;
@@ -112,7 +123,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private PickResults pickResults;
 	private HousePart drawn = null;
 
-	private int operation = SELECT;
+	private Operation operation = Operation.SELECT;
 	protected HousePart lastHoveredObject;
 	private LightState lightState;
 	private double angle;
@@ -169,6 +180,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return;
 		}
 		camera.resize(size.width, size.height);
+//		camera.set
+//		camera.setFrustumNear(0.1);
 		resetCamera(canvas);
 
 		AWTImageLoader.registerLoader();
@@ -273,7 +286,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
 			
 			renderer.getCamera().setLocation(rotate.applyPre(renderer.getCamera().getLocation(), null));
-			renderer.getCamera().lookAt(0, 0, 0, Vector3.UNIT_Z);
+			renderer.getCamera().lookAt(0, 0, 1, Vector3.UNIT_Z);
 			
 			// Update the box rotation using the rotation matrix.
 			root.setRotation(rotate);
@@ -390,7 +403,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			
 			@Override
 			protected void rotate(Camera camera, double dx, double dy) {
-				if (operation == SELECT && (drawn == null || drawn.isDrawCompleted()) && !topView)
+				if (operation == Operation.SELECT && (drawn == null || drawn.isDrawCompleted()) && !topView)
 					super.rotate(camera, dx, dy);
 			}
 		};
@@ -401,7 +414,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
-				if (operation == SELECT) {
+				if (operation == Operation.SELECT) {
 					if (drawn == null || drawn.isDrawCompleted())
 						selectHousePart(mouseState.getX(), mouseState.getY(), true);
 				} else
@@ -411,16 +424,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (operation == DRAW_ROOF)
+				if (operation == Operation.DRAW_ROOF)
 					return;
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
-				if (operation == SELECT) {
+				if (operation == Operation.SELECT) {
 					if (drawn != null)
 						drawn.complete();
 					return;
 				}
 
-				drawn.addPoint(mouseState.getX(), mouseState.getY());
+				if (!drawn.isDrawCompleted())
+					drawn.addPoint(mouseState.getX(), mouseState.getY());
 
 				if (drawn.isDrawCompleted()) {
 //					Scene.root.updateWorldBound(true);
@@ -753,7 +767,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// Vector3.releaseTempInstance(dir);
 	// }
 
-	public void setOperation(int operation) {
+	public void setOperation(Operation operation) {
 		this.operation = operation;
 		if (drawn != null && !drawn.isDrawCompleted())
 			removeHousePart(drawn);
@@ -762,17 +776,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private HousePart newHousePart() {
 		HousePart drawn = null;
-		if (operation == DRAW_WALL)
+		if (operation == Operation.DRAW_WALL)
 			drawn = new Wall();
-		else if (operation == DRAW_DOOR)
+		else if (operation == Operation.DRAW_DOOR)
 			drawn = new Door();
-		else if (operation == DRAW_WINDOW)
+		else if (operation == Operation.DRAW_WINDOW)
 			drawn = new Window();
-		else if (operation == DRAW_ROOF)
+		else if (operation == Operation.DRAW_ROOF)
 			drawn = new Roof();
-		else if (operation == DRAW_FLOOR)
+		else if (operation == Operation.DRAW_ROOF_HIP)
+			drawn = new Roof2();
+		else if (operation == Operation.DRAW_FLOOR)
 			drawn = new Floor();
-		else if (operation == DRAW_FOUNDATION)
+		else if (operation == Operation.DRAW_FOUNDATION)
 			drawn = new Foundation();
 
 		if (drawn != null)
@@ -794,7 +810,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		drawn.delete();
 	}
 
-	public int getOperation() {
+	public Operation getOperation() {
 		return operation;
 	}
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.poly2tri.polygon.PolygonPoint;
 
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -312,6 +313,49 @@ public abstract class HousePart implements Serializable {
 			return null;
 		}
 	}
+	
+	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
+		ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
+		Wall currentWall = startWall;
+		Wall prevWall = null;
+		while (currentWall != null) {
+			Snap next = currentWall.next(prevWall);
+			prevWall = currentWall;
+			if (next == null)
+				break;
+			currentWall = (Wall) next.getNeighbor();
+			if (currentWall == startWall)
+				break;
+		}
+
+		startWall = currentWall;
+		prevWall = null;
+		while (currentWall != null && currentWall.isFirstPointInserted()) {
+			Snap next = currentWall.next(prevWall);
+			int pointIndex = 0;
+			if (next != null)
+				pointIndex = next.getThisPointIndex();
+			pointIndex = pointIndex + 1;
+			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex == 1 ? 3 : 1));
+			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex));
+			prevWall = currentWall;
+			if (next == null)
+				break;
+			currentWall = (Wall) next.getNeighbor();
+			if (currentWall == startWall)
+				break;
+		}
+
+		return poly;
+	}
+	
+	protected void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
+		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+		if (!poly.contains(polygonPoint)) {
+//			avg.addLocal(p);
+			poly.add(polygonPoint);
+		}
+	}	
 	
 	protected Vector3 grid(Vector3 p, double gridSize) {
 		return grid(p, gridSize, true);

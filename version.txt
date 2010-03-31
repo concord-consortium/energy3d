@@ -114,10 +114,15 @@ Version 0.2
 - fixed flickering door when rotating wall
 - implement Grid snap for all objects
 - allow disable Grid snap in z direction for some objects (ie. wall on Foundation)
-- Fixed problem with not making holes in the wall after opening a saved work
-- Fixed problem with wall showing through the roof when roof is flat 
-- Fixed window 2nd point
-- Add Floor
+- fixed problem with not making holes in the wall after opening a saved work
+- fixed problem with wall showing through the roof when roof is flat 
+- fixed window 2nd point
+- add Floor
+- fixed exception errors when adding floor
+- improved rotate animation
+- convert draw operation from int to enum 
+- add Hip Roof (Style 2) with 3 edit points, one for height, 2 for back and front width
+- add Hip Roof toolbar button
 
 
 TODO:

@@ -20,16 +20,16 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Floor extends HousePart {
+public class Roof2 extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.5;
 //	private double height = 0.5;
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
-//	private transient Vector3 avg;
+	private transient Vector3 avg;
 
-	public Floor() {
-		super(1, 1);
+	public Roof2() {
+		super(1, 3);
 		height = 0.5;
 	}
 
@@ -51,23 +51,25 @@ public class Floor extends HousePart {
 		ts.setTexture(TextureManager.load("roof2.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		mesh.setRenderState(ts);
 
-		mesh.setUserData(new UserData(this, 0));
+		mesh.setUserData(new UserData(this));
 	}
 
 	@Override
 	public void setPreviewPoint(int x, int y) {
-//		if (editPointIndex == -1) {
+		if (editPointIndex == -1) {
 			pick(x, y, Wall.class);
-//		} else {
-			if (container != null) {
-			Vector3 base = container.getPoints().get(0);
+		} else if (editPointIndex == 0){
+			Vector3 base = avg;
 			Vector3 p = closestPoint(base, base.add(0, 0, 1, null), x, y);
 			p = grid(p, GRID_SIZE);
-			height = findHeight(base, p) + base.getZ();
-//		}
+			height = findHeight(base, p);
+		} else if (editPointIndex == 1 || editPointIndex == 2) {
+			Vector3 p = closestPoint(points.get(0), points.get(0).add(Vector3.UNIT_Y, null), x, y);
+			p = grid(p, GRID_SIZE);
+			points.get(editPointIndex).set(p);
+		}
 		draw();
 		showPoints();
-			}
 
 	}
 
@@ -78,12 +80,26 @@ public class Floor extends HousePart {
 
 		if (container == null)
 			return;
-//		avg = new Vector3();
+
 		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
-//		avg.multiplyLocal(1f / (wallUpperPoints.size()));
+		
+		avg = new Vector3();
+		for (PolygonPoint p : wallUpperPoints)
+			avg.addLocal(p.getX(), p.getY(), p.getZ());
+		avg.multiplyLocal(1f / (wallUpperPoints.size()));
+		
 		shiftToOutterEdge(wallUpperPoints);
-//		points.get(0).set(avg.getX(), avg.getY(), avg.getZ() + height);
-//		PolygonPoint roofUpperPoint = new PolygonPoint(avg.getX(), avg.getY(), avg.getZ() + height);
+		
+		points.get(0).set(avg.getX(), avg.getY(), avg.getZ() + height);
+		if (editPointIndex == -1) {
+			points.get(1).set(avg.getX(), avg.getY()-1, avg.getZ() + height);
+			points.get(2).set(avg.getX(), avg.getY()+1, avg.getZ() + height);
+		} else {
+			points.get(1).setZ(avg.getZ() + height);
+			points.get(2).setZ(avg.getZ() + height);
+		}
+		PolygonPoint roofUpperPoint1 = new PolygonPoint(points.get(1).getX(), points.get(1).getY(), points.get(1).getZ());
+		PolygonPoint roofUpperPoint2 = new PolygonPoint(points.get(2).getX(), points.get(2).getY(), points.get(2).getZ());
 
 //		System.out.println("Polygon Points:");
 //		for (PolygonPoint p : wallUpperPoints) {
@@ -91,7 +107,8 @@ public class Floor extends HousePart {
 //		}
 
 		Polygon ps = new Polygon(wallUpperPoints);
-//		ps.addSteinerPoint(roofUpperPoint);
+		ps.addSteinerPoint(roofUpperPoint1);
+		ps.addSteinerPoint(roofUpperPoint2);
 		Poly2Tri.triangulate(ps);
 
 //		System.out.println("Triangulated Points:");
@@ -119,15 +136,14 @@ public class Floor extends HousePart {
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
-
+	
 	private void shiftToOutterEdge(ArrayList<PolygonPoint> wallUpperPoints) {
-//		final double edgeLenght = 0.3;
-//		Vector3 op = new Vector3();
+		final double edgeLenght = 0.3;
+		Vector3 op = new Vector3();
 		for (PolygonPoint p : wallUpperPoints) {
-//			op.set(p.getX(), p.getY(), 0).subtractLocal(avg.getX(), avg.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
-//			op.addLocal(p.getX(), p.getY(), p.getZ());
-//			p.set(op.getX(), op.getY(), op.getZ()+0.01);
-			p.set(p.getX(), p.getY(), height);
+			op.set(p.getX(), p.getY(), 0).subtractLocal(avg.getX(), avg.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
+			op.addLocal(p.getX(), p.getY(), p.getZ());
+			p.set(op.getX(), op.getY(), op.getZ()+0.01);
 		}
 	}
 

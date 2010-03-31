@@ -76,8 +76,12 @@ public class Roof extends HousePart {
 
 		if (container == null)
 			return;
-		avg = new Vector3();
+		
 		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
+		
+		avg = new Vector3();
+		for (PolygonPoint p : wallUpperPoints)
+			avg.addLocal(p.getX(), p.getY(), p.getZ());
 		avg.multiplyLocal(1f / (wallUpperPoints.size()));
 		shiftToOutterEdge(wallUpperPoints);
 		points.get(0).set(avg.getX(), avg.getY(), avg.getZ() + height);
@@ -118,48 +122,48 @@ public class Roof extends HousePart {
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
 
-	private ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
-		ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
-		Wall currentWall = startWall;
-		Wall prevWall = null;
-		while (currentWall != null) {
-			Snap next = currentWall.next(prevWall);
-			prevWall = currentWall;
-			if (next == null)
-				break;
-			currentWall = (Wall) next.getNeighbor();
-			if (currentWall == startWall)
-				break;
-		}
-
-		startWall = currentWall;
-		prevWall = null;
-		while (currentWall != null && currentWall.isFirstPointInserted()) {
-			Snap next = currentWall.next(prevWall);
-			int pointIndex = 0;
-			if (next != null)
-				pointIndex = next.getThisPointIndex();
-			pointIndex = pointIndex + 1;
-			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex == 1 ? 3 : 1));
-			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex));
-			prevWall = currentWall;
-			if (next == null)
-				break;
-			currentWall = (Wall) next.getNeighbor();
-			if (currentWall == startWall)
-				break;
-		}
-
-		return poly;
-	}
-	
-	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
-		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-		if (!poly.contains(polygonPoint)) {
-			avg.addLocal(p);
-			poly.add(polygonPoint);
-		}
-	}
+//	private ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
+//		ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
+//		Wall currentWall = startWall;
+//		Wall prevWall = null;
+//		while (currentWall != null) {
+//			Snap next = currentWall.next(prevWall);
+//			prevWall = currentWall;
+//			if (next == null)
+//				break;
+//			currentWall = (Wall) next.getNeighbor();
+//			if (currentWall == startWall)
+//				break;
+//		}
+//
+//		startWall = currentWall;
+//		prevWall = null;
+//		while (currentWall != null && currentWall.isFirstPointInserted()) {
+//			Snap next = currentWall.next(prevWall);
+//			int pointIndex = 0;
+//			if (next != null)
+//				pointIndex = next.getThisPointIndex();
+//			pointIndex = pointIndex + 1;
+//			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex == 1 ? 3 : 1));
+//			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex));
+//			prevWall = currentWall;
+//			if (next == null)
+//				break;
+//			currentWall = (Wall) next.getNeighbor();
+//			if (currentWall == startWall)
+//				break;
+//		}
+//
+//		return poly;
+//	}
+//	
+//	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
+//		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+//		if (!poly.contains(polygonPoint)) {
+//			avg.addLocal(p);
+//			poly.add(polygonPoint);
+//		}
+//	}
 
 	private void shiftToOutterEdge(ArrayList<PolygonPoint> wallUpperPoints) {
 		final double edgeLenght = 0.3;

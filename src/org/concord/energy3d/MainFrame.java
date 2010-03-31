@@ -41,6 +41,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton gridButton = null;
 	private JToggleButton snapButton = null;
 	private JToggleButton floorButton = null;
+	private JToggleButton roofHipButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -87,6 +88,7 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getDoorButton());
 			appToolbar.add(getWindowButton());
 			appToolbar.add(getRoofButton());
+			appToolbar.add(getRoofHipButton());
 			appToolbar.add(getFloorButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
@@ -102,6 +104,7 @@ public class MainFrame extends JFrame {
 			bg.add(doorButton);
 			bg.add(windowButton);
 			bg.add(roofButton);
+			bg.add(roofHipButton);
 			bg.add(floorButton);
 		}
 		return appToolbar;
@@ -119,7 +122,7 @@ public class MainFrame extends JFrame {
 			selectButton.setSelected(true);
 			selectButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.SELECT);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
 		}
@@ -137,7 +140,7 @@ public class MainFrame extends JFrame {
 			wallButton.setText("Wall");
 			wallButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.DRAW_WALL);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
 				}
 			});
 		}
@@ -155,7 +158,7 @@ public class MainFrame extends JFrame {
 			doorButton.setText("Door");
 			doorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.DRAW_DOOR);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
 				}
 			});
 		}
@@ -173,7 +176,7 @@ public class MainFrame extends JFrame {
 			roofButton.setText("Roof");
 			roofButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.DRAW_ROOF);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF);
 				}
 			});
 		}
@@ -191,7 +194,7 @@ public class MainFrame extends JFrame {
 			windowButton.setText("Window");
 			windowButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.DRAW_WINDOW);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
 				}
 			});
 		}
@@ -209,7 +212,7 @@ public class MainFrame extends JFrame {
 			foundationButton.setText("Foundation");
 			foundationButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.DRAW_FOUNDATION);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
 				}
 			});
 		}
@@ -376,11 +379,29 @@ public class MainFrame extends JFrame {
 			floorButton.setText("Floor");
 			floorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.DRAW_FLOOR);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR);
 				}
 			});
 		}
 		return floorButton;
+	}
+
+	/**
+	 * This method initializes roofHipButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getRoofHipButton() {
+		if (roofHipButton == null) {
+			roofHipButton = new JToggleButton();
+			roofHipButton.setText("Roof Hip");
+			roofHipButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP);
+				}
+			});
+		}
+		return roofHipButton;
 	}
 
 	/**
