@@ -180,9 +180,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return;
 		}
 		camera.resize(size.width, size.height);
-//		camera.set
-//		camera.setFrustumNear(0.1);
 		resetCamera(canvas);
+		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.5, 200);
+//		camera.setDepthRangeNear(-5);
 
 		AWTImageLoader.registerLoader();
 
@@ -274,7 +274,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	@MainThread
 	public void update(final ReadOnlyTimer timer) {
 		final double tpf = timer.getTimePerFrame();
-		logicalLayer.checkTriggers(tpf);				
+		logicalLayer.checkTriggers(tpf);	
+		
+//		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, Math.abs(Math.sin(timer.getTimeInSeconds())) + 0.5, 1000);
 
 		if (rot) {
 			// Update the angle using the current tpf to rotate at a constant speed.

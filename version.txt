@@ -123,6 +123,8 @@ Version 0.2
 - convert draw operation from int to enum 
 - add Hip Roof (Style 2) with 3 edit points, one for height, 2 for back and front width
 - add Hip Roof toolbar button
+- avoid clipping objects that are close to camera
+
 
 
 TODO:
