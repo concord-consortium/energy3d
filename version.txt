@@ -124,7 +124,7 @@ Version 0.2
 - add Hip Roof (Style 2) with 3 edit points, one for height, 2 for back and front width
 - add Hip Roof toolbar button
 - avoid clipping objects that are close to camera
-
+- allow selecting a target among overlapping objects by holding Ctrl key 
 
 
 TODO:
