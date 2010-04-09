@@ -17,6 +17,8 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 
 import com.ardor3d.annotation.MainThread;
+import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
@@ -50,6 +52,8 @@ import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.light.DirectionalLight;
+import com.ardor3d.light.Light;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -60,7 +64,11 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.Camera.ProjectionMode;
+import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
+import com.ardor3d.renderer.pass.BasicPassManager;
+import com.ardor3d.renderer.pass.RenderPass;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.LightState;
@@ -72,9 +80,12 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
+import com.ardor3d.scenegraph.shape.Torus;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -133,6 +144,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// private ReadOnlyVector3 axis = new Vector3(0, 0, 1);
 	private FirstPersonControl control;
 	private int pickLayer = -1;
+	private BasicPassManager passManager = new BasicPassManager();
+	private ParallelSplitShadowMapPass pssmPass;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -157,6 +170,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerInput(canvas, pl);
 
 		frameHandler.addUpdater(this);
+		
+		TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
 
 		panel.addComponentListener(new java.awt.event.ComponentAdapter() {
 			public void componentResized(java.awt.event.ComponentEvent e) {
@@ -183,7 +198,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 		camera.resize(size.width, size.height);
 		resetCamera(canvas);
-		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.5, 200);
+//		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.5, 200);
+		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
 //		camera.setDepthRangeNear(-5);
 
 		AWTImageLoader.registerLoader();
@@ -204,18 +220,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		root.setRenderState(buf);
 
 		/** Set up a basic, default light. */
-		final PointLight light = new PointLight();
-		// light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
-		// light.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
-		light.setDiffuse(new ColorRGBA(1, 1, 1, 1));
-		light.setAmbient(new ColorRGBA(0.75f, 0.75f, 0.75f, 1.0f));
+//		final PointLight light = new PointLight();
+		final DirectionalLight light = new DirectionalLight();
+//		light.setDiffuse(new ColorRGBA(1, 1, 1, 1));
+//		light.setAmbient(new ColorRGBA(0.75f, 0.75f, 0.75f, 1.0f));
 
-		// light.setLocation(new Vector3(5, -5, 10));
-		light.setLocation(new Vector3(0, -20, 10));
+//		light.setLocation(new Vector3(0, -20, 10));
+//		light.setLocation(new Vector3(0, 0, 5));
+		light.setDirection(new Vector3(0, 1, -1));
 		light.setEnabled(true);
 
 		lightState = new LightState();
-		lightState.setEnabled(false);
+		lightState.setEnabled(true);
 		lightState.attach(light);
 		root.setRenderState(lightState);
 
@@ -223,13 +239,29 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		pickResults = new PrimitivePickResults();
 		pickResults.setCheckDistance(true);
 
-		root.attachChild(createAxis());
+//		root.attachChild(createAxis());
 		root.attachChild(createFloor());
-		root.attachChild(createSky());
+//		root.attachChild(createSky());
 
 		// Wall w1 = testWall(0, 0, 0, 2);
 		// Wall w2 = testWall(0, 2, 2, 2);
 		// Wall w3 = testWall(2, 2, 2, 0);
+		
+        final RenderPass rootPass = new RenderPass();
+        rootPass.add(root);
+        
+//        setupTerrain();
+        Node n = setupOccluders();
+        
+        pssmPass = new ParallelSplitShadowMapPass(light, 1024, 3);
+        pssmPass.add(root);
+        pssmPass.addOccluder(root);
+        pssmPass.setDrawDebug(true);
+//        pssmPass.setDrawShaderDebug(true);
+        
+        passManager.add(rootPass);
+        passManager.add(pssmPass);
+//        passManager.add(renderPass);        
 
 		Scene.getInstance();
 
@@ -276,32 +308,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	@MainThread
 	public void update(final ReadOnlyTimer timer) {
 		final double tpf = timer.getTimePerFrame();
+		passManager.updatePasses(tpf);
 		logicalLayer.checkTriggers(tpf);	
 		
-//		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, Math.abs(Math.sin(timer.getTimeInSeconds())) + 0.5, 1000);
-
 		if (rot) {
-			// Update the angle using the current tpf to rotate at a constant speed.
-			angle = 1; //timer.getTimePerFrame() * 50;
-			// Wrap the angle to keep it inside 0-360 range
-			angle %= 360;
-
-			// Update the rotation matrix using the angle and rotation axis.
+			angle = 1;
 			rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
-			
 			renderer.getCamera().setLocation(rotate.applyPre(renderer.getCamera().getLocation(), null));
 			renderer.getCamera().lookAt(0, 0, 1, Vector3.UNIT_Z);
-			
-			// Update the box rotation using the rotation matrix.
 			root.setRotation(rotate);
 		}
 		root.updateGeometricState(tpf);
-		
-//			Scene.getInstance().updateTexture();
-//		Scene.getInstance().init();
-
-		// if (drawn != null)
-		// drawn.getRoot().updateGeometricState(tpf, true);
 	}
 
 	private void quit(final Renderer renderer) {
@@ -311,11 +328,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 //	@Override
 	public boolean renderUnto(Renderer renderer) {
+        if (!pssmPass.isInitialised()) {
+            pssmPass.init(renderer);
+        }		
+//        pssmPass.reinit(renderer);
 //		if (!Scene.getInstance().getParts().isEmpty())
 //			Scene.getInstance().renderTexture(renderer);
 //		Scene.getInstance().init();
-			renderer.draw(root);
+			
+//        renderer.draw(root);
 //		Debugger.drawBounds(root, renderer, true);
+        
+			
+		passManager.renderPasses(renderer);
 		return true;
 	}
 
@@ -335,14 +360,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
 		blendState.setTestEnabled(true);
-		floor.setRenderState(blendState);
-		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+//		floor.setRenderState(blendState);
+//		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		floor.setRenderState(ms);
-
+		
+		floor.updateModelBound();
+		
 		return floor;
 	}
 
@@ -961,4 +988,45 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		root.updateWorldRenderStates(true);
 	}
 
+    private Node setupOccluders() {
+        final Node occluders = new Node("occs");
+        root.attachChild(occluders);
+        for (int i = 0; i < 50; i++) {
+            final double w = Math.random() * 4 + 0;
+            final double y = Math.random() * 2 + 0;
+            final Box b = new Box("box", new Vector3(), w, y, w);
+            b.setModelBound(new BoundingBox());
+            final double x = Math.random() * 100 - 50;
+            final double z = Math.random() * 100 - 50;
+            b.setTranslation(new Vector3(x, z, 0));            
+            occluders.attachChild(b);
+        }
+
+//        final Torus torus = new Torus("torus", 64, 12, 10.0f, 1.0f);
+//        torus.setModelBound(new BoundingBox());
+//
+//        occluders.attachChild(torus);
+//
+//        torus.addController(new SpatialController<Torus>() {
+//            private static final long serialVersionUID = 1L;
+//            double timer = 0;
+//            Matrix3 rotation = new Matrix3();
+//
+//            public void update(final double time, final Torus caller) {
+//                timer += time;
+//                caller.setTranslation(Math.sin(timer) * 40.0, Math.sin(timer) * 50.0 + 20.0, Math.cos(timer) * 40.0);
+//                rotation.fromAngles(timer * 0.4, timer * 0.4, timer * 0.4);
+//                caller.setRotation(rotation);
+//            }
+//        });
+
+        return occluders;
+    }
+    
+    private void setupTerrain() {
+        final Box box = new Box("box", new Vector3(), 100, 100, 1);
+        box.setModelBound(new BoundingBox());
+//        root.attachChild(box);
+    }
+    
 }

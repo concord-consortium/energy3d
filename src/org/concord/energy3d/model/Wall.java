@@ -29,16 +29,16 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.5; 
+	private static final double GRID_SIZE = 0.5;
 	private static double defaultWallHeight = 1f;
-//	private double height = defaultWallHeight;
+	// private double height = defaultWallHeight;
 	private double wallThickness = 0.1;
 	private transient Mesh mesh;
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
 	private transient Mesh invisibleMesh;
-//	private transient FloatBuffer vertexBuffer;
-//	private transient FloatBuffer textureBuffer;
+	// private transient FloatBuffer vertexBuffer;
+	// private transient FloatBuffer textureBuffer;
 	private Snap[] neighbors = new Snap[2];
 
 	public Wall() {
@@ -59,7 +59,7 @@ public class Wall extends HousePart {
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		mesh.setModelBound(null);
 		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		
+
 		root.attachChild(backMesh);
 		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
@@ -75,12 +75,12 @@ public class Wall extends HousePart {
 		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		surroundMesh.setModelBound(null);
 		surroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		
+
 		root.attachChild(invisibleMesh);
 		invisibleMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		invisibleMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
-		
+
 		// surroundMesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
@@ -155,9 +155,9 @@ public class Wall extends HousePart {
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				Snap snap = snap(p, index);
 				if (snap == null)
-				    p = grid(p, GRID_SIZE, false);
+					p = grid(p, GRID_SIZE, false);
 				setNeighbor(index, snap, true);
-				if (index == 2)		// make sure z of 2nd base point is same as 2st (needed for platform picking side)
+				if (index == 2) // make sure z of 2nd base point is same as 2st (needed for platform picking side)
 					p.setZ(points.get(0).getZ());
 				points.set(index, p);
 				points.set(index + 1, getUpperPoint(p));
@@ -167,8 +167,8 @@ public class Wall extends HousePart {
 			Vector3 base = points.get(lower);
 			Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
 			Snap snap = snap(closestPoint, -1);
-            if (snap == null)
-                closestPoint = grid(closestPoint, GRID_SIZE);			
+			if (snap == null)
+				closestPoint = grid(closestPoint, GRID_SIZE);
 			// neighbor[1] = snap(closestPoint);
 			defaultWallHeight = height = findHeight(base, closestPoint);
 			points.set(1, getUpperPoint(points.get(1)));
@@ -190,7 +190,7 @@ public class Wall extends HousePart {
 
 		for (int i = 0; i < points.size(); i++) {
 			pointsRoot.getChild(i).setTranslation(points.get(i));
-		}
+		}		
 
 		if (drawable) {
 			Vector3 normal = points.get(2).subtract(points.get(0), null).cross(points.get(1).subtract(points.get(0), null), null).normalize(null);
@@ -200,7 +200,7 @@ public class Wall extends HousePart {
 			FloatBuffer invisibleVertexBuffer = invisibleMesh.getMeshData().getVertexBuffer();
 			invisibleVertexBuffer.rewind();
 			Vector3 p;
-			
+
 			p = points.get(0);
 			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			p = points.get(1);
@@ -209,7 +209,7 @@ public class Wall extends HousePart {
 			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			p = points.get(3);
 			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			
+
 			p = points.get(0);
 			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 			p = points.get(2);
@@ -219,7 +219,6 @@ public class Wall extends HousePart {
 			p = points.get(1);
 			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 
-			
 			try {
 				AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 				XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
@@ -237,22 +236,22 @@ public class Wall extends HousePart {
 						PolygonPoint pp;
 						ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
 						ArrayList<Vector3> points = child.getPoints();
-//						p = win.convertFromWallRelativeToAbsolute(points.get(0));
+						// p = win.convertFromWallRelativeToAbsolute(points.get(0));
 						p = points.get(0);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
 						holePoints.add(pp);
-//						p = win.convertFromWallRelativeToAbsolute(points.get(2));
+						// p = win.convertFromWallRelativeToAbsolute(points.get(2));
 						p = points.get(2);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
 						holePoints.add(pp);
-//						p = win.convertFromWallRelativeToAbsolute(points.get(3));
+						// p = win.convertFromWallRelativeToAbsolute(points.get(3));
 						p = points.get(3);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
 						holePoints.add(pp);
-//						p = win.convertFromWallRelativeToAbsolute(points.get(1));
+						// p = win.convertFromWallRelativeToAbsolute(points.get(1));
 						p = points.get(1);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
@@ -291,11 +290,11 @@ public class Wall extends HousePart {
 			// backMesh.updateModelBound();
 			// surroundMesh.updateModelBound();
 			// root.updateWorldBound(true);
-//			mesh.updateModelBound();
-//			backMesh.updateModelBound();
-//			surroundMesh.updateModelBound();
+			// mesh.updateModelBound();
+			// backMesh.updateModelBound();
+			// surroundMesh.updateModelBound();
 			invisibleMesh.updateModelBound();
-//			root.updateGeometricState(0);
+			// root.updateGeometricState(0);
 			CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
 			for (HousePart child : children)
@@ -309,7 +308,7 @@ public class Wall extends HousePart {
 		if (neighbors[0] != null && neighbors[0].getNeighbor().isFirstPointInserted())
 			reduceBackMeshWidth(polygon, dir, 0);
 
-		if (neighbors[1] != null && neighbors[1].getNeighbor().isFirstPointInserted()) {			
+		if (neighbors[1] != null && neighbors[1].getNeighbor().isFirstPointInserted()) {
 			dir.normalizeLocal().negateLocal();
 			reduceBackMeshWidth(polygon, dir, 1);
 		}
