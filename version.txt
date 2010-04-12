@@ -126,5 +126,7 @@ Version 0.2
 - avoid clipping objects that are close to camera
 - allow selecting a target among overlapping objects by holding Ctrl key 
 - shadows added 
+- fix shadow bound problems
+- enable/disable shawdows using light button
 
 TODO:

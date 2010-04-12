@@ -221,17 +221,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		/** Set up a basic, default light. */
 //		final PointLight light = new PointLight();
-		final DirectionalLight light = new DirectionalLight();
-//		light.setDiffuse(new ColorRGBA(1, 1, 1, 1));
-//		light.setAmbient(new ColorRGBA(0.75f, 0.75f, 0.75f, 1.0f));
-
 //		light.setLocation(new Vector3(0, -20, 10));
 //		light.setLocation(new Vector3(0, 0, 5));
+//		light.setDiffuse(new ColorRGBA(1, 1, 1, 1));
+
+		final DirectionalLight light = new DirectionalLight();
 		light.setDirection(new Vector3(0, 1, -1));
+
+		light.setAmbient(new ColorRGBA(1, 1, 1, 1));
 		light.setEnabled(true);
 
 		lightState = new LightState();
-		lightState.setEnabled(true);
+		lightState.setEnabled(false);
 		lightState.attach(light);
 		root.setRenderState(lightState);
 
@@ -239,9 +240,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		pickResults = new PrimitivePickResults();
 		pickResults.setCheckDistance(true);
 
-//		root.attachChild(createAxis());
+		root.attachChild(createAxis());
 		root.attachChild(createFloor());
-//		root.attachChild(createSky());
+		root.attachChild(createSky());
 
 		// Wall w1 = testWall(0, 0, 0, 2);
 		// Wall w2 = testWall(0, 2, 2, 2);
@@ -251,16 +252,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
         rootPass.add(root);
         
 //        setupTerrain();
-        Node n = setupOccluders();
+//        Node n = setupOccluders();
         
         pssmPass = new ParallelSplitShadowMapPass(light, 1024, 3);
-        pssmPass.add(root);
-        pssmPass.addOccluder(root);
-        pssmPass.setDrawDebug(true);
+        pssmPass.add(floor);
+        pssmPass.add(housePartsNode);
+        pssmPass.addOccluder(housePartsNode);
+//        pssmPass.setDrawDebug(true);
 //        pssmPass.setDrawShaderDebug(true);
         
         passManager.add(rootPass);
-        passManager.add(pssmPass);
+//        passManager.add(pssmPass);
 //        passManager.add(renderPass);        
 
 		Scene.getInstance();
@@ -360,9 +362,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
 		blendState.setTestEnabled(true);
-//		floor.setRenderState(blendState);
-//		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-
+		floor.setRenderState(blendState);
+		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		floor.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+		
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
@@ -384,10 +387,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		ts.setTexture(TextureManager.load("sky6.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		sky.setRenderState(ts);
 
-		// Add a material to the box, to show both vertex color and lighting/shading.
-		final MaterialState ms = new MaterialState();
-		ms.setColorMaterial(ColorMaterial.Diffuse);
-		sky.setRenderState(ms);
+//		// Add a material to the box, to show both vertex color and lighting/shading.
+//		final MaterialState ms = new MaterialState();
+//		ms.setColorMaterial(ColorMaterial.Diffuse);
+//		sky.setRenderState(ms);
+		
+		sky.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
 		return sky;
 	}
@@ -986,11 +991,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void setLighting(boolean enable) {
 		lightState.setEnabled(enable);
 		root.updateWorldRenderStates(true);
+		if (enable)
+			passManager.add(pssmPass);
+		else
+			passManager.remove(pssmPass);
 	}
 
     private Node setupOccluders() {
         final Node occluders = new Node("occs");
-        root.attachChild(occluders);
+        housePartsNode.attachChild(occluders);
         for (int i = 0; i < 50; i++) {
             final double w = Math.random() * 4 + 0;
             final double y = Math.random() * 2 + 0;
