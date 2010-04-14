@@ -7,6 +7,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.polygon.PolygonPoint;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
@@ -65,7 +66,7 @@ public abstract class HousePart implements Serializable {
 		abspoints = new ArrayList<Vector3>(numOfEditPoints);
 		for (int i = 0; i < points.size(); i++)
 			abspoints.add(points.get(i).clone());
-		root = new Node("House Part");
+		root = new Node("House Part");		
 		pointsRoot = new Node("Edit Points");
 
 		// Set up a reusable pick results
@@ -78,8 +79,10 @@ public abstract class HousePart implements Serializable {
 			Sphere pointShape = new Sphere("Point", origin, 8, 8, 0.03);
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
+//			pointShape.setModelBound(new BoundingBox());
 			pointShape.updateModelBound(); // important
 			pointShape.getSceneHints().setCullHint(CullHint.Always);
+			pointShape.setCastsShadows(false);
 			// pointShape.updateWorldBound(true);
 		}
 		// pointsRoot.setAllVisible();

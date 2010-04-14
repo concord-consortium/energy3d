@@ -127,6 +127,11 @@ Version 0.2
 - allow selecting a target among overlapping objects by holding Ctrl key 
 - shadows added 
 - fix shadow bound problems
-- enable/disable shawdows using light button
+- enable/disable shadows using light button
+- simulate sun by rotating a directional light
+- draw sun using Blooming effect
+- draw sun axis
+- fix problem with reversed shadow 
+
 
 TODO:

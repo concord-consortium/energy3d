@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
@@ -34,10 +35,11 @@ public class Window extends HousePart {
 		mesh = new Mesh("Window");
 		vertexBuffer = BufferUtils.createVector3Buffer(4);
 		normalBuffer = BufferUtils.createVector3Buffer(4);
-		root.attachChild(mesh);
+//		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
 		mesh.getMeshData().setNormalBuffer(normalBuffer);
+		mesh.setModelBound(new BoundingBox());
 		// mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
 		// Transparency

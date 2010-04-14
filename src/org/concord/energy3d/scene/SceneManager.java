@@ -1,9 +1,12 @@
 package org.concord.energy3d.scene;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.net.URL;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
+import java.util.List;
 
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -18,6 +21,7 @@ import org.concord.energy3d.model.Window;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
@@ -60,8 +64,10 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Ray3;
+import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRendererFactory;
@@ -73,6 +79,7 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -83,9 +90,13 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
+import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.scenegraph.shape.Torus;
+import com.ardor3d.spline.CatmullRomSpline;
+import com.ardor3d.spline.Curve;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -138,7 +149,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Operation operation = Operation.SELECT;
 	protected HousePart lastHoveredObject;
 	private LightState lightState;
-	private double angle;
+	private double angle, lightAngleX, lightAngleY;
 	private Matrix3 rotate = new Matrix3();
 	private boolean topView;
 	// private ReadOnlyVector3 axis = new Vector3(0, 0, 1);
@@ -146,6 +157,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private int pickLayer = -1;
 	private BasicPassManager passManager = new BasicPassManager();
 	private ParallelSplitShadowMapPass pssmPass;
+	private Sphere sun;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -242,7 +254,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		root.attachChild(createAxis());
 		root.attachChild(createFloor());
-		root.attachChild(createSky());
+//		root.attachChild(createSky());
+		root.attachChild(createSunAxis());
 
 		// Wall w1 = testWall(0, 0, 0, 2);
 		// Wall w2 = testWall(0, 2, 2, 2);
@@ -255,6 +268,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //        Node n = setupOccluders();
         
         pssmPass = new ParallelSplitShadowMapPass(light, 1024, 3);
+        pssmPass.setUseObjectCullFace(true);
         pssmPass.add(floor);
         pssmPass.add(housePartsNode);
         pssmPass.addOccluder(housePartsNode);
@@ -284,6 +298,50 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// addHousePart(wall);
 	// return wall;
 	// }
+
+	private Spatial createSunAxis() {
+		Node node = new Node();
+		Cylinder cyl = new Cylinder("Sun Curve", 10, 50, 5, 0.3);
+		Transform trans = new Transform();
+		trans.setMatrix(new Matrix3().fromAngleAxis(Math.PI/2, Vector3.UNIT_X));
+		trans.setTranslation(0, -1, 0);
+		cyl.setDefaultColor(ColorRGBA.YELLOW);
+		cyl.setTransform(trans);		
+		node.attachChild(cyl);
+		
+		sun = new Sphere("Sun", 20, 20, 0.3);
+		sun.setTranslation(0, -1, 5);
+		node.attachChild(sun);
+		
+		reverseNormals(sun.getMeshData().getNormalBuffer());
+		
+		MaterialState material = new MaterialState();
+//		material.setShininess(128);
+		material.setEmissive(ColorRGBA.WHITE);
+		sun.setRenderState(material);
+			
+		
+		BloomRenderPass bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);
+
+        if (!bloomRenderPass.isSupported()) {
+            System.out.println("Bloom not supported!");
+        } else {
+            bloomRenderPass.add(sun);
+        }		
+        passManager.add(bloomRenderPass);
+		return node;
+	}
+
+	private void reverseNormals(FloatBuffer normalBuffer) {
+		normalBuffer.rewind();
+		int i = 0;
+		while (normalBuffer.hasRemaining()) {
+			float f = normalBuffer.get();
+			normalBuffer.position(i);
+			normalBuffer.put(-f);
+			i++;
+		}
+	}
 
 	public void run() {
 		try {
@@ -320,6 +378,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			renderer.getCamera().lookAt(0, 0, 1, Vector3.UNIT_Z);
 			root.setRotation(rotate);
 		}
+		lightAngleX = (lightAngleX + 1) % 180;
+		DirectionalLight light = (DirectionalLight)lightState.get(0);
+		light.setDirection(Math.cos(lightAngleX*Math.PI/180), 1, -Math.sin(lightAngleX*Math.PI/180));
+		
+		sun.setTranslation(-Math.cos(lightAngleX*Math.PI/180)*5, -1, Math.sin(lightAngleX*Math.PI/180)*5);
 		root.updateGeometricState(tpf);
 	}
 
@@ -383,6 +446,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		sky.setRotation(new Quaternion(1, 0, 0, 1));
 //		sky.setTranslation(0, 0, 10);
 		// Add a texture to the box.
+		
+//		reverseNormals(sky.getMeshData().getNormalBuffer());
+		
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("sky6.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		sky.setRenderState(ts);

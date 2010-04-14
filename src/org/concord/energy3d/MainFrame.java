@@ -17,11 +17,12 @@ import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import javax.swing.JButton;
+import java.awt.Dimension;
 
 
 public class MainFrame extends JFrame {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L; 
 	private JPanel jContentPane = null;
 	private JMenuBar appMenuBar = null;
 	private JMenu fileMenu = null;
@@ -137,7 +138,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton getWallButton() {
 		if (wallButton == null) {
 			wallButton = new JToggleButton();
-			wallButton.setText("Wall");
+			wallButton.setText("Wall     ");
 			wallButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
@@ -191,7 +192,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton getWindowButton() {
 		if (windowButton == null) {
 			windowButton = new JToggleButton();
-			windowButton.setText("Window");
+			windowButton.setText("Window     ");			
 			windowButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
@@ -432,7 +433,7 @@ public class MainFrame extends JFrame {
 	 * @return void
 	 */
 	private void initialize() {
-		this.setSize(800, 600);
+		this.setSize(900, 600);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getAppMenuBar());
 		this.setContentPane(getJContentPane());
