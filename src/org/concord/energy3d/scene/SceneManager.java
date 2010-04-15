@@ -77,6 +77,7 @@ import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.RenderState;
@@ -212,6 +213,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		resetCamera(canvas);
 //		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.5, 200);
 		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
+//		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.1, 100);
 //		camera.setDepthRangeNear(-5);
 
 		AWTImageLoader.registerLoader();
@@ -267,7 +269,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //        setupTerrain();
 //        Node n = setupOccluders();
         
-        pssmPass = new ParallelSplitShadowMapPass(light, 1024, 3);
+        pssmPass = new ParallelSplitShadowMapPass(light, 3072, 3);
         pssmPass.setUseObjectCullFace(true);
         pssmPass.add(floor);
         pssmPass.add(housePartsNode);
@@ -308,6 +310,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		cyl.setDefaultColor(ColorRGBA.YELLOW);
 		cyl.setTransform(trans);		
 		node.attachChild(cyl);
+		
+        final ClipState cs = new ClipState();
+        cs.setEnableClipPlane(0, true);
+        cs.setClipPlaneEquation(0, 0, 0, 1, -0.19);
+        cyl.setRenderState(cs);		
+		
+		Cylinder baseCyl = new Cylinder("Sun Curve", 10, 50, 5, 0.2);
+		baseCyl.setTranslation(0, -1, 0.1);
+		node.attachChild(baseCyl);
 		
 		sun = new Sphere("Sun", 20, 20, 0.3);
 		sun.setTranslation(0, -1, 5);

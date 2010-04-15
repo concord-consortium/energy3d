@@ -132,6 +132,10 @@ Version 0.2
 - draw sun using Blooming effect
 - draw sun axis
 - fix problem with reversed shadow 
-
+- improve shadow resolution
+- cull the inside of the walls for faster rendering and avoid drawing of bricks around window holes
 
 TODO:
+
+- combine the wall meshed into one
+- draw window shelf on walls

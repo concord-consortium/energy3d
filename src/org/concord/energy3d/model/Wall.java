@@ -21,7 +21,9 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
@@ -32,15 +34,24 @@ public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.5;
 	private static double defaultWallHeight = 1f;
+	private static CullState CULL_FRONT = new CullState();
+	private static CullState CULL_BACK = new CullState();
 	// private double height = defaultWallHeight;
 	private double wallThickness = 0.1;
 	private transient Mesh mesh;
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
 	private transient Mesh invisibleMesh;
+//	private transient Mesh windowsSurroundMesh;
 	// private transient FloatBuffer vertexBuffer;
 	// private transient FloatBuffer textureBuffer;
 	private Snap[] neighbors = new Snap[2];
+	
+	static {
+		CULL_FRONT.setCullFace(Face.Front);
+		CULL_BACK.setCullFace(Face.Back);
+	}
+	
 
 	public Wall() {
 		super(2, 4);
@@ -60,7 +71,12 @@ public class Wall extends HousePart {
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		mesh.setModelBound(null);
 		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-
+//		mesh.setRenderState(CULL_BACK);
+//		CullState cullState;
+//		cullState = new CullState();
+//		cullState.setCullFace(Face.Back);
+//		mesh.setRenderState(cullState);
+		
 		root.attachChild(backMesh);
 		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
@@ -75,13 +91,22 @@ public class Wall extends HousePart {
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
 		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		surroundMesh.setModelBound(null);
-		surroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		surroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);		
 
 		root.attachChild(invisibleMesh);
 		invisibleMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		invisibleMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		invisibleMesh.setModelBound(new BoundingBox());
 		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
+		
+		
+//		root.attachChild(windowsSurroundMesh);
+//		windowsSurroundMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+//		windowsSurroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
+//		windowsSurroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
+//		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
+//		windowsSurroundMesh.setModelBound(null);
+//		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);		
 
 		// surroundMesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
@@ -340,6 +365,10 @@ public class Wall extends HousePart {
 	}
 
 	private Vector3 decideThicknessNormal() {
+		mesh.setRenderState(CULL_FRONT);
+		backMesh.setRenderState(CULL_BACK);
+		surroundMesh.setRenderState(CULL_BACK);
+		
 		FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
 		normalBuffer.position(0);
 		// Vector3 n = new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get());
@@ -361,11 +390,18 @@ public class Wall extends HousePart {
 			Vector3 ab = b.subtract(a, null).normalizeLocal();
 			if (n.dot(ab) < 0) {
 				n.negateLocal();
+				mesh.setRenderState(CULL_BACK);
+				backMesh.setRenderState(CULL_FRONT);
+				surroundMesh.setRenderState(CULL_FRONT);
 			}
 		} else {
 			ReadOnlyVector3 camera = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getDirection();
-			if (camera.dot(n) < 0)
+			if (camera.dot(n) < 0) {
 				n.negateLocal();
+				mesh.setRenderState(CULL_BACK);
+				backMesh.setRenderState(CULL_FRONT);
+				surroundMesh.setRenderState(CULL_FRONT);
+			}
 		}
 		return n;
 	}
