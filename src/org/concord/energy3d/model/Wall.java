@@ -42,7 +42,7 @@ public class Wall extends HousePart {
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
 	private transient Mesh invisibleMesh;
-//	private transient Mesh windowsSurroundMesh;
+	private transient Mesh windowsSurroundMesh;
 	// private transient FloatBuffer vertexBuffer;
 	// private transient FloatBuffer textureBuffer;
 	private Snap[] neighbors = new Snap[2];
@@ -64,7 +64,8 @@ public class Wall extends HousePart {
 		backMesh = new Mesh("Wall (Back)");
 		surroundMesh = new Mesh("Wall (Surround)");
 		invisibleMesh = new Mesh("Wall (Invisible)");
-
+		windowsSurroundMesh = new Mesh("Wall (Windows Surround)");
+		
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
@@ -100,13 +101,13 @@ public class Wall extends HousePart {
 		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
 		
 		
-//		root.attachChild(windowsSurroundMesh);
-//		windowsSurroundMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-//		windowsSurroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
-//		windowsSurroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
-//		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
-//		windowsSurroundMesh.setModelBound(null);
-//		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);		
+		root.attachChild(windowsSurroundMesh);
+		windowsSurroundMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		windowsSurroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(100));
+		windowsSurroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
+		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
+		windowsSurroundMesh.setModelBound(null);
+		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);		
 
 		// surroundMesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 
@@ -307,6 +308,8 @@ public class Wall extends HousePart {
 				Vector3 n = drawBackMesh(polygon, fromXY);
 
 				drawSurroundMesh(n);
+				
+				drawWindowsSurroundMesh(n);
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -445,6 +448,31 @@ public class Wall extends HousePart {
 		while (vertexBuffer.position() < vertexBuffer.capacity())
 			vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 		Vector3.releaseTempInstance(p2);
+	}
+
+	private void drawWindowsSurroundMesh(Vector3 n) {
+		FloatBuffer vertexBuffer = windowsSurroundMesh.getMeshData().getVertexBuffer();
+		final int[] order = new int[] { 0, 1, 3, 2 };
+		Vector3 p = new Vector3();
+		for (HousePart child : children) {
+			if (child instanceof Window) {
+				for (int i : order) {
+					p.set(child.getPoints().get(i));
+					vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+					p.addLocal(n);
+					vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+				}
+				p.set(child.getPoints().get(0));
+				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+				p.addLocal(n);
+				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+//				p.set(child.getPoints().get(1));
+//				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());				
+			}
+		}
+		int pos = vertexBuffer.position();
+		vertexBuffer.limit(pos != 0 ? pos-1 : 1);
+		
 	}
 
 	public Snap next(Wall previous) {

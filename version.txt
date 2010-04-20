@@ -134,6 +134,7 @@ Version 0.2
 - fix problem with reversed shadow 
 - improve shadow resolution
 - cull the inside of the walls for faster rendering and avoid drawing of bricks around window holes
+- draw window surround polygons
 
 TODO:
 
