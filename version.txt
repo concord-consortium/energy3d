@@ -135,8 +135,9 @@ Version 0.2
 - improve shadow resolution
 - cull the inside of the walls for faster rendering and avoid drawing of bricks around window holes
 - draw window surround polygons
-- fix problem with incomplete buttom window surround polygons
-- cull back face of window surround polygons
+- fix problem with incomplete bottom shelf polygons
+- cull back face of window shelves
+- set the normals for window shelves for correct shading
 
 TODO:
 

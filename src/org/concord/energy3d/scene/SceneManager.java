@@ -389,7 +389,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			renderer.getCamera().lookAt(0, 0, 1, Vector3.UNIT_Z);
 			root.setRotation(rotate);
 		}
-		lightAngleX = (lightAngleX + 1) % 180;
+		lightAngleX = (lightAngleX + 1) % 360;
 		DirectionalLight light = (DirectionalLight)lightState.get(0);
 		light.setDirection(Math.cos(lightAngleX*Math.PI/180), 1, -Math.sin(lightAngleX*Math.PI/180));
 		
