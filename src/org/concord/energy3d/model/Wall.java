@@ -72,11 +72,6 @@ public class Wall extends HousePart {
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		mesh.setModelBound(null);
 		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-//		mesh.setRenderState(CULL_BACK);
-//		CullState cullState;
-//		cullState = new CullState();
-//		cullState.setCullFace(Face.Back);
-//		mesh.setRenderState(cullState);
 		
 		root.attachChild(backMesh);
 		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
@@ -368,9 +363,7 @@ public class Wall extends HousePart {
 	}
 
 	private Vector3 decideThicknessNormal() {
-		mesh.setRenderState(CULL_FRONT);
-		backMesh.setRenderState(CULL_BACK);
-		surroundMesh.setRenderState(CULL_BACK);
+		cull(true);
 		
 		FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
 		normalBuffer.position(0);
@@ -393,20 +386,30 @@ public class Wall extends HousePart {
 			Vector3 ab = b.subtract(a, null).normalizeLocal();
 			if (n.dot(ab) < 0) {
 				n.negateLocal();
-				mesh.setRenderState(CULL_BACK);
-				backMesh.setRenderState(CULL_FRONT);
-				surroundMesh.setRenderState(CULL_FRONT);
+				cull(false);			
 			}
 		} else {
 			ReadOnlyVector3 camera = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getDirection();
 			if (camera.dot(n) < 0) {
 				n.negateLocal();
-				mesh.setRenderState(CULL_BACK);
-				backMesh.setRenderState(CULL_FRONT);
-				surroundMesh.setRenderState(CULL_FRONT);
+				cull(false);
 			}
 		}
 		return n;
+	}
+
+	private void cull(boolean back) {
+		if (back) {
+			mesh.setRenderState(CULL_FRONT);
+			backMesh.setRenderState(CULL_BACK);
+			surroundMesh.setRenderState(CULL_BACK);
+			windowsSurroundMesh.setRenderState(CULL_FRONT);
+		} else {
+			mesh.setRenderState(CULL_BACK);
+			backMesh.setRenderState(CULL_FRONT);
+			surroundMesh.setRenderState(CULL_FRONT);
+			windowsSurroundMesh.setRenderState(CULL_BACK);
+		}
 	}
 
 	private void drawSurroundMesh(ReadOnlyVector3 thickness) {
@@ -452,7 +455,8 @@ public class Wall extends HousePart {
 
 	private void drawWindowsSurroundMesh(Vector3 n) {
 		FloatBuffer vertexBuffer = windowsSurroundMesh.getMeshData().getVertexBuffer();
-		final int[] order = new int[] { 0, 1, 3, 2 };
+		vertexBuffer.rewind();
+		final int[] order = new int[] {0, 1, 3, 2};
 		Vector3 p = new Vector3();
 		for (HousePart child : children) {
 			if (child instanceof Window) {
@@ -466,12 +470,10 @@ public class Wall extends HousePart {
 				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 				p.addLocal(n);
 				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-//				p.set(child.getPoints().get(1));
-//				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());				
 			}
 		}
 		int pos = vertexBuffer.position();
-		vertexBuffer.limit(pos != 0 ? pos-1 : 1);
+		vertexBuffer.limit(pos != 0 ? pos : 1);
 		
 	}
 
