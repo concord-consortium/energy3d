@@ -31,7 +31,7 @@ public class Window extends HousePart {
 	protected void init() {
 		super.init();
 		for (int i = 0; i < points.size(); i++)
-			abspoints.get(i).set(convertFromWallRelativeToAbsolute(abspoints.get(i)));		
+			abspoints.get(i).set(toAbsolute(abspoints.get(i)));		
 		mesh = new Mesh("Window");
 		vertexBuffer = BufferUtils.createVector3Buffer(4);
 		normalBuffer = BufferUtils.createVector3Buffer(4);
@@ -85,6 +85,9 @@ public class Window extends HousePart {
 			PickedHousePart picked = pick(x, y, Wall.class);
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
+				if (isFirstPointInserted())
+					System.out.println(p);
+					
 				if (points.size() == 2 || editPointIndex == 0) {
 					p = grid(p, GRID_SIZE);
 //					if (points.size() != 2) {
@@ -98,11 +101,18 @@ public class Window extends HousePart {
 					p.setZ(points.get(0).getZ() + container.getPoints().get(0).getZ());
 					p = grid(p, GRID_SIZE);					
 				}
-				Vector3 p_rel = convertToWallRelative(p);
 
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 //				points.set(index, p);
 //				points.set(index + 1, getUpperPoint(p));
+				
+//				Vector3 p_rel = toRelative(p);
+				
+				System.out.println("org = " + p);
+				Vector3 p_rel = toRelative(p);
+				System.out.println("rel = " + p_rel);
+				System.out.println("abs = " + toAbsolute(p_rel));
+				
 				points.get(index).set(p_rel);
 				points.get(index+1).set(p_rel).setZ(p.getZ() + height);
 				
@@ -117,7 +127,7 @@ public class Window extends HousePart {
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
 			int lower = (editPointIndex == 1) ? 0 : 2;
 			Vector3 base = points.get(lower);
-			Vector3 absoluteBase = convertFromWallRelativeToAbsolute(base);
+			Vector3 absoluteBase = toAbsolute(base);
 			Vector3 p = closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y);
 			p = grid(p, GRID_SIZE);
 			height = findHeight(absoluteBase, p); // + absoluteBase.getZ();
@@ -142,13 +152,14 @@ public class Window extends HousePart {
 		vertexBuffer.position(0);
 		Vector3[] convertedPoints = new Vector3[4];
 		for (int i = 0; i < points.size(); i++) {
-			Vector3 p = convertFromWallRelativeToAbsolute(points.get(i));
+			Vector3 p = toAbsolute(points.get(i));
 			convertedPoints[i] = p;
 			abspoints.get(i).set(p);
 			if (drawable)
 				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
 			// update location of point spheres
+//			System.out.println(p);
 			pointsRoot.getChild(i).setTranslation(p);
 			pointsRoot.updateGeometricState(0);
 		}

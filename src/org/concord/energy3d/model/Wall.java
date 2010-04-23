@@ -55,7 +55,7 @@ public class Wall extends HousePart {
 	
 
 	public Wall() {
-		super(2, 4);
+		super(2, 4, true);
 		height = defaultWallHeight;
 	}
 
@@ -182,8 +182,14 @@ public class Wall extends HousePart {
 				setNeighbor(index, snap, true);
 				if (index == 2) // make sure z of 2nd base point is same as 2st (needed for platform picking side)
 					p.setZ(points.get(0).getZ());
-				points.set(index, p);
-				points.set(index + 1, getUpperPoint(p));
+//				points.set(index, p);
+//				points.set(index + 1, getUpperPoint(p));
+				System.out.println("org = " + p);
+				Vector3 p_rel = toRelative(p);
+				System.out.println("rel = " + p_rel);
+				System.out.println("abs = " + toAbsolute(p_rel));
+				points.get(index).set(p_rel);
+				points.get(index+1).set(p_rel).setZ(p.getZ() + height);				
 			}
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
 			int lower = (editPointIndex == 1) ? 0 : 2;
@@ -209,11 +215,22 @@ public class Wall extends HousePart {
 
 	@Override
 	protected void draw() {
+		super.draw();
+//		if (root == null)
+//			init();		
+//
+//		for (int i = 0; i < points.size(); i++) {
+//			Vector3 p = points.get(i);
+//			p = toAbsolute(p);
+//			pointsRoot.getChild(i).setTranslation(p);
+//		}		
+		
 		boolean drawable = points.size() >= 4 && !points.get(0).equals(points.get(2));
-
-		for (int i = 0; i < points.size(); i++) {
-			pointsRoot.getChild(i).setTranslation(points.get(i));
-		}		
+		
+		System.out.println("rel = " + points.get(0));
+		System.out.println("abs = " + toAbsolute(points.get(0)));
+		
+		ArrayList<Vector3> points = abspoints;
 
 		if (drawable) {
 			Vector3 normal = points.get(2).subtract(points.get(0), null).cross(points.get(1).subtract(points.get(0), null), null).normalize(null);
@@ -223,23 +240,33 @@ public class Wall extends HousePart {
 			FloatBuffer invisibleVertexBuffer = invisibleMesh.getMeshData().getVertexBuffer();
 			invisibleVertexBuffer.rewind();
 			Vector3 p;
-
+			
 			p = points.get(0);
+//			p = toAbsolute(p);
+			System.out.println("invis abs Y = " + p.getY());
 			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			p = points.get(1);
+//			p = toAbsolute(p);
 			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			p = points.get(2);
+//			p = toAbsolute(p);
+//			System.out.println("abs = " + p);
 			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			p = points.get(3);
+//			p = toAbsolute(p);
 			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
 			p = points.get(0);
+//			p = toAbsolute(p);
 			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 			p = points.get(2);
+//			p = toAbsolute(p);
 			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 			p = points.get(3);
+//			p = toAbsolute(p);
 			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 			p = points.get(1);
+//			p = toAbsolute(p);
 			polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 
 			try {
@@ -258,24 +285,20 @@ public class Wall extends HousePart {
 							continue;
 						PolygonPoint pp;
 						ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
-						ArrayList<Vector3> points = child.getPoints();
-						// p = win.convertFromWallRelativeToAbsolute(points.get(0));
-						p = points.get(0);
+						ArrayList<Vector3> winPoints = child.getPoints();
+						p = winPoints.get(0);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
 						holePoints.add(pp);
-						// p = win.convertFromWallRelativeToAbsolute(points.get(2));
-						p = points.get(2);
+						p = winPoints.get(2);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
 						holePoints.add(pp);
-						// p = win.convertFromWallRelativeToAbsolute(points.get(3));
-						p = points.get(3);
+						p = winPoints.get(3);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
 						holePoints.add(pp);
-						// p = win.convertFromWallRelativeToAbsolute(points.get(1));
-						p = points.get(1);
+						p = winPoints.get(1);
 						pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 						toXY.transform(pp);
 						holePoints.add(pp);
@@ -329,6 +352,7 @@ public class Wall extends HousePart {
 	}
 
 	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
+		ArrayList<Vector3> points = abspoints;
 		Vector3 dir = points.get(2).subtract(points.get(0), null).normalizeLocal();
 		if (neighbors[0] != null && neighbors[0].getNeighbor().isFirstPointInserted())
 			reduceBackMeshWidth(polygon, dir, 0);
@@ -363,6 +387,7 @@ public class Wall extends HousePart {
 	}
 
 	private Vector3 decideThicknessNormal() {
+		ArrayList<Vector3> points = abspoints;
 		reversedThickness = false;
 		cull(true);
 		
@@ -416,6 +441,7 @@ public class Wall extends HousePart {
 	}
 
 	private void drawSurroundMesh(ReadOnlyVector3 thickness) {
+		ArrayList<Vector3> points = abspoints;
 		FloatBuffer vertexBuffer = surroundMesh.getMeshData().getVertexBuffer();
 		FloatBuffer normalBuffer = surroundMesh.getMeshData().getNormalBuffer();
 		vertexBuffer.position(0);

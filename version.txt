@@ -138,6 +138,7 @@ Version 0.2
 - fix problem with incomplete bottom shelf polygons
 - cull back face of window shelves
 - set the normals for window shelves for correct shading
+- stretch and re-scale the entire house if the Foundation is resized
 
 TODO:
 

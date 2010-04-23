@@ -34,6 +34,7 @@ public abstract class HousePart implements Serializable {
 	private boolean firstPointInserted = false;
 	protected transient ArrayList<Vector3> abspoints;
 	protected double height;
+	protected boolean relativeToHorizontal;
 
 	public static boolean isSnapToObjects() {
 		return snapToObjects;
@@ -50,11 +51,16 @@ public abstract class HousePart implements Serializable {
 	public static void setSnapToGrids(boolean snapToGrid) {
 		HousePart.snapToGrids = snapToGrid;
 	}
-
+	
 	public HousePart(int numOfDrawPoints, int numOfEditPoints) {
+		this(numOfDrawPoints, numOfEditPoints, false);
+	}
+
+	public HousePart(int numOfDrawPoints, int numOfEditPoints, boolean relativeToHorizontal) {
 		// System.out.println("Creating " + this + "...");
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
+		this.relativeToHorizontal = relativeToHorizontal;
 		points = new ArrayList<Vector3>(numOfEditPoints);
 		init();
 
@@ -66,7 +72,7 @@ public abstract class HousePart implements Serializable {
 		abspoints = new ArrayList<Vector3>(numOfEditPoints);
 		for (int i = 0; i < points.size(); i++)
 			abspoints.add(points.get(i).clone());
-		root = new Node("House Part");		
+		root = new Node(toString());		
 		pointsRoot = new Node("Edit Points");
 
 		// Set up a reusable pick results
@@ -113,7 +119,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public ArrayList<Vector3> getPoints() {
-		return points;
+		return abspoints;
 	}
 
 	public void addChild(HousePart housePart) {
@@ -267,22 +273,34 @@ public abstract class HousePart implements Serializable {
 		return picked;
 	}
 
-	protected Vector3 convertToWallRelative(Vector3 p) {
+	protected Vector3 toRelative(Vector3 org) {
+		if (container == null)
+			return org;
 		ArrayList<Vector3> wallPoints = container.getPoints();
 		Vector3 origin = wallPoints.get(0);
-		p = p.subtract(origin, null);
-		Vector3 wallx = wallPoints.get(2).subtract(origin, null).normalize(null);
-		Vector3 wally = wallPoints.get(1).subtract(origin, null).normalize(null);
-		Vector3 pointOnWall = new Vector3(wallx.dot(p), 0, wally.dot(p));
+//		p = p.subtract(origin, null);
+		Vector3 p = org.subtract(origin, null); //.normalizeLocal();
+		Vector3 wallx = wallPoints.get(2).subtract(origin, null);//.normalize(null);
+		Vector3 wally = wallPoints.get(1).subtract(origin, null);//.normalize(null);
+//		Vector3 pointOnWall = new Vector3(wallx.dot(p), 0, wally.dot(p));
+//		Vector3 pointOnWall = new Vector3(wallx.dot(p), (relativeToHorizontal) ? wally.dot(p): p.getY(), (relativeToHorizontal) ? p.getZ() : wally.dot(p));
+		Vector3 pointOnWall = new Vector3(p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY(): org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
 		return pointOnWall;
 	}
 
-	protected Vector3 convertFromWallRelativeToAbsolute(Vector3 p) {
+	protected Vector3 toAbsolute(Vector3 p) {
+		if (container == null)
+			return p;
 		ArrayList<Vector3> wallPoints = container.getPoints();
 		Vector3 origin = wallPoints.get(0);
-		Vector3 wallx = wallPoints.get(2).subtract(origin, null).normalize(null);
-		Vector3 wally = wallPoints.get(1).subtract(origin, null).normalize(null);
-		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply(p.getZ(), null), null);
+		Vector3 wallx = wallPoints.get(2).subtract(origin, null); //.normalize(null);
+		Vector3 wally = wallPoints.get(1).subtract(origin, null); //.normalize(null);
+//		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply(p.getZ(), null), null);
+		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
+		if (relativeToHorizontal)
+			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
+//		else
+//			pointOnSpace.setY(pointOnSpace.getZ() + p.getY());
 		return pointOnSpace;
 	}
 
@@ -398,6 +416,16 @@ public abstract class HousePart implements Serializable {
 
 	public abstract void setPreviewPoint(int x, int y);
 
-	protected abstract void draw();
+	protected void draw() {
+		if (root == null)
+			init();		
+
+		for (int i = 0; i < points.size(); i++) {
+			Vector3 p = points.get(i);
+			p = toAbsolute(p);
+			pointsRoot.getChild(i).setTranslation(p);
+			abspoints.get(i).set(p);
+		}		
+	}
 
 }

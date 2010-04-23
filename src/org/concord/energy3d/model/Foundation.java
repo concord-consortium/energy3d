@@ -57,39 +57,53 @@ public class Foundation extends HousePart {
 	public void setPreviewPoint(int x, int y) {
 		PickedHousePart pick = SceneManager.getInstance().findMousePoint(x, y);
 		if (pick != null) {
-			final double H = 0; //foundationHeight;
+			final double H = 0;
 			Vector3 p = pick.getPoint().addLocal(0, 0, H);
 			p = grid(p, GRID_SIZE);
-			int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
+//			int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
+			int index = editPointIndex;
+			if (index == -1) {
+				if (isFirstPointInserted())
+					index = 3;
+				else
+					index = 0;
+			}
 			points.get(index).set(p);
 			if (points.size() == 4) {
-				if (index == 0 || index == 2) {
-					points.get(1).set(points.get(0).getX(), points.get(2).getY(), H);
-					points.get(3).set(points.get(2).getX(), points.get(0).getY(), H);
+				if (index == 0 || index == 3) {
+					points.get(1).set(points.get(0).getX(), points.get(3).getY(), H);
+					points.get(2).set(points.get(3).getX(), points.get(0).getY(), H);
 				} else {
-					points.get(0).set(points.get(1).getX(), points.get(3).getY(), H);
-					points.get(2).set(points.get(3).getX(), points.get(1).getY(), H);					
+					points.get(0).set(points.get(1).getX(), points.get(2).getY(), H);
+					points.get(3).set(points.get(2).getX(), points.get(1).getY(), H);					
 				}
 			} else {
-				points.get(index+1).set(p);
+//				points.get(index+1).set(p);
+				points.get(1).set(p);
 			}
 		}
 		draw();
 		showPoints();
+		
+		for (HousePart child : children)
+			child.draw();
+		
 	}
 
 	@Override
 	protected void draw() {
+		super.draw();
 		boolean drawable = points.size() == 4;
 
-		for (int i = 0; i < points.size(); i++) {
-			Vector3 p = points.get(i);
-			// update location of point spheres
-			pointsRoot.getChild(i).setTranslation(p);
-		}
+//		for (int i = 0; i < points.size(); i++) {
+//			Vector3 p = points.get(i);
+//			// update location of point spheres
+//			pointsRoot.getChild(i).setTranslation(p);
+//		}
 
 		if (drawable) {
-			mesh.setData(points.get(0), points.get(2).add(0, 0, height, null));
+			mesh.setData(points.get(0), points.get(3).add(0, 0, height, null));
+			mesh.updateModelBound();			
 		}
 	}
 

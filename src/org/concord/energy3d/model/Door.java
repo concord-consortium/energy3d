@@ -109,7 +109,7 @@ public class Door extends HousePart {
 				p = grid(p, GRID_SIZE);
 				// p = snap(p);
 				// convert from absolute coordinates to relative-to-wall coordinates
-				p = convertToWallRelative(p);
+				p = toRelative(p);
 
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				points.set(index, p);
@@ -118,7 +118,7 @@ public class Door extends HousePart {
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
 			int lower = (editPointIndex == 1) ? 0 : 2;
 			Vector3 base = points.get(lower);
-			Vector3 absoluteBase = convertFromWallRelativeToAbsolute(base);
+			Vector3 absoluteBase = toAbsolute(base);
 			// doorHeight = findHeight(absoluteBase, snap(closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y)));
 			Vector3 p = closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y);
 			p = grid(p, GRID_SIZE);
@@ -193,7 +193,7 @@ public class Door extends HousePart {
 		vertexBuffer.position(0);
 		Vector3[] convertedPoints = new Vector3[4];
 		for (int i = 0; i < points.size(); i++) {
-			Vector3 p = convertFromWallRelativeToAbsolute(points.get(i));
+			Vector3 p = toAbsolute(points.get(i));
 			convertedPoints[i] = p;
 //			if (i < abspoints.size())
 //				abspoints.set(i, p);
