@@ -139,6 +139,7 @@ Version 0.2
 - cull back face of window shelves
 - set the normals for window shelves for correct shading
 - stretch and re-scale the entire house if the Foundation is resized
+- draw scale bounding box around house
 
 TODO:
 

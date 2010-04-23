@@ -135,30 +135,13 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void showPoints() {
-		// // pointsRoot.getSceneHints().setCullHint(CullHint.Inherit);
 		for (int i = 0; i < points.size(); i++)
 			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
-		// // pointsRoot.setVisible(i, true);
-		// // CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
-		// // ((Sphere)pointsRoot.getChild(i)).updateModelBound();
-		// // ((Sphere)pointsRoot.getChild(i)).updateWorldBound(false);
-		// // }
-		// // CollisionTreeManager.INSTANCE.removeCollisionTree(root);
-		// // root.updateWorldBound(true);
-		// // root.updateGeometricState(0);
 	}
 
 	public void hidePoints() {
-		// // pointsRoot.getSceneHints().setCullHint(CullHint.Always);
-		for (int i = 0; i < points.size(); i++)
-			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
-		// // pointsRoot.setAllNonVisible();
-		// // for (int i=0; i<points.size(); i++) {
-		// // pointsRoot.setVisible(i, true);
-		// // ((Sphere)pointsRoot.getChild(i)).setModelBound(null);
-		// // CollisionTreeManager.INSTANCE.removeCollisionTree(pointsRoot.getChild(i));
-		// // }
-		// root.updateGeometricState(0);
+//		for (int i = 0; i < points.size(); i++)
+//			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 	}
 
 	public void editPoint(int i) {
