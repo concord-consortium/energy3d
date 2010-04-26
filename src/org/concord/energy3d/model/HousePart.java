@@ -140,8 +140,8 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void hidePoints() {
-//		for (int i = 0; i < points.size(); i++)
-//			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
+		for (int i = 0; i < points.size(); i++)
+			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 	}
 
 	public void editPoint(int i) {
@@ -399,7 +399,7 @@ public abstract class HousePart implements Serializable {
 
 	public abstract void setPreviewPoint(int x, int y);
 
-	protected void draw() {
+	public void draw() {
 		if (root == null)
 			init();		
 

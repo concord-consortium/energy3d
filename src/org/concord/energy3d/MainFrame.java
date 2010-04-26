@@ -14,6 +14,7 @@ import javax.swing.SwingUtilities;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SceneManager.Operation;
 
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import javax.swing.JButton;
@@ -43,6 +44,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton snapButton = null;
 	private JToggleButton floorButton = null;
 	private JToggleButton roofHipButton = null;
+	private JToggleButton resizeButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -83,6 +85,7 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getSaveButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getSelectButton());
+			appToolbar.add(getResizeButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getFoundationButton());
 			appToolbar.add(getWallButton());
@@ -100,6 +103,7 @@ public class MainFrame extends JFrame {
 			
 			ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
+			bg.add(resizeButton);
 			bg.add(foundationButton);
 			bg.add(wallButton);
 			bg.add(doorButton);
@@ -403,6 +407,24 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return roofHipButton;
+	}
+
+	/**
+	 * This method initializes resizeButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getResizeButton() {
+		if (resizeButton == null) {
+			resizeButton = new JToggleButton();
+			resizeButton.setText("Resize");
+			resizeButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setOperation(Operation.RESIZE);
+				}
+			});
+		}
+		return resizeButton;
 	}
 
 	/**

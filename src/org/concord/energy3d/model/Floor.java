@@ -72,7 +72,7 @@ public class Floor extends HousePart {
 	}
 
 	@Override
-	protected void draw() {
+	public void draw() {
 		if (root == null)
 			init();
 

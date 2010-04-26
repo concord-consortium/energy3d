@@ -185,7 +185,7 @@ public class Door extends HousePart {
 //	}
 
 	@Override
-	protected void draw() {
+	public void draw() {
 		if (root == null)
 			init();
 		boolean drawable = points.size() >= 4;

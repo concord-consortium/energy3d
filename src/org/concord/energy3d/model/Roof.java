@@ -70,7 +70,7 @@ public class Roof extends HousePart {
 	}
 
 	@Override
-	protected void draw() {
+	public void draw() {
 		if (root == null)
 			init();
 

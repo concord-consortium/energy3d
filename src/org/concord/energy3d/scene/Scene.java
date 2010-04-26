@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 
 import com.ardor3d.image.Image;
@@ -242,6 +243,15 @@ public class Scene implements Serializable {
 			instance = new Scene();
 		}
 //		instance.init();
+	}
+
+	public void drawResizeBounds() {
+		for (HousePart part : parts) {
+			if (part instanceof Foundation) {
+				part.draw();
+				part.showPoints();
+			}
+		}
 	}
 
 }

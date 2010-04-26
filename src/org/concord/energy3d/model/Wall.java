@@ -214,7 +214,7 @@ public class Wall extends HousePart {
 	}
 
 	@Override
-	protected void draw() {
+	public void draw() {
 		super.draw();
 //		if (root == null)
 //			init();		
@@ -584,6 +584,12 @@ public class Wall extends HousePart {
 		for (int i = 0; i < neighbors.length; i++)
 			if (neighbors[i] != null)
 				((Wall) neighbors[i].getNeighbor()).setNeighbor(neighbors[i].getNeighborPointIndex(), null, false); // .removeNeighbor(this);
+	}
+
+	public void setHeight(double newHeight) {
+		points.get(1).setZ(newHeight);
+		points.get(3).setZ(newHeight);
+		draw();		
 	}
 
 }

@@ -140,6 +140,9 @@ Version 0.2
 - set the normals for window shelves for correct shading
 - stretch and re-scale the entire house if the Foundation is resized
 - draw scale bounding box around house
+- select and edit scale bounding box with mouse
+- fix problem with moving points in a void background
+- rescale all contained walls as scal bounding box is resized
 
 TODO:
 

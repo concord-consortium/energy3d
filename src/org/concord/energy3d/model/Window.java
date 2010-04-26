@@ -98,7 +98,7 @@ public class Window extends HousePart {
 					Vector3 wallFirstPoint = container.getPoints().get(0);
 					Vector3 wallx = container.getPoints().get(2).subtract(wallFirstPoint, null);
 					p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
-					p.setZ(points.get(0).getZ() + container.getPoints().get(0).getZ());
+					p.setZ(abspoints.get(0).getZ()); // + container.getPoints().get(0).getZ());
 					p = grid(p, GRID_SIZE);					
 				}
 
@@ -114,7 +114,11 @@ public class Window extends HousePart {
 				System.out.println("abs = " + toAbsolute(p_rel));
 				
 				points.get(index).set(p_rel);
-				points.get(index+1).set(p_rel).setZ(p.getZ() + height);
+				System.out.println(height);
+				p.setZ(p.getZ() + height);
+				p_rel = toRelative(p);
+				points.get(index+1).set(p_rel); //.setZ(p.getZ() + height);
+				System.out.println("***" + (toAbsolute(points.get(1)).getZ() - toAbsolute(points.get(0)).getZ()));
 				
 				if (editPointIndex == 0 && points.size() != 2) {
 //					points.get(2).setZ(p.getZ());
@@ -144,7 +148,7 @@ public class Window extends HousePart {
 	}
 
 	@Override
-	protected void draw() {
+	public void draw() {
 		if (root == null)
 			init();
 
@@ -163,6 +167,7 @@ public class Window extends HousePart {
 			pointsRoot.getChild(i).setTranslation(p);
 			pointsRoot.updateGeometricState(0);
 		}
+		System.out.println("***" + (abspoints.get(1).getZ() - abspoints.get(0).getZ()));
 
 		// compute normals		
 		if (drawable) {

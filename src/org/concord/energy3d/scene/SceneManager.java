@@ -109,13 +109,14 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 	public enum Operation {
 		SELECT,
+		RESIZE,		
 		DRAW_WALL,
 		DRAW_DOOR,
 		DRAW_ROOF,
 		DRAW_ROOF_HIP,
 		DRAW_WINDOW,
 		DRAW_FOUNDATION,
-		DRAW_FLOOR		
+		DRAW_FLOOR 
 	}
 //	public static final int SELECT = 0;
 //	public static final int DRAW_WALL = 1;
@@ -527,7 +528,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
-				if (operation == Operation.SELECT) {
+				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 					if (drawn == null || drawn.isDrawCompleted()) {
 						if (drawn != null)
 							drawn.hidePoints();
@@ -546,7 +547,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (operation == Operation.DRAW_ROOF)
 					return;
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
-				if (operation == Operation.SELECT) {
+				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 					if (drawn != null)
 						drawn.complete();
 					return;
@@ -900,6 +901,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.operation = operation;
 		if (drawn != null && !drawn.isDrawCompleted())
 			removeHousePart(drawn);
+		if (operation == Operation.RESIZE) {
+			Foundation.setResizeHouseMode(true);
+		} else
+			Foundation.setResizeHouseMode(false);
+		Scene.getInstance().drawResizeBounds();
 		drawn = newHousePart();
 	}
 
@@ -924,7 +930,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			addHousePart(drawn);
 		return drawn;
 	}
-
+	
 	private void addHousePart(HousePart drawn) {
 		housePartsNode.attachChild(drawn.getRoot());
 		Scene.getInstance().add(drawn);
