@@ -235,6 +235,8 @@ public class Scene implements Serializable {
 			in.close();
 			for (HousePart housePart : instance.getParts())
 				root.attachChild(housePart.getRoot());
+//			for (HousePart housePart : instance.getParts())
+//				housePart.draw();			
 		} catch (FileNotFoundException e) {
 			System.out.println("Energy3D saved file not found...creating a new file...");			
 			instance = new Scene();

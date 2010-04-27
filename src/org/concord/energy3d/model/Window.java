@@ -86,7 +86,7 @@ public class Window extends HousePart {
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
 				if (isFirstPointInserted())
-					System.out.println(p);
+//					System.out.println(p);
 					
 				if (points.size() == 2 || editPointIndex == 0) {
 					p = grid(p, GRID_SIZE);
@@ -108,17 +108,17 @@ public class Window extends HousePart {
 				
 //				Vector3 p_rel = toRelative(p);
 				
-				System.out.println("org = " + p);
+//				System.out.println("org = " + p);
 				Vector3 p_rel = toRelative(p);
-				System.out.println("rel = " + p_rel);
-				System.out.println("abs = " + toAbsolute(p_rel));
+//				System.out.println("rel = " + p_rel);
+//				System.out.println("abs = " + toAbsolute(p_rel));
 				
 				points.get(index).set(p_rel);
-				System.out.println(height);
+//				System.out.println(height);
 				p.setZ(p.getZ() + height);
 				p_rel = toRelative(p);
 				points.get(index+1).set(p_rel); //.setZ(p.getZ() + height);
-				System.out.println("***" + (toAbsolute(points.get(1)).getZ() - toAbsolute(points.get(0)).getZ()));
+//				System.out.println("***" + (toAbsolute(points.get(1)).getZ() - toAbsolute(points.get(0)).getZ()));
 				
 				if (editPointIndex == 0 && points.size() != 2) {
 //					points.get(2).setZ(p.getZ());
@@ -167,7 +167,7 @@ public class Window extends HousePart {
 			pointsRoot.getChild(i).setTranslation(p);
 			pointsRoot.updateGeometricState(0);
 		}
-		System.out.println("***" + (abspoints.get(1).getZ() - abspoints.get(0).getZ()));
+//		System.out.println("***" + (abspoints.get(1).getZ() - abspoints.get(0).getZ()));
 
 		// compute normals		
 		if (drawable) {

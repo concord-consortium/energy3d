@@ -19,6 +19,7 @@ public class Foundation extends HousePart {
 	private transient Box mesh; // = new Box("Foundation", new Vector3(), new Vector3());
 	private transient Box boundingMesh;
 	private double boundingHeight = 2;
+	private transient double newBoundingHeight;
 
 	public static void setResizeHouseMode(boolean resizeHouseMode) {
 		Foundation.resizeHouseMode = resizeHouseMode;
@@ -82,6 +83,12 @@ public class Foundation extends HousePart {
 			else
 				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
 		}
+	}	
+	
+	@Override
+	public void addChild(HousePart housePart) {
+		super.addChild(housePart);
+		boundingHeight = newBoundingHeight;
 	}
 
 	@Override
@@ -114,18 +121,20 @@ public class Foundation extends HousePart {
 				}
 			} else {
 				int lower = (editPointIndex == 1) ? 0 : 2;
-				Vector3 base = points.get(lower);
+				System.out.println("x,y = " + x + "," + y);
+				Vector3 base = abspoints.get(lower);
+				System.out.println("base = " + base);
 				Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
-				Snap snap = snap(closestPoint, -1);
-				if (snap == null)
+				System.out.println("closest = " + closestPoint);
+//				Snap snap = snap(closestPoint, -1);
+//				if (snap == null)
 					closestPoint = grid(closestPoint, GRID_SIZE);
-				// neighbor[1] = snap(closestPoint);
-				double newHeight = findHeight(base, closestPoint);
-				applyNewHeight(boundingHeight, newHeight);
-				boundingHeight = newHeight;
+				newBoundingHeight = findHeight(base, closestPoint);
+				applyNewHeight(boundingHeight, newBoundingHeight);
+//				boundingHeight = newHeight;
 			}
 			for (int i = 0; i < 4; i++)
-				points.get(i + 4).set(points.get(i)).setZ(boundingHeight);
+				points.get(i + 4).set(points.get(i)).setZ(newBoundingHeight);
 		}
 		draw();
 		showPoints();
@@ -135,11 +144,16 @@ public class Foundation extends HousePart {
 
 	}
 
-	private void applyNewHeight(double boundingHeight2, double newHeight) {
+	private void applyNewHeight(double oldHeight, double newHeight) {
+		System.out.println("h2 = " + newHeight);
 		for (HousePart child : children) {
 			if (child instanceof Wall) {
 				Wall wall = (Wall) child;
-				wall.setHeight(newHeight);
+//				System.out.println("h = " + wall.getHeight());
+				System.out.println("fac = " + newHeight / oldHeight);
+//				wall.setHeight(newHeight);
+				wall.setHeight(wall.getHeight() * newHeight / oldHeight);
+//				System.out.println("h2 = " + wall.getHeight());
 			}
 		}
 

@@ -184,10 +184,10 @@ public class Wall extends HousePart {
 					p.setZ(points.get(0).getZ());
 //				points.set(index, p);
 //				points.set(index + 1, getUpperPoint(p));
-				System.out.println("org = " + p);
+//				System.out.println("org = " + p);
 				Vector3 p_rel = toRelative(p);
-				System.out.println("rel = " + p_rel);
-				System.out.println("abs = " + toAbsolute(p_rel));
+//				System.out.println("rel = " + p_rel);
+//				System.out.println("abs = " + toAbsolute(p_rel));
 				points.get(index).set(p_rel);
 				points.get(index+1).set(p_rel).setZ(p.getZ() + height);				
 			}
@@ -227,8 +227,8 @@ public class Wall extends HousePart {
 		
 		boolean drawable = points.size() >= 4 && !points.get(0).equals(points.get(2));
 		
-		System.out.println("rel = " + points.get(0));
-		System.out.println("abs = " + toAbsolute(points.get(0)));
+//		System.out.println("rel = " + points.get(0));
+//		System.out.println("abs = " + toAbsolute(points.get(0)));
 		
 		ArrayList<Vector3> points = abspoints;
 
@@ -243,7 +243,7 @@ public class Wall extends HousePart {
 			
 			p = points.get(0);
 //			p = toAbsolute(p);
-			System.out.println("invis abs Y = " + p.getY());
+//			System.out.println("invis abs Y = " + p.getY());
 			invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			p = points.get(1);
 //			p = toAbsolute(p);
@@ -448,6 +448,15 @@ public class Wall extends HousePart {
 		normalBuffer.position(0);
 		Vector3 p2 = Vector3.fetchTempInstance();
 		int[] order;
+//		if (neighbors[0] != null && neighbors[1] != null && neighbors[0].getNeighbor().getHeight() == this.height && neighbors[1].getNeighbor().getHeight() == this.height)
+//			order = new int[] { 1, 3 };
+//		else if (neighbors[0] != null && neighbors[0].getNeighbor().getHeight() == this.height)
+//			order = new int[] { 1, 3, 2 };
+//		else if (neighbors[1] != null && neighbors[1].getNeighbor().getHeight() == this.height)
+//			order = new int[] { 0, 1, 3 };
+//		else
+//			order = new int[] { 0, 1, 3, 2 };
+
 		if (neighbors[0] != null && neighbors[1] != null)
 			order = new int[] { 1, 3 };
 		else if (neighbors[0] != null)

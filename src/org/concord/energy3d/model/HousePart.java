@@ -7,7 +7,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.polygon.PolygonPoint;
 
-import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
@@ -97,12 +96,16 @@ public abstract class HousePart implements Serializable {
 		// pointsRoot.setAllNonVisible();
 		// root.updateGeometricState(0);
 	}
-
-	public Node getRoot() {
+	
+	private void initCheck() {
 		if (root == null) {
 			init();
 			draw();
-		}
+		}		
+	}
+
+	public Node getRoot() {
+		initCheck();
 		return root;
 	}
 
@@ -119,6 +122,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public ArrayList<Vector3> getPoints() {
+		initCheck();	
 		return abspoints;
 	}
 
@@ -164,11 +168,13 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected double findHeight(Vector3 base, Vector3 upperPoint) {
-		Vector3 subtract = upperPoint.subtract(base, null);
-		if (subtract.dot(0, 0, -1) >= 0)
-			return 0;
-		else
-			return subtract.length();
+//		Vector3 subtract = upperPoint.subtract(base, null);
+//		if (subtract.dot(0, 0, -1) >= 0)
+//			return 0;
+//		else
+//			return subtract.length();
+		double subtract = upperPoint.getZ() - base.getZ();
+		return Math.max(0, subtract);
 	}
 
 	protected Vector3 closestPoint(ReadOnlyVector3 p1, ReadOnlyVector3 p2, ReadOnlyVector3 p3, ReadOnlyVector3 p4) {

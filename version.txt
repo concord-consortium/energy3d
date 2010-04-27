@@ -142,9 +142,10 @@ Version 0.2
 - draw scale bounding box around house
 - select and edit scale bounding box with mouse
 - fix problem with moving points in a void background
-- rescale all contained walls as scal bounding box is resized
+- rescale all contained walls as scale bounding box is resized
+- implemented relative wall resize instead of setting all wall heights to the height of the bounding box
+- fixed problem with jittering house when resizing using bounding box
+- fixed problem with not updating abspoints when loading the scene
 
 TODO:
-
 - combine the wall meshed into one
-- draw window shelf on walls
