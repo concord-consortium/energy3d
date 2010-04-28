@@ -18,7 +18,7 @@ public class Foundation extends HousePart {
 	// private double height = 0.1;
 	private transient Box mesh; // = new Box("Foundation", new Vector3(), new Vector3());
 	private transient Box boundingMesh;
-	private double boundingHeight = 2;
+	private double boundingHeight;
 	private transient double newBoundingHeight;
 
 	public static void setResizeHouseMode(boolean resizeHouseMode) {
@@ -36,6 +36,9 @@ public class Foundation extends HousePart {
 
 	protected void init() {
 		super.init();
+		if (boundingHeight == 0)
+			boundingHeight = 2;
+		newBoundingHeight = boundingHeight;
 		mesh = new Box("Foundation", new Vector3(), new Vector3());
 		boundingMesh = new Box("Foundation (Bounding)", new Vector3(), new Vector3());
 		root.attachChild(mesh);

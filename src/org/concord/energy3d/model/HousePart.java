@@ -51,7 +51,7 @@ public abstract class HousePart implements Serializable {
 		HousePart.snapToGrids = snapToGrid;
 	}
 	
-	public HousePart(int numOfDrawPoints, int numOfEditPoints) {
+	public HousePart(int numOfDrawPoints, int numOfEditPoints) {		
 		this(numOfDrawPoints, numOfEditPoints, false);
 	}
 
