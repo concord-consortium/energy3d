@@ -81,7 +81,7 @@ public abstract class HousePart implements Serializable {
 		// hidePoints();
 		final Vector3 origin = new Vector3();
 		for (int i = 0; i < numOfEditPoints; i++) {
-			Sphere pointShape = new Sphere("Point", origin, 8, 8, 0.03);
+			Sphere pointShape = new Sphere("Point", origin, 8, 8, 0.05);
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
 //			pointShape.setModelBound(new BoundingBox());

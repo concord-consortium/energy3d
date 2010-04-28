@@ -45,6 +45,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton floorButton = null;
 	private JToggleButton roofHipButton = null;
 	private JToggleButton resizeButton = null;
+	private JToggleButton sunButton = null;
+	private JToggleButton sunAnimButton = null;
 
 	/**
 	 * This method initializes appMenuBar	
@@ -96,6 +98,8 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getFloorButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
+			appToolbar.add(getSunButton());
+			appToolbar.add(getSunAnimButton());
 			appToolbar.add(getRotAnimButton());
 			appToolbar.add(getTopViewButton());
 			appToolbar.add(getGridButton());
@@ -425,6 +429,42 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return resizeButton;
+	}
+
+	/**
+	 * This method initializes sunButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getSunButton() {
+		if (sunButton == null) {
+			sunButton = new JToggleButton();
+			sunButton.setText("Sun");
+			sunButton.addItemListener(new java.awt.event.ItemListener() {
+				public void itemStateChanged(java.awt.event.ItemEvent e) {
+					SceneManager.getInstance().setSunControl(sunButton.isSelected());
+				}
+			});
+		}
+		return sunButton;
+	}
+
+	/**
+	 * This method initializes sunAnimButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getSunAnimButton() {
+		if (sunAnimButton == null) {
+			sunAnimButton = new JToggleButton();
+			sunAnimButton.setText("Sun Anim");
+			sunAnimButton.addItemListener(new java.awt.event.ItemListener() {
+				public void itemStateChanged(java.awt.event.ItemEvent e) {
+					SceneManager.getInstance().setSunAnim(sunAnimButton.isSelected());
+				}
+			});
+		}
+		return sunAnimButton;
 	}
 
 	/**

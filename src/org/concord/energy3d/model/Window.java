@@ -85,7 +85,7 @@ public class Window extends HousePart {
 			PickedHousePart picked = pick(x, y, Wall.class);
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
-				if (isFirstPointInserted())
+//				if (isFirstPointInserted())
 //					System.out.println(p);
 					
 				if (points.size() == 2 || editPointIndex == 0) {

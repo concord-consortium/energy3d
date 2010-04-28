@@ -143,7 +143,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// private static final double TURN_SPEED = 0.5;
 	// private final Matrix3 _incr = new Matrix3();
 	// private static final double MOUSE_TURN_SPEED = 0.1;
-	private boolean rot = false;
+	private boolean rotAnim = false;
 
 	private PickResults pickResults;
 	private HousePart drawn = null;
@@ -151,7 +151,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Operation operation = Operation.SELECT;
 	protected HousePart lastHoveredObject;
 	private LightState lightState;
-	private double angle, lightAngleX = 90, lightAngleY = 0;
+	private double angle, sunAngle = 90, sunBaseAngle = 0;
 	private Matrix3 rotate = new Matrix3();
 	private boolean topView;
 	// private ReadOnlyVector3 axis = new Vector3(0, 0, 1);
@@ -162,6 +162,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Sphere sun;		
 	private Node sunHeliodon;
 	private Node sunRot;
+	private boolean sunControl;
+	private boolean sunAnim;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -260,7 +262,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		root.attachChild(createAxis());
 		root.attachChild(createFloor());
 //		root.attachChild(createSky());
-		root.attachChild(createSunAxis());
+		root.attachChild(createSunHeliodon());
 
 		// Wall w1 = testWall(0, 0, 0, 2);
 		// Wall w2 = testWall(0, 2, 2, 2);
@@ -304,7 +306,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// return wall;
 	// }
 
-	private Spatial createSunAxis() {
+	private Spatial createSunHeliodon() {
 		sunHeliodon = new Node();
 		Cylinder cyl = new Cylinder("Sun Curve", 10, 50, 5, 0.3);
 		Transform trans = new Transform();
@@ -330,7 +332,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		sunHeliodon.attachChild(sunRot);
 		
 		
-		sunHeliodon.setTranslation(0, -1, 0);
+//		sunHeliodon.setTranslation(0, -1, 0);
 		
 		reverseNormals(sun.getMeshData().getNormalBuffer());
 		
@@ -341,7 +343,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			
 		
 		
-		BloomRenderPass bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);
+		BloomRenderPass bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);		
 
         if (!bloomRenderPass.isSupported()) {
             System.out.println("Bloom not supported!");
@@ -392,36 +394,45 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.checkTriggers(tpf);	
 		
 		int val = 1;
-		if (rot) {
+		if (rotAnim) {
 			angle = val;
 			rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
 			renderer.getCamera().setLocation(rotate.applyPre(renderer.getCamera().getLocation(), null));
 			renderer.getCamera().lookAt(0, 0, val, Vector3.UNIT_Z);
 			root.setRotation(rotate);
-		}		
-//		elevateSun(val);
+		}
+		
+		if (sunAnim) {
+			sunAngle++;
+			updateSunHeliodon();
+		}
+
 		root.updateGeometricState(tpf);
 	}
 	
 	private void updateSunHeliodon() {
 //		lightAngleX += val;
-		lightAngleX = Math.max(lightAngleX, 0);
-		lightAngleX = Math.min(lightAngleX, 180);
+		if (sunAnim)
+			sunAngle %= 180;
+		else {
+		sunAngle = Math.max(sunAngle, 0);
+		sunAngle = Math.min(sunAngle, 180);
+		}
 		
 //		sun.setTranslation(-Math.cos(lightAngleX*Math.PI/180)*5, -1, Math.sin(lightAngleX*Math.PI/180)*5);
-		sunRot.setRotation(new Matrix3().fromAngleAxis((-90+lightAngleX)*Math.PI/180, Vector3.UNIT_Y));
+		sunRot.setRotation(new Matrix3().fromAngleAxis((-90+sunAngle)*Math.PI/180, Vector3.UNIT_Y));
 		
 		DirectionalLight light = (DirectionalLight)lightState.get(0);
 //		light.setDirection(Math.cos(lightAngleX*Math.PI/180), 1, -Math.sin(lightAngleX*Math.PI/180));
 		light.setDirection(sun.getWorldTranslation().negate(null));
 		
 //		lightAngleY += val;
-		lightAngleY = lightAngleY % 360;
+		sunBaseAngle = sunBaseAngle % 360;
 //		lightAngleY = Math.min(lightAngleY, 180);		
 //		DirectionalLight light = (DirectionalLight)lightState.get(0);
 //		light.setDirection(Math.cos(lightAngleX*Math.PI/180), 1, -Math.sin(lightAngleX*Math.PI/180));		
 //		sun.setTranslation(-Math.cos(lightAngleX*Math.PI/180)*5, -1, Math.sin(lightAngleX*Math.PI/180)*5);
-		sunHeliodon.setRotation(new Matrix3().fromAngleAxis(lightAngleY * Math.PI / 180, Vector3.UNIT_Z));
+		sunHeliodon.setRotation(new Matrix3().fromAngleAxis(sunBaseAngle * Math.PI / 180, Vector3.UNIT_Z));
 		sunHeliodon.updateGeometricState(0);
 	}
 	
@@ -544,13 +555,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			
 			@Override
 			protected void rotate(Camera camera, double dx, double dy) {
-//				if (operation == Operation.SELECT && (drawn == null || drawn.isDrawCompleted()) && !topView)
-//					super.rotate(camera, dx, dy);
+				if ((operation == Operation.SELECT || operation == Operation.RESIZE) && !sunControl && (drawn == null || drawn.isDrawCompleted()) && !topView)
+					super.rotate(camera, dx, dy);
 			}
 		};
 		control.setupKeyboardTriggers(logicalLayer);
 		control.setupMouseTriggers(logicalLayer, true);
-		control.setMoveSpeed(MOVE_SPEED);		
+		control.setMoveSpeed(MOVE_SPEED);
+		control.setKeyRotateSpeed(1);
 		
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
@@ -719,25 +731,29 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.UP), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				lightAngleX--;
+				if (!sunControl) return;
+				sunAngle--;
 				updateSunHeliodon();
 			}
 		}));		
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DOWN), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				lightAngleX++;
+				if (!sunControl) return;
+				sunAngle++;
 				updateSunHeliodon();
 			}
 		}));		
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.RIGHT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				lightAngleY++;
+				if (!sunControl) return;
+				sunBaseAngle++;
 				updateSunHeliodon();
 			}
 		}));		
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				lightAngleY--;
+				if (!sunControl) return;
+				sunBaseAngle--;
 				updateSunHeliodon();
 			}
 		}));		
@@ -833,7 +849,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void toggleRotation() {
-		rot = !rot;
+		rotAnim = !rotAnim;
 	}
 
 	// private void rotateUpDown(final Canvas canvas, final double speed) {
@@ -1173,5 +1189,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
         box.setModelBound(new BoundingBox());
 //        root.attachChild(box);
     }
+
+	public void setSunControl(boolean selected) {
+		this.sunControl = selected;		
+	}
+
+	public void setSunAnim(boolean selected) {
+		this.sunAnim = selected;
+		
+	}
     
 }
