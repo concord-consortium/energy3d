@@ -273,7 +273,10 @@ public abstract class HousePart implements Serializable {
 		Vector3 wally = wallPoints.get(1).subtract(origin, null);//.normalize(null);
 //		Vector3 pointOnWall = new Vector3(wallx.dot(p), 0, wally.dot(p));
 //		Vector3 pointOnWall = new Vector3(wallx.dot(p), (relativeToHorizontal) ? wally.dot(p): p.getY(), (relativeToHorizontal) ? p.getZ() : wally.dot(p));
-		Vector3 pointOnWall = new Vector3(p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY(): org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
+//		double y = p.getY();
+//		if (wallx.getX() == 0)
+//			y = p.getX();
+		Vector3 pointOnWall = new Vector3(wallx.getX() == 0 ? p.getY() / wallx.getY() : p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY(): org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
 		return pointOnWall;
 	}
 

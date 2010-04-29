@@ -1,12 +1,9 @@
 package org.concord.energy3d.scene;
 
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.net.URL;
 import java.nio.FloatBuffer;
-import java.util.Arrays;
-import java.util.List;
 
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -20,7 +17,6 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 
 import com.ardor3d.annotation.MainThread;
-import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
 import com.ardor3d.framework.Canvas;
@@ -57,8 +53,6 @@ import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.light.DirectionalLight;
-import com.ardor3d.light.Light;
-import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
@@ -67,7 +61,6 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRendererFactory;
@@ -80,7 +73,6 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -88,16 +80,11 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
-import com.ardor3d.scenegraph.shape.Torus;
-import com.ardor3d.spline.CatmullRomSpline;
-import com.ardor3d.spline.Curve;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -245,7 +232,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //		light.setDiffuse(new ColorRGBA(1, 1, 1, 1));
 
 		final DirectionalLight light = new DirectionalLight();
-		light.setDirection(new Vector3(0, 1, -1));
+//		light.setDirection(new Vector3(0, 1, -1));
+		light.setDirection(new Vector3(0, 0, -1));
 
 		light.setAmbient(new ColorRGBA(1, 1, 1, 1));
 		light.setEnabled(true);
@@ -253,6 +241,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		lightState = new LightState();
 		lightState.setEnabled(false);
 		lightState.attach(light);
+//		lightState.setTwoSidedLighting(true);
 		root.setRenderState(lightState);
 
 		// Set up a reusable pick results
@@ -411,27 +400,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 	
 	private void updateSunHeliodon() {
-//		lightAngleX += val;
 		if (sunAnim)
 			sunAngle %= 180;
 		else {
-		sunAngle = Math.max(sunAngle, 0);
-		sunAngle = Math.min(sunAngle, 180);
+			sunAngle = Math.max(sunAngle, 1);
+			sunAngle = Math.min(sunAngle, 179);
 		}
-		
-//		sun.setTranslation(-Math.cos(lightAngleX*Math.PI/180)*5, -1, Math.sin(lightAngleX*Math.PI/180)*5);
 		sunRot.setRotation(new Matrix3().fromAngleAxis((-90+sunAngle)*Math.PI/180, Vector3.UNIT_Y));
-		
 		DirectionalLight light = (DirectionalLight)lightState.get(0);
-//		light.setDirection(Math.cos(lightAngleX*Math.PI/180), 1, -Math.sin(lightAngleX*Math.PI/180));
 		light.setDirection(sun.getWorldTranslation().negate(null));
 		
-//		lightAngleY += val;
 		sunBaseAngle = sunBaseAngle % 360;
-//		lightAngleY = Math.min(lightAngleY, 180);		
-//		DirectionalLight light = (DirectionalLight)lightState.get(0);
-//		light.setDirection(Math.cos(lightAngleX*Math.PI/180), 1, -Math.sin(lightAngleX*Math.PI/180));		
-//		sun.setTranslation(-Math.cos(lightAngleX*Math.PI/180)*5, -1, Math.sin(lightAngleX*Math.PI/180)*5);
 		sunHeliodon.setRotation(new Matrix3().fromAngleAxis(sunBaseAngle * Math.PI / 180, Vector3.UNIT_Z));
 		sunHeliodon.updateGeometricState(0);
 	}
@@ -490,12 +469,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createSky() {
-		 Dome sky = new Dome("Sky", 100, 100, 100);
+		Dome sky = new Dome("Sky", 100, 100, 100);
+		sky.setRotation(new Quaternion(1, 0, 0, 1));
 //		Sphere sky = new Sphere("Sky", 100, 100, 100);
 //		sky.setTextureMode(TextureMode.Polar);
-		sky.setRotation(new Quaternion(1, 0, 0, 1));
 //		sky.setTranslation(0, 0, 10);
-		// Add a texture to the box.
 		
 //		reverseNormals(sky.getMeshData().getNormalBuffer());
 		
@@ -503,7 +481,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		ts.setTexture(TextureManager.load("sky6.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		sky.setRenderState(ts);
 
-//		// Add a material to the box, to show both vertex color and lighting/shading.
 //		final MaterialState ms = new MaterialState();
 //		ms.setColorMaterial(ColorMaterial.Diffuse);
 //		sky.setRenderState(ms);
@@ -551,18 +528,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void registerInputTriggers() {
-		control = new FirstPersonControl(Vector3.UNIT_Z) {
-			
-			@Override
-			protected void rotate(Camera camera, double dx, double dy) {
-				if ((operation == Operation.SELECT || operation == Operation.RESIZE) && !sunControl && (drawn == null || drawn.isDrawCompleted()) && !topView)
-					super.rotate(camera, dx, dy);
-			}
-		};
+//		control = new FirstPersonControl(Vector3.UNIT_Z) {
+//			
+//			@Override
+//			protected void rotate(Camera camera, double dx, double dy) {
+//				if ((operation == Operation.SELECT || operation == Operation.RESIZE) && !sunControl && (drawn == null || drawn.isDrawCompleted()) && !topView)
+//					super.rotate(camera, dx, dy);
+//			}
+//		};
+		control = new FirstPersonControl(Vector3.UNIT_Z);
 		control.setupKeyboardTriggers(logicalLayer);
 		control.setupMouseTriggers(logicalLayer, true);
 		control.setMoveSpeed(MOVE_SPEED);
-		control.setKeyRotateSpeed(1);
+		control.setKeyRotateSpeed(1);		
 		
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
@@ -597,7 +575,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					drawn.addPoint(mouseState.getX(), mouseState.getY());
 
 				if (drawn.isDrawCompleted()) {
-//					Scene.root.updateWorldBound(true);
 					drawn.hidePoints();
 					drawn = newHousePart();
 				}
@@ -609,12 +586,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final MouseState mouseState = inputStates.getCurrent().getMouseState();
 				int x = mouseState.getX();
 				int y = mouseState.getY();
-//				System.out.println(drawn + " " + drawn.isDrawCompleted());
 				if (drawn != null && !drawn.isDrawCompleted()) {
 					drawn.setPreviewPoint(x, y);
 				} else {
 					selectHousePart(x, y, false);
 				}
+				enableDisableMouseRotation();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LCONTROL), new TriggerAction() {
@@ -660,55 +637,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					moveUpDown(source, tpf, false);
 			}
 		}));
-		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
-		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// moveForward(source, tpf);
-		// }
-		// }));
-		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.S), new TriggerAction() {
-		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// moveBack(source, tpf);
-		// }
-		// }));
-		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.A), new TriggerAction() {
-		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// turnLeft(source, tpf);
-		// }
-		// }));
-		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.D), new TriggerAction() {
-		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// turnRight(source, tpf);
-		// }
-		// }));
-		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Q), new TriggerAction() {
-		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// moveLeft(source, tpf);
-		// }
-		// }));
-		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.E), new TriggerAction() {
-		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// moveRight(source, tpf);
-		// }
-		// }));
-		//
-		// // logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
-		// // public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// // exit.exit();
-		// // }
-		// // }));
-		//
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				toggleRotation();
 			}
 		}));
-		//
-		// logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.U), new TriggerAction() {
-		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// toggleRotation();
-		// }
-		// }));
-		//
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				resetCamera(source);
@@ -810,11 +743,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		Camera camera = source.getCanvasRenderer().getCamera();
 		camera.setFrame(loc, left, up, dir);
-//		camera.lookAt(0, 0, 0, Vector3.UNIT_Z);
-
 		camera.setProjectionMode(ProjectionMode.Perspective);
-
-//		float scale = 0.5f;
 		resizeCamera(camera);
 	}
 
@@ -828,13 +757,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Camera camera = source.getCanvasRenderer().getCamera();
 		camera.setFrame(loc, left, up, dir);
 		camera.setProjectionMode(ProjectionMode.Parallel);
-//		float scale = 4;
-//		double ratio = (double) camera.getWidth() / camera.getHeight();
-//		camera.setFrustumTop(scale);
-//		camera.setFrustumBottom(-scale);
-//		camera.setFrustumLeft(-scale * ratio);
-//		camera.setFrustumRight(scale * ratio);
-//		camera.update();
 		resizeCamera(camera);
 	}
 
@@ -852,119 +774,31 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		rotAnim = !rotAnim;
 	}
 
-	// private void rotateUpDown(final Canvas canvas, final double speed) {
-	// final Camera camera = canvas.getCanvasRenderer().getCamera();
-	//
-	// final Vector3 temp = Vector3.fetchTempInstance();
-	// _incr.fromAngleNormalAxis(speed, camera.getLeft());
-	//
-	// _incr.applyPost(camera.getLeft(), temp);
-	// camera.setLeft(temp);
-	//
-	// _incr.applyPost(camera.getDirection(), temp);
-	// camera.setDirection(temp);
-	//
-	// _incr.applyPost(camera.getUp(), temp);
-	// camera.setUp(temp);
-	//
-	// Vector3.releaseTempInstance(temp);
-	//
-	// camera.normalize();
-	//
-	// }
-	//
-	// private void turnRight(final Canvas canvas, final double tpf) {
-	// turn(canvas, -TURN_SPEED * tpf);
-	// }
-	//
-	// private void turn(final Canvas canvas, final double speed) {
-	// final Camera camera = canvas.getCanvasRenderer().getCamera();
-	//
-	// final Vector3 temp = Vector3.fetchTempInstance();
-	// _incr.fromAngleNormalAxis(speed, camera.getUp());
-	//
-	// _incr.applyPost(camera.getLeft(), temp);
-	// camera.setLeft(temp);
-	//
-	// _incr.applyPost(camera.getDirection(), temp);
-	// camera.setDirection(temp);
-	//
-	// _incr.applyPost(camera.getUp(), temp);
-	// camera.setUp(temp);
-	// Vector3.releaseTempInstance(temp);
-	//
-	// camera.normalize();
-	// }
-	//
-	// private void turnLeft(final Canvas canvas, final double tpf) {
-	// turn(canvas, TURN_SPEED * tpf);
-	// }
-	//
 	 private void move(final Canvas canvas, final double tpf, int val) {
-	 final Camera camera = canvas.getCanvasRenderer().getCamera();
-	 final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
-	 final Vector3 dir = Vector3.fetchTempInstance();
-	 // if (camera.getProjectionMode() == ProjectionMode.Perspective) {
-	 // dir.set(camera.getDirection());
-	 // } else {
-	 // // move up if in parallel mode
-	 dir.set(camera.getDirection());
-	 // }
-	 dir.multiplyLocal(-val * MOVE_SPEED * 10 * tpf);
-	 loc.addLocal(dir);
-	 camera.setLocation(loc);
-	 Vector3.releaseTempInstance(loc);
-	 Vector3.releaseTempInstance(dir);
+		 final Camera camera = canvas.getCanvasRenderer().getCamera();
+		 final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
+		 final Vector3 dir = Vector3.fetchTempInstance();
+		 dir.set(camera.getDirection());
+		 dir.multiplyLocal(-val * MOVE_SPEED * 10 * tpf);
+		 loc.addLocal(dir);
+		 camera.setLocation(loc);
+		 Vector3.releaseTempInstance(loc);
+		 Vector3.releaseTempInstance(dir);
 	 }
 
 	private void moveUpDown(final Canvas canvas, final double tpf, boolean up) {
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
 		final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
 		final Vector3 dir = Vector3.fetchTempInstance();
-
 		dir.set(camera.getUp());
-
 		if (topView)
 			up = !up;
-
 		dir.multiplyLocal((up ? 1 : -1) * MOVE_SPEED * tpf);
 		loc.addLocal(dir);
 		camera.setLocation(loc);
 		Vector3.releaseTempInstance(loc);
 		Vector3.releaseTempInstance(dir);
 	}
-
-	//
-	// private void moveRight(final Canvas canvas, final double tpf) {
-	// final Camera camera = canvas.getCanvasRenderer().getCamera();
-	// final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
-	// final Vector3 dir = Vector3.fetchTempInstance();
-	//
-	// dir.set(camera.getLeft());
-	//
-	// dir.multiplyLocal(-MOVE_SPEED * tpf);
-	// loc.addLocal(dir);
-	// camera.setLocation(loc);
-	// Vector3.releaseTempInstance(loc);
-	// Vector3.releaseTempInstance(dir);
-	// }
-	//
-	// private void moveBack(final Canvas canvas, final double tpf) {
-	// final Camera camera = canvas.getCanvasRenderer().getCamera();
-	// final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
-	// final Vector3 dir = Vector3.fetchTempInstance();
-	// if (camera.getProjectionMode() == ProjectionMode.Perspective) {
-	// dir.set(camera.getDirection());
-	// } else {
-	// // move up if in parallel mode
-	// dir.set(camera.getUp());
-	// }
-	// dir.multiplyLocal(-MOVE_SPEED * tpf);
-	// loc.addLocal(dir);
-	// camera.setLocation(loc);
-	// Vector3.releaseTempInstance(loc);
-	// Vector3.releaseTempInstance(dir);
-	// }
 
 	public void setOperation(Operation operation) {
 		this.operation = operation;
@@ -976,6 +810,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			Foundation.setResizeHouseMode(false);
 		Scene.getInstance().drawResizeBounds();
 		drawn = newHousePart();
+		enableDisableMouseRotation();
 	}
 
 	private HousePart newHousePart() {
@@ -1010,7 +845,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return;
 		housePartsNode.detachChild(drawn.getRoot());
 		Scene.getInstance().remove(drawn);
-//		if (drawn instanceof Wall)
 		drawn.delete();
 	}
 
@@ -1075,13 +909,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			} else if (this.pickLayer != -1){
 				continue;
-//				objCounter++;
-//				prevHousePart = null;
 			}
 			if (this.pickLayer != -1 && objCounter != this.pickLayer)
 				continue;
 			Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
-//			Vector3 intersectionPoint = root.getTransform().applyInverse(pick.getIntersectionRecord().getIntersectionPoint(0));
 			PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
 			double polyDist_i = pick.getClosestDistance();
 			double pointDist_i = Double.MAX_VALUE;
@@ -1091,7 +922,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (userData.getHousePart() == drawn)
 						pointDist_i -= 0.1;
 					if (pointDist_i < pointDist && (userData.getPointIndex() != -1 || pickedHousePart == null || pickedHousePart.getUserData().getPointIndex() == -1)
-					// && (userData.getPointIndex() == -1 || pointDist < 0.5)
 					) {
 						pickedHousePart = picked_i;
 						polyDist = polyDist_i;
@@ -1105,9 +935,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				pointDist = pointDist_i;
 			}
 		}
-
-//		if (pickedHousePart.getUserData() == null)
-//			System.out.println(pickedHousePart);
 		return pickedHousePart;
 	}
 
@@ -1149,54 +976,25 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			passManager.remove(pssmPass);
 	}
 
-    private Node setupOccluders() {
-        final Node occluders = new Node("occs");
-        housePartsNode.attachChild(occluders);
-        for (int i = 0; i < 50; i++) {
-            final double w = Math.random() * 4 + 0;
-            final double y = Math.random() * 2 + 0;
-            final Box b = new Box("box", new Vector3(), w, y, w);
-            b.setModelBound(new BoundingBox());
-            final double x = Math.random() * 100 - 50;
-            final double z = Math.random() * 100 - 50;
-            b.setTranslation(new Vector3(x, z, 0));            
-            occluders.attachChild(b);
-        }
-
-//        final Torus torus = new Torus("torus", 64, 12, 10.0f, 1.0f);
-//        torus.setModelBound(new BoundingBox());
-//
-//        occluders.attachChild(torus);
-//
-//        torus.addController(new SpatialController<Torus>() {
-//            private static final long serialVersionUID = 1L;
-//            double timer = 0;
-//            Matrix3 rotation = new Matrix3();
-//
-//            public void update(final double time, final Torus caller) {
-//                timer += time;
-//                caller.setTranslation(Math.sin(timer) * 40.0, Math.sin(timer) * 50.0 + 20.0, Math.cos(timer) * 40.0);
-//                rotation.fromAngles(timer * 0.4, timer * 0.4, timer * 0.4);
-//                caller.setRotation(rotation);
-//            }
-//        });
-
-        return occluders;
-    }
-    
-    private void setupTerrain() {
-        final Box box = new Box("box", new Vector3(), 100, 100, 1);
-        box.setModelBound(new BoundingBox());
-//        root.attachChild(box);
-    }
-
 	public void setSunControl(boolean selected) {
-		this.sunControl = selected;		
+		this.sunControl = selected;
+		enableDisableMouseRotation();
 	}
 
 	public void setSunAnim(boolean selected) {
 		this.sunAnim = selected;
+	}
+	
+	public void enableDisableMouseRotation() {
+		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted()) && !topView)
+			control.setMouseRotateSpeed(0.005);		
+		else
+			control.setMouseRotateSpeed(0.000000001);
 		
+		if (sunControl)
+			control.setKeyRotateSpeed(0);
+		else
+			control.setKeyRotateSpeed(1);
 	}
     
 }

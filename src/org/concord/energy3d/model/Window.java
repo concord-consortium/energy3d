@@ -97,7 +97,8 @@ public class Window extends HousePart {
 				} else {
 					Vector3 wallFirstPoint = container.getPoints().get(0);
 					Vector3 wallx = container.getPoints().get(2).subtract(wallFirstPoint, null);
-					p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
+//					p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
+					p = closestPoint(abspoints.get(0), abspoints.get(0).add(wallx, null), x, y);
 					p.setZ(abspoints.get(0).getZ()); // + container.getPoints().get(0).getZ());
 					p = grid(p, GRID_SIZE);					
 				}
@@ -116,15 +117,16 @@ public class Window extends HousePart {
 				points.get(index).set(p_rel);
 //				System.out.println(height);
 				p.setZ(p.getZ() + height);
-				p_rel = toRelative(p);
-				points.get(index+1).set(p_rel); //.setZ(p.getZ() + height);
+				Vector3 p_rel_up = toRelative(p);
+				points.get(index+1).set(p_rel_up); //.setZ(p.getZ() + height);
 //				System.out.println("***" + (toAbsolute(points.get(1)).getZ() - toAbsolute(points.get(0)).getZ()));
 				
 				if (editPointIndex == 0 && points.size() != 2) {
 //					points.get(2).setZ(p.getZ());
 //					points.get(3).set(points.get(2)).setZ(p.getZ()+height);
 					points.get(2).setZ(p_rel.getZ());
-					points.get(3).setZ(p.getZ()+height);			
+//					points.get(3).setZ(p.getZ()+height);			
+					points.get(3).setZ(p_rel_up.getZ());
 				}
 				
 			}
@@ -135,8 +137,11 @@ public class Window extends HousePart {
 			Vector3 p = closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y);
 			p = grid(p, GRID_SIZE);
 			height = findHeight(absoluteBase, p); // + absoluteBase.getZ();
-			points.get(1).setZ(height + absoluteBase.getZ());
-			points.get(3).setZ(height + absoluteBase.getZ());
+//			points.get(1).setZ(height + absoluteBase.getZ());
+//			points.get(3).setZ(height + absoluteBase.getZ());
+			double rel_z = toRelative(absoluteBase.addLocal(0,0,height)).getZ();
+			points.get(1).setZ(rel_z);
+			points.get(3).setZ(rel_z);			
 //			points.set(1, getUpperPoint(points.get(1)));
 //			points.set(3, getUpperPoint(points.get(3)));
 		}

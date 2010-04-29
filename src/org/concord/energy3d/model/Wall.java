@@ -98,8 +98,8 @@ public class Wall extends HousePart {
 		
 		root.attachChild(windowsSurroundMesh);
 		windowsSurroundMesh.getMeshData().setIndexMode(IndexMode.Quads);
-		windowsSurroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(100));
-		windowsSurroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(100));
+		windowsSurroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
+		windowsSurroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(1000));
 		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		windowsSurroundMesh.setModelBound(null);
 		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);		
@@ -501,25 +501,20 @@ public class Wall extends HousePart {
 		normalBuffer.rewind();
 		vertexBuffer.limit(vertexBuffer.capacity());
 		normalBuffer.limit(vertexBuffer.capacity());
-		final int[] order = new int[] {0, 1, 3, 2, 0};
+		final int[] order1 = new int[] {0, 1, 3, 2, 0};
+		final int[] order2 = new int[] {2, 3, 1, 0, 2};
 		Vector3 sideNormal = thickness.cross(0, 0, 1, null).normalizeLocal();
 		Vector3 n = new Vector3();
 		Vector3 p = new Vector3();
+		final Vector3 wallDirection = abspoints.get(2).subtract(abspoints.get(0), null);
 		for (HousePart child : children) {
-			if (child instanceof Window && child.isFirstPointInserted()) {				
-//				boolean switchBackOrder = false;
+			if (child instanceof Window && child.isFirstPointInserted()) {
+				int[] order = order1;
+				Vector3 windowDirection = child.getPoints().get(2).subtract(child.getPoints().get(0), null);
+				if (windowDirection.dot(wallDirection) < 0)
+					order = order2;
 				for (int index = 0; index < order.length - 1; index ++) {
 					int i = order[index];
-//					p.set(child.getPoints().get(i));
-//					if (switchBackOrder)
-//						p.addLocal(thickness);					
-//					vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-//					p.set(child.getPoints().get(i));
-//					if (!switchBackOrder)
-//						p.addLocal(thickness);
-//					vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-//					switchBackOrder = !switchBackOrder;
-
 					p.set(child.getPoints().get(i));
 					vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 					p.set(child.getPoints().get(i)).addLocal(thickness);
@@ -530,7 +525,6 @@ public class Wall extends HousePart {
 					p.set(child.getPoints().get(i));
 					vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 					
-//					i = order[index];					
 					if (index == 1 || index == 3) {
 						int z = 1;
 						if (index == 1)
@@ -539,24 +533,18 @@ public class Wall extends HousePart {
 							z = -z;
 						for (int j=0; j<4; j++)
 							normalBuffer.put(0).put(0).put(z);
-//						normalBuffer.put(0).put(0).put(1);
 					} else if (index == 0 || index == 2) {
 						n.set(sideNormal);
-//						if (reversedThickness)
-//							n.negateLocal();
 						if (index == 2)
-							n.negateLocal();	
+							n.negateLocal();
 						for (int j=0; j<4; j++)
 							normalBuffer.put(n.getXf()).put(n.getYf()).put(n.getZf());
-//						normalBuffer.put(sideNormal.getXf()).put(sideNormal.getYf()).put(sideNormal.getZf());
 					}
 				}
-//				break;
 			}
 		}
 		int pos = vertexBuffer.position();
 		vertexBuffer.limit(pos != 0 ? pos : 1);
-		
 	}
 
 	public Snap next(Wall previous) {

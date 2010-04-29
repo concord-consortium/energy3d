@@ -3,6 +3,7 @@ package org.concord.energy3d;
 import java.awt.BorderLayout;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -17,8 +18,6 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
-import javax.swing.JButton;
-import java.awt.Dimension;
 
 
 public class MainFrame extends JFrame {
