@@ -151,10 +151,13 @@ Version 0.2
 - disable keyboard navigation automatically when sun control is selected 
 - fix problem with crashing when trying to insert a window in a wall that is parallel to y-axis
 - fix problem with offset between mouse pointer and 2nd window point when inserting a new window
-- Auto-disable mouse rotation instead of both mouse and keyword rotation when Select or Resize
+- auto-disable mouse rotation instead of both mouse and keyword rotation when Select or Resize
 - design a new startup scene with 2 buildings
 - reverse the cycle of window points when drawing surround mesh of those windows that are drawn backward
 - fix blooming effect on backgrounds without texture
+- sky re-added
+- auto-adjust height of the bounding box to the highest height of its children
+ 
 
 TODO:
 - combine the wall meshed into one

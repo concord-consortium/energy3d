@@ -250,7 +250,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		root.attachChild(createAxis());
 		root.attachChild(createFloor());
-//		root.attachChild(createSky());
+		root.attachChild(createSky());
 
 		// Wall w1 = testWall(0, 0, 0, 2);
 		// Wall w2 = testWall(0, 2, 2, 2);
@@ -333,7 +333,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		
 		
 		BloomRenderPass bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);		
-
+//		bloomRenderPass.setUseCurrentScene(true);
         if (!bloomRenderPass.isSupported()) {
             System.out.println("Bloom not supported!");
         } else {
@@ -470,7 +470,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private Mesh createSky() {
 		Dome sky = new Dome("Sky", 100, 100, 100);
-		sky.setRotation(new Quaternion(1, 0, 0, 1));
+//		sky.setRotation(new Quaternion(1, 0, 0, 1));
+		sky.setRotation(new Matrix3().fromAngles(Math.PI/2, 0, 0));
 //		Sphere sky = new Sphere("Sky", 100, 100, 100);
 //		sky.setTextureMode(TextureMode.Polar);
 //		sky.setTranslation(0, 0, 10);

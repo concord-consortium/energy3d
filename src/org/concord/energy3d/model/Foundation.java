@@ -38,7 +38,8 @@ public class Foundation extends HousePart {
 		super.init();
 		if (boundingHeight == 0)
 			boundingHeight = 2;
-		newBoundingHeight = boundingHeight;
+//		newBoundingHeight = boundingHeight;
+		newBoundingHeight = -1;
 		mesh = new Box("Foundation", new Vector3(), new Vector3());
 		boundingMesh = new Box("Foundation (Bounding)", new Vector3(), new Vector3());
 		root.attachChild(mesh);
@@ -169,13 +170,14 @@ public class Foundation extends HousePart {
 
 	@Override
 	public void draw() {
+		if (resizeHouseMode) {
+			adjustBoundingHeight();
+			root.attachChild(boundingMesh);
+		} else
+			root.detachChild(boundingMesh);
 		super.draw();
 		boolean drawable = points.size() == 8;
 
-		if (resizeHouseMode)
-			root.attachChild(boundingMesh);
-		else
-			root.detachChild(boundingMesh);
 
 		// for (int i = 0; i < points.size(); i++) {
 		// Vector3 p = points.get(i);
@@ -189,6 +191,20 @@ public class Foundation extends HousePart {
 			boundingMesh.setData(points.get(0), points.get(7));
 			boundingMesh.updateModelBound();
 		}
+	}
+	
+	private void adjustBoundingHeight() {
+		boundingHeight = 0;
+		for (HousePart child : children) {
+			for (Vector3 p : child.getPoints()) {
+				boundingHeight = Math.max(boundingHeight, p.getZ());
+			}
+		}
+		boundingHeight += 0.5;
+		for (int i = 4; i < 8; i++)
+			points.get(i).setZ(boundingHeight);
+		if (newBoundingHeight == -1)
+			newBoundingHeight = boundingHeight;
 	}
 
 }
