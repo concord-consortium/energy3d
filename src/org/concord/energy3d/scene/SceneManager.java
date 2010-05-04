@@ -56,7 +56,6 @@ import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
@@ -805,10 +804,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.operation = operation;
 		if (drawn != null && !drawn.isDrawCompleted())
 			removeHousePart(drawn);
-		if (operation == Operation.RESIZE) {
-			Foundation.setResizeHouseMode(true);
-		} else
-			Foundation.setResizeHouseMode(false);
+//		if (operation == Operation.RESIZE) {
+//			Foundation.setResizeHouseMode(true);
+//		} else
+//			Foundation.setResizeHouseMode(false);
+		for (HousePart part : Scene.getInstance().getParts())
+			if (part instanceof Foundation) {
+				((Foundation)part).setResizeHouseMode(operation == Operation.RESIZE);
+			}
 		Scene.getInstance().drawResizeBounds();
 		drawn = newHousePart();
 		enableDisableMouseRotation();

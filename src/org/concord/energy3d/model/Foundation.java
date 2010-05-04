@@ -14,20 +14,12 @@ import com.ardor3d.util.TextureManager;
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.5;
-	private static boolean resizeHouseMode = false;
+	private transient boolean resizeHouseMode = false;
 	// private double height = 0.1;
 	private transient Box mesh; // = new Box("Foundation", new Vector3(), new Vector3());
 	private transient Box boundingMesh;
 	private double boundingHeight;
 	private transient double newBoundingHeight;
-
-	public static void setResizeHouseMode(boolean resizeHouseMode) {
-		Foundation.resizeHouseMode = resizeHouseMode;
-	}
-
-	public static boolean isResizeHouseMode() {
-		return resizeHouseMode;
-	}
 
 	public Foundation() {
 		super(2, 8);
@@ -36,6 +28,7 @@ public class Foundation extends HousePart {
 
 	protected void init() {
 		super.init();
+		resizeHouseMode = false;
 		if (boundingHeight == 0)
 			boundingHeight = 2;
 //		newBoundingHeight = boundingHeight;
@@ -59,6 +52,19 @@ public class Foundation extends HousePart {
 		boundingMesh.setUserData(userData);
 	}
 
+	public void setResizeHouseMode(boolean resizeHouseMode) {
+		this.resizeHouseMode = resizeHouseMode;
+		if (resizeHouseMode) {
+			adjustBoundingHeight();
+			root.attachChild(boundingMesh);
+		} else
+			root.detachChild(boundingMesh);		
+	}
+	
+	public boolean isResizeHouseMode() {
+		return resizeHouseMode;
+	}
+	
 	// @Override
 	// public void addPoint(int x, int y) {
 	// if (drawCompleted)
@@ -154,7 +160,7 @@ public class Foundation extends HousePart {
 	}
 
 	private void applyNewHeight(double oldHeight, double newHeight) {
-		System.out.println("h2 = " + newHeight);
+		System.out.println("newH = " + newHeight + ", oldH = " + oldHeight);
 		for (HousePart child : children) {
 			if (child instanceof Wall) {
 				Wall wall = (Wall) child;
@@ -170,11 +176,11 @@ public class Foundation extends HousePart {
 
 	@Override
 	public void draw() {
-		if (resizeHouseMode) {
-			adjustBoundingHeight();
-			root.attachChild(boundingMesh);
-		} else
-			root.detachChild(boundingMesh);
+//		if (resizeHouseMode) {
+//			adjustBoundingHeight();
+//			root.attachChild(boundingMesh);
+//		} else
+//			root.detachChild(boundingMesh);
 		super.draw();
 		boolean drawable = points.size() == 8;
 
