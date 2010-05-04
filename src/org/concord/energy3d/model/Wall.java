@@ -204,12 +204,17 @@ public class Wall extends HousePart {
 			points.set(3, getUpperPoint(points.get(3)));
 
 		}
+		
+//		if (editPointIndex != -1)
+//			for (HousePart child : children)
+//				child.recalculateRelativePoints();
+		
 		draw();
 		showPoints();
 
 		for (Snap neighbor : this.neighbors)
 			if (neighbor != null)
-				neighbor.getNeighbor().draw();
+				neighbor.getNeighbor().draw();		
 
 	}
 

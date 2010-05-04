@@ -283,10 +283,10 @@ public abstract class HousePart implements Serializable {
 	protected Vector3 toAbsolute(Vector3 p) {
 		if (container == null)
 			return p;
-		ArrayList<Vector3> wallPoints = container.getPoints();
-		Vector3 origin = wallPoints.get(0);
-		Vector3 wallx = wallPoints.get(2).subtract(origin, null); //.normalize(null);
-		Vector3 wally = wallPoints.get(1).subtract(origin, null); //.normalize(null);
+		ArrayList<Vector3> containerPoints = container.getPoints();
+		Vector3 origin = containerPoints.get(0);
+		Vector3 wallx = containerPoints.get(2).subtract(origin, null); //.normalize(null);
+		Vector3 wally = containerPoints.get(1).subtract(origin, null); //.normalize(null);
 //		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply(p.getZ(), null), null);
 		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
 		if (relativeToHorizontal)
@@ -419,5 +419,11 @@ public abstract class HousePart implements Serializable {
 			abspoints.get(i).set(p);
 		}		
 	}
+
+//	public void recalculateRelativePoints() {
+//		for (int i=0; i<points.size(); i++) {
+//			points.get(i).set(toRelative(abspoints.get(i)));
+//		}
+//	}
 
 }

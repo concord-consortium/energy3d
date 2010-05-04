@@ -139,6 +139,11 @@ public class Foundation extends HousePart {
 			for (int i = 0; i < 4; i++)
 				points.get(i + 4).set(points.get(i)).setZ(newBoundingHeight);
 		}
+		
+//		if (editPointIndex != -1)
+//			for (HousePart child : children)
+//				child.recalculateRelativePoints();
+		
 		draw();
 		showPoints();
 

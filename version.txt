@@ -154,6 +154,7 @@ Version 0.2
 - Auto-disable mouse rotation instead of both mouse and keyword rotation when Select or Resize
 - design a new startup scene with 2 buildings
 - reverse the cycle of window points when drawing surround mesh of those windows that are drawn backward
+- fix blooming effect on backgrounds without texture
 
 TODO:
 - combine the wall meshed into one

@@ -251,7 +251,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		root.attachChild(createAxis());
 		root.attachChild(createFloor());
 //		root.attachChild(createSky());
-		root.attachChild(createSunHeliodon());
 
 		// Wall w1 = testWall(0, 0, 0, 2);
 		// Wall w2 = testWall(0, 2, 2, 2);
@@ -275,6 +274,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //        passManager.add(pssmPass);
 //        passManager.add(renderPass);        
 
+        root.attachChild(createSunHeliodon());
 		Scene.getInstance();
 
 		registerInputTriggers();
