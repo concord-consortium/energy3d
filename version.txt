@@ -157,7 +157,9 @@ Version 0.2
 - fix blooming effect on backgrounds without texture
 - sky re-added
 - auto-adjust height of the bounding box to the highest height of its children
-- fixed problem with adjusting vertical scale due to overriding mouse value 
+- fixed problem with adjusting vertical scale due to overriding mouse value
+- fixed problem with not remembering the previous wall height when resizing house
+- prevent other edit points from being selectable when in resize mode 
 
 TODO:
 - combine the wall meshed into one

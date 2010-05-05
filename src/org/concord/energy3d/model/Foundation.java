@@ -32,7 +32,7 @@ public class Foundation extends HousePart {
 		if (boundingHeight == 0)
 			boundingHeight = 2;
 //		newBoundingHeight = boundingHeight;
-		newBoundingHeight = -1;
+//		newBoundingHeight = -1;
 		mesh = new Box("Foundation", new Vector3(), new Vector3());
 		boundingMesh = new Box("Foundation (Bounding)", new Vector3(), new Vector3());
 		root.attachChild(mesh);
@@ -98,8 +98,13 @@ public class Foundation extends HousePart {
 	@Override
 	public void addChild(HousePart housePart) {
 		super.addChild(housePart);
-		boundingHeight = newBoundingHeight;
+		applyNewHeight(boundingHeight, newBoundingHeight, true);		
 	}
+	
+	public void complete() {
+		super.complete();
+		applyNewHeight(boundingHeight, newBoundingHeight, true);
+	}	
 
 	@Override
 	public void setPreviewPoint(int x, int y) {
@@ -140,7 +145,7 @@ public class Foundation extends HousePart {
 //				if (snap == null)
 					closestPoint = grid(closestPoint, GRID_SIZE);
 				newBoundingHeight = findHeight(base, closestPoint);
-				applyNewHeight(boundingHeight, newBoundingHeight);
+				applyNewHeight(boundingHeight, newBoundingHeight, false);
 //				boundingHeight = newHeight;
 			}
 			for (int i = 0; i < 4; i++)
@@ -159,7 +164,7 @@ public class Foundation extends HousePart {
 
 	}
 
-	private void applyNewHeight(double oldHeight, double newHeight) {
+	private void applyNewHeight(double oldHeight, double newHeight, boolean finalize) {
 		System.out.println("newH = " + newHeight + ", oldH = " + oldHeight);
 		for (HousePart child : children) {
 			if (child instanceof Wall) {
@@ -167,11 +172,12 @@ public class Foundation extends HousePart {
 //				System.out.println("h = " + wall.getHeight());
 				System.out.println("fac = " + newHeight / oldHeight);
 //				wall.setHeight(newHeight);
-				wall.setHeight(wall.getHeight() * newHeight / oldHeight);
+				wall.setHeight(wall.getHeight() * newHeight / oldHeight, finalize);
 //				System.out.println("h2 = " + wall.getHeight());
 			}
 		}
-
+		if (finalize)
+			boundingHeight = newHeight;
 	}
 
 	@Override
@@ -209,7 +215,7 @@ public class Foundation extends HousePart {
 		boundingHeight += 0.5;
 		for (int i = 4; i < 8; i++)
 			points.get(i).setZ(boundingHeight);
-		if (newBoundingHeight == -1)
+//		if (newBoundingHeight == -1)
 			newBoundingHeight = boundingHeight;
 	}
 

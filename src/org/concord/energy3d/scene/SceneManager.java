@@ -588,7 +588,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				int y = mouseState.getY();
 				if (drawn != null && !drawn.isDrawCompleted()) {
 					drawn.setPreviewPoint(x, y);
-				} else {
+				} else if (operation == Operation.SELECT){
 					selectHousePart(x, y, false);
 				}
 				enableDisableMouseRotation();

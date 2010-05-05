@@ -588,7 +588,10 @@ public class Wall extends HousePart {
 				((Wall) neighbors[i].getNeighbor()).setNeighbor(neighbors[i].getNeighborPointIndex(), null, false); // .removeNeighbor(this);
 	}
 
-	public void setHeight(double newHeight) {
+	public void setHeight(double newHeight, boolean finalize) {
+		if (finalize)
+			this.height = newHeight; // - points.get(0).getZ();
+		System.out.println("wall.height = " + height);
 		points.get(1).setZ(newHeight);
 		points.get(3).setZ(newHeight);
 		draw();		
