@@ -589,12 +589,13 @@ public class Wall extends HousePart {
 	}
 
 	public void setHeight(double newHeight, boolean finalize) {
-		if (finalize)
-			this.height = newHeight; // - points.get(0).getZ();
-		System.out.println("wall.height = " + height);
+		super.setHeight(newHeight, finalize);
 		points.get(1).setZ(newHeight);
 		points.get(3).setZ(newHeight);
 		draw();		
+//		for (HousePart child : children)
+//			if (child instanceof Floor)
+//				child.setHeight(newHeight, finalize);
 	}
 
 }

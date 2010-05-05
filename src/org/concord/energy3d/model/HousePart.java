@@ -33,6 +33,7 @@ public abstract class HousePart implements Serializable {
 	private boolean firstPointInserted = false;
 	protected transient ArrayList<Vector3> abspoints;
 	protected double height;
+	protected transient double orgHeight;
 	protected boolean relativeToHorizontal;
 
 	public static boolean isSnapToObjects() {
@@ -68,6 +69,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void init() {
+		orgHeight = height;
 		abspoints = new ArrayList<Vector3>(numOfEditPoints);
 		for (int i = 0; i < points.size(); i++)
 			abspoints.add(points.get(i).clone());
@@ -134,9 +136,19 @@ public abstract class HousePart implements Serializable {
 		return children.remove(housePart);
 	}
 
-	public double getHeight() {
-		return height;
+	public ArrayList<HousePart> getChildren() {
+		return children;
 	}
+	
+	public double getHeight() {
+		return orgHeight;
+	}
+
+	public void setHeight(double newHeight, boolean finalize) {
+			this.height = newHeight;
+			if (finalize)
+				this.orgHeight = newHeight;
+		}
 
 	public void showPoints() {
 		for (int i = 0; i < points.size(); i++)
@@ -404,7 +416,7 @@ public abstract class HousePart implements Serializable {
 
 	public void delete() {
 
-	}
+	}	
 
 	public abstract void setPreviewPoint(int x, int y);
 

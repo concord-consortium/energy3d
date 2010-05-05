@@ -1,5 +1,7 @@
 package org.concord.energy3d.model;
 
+import java.util.ArrayList;
+
 import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.image.Texture;
@@ -166,18 +168,22 @@ public class Foundation extends HousePart {
 
 	private void applyNewHeight(double oldHeight, double newHeight, boolean finalize) {
 		System.out.println("newH = " + newHeight + ", oldH = " + oldHeight);
-		for (HousePart child : children) {
-			if (child instanceof Wall) {
-				Wall wall = (Wall) child;
-//				System.out.println("h = " + wall.getHeight());
-				System.out.println("fac = " + newHeight / oldHeight);
-//				wall.setHeight(newHeight);
-				wall.setHeight(wall.getHeight() * newHeight / oldHeight, finalize);
-//				System.out.println("h2 = " + wall.getHeight());
-			}
-		}
+		double scale = newHeight / oldHeight;
+		System.out.println("fac = " + scale);
+		
+//		ArrayList<HousePart> children = this.children;
+		applyNewHeight(children, scale, finalize);
 		if (finalize)
 			boundingHeight = newHeight;
+	}
+
+	private void applyNewHeight(ArrayList<HousePart> children, double scale, boolean finalize) {
+		for (HousePart child : children) {
+			if (child instanceof Wall || child instanceof Floor || child instanceof Roof) {
+				child.setHeight(child.getHeight() * scale, finalize);	
+				applyNewHeight(child.getChildren(), scale, finalize);
+			}
+		}
 	}
 
 	@Override

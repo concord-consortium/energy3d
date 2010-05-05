@@ -130,5 +130,11 @@ public class Floor extends HousePart {
 			p.set(p.getX(), p.getY(), height);
 		}
 	}
+	
+	public void setHeight(double newHeight, boolean finalize) {
+		super.setHeight(newHeight, finalize);
+//		points.get(0).setZ(newHeight);
+		draw();		
+	}	
 
 }

@@ -160,6 +160,9 @@ Version 0.2
 - fixed problem with adjusting vertical scale due to overriding mouse value
 - fixed problem with not remembering the previous wall height when resizing house
 - prevent other edit points from being selectable when in resize mode 
+- resize roof
+- resize floors
+
 
 TODO:
 - combine the wall meshed into one
