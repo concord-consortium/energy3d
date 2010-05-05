@@ -106,7 +106,7 @@ public class Door extends HousePart {
 				Vector3 wallFirstPoint = container.getPoints().get(0);
 				Vector3 wallx = container.getPoints().get(2).subtract(wallFirstPoint, null);
 				p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
-				p = grid(p, GRID_SIZE);
+				p = grid(p, GRID_SIZE, false);
 				// p = snap(p);
 				// convert from absolute coordinates to relative-to-wall coordinates
 				p = toRelative(p);
