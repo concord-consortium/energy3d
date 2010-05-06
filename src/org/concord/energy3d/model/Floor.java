@@ -29,8 +29,8 @@ public class Floor extends HousePart {
 //	private transient Vector3 avg;
 
 	public Floor() {
-		super(1, 1);
-		height = 0.5;
+		super(1, 1, 0.5);
+//		height = 0.5;
 	}
 
 	protected void init() {

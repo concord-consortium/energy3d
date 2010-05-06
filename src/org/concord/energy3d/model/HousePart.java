@@ -19,6 +19,7 @@ import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private static double flattenPos = 3;
 	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = false;	
 	protected transient Node root; // = new Node();
@@ -35,6 +36,7 @@ public abstract class HousePart implements Serializable {
 	protected double height;
 	protected transient double orgHeight;
 	protected boolean relativeToHorizontal;
+	private double pos;
 
 	public static boolean isSnapToObjects() {
 		return snapToObjects;
@@ -52,15 +54,16 @@ public abstract class HousePart implements Serializable {
 		HousePart.snapToGrids = snapToGrid;
 	}
 	
-	public HousePart(int numOfDrawPoints, int numOfEditPoints) {		
-		this(numOfDrawPoints, numOfEditPoints, false);
+	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height) {		
+		this(numOfDrawPoints, numOfEditPoints, height, false);
 	}
 
-	public HousePart(int numOfDrawPoints, int numOfEditPoints, boolean relativeToHorizontal) {
+	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height, boolean relativeToHorizontal) {
 		// System.out.println("Creating " + this + "...");
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
-		this.relativeToHorizontal = relativeToHorizontal;
+		this.height = this.orgHeight = height;
+		this.relativeToHorizontal = relativeToHorizontal;		
 		points = new ArrayList<Vector3>(numOfEditPoints);
 		init();
 
@@ -69,6 +72,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void init() {
+		pos = flattenPos++;
 		orgHeight = height;
 		abspoints = new ArrayList<Vector3>(numOfEditPoints);
 		for (int i = 0; i < points.size(); i++)
@@ -429,7 +433,9 @@ public abstract class HousePart implements Serializable {
 			p = toAbsolute(p);
 			pointsRoot.getChild(i).setTranslation(p);
 			abspoints.get(i).set(p);
-		}		
+		}	
+		
+//		flatten();
 	}
 
 //	public void recalculateRelativePoints() {
@@ -437,5 +443,9 @@ public abstract class HousePart implements Serializable {
 //			points.get(i).set(toRelative(abspoints.get(i)));
 //		}
 //	}
+	
+	private void flatten() {
+		root.setTranslation(pos, 0, 0);
+	}
 
 }

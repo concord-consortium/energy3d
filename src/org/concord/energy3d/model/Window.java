@@ -24,8 +24,8 @@ public class Window extends HousePart {
 	private transient FloatBuffer normalBuffer;
 
 	public Window() {
-		super(2, 4);
-		height = 0.30;
+		super(2, 4, 0.30);
+//		height = 0.30;
 	}
 
 	protected void init() {

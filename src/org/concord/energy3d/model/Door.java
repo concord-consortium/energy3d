@@ -30,8 +30,8 @@ public class Door extends HousePart {
 //	protected transient ArrayList<Vector3> abspoints;
 
 	public Door() {
-		super(2, 4);
-		height = defaultDoorHeight;
+		super(2, 4, defaultDoorHeight);
+//		height = defaultDoorHeight;
 
 //		allocateNewPoint();
 	}

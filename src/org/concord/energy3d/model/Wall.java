@@ -55,8 +55,8 @@ public class Wall extends HousePart {
 	
 
 	public Wall() {
-		super(2, 4, true);
-		height = defaultWallHeight;
+		super(2, 4, defaultWallHeight, true);
+//		height = defaultWallHeight;
 	}
 
 	protected void init() {
@@ -591,7 +591,8 @@ public class Wall extends HousePart {
 	public void setHeight(double newHeight, boolean finalize) {
 		super.setHeight(newHeight, finalize);
 		points.get(1).setZ(newHeight);
-		points.get(3).setZ(newHeight);
+		if (isFirstPointInserted())
+			points.get(3).setZ(newHeight);
 		draw();		
 //		for (HousePart child : children)
 //			if (child instanceof Floor)

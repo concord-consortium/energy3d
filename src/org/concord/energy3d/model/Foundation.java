@@ -24,8 +24,8 @@ public class Foundation extends HousePart {
 	private transient double newBoundingHeight;
 
 	public Foundation() {
-		super(2, 8);
-		height = 0.1;
+		super(2, 8, 0.1);
+//		height = orgHeight = 0.1;
 	}
 
 	protected void init() {
@@ -99,8 +99,8 @@ public class Foundation extends HousePart {
 	
 	@Override
 	public void addChild(HousePart housePart) {
-		super.addChild(housePart);
-		applyNewHeight(boundingHeight, newBoundingHeight, true);		
+		super.addChild(housePart);		
+//		applyNewHeight(boundingHeight, newBoundingHeight, true);		
 	}
 	
 	public void complete() {

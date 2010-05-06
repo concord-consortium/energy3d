@@ -249,7 +249,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		root.attachChild(createAxis());
 		root.attachChild(createFloor());
-		root.attachChild(createSky());
+//		root.attachChild(createSky());
 
 		// Wall w1 = testWall(0, 0, 0, 2);
 		// Wall w2 = testWall(0, 2, 2, 2);
@@ -364,7 +364,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					e.printStackTrace();
 				}
 				Thread.yield();
-
 			}
 			// grab the graphics context so cleanup will work out.
 			canvas.getCanvasRenderer().setCurrentContext();
@@ -540,7 +539,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		control.setupKeyboardTriggers(logicalLayer);
 		control.setupMouseTriggers(logicalLayer, true);
 		control.setMoveSpeed(MOVE_SPEED);
-		control.setKeyRotateSpeed(1);		
+		control.setKeyRotateSpeed(1);
 		
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
@@ -566,7 +565,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					return;
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-					if (drawn != null)
+					if (drawn != null && !drawn.isDrawCompleted())
 						drawn.complete();
 					return;
 				}
