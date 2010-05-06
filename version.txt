@@ -165,6 +165,8 @@ Version 0.2
 - fixed issued with inserting door at z=0 when grid snap is enabled
 - force initialization of height in HousePart constructor
 - fix door problem in load model
+- flatten walls + doors + windows for printing
+- flatten foundation for printing
 
 TODO:
 - combine the wall meshed into one

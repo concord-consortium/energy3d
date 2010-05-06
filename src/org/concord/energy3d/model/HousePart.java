@@ -19,7 +19,7 @@ import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private static double flattenPos = 3;
+	private static double flattenPos = 0;
 	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = false;	
 	protected transient Node root; // = new Node();
@@ -36,7 +36,7 @@ public abstract class HousePart implements Serializable {
 	protected double height;
 	protected transient double orgHeight;
 	protected boolean relativeToHorizontal;
-	private double pos;
+	protected double pos;
 
 	public static boolean isSnapToObjects() {
 		return snapToObjects;
@@ -72,7 +72,8 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void init() {
-		pos = flattenPos++;
+		pos = flattenPos;
+		flattenPos += 3;
 		orgHeight = height;
 		abspoints = new ArrayList<Vector3>(numOfEditPoints);
 		for (int i = 0; i < points.size(); i++)
@@ -309,6 +310,7 @@ public abstract class HousePart implements Serializable {
 			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
 //		else
 //			pointOnSpace.setY(pointOnSpace.getZ() + p.getY());
+//		pointOnSpace = container.getRoot().getTransform().applyForward(pointOnSpace);
 		return pointOnSpace;
 	}
 
@@ -435,7 +437,7 @@ public abstract class HousePart implements Serializable {
 			abspoints.get(i).set(p);
 		}	
 		
-//		flatten();
+		flatten();
 	}
 
 //	public void recalculateRelativePoints() {
@@ -444,8 +446,11 @@ public abstract class HousePart implements Serializable {
 //		}
 //	}
 	
-	private void flatten() {
-		root.setTranslation(pos, 0, 0);
+	protected void flatten() {
+//		root.setTranslation(pos, 0, 0);
+//		for (int i = 0; i < points.size(); i++) {
+//			abspoints.get(i).setY(0);
+//		}		
 	}
 
 }

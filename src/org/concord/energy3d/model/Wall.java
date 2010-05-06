@@ -18,6 +18,7 @@ import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
@@ -328,11 +329,11 @@ public class Wall extends HousePart {
 				ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
 				mesh.getMeshData().updateVertexCount();
 
-				Vector3 n = drawBackMesh(polygon, fromXY);
+//				Vector3 n = drawBackMesh(polygon, fromXY);
 
-				drawSurroundMesh(n);
+//				drawSurroundMesh(n);
 				
-				drawWindowsSurroundMesh(n);
+//				drawWindowsSurroundMesh(n);
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -598,5 +599,19 @@ public class Wall extends HousePart {
 //			if (child instanceof Floor)
 //				child.setHeight(newHeight, finalize);
 	}
+	
+	protected void flatten() {		
+		Vector3 wallx = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
+		double angle = wallx.smallestAngleBetween(Vector3.UNIT_X);
+		root.setRotation((new Matrix3().fromAngles(0, 0, -angle)));
+//		double y = 0;
+//		for (int i = 0; i < points.size(); i++) {
+//			y += abspoints.get(i).getY();
+//		}	
+//		root.getTransform().applyForward(abspoints.get(0)).getY()
+		double y = -root.getTransform().applyForward(abspoints.get(0).clone()).getY();
+		root.setTranslation(pos, y, 0);
+	}
+	
 
 }

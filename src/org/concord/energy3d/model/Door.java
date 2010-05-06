@@ -200,6 +200,9 @@ public class Door extends HousePart {
 //			else
 //				abspoints.add(p);
 			abspoints.get(i).set(p);
+			
+			container.getRoot().getTransform().applyForward(p);
+			
 			if (drawable)
 				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
