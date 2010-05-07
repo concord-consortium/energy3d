@@ -167,6 +167,10 @@ Version 0.2
 - fix door problem in load model
 - flatten walls + doors + windows for printing
 - flatten foundation for printing
+- print preview
+- animate print preview as the house decomposes into its components 
+- add menu items including Print menu item
+
 
 TODO:
 - combine the wall meshed into one

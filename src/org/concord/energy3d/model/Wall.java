@@ -329,11 +329,11 @@ public class Wall extends HousePart {
 				ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
 				mesh.getMeshData().updateVertexCount();
 
-//				Vector3 n = drawBackMesh(polygon, fromXY);
-
-//				drawSurroundMesh(n);
-				
-//				drawWindowsSurroundMesh(n);
+//				if (!isFlatten()) {
+					Vector3 n = drawBackMesh(polygon, fromXY);
+					drawSurroundMesh(n);
+					drawWindowsSurroundMesh(n);
+//				}
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -603,14 +603,16 @@ public class Wall extends HousePart {
 	protected void flatten() {		
 		Vector3 wallx = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
 		double angle = wallx.smallestAngleBetween(Vector3.UNIT_X);
-		root.setRotation((new Matrix3().fromAngles(0, 0, -angle)));
+		root.setRotation((new Matrix3().fromAngles(0, 0, -flattenTime * angle)));
 //		double y = 0;
 //		for (int i = 0; i < points.size(); i++) {
 //			y += abspoints.get(i).getY();
 //		}	
 //		root.getTransform().applyForward(abspoints.get(0)).getY()
+		root.setTranslation(0,0,0);
 		double y = -root.getTransform().applyForward(abspoints.get(0).clone()).getY();
-		root.setTranslation(pos, y, 0);
+//		root.setTranslation(pos, y, 0);
+		root.setTranslation(flattenTime * 5*(int) (pos / 3), flattenTime * y, flattenTime * 3*(pos % 3));
 	}
 	
 

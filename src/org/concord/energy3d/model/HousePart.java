@@ -19,6 +19,8 @@ import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private static boolean flatten = false;
+	protected static double flattenTime = 0;
 	private static double flattenPos = 0;
 	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = false;	
@@ -37,6 +39,26 @@ public abstract class HousePart implements Serializable {
 	protected transient double orgHeight;
 	protected boolean relativeToHorizontal;
 	protected double pos;
+
+	public static void setFlatten(boolean flatten) {
+		HousePart.flatten = flatten;
+	}
+
+	public static boolean isFlatten() {
+		return flatten;
+	}
+
+	public static void setFlattenTime(double flattenTime) {
+		if (flattenTime < 0)
+			flattenTime = 0;
+		if (flattenTime > 1)
+			flattenTime = 1;
+		HousePart.flattenTime = flattenTime;
+	}
+
+	public static double getFlattenTime() {
+		return flattenTime;
+	}
 
 	public static boolean isSnapToObjects() {
 		return snapToObjects;
@@ -72,8 +94,10 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void init() {
+		if (!(this instanceof Window || this instanceof Door)) {
 		pos = flattenPos;
-		flattenPos += 3;
+		flattenPos += 1;
+		}
 		orgHeight = height;
 		abspoints = new ArrayList<Vector3>(numOfEditPoints);
 		for (int i = 0; i < points.size(); i++)
@@ -437,7 +461,8 @@ public abstract class HousePart implements Serializable {
 			abspoints.get(i).set(p);
 		}	
 		
-		flatten();
+		if (flatten)
+			flatten();
 	}
 
 //	public void recalculateRelativePoints() {

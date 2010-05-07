@@ -18,6 +18,8 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
+import javax.swing.JMenuItem;
+import javax.swing.JCheckBoxMenuItem;
 
 
 public class MainFrame extends JFrame {
@@ -35,9 +37,6 @@ public class MainFrame extends JFrame {
 	private JToggleButton foundationButton = null;
 	private JToggleButton lightButton = null;
 	private JToggleButton topViewButton = null;
-	private JButton saveButton = null;
-	private JButton newButton = null;
-	private JButton openButton = null;
 	private JToggleButton rotAnimButton = null;
 	private JToggleButton gridButton = null;
 	private JToggleButton snapButton = null;
@@ -46,7 +45,11 @@ public class MainFrame extends JFrame {
 	private JToggleButton resizeButton = null;
 	private JToggleButton sunButton = null;
 	private JToggleButton sunAnimButton = null;
-
+	private JMenuItem newMenuItem = null;
+	private JMenuItem openMenuItem = null;
+	private JMenuItem saveMenuItem = null;
+	private JMenuItem printMenuItem = null;
+	private JCheckBoxMenuItem previewMenuItem = null;
 	/**
 	 * This method initializes appMenuBar	
 	 * 	
@@ -69,6 +72,11 @@ public class MainFrame extends JFrame {
 		if (fileMenu == null) {
 			fileMenu = new JMenu();
 			fileMenu.setText("File");
+			fileMenu.add(getNewMenuItem());
+			fileMenu.add(getOpenMenuItem());
+			fileMenu.add(getSaveMenuItem());
+			fileMenu.add(getPreviewMenuItem());
+			fileMenu.add(getPrintMenuItem());
 		}
 		return fileMenu;
 	}
@@ -81,10 +89,6 @@ public class MainFrame extends JFrame {
 	private JToolBar getAppToolbar() {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
-			appToolbar.add(getNewButton());
-			appToolbar.add(getOpenButton());
-			appToolbar.add(getSaveButton());
-			appToolbar.addSeparator();
 			appToolbar.add(getSelectButton());
 			appToolbar.add(getResizeButton());
 			appToolbar.addSeparator();
@@ -268,60 +272,6 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes saveButton	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getSaveButton() {
-		if (saveButton == null) {
-			saveButton = new JButton();
-			saveButton.setText("Save");
-			saveButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					Scene.getInstance().save();
-				}
-			});
-		}
-		return saveButton;
-	}
-
-	/**
-	 * This method initializes newButton	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getNewButton() {
-		if (newButton == null) {
-			newButton = new JButton();
-			newButton.setText("New");
-			newButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					Scene.getInstance().newFile();
-				}
-			});
-		}
-		return newButton;
-	}
-
-	/**
-	 * This method initializes openButton	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getOpenButton() {
-		if (openButton == null) {
-			openButton = new JButton();
-			openButton.setText("Open");
-			openButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					Scene.open();
-				}
-			});
-		}
-		return openButton;
-	}
-
-	/**
 	 * This method initializes rotAnimButton	
 	 * 	
 	 * @return javax.swing.JToggleButton	
@@ -464,6 +414,91 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return sunAnimButton;
+	}
+
+	/**
+	 * This method initializes newMenuItem	
+	 * 	
+	 * @return javax.swing.JMenuItem	
+	 */
+	private JMenuItem getNewMenuItem() {
+		if (newMenuItem == null) {
+			newMenuItem = new JMenuItem("New");
+			newMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					Scene.getInstance().newFile();
+				}
+			});
+		}
+		return newMenuItem;
+	}
+
+	/**
+	 * This method initializes openMenuItem	
+	 * 	
+	 * @return javax.swing.JMenuItem	
+	 */
+	private JMenuItem getOpenMenuItem() {
+		if (openMenuItem == null) {
+			openMenuItem = new JMenuItem("Open");
+			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					Scene.open();
+				}
+			});
+		}
+		return openMenuItem;
+	}
+
+	/**
+	 * This method initializes saveMenuItem	
+	 * 	
+	 * @return javax.swing.JMenuItem	
+	 */
+	private JMenuItem getSaveMenuItem() {
+		if (saveMenuItem == null) {
+			saveMenuItem = new JMenuItem("Save");
+			saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					Scene.getInstance().save();
+				}
+			});
+		}
+		return saveMenuItem;
+	}
+
+	/**
+	 * This method initializes printMenuItem	
+	 * 	
+	 * @return javax.swing.JMenuItem	
+	 */
+	private JMenuItem getPrintMenuItem() {
+		if (printMenuItem == null) {
+			printMenuItem = new JMenuItem("Print");
+			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					
+				}
+			});
+		}
+		return printMenuItem;
+	}
+
+	/**
+	 * This method initializes previewMenuItem	
+	 * 	
+	 * @return javax.swing.JCheckBoxMenuItem	
+	 */
+	private JCheckBoxMenuItem getPreviewMenuItem() {
+		if (previewMenuItem == null) {
+			previewMenuItem = new JCheckBoxMenuItem("Print Preview");
+			previewMenuItem.addItemListener(new java.awt.event.ItemListener() {
+				public void itemStateChanged(java.awt.event.ItemEvent e) {
+					Scene.getInstance().setFlatten(previewMenuItem.isSelected());
+				}
+			});
+		}
+		return previewMenuItem;
 	}
 
 	/**
