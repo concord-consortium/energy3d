@@ -48,6 +48,7 @@ public class Wall extends HousePart {
 	// private transient FloatBuffer textureBuffer;
 	private Snap[] neighbors = new Snap[2];
 	private transient boolean reversedThickness;
+	private Vector3 thicknessNormal;
 	
 	static {
 		CULL_FRONT.setCullFace(Face.Front);
@@ -373,10 +374,10 @@ public class Wall extends HousePart {
 		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
 		backMesh.getMeshData().updateVertexCount();
 
-		Vector3 n = decideThicknessNormal();
+		thicknessNormal = decideThicknessNormal();
 
-		backMesh.setTranslation(n);
-		return n;
+		backMesh.setTranslation(thicknessNormal);
+		return thicknessNormal;
 	}
 
 	private void reduceBackMeshWidth(Polygon polygon, final Vector3 dir, final int neighbor) {
@@ -397,8 +398,8 @@ public class Wall extends HousePart {
 		reversedThickness = false;
 		cull(true);
 		
-		FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
-		normalBuffer.position(0);
+//		FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
+//		normalBuffer.position(0);
 		// Vector3 n = new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get());
 		Vector3 p02 = points.get(2).subtract(points.get(0), null).normalizeLocal();
 		Vector3 p01 = points.get(1).subtract(points.get(0), null).normalizeLocal();
@@ -601,8 +602,12 @@ public class Wall extends HousePart {
 	}
 	
 	protected void flatten() {		
-		Vector3 wallx = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
-		double angle = wallx.smallestAngleBetween(Vector3.UNIT_X);
+//		Vector3 wallx = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
+		thicknessNormal = decideThicknessNormal().normalizeLocal();
+		double angle = thicknessNormal.smallestAngleBetween(Vector3.UNIT_Y);
+		if (reversedThickness)
+			angle = -angle;
+		
 		root.setRotation((new Matrix3().fromAngles(0, 0, -flattenTime * angle)));
 //		double y = 0;
 //		for (int i = 0; i < points.size(); i++) {
