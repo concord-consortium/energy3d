@@ -171,6 +171,9 @@ Version 0.2
 - animate print preview as the house decomposes into its components 
 - add menu items including Print menu item
 - adjusting correct rotation
+- when print preview compute the angle so that the front of wall is always displayed
+- enable print preview for floor & hip root
+- in print preview move the roofs and floors back to y=0
 
 TODO:
 - combine the wall meshed into one

@@ -11,6 +11,7 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
@@ -80,6 +81,8 @@ public class Roof2 extends HousePart {
 
 		if (container == null)
 			return;
+		
+		super.init();
 
 		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
 		
@@ -147,4 +150,9 @@ public class Roof2 extends HousePart {
 		}
 	}
 
+	protected void flatten() {		
+		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
+		root.setTranslation(flattenTime * 5*(int) (pos / 3), 0, flattenTime * 3*(pos % 3));
+	}		
+	
 }

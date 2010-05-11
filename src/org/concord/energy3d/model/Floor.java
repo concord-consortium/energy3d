@@ -11,6 +11,7 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
@@ -78,41 +79,26 @@ public class Floor extends HousePart {
 
 		if (container == null)
 			return;
-//		avg = new Vector3();
+		
+//		super.init();
+		if (isFlatten())
+			flatten();
+		
 		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
-//		avg.multiplyLocal(1f / (wallUpperPoints.size()));
 		shiftToOutterEdge(wallUpperPoints);
-//		points.get(0).set(avg.getX(), avg.getY(), avg.getZ() + height);
-//		PolygonPoint roofUpperPoint = new PolygonPoint(avg.getX(), avg.getY(), avg.getZ() + height);
-
-//		System.out.println("Polygon Points:");
-//		for (PolygonPoint p : wallUpperPoints) {
-//			System.out.println(p.getXf() + "\t" + p.getYf() + "\t" + p.getZf());
-//		}
-
 		Polygon ps = new Polygon(wallUpperPoints);
-//		ps.addSteinerPoint(roofUpperPoint);
 		Poly2Tri.triangulate(ps);
 
-//		System.out.println("Triangulated Points:");
-//		for (DelaunayTriangle t : ps.getTriangles()) {
-//			t.printDebug();
-//		}
-		
 		ArdorMeshMapper.updateTriangleMesh(mesh, ps);
 		ArdorMeshMapper.updateVertexNormals(mesh, ps.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, ps.getTriangles());
 		ArdorMeshMapper.updateTextureCoordinates(mesh, ps.getTriangles(), 1, 0);
 		
 		mesh.getMeshData().updateVertexCount();
-		// mesh.setRandomColors();
 
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = points.get(i);
-			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
-//			((Sphere) pointsRoot.getChild(i)).updateModelBound();
-//			pointsRoot.setVisible(i, true);
 		}
 
 		// force bound update
@@ -137,4 +123,9 @@ public class Floor extends HousePart {
 		draw();		
 	}	
 
+	protected void flatten() {		
+		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
+		root.setTranslation(flattenTime * 5*(int) (pos / 3), height, flattenTime * 3*(pos % 3));
+	}		
+	
 }

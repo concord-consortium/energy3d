@@ -211,6 +211,7 @@ public class Wall extends HousePart {
 //			for (HousePart child : children)
 //				child.recalculateRelativePoints();
 		
+		thicknessNormal = null;
 		draw();
 		showPoints();
 
@@ -221,7 +222,7 @@ public class Wall extends HousePart {
 	}
 
 	@Override
-	public void draw() {
+	public void draw() {		
 		super.draw();
 //		if (root == null)
 //			init();		
@@ -394,8 +395,11 @@ public class Wall extends HousePart {
 	}
 
 	private Vector3 decideThicknessNormal() {
+		if (thicknessNormal != null) {
+			return thicknessNormal;
+		}
+		
 		ArrayList<Vector3> points = abspoints;
-		reversedThickness = false;
 		cull(true);
 		
 //		FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
@@ -405,6 +409,14 @@ public class Wall extends HousePart {
 		Vector3 p01 = points.get(1).subtract(points.get(0), null).normalizeLocal();
 		Vector3 n = p02.crossLocal(p01).normalizeLocal();
 		n.multiplyLocal(wallThickness);
+		
+//		if (thicknessNormal != null) {
+//			if (reversedThickness)
+//				n.negateLocal();
+//			return n;
+//		}
+			
+		reversedThickness = false;
 
 		Snap neighbor = this.neighbors[0];
 		if (neighbor == null)
@@ -603,10 +615,16 @@ public class Wall extends HousePart {
 	
 	protected void flatten() {		
 //		Vector3 wallx = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
-		thicknessNormal = decideThicknessNormal().normalizeLocal();
-		double angle = thicknessNormal.smallestAngleBetween(Vector3.UNIT_Y);
-		if (reversedThickness)
-			angle = -angle;
+		thicknessNormal = decideThicknessNormal();
+		Vector3 n = thicknessNormal.normalize(null);
+		double angle = n.smallestAngleBetween(Vector3.UNIT_X);
+//		if (reversedThickness)
+			angle -= Math.PI / 2;
+		
+		if (n.dot(Vector3.UNIT_Y) < 0)
+			angle = Math.PI-angle;
+//		System.out.println(reversedThickness);
+		System.out.println((int)(angle / Math.PI * 180));
 		
 		root.setRotation((new Matrix3().fromAngles(0, 0, -flattenTime * angle)));
 //		double y = 0;
