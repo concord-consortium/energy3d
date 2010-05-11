@@ -21,7 +21,7 @@ public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static boolean flatten = false;
 	protected static double flattenTime = 0;
-	private static double flattenPos = 0;
+	private static double flattenPos = -10;
 	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = false;	
 	protected transient Node root; // = new Node();
@@ -39,6 +39,7 @@ public abstract class HousePart implements Serializable {
 	protected transient double orgHeight;
 	protected boolean relativeToHorizontal;
 	protected double pos;
+	private transient HousePart original = null;
 
 	public static void setFlatten(boolean flatten) {
 		HousePart.flatten = flatten;
@@ -133,6 +134,14 @@ public abstract class HousePart implements Serializable {
 			init();
 			draw();
 		}		
+	}
+
+	public void setOriginal(HousePart original) {
+		this.original = original;
+	}
+
+	public HousePart getOriginal() {
+		return original;
 	}
 
 	public Node getRoot() {
@@ -477,5 +486,4 @@ public abstract class HousePart implements Serializable {
 //			abspoints.get(i).setY(0);
 //		}		
 	}
-
 }

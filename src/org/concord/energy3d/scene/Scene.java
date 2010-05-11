@@ -74,6 +74,7 @@ public class Scene implements Serializable {
 	transient int size; // = C * C * C * 3;
 	transient ByteBuffer texBuffer;// = BufferUtils.createByteBuffer(size);
 	transient Texture3D tex; // = new Texture3D();
+	private static Scene sceneClone = null;
 
 	public void updateTexture() {
 		texBuffer.position(0);
@@ -258,6 +259,23 @@ public class Scene implements Serializable {
 	}
 
 	public void setFlatten(final boolean flatten) {
+		if (flatten)
+			try {
+				if (sceneClone != null)
+					for (HousePart housePart : sceneClone.getParts())
+						root.detachChild(housePart.getRoot());
+				sceneClone  = (Scene)ObjectCloner.deepCopy(this);
+//				sceneClone = new Scene();
+				for (int i = 0; i < sceneClone.getParts().size(); i++) {
+//					HousePart newPart = (HousePart)ObjectCloner.deepCopy(part);
+					HousePart newPart = sceneClone.getParts().get(i);
+					newPart.setOriginal(parts.get(i));
+//					sceneClone.add(newPart);					
+					root.attachChild(newPart.getRoot());			
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 		new Thread() {
 			public void run() {
 				if (flatten)
@@ -267,7 +285,7 @@ public class Scene implements Serializable {
 						HousePart.setFlattenTime(t);
 					else
 						HousePart.setFlattenTime(1-t);
-					for (HousePart part : parts)
+					for (HousePart part : sceneClone.getParts())
 						part.draw();
 					try {
 						Thread.sleep(30);

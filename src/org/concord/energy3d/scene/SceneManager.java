@@ -150,6 +150,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Node sunRot;
 	private boolean sunControl;
 	private boolean sunAnim;
+	private BloomRenderPass bloomRenderPass;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -331,7 +332,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			
 		
 		
-		BloomRenderPass bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);		
+		bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);		
 //		bloomRenderPass.setUseCurrentScene(true);
         if (!bloomRenderPass.isSupported()) {
             System.out.println("Bloom not supported!");
@@ -966,7 +967,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 			housePart.showPoints();
 			lastHoveredObject = housePart;
+			if (drawn != null && drawn.getOriginal() != null)
+				bloomRenderPass.remove(drawn.getOriginal().getRoot());			
 			drawn = data.getHousePart();
+			if (drawn.getOriginal() != null)
+				bloomRenderPass.add(drawn.getOriginal().getRoot());			
 		}
 	}
 

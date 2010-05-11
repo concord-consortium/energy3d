@@ -183,17 +183,24 @@ public class Door extends HousePart {
 //		}
 //		return null;
 //	}
-
+	private static int j = 0;
+	
 	@Override
 	public void draw() {
 		if (root == null)
 			init();
 		boolean drawable = points.size() >= 4;
 
-		vertexBuffer.position(0);
+		if (j == 22)
+			System.out.println(j);
+		j++;
+		
+//		vertexBuffer.rewind();
 		Vector3[] convertedPoints = new Vector3[4];
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = toAbsolute(points.get(i));
+			if (i == 0)		// toAbsolute somehow moved vertex forward (it redraws it)
+				vertexBuffer.rewind();
 			convertedPoints[i] = p;
 //			if (i < abspoints.size())
 //				abspoints.set(i, p);
@@ -202,7 +209,8 @@ public class Door extends HousePart {
 			abspoints.get(i).set(p);
 			
 			container.getRoot().getTransform().applyForward(p);
-			
+
+		
 			if (drawable)
 				vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
