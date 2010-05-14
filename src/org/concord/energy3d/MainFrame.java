@@ -260,11 +260,11 @@ public class MainFrame extends JFrame {
 			topViewButton.setText("Top View");
 			topViewButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					JoglAwtCanvas canvas = SceneManager.getInstance().getCanvas();
+//					JoglAwtCanvas canvas = SceneManager.getInstance().getCanvas();
 					if (topViewButton.isSelected())
-						SceneManager.getInstance().topCameraView(canvas);
+						SceneManager.getInstance().topCameraView();
 					else
-						SceneManager.getInstance().resetCamera(canvas);
+						SceneManager.getInstance().resetCamera();
 				}
 			});
 		}
@@ -477,7 +477,7 @@ public class MainFrame extends JFrame {
 			printMenuItem = new JMenuItem("Print");
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					
+					SceneManager.getInstance().print();
 				}
 			});
 		}
@@ -494,7 +494,8 @@ public class MainFrame extends JFrame {
 			previewMenuItem = new JCheckBoxMenuItem("Print Preview");
 			previewMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					Scene.getInstance().setFlatten(previewMenuItem.isSelected());
+//					Scene.getInstance().setFlatten(previewMenuItem.isSelected());
+					SceneManager.getInstance().setPrintPreview(previewMenuItem.isSelected());					
 				}
 			});
 		}

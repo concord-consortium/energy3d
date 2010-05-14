@@ -176,6 +176,10 @@ Version 0.2
 - in print preview move the roofs and floors back to y=0
 - keep original scene when in print preview
 - highlight original parts when hovering mouse over print parts
+- start blinking corresponding house part when mouse is hovered on print preview part
+- hide original house in the beginning of the animation  
+- arrange objects based on their centers in print preview mode
+- automatically changed perspective when switching to print preview
 
 TODO:
 - combine the wall meshed into one

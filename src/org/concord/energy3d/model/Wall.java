@@ -446,17 +446,17 @@ public class Wall extends HousePart {
 	}
 
 	private void cull(boolean back) {
-		if (back) {
-			mesh.setRenderState(CULL_FRONT);
-			backMesh.setRenderState(CULL_BACK);
-			surroundMesh.setRenderState(CULL_BACK);
-			windowsSurroundMesh.setRenderState(CULL_FRONT);
-		} else {
-			mesh.setRenderState(CULL_BACK);
-			backMesh.setRenderState(CULL_FRONT);
-			surroundMesh.setRenderState(CULL_FRONT);
-			windowsSurroundMesh.setRenderState(CULL_BACK);
-		}
+//		if (back) {
+//			mesh.setRenderState(CULL_FRONT);
+//			backMesh.setRenderState(CULL_BACK);
+//			surroundMesh.setRenderState(CULL_BACK);
+//			windowsSurroundMesh.setRenderState(CULL_FRONT);
+//		} else {
+//			mesh.setRenderState(CULL_BACK);
+//			backMesh.setRenderState(CULL_FRONT);
+//			surroundMesh.setRenderState(CULL_FRONT);
+//			windowsSurroundMesh.setRenderState(CULL_BACK);
+//		}
 	}
 
 	private void drawSurroundMesh(ReadOnlyVector3 thickness) {
@@ -624,7 +624,7 @@ public class Wall extends HousePart {
 		if (n.dot(Vector3.UNIT_Y) < 0)
 			angle = Math.PI-angle;
 //		System.out.println(reversedThickness);
-		System.out.println((int)(angle / Math.PI * 180));
+//		System.out.println((int)(angle / Math.PI * 180));
 		
 		root.setRotation((new Matrix3().fromAngles(0, 0, -flattenTime * angle)));
 //		double y = 0;
@@ -632,10 +632,12 @@ public class Wall extends HousePart {
 //			y += abspoints.get(i).getY();
 //		}	
 //		root.getTransform().applyForward(abspoints.get(0)).getY()
-		root.setTranslation(0,0,0);
-		double y = -root.getTransform().applyForward(abspoints.get(0).clone()).getY();
-//		root.setTranslation(pos, y, 0);
-		root.setTranslation(flattenTime * 5*(int) (pos / 3), flattenTime * y, flattenTime * 3*(pos % 3));
+//		root.setTranslation(0,0,0);
+//		double y = -root.getTransform().applyForward(abspoints.get(0).clone()).getY();
+////		root.setTranslation(pos, y, 0);
+////		root.setTranslation(flattenTime * 5*(int) (pos / 3), flattenTime * y, flattenTime * 3*(2 + pos % 3));
+//		root.setTranslation(flattenTime *printX, flattenTime * y, flattenTime *printY);
+		super.flatten();
 	}
 	
 

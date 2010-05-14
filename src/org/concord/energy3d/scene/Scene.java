@@ -8,12 +8,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 
+import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture3D;
@@ -27,6 +29,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
@@ -36,6 +39,7 @@ public class Scene implements Serializable {
 	public static final Node root = new Node("House Root");
 	private static Scene instance;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
+	private transient ArrayList<HousePart> printParts;
 	private double RADIUS = 0;
 
 	public static Scene getInstance() {
@@ -47,27 +51,29 @@ public class Scene implements Serializable {
 	}
 
 	private Scene() {
+		init();
 	}
 
 	public void init() {
 		System.out.println("Scene.init()");
-		TextureState ts;
-		ts = (TextureState) root.getLocalRenderState(StateType.Texture);
-		if (ts == null) {
-			ts = new TextureState();
-			root.setRenderState(ts);
-		}
-		C = 50;
-		size = C * C * C * 3;
-		tex = new Texture3D();
-		texBuffer = BufferUtils.createByteBuffer(size);
-
-		final Texture texture = createTexture();
-		// texture.setApply(ApplyMode.Combine);
-		// texture.setCombineFuncRGB(combineFuncRGB)
-		texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
-		ts.setTexture(texture);
-		ts.setNeedsRefresh(true);
+		printParts = new ArrayList<HousePart>();
+//		TextureState ts;
+//		ts = (TextureState) root.getLocalRenderState(StateType.Texture);
+//		if (ts == null) {
+//			ts = new TextureState();
+//			root.setRenderState(ts);
+//		}
+//		C = 50;
+//		size = C * C * C * 3;
+//		tex = new Texture3D();
+//		texBuffer = BufferUtils.createByteBuffer(size);
+//
+//		final Texture texture = createTexture();
+//		// texture.setApply(ApplyMode.Combine);
+//		// texture.setCombineFuncRGB(combineFuncRGB)
+//		texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
+//		ts.setTexture(texture);
+//		ts.setNeedsRefresh(true);
 	}
 
 	transient int C; // = 20;
@@ -210,6 +216,11 @@ public class Scene implements Serializable {
 	public ArrayList<HousePart> getParts() {
 		return parts;
 	}
+	
+	public ArrayList<HousePart> getPrintParts() {
+		return printParts;
+	}
+	
 
 	public void save() {
 		try {
@@ -234,6 +245,7 @@ public class Scene implements Serializable {
 		try {
 			ObjectInputStream in = new ObjectInputStream(new FileInputStream("house.ser"));
 			instance = (Scene) in.readObject();
+			instance.init();
 			in.close();
 			for (HousePart housePart : instance.getParts())
 				root.attachChild(housePart.getRoot());
@@ -264,23 +276,41 @@ public class Scene implements Serializable {
 				if (sceneClone != null)
 					for (HousePart housePart : sceneClone.getParts())
 						root.detachChild(housePart.getRoot());
+				HousePart.flattenPos = 0;
 				sceneClone  = (Scene)ObjectCloner.deepCopy(this);
 //				sceneClone = new Scene();
+				printParts.clear();
+				double x = 0;
+				double y = 0;				
 				for (int i = 0; i < sceneClone.getParts().size(); i++) {
 //					HousePart newPart = (HousePart)ObjectCloner.deepCopy(part);
 					HousePart newPart = sceneClone.getParts().get(i);
+					printParts.add(newPart);
 					newPart.setOriginal(parts.get(i));
+					newPart.setPrintX(5*x);
+					newPart.setPrintY(2*y);					
+					x++;
+					if (x >= 3) {
+						x = 0;
+						y++;
+					}
 //					sceneClone.add(newPart);					
 					root.attachChild(newPart.getRoot());			
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
+			
+			for (HousePart part : getParts())
+				part.getRoot().getSceneHints().setCullHint(CullHint.Always);		
+
+			
 		new Thread() {
 			public void run() {
 				if (flatten)
 					HousePart.setFlatten(true);
-				for (double t = 0; t < 1.1; t += 0.05) {
+//				for (double t = 0; t < 1.1; t += 0.05) {
+				double t = 1;
 					if (flatten)						
 						HousePart.setFlattenTime(t);
 					else
@@ -292,14 +322,15 @@ public class Scene implements Serializable {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-				}
+//				}
 				if (!flatten) {
 					HousePart.setFlatten(false);
 					for (HousePart part : parts)
 						part.draw();
 				}
+//				for (HousePart part : getParts())
+//					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);		
 			}
 		}.start();
 	}
-
 }

@@ -21,7 +21,7 @@ public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static boolean flatten = false;
 	protected static double flattenTime = 0;
-	private static double flattenPos = -10;
+	public static double flattenPos = -10;
 	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = false;	
 	protected transient Node root; // = new Node();
@@ -40,6 +40,7 @@ public abstract class HousePart implements Serializable {
 	protected boolean relativeToHorizontal;
 	protected double pos;
 	private transient HousePart original = null;
+	protected transient double printX, printY;
 
 	public static void setFlatten(boolean flatten) {
 		HousePart.flatten = flatten;
@@ -95,9 +96,9 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void init() {
-		if (!(this instanceof Window || this instanceof Door)) {
-		pos = flattenPos;
-		flattenPos += 1;
+		if (!(this instanceof Window || this instanceof Door)) { // && pos == 0) {			
+			pos = flattenPos;
+			flattenPos += 1;
 		}
 		orgHeight = height;
 		abspoints = new ArrayList<Vector3>(numOfEditPoints);
@@ -119,7 +120,7 @@ public abstract class HousePart implements Serializable {
 //			pointShape.setModelBound(new BoundingBox());
 			pointShape.updateModelBound(); // important
 			pointShape.getSceneHints().setCullHint(CullHint.Always);
-			pointShape.setCastsShadows(false);
+//			pointShape.setCastsShadows(false);
 			// pointShape.updateWorldBound(true);
 		}
 		// pointsRoot.setAllVisible();
@@ -481,9 +482,31 @@ public abstract class HousePart implements Serializable {
 //	}
 	
 	protected void flatten() {
-//		root.setTranslation(pos, 0, 0);
-//		for (int i = 0; i < points.size(); i++) {
-//			abspoints.get(i).setY(0);
+		root.setTranslation(0,0,0);
+		Vector3 targetCenter = new Vector3(flattenTime *printX, 0, flattenTime *printY);
+		Vector3 currentCenter = new Vector3();
+		for (Vector3 p : abspoints)
+			currentCenter.addLocal(root.getTransform().applyForward(p.clone()));
+		currentCenter.multiplyLocal(1.0 / abspoints.size());
+		
+//		Vector3 trans = null;
+//		try {
+//			trans = targetCenter.subtract(root.getWorldBound().getCenter(), null);
+//		} catch (Exception e) {
+//			e.printStackTrace();
 //		}		
+//		double y = -root.getTransform().applyForward(abspoints.get(0).clone()).getY();
+//		root.setTranslation(flattenTime *printX, flattenTime * y, flattenTime *printY);
+//		root.setTranslation(root.getTranslation().add(trans, null));
+
+		root.setTranslation(targetCenter.subtractLocal(currentCenter));
+	}
+
+	public void setPrintX(double printX) {
+		this.printX = printX;
+	}
+
+	public void setPrintY(double printY) {
+		this.printY = printY;
 	}
 }
