@@ -77,6 +77,7 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRendererFactory;
@@ -1086,9 +1087,27 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void print() {
-		Scene.getInstance().getPrintParts().get(0).getRoot().setTranslation(10 / 0.01, 0, 0);
-		Camera.getCurrentCamera().setLocation(10, -2, 0);
-
+		Camera camera = Camera.getCurrentCamera();
+		Vector3 location = new Vector3(camera.getLocation());
+		Vector3 direction = new Vector3(camera.getDirection());
+		ReadOnlyVector3 up = camera.getUp();
+		for (HousePart part : Scene.getInstance().getPrintParts()) {
+//			part.getRoot().setTranslation(10 / 0.01, 0, 0);
+			if (part.isPrintable()) {
+				Vector3 pos = new Vector3(part.getPrintX(), -5, part.getPrintY());
+				camera.setLocation(pos);
+//				camera.setDirection(Vector3.UNIT_Y);
+				camera.lookAt(pos.addLocal(0, 1, 0), Vector3.UNIT_Z);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			}			
+		}
+//		camera.setDirection(direction);
+		camera.setLocation(location);
+		camera.lookAt(location.addLocal(direction), up);		
 	}
 
 	// This class is used to hold an image while on the clipboard.

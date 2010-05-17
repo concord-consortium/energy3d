@@ -12,8 +12,12 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Window;
 
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.image.Image;
@@ -287,15 +291,18 @@ public class Scene implements Serializable {
 					HousePart newPart = sceneClone.getParts().get(i);
 					printParts.add(newPart);
 					newPart.setOriginal(parts.get(i));
-					newPart.setPrintX(5*x);
-					newPart.setPrintY(2*y);					
-					x++;
-					if (x >= 3) {
-						x = 0;
-						y++;
+					if (newPart.isPrintable()) {
+						newPart.setPrintX(5*x);
+						newPart.setPrintY(5*y);					
+						x++;
+						if (x >= 3) {
+							x = 0;
+							y++;
+						}
 					}
-//					sceneClone.add(newPart);					
-					root.attachChild(newPart.getRoot());			
+//					sceneClone.add(newPart);
+//					if (i < 6)
+					root.attachChild(newPart.getRoot());	
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -309,8 +316,8 @@ public class Scene implements Serializable {
 			public void run() {
 				if (flatten)
 					HousePart.setFlatten(true);
-//				for (double t = 0; t < 1.1; t += 0.05) {
-				double t = 1;
+				for (double t = 0; t < 1.1; t += 0.05) {
+//				double t = 1;
 					if (flatten)						
 						HousePart.setFlattenTime(t);
 					else
@@ -322,7 +329,7 @@ public class Scene implements Serializable {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-//				}
+				}
 				if (!flatten) {
 					HousePart.setFlatten(false);
 					for (HousePart part : parts)

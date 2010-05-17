@@ -206,13 +206,14 @@ public class Window extends HousePart {
 		}
 	}
 	
-	@Override
 	public ArrayList<Vector3> getPoints() {
 		if (root == null)
 			init();
 		return abspoints;
 	}
-	
-	
+
+	public boolean isPrintable() {
+		return false;
+	}		
 
 }

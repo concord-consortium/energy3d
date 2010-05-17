@@ -81,8 +81,7 @@ public class Floor extends HousePart {
 			return;
 		
 //		super.init();
-		if (isFlatten())
-			flatten();
+
 		
 		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
 		shiftToOutterEdge(wallUpperPoints);
@@ -101,20 +100,21 @@ public class Floor extends HousePart {
 			pointsRoot.getChild(i).setTranslation(p);
 		}
 
+		if (flatten)
+			flatten();
+		
 		// force bound update
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
 
 	private void shiftToOutterEdge(ArrayList<PolygonPoint> wallUpperPoints) {
-//		final double edgeLenght = 0.3;
-//		Vector3 op = new Vector3();
+		center.set(0, 0, 0);
 		for (PolygonPoint p : wallUpperPoints) {
-//			op.set(p.getX(), p.getY(), 0).subtractLocal(avg.getX(), avg.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
-//			op.addLocal(p.getX(), p.getY(), p.getZ());
-//			p.set(op.getX(), op.getY(), op.getZ()+0.01);
+			center.addLocal(p.getX(), p.getY(), height);
 			p.set(p.getX(), p.getY(), height);
 		}
+		center.multiplyLocal(1.0 / wallUpperPoints.size());
 	}
 	
 	public void setHeight(double newHeight, boolean finalize) {
@@ -126,7 +126,8 @@ public class Floor extends HousePart {
 	protected void flatten() {		
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 //		root.setTranslation(flattenTime * 5*(int) (pos / 3), height, flattenTime * 3*(2 + pos % 3));
-		root.setTranslation(flattenTime * printX, height, flattenTime * printY);
+//		root.setTranslation(flattenTime * printX, height, flattenTime * printY);
+		super.flatten();
 	}		
 	
 }

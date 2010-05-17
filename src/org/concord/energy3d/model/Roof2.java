@@ -152,7 +152,8 @@ public class Roof2 extends HousePart {
 
 	protected void flatten() {		
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
-		root.setTranslation(flattenTime * 5*(int) (pos / 3), 0, flattenTime * 3*(pos % 3));
+//		root.setTranslation(flattenTime * 5*(int) (pos / 3), 0, flattenTime * 3*(pos % 3));
+		super.flatten();
 	}		
 	
 }

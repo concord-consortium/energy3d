@@ -249,6 +249,9 @@ public class Door extends HousePart {
 		return abspoints;
 	}
 	
+	public boolean isPrintable() {
+		return false;
+	}		
 	
 
 }

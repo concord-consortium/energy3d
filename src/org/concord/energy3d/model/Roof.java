@@ -27,7 +27,7 @@ public class Roof extends HousePart {
 //	private double height = 0.5;
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
-	private transient Vector3 avg;
+//	private transient Vector3 center;
 
 	public Roof() {
 		super(1, 1, 0.5);
@@ -60,7 +60,7 @@ public class Roof extends HousePart {
 		if (editPointIndex == -1) {
 			pick(x, y, Wall.class);
 		} else {
-			Vector3 base = avg;
+			Vector3 base = center;
 			Vector3 p = closestPoint(base, base.add(0, 0, 1, null), x, y);
 			p = grid(p, GRID_SIZE);
 			height = findHeight(base, p);
@@ -78,17 +78,18 @@ public class Roof extends HousePart {
 		if (container == null)
 			return;
 		
-		super.draw();
+//		super.draw();
 		
 		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
 		
-		avg = new Vector3();
+//		center = new Vector3();
+		center.set(0, 0, 0);
 		for (PolygonPoint p : wallUpperPoints)
-			avg.addLocal(p.getX(), p.getY(), p.getZ());
-		avg.multiplyLocal(1f / (wallUpperPoints.size()));
+			center.addLocal(p.getX(), p.getY(), p.getZ());
+		center.multiplyLocal(1.0 / wallUpperPoints.size());
 		shiftToOutterEdge(wallUpperPoints);
-		points.get(0).set(avg.getX(), avg.getY(), avg.getZ() + height);
-		PolygonPoint roofUpperPoint = new PolygonPoint(avg.getX(), avg.getY(), avg.getZ() + height);
+		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+		PolygonPoint roofUpperPoint = new PolygonPoint(center.getX(), center.getY(), center.getZ() + height);
 
 //		System.out.println("Polygon Points:");
 //		for (PolygonPoint p : wallUpperPoints) {
@@ -120,6 +121,9 @@ public class Roof extends HousePart {
 //			pointsRoot.setVisible(i, true);
 		}
 
+		if (flatten)
+			flatten();
+		
 		// force bound update
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
@@ -172,7 +176,7 @@ public class Roof extends HousePart {
 		final double edgeLenght = 0.3;
 		Vector3 op = new Vector3();
 		for (PolygonPoint p : wallUpperPoints) {
-			op.set(p.getX(), p.getY(), 0).subtractLocal(avg.getX(), avg.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
+			op.set(p.getX(), p.getY(), 0).subtractLocal(center.getX(), center.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
 			op.addLocal(p.getX(), p.getY(), p.getZ());
 			p.set(op.getX(), op.getY(), op.getZ()+0.01);
 		}
@@ -180,6 +184,7 @@ public class Roof extends HousePart {
 
 	protected void flatten() {		
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
-		root.setTranslation(flattenTime * printX, points.get(0).getZ(), flattenTime * printY);
+//		root.setTranslation(flattenTime * printX, points.get(0).getZ(), flattenTime * printY);
+		super.flatten();
 	}		
 }

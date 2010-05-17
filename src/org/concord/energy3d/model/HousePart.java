@@ -19,7 +19,7 @@ import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private static boolean flatten = false;
+	protected static boolean flatten = false;
 	protected static double flattenTime = 0;
 	public static double flattenPos = -10;
 	private static boolean snapToObjects = true;
@@ -41,6 +41,7 @@ public abstract class HousePart implements Serializable {
 	protected double pos;
 	private transient HousePart original = null;
 	protected transient double printX, printY;
+	protected transient Vector3 center;
 
 	public static void setFlatten(boolean flatten) {
 		HousePart.flatten = flatten;
@@ -101,6 +102,7 @@ public abstract class HousePart implements Serializable {
 			flattenPos += 1;
 		}
 		orgHeight = height;
+		center = new Vector3();
 		abspoints = new ArrayList<Vector3>(numOfEditPoints);
 		for (int i = 0; i < points.size(); i++)
 			abspoints.add(points.get(i).clone());
@@ -463,13 +465,16 @@ public abstract class HousePart implements Serializable {
 	public void draw() {
 		if (root == null)
 			init();		
-
+		
+		center.set(0, 0, 0);
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = points.get(i);
 			p = toAbsolute(p);
 			pointsRoot.getChild(i).setTranslation(p);
 			abspoints.get(i).set(p);
+			center.addLocal(p);
 		}	
+		center.multiplyLocal(1.0 / points.size());
 		
 		if (flatten)
 			flatten();
@@ -483,11 +488,13 @@ public abstract class HousePart implements Serializable {
 	
 	protected void flatten() {
 		root.setTranslation(0,0,0);
-		Vector3 targetCenter = new Vector3(flattenTime *printX, 0, flattenTime *printY);
-		Vector3 currentCenter = new Vector3();
-		for (Vector3 p : abspoints)
-			currentCenter.addLocal(root.getTransform().applyForward(p.clone()));
-		currentCenter.multiplyLocal(1.0 / abspoints.size());
+		Vector3 targetCenter = new Vector3(printX, 0, printY);
+//		Vector3 currentCenter = new Vector3();
+//		for (Vector3 p : abspoints)
+//			currentCenter.addLocal(root.getTransform().applyForward(p.clone()));
+		Vector3 currentCenter = root.getTransform().applyForward(center.clone());
+//		currentCenter.multiplyLocal(1.0 / abspoints.size());
+		root.setTranslation(targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime));
 		
 //		Vector3 trans = null;
 //		try {
@@ -499,7 +506,6 @@ public abstract class HousePart implements Serializable {
 //		root.setTranslation(flattenTime *printX, flattenTime * y, flattenTime *printY);
 //		root.setTranslation(root.getTranslation().add(trans, null));
 
-		root.setTranslation(targetCenter.subtractLocal(currentCenter));
 	}
 
 	public void setPrintX(double printX) {
@@ -508,5 +514,17 @@ public abstract class HousePart implements Serializable {
 
 	public void setPrintY(double printY) {
 		this.printY = printY;
+	}
+
+	public double getPrintX() {
+		return printX;
+	}
+
+	public double getPrintY() {
+		return printY;
+	}
+
+	public boolean isPrintable() {
+		return true;
 	}
 }

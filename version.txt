@@ -180,6 +180,8 @@ Version 0.2
 - hide original house in the beginning of the animation  
 - arrange objects based on their centers in print preview mode
 - automatically changed perspective when switching to print preview
+- when printing, move the camera to front of house parts one-by-one with 500ms delay
+- reset the camera view after printing to exact position and direction as before
 
 TODO:
 - combine the wall meshed into one
