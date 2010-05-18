@@ -187,7 +187,8 @@ Version 0.2
 - add helidon when sun control selected
 - orbit navigation added
 - option to switch between orbit and first person navigation added to GUI
-
+- fixed bug with not being able to delete hip roof
+ 
 TODO:
 - combine the wall meshed into one
 - insert window in oriented wall attached to other walls

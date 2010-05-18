@@ -8,7 +8,7 @@ public class MainApplication {
 		MainFrame frame = new MainFrame();
 		SceneManager scene = new SceneManager(frame.getContentPane());		
 		frame.setVisible(true);
-		new Thread(scene).start();
+		new Thread(scene, "Energy 3D Application").start();
 	}
 
 }

@@ -1,27 +1,16 @@
 package org.concord.energy3d.scene;
 
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.image.BufferedImage;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
 
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -37,18 +26,15 @@ import org.concord.energy3d.model.Window;
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
-import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
-import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.AWTImageLoader;
-import com.ardor3d.image.util.ScreenShotImageExporter;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
@@ -102,7 +88,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
@@ -114,7 +99,6 @@ import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
-import com.ardor3d.util.screen.ScreenExportable;
 import com.ardor3d.util.screen.ScreenExporter;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
@@ -203,7 +187,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	Blinker blinker = null;
-	private UIHud hud;
 	private Line axis;
 	private boolean dirtyRenderer;
 	private boolean print;
@@ -216,7 +199,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public SceneManager(final Container panel) {
-		instance = this;
+		instance = this;		
 		this.panel = panel;
 		root.attachChild(housePartsNode);
 
@@ -252,12 +235,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 		panel.add(canvas, "Center");
 		// BMFontLoader.defaultFont();
-		AWTImageLoader.registerLoader();
-		hud = new UIHud();
-		// hud.attachChild(root);
-		hud.attachChild(new Box());
-		// hud.setupInput(canvas, pl, logicalLayer);
-
+//		AWTImageLoader.registerLoader();
 	}
 
 	@MainThread
@@ -651,12 +629,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					return;
 				}
 
+				int x = mouseState.getX();
+				int y = mouseState.getY();
 				if (!drawn.isDrawCompleted())
-					drawn.addPoint(mouseState.getX(), mouseState.getY());
+					drawn.addPoint(x, y);
 
 				if (drawn.isDrawCompleted()) {
 					drawn.hidePoints();
 					drawn = newHousePart();
+					drawn.setPreviewPoint(x, y);
 				}
 			}
 		}));
@@ -672,6 +653,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					selectHousePart(x, y, false);
 				}
 				enableDisableMouseRotation();
+				int i =0;
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LCONTROL), new TriggerAction() {
@@ -1097,6 +1079,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			// blinker.setTarget(drawn.getOriginal().getRoot());
 			// drawn = data.getHousePart();
 		}
+		int i =0;
 	}
 
 	public void setLighting(boolean enable) {

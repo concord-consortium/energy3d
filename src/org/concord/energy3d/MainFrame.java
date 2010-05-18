@@ -22,6 +22,8 @@ import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import javax.swing.JMenuItem;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JRadioButtonMenuItem;
+import java.awt.Insets;
+import java.awt.Dimension;
 
 
 public class MainFrame extends JFrame {
@@ -155,7 +157,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getWallButton() {
 		if (wallButton == null) {
 			wallButton = new JToggleButton();
-			wallButton.setText("Wall     ");
+			wallButton.setText("Wall");
+			wallButton.setMaximumSize(new Dimension(38, 28));
 			wallButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
@@ -209,7 +212,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getWindowButton() {
 		if (windowButton == null) {
 			windowButton = new JToggleButton();
-			windowButton.setText("Window     ");			
+			windowButton.setText("Window");			
+			windowButton.setMaximumSize(new Dimension(59, 28));
 			windowButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);

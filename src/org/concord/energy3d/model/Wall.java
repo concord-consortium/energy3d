@@ -216,8 +216,9 @@ public class Wall extends HousePart {
 		showPoints();
 
 		for (Snap neighbor : this.neighbors)
-			if (neighbor != null)
-				neighbor.getNeighbor().draw();		
+			if (neighbor != null) {
+				neighbor.getNeighbor().draw();
+			}
 
 	}
 
@@ -337,24 +338,25 @@ public class Wall extends HousePart {
 					drawWindowsSurroundMesh(n);
 //				}
 
+					// force bound update
+					// mesh.updateModelBound();
+					// backMesh.updateModelBound();
+					// surroundMesh.updateModelBound();
+					// root.updateWorldBound(true);
+					// mesh.updateModelBound();
+					// backMesh.updateModelBound();
+					// surroundMesh.updateModelBound();
+					invisibleMesh.updateModelBound();
+					// root.updateGeometricState(0);
+					CollisionTreeManager.INSTANCE.removeCollisionTree(root);
+					
+					for (HousePart child : children)
+						child.draw();
+					
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
-			// force bound update
-			// mesh.updateModelBound();
-			// backMesh.updateModelBound();
-			// surroundMesh.updateModelBound();
-			// root.updateWorldBound(true);
-			// mesh.updateModelBound();
-			// backMesh.updateModelBound();
-			// surroundMesh.updateModelBound();
-			invisibleMesh.updateModelBound();
-			// root.updateGeometricState(0);
-			CollisionTreeManager.INSTANCE.removeCollisionTree(root);
-
-			for (HousePart child : children)
-				child.draw();
 		}
 
 	}
@@ -395,9 +397,9 @@ public class Wall extends HousePart {
 	}
 
 	private Vector3 decideThicknessNormal() {
-		if (thicknessNormal != null) {
-			return thicknessNormal;
-		}
+//		if (thicknessNormal != null) {
+//			return thicknessNormal;
+//		}
 		
 		ArrayList<Vector3> points = abspoints;
 		cull(true);

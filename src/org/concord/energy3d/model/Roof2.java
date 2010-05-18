@@ -82,7 +82,7 @@ public class Roof2 extends HousePart {
 		if (container == null)
 			return;
 		
-		super.init();
+		super.draw();
 
 		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
 		
