@@ -182,6 +182,9 @@ Version 0.2
 - automatically changed perspective when switching to print preview
 - when printing, move the camera to front of house parts one-by-one with 500ms delay
 - reset the camera view after printing to exact position and direction as before
+- print all parts in continious pages
+- add mini scaled version of 3D house to lower left corner of print preview and rotate it
+- add helidon when sun control selected
 
 TODO:
 - combine the wall meshed into one
