@@ -15,11 +15,13 @@ import javax.swing.SwingUtilities;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import javax.swing.JMenuItem;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 
 
 public class MainFrame extends JFrame {
@@ -50,6 +52,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem saveMenuItem = null;
 	private JMenuItem printMenuItem = null;
 	private JCheckBoxMenuItem previewMenuItem = null;
+	private JMenu cameraMenu = null;
+	private JRadioButtonMenuItem orbitMenuItem = null;
+	private JRadioButtonMenuItem firstPersonMenuItem = null;
 	/**
 	 * This method initializes appMenuBar	
 	 * 	
@@ -59,6 +64,7 @@ public class MainFrame extends JFrame {
 		if (appMenuBar == null) {
 			appMenuBar = new JMenuBar();
 			appMenuBar.add(getFileMenu());
+			appMenuBar.add(getCameraMenu());
 		}
 		return appMenuBar;
 	}
@@ -500,6 +506,61 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return previewMenuItem;
+	}
+
+	/**
+	 * This method initializes cameraMenu	
+	 * 	
+	 * @return javax.swing.JMenu	
+	 */
+	private JMenu getCameraMenu() {
+		if (cameraMenu == null) {
+			cameraMenu = new JMenu();
+			cameraMenu.setText("Camera");
+			cameraMenu.add(getOrbitMenuItem());
+			cameraMenu.add(getFirstPersonMenuItem());
+			ButtonGroup bg = new ButtonGroup();
+			bg.add(orbitMenuItem);
+			bg.add(firstPersonMenuItem);
+		}
+		return cameraMenu;
+	}
+
+	/**
+	 * This method initializes orbitMenuItem	
+	 * 	
+	 * @return javax.swing.JRadioButtonMenuItem	
+	 */
+	private JRadioButtonMenuItem getOrbitMenuItem() {
+		if (orbitMenuItem == null) {
+			orbitMenuItem = new JRadioButtonMenuItem();
+			orbitMenuItem.setText("Orbit");
+			orbitMenuItem.setSelected(true);
+			orbitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setCameraControl(CameraMode.ORBIT);
+				}
+			});
+		}
+		return orbitMenuItem;
+	}
+
+	/**
+	 * This method initializes firstPersonMenuItem	
+	 * 	
+	 * @return javax.swing.JRadioButtonMenuItem	
+	 */
+	private JRadioButtonMenuItem getFirstPersonMenuItem() {
+		if (firstPersonMenuItem == null) {
+			firstPersonMenuItem = new JRadioButtonMenuItem();
+			firstPersonMenuItem.setText("First Person");
+			firstPersonMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setCameraControl(CameraMode.FIRST_PERSON);
+				}
+			});
+		}
+		return firstPersonMenuItem;
 	}
 
 	/**

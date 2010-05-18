@@ -57,7 +57,6 @@ import com.ardor3d.input.awt.AwtFocusWrapper;
 import com.ardor3d.input.awt.AwtKeyboardWrapper;
 import com.ardor3d.input.awt.AwtMouseManager;
 import com.ardor3d.input.awt.AwtMouseWrapper;
-import com.ardor3d.input.control.FirstPersonControl;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyHeldCondition;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -122,6 +121,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public enum Operation {
 		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR
 	}
+	public enum CameraMode {
+		ORBIT, FIRST_PERSON
+	}
 
 	// public static final int SELECT = 0;
 	// public static final int DRAW_WALL = 1;
@@ -159,7 +161,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Matrix3 rotate = new Matrix3();
 	private boolean topView;
 	// private ReadOnlyVector3 axis = new Vector3(0, 0, 1);
-	private FirstPersonControl control;
+//	private FirstPersonControl control;
+	private CameraControl control;
 	private int pickLayer = -1;
 	private BasicPassManager passManager = new BasicPassManager();
 	private ParallelSplitShadowMapPass pssmPass;
@@ -611,11 +614,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// super.rotate(camera, dx, dy);
 		// }
 		// };
-		control = new FirstPersonControl(Vector3.UNIT_Z);
-		control.setupKeyboardTriggers(logicalLayer);
-		control.setupMouseTriggers(logicalLayer, true);
-		control.setMoveSpeed(MOVE_SPEED);
-		control.setKeyRotateSpeed(1);
+//		control = new FirstPersonControl(Vector3.UNIT_Z);
+		
+		setCameraControl(CameraMode.ORBIT);
+//		control = new OrbitControl(Vector3.UNIT_Z);
+//		control.setupKeyboardTriggers(logicalLayer);
+//		control.setupMouseTriggers(logicalLayer, true);
+//		control.setMoveSpeed(MOVE_SPEED);
+//		control.setKeyRotateSpeed(1);
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -803,6 +809,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// }));
 	}
 
+	public void setCameraControl(CameraMode type) {
+		if (control != null)
+			control.removeTriggers(logicalLayer);
+		
+		if (type == CameraMode.ORBIT)
+			control = new OrbitControl(Vector3.UNIT_Z);
+		else if (type == CameraMode.FIRST_PERSON)
+			control = new FirstPersonControl(Vector3.UNIT_Z);
+		control.setupKeyboardTriggers(logicalLayer);
+		control.setupMouseTriggers(logicalLayer, true);
+		control.setMoveSpeed(MOVE_SPEED);
+		control.setKeyRotateSpeed(1);		
+	}
+
 	private void hideAllEditPoints() {
 		for (HousePart part : Scene.getInstance().getParts())
 			part.hidePoints();
@@ -815,7 +835,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void resetCamera() {
 		topView = false;
-		Vector3 loc = new Vector3(1.0f, -5.0f, 1.0f);
+//		Vector3 loc = new Vector3(1.0f, -5.0f, 1.0f);
+		Vector3 loc = new Vector3(1.0f, -8.0f, 1.0f);
 		// Vector3 loc = new Vector3(0, -2, 0);
 		Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
@@ -830,6 +851,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else {
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			root.setScale(1);
+//			camera.lookAt(0, 0, 1, Vector3.UNIT_Z); 
 		}
 
 		camera.setFrame(loc, left, up, dir);

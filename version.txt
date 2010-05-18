@@ -146,8 +146,8 @@ Version 0.2
 - implemented relative wall resize instead of setting all wall heights to the height of the bounding box
 - fixed problem with jittering house when resizing using bounding box
 - fixed problem with not updating abspoints when loading the scene
-- implement ferature for moving the sun and rotating it around Helidon using arrow keys
-- add gui buttons for sun position control and sun animation
+- implement feature for moving the sun and rotating it around Helidon using arrow keys
+- add GUI buttons for sun position control and sun animation
 - disable keyboard navigation automatically when sun control is selected 
 - fix problem with crashing when trying to insert a window in a wall that is parallel to y-axis
 - fix problem with offset between mouse pointer and 2nd window point when inserting a new window
@@ -182,9 +182,11 @@ Version 0.2
 - automatically changed perspective when switching to print preview
 - when printing, move the camera to front of house parts one-by-one with 500ms delay
 - reset the camera view after printing to exact position and direction as before
-- print all parts in continious pages
+- print all parts in continuous pages
 - add mini scaled version of 3D house to lower left corner of print preview and rotate it
 - add helidon when sun control selected
+- orbit navigation added
+- option to switch between orbit and first person navigation added to GUI
 
 TODO:
 - combine the wall meshed into one
