@@ -50,8 +50,8 @@ public class Scene implements Serializable {
 
 	public static Scene getInstance() {
 		if (instance == null) {
-			// instance = new Scene();
-			open();
+			 instance = new Scene();
+//			open();
 		}
 		return instance;
 	}

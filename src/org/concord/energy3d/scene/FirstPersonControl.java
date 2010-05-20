@@ -13,6 +13,7 @@ package org.concord.energy3d.scene;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyboardState;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 
@@ -98,4 +99,15 @@ public class FirstPersonControl extends CameraControl {
 
         camera.normalize();
     }
+    
+	protected void move(final Camera camera, final double dx, final double dy) {
+//		Vector4 v = new Vector4(-dx * _moveSpeed / 500, 0, -dy * _moveSpeed / 500, 0);
+//		Vector4 newV = camera.getModelViewMatrix().applyPost(v, null);
+//		camera.setLocation(camera.getLocation().add(new Vector3(newV.getX(), newV.getZ(), v.getZ()), null));
+		
+		Vector4 v = new Vector4(-dx * _moveSpeed / 500, -dy * _moveSpeed / 500, 0, 0);
+		Vector4 newV = camera.getModelViewProjectionMatrix().applyPost(v, null);
+		camera.setLocation(camera.getLocation().add(new Vector3(newV.getX(), newV.getY(), newV.getZ()), null));
+		
+	}    
 }

@@ -11,8 +11,10 @@
 package org.concord.energy3d.scene;
 
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyboardState;
+import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
@@ -74,6 +76,8 @@ public abstract class CameraControl {
     }
 
     protected abstract void move(final Camera camera, final KeyboardState kb, final double tpf);
+    
+    protected abstract void move(final Camera camera, final double dx, final double dy);
 
     protected abstract void rotate(final Camera camera, final double dx, final double dy);
 
@@ -122,7 +126,10 @@ public abstract class CameraControl {
                 final MouseState mouse = inputStates.getCurrent().getMouseState();
                 if (mouse.getDx() != 0 || mouse.getDy() != 0) {
                     if (!firstPing) {
-                        control.rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
+                    	if (inputStates.getCurrent().getMouseState().getButtonState(MouseButton.RIGHT) == ButtonState.DOWN)
+                    		control.move(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
+                    	else
+                    		control.rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
                     } else {
                         firstPing = false;
                     }
