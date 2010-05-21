@@ -1,13 +1,16 @@
 package org.concord.energy3d;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
@@ -17,13 +20,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
-
-import com.ardor3d.framework.jogl.JoglAwtCanvas;
-import javax.swing.JMenuItem;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JRadioButtonMenuItem;
-import java.awt.Insets;
-import java.awt.Dimension;
 
 
 public class MainFrame extends JFrame {

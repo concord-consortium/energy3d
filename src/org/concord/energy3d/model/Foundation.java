@@ -2,7 +2,7 @@ package org.concord.energy3d.model;
 
 import java.util.ArrayList;
 
-import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SelectUtil;
 
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
@@ -10,6 +10,7 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.TextureManager;
@@ -118,7 +119,7 @@ public class Foundation extends HousePart {
 			else
 				index = 0;
 		}
-		PickedHousePart pick = SceneManager.getInstance().findMousePoint(x, y);
+		PickedHousePart pick = SelectUtil.pickPart(x, y, (Spatial)null);
 		Vector3 p = points.get(index);
 		if (pick != null) {
 			p = pick.getPoint();

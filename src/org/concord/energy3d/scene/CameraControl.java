@@ -29,7 +29,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 public abstract class CameraControl {
-
+	public enum ButtonAction {MOVE, ROTATE, NONE};
     protected final Vector3 _upAxis = new Vector3();
     protected double _mouseRotateSpeed = .005;
     protected double _moveSpeed = 50;
@@ -38,6 +38,9 @@ public abstract class CameraControl {
     protected final Vector3 _workerStoreA = new Vector3();
     protected InputTrigger _mouseTrigger;
     protected InputTrigger _keyTrigger;
+    protected boolean enabled = true;
+	protected ButtonAction leftButtonAction = ButtonAction.ROTATE;
+	protected ButtonAction rightButtonAction = ButtonAction.MOVE;
 
     public CameraControl(final ReadOnlyVector3 upAxis) {
         _upAxis.set(upAxis);
@@ -123,12 +126,15 @@ public abstract class CameraControl {
             private boolean firstPing = true;
 
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+            	if (!enabled) return;
                 final MouseState mouse = inputStates.getCurrent().getMouseState();
                 if (mouse.getDx() != 0 || mouse.getDy() != 0) {
                     if (!firstPing) {
-                    	if (inputStates.getCurrent().getMouseState().getButtonState(MouseButton.RIGHT) == ButtonState.DOWN)
+                    	final boolean left = mouse.getButtonState(MouseButton.LEFT) == ButtonState.DOWN;
+                    	final boolean right = mouse.getButtonState(MouseButton.RIGHT) == ButtonState.DOWN;
+						if (left && leftButtonAction == ButtonAction.MOVE || right && rightButtonAction == ButtonAction.MOVE)
                     		control.move(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
-                    	else
+                    	else if (left && leftButtonAction == ButtonAction.ROTATE || right && rightButtonAction == ButtonAction.ROTATE)
                     		control.rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
                     } else {
                         firstPing = false;
@@ -161,6 +167,7 @@ public abstract class CameraControl {
 
         final TriggerAction moveAction = new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+            	if (!enabled) return;
                 control.move(source.getCanvasRenderer().getCamera(), inputStates.getCurrent().getKeyboardState(), tpf);
             }
         };
@@ -176,4 +183,18 @@ public abstract class CameraControl {
     public InputTrigger getMouseTrigger() {
         return _mouseTrigger;
     }
+
+    public boolean isEnabled() {
+    	return enabled;
+    }
+    
+    public void setEnabled(boolean enabled) {
+    	this.enabled = enabled;
+    }
+	
+	public void setMouseButtonActions(ButtonAction leftButtonAction, ButtonAction rightButtonAction) {
+		this.leftButtonAction = leftButtonAction;
+		this.rightButtonAction = rightButtonAction;
+	}
+
 }

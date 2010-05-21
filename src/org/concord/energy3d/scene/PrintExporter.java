@@ -23,7 +23,7 @@ public class PrintExporter implements ScreenExportable, Printable {
 	public PrintExporter(boolean useAlpha, int pages) {
 		_useAlpha = useAlpha;
 		images = new BufferedImage[pages];
-		
+
 	}
 
 	public void export(final ByteBuffer data, final int width, final int height) {
@@ -37,7 +37,7 @@ public class PrintExporter implements ScreenExportable, Printable {
 				r = ((data.get(index + 0)));
 				g = ((data.get(index + 1)));
 				b = ((data.get(index + 2)));
-				
+
 				argb = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
 
 				if (_useAlpha) {
@@ -49,25 +49,25 @@ public class PrintExporter implements ScreenExportable, Printable {
 			}
 		}
 		currentPage++;
-//		print(img);
+		// print(img);
 
 	}
 
-//	private void print(BufferedImage img) {
-//		PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-//		pras.add(new Copies(1));
-//		PrintService pss[] = PrintServiceLookup.lookupPrintServices(DocFlavor.INPUT_STREAM.GIF, pras);
-//		if (pss.length == 0)
-//			throw new RuntimeException("No printer services available.");
-//		PrintService ps = pss[0];
-//		System.out.println("Printing to " + ps);
-//		DocPrintJob job = ps.createPrintJob();
-//		job.setPrintable(new PrintInterface(img));
-//		FileInputStream fin = new FileInputStream("YOurImageFileName.PNG");
-//		Doc doc = new SimpleDoc(fin, DocFlavor.INPUT_STREAM.GIF, null);
-//		job.print(doc, pras);
-//		fin.close();
-//	}
+	// private void print(BufferedImage img) {
+	// PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
+	// pras.add(new Copies(1));
+	// PrintService pss[] = PrintServiceLookup.lookupPrintServices(DocFlavor.INPUT_STREAM.GIF, pras);
+	// if (pss.length == 0)
+	// throw new RuntimeException("No printer services available.");
+	// PrintService ps = pss[0];
+	// System.out.println("Printing to " + ps);
+	// DocPrintJob job = ps.createPrintJob();
+	// job.setPrintable(new PrintInterface(img));
+	// FileInputStream fin = new FileInputStream("YOurImageFileName.PNG");
+	// Doc doc = new SimpleDoc(fin, DocFlavor.INPUT_STREAM.GIF, null);
+	// job.print(doc, pras);
+	// fin.close();
+	// }
 
 	public ImageDataFormat getFormat() {
 		if (_useAlpha) {
@@ -94,8 +94,12 @@ public class PrintExporter implements ScreenExportable, Printable {
 		Graphics2D g2d = (Graphics2D) graphics;
 		g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 
-		graphics.drawImage(images[pageIndex], 10, 10, null);
+		graphics.drawImage(images[pageIndex], 0, 0, 600, 600 * images[pageIndex].getHeight() / images[pageIndex].getWidth() , null);
 
+		// AffineTransform at = AffineTransform.getScaleInstance((double) width / images[pageIndex].getWidth(), (double) height / images[pageIndex].getHeight());
+		// graphics.drawImage(images[pageIndex], at);
+
+//		return NO_SUCH_PAGE;
 		return PAGE_EXISTS;
 	}
 

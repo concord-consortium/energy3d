@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SelectUtil;
 import org.poly2tri.polygon.PolygonPoint;
 
 import com.ardor3d.intersection.PickResults;
@@ -294,9 +295,9 @@ public abstract class HousePart implements Serializable {
 		PickedHousePart picked = null;
 		// if (container == null || points.size() < 4)
 		if (!firstPointInserted)
-			picked = SceneManager.getInstance().findMousePoint(x, y, typeOfHousePart);
+			picked = SelectUtil.pickPart(x, y, typeOfHousePart);
 		else
-			picked = SceneManager.getInstance().findMousePoint(x, y, container == null ? null : container.getRoot());
+			picked = SelectUtil.pickPart(x, y, container == null ? null : container.getRoot());
 
 		if (!firstPointInserted) {
 			UserData userData = null;

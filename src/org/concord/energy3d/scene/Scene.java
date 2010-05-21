@@ -8,18 +8,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.concord.energy3d.model.Door;
-import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Roof;
-import org.concord.energy3d.model.Window;
 
-import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture3D;
@@ -283,9 +277,9 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public void setFlatten(final boolean flatten, final boolean thread) {
-		if (flatten)
-			try {
+	public void setFlatten(final boolean flatten) { //, final boolean thread) {
+		if (flatten) {
+//			try {
 				if (sceneClone != null)
 					for (HousePart housePart : sceneClone.getParts())
 						root.detachChild(housePart.getRoot());
@@ -313,21 +307,22 @@ public class Scene implements Serializable {
 //					if (i < 6)
 					root.attachChild(newPart.getRoot());	
 				}
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
+//			} catch (Exception e1) {
+//				e1.printStackTrace();
+//			}
+		}
 			
 			for (HousePart part : getParts())
 				part.getRoot().getSceneHints().setCullHint(CullHint.Always);		
 
-		if (thread)	
-		new Thread() {
-			public void run() {
+//		if (thread)	
+//		new Thread() {
+//			public void run() {
 				animateFlatten(flatten);		
-			}
-		}.start();
-		else
-			animateFlatten(flatten);
+//			}
+//		}.start();
+//		else
+//			animateFlatten(flatten);
 	}
 	
 	public void rotate() {
