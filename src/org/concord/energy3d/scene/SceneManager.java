@@ -98,42 +98,31 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public enum Operation {
 		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR
 	}
-
 	public enum CameraMode {
 		ORBIT, FIRST_PERSON
 	}
+	public enum ViewMode {
+		NORMAL, TOP_VIEW, PRINT_PREVIEW
+	}
+
+	private static final int MOVE_SPEED = 5;
 
 	private static SceneManager instance = null;
-//	private final Container panel;
 	private final JoglAwtCanvas canvas;
-	// private final JoglCanvasRenderer canvasRenderer;
 	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
 	private boolean _exit = false;
 	protected final Node root = new Node("Root");
-	private final Node housePartsNode = Scene.root; // new Node("House Parts");
-
+	private final Node housePartsNode = Scene.root;
 	private Mesh floor;
-
-	private static final int MOVE_SPEED = 5;
-	// private static final double TURN_SPEED = 0.5;
-	// private final Matrix3 _incr = new Matrix3();
-	// private static final double MOUSE_TURN_SPEED = 0.1;
 	private boolean rotAnim = false;
-
-//	private PickResults pickResults;
 	private HousePart drawn = null;
-
 	private Operation operation = Operation.SELECT;
-//	protected HousePart lastHoveredObject;
 	private LightState lightState;
 	private double angle, sunAngle = 90, sunBaseAngle = 0;
 	private Matrix3 rotate = new Matrix3();
-	private boolean topView;
-	// private ReadOnlyVector3 axis = new Vector3(0, 0, 1);
-	// private FirstPersonControl control;
+//	private boolean topView;
 	private CameraControl control;
-//	private int pickLayer = -1;
 	private BasicPassManager passManager = new BasicPassManager();
 	private ParallelSplitShadowMapPass pssmPass;
 	private Sphere sun;
@@ -142,43 +131,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean sunControl;
 	private boolean sunAnim;
 	private BloomRenderPass bloomRenderPass;
-	private boolean printPreview = false;
-
-//	private static class Blinker extends Thread {
-//		Node target;
-//
-//		public Blinker(Node target) {
-//			this.target = target;
-//			this.start();
-//		}
-//
-//		public void run() {
-//			while (target != null) {
-//				// if (target != null) {
-//				CullHint cullHint = target.getSceneHints().getCullHint();
-//				target.getSceneHints().setCullHint(cullHint == CullHint.Always ? cullHint = CullHint.Inherit : CullHint.Always);
-//				// }
-//				try {
-//					sleep(500);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//
-//		public void finish() {
-//			target.getSceneHints().setCullHint(CullHint.Inherit);
-//			this.target = null;
-//		}
-//	}
-//
-//	Blinker blinker = null;
+//	private boolean printPreview = false;
 	private Line axis;
 	private boolean dirtyRenderer;
-	// private boolean print;
-	// private PrintExporter printExporter;
-	// private PrinterJob printJob;
 	private Dome sky;
+	private ViewMode viewMode = ViewMode.NORMAL;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -186,7 +143,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public SceneManager(final Container panel) {
 		instance = this;
-//		this.panel = panel;
 		root.attachChild(housePartsNode);
 
 		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 8, false, false);
@@ -199,8 +155,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(canvas, new AwtMouseManager(canvas));
 		final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvas);
 		final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvas);
-		final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
-		logicalLayer.registerInput(canvas, pl);
+		final PhysicalLayer physicalLayer = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
+		logicalLayer.registerInput(canvas, physicalLayer);
 
 		frameHandler.addUpdater(this);
 
@@ -228,11 +184,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //		final Camera camera = canvas.getCanvasRenderer().getCamera();
 //		final Dimension size = canvas.getSize();
 //		camera.resize(size.width, size.height);
-		resetCamera();
-		// canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.5, 200);
+		resetCamera(ViewMode.NORMAL);
 		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
-		// canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.1, 100);
-		// camera.setDepthRangeNear(-5);
 
 		AWTImageLoader.registerLoader();
 
@@ -419,7 +372,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			updateSunHeliodon();
 		}
 
-		if (printPreview)
+		if (viewMode == ViewMode.PRINT_PREVIEW)
 			Scene.getInstance().rotate();
 
 		root.updateGeometricState(tpf);
@@ -449,7 +402,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// @Override
 	public boolean renderUnto(Renderer renderer) {
 		if (dirtyRenderer) {
-			renderer.setBackgroundColor(printPreview ? ColorRGBA.WHITE : ColorRGBA.BLACK);
+			renderer.setBackgroundColor(viewMode == ViewMode.PRINT_PREVIEW ? ColorRGBA.WHITE : ColorRGBA.BLACK);
 			dirtyRenderer = false;
 		}
 
@@ -637,7 +590,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				} else if (operation == Operation.SELECT) {
 					drawn = SelectUtil.selectHousePart(x, y, false);
 				}
-				enableDisableMouseRotation();
+				enableDisableRotationControl();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LCONTROL), new TriggerAction() {
@@ -675,13 +628,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (topView)
+				if (viewMode == ViewMode.TOP_VIEW)
 					moveUpDown(source, tpf, true);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.S), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (topView)
+				if (viewMode == ViewMode.TOP_VIEW)
 					moveUpDown(source, tpf, false);
 			}
 		}));
@@ -692,17 +645,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				resetCamera();
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ONE), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				topCameraView();
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.NINE), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				lookAtZero(source);
+				resetCamera(viewMode);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
@@ -742,39 +685,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				updateSunHeliodon();
 			}
 		}));
-
-		//
-		// final Predicate<TwoInputStates> mouseMovedAndOneButtonPressed = Predicates.and(TriggerConditions.mouseMoved(), Predicates.or(TriggerConditions.leftButtonDown(), TriggerConditions.rightButtonDown()));
-		//
-		// logicalLayer.registerTrigger(new InputTrigger(mouseMovedAndOneButtonPressed, new TriggerAction() {
-		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// if (operation == SELECT && (drawn == null || drawn.isDrawCompleted())) {
-		// final MouseState mouseState = inputStates.getCurrent().getMouseState();
-		//
-		// turn(source, mouseState.getDx() * tpf * -MOUSE_TURN_SPEED);
-		// rotateUpDown(source, mouseState.getDy() * tpf * -MOUSE_TURN_SPEED);
-		// }
-		// }
-		// }));
-		// logicalLayer.registerTrigger(new InputTrigger(new MouseButtonCondition(ButtonState.DOWN, ButtonState.DOWN, ButtonState.UNDEFINED), new TriggerAction() {
-		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// moveForward(source, tpf);
-		// }
-		// }));
-		//
-		// logicalLayer.registerTrigger(new InputTrigger(new MouseButtonCondition(ButtonState.DOWN, ButtonState.DOWN, ButtonState.UNDEFINED), new TriggerAction() {
-		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-		// moveForward(source, tpf);
-		// }
-		// }));
-		//
-		// logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
-		// public void perform(Canvas source, TwoInputStates inputStates, double tpf) {
-		// final InputState current = inputStates.getCurrent();
-		//
-		// System.out.println("Key character pressed: " + current.getKeyboardState().getKeyEvent().getKeyChar());
-		// }
-		// }));
 	}
 
 	public void setCameraControl(CameraMode type) {
@@ -796,16 +706,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			part.hidePoints();
 	}
 
-	private void lookAtZero(final Canvas source) {
-		source.getCanvasRenderer().getCamera().setLocation(0, -2, 0);
-		source.getCanvasRenderer().getCamera().lookAt(Vector3.ZERO, Vector3.UNIT_Z); // .negate(null));
-	}
+//	private void lookAtZero(final Canvas source) {
+//		source.getCanvasRenderer().getCamera().setLocation(0, -2, 0);
+//		source.getCanvasRenderer().getCamera().lookAt(Vector3.ZERO, Vector3.UNIT_Z); // .negate(null));
+//	}
 
-	public void resetCamera() {
-		topView = false;
+	public void resetCamera(final ViewMode viewMode) {
+		this.viewMode = viewMode;
+//		topView = false;
 		Camera camera = canvas.getCanvasRenderer().getCamera();
-		final Dimension size = canvas.getSize();
-		camera.resize(size.width, size.height);
+//		final Dimension size = canvas.getSize();
+//		camera.resize(size.width, size.height);
 		
 		if (control != null) {
 			control.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
@@ -818,11 +729,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
 		Vector3 dir = new Vector3(0.0f, 1.0f, 0.0f);
 
-		if (printPreview) {
+		if (viewMode == ViewMode.TOP_VIEW) {
+			camera.setProjectionMode(ProjectionMode.Parallel);			
+			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
+			control.setMoveSpeed(MOVE_SPEED * 10); 
+			loc = new Vector3(0, 0, 50);
+			up = new Vector3(0.0f, -1.0f, 0.0f);
+			dir = new Vector3(0.0f, 0.0f, -1.0f);
+//			root.setScale(0.04);
+		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
 			camera.setProjectionMode(ProjectionMode.Parallel);
-			root.setScale(0.04);
 			up = new Vector3(0.0f, 0.0f, -1.0f);
 			loc = new Vector3(0.5, -2, 0.40);
+			root.setScale(0.04);
 		} else {
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			root.setScale(1);
@@ -833,23 +752,25 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		resizeCamera(camera);
 	}
 
-	public void topCameraView() {
-		topView = true;
-		control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
-		control.setMoveSpeed(MOVE_SPEED * 10); 
-		final Vector3 loc = new Vector3(0, 0, 50);
-		final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
-		final Vector3 up = new Vector3(0.0f, -1.0f, 0.0f);
-		final Vector3 dir = new Vector3(0.0f, 0.0f, -1.0f);
-
-		Camera camera = canvas.getCanvasRenderer().getCamera();
-		camera.setFrame(loc, left, up, dir);
-		camera.setProjectionMode(ProjectionMode.Parallel);
-		resizeCamera(camera);
-	}
+//	public void topCameraView() {
+//		topView = true;
+//		control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
+//		control.setMoveSpeed(MOVE_SPEED * 10); 
+//		final Vector3 loc = new Vector3(0, 0, 50);
+//		final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
+//		final Vector3 up = new Vector3(0.0f, -1.0f, 0.0f);
+//		final Vector3 dir = new Vector3(0.0f, 0.0f, -1.0f);
+//
+//		Camera camera = canvas.getCanvasRenderer().getCamera();
+//		camera.setFrame(loc, left, up, dir);
+//		camera.setProjectionMode(ProjectionMode.Parallel);
+//		resizeCamera(camera);
+//	}
 
 	private void resizeCamera(final Camera camera) {
-		final double scale = topView ? 4 : 0.5;
+		final Dimension size = canvas.getSize();
+		camera.resize(size.width, size.height);
+		final double scale = 0.4; //4; //topView ? 4 : 0.5;
 		final double ratio = (double) camera.getWidth() / camera.getHeight();
 		camera.setFrustumTop(scale);
 		camera.setFrustumBottom(-scale);
@@ -879,7 +800,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
 		final Vector3 dir = Vector3.fetchTempInstance();
 		dir.set(camera.getUp());
-		if (topView)
+		if (viewMode == ViewMode.TOP_VIEW)
 			up = !up;
 		dir.multiplyLocal((up ? 1 : -1) * MOVE_SPEED * tpf);
 		loc.addLocal(dir);
@@ -902,7 +823,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		Scene.getInstance().drawResizeBounds();
 		drawn = newHousePart();
-		enableDisableMouseRotation();
+		enableDisableRotationControl();
 	}
 
 	private HousePart newHousePart() {
@@ -1100,15 +1021,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			passManager.add(bloomRenderPass);
 		}
 
-		enableDisableMouseRotation();
+		enableDisableRotationControl();
 	}
 
 	public void setSunAnim(boolean selected) {
 		this.sunAnim = selected;
 	}
 
-	public void enableDisableMouseRotation() {
-		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted()) && !topView && !printPreview)
+	public void enableDisableRotationControl() {
+		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted()) && viewMode != ViewMode.TOP_VIEW && viewMode != ViewMode.PRINT_PREVIEW)
 			control.setMouseRotateSpeed(0.005);
 		else
 			control.setMouseRotateSpeed(0.000000001);
@@ -1121,11 +1042,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void print() {
 		PrintExporter printExporter = new PrintExporter(Scene.getInstance().getPrintParts().size());
-		// print(renderer.getRenderer());
-		// this.print = true;
-		// }
-		//
-		// public void print(Renderer renderer) {
 		double scale = 0.2;
 		root.setScale(scale);
 		Camera camera = Camera.getCurrentCamera();
@@ -1158,7 +1074,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		// camera.setLocation(location);
 		// camera.lookAt(location.addLocal(direction), up);
-		resetCamera();
+		resetCamera(viewMode);
 	}
 
 	// This class is used to hold an image while on the clipboard.
@@ -1193,16 +1109,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			this.dirtyRenderer = true;
 		new Thread() {
 			public void run() {
-				SceneManager.this.printPreview = printPreview;
+//				SceneManager.this.printPreview = printPreview;
+//				viewMode = ViewMode.PRINT_PREVIEW;
 				if (printPreview) {
-					resetCamera();
+					resetCamera(ViewMode.PRINT_PREVIEW);
 					root.detachChild(floor);
 					root.detachChild(axis);
 					root.detachChild(sky);
 					Scene.getInstance().setFlatten(printPreview);
 				} else {
 					Scene.getInstance().setFlatten(printPreview);
-					resetCamera();
+					resetCamera(ViewMode.NORMAL);
 					root.attachChild(floor);
 					root.attachChild(axis);
 					root.attachChild(sky);
@@ -1222,7 +1139,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //	}
 
 	public boolean isTopView() {
-		return topView;
+		return viewMode == ViewMode.TOP_VIEW;
 	}
 
 }

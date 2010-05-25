@@ -20,6 +20,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
+import org.concord.energy3d.scene.SceneManager.ViewMode;
 
 
 public class MainFrame extends JFrame {
@@ -267,10 +268,11 @@ public class MainFrame extends JFrame {
 			topViewButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 //					JoglAwtCanvas canvas = SceneManager.getInstance().getCanvas();
-					if (topViewButton.isSelected())
-						SceneManager.getInstance().topCameraView();
-					else
-						SceneManager.getInstance().resetCamera();
+//					if (topViewButton.isSelected())
+//						SceneManager.getInstance().topCameraView();
+//					else
+//						SceneManager.getInstance().resetCamera();
+					SceneManager.getInstance().resetCamera(topViewButton.isSelected() ? ViewMode.TOP_VIEW : ViewMode.NORMAL);					
 				}
 			});
 		}

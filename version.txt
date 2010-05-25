@@ -190,6 +190,7 @@ Version 0.2
 - fixed bug with not being able to delete hip roof
 - move view when holding right mouse button
 - extract SelectUtil from SceneManager
+- clean up camera reset code
  
 TODO:
 - combine the wall meshed into one

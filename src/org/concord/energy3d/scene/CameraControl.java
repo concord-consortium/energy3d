@@ -132,10 +132,11 @@ public abstract class CameraControl {
                     if (!firstPing) {
                     	final boolean left = mouse.getButtonState(MouseButton.LEFT) == ButtonState.DOWN;
                     	final boolean right = mouse.getButtonState(MouseButton.RIGHT) == ButtonState.DOWN;
-						if (left && leftButtonAction == ButtonAction.MOVE || right && rightButtonAction == ButtonAction.MOVE)
+						if (left && leftButtonAction == ButtonAction.MOVE || right && rightButtonAction == ButtonAction.MOVE) {
                     		control.move(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
-                    	else if (left && leftButtonAction == ButtonAction.ROTATE || right && rightButtonAction == ButtonAction.ROTATE)
+						} else if (left && leftButtonAction == ButtonAction.ROTATE || right && rightButtonAction == ButtonAction.ROTATE) {
                     		control.rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
+						}
                     } else {
                         firstPing = false;
                     }
@@ -196,5 +197,4 @@ public abstract class CameraControl {
 		this.leftButtonAction = leftButtonAction;
 		this.rightButtonAction = rightButtonAction;
 	}
-
 }
