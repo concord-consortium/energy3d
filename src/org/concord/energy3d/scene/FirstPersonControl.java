@@ -40,7 +40,7 @@ public class FirstPersonControl extends CameraControl {
         }
 
         if (moveFB != 0 || strafeLR != 0) {
-            final Vector3 loc = _workerStoreA.zero();
+            final Vector3 loc = _workerVector.zero();
             if (moveFB == 1) {
                 loc.addLocal(camera.getDirection());
             } else if (moveFB == -1) {
@@ -79,22 +79,22 @@ public class FirstPersonControl extends CameraControl {
 
         if (dx != 0) {
             _workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis != null ? _upAxis : camera.getUp());
-            _workerMatrix.applyPost(camera.getLeft(), _workerStoreA);
-            camera.setLeft(_workerStoreA);
-            _workerMatrix.applyPost(camera.getDirection(), _workerStoreA);
-            camera.setDirection(_workerStoreA);
-            _workerMatrix.applyPost(camera.getUp(), _workerStoreA);
-            camera.setUp(_workerStoreA);
+            _workerMatrix.applyPost(camera.getLeft(), _workerVector);
+            camera.setLeft(_workerVector);
+            _workerMatrix.applyPost(camera.getDirection(), _workerVector);
+            camera.setDirection(_workerVector);
+            _workerMatrix.applyPost(camera.getUp(), _workerVector);
+            camera.setUp(_workerVector);
         }
 
         if (dy != 0) {
             _workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dy, camera.getLeft());
-            _workerMatrix.applyPost(camera.getLeft(), _workerStoreA);
-            camera.setLeft(_workerStoreA);
-            _workerMatrix.applyPost(camera.getDirection(), _workerStoreA);
-            camera.setDirection(_workerStoreA);
-            _workerMatrix.applyPost(camera.getUp(), _workerStoreA);
-            camera.setUp(_workerStoreA);
+            _workerMatrix.applyPost(camera.getLeft(), _workerVector);
+            camera.setLeft(_workerVector);
+            _workerMatrix.applyPost(camera.getDirection(), _workerVector);
+            camera.setDirection(_workerVector);
+            _workerMatrix.applyPost(camera.getUp(), _workerVector);
+            camera.setUp(_workerVector);
         }
 
         camera.normalize();

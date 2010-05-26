@@ -34,8 +34,8 @@ public abstract class CameraControl {
     protected double _mouseRotateSpeed = .005;
     protected double _moveSpeed = 50;
     protected double _keyRotateSpeed = 2.25;
-    protected final Matrix3 _workerMatrix = new Matrix3();
-    protected final Vector3 _workerStoreA = new Vector3();
+    protected final Matrix3 _workerMatrix = new Matrix3();    
+    protected final Vector3 _workerVector = new Vector3();
     protected InputTrigger _mouseTrigger;
     protected InputTrigger _keyTrigger;
     protected boolean enabled = true;

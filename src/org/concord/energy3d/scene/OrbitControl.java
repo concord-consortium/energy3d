@@ -13,16 +13,16 @@ package org.concord.energy3d.scene;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyboardState;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 
 public class OrbitControl extends CameraControl {
-	
-	private Vector3 center = new Vector3(1,0,1);
-	private Vector3 cameraLocation;
+	private static final int FRONT_DISTANCE = 8;
+	private Vector3 _center = new Vector3(1, 0, 1);
+	private final Matrix3 _workerMatrix_2 = new Matrix3();
+	private final Vector4 _workerVector4 = new Vector4();
 
 	public OrbitControl(final ReadOnlyVector3 upAxis) {
 		super(upAxis);
@@ -45,7 +45,7 @@ public class OrbitControl extends CameraControl {
 		}
 
 		if (moveFB != 0 || strafeLR != 0) {
-			final Vector3 loc = _workerStoreA.zero();
+			final Vector3 loc = _workerVector.zero();
 			if (moveFB == 1) {
 				loc.addLocal(camera.getDirection());
 			} else if (moveFB == -1) {
@@ -58,7 +58,7 @@ public class OrbitControl extends CameraControl {
 			}
 			loc.normalizeLocal().multiplyLocal(_moveSpeed * tpf).addLocal(camera.getLocation());
 			camera.setLocation(loc);
-			center.set(camera.getLocation().add(camera.getDirection().multiply(8, null), null));
+			_center.set(camera.getDirection()).multiplyLocal(FRONT_DISTANCE).addLocal(camera.getLocation());
 		}
 
 		// ROTATION
@@ -76,56 +76,27 @@ public class OrbitControl extends CameraControl {
 			rotX -= 1;
 		}
 		if (rotX != 0 || rotY != 0) {
-			rotate(camera, rotX * (_keyRotateSpeed / _mouseRotateSpeed) * tpf, rotY * (_keyRotateSpeed / _mouseRotateSpeed) * tpf);			
+			rotate(camera, rotX * (_keyRotateSpeed / _mouseRotateSpeed) * tpf, rotY * (_keyRotateSpeed / _mouseRotateSpeed) * tpf);
 		}
 	}
 
 	protected void rotate(final Camera camera, final double dx, final double dy) {
-//		if (cameraLocation == null)
-//			cameraLocation = new Vector3(camera.getLocation());
-			
-//		if (dx != 0) {			
-//			_workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis != null ? _upAxis : camera.getUp());
-//			_workerMatrix.applyPost(camera.getLocation(), _workerStoreA);
-//			camera.setLocation(_workerStoreA.addLocal(center));
-
-//			Transform m1 = new Transform();
-//			m1.setTranslation(center.negate(null));
-//			_workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis != null ? _upAxis : camera.getUp());
-			_workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis != null ? _upAxis : camera.getUp());
-			_workerMatrix.multiplyLocal(new Matrix3().fromAngleNormalAxis(_mouseRotateSpeed * dy, camera.getLeft()));
-//			_workerMatrix.applyPost(camera.getLocation(), _workerStoreA);
-			
-			Vector3 newLocation = _workerMatrix.applyPost(camera.getLocation().subtract(center, null), null);
-			
-//			Transform m2 = new Transform();			
-//			m2.setRotation(_workerMatrix);
-//			Vector3 newLocation = m2.applyForward(cameraLocation.subtract(center, null), null);
-			newLocation = newLocation.add(center, null);
-			camera.setLocation(newLocation);
-			
-//		}
-
-//		if (dy != 0) {
-//			_workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dy, camera.getLeft());
-//			_workerMatrix.applyPost(camera.getLocation(), _workerStoreA);
-//			camera.setLocation(_workerStoreA.addLocal(center));
-//		}
-		camera.lookAt(center, _upAxis);
-
-		camera.normalize();
+		_workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis != null ? _upAxis : camera.getUp());
+		_workerMatrix_2.fromAngleNormalAxis(_mouseRotateSpeed * dy, camera.getLeft());
+		_workerMatrix.multiplyLocal(_workerMatrix_2);
+		camera.getLocation().subtract(_center, _workerVector);
+		_workerMatrix.applyPost(_workerVector, _workerVector);
+		_workerVector.addLocal(_center);
+		camera.setLocation(_workerVector);
+		camera.lookAt(_center, _upAxis);
 	}
 
 	protected void move(final Camera camera, final double dx, final double dy) {
-//		Vector3 v = new Vector3(dx * _moveSpeed / 500, 0, dy * _moveSpeed / 500);
-//		_workerMatrix.applyPost(v, _workerStoreA);
-//		camera.setLocation(camera.getLocation().add(v, null));
-
-		Vector4 v = new Vector4(dx * _moveSpeed / 500, dy * _moveSpeed / 500, 0, 0);
-		Vector4 newV = camera.getModelViewProjectionMatrix().applyPost(v, null);
-		cameraLocation = camera.getLocation().add(new Vector3(newV.getX(), newV.getY(), newV.getZ()), null);
-		camera.setLocation(cameraLocation);
-		center.set(camera.getLocation().add(camera.getDirection().multiply(8, null), null));
-		
+		_workerVector4.set(dx * _moveSpeed / 500, dy * _moveSpeed / 500, 0, 0);
+		camera.getModelViewProjectionMatrix().applyPost(_workerVector4, _workerVector4);
+		_workerVector.set(_workerVector4.getX(), _workerVector4.getY(), _workerVector4.getZ());
+		_workerVector.addLocal(camera.getLocation());
+		camera.setLocation(_workerVector);
+		_center.set(camera.getDirection()).multiplyLocal(FRONT_DISTANCE).addLocal(camera.getLocation());
 	}
 }
