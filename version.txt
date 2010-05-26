@@ -191,6 +191,7 @@ Version 0.2
 - move view when holding right mouse button
 - extract SelectUtil from SceneManager
 - clean up camera reset code
+- rotate around the center of view in OrbitControl when camera moves (+8 in camera direction)
  
 TODO:
 - combine the wall meshed into one
