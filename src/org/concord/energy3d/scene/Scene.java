@@ -272,10 +272,16 @@ public class Scene implements Serializable {
 			printParts.clear();
 			double x = 2;
 			double y = 0;
+			int id = 1;
 			for (int i = 0; i < sceneClone.getParts().size(); i++) {
-				HousePart newPart = sceneClone.getParts().get(i);
+				final HousePart newPart = sceneClone.getParts().get(i);
+				root.attachChild(newPart.getRoot());
 				newPart.setOriginal(parts.get(i));
 				if (newPart.isPrintable()) {
+					final String labelText = "(" + id + ")";
+					newPart.setLabel(labelText);
+					newPart.getOriginal().setLabel(labelText);
+					id++;
 					printParts.add(newPart);
 					newPart.setPrintX(5 * x - 2);
 					newPart.setPrintY(5 * y + 1.3);
@@ -285,7 +291,6 @@ public class Scene implements Serializable {
 						y++;
 					}
 				}
-				root.attachChild(newPart.getRoot());
 			}
 		}
 

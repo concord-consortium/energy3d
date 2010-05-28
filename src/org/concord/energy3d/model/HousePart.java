@@ -8,6 +8,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SelectUtil;
 import org.poly2tri.polygon.PolygonPoint;
 
+import com.ardor3d.example.ui.BMFontLoader;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
@@ -17,10 +18,12 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.ui.text.BMFont;
+import com.ardor3d.ui.text.BMText;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
-//	protected static boolean flatten = false;
+	private static final BMFont font = BMFontLoader.defaultFont();
 	protected static double flattenTime = 0;
 	public static double flattenPos = -10;
 	private static boolean snapToObjects = true;
@@ -43,6 +46,7 @@ public abstract class HousePart implements Serializable {
 	private transient HousePart original = null;
 	protected transient double printX, printY;
 	protected transient Vector3 center;
+	private transient BMText label;
 
 //	public static void setFlatten(boolean flatten) {
 //		HousePart.flatten = flatten;
@@ -109,6 +113,7 @@ public abstract class HousePart implements Serializable {
 			abspoints.add(points.get(i).clone());
 		root = new Node(toString());		
 		pointsRoot = new Node("Edit Points");
+//		label = new BMText("textSpatial1", "HELLO", font, BMText.Align.West, BMText.Justify.Center);
 
 		// Set up a reusable pick results
 		pickResults = new PrimitivePickResults();
@@ -132,16 +137,15 @@ public abstract class HousePart implements Serializable {
 		// pointsRoot.setAllNonVisible();
 		// root.updateGeometricState(0);
 		
-//        final BMFont font = BMFontLoader.defaultFont();
-//        final String initialString = "Hello";		
-//        final BMText text = new BMText("textSpatial1", initialString, font, BMText.Align.SouthWest,
-//                BMText.Justify.Right);
-////        text.setFontScale(fontScale);
-////        text.setAutoFade(AutoFade.CapScreenSize);
-////        text.setAutoFadeFalloff(1.0f);
-////        text.setAutoScale(AutoScale.CapScreenSize);
-////        text.setAutoRotate(true);
-//        root.attachChild(text);
+        
+//		final BMFont font = BMFontLoader.defaultFont();
+//		final BMText label = new BMText("textSpatial1", "HELLO", font, BMText.Align.Center, BMText.Justify.Center);
+//        text.setFontScale(fontScale);
+//        text.setAutoFade(AutoFade.CapScreenSize);
+//        text.setAutoFadeFalloff(1.0f);
+//        text.setAutoScale(AutoScale.CapScreenSize);
+//        text.setAutoRotate(true);
+//        root.attachChild(label);
 	}
 	
 	private void initCheck() {
@@ -487,9 +491,12 @@ public abstract class HousePart implements Serializable {
 			center.addLocal(p);
 		}	
 		center.multiplyLocal(1.0 / points.size());
+		if (label != null)
+			label.setTranslation(center);
 		
 		if (flattenTime > 0)
-			flatten();
+			flatten();		
+		
 	}
 
 //	public void recalculateRelativePoints() {
@@ -523,5 +530,14 @@ public abstract class HousePart implements Serializable {
 
 	public boolean isPrintable() {
 		return true;
+	}
+
+	public void setLabel(String labelText) {
+		if (label == null) {
+			label = new BMText("textSpatial1", labelText, font, BMText.Align.West, BMText.Justify.Center);
+			label.setTranslation(center);
+			root.attachChild(label);
+		} else
+			label.setText(labelText);
 	}
 }

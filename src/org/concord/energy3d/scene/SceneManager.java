@@ -303,7 +303,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 	}
 
-	@MainThread
 	public void update(final ReadOnlyTimer timer) {
 		// Scene.getInstance().updateTexture();
 		final double tpf = timer.getTimePerFrame();
@@ -649,18 +648,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void resetCamera(final ViewMode viewMode) {
 		this.viewMode = viewMode;
-//		topView = false;
 		Camera camera = canvas.getCanvasRenderer().getCamera();
-//		final Dimension size = canvas.getSize();
-//		camera.resize(size.width, size.height);
 		
 		if (control != null) {
 			control.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 			control.setMoveSpeed(MOVE_SPEED);
 		}
-		// Vector3 loc = new Vector3(1.0f, -5.0f, 1.0f);
 		Vector3 loc = new Vector3(1.0f, -8.0f, 1.0f);
-		// Vector3 loc = new Vector3(0, -2, 0);
 		Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
 		Vector3 dir = new Vector3(0.0f, 1.0f, 0.0f);
@@ -672,18 +666,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			loc = new Vector3(0, 0, 50);
 			up = new Vector3(0.0f, -1.0f, 0.0f);
 			dir = new Vector3(0.0f, 0.0f, -1.0f);
-//			root.setScale(0.04);
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
-			control.setMoveSpeed(MOVE_SPEED / 10); 
-			camera.setProjectionMode(ProjectionMode.Parallel);
-			up = new Vector3(0.0f, 0.0f, -1.0f);
-			loc = new Vector3(0.5, -2, 0.40);
-			root.setScale(0.04);
+//			control.setMoveSpeed(MOVE_SPEED / 10); 
+//			camera.setProjectionMode(ProjectionMode.Parallel);
+			camera.setProjectionMode(ProjectionMode.Perspective);
+//			up = new Vector3(0.0f, 0.0f, -1.0f);
+//			loc = new Vector3(0.5, -2, 0.40);
+			loc = new Vector3(5, -20, 5);
+//			root.setScale(0.04);
 		} else {
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			root.setScale(1);
-			// camera.lookAt(0, 0, 1, Vector3.UNIT_Z);
 		}
 
 		camera.setFrame(loc, left, up, dir);
