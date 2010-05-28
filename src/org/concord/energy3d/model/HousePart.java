@@ -20,7 +20,7 @@ import com.ardor3d.scenegraph.shape.Sphere;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
-	protected static boolean flatten = false;
+//	protected static boolean flatten = false;
 	protected static double flattenTime = 0;
 	public static double flattenPos = -10;
 	private static boolean snapToObjects = true;
@@ -44,13 +44,13 @@ public abstract class HousePart implements Serializable {
 	protected transient double printX, printY;
 	protected transient Vector3 center;
 
-	public static void setFlatten(boolean flatten) {
-		HousePart.flatten = flatten;
-	}
-
-	public static boolean isFlatten() {
-		return flatten;
-	}
+//	public static void setFlatten(boolean flatten) {
+//		HousePart.flatten = flatten;
+//	}
+//
+//	public static boolean isFlatten() {
+//		return flatten;
+//	}
 
 	public static void setFlattenTime(double flattenTime) {
 		if (flattenTime < 0)
@@ -131,6 +131,17 @@ public abstract class HousePart implements Serializable {
 		root.attachChild(pointsRoot);
 		// pointsRoot.setAllNonVisible();
 		// root.updateGeometricState(0);
+		
+//        final BMFont font = BMFontLoader.defaultFont();
+//        final String initialString = "Hello";		
+//        final BMText text = new BMText("textSpatial1", initialString, font, BMText.Align.SouthWest,
+//                BMText.Justify.Right);
+////        text.setFontScale(fontScale);
+////        text.setAutoFade(AutoFade.CapScreenSize);
+////        text.setAutoFadeFalloff(1.0f);
+////        text.setAutoScale(AutoScale.CapScreenSize);
+////        text.setAutoRotate(true);
+//        root.attachChild(text);
 	}
 	
 	private void initCheck() {
@@ -477,7 +488,7 @@ public abstract class HousePart implements Serializable {
 		}	
 		center.multiplyLocal(1.0 / points.size());
 		
-		if (flatten)
+		if (flattenTime > 0)
 			flatten();
 	}
 
@@ -490,23 +501,8 @@ public abstract class HousePart implements Serializable {
 	protected void flatten() {
 		root.setTranslation(0,0,0);
 		Vector3 targetCenter = new Vector3(printX, 0, printY);
-//		Vector3 currentCenter = new Vector3();
-//		for (Vector3 p : abspoints)
-//			currentCenter.addLocal(root.getTransform().applyForward(p.clone()));
 		Vector3 currentCenter = root.getTransform().applyForward(center.clone());
-//		currentCenter.multiplyLocal(1.0 / abspoints.size());
 		root.setTranslation(targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime));
-		
-//		Vector3 trans = null;
-//		try {
-//			trans = targetCenter.subtract(root.getWorldBound().getCenter(), null);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}		
-//		double y = -root.getTransform().applyForward(abspoints.get(0).clone()).getY();
-//		root.setTranslation(flattenTime *printX, flattenTime * y, flattenTime *printY);
-//		root.setTranslation(root.getTranslation().add(trans, null));
-
 	}
 
 	public void setPrintX(double printX) {

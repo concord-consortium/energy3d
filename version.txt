@@ -193,6 +193,8 @@ Version 0.2
 - clean up camera reset code
 - rotate around the center of view in OrbitControl when camera moves (+8 in camera direction)
 - re-use allocated store objects in OrbitControl and clean the code 
+- bug fix: camera would move when editing objects
+- bug fix: house height would reset to zero when editing platform points  
  
 TODO:
 - combine the wall meshed into one

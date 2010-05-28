@@ -100,7 +100,7 @@ public class Floor extends HousePart {
 			pointsRoot.getChild(i).setTranslation(p);
 		}
 
-		if (flatten)
+		if (flattenTime > 0)
 			flatten();
 		
 		// force bound update

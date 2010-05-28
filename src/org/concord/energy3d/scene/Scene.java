@@ -41,11 +41,17 @@ public class Scene implements Serializable {
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private transient ArrayList<HousePart> printParts;
 	private double RADIUS = 0;
+	transient int C; // = 20;
+	transient int size; // = C * C * C * 3;
+	transient ByteBuffer texBuffer;// = BufferUtils.createByteBuffer(size);
+	transient Texture3D tex; // = new Texture3D();
+	private static double angle = 0;
+	private static Scene sceneClone = null;
 
 	public static Scene getInstance() {
 		if (instance == null) {
-			 instance = new Scene();
-//			open();
+			instance = new Scene();
+			// open();
 		}
 		return instance;
 	}
@@ -55,11 +61,10 @@ public class Scene implements Serializable {
 	}
 
 	public void init() {
-		System.out.println("Scene.init()");
 		printParts = new ArrayList<HousePart>();
-//		initTexture3D();
+		// initTexture3D();
 	}
-	
+
 	public void initTexture3D() {
 		TextureState ts;
 		ts = (TextureState) root.getLocalRenderState(StateType.Texture);
@@ -79,13 +84,6 @@ public class Scene implements Serializable {
 		ts.setTexture(texture);
 		ts.setNeedsRefresh(true);
 	}
-
-	transient int C; // = 20;
-	transient int size; // = C * C * C * 3;
-	transient ByteBuffer texBuffer;// = BufferUtils.createByteBuffer(size);
-	transient Texture3D tex; // = new Texture3D();
-	private static double angle = 0;
-	private static Scene sceneClone = null;
 
 	public void updateTexture() {
 		texBuffer.position(0);
@@ -206,26 +204,17 @@ public class Scene implements Serializable {
 		return parts.add(e);
 	}
 
-	public void clear() {
-		parts.clear();
-	}
-
 	public boolean remove(Object o) {
 		return parts.remove(o);
-	}
-
-	public int size() {
-		return parts.size();
 	}
 
 	public ArrayList<HousePart> getParts() {
 		return parts;
 	}
-	
+
 	public ArrayList<HousePart> getPrintParts() {
 		return printParts;
 	}
-	
 
 	public void save() {
 		try {
@@ -247,6 +236,7 @@ public class Scene implements Serializable {
 	}
 
 	public static void open() {
+		System.out.print("Opening...");
 		try {
 			ObjectInputStream in = new ObjectInputStream(new FileInputStream("house.ser"));
 			instance = (Scene) in.readObject();
@@ -256,8 +246,6 @@ public class Scene implements Serializable {
 				houseRoot.attachChild(housePart.getRoot());
 			}
 			root.attachChild(houseRoot);
-			// for (HousePart housePart : instance.getParts())
-			// housePart.draw();
 		} catch (FileNotFoundException e) {
 			System.out.println("Energy3D saved file not found...creating a new file...");
 			instance = new Scene();
@@ -265,7 +253,7 @@ public class Scene implements Serializable {
 			e.printStackTrace();
 			instance = new Scene();
 		}
-		// instance.init();
+		System.out.println("done");
 	}
 
 	public void drawResizeBounds() {
@@ -277,90 +265,73 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public void setFlatten(final boolean flatten) { //, final boolean thread) {
+	public void setFlatten(final boolean flatten) {
 		if (flatten) {
-//			try {
-				if (sceneClone != null)
-					for (HousePart housePart : sceneClone.getParts())
-						root.detachChild(housePart.getRoot());
-				HousePart.flattenPos = 0;
-				sceneClone  = (Scene)ObjectCloner.deepCopy(this);
-//				sceneClone = new Scene();
-				printParts.clear();
-				double x = 2;
-				double y = 0;				
-				for (int i = 0; i < sceneClone.getParts().size(); i++) {
-//					HousePart newPart = (HousePart)ObjectCloner.deepCopy(part);
-					HousePart newPart = sceneClone.getParts().get(i);
-					newPart.setOriginal(parts.get(i));
-					if (newPart.isPrintable()) {
-						printParts.add(newPart);
-						newPart.setPrintX(5*x-2);
-						newPart.setPrintY(5*y+1.3);					
-						x++;
-						if (x >= 5) {
-							x = 0;
-							y++;
-						}
+			HousePart.flattenPos = 0;
+			sceneClone = (Scene) ObjectCloner.deepCopy(this);
+			printParts.clear();
+			double x = 2;
+			double y = 0;
+			for (int i = 0; i < sceneClone.getParts().size(); i++) {
+				HousePart newPart = sceneClone.getParts().get(i);
+				newPart.setOriginal(parts.get(i));
+				if (newPart.isPrintable()) {
+					printParts.add(newPart);
+					newPart.setPrintX(5 * x - 2);
+					newPart.setPrintY(5 * y + 1.3);
+					x++;
+					if (x >= 5) {
+						x = 0;
+						y++;
 					}
-//					sceneClone.add(newPart);
-//					if (i < 6)
-					root.attachChild(newPart.getRoot());	
 				}
-//			} catch (Exception e1) {
-//				e1.printStackTrace();
-//			}
+				root.attachChild(newPart.getRoot());
+			}
 		}
-			
-			for (HousePart part : getParts())
-				part.getRoot().getSceneHints().setCullHint(CullHint.Always);		
 
-//		if (thread)	
-//		new Thread() {
-//			public void run() {
-				animateFlatten(flatten);		
-//			}
-//		}.start();
-//		else
-//			animateFlatten(flatten);
-	}
+		for (HousePart part : getParts())
+			part.getRoot().getSceneHints().setCullHint(CullHint.Always);
+
+//		animateFlatten(flatten);
+//	}
+
+//	private void animateFlatten(final boolean flatten) {
+	//		if (flatten)
+	//			HousePart.setFlatten(true);
+			for (double t = 0; t < 1.1; t += 0.05) {
+				if (flatten)
+					HousePart.setFlattenTime(t);
+				else
+					HousePart.setFlattenTime(1 - t);
+				for (HousePart part : sceneClone.getParts())
+					part.draw();
+				try {
+					Thread.sleep(30);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			if (!flatten) {
+	//			HousePart.setFlatten(false);
+	//			for (HousePart part : parts)
+	//				part.draw();
+				houseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
+				angle = 0;
+				for (HousePart housePart : sceneClone.getParts())
+					root.detachChild(housePart.getRoot());
+			}
 	
-	public void rotate() {
-		angle += 0.01;
-		houseRoot.setRotation(new Matrix3().fromAngles(0, 0, angle ));
-	}
-
-	private void animateFlatten(final boolean flatten) {
-		if (flatten)
-			HousePart.setFlatten(true);
-		for (double t = 0; t < 1.1; t += 0.05) {
-//				double t = 1;
-			if (flatten)						
-				HousePart.setFlattenTime(t);
-			else
-				HousePart.setFlattenTime(1-t);
-			for (HousePart part : sceneClone.getParts())
-				part.draw();
+			for (HousePart part : getParts())
+				part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
 			try {
-				Thread.sleep(30);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		if (!flatten) {
-			HousePart.setFlatten(false);
-			for (HousePart part : parts)
-				part.draw();
-//			SceneManager.getInstance().resetCamera();
-			houseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
-			angle = 0;
-		}
-		for (HousePart part : getParts())
-			part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+
+	public void rotate() {
+		angle += 0.01;
+		houseRoot.setRotation(new Matrix3().fromAngles(0, 0, angle));
 	}
 }

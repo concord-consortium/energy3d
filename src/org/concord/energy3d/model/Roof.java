@@ -121,7 +121,7 @@ public class Roof extends HousePart {
 //			pointsRoot.setVisible(i, true);
 		}
 
-		if (flatten)
+		if (flattenTime > 0)
 			flatten();
 		
 		// force bound update

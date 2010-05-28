@@ -598,6 +598,11 @@ public class MainFrame extends JFrame {
 		this.setJMenuBar(getAppMenuBar());
 		this.setContentPane(getJContentPane());
 		this.setTitle("Solar House Simulation");
+		this.addWindowListener(new java.awt.event.WindowAdapter() {
+			public void windowClosing(java.awt.event.WindowEvent e) {
+				SceneManager.getInstance().exit();
+			}
+		});
 	}
 
 	/**
