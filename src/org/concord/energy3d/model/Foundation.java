@@ -173,5 +173,20 @@ public class Foundation extends HousePart {
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 		super.flatten();
 	}
+	
+	protected void computeCenter() {
+		center.set(0, 0, 0);
+		for (int i = 0; i < points.size() / 2; i++) {
+			Vector3 p = points.get(i);
+			p = toAbsolute(p);
+			pointsRoot.getChild(i).setTranslation(p);
+			abspoints.get(i).set(p);
+			center.addLocal(p);
+		}	
+		center.multiplyLocal(1.0 / points.size() * 2);
+	}	
 
+	protected double computeLabelTop() {
+		return mesh.getYExtent();
+	}	
 }

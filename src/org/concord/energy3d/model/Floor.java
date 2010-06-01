@@ -28,6 +28,7 @@ public class Floor extends HousePart {
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 //	private transient Vector3 avg;
+	private double labelTop;
 
 	public Floor() {
 		super(1, 1, 0.5);
@@ -100,6 +101,7 @@ public class Floor extends HousePart {
 			pointsRoot.getChild(i).setTranslation(p);
 		}
 
+		updateLabelLocation();
 		if (flattenTime > 0)
 			flatten();
 		
@@ -110,11 +112,15 @@ public class Floor extends HousePart {
 
 	private void shiftToOutterEdge(ArrayList<PolygonPoint> wallUpperPoints) {
 		center.set(0, 0, 0);
+		double maxY = wallUpperPoints.get(0).getY();
 		for (PolygonPoint p : wallUpperPoints) {
 			center.addLocal(p.getX(), p.getY(), height);
 			p.set(p.getX(), p.getY(), height);
+			if (p.getY() > maxY)
+				maxY = p.getY();			
 		}
 		center.multiplyLocal(1.0 / wallUpperPoints.size());
+		labelTop = (maxY-center.getY());
 	}
 	
 	public void setHeight(double newHeight, boolean finalize) {
@@ -129,5 +135,9 @@ public class Floor extends HousePart {
 //		root.setTranslation(flattenTime * printX, height, flattenTime * printY);
 		super.flatten();
 	}		
+
+	protected double computeLabelTop() {
+		return labelTop;
+	}	
 	
 }

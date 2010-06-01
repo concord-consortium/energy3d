@@ -13,6 +13,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
@@ -28,6 +29,7 @@ public class Roof extends HousePart {
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 //	private transient Vector3 center;
+	private double labelTop;
 
 	public Roof() {
 		super(1, 1, 0.5);
@@ -78,7 +80,7 @@ public class Roof extends HousePart {
 		if (container == null)
 			return;
 		
-//		super.draw();
+//		super.draw();				
 		
 		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
 		
@@ -121,6 +123,8 @@ public class Roof extends HousePart {
 //			pointsRoot.setVisible(i, true);
 		}
 
+		updateLabelLocation();
+		
 		if (flattenTime > 0)
 			flatten();
 		
@@ -175,16 +179,30 @@ public class Roof extends HousePart {
 	private void shiftToOutterEdge(ArrayList<PolygonPoint> wallUpperPoints) {
 		final double edgeLenght = 0.3;
 		Vector3 op = new Vector3();
+		double maxY;
+		maxY = wallUpperPoints.get(0).getY();
 		for (PolygonPoint p : wallUpperPoints) {
 			op.set(p.getX(), p.getY(), 0).subtractLocal(center.getX(), center.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
 			op.addLocal(p.getX(), p.getY(), p.getZ());
 			p.set(op.getX(), op.getY(), op.getZ()+0.01);
+			if (p.getY() > maxY)
+				maxY = p.getY();			
 		}
+		labelTop = (maxY-center.getY());
 	}
 
 	protected void flatten() {		
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 //		root.setTranslation(flattenTime * printX, points.get(0).getZ(), flattenTime * printY);
 		super.flatten();
-	}		
+	}
+	
+	protected double computeLabelTop() {
+		return labelTop;
+	}	
+	
+	protected ReadOnlyVector3 getFaceDirection() {
+		return new Vector3(0, 0, 0.5 + height);
+	}	
+	
 }

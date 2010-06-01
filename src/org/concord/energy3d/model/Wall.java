@@ -641,6 +641,9 @@ public class Wall extends HousePart {
 //		root.setTranslation(flattenTime *printX, flattenTime * y, flattenTime *printY);
 		super.flatten();
 	}
-	
+
+	protected ReadOnlyVector3 getFaceDirection() {
+		return thicknessNormal.negate(null).normalizeLocal().multiplyLocal(0.5);
+	}	
 
 }
