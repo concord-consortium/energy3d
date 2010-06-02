@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.io.Serializable;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
@@ -15,12 +16,14 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -471,9 +474,11 @@ public abstract class HousePart implements Serializable {
 
 		if (flattenTime > 0)
 			flatten();
+		
+		drawMeasurements();
 
 	}
-
+	
 	protected void computeCenter() {
 		center.set(0, 0, 0);
 		for (int i = 0; i < points.size(); i++) {
@@ -543,4 +548,31 @@ public abstract class HousePart implements Serializable {
 	protected ReadOnlyVector3 getFaceDirection() {
 		return defaultDirection ;
 	}
+
+	private void drawMeasurements() {
+		final double C = 0.1;
+		if (abspoints.size() >= 2) {
+			Line line = new Line("Measurement");
+			final FloatBuffer vertices = BufferUtils.createVector3Buffer(2);
+			line.getMeshData().setVertexBuffer(vertices);
+			Vector3 v = new Vector3();
+			Vector3 middle = new Vector3();
+			BMText label = new BMText("textSpatial1", "Hello", font, BMText.Align.Center, BMText.Justify.Center); 
+			for (int i=0; i < 2; i++) {				
+				v.set(abspoints.get(i));//.addLocal(C, C, 0);
+				v.subtractLocal(center).normalizeLocal().multiplyLocal(C).addLocal(abspoints.get(i)).setZ(abspoints.get(i).getZ());
+				vertices.put(v.getXf()).put(v.getYf()).put(v.getZf());
+				middle.set(v);
+				i++;
+				v.set(abspoints.get(i));//.addLocal(C, C, 0);
+				v.subtractLocal(center).normalizeLocal().multiplyLocal(C).addLocal(abspoints.get(i)).setZ(abspoints.get(i).getZ());
+				vertices.put(v.getXf()).put(v.getYf()).put(v.getZf());
+				label.setText(""+Math.round(v.subtract(middle, null).getZf() * 100) / 100.0);
+				middle.addLocal(v).multiplyLocal(0.5);				
+				label.setTranslation(middle.getXf(), middle.getYf(), middle.getZf());
+			}			
+			root.attachChild(label);
+			root.attachChild(line);
+		}
+	}	
 }

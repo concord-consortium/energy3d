@@ -196,7 +196,9 @@ Version 0.2
 - bug fix: camera would move when editing objects
 - bug fix: house height would reset to zero when editing platform points
 - draw numerical labels for print parts and original parts when in print preview mode
-- move numerical labels to top of print parts and front of actual model    
+- move numerical labels to top of print parts and front of actual model
+- create measurement annotations in print preview mode
+- shift measurement lines away from the center of house Part  
  
 TODO:
 - combine the wall meshed into one
