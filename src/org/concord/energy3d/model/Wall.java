@@ -643,6 +643,8 @@ public class Wall extends HousePart {
 	}
 
 	protected ReadOnlyVector3 getFaceDirection() {
+		if (thicknessNormal == null)
+			thicknessNormal = decideThicknessNormal();
 		return thicknessNormal.negate(null).normalizeLocal().multiplyLocal(0.5);
 	}	
 

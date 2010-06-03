@@ -12,6 +12,7 @@ import org.poly2tri.polygon.PolygonPoint;
 import com.ardor3d.example.ui.BMFontLoader;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -51,7 +52,8 @@ public abstract class HousePart implements Serializable {
 	protected transient double printX, printY;
 	protected transient Vector3 center;
 	private transient BMText label;
-	private ReadOnlyVector3 defaultDirection;
+	private transient ReadOnlyVector3 defaultDirection;
+	private transient Node annotRoot;
 
 	// public static void setFlatten(boolean flatten) {
 	// HousePart.flatten = flatten;
@@ -119,6 +121,7 @@ public abstract class HousePart implements Serializable {
 			abspoints.add(points.get(i).clone());
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");
+		annotRoot = new Node("Annotations");
 		// label = new BMText("textSpatial1", "HELLO", font, BMText.Align.West, BMText.Justify.Center);
 
 		// Set up a reusable pick results
@@ -140,6 +143,7 @@ public abstract class HousePart implements Serializable {
 		// pointsRoot.setAllVisible();
 		// pointsRoot.updateWorldBound(false);
 		root.attachChild(pointsRoot);
+		root.attachChild(annotRoot);
 		// pointsRoot.setAllNonVisible();
 		// root.updateGeometricState(0);
 
@@ -474,11 +478,11 @@ public abstract class HousePart implements Serializable {
 
 		if (flattenTime > 0)
 			flatten();
-		
+
 		drawMeasurements();
 
 	}
-	
+
 	protected void computeCenter() {
 		center.set(0, 0, 0);
 		for (int i = 0; i < points.size(); i++) {
@@ -546,33 +550,27 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected ReadOnlyVector3 getFaceDirection() {
-		return defaultDirection ;
+		return defaultDirection;
 	}
 
 	private void drawMeasurements() {
-		final double C = 0.1;
-		if (abspoints.size() >= 2) {
-			Line line = new Line("Measurement");
-			final FloatBuffer vertices = BufferUtils.createVector3Buffer(2);
-			line.getMeshData().setVertexBuffer(vertices);
-			Vector3 v = new Vector3();
-			Vector3 middle = new Vector3();
-			BMText label = new BMText("textSpatial1", "Hello", font, BMText.Align.Center, BMText.Justify.Center); 
-			for (int i=0; i < 2; i++) {				
-				v.set(abspoints.get(i));//.addLocal(C, C, 0);
-				v.subtractLocal(center).normalizeLocal().multiplyLocal(C).addLocal(abspoints.get(i)).setZ(abspoints.get(i).getZ());
-				vertices.put(v.getXf()).put(v.getYf()).put(v.getZf());
-				middle.set(v);
-				i++;
-				v.set(abspoints.get(i));//.addLocal(C, C, 0);
-				v.subtractLocal(center).normalizeLocal().multiplyLocal(C).addLocal(abspoints.get(i)).setZ(abspoints.get(i).getZ());
-				vertices.put(v.getXf()).put(v.getYf()).put(v.getZf());
-				label.setText(""+Math.round(v.subtract(middle, null).getZf() * 100) / 100.0);
-				middle.addLocal(v).multiplyLocal(0.5);				
-				label.setTranslation(middle.getXf(), middle.getYf(), middle.getZf());
-			}			
-			root.attachChild(label);
-			root.attachChild(line);
+		if (abspoints.size() < 2)
+			return;
+		
+		int[] order = {0, 1, 3, 2, 0};
+
+		
+		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {
+			final SizeAnnotation annot;
+			if (annotCounter < annotRoot.getChildren().size())
+				annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
+			else {
+				annot = new SizeAnnotation();
+				annotRoot.attachChild(annot);
+			}
+			annotCounter++;
+			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection());
 		}
-	}	
+
+	}
 }

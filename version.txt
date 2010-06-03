@@ -198,7 +198,9 @@ Version 0.2
 - draw numerical labels for print parts and original parts when in print preview mode
 - move numerical labels to top of print parts and front of actual model
 - create measurement annotations in print preview mode
-- shift measurement lines away from the center of house Part  
+- shift measurement lines away from the center of house Part
+- create SizeAnnotation class
+- offset the measurement lines based on the perpendicular direction from wall edge to direction away from center   
  
 TODO:
 - combine the wall meshed into one

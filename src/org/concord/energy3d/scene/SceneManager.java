@@ -961,15 +961,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void enableDisableRotationControl() {
-//		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted()) && viewMode != ViewMode.TOP_VIEW && viewMode != ViewMode.PRINT_PREVIEW)
-//			control.setMouseRotateSpeed(0.005);
-//		else
-//			control.setMouseRotateSpeed(0.000000001);
-//
-//		if (sunControl)
-//			control.setKeyRotateSpeed(0);
-//		else
-//			control.setKeyRotateSpeed(1);
+		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted()) && viewMode != ViewMode.TOP_VIEW && viewMode != ViewMode.PRINT_PREVIEW)
+			control.setMouseRotateSpeed(0.005);
+		else
+			control.setMouseRotateSpeed(0.000000001);
+
+		if (sunControl)
+			control.setKeyRotateSpeed(0);
+		else
+			control.setKeyRotateSpeed(1);
 	}
 
 	public void print() {
