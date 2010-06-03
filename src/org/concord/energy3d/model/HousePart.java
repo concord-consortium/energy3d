@@ -1,7 +1,6 @@
 package org.concord.energy3d.model;
 
 import java.io.Serializable;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
@@ -12,19 +11,16 @@ import org.poly2tri.polygon.PolygonPoint;
 import com.ardor3d.example.ui.BMFontLoader;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
-import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;

@@ -200,7 +200,9 @@ Version 0.2
 - create measurement annotations in print preview mode
 - shift measurement lines away from the center of house Part
 - create SizeAnnotation class
-- offset the measurement lines based on the perpendicular direction from wall edge to direction away from center   
+- offset the measurement lines based on the perpendicular direction from wall edge to direction away from center
+- draw annotation arrows as lines
+- draw annotation arrows as triangles    
  
 TODO:
 - combine the wall meshed into one
