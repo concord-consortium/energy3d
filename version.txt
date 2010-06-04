@@ -202,7 +202,8 @@ Version 0.2
 - create SizeAnnotation class
 - offset the measurement lines based on the perpendicular direction from wall edge to direction away from center
 - draw annotation arrows as lines
-- draw annotation arrows as triangles    
+- draw annotation arrows as triangles   
+- leave empty space in annotation line where there is measurements 
  
 TODO:
 - combine the wall meshed into one

@@ -14,7 +14,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class SizeAnnotation extends Node {
 	private final BMText label = new BMText("textSpatial1", "0.0", BMFontLoader.defaultFont(), BMText.Align.Center, BMText.Justify.Center);
-	private final Line lines = new Line("Size annotation lines", BufferUtils.createVector3Buffer(10), null, null, null);
+	private final Line lines = new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null);
 	private final Mesh arrows = new Mesh("Arrows");
 	
 	public SizeAnnotation() {
@@ -34,13 +34,21 @@ public class SizeAnnotation extends Node {
 		if (v.dot(offset) < 0)
 			offset.negateLocal();
 			
+		
 		FloatBuffer vertexBuffer = lines.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		
 		// main line
-		Vector3 newFrom = Vector3.fetchTempInstance().set(from).addLocal(offset);
+		final Vector3 newFrom = Vector3.fetchTempInstance().set(from).addLocal(offset);
+		final Vector3 newTo = Vector3.fetchTempInstance().set(to).addLocal(offset);
+		final Vector3 middle = Vector3.fetchTempInstance().set(newFrom).addLocal(newTo).multiplyLocal(0.5);
+		Vector3 body = Vector3.fetchTempInstance().set(to).subtractLocal(from).multiplyLocal(0.5);
 		vertexBuffer.put(newFrom.getXf()).put(newFrom.getYf()).put(newFrom.getZf());
-		Vector3 newTo = Vector3.fetchTempInstance().set(to).addLocal(offset);
+		double s = (body.length() - 0.15) / body.length();
+		v.set(body).multiplyLocal(s).addLocal(newFrom);
+		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+		v.set(body).multiplyLocal(-s).addLocal(newTo);
+		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());		
 		vertexBuffer.put(newTo.getXf()).put(newTo.getYf()).put(newTo.getZf());				
 		
 		offset.multiplyLocal(0.5);
@@ -58,7 +66,7 @@ public class SizeAnnotation extends Node {
 
 		// arrow		
 		offset.multiplyLocal(0.5);
-		Vector3 body = Vector3.fetchTempInstance().set(to).subtractLocal(from).normalizeLocal().multiplyLocal(0.05);
+		body = Vector3.fetchTempInstance().set(to).subtractLocal(from).normalizeLocal().multiplyLocal(0.05);
 //		// arrow right side
 //		v.set(newFrom);
 //		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
@@ -89,9 +97,9 @@ public class SizeAnnotation extends Node {
 		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());			
 		
 				
-		Vector3 middle = Vector3.fetchTempInstance().set(newFrom).addLocal(newTo).multiplyLocal(0.5);		
+//		Vector3 middle = Vector3.fetchTempInstance().set(newFrom).addLocal(newTo).multiplyLocal(0.5);		
 		label.setTranslation(middle);	
-		label.setText(""+Math.round(to.subtract(from, null).length() * 100) / 100.0);
+		label.setText(""+Math.round(to.subtract(from, null).length() * 100) / 100.0 + "m");
 		
 		
 		

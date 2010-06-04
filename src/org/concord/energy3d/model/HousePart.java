@@ -523,7 +523,7 @@ public abstract class HousePart implements Serializable {
 			final Align align = (original == null) ? BMText.Align.Center : BMText.Align.South;
 			label = new BMText("textSpatial1", labelText, font, align, BMText.Justify.Center);
 			updateLabelLocation();
-			root.attachChild(label);
+//			root.attachChild(label);
 		} else
 			label.setText(labelText);
 	}
