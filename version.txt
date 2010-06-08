@@ -203,7 +203,11 @@ Version 0.2
 - offset the measurement lines based on the perpendicular direction from wall edge to direction away from center
 - draw annotation arrows as lines
 - draw annotation arrows as triangles   
-- leave empty space in annotation line where there is measurements 
+- leave empty space in annotation line where there is measurements
+- create a new font without outline 
+- avoid drawing redundant annotations for walls
+- draw horizontal annotations in front of walls instead of below them when not in print preview mode
+- align the horizontal annotations with the annotation line when not in print preview mode
  
 TODO:
 - combine the wall meshed into one

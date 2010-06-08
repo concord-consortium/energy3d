@@ -11,6 +11,7 @@ import org.poly2tri.polygon.PolygonPoint;
 import com.ardor3d.example.ui.BMFontLoader;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -24,7 +25,7 @@ import com.ardor3d.ui.text.BMText.Align;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private static final BMFont font = BMFontLoader.defaultFont();
+//	private static final BMFont font = BMFontLoader.defaultFont();
 	protected static double flattenTime = 0;
 	public static double flattenPos = -10;
 	private static boolean snapToObjects = true;
@@ -44,12 +45,12 @@ public abstract class HousePart implements Serializable {
 	protected transient double orgHeight;
 	protected boolean relativeToHorizontal;
 	protected double pos;
-	private transient HousePart original = null;
+	protected transient HousePart original = null;
 	protected transient double printX, printY;
 	protected transient Vector3 center;
 	private transient BMText label;
 	private transient ReadOnlyVector3 defaultDirection;
-	private transient Node annotRoot;
+	protected transient Node annotRoot;
 
 	// public static void setFlatten(boolean flatten) {
 	// HousePart.flatten = flatten;
@@ -521,6 +522,7 @@ public abstract class HousePart implements Serializable {
 	public void setLabel(String labelText) {
 		if (label == null) {
 			final Align align = (original == null) ? BMText.Align.Center : BMText.Align.South;
+			final BMFont font = BMFontLoader.defaultFont();
 			label = new BMText("textSpatial1", labelText, font, align, BMText.Justify.Center);
 			updateLabelLocation();
 //			root.attachChild(label);
@@ -549,11 +551,13 @@ public abstract class HousePart implements Serializable {
 		return defaultDirection;
 	}
 
-	private void drawMeasurements() {
+	protected void drawMeasurements() {
 		if (abspoints.size() < 2)
 			return;
 		
 		int[] order = {0, 1, 3, 2, 0};
+		
+//		int[] order = {3, 2, 0};
 
 		
 		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {
@@ -565,7 +569,7 @@ public abstract class HousePart implements Serializable {
 				annotRoot.attachChild(annot);
 			}
 			annotCounter++;
-			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection());
+			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false);
 		}
 
 	}
