@@ -13,6 +13,7 @@ import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.TextureManager;
 
 public class Foundation extends HousePart {
@@ -188,5 +189,21 @@ public class Foundation extends HousePart {
 
 	protected double computeLabelTop() {
 		return mesh.getYExtent();
+	}
+	
+	protected void drawMeasurements() {
+		int[] order = {0, 1, 3, 2, 0};
+		
+		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {
+			final SizeAnnotation annot;
+			if (annotCounter < annotRoot.getChildren().size())
+				annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
+			else {
+				annot = new SizeAnnotation();
+				annotRoot.attachChild(annot);
+			}
+			annotCounter++;
+			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false, Align.South);
+		}
 	}	
 }

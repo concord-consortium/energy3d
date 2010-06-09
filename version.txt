@@ -208,6 +208,8 @@ Version 0.2
 - avoid drawing redundant annotations for walls
 - draw horizontal annotations in front of walls instead of below them when not in print preview mode
 - align the horizontal annotations with the annotation line when not in print preview mode
+- align the annotations of the foundation object with the annotation line
+- optimize the snap class for better memory efficiency and sharing
  
 TODO:
 - combine the wall meshed into one

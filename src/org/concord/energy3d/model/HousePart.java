@@ -379,7 +379,7 @@ public abstract class HousePart implements Serializable {
 		}
 		if (closestDistance < 0.5) {
 			p.set(closestPoint);
-			return new Snap(closestWall, index, closestPointIndex);
+			return new Snap(this, closestWall, index, closestPointIndex);
 		} else {
 			return null;
 		}
@@ -394,7 +394,7 @@ public abstract class HousePart implements Serializable {
 			prevWall = currentWall;
 			if (next == null)
 				break;
-			currentWall = (Wall) next.getNeighbor();
+			currentWall = (Wall) next.getNeighborOf(this);
 			if (currentWall == startWall)
 				break;
 		}
@@ -405,14 +405,14 @@ public abstract class HousePart implements Serializable {
 			Snap next = currentWall.next(prevWall);
 			int pointIndex = 0;
 			if (next != null)
-				pointIndex = next.getThisPointIndex();
+				pointIndex = next.getSnapPointIndexOf(this);
 			pointIndex = pointIndex + 1;
 			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex == 1 ? 3 : 1));
 			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex));
 			prevWall = currentWall;
 			if (next == null)
 				break;
-			currentWall = (Wall) next.getNeighbor();
+			currentWall = (Wall) next.getNeighborOf(this);
 			if (currentWall == startWall)
 				break;
 		}
@@ -552,25 +552,18 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void drawMeasurements() {
-		if (abspoints.size() < 2)
-			return;
-		
-		int[] order = {0, 1, 3, 2, 0};
-		
-//		int[] order = {3, 2, 0};
-
-		
-		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {
-			final SizeAnnotation annot;
-			if (annotCounter < annotRoot.getChildren().size())
-				annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
-			else {
-				annot = new SizeAnnotation();
-				annotRoot.attachChild(annot);
-			}
-			annotCounter++;
-			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false);
-		}
-
+//		int[] order = {0, 1, 3, 2, 0};
+//		
+//		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {
+//			final SizeAnnotation annot;
+//			if (annotCounter < annotRoot.getChildren().size())
+//				annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
+//			else {
+//				annot = new SizeAnnotation();
+//				annotRoot.attachChild(annot);
+//			}
+//			annotCounter++;
+//			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false);
+//		}
 	}
 }

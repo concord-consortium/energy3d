@@ -28,6 +28,7 @@ import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
+import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -217,7 +218,7 @@ public class Wall extends HousePart {
 
 		for (Snap neighbor : this.neighbors)
 			if (neighbor != null) {
-				neighbor.getNeighbor().draw();
+				neighbor.getNeighborOf(this).draw();
 			}
 
 	}
@@ -364,10 +365,10 @@ public class Wall extends HousePart {
 	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
 		ArrayList<Vector3> points = abspoints;
 		Vector3 dir = points.get(2).subtract(points.get(0), null).normalizeLocal();
-		if (neighbors[0] != null && neighbors[0].getNeighbor().isFirstPointInserted())
+		if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted())
 			reduceBackMeshWidth(polygon, dir, 0);
 
-		if (neighbors[1] != null && neighbors[1].getNeighbor().isFirstPointInserted()) {
+		if (neighbors[1] != null && neighbors[1].getNeighborOf(this).isFirstPointInserted()) {
 			dir.normalizeLocal().negateLocal();
 			reduceBackMeshWidth(polygon, dir, 1);
 		}
@@ -384,8 +385,8 @@ public class Wall extends HousePart {
 	}
 
 	private void reduceBackMeshWidth(Polygon polygon, final Vector3 dir, final int neighbor) {
-		final int neighborPointIndex = neighbors[neighbor].getNeighborPointIndex();
-		ArrayList<Vector3> points2 = neighbors[neighbor].getNeighbor().getPoints();
+		final int neighborPointIndex = neighbors[neighbor].getSnapPointIndexOfNeighborOf(this);
+		ArrayList<Vector3> points2 = neighbors[neighbor].getNeighborOf(this).getPoints();
 		Vector3 dir2 = points2.get(neighborPointIndex == 0 ? 2 : 0).subtract(points2.get(neighborPointIndex), null).normalizeLocal();
 		final double angle = Math.max(0.1, dir2.smallestAngleBetween(dir) / 2);
 		// System.out.println(angle);
@@ -397,6 +398,7 @@ public class Wall extends HousePart {
 	}
 
 	private Vector3 decideThicknessNormal() {
+		
 //		if (thicknessNormal != null) {
 //			return thicknessNormal;
 //		}
@@ -424,10 +426,10 @@ public class Wall extends HousePart {
 		if (neighbor == null)
 			neighbor = this.neighbors[1];
 
-		if (neighbor != null && neighbor.getNeighbor().getPoints().size() >= 4) {
-			Wall otherWall = (Wall) neighbor.getNeighbor();
+		if (neighbor != null && neighbor.getNeighborOf(this).getPoints().size() >= 4) {
+			Wall otherWall = (Wall) neighbor.getNeighborOf(this);
 			ArrayList<Vector3> otherPoints = otherWall.getPoints();
-			int otherPointIndex = neighbor.getNeighborPointIndex();
+			int otherPointIndex = neighbor.getSnapPointIndexOfNeighborOf(this);
 			Vector3 a = otherPoints.get(otherPointIndex);
 			Vector3 b = otherPoints.get(otherPointIndex == 0 ? 2 : 0);
 			Vector3 ab = b.subtract(a, null).normalizeLocal();
@@ -570,7 +572,7 @@ public class Wall extends HousePart {
 
 	public Snap next(Wall previous) {
 		for (Snap s : neighbors)
-			if (s != null && s.getNeighbor() != previous)
+			if (s != null && s.getNeighborOf(this) != previous)
 				return s;
 		return null;
 	}
@@ -585,15 +587,16 @@ public class Wall extends HousePart {
 			return;
 
 		if (oldNeighbor != null)
-			((Wall) oldNeighbor.getNeighbor()).removeNeighbor(oldNeighbor.getNeighborPointIndex(), pointIndex, this);
+			((Wall) oldNeighbor.getNeighborOf(this)).removeNeighbor(oldNeighbor.getSnapPointIndexOfNeighborOf(this), pointIndex, this);
 
 		if (newNeighbor != null)
-			((Wall) newNeighbor.getNeighbor()).setNeighbor(newNeighbor.getNeighborPointIndex(), new Snap(this, newNeighbor.getNeighborPointIndex(), newNeighbor.getThisPointIndex()), false);
+//			((Wall) newNeighbor.getNeighborOf(this)).setNeighbor(newNeighbor.getSnapPointIndexOfNeighborOf(this), new Snap(this, newNeighbor.getSnapPointIndexOfNeighborOf(this), newNeighbor.getSnapPointIndexOf(this)), false);
+			((Wall) newNeighbor.getNeighborOf(this)).setNeighbor(newNeighbor.getSnapPointIndexOfNeighborOf(this), newNeighbor, false);
 	}
 
 	private void removeNeighbor(int pointIndex, int requestingPointIndex, Wall wall) {
 		int i = pointIndex < 2 ? 0 : 1;
-		if (neighbors[i] != null && neighbors[i].getNeighbor() == wall && neighbors[i].getNeighborPointIndex() == requestingPointIndex)
+		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall && neighbors[i].getSnapPointIndexOfNeighborOf(this) == requestingPointIndex)
 			neighbors[i] = null;
 		draw();
 	}
@@ -601,7 +604,7 @@ public class Wall extends HousePart {
 	public void delete() {
 		for (int i = 0; i < neighbors.length; i++)
 			if (neighbors[i] != null)
-				((Wall) neighbors[i].getNeighbor()).setNeighbor(neighbors[i].getNeighborPointIndex(), null, false); // .removeNeighbor(this);
+				((Wall) neighbors[i].getNeighborOf(this)).setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false); // .removeNeighbor(this);
 	}
 
 	public void setHeight(double newHeight, boolean finalize) {
@@ -649,18 +652,18 @@ public class Wall extends HousePart {
 	}	
 
 	protected void drawMeasurements() {
-		if (abspoints.size() < 2)
+		if (points.size() < 4)
 			return;
-		
 		int[] order;
-		
-		if (original != null || neighbors[1] == null)
+		ReadOnlyVector3 faceDirection = getFaceDirection();
+		if (original != null || (neighbors[0] == null && neighbors[1] == null))
 			order = new int[] {0, 1, 3, 2, 0};
-		else	
+		else if (neighbors[0] != null) { // && neighbors[0].getNeighbor()){	
 			order = new int[] {3, 2, 0};
-		
-//		int[] order = {3, 2, 0};
-
+//			faceDirection = faceDirection.add(neighbors[1].getNeighbor().getFaceDirection(), null).multiplyLocal(0.5);
+		} else {
+			order = new int[] {3, 2, 0};
+		}
 		
 		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {
 			final SizeAnnotation annot;
@@ -671,7 +674,8 @@ public class Wall extends HousePart {
 				annotRoot.attachChild(annot);
 			}
 			annotCounter++;
-			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), i == 1 ? true : false);
+			
+			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, faceDirection, true, i == 1 ? Align.South : Align.Center);
 		}
 
 	}	
