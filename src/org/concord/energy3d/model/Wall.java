@@ -655,11 +655,8 @@ public class Wall extends HousePart {
 	protected void drawAnnotations() {
 		if (points.size() < 4)
 			return;
-//		int[] order;
 		ReadOnlyVector3 faceDirection = getFaceDirection();
-//		ArrayList<Integer> order = new ArrayList<Integer>();
 		int annotCounter = 0;
-//		if (original != null)
 		drawAnnot(0, 2, faceDirection, annotCounter++, original == null ? Align.South: Align.Center);
 		if (original != null || neighbors[0] == null || !neighbors[0].isDrawn()) {
 			drawAnnot(0, 1, faceDirection, annotCounter++, Align.Center);
@@ -673,22 +670,6 @@ public class Wall extends HousePart {
 		}
 		if (original != null)
 			drawAnnot(1, 3, faceDirection, annotCounter++, Align.Center);
-		
-		
-		
-//		if (original != null || (neighbors[0] == null && neighbors[1] == null) || (neighbors[0] != null && neighbors[1] != null && !neighbors[0].isDrawn() && !neighbors[1].isDrawn()))
-//			order = new int[] {0, 1, 3, 2, 0};
-//		else if (neighbors[0] != null && !neighbors[0].isDrawn()) { // && neighbors[0].getNeighbor()){	
-//			order = new int[] {3, 2, 0};
-//		} else if (neighbors[1] != null && !neighbors[1].isDrawn()) {
-//			order = new int[] {2, 0, 1};
-//		} else
-//			return;
-			
-//		int a, b;
-//		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {
-//			drawAnnot(a, b, faceDirection, annotCounter);
-//		}
 		
 		for (int i = annotCounter; i < annotRoot.getChildren().size(); i++)
 			annotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);

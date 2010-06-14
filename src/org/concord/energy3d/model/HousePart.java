@@ -394,7 +394,7 @@ public abstract class HousePart implements Serializable {
 			prevWall = currentWall;
 			if (next == null)
 				break;
-			currentWall = (Wall) next.getNeighborOf(this);
+			currentWall = (Wall) next.getNeighborOf(currentWall);
 			if (currentWall == startWall)
 				break;
 		}
@@ -405,14 +405,14 @@ public abstract class HousePart implements Serializable {
 			Snap next = currentWall.next(prevWall);
 			int pointIndex = 0;
 			if (next != null)
-				pointIndex = next.getSnapPointIndexOf(this);
+				pointIndex = next.getSnapPointIndexOf(currentWall);
 			pointIndex = pointIndex + 1;
 			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex == 1 ? 3 : 1));
 			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex));
 			prevWall = currentWall;
 			if (next == null)
 				break;
-			currentWall = (Wall) next.getNeighborOf(this);
+			currentWall = (Wall) next.getNeighborOf(currentWall);
 			if (currentWall == startWall)
 				break;
 		}

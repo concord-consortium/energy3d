@@ -19,6 +19,8 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -30,6 +32,7 @@ public class Roof extends HousePart {
 	private transient FloatBuffer vertexBuffer;
 //	private transient Vector3 center;
 	private double labelTop;
+	private transient ArrayList<PolygonPoint> wallUpperPoints;
 
 	public Roof() {
 		super(1, 1, 0.5);
@@ -76,15 +79,12 @@ public class Roof extends HousePart {
 	public void draw() {
 		if (root == null)
 			init();
-
 		if (container == null)
 			return;
 		
 //		super.draw();				
 		
-		ArrayList<PolygonPoint> wallUpperPoints = exploreWallNeighbors((Wall) container);
-		
-//		center = new Vector3();
+		wallUpperPoints = exploreWallNeighbors((Wall) container);
 		center.set(0, 0, 0);
 		for (PolygonPoint p : wallUpperPoints)
 			center.addLocal(p.getX(), p.getY(), p.getZ());
@@ -93,34 +93,20 @@ public class Roof extends HousePart {
 		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 		PolygonPoint roofUpperPoint = new PolygonPoint(center.getX(), center.getY(), center.getZ() + height);
 
-//		System.out.println("Polygon Points:");
-//		for (PolygonPoint p : wallUpperPoints) {
-//			System.out.println(p.getXf() + "\t" + p.getYf() + "\t" + p.getZf());
-//		}
-
 		Polygon ps = new Polygon(wallUpperPoints);
 		ps.addSteinerPoint(roofUpperPoint);
 		Poly2Tri.triangulate(ps);
 
-//		System.out.println("Triangulated Points:");
-//		for (DelaunayTriangle t : ps.getTriangles()) {
-//			t.printDebug();
-//		}
-		
 		ArdorMeshMapper.updateTriangleMesh(mesh, ps);
 		ArdorMeshMapper.updateVertexNormals(mesh, ps.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, ps.getTriangles());
 		ArdorMeshMapper.updateTextureCoordinates(mesh, ps.getTriangles(), 1, 0);
 		
 		mesh.getMeshData().updateVertexCount();
-		// mesh.setRandomColors();
 
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = points.get(i);
-			// update location of point spheres
 			pointsRoot.getChild(i).setTranslation(p);
-//			((Sphere) pointsRoot.getChild(i)).updateModelBound();
-//			pointsRoot.setVisible(i, true);
 		}
 
 		updateLabelLocation();
@@ -128,53 +114,12 @@ public class Roof extends HousePart {
 		if (flattenTime > 0)
 			flatten();
 		
+		drawAnnotations();
+		
 		// force bound update
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
-
-//	private ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
-//		ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
-//		Wall currentWall = startWall;
-//		Wall prevWall = null;
-//		while (currentWall != null) {
-//			Snap next = currentWall.next(prevWall);
-//			prevWall = currentWall;
-//			if (next == null)
-//				break;
-//			currentWall = (Wall) next.getNeighbor();
-//			if (currentWall == startWall)
-//				break;
-//		}
-//
-//		startWall = currentWall;
-//		prevWall = null;
-//		while (currentWall != null && currentWall.isFirstPointInserted()) {
-//			Snap next = currentWall.next(prevWall);
-//			int pointIndex = 0;
-//			if (next != null)
-//				pointIndex = next.getThisPointIndex();
-//			pointIndex = pointIndex + 1;
-//			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex == 1 ? 3 : 1));
-//			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex));
-//			prevWall = currentWall;
-//			if (next == null)
-//				break;
-//			currentWall = (Wall) next.getNeighbor();
-//			if (currentWall == startWall)
-//				break;
-//		}
-//
-//		return poly;
-//	}
-//	
-//	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
-//		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-//		if (!poly.contains(polygonPoint)) {
-//			avg.addLocal(p);
-//			poly.add(polygonPoint);
-//		}
-//	}
 
 	private void shiftToOutterEdge(ArrayList<PolygonPoint> wallUpperPoints) {
 		final double edgeLenght = 0.3;
@@ -193,7 +138,6 @@ public class Roof extends HousePart {
 
 	protected void flatten() {		
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
-//		root.setTranslation(flattenTime * printX, points.get(0).getZ(), flattenTime * printY);
 		super.flatten();
 	}
 	
@@ -202,7 +146,42 @@ public class Roof extends HousePart {
 	}	
 	
 	protected ReadOnlyVector3 getFaceDirection() {
-		return new Vector3(0, 0, 0.5 + height);
-	}	
+//		return new Vector3(0, 0, 0.5 + height);
+		return Vector3.UNIT_Z;
+	}
+	
+	protected void drawAnnotations() {
+		ReadOnlyVector3 faceDirection = getFaceDirection();
+		int annotCounter = 0;
+		Vector3 a = Vector3.fetchTempInstance();
+		Vector3 b = Vector3.fetchTempInstance();
+		
+		for (int i=0; i<wallUpperPoints.size(); i++) {
+			PolygonPoint p = wallUpperPoints.get(i);
+			a.set(p.getX(), p.getY(), p.getZ());
+			p = wallUpperPoints.get((i+1)%wallUpperPoints.size());
+			b.set(p.getX(), p.getY(), p.getZ());
+			drawAnnot(a, b, faceDirection, annotCounter++, Align.Center);
+		}
+		
+		for (int i = annotCounter; i < annotRoot.getChildren().size(); i++)
+			annotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
+		
+		Vector3.releaseTempInstance(a);
+		Vector3.releaseTempInstance(b);
+
+	}
+
+	private void drawAnnot(Vector3 a, Vector3 b, ReadOnlyVector3 faceDirection, int annotCounter, Align align) {
+		final SizeAnnotation annot;
+		if (annotCounter < annotRoot.getChildren().size()) {
+			annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
+			annot.getSceneHints().setCullHint(CullHint.Inherit);
+		} else {
+			annot = new SizeAnnotation();
+			annotRoot.attachChild(annot);
+		}			
+		annot.setRange(a, b, center, faceDirection, original == null, align);
+	}		
 	
 }

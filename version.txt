@@ -211,7 +211,10 @@ Version 0.2
 - align the annotations of the foundation object with the annotation line
 - optimize the snap class for better memory efficiency and sharing
 - hide extra annotations when a wall is snapped to a neighboring wall
-- flag wall snap edges that are already annotated so that duplicate annotations won't be drawn  
+- flag wall snap edges that are already annotated so that duplicate annotations won't be drawn
+- fixed problem with roof exception
+- draw annotations of the roof
+  
  
 TODO:
 - combine the wall meshed into one
