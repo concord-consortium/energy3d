@@ -169,6 +169,7 @@ public class Wall extends HousePart {
 	}
 
 	public void setPreviewPoint(int x, int y) {
+		Snap.increaseAnnotationTimer();
 		// System.out.println("moving wall...");
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			PickedHousePart picked = pick(x, y, new Class<?>[] { Foundation.class, null }); // Foundation.class);
@@ -651,32 +652,58 @@ public class Wall extends HousePart {
 		return thicknessNormal.negate(null).normalizeLocal().multiplyLocal(0.5);
 	}	
 
-	protected void drawMeasurements() {
+	protected void drawAnnotations() {
 		if (points.size() < 4)
 			return;
-		int[] order;
+//		int[] order;
 		ReadOnlyVector3 faceDirection = getFaceDirection();
-		if (original != null || (neighbors[0] == null && neighbors[1] == null))
-			order = new int[] {0, 1, 3, 2, 0};
-		else if (neighbors[0] != null) { // && neighbors[0].getNeighbor()){	
-			order = new int[] {3, 2, 0};
-//			faceDirection = faceDirection.add(neighbors[1].getNeighbor().getFaceDirection(), null).multiplyLocal(0.5);
-		} else {
-			order = new int[] {3, 2, 0};
+//		ArrayList<Integer> order = new ArrayList<Integer>();
+		int annotCounter = 0;
+//		if (original != null)
+		drawAnnot(0, 2, faceDirection, annotCounter++, original == null ? Align.South: Align.Center);
+		if (original != null || neighbors[0] == null || !neighbors[0].isDrawn()) {
+			drawAnnot(0, 1, faceDirection, annotCounter++, Align.Center);
+			if (neighbors[0] != null)
+				neighbors[0].setDrawn();
 		}
+		if (original != null || neighbors[1] == null || !neighbors[1].isDrawn()) {
+			drawAnnot(2, 3, faceDirection, annotCounter++, Align.Center);
+			if (neighbors[1] != null)
+				neighbors[1].setDrawn();
+		}
+		if (original != null)
+			drawAnnot(1, 3, faceDirection, annotCounter++, Align.Center);
 		
-		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {
-			final SizeAnnotation annot;
-			if (annotCounter < annotRoot.getChildren().size())
-				annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
-			else {
-				annot = new SizeAnnotation();
-				annotRoot.attachChild(annot);
-			}
-			annotCounter++;
+		
+		
+//		if (original != null || (neighbors[0] == null && neighbors[1] == null) || (neighbors[0] != null && neighbors[1] != null && !neighbors[0].isDrawn() && !neighbors[1].isDrawn()))
+//			order = new int[] {0, 1, 3, 2, 0};
+//		else if (neighbors[0] != null && !neighbors[0].isDrawn()) { // && neighbors[0].getNeighbor()){	
+//			order = new int[] {3, 2, 0};
+//		} else if (neighbors[1] != null && !neighbors[1].isDrawn()) {
+//			order = new int[] {2, 0, 1};
+//		} else
+//			return;
 			
-			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, faceDirection, true, i == 1 ? Align.South : Align.Center);
-		}
+//		int a, b;
+//		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {
+//			drawAnnot(a, b, faceDirection, annotCounter);
+//		}
+		
+		for (int i = annotCounter; i < annotRoot.getChildren().size(); i++)
+			annotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 
+	}
+
+	private void drawAnnot(int a, int b, ReadOnlyVector3 faceDirection, int annotCounter, Align align) {
+		final SizeAnnotation annot;
+		if (annotCounter < annotRoot.getChildren().size()) {
+			annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
+			annot.getSceneHints().setCullHint(CullHint.Inherit);
+		} else {
+			annot = new SizeAnnotation();
+			annotRoot.attachChild(annot);
+		}			
+		annot.setRange(abspoints.get(a), abspoints.get(b), center, faceDirection, original == null, align);
 	}	
 }

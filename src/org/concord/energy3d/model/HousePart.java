@@ -468,7 +468,7 @@ public abstract class HousePart implements Serializable {
 
 	public void draw() {
 		if (root == null)
-			init();
+			init();		
 
 		computeCenter();
 		updateLabelLocation();
@@ -476,7 +476,7 @@ public abstract class HousePart implements Serializable {
 		if (flattenTime > 0)
 			flatten();
 
-		drawMeasurements();
+		drawAnnotations();
 
 	}
 
@@ -551,7 +551,7 @@ public abstract class HousePart implements Serializable {
 		return defaultDirection;
 	}
 
-	protected void drawMeasurements() {
+	protected void drawAnnotations() {
 //		int[] order = {0, 1, 3, 2, 0};
 //		
 //		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {

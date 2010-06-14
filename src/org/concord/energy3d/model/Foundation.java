@@ -191,7 +191,7 @@ public class Foundation extends HousePart {
 		return mesh.getYExtent();
 	}
 	
-	protected void drawMeasurements() {
+	protected void drawAnnotations() {
 		int[] order = {0, 1, 3, 2, 0};
 		
 		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {

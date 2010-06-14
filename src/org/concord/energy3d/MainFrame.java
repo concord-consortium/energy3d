@@ -503,6 +503,7 @@ public class MainFrame extends JFrame {
 			previewMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 //					Scene.getInstance().setFlatten(previewMenuItem.isSelected());
+					deselect();
 					SceneManager.getInstance().setPrintPreview(previewMenuItem.isSelected());					
 				}
 			});
@@ -623,5 +624,10 @@ public class MainFrame extends JFrame {
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 		jContentPane.setVisible(visible);
+	}
+
+	private void deselect() {
+		getSelectButton().setSelected(true);
+		SceneManager.getInstance().setOperation(Operation.SELECT);
 	}
 }
