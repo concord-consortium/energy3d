@@ -214,6 +214,7 @@ Version 0.2
 - flag wall snap edges that are already annotated so that duplicate annotations won't be drawn
 - fixed problem with roof exception
 - draw annotations of the roof
+- make superclass Roof and make every Roof and Floor subclass of it
   
  
 TODO:

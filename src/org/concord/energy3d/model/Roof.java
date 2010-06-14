@@ -24,24 +24,21 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Roof extends HousePart {
+public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.5;
-//	private double height = 0.5;
-	private transient Mesh mesh;
+	protected static final double GRID_SIZE = 0.5;
+	protected transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
-//	private transient Vector3 center;
-	private double labelTop;
+	protected double labelTop;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 
-	public Roof() {
-		super(1, 1, 0.5);
-//		height = 0.5;
+	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
+		super(numOfDrawPoints, numOfEditPoints, height);
 	}
 
 	protected void init() {
 		super.init();
-		mesh = new Mesh("Roof");
+		mesh = new Mesh("Roof/Floor");
 		vertexBuffer = BufferUtils.createVector3Buffer(4);
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
@@ -60,22 +57,6 @@ public class Roof extends HousePart {
 		mesh.setUserData(new UserData(this));
 	}
 
-	@Override
-	public void setPreviewPoint(int x, int y) {
-		if (editPointIndex == -1) {
-			pick(x, y, Wall.class);
-		} else {
-			Vector3 base = center;
-			Vector3 p = closestPoint(base, base.add(0, 0, 1, null), x, y);
-			p = grid(p, GRID_SIZE);
-			height = findHeight(base, p);
-		}
-		draw();
-		showPoints();
-
-	}
-
-	@Override
 	public void draw() {
 		if (root == null)
 			init();
@@ -89,18 +70,17 @@ public class Roof extends HousePart {
 		for (PolygonPoint p : wallUpperPoints)
 			center.addLocal(p.getX(), p.getY(), p.getZ());
 		center.multiplyLocal(1.0 / wallUpperPoints.size());
-		shiftToOutterEdge(wallUpperPoints);
-		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
-		PolygonPoint roofUpperPoint = new PolygonPoint(center.getX(), center.getY(), center.getZ() + height);
+		final Polygon polygon = makePolygon(wallUpperPoints);		
 
-		Polygon ps = new Polygon(wallUpperPoints);
-		ps.addSteinerPoint(roofUpperPoint);
-		Poly2Tri.triangulate(ps);
+//		final Polygon polygon = new Polygon(wallUpperPoints);
+//		PolygonPoint roofUpperPoint = new PolygonPoint(center.getX(), center.getY(), center.getZ() + height);
+//		insertUpperPoints(polygon);
+		Poly2Tri.triangulate(polygon);
 
-		ArdorMeshMapper.updateTriangleMesh(mesh, ps);
-		ArdorMeshMapper.updateVertexNormals(mesh, ps.getTriangles());
-		ArdorMeshMapper.updateFaceNormals(mesh, ps.getTriangles());
-		ArdorMeshMapper.updateTextureCoordinates(mesh, ps.getTriangles(), 1, 0);
+		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
+		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
+		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
+		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, 0);
 		
 		mesh.getMeshData().updateVertexCount();
 
@@ -121,19 +101,8 @@ public class Roof extends HousePart {
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
 
-	private void shiftToOutterEdge(ArrayList<PolygonPoint> wallUpperPoints) {
-		final double edgeLenght = 0.3;
-		Vector3 op = new Vector3();
-		double maxY;
-		maxY = wallUpperPoints.get(0).getY();
-		for (PolygonPoint p : wallUpperPoints) {
-			op.set(p.getX(), p.getY(), 0).subtractLocal(center.getX(), center.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
-			op.addLocal(p.getX(), p.getY(), p.getZ());
-			p.set(op.getX(), op.getY(), op.getZ()+0.01);
-			if (p.getY() > maxY)
-				maxY = p.getY();			
-		}
-		labelTop = (maxY-center.getY());
+	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
+		return new Polygon(wallUpperPoints);
 	}
 
 	protected void flatten() {		

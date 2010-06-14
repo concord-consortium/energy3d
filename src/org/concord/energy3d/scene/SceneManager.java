@@ -16,8 +16,8 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Roof;
-import org.concord.energy3d.model.Roof2;
+import org.concord.energy3d.model.PyramidRoof;
+import org.concord.energy3d.model.HipRoof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
@@ -767,9 +767,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else if (operation == Operation.DRAW_WINDOW)
 			drawn = new Window();
 		else if (operation == Operation.DRAW_ROOF)
-			drawn = new Roof();
+			drawn = new PyramidRoof();
 		else if (operation == Operation.DRAW_ROOF_HIP)
-			drawn = new Roof2();
+			drawn = new HipRoof();
 		else if (operation == Operation.DRAW_FLOOR)
 			drawn = new Floor();
 		else if (operation == Operation.DRAW_FOUNDATION)
