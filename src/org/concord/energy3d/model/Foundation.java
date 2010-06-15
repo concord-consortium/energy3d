@@ -146,8 +146,7 @@ public class Foundation extends HousePart {
 		}
 	}
 
-	public void draw() {
-		super.draw();
+	protected void updateMesh() {
 		final boolean drawable = points.size() == 8;
 		if (drawable) {
 			mesh.setData(points.get(0), points.get(3).add(0, 0, height, null));

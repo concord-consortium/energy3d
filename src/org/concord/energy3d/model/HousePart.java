@@ -7,6 +7,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SelectUtil;
 
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.example.ui.BMFontLoader;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -372,7 +373,18 @@ public abstract class HousePart implements Serializable {
 		if (root == null)
 			init();		
 
+		for (int i = 0; i < points.size(); i++) {
+			Vector3 p = points.get(i);
+			p = toAbsolute(p);
+			abspoints.get(i).set(p);
+			pointsRoot.getChild(i).setTranslation(p);
+		}		
 		computeCenter();
+		
+		updateMesh();
+		
+		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
+		
 		updateLabelLocation();
 
 		if (flattenTime > 0)
@@ -383,14 +395,9 @@ public abstract class HousePart implements Serializable {
 
 	protected void computeCenter() {
 		center.set(0, 0, 0);
-		for (int i = 0; i < points.size(); i++) {
-			Vector3 p = points.get(i);
-			p = toAbsolute(p);
-			pointsRoot.getChild(i).setTranslation(p);
-			abspoints.get(i).set(p);
-			center.addLocal(p);
-		}
-		center.multiplyLocal(1.0 / points.size());
+		for (int i = 0; i < abspoints.size(); i++)
+			center.addLocal(abspoints.get(i));
+		center.multiplyLocal(1.0 / abspoints.size());
 	}
 
 	protected void flatten() {
@@ -467,4 +474,5 @@ public abstract class HousePart implements Serializable {
 	public abstract void setPreviewPoint(int x, int y);	
 	public void delete() {}
 	protected void drawAnnotations() {}
+	protected abstract void updateMesh();
 }

@@ -8,7 +8,6 @@ import org.poly2tri.polygon.Polygon;
 import org.poly2tri.polygon.PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
-import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.Matrix3;
@@ -57,13 +56,11 @@ public abstract class Roof extends HousePart {
 		mesh.setUserData(new UserData(this));
 	}
 
-	public void draw() {
-		if (root == null)
-			init();
+	protected void updateMesh() {
+//		if (root == null)
+//			init();
 		if (container == null)
 			return;
-		
-//		super.draw();
 		
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
 		center.set(0, 0, 0);
@@ -93,9 +90,7 @@ public abstract class Roof extends HousePart {
 		
 		drawAnnotations();
 		
-		// force bound update
 		mesh.updateModelBound();
-		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
 	
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
@@ -158,6 +153,8 @@ public abstract class Roof extends HousePart {
 	}
 	
 	protected void drawAnnotations() {
+		if (container == null)
+			return;
 		ReadOnlyVector3 faceDirection = getFaceDirection();
 		int annotCounter = 0;
 		Vector3 a = Vector3.fetchTempInstance();

@@ -2,12 +2,9 @@ package org.concord.energy3d.model;
 
 import java.util.ArrayList;
 
-import org.poly2tri.Poly2Tri;
 import org.poly2tri.polygon.Polygon;
 import org.poly2tri.polygon.PolygonPoint;
-import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
-import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.Vector3;
 
 public class Floor extends Roof {
@@ -85,19 +82,7 @@ public class Floor extends Roof {
 	
 	public void setHeight(double newHeight, boolean finalize) {
 		super.setHeight(newHeight, finalize);
-//		points.get(0).setZ(newHeight);
 		draw();		
 	}	
-//
-//	protected void flatten() {		
-//		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
-////		root.setTranslation(flattenTime * 5*(int) (pos / 3), height, flattenTime * 3*(2 + pos % 3));
-////		root.setTranslation(flattenTime * printX, height, flattenTime * printY);
-//		super.flatten();
-//	}		
-//
-//	protected double computeLabelTop() {
-//		return labelTop;
-//	}	
 	
 }

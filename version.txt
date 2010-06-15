@@ -216,6 +216,7 @@ Version 0.2
 - draw annotations of the roof
 - make superclass Roof and make every Roof and Floor subclass of it
 - transferred roof/floor related methods from superclass HousePart to Roof 
+- modify the drawing architecture so that all drawing goes through HousePart.draw() method and subclasses override updateMesh()
   
  
 TODO:
