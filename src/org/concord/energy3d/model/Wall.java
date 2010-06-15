@@ -657,34 +657,34 @@ public class Wall extends HousePart {
 			return;
 		ReadOnlyVector3 faceDirection = getFaceDirection();
 		int annotCounter = 0;
-		drawAnnot(0, 2, faceDirection, annotCounter++, original == null ? Align.South: Align.Center);
+		drawAnnot(abspoints.get(0), abspoints.get(2), faceDirection, annotCounter++, original == null ? Align.South: Align.Center);
 		if (original != null || neighbors[0] == null || !neighbors[0].isDrawn()) {
-			drawAnnot(0, 1, faceDirection, annotCounter++, Align.Center);
+			drawAnnot(abspoints.get(0), abspoints.get(1), faceDirection, annotCounter++, Align.Center);
 			if (neighbors[0] != null)
 				neighbors[0].setDrawn();
 		}
 		if (original != null || neighbors[1] == null || !neighbors[1].isDrawn()) {
-			drawAnnot(2, 3, faceDirection, annotCounter++, Align.Center);
+			drawAnnot(abspoints.get(2), abspoints.get(3), faceDirection, annotCounter++, Align.Center);
 			if (neighbors[1] != null)
 				neighbors[1].setDrawn();
 		}
 		if (original != null)
-			drawAnnot(1, 3, faceDirection, annotCounter++, Align.Center);
+			drawAnnot(abspoints.get(1), abspoints.get(3), faceDirection, annotCounter++, Align.Center);
 		
 		for (int i = annotCounter; i < annotRoot.getChildren().size(); i++)
 			annotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 
 	}
 
-	private void drawAnnot(int a, int b, ReadOnlyVector3 faceDirection, int annotCounter, Align align) {
-		final SizeAnnotation annot;
-		if (annotCounter < annotRoot.getChildren().size()) {
-			annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
-			annot.getSceneHints().setCullHint(CullHint.Inherit);
-		} else {
-			annot = new SizeAnnotation();
-			annotRoot.attachChild(annot);
-		}			
-		annot.setRange(abspoints.get(a), abspoints.get(b), center, faceDirection, original == null, align);
-	}	
+//	private void drawAnnot(int a, int b, ReadOnlyVector3 faceDirection, int annotCounter, Align align) {
+//		final SizeAnnotation annot;
+//		if (annotCounter < annotRoot.getChildren().size()) {
+//			annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
+//			annot.getSceneHints().setCullHint(CullHint.Inherit);
+//		} else {
+//			annot = new SizeAnnotation();
+//			annotRoot.attachChild(annot);
+//		}			
+//		annot.setRange(abspoints.get(a), abspoints.get(b), center, faceDirection, original == null, align);
+//	}	
 }

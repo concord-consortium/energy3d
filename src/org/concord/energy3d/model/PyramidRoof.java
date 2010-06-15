@@ -27,10 +27,6 @@ public class PyramidRoof extends Roof {
 		showPoints();
 	}
 
-//	protected void insertUpperPoints(final Polygon polygon) {
-////		polygon.addSteinerPoint(new PolygonPoint(center.getX(), center.getY(), center.getZ() + height));
-//	}
-	
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
 		final double edgeLenght = 0.3;
 		Vector3 op = new Vector3();

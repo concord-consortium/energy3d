@@ -63,18 +63,15 @@ public abstract class Roof extends HousePart {
 		if (container == null)
 			return;
 		
-//		super.draw();				
+//		super.draw();
 		
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
 		center.set(0, 0, 0);
 		for (PolygonPoint p : wallUpperPoints)
 			center.addLocal(p.getX(), p.getY(), p.getZ());
 		center.multiplyLocal(1.0 / wallUpperPoints.size());
-		final Polygon polygon = makePolygon(wallUpperPoints);		
 
-//		final Polygon polygon = new Polygon(wallUpperPoints);
-//		PolygonPoint roofUpperPoint = new PolygonPoint(center.getX(), center.getY(), center.getZ() + height);
-//		insertUpperPoints(polygon);
+		final Polygon polygon = makePolygon(wallUpperPoints);		
 		Poly2Tri.triangulate(polygon);
 
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
@@ -100,6 +97,48 @@ public abstract class Roof extends HousePart {
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
+	
+	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
+		ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
+		Wall currentWall = startWall;
+		Wall prevWall = null;
+		while (currentWall != null) {
+			Snap next = currentWall.next(prevWall);
+			prevWall = currentWall;
+			if (next == null)
+				break;
+			currentWall = (Wall) next.getNeighborOf(currentWall);
+			if (currentWall == startWall)
+				break;
+		}
+
+		startWall = currentWall;
+		prevWall = null;
+		while (currentWall != null && currentWall.isFirstPointInserted()) {
+			Snap next = currentWall.next(prevWall);
+			int pointIndex = 0;
+			if (next != null)
+				pointIndex = next.getSnapPointIndexOf(currentWall);
+			pointIndex = pointIndex + 1;
+			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex == 1 ? 3 : 1));
+			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex));
+			prevWall = currentWall;
+			if (next == null)
+				break;
+			currentWall = (Wall) next.getNeighborOf(currentWall);
+			if (currentWall == startWall)
+				break;
+		}
+
+		return poly;
+	}
+
+	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
+		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+		if (!poly.contains(polygonPoint)) {
+			poly.add(polygonPoint);
+		}
+	}	
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
 		return new Polygon(wallUpperPoints);
@@ -115,7 +154,6 @@ public abstract class Roof extends HousePart {
 	}	
 	
 	protected ReadOnlyVector3 getFaceDirection() {
-//		return new Vector3(0, 0, 0.5 + height);
 		return Vector3.UNIT_Z;
 	}
 	
@@ -138,19 +176,5 @@ public abstract class Roof extends HousePart {
 		
 		Vector3.releaseTempInstance(a);
 		Vector3.releaseTempInstance(b);
-
-	}
-
-	private void drawAnnot(Vector3 a, Vector3 b, ReadOnlyVector3 faceDirection, int annotCounter, Align align) {
-		final SizeAnnotation annot;
-		if (annotCounter < annotRoot.getChildren().size()) {
-			annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
-			annot.getSceneHints().setCullHint(CullHint.Inherit);
-		} else {
-			annot = new SizeAnnotation();
-			annotRoot.attachChild(annot);
-		}			
-		annot.setRange(a, b, center, faceDirection, original == null, align);
-	}		
-	
+	}	
 }
