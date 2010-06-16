@@ -217,7 +217,7 @@ Version 0.2
 - make superclass Roof and make every Roof and Floor subclass of it
 - transferred roof/floor related methods from superclass HousePart to Roof 
 - modify the drawing architecture so that all drawing goes through HousePart.draw() method and subclasses override updateMesh()
-  
+- decompose the roof into individual triangles when in print preview
  
 TODO:
 - combine the wall meshed into one

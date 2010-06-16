@@ -57,25 +57,25 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void updateMesh() {
-//		if (root == null)
-//			init();
+		// if (root == null)
+		// init();
 		if (container == null)
 			return;
-		
+
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
 		center.set(0, 0, 0);
 		for (PolygonPoint p : wallUpperPoints)
 			center.addLocal(p.getX(), p.getY(), p.getZ());
 		center.multiplyLocal(1.0 / wallUpperPoints.size());
 
-		final Polygon polygon = makePolygon(wallUpperPoints);		
+		final Polygon polygon = makePolygon(wallUpperPoints);
 		Poly2Tri.triangulate(polygon);
 
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
 		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, 0);
-		
+
 		mesh.getMeshData().updateVertexCount();
 
 		for (int i = 0; i < points.size(); i++) {
@@ -84,15 +84,15 @@ public abstract class Roof extends HousePart {
 		}
 
 		updateLabelLocation();
-		
+
 		if (flattenTime > 0)
 			flatten();
-		
+
 		drawAnnotations();
-		
+
 		mesh.updateModelBound();
 	}
-	
+
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
 		ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
 		Wall currentWall = startWall;
@@ -133,25 +133,85 @@ public abstract class Roof extends HousePart {
 		if (!poly.contains(polygonPoint)) {
 			poly.add(polygonPoint);
 		}
-	}	
+	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
 		return new Polygon(wallUpperPoints);
 	}
 
-	protected void flatten() {		
-		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
+	protected void flatten() {
+		System.out.println("-");
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		final Vector3 p1 = Vector3.fetchTempInstance();
+		final Vector3 p2 = Vector3.fetchTempInstance();
+		final Vector3 p3 = Vector3.fetchTempInstance();
+
+		float pos = 0;
+		for (int i = 0; i < vertexBuffer.capacity() / 9 - 0; i++) {
+			pos += 0.05;
+//			for (int j = 0; j < 3; j++) {
+				final int xPos = i * 9;
+				System.out.println(i + " " + xPos);
+				vertexBuffer.position(xPos);
+				p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+				p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+				p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+				flattenTriangle(p1, p2, p3);
+				vertexBuffer.position(xPos);
+				vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+				vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+				vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
+//			}
+		}
+
+		Vector3.releaseTempInstance(p1);
+		Vector3.releaseTempInstance(p2);
+		Vector3.releaseTempInstance(p3);
+
+//		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 		super.flatten();
 	}
-	
+
+	private void flattenTriangle(Vector3 p1, Vector3 p2, Vector3 p3) {
+		final Vector3 v = Vector3.fetchTempInstance();
+		final Vector3 normal = Vector3.fetchTempInstance();		
+		v.set(p3).subtractLocal(p1);
+		normal.set(p2).subtractLocal(p1).crossLocal(v).setX(0);
+		normal.normalizeLocal();		
+		double angle = normal.smallestAngleBetween(Vector3.UNIT_Z);
+		normal.set(p2).subtractLocal(p1).crossLocal(v).setX(0);
+		normal.normalizeLocal();		
+		double angle2 = normal.smallestAngleBetween(Vector3.UNIT_Z);
+		if (angle > Math.PI / 2)
+			angle = 0;
+		System.out.println("--------------");
+		System.out.println((int)(angle/3.14*180));
+		v.set(p3).subtractLocal(p1).normalizeLocal();
+//		final Matrix3 m = Matrix3.fetchTempInstance().fromAngleAxis(angle, Vector3.UNIT_Y);
+		final Matrix3 m = Matrix3.fetchTempInstance().fromAngles(angle2, angle, 0);
+		System.out.println(p1);
+		m.applyPost(p1, p1);
+		System.out.println(p1);
+		System.out.println(p2);
+		m.applyPost(p2, p2);
+		System.out.println(p2);
+		System.out.println(p3);
+		m.applyPost(p3, p3);
+		System.out.println(p3);
+		
+		Vector3.releaseTempInstance(v );
+		Vector3.releaseTempInstance(normal);
+		Matrix3.releaseTempInstance(m);
+	}
+
 	protected double computeLabelTop() {
 		return labelTop;
-	}	
-	
+	}
+
 	protected ReadOnlyVector3 getFaceDirection() {
 		return Vector3.UNIT_Z;
 	}
-	
+
 	protected void drawAnnotations() {
 		if (container == null)
 			return;
@@ -159,19 +219,19 @@ public abstract class Roof extends HousePart {
 		int annotCounter = 0;
 		Vector3 a = Vector3.fetchTempInstance();
 		Vector3 b = Vector3.fetchTempInstance();
-		
-		for (int i=0; i<wallUpperPoints.size(); i++) {
+
+		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			PolygonPoint p = wallUpperPoints.get(i);
 			a.set(p.getX(), p.getY(), p.getZ());
-			p = wallUpperPoints.get((i+1)%wallUpperPoints.size());
+			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
 			b.set(p.getX(), p.getY(), p.getZ());
 			drawAnnot(a, b, faceDirection, annotCounter++, Align.Center);
 		}
-		
+
 		for (int i = annotCounter; i < annotRoot.getChildren().size(); i++)
 			annotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
-		
+
 		Vector3.releaseTempInstance(a);
 		Vector3.releaseTempInstance(b);
-	}	
+	}
 }
