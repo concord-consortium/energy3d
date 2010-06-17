@@ -55,8 +55,8 @@ public class SizeAnnotation extends Node {
 		else {
 			offset.set(to).subtractLocal(from).crossLocal(faceDirection).normalizeLocal().multiplyLocal(C);
 			v.set(from).subtractLocal(center).normalizeLocal();
-			if (v.dot(offset) < 0)
-				offset.negateLocal();
+//			if (v.dot(offset) < 0)
+//				offset.negateLocal();
 		}
 
 		FloatBuffer vertexBuffer = lines.getMeshData().getVertexBuffer();

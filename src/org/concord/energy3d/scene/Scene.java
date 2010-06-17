@@ -270,8 +270,8 @@ public class Scene implements Serializable {
 			HousePart.flattenPos = 0;
 			sceneClone = (Scene) ObjectCloner.deepCopy(this);
 			printParts.clear();
-			double x = 2;
-			double y = 0;
+			int printSeq = 2;
+//			double y = 0;
 			int id = 1;
 			for (int i = 0; i < sceneClone.getParts().size(); i++) {
 				final HousePart newPart = sceneClone.getParts().get(i);
@@ -283,13 +283,13 @@ public class Scene implements Serializable {
 					newPart.getOriginal().setLabel(labelText);
 					id++;
 					printParts.add(newPart);
-					newPart.setPrintX(5 * x - 2);
-					newPart.setPrintY(5 * y + 1.3);
-					x++;
-					if (x >= 5) {
-						x = 0;
-						y++;
-					}
+					newPart.setPrintSequence(printSeq);
+//					newPart.setPrintY(5 * y + 1.3);
+					printSeq++;
+//					if (printSeq >= 5) {
+//						printSeq = 0;
+//						y++;
+//					}
 				}
 			}
 		}

@@ -26,7 +26,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
 	protected static final double GRID_SIZE = 0.5;
-	protected transient Mesh mesh;
+	transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 	protected double labelTop;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
@@ -142,53 +142,47 @@ public abstract class Roof extends HousePart {
 	protected void flatten() {
 		System.out.println("-");
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		final FloatBuffer orgVertexBuffer = ((Roof)original).mesh.getMeshData().getVertexBuffer();
 		final Vector3 p1 = Vector3.fetchTempInstance();
 		final Vector3 p2 = Vector3.fetchTempInstance();
 		final Vector3 p3 = Vector3.fetchTempInstance();
 
 		float pos = 0;
-		for (int i = 0; i < vertexBuffer.capacity() / 9 - 0; i++) {
-			pos += 0.05;
-//			for (int j = 0; j < 3; j++) {
+		for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
+			pos += 0.5;
 				final int xPos = i * 9;
 				System.out.println(i + " " + xPos);
-				vertexBuffer.position(xPos);
-				p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-				p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-				p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-				flattenTriangle(p1, p2, p3);
+				orgVertexBuffer.position(xPos);
+				p1.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
+				p2.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
+				p3.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
+				flattenTriangle(p1, p2, p3, printSequence + i);
 				vertexBuffer.position(xPos);
 				vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
 				vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 				vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
-//			}
 		}
 
 		Vector3.releaseTempInstance(p1);
 		Vector3.releaseTempInstance(p2);
 		Vector3.releaseTempInstance(p3);
 
-//		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
-		super.flatten();
+		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
+//		super.flatten();
 	}
 
-	private void flattenTriangle(Vector3 p1, Vector3 p2, Vector3 p3) {
+	private void flattenTriangle(Vector3 p1, Vector3 p2, Vector3 p3, int printSequence) {
 		final Vector3 v = Vector3.fetchTempInstance();
 		final Vector3 normal = Vector3.fetchTempInstance();		
 		v.set(p3).subtractLocal(p1);
-		normal.set(p2).subtractLocal(p1).crossLocal(v).setX(0);
+		normal.set(p2).subtractLocal(p1).crossLocal(v);
 		normal.normalizeLocal();		
-		double angle = normal.smallestAngleBetween(Vector3.UNIT_Z);
-		normal.set(p2).subtractLocal(p1).crossLocal(v).setX(0);
-		normal.normalizeLocal();		
-		double angle2 = normal.smallestAngleBetween(Vector3.UNIT_Z);
-		if (angle > Math.PI / 2)
-			angle = 0;
+		double angle = flattenTime * normal.smallestAngleBetween(Vector3.UNIT_Z);
 		System.out.println("--------------");
 		System.out.println((int)(angle/3.14*180));
 		v.set(p3).subtractLocal(p1).normalizeLocal();
-//		final Matrix3 m = Matrix3.fetchTempInstance().fromAngleAxis(angle, Vector3.UNIT_Y);
-		final Matrix3 m = Matrix3.fetchTempInstance().fromAngles(angle2, angle, 0);
+		normal.crossLocal(Vector3.UNIT_Z);
+		final Matrix3 m = Matrix3.fetchTempInstance().fromAngleAxis(angle, normal);
 		System.out.println(p1);
 		m.applyPost(p1, p1);
 		System.out.println(p1);
@@ -198,6 +192,15 @@ public abstract class Roof extends HousePart {
 		System.out.println(p3);
 		m.applyPost(p3, p3);
 		System.out.println(p3);
+		
+//		root.setTranslation(0, 0, 0);
+		Vector3 targetCenter = new Vector3(printSequence % 5 * 5, printSequence / 5 * 5, 0);
+		Vector3 currentCenter = v.set(p1).addLocal(p2).addLocal(p3).multiplyLocal(1.0/3.0);
+		final Vector3 d = targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime);
+//		root.setTranslation(d);
+		p1.addLocal(d);
+		p2.addLocal(d);
+		p3.addLocal(d);
 		
 		Vector3.releaseTempInstance(v );
 		Vector3.releaseTempInstance(normal);
@@ -220,12 +223,41 @@ public abstract class Roof extends HousePart {
 		Vector3 a = Vector3.fetchTempInstance();
 		Vector3 b = Vector3.fetchTempInstance();
 
+		if (flattenTime == 0) {
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			PolygonPoint p = wallUpperPoints.get(i);
 			a.set(p.getX(), p.getY(), p.getZ());
 			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
 			b.set(p.getX(), p.getY(), p.getZ());
 			drawAnnot(a, b, faceDirection, annotCounter++, Align.Center);
+		}
+		} else {
+			final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+			final Vector3 p1 = Vector3.fetchTempInstance();
+			final Vector3 p2 = Vector3.fetchTempInstance();
+			final Vector3 p3 = Vector3.fetchTempInstance();
+
+			float pos = 0;
+			for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
+				pos += 0.5;
+					final int xPos = i * 9;
+					System.out.println(i + " " + xPos);
+					vertexBuffer.position(xPos);
+					p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+					p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+					p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+//					flattenTriangle(p1, p2, p3, printSequence + i);
+//					a.set(p2).subtractLocal(p1).crossLocal(Vector3.UNIT_Y).normalizeLocal();
+					drawAnnot(p1, p2, Vector3.UNIT_Z, annotCounter++, Align.Center);
+//					a.set(p3).subtractLocal(p2).crossLocal(Vector3.UNIT_Y).normalizeLocal();
+					drawAnnot(p2, p3, Vector3.UNIT_Z, annotCounter++, Align.Center);
+//					a.set(p1).subtractLocal(p3).crossLocal(Vector3.UNIT_Y).normalizeLocal();
+					drawAnnot(p3, p1, Vector3.UNIT_Z, annotCounter++, Align.Center);
+			}
+
+			Vector3.releaseTempInstance(p1);
+			Vector3.releaseTempInstance(p2);
+			Vector3.releaseTempInstance(p3);
 		}
 
 		for (int i = annotCounter; i < annotRoot.getChildren().size(); i++)
@@ -234,4 +266,10 @@ public abstract class Roof extends HousePart {
 		Vector3.releaseTempInstance(a);
 		Vector3.releaseTempInstance(b);
 	}
+	
+	public int setPrintSequence(int printSequence) {
+		super.setPrintSequence(printSequence);
+		return mesh.getMeshData().getVertexCount() / 3;
+	}
+	
 }

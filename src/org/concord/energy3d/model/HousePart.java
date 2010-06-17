@@ -44,11 +44,13 @@ public abstract class HousePart implements Serializable {
 	protected boolean relativeToHorizontal;
 	protected double pos;
 	protected transient HousePart original = null;
-	protected transient double printX, printY;
+	protected transient int printSequence;
 	protected transient Vector3 center;
 	private transient BMText label;
 	private transient ReadOnlyVector3 defaultDirection;
 	protected transient Node annotRoot;
+	public static int PRINT_SPACE = 5;
+	public static int PRINT_COLS = 4;
 
 	public static void setFlattenTime(double flattenTime) {
 		if (flattenTime < 0)
@@ -402,26 +404,27 @@ public abstract class HousePart implements Serializable {
 
 	protected void flatten() {
 		root.setTranslation(0, 0, 0);
-		Vector3 targetCenter = new Vector3(printX, 0, printY);
+		Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE , 0, printSequence / PRINT_COLS * PRINT_SPACE);
 		Vector3 currentCenter = root.getTransform().applyForward(center.clone());
 		root.setTranslation(targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime));
 	}
 
-	public void setPrintX(double printX) {
-		this.printX = printX;
+	public int setPrintSequence(int printSequence) {
+		this.printSequence = printSequence;
+		return 1;
 	}
 
-	public void setPrintY(double printY) {
-		this.printY = printY;
+//	public void setPrintY(double printY) {
+//		this.printY = printY;
+//	}
+
+	public double getPrintSequence() {
+		return printSequence;
 	}
 
-	public double getPrintX() {
-		return printX;
-	}
-
-	public double getPrintY() {
-		return printY;
-	}
+//	public double getPrintY() {
+//		return printY;
+//	}
 
 	public boolean isPrintable() {
 		return true;
