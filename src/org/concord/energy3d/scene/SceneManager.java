@@ -114,7 +114,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final LogicalLayer logicalLayer;
 	private boolean exit = false;
 	protected final Node root = new Node("Root");
-	private final Node housePartsNode = Scene.root;
+//	private final Node housePartsNode = Scene.root;
 	private Mesh floor;
 	private boolean rotAnim = false;
 	private HousePart drawn = null;
@@ -143,7 +143,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public SceneManager(final Container panel) {
 		System.out.print("Initializing scene manager...");
 		instance = this;
-		root.attachChild(housePartsNode);
+//		root.attachChild(housePartsNode);
+		root.attachChild(Scene.getRoot());
 
 		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 8, false, false);
 		final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(this);
@@ -228,14 +229,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		pssmPass = new ParallelSplitShadowMapPass(light, 3072, 3);
 		pssmPass.setUseObjectCullFace(true);
 		pssmPass.add(floor);
-		pssmPass.add(housePartsNode);
-		pssmPass.addOccluder(housePartsNode);
+		pssmPass.add(Scene.getRoot());
+		pssmPass.addOccluder(Scene.getRoot());
 		pssmPass.init(canvas.getCanvasRenderer().getRenderer());
 
 		createSunHeliodon();
 		Scene.getInstance();
 
-		SelectUtil.init(floor, housePartsNode);
+		SelectUtil.init(floor, Scene.getRoot());
 		registerInputTriggers();
 
 		root.updateGeometricState(0, true);
@@ -542,7 +543,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DELETE), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				removeHousePart(drawn);
+//				removeHousePart(drawn);
+				Scene.getInstance().remove(drawn);
 				drawn = null;
 			}
 		}));
@@ -744,7 +746,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void setOperation(Operation operation) {
 		this.operation = operation;
 		if (drawn != null && !drawn.isDrawCompleted())
-			removeHousePart(drawn);
+//			removeHousePart(drawn);
+			Scene.getInstance().remove(drawn);
 		// if (operation == Operation.RESIZE) {
 		// Foundation.setResizeHouseMode(true);
 		// } else
@@ -776,153 +779,27 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Foundation();
 
 		if (drawn != null)
-			addHousePart(drawn);
+//			addHousePart(drawn);
+			Scene.getInstance().add(drawn);
 		return drawn;
 	}
 
-	private void addHousePart(HousePart drawn) {
-		housePartsNode.attachChild(drawn.getRoot());
-		Scene.getInstance().add(drawn);
-	}
-
-	private void removeHousePart(HousePart drawn) {
-		if (drawn == null)
-			return;
-		housePartsNode.detachChild(drawn.getRoot());
-		Scene.getInstance().remove(drawn);
-		drawn.delete();
-	}
+//	private void addHousePart(HousePart drawn) {
+//		housePartsNode.attachChild(drawn.getRoot());
+//		Scene.getInstance().add(drawn);
+//	}
+//
+//	private void removeHousePart(HousePart drawn) {
+//		if (drawn == null)
+//			return;
+//		housePartsNode.detachChild(drawn.getRoot());
+//		drawn.delete();
+//		Scene.getInstance().remove(drawn);
+//	}
 
 	public Operation getOperation() {
 		return operation;
 	}
-
-//	private void pick(int x, int y, Spatial target) {
-//		// Put together a pick ray
-//		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
-//		final Ray3 pickRay = Ray3.fetchTempInstance();
-//		canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-//		Vector2.releaseTempInstance(pos);
-//
-//		// Do the pick
-//		PickingUtil.findPick(target, pickRay, pickResults);
-//		Ray3.releaseTempInstance(pickRay);
-//	}
-//
-//	public PickedHousePart findMousePoint(int x, int y) {
-//		return findMousePoint(x, y, floor);
-//	}
-//
-//	public PickedHousePart findMousePoint(int x, int y, Spatial target) {
-//		if (target == null)
-//			target = floor;
-//		pickResults.clear();
-//		pick(x, y, target);
-//
-//		return getPickResult();
-//	}
-//
-//	public PickedHousePart findMousePoint(int x, int y, Class<?> typeOfHousePart) {
-//		pickResults.clear();
-//		if (typeOfHousePart == null)
-//			pick(x, y, floor);
-//		else
-//			for (HousePart housePart : Scene.getInstance().getParts())
-//				if (typeOfHousePart.isInstance(housePart)) // && housePart != except)
-//					pick(x, y, housePart.getRoot());
-//
-//		return getPickResult();
-//	}
-//
-//	private PickedHousePart getPickResult() {
-//		PickedHousePart pickedHousePart = null;
-//		double polyDist = Double.MAX_VALUE;
-//		double pointDist = Double.MAX_VALUE;
-//		int objCounter = 0;
-//		HousePart prevHousePart = null;
-//		for (int i = 0; i < pickResults.getNumber(); i++) {
-//			final PickData pick = pickResults.getPickData(i);
-//			if (pick.getIntersectionRecord().getNumberOfIntersections() == 0)
-//				continue;
-//			Object obj = pick.getTargetMesh().getUserData();
-//			UserData userData = null;
-//			if (obj instanceof UserData) {
-//				userData = (UserData) obj;
-//				if (userData.getHousePart() != prevHousePart) {
-//					objCounter++;
-//					prevHousePart = userData.getHousePart();
-//				}
-//			} else if (this.pickLayer != -1) {
-//				continue;
-//			}
-//			if (this.pickLayer != -1 && objCounter != this.pickLayer)
-//				continue;
-//			Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
-//			PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
-//			double polyDist_i = pick.getClosestDistance();
-//			double pointDist_i = Double.MAX_VALUE;
-//			if (userData != null && polyDist_i - polyDist < 0.1) {
-//				for (Vector3 p : userData.getHousePart().getPoints()) {
-//					pointDist_i = p.distance(intersectionPoint);
-//					if (userData.getHousePart() == drawn)
-//						pointDist_i -= 0.1;
-//					if (pointDist_i < pointDist && (userData.getPointIndex() != -1 || pickedHousePart == null || pickedHousePart.getUserData().getPointIndex() == -1)) {
-//						pickedHousePart = picked_i;
-//						polyDist = polyDist_i;
-//						pointDist = pointDist_i;
-//					}
-//				}
-//			}
-//			if (pickedHousePart == null) {
-//				pickedHousePart = picked_i;
-//				polyDist = polyDist_i;
-//				pointDist = pointDist_i;
-//			}
-//		}
-//		return pickedHousePart;
-//	}
-//
-//	private void selectHousePart(int x, int y, boolean edit) {
-//		PickedHousePart selectedMesh = findMousePoint(x, y, housePartsNode);
-//		UserData data = null;
-//		if (selectedMesh != null)
-//			data = selectedMesh.getUserData();
-//
-//		if (data == null) {
-//			if (lastHoveredObject != null) {
-//				lastHoveredObject.hidePoints();
-//				lastHoveredObject = null;
-//				if (blinker != null) {
-//					blinker.finish();
-//					blinker = null;
-//				}
-//			}
-//		} else if (edit && data.getPointIndex() != -1) {
-//			drawn = data.getHousePart();
-//			int pointIndex = data.getPointIndex();
-//			if (topView && drawn instanceof Wall)
-//				pointIndex -= 1;
-//			drawn.editPoint(pointIndex);
-//		} else {
-//			HousePart housePart = data.getHousePart();
-//			drawn = housePart;
-//			if (lastHoveredObject != null && lastHoveredObject != housePart) {
-//				lastHoveredObject.hidePoints();
-//				lastHoveredObject = null;
-//			}
-//
-//			if (lastHoveredObject != housePart) {
-//				if (blinker != null) {
-//					blinker.finish();
-//					blinker = null;
-//				}
-//				if (drawn.getOriginal() != null)
-//					blinker = new Blinker(drawn.getOriginal().getRoot());
-//			}
-//			housePart.showPoints();
-//			lastHoveredObject = housePart;
-//		}
-//	}
 
 	public void setLighting(boolean enable) {
 		lightState.setEnabled(enable);
@@ -1049,9 +926,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					canvasRenderer.setCurrentContext();
 					canvasRenderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
 					canvasRenderer.releaseCurrentContext();							
-					Scene.getInstance().setFlatten(printPreview);
+					Scene.getInstance().flatten(printPreview);
 				} else {
-					Scene.getInstance().setFlatten(printPreview);
+					Scene.getInstance().flatten(printPreview);
 					resetCamera(ViewMode.NORMAL);
 					root.attachChild(floor);
 					root.attachChild(axis);

@@ -23,7 +23,7 @@ public class SizeAnnotation extends Node {
 	private final Mesh arrows = new Mesh("Arrows");
 
 	static {
-		final String file = "fonts/tahoma.fnt";
+		final String file = "fonts/f3.fnt";
 		final ResourceSource url = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, file);
 		BMFont f = null;
 		try {
@@ -46,7 +46,7 @@ public class SizeAnnotation extends Node {
 
 	}
 
-	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align) {
+	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipDirection) {
 		final double C = 0.1;
 		Vector3 v = Vector3.fetchTempInstance();
 		final Vector3 offset = Vector3.fetchTempInstance();
@@ -54,9 +54,11 @@ public class SizeAnnotation extends Node {
 			offset.set(faceDirection).normalizeLocal().multiplyLocal(C);
 		else {
 			offset.set(to).subtractLocal(from).crossLocal(faceDirection).normalizeLocal().multiplyLocal(C);
-			v.set(from).subtractLocal(center).normalizeLocal();
-//			if (v.dot(offset) < 0)
-//				offset.negateLocal();
+			if (autoFlipDirection) {
+				v.set(from).subtractLocal(center).normalizeLocal();
+				if (v.dot(offset) < 0)
+					offset.negateLocal();
+			}
 		}
 
 		FloatBuffer vertexBuffer = lines.getMeshData().getVertexBuffer();

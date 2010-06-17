@@ -35,8 +35,8 @@ import com.google.common.collect.Lists;
 
 public class Scene implements Serializable {
 	private static final long serialVersionUID = 1L;
-	public static final Node root = new Node("House Root");
-	public static final Node houseRoot = new Node("Original House Root");
+	private static final Node root = new Node("House Root");
+	private static final Node originalHouseRoot = new Node("Original House Root");
 	private static Scene instance;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private transient ArrayList<HousePart> printParts;
@@ -55,6 +55,10 @@ public class Scene implements Serializable {
 		}
 		return instance;
 	}
+
+	public static Node getRoot() {
+		return root;
+	}	
 
 	private Scene() {
 		init();
@@ -200,12 +204,17 @@ public class Scene implements Serializable {
 	// return tex;
 	// }
 
-	public boolean add(HousePart e) {
-		return parts.add(e);
+	public void add(HousePart housePart) {
+		originalHouseRoot.attachChild(housePart.getRoot());
+		parts.add(housePart);
 	}
 
-	public boolean remove(Object o) {
-		return parts.remove(o);
+	public void remove(HousePart housePart) {
+		if (housePart == null)
+			return;
+		originalHouseRoot.detachChild(housePart.getRoot());
+		housePart.delete();
+		parts.remove(housePart);
 	}
 
 	public ArrayList<HousePart> getParts() {
@@ -243,9 +252,9 @@ public class Scene implements Serializable {
 			instance.init();
 			in.close();
 			for (HousePart housePart : instance.getParts()) {
-				houseRoot.attachChild(housePart.getRoot());
+				originalHouseRoot.attachChild(housePart.getRoot());
 			}
-			root.attachChild(houseRoot);
+			root.attachChild(originalHouseRoot);
 		} catch (FileNotFoundException e) {
 			System.out.println("Energy3D saved file not found...creating a new file...");
 			instance = new Scene();
@@ -265,7 +274,7 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public void setFlatten(final boolean flatten) {
+	public void flatten(final boolean flatten) {
 		if (flatten) {
 			HousePart.flattenPos = 0;
 			sceneClone = (Scene) ObjectCloner.deepCopy(this);
@@ -283,9 +292,9 @@ public class Scene implements Serializable {
 					newPart.getOriginal().setLabel(labelText);
 					id++;
 					printParts.add(newPart);
-					newPart.setPrintSequence(printSeq);
+					printSeq += newPart.setPrintSequence(printSeq);
 //					newPart.setPrintY(5 * y + 1.3);
-					printSeq++;
+//					printSeq++;
 //					if (printSeq >= 5) {
 //						printSeq = 0;
 //						y++;
@@ -320,7 +329,7 @@ public class Scene implements Serializable {
 	//			HousePart.setFlatten(false);
 	//			for (HousePart part : parts)
 	//				part.draw();
-				houseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
+				originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
 				angle = 0;
 				for (HousePart housePart : sceneClone.getParts())
 					root.detachChild(housePart.getRoot());
@@ -337,6 +346,6 @@ public class Scene implements Serializable {
 
 	public void rotate() {
 		angle += 0.01;
-		houseRoot.setRotation(new Matrix3().fromAngles(0, 0, angle));
+		originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, angle));
 	}
 }

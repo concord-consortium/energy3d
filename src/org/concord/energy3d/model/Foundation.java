@@ -202,7 +202,7 @@ public class Foundation extends HousePart {
 				annotRoot.attachChild(annot);
 			}
 			annotCounter++;
-			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false, Align.South);
+			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false, Align.South, true);
 		}
 	}	
 }

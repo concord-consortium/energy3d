@@ -462,7 +462,7 @@ public abstract class HousePart implements Serializable {
 		return defaultDirection;
 	}
 	
-	protected void drawAnnot(Vector3 a, Vector3 b, ReadOnlyVector3 faceDirection, int annotCounter, Align align) {
+	protected void drawAnnot(Vector3 a, Vector3 b, ReadOnlyVector3 faceDirection, int annotCounter, Align align, boolean autoFlipDirection) {
 		final SizeAnnotation annot;
 		if (annotCounter < annotRoot.getChildren().size()) {
 			annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
@@ -471,7 +471,7 @@ public abstract class HousePart implements Serializable {
 			annot = new SizeAnnotation();
 			annotRoot.attachChild(annot);
 		}			
-		annot.setRange(a, b, center, faceDirection, original == null, align);
+		annot.setRange(a, b, center, faceDirection, original == null, align, autoFlipDirection);
 	}		
 
 	public abstract void setPreviewPoint(int x, int y);	

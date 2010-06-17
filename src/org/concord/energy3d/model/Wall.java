@@ -651,19 +651,19 @@ public class Wall extends HousePart {
 			return;
 		ReadOnlyVector3 faceDirection = getFaceDirection();
 		int annotCounter = 0;
-		drawAnnot(abspoints.get(0), abspoints.get(2), faceDirection, annotCounter++, original == null ? Align.South : Align.Center);
+		drawAnnot(abspoints.get(0), abspoints.get(2), faceDirection, annotCounter++, original == null ? Align.South : Align.Center, true);
 		if (original != null || neighbors[0] == null || !neighbors[0].isDrawn()) {
-			drawAnnot(abspoints.get(0), abspoints.get(1), faceDirection, annotCounter++, Align.Center);
+			drawAnnot(abspoints.get(0), abspoints.get(1), faceDirection, annotCounter++, Align.Center, true);
 			if (neighbors[0] != null)
 				neighbors[0].setDrawn();
 		}
 		if (original != null || neighbors[1] == null || !neighbors[1].isDrawn()) {
-			drawAnnot(abspoints.get(2), abspoints.get(3), faceDirection, annotCounter++, Align.Center);
+			drawAnnot(abspoints.get(2), abspoints.get(3), faceDirection, annotCounter++, Align.Center, true);
 			if (neighbors[1] != null)
 				neighbors[1].setDrawn();
 		}
 		if (original != null)
-			drawAnnot(abspoints.get(1), abspoints.get(3), faceDirection, annotCounter++, Align.Center);
+			drawAnnot(abspoints.get(1), abspoints.get(3), faceDirection, annotCounter++, Align.Center, true);
 
 		for (int i = annotCounter; i < annotRoot.getChildren().size(); i++)
 			annotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);

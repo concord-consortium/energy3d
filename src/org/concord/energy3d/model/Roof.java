@@ -140,7 +140,6 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void flatten() {
-		System.out.println("-");
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer orgVertexBuffer = ((Roof)original).mesh.getMeshData().getVertexBuffer();
 		final Vector3 p1 = Vector3.fetchTempInstance();
@@ -151,7 +150,6 @@ public abstract class Roof extends HousePart {
 		for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
 			pos += 0.5;
 				final int xPos = i * 9;
-				System.out.println(i + " " + xPos);
 				orgVertexBuffer.position(xPos);
 				p1.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
 				p2.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
@@ -178,23 +176,15 @@ public abstract class Roof extends HousePart {
 		normal.set(p2).subtractLocal(p1).crossLocal(v);
 		normal.normalizeLocal();		
 		double angle = flattenTime * normal.smallestAngleBetween(Vector3.UNIT_Z);
-		System.out.println("--------------");
-		System.out.println((int)(angle/3.14*180));
 		v.set(p3).subtractLocal(p1).normalizeLocal();
 		normal.crossLocal(Vector3.UNIT_Z);
 		final Matrix3 m = Matrix3.fetchTempInstance().fromAngleAxis(angle, normal);
-		System.out.println(p1);
 		m.applyPost(p1, p1);
-		System.out.println(p1);
-		System.out.println(p2);
 		m.applyPost(p2, p2);
-		System.out.println(p2);
-		System.out.println(p3);
 		m.applyPost(p3, p3);
-		System.out.println(p3);
 		
 //		root.setTranslation(0, 0, 0);
-		Vector3 targetCenter = new Vector3(printSequence % 5 * 5, printSequence / 5 * 5, 0);
+		Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE, printSequence / PRINT_COLS * PRINT_SPACE, 0);
 		Vector3 currentCenter = v.set(p1).addLocal(p2).addLocal(p3).multiplyLocal(1.0/3.0);
 		final Vector3 d = targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime);
 //		root.setTranslation(d);
@@ -229,7 +219,7 @@ public abstract class Roof extends HousePart {
 			a.set(p.getX(), p.getY(), p.getZ());
 			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
 			b.set(p.getX(), p.getY(), p.getZ());
-			drawAnnot(a, b, faceDirection, annotCounter++, Align.Center);
+			drawAnnot(a, b, faceDirection, annotCounter++, Align.Center, true);
 		}
 		} else {
 			final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
@@ -248,11 +238,11 @@ public abstract class Roof extends HousePart {
 					p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 //					flattenTriangle(p1, p2, p3, printSequence + i);
 //					a.set(p2).subtractLocal(p1).crossLocal(Vector3.UNIT_Y).normalizeLocal();
-					drawAnnot(p1, p2, Vector3.UNIT_Z, annotCounter++, Align.Center);
+					drawAnnot(p1, p2, Vector3.UNIT_Z, annotCounter++, Align.Center, false);
 //					a.set(p3).subtractLocal(p2).crossLocal(Vector3.UNIT_Y).normalizeLocal();
-					drawAnnot(p2, p3, Vector3.UNIT_Z, annotCounter++, Align.Center);
+					drawAnnot(p2, p3, Vector3.UNIT_Z, annotCounter++, Align.Center, false);
 //					a.set(p1).subtractLocal(p3).crossLocal(Vector3.UNIT_Y).normalizeLocal();
-					drawAnnot(p3, p1, Vector3.UNIT_Z, annotCounter++, Align.Center);
+					drawAnnot(p3, p1, Vector3.UNIT_Z, annotCounter++, Align.Center, false);
 			}
 
 			Vector3.releaseTempInstance(p1);

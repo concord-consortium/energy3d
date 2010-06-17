@@ -218,7 +218,11 @@ Version 0.2
 - transferred roof/floor related methods from superclass HousePart to Roof 
 - modify the drawing architecture so that all drawing goes through HousePart.draw() method and subclasses override updateMesh()
 - decompose the roof into individual triangles when in print preview
-- rotate roof triangles to face the camera in print preview
+- compute rotation angle of  roof triangles to face the camera in print preview mode
+- arrange roof triangles so that each triangle is rendered in its own page
+- fixed problem with disconnected new parts from old parts by making Scene class the sole controller of add/remove parts
+- fixed font problem in older machines
+
  
 TODO:
 - combine the wall meshed into one
