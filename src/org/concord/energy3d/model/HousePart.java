@@ -14,6 +14,7 @@ import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -49,7 +50,7 @@ public abstract class HousePart implements Serializable {
 	private transient BMText label;
 	private transient ReadOnlyVector3 defaultDirection;
 	protected transient Node annotRoot;
-	public static int PRINT_SPACE = 5;
+	public static int PRINT_SPACE = 4;
 	public static int PRINT_COLS = 4;
 
 	public static void setFlattenTime(double flattenTime) {
@@ -305,10 +306,30 @@ public abstract class HousePart implements Serializable {
 		Vector3 wally = containerPoints.get(1).subtract(origin, null);
 		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
 		if (relativeToHorizontal)
-			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
+			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());		
 		return pointOnSpace;
 	}
 
+//	protected Vector3 toAbsolute(Vector3 p) {
+//		if (container == null)
+//			return p;
+//		ArrayList<Vector3> containerPoints = container.getPoints();
+//		final Vector3 p0 = new Vector3(containerPoints.get(0));
+//		final ReadOnlyTransform transform = container.getRoot().getTransform();
+//		transform.applyForward(p0);
+//		Vector3 origin = p0;
+//		final Vector3 p2 = containerPoints.get(2);
+//		transform.applyForward(p2);
+//		Vector3 wallx = p2.subtract(origin, null);
+//		final Vector3 p1 = containerPoints.get(1);
+//		transform.applyForward(p1);
+//		Vector3 wally = p1.subtract(origin, null);
+//		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
+//		if (relativeToHorizontal)
+//			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());		
+//		return pointOnSpace;
+//	}
+	
 	protected Snap snap(Vector3 p, int index) {
 		if (!snapToObjects)
 			return null;
@@ -373,7 +394,7 @@ public abstract class HousePart implements Serializable {
 
 	public void draw() {
 		if (root == null)
-			init();		
+			init();
 
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = points.get(i);
@@ -393,6 +414,12 @@ public abstract class HousePart implements Serializable {
 			flatten();
 
 		drawAnnotations();
+	
+		for (HousePart child : children)
+			child.draw();
+		
+//		for (HousePart child : children)
+//			child.draw();
 	}
 
 	protected void computeCenter() {
@@ -404,14 +431,36 @@ public abstract class HousePart implements Serializable {
 
 	protected void flatten() {
 		root.setTranslation(0, 0, 0);
-		Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE , 0, printSequence / PRINT_COLS * PRINT_SPACE);
-		Vector3 currentCenter = root.getTransform().applyForward(center.clone());
+//		Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE , 0, printSequence / PRINT_COLS * PRINT_SPACE);
+		Vector3 targetCenter = Vector3.fetchTempInstance();
+		computePrintCenter(targetCenter, this.printSequence);
+		Vector3 currentCenter = Vector3.fetchTempInstance().set(center);
+//		Vector3 currentCenter = root.getTransform().applyForward(center.clone());
+		currentCenter = root.getTransform().applyForward(currentCenter);
 		root.setTranslation(targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime));
+//		root.setTranslation(currentCenter);
+		Vector3.releaseTempInstance(targetCenter);
+		Vector3.releaseTempInstance(currentCenter);
 	}
 
-	public int setPrintSequence(int printSequence) {
+	public int setPrintSequence(final int printSequence) {
+		Vector3 targetCenter = Vector3.fetchTempInstance();
 		this.printSequence = printSequence;
-		return 1;
+		while (true) {
+			computePrintCenter(targetCenter, this.printSequence);
+			if (targetCenter.length() >= 3)
+				break;
+			else
+				this.printSequence++;
+		}
+		Vector3.releaseTempInstance(targetCenter);
+		return 1 + this.printSequence - printSequence;
+	}
+
+	protected void computePrintCenter(Vector3 targetCenter, int printSequence) {
+//		final double size = 1.5;
+		targetCenter.set((-1.5 + printSequence % PRINT_COLS) * PRINT_SPACE , 0, (-0.8 + printSequence / PRINT_COLS) * PRINT_SPACE);
+		System.out.println(printSequence + ":" + targetCenter);
 	}
 
 //	public void setPrintY(double printY) {
@@ -436,7 +485,7 @@ public abstract class HousePart implements Serializable {
 			final BMFont font = BMFontLoader.defaultFont();
 			label = new BMText("textSpatial1", labelText, font, align, BMText.Justify.Center);
 			updateLabelLocation();
-			root.attachChild(label);
+//			root.attachChild(label);
 		} else
 			label.setText(labelText);
 	}

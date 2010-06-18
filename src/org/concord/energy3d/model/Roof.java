@@ -165,7 +165,7 @@ public abstract class Roof extends HousePart {
 		Vector3.releaseTempInstance(p2);
 		Vector3.releaseTempInstance(p3);
 
-		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
+//		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 //		super.flatten();
 	}
 
@@ -175,25 +175,26 @@ public abstract class Roof extends HousePart {
 		v.set(p3).subtractLocal(p1);
 		normal.set(p2).subtractLocal(p1).crossLocal(v);
 		normal.normalizeLocal();		
-		double angle = flattenTime * normal.smallestAngleBetween(Vector3.UNIT_Z);
+		double angle = flattenTime * normal.smallestAngleBetween(Vector3.UNIT_Y);
 		v.set(p3).subtractLocal(p1).normalizeLocal();
-		normal.crossLocal(Vector3.UNIT_Z);
+		normal.crossLocal(Vector3.UNIT_Y);
 		final Matrix3 m = Matrix3.fetchTempInstance().fromAngleAxis(angle, normal);
 		m.applyPost(p1, p1);
 		m.applyPost(p2, p2);
 		m.applyPost(p3, p3);
 		
-//		root.setTranslation(0, 0, 0);
-		Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE, printSequence / PRINT_COLS * PRINT_SPACE, 0);
+//		Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE, printSequence / PRINT_COLS * PRINT_SPACE, 0);
+		Vector3 targetCenter = Vector3.fetchTempInstance();
+		computePrintCenter(targetCenter, printSequence);
 		Vector3 currentCenter = v.set(p1).addLocal(p2).addLocal(p3).multiplyLocal(1.0/3.0);
 		final Vector3 d = targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime);
-//		root.setTranslation(d);
 		p1.addLocal(d);
 		p2.addLocal(d);
 		p3.addLocal(d);
 		
-		Vector3.releaseTempInstance(v );
+		Vector3.releaseTempInstance(v);
 		Vector3.releaseTempInstance(normal);
+		Vector3.releaseTempInstance(targetCenter);
 		Matrix3.releaseTempInstance(m);
 	}
 
@@ -231,18 +232,18 @@ public abstract class Roof extends HousePart {
 			for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
 				pos += 0.5;
 					final int xPos = i * 9;
-					System.out.println(i + " " + xPos);
+//					System.out.println(i + " " + xPos);
 					vertexBuffer.position(xPos);
 					p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 					p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 					p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 //					flattenTriangle(p1, p2, p3, printSequence + i);
 //					a.set(p2).subtractLocal(p1).crossLocal(Vector3.UNIT_Y).normalizeLocal();
-					drawAnnot(p1, p2, Vector3.UNIT_Z, annotCounter++, Align.Center, false);
+					drawAnnot(p1, p2, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
 //					a.set(p3).subtractLocal(p2).crossLocal(Vector3.UNIT_Y).normalizeLocal();
-					drawAnnot(p2, p3, Vector3.UNIT_Z, annotCounter++, Align.Center, false);
+					drawAnnot(p2, p3, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
 //					a.set(p1).subtractLocal(p3).crossLocal(Vector3.UNIT_Y).normalizeLocal();
-					drawAnnot(p3, p1, Vector3.UNIT_Z, annotCounter++, Align.Center, false);
+					drawAnnot(p3, p1, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
 			}
 
 			Vector3.releaseTempInstance(p1);

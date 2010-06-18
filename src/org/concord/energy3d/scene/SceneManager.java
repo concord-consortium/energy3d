@@ -673,9 +673,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //			control.setMoveSpeed(MOVE_SPEED / 10); 
 //			camera.setProjectionMode(ProjectionMode.Parallel);
 			camera.setProjectionMode(ProjectionMode.Perspective);
-//			up = new Vector3(0.0f, 0.0f, -1.0f);
-//			loc = new Vector3(0.5, -2, 0.40);
-			loc = new Vector3(5, -20, 5);
+//			loc = new Vector3(5, -20, 5);
+			loc = new Vector3(0, -20, 0);
 //			root.setScale(0.04);
 		} else {
 			camera.setProjectionMode(ProjectionMode.Perspective);
@@ -745,6 +744,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setOperation(Operation operation) {
 		this.operation = operation;
+		if (operation == Operation.SELECT) {
+			drawn = null;
+			return;
+		}
 		if (drawn != null && !drawn.isDrawCompleted())
 //			removeHousePart(drawn);
 			Scene.getInstance().remove(drawn);

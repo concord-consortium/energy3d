@@ -209,11 +209,13 @@ public class Door extends HousePart {
 
 	protected void updateMesh() {
 		if (points.size() < 4)
-			return;
+			return;		
 
 		vertexBuffer.rewind();
 		for (Vector3 p : abspoints) {
-			container.getRoot().getTransform().applyForward(p); //???
+//			container.getRoot().getTransform().applyForward(p); //???
+//			container.getRoot().getTransform().getMatrix().applyPost(p, p);
+//			Vector3 p1 = new Vector3(getFaceDirection()).multiplyLocal(1).addLocal(p); 
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 

@@ -222,6 +222,9 @@ Version 0.2
 - arrange roof triangles so that each triangle is rendered in its own page
 - fixed problem with disconnected new parts from old parts by making Scene class the sole controller of add/remove parts
 - fixed font problem in older machines
+- rearrange the house parts around the main model in print preview
+
+- fixed door position in print preview
 
  
 TODO:

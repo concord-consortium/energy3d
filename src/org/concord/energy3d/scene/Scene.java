@@ -28,6 +28,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
@@ -240,7 +241,10 @@ public class Scene implements Serializable {
 	}
 
 	public void newFile() {
-		root.detachAllChildren();
+		originalHouseRoot.detachAllChildren();
+		for (Spatial child : root.getChildren())
+			if (child != originalHouseRoot)
+				root.detachChild(child);
 		parts.clear();
 	}
 
@@ -279,7 +283,7 @@ public class Scene implements Serializable {
 			HousePart.flattenPos = 0;
 			sceneClone = (Scene) ObjectCloner.deepCopy(this);
 			printParts.clear();
-			int printSeq = 2;
+			int printSeq = 0; //2;
 //			double y = 0;
 			int id = 1;
 			for (int i = 0; i < sceneClone.getParts().size(); i++) {
