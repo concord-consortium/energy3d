@@ -212,8 +212,11 @@ public class Door extends HousePart {
 			return;		
 
 		vertexBuffer.rewind();
-		for (Vector3 p : abspoints) {
-//			container.getRoot().getTransform().applyForward(p); //???
+//		int j=0;
+		for (Vector3 p : abspoints) {				
+			container.getRoot().getTransform().applyForward(p);
+//			if (j++ == 0)
+//				System.out.println(this + ": " + p);
 //			container.getRoot().getTransform().getMatrix().applyPost(p, p);
 //			Vector3 p1 = new Vector3(getFaceDirection()).multiplyLocal(1).addLocal(p); 
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
@@ -243,5 +246,4 @@ public class Door extends HousePart {
 	public boolean isPrintable() {
 		return false;
 	}
-
 }

@@ -225,6 +225,7 @@ Version 0.2
 - rearrange the house parts around the main model in print preview
 
 - fixed door position in print preview
+- avoid exception when print previewing incomplete drawings
 
  
 TODO:

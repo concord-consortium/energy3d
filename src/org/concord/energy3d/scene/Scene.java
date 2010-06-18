@@ -53,6 +53,7 @@ public class Scene implements Serializable {
 		if (instance == null) {
 			instance = new Scene();
 			open();
+			root.attachChild(originalHouseRoot);
 		}
 		return instance;
 	}
@@ -257,8 +258,7 @@ public class Scene implements Serializable {
 			in.close();
 			for (HousePart housePart : instance.getParts()) {
 				originalHouseRoot.attachChild(housePart.getRoot());
-			}
-			root.attachChild(originalHouseRoot);
+			}			
 		} catch (FileNotFoundException e) {
 			System.out.println("Energy3D saved file not found...creating a new file...");
 			instance = new Scene();
@@ -290,13 +290,14 @@ public class Scene implements Serializable {
 				final HousePart newPart = sceneClone.getParts().get(i);
 				root.attachChild(newPart.getRoot());
 				newPart.setOriginal(parts.get(i));
-				if (newPart.isPrintable()) {
-					final String labelText = "(" + id + ")";
-					newPart.setLabel(labelText);
-					newPart.getOriginal().setLabel(labelText);
-					id++;
+				if (newPart.isPrintable() && newPart.isDrawCompleted()) {
+//					final String labelText = "(" + id + ")";
+//					newPart.setLabel(labelText);
+//					newPart.getOriginal().setLabel(labelText);
+//					newPart.getOriginal().setPrintSequence(printSeq);
+//					id++;
 					printParts.add(newPart);
-					printSeq += newPart.setPrintSequence(printSeq);
+//					printSeq += newPart.setPrintSequence(printSeq);
 //					newPart.setPrintY(5 * y + 1.3);
 //					printSeq++;
 //					if (printSeq >= 5) {
@@ -316,19 +317,22 @@ public class Scene implements Serializable {
 //	private void animateFlatten(final boolean flatten) {
 	//		if (flatten)
 	//			HousePart.setFlatten(true);
-			for (double t = 0; t < 1.1; t += 0.05) {
+		double t = 1;
+//			for (double t = 0; t < 1.1; t += 0.05) {
 				if (flatten)
 					HousePart.setFlattenTime(t);
 				else
 					HousePart.setFlattenTime(1 - t);
 				for (HousePart part : sceneClone.getParts())
-					part.draw();
+					//TODO If draw not completed then it shouldn't even exist at this point!
+					if (part.isDrawCompleted())   
+						part.draw();
 				try {
 					Thread.sleep(30);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			}
+//			}
 			if (!flatten) {
 	//			HousePart.setFlatten(false);
 	//			for (HousePart part : parts)
@@ -338,6 +342,7 @@ public class Scene implements Serializable {
 				for (HousePart housePart : sceneClone.getParts())
 					root.detachChild(housePart.getRoot());
 			}
+			originalHouseRoot.setScale(flatten ? 2 : 1);
 	
 			for (HousePart part : getParts())
 				part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);

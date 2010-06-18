@@ -22,6 +22,7 @@ import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.ui.text.BMText.Justify;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -45,11 +46,14 @@ public abstract class HousePart implements Serializable {
 	protected boolean relativeToHorizontal;
 	protected double pos;
 	protected transient HousePart original = null;
-	protected transient int printSequence;
+	protected static int printSequence;
+	protected static int printPage;
 	protected transient Vector3 center;
-	private transient BMText label;
+	// private transient BMText label;
+	protected transient Node labelsRoot;
 	private transient ReadOnlyVector3 defaultDirection;
 	protected transient Node annotRoot;
+	protected transient Vector3 printCenter;
 	public static int PRINT_SPACE = 4;
 	public static int PRINT_COLS = 4;
 
@@ -59,6 +63,7 @@ public abstract class HousePart implements Serializable {
 		if (flattenTime > 1)
 			flattenTime = 1;
 		HousePart.flattenTime = flattenTime;
+		HousePart.printSequence = HousePart.printPage = 0;
 	}
 
 	public static double getFlattenTime() {
@@ -109,6 +114,9 @@ public abstract class HousePart implements Serializable {
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");
 		annotRoot = new Node("Annotations");
+		labelsRoot = new Node("Labels");
+		
+		printCenter = new Vector3();
 
 		// Set up a reusable pick results
 		pickResults = new PrimitivePickResults();
@@ -124,6 +132,7 @@ public abstract class HousePart implements Serializable {
 		}
 		root.attachChild(pointsRoot);
 		root.attachChild(annotRoot);
+		root.attachChild(labelsRoot);
 	}
 
 	private void initCheck() {
@@ -306,30 +315,30 @@ public abstract class HousePart implements Serializable {
 		Vector3 wally = containerPoints.get(1).subtract(origin, null);
 		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
 		if (relativeToHorizontal)
-			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());		
+			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
 		return pointOnSpace;
 	}
 
-//	protected Vector3 toAbsolute(Vector3 p) {
-//		if (container == null)
-//			return p;
-//		ArrayList<Vector3> containerPoints = container.getPoints();
-//		final Vector3 p0 = new Vector3(containerPoints.get(0));
-//		final ReadOnlyTransform transform = container.getRoot().getTransform();
-//		transform.applyForward(p0);
-//		Vector3 origin = p0;
-//		final Vector3 p2 = containerPoints.get(2);
-//		transform.applyForward(p2);
-//		Vector3 wallx = p2.subtract(origin, null);
-//		final Vector3 p1 = containerPoints.get(1);
-//		transform.applyForward(p1);
-//		Vector3 wally = p1.subtract(origin, null);
-//		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
-//		if (relativeToHorizontal)
-//			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());		
-//		return pointOnSpace;
-//	}
-	
+	// protected Vector3 toAbsolute(Vector3 p) {
+	// if (container == null)
+	// return p;
+	// ArrayList<Vector3> containerPoints = container.getPoints();
+	// final Vector3 p0 = new Vector3(containerPoints.get(0));
+	// final ReadOnlyTransform transform = container.getRoot().getTransform();
+	// transform.applyForward(p0);
+	// Vector3 origin = p0;
+	// final Vector3 p2 = containerPoints.get(2);
+	// transform.applyForward(p2);
+	// Vector3 wallx = p2.subtract(origin, null);
+	// final Vector3 p1 = containerPoints.get(1);
+	// transform.applyForward(p1);
+	// Vector3 wally = p1.subtract(origin, null);
+	// Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
+	// if (relativeToHorizontal)
+	// pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
+	// return pointOnSpace;
+	// }
+
 	protected Snap snap(Vector3 p, int index) {
 		if (!snapToObjects)
 			return null;
@@ -401,25 +410,26 @@ public abstract class HousePart implements Serializable {
 			p = toAbsolute(p);
 			abspoints.get(i).set(p);
 			pointsRoot.getChild(i).setTranslation(p);
-		}		
+		}
 		computeCenter();
-		
-		updateMesh();
-		
-		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
-		
-		updateLabelLocation();
 
-		if (flattenTime > 0)
+		updateMesh();
+
+		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
+
+		if (original != null && isPrintable())
+			updateLabels();
+
+		if (isPrintable() && flattenTime > 0) // TODO If draw not completed then it shouldn't even exist at this point!
 			flatten();
 
 		drawAnnotations();
-	
-		for (HousePart child : children)
-			child.draw();
-		
+
 //		for (HousePart child : children)
 //			child.draw();
+
+		// for (HousePart child : children)
+		// child.draw();
 	}
 
 	protected void computeCenter() {
@@ -431,86 +441,132 @@ public abstract class HousePart implements Serializable {
 
 	protected void flatten() {
 		root.setTranslation(0, 0, 0);
-//		Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE , 0, printSequence / PRINT_COLS * PRINT_SPACE);
-		Vector3 targetCenter = Vector3.fetchTempInstance();
-		computePrintCenter(targetCenter, this.printSequence);
+		// Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE , 0, printSequence / PRINT_COLS * PRINT_SPACE);
+//		Vector3 targetCenter = Vector3.fetchTempInstance();
+//		Vector3 targetCenter = printCenter;
+//		computePrintCenter(targetCenter, printPage++);
+		computePrintCenter();
+		Vector3 targetCenter = Vector3.fetchTempInstance().set(printCenter);
 		Vector3 currentCenter = Vector3.fetchTempInstance().set(center);
-//		Vector3 currentCenter = root.getTransform().applyForward(center.clone());
+		// Vector3 currentCenter = root.getTransform().applyForward(center.clone());
 		currentCenter = root.getTransform().applyForward(currentCenter);
-		root.setTranslation(targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime));
-//		root.setTranslation(currentCenter);
+		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
+		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));
+		// root.setTranslation(currentCenter);
 		Vector3.releaseTempInstance(targetCenter);
 		Vector3.releaseTempInstance(currentCenter);
 	}
 
-	public int setPrintSequence(final int printSequence) {
-		Vector3 targetCenter = Vector3.fetchTempInstance();
-		this.printSequence = printSequence;
+//	public int setPrintSequence(final int printSequence) {
+//		Vector3 targetCenter = Vector3.fetchTempInstance();
+//		this.printSequence = printSequence;
+//		int numOfPages = 1;
+//		while (true) {
+//			computePrintCenter(targetCenter, printSequence + numOfPages - 1);
+//			if (targetCenter.length() >= 3)
+//				break;
+//			else
+//				numOfPages++;
+//		}
+//		Vector3.releaseTempInstance(targetCenter);
+//		return numOfPages;
+//	}
+
+//	protected void computePrintCenter(Vector3 targetCenter, int printSequence) {
+	protected void computePrintCenter() {
+//		targetCenter.set((-1.5 + printSequence % PRINT_COLS) * PRINT_SPACE, 0, (-0.8 + printSequence / PRINT_COLS) * PRINT_SPACE);
+		
+//		Vector3 targetCenter = Vector3.fetchTempInstance();
+//		this.printCenter = new Vector3(targetCenter);
+//		this.printSequence = printSequence;
+		int numOfPages = 1;
 		while (true) {
-			computePrintCenter(targetCenter, this.printSequence);
-			if (targetCenter.length() >= 3)
+			printCenter.set((-1.5 + printSequence % PRINT_COLS) * PRINT_SPACE, 0, (-0.8 + printSequence / PRINT_COLS) * PRINT_SPACE);
+			if (printCenter.length() >= 3)
 				break;
 			else
-				this.printSequence++;
+				numOfPages++;
 		}
-		Vector3.releaseTempInstance(targetCenter);
-		return 1 + this.printSequence - printSequence;
+//		Vector3.releaseTempInstance(targetCenter);
+		printPage += numOfPages;		
 	}
 
-	protected void computePrintCenter(Vector3 targetCenter, int printSequence) {
-//		final double size = 1.5;
-		targetCenter.set((-1.5 + printSequence % PRINT_COLS) * PRINT_SPACE , 0, (-0.8 + printSequence / PRINT_COLS) * PRINT_SPACE);
-		System.out.println(printSequence + ":" + targetCenter);
-	}
+	// public void setPrintY(double printY) {
+	// this.printY = printY;
+	// }
 
-//	public void setPrintY(double printY) {
-//		this.printY = printY;
+//	public double getPrintSequence() {
+//		return printSequence;
 //	}
 
-	public double getPrintSequence() {
-		return printSequence;
-	}
-
-//	public double getPrintY() {
-//		return printY;
-//	}
+	// public double getPrintY() {
+	// return printY;
+	// }
 
 	public boolean isPrintable() {
 		return true;
 	}
 
-	public void setLabel(String labelText) {
-		if (label == null) {
-			final Align align = (original == null) ? BMText.Align.Center : BMText.Align.South;
-			final BMFont font = BMFontLoader.defaultFont();
-			label = new BMText("textSpatial1", labelText, font, align, BMText.Justify.Center);
-			updateLabelLocation();
-//			root.attachChild(label);
-		} else
-			label.setText(labelText);
-	}
+	// public void setLabel(String labelText) {
+	// if (label == null) {
+	// final Align align = (original == null) ? BMText.Align.Center : BMText.Align.South;
+	// final BMFont font = BMFontLoader.defaultFont();
+	// label = new BMText("textSpatial1", labelText, font, align, BMText.Justify.Center);
+	// updateLabelLocation();
+	// root.attachChild(label);
+	// } else
+	// label.setText(labelText);
+	// }
 
 	protected double computeLabelTop() {
-		return height / 2;
+		return height / 1;
 	}
 
-	protected void updateLabelLocation() {
-		if (label != null) {
-			label.setTranslation(center);
-			Vector3 up = new Vector3();
-			if (original == null)
-				up.set(getFaceDirection());
-			else
-				up.set(0, 0, computeLabelTop());
-			root.getTransform().applyInverseVector(up);
-			label.setTranslation(center.getX() + up.getX(), center.getY() + up.getY(), center.getZ() + up.getZ());
-		}
+	// protected void updateLabelLocation() {
+	// if (label != null) {
+	// label.setTranslation(center);
+	// Vector3 up = new Vector3();
+	// if (original == null)
+	// up.set(getFaceDirection());
+	// else
+	// up.set(0, 0, computeLabelTop());
+	// root.getTransform().applyInverseVector(up);
+	// label.setTranslation(center.getX() + up.getX(), center.getY() + up.getY(), center.getZ() + up.getZ());
+	// }
+	// }
+
+	protected void updateLabels() {
+		final String text = "(" + (printSequence++ + 1) + ")";
+		final BMText label = fetchBMText(text, 0);
+				
+		label.setTranslation(center);
+		Vector3 up = new Vector3();
+		if (original == null)
+			up.set(getFaceDirection());
+		else
+			up.set(0, 0, computeLabelTop());
+		root.getTransform().applyInverseVector(up);
+		label.setTranslation(center.getX() + up.getX(), center.getY() + up.getY(), center.getZ() + up.getZ());
 	}
+	
+	protected BMText fetchBMText(final String text, final int index) {
+		final BMText label;
+		if (labelsRoot.getChildren().size() > index) {
+			label = (BMText)labelsRoot.getChild(index);
+			label.setText(text);
+			label.getSceneHints().setCullHint(CullHint.Inherit);			
+		} else {
+			label = new BMText("textSpatial1", text, BMFontLoader.defaultFont(), (original == null) ? Align.Center : Align.South, Justify.Center);
+			labelsRoot.attachChild(label);
+		}
+		return label;
+	}
+	
 
 	protected ReadOnlyVector3 getFaceDirection() {
 		return defaultDirection;
 	}
-	
+
 	protected void drawAnnot(Vector3 a, Vector3 b, ReadOnlyVector3 faceDirection, int annotCounter, Align align, boolean autoFlipDirection) {
 		final SizeAnnotation annot;
 		if (annotCounter < annotRoot.getChildren().size()) {
@@ -519,12 +575,21 @@ public abstract class HousePart implements Serializable {
 		} else {
 			annot = new SizeAnnotation();
 			annotRoot.attachChild(annot);
-		}			
+		}
 		annot.setRange(a, b, center, faceDirection, original == null, align, autoFlipDirection);
-	}		
+	}
 
-	public abstract void setPreviewPoint(int x, int y);	
-	public void delete() {}
-	protected void drawAnnotations() {}
+	public abstract void setPreviewPoint(int x, int y);
+
+	public void delete() {
+	}
+
+	protected void drawAnnotations() {
+	}
+
 	protected abstract void updateMesh();
+
+	public Vector3 getPrintCenter() {
+		return printCenter;
+	}
 }

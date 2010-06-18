@@ -8,6 +8,7 @@ import org.poly2tri.polygon.Polygon;
 import org.poly2tri.polygon.PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
+import com.ardor3d.example.ui.BMFontLoader;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.Matrix3;
@@ -19,7 +20,9 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -29,7 +32,7 @@ public abstract class Roof extends HousePart {
 	transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 	protected double labelTop;
-	private transient ArrayList<PolygonPoint> wallUpperPoints;
+	private transient ArrayList<PolygonPoint> wallUpperPoints;	 
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -83,7 +86,7 @@ public abstract class Roof extends HousePart {
 			pointsRoot.getChild(i).setTranslation(p);
 		}
 
-		updateLabelLocation();
+//		updateLabelLocation();
 
 		if (flattenTime > 0)
 			flatten();
@@ -154,7 +157,7 @@ public abstract class Roof extends HousePart {
 				p1.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
 				p2.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
 				p3.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
-				flattenTriangle(p1, p2, p3, printSequence + i);
+				flattenTriangle(p1, p2, p3, printPage + i);
 				vertexBuffer.position(xPos);
 				vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
 				vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
@@ -184,8 +187,9 @@ public abstract class Roof extends HousePart {
 		m.applyPost(p3, p3);
 		
 //		Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE, printSequence / PRINT_COLS * PRINT_SPACE, 0);
-		Vector3 targetCenter = Vector3.fetchTempInstance();
-		computePrintCenter(targetCenter, printSequence);
+//		computePrintCenter(targetCenter, printSequence);
+		computePrintCenter();
+		Vector3 targetCenter = Vector3.fetchTempInstance().set(printCenter);
 		Vector3 currentCenter = v.set(p1).addLocal(p2).addLocal(p3).multiplyLocal(1.0/3.0);
 		final Vector3 d = targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime);
 		p1.addLocal(d);
@@ -258,9 +262,35 @@ public abstract class Roof extends HousePart {
 		Vector3.releaseTempInstance(b);
 	}
 	
-	public int setPrintSequence(int printSequence) {
-		super.setPrintSequence(printSequence);
-		return mesh.getMeshData().getVertexCount() / 3;
+//	public int setPrintSequence(int printSequence) {
+//		int numOfPages = 0;
+//		for (int i=0; i<mesh.getMeshData().getVertexCount() / 9; i++)
+//			numOfPages += super.setPrintSequence(printSequence + numOfPages);		
+//		return numOfPages;
+//	}
+
+	protected void updateLabels() {
+		final Vector3 p1 = Vector3.fetchTempInstance();
+		final Vector3 p2 = Vector3.fetchTempInstance();
+		final Vector3 p3 = Vector3.fetchTempInstance();
+		
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		buf.rewind();
+		for (int triangle=0; triangle<buf.capacity()/9; triangle++) {
+			p1.set(buf.get(), buf.get(), buf.get());
+			p2.set(buf.get(), buf.get(), buf.get());
+			p3.set(buf.get(), buf.get(), buf.get());
+			double height = Math.max(Math.max(p1.getZ(), p2.getZ()), p3.getZ());
+			p1.addLocal(p2).addLocal(p3).multiplyLocal(1.0/3.0);
+			p1.setZ(height + 0.3);
+			final String text = "(" + (printSequence++ + 1 + triangle) + ")";
+			final BMText label = fetchBMText(text, triangle);
+			label.setTranslation(p1);
+		}
+		Vector3.releaseTempInstance(p1);
+		Vector3.releaseTempInstance(p2);
+		Vector3.releaseTempInstance(p3);
+				
 	}
 	
 }

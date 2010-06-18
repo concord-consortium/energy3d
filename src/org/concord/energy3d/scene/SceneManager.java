@@ -864,7 +864,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			// if (printExporter.getCurrentPage() < Scene.getInstance().getPrintParts().size()) {
 			// HousePart part = Scene.getInstance().getPrintParts().get(printExporter.getCurrentPage());
 //			Vector3 pos = new Vector3(part.getPrintSequence() * scale, -5, part.getPrintY() * scale);
-			Vector3 pos = new Vector3(part.getPrintSequence() % HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale, -5, part.getPrintSequence() / HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale);
+//			Vector3 pos = new Vector3(part.getPrintSequence() % HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale, -5, part.getPrintSequence() / HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale);
+			Vector3 pos = part.getPrintCenter();
 			camera.setLocation(pos);
 			camera.lookAt(pos.addLocal(0, 1, 0), Vector3.UNIT_Z);
 			try {

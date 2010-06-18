@@ -187,13 +187,13 @@ public class Foundation extends HousePart {
 	}	
 
 	protected double computeLabelTop() {
-		return mesh.getYExtent();
+		return mesh.getYExtent() * 1.5;
 	}
 	
 	protected void drawAnnotations() {
 		int[] order = {0, 1, 3, 2, 0};
-		
-		for (int i = 0, annotCounter = 0; i < order.length - 1; i++, annotCounter++) {
+		int annotCounter = 0;
+		for (int i = 0; i < order.length - 1; i++, annotCounter++) {
 			final SizeAnnotation annot;
 			if (annotCounter < annotRoot.getChildren().size())
 				annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
@@ -201,8 +201,10 @@ public class Foundation extends HousePart {
 				annot = new SizeAnnotation();
 				annotRoot.attachChild(annot);
 			}
-			annotCounter++;
-			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false, Align.South, true);
+			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false, original == null ? Align.South : Align.Center, true);
 		}
+		
+		for (int i = annotCounter; i < annotRoot.getChildren().size(); i++)
+			annotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);		
 	}	
 }
