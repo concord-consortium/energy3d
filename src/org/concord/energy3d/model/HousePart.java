@@ -14,12 +14,10 @@ import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
-import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -417,11 +415,12 @@ public abstract class HousePart implements Serializable {
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
+
+		if (isPrintable() && isDrawCompleted() && flattenTime > 0) // TODO If draw not completed then it shouldn't even exist at this point!
+			flatten();
+
 		if (original != null && isPrintable())
 			updateLabels();
-
-		if (isPrintable() && flattenTime > 0) // TODO If draw not completed then it shouldn't even exist at this point!
-			flatten();
 
 		drawAnnotations();
 
@@ -479,16 +478,19 @@ public abstract class HousePart implements Serializable {
 //		Vector3 targetCenter = Vector3.fetchTempInstance();
 //		this.printCenter = new Vector3(targetCenter);
 //		this.printSequence = printSequence;
-		int numOfPages = 1;
+//		int numOfPages = 1;
 		while (true) {
-			printCenter.set((-1.5 + printSequence % PRINT_COLS) * PRINT_SPACE, 0, (-0.8 + printSequence / PRINT_COLS) * PRINT_SPACE);
+//			printCenter.set((-1.5 + printSequence % PRINT_COLS) * PRINT_SPACE, 0, (-0.8 + printSequence / PRINT_COLS) * PRINT_SPACE);
+			printCenter.set((-1.5 + printPage % PRINT_COLS) * PRINT_SPACE, 0, (-0.8 + printPage / PRINT_COLS) * PRINT_SPACE);
 			if (printCenter.length() >= 3)
 				break;
 			else
-				numOfPages++;
+				printPage++;				
+//				numOfPages++;
 		}
+		printPage++;
 //		Vector3.releaseTempInstance(targetCenter);
-		printPage += numOfPages;		
+//		printPage += numOfPages;		
 	}
 
 	// public void setPrintY(double printY) {
@@ -518,8 +520,9 @@ public abstract class HousePart implements Serializable {
 	// label.setText(labelText);
 	// }
 
-	protected double computeLabelTop() {
-		return height / 1;
+	protected void computeLabelTop(final Vector3 top) {
+		top.set(0, 0, height);
+//		return height / 1;
 	}
 
 	// protected void updateLabelLocation() {
@@ -544,7 +547,8 @@ public abstract class HousePart implements Serializable {
 		if (original == null)
 			up.set(getFaceDirection());
 		else
-			up.set(0, 0, computeLabelTop());
+//			up.set(0, 0, computeLabelTop());
+			computeLabelTop(up);
 		root.getTransform().applyInverseVector(up);
 		label.setTranslation(center.getX() + up.getX(), center.getY() + up.getY(), center.getZ() + up.getZ());
 	}

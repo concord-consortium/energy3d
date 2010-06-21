@@ -223,9 +223,10 @@ Version 0.2
 - fixed problem with disconnected new parts from old parts by making Scene class the sole controller of add/remove parts
 - fixed font problem in older machines
 - rearrange the house parts around the main model in print preview
-
 - fixed door position in print preview
 - avoid exception when print previewing incomplete drawings
+- automatically skip the page position that lays on the center house in print preview mode
+- use global sequencing for counting print parts 
 
  
 TODO:

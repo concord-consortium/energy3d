@@ -81,17 +81,17 @@ public abstract class Roof extends HousePart {
 
 		mesh.getMeshData().updateVertexCount();
 
-		for (int i = 0; i < points.size(); i++) {
-			Vector3 p = points.get(i);
-			pointsRoot.getChild(i).setTranslation(p);
-		}
+//		for (int i = 0; i < points.size(); i++) {
+//			Vector3 p = points.get(i);
+//			pointsRoot.getChild(i).setTranslation(p);
+//		}
 
 //		updateLabelLocation();
 
-		if (flattenTime > 0)
-			flatten();
-
-		drawAnnotations();
+//		if (flattenTime > 0)
+//			flatten();
+//
+//		drawAnnotations();
 
 		mesh.updateModelBound();
 	}
@@ -157,7 +157,7 @@ public abstract class Roof extends HousePart {
 				p1.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
 				p2.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
 				p3.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
-				flattenTriangle(p1, p2, p3, printPage + i);
+				flattenTriangle(p1, p2, p3);
 				vertexBuffer.position(xPos);
 				vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
 				vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
@@ -172,7 +172,7 @@ public abstract class Roof extends HousePart {
 //		super.flatten();
 	}
 
-	private void flattenTriangle(Vector3 p1, Vector3 p2, Vector3 p3, int printSequence) {
+	private void flattenTriangle(Vector3 p1, Vector3 p2, Vector3 p3) {
 		final Vector3 v = Vector3.fetchTempInstance();
 		final Vector3 normal = Vector3.fetchTempInstance();		
 		v.set(p3).subtractLocal(p1);
@@ -202,8 +202,9 @@ public abstract class Roof extends HousePart {
 		Matrix3.releaseTempInstance(m);
 	}
 
-	protected double computeLabelTop() {
-		return labelTop;
+	protected void computeLabelTop(final Vector3 top) {
+		top.set(0, 0, labelTop);
+//		return labelTop;
 	}
 
 	protected ReadOnlyVector3 getFaceDirection() {
@@ -283,7 +284,7 @@ public abstract class Roof extends HousePart {
 			double height = Math.max(Math.max(p1.getZ(), p2.getZ()), p3.getZ());
 			p1.addLocal(p2).addLocal(p3).multiplyLocal(1.0/3.0);
 			p1.setZ(height + 0.3);
-			final String text = "(" + (printSequence++ + 1 + triangle) + ")";
+			final String text = "(" + (printSequence++ + 1) + ")";
 			final BMText label = fetchBMText(text, triangle);
 			label.setTranslation(p1);
 		}

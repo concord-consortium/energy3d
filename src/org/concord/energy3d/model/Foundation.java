@@ -186,9 +186,15 @@ public class Foundation extends HousePart {
 		center.multiplyLocal(1.0 / points.size() * 2);
 	}	
 
-	protected double computeLabelTop() {
-		return mesh.getYExtent() * 1.5;
-	}
+//	protected double computeLabelTop() {
+//		return mesh.getYExtent() * 1.5;
+//	}
+	
+	protected void computeLabelTop(final Vector3 top) {
+//		top.set(0, labelTop, 0);
+//		return labelTop;
+		top.set(0, 0, mesh.getYExtent() * 1.5);
+	}	
 	
 	protected void drawAnnotations() {
 		int[] order = {0, 1, 3, 2, 0};
