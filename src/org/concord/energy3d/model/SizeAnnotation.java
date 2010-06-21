@@ -1,6 +1,5 @@
 package org.concord.energy3d.model;
 
-import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.math.ColorRGBA;
@@ -8,42 +7,24 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Node;
-import com.ardor3d.ui.text.BMFont;
-import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.ResourceSource;
 
-public class SizeAnnotation extends Node {
-	private static final BMFont font;
-	private final BMText label = new BMText("textSpatial1", "0.0", font, BMText.Align.Center, BMText.Justify.Center);
-	private final Line lines = new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null);
-	private final Mesh arrows = new Mesh("Arrows");
-
-	static {
-		final String file = "fonts/f3.fnt";
-		final ResourceSource url = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, file);
-		BMFont f = null;
-		try {
-			f = new BMFont(url, true);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		font = f;
-	}
-
+public class SizeAnnotation extends Annotation {
+	protected final Mesh arrows = new Mesh("Arrows");
+	
 	public SizeAnnotation() {
-		this.attachChild(lines);
-		this.attachChild(label);
+		super();
 		this.attachChild(arrows);
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		arrows.setDefaultColor(ColorRGBA.BLACK);
-		lines.setDefaultColor(ColorRGBA.BLACK);
-		label.setTextColor(ColorRGBA.BLACK);
-		label.setFontScale(0.5);
-
+	}
+	
+	protected Mesh getMesh() {
+		if (mesh != null)
+			return mesh;
+		else
+			return new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null);
 	}
 
 	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipDirection) {
@@ -61,7 +42,7 @@ public class SizeAnnotation extends Node {
 			}
 		}
 
-		FloatBuffer vertexBuffer = lines.getMeshData().getVertexBuffer();
+		FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 
 		// main line

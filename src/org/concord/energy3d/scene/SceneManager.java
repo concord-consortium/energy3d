@@ -928,7 +928,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					root.detachChild(axis);
 					root.detachChild(sky);
 					canvasRenderer.setCurrentContext();
-					canvasRenderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
+//					canvasRenderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
 					canvasRenderer.releaseCurrentContext();							
 					Scene.getInstance().flatten(printPreview);
 				} else {

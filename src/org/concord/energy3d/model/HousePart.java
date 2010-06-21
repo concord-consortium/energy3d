@@ -50,7 +50,8 @@ public abstract class HousePart implements Serializable {
 	// private transient BMText label;
 	protected transient Node labelsRoot;
 	private transient ReadOnlyVector3 defaultDirection;
-	protected transient Node annotRoot;
+	protected transient Node sizeAnnotRoot;
+	protected transient Node angleAnnotRoot;
 	protected transient Vector3 printCenter;
 	public static int PRINT_SPACE = 4;
 	public static int PRINT_COLS = 4;
@@ -111,7 +112,8 @@ public abstract class HousePart implements Serializable {
 			abspoints.add(points.get(i).clone());
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");
-		annotRoot = new Node("Annotations");
+		sizeAnnotRoot = new Node("Size Annotations");
+		angleAnnotRoot = new Node("Angle Annotations");
 		labelsRoot = new Node("Labels");
 		
 		printCenter = new Vector3();
@@ -129,7 +131,8 @@ public abstract class HousePart implements Serializable {
 			pointShape.getSceneHints().setCullHint(CullHint.Always);
 		}
 		root.attachChild(pointsRoot);
-		root.attachChild(annotRoot);
+		root.attachChild(sizeAnnotRoot);
+		root.attachChild(angleAnnotRoot);
 		root.attachChild(labelsRoot);
 	}
 
@@ -571,18 +574,32 @@ public abstract class HousePart implements Serializable {
 		return defaultDirection;
 	}
 
-	protected void drawAnnot(Vector3 a, Vector3 b, ReadOnlyVector3 faceDirection, int annotCounter, Align align, boolean autoFlipDirection) {
+	protected SizeAnnotation fetchSizeAnnot(int annotCounter) {
 		final SizeAnnotation annot;
-		if (annotCounter < annotRoot.getChildren().size()) {
-			annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
+		if (annotCounter < sizeAnnotRoot.getChildren().size()) {
+			annot = (SizeAnnotation) sizeAnnotRoot.getChild(annotCounter);
 			annot.getSceneHints().setCullHint(CullHint.Inherit);
 		} else {
 			annot = new SizeAnnotation();
-			annotRoot.attachChild(annot);
+			sizeAnnotRoot.attachChild(annot);
 		}
-		annot.setRange(a, b, center, faceDirection, original == null, align, autoFlipDirection);
+		return annot;
+//		annot.setRange(a, b, center, faceDirection, original == null, align, autoFlipDirection);
 	}
 
+	protected AngleAnnotation fetchAngleAnnot(int annotCounter) {
+		final AngleAnnotation annot;
+		if (annotCounter < angleAnnotRoot.getChildren().size()) {
+			annot = (AngleAnnotation) angleAnnotRoot.getChild(annotCounter);
+			annot.getSceneHints().setCullHint(CullHint.Inherit);
+		} else {
+			annot = new AngleAnnotation();
+			angleAnnotRoot.attachChild(annot);
+		}
+		return annot;
+//		annot.setRange(a, b, center, faceDirection, original == null, align, autoFlipDirection);
+	}
+	
 	public abstract void setPreviewPoint(int x, int y);
 
 	public void delete() {

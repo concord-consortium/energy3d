@@ -215,7 +215,7 @@ public abstract class Roof extends HousePart {
 		if (container == null)
 			return;
 		ReadOnlyVector3 faceDirection = getFaceDirection();
-		int annotCounter = 0;
+		int annotCounter = 0, angleAnnotCounter = 0;
 		Vector3 a = Vector3.fetchTempInstance();
 		Vector3 b = Vector3.fetchTempInstance();
 
@@ -225,7 +225,8 @@ public abstract class Roof extends HousePart {
 			a.set(p.getX(), p.getY(), p.getZ());
 			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
 			b.set(p.getX(), p.getY(), p.getZ());
-			drawAnnot(a, b, faceDirection, annotCounter++, Align.Center, true);
+			fetchSizeAnnot(annotCounter++).setRange(a, b, center, faceDirection, original == null, Align.Center, true);
+//			drawSizeAnnot(a, b, faceDirection, annotCounter++, Align.Center, true);
 		}
 		} else {
 			final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
@@ -237,18 +238,21 @@ public abstract class Roof extends HousePart {
 			for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
 				pos += 0.5;
 					final int xPos = i * 9;
-//					System.out.println(i + " " + xPos);
 					vertexBuffer.position(xPos);
 					p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 					p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 					p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-//					flattenTriangle(p1, p2, p3, printSequence + i);
-//					a.set(p2).subtractLocal(p1).crossLocal(Vector3.UNIT_Y).normalizeLocal();
-					drawAnnot(p1, p2, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
-//					a.set(p3).subtractLocal(p2).crossLocal(Vector3.UNIT_Y).normalizeLocal();
-					drawAnnot(p2, p3, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
-//					a.set(p1).subtractLocal(p3).crossLocal(Vector3.UNIT_Y).normalizeLocal();
-					drawAnnot(p3, p1, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
+//					drawSizeAnnot(p1, p2, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
+//					drawSizeAnnot(p2, p3, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
+//					drawSizeAnnot(p3, p1, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
+					fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.UNIT_Y, original == null, Align.Center, false);
+					fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.UNIT_Y, original == null, Align.Center, false);
+					fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.UNIT_Y, original == null, Align.Center, false);
+					
+					
+					// Angle annotations
+					fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
+					
 			}
 
 			Vector3.releaseTempInstance(p1);
@@ -256,8 +260,8 @@ public abstract class Roof extends HousePart {
 			Vector3.releaseTempInstance(p3);
 		}
 
-		for (int i = annotCounter; i < annotRoot.getChildren().size(); i++)
-			annotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
+		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
+			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 
 		Vector3.releaseTempInstance(a);
 		Vector3.releaseTempInstance(b);

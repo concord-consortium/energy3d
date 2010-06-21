@@ -227,6 +227,7 @@ Version 0.2
 - avoid exception when print previewing incomplete drawings
 - automatically skip the page position that lays on the center house in print preview mode
 - use global sequencing for counting print parts 
+- add angle annotations
 
  
 TODO:
