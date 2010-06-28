@@ -228,6 +228,7 @@ Version 0.2
 - automatically skip the page position that lays on the center house in print preview mode
 - use global sequencing for counting print parts 
 - add angle annotations
+- compute the start and end angle of semi-circle that represents angle annotation
 
  
 TODO:

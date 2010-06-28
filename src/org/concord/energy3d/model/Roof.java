@@ -249,7 +249,6 @@ public abstract class Roof extends HousePart {
 					fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.UNIT_Y, original == null, Align.Center, false);
 					fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.UNIT_Y, original == null, Align.Center, false);
 					
-					
 					// Angle annotations
 					fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
 					
