@@ -32,10 +32,10 @@ public class AngleAnnotation extends Annotation {
 		v.set(a).crossLocal(n).normalizeLocal();
 		double start = a.smallestAngleBetween(Vector3.UNIT_X);
 		if (a.dot(Vector3.UNIT_Z) < 0)
-			start = -start;		
+			start = Math.PI*2-start;		
 		double end = b.smallestAngleBetween(Vector3.UNIT_X);
 		if (b.dot(Vector3.UNIT_Z) < 0)
-			end = -end;
+			end = Math.PI*2-end;
 		
 		
 		System.out.println(p1);
@@ -54,7 +54,8 @@ public class AngleAnnotation extends Annotation {
 		
 		double rot = a.crossLocal(b).smallestAngleBetween(Vector3.UNIT_Z);		
 		a.crossLocal(Vector3.UNIT_Z);
-		m1.fromAngleAxis(rot, a);
+//		m1.fromAngleAxis(rot, a);
+		m1.fromAngleAxis(Math.PI / 2, Vector3.UNIT_X);
 		
 //		m2.multiplyLocal(m1);
 		this.setRotation(m1);
@@ -62,8 +63,7 @@ public class AngleAnnotation extends Annotation {
 		
 		
 		Arc arc = (Arc)mesh;
-		arc.set(10, 1, start, end);
-		
+		arc.set(10, 0.5, start, end);
 		
 		Vector3.releaseTempInstance(a);
 		Vector3.releaseTempInstance(b);

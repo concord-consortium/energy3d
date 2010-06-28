@@ -251,6 +251,8 @@ public abstract class Roof extends HousePart {
 					
 					// Angle annotations
 					fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
+					fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p1, p3);
+					fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2);
 					
 			}
 

@@ -229,7 +229,7 @@ Version 0.2
 - use global sequencing for counting print parts 
 - add angle annotations
 - compute the start and end angle of semi-circle that represents angle annotation
-
+- compute parameters of angle annotation of all 3 points of composite triangles of the roof
  
 TODO:
 - combine the wall meshed into one
