@@ -231,6 +231,9 @@ Version 0.2
 - compute the start and end angle of semi-circle that represents angle annotation
 - compute parameters of angle annotation of all 3 points of composite triangles of the roof
 - fixed problem with angle annotation rotating more than 180 degrees sometimes
+- draw numerical angle next to angle notation
+- position the numerical angle inside the angle triangle
+- auto align the numerical angle (9 possible alignment) based on the location of label with respect to angle
  
 TODO:
 - combine the wall meshed into one

@@ -31,12 +31,12 @@ public class Arc extends Line {
 
 	public void set(int samples, double radius, double start, double end) {
 		FloatBuffer vertexBuf = createVertex(samples, radius, start, end);
-		FloatBuffer normalBuf = createNormal(samples);
-		FloatBuffer colorBuf = createColor(samples);
+//		FloatBuffer normalBuf = createNormal(samples);
+//		FloatBuffer colorBuf = createColor(samples);
 
 		getMeshData().setVertexBuffer(vertexBuf);
-		getMeshData().setNormalBuffer(normalBuf);
-		getMeshData().setColorBuffer(colorBuf);
+//		getMeshData().setNormalBuffer(normalBuf);
+//		getMeshData().setColorBuffer(colorBuf);
 		getMeshData().setIndexMode(IndexMode.LineStrip);
 		getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		setAntialiased(true);

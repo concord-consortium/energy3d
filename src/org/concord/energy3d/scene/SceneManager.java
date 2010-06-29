@@ -114,7 +114,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final LogicalLayer logicalLayer;
 	private boolean exit = false;
 	protected final Node root = new Node("Root");
-//	private final Node housePartsNode = Scene.root;
+//	private final Node housePartsNode = Scene.root; 
 	private Mesh floor;
 	private boolean rotAnim = false;
 	private HousePart drawn = null;
@@ -928,7 +928,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					root.detachChild(axis);
 					root.detachChild(sky);
 					canvasRenderer.setCurrentContext();
-//					canvasRenderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
+					canvasRenderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
 					canvasRenderer.releaseCurrentContext();							
 					Scene.getInstance().flatten(printPreview);
 				} else {

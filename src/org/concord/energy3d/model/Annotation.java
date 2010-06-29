@@ -16,7 +16,7 @@ public abstract class Annotation extends Node {
 	protected final Mesh mesh = getMesh(); // = new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null);	
 	
 	static {
-		final String file = "fonts/f3.fnt";
+		final String file = "fonts/f6.fnt";
 		final ResourceSource url = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, file);
 		BMFont f = null;
 		try {
