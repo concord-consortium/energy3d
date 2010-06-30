@@ -234,6 +234,7 @@ Version 0.2
 - draw numerical angle next to angle notation
 - position the numerical angle inside the angle triangle
 - auto align the numerical angle (9 possible alignment) based on the location of label with respect to angle
+- aligned angles of roof and wall correctly in 3D model
  
 TODO:
 - combine the wall meshed into one
