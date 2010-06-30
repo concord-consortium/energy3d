@@ -221,16 +221,16 @@ public abstract class Roof extends HousePart {
 		Vector3 a = Vector3.fetchTempInstance();
 		Vector3 b = Vector3.fetchTempInstance();
 
-		if (flattenTime == 0) {
-		for (int i = 0; i < wallUpperPoints.size(); i++) {
-			PolygonPoint p = wallUpperPoints.get(i);
-			a.set(p.getX(), p.getY(), p.getZ());
-			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
-			b.set(p.getX(), p.getY(), p.getZ());
-			fetchSizeAnnot(annotCounter++).setRange(a, b, center, faceDirection, original == null, Align.Center, true);
-//			drawSizeAnnot(a, b, faceDirection, annotCounter++, Align.Center, true);
-		}
-		} else {
+//		if (flattenTime == 0) {
+//		for (int i = 0; i < wallUpperPoints.size(); i++) {
+//			PolygonPoint p = wallUpperPoints.get(i);
+//			a.set(p.getX(), p.getY(), p.getZ());
+//			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
+//			b.set(p.getX(), p.getY(), p.getZ());
+//			fetchSizeAnnot(annotCounter++).setRange(a, b, center, faceDirection, original == null, Align.Center, true);
+////			drawSizeAnnot(a, b, faceDirection, annotCounter++, Align.Center, true);
+//		}
+//		} else {
 			final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 			final Vector3 p1 = Vector3.fetchTempInstance();
 			final Vector3 p2 = Vector3.fetchTempInstance();
@@ -253,15 +253,15 @@ public abstract class Roof extends HousePart {
 					
 					// Angle annotations
 					fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
-					fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p1, p3);
-					fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2);
+//					fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p1, p3);
+//					fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2);
 					
 			}
 
 			Vector3.releaseTempInstance(p1);
 			Vector3.releaseTempInstance(p2);
 			Vector3.releaseTempInstance(p3);
-		}
+//		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
