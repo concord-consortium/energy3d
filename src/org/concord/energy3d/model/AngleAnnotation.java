@@ -28,21 +28,22 @@ public class AngleAnnotation extends Annotation {
 		Vector3 n = Vector3.fetchTempInstance().set(a).crossLocal(b).normalizeLocal();
 		Vector3 v = Vector3.fetchTempInstance();
 		Matrix3 m1 = Matrix3.fetchTempInstance();
-		Matrix3 m2 = Matrix3.fetchTempInstance();
 		
-		v.set(a).crossLocal(n).normalizeLocal();
+//		v.set(a).crossLocal(n).normalizeLocal();
+		v.set(n).crossLocal(a).normalizeLocal();
 		double start = a.smallestAngleBetween(Vector3.UNIT_X);
+//		double start = v.smallestAngleBetween(Vector3.UNIT_Z);
 		if (a.dot(Vector3.UNIT_Z) < 0)
-//			start = Math.PI*2-start;		
 			start = -start;
 		double end = b.smallestAngleBetween(Vector3.UNIT_X);
 		if (b.dot(Vector3.UNIT_Z) < 0)
-//			end = Math.PI*2-end;
 			end = -end;
 		
 		if (Math.abs(end-start) > Math.PI)
 			end = (end < 0) ? 1 : -1 * Math.PI*2+end;
 		
+		Arc arc = (Arc)mesh;
+		arc.set(10, 0.2, start, end);
 		
 //		System.out.println(p1);
 //		System.out.println(p2);
@@ -52,50 +53,33 @@ public class AngleAnnotation extends Annotation {
 		System.out.println(b);
 		System.out.println("start = " + start* 180 / Math.PI);
 		System.out.println("end = " + end * 180 / Math.PI);
+
 		
-//		double angle = a.smallestAngleBetween(b);
-//		double aAngle = v.set(a).crossLocal(n).smallestAngleBetween(a);
-		double aAngle = v.smallestAngleBetween(a);
-//		double aAngle = 0.5;
-		m2.fromAngleAxis(aAngle, v);
-		
-//		double rot = a.crossLocal(b).smallestAngleBetween(Vector3.UNIT_Z);		
-//		a.crossLocal(Vector3.UNIT_Z);
-//		m1.fromAngleAxis(rot, a);
 		m1.fromAngleAxis(Math.PI / 2, Vector3.UNIT_X);
+//		m1.fromAngleAxis(n.smallestAngleBetween(Vector3.UNIT_Z), a);
 		
-//		m2.multiplyLocal(m1);
 		mesh.setRotation(m1);
-		this.setTranslation(p1.getX(), -0.01, p1.getZ());
-//		label.setTranslation(p1.getX(), -0.01, p1.getZ());
+//		this.setTranslation(p1.getX(), -0.01, p1.getZ());
+		this.setTranslation(p1.getX(), p1.getY()-0.01, p1.getZ());
+//		this.setTranslation(p1);
 		
-//		v.set(a).addLocal(b).normalizeLocal().multiplyLocal(-0.2);
 		v.set(a).addLocal(b).normalizeLocal();
-//		int horizontal = getPreferedAlignment(v, Vector3.UNIT_X);
-//		int vertical = getPreferedAlignment(v, Vector3.UNIT_Z);
-//		final Align align = Align.values()[vertical*3+horizontal];
 		final Align align = getPreferedAlignment(v);
 		System.out.println(align);
 		label.setAlign(align);
 		v.multiplyLocal(0.22);		
-		mesh.setDefaultColor(ColorRGBA.WHITE);
-//		v.set(a); //.multiplyLocal(-1);
+		mesh.setDefaultColor(ColorRGBA.RED);
 		
-		System.out.println("label pos = " + v);
 		label.setTranslation(v);
 		label.setTextColor(ColorRGBA.WHITE);
 		label.setText(""+Math.round(a.smallestAngleBetween(b)*180/Math.PI)+"\u00B0");
 
-		
-		Arc arc = (Arc)mesh;
-		arc.set(10, 0.2, start, end);
 		
 		Vector3.releaseTempInstance(a);
 		Vector3.releaseTempInstance(b);
 		Vector3.releaseTempInstance(n);
 		Vector3.releaseTempInstance(v);
 		Matrix3.releaseTempInstance(m1);
-		Matrix3.releaseTempInstance(m2);
 		
 	}
 

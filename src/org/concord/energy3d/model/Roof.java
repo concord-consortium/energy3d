@@ -164,6 +164,8 @@ public abstract class Roof extends HousePart {
 				vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
 		}
 
+		mesh.updateModelBound();
+		
 		Vector3.releaseTempInstance(p1);
 		Vector3.releaseTempInstance(p2);
 		Vector3.releaseTempInstance(p3);
