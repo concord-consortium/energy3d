@@ -595,7 +595,20 @@ public abstract class HousePart implements Serializable {
 			annot = (AngleAnnotation) angleAnnotRoot.getChild(annotCounter);
 			annot.getSceneHints().setCullHint(CullHint.Inherit);
 		} else {
-			annot = new AngleAnnotation();
+			annot = new AngleAnnotation(this);
+			angleAnnotRoot.attachChild(annot);
+		}
+		return annot;
+//		annot.setRange(a, b, center, faceDirection, original == null, align, autoFlipDirection);
+	}
+
+	protected Angle90Annotation fetchAngleAnnot90(int annotCounter) {
+		final Angle90Annotation annot;
+		if (annotCounter < angleAnnotRoot.getChildren().size()) {
+			annot = (Angle90Annotation) angleAnnotRoot.getChild(annotCounter);
+			annot.getSceneHints().setCullHint(CullHint.Inherit);
+		} else {
+			annot = new Angle90Annotation(this);
 			angleAnnotRoot.attachChild(annot);
 		}
 		return annot;

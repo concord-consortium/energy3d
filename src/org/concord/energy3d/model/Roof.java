@@ -238,6 +238,7 @@ public abstract class Roof extends HousePart {
 
 			float pos = 0;
 			for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
+//			int i = 0;
 				pos += 0.5;
 					final int xPos = i * 9;
 					vertexBuffer.position(xPos);

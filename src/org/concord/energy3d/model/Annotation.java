@@ -13,7 +13,8 @@ import com.ardor3d.util.resource.ResourceSource;
 public abstract class Annotation extends Node {
 	protected static final BMFont font;
 	protected final BMText label = new BMText("textSpatial1", "0.0", font, BMText.Align.Center, BMText.Justify.Center);
-	protected final Mesh mesh = getMesh(); // = new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null);	
+	protected final Mesh mesh = getMesh(); // = new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null);
+	protected final HousePart housePart;
 	
 	static {
 		final String file = "fonts/f6.fnt";
@@ -27,8 +28,9 @@ public abstract class Annotation extends Node {
 		font = f;
 	}
 	
-	public Annotation() {
+	public Annotation(HousePart housePart) {
 		super();
+		this.housePart = housePart;
 		this.attachChild(mesh);
 		this.attachChild(label);
 		mesh.setDefaultColor(ColorRGBA.BLACK);

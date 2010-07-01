@@ -14,7 +14,7 @@ public class SizeAnnotation extends Annotation {
 	protected final Mesh arrows = new Mesh("Arrows");
 	
 	public SizeAnnotation() {
-		super();
+		super(null); // TODO temporarly
 		this.attachChild(arrows);
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		arrows.setDefaultColor(ColorRGBA.BLACK);

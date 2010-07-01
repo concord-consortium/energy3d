@@ -11,6 +11,10 @@ import com.ardor3d.ui.text.BMText.Align;
 
 public class AngleAnnotation extends Annotation {
 
+	public AngleAnnotation(HousePart housePart) {
+		super(housePart);
+	}
+
 	protected Mesh getMesh() {
 		if (mesh != null)
 			return mesh;
@@ -118,14 +122,19 @@ public class AngleAnnotation extends Annotation {
 //		end = Math.PI / 2;
 		
 		v.set(n).crossLocal(Vector3.UNIT_Z).normalizeLocal();
-		double angleOffset = a.smallestAngleBetween(Vector3.UNIT_X);
+		double angleOffset = -a.smallestAngleBetween(Vector3.UNIT_X);
 //		double angleOffset = v.smallestAngleBetween(Vector3.UNIT_X);
-		if (a.dot(Vector3.UNIT_Y) < 0)
+//		if (a.dot(Vector3.UNIT_Y) < 0)
+		if (a.dot(Vector3.UNIT_Z) < 0)
 			angleOffset = -angleOffset;
 		start += angleOffset;
 		end += angleOffset;
+
+//		start = 0;
+//		end = angleOffset;
+//		end = Math.PI/2;
 		
-		System.out.println("angleOffset = "  + angleOffset);
+		System.out.println("angleOffset = "  + angleOffset * 180 / Math.PI);
 		
 		Arc arc = (Arc)mesh;
 		arc.set(10, 0.2, start, end);
@@ -135,7 +144,7 @@ public class AngleAnnotation extends Annotation {
 //		System.out.println(p2);
 //		System.out.println(p3);
 //		System.out.println(a);
-//		System.out.println("a = " + a);
+		System.out.println("a = " + a);
 //		System.out.println(b);
 		System.out.println("start = " + start* 180 / Math.PI);
 		System.out.println("end = " + end * 180 / Math.PI);
@@ -179,7 +188,7 @@ public class AngleAnnotation extends Annotation {
 		Matrix3.releaseTempInstance(m2);
 		
 	}
-		
+	
 	private Align getPreferedAlignment(Vector3 dir) {
 		int h, v;
 		double dot = dir.dot(Vector3.UNIT_X);
