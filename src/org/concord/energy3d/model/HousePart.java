@@ -139,7 +139,7 @@ public abstract class HousePart implements Serializable {
 	private void initCheck() {
 		if (root == null) {
 			init();
-			draw();
+//			draw();
 		}
 	}
 
@@ -457,6 +457,9 @@ public abstract class HousePart implements Serializable {
 		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
 		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));
 		// root.setTranslation(currentCenter);
+		System.out.println("flatten trans = " + root.getTranslation());
+		System.out.println("flatten world trans = " + root.getWorldTranslation());
+		
 		Vector3.releaseTempInstance(targetCenter);
 		Vector3.releaseTempInstance(currentCenter);
 	}

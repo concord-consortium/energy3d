@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -206,8 +207,12 @@ public class Window extends HousePart {
 		
 		
 		
-		for (Vector3 p : abspoints)
-			container.getRoot().getWorldTransform().applyForward(p);
+//		final ReadOnlyTransform worldTransform = container.getRoot().getWorldTransform();
+		final ReadOnlyTransform worldTransform = container.getRoot().getTransform();
+//		System.out.println("World = " + worldTransform);
+		for (Vector3 p : abspoints) {
+			worldTransform.applyForward(p);
+		}
 		
 		label1.setTranslation(abspoints.get(1));
 		label2.setTranslation(abspoints.get(2));
