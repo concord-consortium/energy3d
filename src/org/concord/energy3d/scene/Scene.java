@@ -344,8 +344,8 @@ public class Scene implements Serializable {
 			}
 			originalHouseRoot.setScale(flatten ? 2 : 1);
 	
-			for (HousePart part : getParts())
-				part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
+//			for (HousePart part : getParts())
+//				part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {

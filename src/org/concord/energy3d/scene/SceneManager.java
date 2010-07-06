@@ -669,7 +669,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			up = new Vector3(0.0f, -1.0f, 0.0f);
 			dir = new Vector3(0.0f, 0.0f, -1.0f);
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
-			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
+//			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 //			control.setMoveSpeed(MOVE_SPEED / 10); 
 //			camera.setProjectionMode(ProjectionMode.Parallel);
 			camera.setProjectionMode(ProjectionMode.Perspective);
@@ -841,7 +841,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void enableDisableRotationControl() {
-		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted()) && viewMode != ViewMode.TOP_VIEW && viewMode != ViewMode.PRINT_PREVIEW)
+		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted()) && viewMode != ViewMode.TOP_VIEW) // && viewMode != ViewMode.PRINT_PREVIEW)
 			control.setMouseRotateSpeed(0.005);
 		else
 			control.setMouseRotateSpeed(0.000000001);

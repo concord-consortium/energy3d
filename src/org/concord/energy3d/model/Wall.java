@@ -399,8 +399,8 @@ public class Wall extends HousePart {
 			e.printStackTrace();
 		}
 
-//		for (HousePart child : children)
-//			child.draw();
+		for (HousePart child : children)
+			child.draw();
 	}
 
 	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
