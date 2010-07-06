@@ -209,22 +209,26 @@ public class Window extends HousePart {
 		
 //		final ReadOnlyTransform worldTransform = container.getRoot().getWorldTransform();
 		final ReadOnlyTransform worldTransform = container.getRoot().getTransform();
-//		System.out.println("World = " + worldTransform);
+		System.out.println("World = " + worldTransform.getMatrix());
+//		if (original != null)
 		for (Vector3 p : abspoints) {
 			worldTransform.applyForward(p);
 		}
+
+		Vector3 faceDirection = Vector3.fetchTempInstance().set(container.getFaceDirection());
+		System.out.println("face direction annot (1) = " + faceDirection);
+		Vector3 moveToFront = Vector3.fetchTempInstance().set(0,0,0);
+		worldTransform.applyForwardVector(faceDirection);
+		moveToFront.set(faceDirection).multiplyLocal(0.04);
 		
 		label1.setTranslation(abspoints.get(1));
 		label2.setTranslation(abspoints.get(2));
 
 //		Vector3 faceDirection = Vector3.fetchTempInstance().set(container.getFaceDirection());
 //		container.getRoot().getWorldTransform().applyForward(faceDirection);
-		ReadOnlyVector3 faceDirection = container.getFaceDirection();
 
-		Vector3 moveToFront = Vector3.fetchTempInstance().set(0,0,0);
-//		if (original != null)
-			moveToFront.set(faceDirection).multiplyLocal(0.04);
 		
+		System.out.println("face direction annot (2) = " + faceDirection);
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 //		annot.setRange(abspoints.get(0), abspoints.get(1), center, faceDirection, original == null, Align.Center, true);
 		annot.setRange(abspoints.get(0), abspoints.get(1), center, faceDirection, false, Align.Center, true);
@@ -238,6 +242,8 @@ public class Window extends HousePart {
 		System.out.println(abspoints.get(0));
 		
 		Vector3.releaseTempInstance(v);
+		Vector3.releaseTempInstance(faceDirection);
+		Vector3.releaseTempInstance(moveToFront);
 	}	
 
 	public void delete() {
