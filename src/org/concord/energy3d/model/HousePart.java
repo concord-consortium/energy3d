@@ -134,6 +134,9 @@ public abstract class HousePart implements Serializable {
 		root.attachChild(sizeAnnotRoot);
 		root.attachChild(angleAnnotRoot);
 		root.attachChild(labelsRoot);
+		
+		computeAbsPoints();
+		computeCenter();		
 	}
 
 	private void initCheck() {
@@ -408,12 +411,7 @@ public abstract class HousePart implements Serializable {
 		if (root == null)
 			init();
 
-		for (int i = 0; i < points.size(); i++) {
-			Vector3 p = points.get(i);
-			p = toAbsolute(p);
-			abspoints.get(i).set(p);
-			pointsRoot.getChild(i).setTranslation(p);
-		}
+		computeAbsPoints();
 		computeCenter();
 
 		updateMesh();
@@ -434,6 +432,15 @@ public abstract class HousePart implements Serializable {
 
 		// for (HousePart child : children)
 		// child.draw();
+	}
+
+	private void computeAbsPoints() {
+		for (int i = 0; i < points.size(); i++) {
+			Vector3 p = points.get(i);
+			p = toAbsolute(p);
+			abspoints.get(i).set(p);
+			pointsRoot.getChild(i).setTranslation(p);
+		}
 	}
 
 	protected void computeCenter() {

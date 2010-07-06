@@ -25,7 +25,7 @@ public class Window extends HousePart {
 	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer normalBuffer;
-	private transient BMText label1, label2; 
+	private transient BMText label1; //, label2; 
 
 	public Window() {
 		super(2, 4, 0.30);
@@ -188,22 +188,25 @@ public class Window extends HousePart {
 			label1.setAlign(Align.NorthWest);
 			root.attachChild(label1);
 		}
-		v.set(abspoints.get(1)).subtractLocal(container.getPoints().get(0));		
-		if (v.getXf() < 0)
-			v.setX(len+v.getX());
+		v.set(abspoints.get(1)).subtractLocal(container.getPoints().get(0));
+		double xy = Math.sqrt(v.getX() * v.getX() + v.getY() * v.getY());
+//		if (v.getXf() < 0)
+//			v.setX(len+v.getX());
+		if (xy < 0)
+			xy = len+xy;		
 //		label1.setText("(" + Math.round(10*v.getXf())/10 + ", " + Math.round(10*v.getZf())/10 + ")");
-		label1.setText("(" + v.getXf()+ ", " + v.getZf() + ")");
+		label1.setText("(" + xy+ ", " + v.getZf() + ")");
 		
-		if (label2 == null) {
-			label2 = Annotation.makeNewLabel();
-			label2.setAlign(Align.SouthEast);
-			root.attachChild(label2);
-		}
-		v.set(abspoints.get(2)).subtractLocal(container.getPoints().get(0));		
-		if (v.getXf() < 0)
-			v.setX(len+v.getX());
-//		label2.setText("(" + Math.round(10*v.getXf())/10 + ", " + Math.round(10*v.getZf())/10 + ")");
-		label2.setText("(" + v.getXf()+ ", " + v.getZf() + ")");
+//		if (label2 == null) {
+//			label2 = Annotation.makeNewLabel();
+//			label2.setAlign(Align.SouthEast);
+//			root.attachChild(label2);
+//		}
+//		v.set(abspoints.get(2)).subtractLocal(container.getPoints().get(0));		
+//		if (v.getXf() < 0)
+//			v.setX(len+v.getX());
+////		label2.setText("(" + Math.round(10*v.getXf())/10 + ", " + Math.round(10*v.getZf())/10 + ")");
+//		label2.setText("(" + v.getXf()+ ", " + v.getZf() + ")");
 		
 		
 		
@@ -222,7 +225,7 @@ public class Window extends HousePart {
 		moveToFront.set(faceDirection).multiplyLocal(0.04);
 		
 		label1.setTranslation(abspoints.get(1));
-		label2.setTranslation(abspoints.get(2));
+//		label2.setTranslation(abspoints.get(2));
 
 //		Vector3 faceDirection = Vector3.fetchTempInstance().set(container.getFaceDirection());
 //		container.getRoot().getWorldTransform().applyForward(faceDirection);

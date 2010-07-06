@@ -258,7 +258,12 @@ public class Scene implements Serializable {
 			in.close();
 			for (HousePart housePart : instance.getParts()) {
 				originalHouseRoot.attachChild(housePart.getRoot());
-			}			
+			}
+			for (HousePart housePart : instance.getParts())
+				housePart.draw();
+			for (HousePart housePart : instance.getParts())
+				housePart.draw();
+			
 		} catch (FileNotFoundException e) {
 			System.out.println("Energy3D saved file not found...creating a new file...");
 			instance = new Scene();
@@ -289,6 +294,7 @@ public class Scene implements Serializable {
 			for (int i = 0; i < sceneClone.getParts().size(); i++) {
 				final HousePart newPart = sceneClone.getParts().get(i);
 				root.attachChild(newPart.getRoot());
+				newPart.draw();
 				newPart.setOriginal(parts.get(i));
 				if (newPart.isPrintable() && newPart.isDrawCompleted()) {
 //					final String labelText = "(" + id + ")";
@@ -344,8 +350,9 @@ public class Scene implements Serializable {
 			}
 			originalHouseRoot.setScale(flatten ? 2 : 1);
 	
-//			for (HousePart part : getParts())
-//				part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
+			for (HousePart part : getParts())
+				part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
+			
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {

@@ -238,7 +238,9 @@ Version 0.2
 - draw squared angle for 90 degrees angles of the walls 
 - draw size annotations around windows in both model view and print view
 - fixed problem with wrong world coordinates when drawing window annotations
-- fixed window annotation face-direction problem in y-axis-parallel wall
+- fixed window annotation face-direction problem for walls parallel to y-axis
+- compute window annotation location label value for walls parallel to y-axis
+
 
 TODO:
 - combine the wall meshed into one

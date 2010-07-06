@@ -154,6 +154,9 @@ public class Wall extends HousePart {
 		draw();
 		showPoints();
 
+		for (HousePart child : children)
+			child.draw();
+		
 		for (Snap neighbor : this.neighbors)
 			if (neighbor != null) {
 				neighbor.getNeighborOf(this).draw();
