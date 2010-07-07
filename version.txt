@@ -240,7 +240,7 @@ Version 0.2
 - fixed problem with wrong world coordinates when drawing window annotations
 - fixed window annotation face-direction problem for walls parallel to y-axis
 - compute window annotation location label value for walls parallel to y-axis
-
+- fixed problem with window draw points when animating print preview 
 
 TODO:
 - combine the wall meshed into one

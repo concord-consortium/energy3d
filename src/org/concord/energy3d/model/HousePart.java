@@ -406,8 +406,8 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void draw() {
-		System.out.println("(" + printSequence + ")");
-		System.out.println(this);
+//		System.out.println("(" + printSequence + ")");
+		System.out.println("drawing..." + this);
 		if (root == null)
 			init();
 

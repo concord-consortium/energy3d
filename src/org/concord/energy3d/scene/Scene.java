@@ -323,8 +323,8 @@ public class Scene implements Serializable {
 //	private void animateFlatten(final boolean flatten) {
 	//		if (flatten)
 	//			HousePart.setFlatten(true);
-		double t = 1;
-//			for (double t = 0; t < 1.1; t += 0.05) {
+			for (double t = 0; t < 1.1; t += 0.05) {
+//			double t = 1;
 				if (flatten)
 					HousePart.setFlattenTime(t);
 				else
@@ -338,7 +338,23 @@ public class Scene implements Serializable {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-//			}
+				
+//				t = 0;
+//				if (flatten)
+//					HousePart.setFlattenTime(t);
+//				else
+//					HousePart.setFlattenTime(1 - t);
+//				for (HousePart part : sceneClone.getParts())
+//					//TODO If draw not completed then it shouldn't even exist at this point!
+//					if (part.isDrawCompleted())   
+//						part.draw();
+//				try {
+//					Thread.sleep(30);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+				
+			}
 			if (!flatten) {
 	//			HousePart.setFlatten(false);
 	//			for (HousePart part : parts)

@@ -346,11 +346,12 @@ public class Wall extends HousePart {
 		// Add window holes
 		for (HousePart child : children) {
 			if (child instanceof Window) {
-				Window win = (Window) child;
-				if (win.getPoints().size() < 4)
+//				Window win = (Window) child;
+				if (child.getPoints().size() < 4)
 					continue;
 				PolygonPoint pp;
 				ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
+				System.out.println("win[0] = " + child.getPoints().get(0));
 				ArrayList<Vector3> winPoints = child.getPoints();
 				p = winPoints.get(0);
 				pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());

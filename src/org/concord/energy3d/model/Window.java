@@ -182,6 +182,7 @@ public class Window extends HousePart {
 		int annotCounter = 0;
 		
 		Vector3 v = Vector3.fetchTempInstance();
+		Vector3 v1 = Vector3.fetchTempInstance();
 		double len = v.set(container.getPoints().get(2)).subtractLocal(container.getPoints().get(0)).length();
 		if (label1 == null) {
 			label1 = Annotation.makeNewLabel();
@@ -211,43 +212,50 @@ public class Window extends HousePart {
 		
 		
 //		final ReadOnlyTransform worldTransform = container.getRoot().getWorldTransform();
-		final ReadOnlyTransform worldTransform = container.getRoot().getTransform();
-		System.out.println("World = " + worldTransform.getMatrix());
+		final ReadOnlyTransform trans = container.getRoot().getTransform();
+//		System.out.println("World = " + worldTransform.getMatrix());
 //		if (original != null)
-		for (Vector3 p : abspoints) {
-			worldTransform.applyForward(p);
-		}
+//		for (Vector3 p : abspoints) {
+//			trans.applyForward(p);
+//		}
 
 		Vector3 faceDirection = Vector3.fetchTempInstance().set(container.getFaceDirection());
-		System.out.println("face direction annot (1) = " + faceDirection);
+//		System.out.println("face direction annot (1) = " + faceDirection);
 		Vector3 moveToFront = Vector3.fetchTempInstance().set(0,0,0);
-		worldTransform.applyForwardVector(faceDirection);
+		trans.applyForwardVector(faceDirection);
 		moveToFront.set(faceDirection).multiplyLocal(0.04);
 		
-		label1.setTranslation(abspoints.get(1));
+//		label1.setTranslation(abspoints.get(1));
+		label1.setTranslation(abspointsTrans(1, trans, v));
 //		label2.setTranslation(abspoints.get(2));
 
 //		Vector3 faceDirection = Vector3.fetchTempInstance().set(container.getFaceDirection());
 //		container.getRoot().getWorldTransform().applyForward(faceDirection);
 
 		
-		System.out.println("face direction annot (2) = " + faceDirection);
+//		System.out.println("face direction annot (2) = " + faceDirection);
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 //		annot.setRange(abspoints.get(0), abspoints.get(1), center, faceDirection, original == null, Align.Center, true);
-		annot.setRange(abspoints.get(0), abspoints.get(1), center, faceDirection, false, Align.Center, true);
+		annot.setRange(abspointsTrans(0, trans, v), abspointsTrans(1, trans, v1), center, faceDirection, false, Align.Center, true);
 		annot.setTranslation(moveToFront);
 		
 		annot = fetchSizeAnnot(annotCounter++);		
 //		annot.setRange(abspoints.get(0), abspoints.get(2), center, faceDirection, original == null, Align.Center, true);
-		annot.setRange(abspoints.get(0), abspoints.get(2), center, faceDirection, false, Align.Center, true);
+		annot.setRange(abspointsTrans(0, trans, v), abspointsTrans(2, trans, v1), center, faceDirection, false, Align.Center, true);
 		annot.setTranslation(moveToFront);
 		
-		System.out.println(abspoints.get(0));
+//		System.out.println(abspoints.get(0));
 		
 		Vector3.releaseTempInstance(v);
+		Vector3.releaseTempInstance(v1);
 		Vector3.releaseTempInstance(faceDirection);
 		Vector3.releaseTempInstance(moveToFront);
 	}	
+
+	private ReadOnlyVector3 abspointsTrans(int i, ReadOnlyTransform trans, Vector3 v) {
+		v.set(abspoints.get(i));
+		return trans.applyForward(v);
+	}
 
 	public void delete() {
 		if (container != null) {
