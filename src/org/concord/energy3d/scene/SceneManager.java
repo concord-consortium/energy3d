@@ -35,6 +35,7 @@ import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.AWTImageLoader;
+import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
@@ -523,7 +524,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				int y = mouseState.getY();
 				if (drawn != null && !drawn.isDrawCompleted()) {
 					drawn.setPreviewPoint(x, y);
-				} else if (operation == Operation.SELECT) {
+				} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
 					drawn = SelectUtil.selectHousePart(x, y, false);
 				}
 //				enableDisableRotationControl();

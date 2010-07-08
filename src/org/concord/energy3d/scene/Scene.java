@@ -339,21 +339,6 @@ public class Scene implements Serializable {
 					e.printStackTrace();
 				}
 				
-//				t = 0;
-//				if (flatten)
-//					HousePart.setFlattenTime(t);
-//				else
-//					HousePart.setFlattenTime(1 - t);
-//				for (HousePart part : sceneClone.getParts())
-//					//TODO If draw not completed then it shouldn't even exist at this point!
-//					if (part.isDrawCompleted())   
-//						part.draw();
-//				try {
-//					Thread.sleep(30);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-				
 			}
 			if (!flatten) {
 	//			HousePart.setFlatten(false);

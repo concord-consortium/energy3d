@@ -99,7 +99,9 @@ public class SelectUtil {
 					pointDist_i = p.distance(intersectionPoint);
 					if (userData.getHousePart() == SceneManager.getInstance().getSelectedPart())
 						pointDist_i -= 0.1;
-					if (pointDist_i < pointDist && (userData.getPointIndex() != -1 || pickedHousePart == null || pickedHousePart.getUserData().getPointIndex() == -1)) {
+					if (pointDist_i < pointDist && 
+							(userData.getPointIndex() != -1 || pickedHousePart == null || 
+									pickedHousePart.getUserData().getPointIndex() == -1)) {
 						pickedHousePart = picked_i;
 						polyDist = polyDist_i;
 						pointDist = pointDist_i;

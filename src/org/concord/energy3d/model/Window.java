@@ -196,7 +196,7 @@ public class Window extends HousePart {
 		if (xy < 0)
 			xy = len+xy;		
 //		label1.setText("(" + Math.round(10*v.getXf())/10 + ", " + Math.round(10*v.getZf())/10 + ")");
-		label1.setText("(" + xy+ ", " + v.getZf() + ")");
+		label1.setText("(" + Math.round(10*xy)/10.0+ ", " + Math.round(10*v.getZf())/10.0 + ")");
 		
 //		if (label2 == null) {
 //			label2 = Annotation.makeNewLabel();
