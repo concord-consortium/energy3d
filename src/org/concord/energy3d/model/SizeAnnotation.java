@@ -29,8 +29,8 @@ public class SizeAnnotation extends Annotation {
 
 	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipDirection) {
 		final double C = 0.1;
-		Vector3 v = Vector3.fetchTempInstance();
-		final Vector3 offset = Vector3.fetchTempInstance();
+		final Vector3 v = new Vector3();
+		final Vector3 offset = new Vector3();
 		if (front)
 			offset.set(faceDirection).normalizeLocal().multiplyLocal(C);
 		else {
@@ -46,10 +46,10 @@ public class SizeAnnotation extends Annotation {
 		vertexBuffer.rewind();
 
 		// main line
-		final Vector3 newFrom = Vector3.fetchTempInstance().set(from).addLocal(offset);
-		final Vector3 newTo = Vector3.fetchTempInstance().set(to).addLocal(offset);
-		final Vector3 middle = Vector3.fetchTempInstance().set(newFrom).addLocal(newTo).multiplyLocal(0.5);
-		Vector3 body = Vector3.fetchTempInstance().set(to).subtractLocal(from).multiplyLocal(0.5);
+		final Vector3 newFrom = new Vector3(from).addLocal(offset);
+		final Vector3 newTo = new Vector3(to).addLocal(offset);
+		final Vector3 middle = new Vector3(newFrom).addLocal(newTo).multiplyLocal(0.5);
+		final Vector3 body = new Vector3(to).subtractLocal(from).multiplyLocal(0.5);
 		vertexBuffer.put(newFrom.getXf()).put(newFrom.getYf()).put(newFrom.getZf());
 		double s = (body.length() - 0.15) / body.length();
 		v.set(body).multiplyLocal(s).addLocal(newFrom);
@@ -73,7 +73,7 @@ public class SizeAnnotation extends Annotation {
 
 		// arrow
 		offset.multiplyLocal(0.5);
-		body = Vector3.fetchTempInstance().set(to).subtractLocal(from).normalizeLocal().multiplyLocal(0.05);
+		body.set(to).subtractLocal(from).normalizeLocal().multiplyLocal(0.05);
 		// // arrow right side
 		// v.set(newFrom);
 		// vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
@@ -107,12 +107,5 @@ public class SizeAnnotation extends Annotation {
 		label.setTranslation(middle);
 		label.setText("" + Math.round(to.subtract(from, null).length() * 100) / 100.0 + "m");
 		label.setAlign(align);
-
-		Vector3.releaseTempInstance(newFrom);
-		Vector3.releaseTempInstance(newTo);
-		Vector3.releaseTempInstance(middle);
-		Vector3.releaseTempInstance(v);
-		Vector3.releaseTempInstance(body);
-		Vector3.releaseTempInstance(offset);
 	}
 }

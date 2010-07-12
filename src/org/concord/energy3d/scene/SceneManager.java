@@ -719,28 +719,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private void move(final Canvas canvas, final double tpf, int val) {
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
-		final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
-		final Vector3 dir = Vector3.fetchTempInstance();
-		dir.set(camera.getDirection());
-		dir.multiplyLocal(-val * MOVE_SPEED * 10 * tpf);
-		loc.addLocal(dir);
+		final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * MOVE_SPEED * 10 * tpf).addLocal(camera.getLocation());
+//		final Vector3 loc = new Vector3(camera.getLocation()).addLocal(dir);
 		camera.setLocation(loc);
-		Vector3.releaseTempInstance(loc);
-		Vector3.releaseTempInstance(dir);
 	}
 
 	private void moveUpDown(final Canvas canvas, final double tpf, boolean up) {
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
-		final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
-		final Vector3 dir = Vector3.fetchTempInstance();
-		dir.set(camera.getUp());
+		final Vector3 loc = new Vector3(camera.getUp());
 		if (viewMode == ViewMode.TOP_VIEW)
 			up = !up;
-		dir.multiplyLocal((up ? 1 : -1) * MOVE_SPEED * tpf);
-		loc.addLocal(dir);
+		loc.multiplyLocal((up ? 1 : -1) * MOVE_SPEED * tpf).addLocal(camera.getLocation());
+//		final Vector3 loc = new Vector3(camera.getLocation());
+//		loc.addLocal(dir);
 		camera.setLocation(loc);
-		Vector3.releaseTempInstance(loc);
-		Vector3.releaseTempInstance(dir);
 	}
 
 	public void setOperation(Operation operation) {

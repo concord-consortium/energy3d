@@ -214,14 +214,16 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected Vector3 closestPoint(Vector3 p1, Vector3 p2, int x, int y) {
-		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
-		final Ray3 pickRay = Ray3.fetchTempInstance();
+//		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
+		final Vector2 pos = new Vector2(x, y);
+//		final Ray3 pickRay = Ray3.fetchTempInstance();
 
-		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-		Vector3 closest = closestPoint(p1, p2, pickRay.getOrigin(), pickRay.getOrigin().add(pickRay.getDirection(), null));
+//		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
+		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, null);
+		final Vector3 closest = closestPoint(p1, p2, pickRay.getOrigin(), pickRay.getOrigin().add(pickRay.getDirection(), null));
 
-		Vector2.releaseTempInstance(pos);
-		Ray3.releaseTempInstance(pickRay);
+//		Vector2.releaseTempInstance(pos);
+//		Ray3.releaseTempInstance(pickRay);
 		return closest;
 	}
 
@@ -457,16 +459,19 @@ public abstract class HousePart implements Serializable {
 //		Vector3 targetCenter = printCenter;
 //		computePrintCenter(targetCenter, printPage++);
 		computePrintCenter();
-		Vector3 targetCenter = Vector3.fetchTempInstance().set(printCenter);
-		Vector3 currentCenter = Vector3.fetchTempInstance().set(center);
+//		Vector3 targetCenter = Vector3.fetchTempInstance().set(printCenter);
+//		Vector3 currentCenter = Vector3.fetchTempInstance().set(center);
+		final Vector3 targetCenter = new Vector3(printCenter);
+		final Vector3 currentCenter = new Vector3(center);
+		
 		// Vector3 currentCenter = root.getTransform().applyForward(center.clone());
-		currentCenter = root.getTransform().applyForward(currentCenter);
+		root.getTransform().applyForward(currentCenter);
 		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
 		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));
 		// root.setTranslation(currentCenter);
 		
-		Vector3.releaseTempInstance(targetCenter);
-		Vector3.releaseTempInstance(currentCenter);
+//		Vector3.releaseTempInstance(targetCenter);
+//		Vector3.releaseTempInstance(currentCenter);
 	}
 
 //	public int setPrintSequence(final int printSequence) {

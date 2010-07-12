@@ -181,8 +181,8 @@ public class Window extends HousePart {
 			return;
 		int annotCounter = 0;
 		
-		Vector3 v = Vector3.fetchTempInstance();
-		Vector3 v1 = Vector3.fetchTempInstance();
+		Vector3 v = new Vector3();
+		Vector3 v1 = new Vector3();
 		double len = v.set(container.getPoints().get(2)).subtractLocal(container.getPoints().get(0)).length();
 		if (label1 == null) {
 			label1 = Annotation.makeNewLabel();
@@ -219,9 +219,9 @@ public class Window extends HousePart {
 //			trans.applyForward(p);
 //		}
 
-		Vector3 faceDirection = Vector3.fetchTempInstance().set(container.getFaceDirection());
+		Vector3 faceDirection = new Vector3(container.getFaceDirection());
 //		System.out.println("face direction annot (1) = " + faceDirection);
-		Vector3 moveToFront = Vector3.fetchTempInstance().set(0,0,0);
+		Vector3 moveToFront = new Vector3();
 		trans.applyForwardVector(faceDirection);
 		moveToFront.set(faceDirection).multiplyLocal(0.04);
 		
@@ -246,10 +246,10 @@ public class Window extends HousePart {
 		
 //		System.out.println(abspoints.get(0));
 		
-		Vector3.releaseTempInstance(v);
-		Vector3.releaseTempInstance(v1);
-		Vector3.releaseTempInstance(faceDirection);
-		Vector3.releaseTempInstance(moveToFront);
+//		Vector3.releaseTempInstance(v);
+//		Vector3.releaseTempInstance(v1);
+//		Vector3.releaseTempInstance(faceDirection);
+//		Vector3.releaseTempInstance(moveToFront);
 	}	
 
 	private ReadOnlyVector3 abspointsTrans(int i, ReadOnlyTransform trans, Vector3 v) {

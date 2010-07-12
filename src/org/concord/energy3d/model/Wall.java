@@ -494,12 +494,12 @@ public class Wall extends HousePart {
 	}
 
 	private void drawSurroundMesh(ReadOnlyVector3 thickness) {
-		ArrayList<Vector3> points = abspoints;
-		FloatBuffer vertexBuffer = surroundMesh.getMeshData().getVertexBuffer();
-		FloatBuffer normalBuffer = surroundMesh.getMeshData().getNormalBuffer();
+		final ArrayList<Vector3> points = abspoints;
+		final FloatBuffer vertexBuffer = surroundMesh.getMeshData().getVertexBuffer();
+		final FloatBuffer normalBuffer = surroundMesh.getMeshData().getNormalBuffer();
 		vertexBuffer.position(0);
 		normalBuffer.position(0);
-		Vector3 p2 = Vector3.fetchTempInstance();
+		final Vector3 p2 = new Vector3();
 		int[] order;
 
 		if (neighbors[0] != null && neighbors[1] != null)
@@ -531,7 +531,7 @@ public class Wall extends HousePart {
 
 		while (vertexBuffer.position() < vertexBuffer.capacity())
 			vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-		Vector3.releaseTempInstance(p2);
+//		Vector3.releaseTempInstance(p2);
 	}
 
 	private void drawWindowsSurroundMesh(Vector3 thickness) {

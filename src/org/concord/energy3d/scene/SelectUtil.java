@@ -30,16 +30,9 @@ public class SelectUtil {
 	}
 	
 	private static void pick(int x, int y, Spatial target) {
-		// Put together a pick ray
-		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);
-		final Ray3 pickRay = Ray3.fetchTempInstance();
-//		canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-		SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-		Vector2.releaseTempInstance(pos);
-
-		// Do the pick
+		final Vector2 pos = new Vector2(x, y);
+		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, null);
 		PickingUtil.findPick(target, pickRay, pickResults);
-		Ray3.releaseTempInstance(pickRay);
 	}
 
 //	public PickedHousePart findMousePoint(int x, int y) {
