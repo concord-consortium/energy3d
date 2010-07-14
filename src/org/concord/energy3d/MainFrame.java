@@ -176,8 +176,12 @@ public class MainFrame extends JFrame {
 			doorButton = new JToggleButton();
 			doorButton.setText("Door");
 			doorButton.addActionListener(new java.awt.event.ActionListener() {
+				private boolean printPreview = true;
+
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
+//					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
+					PrintPreviewController.getInstance().setPrintPreview(printPreview );
+					printPreview = !printPreview;
 				}
 			});
 		}

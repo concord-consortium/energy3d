@@ -151,8 +151,8 @@ public class SelectUtil {
 					blinker.finish();
 					blinker = null;
 				}
-				if (data.getHousePart().getOriginal() != null)
-					blinker = new Blinker(drawn.getOriginal().getRoot());
+//				if (data.getHousePart().getOriginal() != null)
+//					blinker = new Blinker(drawn.getOriginal().getRoot());
 			}
 			housePart.showPoints();
 			lastHoveredObject = housePart;

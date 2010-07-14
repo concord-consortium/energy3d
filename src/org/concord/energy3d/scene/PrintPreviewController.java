@@ -66,12 +66,14 @@ public class PrintPreviewController implements Updater {
 				}
 				Scene.getInstance().getOriginalHouseRoot().setScale(2);
 			}
-			// for (HousePart part : Scene.getInstance().getParts())
-			// part.getRoot().getSceneHints().setCullHint(CullHint.Always);
+			 for (HousePart part : Scene.getInstance().getParts())
+			 part.getRoot().getSceneHints().setCullHint(CullHint.Always);
 		}
 
 		if (!finish) {
-			final double t = Math.min(1, (time - startTime) / 1.0 / timer.getResolution());
+//			final double t = (time - startTime) / 1.0 / timer.getResolution();
+			final double t = 0.5;
+			System.out.println("t = " + t);
 			HousePart.setFlattenTime(isPrintPreview ? t : 1 - t);
 			for (HousePart part : sceneClone.getParts())
 				// TODO If draw not completed then it shouldn't even exist at this point!
@@ -87,25 +89,35 @@ public class PrintPreviewController implements Updater {
 				// HousePart.setFlatten(false);
 				// for (HousePart part : parts)
 				// part.draw();
+				
+//				try {
+//					Thread.sleep(1000);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+				
 				Scene.getInstance().getOriginalHouseRoot().setRotation(new Matrix3().fromAngles(0, 0, 0));
 				angle = 0;
-				for (HousePart housePart : sceneClone.getParts())
-					Scene.getRoot().detachChild(housePart.getRoot());
-				Scene.getInstance().getOriginalHouseRoot().setScale(1);
-				final JoglCanvasRenderer renderer = (JoglCanvasRenderer) SceneManager.getInstance().getCanvas().getCanvasRenderer();
-				renderer.setCurrentContext();
-				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
-				renderer.releaseCurrentContext();				
-			}
-			
-			if (!isPrintPreview && finishPhase == 1) {
-				SceneManager.getInstance().updatePrintPreviewScene(false);				
+//				for (HousePart housePart : sceneClone.getParts())
+//					Scene.getRoot().detachChild(housePart.getRoot());
+//				Scene.getInstance().getOriginalHouseRoot().setScale(1);
+//				final JoglCanvasRenderer renderer = (JoglCanvasRenderer) SceneManager.getInstance().getCanvas().getCanvasRenderer();
+//				renderer.setCurrentContext();
+//				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
+//				renderer.releaseCurrentContext();
 			}
 
-			// for (HousePart part : Scene.getInstance().getParts())
-			// part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
+//			if (finishPhase == 0) {
+//				for (HousePart part : Scene.getInstance().getParts())
+//					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
+//			}
+
+			if (!isPrintPreview && finishPhase == 1) {
+//				SceneManager.getInstance().updatePrintPreviewScene(false);
+			}
+			
+			finishPhase++;
 		}
-		finishPhase++;
 	}
 
 	public void setPrintPreview(final boolean printPreview) {
