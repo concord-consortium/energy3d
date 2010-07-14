@@ -135,8 +135,8 @@ public abstract class HousePart implements Serializable {
 		root.attachChild(angleAnnotRoot);
 		root.attachChild(labelsRoot);
 		
-		computeAbsPoints();
-		computeCenter();		
+//		computeAbsPoints();
+//		computeCenter();		
 	}
 
 	private void initCheck() {
@@ -436,7 +436,7 @@ public abstract class HousePart implements Serializable {
 		// child.draw();
 	}
 
-	private void computeAbsPoints() {
+	protected void computeAbsPoints() {
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = points.get(i);
 			p = toAbsolute(p);

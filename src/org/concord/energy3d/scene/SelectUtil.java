@@ -70,7 +70,8 @@ public class SelectUtil {
 			final PickData pick = pickResults.getPickData(i);
 			if (pick.getIntersectionRecord().getNumberOfIntersections() == 0)
 				continue;
-			Object obj = pick.getTargetMesh().getUserData();
+//			Object obj = pick.getTargetMesh().getUserData();
+			Object obj = ((Mesh)pick.getTarget()).getUserData();
 			UserData userData = null;
 			if (obj instanceof UserData) {
 				userData = (UserData) obj;
@@ -85,7 +86,8 @@ public class SelectUtil {
 				continue;
 			Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
 			PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
-			double polyDist_i = pick.getClosestDistance();
+//			double polyDist_i = pick.getClosestDistance();
+			double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {
 				for (Vector3 p : userData.getHousePart().getPoints()) {

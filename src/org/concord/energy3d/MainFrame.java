@@ -16,6 +16,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.scene.PrintPreviewController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
@@ -504,7 +505,8 @@ public class MainFrame extends JFrame {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 //					Scene.getInstance().setFlatten(previewMenuItem.isSelected());
 					deselect();
-					SceneManager.getInstance().setPrintPreview(previewMenuItem.isSelected());					
+//					SceneManager.getInstance().setPrintPreview(previewMenuItem.isSelected());
+					PrintPreviewController.getInstance().setPrintPreview(previewMenuItem.isSelected());
 				}
 			});
 		}

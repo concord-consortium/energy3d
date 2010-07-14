@@ -58,18 +58,24 @@ public abstract class Roof extends HousePart {
 
 		mesh.setUserData(new UserData(this));
 	}
+	
+	protected void computeAbsPoints() {
+	}
+
+	protected void computeCenter() {
+	}	
 
 	protected void updateMesh() {
-		// if (root == null)
-		// init();
 		if (container == null)
 			return;
 
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
+		
 		center.set(0, 0, 0);
 		for (PolygonPoint p : wallUpperPoints)
 			center.addLocal(p.getX(), p.getY(), p.getZ());
-		center.multiplyLocal(1.0 / wallUpperPoints.size());
+		center.multiplyLocal(1.0 / wallUpperPoints.size());		
+		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 
 		final Polygon polygon = makePolygon(wallUpperPoints);
 		Poly2Tri.triangulate(polygon);
@@ -81,10 +87,10 @@ public abstract class Roof extends HousePart {
 
 		mesh.getMeshData().updateVertexCount();
 
-//		for (int i = 0; i < points.size(); i++) {
-//			Vector3 p = points.get(i);
-//			pointsRoot.getChild(i).setTranslation(p);
-//		}
+		for (int i = 0; i < points.size(); i++) {
+			Vector3 p = points.get(i);
+			pointsRoot.getChild(i).setTranslation(p);
+		}
 
 //		updateLabelLocation();
 
