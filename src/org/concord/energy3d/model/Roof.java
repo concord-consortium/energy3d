@@ -150,6 +150,8 @@ public abstract class Roof extends HousePart {
 
 	protected void flatten() {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		if (original == null)
+			original = null;
 		final FloatBuffer orgVertexBuffer = ((Roof)original).mesh.getMeshData().getVertexBuffer();
 		final Vector3 p1 = new Vector3();
 		final Vector3 p2 = new Vector3();

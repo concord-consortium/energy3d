@@ -40,13 +40,14 @@ public class PrintPreviewController implements Updater {
 		if (isPrintPreview)
 			rotate();
 
-		if (finish && finishPhase > 1)
+		if (finish && finishPhase > 20)
 			return;
 
 		final long time = timer.getTime();
 		if (init) {
 			init = false;
 			startTime = time;
+			HousePart.setFlatten(true);
 			final JoglCanvasRenderer renderer = (JoglCanvasRenderer) SceneManager.getInstance().getCanvas().getCanvasRenderer();
 			if (isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
 				renderer.setCurrentContext();
@@ -71,8 +72,8 @@ public class PrintPreviewController implements Updater {
 		}
 
 		if (!finish) {
-//			final double t = (time - startTime) / 1.0 / timer.getResolution();
-			final double t = 0.5;
+			final double t = (time - startTime) / 1.0 / timer.getResolution();
+//			final double t = 1;
 			System.out.println("t = " + t);
 			HousePart.setFlattenTime(isPrintPreview ? t : 1 - t);
 			for (HousePart part : sceneClone.getParts())
@@ -80,12 +81,13 @@ public class PrintPreviewController implements Updater {
 				if (part.isDrawCompleted())
 					part.draw();
 
-			finish = t >= 1;
+			finish = t > 1;
 			finishPhase = 0;
 		}
 
 		if (finish) {
-			if (!isPrintPreview && finishPhase == 0) {
+			HousePart.setFlatten(false);
+			if (!isPrintPreview && finishPhase == 10) {
 				// HousePart.setFlatten(false);
 				// for (HousePart part : parts)
 				// part.draw();
@@ -98,24 +100,24 @@ public class PrintPreviewController implements Updater {
 				
 				Scene.getInstance().getOriginalHouseRoot().setRotation(new Matrix3().fromAngles(0, 0, 0));
 				angle = 0;
-//				for (HousePart housePart : sceneClone.getParts())
-//					Scene.getRoot().detachChild(housePart.getRoot());
-//				Scene.getInstance().getOriginalHouseRoot().setScale(1);
-//				final JoglCanvasRenderer renderer = (JoglCanvasRenderer) SceneManager.getInstance().getCanvas().getCanvasRenderer();
-//				renderer.setCurrentContext();
-//				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
-//				renderer.releaseCurrentContext();
+				for (HousePart housePart : sceneClone.getParts())
+					Scene.getRoot().detachChild(housePart.getRoot());
+				printParts.clear();
+				Scene.getInstance().getOriginalHouseRoot().setScale(1);
+				Scene.getInstance().getOriginalHouseRoot().updateGeometricState(timer.getTimePerFrame(), true);
+
+				final JoglCanvasRenderer renderer = (JoglCanvasRenderer) SceneManager.getInstance().getCanvas().getCanvasRenderer();
+				renderer.setCurrentContext();
+				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
+				renderer.releaseCurrentContext();				
+				SceneManager.getInstance().updatePrintPreviewScene(false);
 			}
 
-//			if (finishPhase == 0) {
-//				for (HousePart part : Scene.getInstance().getParts())
-//					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
-//			}
-
-			if (!isPrintPreview && finishPhase == 1) {
-//				SceneManager.getInstance().updatePrintPreviewScene(false);
+			if (finishPhase == 10) {
+				for (HousePart part : Scene.getInstance().getParts())
+					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
 			}
-			
+
 			finishPhase++;
 		}
 	}
@@ -133,5 +135,9 @@ public class PrintPreviewController implements Updater {
 	public void rotate() {
 		angle += 0.01;
 		Scene.getInstance().getOriginalHouseRoot().setRotation(new Matrix3().fromAngles(0, 0, angle));
+	}
+
+	public ArrayList<HousePart> getPrintParts() {
+		return printParts;
 	}
 }

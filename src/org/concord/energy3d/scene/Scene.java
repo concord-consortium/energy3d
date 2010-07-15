@@ -40,7 +40,7 @@ public class Scene implements Serializable {
 	private static final Node originalHouseRoot = new Node("Original House Root");
 	private static Scene instance;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
-	private transient ArrayList<HousePart> printParts;
+//	private transient ArrayList<HousePart> printParts;
 	private double RADIUS = 0;
 	transient int C; // = 20;
 	transient int size; // = C * C * C * 3;
@@ -67,7 +67,7 @@ public class Scene implements Serializable {
 	}
 
 	public void init() {
-		printParts = new ArrayList<HousePart>();
+//		printParts = new ArrayList<HousePart>();
 		// initTexture3D();
 	}
 
@@ -223,9 +223,9 @@ public class Scene implements Serializable {
 		return parts;
 	}
 
-	public ArrayList<HousePart> getPrintParts() {
-		return printParts;
-	}
+//	public ArrayList<HousePart> getPrintParts() {
+//		return printParts;
+//	}
 
 	public void save() {
 		try {

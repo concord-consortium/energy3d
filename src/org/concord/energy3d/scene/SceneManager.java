@@ -673,7 +673,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			up = new Vector3(0.0f, -1.0f, 0.0f);
 			dir = new Vector3(0.0f, 0.0f, -1.0f);
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
-			// control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
+			 control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			// control.setMoveSpeed(MOVE_SPEED / 10);
 			// camera.setProjectionMode(ProjectionMode.Parallel);
 			camera.setProjectionMode(ProjectionMode.Perspective);
@@ -850,20 +850,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void print() {
-		PrintExporter printExporter = new PrintExporter(Scene.getInstance().getPrintParts().size());		
-		double scale = 0.2;
-		root.setScale(scale);
+		PrintExporter printExporter = new PrintExporter(PrintPreviewController.getInstance().getPrintParts().size());		
+//		double scale = 0.2;
+//		root.setScale(scale);
 		Camera camera = Camera.getCurrentCamera();
 		// Vector3 location = new Vector3(camera.getLocation());
 		// Vector3 direction = new Vector3(camera.getDirection());
 		// ReadOnlyVector3 up = camera.getUp();
-		for (HousePart part : Scene.getInstance().getPrintParts()) {
+//		for (HousePart part : Scene.getInstance().getPrintParts()) {
+		for (HousePart part : PrintPreviewController.getInstance().getPrintParts()) {
 			// if (printExporter.getCurrentPage() < Scene.getInstance().getPrintParts().size()) {
 			// HousePart part = Scene.getInstance().getPrintParts().get(printExporter.getCurrentPage());
 			// Vector3 pos = new Vector3(part.getPrintSequence() * scale, -5, part.getPrintY() * scale);
-			// Vector3 pos = new Vector3(part.getPrintSequence() % HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale, -5, part.getPrintSequence() / HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale);
+//			 Vector3 pos = new Vector3(part.getPrintSequence() % HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale, -5, part.getPrintSequence() / HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale);
 			Vector3 pos = part.getPrintCenter();
-			camera.setLocation(pos);
+			camera.setLocation(pos.getX(), pos.getY() - 5, pos.getZ());
 			camera.lookAt(pos.addLocal(0, 1, 0), Vector3.UNIT_Z);
 			try {
 				Thread.sleep(100);

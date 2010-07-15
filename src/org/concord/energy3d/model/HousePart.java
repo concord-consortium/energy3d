@@ -18,12 +18,15 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private static final BMFont defaultFont = BMFontLoader.defaultFont();
+	private static boolean isFlatten = false;
 	protected static double flattenTime = 0;
 	public static double flattenPos = -10;
 	private static boolean snapToObjects = true;
@@ -64,6 +67,10 @@ public abstract class HousePart implements Serializable {
 		HousePart.flattenTime = flattenTime;
 		HousePart.printSequence = HousePart.printPage = 0;
 	}
+	
+	public static void setFlatten(boolean flatten) {
+		HousePart.isFlatten = flatten;
+	}	
 
 	public static double getFlattenTime() {
 		return flattenTime;
@@ -421,7 +428,7 @@ public abstract class HousePart implements Serializable {
 		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
 
-		if (isPrintable() && isDrawCompleted() && flattenTime > 0) // TODO If draw not completed then it shouldn't even exist at this point!
+		if (isFlatten && original != null && isPrintable() && isDrawCompleted()) // && flattenTime >= 0) // TODO If draw not completed then it shouldn't even exist at this point!
 			flatten();
 
 		if (original != null && isPrintable())
@@ -577,8 +584,8 @@ public abstract class HousePart implements Serializable {
 			label = (BMText)labelsRoot.getChild(index);
 			label.setText(text);
 			label.getSceneHints().setCullHint(CullHint.Inherit);			
-		} else {
-			label = new BMText("textSpatial1", text, BMFontLoader.defaultFont(), (original == null) ? Align.Center : Align.South, Justify.Center);
+		} else {			
+			label = new BMText("textSpatial1", text, defaultFont, (original == null) ? Align.Center : Align.South, Justify.Center);
 			labelsRoot.attachChild(label);
 		}
 		return label;
