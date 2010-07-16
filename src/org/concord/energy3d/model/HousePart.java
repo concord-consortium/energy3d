@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SelectUtil;
@@ -50,7 +51,6 @@ public abstract class HousePart implements Serializable {
 	protected static int printSequence;
 	protected static int printPage;
 	protected transient Vector3 center;
-	// private transient BMText label;
 	protected transient Node labelsRoot;
 	private transient ReadOnlyVector3 defaultDirection;
 	protected transient Node sizeAnnotRoot;
@@ -461,107 +461,35 @@ public abstract class HousePart implements Serializable {
 
 	protected void flatten() {
 		root.setTranslation(0, 0, 0);
-		// Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE , 0, printSequence / PRINT_COLS * PRINT_SPACE);
-//		Vector3 targetCenter = Vector3.fetchTempInstance();
-//		Vector3 targetCenter = printCenter;
-//		computePrintCenter(targetCenter, printPage++);
-		computePrintCenter();
-//		Vector3 targetCenter = Vector3.fetchTempInstance().set(printCenter);
-//		Vector3 currentCenter = Vector3.fetchTempInstance().set(center);
+		computePrintCenter();	//TODO move to setPreview(true) doesnt need to recompute every tme
 		final Vector3 targetCenter = new Vector3(printCenter);
 		final Vector3 currentCenter = new Vector3(center);
 		
-		// Vector3 currentCenter = root.getTransform().applyForward(center.clone());
 		root.getTransform().applyForward(currentCenter);
 		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
 		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));
-		// root.setTranslation(currentCenter);
-		
-//		Vector3.releaseTempInstance(targetCenter);
-//		Vector3.releaseTempInstance(currentCenter);
 	}
 
-//	public int setPrintSequence(final int printSequence) {
-//		Vector3 targetCenter = Vector3.fetchTempInstance();
-//		this.printSequence = printSequence;
-//		int numOfPages = 1;
-//		while (true) {
-//			computePrintCenter(targetCenter, printSequence + numOfPages - 1);
-//			if (targetCenter.length() >= 3)
-//				break;
-//			else
-//				numOfPages++;
-//		}
-//		Vector3.releaseTempInstance(targetCenter);
-//		return numOfPages;
-//	}
-
-//	protected void computePrintCenter(Vector3 targetCenter, int printSequence) {
 	protected void computePrintCenter() {
-//		targetCenter.set((-1.5 + printSequence % PRINT_COLS) * PRINT_SPACE, 0, (-0.8 + printSequence / PRINT_COLS) * PRINT_SPACE);
-		
-//		Vector3 targetCenter = Vector3.fetchTempInstance();
-//		this.printCenter = new Vector3(targetCenter);
-//		this.printSequence = printSequence;
-//		int numOfPages = 1;
 		while (true) {
-//			printCenter.set((-1.5 + printSequence % PRINT_COLS) * PRINT_SPACE, 0, (-0.8 + printSequence / PRINT_COLS) * PRINT_SPACE);
 			printCenter.set((-1.5 + printPage % PRINT_COLS) * PRINT_SPACE, 0, (-0.8 + printPage / PRINT_COLS) * PRINT_SPACE);
 			if (printCenter.length() >= 3)
 				break;
 			else
 				printPage++;				
-//				numOfPages++;
 		}
+		PrintController.getInstance().addPrintCenters(new Vector3(printCenter));
 		printPage++;
-//		Vector3.releaseTempInstance(targetCenter);
-//		printPage += numOfPages;		
 	}
-
-	// public void setPrintY(double printY) {
-	// this.printY = printY;
-	// }
-
-//	public double getPrintSequence() {
-//		return printSequence;
-//	}
-
-	// public double getPrintY() {
-	// return printY;
-	// }
 
 	public boolean isPrintable() {
 		return true;
 	}
 
-	// public void setLabel(String labelText) {
-	// if (label == null) {
-	// final Align align = (original == null) ? BMText.Align.Center : BMText.Align.South;
-	// final BMFont font = BMFontLoader.defaultFont();
-	// label = new BMText("textSpatial1", labelText, font, align, BMText.Justify.Center);
-	// updateLabelLocation();
-	// root.attachChild(label);
-	// } else
-	// label.setText(labelText);
-	// }
-
 	protected void computeLabelTop(final Vector3 top) {
 		top.set(0, 0, height);
 //		return height / 1;
 	}
-
-	// protected void updateLabelLocation() {
-	// if (label != null) {
-	// label.setTranslation(center);
-	// Vector3 up = new Vector3();
-	// if (original == null)
-	// up.set(getFaceDirection());
-	// else
-	// up.set(0, 0, computeLabelTop());
-	// root.getTransform().applyInverseVector(up);
-	// label.setTranslation(center.getX() + up.getX(), center.getY() + up.getY(), center.getZ() + up.getZ());
-	// }
-	// }
 
 	protected void updateLabels() {
 		final String text = "(" + (printSequence++ + 1) + ")";

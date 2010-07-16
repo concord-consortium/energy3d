@@ -7,27 +7,31 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.util.screen.ScreenExportable;
 
 public class PrintExporter implements ScreenExportable, Printable {
 	protected boolean _useAlpha;
-	private BufferedImage[] images;
-	private int currentPage = 0;
+//	private BufferedImage[] images;
+	private ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
+//	private int currentPage = 0;
 
-	public PrintExporter(int pages) {
-		this(false, pages);
+	public PrintExporter() {
+		this(false);
 	}
 
-	public PrintExporter(boolean useAlpha, int pages) {
+	public PrintExporter(boolean useAlpha) {
 		_useAlpha = useAlpha;
-		images = new BufferedImage[pages];
+//		images = new BufferedImage[pages];
 
 	}
 
 	public void export(final ByteBuffer data, final int width, final int height) {
-		images[currentPage] = new BufferedImage(width, height, _useAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
+//		images[currentPage] = new BufferedImage(width, height, _useAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
+		final BufferedImage img = new BufferedImage(width, height, _useAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
+		images.add(img);
 
 		int index, r, g, b, a;
 		int argb;
@@ -45,10 +49,11 @@ public class PrintExporter implements ScreenExportable, Printable {
 					argb |= (a & 0xFF) << 24;
 				}
 
-				images[currentPage].setRGB(x, y, argb);
+//				images[currentPage].setRGB(x, y, argb);
+				img.setRGB(x, y, argb);
 			}
 		}
-		currentPage++;
+//		currentPage++;
 		// print(img);
 
 	}
@@ -87,14 +92,16 @@ public class PrintExporter implements ScreenExportable, Printable {
 
 	@Override
 	public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-		if (pageIndex >= images.length) {
+		if (pageIndex >= images.size()) {
 			return NO_SUCH_PAGE;
 		}
 
 		Graphics2D g2d = (Graphics2D) graphics;
 		g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 
-		graphics.drawImage(images[pageIndex], 0, 0, 600, 600 * images[pageIndex].getHeight() / images[pageIndex].getWidth() , null);
+//		graphics.drawImage(images[pageIndex], 0, 0, 600, 600 * images[pageIndex].getHeight() / images[pageIndex].getWidth() , null);
+		final BufferedImage img = images.get(pageIndex);
+		graphics.drawImage(img, 0, 0, 600, 600 * img.getHeight() / img.getWidth() , null);
 
 		// AffineTransform at = AffineTransform.getScaleInstance((double) width / images[pageIndex].getWidth(), (double) height / images[pageIndex].getHeight());
 		// graphics.drawImage(images[pageIndex], at);
@@ -103,7 +110,7 @@ public class PrintExporter implements ScreenExportable, Printable {
 		return PAGE_EXISTS;
 	}
 
-	public int getCurrentPage() {
-		return currentPage;
-	}
+//	public int getCurrentPage() {
+//		return currentPage;
+//	}
 }

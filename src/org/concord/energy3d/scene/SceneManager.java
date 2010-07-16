@@ -163,7 +163,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerInput(canvas, physicalLayer);
 
 		frameHandler.addUpdater(this);
-		frameHandler.addUpdater(PrintPreviewController.getInstance());
+		frameHandler.addUpdater(PrintController.getInstance());
 
 		TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
 
@@ -652,6 +652,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// source.getCanvasRenderer().getCamera().lookAt(Vector3.ZERO, Vector3.UNIT_Z); // .negate(null));
 	// }
 
+	public void resetCamera() {
+		resetCamera(this.viewMode);
+	}
+	
 	public void resetCamera(final ViewMode viewMode) {
 		this.viewMode = viewMode;
 		Camera camera = canvas.getCanvasRenderer().getCamera();
@@ -849,45 +853,48 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			control.setKeyRotateSpeed(1);
 	}
 
-	public void print() {
-		PrintExporter printExporter = new PrintExporter(PrintPreviewController.getInstance().getPrintParts().size());		
-//		double scale = 0.2;
-//		root.setScale(scale);
-		Camera camera = Camera.getCurrentCamera();
-		// Vector3 location = new Vector3(camera.getLocation());
-		// Vector3 direction = new Vector3(camera.getDirection());
-		// ReadOnlyVector3 up = camera.getUp();
-//		for (HousePart part : Scene.getInstance().getPrintParts()) {
-		for (HousePart part : PrintPreviewController.getInstance().getPrintParts()) {
-			// if (printExporter.getCurrentPage() < Scene.getInstance().getPrintParts().size()) {
-			// HousePart part = Scene.getInstance().getPrintParts().get(printExporter.getCurrentPage());
-			// Vector3 pos = new Vector3(part.getPrintSequence() * scale, -5, part.getPrintY() * scale);
-//			 Vector3 pos = new Vector3(part.getPrintSequence() % HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale, -5, part.getPrintSequence() / HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale);
-			Vector3 pos = part.getPrintCenter();
-			camera.setLocation(pos.getX(), pos.getY() - 5, pos.getZ());
-			camera.lookAt(pos.addLocal(0, 1, 0), Vector3.UNIT_Z);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			final JoglCanvasRenderer canvasRenderer = canvas.getCanvasRenderer();
-			canvasRenderer.setCurrentContext();
-			ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printExporter);
-			canvasRenderer.releaseCurrentContext();
-		}
-		PrinterJob job = PrinterJob.getPrinterJob();
-		job.setPrintable(printExporter);
-		if (job.printDialog())
-			try {
-				job.print();
-			} catch (PrinterException exc) {
-				System.out.println(exc);
-			}
-		// camera.setLocation(location);
-		// camera.lookAt(location.addLocal(direction), up);
-		resetCamera(viewMode);
-	}
+//	public void print() {
+////		PrintExporter printExporter = new PrintExporter(PrintPreviewController.getInstance().getPrintParts().size());		
+//		PrintExporter printExporter = new PrintExporter();
+////		double scale = 0.2;
+////		root.setScale(scale);
+//		Camera camera = Camera.getCurrentCamera();
+//		// Vector3 location = new Vector3(camera.getLocation());
+//		// Vector3 direction = new Vector3(camera.getDirection());
+//		// ReadOnlyVector3 up = camera.getUp();
+////		for (HousePart part : Scene.getInstance().getPrintParts()) {
+////		for (HousePart part : PrintPreviewController.getInstance().getPrintParts()) {
+//		for (Vector3 pos: PrintPreviewController.getInstance().printCenters) {
+//			// if (printExporter.getCurrentPage() < Scene.getInstance().getPrintParts().size()) {
+//			// HousePart part = Scene.getInstance().getPrintParts().get(printExporter.getCurrentPage());
+//			// Vector3 pos = new Vector3(part.getPrintSequence() * scale, -5, part.getPrintY() * scale);
+////			 Vector3 pos = new Vector3(part.getPrintSequence() % HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale, -5, part.getPrintSequence() / HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale);
+////			Vector3 pos = part.getPrintCenter();
+//			System.out.println(pos);
+//			camera.setLocation(pos.getX(), pos.getY() - 5, pos.getZ());
+//			camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//			final JoglCanvasRenderer canvasRenderer = canvas.getCanvasRenderer();
+//			canvasRenderer.setCurrentContext();
+//			ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printExporter);
+//			canvasRenderer.releaseCurrentContext();
+//		}
+//		PrinterJob job = PrinterJob.getPrinterJob();
+//		job.setPrintable(printExporter);
+//		if (job.printDialog())
+//			try {
+//				job.print();
+//			} catch (PrinterException exc) {
+//				System.out.println(exc);
+//			}
+//		// camera.setLocation(location);
+//		// camera.lookAt(location.addLocal(direction), up);
+//		resetCamera(viewMode);
+//	}
 
 	// This class is used to hold an image while on the clipboard.
 	public static class ImageSelection implements Transferable {

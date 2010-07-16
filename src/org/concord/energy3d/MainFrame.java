@@ -16,7 +16,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.scene.PrintPreviewController;
+import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
@@ -180,7 +180,7 @@ public class MainFrame extends JFrame {
 
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 //					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
-					PrintPreviewController.getInstance().setPrintPreview(printPreview );
+					PrintController.getInstance().setPrintPreview(printPreview );
 					printPreview = !printPreview;
 				}
 			});
@@ -490,7 +490,8 @@ public class MainFrame extends JFrame {
 			printMenuItem = new JMenuItem("Print");
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().print();
+//					SceneManager.getInstance().print();
+					PrintController.getInstance().print();
 				}
 			});
 		}
@@ -510,7 +511,7 @@ public class MainFrame extends JFrame {
 //					Scene.getInstance().setFlatten(previewMenuItem.isSelected());
 					deselect();
 //					SceneManager.getInstance().setPrintPreview(previewMenuItem.isSelected());
-					PrintPreviewController.getInstance().setPrintPreview(previewMenuItem.isSelected());
+					PrintController.getInstance().setPrintPreview(previewMenuItem.isSelected());
 				}
 			});
 		}
