@@ -8,7 +8,6 @@ import org.poly2tri.polygon.Polygon;
 import org.poly2tri.polygon.PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
-import com.ardor3d.example.ui.BMFontLoader;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.Matrix3;
@@ -16,13 +15,12 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
-import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -215,14 +213,14 @@ public abstract class Roof extends HousePart {
 //		return labelTop;
 	}
 
-	protected ReadOnlyVector3 getFaceDirection() {
+	public ReadOnlyVector3 getFaceDirection() {
 		return Vector3.UNIT_Z;
 	}
 
 	protected void drawAnnotations() {
 		if (container == null)
 			return;
-		ReadOnlyVector3 faceDirection = getFaceDirection();
+//		ReadOnlyVector3 faceDirection = getFaceDirection();
 		int annotCounter = 0, angleAnnotCounter = 0;
 
 //		if (flattenTime == 0) {

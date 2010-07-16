@@ -5,6 +5,8 @@ import java.awt.print.PrinterJob;
 import java.util.ArrayList;
 
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.util.ObjectCloner;
+import org.concord.energy3d.util.PrintExporter;
 
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
@@ -26,7 +28,7 @@ public class PrintController implements Updater {
 	private Scene sceneClone = null;
 	private ArrayList<HousePart> printParts = new ArrayList<HousePart>();
 	private double angle;
-	private int counter = 0;
+//	private int counter = 0;
 	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
 
 	public static PrintController getInstance() {

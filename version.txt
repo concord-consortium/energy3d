@@ -245,6 +245,10 @@ Version 0.2
 - moved print preview animation to an Updated classed to avoid creating extra threads
 - fixed problem with crashing JVM
 - allow printing of roof triangles one by one
+- create FontManager preloaded with default fonts
+- create shapes, utils and fonts packages
+- implement zoom out capability in TopView mode
+
 
 TODO:
 - combine the wall meshed into one

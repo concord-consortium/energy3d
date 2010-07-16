@@ -81,6 +81,8 @@ public class OrbitControl extends CameraControl {
 	}
 
 	protected void rotate(final Camera camera, final double dx, final double dy) {
+		if (_center.length() == 0)
+			_center.set(camera.getDirection()).multiplyLocal(FRONT_DISTANCE).addLocal(camera.getLocation());
 		_workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis != null ? _upAxis : camera.getUp());
 		_workerMatrix_2.fromAngleNormalAxis(_mouseRotateSpeed * dy, camera.getLeft());
 		_workerMatrix.multiplyLocal(_workerMatrix_2);
@@ -97,6 +99,7 @@ public class OrbitControl extends CameraControl {
 		_workerVector.set(_workerVector4.getX(), _workerVector4.getY(), _workerVector4.getZ());
 		_workerVector.addLocal(camera.getLocation());
 		camera.setLocation(_workerVector);
-		_center.set(camera.getDirection()).multiplyLocal(FRONT_DISTANCE).addLocal(camera.getLocation());
+//		_center.set(camera.getDirection()).multiplyLocal(FRONT_DISTANCE).addLocal(camera.getLocation());
+		_center.set(0, 0, 0);
 	}
 }

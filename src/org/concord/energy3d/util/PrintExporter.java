@@ -1,4 +1,4 @@
-package org.concord.energy3d.scene;
+package org.concord.energy3d.util;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;

@@ -1,9 +1,11 @@
-package org.concord.energy3d.scene;
+package org.concord.energy3d.util;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;

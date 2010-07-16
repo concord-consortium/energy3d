@@ -18,6 +18,7 @@ import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.MouseWheelMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -41,6 +42,8 @@ public abstract class CameraControl {
     protected boolean enabled = true;
 	protected ButtonAction leftButtonAction = ButtonAction.ROTATE;
 	protected ButtonAction rightButtonAction = ButtonAction.MOVE;
+	private boolean mouseEnabled = true;
+	private boolean zoomScale = true;
 
     public CameraControl(final ReadOnlyVector3 upAxis) {
         _upAxis.set(upAxis);
@@ -77,6 +80,13 @@ public abstract class CameraControl {
     public void setKeyRotateSpeed(final double speed) {
         _keyRotateSpeed = speed;
     }
+    
+//	private void zoom(final Canvas canvas, final double tpf, int val) {
+//		final Camera camera = canvas.getCanvasRenderer().getCamera();
+//		final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * _moveSpeed * 10 * tpf).addLocal(camera.getLocation());
+//		// final Vector3 loc = new Vector3(camera.getLocation()).addLocal(dir);
+//		camera.setLocation(loc);
+//	}    
 
     protected abstract void move(final Camera camera, final KeyboardState kb, final double tpf);
     
@@ -126,7 +136,7 @@ public abstract class CameraControl {
             private boolean firstPing = true;
 
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-            	if (!enabled) return;
+            	if (!enabled || !mouseEnabled) return;
                 final MouseState mouse = inputStates.getCurrent().getMouseState();
                 if (mouse.getDx() != 0 || mouse.getDy() != 0) {
                     if (!firstPing) {
@@ -143,9 +153,17 @@ public abstract class CameraControl {
                 }
             }
         };
+        
 
         _mouseTrigger = new InputTrigger(dragOnly ? dragged : TriggerConditions.mouseMoved(), dragAction);
         layer.registerTrigger(_mouseTrigger);
+
+        
+//        layer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
+//        	public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//        		zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
+//        	}
+//        }));        
     }
 
     public Predicate<TwoInputStates> setupKeyboardTriggers(final LogicalLayer layer) {
@@ -196,5 +214,13 @@ public abstract class CameraControl {
 	public void setMouseButtonActions(ButtonAction leftButtonAction, ButtonAction rightButtonAction) {
 		this.leftButtonAction = leftButtonAction;
 		this.rightButtonAction = rightButtonAction;
+	}
+
+	public void setMouseEnabled(boolean enabled) {		
+		this.mouseEnabled  = enabled;
+	}
+
+	public boolean isMouseEnabled() {
+		return mouseEnabled;
 	}
 }

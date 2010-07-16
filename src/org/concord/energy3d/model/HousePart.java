@@ -6,10 +6,13 @@ import java.util.ArrayList;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.scene.SelectUtil;
+import org.concord.energy3d.shapes.Angle90Annotation;
+import org.concord.energy3d.shapes.AngleAnnotation;
+import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.util.FontManager;
+import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.bounding.CollisionTreeManager;
-import com.ardor3d.example.ui.BMFontLoader;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
@@ -26,7 +29,7 @@ import com.ardor3d.ui.text.BMText.Justify;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private static final BMFont defaultFont = BMFontLoader.defaultFont();
+	private static final BMFont defaultFont = FontManager.getInstance().getPartNumberFont();
 	private static boolean isFlatten = false;
 	protected static double flattenTime = 0;
 	public static double flattenPos = -10;
@@ -520,7 +523,7 @@ public abstract class HousePart implements Serializable {
 	}
 	
 
-	protected ReadOnlyVector3 getFaceDirection() {
+	public ReadOnlyVector3 getFaceDirection() {
 		return defaultDirection;
 	}
 

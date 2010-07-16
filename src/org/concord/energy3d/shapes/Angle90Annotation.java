@@ -1,16 +1,13 @@
-package org.concord.energy3d.model;
+package org.concord.energy3d.shapes;
 
 import java.nio.FloatBuffer;
 
-import org.concord.energy3d.util.Arc;
+import org.concord.energy3d.model.HousePart;
 
-import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Angle90Annotation extends Annotation {

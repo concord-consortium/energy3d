@@ -1,6 +1,8 @@
-package org.concord.energy3d.model;
+package org.concord.energy3d.shapes;
 
 import java.nio.FloatBuffer;
+
+
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;

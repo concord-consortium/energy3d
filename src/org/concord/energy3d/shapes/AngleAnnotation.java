@@ -1,6 +1,6 @@
-package org.concord.energy3d.model;
+package org.concord.energy3d.shapes;
 
-import org.concord.energy3d.util.Arc;
+import org.concord.energy3d.model.HousePart;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;

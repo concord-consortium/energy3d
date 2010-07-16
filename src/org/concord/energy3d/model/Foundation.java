@@ -2,7 +2,8 @@ package org.concord.energy3d.model;
 
 import java.util.ArrayList;
 
-import org.concord.energy3d.scene.SelectUtil;
+import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;

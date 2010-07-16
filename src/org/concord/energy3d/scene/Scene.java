@@ -16,20 +16,18 @@ import org.concord.energy3d.model.HousePart;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.Texture.EnvironmentalMapMode;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.util.GeneratedImageFactory;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
@@ -46,8 +44,8 @@ public class Scene implements Serializable {
 	transient int size; // = C * C * C * 3;
 	transient ByteBuffer texBuffer;// = BufferUtils.createByteBuffer(size);
 	transient Texture3D tex; // = new Texture3D();
-	private static double angle = 0;
-	private static Scene sceneClone = null;
+//	private static double angle = 0;
+//	private static Scene sceneClone = null;
 
 	public static Scene getInstance() {
 		if (instance == null) {

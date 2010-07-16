@@ -1,4 +1,4 @@
-package org.concord.energy3d.util;
+package org.concord.energy3d.shapes;
 
 import java.nio.FloatBuffer;
 
@@ -42,21 +42,21 @@ public class Arc extends Line {
 		setAntialiased(true);
 	}
 
-	private FloatBuffer createColor(int samples) {
-		FloatBuffer buf = BufferUtils.createColorBuffer(samples);
-		for (int i = 0; i < samples; i++) {
-			buf.put(1).put(1).put(1).put(1);
-		}
-		return buf;
-	}
-
-	private FloatBuffer createNormal(int samples) {
-		FloatBuffer buf = BufferUtils.createVector3Buffer(samples);
-		for (int i = 0; i < samples; i++) {
-			buf.put(0).put(0).put(1);
-		}
-		return buf;
-	}
+//	private FloatBuffer createColor(int samples) {
+//		FloatBuffer buf = BufferUtils.createColorBuffer(samples);
+//		for (int i = 0; i < samples; i++) {
+//			buf.put(1).put(1).put(1).put(1);
+//		}
+//		return buf;
+//	}
+//
+//	private FloatBuffer createNormal(int samples) {
+//		FloatBuffer buf = BufferUtils.createVector3Buffer(samples);
+//		for (int i = 0; i < samples; i++) {
+//			buf.put(0).put(0).put(1);
+//		}
+//		return buf;
+//	}
 
 	private FloatBuffer createVertex(int sample, double radius, double start, double end) {
 		FloatBuffer buf = BufferUtils.createVector3Buffer(sample);
