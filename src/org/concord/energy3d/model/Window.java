@@ -17,6 +17,7 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
@@ -278,6 +279,14 @@ public class Window extends HousePart {
 
 	public boolean isPrintable() {
 		return false;
-	}	
+	}
+
+	public void setAnnotationsVisible(boolean visible) {
+		super.setAnnotationsVisible(visible);
+		if (label1 != null)
+			label1.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+	}
+	
+	
 
 }

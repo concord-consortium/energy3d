@@ -40,21 +40,22 @@ public class Scene implements Serializable {
 	private static Scene instance;
 	private static File file = null;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
-//	private transient ArrayList<HousePart> printParts;
+	// private transient ArrayList<HousePart> printParts;
 	private double RADIUS = 0;
 	transient int C; // = 20;
 	transient int size; // = C * C * C * 3;
 	transient ByteBuffer texBuffer;// = BufferUtils.createByteBuffer(size);
 	transient Texture3D tex; // = new Texture3D();
-//	private static double angle = 0;
-//	private static Scene sceneClone = null;
+	// private static double angle = 0;
+	// private static Scene sceneClone = null;
+	private transient boolean redrawAll = false;
 
 	public static Scene getInstance() {
 		if (instance == null) {
 			instance = new Scene();
 			try {
 				open(new File("house.ser"));
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				instance = new Scene();
 			}
 			root.attachChild(originalHouseRoot);
@@ -71,7 +72,7 @@ public class Scene implements Serializable {
 	}
 
 	public void init() {
-//		printParts = new ArrayList<HousePart>();
+		// printParts = new ArrayList<HousePart>();
 		// initTexture3D();
 	}
 
@@ -227,23 +228,23 @@ public class Scene implements Serializable {
 		return parts;
 	}
 
-//	public ArrayList<HousePart> getPrintParts() {
-//		return printParts;
-//	}
+	// public ArrayList<HousePart> getPrintParts() {
+	// return printParts;
+	// }
 
 	public void save(final File file) throws FileNotFoundException, IOException {
 		Scene.file = file;
-//		try {
-			System.out.print("Saving " + file + "...");
-			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
-			out.writeObject(this);
-			out.close();
-			System.out.println("done");
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		// try {
+		System.out.print("Saving " + file + "...");
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+		out.writeObject(this);
+		out.close();
+		System.out.println("done");
+		// } catch (FileNotFoundException e) {
+		// e.printStackTrace();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
 
 	}
 
@@ -255,30 +256,30 @@ public class Scene implements Serializable {
 		parts.clear();
 	}
 
-	public static void open(final File file) throws FileNotFoundException, IOException, ClassNotFoundException {		
+	public static void open(final File file) throws FileNotFoundException, IOException, ClassNotFoundException {
 		System.out.print("Opening..." + file);
-		Scene.file  = file;
-//		try {
-//			ObjectInputStream in = new ObjectInputStream(new FileInputStream("house.ser"));
-			ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-			instance = (Scene) in.readObject();
-			instance.init();
-			in.close();
-			for (HousePart housePart : instance.getParts()) {
-				originalHouseRoot.attachChild(housePart.getRoot());
-			}
-			for (HousePart housePart : instance.getParts())
-				housePart.draw();
-			for (HousePart housePart : instance.getParts())
-				housePart.draw();
+		Scene.file = file;
+		// try {
+		// ObjectInputStream in = new ObjectInputStream(new FileInputStream("house.ser"));
+		ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+		instance = (Scene) in.readObject();
+		instance.init();
+		in.close();
+		for (HousePart housePart : instance.getParts()) {
+			originalHouseRoot.attachChild(housePart.getRoot());
+		}
+		for (HousePart housePart : instance.getParts())
+			housePart.draw();
+		for (HousePart housePart : instance.getParts())
+			housePart.draw();
 
-//		} catch (FileNotFoundException e) {
-//			System.out.println("Energy3D saved file not found...creating a new file...");
-//			instance = new Scene();
-//		} catch (Throwable e) {
-//			e.printStackTrace();
-//			instance = new Scene();
-//		}
+		// } catch (FileNotFoundException e) {
+		// System.out.println("Energy3D saved file not found...creating a new file...");
+		// instance = new Scene();
+		// } catch (Throwable e) {
+		// e.printStackTrace();
+		// instance = new Scene();
+		// }
 		System.out.println("done");
 	}
 
@@ -291,66 +292,66 @@ public class Scene implements Serializable {
 		}
 	}
 
-//	public void flatten(final boolean flatten) {
-//		if (flatten) {
-//			HousePart.flattenPos = 0;
-//			sceneClone = (Scene) ObjectCloner.deepCopy(this);
-//			printParts.clear();
-//			for (int i = 0; i < sceneClone.getParts().size(); i++) {
-//				final HousePart newPart = sceneClone.getParts().get(i);
-//				root.attachChild(newPart.getRoot());
-//				newPart.draw();
-//				newPart.setOriginal(parts.get(i));
-//				if (newPart.isPrintable() && newPart.isDrawCompleted())
-//					printParts.add(newPart);
-//			}
-//		}
-//
-//		for (HousePart part : getParts())
-//			part.getRoot().getSceneHints().setCullHint(CullHint.Always);
-//
-//		for (double t = 0; t < 1.1; t += 0.05) {
-//			// double t = 1;
-//			if (flatten)
-//				HousePart.setFlattenTime(t);
-//			else
-//				HousePart.setFlattenTime(1 - t);
-//			for (HousePart part : sceneClone.getParts())
-//				// TODO If draw not completed then it shouldn't even exist at this point!
-//				if (part.isDrawCompleted())
-//					part.draw();
-//			try {
-//				Thread.sleep(30);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//
-//		}
-//		if (!flatten) {
-//			// HousePart.setFlatten(false);
-//			// for (HousePart part : parts)
-//			// part.draw();
-//			originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
-//			angle = 0;
-//			for (HousePart housePart : sceneClone.getParts())
-//				root.detachChild(housePart.getRoot());
-//		}
-//		originalHouseRoot.setScale(flatten ? 2 : 1);
-//
-//		for (HousePart part : getParts())
-//			part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
-//
-//		try {
-//			Thread.sleep(500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//	}
+	// public void flatten(final boolean flatten) {
+	// if (flatten) {
+	// HousePart.flattenPos = 0;
+	// sceneClone = (Scene) ObjectCloner.deepCopy(this);
+	// printParts.clear();
+	// for (int i = 0; i < sceneClone.getParts().size(); i++) {
+	// final HousePart newPart = sceneClone.getParts().get(i);
+	// root.attachChild(newPart.getRoot());
+	// newPart.draw();
+	// newPart.setOriginal(parts.get(i));
+	// if (newPart.isPrintable() && newPart.isDrawCompleted())
+	// printParts.add(newPart);
+	// }
+	// }
+	//
+	// for (HousePart part : getParts())
+	// part.getRoot().getSceneHints().setCullHint(CullHint.Always);
+	//
+	// for (double t = 0; t < 1.1; t += 0.05) {
+	// // double t = 1;
+	// if (flatten)
+	// HousePart.setFlattenTime(t);
+	// else
+	// HousePart.setFlattenTime(1 - t);
+	// for (HousePart part : sceneClone.getParts())
+	// // TODO If draw not completed then it shouldn't even exist at this point!
+	// if (part.isDrawCompleted())
+	// part.draw();
+	// try {
+	// Thread.sleep(30);
+	// } catch (InterruptedException e) {
+	// e.printStackTrace();
+	// }
+	//
+	// }
+	// if (!flatten) {
+	// // HousePart.setFlatten(false);
+	// // for (HousePart part : parts)
+	// // part.draw();
+	// originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
+	// angle = 0;
+	// for (HousePart housePart : sceneClone.getParts())
+	// root.detachChild(housePart.getRoot());
+	// }
+	// originalHouseRoot.setScale(flatten ? 2 : 1);
+	//
+	// for (HousePart part : getParts())
+	// part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
+	//
+	// try {
+	// Thread.sleep(500);
+	// } catch (InterruptedException e) {
+	// e.printStackTrace();
+	// }
+	// }
 
-//	public void rotate() {
-//		angle += 0.01;
-//		originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, angle));
-//	}
+	// public void rotate() {
+	// angle += 0.01;
+	// originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, angle));
+	// }
 
 	public Spatial getOriginalHouseRoot() {
 		return originalHouseRoot;
@@ -358,5 +359,25 @@ public class Scene implements Serializable {
 
 	public static File getFile() {
 		return file;
+	}
+
+	public void setAnnotationsVisible(boolean visible) {		
+		for (HousePart part : parts)
+			part.setAnnotationsVisible(visible);
+		for (HousePart part : PrintController.getInstance().getPrintParts())
+			part.setAnnotationsVisible(visible);
+		
+		if (visible)
+			redrawAll = true;
+	}
+
+	public void update() {
+		if (redrawAll ) {
+			for (HousePart part : parts)
+				part.draw();
+			HousePart.setFlattenTime(HousePart.getFlattenTime());
+			PrintController.getInstance().drawPrintParts();
+		}
+		redrawAll = false;
 	}
 }

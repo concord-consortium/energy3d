@@ -11,21 +11,14 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <file path="/Energy3D/src/org/concord/energy3d/images/wall7.jpg"/>
         <javaElement handleIdentifier="=ardor3d-core/src\/main\/resources&lt;com.ardor3d.renderer.state"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/resources&lt;com.ardor3d.extension.shadow.map"/>
-        <file path="/Energy3D/src/org/concord/energy3d/images/sky6.jpg"/>
-        <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.model"/>
-        <file path="/Energy3D/src/org/concord/energy3d/images/door.jpg"/>
-        <javaElement handleIdentifier="=ardor3d-core/src\/main\/java"/>
-        <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.shadow.map"/>
-        <file path="/Energy3D/src/org/concord/energy3d/images/roof2.jpg"/>
-        <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.scene"/>
-        <file path="/Energy3D/src/org/concord/energy3d/images/concrete.jpg"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/resources&lt;com.ardor3d.extension.effect.bloom"/>
         <javaElement handleIdentifier="=ardor3d-jogl/src\/main\/java"/>
+        <javaElement handleIdentifier="=Energy3D/src"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.effect.bloom"/>
-        <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d"/>
         <javaElement handleIdentifier="=ardor3d-awt/src\/main\/java"/>
+        <javaElement handleIdentifier="=ardor3d-core/src\/main\/java"/>
+        <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.shadow.map"/>
     </selectedElements>
 </jardesc>

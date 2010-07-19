@@ -314,6 +314,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final double tpf = timer.getTimePerFrame();
 		passManager.updatePasses(tpf);
 		logicalLayer.checkTriggers(tpf);
+		
+		Scene.getInstance().update();
 
 		int val = 1;
 		if (rotAnim) {

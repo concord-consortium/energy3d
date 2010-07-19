@@ -35,6 +35,7 @@ public abstract class HousePart implements Serializable {
 	public static double flattenPos = -10;
 	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = false;
+	private static boolean drawAnnotations = false;
 	protected transient Node root;
 	protected transient Node pointsRoot;
 	protected final int numOfDrawPoints, numOfEditPoints;
@@ -437,7 +438,8 @@ public abstract class HousePart implements Serializable {
 		if (original != null && isPrintable())
 			updateLabels();
 
-		drawAnnotations();
+		if (drawAnnotations)
+			drawAnnotations();
 
 //		for (HousePart child : children)
 //			child.draw();
@@ -578,5 +580,12 @@ public abstract class HousePart implements Serializable {
 
 	public Vector3 getPrintCenter() {
 		return printCenter;
+	}
+
+	public void setAnnotationsVisible(boolean visible) {
+		drawAnnotations  = visible;
+		final CullHint cull = visible ? CullHint.Inherit : CullHint.Always;
+		sizeAnnotRoot.getSceneHints().setCullHint(cull);
+		angleAnnotRoot.getSceneHints().setCullHint(cull);
 	}
 }

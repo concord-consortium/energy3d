@@ -84,18 +84,15 @@ public class PrintController implements Updater {
 			System.out.println("t = " + t);
 			HousePart.setFlattenTime(isPrintPreview ? t : 1 - t);
 //			clearPrintCenters();
-			printCenters.clear();
-			for (HousePart part : sceneClone.getParts())
-				// TODO If draw not completed then it shouldn't even exist at this point!
-				if (part.isDrawCompleted())
-					part.draw();
+			drawPrintParts();
 
 			finish = t > 1;
 			finishPhase = 0;
 		}
 
 		if (finish) {
-			HousePart.setFlatten(false);
+			if (!isPrintPreview)
+				HousePart.setFlatten(false);
 			if (!isPrintPreview && finishPhase == 10) {
 				// HousePart.setFlatten(false);
 				// for (HousePart part : parts)
@@ -137,6 +134,16 @@ public class PrintController implements Updater {
 //				finish = false;
 //			}
 		}
+	}
+
+	public void drawPrintParts() {
+		if (sceneClone == null)
+			return;
+		printCenters.clear();
+		for (HousePart part : sceneClone.getParts())
+			// TODO If draw not completed then it shouldn't even exist at this point!
+			if (part.isDrawCompleted())
+				part.draw();
 	}
 	
 	public void print() {

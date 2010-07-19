@@ -2,7 +2,8 @@ package org.concord.energy3d;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.ButtonGroup;
@@ -26,8 +27,6 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -60,8 +59,8 @@ public class MainFrame extends JFrame {
 	private JMenu cameraMenu = null;
 	private JRadioButtonMenuItem orbitMenuItem = null;
 	private JRadioButtonMenuItem firstPersonMenuItem = null;
-	private JMenuItem mntmSaveAs;
 	private JMenuItem saveasMenuItem;
+	private JToggleButton annotationToggleButton;
 
 	/**
 	 * This method initializes appMenuBar
@@ -133,6 +132,7 @@ public class MainFrame extends JFrame {
 			bg.add(roofButton);
 			bg.add(roofHipButton);
 			bg.add(floorButton);
+			appToolbar.add(getAnnotationToggleButton());
 		}
 		return appToolbar;
 	}
@@ -675,5 +675,16 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return saveasMenuItem;
+	}
+	private JToggleButton getAnnotationToggleButton() {
+		if (annotationToggleButton == null) {
+			annotationToggleButton = new JToggleButton("Annotation");
+			annotationToggleButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());
+				}
+			});
+		}
+		return annotationToggleButton;
 	}
 }
