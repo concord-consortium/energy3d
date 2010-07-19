@@ -8,6 +8,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BMText.AutoScale;
 
 public abstract class Annotation extends Node {
 	private static BMFont font = FontManager.getInstance().getAnnotationFont();
@@ -29,7 +30,10 @@ public abstract class Annotation extends Node {
 //		}
 		final BMText label = new BMText("Annotation Label", "0.0", font, BMText.Align.Center, BMText.Justify.Center);
 		label.setTextColor(ColorRGBA.BLACK);
-		label.setFontScale(0.5);		
+		label.setFontScale(0.5);
+//		label.setAutoRotate(false);
+		label.setAutoScale(AutoScale.Off);
+		label.setFontScale(0.1);
 		return label;
 	}
 	

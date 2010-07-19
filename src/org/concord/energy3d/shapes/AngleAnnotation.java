@@ -228,7 +228,7 @@ public class AngleAnnotation extends Annotation {
 		final Align align = getPreferedAlignment(v);
 		label.setAlign(align);
 		v.multiplyLocal(0.22);		
-		mesh.setDefaultColor(ColorRGBA.RED);
+		mesh.setDefaultColor(ColorRGBA.WHITE);
 		
 		label.setTranslation(v);
 		label.setTextColor(ColorRGBA.WHITE);

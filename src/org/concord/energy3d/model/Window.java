@@ -237,6 +237,10 @@ public class Window extends HousePart {
 		
 //		System.out.println("face direction annot (2) = " + faceDirection);
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
+		
+//		if (abspoints.get(2).getX() - abspoints.get(0).getX() < 0)
+//			faceDirection = faceDirection.negate(null);
+		trans.applyForward(center);
 //		annot.setRange(abspoints.get(0), abspoints.get(1), center, faceDirection, original == null, Align.Center, true);
 		annot.setRange(abspointsTrans(0, trans, v), abspointsTrans(1, trans, v1), center, faceDirection, false, Align.Center, true);
 		annot.setTranslation(moveToFront);

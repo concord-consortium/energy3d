@@ -249,6 +249,8 @@ Version 0.2
 - create shapes, utils and fonts packages
 - implement zoom out capability in TopView mode
 - convert Blinker class from Thread to Updater to avoid thread lock and for faster rendering
+- keep annotation text font size the same regardless of camera position
+- fixed window annotation direction in print preview due to non-transformed center point
 
 
 TODO:
