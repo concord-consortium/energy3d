@@ -2,13 +2,17 @@ package org.concord.energy3d;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
+import java.io.File;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
@@ -22,11 +26,12 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
-
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class MainFrame extends JFrame {
-
-	private static final long serialVersionUID = 1L; 
+	private static final long serialVersionUID = 1L;
+	private static final JFileChooser fileChooser = new JFileChooser();
 	private JPanel jContentPane = null;
 	private JMenuBar appMenuBar = null;
 	private JMenu fileMenu = null;
@@ -55,10 +60,13 @@ public class MainFrame extends JFrame {
 	private JMenu cameraMenu = null;
 	private JRadioButtonMenuItem orbitMenuItem = null;
 	private JRadioButtonMenuItem firstPersonMenuItem = null;
+	private JMenuItem mntmSaveAs;
+	private JMenuItem saveasMenuItem;
+
 	/**
-	 * This method initializes appMenuBar	
-	 * 	
-	 * @return javax.swing.JMenuBar	
+	 * This method initializes appMenuBar
+	 * 
+	 * @return javax.swing.JMenuBar
 	 */
 	private JMenuBar getAppMenuBar() {
 		if (appMenuBar == null) {
@@ -70,9 +78,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes fileMenu	
-	 * 	
-	 * @return javax.swing.JMenu	
+	 * This method initializes fileMenu
+	 * 
+	 * @return javax.swing.JMenu
 	 */
 	private JMenu getFileMenu() {
 		if (fileMenu == null) {
@@ -81,6 +89,7 @@ public class MainFrame extends JFrame {
 			fileMenu.add(getNewMenuItem());
 			fileMenu.add(getOpenMenuItem());
 			fileMenu.add(getSaveMenuItem());
+			fileMenu.add(getSaveasMenuItem());
 			fileMenu.add(getPreviewMenuItem());
 			fileMenu.add(getPrintMenuItem());
 		}
@@ -88,9 +97,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes appToolbar	
-	 * 	
-	 * @return javax.swing.JToolBar	
+	 * This method initializes appToolbar
+	 * 
+	 * @return javax.swing.JToolBar
 	 */
 	private JToolBar getAppToolbar() {
 		if (appToolbar == null) {
@@ -113,7 +122,7 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getTopViewButton());
 			appToolbar.add(getGridButton());
 			appToolbar.add(getSnapButton());
-			
+
 			ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
 			bg.add(resizeButton);
@@ -129,9 +138,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes selectButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes selectButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getSelectButton() {
 		if (selectButton == null) {
@@ -148,9 +157,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes wallButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes wallButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getWallButton() {
 		if (wallButton == null) {
@@ -167,9 +176,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes doorButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes doorButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getDoorButton() {
 		if (doorButton == null) {
@@ -185,9 +194,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes roofButton	
-	 * 	
-	 * @return javax.swing.JButton	
+	 * This method initializes roofButton
+	 * 
+	 * @return javax.swing.JButton
 	 */
 	private JToggleButton getRoofButton() {
 		if (roofButton == null) {
@@ -203,14 +212,14 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes windowButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes windowButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getWindowButton() {
 		if (windowButton == null) {
 			windowButton = new JToggleButton();
-			windowButton.setText("Window");			
+			windowButton.setText("Window");
 			windowButton.setMaximumSize(new Dimension(59, 28));
 			windowButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -222,9 +231,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes foundationButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes foundationButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getFoundationButton() {
 		if (foundationButton == null) {
@@ -240,9 +249,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes lightButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes lightButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getLightButton() {
 		if (lightButton == null) {
@@ -258,9 +267,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes topViewButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes topViewButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getTopViewButton() {
 		if (topViewButton == null) {
@@ -268,12 +277,12 @@ public class MainFrame extends JFrame {
 			topViewButton.setText("Top View");
 			topViewButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-//					JoglAwtCanvas canvas = SceneManager.getInstance().getCanvas();
-//					if (topViewButton.isSelected())
-//						SceneManager.getInstance().topCameraView();
-//					else
-//						SceneManager.getInstance().resetCamera();
-					SceneManager.getInstance().resetCamera(topViewButton.isSelected() ? ViewMode.TOP_VIEW : ViewMode.NORMAL);					
+					// JoglAwtCanvas canvas = SceneManager.getInstance().getCanvas();
+					// if (topViewButton.isSelected())
+					// SceneManager.getInstance().topCameraView();
+					// else
+					// SceneManager.getInstance().resetCamera();
+					SceneManager.getInstance().resetCamera(topViewButton.isSelected() ? ViewMode.TOP_VIEW : ViewMode.NORMAL);
 				}
 			});
 		}
@@ -281,9 +290,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes rotAnimButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes rotAnimButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getRotAnimButton() {
 		if (rotAnimButton == null) {
@@ -299,9 +308,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes gridButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes gridButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getGridButton() {
 		if (gridButton == null) {
@@ -317,9 +326,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes snapButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes snapButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getSnapButton() {
 		if (snapButton == null) {
@@ -336,9 +345,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes floorButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes floorButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getFloorButton() {
 		if (floorButton == null) {
@@ -354,9 +363,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes roofHipButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes roofHipButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getRoofHipButton() {
 		if (roofHipButton == null) {
@@ -372,9 +381,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes resizeButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes resizeButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getResizeButton() {
 		if (resizeButton == null) {
@@ -390,9 +399,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes sunButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes sunButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getSunButton() {
 		if (sunButton == null) {
@@ -408,9 +417,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes sunAnimButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes sunAnimButton
+	 * 
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getSunAnimButton() {
 		if (sunAnimButton == null) {
@@ -426,9 +435,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes newMenuItem	
-	 * 	
-	 * @return javax.swing.JMenuItem	
+	 * This method initializes newMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getNewMenuItem() {
 		if (newMenuItem == null) {
@@ -443,16 +452,23 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes openMenuItem	
-	 * 	
-	 * @return javax.swing.JMenuItem	
+	 * This method initializes openMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getOpenMenuItem() {
 		if (openMenuItem == null) {
-			openMenuItem = new JMenuItem("Open");
+			openMenuItem = new JMenuItem("Open...");
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					Scene.open();
+					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+						try {
+							Scene.open(fileChooser.getSelectedFile());
+						} catch (Throwable err) {
+							err.printStackTrace();
+							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+						}
+					}
 				}
 			});
 		}
@@ -460,16 +476,25 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes saveMenuItem	
-	 * 	
-	 * @return javax.swing.JMenuItem	
+	 * This method initializes saveMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getSaveMenuItem() {
 		if (saveMenuItem == null) {
 			saveMenuItem = new JMenuItem("Save");
 			saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					Scene.getInstance().save();
+					try {
+						final File file = Scene.getFile();
+						if (file != null)
+							Scene.getInstance().save(file);
+						else if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
+							Scene.getInstance().save(fileChooser.getSelectedFile());
+					} catch (Throwable err) {
+						err.printStackTrace();
+						JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			});
 		}
@@ -477,16 +502,16 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes printMenuItem	
-	 * 	
-	 * @return javax.swing.JMenuItem	
+	 * This method initializes printMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getPrintMenuItem() {
 		if (printMenuItem == null) {
 			printMenuItem = new JMenuItem("Print");
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-//					SceneManager.getInstance().print();
+					// SceneManager.getInstance().print();
 					PrintController.getInstance().print();
 				}
 			});
@@ -495,18 +520,18 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes previewMenuItem	
-	 * 	
-	 * @return javax.swing.JCheckBoxMenuItem	
+	 * This method initializes previewMenuItem
+	 * 
+	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	private JCheckBoxMenuItem getPreviewMenuItem() {
 		if (previewMenuItem == null) {
 			previewMenuItem = new JCheckBoxMenuItem("Print Preview");
 			previewMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-//					Scene.getInstance().setFlatten(previewMenuItem.isSelected());
+					// Scene.getInstance().setFlatten(previewMenuItem.isSelected());
 					deselect();
-//					SceneManager.getInstance().setPrintPreview(previewMenuItem.isSelected());
+					// SceneManager.getInstance().setPrintPreview(previewMenuItem.isSelected());
 					PrintController.getInstance().setPrintPreview(previewMenuItem.isSelected());
 				}
 			});
@@ -515,9 +540,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes cameraMenu	
-	 * 	
-	 * @return javax.swing.JMenu	
+	 * This method initializes cameraMenu
+	 * 
+	 * @return javax.swing.JMenu
 	 */
 	private JMenu getCameraMenu() {
 		if (cameraMenu == null) {
@@ -533,9 +558,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes orbitMenuItem	
-	 * 	
-	 * @return javax.swing.JRadioButtonMenuItem	
+	 * This method initializes orbitMenuItem
+	 * 
+	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getOrbitMenuItem() {
 		if (orbitMenuItem == null) {
@@ -552,9 +577,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes firstPersonMenuItem	
-	 * 	
-	 * @return javax.swing.JRadioButtonMenuItem	
+	 * This method initializes firstPersonMenuItem
+	 * 
+	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getFirstPersonMenuItem() {
 		if (firstPersonMenuItem == null) {
@@ -570,8 +595,8 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-		 * @param args
-		 */
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		SwingUtilities.invokeLater(new Runnable() {
@@ -618,7 +643,7 @@ public class MainFrame extends JFrame {
 		if (jContentPane == null) {
 			jContentPane = new JPanel();
 			jContentPane.setLayout(new BorderLayout());
-//			jContentPane.setVisible(false);
+			// jContentPane.setVisible(false);
 			jContentPane.add(getAppToolbar(), BorderLayout.NORTH);
 		}
 		return jContentPane;
@@ -632,5 +657,23 @@ public class MainFrame extends JFrame {
 	private void deselect() {
 		getSelectButton().setSelected(true);
 		SceneManager.getInstance().setOperation(Operation.SELECT);
+	}
+
+	private JMenuItem getSaveasMenuItem() {
+		if (saveasMenuItem == null) {
+			saveasMenuItem = new JMenuItem("Save As...");
+			saveasMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
+						try {
+							Scene.getInstance().save(fileChooser.getSelectedFile());
+						} catch (Throwable err) {
+							err.printStackTrace();
+							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+						}
+				}
+			});
+		}
+		return saveasMenuItem;
 	}
 }

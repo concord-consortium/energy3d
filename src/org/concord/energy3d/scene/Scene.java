@@ -1,5 +1,6 @@
 package org.concord.energy3d.scene;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -37,6 +38,7 @@ public class Scene implements Serializable {
 	private static final Node root = new Node("House Root");
 	private static final Node originalHouseRoot = new Node("Original House Root");
 	private static Scene instance;
+	private static File file = null;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
 //	private transient ArrayList<HousePart> printParts;
 	private double RADIUS = 0;
@@ -50,7 +52,11 @@ public class Scene implements Serializable {
 	public static Scene getInstance() {
 		if (instance == null) {
 			instance = new Scene();
-			open();
+			try {
+				open(new File("house.ser"));
+			} catch (Exception e) {
+				instance = new Scene();
+			}
 			root.attachChild(originalHouseRoot);
 		}
 		return instance;
@@ -225,17 +231,19 @@ public class Scene implements Serializable {
 //		return printParts;
 //	}
 
-	public void save() {
-		try {
-			System.out.println("Saving...done.");
-			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("house.ser"));
+	public void save(final File file) throws FileNotFoundException, IOException {
+		Scene.file = file;
+//		try {
+			System.out.print("Saving " + file + "...");
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
 			out.writeObject(this);
 			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			System.out.println("done");
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 	}
 
@@ -247,10 +255,12 @@ public class Scene implements Serializable {
 		parts.clear();
 	}
 
-	public static void open() {
-		System.out.print("Opening...");
-		try {
-			ObjectInputStream in = new ObjectInputStream(new FileInputStream("house.ser"));
+	public static void open(final File file) throws FileNotFoundException, IOException, ClassNotFoundException {		
+		System.out.print("Opening..." + file);
+		Scene.file  = file;
+//		try {
+//			ObjectInputStream in = new ObjectInputStream(new FileInputStream("house.ser"));
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
 			instance = (Scene) in.readObject();
 			instance.init();
 			in.close();
@@ -262,13 +272,13 @@ public class Scene implements Serializable {
 			for (HousePart housePart : instance.getParts())
 				housePart.draw();
 
-		} catch (FileNotFoundException e) {
-			System.out.println("Energy3D saved file not found...creating a new file...");
-			instance = new Scene();
-		} catch (Throwable e) {
-			e.printStackTrace();
-			instance = new Scene();
-		}
+//		} catch (FileNotFoundException e) {
+//			System.out.println("Energy3D saved file not found...creating a new file...");
+//			instance = new Scene();
+//		} catch (Throwable e) {
+//			e.printStackTrace();
+//			instance = new Scene();
+//		}
 		System.out.println("done");
 	}
 
@@ -344,5 +354,9 @@ public class Scene implements Serializable {
 
 	public Spatial getOriginalHouseRoot() {
 		return originalHouseRoot;
+	}
+
+	public static File getFile() {
+		return file;
 	}
 }
