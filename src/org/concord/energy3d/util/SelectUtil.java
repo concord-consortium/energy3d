@@ -17,11 +17,10 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.CullHint;
 
 public class SelectUtil {
 	private static final PickResults pickResults = new PrimitivePickResults();
-	private static Blinker blinker = null;
+//	private static Blinker blinker = null;
 	private static Mesh floor;
 	private static Node housePartsNode;	
 //	protected static HousePart lastHoveredObject;	
@@ -126,10 +125,11 @@ public class SelectUtil {
 			if (lastHoveredObject != null) {
 				lastHoveredObject.hidePoints();
 				lastHoveredObject = null;
-				if (blinker != null) {
-					blinker.finish();
-					blinker = null;
-				}
+//				if (blinker != null) {
+//					blinker.finish();
+//					blinker = null;
+//				}
+				Blinker.getInstance().setTarget(null);
 			}
 		} else if (edit && data.getPointIndex() != -1) {
 			drawn = data.getHousePart();
@@ -149,12 +149,14 @@ public class SelectUtil {
 			}
 
 			if (lastHoveredObject != housePart) {
-				if (blinker != null) {
-					blinker.finish();
-					blinker = null;
-				}
-//				if (data.getHousePart().getOriginal() != null)
+//				if (blinker != null) {
+//					blinker.finish();
+//					blinker = null;
+//				}
+				Blinker.getInstance().setTarget(null);
+				if (data.getHousePart().getOriginal() != null)
 //					blinker = new Blinker(drawn.getOriginal().getRoot());
+					Blinker.getInstance().setTarget(drawn.getOriginal().getRoot());
 			}
 			housePart.showPoints();
 			lastHoveredObject = housePart;
@@ -177,30 +179,31 @@ public class SelectUtil {
 	}
 }
 
-class Blinker extends Thread {
-	Node target;
+//class Blinker extends Thread {
+//	Node target;
+//
+//	public Blinker(Node target) {
+//		this.target = target;
+//		this.start();
+//	}
+//
+//	public void run() {
+//		while (target != null) {
+//			// if (target != null) {
+//			CullHint cullHint = target.getSceneHints().getCullHint();
+//			target.getSceneHints().setCullHint(cullHint == CullHint.Always ? cullHint = CullHint.Inherit : CullHint.Always);
+//			// }
+//			try {
+//				sleep(300);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+//
+//	public void finish() {
+//		target.getSceneHints().setCullHint(CullHint.Inherit);
+//		this.target = null;
+//	}
+//}
 
-	public Blinker(Node target) {
-		this.target = target;
-		this.start();
-	}
-
-	public void run() {
-		while (target != null) {
-			// if (target != null) {
-			CullHint cullHint = target.getSceneHints().getCullHint();
-			target.getSceneHints().setCullHint(cullHint == CullHint.Always ? cullHint = CullHint.Inherit : CullHint.Always);
-			// }
-			try {
-				sleep(300);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void finish() {
-		target.getSceneHints().setCullHint(CullHint.Inherit);
-		this.target = null;
-	}
-}

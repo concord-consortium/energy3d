@@ -248,6 +248,7 @@ Version 0.2
 - create FontManager preloaded with default fonts
 - create shapes, utils and fonts packages
 - implement zoom out capability in TopView mode
+- convert Blinker class from Thread to Updater to avoid thread lock and for faster rendering
 
 
 TODO:

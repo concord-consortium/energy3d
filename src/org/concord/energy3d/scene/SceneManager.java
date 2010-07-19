@@ -18,6 +18,7 @@ import org.concord.energy3d.model.PyramidRoof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
+import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.annotation.MainThread;
@@ -160,6 +161,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		frameHandler.addUpdater(this);
 		frameHandler.addUpdater(PrintController.getInstance());
+		frameHandler.addUpdater(Blinker.getInstance());
 
 		TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
 

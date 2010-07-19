@@ -18,7 +18,6 @@ import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
-import com.ardor3d.input.logical.MouseWheelMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -43,7 +42,7 @@ public abstract class CameraControl {
 	protected ButtonAction leftButtonAction = ButtonAction.ROTATE;
 	protected ButtonAction rightButtonAction = ButtonAction.MOVE;
 	private boolean mouseEnabled = true;
-	private boolean zoomScale = true;
+//	private boolean zoomScale = true;
 
     public CameraControl(final ReadOnlyVector3 upAxis) {
         _upAxis.set(upAxis);
