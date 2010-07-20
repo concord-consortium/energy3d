@@ -8,6 +8,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.concurrent.Callable;
 
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -86,6 +87,8 @@ import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ContextGarbageCollector;
+import com.ardor3d.util.GameTaskQueue;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
@@ -124,7 +127,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Matrix3 rotate = new Matrix3();
 	private CameraControl control;
 	private BasicPassManager passManager = new BasicPassManager();
-	private ParallelSplitShadowMapPass pssmPass;
+	private ParallelSplitShadowMapPass shadowPass;
 	private Sphere sun;
 	private Node sunHeliodon;
 	private Node sunRot;
@@ -135,6 +138,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// private boolean dirtyRenderer;
 	private Dome sky;
 	private ViewMode viewMode = ViewMode.NORMAL;
+	private final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -231,12 +235,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		rootPass.add(root);
 		passManager.add(rootPass);
 
-		pssmPass = new ParallelSplitShadowMapPass(light, 3072, 3);
-		pssmPass.setUseObjectCullFace(true);
-		pssmPass.add(floor);
-		pssmPass.add(Scene.getRoot());
-		pssmPass.addOccluder(Scene.getRoot());
-		pssmPass.init(canvas.getCanvasRenderer().getRenderer());
+		shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
+		shadowPass.setUseObjectCullFace(true);
+		shadowPass.add(floor);
+		shadowPass.add(Scene.getRoot());
+		shadowPass.addOccluder(Scene.getRoot());
+//		shadowPass.init(canvas.getCanvasRenderer().getRenderer());
 
 		createSunHeliodon();
 		Scene.getInstance();
@@ -314,7 +318,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final double tpf = timer.getTimePerFrame();
 		passManager.updatePasses(tpf);
 		logicalLayer.checkTriggers(tpf);
-		
+
+		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
 		Scene.getInstance().update();
 
 		int val = 1;
@@ -355,9 +360,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public boolean renderUnto(Renderer renderer) {
-		// if (!pssmPass.isInitialised()) {
-		// pssmPass.init(renderer);
-		// }
 		// if (!Scene.getInstance().getParts().isEmpty())
 		// Scene.getInstance().renderTexture(renderer);
 		// Scene.getInstance().init();
@@ -365,7 +367,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// renderer.draw(root);
 		// if (drawn != null)
 		// com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
-
+		
 		passManager.renderPasses(renderer);
 		return true;
 	}
@@ -662,12 +664,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void resetCamera(final ViewMode viewMode) {
 		this.viewMode = viewMode;
 		Camera camera = canvas.getCanvasRenderer().getCamera();
-		
-		resizeCamera(camera);		
-//		camera.setFrustumTop(camera.getFrustumTop() * fac);
-//		camera.setFrustumBottom(camera.getFrustumBottom() * fac);
-//		camera.setFrustumLeft(camera.getFrustumLeft() * fac);
-//		camera.setFrustumRight(camera.getFrustumRight() * fac);		
+
+		resizeCamera(camera);
+		// camera.setFrustumTop(camera.getFrustumTop() * fac);
+		// camera.setFrustumBottom(camera.getFrustumBottom() * fac);
+		// camera.setFrustumLeft(camera.getFrustumLeft() * fac);
+		// camera.setFrustumRight(camera.getFrustumRight() * fac);
 
 		if (control != null) {
 			control.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
@@ -735,18 +737,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private void zoom(final Canvas canvas, final double tpf, int val) {
 		if (viewMode == ViewMode.TOP_VIEW) {
-//		System.out.println(val);
-//			double scale = val > 0 ? val / 10.0 : 0.01 / (-val);
+			// System.out.println(val);
+			// double scale = val > 0 ? val / 10.0 : 0.01 / (-val);
 			final double fac = val > 0 ? 1.1 : 0.9;
-//			final double scale2 = root.getScale().getX() * fac;
-//			System.out.println(scale2);
-//			root.setScale(scale2);
+			// final double scale2 = root.getScale().getX() * fac;
+			// System.out.println(scale2);
+			// root.setScale(scale2);
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
 			camera.setFrustumTop(camera.getFrustumTop() * fac);
 			camera.setFrustumBottom(camera.getFrustumBottom() * fac);
 			camera.setFrustumLeft(camera.getFrustumLeft() * fac);
 			camera.setFrustumRight(camera.getFrustumRight() * fac);
-			
+
 			control.setMoveSpeed(1.1 * fac * control.getMoveSpeed());
 		} else {
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
@@ -830,36 +832,74 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return operation;
 	}
 
-	public void setLighting(boolean enable) {
-		lightState.setEnabled(enable);
-		root.updateWorldRenderStates(true);
-		if (enable)
-			passManager.add(pssmPass);
-		else
-			passManager.remove(pssmPass);
+	public void setLighting(final boolean enable) {		
+		taskManager.update(new Callable<Object>() {
+			public Object call() throws Exception {				
+				lightState.setEnabled(enable);
+				root.updateWorldRenderStates(true);				
+//				if (enable)
+//					passManager.add(shadowPass);
+//				else
+//					passManager.remove(shadowPass);
+				return null;
+			}
+		});
+
+		// lightState.setEnabled(enable);
+		// root.updateWorldRenderStates(true);
+		// if (enable)
+		// passManager.add(pssmPass);
+		// else
+		// passManager.remove(pssmPass);
 	}
 
 	public void setSunControl(boolean selected) {
 		this.sunControl = selected;
-		if (selected)
-			root.attachChild(sunHeliodon);
-		else
-			root.detachChild(sunHeliodon);
+		
+		taskManager.update(new Callable<Object>() {
+			public Object call() throws Exception {
+				if (sunControl)
+					root.attachChild(sunHeliodon);
+				else
+					root.detachChild(sunHeliodon);
 
-		if (bloomRenderPass != null)
-			passManager.remove(bloomRenderPass);
-		if (selected) {
-			bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);
-			// bloomRenderPass.setUseCurrentScene(true);
-			if (!bloomRenderPass.isSupported()) {
-				System.out.println("Bloom not supported!");
-			} else {
-				bloomRenderPass.add(sun);
+				if (bloomRenderPass != null)
+					passManager.remove(bloomRenderPass);
+				if (sunControl) {
+					bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);
+					// bloomRenderPass.setUseCurrentScene(true);
+					if (!bloomRenderPass.isSupported()) {
+						System.out.println("Bloom not supported!");
+					} else {
+						bloomRenderPass.add(sun);
+					}
+					passManager.add(bloomRenderPass);
+				}
+
+				enableDisableRotationControl();
+				return null;
 			}
-			passManager.add(bloomRenderPass);
-		}
-
-		enableDisableRotationControl();
+		});
+		
+//		if (selected)
+//			root.attachChild(sunHeliodon);
+//		else
+//			root.detachChild(sunHeliodon);
+//
+//		if (bloomRenderPass != null)
+//			passManager.remove(bloomRenderPass);
+//		if (selected) {
+//			bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);
+//			// bloomRenderPass.setUseCurrentScene(true);
+//			if (!bloomRenderPass.isSupported()) {
+//				System.out.println("Bloom not supported!");
+//			} else {
+//				bloomRenderPass.add(sun);
+//			}
+//			passManager.add(bloomRenderPass);
+//		}
+//
+//		enableDisableRotationControl();
 	}
 
 	public void setSunAnim(boolean selected) {
@@ -868,13 +908,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void enableDisableRotationControl() {
 		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted())) // && viewMode != ViewMode.TOP_VIEW) // && viewMode != ViewMode.PRINT_PREVIEW)
-//			control.setMouseRotateSpeed(0.005);
+			// control.setMouseRotateSpeed(0.005);
 			control.setMouseEnabled(true);
 		else
-//			control.setMouseRotateSpeed(0.000000001);
+			// control.setMouseRotateSpeed(0.000000001);
 			control.setMouseEnabled(false);
-		
-				
 
 		if (sunControl)
 			control.setKeyRotateSpeed(0);

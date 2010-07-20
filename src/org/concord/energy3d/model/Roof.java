@@ -30,7 +30,7 @@ public abstract class Roof extends HousePart {
 	transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 	protected double labelTop;
-	private transient ArrayList<PolygonPoint> wallUpperPoints;	 
+	private transient ArrayList<PolygonPoint> wallUpperPoints;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -56,23 +56,23 @@ public abstract class Roof extends HousePart {
 
 		mesh.setUserData(new UserData(this));
 	}
-	
+
 	protected void computeAbsPoints() {
 	}
 
 	protected void computeCenter() {
-	}	
+	}
 
 	protected void updateMesh() {
 		if (container == null)
 			return;
 
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
-		
+
 		center.set(0, 0, 0);
 		for (PolygonPoint p : wallUpperPoints)
 			center.addLocal(p.getX(), p.getY(), p.getZ());
-		center.multiplyLocal(1.0 / wallUpperPoints.size());		
+		center.multiplyLocal(1.0 / wallUpperPoints.size());
 		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 
 		final Polygon polygon = makePolygon(wallUpperPoints);
@@ -90,12 +90,12 @@ public abstract class Roof extends HousePart {
 			pointsRoot.getChild(i).setTranslation(p);
 		}
 
-//		updateLabelLocation();
+		// updateLabelLocation();
 
-//		if (flattenTime > 0)
-//			flatten();
-//
-//		drawAnnotations();
+		// if (flattenTime > 0)
+		// flatten();
+		//
+		// drawAnnotations();
 
 		mesh.updateModelBound();
 	}
@@ -150,7 +150,7 @@ public abstract class Roof extends HousePart {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		if (original == null)
 			original = null;
-		final FloatBuffer orgVertexBuffer = ((Roof)original).mesh.getMeshData().getVertexBuffer();
+		final FloatBuffer orgVertexBuffer = ((Roof) original).mesh.getMeshData().getVertexBuffer();
 		final Vector3 p1 = new Vector3();
 		final Vector3 p2 = new Vector3();
 		final Vector3 p3 = new Vector3();
@@ -158,32 +158,32 @@ public abstract class Roof extends HousePart {
 		float pos = 0;
 		for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
 			pos += 0.5;
-				final int xPos = i * 9;
-				orgVertexBuffer.position(xPos);
-				p1.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
-				p2.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
-				p3.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
-				flattenTriangle(p1, p2, p3);
-				vertexBuffer.position(xPos);
-				vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-				vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-				vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
+			final int xPos = i * 9;
+			orgVertexBuffer.position(xPos);
+			p1.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
+			p2.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
+			p3.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
+			flattenTriangle(p1, p2, p3);
+			vertexBuffer.position(xPos);
+			vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+			vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+			vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
 		}
 
 		mesh.updateModelBound();
-		
-//		Vector3.releaseTempInstance(p1);
-//		Vector3.releaseTempInstance(p2);
-//		Vector3.releaseTempInstance(p3);
 
-//		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
-//		super.flatten();
+		// Vector3.releaseTempInstance(p1);
+		// Vector3.releaseTempInstance(p2);
+		// Vector3.releaseTempInstance(p3);
+
+		// root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
+		// super.flatten();
 	}
 
 	private void flattenTriangle(Vector3 p1, Vector3 p2, Vector3 p3) {
 		final Vector3 v = new Vector3(p3).subtractLocal(p1);
 		final Vector3 normal = new Vector3(p2).subtractLocal(p1).crossLocal(v);
-		normal.normalizeLocal();		
+		normal.normalizeLocal();
 		double angle = flattenTime * normal.smallestAngleBetween(Vector3.UNIT_Y);
 		v.set(p3).subtractLocal(p1).normalizeLocal();
 		normal.crossLocal(Vector3.UNIT_Y);
@@ -191,26 +191,26 @@ public abstract class Roof extends HousePart {
 		m.applyPost(p1, p1);
 		m.applyPost(p2, p2);
 		m.applyPost(p3, p3);
-		
-//		Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE, printSequence / PRINT_COLS * PRINT_SPACE, 0);
-//		computePrintCenter(targetCenter, printSequence);
+
+		// Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE, printSequence / PRINT_COLS * PRINT_SPACE, 0);
+		// computePrintCenter(targetCenter, printSequence);
 		computePrintCenter();
 		final Vector3 targetCenter = new Vector3(printCenter);
-		final Vector3 currentCenter = v.set(p1).addLocal(p2).addLocal(p3).multiplyLocal(1.0/3.0);
+		final Vector3 currentCenter = v.set(p1).addLocal(p2).addLocal(p3).multiplyLocal(1.0 / 3.0);
 		final Vector3 d = targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime);
 		p1.addLocal(d);
 		p2.addLocal(d);
 		p3.addLocal(d);
-		
-//		Vector3.releaseTempInstance(v);
-//		Vector3.releaseTempInstance(normal);
-//		Vector3.releaseTempInstance(targetCenter);
-//		Matrix3.releaseTempInstance(m);
+
+		// Vector3.releaseTempInstance(v);
+		// Vector3.releaseTempInstance(normal);
+		// Vector3.releaseTempInstance(targetCenter);
+		// Matrix3.releaseTempInstance(m);
 	}
 
 	protected void computeLabelTop(final Vector3 top) {
 		top.set(0, 0, labelTop);
-//		return labelTop;
+		// return labelTop;
 	}
 
 	public ReadOnlyVector3 getFaceDirection() {
@@ -220,85 +220,86 @@ public abstract class Roof extends HousePart {
 	protected void drawAnnotations() {
 		if (container == null)
 			return;
-//		ReadOnlyVector3 faceDirection = getFaceDirection();
+		// ReadOnlyVector3 faceDirection = getFaceDirection();
 		int annotCounter = 0, angleAnnotCounter = 0;
 
-		if (flattenTime == 0) {
-		for (int i = 0; i < wallUpperPoints.size(); i++) {
-			PolygonPoint p = wallUpperPoints.get(i);
-			Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
-			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
-			Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
-			fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), original == null, Align.Center, true);
-//			drawSizeAnnot(a, b, faceDirection, annotCounter++, Align.Center, true);
-		}
+		// if (flattenTime == 0) {
+		if (original == null) {
+			for (int i = 0; i < wallUpperPoints.size(); i++) {
+				PolygonPoint p = wallUpperPoints.get(i);
+				Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
+				p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
+				Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
+				fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), original == null, Align.Center, true);
+				// drawSizeAnnot(a, b, faceDirection, annotCounter++, Align.Center, true);
+			}
 		} else {
 			final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-			
+
 			final Vector3 p1 = new Vector3();
 			final Vector3 p2 = new Vector3();
 			final Vector3 p3 = new Vector3();
 
 			float pos = 0;
 			for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
-//			int i = 0;
+				// int i = 0;
 				pos += 0.5;
-					final int xPos = i * 9;
-					vertexBuffer.position(xPos);
-					p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-					p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-					p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-//					drawSizeAnnot(p1, p2, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
-//					drawSizeAnnot(p2, p3, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
-//					drawSizeAnnot(p3, p1, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
-					fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.UNIT_Y, original == null, Align.Center, false);
-					fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.UNIT_Y, original == null, Align.Center, false);
-					fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.UNIT_Y, original == null, Align.Center, false);
-					
-					// Angle annotations
-					fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
-					fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1);
-					fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2);
-					
+				final int xPos = i * 9;
+				vertexBuffer.position(xPos);
+				p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+				p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+				p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+				// drawSizeAnnot(p1, p2, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
+				// drawSizeAnnot(p2, p3, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
+				// drawSizeAnnot(p3, p1, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
+				fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.UNIT_Y, original == null, Align.Center, false);
+				fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.UNIT_Y, original == null, Align.Center, false);
+				fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.UNIT_Y, original == null, Align.Center, false);
+
+				// Angle annotations
+				fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
+				fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1);
+				fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2);
+
 			}
 
-//			Vector3.releaseTempInstance(p1);
-//			Vector3.releaseTempInstance(p2);
-//			Vector3.releaseTempInstance(p3);
+			// Vector3.releaseTempInstance(p1);
+			// Vector3.releaseTempInstance(p2);
+			// Vector3.releaseTempInstance(p3);
 		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 
-//		Vector3.releaseTempInstance(a);
-//		Vector3.releaseTempInstance(b);
+		// Vector3.releaseTempInstance(a);
+		// Vector3.releaseTempInstance(b);
 	}
-	
-//	public int setPrintSequence(int printSequence) {
-//		int numOfPages = 0;
-//		for (int i=0; i<mesh.getMeshData().getVertexCount() / 9; i++)
-//			numOfPages += super.setPrintSequence(printSequence + numOfPages);		
-//		return numOfPages;
-//	}
+
+	// public int setPrintSequence(int printSequence) {
+	// int numOfPages = 0;
+	// for (int i=0; i<mesh.getMeshData().getVertexCount() / 9; i++)
+	// numOfPages += super.setPrintSequence(printSequence + numOfPages);
+	// return numOfPages;
+	// }
 
 	protected void updateLabels() {
 		final Vector3 p1 = new Vector3();
 		final Vector3 p2 = new Vector3();
 		final Vector3 p3 = new Vector3();
-		
+
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		buf.rewind();
-		for (int triangle=0; triangle<buf.capacity()/9; triangle++) {
+		for (int triangle = 0; triangle < buf.capacity() / 9; triangle++) {
 			p1.set(buf.get(), buf.get(), buf.get());
 			p2.set(buf.get(), buf.get(), buf.get());
 			p3.set(buf.get(), buf.get(), buf.get());
 			double height = Math.max(Math.max(p1.getZ(), p2.getZ()), p3.getZ());
-			p1.addLocal(p2).addLocal(p3).multiplyLocal(1.0/3.0);
+			p1.addLocal(p2).addLocal(p3).multiplyLocal(1.0 / 3.0);
 			p1.setZ(height + 0.3);
 			final String text = "(" + (printSequence++ + 1) + ")";
 			final BMText label = fetchBMText(text, triangle);
 			label.setTranslation(p1);
 		}
 	}
-	
+
 }
