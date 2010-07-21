@@ -235,7 +235,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		rootPass.add(root);
 		passManager.add(rootPass);
 
-		shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
+//		shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
+		shadowPass = new ParallelSplitShadowMapPass(light, 512, 3);
 		shadowPass.setUseObjectCullFace(true);
 		shadowPass.add(floor);
 		shadowPass.add(Scene.getRoot());
@@ -837,10 +838,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() throws Exception {				
 				lightState.setEnabled(enable);
 				root.updateWorldRenderStates(true);				
-//				if (enable)
-//					passManager.add(shadowPass);
-//				else
-//					passManager.remove(shadowPass);
+				if (enable)
+					passManager.add(shadowPass);
+				else
+					passManager.remove(shadowPass);
 				return null;
 			}
 		});

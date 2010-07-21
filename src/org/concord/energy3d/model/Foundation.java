@@ -124,8 +124,8 @@ public class Foundation extends HousePart {
 		draw();
 		showPoints();
 
-		for (HousePart child : children)
-			child.draw();
+//		for (HousePart child : children)
+//			child.draw();
 	}
 
 	private void applyNewHeight(double oldHeight, double newHeight, boolean finalize) {
@@ -154,6 +154,9 @@ public class Foundation extends HousePart {
 			mesh.updateModelBound();
 			boundingMesh.setData(points.get(0), points.get(7));
 			boundingMesh.updateModelBound();
+			
+			for (HousePart child : children)
+				child.draw();			
 		}
 	}
 

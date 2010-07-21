@@ -253,6 +253,8 @@ Version 0.2
 - fixed window annotation direction in print preview due to non-transformed center point
 - show open/save dialogs for opening and saving energy3D scenes
 - add toolbar button to switch annotations on/off
+- fixed new problems with resizing
+- fixed shadow openGL error in Intel graphics cards
 
 TODO:
 - combine the wall meshed into one

@@ -154,8 +154,8 @@ public class Wall extends HousePart {
 		draw();
 		showPoints();
 
-		for (HousePart child : children)
-			child.draw();
+//		for (HousePart child : children)
+//			child.draw();
 		
 		for (Snap neighbor : this.neighbors)
 			if (neighbor != null) {
@@ -403,8 +403,9 @@ public class Wall extends HousePart {
 			e.printStackTrace();
 		}
 
-//		for (HousePart child : children)
-//			child.draw();
+		// keep it for platform resizing
+		for (HousePart child : children)
+			child.draw();
 	}
 
 	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
