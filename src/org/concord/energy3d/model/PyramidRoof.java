@@ -24,7 +24,8 @@ public class PyramidRoof extends Roof {
 			height = findHeight(base, p);
 		}
 		draw();
-		showPoints();
+		if (container != null)
+			showPoints();
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {

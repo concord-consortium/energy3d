@@ -30,6 +30,7 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
+	private static final MainFrame instance = new MainFrame();
 	private static final JFileChooser fileChooser = new JFileChooser();
 	private JPanel jContentPane = null;
 	private JMenuBar appMenuBar = null;
@@ -62,6 +63,10 @@ public class MainFrame extends JFrame {
 	private JMenuItem saveasMenuItem;
 	private JToggleButton annotationToggleButton;
 
+	public static MainFrame getInstance() {
+		return instance;
+	}
+	
 	/**
 	 * This method initializes appMenuBar
 	 * 
@@ -142,7 +147,7 @@ public class MainFrame extends JFrame {
 	 * 
 	 * @return javax.swing.JToggleButton
 	 */
-	private JToggleButton getSelectButton() {
+	public JToggleButton getSelectButton() {
 		if (selectButton == null) {
 			selectButton = new JToggleButton();
 			selectButton.setText("Select");
@@ -611,7 +616,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * This is the default constructor
 	 */
-	public MainFrame() {
+	private MainFrame() {
 		super();
 		initialize();
 	}

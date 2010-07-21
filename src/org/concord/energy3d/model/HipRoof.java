@@ -29,7 +29,8 @@ public class HipRoof extends Roof {
 			points.get(editPointIndex).set(p);
 		}
 		draw();
-		showPoints();
+		if (container != null)
+			showPoints();
 
 	}
 

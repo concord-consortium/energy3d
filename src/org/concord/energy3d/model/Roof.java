@@ -31,6 +31,7 @@ public abstract class Roof extends HousePart {
 	private transient FloatBuffer vertexBuffer;
 	protected double labelTop;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
+//	private transient ArrayList<Wall> walls;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -38,6 +39,7 @@ public abstract class Roof extends HousePart {
 
 	protected void init() {
 		super.init();
+//		walls = new ArrayList<Wall>();
 		mesh = new Mesh("Roof/Floor");
 		vertexBuffer = BufferUtils.createVector3Buffer(4);
 		root.attachChild(mesh);
@@ -64,10 +66,17 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void updateMesh() {
-		if (container == null)
-			return;
+		if (container == null) {
+			final FloatBuffer buff = mesh.getMeshData().getVertexBuffer();
+			buff.rewind();
+			while (buff.hasRemaining())
+				buff.put(0);
+			hidePoints();
+			return;			
+		}
 
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
+		
 
 		center.set(0, 0, 0);
 		for (PolygonPoint p : wallUpperPoints)
@@ -104,19 +113,25 @@ public abstract class Roof extends HousePart {
 		ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
 		Wall currentWall = startWall;
 		Wall prevWall = null;
+		Snap.clearVisits();
 		while (currentWall != null) {
 			Snap next = currentWall.next(prevWall);
 			prevWall = currentWall;
-			if (next == null)
+			if (next == null || next.isVisited())
 				break;
 			currentWall = (Wall) next.getNeighborOf(currentWall);
-			if (currentWall == startWall)
-				break;
+			next.visit();
+//			if (currentWall == startWall)
+//				break;
 		}
 
+//		walls.clear();
+		Snap.clearVisits();
 		startWall = currentWall;
 		prevWall = null;
+		int i = 1;
 		while (currentWall != null && currentWall.isFirstPointInserted()) {
+			System.out.println("wall (" + i++ + "): " + currentWall);
 			Snap next = currentWall.next(prevWall);
 			int pointIndex = 0;
 			if (next != null)
@@ -125,11 +140,19 @@ public abstract class Roof extends HousePart {
 			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex == 1 ? 3 : 1));
 			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex));
 			prevWall = currentWall;
-			if (next == null)
+			
+			currentWall.setRoof(this);
+			
+//			if (!currentWall.getChildren().contains(this))
+//				currentWall.getChildren().add(this);
+//			if (!walls.contains(currentWall))
+//				walls.add(currentWall);
+			if (next == null || next.isVisited())
 				break;
 			currentWall = (Wall) next.getNeighborOf(currentWall);
-			if (currentWall == startWall)
-				break;
+			next.visit();
+//			if (currentWall == startWall)
+//				break;
 		}
 
 		return poly;

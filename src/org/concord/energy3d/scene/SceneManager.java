@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.concurrent.Callable;
 
+import org.concord.energy3d.MainFrame;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -502,8 +503,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (operation == Operation.DRAW_ROOF)
-					return;
+//				if (operation == Operation.DRAW_ROOF)
+//					return;
 				MouseState mouseState = inputStates.getCurrent().getMouseState();
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 					if (drawn != null && !drawn.isDrawCompleted())
@@ -518,8 +519,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 				if (drawn.isDrawCompleted()) {
 					drawn.hidePoints();
-					drawn = newHousePart();
-					drawn.setPreviewPoint(x, y);
+					if (operation == Operation.DRAW_ROOF || operation == Operation.DRAW_ROOF_HIP) {
+						MainFrame.getInstance().getSelectButton().setSelected(true);
+						operation = Operation.SELECT;
+						drawn = null;
+					} else {
+						drawn = newHousePart();
+						drawn.setPreviewPoint(x, y);
+					}
 				}
 
 				enableDisableRotationControl();
@@ -802,7 +809,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else if (operation == Operation.DRAW_WINDOW)
 			drawn = new Window();
 		else if (operation == Operation.DRAW_ROOF)
-			drawn = new PyramidRoof();
+			drawn = new PyramidRoof();			
 		else if (operation == Operation.DRAW_ROOF_HIP)
 			drawn = new HipRoof();
 		else if (operation == Operation.DRAW_FLOOR)
@@ -1030,8 +1037,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.out.print("exiting...");
 		this.exit = true;
 		canvas.getCanvasRenderer().setCurrentContext();
-		ContextGarbageCollector.doFinalCleanup(canvas.getCanvasRenderer().getRenderer());
+		ContextGarbageCollector.doFinalCleanup(canvas.getCanvasRenderer().getRenderer());		
 		System.out.println("done");
+		System.exit(0);
 	}
 
 	public void updatePrintPreviewScene(boolean printPreview) {

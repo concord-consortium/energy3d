@@ -46,6 +46,7 @@ public class Wall extends HousePart {
 	private Snap[] neighbors = new Snap[2];
 	private transient boolean reversedThickness;
 	private Vector3 thicknessNormal;
+	private Roof roof;
 
 	static {
 		CULL_FRONT.setCullFace(Face.Front);
@@ -169,6 +170,9 @@ public class Wall extends HousePart {
 			if (neighbor != null) {
 				neighbor.getNeighborOf(this).draw();
 			}
+		
+		if (roof != null)
+			roof.draw();
 
 	}
 
@@ -433,6 +437,7 @@ public class Wall extends HousePart {
 		// keep it for platform resizing
 		for (HousePart child : children)
 			child.draw();
+				
 	}
 
 	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
@@ -713,6 +718,11 @@ public class Wall extends HousePart {
 		fetchAngleAnnot90(annotCounter++).setRange(abspoints.get(2), abspoints.get(0), abspoints.get(3));
 		fetchAngleAnnot90(annotCounter++).setRange(abspoints.get(3), abspoints.get(1), abspoints.get(2));
 
+	}
+
+	public void setRoof(Roof roof) {
+		this.roof = roof;
+		
 	}
 
 	// private void drawAnnot(int a, int b, ReadOnlyVector3 faceDirection, int annotCounter, Align align) {

@@ -5,15 +5,21 @@ import java.io.Serializable;
 public class Snap implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static int annotationTimer = 1;
+	private static int currentVisitStamp = 1;
 	private HousePart neighbor1;
 	private HousePart neighbor2;
 	private int pointIndex1;
 	private int pointIndex2;
 	private transient int annotationDrawn;
+	private transient int visitStamp;
 	
 	public static void increaseAnnotationTimer() {
 		annotationTimer = ++annotationTimer % 1000;
 	}
+	
+	public static void clearVisits() {
+		currentVisitStamp = ++currentVisitStamp % 1000;
+	}	
 	
 	public Snap(HousePart neighbor1, HousePart neighbor2, int pointIndex1, int pointIndex2) {
 		this.neighbor1 = neighbor1;
@@ -50,6 +56,14 @@ public class Snap implements Serializable {
 	public boolean isDrawn() {
 		return annotationDrawn == annotationTimer;
 	}
+
+	public boolean isVisited() {
+		return visitStamp == currentVisitStamp;
+	}
+
+	public void visit() {
+		visitStamp = currentVisitStamp;
+	}	
 	
 
 //	@Override
