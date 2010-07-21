@@ -57,8 +57,11 @@ public class Foundation extends HousePart {
 		if (resizeHouseMode) {
 			adjustBoundingHeight();
 			root.attachChild(boundingMesh);
-		} else
+			showPoints();
+		} else {
 			root.detachChild(boundingMesh);
+			hidePoints();
+		}
 	}
 
 	public boolean isResizeHouseMode() {
@@ -72,7 +75,7 @@ public class Foundation extends HousePart {
 			else
 				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
 		}
-	}
+	}	
 
 	public void complete() {
 		super.complete();
@@ -216,5 +219,11 @@ public class Foundation extends HousePart {
 		
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);		
+	}
+
+	@Override
+	public void hidePoints() {
+		if (!resizeHouseMode)
+			super.hidePoints();
 	}	
 }

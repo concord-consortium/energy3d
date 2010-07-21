@@ -255,6 +255,10 @@ Version 0.2
 - add toolbar button to switch annotations on/off
 - fixed new problems with resizing
 - fixed shadow openGL error in Intel graphics cards
+- allow move a wall from off-foundation to on-foundation
+- when switching the container of wall, keep the absolute points the same
+- prevent hiding of edit points when resize mode is on
+- snap walls to foundation corners
 
 TODO:
 - combine the wall meshed into one

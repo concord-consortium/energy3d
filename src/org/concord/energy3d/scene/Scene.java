@@ -287,7 +287,7 @@ public class Scene implements Serializable {
 		for (HousePart part : parts) {
 			if (part instanceof Foundation) {
 				part.draw();
-				part.showPoints();
+//				part.showPoints();
 			}
 		}
 	}

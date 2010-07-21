@@ -29,6 +29,7 @@ import com.ardor3d.ui.text.BMText.Justify;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
+	protected static final double SNAP_DISTANCE = 0.5;
 	private static final BMFont defaultFont = FontManager.getInstance().getPartNumberFont();
 	private static boolean isFlatten = false;
 	protected static double flattenTime = 0;
@@ -289,12 +290,12 @@ public abstract class HousePart implements Serializable {
 
 	protected PickedHousePart pick(int x, int y, Class<?> typeOfHousePart) {
 		PickedHousePart picked = null;
-		if (!firstPointInserted)
+		if (!firstPointInserted || container == null)
 			picked = SelectUtil.pickPart(x, y, typeOfHousePart);
 		else
 			picked = SelectUtil.pickPart(x, y, container == null ? null : container.getRoot());
 
-		if (!firstPointInserted) {
+		if (!firstPointInserted || container == null) {
 			UserData userData = null;
 			if (picked != null)
 				userData = picked.getUserData();
@@ -379,7 +380,7 @@ public abstract class HousePart implements Serializable {
 				}
 			}
 		}
-		if (closestDistance < 0.5) {
+		if (closestDistance < SNAP_DISTANCE) {
 			p.set(closestPoint);
 			return new Snap(this, closestWall, index, closestPointIndex);
 		} else {

@@ -120,15 +120,23 @@ public class Wall extends HousePart {
 	public void setPreviewPoint(int x, int y) {
 		Snap.increaseAnnotationTimer();
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
+			final HousePart previousContainer = container;
 			PickedHousePart picked = pick(x, y, new Class<?>[] { Foundation.class, null });
+			if (container != previousContainer)
+				for (int i=0; i<points.size(); i++)
+					points.get(i).set(toRelative(abspoints.get(i)));
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
 				if (container != null)
 					p.setZ(container.getHeight());
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				Snap snap = snap(p, index);
-				if (snap == null)
+				if (snap == null) {
+					boolean foundationSnap = foundationSnap(p);
+//				if (snap == null)
+					if (!foundationSnap)
 					p = grid(p, GRID_SIZE, false);
+				}
 				setNeighbor(index, snap, true);
 				if (index == 2) // make sure z of 2nd base point is same as 2st (needed for platform picking side)
 					p.setZ(points.get(0).getZ());
@@ -302,6 +310,25 @@ public class Wall extends HousePart {
 	// }
 	//
 	// }
+
+	private boolean foundationSnap(Vector3 current) {
+		if (container == null)
+			return false;
+		Vector3 snapPoint = null;
+		double snapDistance = Double.MAX_VALUE;
+		for (Vector3 p : container.getPoints()) {
+			final double d = p.distance(current);
+			if (d < snapDistance) {
+				snapDistance = d;
+				snapPoint = p;
+			}
+		}
+		if (snapDistance < SNAP_DISTANCE) {
+			current.set(snapPoint.getX(), snapPoint.getY(), current.getZ());
+			return true;
+		} else
+			return false;
+	}
 
 	protected void updateMesh() {
 		final boolean drawable = points.size() >= 4 && !points.get(0).equals(points.get(2));
