@@ -35,14 +35,14 @@ public class HipRoof extends Roof {
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
-		final double edgeLenght = 0.3;
-		Vector3 op = new Vector3();
-		for (PolygonPoint p : wallUpperPoints) {
-			op.set(p.getX(), p.getY(), 0).subtractLocal(center.getX(), center.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
-			op.addLocal(p.getX(), p.getY(), p.getZ());
-			p.set(op.getX(), op.getY(), op.getZ()+0.01);
-		}
-		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+//		final double edgeLenght = 0.3;
+//		Vector3 op = new Vector3();
+//		for (PolygonPoint p : wallUpperPoints) {
+//			op.set(p.getX(), p.getY(), 0).subtractLocal(center.getX(), center.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
+//			op.addLocal(p.getX(), p.getY(), p.getZ());
+//			p.set(op.getX(), op.getY(), op.getZ()+0.01);
+//		}
+//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 		
 		// upper points
 		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
@@ -60,5 +60,20 @@ public class HipRoof extends Roof {
 		polygon.addSteinerPoint(roofUpperPoint2);
 		return polygon;						
 	}
+	
+	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
+		final ArrayList<PolygonPoint> wallUpperPoints = super.exploreWallNeighbors(startWall);
+
+		final double edgeLenght = 0.3;
+		Vector3 op = new Vector3();
+		for (PolygonPoint p : wallUpperPoints) {
+			op.set(p.getX(), p.getY(), 0).subtractLocal(center.getX(), center.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
+			op.addLocal(p.getX(), p.getY(), p.getZ());
+			p.set(op.getX(), op.getY(), op.getZ()+0.01);
+		}
+		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);		
+		
+		return wallUpperPoints;
+	}	
 
 }

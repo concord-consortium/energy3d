@@ -29,6 +29,27 @@ public class PyramidRoof extends Roof {
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
+//		final double edgeLenght = 0.3;
+//		Vector3 op = new Vector3();
+//		double maxY;
+//		maxY = wallUpperPoints.get(0).getY();
+//		for (PolygonPoint p : wallUpperPoints) {
+//			op.set(p.getX(), p.getY(), 0).subtractLocal(center.getX(), center.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
+//			op.addLocal(p.getX(), p.getY(), p.getZ());
+//			p.set(op.getX(), op.getY(), op.getZ()+0.01);
+//			if (p.getY() > maxY)
+//				maxY = p.getY();			
+//		}
+//		labelTop = (maxY-center.getY());
+//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+		final Polygon polygon = new Polygon(wallUpperPoints);
+		polygon.addSteinerPoint(new PolygonPoint(center.getX(), center.getY(), center.getZ() + height));
+		return polygon;		
+	}
+
+	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
+		final ArrayList<PolygonPoint> wallUpperPoints = super.exploreWallNeighbors(startWall);
+
 		final double edgeLenght = 0.3;
 		Vector3 op = new Vector3();
 		double maxY;
@@ -42,9 +63,10 @@ public class PyramidRoof extends Roof {
 		}
 		labelTop = (maxY-center.getY());
 		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
-		final Polygon polygon = new Polygon(wallUpperPoints);
-		polygon.addSteinerPoint(new PolygonPoint(center.getX(), center.getY(), center.getZ() + height));
-		return polygon;		
+		
+		return wallUpperPoints;
 	}
+	
+	
 
 }

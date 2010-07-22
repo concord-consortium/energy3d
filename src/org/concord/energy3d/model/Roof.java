@@ -27,11 +27,11 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
 	protected static final double GRID_SIZE = 0.5;
-	transient Mesh mesh;
-	private transient FloatBuffer vertexBuffer;
+	private transient Mesh mesh;
+	protected transient Mesh bottomMesh;
+//	private transient FloatBuffer vertexBuffer;
 	protected double labelTop;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
-//	private transient ArrayList<Wall> walls;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -39,24 +39,33 @@ public abstract class Roof extends HousePart {
 
 	protected void init() {
 		super.init();
-//		walls = new ArrayList<Wall>();
 		mesh = new Mesh("Roof/Floor");
-		vertexBuffer = BufferUtils.createVector3Buffer(4);
+		bottomMesh = new Mesh("Roof/Floor (bottom)");
+//		vertexBuffer = BufferUtils.createVector3Buffer(4);
 		root.attachChild(mesh);
+		root.attachChild(bottomMesh);
+		
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		mesh.getMeshData().setVertexBuffer(vertexBuffer);
+		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 
+		bottomMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		bottomMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
+		bottomMesh.setRenderState(ms);
 
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("roof2.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		mesh.setRenderState(ts);
+		bottomMesh.setRenderState(ts);
 
-		mesh.setUserData(new UserData(this));
+		final UserData userData = new UserData(this);
+		mesh.setUserData(userData);
+		bottomMesh.setUserData(userData);
 	}
 
 	protected void computeAbsPoints() {
@@ -75,24 +84,18 @@ public abstract class Roof extends HousePart {
 			return;			
 		}
 
-		wallUpperPoints = exploreWallNeighbors((Wall) container);
-		
+		wallUpperPoints = exploreWallNeighbors((Wall) container);	
 
-		center.set(0, 0, 0);
-		for (PolygonPoint p : wallUpperPoints)
-			center.addLocal(p.getX(), p.getY(), p.getZ());
-		center.multiplyLocal(1.0 / wallUpperPoints.size());
-		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+//		center.set(0, 0, 0);
+//		for (PolygonPoint p : wallUpperPoints)
+//			center.addLocal(p.getX(), p.getY(), p.getZ());
+//		center.multiplyLocal(1.0 / wallUpperPoints.size());
+//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 
-		final Polygon polygon = makePolygon(wallUpperPoints);
-		Poly2Tri.triangulate(polygon);
-
-		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
-		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
-		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, 0);
-
-		mesh.getMeshData().updateVertexCount();
+//		final Polygon polygon = makePolygon(wallUpperPoints);
+		if (bottomMesh != null)
+			fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
+		fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
 
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = points.get(i);
@@ -107,6 +110,15 @@ public abstract class Roof extends HousePart {
 		// drawAnnotations();
 
 		mesh.updateModelBound();
+	}
+
+	private void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
+		Poly2Tri.triangulate(polygon);
+		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
+		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
+		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
+		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, 0);
+		mesh.getMeshData().updateVertexCount();
 	}
 
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
@@ -125,11 +137,11 @@ public abstract class Roof extends HousePart {
 //				break;
 		}
 
-//		walls.clear();
 		Snap.clearVisits();
 		startWall = currentWall;
 		prevWall = null;
 		int i = 1;
+		center.set(0, 0, 0);
 		while (currentWall != null && currentWall.isFirstPointInserted()) {
 			System.out.println("wall (" + i++ + "): " + currentWall);
 			Snap next = currentWall.next(prevWall);
@@ -137,16 +149,14 @@ public abstract class Roof extends HousePart {
 			if (next != null)
 				pointIndex = next.getSnapPointIndexOf(currentWall);
 			pointIndex = pointIndex + 1;
-			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex == 1 ? 3 : 1));
-			addPointToPolygon(poly, currentWall.getPoints().get(pointIndex));
+			final Vector3 p1 = currentWall.getPoints().get(pointIndex == 1 ? 3 : 1);
+			final Vector3 p2 = currentWall.getPoints().get(pointIndex);
+			addPointToPolygon(poly, p1);
+			addPointToPolygon(poly, p2);
 			prevWall = currentWall;
 			
 			currentWall.setRoof(this);
 			
-//			if (!currentWall.getChildren().contains(this))
-//				currentWall.getChildren().add(this);
-//			if (!walls.contains(currentWall))
-//				walls.add(currentWall);
 			if (next == null || next.isVisited())
 				break;
 			currentWall = (Wall) next.getNeighborOf(currentWall);
@@ -154,6 +164,9 @@ public abstract class Roof extends HousePart {
 //			if (currentWall == startWall)
 //				break;
 		}
+		
+		center.multiplyLocal(1.0 / poly.size());
+		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);		
 
 		return poly;
 	}
@@ -162,6 +175,7 @@ public abstract class Roof extends HousePart {
 		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 		if (!poly.contains(polygonPoint)) {
 			poly.add(polygonPoint);
+			center.addLocal(p);
 		}
 	}
 

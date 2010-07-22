@@ -14,6 +14,11 @@ public class Floor extends Roof {
 	public Floor() {
 		super(1, 1, 0.5);
 	}
+	
+	protected void init() {
+		super.init();
+		bottomMesh = null;
+	}
 
 	public void setPreviewPoint(int x, int y) {
 			pick(x, y, Wall.class);

@@ -260,10 +260,10 @@ Version 0.2
 - prevent hiding of edit points when resize mode is on
 - snap walls to foundation corners
 - unselect pyramid and hip roof tools after they are drawn (repetitive drawing is not necessary)
+- draw bottom of the roof
 
 
 TODO:
 - new Orbit
-- draw bottom of the roof
 - combine the wall meshed into one
 - insert window in oriented wall attached to other walls
