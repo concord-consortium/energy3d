@@ -140,6 +140,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Dome sky;
 	private ViewMode viewMode = ViewMode.NORMAL;
 	private final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
+	private CameraMode cameraMode = CameraMode.ORBIT;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -474,7 +475,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// };
 		// control = new FirstPersonControl(Vector3.UNIT_Z);
 
-		setCameraControl(CameraMode.ORBIT);
+//		setCameraControl(CameraMode.ORBIT);
 		// control = new OrbitControl(Vector3.UNIT_Z);
 		// control.setupKeyboardTriggers(logicalLayer);
 		// control.setupMouseTriggers(logicalLayer, true);
@@ -519,7 +520,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 				if (drawn.isDrawCompleted()) {
 					drawn.hidePoints();
-					if (operation == Operation.DRAW_ROOF || operation == Operation.DRAW_ROOF_HIP) {
+					if (operation == Operation.DRAW_FLOOR || operation == Operation.DRAW_ROOF || operation == Operation.DRAW_ROOF_HIP) {
 						MainFrame.getInstance().getSelectButton().setSelected(true);
 						operation = Operation.SELECT;
 						drawn = null;
@@ -642,6 +643,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setCameraControl(CameraMode type) {
+		this.cameraMode = type;
 		if (control != null)
 			control.removeTriggers(logicalLayer);
 
@@ -679,10 +681,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// camera.setFrustumLeft(camera.getFrustumLeft() * fac);
 		// camera.setFrustumRight(camera.getFrustumRight() * fac);
 
-		if (control != null) {
+		setCameraControl(cameraMode);
+//		if (control != null) {
 			control.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 			control.setMoveSpeed(MOVE_SPEED);
-		}
+//		}
 		Vector3 loc = new Vector3(1.0f, -8.0f, 1.0f);
 		Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
@@ -710,6 +713,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		camera.setFrame(loc, left, up, dir);
 		resizeCamera(camera);
+		
+		
 	}
 
 	// public void topCameraView() {
@@ -763,6 +768,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * MOVE_SPEED * 10 * tpf).addLocal(camera.getLocation());
 			// final Vector3 loc = new Vector3(camera.getLocation()).addLocal(dir);
 			camera.setLocation(loc);
+			
+			if (control instanceof OrbitControl)
+				((OrbitControl)control).computeNewFrontDistance();
 		}
 	}
 

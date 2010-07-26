@@ -435,6 +435,7 @@ public class Wall extends HousePart {
 		}
 
 		// keep it for platform resizing
+		if (original == null)
 		for (HousePart child : children)
 			child.draw();
 				

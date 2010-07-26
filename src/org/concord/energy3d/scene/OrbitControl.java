@@ -19,7 +19,8 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 
 public class OrbitControl extends CameraControl {
-	private static final int FRONT_DISTANCE = 8;
+	private static final double FRONT_DISTANCE_DEFAULT = 8;
+	private static double frontDistance = FRONT_DISTANCE_DEFAULT;
 	private Vector3 _center = new Vector3(1, 0, 1);
 	private final Matrix3 _workerMatrix_2 = new Matrix3();
 	private final Vector4 _workerVector4 = new Vector4();
@@ -58,7 +59,8 @@ public class OrbitControl extends CameraControl {
 			}
 			loc.normalizeLocal().multiplyLocal(_moveSpeed * tpf).addLocal(camera.getLocation());
 			camera.setLocation(loc);
-			_center.set(camera.getDirection()).multiplyLocal(FRONT_DISTANCE).addLocal(camera.getLocation());
+//			_center.set(camera.getDirection()).multiplyLocal(FRONT_DISTANCE_DEFAULT).addLocal(camera.getLocation());
+			clearOrbitCenter();
 		}
 
 		// ROTATION
@@ -82,7 +84,7 @@ public class OrbitControl extends CameraControl {
 
 	protected void rotate(final Camera camera, final double dx, final double dy) {
 		if (_center.length() == 0)
-			_center.set(camera.getDirection()).multiplyLocal(FRONT_DISTANCE).addLocal(camera.getLocation());
+			_center.set(camera.getDirection()).multiplyLocal(frontDistance).addLocal(camera.getLocation());
 		_workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis != null ? _upAxis : camera.getUp());
 		_workerMatrix_2.fromAngleNormalAxis(_mouseRotateSpeed * dy, camera.getLeft());
 		_workerMatrix.multiplyLocal(_workerMatrix_2);
@@ -100,6 +102,15 @@ public class OrbitControl extends CameraControl {
 		_workerVector.addLocal(camera.getLocation());
 		camera.setLocation(_workerVector);
 //		_center.set(camera.getDirection()).multiplyLocal(FRONT_DISTANCE).addLocal(camera.getLocation());
+		clearOrbitCenter();
+	}
+	
+	private void clearOrbitCenter() {
 		_center.set(0, 0, 0);
+	}
+	
+	public void computeNewFrontDistance() {
+		frontDistance = _center.subtractLocal(Camera.getCurrentCamera().getLocation()).length();
+		clearOrbitCenter();
 	}
 }

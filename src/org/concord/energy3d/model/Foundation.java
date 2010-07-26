@@ -158,8 +158,9 @@ public class Foundation extends HousePart {
 			boundingMesh.setData(points.get(0), points.get(7));
 			boundingMesh.updateModelBound();
 			
-			for (HousePart child : children)
-				child.draw();			
+			if (original == null)
+				for (HousePart child : children)
+					child.draw();			
 		}
 	}
 

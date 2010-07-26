@@ -144,6 +144,7 @@ public class PrintController implements Updater {
 			// TODO If draw not completed then it shouldn't even exist at this point!
 			if (part.isDrawCompleted())
 				part.draw();
+		printCenters.size();
 	}
 	
 	public void print() {

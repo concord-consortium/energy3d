@@ -208,6 +208,8 @@ public abstract class Roof extends HousePart {
 		}
 
 		mesh.updateModelBound();
+		bottomMesh.getSceneHints().setCullHint(CullHint.Always);
+	
 
 		// Vector3.releaseTempInstance(p1);
 		// Vector3.releaseTempInstance(p2);

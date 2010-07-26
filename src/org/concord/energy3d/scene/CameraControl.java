@@ -108,12 +108,6 @@ public abstract class CameraControl {
         this.setupMouseTriggers(layer, dragOnly);
     }
 
-    /**
-     * Deregister the triggers of the given FirstPersonControl from the given LogicalLayer.
-     * 
-     * @param layer
-     * @param control
-     */
     public void removeTriggers(final LogicalLayer layer) {
         if (_mouseTrigger != null) {
             layer.deregisterTrigger(_mouseTrigger);
