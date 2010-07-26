@@ -262,7 +262,8 @@ Version 0.2
 - unselect pyramid and hip roof tools after they are drawn (repetitive drawing is not necessary)
 - draw bottom of the roof
 - improve Orbit control to always compute the focal point correctly even when switching between different views
-
+- create new Energy Projects folders if doesn't exist for storing project files
+- filter .ser files in open/save dialog boxes 
 
 
 TODO:

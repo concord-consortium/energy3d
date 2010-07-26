@@ -19,6 +19,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileView;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.PrintController;
@@ -30,8 +31,8 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private static final MainFrame instance = new MainFrame();
 	private static final JFileChooser fileChooser = new JFileChooser();
+	private static final MainFrame instance = new MainFrame();
 	private JPanel jContentPane = null;
 	private JMenuBar appMenuBar = null;
 	private JMenu fileMenu = null;
@@ -65,7 +66,7 @@ public class MainFrame extends JFrame {
 
 	public static MainFrame getInstance() {
 		return instance;
-	}
+	}	
 	
 	/**
 	 * This method initializes appMenuBar
@@ -619,6 +620,19 @@ public class MainFrame extends JFrame {
 	private MainFrame() {
 		super();
 		initialize();
+		
+		final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
+		if (!dir.exists()) {
+			System.out.print("Making save directory...");
+			final boolean success = dir.mkdir();
+			System.out.println(success ? "done" : "failed");			
+		}
+		fileChooser.setCurrentDirectory(dir);
+		fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
+		
+//		fileChooser.setFileView(new FileView() {
+//			
+//		});
 	}
 
 	/**
@@ -693,3 +707,48 @@ public class MainFrame extends JFrame {
 		return annotationToggleButton;
 	}
 }
+
+class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
+	  String description;
+
+	  String extensions[];
+
+	  public ExtensionFileFilter(String description, String extension) {
+	    this(description, new String[] { extension });
+	  }
+
+	  public ExtensionFileFilter(String description, String extensions[]) {
+	    if (description == null) {
+	      this.description = extensions[0] + "{ " + extensions.length + "} ";
+	    } else {
+	      this.description = description;
+	    }
+	    this.extensions = (String[]) extensions.clone();
+	    toLower(this.extensions);
+	  }
+
+	  private void toLower(String array[]) {
+	    for (int i = 0, n = array.length; i < n; i++) {
+	      array[i] = array[i].toLowerCase();
+	    }
+	  }
+
+	  public String getDescription() {
+	    return description;
+	  }
+
+	  public boolean accept(File file) {
+	    if (file.isDirectory()) {
+	      return true;
+	    } else {
+	      String path = file.getAbsolutePath().toLowerCase();
+	      for (int i = 0, n = extensions.length; i < n; i++) {
+	        String extension = extensions[i];
+	        if ((path.endsWith(extension) && (path.charAt(path.length() - extension.length() - 1)) == '.')) {
+	          return true;
+	        }
+	      }
+	    }
+	    return false;
+	  }
+	}

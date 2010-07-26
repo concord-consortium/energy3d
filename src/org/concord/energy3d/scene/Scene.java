@@ -234,9 +234,11 @@ public class Scene implements Serializable {
 
 	public void save(final File file) throws FileNotFoundException, IOException {
 		Scene.file = file;
+		if (!file.getName().toLowerCase().endsWith(".ser"))
+			Scene.file = new File(file.toString() + ".ser");
 		// try {
-		System.out.print("Saving " + file + "...");
-		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+		System.out.print("Saving " + Scene.file + "...");
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(Scene.file));
 		out.writeObject(this);
 		out.close();
 		System.out.println("done");
@@ -254,6 +256,7 @@ public class Scene implements Serializable {
 			if (child != originalHouseRoot)
 				root.detachChild(child);
 		parts.clear();
+		file = null;
 	}
 
 	public static void open(final File file) throws FileNotFoundException, IOException, ClassNotFoundException {
