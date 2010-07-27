@@ -54,7 +54,7 @@ public class Scene implements Serializable {
 		if (instance == null) {
 			instance = new Scene();
 			try {
-				open(new File("house.ser"));
+				instance.open(new File("house.ser"));
 			} catch (Throwable e) {
 				instance = new Scene();
 			}
@@ -259,8 +259,9 @@ public class Scene implements Serializable {
 		file = null;
 	}
 
-	public static void open(final File file) throws FileNotFoundException, IOException, ClassNotFoundException {
+	public void open(final File file) throws FileNotFoundException, IOException, ClassNotFoundException {		
 		System.out.print("Opening..." + file);
+		instance.newFile();
 		Scene.file = file;
 		// try {
 		// ObjectInputStream in = new ObjectInputStream(new FileInputStream("house.ser"));

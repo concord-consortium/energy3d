@@ -76,10 +76,9 @@ public abstract class Roof extends HousePart {
 
 	protected void updateMesh() {
 		if (container == null) {
-			final FloatBuffer buff = mesh.getMeshData().getVertexBuffer();
-			buff.rewind();
-			while (buff.hasRemaining())
-				buff.put(0);
+			resetToZero(mesh.getMeshData().getVertexBuffer());
+			if (bottomMesh != null)
+				resetToZero(bottomMesh.getMeshData().getVertexBuffer());
 			hidePoints();
 			return;			
 		}
@@ -110,6 +109,12 @@ public abstract class Roof extends HousePart {
 		// drawAnnotations();
 
 		mesh.updateModelBound();
+	}
+
+	private void resetToZero(final FloatBuffer buff) {
+		buff.rewind();
+		while (buff.hasRemaining())
+			buff.put(0);
 	}
 
 	private void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
@@ -193,7 +198,8 @@ public abstract class Roof extends HousePart {
 		final Vector3 p3 = new Vector3();
 
 		float pos = 0;
-		for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
+//		for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
+		for (int i = 0; i < vertexBuffer.limit() / 9; i++) {
 			pos += 0.5;
 			final int xPos = i * 9;
 			orgVertexBuffer.position(xPos);
@@ -208,7 +214,8 @@ public abstract class Roof extends HousePart {
 		}
 
 		mesh.updateModelBound();
-		bottomMesh.getSceneHints().setCullHint(CullHint.Always);
+		if (bottomMesh != null)
+			bottomMesh.getSceneHints().setCullHint(CullHint.Always);
 	
 
 		// Vector3.releaseTempInstance(p1);
@@ -328,7 +335,7 @@ public abstract class Roof extends HousePart {
 
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		buf.rewind();
-		for (int triangle = 0; triangle < buf.capacity() / 9; triangle++) {
+		for (int triangle = 0; triangle < buf.limit() / 9; triangle++) {
 			p1.set(buf.get(), buf.get(), buf.get());
 			p2.set(buf.get(), buf.get(), buf.get());
 			p3.set(buf.get(), buf.get(), buf.get());

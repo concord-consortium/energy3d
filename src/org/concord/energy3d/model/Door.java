@@ -79,11 +79,14 @@ public class Door extends HousePart {
 				p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
 				p = grid(p, GRID_SIZE, false);
 				// Convert from absolute coordinates to relative-to-wall coordinates
-				p = toRelative(p);
+//				p = toRelative(p);
+				Vector3 p_rel = toRelative(p);
 
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
-				points.set(index, p);
-				points.set(index + 1, getUpperPoint(p));
+//				points.set(index, p);
+				points.set(index, p_rel);
+//				points.set(index + 1, getUpperPoint(p));
+				points.set(index + 1, toRelative(getUpperPoint(p)));
 			}
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
 			int lower = (editPointIndex == 1) ? 0 : 2;
@@ -92,9 +95,13 @@ public class Door extends HousePart {
 			Vector3 p = closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y);
 			p = grid(p, GRID_SIZE);
 			height = findHeight(absoluteBase, p);
-			defaultDoorHeight = height;
-			points.set(1, getUpperPoint(points.get(1)));
-			points.set(3, getUpperPoint(points.get(3)));
+//			defaultDoorHeight = height;
+//			points.set(1, getUpperPoint(points.get(1)));
+//			points.set(3, getUpperPoint(points.get(3)));
+			
+			final double rel_z = toRelative(absoluteBase.addLocal(0, 0, height)).getZ();
+			points.get(1).setZ(rel_z);
+			points.get(3).setZ(rel_z);
 		}
 		if (container != null) {
 			draw();

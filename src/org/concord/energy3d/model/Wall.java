@@ -430,7 +430,7 @@ public class Wall extends HousePart {
 
 			invisibleMesh.updateModelBound();
 			// CollisionTreeManager.INSTANCE.removeCollisionTree(root);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 
