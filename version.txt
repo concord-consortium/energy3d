@@ -270,6 +270,8 @@ Version 0.2
 - fixed buffer underflow exception when print previewing objects with buffer limit less than the capacity
 - avoid splitting the floor Quad polygon into 2 triangles when print previewing
 - avoid splitting the roof Quad polygon into 2 triangles when print previewing
+- add wireframe lines to distinguish edges of walls 
+
 
 - reset toolbar selection to "Select" tool when New, Open, Print Preview, Print, etc.
 - in Top View, the edit points disappear passed original boundaries when zooming out

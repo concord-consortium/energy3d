@@ -60,7 +60,7 @@ public abstract class Roof extends HousePart {
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("roof2.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		mesh.setRenderState(ts);
+//		mesh.setRenderState(ts);
 		bottomMesh.setRenderState(ts);
 
 		final UserData userData = new UserData(this);
@@ -122,6 +122,7 @@ public abstract class Roof extends HousePart {
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
+//		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
 		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, 0);
 		mesh.getMeshData().updateVertexCount();
 	}

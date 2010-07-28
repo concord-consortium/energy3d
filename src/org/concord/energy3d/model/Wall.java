@@ -24,6 +24,7 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.CullState.Face;
+import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
@@ -43,10 +44,11 @@ public class Wall extends HousePart {
 	private transient Mesh surroundMesh;
 	private transient Mesh invisibleMesh;
 	private transient Mesh windowsSurroundMesh;
+	private transient Mesh wireframeMesh;
 	private Snap[] neighbors = new Snap[2];
 	private transient boolean reversedThickness;
 	private Vector3 thicknessNormal;
-	private Roof roof;
+	private Roof roof;	
 
 	static {
 		CULL_FRONT.setCullFace(Face.Front);
@@ -64,6 +66,7 @@ public class Wall extends HousePart {
 		surroundMesh = new Mesh("Wall (Surround)");
 		invisibleMesh = new Mesh("Wall (Invisible)");
 		windowsSurroundMesh = new Mesh("Wall (Windows Surround)");
+		wireframeMesh = new Mesh("Wall (Wireframe)");
 
 		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
@@ -101,11 +104,22 @@ public class Wall extends HousePart {
 		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		windowsSurroundMesh.setModelBound(null);
 		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		
+		root.attachChild(wireframeMesh);
+		wireframeMesh.getMeshData().setIndexMode(IndexMode.Quads);
+		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		wireframeMesh.setModelBound(null);
+		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);		
+		wireframeMesh.setRenderState(new WireframeState());
+		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		mesh.setRenderState(ts);
+//		mesh.setRenderState(ts);
+		
+//		mesh.setDefaultColor(ColorRGBA.GRAY);
+		
 
 		UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -433,6 +447,19 @@ public class Wall extends HousePart {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+		
+		// draw wireframe
+		final FloatBuffer buf = wireframeMesh.getMeshData().getVertexBuffer();
+		buf.rewind();
+		Vector3 w;
+		w = abspoints.get(0);
+		buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
+		w = abspoints.get(2);
+		buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
+		w = abspoints.get(3);
+		buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
+		w = abspoints.get(1);
+		buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
 
 		// keep it for platform resizing
 		if (original == null)
