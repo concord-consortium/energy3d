@@ -196,21 +196,63 @@ public abstract class Roof extends HousePart {
 		final Vector3 p1 = new Vector3();
 		final Vector3 p2 = new Vector3();
 		final Vector3 p3 = new Vector3();
+		final Vector3 p4 = new Vector3();
+		final Vector3 p5 = new Vector3();
+		final Vector3 p6 = new Vector3();
+//		final Vector3 v = new Vector3();
 
-		float pos = 0;
+//		float pos = 0;
 //		for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
-		for (int i = 0; i < vertexBuffer.limit() / 9; i++) {
-			pos += 0.5;
+		final int n = vertexBuffer.limit() / 9;
+		int labelNum = 0;
+		for (int i = 0; i < n; i++) {
+//			pos += 0.5;
 			final int xPos = i * 9;
 			orgVertexBuffer.position(xPos);
 			p1.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
 			p2.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
 			p3.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
-			flattenTriangle(p1, p2, p3);
+//			Vector3 p4 = null;
+			if (i < n - 1) {
+				p4.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
+				p5.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
+				p6.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
+				
+//				orgVertexBuffer.position(xPos + 9 + 6);				
+//				v.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
+//				while (orgVertexBuffer.position() < xPos + 18 && (v.equals(p1) || v.equals(p2) || v.equals(p3)))
+//					v.set(orgVertexBuffer.get(), orgVertexBuffer.get(), orgVertexBuffer.get());
+//				if (!v.equals(p1) && !v.equals(p2) && !v.equals(p3))
+//					p4 = v;
+			}
+			final boolean isQuad = flattenQuadTriangle(p1, p2, p3, p4, p5, p6);
+
 			vertexBuffer.position(xPos);
 			vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
 			vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 			vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
+			if (isQuad) {
+				vertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
+				vertexBuffer.put(p5.getXf()).put(p5.getYf()).put(p5.getZf());
+				vertexBuffer.put(p6.getXf()).put(p6.getYf()).put(p6.getZf());
+				i++;
+			}
+						
+//			p1.addLocal(p2).addLocal(p3).multiplyLocal(1.0 / 3.0);
+			double height = p1.getZ();
+			height = Math.max(height, p2.getZ());
+			height = Math.max(height, p3.getZ());
+			height = Math.max(height, p4.getZ());
+			height = Math.max(height, p5.getZ());
+			height = Math.max(height, p6.getZ());
+			if (isQuad)
+				center.set(p1).addLocal(p2).addLocal(p3).addLocal(p4).addLocal(p5).addLocal(p6).multiplyLocal(1.0 / 6.0);
+			else
+				center.set(p1).addLocal(p2).addLocal(p3).multiplyLocal(1.0 / 3.0);
+			center.setZ(height + 0.3);
+			final String text = "(" + (printSequence++ + 1) + ")";
+			final BMText label = fetchBMText(text, labelNum++);
+			label.setTranslation(center);			
 		}
 
 		mesh.updateModelBound();
@@ -226,32 +268,48 @@ public abstract class Roof extends HousePart {
 		// super.flatten();
 	}
 
-	private void flattenTriangle(Vector3 p1, Vector3 p2, Vector3 p3) {
+	private boolean flattenQuadTriangle(final Vector3 p1, final Vector3 p2, final Vector3 p3, final Vector3 p4, final Vector3 p5, final Vector3 p6) {
 		final Vector3 v = new Vector3(p3).subtractLocal(p1);
 		final Vector3 normal = new Vector3(p2).subtractLocal(p1).crossLocal(v);
 		normal.normalizeLocal();
 		double angle = flattenTime * normal.smallestAngleBetween(Vector3.UNIT_Y);
 		v.set(p3).subtractLocal(p1).normalizeLocal();
-		normal.crossLocal(Vector3.UNIT_Y);
-		final Matrix3 m = new Matrix3().fromAngleAxis(angle, normal);
+//		final Vector3 rotAxis = normal.cross(Vector3.UNIT_Y, null);
+		
+		Vector3 fourthPoint = null;
+		if (!p4.equals(p1) && !p4.equals(p2) && !p4.equals(p3))
+			fourthPoint = p4;
+		else if (!p5.equals(p1) && !p5.equals(p2) && !p5.equals(p3))
+			fourthPoint = p5;
+		else if (!p6.equals(p1) && !p6.equals(p2) && !p6.equals(p3))
+			fourthPoint = p6;
+		
+		final boolean isQuad = fourthPoint == null ? false : Math.abs(fourthPoint.subtract(p1, null).dot(normal)) < 0.1 ;
+		
+		final Matrix3 m = new Matrix3().fromAngleAxis(angle, normal.cross(Vector3.UNIT_Y, null));
 		m.applyPost(p1, p1);
 		m.applyPost(p2, p2);
 		m.applyPost(p3, p3);
+		if (isQuad) {
+			m.applyPost(p4, p4);
+			m.applyPost(p5, p5);
+			m.applyPost(p6, p6);
+		}
 
-		// Vector3 targetCenter = new Vector3(printSequence % PRINT_COLS * PRINT_SPACE, printSequence / PRINT_COLS * PRINT_SPACE, 0);
-		// computePrintCenter(targetCenter, printSequence);
 		computePrintCenter();
 		final Vector3 targetCenter = new Vector3(printCenter);
-		final Vector3 currentCenter = v.set(p1).addLocal(p2).addLocal(p3).multiplyLocal(1.0 / 3.0);
+		final Vector3 currentCenter = v.set(p1).addLocal(p2).addLocal(p3).addLocal(isQuad ? fourthPoint : Vector3.ZERO).multiplyLocal(1.0 / (isQuad ? 4.0 : 3.0));
+//		center.set(currentCenter);
 		final Vector3 d = targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime);
 		p1.addLocal(d);
 		p2.addLocal(d);
 		p3.addLocal(d);
-
-		// Vector3.releaseTempInstance(v);
-		// Vector3.releaseTempInstance(normal);
-		// Vector3.releaseTempInstance(targetCenter);
-		// Matrix3.releaseTempInstance(m);
+		if (isQuad) {
+			p4.addLocal(d);
+			p5.addLocal(d);
+			p6.addLocal(d);
+		}
+		return isQuad;
 	}
 
 	protected void computeLabelTop(final Vector3 top) {
@@ -329,23 +387,23 @@ public abstract class Roof extends HousePart {
 	// }
 
 	protected void updateLabels() {
-		final Vector3 p1 = new Vector3();
-		final Vector3 p2 = new Vector3();
-		final Vector3 p3 = new Vector3();
-
-		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-		buf.rewind();
-		for (int triangle = 0; triangle < buf.limit() / 9; triangle++) {
-			p1.set(buf.get(), buf.get(), buf.get());
-			p2.set(buf.get(), buf.get(), buf.get());
-			p3.set(buf.get(), buf.get(), buf.get());
-			double height = Math.max(Math.max(p1.getZ(), p2.getZ()), p3.getZ());
-			p1.addLocal(p2).addLocal(p3).multiplyLocal(1.0 / 3.0);
-			p1.setZ(height + 0.3);
-			final String text = "(" + (printSequence++ + 1) + ")";
-			final BMText label = fetchBMText(text, triangle);
-			label.setTranslation(p1);
-		}
+//		final Vector3 p1 = new Vector3();
+//		final Vector3 p2 = new Vector3();
+//		final Vector3 p3 = new Vector3();
+//
+//		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+//		buf.rewind();
+//		for (int triangle = 0; triangle < buf.limit() / 9; triangle++) {
+//			p1.set(buf.get(), buf.get(), buf.get());
+//			p2.set(buf.get(), buf.get(), buf.get());
+//			p3.set(buf.get(), buf.get(), buf.get());
+//			double height = Math.max(Math.max(p1.getZ(), p2.getZ()), p3.getZ());
+//			p1.addLocal(p2).addLocal(p3).multiplyLocal(1.0 / 3.0);
+//			p1.setZ(height + 0.3);
+//			final String text = "(" + (printSequence++ + 1) + ")";
+//			final BMText label = fetchBMText(text, triangle);
+//			label.setTranslation(p1);
+//		}
 	}
 
 }
