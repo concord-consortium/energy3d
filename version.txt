@@ -271,6 +271,9 @@ Version 0.2
 - avoid splitting the floor Quad polygon into 2 triangles when print previewing
 - avoid splitting the roof Quad polygon into 2 triangles when print previewing
 - add wireframe lines to distinguish edges of walls 
+- add annotation units options for Meter, Centimeter and Inches
+- fixed bug with no redrawing annotation the 2nd time it is turned on
+- add Scale option to scale annotation size of scene up or down with any percentage factors
 
 
 - reset toolbar selection to "Select" tool when New, Open, Print Preview, Print, etc.

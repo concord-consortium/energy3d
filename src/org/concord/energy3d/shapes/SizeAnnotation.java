@@ -2,6 +2,8 @@ package org.concord.energy3d.shapes;
 
 import java.nio.FloatBuffer;
 
+import org.concord.energy3d.scene.Scene;
+
 
 
 import com.ardor3d.math.ColorRGBA;
@@ -106,8 +108,8 @@ public class SizeAnnotation extends Annotation {
 		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
 
 		// Vector3 middle = Vector3.fetchTempInstance().set(newFrom).addLocal(newTo).multiplyLocal(0.5);
-		label.setTranslation(middle);
-		label.setText("" + Math.round(to.subtract(from, null).length() * 100) / 100.0 + "m");
+		label.setTranslation(middle);		
+		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 100) / 100.0 + Scene.getInstance().getUnit().getNotation());
 		label.setAlign(align);
 	}
 }

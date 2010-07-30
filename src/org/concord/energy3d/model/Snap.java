@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Snap implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private static int annotationTimer = 1;
+	private static int currentAnnotationDrawnStamp = 1;
 	private static int currentVisitStamp = 1;
 	private HousePart neighbor1;
 	private HousePart neighbor2;
@@ -13,8 +13,8 @@ public class Snap implements Serializable {
 	private transient int annotationDrawn;
 	private transient int visitStamp;
 	
-	public static void increaseAnnotationTimer() {
-		annotationTimer = ++annotationTimer % 1000;
+	public static void clearAnnotationDrawn() {
+		currentAnnotationDrawnStamp = ++currentAnnotationDrawnStamp % 1000;
 	}
 	
 	public static void clearVisits() {
@@ -50,11 +50,11 @@ public class Snap implements Serializable {
 	}
 	
 	public void setDrawn() {
-		annotationDrawn = annotationTimer;
+		annotationDrawn = currentAnnotationDrawnStamp;
 	}
 	
 	public boolean isDrawn() {
-		return annotationDrawn == annotationTimer;
+		return annotationDrawn == currentAnnotationDrawnStamp;
 	}
 
 	public boolean isVisited() {

@@ -589,4 +589,4 @@ public abstract class HousePart implements Serializable {
 		sizeAnnotRoot.getSceneHints().setCullHint(cull);
 		angleAnnotRoot.getSceneHints().setCullHint(cull);
 	}
-}
+}  

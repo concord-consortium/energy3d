@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Snap;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
@@ -34,6 +35,16 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
 
 public class Scene implements Serializable {
+	public static enum Unit {Meter("m"), Centimeter("cm"), Inches("\"");
+		private final String notation;
+		private Unit(String notation) {
+			this.notation = notation; 
+		}
+		public String getNotation() {
+			return notation;
+		}
+	};
+	
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
 	private static final Node originalHouseRoot = new Node("Original House Root");
@@ -49,6 +60,8 @@ public class Scene implements Serializable {
 	// private static double angle = 0;
 	// private static Scene sceneClone = null;
 	private transient boolean redrawAll = false;
+	private Unit unit = Unit.Meter;
+	private double annotationScale = 1;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -377,11 +390,34 @@ public class Scene implements Serializable {
 
 	public void update() {
 		if (redrawAll ) {
+			Snap.clearAnnotationDrawn();
 			for (HousePart part : parts)
 				part.draw();
 			HousePart.setFlattenTime(HousePart.getFlattenTime());
 			PrintController.getInstance().drawPrintParts();
 		}
 		redrawAll = false;
+	}
+
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+		redrawAll = true;
+	}
+
+	public Unit getUnit() {
+		if (unit == null)
+			unit = Unit.Meter;
+		return unit;
+	}
+
+	public void setAnnotationScale(double scale) {
+		this.annotationScale  = scale;	
+		this.redrawAll = true;
+	}
+
+	public double getAnnotationScale() {
+		if (annotationScale == 0)
+			annotationScale = 1;
+		return annotationScale;
 	}
 }

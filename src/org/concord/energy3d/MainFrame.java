@@ -24,6 +24,7 @@ import javax.swing.filechooser.FileView;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.Unit;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
@@ -63,11 +64,19 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem firstPersonMenuItem = null;
 	private JMenuItem saveasMenuItem;
 	private JToggleButton annotationToggleButton;
+	private JMenu viewMenu;
+	private JMenu unitsMenu;
+	private JRadioButtonMenuItem metersRadioButtonMenuItem;
+	private JRadioButtonMenuItem centimetersRadioButtonMenuItem;
+	private JRadioButtonMenuItem inchesRadioButtonMenuItem;
+	private final ButtonGroup buttonGroup = new ButtonGroup();
+	private JMenu scaleMenu;
+	private JMenuItem scaleMenuItem;
 
 	public static MainFrame getInstance() {
 		return instance;
-	}	
-	
+	}
+
 	/**
 	 * This method initializes appMenuBar
 	 * 
@@ -77,6 +86,8 @@ public class MainFrame extends JFrame {
 		if (appMenuBar == null) {
 			appMenuBar = new JMenuBar();
 			appMenuBar.add(getFileMenu());
+			appMenuBar.add(getViewMenu());
+			appMenuBar.add(getScaleMenu());
 			appMenuBar.add(getCameraMenu());
 		}
 		return appMenuBar;
@@ -620,19 +631,19 @@ public class MainFrame extends JFrame {
 	private MainFrame() {
 		super();
 		initialize();
-		
+
 		final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
 		if (!dir.exists()) {
 			System.out.print("Making save directory...");
 			final boolean success = dir.mkdir();
-			System.out.println(success ? "done" : "failed");			
+			System.out.println(success ? "done" : "failed");
 		}
 		fileChooser.setCurrentDirectory(dir);
 		fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
-		
-//		fileChooser.setFileView(new FileView() {
-//			
-//		});
+
+		// fileChooser.setFileView(new FileView() {
+		//
+		// });
 	}
 
 	/**
@@ -695,6 +706,7 @@ public class MainFrame extends JFrame {
 		}
 		return saveasMenuItem;
 	}
+
 	private JToggleButton getAnnotationToggleButton() {
 		if (annotationToggleButton == null) {
 			annotationToggleButton = new JToggleButton("Annotation");
@@ -706,49 +718,146 @@ public class MainFrame extends JFrame {
 		}
 		return annotationToggleButton;
 	}
+
+	private JMenu getViewMenu() {
+		if (viewMenu == null) {
+			viewMenu = new JMenu("View");
+			viewMenu.add(getUnitsMenu());
+		}
+		return viewMenu;
+	}
+
+	private JMenu getUnitsMenu() {
+		if (unitsMenu == null) {
+			unitsMenu = new JMenu("Units");
+			unitsMenu.add(getMetersRadioButtonMenuItem());
+			unitsMenu.add(getCentimetersRadioButtonMenuItem());
+			unitsMenu.add(getInchesRadioButtonMenuItem());
+		}
+		return unitsMenu;
+	}
+
+	private JRadioButtonMenuItem getMetersRadioButtonMenuItem() {
+		if (metersRadioButtonMenuItem == null) {
+			metersRadioButtonMenuItem = new JRadioButtonMenuItem("Meters (m)");
+			metersRadioButtonMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Scene.getInstance().setUnit(Unit.Meter);
+				}
+			});
+			buttonGroup.add(metersRadioButtonMenuItem);
+			metersRadioButtonMenuItem.setSelected(true);
+		}
+		return metersRadioButtonMenuItem;
+	}
+
+	private JRadioButtonMenuItem getCentimetersRadioButtonMenuItem() {
+		if (centimetersRadioButtonMenuItem == null) {
+			centimetersRadioButtonMenuItem = new JRadioButtonMenuItem("Centimeters (cm)");
+			centimetersRadioButtonMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Scene.getInstance().setUnit(Unit.Centimeter);
+				}
+			});
+			buttonGroup.add(centimetersRadioButtonMenuItem);
+		}
+		return centimetersRadioButtonMenuItem;
+	}
+
+	private JRadioButtonMenuItem getInchesRadioButtonMenuItem() {
+		if (inchesRadioButtonMenuItem == null) {
+			inchesRadioButtonMenuItem = new JRadioButtonMenuItem("Inches (\")");
+			inchesRadioButtonMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Scene.getInstance().setUnit(Unit.Inches);
+				}
+			});
+			buttonGroup.add(inchesRadioButtonMenuItem);
+		}
+		return inchesRadioButtonMenuItem;
+	}
+
+	private JMenu getScaleMenu() {
+		if (scaleMenu == null) {
+			scaleMenu = new JMenu("Scale");
+			scaleMenu.add(getScaleMenuItem());
+		}
+		return scaleMenu;
+	}
+
+	private JMenuItem getScaleMenuItem() {
+		if (scaleMenuItem == null) {
+			scaleMenuItem = new JMenuItem("Scale...");
+			scaleMenuItem.addActionListener(new ActionListener() {
+				private String previousScaleInput = "200%";
+
+				public void actionPerformed(ActionEvent e) {
+					boolean done = false;
+					while (!done) {
+//						previousScaleInput = "200%";
+						String result = JOptionPane.showInputDialog(MainFrame.this, "Please enter the scale factor in percentage:", previousScaleInput).trim();
+						if (result == null)
+							break;
+						if (result.endsWith("%") && result.length() >= 1)
+							result = result.substring(0, result.length() - 1);
+						try {
+							final Scene scene = Scene.getInstance();
+							scene.setAnnotationScale(scene.getAnnotationScale() * Double.parseDouble(result) / 100.0);
+							previousScaleInput = result + "%";
+							done = true;
+						} catch (Exception err) {
+							err.printStackTrace();
+							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				}
+			});
+		}
+		return scaleMenuItem;
+	}
 }
 
 class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
-	  String description;
+	String description;
 
-	  String extensions[];
+	String extensions[];
 
-	  public ExtensionFileFilter(String description, String extension) {
-	    this(description, new String[] { extension });
-	  }
-
-	  public ExtensionFileFilter(String description, String extensions[]) {
-	    if (description == null) {
-	      this.description = extensions[0] + "{ " + extensions.length + "} ";
-	    } else {
-	      this.description = description;
-	    }
-	    this.extensions = (String[]) extensions.clone();
-	    toLower(this.extensions);
-	  }
-
-	  private void toLower(String array[]) {
-	    for (int i = 0, n = array.length; i < n; i++) {
-	      array[i] = array[i].toLowerCase();
-	    }
-	  }
-
-	  public String getDescription() {
-	    return description;
-	  }
-
-	  public boolean accept(File file) {
-	    if (file.isDirectory()) {
-	      return true;
-	    } else {
-	      String path = file.getAbsolutePath().toLowerCase();
-	      for (int i = 0, n = extensions.length; i < n; i++) {
-	        String extension = extensions[i];
-	        if ((path.endsWith(extension) && (path.charAt(path.length() - extension.length() - 1)) == '.')) {
-	          return true;
-	        }
-	      }
-	    }
-	    return false;
-	  }
+	public ExtensionFileFilter(String description, String extension) {
+		this(description, new String[] { extension });
 	}
+
+	public ExtensionFileFilter(String description, String extensions[]) {
+		if (description == null) {
+			this.description = extensions[0] + "{ " + extensions.length + "} ";
+		} else {
+			this.description = description;
+		}
+		this.extensions = (String[]) extensions.clone();
+		toLower(this.extensions);
+	}
+
+	private void toLower(String array[]) {
+		for (int i = 0, n = array.length; i < n; i++) {
+			array[i] = array[i].toLowerCase();
+		}
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public boolean accept(File file) {
+		if (file.isDirectory()) {
+			return true;
+		} else {
+			String path = file.getAbsolutePath().toLowerCase();
+			for (int i = 0, n = extensions.length; i < n; i++) {
+				String extension = extensions[i];
+				if ((path.endsWith(extension) && (path.charAt(path.length() - extension.length() - 1)) == '.')) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+}

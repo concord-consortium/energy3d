@@ -116,7 +116,7 @@ public class Wall extends HousePart {
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-//		mesh.setRenderState(ts);
+		mesh.setRenderState(ts);
 		
 //		mesh.setDefaultColor(ColorRGBA.GRAY);
 		
@@ -133,7 +133,7 @@ public class Wall extends HousePart {
 	}
 
 	public void setPreviewPoint(int x, int y) {
-		Snap.increaseAnnotationTimer();
+		Snap.clearAnnotationDrawn();
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			final HousePart previousContainer = container;
 			PickedHousePart picked = pick(x, y, new Class<?>[] { Foundation.class, null });
