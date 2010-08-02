@@ -110,15 +110,16 @@ public class Wall extends HousePart {
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		wireframeMesh.setModelBound(null);
 		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);		
+		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.setRenderState(new WireframeState());
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		mesh.setRenderState(ts);
+//		mesh.setRenderState(ts);
 		
-//		mesh.setDefaultColor(ColorRGBA.GRAY);
+		mesh.setDefaultColor(ColorRGBA.GRAY);
 		
 
 		UserData userData = new UserData(this);

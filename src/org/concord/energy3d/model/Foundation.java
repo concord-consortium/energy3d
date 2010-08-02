@@ -42,7 +42,7 @@ public class Foundation extends HousePart {
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		mesh.setRenderState(ts);
+//		mesh.setRenderState(ts);
 
 		WireframeState wire = new WireframeState();
 		boundingMesh.setRenderState(wire);

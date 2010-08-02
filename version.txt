@@ -274,10 +274,12 @@ Version 0.2
 - add annotation units options for Meter, Centimeter and Inches
 - fixed bug with no redrawing annotation the 2nd time it is turned on
 - add Scale option to scale annotation size of scene up or down with any percentage factors
-
-
+- fixed problem in Top View, the edit points disappear passed original boundaries when zooming out
 - reset toolbar selection to "Select" tool when New, Open, Print Preview, Print, etc.
-- in Top View, the edit points disappear passed original boundaries when zooming out
+- change default behavior so that draw tool is always un-selected after drawing one shape
+
+- allow draw tool to stay on if user double-clicks on the tool button in toolbar
+- avoid drawing roof if only one attached wall is present
 - auto-arrange parts in print preview to fit in page and no overlap
 - change color of floor
 - change/remove textures of all parts 

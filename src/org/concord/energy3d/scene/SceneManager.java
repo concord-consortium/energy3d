@@ -237,8 +237,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		rootPass.add(root);
 		passManager.add(rootPass);
 
-//		shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
-		shadowPass = new ParallelSplitShadowMapPass(light, 512, 3);
+		shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
+//		shadowPass = new ParallelSplitShadowMapPass(light, 512, 3);
 		shadowPass.setUseObjectCullFace(true);
 		shadowPass.add(floor);
 		shadowPass.add(Scene.getRoot());
@@ -520,14 +520,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 				if (drawn.isDrawCompleted()) {
 					drawn.hidePoints();
-					if (operation == Operation.DRAW_FLOOR || operation == Operation.DRAW_ROOF || operation == Operation.DRAW_ROOF_HIP) {
+//					if (operation == Operation.DRAW_FLOOR || operation == Operation.DRAW_ROOF || operation == Operation.DRAW_ROOF_HIP) {
 						MainFrame.getInstance().getSelectButton().setSelected(true);
 						operation = Operation.SELECT;
 						drawn = null;
-					} else {
-						drawn = newHousePart();
-						drawn.setPreviewPoint(x, y);
-					}
+//					} else {
+//						drawn = newHousePart();
+//						drawn.setPreviewPoint(x, y);
+//					}
 				}
 
 				enableDisableRotationControl();
@@ -673,19 +673,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void resetCamera(final ViewMode viewMode) {
 		this.viewMode = viewMode;
-		Camera camera = canvas.getCanvasRenderer().getCamera();
+		final Camera camera = canvas.getCanvasRenderer().getCamera();
 
-		resizeCamera(camera);
-		// camera.setFrustumTop(camera.getFrustumTop() * fac);
-		// camera.setFrustumBottom(camera.getFrustumBottom() * fac);
-		// camera.setFrustumLeft(camera.getFrustumLeft() * fac);
-		// camera.setFrustumRight(camera.getFrustumRight() * fac);
+//		resizeCamera(camera);
 
 		setCameraControl(cameraMode);
-//		if (control != null) {
 			control.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 			control.setMoveSpeed(MOVE_SPEED);
-//		}
 		Vector3 loc = new Vector3(1.0f, -8.0f, 1.0f);
 		Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
@@ -698,6 +692,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			loc = new Vector3(0, 0, 50);
 			up = new Vector3(0.0f, -1.0f, 0.0f);
 			dir = new Vector3(0.0f, 0.0f, -1.0f);
+			double fac = 10;
+			camera.setFrustumTop(camera.getFrustumTop() * fac);
+			camera.setFrustumBottom(camera.getFrustumBottom() * fac);
+			camera.setFrustumLeft(camera.getFrustumLeft() * fac);
+			camera.setFrustumRight(camera.getFrustumRight() * fac);
+			camera.update();			
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			// control.setMoveSpeed(MOVE_SPEED / 10);
@@ -712,7 +712,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		camera.setFrame(loc, left, up, dir);
-		resizeCamera(camera);
+		if (viewMode != ViewMode.TOP_VIEW)
+			resizeCamera(camera);
 		
 		
 	}
@@ -761,6 +762,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			camera.setFrustumBottom(camera.getFrustumBottom() * fac);
 			camera.setFrustumLeft(camera.getFrustumLeft() * fac);
 			camera.setFrustumRight(camera.getFrustumRight() * fac);
+			camera.update();
 
 			control.setMoveSpeed(1.1 * fac * control.getMoveSpeed());
 		} else {

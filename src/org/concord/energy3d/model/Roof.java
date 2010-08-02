@@ -10,6 +10,7 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -60,8 +61,10 @@ public abstract class Roof extends HousePart {
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("roof2.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		mesh.setRenderState(ts);
+//		mesh.setRenderState(ts);
 		bottomMesh.setRenderState(ts);
+		
+		mesh.setDefaultColor(ColorRGBA.GRAY);
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);

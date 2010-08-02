@@ -29,6 +29,8 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MenuEvent;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -101,6 +103,16 @@ public class MainFrame extends JFrame {
 	private JMenu getFileMenu() {
 		if (fileMenu == null) {
 			fileMenu = new JMenu();
+			fileMenu.addMenuListener(new MenuListener() {
+				public void menuCanceled(MenuEvent e) {
+				}
+				public void menuDeselected(MenuEvent e) {
+				}
+				public void menuSelected(MenuEvent e) {
+					getSelectButton().setSelected(true);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);					
+				}
+			});
 			fileMenu.setText("File");
 			fileMenu.add(getNewMenuItem());
 			fileMenu.add(getOpenMenuItem());
@@ -564,6 +576,16 @@ public class MainFrame extends JFrame {
 	private JMenu getCameraMenu() {
 		if (cameraMenu == null) {
 			cameraMenu = new JMenu();
+			cameraMenu.addMenuListener(new MenuListener() {
+				public void menuCanceled(MenuEvent e) {
+				}
+				public void menuDeselected(MenuEvent e) {
+				}
+				public void menuSelected(MenuEvent e) {
+					getSelectButton().setSelected(true);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
+				}
+			});
 			cameraMenu.setText("Camera");
 			cameraMenu.add(getOrbitMenuItem());
 			cameraMenu.add(getFirstPersonMenuItem());
@@ -722,6 +744,16 @@ public class MainFrame extends JFrame {
 	private JMenu getViewMenu() {
 		if (viewMenu == null) {
 			viewMenu = new JMenu("View");
+			viewMenu.addMenuListener(new MenuListener() {
+				public void menuCanceled(MenuEvent e) {
+				}
+				public void menuDeselected(MenuEvent e) {
+				}
+				public void menuSelected(MenuEvent e) {
+					getSelectButton().setSelected(true);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);					
+				}
+			});
 			viewMenu.add(getUnitsMenu());
 		}
 		return viewMenu;
@@ -780,6 +812,16 @@ public class MainFrame extends JFrame {
 	private JMenu getScaleMenu() {
 		if (scaleMenu == null) {
 			scaleMenu = new JMenu("Scale");
+			scaleMenu.addMenuListener(new MenuListener() {
+				public void menuCanceled(MenuEvent e) {
+				}
+				public void menuDeselected(MenuEvent e) {
+				}
+				public void menuSelected(MenuEvent e) {
+					getSelectButton().setSelected(true);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);					
+				}
+			});
 			scaleMenu.add(getScaleMenuItem());
 		}
 		return scaleMenu;
