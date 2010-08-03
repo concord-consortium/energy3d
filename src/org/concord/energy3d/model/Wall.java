@@ -399,6 +399,7 @@ public class Wall extends HousePart {
 				ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
 				System.out.println("win[0] = " + child.getPoints().get(0));
 				ArrayList<Vector3> winPoints = child.getPoints();
+//				p = winPoints.get(0);
 				p = winPoints.get(0);
 				pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 				toXY.transform(pp);

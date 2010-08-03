@@ -412,7 +412,7 @@ public abstract class HousePart implements Serializable {
 		}
 	}
 
-	private void allocateNewPoint() {
+	protected void allocateNewPoint() {
 		for (int i = 0; i < numOfEditPoints / numOfDrawPoints; i++) {
 			points.add(new Vector3());
 			abspoints.add(new Vector3());

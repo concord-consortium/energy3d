@@ -277,7 +277,6 @@ Version 0.2
 - fixed problem in Top View, the edit points disappear passed original boundaries when zooming out
 - reset toolbar selection to "Select" tool when New, Open, Print Preview, Print, etc.
 - change default behavior so that draw tool is always un-selected after drawing one shape
-
 - allow windows to be drawn using opposite corners technique
 - put constraints on window to prevent incorrect wall shapes
 
