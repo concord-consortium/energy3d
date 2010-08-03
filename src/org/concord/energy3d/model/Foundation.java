@@ -7,6 +7,7 @@ import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.TextureState;
@@ -43,6 +44,8 @@ public class Foundation extends HousePart {
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 //		mesh.setRenderState(ts);
+		
+		mesh.setDefaultColor(ColorRGBA.GRAY);
 
 		WireframeState wire = new WireframeState();
 		boundingMesh.setRenderState(wire);

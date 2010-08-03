@@ -148,6 +148,7 @@ public class PrintController implements Updater {
 	}
 	
 	public void print() {
+		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 //		PrintExporter printExporter = new PrintExporter(PrintPreviewController.getInstance().getPrintParts().size());		
 		PrintExporter printExporter = new PrintExporter();
 //		double scale = 0.2;
@@ -165,7 +166,8 @@ public class PrintController implements Updater {
 //			 Vector3 pos = new Vector3(part.getPrintSequence() % HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale, -5, part.getPrintSequence() / HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale);
 //			Vector3 pos = part.getPrintCenter();
 			System.out.println(pos);
-			camera.setLocation(pos.getX(), pos.getY() - 5, pos.getZ());
+//			camera.setLocation(pos.getX(), pos.getY() - 5, pos.getZ());
+			camera.setLocation(pos.getX(), pos.getY() - 7, pos.getZ());
 			camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 			try {
 				Thread.sleep(100);
@@ -188,6 +190,7 @@ public class PrintController implements Updater {
 		// camera.setLocation(location);
 		// camera.lookAt(location.addLocal(direction), up);
 //			resetCamera(viewMode);
+			Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
 			SceneManager.getInstance().resetCamera();
 	}	
 
