@@ -45,7 +45,7 @@ public class Foundation extends HousePart {
 		ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 //		mesh.setRenderState(ts);
 		
-		mesh.setDefaultColor(ColorRGBA.GRAY);
+		mesh.setDefaultColor(defaultColor);
 
 		WireframeState wire = new WireframeState();
 		boundingMesh.setRenderState(wire);

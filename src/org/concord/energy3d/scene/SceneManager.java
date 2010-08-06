@@ -1,5 +1,6 @@
 package org.concord.energy3d.scene;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -9,6 +10,8 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.concurrent.Callable;
+
+import javax.media.opengl.GLCanvas;
 
 import org.concord.energy3d.MainFrame;
 import org.concord.energy3d.model.Door;
@@ -22,16 +25,20 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.SelectUtil;
+import org.lwjgl.LWJGLException;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
+import com.ardor3d.framework.lwjgl.LwjglAwtCanvas;
+import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -113,7 +120,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private static final double MOVE_SPEED = 5;
 
 	private static SceneManager instance = null;
-	private final JoglAwtCanvas canvas;
+//	private final JoglAwtCanvas canvas;
+	private final Canvas canvas;
 	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
 	private boolean exit = false;
@@ -141,27 +149,35 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private ViewMode viewMode = ViewMode.NORMAL;
 	private final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private CameraMode cameraMode = CameraMode.ORBIT;
+	private static final boolean JOGL = true; 
 
 	public static SceneManager getInstance() {
 		return instance;
 	}
 
-	public SceneManager(final Container panel) {
+	public SceneManager(final Container panel) throws LWJGLException {
 		System.out.print("Initializing scene manager...");
 		instance = this;
 		// root.attachChild(housePartsNode);
 		root.attachChild(Scene.getRoot());
 
-		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 8, false, false);
-		final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(this);
-		canvas = new JoglAwtCanvas(settings, canvasRenderer);
+//		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 8, false, false);
+		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 8, false, false);
+//		final DisplaySettings settings = new DisplaySettings(800, 600, 24, 0, 0, 8, 0, 0, false, false);
+//		final DisplaySettings settings = new DisplaySettings(800, 600, 0, 0, false);
+//		final CanvasRenderer canvasRenderer = new JoglCanvasRenderer(this);
+		if (JOGL)
+			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
+		else
+			canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
+		
 		frameHandler = new FrameHandler(new Timer());
 		frameHandler.addCanvas(canvas);
 
 		logicalLayer = new LogicalLayer();
-		final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(canvas, new AwtMouseManager(canvas));
-		final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvas);
-		final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvas);
+		final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper((Component)canvas, new AwtMouseManager((Component)canvas));
+		final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper((Component)canvas);
+		final AwtFocusWrapper focusWrapper = new AwtFocusWrapper((Component)canvas);
 		final PhysicalLayer physicalLayer = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
 		logicalLayer.registerInput(canvas, physicalLayer);
 
@@ -177,14 +193,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if ((size.width == 0) && (size.height == 0)) {
 					return;
 				}
-				final Camera camera = canvasRenderer.getCamera();
+				final Camera camera = canvas.getCanvasRenderer().getCamera();
 				if (camera != null) {
 					// camera.resize(size.width, size.height);
 					resizeCamera(camera);
 				}
 			}
 		});
-		panel.add(canvas, "Center");
+		panel.add((Component)canvas, "Center");
 		System.out.println("done");
 	}
 
@@ -379,7 +395,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return null;
 	}
 
-	public JoglAwtCanvas getCanvas() {
+	public Canvas getCanvas() {
 		return canvas;
 	}
 
@@ -734,7 +750,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// }
 
 	private void resizeCamera(final Camera camera) {
-		final Dimension size = canvas.getSize();
+		final Dimension size = ((GLCanvas)canvas).getSize();
 		camera.resize(size.width, size.height);
 		final double scale = 0.4; // 4; //topView ? 4 : 0.5;
 		final double ratio = (double) camera.getWidth() / camera.getHeight();
@@ -1046,7 +1062,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void exit() {
 		System.out.print("exiting...");
 		this.exit = true;
-		canvas.getCanvasRenderer().setCurrentContext();
+		canvas.getCanvasRenderer().makeCurrentContext();
 		ContextGarbageCollector.doFinalCleanup(canvas.getCanvasRenderer().getRenderer());		
 		System.out.println("done");
 		System.exit(0);

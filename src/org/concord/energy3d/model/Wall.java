@@ -119,7 +119,7 @@ public class Wall extends HousePart {
 		ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 //		mesh.setRenderState(ts);
 		
-		mesh.setDefaultColor(ColorRGBA.GRAY);
+		mesh.setDefaultColor(defaultColor);
 		
 
 		UserData userData = new UserData(this);

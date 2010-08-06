@@ -15,9 +15,11 @@ import org.concord.energy3d.util.SelectUtil;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -61,8 +63,11 @@ public abstract class HousePart implements Serializable {
 	protected transient Node sizeAnnotRoot;
 	protected transient Node angleAnnotRoot;
 	protected transient Vector3 printCenter;
+	protected transient double printWidth;
+	protected transient double printHeight;
 	public static int PRINT_SPACE = 4;
 	public static int PRINT_COLS = 4;
+	protected static final ReadOnlyColorRGBA defaultColor = ColorRGBA.GREEN;
 
 	public static void setFlattenTime(double flattenTime) {
 		if (flattenTime < 0)
@@ -146,6 +151,11 @@ public abstract class HousePart implements Serializable {
 		root.attachChild(sizeAnnotRoot);
 		root.attachChild(angleAnnotRoot);
 		root.attachChild(labelsRoot);
+		
+		printWidth = 10;
+		printHeight = 10;
+		
+		PRINT_SPACE = 10;
 		
 //		computeAbsPoints();
 //		computeCenter();		
@@ -479,7 +489,7 @@ public abstract class HousePart implements Serializable {
 	protected void computePrintCenter() {
 		while (true) {
 			printCenter.set((-1.5 + printPage % PRINT_COLS) * PRINT_SPACE, 0, (-0.8 + printPage / PRINT_COLS) * PRINT_SPACE);
-			if (printCenter.length() >= 3)
+			if (printCenter.length() >= PRINT_SPACE)
 				break;
 			else
 				printPage++;				
@@ -493,7 +503,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void computeLabelTop(final Vector3 top) {
-		top.set(0, 0, height);
+		top.set(0, 0, height / 2);
 //		return height / 1;
 	}
 
@@ -508,6 +518,7 @@ public abstract class HousePart implements Serializable {
 		else
 //			up.set(0, 0, computeLabelTop());
 			computeLabelTop(up);
+		up.addLocal(0, 0, label.getHeight());
 		root.getTransform().applyInverseVector(up);
 		label.setTranslation(center.getX() + up.getX(), center.getY() + up.getY(), center.getZ() + up.getZ());
 	}
@@ -588,5 +599,13 @@ public abstract class HousePart implements Serializable {
 		final CullHint cull = visible ? CullHint.Inherit : CullHint.Always;
 		sizeAnnotRoot.getSceneHints().setCullHint(cull);
 		angleAnnotRoot.getSceneHints().setCullHint(cull);
+	}
+
+	public double getPrintWidth() {
+		return printWidth;
+	}
+
+	public double getPrintHeight() {
+		return printHeight;
 	}
 }  

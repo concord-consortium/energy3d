@@ -279,15 +279,18 @@ Version 0.2
 - change default behavior so that draw tool is always un-selected after drawing one shape
 - allow windows to be drawn using opposite corners technique
 - put constraints on window to prevent incorrect wall shapes
+- allow static scaling of print preview parts
+- when printing adjust camera view to avoid sections of the neighboring parts from appearing in the printout
+ 
 
 
+TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar
 - avoid drawing roof if only one attached wall is present
 - auto-arrange parts in print preview to fit in page and no overlap
 - change color of floor
-- change/remove textures of all parts 
-
-TODO:
+- change/remove textures of all parts
+ 
 - new Orbit
 - combine the wall meshed into one
 - insert window in oriented wall attached to other walls

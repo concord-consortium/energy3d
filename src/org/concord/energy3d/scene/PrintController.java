@@ -8,6 +8,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.PrintExporter;
 
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.math.ColorRGBA;
@@ -57,7 +58,7 @@ public class PrintController implements Updater {
 			HousePart.setFlatten(true);
 			final JoglCanvasRenderer renderer = (JoglCanvasRenderer) SceneManager.getInstance().getCanvas().getCanvasRenderer();
 			if (isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
-				renderer.setCurrentContext();
+				renderer.makeCurrentContext();
 				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
 				renderer.releaseCurrentContext();
 				SceneManager.getInstance().updatePrintPreviewScene(true);
@@ -72,7 +73,10 @@ public class PrintController implements Updater {
 					if (newPart.isPrintable() && newPart.isDrawCompleted())
 						printParts.add(newPart);
 				}
+				applyPreviewScale();
+				
 				Scene.getInstance().getOriginalHouseRoot().setScale(2);
+//				Scene.getInstance().getOriginalHouseRoot().setTranslation(0, y, 0);
 			}
 			 for (HousePart part : Scene.getInstance().getParts())
 			 part.getRoot().getSceneHints().setCullHint(CullHint.Always);
@@ -113,7 +117,7 @@ public class PrintController implements Updater {
 				Scene.getInstance().getOriginalHouseRoot().updateGeometricState(timer.getTimePerFrame(), true);
 
 				final JoglCanvasRenderer renderer = (JoglCanvasRenderer) SceneManager.getInstance().getCanvas().getCanvasRenderer();
-				renderer.setCurrentContext();
+				renderer.makeCurrentContext();
 				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
 				renderer.releaseCurrentContext();				
 				SceneManager.getInstance().updatePrintPreviewScene(false);
@@ -134,6 +138,25 @@ public class PrintController implements Updater {
 //				finish = false;
 //			}
 		}
+	}
+
+	private void applyPreviewScale() {
+//		double maxW = 0;
+//		double maxH = 0;
+//		
+//		for (HousePart part : printParts) {
+//			final double w = part.getPrintWidth();
+//			final double h = part.getPrintHeight();
+//			if (w > maxW)
+//				maxW = w;
+//			if (h > maxH)
+//				maxH = h;
+//		}
+//		
+//		final double scale = HousePart.PRINT_SPACE / Math.max(maxW, maxH);
+//		for (HousePart part : printParts)
+//			part.getRoot().setScale(scale);
+		
 	}
 
 	public void drawPrintParts() {
@@ -167,15 +190,17 @@ public class PrintController implements Updater {
 //			Vector3 pos = part.getPrintCenter();
 			System.out.println(pos);
 //			camera.setLocation(pos.getX(), pos.getY() - 5, pos.getZ());
-			camera.setLocation(pos.getX(), pos.getY() - 7, pos.getZ());
+//			camera.setLocation(pos.getX(), pos.getY() - 7, pos.getZ());
+//			camera.setLocation(pos.getX(), pos.getY() - HousePart.PRINT_SPACE * Math.sin(Math.PI / 2 - camera.getFovY()) / Math.sin(camera.getFovY()), pos.getZ());
+			camera.setLocation(pos.getX(), pos.getY() - HousePart.PRINT_SPACE, pos.getZ());
 			camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			final JoglCanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-			canvasRenderer.setCurrentContext();
+			final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
+			canvasRenderer.makeCurrentContext();
 			ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printExporter);
 			canvasRenderer.releaseCurrentContext();
 		}

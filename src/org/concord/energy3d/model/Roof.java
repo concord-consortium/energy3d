@@ -62,9 +62,10 @@ public abstract class Roof extends HousePart {
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("roof2.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 //		mesh.setRenderState(ts);
-		bottomMesh.setRenderState(ts);
+//		bottomMesh.setRenderState(ts);
 		
-		mesh.setDefaultColor(ColorRGBA.GRAY);
+		mesh.setDefaultColor(defaultColor);
+		bottomMesh.setDefaultColor(defaultColor);
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
