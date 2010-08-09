@@ -56,11 +56,11 @@ public class PrintController implements Updater {
 			init = false;
 			startTime = time;			
 			HousePart.setFlatten(true);
-			final JoglCanvasRenderer renderer = (JoglCanvasRenderer) SceneManager.getInstance().getCanvas().getCanvasRenderer();
+			final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
 			if (isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
-				renderer.makeCurrentContext();
-				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
-				renderer.releaseCurrentContext();
+//				renderer.makeCurrentContext();
+//				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
+//				renderer.releaseCurrentContext();
 				SceneManager.getInstance().updatePrintPreviewScene(true);
 				HousePart.flattenPos = 0;
 				sceneClone = (Scene) ObjectCloner.deepCopy(Scene.getInstance());
@@ -116,10 +116,10 @@ public class PrintController implements Updater {
 				Scene.getInstance().getOriginalHouseRoot().setScale(1);
 				Scene.getInstance().getOriginalHouseRoot().updateGeometricState(timer.getTimePerFrame(), true);
 
-				final JoglCanvasRenderer renderer = (JoglCanvasRenderer) SceneManager.getInstance().getCanvas().getCanvasRenderer();
-				renderer.makeCurrentContext();
-				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
-				renderer.releaseCurrentContext();				
+				final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
+//				renderer.makeCurrentContext();
+//				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
+//				renderer.releaseCurrentContext();				
 				SceneManager.getInstance().updatePrintPreviewScene(false);
 			}
 
@@ -144,14 +144,16 @@ public class PrintController implements Updater {
 //		double maxW = 0;
 //		double maxH = 0;
 //		
-//		for (HousePart part : printParts) {
+		HousePart.clearPrintSpace();
+		for (HousePart part : printParts) {
 //			final double w = part.getPrintWidth();
 //			final double h = part.getPrintHeight();
 //			if (w > maxW)
 //				maxW = w;
 //			if (h > maxH)
 //				maxH = h;
-//		}
+			part.updatePrintSpace();
+		}
 //		
 //		final double scale = HousePart.PRINT_SPACE / Math.max(maxW, maxH);
 //		for (HousePart part : printParts)

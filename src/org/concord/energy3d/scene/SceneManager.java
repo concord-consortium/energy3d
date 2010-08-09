@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.concurrent.Callable;
 
-import javax.media.opengl.GLCanvas;
-
 import org.concord.energy3d.MainFrame;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -31,7 +29,6 @@ import com.ardor3d.annotation.MainThread;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;

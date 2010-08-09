@@ -12,6 +12,9 @@ import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 
+import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingSphere;
+import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -63,9 +66,9 @@ public abstract class HousePart implements Serializable {
 	protected transient Node sizeAnnotRoot;
 	protected transient Node angleAnnotRoot;
 	protected transient Vector3 printCenter;
-	protected transient double printWidth;
-	protected transient double printHeight;
-	public static int PRINT_SPACE = 4;
+//	protected transient double printWidth;
+//	protected transient double printHeight;
+	public static double PRINT_SPACE = 4;
 	public static int PRINT_COLS = 4;
 	protected static final ReadOnlyColorRGBA defaultColor = ColorRGBA.GREEN;
 
@@ -100,6 +103,10 @@ public abstract class HousePart implements Serializable {
 
 	public static void setSnapToGrids(boolean snapToGrid) {
 		HousePart.snapToGrids = snapToGrid;
+	}
+	
+	public static void clearPrintSpace() {
+		PRINT_SPACE = 0;
 	}
 
 	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height) {
@@ -152,8 +159,8 @@ public abstract class HousePart implements Serializable {
 		root.attachChild(angleAnnotRoot);
 		root.attachChild(labelsRoot);
 		
-		printWidth = 10;
-		printHeight = 10;
+//		printWidth = 10;
+//		printHeight = 10;
 		
 		PRINT_SPACE = 10;
 		
@@ -601,11 +608,36 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot.getSceneHints().setCullHint(cull);
 	}
 
-	public double getPrintWidth() {
-		return printWidth;
+//	public double getPrintWidth() {
+//		return printWidth;
+//	}
+//
+//	public double getPrintHeight() {
+//		return printHeight;
+//	}
+	
+	public void updatePrintSpace() {	
+		root.updateWorldBound(true);
+		double d;
+		final BoundingVolume bounds = root.getWorldBound();
+		if (bounds instanceof BoundingSphere)
+			d = ((BoundingSphere)bounds).getRadius() * 2;
+		else {
+			final BoundingBox boundingBox = (BoundingBox)bounds;
+			d = Math.max(boundingBox.getXExtent(), Math.max(boundingBox.getYExtent(), boundingBox.getZExtent()));
+		}
+		
+		d += 2; //((BMText)labelsRoot.getChild(0)).getHeight() * 2;
+		
+		if (!Double.isInfinite(d) && d > PRINT_SPACE)
+			PRINT_SPACE = d;
+//		final double w = getPrintWidth();
+//		final double h = getPrintHeight();
+//		if (w > maxW)
+//			maxW = w;
+//		if (h > maxH)
+//			maxH = h;		
 	}
-
-	public double getPrintHeight() {
-		return printHeight;
-	}
+	
+	
 }  
