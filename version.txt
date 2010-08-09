@@ -281,7 +281,7 @@ Version 0.2
 - put constraints on window to prevent incorrect wall shapes
 - allow static scaling of print preview parts
 - when printing adjust camera view to avoid sections of the neighboring parts from appearing in the printout
- 
+- switch the renderer from JOGL to LWJGL
 
 
 TODO:

@@ -149,7 +149,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private ViewMode viewMode = ViewMode.NORMAL;
 	private final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private CameraMode cameraMode = CameraMode.ORBIT;
-	private static final boolean JOGL = true; 
+	private static final boolean JOGL = false;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -211,8 +211,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// final Camera camera = canvas.getCanvasRenderer().getCamera();
 		// final Dimension size = canvas.getSize();
 		// camera.resize(size.width, size.height);
-		resetCamera(ViewMode.NORMAL);
-		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
+		
+//		frameHandler.updateFrame();
+//		resetCamera(ViewMode.NORMAL);
+//		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
 
 		AWTImageLoader.registerLoader();
 
@@ -267,6 +269,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		SelectUtil.init(floor, Scene.getRoot());
 		registerInputTriggers();
 
+		
+		frameHandler.updateFrame();
+		resetCamera(ViewMode.NORMAL);
+		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
+		
 		root.updateGeometricState(0, true);
 		System.out.println("done");
 	}
@@ -750,7 +757,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// }
 
 	private void resizeCamera(final Camera camera) {
-		final Dimension size = ((GLCanvas)canvas).getSize();
+		final Dimension size = ((Component)canvas).getSize();
 		camera.resize(size.width, size.height);
 		final double scale = 0.4; // 4; //topView ? 4 : 0.5;
 		final double ratio = (double) camera.getWidth() / camera.getHeight();
