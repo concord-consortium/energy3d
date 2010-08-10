@@ -17,6 +17,7 @@ public class Floor extends Roof {
 	
 	protected void init() {
 		super.init();
+		root.detachChild(bottomMesh);
 		bottomMesh = null;
 	}
 

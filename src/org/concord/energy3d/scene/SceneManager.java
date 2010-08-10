@@ -72,6 +72,7 @@ import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
+import com.ardor3d.renderer.lwjgl.LwjglTextureRendererProvider;
 import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -182,7 +183,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.addUpdater(PrintController.getInstance());
 		frameHandler.addUpdater(Blinker.getInstance());
 
-		TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
+		if (JOGL)
+			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
+		else
+			TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
 
 		panel.addComponentListener(new java.awt.event.ComponentAdapter() {
 			public void componentResized(java.awt.event.ComponentEvent e) {
@@ -324,11 +328,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		try {
 			frameHandler.init();
 			while (!exit) {
-				try {
+//				try {
 					frameHandler.updateFrame();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
 				Thread.yield();
 			}
 		} catch (final Throwable t) {
@@ -388,8 +392,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// Scene.getInstance().init();
 
 		// renderer.draw(root);
-		// if (drawn != null)
-		// com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
+//		 if (drawn != null)
+//		 com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
 		
 		passManager.renderPasses(renderer);
 		return true;
@@ -724,7 +728,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			// camera.setProjectionMode(ProjectionMode.Parallel);
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			// loc = new Vector3(5, -20, 5);
-			loc = new Vector3(0, -20, 0);
+//			loc = new Vector3(0, -20, 0);
+			loc = new Vector3(0, -HousePart.PRINT_SPACE * HousePart.PRINT_COLS, 0);
 			// root.setScale(0.04);
 		} else {
 			camera.setProjectionMode(ProjectionMode.Perspective);

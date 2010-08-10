@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.PrintExporter;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.Updater;
@@ -15,6 +16,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.screen.ScreenExporter;
@@ -52,7 +54,9 @@ public class PrintController implements Updater {
 			return;
 
 		final long time = timer.getTime();
+		final Spatial originalHouseRoot = Scene.getInstance().getOriginalHouseRoot();
 		if (init) {
+			System.out.println("Initializing Print Preview Animation...");
 			init = false;
 			startTime = time;			
 			HousePart.setFlatten(true);
@@ -61,7 +65,6 @@ public class PrintController implements Updater {
 //				renderer.makeCurrentContext();
 //				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
 //				renderer.releaseCurrentContext();
-				SceneManager.getInstance().updatePrintPreviewScene(true);
 				HousePart.flattenPos = 0;
 				sceneClone = (Scene) ObjectCloner.deepCopy(Scene.getInstance());
 				printParts.clear();
@@ -74,12 +77,16 @@ public class PrintController implements Updater {
 						printParts.add(newPart);
 				}
 				applyPreviewScale();
+				SceneManager.getInstance().updatePrintPreviewScene(true);
 				
-				Scene.getInstance().getOriginalHouseRoot().setScale(2);
-//				Scene.getInstance().getOriginalHouseRoot().setTranslation(0, y, 0);
+				originalHouseRoot.setScale(2);
+				originalHouseRoot.updateWorldBound(true);
+				originalHouseRoot.setTranslation(0, 0, -Util.findBoundLength(originalHouseRoot.getWorldBound()) / 3);
 			}
 			 for (HousePart part : Scene.getInstance().getParts())
 			 part.getRoot().getSceneHints().setCullHint(CullHint.Always);
+			 
+			 System.out.println("Finished initialization of Print Preview Animation.");
 		}
 
 		if (!finish) {
@@ -95,6 +102,7 @@ public class PrintController implements Updater {
 		}
 
 		if (finish) {
+			System.out.println("Finishing Print Preview Animation...");
 			if (!isPrintPreview)
 				HousePart.setFlatten(false);
 			if (!isPrintPreview && finishPhase == 10) {
@@ -108,24 +116,27 @@ public class PrintController implements Updater {
 //					e.printStackTrace();
 //				}
 				
-				Scene.getInstance().getOriginalHouseRoot().setRotation(new Matrix3().fromAngles(0, 0, 0));
+				originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
 				angle = 0;
 				for (HousePart housePart : sceneClone.getParts())
 					Scene.getRoot().detachChild(housePart.getRoot());
 				printParts.clear();
-				Scene.getInstance().getOriginalHouseRoot().setScale(1);
-				Scene.getInstance().getOriginalHouseRoot().updateGeometricState(timer.getTimePerFrame(), true);
+				originalHouseRoot.setScale(1);
+				originalHouseRoot.setTranslation(0, 0, 0);
+				originalHouseRoot.updateGeometricState(timer.getTimePerFrame(), true);
 
 				final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
 //				renderer.makeCurrentContext();
 //				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
 //				renderer.releaseCurrentContext();				
 				SceneManager.getInstance().updatePrintPreviewScene(false);
+				System.out.println("Finished Print Preview Animation.");
 			}
 
 			if (finishPhase == 10) {
 				for (HousePart part : Scene.getInstance().getParts())
 					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
+				System.out.println("Final Finish of Print Preview Animation.");
 			}
 
 			finishPhase++;
@@ -154,6 +165,8 @@ public class PrintController implements Updater {
 //				maxH = h;
 			part.updatePrintSpace();
 		}
+		
+		HousePart.PRINT_COLS = (int)Math.ceil(Math.sqrt(printParts.size()));
 //		
 //		final double scale = HousePart.PRINT_SPACE / Math.max(maxW, maxH);
 //		for (HousePart part : printParts)

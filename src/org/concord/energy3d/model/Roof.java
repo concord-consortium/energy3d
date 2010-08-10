@@ -113,6 +113,8 @@ public abstract class Roof extends HousePart {
 		// drawAnnotations();
 
 		mesh.updateModelBound();
+		if (bottomMesh != null)
+			bottomMesh.updateModelBound();		
 	}
 
 	private void resetToZero(final FloatBuffer buff) {
@@ -247,12 +249,12 @@ public abstract class Roof extends HousePart {
 			double height = p1.getZ();
 			height = Math.max(height, p2.getZ());
 			height = Math.max(height, p3.getZ());
-			height = Math.max(height, p4.getZ());
-			height = Math.max(height, p5.getZ());
-			height = Math.max(height, p6.getZ());
-			if (isQuad)
-				center.set(p1).addLocal(p2).addLocal(p3).addLocal(p4).addLocal(p5).addLocal(p6).multiplyLocal(1.0 / 6.0);
-			else
+			if (isQuad) {
+				height = Math.max(height, p4.getZ());
+				height = Math.max(height, p5.getZ());
+				height = Math.max(height, p6.getZ());				
+				center.set(p1).addLocal(p2).addLocal(p3).addLocal(p4).addLocal(p5).addLocal(p6).multiplyLocal(1.0 / 6.0);				
+			} else
 				center.set(p1).addLocal(p2).addLocal(p3).multiplyLocal(1.0 / 3.0);
 			center.setZ(height + 0.3);
 			final String text = "(" + (printSequence++ + 1) + ")";

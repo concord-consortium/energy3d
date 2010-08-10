@@ -283,6 +283,11 @@ Version 0.2
 - when printing adjust camera view to avoid sections of the neighboring parts from appearing in the printout
 - switch the renderer from JOGL to LWJGL
 - auto-arrange parts in print preview to fit in page and no overlap
+- compute number of columns for print preview based on squared root of all printable parts
+- fixed problem with roof parts labels being translated to z of highest part
+- adjust the 3D model position to align its center with the center of print preview
+- rearrange the print preview parts in a 4*3 aspect ratio row/column format
+- fit the entire print preview in current canvas by automatically adjusting the camera location
 
 
 TODO:

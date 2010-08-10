@@ -11,6 +11,7 @@ import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
@@ -162,7 +163,7 @@ public abstract class HousePart implements Serializable {
 //		printWidth = 10;
 //		printHeight = 10;
 		
-		PRINT_SPACE = 10;
+//		PRINT_SPACE = 10;
 		
 //		computeAbsPoints();
 //		computeCenter();		
@@ -495,7 +496,11 @@ public abstract class HousePart implements Serializable {
 
 	protected void computePrintCenter() {
 		while (true) {
-			printCenter.set((-1.5 + printPage % PRINT_COLS) * PRINT_SPACE, 0, (-0.8 + printPage / PRINT_COLS) * PRINT_SPACE);
+//			printCenter.set((-1.5 + printPage % PRINT_COLS) * PRINT_SPACE, 0, (-0.8 + printPage / PRINT_COLS) * PRINT_SPACE);
+			int printColsX = PRINT_COLS * 4/3;
+			if (printColsX % 2 == 0)
+				printColsX++;
+			printCenter.set((-(printColsX - 1) / 2.0 + printPage % printColsX) * PRINT_SPACE, 0, (-(PRINT_COLS - 1) / 2.0 + printPage / printColsX) * PRINT_SPACE);
 			if (printCenter.length() >= PRINT_SPACE)
 				break;
 			else
@@ -619,13 +624,7 @@ public abstract class HousePart implements Serializable {
 	public void updatePrintSpace() {	
 		root.updateWorldBound(true);
 		double d;
-		final BoundingVolume bounds = root.getWorldBound();
-		if (bounds instanceof BoundingSphere)
-			d = ((BoundingSphere)bounds).getRadius() * 2;
-		else {
-			final BoundingBox boundingBox = (BoundingBox)bounds;
-			d = Math.max(boundingBox.getXExtent(), Math.max(boundingBox.getYExtent(), boundingBox.getZExtent()));
-		}
+		d = Util.findBoundLength(root.getWorldBound());
 		
 		d += 2; //((BMText)labelsRoot.getChild(0)).getHeight() * 2;
 		
