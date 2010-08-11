@@ -51,7 +51,7 @@ public abstract class HousePart implements Serializable {
 	protected HousePart container = null;
 	protected boolean drawCompleted = false;
 	protected int editPointIndex = -1;
-	private transient PickResults pickResults;
+//	private transient PickResults pickResults;
 	private boolean firstPointInserted = false;
 	protected transient ArrayList<Vector3> abspoints;
 	protected double height;
@@ -125,10 +125,12 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void init() {
+		System.out.print("Deep cloning...");
 		if (!(this instanceof Window || this instanceof Door)) { // && pos == 0) {
 			pos = flattenPos;
 			flattenPos += 1;
 		}
+		System.out.print("Instantiating Nodes...");
 		defaultDirection = new Vector3(0, 0, 0.5);
 		orgHeight = height;
 		center = new Vector3();
@@ -144,9 +146,10 @@ public abstract class HousePart implements Serializable {
 		printCenter = new Vector3();
 
 		// Set up a reusable pick results
-		pickResults = new PrimitivePickResults();
-		pickResults.setCheckDistance(true);
+//		pickResults = new PrimitivePickResults();
+//		pickResults.setCheckDistance(true);
 
+		System.out.print("Creating Edit Points...");
 		final Vector3 origin = new Vector3();
 		for (int i = 0; i < numOfEditPoints; i++) {
 			Sphere pointShape = new Sphere("Point", origin, 8, 8, 0.05);
@@ -155,6 +158,7 @@ public abstract class HousePart implements Serializable {
 			pointShape.updateModelBound(); // important
 			pointShape.getSceneHints().setCullHint(CullHint.Always);
 		}
+		System.out.print("Attaching Nodes...");
 		root.attachChild(pointsRoot);
 		root.attachChild(sizeAnnotRoot);
 		root.attachChild(angleAnnotRoot);
@@ -167,6 +171,7 @@ public abstract class HousePart implements Serializable {
 		
 //		computeAbsPoints();
 //		computeCenter();		
+		System.out.println("done");
 	}
 
 	private void initCheck() {
@@ -440,25 +445,37 @@ public abstract class HousePart implements Serializable {
 	public void draw() {
 //		System.out.println("(" + printSequence + ")");
 		System.out.println("drawing..." + this);
-		if (root == null)
+		if (root == null) {
+			log("init()");
 			init();
+		}
 
+		log("computeAbsPoints()");
 		computeAbsPoints();
+		log("computeCenter()");
 		computeCenter();
 
+		log("updateMesh()");
 		updateMesh();
 
+		log("CollisionTreeManager.INSTANCE.removeCollisionTree()");
 		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
 
-		if (isFlatten && original != null && isPrintable() && isDrawCompleted()) // && flattenTime >= 0) // TODO If draw not completed then it shouldn't even exist at this point!
+		if (isFlatten && original != null && isPrintable() && isDrawCompleted()) { // && flattenTime >= 0) // TODO If draw not completed then it shouldn't even exist at this point!
+			log("flatten()");
 			flatten();
+		}
 
-		if (original != null && isPrintable())
+		if (original != null && isPrintable()) {
+			log("updateLabels()");
 			updateLabels();
+		}
 
-		if (drawAnnotations)
+		if (drawAnnotations) {
+			log("drawAnnotations()");
 			drawAnnotations();
+		}
 
 //		for (HousePart child : children)
 //			child.draw();
@@ -638,5 +655,8 @@ public abstract class HousePart implements Serializable {
 //			maxH = h;		
 	}
 	
+	public void log(String s) {
+		System.out.println(this + "\t" + s);
+	}
 	
 }  

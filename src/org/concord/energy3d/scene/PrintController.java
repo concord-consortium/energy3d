@@ -31,7 +31,7 @@ public class PrintController implements Updater {
 	private Scene sceneClone = null;
 	private ArrayList<HousePart> printParts = new ArrayList<HousePart>();
 	private double angle;
-//	private int counter = 0;
+	private int counter = 0;
 	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
 
 	public static PrintController getInstance() {
@@ -66,10 +66,13 @@ public class PrintController implements Updater {
 //				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
 //				renderer.releaseCurrentContext();
 				HousePart.flattenPos = 0;
+				System.out.print("Deep cloning...");
 				sceneClone = (Scene) ObjectCloner.deepCopy(Scene.getInstance());
+				System.out.println("done");
 				printParts.clear();
 				for (int i = 0; i < sceneClone.getParts().size(); i++) {
 					final HousePart newPart = sceneClone.getParts().get(i);
+					System.out.println("Attaching Print Part...");
 					Scene.getRoot().attachChild(newPart.getRoot());
 					newPart.draw();
 					newPart.setOriginal(Scene.getInstance().getParts().get(i));
@@ -141,13 +144,13 @@ public class PrintController implements Updater {
 
 			finishPhase++;
 			
-//			if (finishPhase > 20) {
-//				counter++;
-//				System.out.println("PrintPreview Counter: " + counter);
-//				isPrintPreview = !isPrintPreview;
-//				init = true;
-//				finish = false;
-//			}
+			if (finishPhase > 20) {
+				counter++;
+				System.out.println("PrintPreview Counter: " + counter);
+				isPrintPreview = !isPrintPreview;
+				init = true;
+				finish = false;
+			}
 		}
 	}
 

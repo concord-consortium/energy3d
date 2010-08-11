@@ -225,7 +225,9 @@ public class Scene implements Serializable {
 	// }
 
 	public void add(HousePart housePart) {
+		System.out.print("Adding new house part...");
 		originalHouseRoot.attachChild(housePart.getRoot());
+		System.out.println("done");
 		parts.add(housePart);
 	}
 

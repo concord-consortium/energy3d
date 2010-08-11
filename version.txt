@@ -288,7 +288,7 @@ Version 0.2
 - adjust the 3D model position to align its center with the center of print preview
 - rearrange the print preview parts in a 4*3 aspect ratio row/column format
 - fit the entire print preview in current canvas by automatically adjusting the camera location
-
+- fixed exception thrown when using mouse wheel to zoom out of print preview
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar
