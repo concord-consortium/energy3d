@@ -147,7 +147,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private ViewMode viewMode = ViewMode.NORMAL;
 	private final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private CameraMode cameraMode = CameraMode.ORBIT;
-	private static final boolean JOGL = false;
+	private static final boolean JOGL = true;
 
 	public static SceneManager getInstance() {
 		return instance;

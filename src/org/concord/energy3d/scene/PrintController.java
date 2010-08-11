@@ -56,22 +56,26 @@ public class PrintController implements Updater {
 		final long time = timer.getTime();
 		final Spatial originalHouseRoot = Scene.getInstance().getOriginalHouseRoot();
 		if (init) {
+			if (Util.DEBUG)
 			System.out.println("Initializing Print Preview Animation...");
 			init = false;
 			startTime = time;			
 			HousePart.setFlatten(true);
 			final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
 			if (isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
-//				renderer.makeCurrentContext();
-//				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
-//				renderer.releaseCurrentContext();
+				renderer.makeCurrentContext();
+				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
+				renderer.releaseCurrentContext();
 				HousePart.flattenPos = 0;
+				if (Util.DEBUG)
 				System.out.print("Deep cloning...");
 				sceneClone = (Scene) ObjectCloner.deepCopy(Scene.getInstance());
+				if (Util.DEBUG)
 				System.out.println("done");
 				printParts.clear();
 				for (int i = 0; i < sceneClone.getParts().size(); i++) {
 					final HousePart newPart = sceneClone.getParts().get(i);
+					if (Util.DEBUG)
 					System.out.println("Attaching Print Part...");
 					Scene.getRoot().attachChild(newPart.getRoot());
 					newPart.draw();
@@ -88,7 +92,7 @@ public class PrintController implements Updater {
 			}
 			 for (HousePart part : Scene.getInstance().getParts())
 			 part.getRoot().getSceneHints().setCullHint(CullHint.Always);
-			 
+			 if (Util.DEBUG)
 			 System.out.println("Finished initialization of Print Preview Animation.");
 		}
 
@@ -105,6 +109,7 @@ public class PrintController implements Updater {
 		}
 
 		if (finish) {
+			if (Util.DEBUG)
 			System.out.println("Finishing Print Preview Animation...");
 			if (!isPrintPreview)
 				HousePart.setFlatten(false);
@@ -129,28 +134,31 @@ public class PrintController implements Updater {
 				originalHouseRoot.updateGeometricState(timer.getTimePerFrame(), true);
 
 				final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-//				renderer.makeCurrentContext();
-//				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
-//				renderer.releaseCurrentContext();				
+				renderer.makeCurrentContext();
+				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
+				renderer.releaseCurrentContext();				
 				SceneManager.getInstance().updatePrintPreviewScene(false);
+				if (Util.DEBUG)
 				System.out.println("Finished Print Preview Animation.");
 			}
 
 			if (finishPhase == 10) {
 				for (HousePart part : Scene.getInstance().getParts())
 					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
+				if (Util.DEBUG)
 				System.out.println("Final Finish of Print Preview Animation.");
 			}
 
 			finishPhase++;
 			
-			if (finishPhase > 20) {
-				counter++;
-				System.out.println("PrintPreview Counter: " + counter);
-				isPrintPreview = !isPrintPreview;
-				init = true;
-				finish = false;
-			}
+//			if (finishPhase > 20) {
+//				counter++;
+//				if (Util.DEBUG)
+//				System.out.println("PrintPreview Counter: " + counter);
+//				isPrintPreview = !isPrintPreview;
+//				init = true;
+//				finish = false;
+//			}
 		}
 	}
 

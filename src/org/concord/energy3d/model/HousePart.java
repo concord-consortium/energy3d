@@ -71,7 +71,7 @@ public abstract class HousePart implements Serializable {
 //	protected transient double printHeight;
 	public static double PRINT_SPACE = 4;
 	public static int PRINT_COLS = 4;
-	protected static final ReadOnlyColorRGBA defaultColor = ColorRGBA.GREEN;
+	protected static final ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
 
 	public static void setFlattenTime(double flattenTime) {
 		if (flattenTime < 0)
@@ -125,11 +125,13 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void init() {
+		if (Util.DEBUG)
 		System.out.print("Deep cloning...");
 		if (!(this instanceof Window || this instanceof Door)) { // && pos == 0) {
 			pos = flattenPos;
 			flattenPos += 1;
 		}
+		if (Util.DEBUG)
 		System.out.print("Instantiating Nodes...");
 		defaultDirection = new Vector3(0, 0, 0.5);
 		orgHeight = height;
@@ -148,7 +150,7 @@ public abstract class HousePart implements Serializable {
 		// Set up a reusable pick results
 //		pickResults = new PrimitivePickResults();
 //		pickResults.setCheckDistance(true);
-
+		if (Util.DEBUG)
 		System.out.print("Creating Edit Points...");
 		final Vector3 origin = new Vector3();
 		for (int i = 0; i < numOfEditPoints; i++) {
@@ -158,6 +160,7 @@ public abstract class HousePart implements Serializable {
 			pointShape.updateModelBound(); // important
 			pointShape.getSceneHints().setCullHint(CullHint.Always);
 		}
+		if (Util.DEBUG)
 		System.out.print("Attaching Nodes...");
 		root.attachChild(pointsRoot);
 		root.attachChild(sizeAnnotRoot);
@@ -171,6 +174,7 @@ public abstract class HousePart implements Serializable {
 		
 //		computeAbsPoints();
 //		computeCenter();		
+		if (Util.DEBUG)
 		System.out.println("done");
 	}
 
@@ -444,6 +448,7 @@ public abstract class HousePart implements Serializable {
 
 	public void draw() {
 //		System.out.println("(" + printSequence + ")");
+		if (Util.DEBUG)
 		System.out.println("drawing..." + this);
 		if (root == null) {
 			log("init()");
@@ -656,6 +661,7 @@ public abstract class HousePart implements Serializable {
 	}
 	
 	public void log(String s) {
+		if (Util.DEBUG)
 		System.out.println(this + "\t" + s);
 	}
 	
