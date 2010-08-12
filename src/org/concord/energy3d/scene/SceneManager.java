@@ -147,6 +147,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private ViewMode viewMode = ViewMode.NORMAL;
 	private final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private CameraMode cameraMode = CameraMode.ORBIT;
+
+	private boolean operationFlag = false;
 	private static final boolean JOGL = false;
 
 	public static SceneManager getInstance() {
@@ -268,6 +270,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 	
 	public void update(final ReadOnlyTimer timer) {
+		if (operationFlag)
+			executeOperation();
+		
 		// Scene.getInstance().updateTexture();
 		final double tpf = timer.getTimePerFrame();
 		passManager.updatePasses(tpf);
@@ -783,7 +788,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setOperation(Operation operation) {
 		this.operation = operation;
-		// if (operation == Operation.SELECT) {
+		this.operationFlag  = true;
+	}
+	
+	public void executeOperation() { 
+		this.operationFlag = false;
+	// if (operation == Operation.SELECT) {
 		// drawn = null;
 		// return;
 		// }

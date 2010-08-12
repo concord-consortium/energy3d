@@ -290,6 +290,8 @@ Version 0.2
 - fit the entire print preview in current canvas by automatically adjusting the camera location
 - fixed exception thrown when using mouse wheel to zoom out of print preview
 - fixed problem with canvas not rendering in Lwjgl mode in graphics cards that do not support Anti-Aliasing
+- use a flag in setOperator method in order to perform the majority of work in main thread
+
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar

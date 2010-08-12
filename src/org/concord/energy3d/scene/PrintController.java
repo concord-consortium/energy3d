@@ -8,10 +8,12 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.PrintExporter;
 import org.concord.energy3d.util.Util;
+import org.lwjgl.LWJGLException;
 
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
+import com.ardor3d.framework.lwjgl.LwjglAwtCanvas;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -63,9 +65,15 @@ public class PrintController implements Updater {
 			HousePart.setFlatten(true);
 			final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
 			if (isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
-//				renderer.makeCurrentContext();
-//				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
+				renderer.makeCurrentContext();
+				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
 //				renderer.releaseCurrentContext();
+				try {
+					((LwjglAwtCanvas)SceneManager.getInstance().getCanvas()).releaseContext();
+				} catch (LWJGLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				};				
 				HousePart.flattenPos = 0;
 				if (Util.DEBUG)
 				System.out.print("Deep cloning...");
@@ -99,6 +107,7 @@ public class PrintController implements Updater {
 		if (!finish) {
 			final double t = (time - startTime) / 1.0 / timer.getResolution();
 //			final double t = 1;
+			if (Util.DEBUG)
 			System.out.println("t = " + t);
 			HousePart.setFlattenTime(isPrintPreview ? t : 1 - t);
 //			clearPrintCenters();
@@ -133,10 +142,16 @@ public class PrintController implements Updater {
 				originalHouseRoot.setTranslation(0, 0, 0);
 				originalHouseRoot.updateGeometricState(timer.getTimePerFrame(), true);
 
-//				final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-//				renderer.makeCurrentContext();
-//				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
-//				renderer.releaseCurrentContext();				
+final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
+renderer.makeCurrentContext();
+renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
+//renderer.releaseCurrentContext();	
+try {
+	((LwjglAwtCanvas)SceneManager.getInstance().getCanvas()).releaseContext();
+} catch (LWJGLException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+};
 				SceneManager.getInstance().updatePrintPreviewScene(false);
 				if (Util.DEBUG)
 				System.out.println("Finished Print Preview Animation.");
@@ -151,14 +166,14 @@ public class PrintController implements Updater {
 
 			finishPhase++;
 			
-//			if (finishPhase > 20) {
-//				counter++;
-//				if (Util.DEBUG)
-//				System.out.println("PrintPreview Counter: " + counter);
-//				isPrintPreview = !isPrintPreview;
-//				init = true;
-//				finish = false;
-//			}
+			if (finishPhase > 20) {
+				counter++;
+				if (Util.DEBUG)
+				System.out.println("PrintPreview Counter: " + counter);
+				isPrintPreview = !isPrintPreview;
+				init = true;
+				finish = false;
+			}
 		}
 	}
 
