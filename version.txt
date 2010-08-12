@@ -289,6 +289,7 @@ Version 0.2
 - rearrange the print preview parts in a 4*3 aspect ratio row/column format
 - fit the entire print preview in current canvas by automatically adjusting the camera location
 - fixed exception thrown when using mouse wheel to zoom out of print preview
+- fixed problem with canvas not rendering in Lwjgl mode in graphics cards that do not support Anti-Aliasing
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar

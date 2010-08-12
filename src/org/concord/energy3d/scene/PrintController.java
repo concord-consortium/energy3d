@@ -63,9 +63,9 @@ public class PrintController implements Updater {
 			HousePart.setFlatten(true);
 			final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
 			if (isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
-				renderer.makeCurrentContext();
-				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
-				renderer.releaseCurrentContext();
+//				renderer.makeCurrentContext();
+//				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
+//				renderer.releaseCurrentContext();
 				HousePart.flattenPos = 0;
 				if (Util.DEBUG)
 				System.out.print("Deep cloning...");
@@ -133,10 +133,10 @@ public class PrintController implements Updater {
 				originalHouseRoot.setTranslation(0, 0, 0);
 				originalHouseRoot.updateGeometricState(timer.getTimePerFrame(), true);
 
-				final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-				renderer.makeCurrentContext();
-				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
-				renderer.releaseCurrentContext();				
+//				final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
+//				renderer.makeCurrentContext();
+//				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
+//				renderer.releaseCurrentContext();				
 				SceneManager.getInstance().updatePrintPreviewScene(false);
 				if (Util.DEBUG)
 				System.out.println("Finished Print Preview Animation.");

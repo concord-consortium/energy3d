@@ -158,7 +158,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		instance = this;
 		root.attachChild(Scene.getRoot());
 
-		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 8, false, false);
+		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
 		if (JOGL)
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
 		else
@@ -849,10 +849,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() throws Exception {
 				lightState.setEnabled(enable);
 				root.updateWorldRenderStates(true);
-				if (enable)
-					passManager.add(shadowPass);
-				else
-					passManager.remove(shadowPass);
+//				if (enable)
+//					passManager.add(shadowPass);
+//				else
+//					passManager.remove(shadowPass);
 				return null;
 			}
 		});
