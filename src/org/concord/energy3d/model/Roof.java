@@ -61,8 +61,8 @@ public abstract class Roof extends HousePart {
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("roof2.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-//		mesh.setRenderState(ts);
-//		bottomMesh.setRenderState(ts);
+		mesh.setRenderState(ts);
+		bottomMesh.setRenderState(ts);
 		
 		mesh.setDefaultColor(defaultColor);
 		bottomMesh.setDefaultColor(defaultColor);
