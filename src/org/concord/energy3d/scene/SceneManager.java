@@ -859,10 +859,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() throws Exception {
 				lightState.setEnabled(enable);
 				root.updateWorldRenderStates(true);
-//				if (enable)
-//					passManager.add(shadowPass);
-//				else
-//					passManager.remove(shadowPass);
+				if (enable)
+					passManager.add(shadowPass);
+				else
+					passManager.remove(shadowPass);
 				return null;
 			}
 		});
