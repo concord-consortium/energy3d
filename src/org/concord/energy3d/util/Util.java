@@ -5,7 +5,7 @@ import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 
 public class Util {
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	
 	public static double findBoundLength(final BoundingVolume bounds) {
 		double d;

@@ -67,13 +67,13 @@ public class PrintController implements Updater {
 			if (isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
 				renderer.makeCurrentContext();
 				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
-//				renderer.releaseCurrentContext();
-				try {
-					((LwjglAwtCanvas)SceneManager.getInstance().getCanvas()).releaseContext();
-				} catch (LWJGLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				};				
+				renderer.releaseCurrentContext();
+//				try {
+//					((LwjglAwtCanvas)SceneManager.getInstance().getCanvas()).releaseContext();
+//				} catch (LWJGLException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				};				
 				HousePart.flattenPos = 0;
 				if (Util.DEBUG)
 				System.out.print("Deep cloning...");
@@ -145,13 +145,13 @@ public class PrintController implements Updater {
 final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
 renderer.makeCurrentContext();
 renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
-//renderer.releaseCurrentContext();	
-try {
-	((LwjglAwtCanvas)SceneManager.getInstance().getCanvas()).releaseContext();
-} catch (LWJGLException e) {
-	// TODO Auto-generated catch block
-	e.printStackTrace();
-};
+renderer.releaseCurrentContext();	
+//try {
+//	((LwjglAwtCanvas)SceneManager.getInstance().getCanvas()).releaseContext();
+//} catch (LWJGLException e) {
+//	// TODO Auto-generated catch block
+//	e.printStackTrace();
+//};
 				SceneManager.getInstance().updatePrintPreviewScene(false);
 				if (Util.DEBUG)
 				System.out.println("Finished Print Preview Animation.");
@@ -166,14 +166,14 @@ try {
 
 			finishPhase++;
 			
-			if (finishPhase > 20) {
-				counter++;
-				if (Util.DEBUG)
-				System.out.println("PrintPreview Counter: " + counter);
-				isPrintPreview = !isPrintPreview;
-				init = true;
-				finish = false;
-			}
+//			if (finishPhase > 20) {
+//				counter++;
+//				if (Util.DEBUG)
+//				System.out.println("PrintPreview Counter: " + counter);
+//				isPrintPreview = !isPrintPreview;
+//				init = true;
+//				finish = false;
+//			}
 		}
 	}
 
