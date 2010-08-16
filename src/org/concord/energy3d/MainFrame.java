@@ -74,6 +74,7 @@ public class MainFrame extends JFrame {
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JMenu scaleMenu;
 	private JMenuItem scaleMenuItem;
+	private JCheckBoxMenuItem shadowMenu;
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -755,6 +756,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 			viewMenu.add(getUnitsMenu());
+			viewMenu.add(getShadowMenu());
 		}
 		return viewMenu;
 	}
@@ -768,6 +770,19 @@ public class MainFrame extends JFrame {
 		}
 		return unitsMenu;
 	}
+	
+	private JCheckBoxMenuItem getShadowMenu() {
+		if (shadowMenu == null) {
+			shadowMenu = new JCheckBoxMenuItem("Shadows", false);
+			shadowMenu.addItemListener(new java.awt.event.ItemListener() {
+				public void itemStateChanged(java.awt.event.ItemEvent e) {
+					SceneManager.getInstance().setShadow(shadowMenu.isSelected());
+				}
+			});			
+		}
+		return shadowMenu;
+	}
+	
 
 	private JRadioButtonMenuItem getMetersRadioButtonMenuItem() {
 		if (metersRadioButtonMenuItem == null) {

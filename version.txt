@@ -291,6 +291,7 @@ Version 0.2
 - fixed exception thrown when using mouse wheel to zoom out of print preview
 - fixed problem with canvas not rendering in Lwjgl mode in graphics cards that do not support Anti-Aliasing
 - use a flag in setOperator method in order to perform the majority of work in main thread
+- add menu item for enabling/disabling shadows
 
 
 TODO:
