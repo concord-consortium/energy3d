@@ -12,6 +12,7 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
@@ -39,13 +40,16 @@ public class Foundation extends HousePart {
 		mesh = new Box("Foundation", new Vector3(), new Vector3());
 		boundingMesh = new Box("Foundation (Bounding)", new Vector3(), new Vector3());
 		root.attachChild(mesh);
-
-		// Add a texture to the box.
-		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		mesh.setRenderState(ts);
 		
-		mesh.setDefaultColor(defaultColor);
+		updateTexture();
+
+//		if (textureEnabled) {
+//		// Add a texture to the box.
+//		final TextureState ts = new TextureState();
+//		ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+//		mesh.setRenderState(ts);
+//		} else 
+//			mesh.setDefaultColor(defaultColor);
 
 		WireframeState wire = new WireframeState();
 		boundingMesh.setRenderState(wire);
@@ -230,4 +234,17 @@ public class Foundation extends HousePart {
 		if (!resizeHouseMode)
 			super.hidePoints();
 	}	
+	
+	public void updateTexture() {
+		if (textureEnabled) {
+			final TextureState ts = new TextureState();
+			ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+			mesh.setRenderState(ts);
+			mesh.setDefaultColor(ColorRGBA.WHITE);
+		} else {
+			mesh.clearRenderState(StateType.Texture);
+			mesh.setDefaultColor(defaultColor);
+		}
+	}
+	
 }

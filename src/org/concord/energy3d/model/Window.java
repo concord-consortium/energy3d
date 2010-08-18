@@ -62,6 +62,8 @@ public class Window extends HousePart {
 		mesh.setRenderState(ms);
 
 		mesh.setUserData(new UserData(this));
+		
+//		root.attachChild(mesh);
 	}
 
 	public void addPoint(int x, int y) {

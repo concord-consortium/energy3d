@@ -292,6 +292,9 @@ Version 0.2
 - fixed problem with canvas not rendering in Lwjgl mode in graphics cards that do not support Anti-Aliasing
 - use a flag in setOperator method in order to perform the majority of work in main thread
 - add menu item for enabling/disabling shadows
+- add menu item for enabling/disabling textures
+- adjust the initial position and orientation of sun
+
 
 
 TODO:

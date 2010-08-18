@@ -24,6 +24,7 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.CullState.Face;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -48,7 +49,7 @@ public class Wall extends HousePart {
 	private Snap[] neighbors = new Snap[2];
 	private transient boolean reversedThickness;
 	private Vector3 thicknessNormal;
-	private Roof roof;	
+	private Roof roof;
 
 	static {
 		CULL_FRONT.setCullFace(Face.Front);
@@ -104,29 +105,35 @@ public class Wall extends HousePart {
 		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		windowsSurroundMesh.setModelBound(null);
 		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		
+
 		root.attachChild(wireframeMesh);
 		wireframeMesh.getMeshData().setIndexMode(IndexMode.Quads);
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		wireframeMesh.setModelBound(null);
-		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);		
+		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.setRenderState(new WireframeState());
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 
-		// Add a texture to the box.
-		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		mesh.setRenderState(ts);
-		
-		mesh.setDefaultColor(defaultColor);
-		
+		updateTexture();
 
 		UserData userData = new UserData(this);
 		mesh.setUserData(userData);
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
 		invisibleMesh.setUserData(userData);
+	}
+
+	public void updateTexture() {
+		if (textureEnabled) {
+			final TextureState ts = new TextureState();
+			ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+			mesh.setRenderState(ts);
+			mesh.setDefaultColor(ColorRGBA.WHITE);
+		} else {
+			mesh.clearRenderState(StateType.Texture);
+			mesh.setDefaultColor(defaultColor);
+		}
 	}
 
 	private Vector3 getUpperPoint(Vector3 p) {
@@ -139,7 +146,7 @@ public class Wall extends HousePart {
 			final HousePart previousContainer = container;
 			PickedHousePart picked = pick(x, y, new Class<?>[] { Foundation.class, null });
 			if (container != previousContainer)
-				for (int i=0; i<points.size(); i++)
+				for (int i = 0; i < points.size(); i++)
 					points.get(i).set(toRelative(abspoints.get(i)));
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
@@ -149,9 +156,9 @@ public class Wall extends HousePart {
 				Snap snap = snap(p, index);
 				if (snap == null) {
 					boolean foundationSnap = foundationSnap(p);
-//				if (snap == null)
+					// if (snap == null)
 					if (!foundationSnap)
-					p = grid(p, GRID_SIZE, false);
+						p = grid(p, GRID_SIZE, false);
 				}
 				setNeighbor(index, snap, true);
 				if (index == 2) // make sure z of 2nd base point is same as 2st (needed for platform picking side)
@@ -178,14 +185,14 @@ public class Wall extends HousePart {
 		draw();
 		showPoints();
 
-//		for (HousePart child : children)
-//			child.draw();
-		
+		// for (HousePart child : children)
+		// child.draw();
+
 		for (Snap neighbor : this.neighbors)
 			if (neighbor != null) {
 				neighbor.getNeighborOf(this).draw();
 			}
-		
+
 		if (roof != null)
 			roof.draw();
 
@@ -202,12 +209,12 @@ public class Wall extends HousePart {
 	// // p = toAbsolute(p);
 	// // pointsRoot.getChild(i).setTranslation(p);
 	// // }
-	//		
+	//
 	// boolean drawable = points.size() >= 4 && !points.get(0).equals(points.get(2));
-	//		
+	//
 	// // System.out.println("rel = " + points.get(0));
 	// // System.out.println("abs = " + toAbsolute(points.get(0)));
-	//		
+	//
 	// ArrayList<Vector3> points = abspoints;
 	//
 	// if (drawable) {
@@ -218,7 +225,7 @@ public class Wall extends HousePart {
 	// FloatBuffer invisibleVertexBuffer = invisibleMesh.getMeshData().getVertexBuffer();
 	// invisibleVertexBuffer.rewind();
 	// Vector3 p;
-	//			
+	//
 	// p = points.get(0);
 	// // p = toAbsolute(p);
 	// // System.out.println("invis abs Y = " + p.getY());
@@ -318,10 +325,10 @@ public class Wall extends HousePart {
 	// invisibleMesh.updateModelBound();
 	// // root.updateGeometricState(0);
 	// CollisionTreeManager.INSTANCE.removeCollisionTree(root);
-	//					
+	//
 	// for (HousePart child : children)
 	// child.draw();
-	//					
+	//
 	// } catch (Exception e) {
 	// e.printStackTrace();
 	// }
@@ -392,14 +399,14 @@ public class Wall extends HousePart {
 		// Add window holes
 		for (HousePart child : children) {
 			if (child instanceof Window) {
-//				Window win = (Window) child;
+				// Window win = (Window) child;
 				if (child.getPoints().size() < 4)
 					continue;
 				PolygonPoint pp;
 				ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
-//				System.out.println("win[0] = " + child.getPoints().get(0));
+				// System.out.println("win[0] = " + child.getPoints().get(0));
 				ArrayList<Vector3> winPoints = child.getPoints();
-//				p = winPoints.get(0);
+				// p = winPoints.get(0);
 				p = winPoints.get(0);
 				pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 				toXY.transform(pp);
@@ -449,7 +456,7 @@ public class Wall extends HousePart {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		
+
 		// draw wireframe
 		final FloatBuffer buf = wireframeMesh.getMeshData().getVertexBuffer();
 		buf.rewind();
@@ -465,9 +472,9 @@ public class Wall extends HousePart {
 
 		// keep it for platform resizing
 		if (original == null)
-		for (HousePart child : children)
-			child.draw();
-				
+			for (HousePart child : children)
+				child.draw();
+
 	}
 
 	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
@@ -594,7 +601,7 @@ public class Wall extends HousePart {
 
 		while (vertexBuffer.position() < vertexBuffer.capacity())
 			vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-//		Vector3.releaseTempInstance(p2);
+		// Vector3.releaseTempInstance(p2);
 	}
 
 	private void drawWindowsSurroundMesh(Vector3 thickness) {
@@ -718,29 +725,28 @@ public class Wall extends HousePart {
 			return;
 		ReadOnlyVector3 faceDirection = getFaceDirection();
 		int annotCounter = 0;
-		
-//		drawSizeAnnot(abspoints.get(0), abspoints.get(2), faceDirection, annotCounter++, original == null ? Align.South : Align.Center, true);
+
+		// drawSizeAnnot(abspoints.get(0), abspoints.get(2), faceDirection, annotCounter++, original == null ? Align.South : Align.Center, true);
 		fetchSizeAnnot(annotCounter++).setRange(abspoints.get(0), abspoints.get(2), center, faceDirection, original == null, original == null ? Align.South : Align.Center, true);
 		if (original != null || neighbors[0] == null || !neighbors[0].isDrawn()) {
-//			drawSizeAnnot(abspoints.get(0), abspoints.get(1), faceDirection, annotCounter++, Align.Center, true);
+			// drawSizeAnnot(abspoints.get(0), abspoints.get(1), faceDirection, annotCounter++, Align.Center, true);
 			fetchSizeAnnot(annotCounter++).setRange(abspoints.get(0), abspoints.get(1), center, faceDirection, original == null, Align.Center, true);
 			if (neighbors[0] != null)
 				neighbors[0].setDrawn();
 		}
 		if (original != null || neighbors[1] == null || !neighbors[1].isDrawn()) {
-//			drawSizeAnnot(abspoints.get(2), abspoints.get(3), faceDirection, annotCounter++, Align.Center, true);
+			// drawSizeAnnot(abspoints.get(2), abspoints.get(3), faceDirection, annotCounter++, Align.Center, true);
 			fetchSizeAnnot(annotCounter++).setRange(abspoints.get(2), abspoints.get(3), center, faceDirection, original == null, Align.Center, true);
 			if (neighbors[1] != null)
 				neighbors[1].setDrawn();
 		}
 		if (original != null)
-//			drawSizeAnnot(abspoints.get(1), abspoints.get(3), faceDirection, annotCounter++, Align.Center, true);
+			// drawSizeAnnot(abspoints.get(1), abspoints.get(3), faceDirection, annotCounter++, Align.Center, true);
 			fetchSizeAnnot(annotCounter++).setRange(abspoints.get(1), abspoints.get(3), center, faceDirection, original == null, Align.Center, true);
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
-		
-		
+
 		// Angle annotations
 		annotCounter = 0;
 		fetchAngleAnnot90(annotCounter++).setRange(abspoints.get(0), abspoints.get(2), abspoints.get(1));
@@ -752,7 +758,7 @@ public class Wall extends HousePart {
 
 	public void setRoof(Roof roof) {
 		this.roof = roof;
-		
+
 	}
 
 	// private void drawAnnot(int a, int b, ReadOnlyVector3 faceDirection, int annotCounter, Align align) {

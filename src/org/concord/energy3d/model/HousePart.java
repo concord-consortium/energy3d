@@ -17,6 +17,8 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.image.Texture;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
@@ -25,6 +27,8 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
@@ -32,6 +36,7 @@ import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
+import com.ardor3d.util.TextureManager;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -71,6 +76,7 @@ public abstract class HousePart implements Serializable {
 //	protected transient double printHeight;
 	public static double PRINT_SPACE = 4;
 	public static int PRINT_COLS = 4;
+	protected static boolean textureEnabled = true;
 	protected static final ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
 
 	public static void setFlattenTime(double flattenTime) {
@@ -184,6 +190,11 @@ public abstract class HousePart implements Serializable {
 //			draw();
 		}
 	}
+	
+//	public void forceInit() {
+//			init();
+//	}
+	
 
 	public void setOriginal(HousePart original) {
 		this.original = original;
@@ -663,6 +674,13 @@ public abstract class HousePart implements Serializable {
 	public void log(String s) {
 		if (Util.DEBUG)
 		System.out.println(this + "\t" + s);
+	}
+
+	public static void setTextureEnabled(boolean enabled) {
+		textureEnabled  = enabled;		
+	}
+
+	public void updateTexture() {		
 	}
 	
 }  

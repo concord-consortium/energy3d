@@ -17,6 +17,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -58,14 +59,18 @@ public abstract class Roof extends HousePart {
 		mesh.setRenderState(ms);
 		bottomMesh.setRenderState(ms);
 
-		// Add a texture to the box.
-		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("roof2.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		mesh.setRenderState(ts);
-		bottomMesh.setRenderState(ts);
+//		if (textureEnabled) {
+//		// Add a texture to the box.
+//		final TextureState ts = new TextureState();
+//		ts.setTexture(TextureManager.load("roof2.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+//		mesh.setRenderState(ts);
+//		bottomMesh.setRenderState(ts);
+//		} else 
+//		
+//		mesh.setDefaultColor(defaultColor);
+////		bottomMesh.setDefaultColor(defaultColor);
 		
-		mesh.setDefaultColor(defaultColor);
-		bottomMesh.setDefaultColor(defaultColor);
+		updateTexture();
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -413,4 +418,24 @@ public abstract class Roof extends HousePart {
 //		}
 	}
 
+	public void updateTexture() {
+		if (textureEnabled) {
+			final TextureState ts = new TextureState();
+			ts.setTexture(TextureManager.load("roof2.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+			mesh.setRenderState(ts);
+			mesh.setDefaultColor(ColorRGBA.WHITE);
+			if (bottomMesh != null) {
+			bottomMesh.setRenderState(ts);
+			bottomMesh.setDefaultColor(ColorRGBA.WHITE);
+			}
+		} else {
+			mesh.clearRenderState(StateType.Texture);
+			mesh.setDefaultColor(defaultColor);
+			if (bottomMesh != null) {
+			bottomMesh.clearRenderState(StateType.Texture);
+			bottomMesh.setDefaultColor(defaultColor);
+			}
+		}
+	}
+	
 }

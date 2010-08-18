@@ -389,6 +389,26 @@ public class Scene implements Serializable {
 		if (visible)
 			redrawAll = true;
 	}
+	
+	public void setTextureEnabled(final boolean visible) {		
+		for (HousePart part : parts)
+			part.updateTexture();
+		for (HousePart part : PrintController.getInstance().getPrintParts())
+			part.updateTexture();
+		
+		if (visible)
+			redrawAll = true;
+	}	
+	
+	public void redrawAll() {
+		Snap.clearAnnotationDrawn();
+		for (HousePart part : parts) {
+//			part.forceInit();
+			part.draw();
+		}
+		HousePart.setFlattenTime(HousePart.getFlattenTime());
+		PrintController.getInstance().drawPrintParts();
+	}
 
 	public void update() {
 		if (redrawAll ) {

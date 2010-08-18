@@ -130,7 +130,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private HousePart drawn = null;
 	private Operation operation = Operation.SELECT;
 	private LightState lightState;
-	private double angle, sunAngle = 90, sunBaseAngle = 0;
+	private double angle, sunAngle = 45, sunBaseAngle = 135;
 	private Matrix3 rotate = new Matrix3();
 	private CameraControl control;
 	private BasicPassManager passManager = new BasicPassManager();
@@ -244,6 +244,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.addOccluder(Scene.getRoot());
 
 		createSunHeliodon();
+		updateSunHeliodon();
 		Scene.getInstance();
 
 		SelectUtil.init(floor, Scene.getRoot());
@@ -252,7 +253,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.updateFrame();
 		resetCamera(ViewMode.NORMAL);
 		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
-
+		
 		root.updateGeometricState(0, true);
 		System.out.println("done");
 	}
@@ -365,12 +366,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			sunAngle = Math.max(sunAngle, 1);
 			sunAngle = Math.min(sunAngle, 179);
 		}
-		sunRot.setRotation(new Matrix3().fromAngleAxis((-90 + sunAngle) * Math.PI / 180, Vector3.UNIT_Y));
-		DirectionalLight light = (DirectionalLight) lightState.get(0);
-		light.setDirection(sun.getWorldTranslation().negate(null));
+		final Matrix3 m = new Matrix3().fromAngleAxis((-90 + sunAngle) * Math.PI / 180, Vector3.UNIT_Y);
+		sunRot.setRotation(m);
 
 		sunBaseAngle = sunBaseAngle % 360;
 		sunHeliodon.setRotation(new Matrix3().fromAngleAxis(sunBaseAngle * Math.PI / 180, Vector3.UNIT_Z));
+
+		DirectionalLight light = (DirectionalLight) lightState.get(0);
+		sunHeliodon.updateWorldTransform(true);
+		light.setDirection(sun.getWorldTranslation().negate(null));
+//		light.setDirection(sun.getTranslation().negate(null));
+//		final Vector3 v = new Vector3(1, 0, 0); 
+//		light.setDirection(m.applyPost(v, v));
+		
 		sunHeliodon.updateGeometricState(0);
 	}
 
@@ -879,7 +887,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.sunControl = selected;
 
 		taskManager.update(new Callable<Object>() {
-			public Object call() throws Exception {
+			public Object call() throws Exception {				
 				if (sunControl)
 					root.attachChild(sunHeliodon);
 				else

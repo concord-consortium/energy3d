@@ -75,6 +75,7 @@ public class MainFrame extends JFrame {
 	private JMenu scaleMenu;
 	private JMenuItem scaleMenuItem;
 	private JCheckBoxMenuItem shadowMenu;
+	private JCheckBoxMenuItem textureCheckBoxMenuItem;
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -757,6 +758,7 @@ public class MainFrame extends JFrame {
 			});
 			viewMenu.add(getUnitsMenu());
 			viewMenu.add(getShadowMenu());
+			viewMenu.add(getTextureCheckBoxMenuItem());
 		}
 		return viewMenu;
 	}
@@ -871,6 +873,18 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return scaleMenuItem;
+	}
+	private JCheckBoxMenuItem getTextureCheckBoxMenuItem() {
+		if (textureCheckBoxMenuItem == null) {
+			textureCheckBoxMenuItem = new JCheckBoxMenuItem("Texture", true);
+			textureCheckBoxMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					HousePart.setTextureEnabled(textureCheckBoxMenuItem.isSelected());
+					Scene.getInstance().setTextureEnabled(textureCheckBoxMenuItem.isSelected());
+				}
+			});
+		}
+		return textureCheckBoxMenuItem;
 	}
 }
 
