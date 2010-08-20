@@ -160,6 +160,7 @@ public abstract class Roof extends HousePart {
 		int i = 1;
 		center.set(0, 0, 0);
 		while (currentWall != null && currentWall.isFirstPointInserted()) {
+			currentWall.draw();
 //			System.out.println("wall (" + i++ + "): " + currentWall);
 			Snap next = currentWall.next(prevWall);
 			int pointIndex = 0;

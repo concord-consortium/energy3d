@@ -149,7 +149,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private CameraMode cameraMode = CameraMode.ORBIT;
 
 	private boolean operationFlag = false;
-	private static final boolean JOGL = false;
+	private static final boolean JOGL = true;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -160,7 +160,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		instance = this;
 		root.attachChild(Scene.getRoot());
 
-		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
+//		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
+		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 8, false, false);
 		if (JOGL)
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
 		else
@@ -276,6 +277,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		
 		// Scene.getInstance().updateTexture();
 		final double tpf = timer.getTimePerFrame();
+		HousePart.clearDrawFlags();
 		passManager.updatePasses(tpf);
 		logicalLayer.checkTriggers(tpf);
 	

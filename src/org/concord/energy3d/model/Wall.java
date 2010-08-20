@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.util.Util;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.polygon.Polygon;
 import org.poly2tri.polygon.PolygonPoint;
@@ -396,6 +397,13 @@ public class Wall extends HousePart {
 
 		final Polygon polygon = new Polygon(polyPoints);
 
+		// keep it for platform resizing
+		if (original == null)
+			for (HousePart child : children)
+				child.draw();
+		
+//		if (Util.DEBUG)
+			System.out.println("drawing holes...");
 		// Add window holes
 		for (HousePart child : children) {
 			if (child instanceof Window) {
@@ -423,6 +431,9 @@ public class Wall extends HousePart {
 				pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 				toXY.transform(pp);
 				holePoints.add(pp);
+//				if (Util.DEBUG)
+					System.out.println(holePoints);
+
 				polygon.addHole(new Polygon(holePoints));
 			}
 
@@ -470,10 +481,7 @@ public class Wall extends HousePart {
 		w = abspoints.get(1);
 		buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
 
-		// keep it for platform resizing
-		if (original == null)
-			for (HousePart child : children)
-				child.draw();
+
 
 	}
 

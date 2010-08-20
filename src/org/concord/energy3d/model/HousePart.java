@@ -78,6 +78,14 @@ public abstract class HousePart implements Serializable {
 	public static int PRINT_COLS = 4;
 	protected static boolean textureEnabled = true;
 	protected static final ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
+	private static int globalDrawFlag = 1;
+	private transient int drawFlag;
+	
+	public static void clearDrawFlags() {
+		globalDrawFlag++;
+		if (globalDrawFlag >= Integer.MAX_VALUE)
+			globalDrawFlag = 1;
+	}
 
 	public static void setFlattenTime(double flattenTime) {
 		if (flattenTime < 0)
@@ -459,6 +467,10 @@ public abstract class HousePart implements Serializable {
 
 	public void draw() {
 //		System.out.println("(" + printSequence + ")");
+		if (drawFlag == globalDrawFlag)
+			return;		
+		drawFlag = globalDrawFlag;
+		
 		if (Util.DEBUG)
 		System.out.println("drawing..." + this);
 		if (root == null) {
@@ -491,13 +503,14 @@ public abstract class HousePart implements Serializable {
 		if (drawAnnotations) {
 			log("drawAnnotations()");
 			drawAnnotations();
-		}
+		}		
 
 //		for (HousePart child : children)
 //			child.draw();
 
 		// for (HousePart child : children)
 		// child.draw();
+				
 	}
 
 	protected void computeAbsPoints() {
@@ -681,6 +694,10 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void updateTexture() {		
+	}
+	
+	private boolean isDrawn() {		
+		return drawFlag == globalDrawFlag;
 	}
 	
 }  
