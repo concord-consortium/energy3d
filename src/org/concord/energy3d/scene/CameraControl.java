@@ -137,8 +137,10 @@ public abstract class CameraControl {
                     	final boolean right = mouse.getButtonState(MouseButton.RIGHT) == ButtonState.DOWN;
 						if (left && leftButtonAction == ButtonAction.MOVE || right && rightButtonAction == ButtonAction.MOVE) {
                     		control.move(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
+                    		SceneManager.getInstance().getCameraNode().updateFromCamera();
 						} else if (left && leftButtonAction == ButtonAction.ROTATE || right && rightButtonAction == ButtonAction.ROTATE) {
                     		control.rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
+                    		SceneManager.getInstance().getCameraNode().updateFromCamera();
 						}
                     } else {
                         firstPing = false;
@@ -181,6 +183,7 @@ public abstract class CameraControl {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
             	if (!enabled) return;
                 control.move(source.getCanvasRenderer().getCamera(), inputStates.getCurrent().getKeyboardState(), tpf);
+                SceneManager.getInstance().getCameraNode().updateFromCamera();
             }
         };
         _keyTrigger = new InputTrigger(keysHeld, moveAction);

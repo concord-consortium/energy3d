@@ -403,6 +403,11 @@ public class Wall extends HousePart {
 				child.draw();
 		
 //		if (Util.DEBUG)
+			System.out.println("drawing polygon...");
+//			System.out.println(polyPoints);
+			for (PolygonPoint x : polyPoints)
+				System.out.print("(" + x.getX() + "," + x.getY() + ","+ x.getZ() + ")-");
+			System.out.println('\b');			
 			System.out.println("drawing holes...");
 		// Add window holes
 		for (HousePart child : children) {
@@ -432,7 +437,10 @@ public class Wall extends HousePart {
 				toXY.transform(pp);
 				holePoints.add(pp);
 //				if (Util.DEBUG)
-					System.out.println(holePoints);
+//					System.out.println(holePoints);
+				for (PolygonPoint x : holePoints)
+					System.out.print("(" + x.getX() + "," + x.getY() + ","+ x.getZ() + ")-");
+				System.out.println('\b');
 
 				polygon.addHole(new Polygon(holePoints));
 			}

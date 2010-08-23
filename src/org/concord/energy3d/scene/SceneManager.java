@@ -28,6 +28,7 @@ import org.lwjgl.LWJGLException;
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
+import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
@@ -87,11 +88,15 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.controller.SpatialController;
+import com.ardor3d.scenegraph.extension.CameraNode;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.scenegraph.shape.Teapot;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -150,6 +155,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private boolean operationFlag = false;
 	private static final boolean JOGL = true;
+
+	private CameraNode cameraNode;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -254,6 +261,22 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.updateFrame();
 		resetCamera(ViewMode.NORMAL);
 		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
+		
+		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
+		final Teapot box = new Teapot("box");
+		box.setScale(0.1);
+		box.setTranslation(-1, -0.7, 2);
+		box.addController(new SpatialController<Spatial>() {
+			public void update(double time, Spatial caller) {
+				final Vector3 direction = Camera.getCurrentCamera().getDirection().normalize(null);
+				double angle = direction.smallestAngleBetween(Vector3.UNIT_X);
+				if (direction.dot(Vector3.UNIT_Y) > 0)
+					angle = - angle;
+				box.setRotation(new Matrix3().fromAngleAxis(angle, Vector3.UNIT_Y));
+			}
+		});
+		cameraNode.attachChild(box);		
+		root.attachChild(cameraNode);
 		
 		root.updateGeometricState(0, true);
 		System.out.println("done");
@@ -783,6 +806,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (control instanceof OrbitControl)
 				((OrbitControl) control).computeNewFrontDistance();
 		}
+		getCameraNode().updateFromCamera();
 	}
 
 	private void moveUpDown(final Canvas canvas, final double tpf, boolean up) {
@@ -1094,5 +1118,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			passManager.add(shadowPass);
 		else
 			passManager.remove(shadowPass);		
+	}
+
+	public CameraNode getCameraNode() {
+		return cameraNode;
 	}
 }

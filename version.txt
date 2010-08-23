@@ -295,8 +295,8 @@ Version 0.2
 - add menu item for enabling/disabling textures
 - adjust the initial position and orientation of sun
 - add draw flag to avoid redundant drawing of house parts due to parent-child updates
-- fixed problem with roofs and floors jumping to zero height when resizing the house   
-
+- fixed problem with roofs and floors jumping to zero height when resizing the house
+- add a compass object to lower right side of the view and have it always point to north.
 
 
 TODO:
