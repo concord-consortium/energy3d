@@ -4,8 +4,8 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.poly2tri.Poly2Tri;
-import org.poly2tri.polygon.Polygon;
-import org.poly2tri.polygon.PolygonPoint;
+import org.poly2tri.geometry.polygon.Polygon;
+import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.image.Texture;

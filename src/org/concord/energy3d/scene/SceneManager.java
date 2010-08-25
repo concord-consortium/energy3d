@@ -24,6 +24,10 @@ import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.SelectUtil;
 import org.lwjgl.LWJGLException;
+import org.poly2tri.Poly2Tri;
+import org.poly2tri.geometry.polygon.Polygon;
+import org.poly2tri.geometry.polygon.PolygonPoint;
+import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
@@ -150,7 +154,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	// private boolean dirtyRenderer;
 	private Dome sky;
 	private ViewMode viewMode = ViewMode.NORMAL;
-	private final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
+	public static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private CameraMode cameraMode = CameraMode.ORBIT;
 
 	private boolean operationFlag = false;
@@ -165,9 +169,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public SceneManager(final Container panel) throws LWJGLException {
 		System.out.print("Initializing scene manager...");
 		instance = this;
-		root.attachChild(Scene.getRoot());
+		// root.attachChild(Scene.getRoot());
 
-//		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
+		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
 		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 8, false, false);
 		if (JOGL)
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
@@ -236,9 +240,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		lightState.attach(light);
 		root.setRenderState(lightState);
 
-		root.attachChild(createAxis());
-		root.attachChild(createFloor());
-		root.attachChild(createSky());
+		 root.attachChild(Scene.getRoot());
+		 root.attachChild(createAxis());
+		 root.attachChild(createFloor());
+		 root.attachChild(createSky());
+//		test();
 
 		final RenderPass rootPass = new RenderPass();
 		rootPass.add(root);
@@ -261,25 +267,54 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.updateFrame();
 		resetCamera(ViewMode.NORMAL);
 		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
-		
+
 		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
-		final Teapot box = new Teapot("box");
-		box.setScale(0.1);
-		box.setTranslation(-1, -0.7, 2);
-		box.addController(new SpatialController<Spatial>() {
+		final Spatial compass = new Teapot("box");
+		compass.setScale(0.1);
+		compass.setTranslation(-1, -0.7, 2);
+		compass.addController(new SpatialController<Spatial>() {
 			public void update(double time, Spatial caller) {
 				final Vector3 direction = Camera.getCurrentCamera().getDirection().normalize(null);
-				double angle = direction.smallestAngleBetween(Vector3.UNIT_X);
-				if (direction.dot(Vector3.UNIT_Y) > 0)
-					angle = - angle;
-				box.setRotation(new Matrix3().fromAngleAxis(angle, Vector3.UNIT_Y));
+				direction.setZ(0);
+				direction.normalizeLocal();
+				double angle = -direction.smallestAngleBetween(Vector3.UNIT_Y);
+				if (direction.dot(Vector3.UNIT_X) > 0)
+					angle = -angle;
+				angle -= Math.PI / 2;
+				System.out.println(direction + " " + angle);
+				compass.setRotation(new Matrix3().fromAngleAxis(angle, Vector3.UNIT_Y));
 			}
 		});
-		cameraNode.attachChild(box);		
+		cameraNode.attachChild(compass);
 		root.attachChild(cameraNode);
-		
+		cameraNode.updateFromCamera();
+
 		root.updateGeometricState(0, true);
 		System.out.println("done");
+	}
+
+	protected void test() {
+		PolygonPoint p[] = new PolygonPoint[4];
+		p[0] = new PolygonPoint(-1.0292539544430312, 0.09999999999999999, 1.362032135164121);
+		p[1] = new PolygonPoint(0.8537302277848444, 0.09999999999999991, 1.362032135164121);
+		p[2] = new PolygonPoint(0.8537302277848444, 1.1, 1.362032135164121);
+		p[3] = new PolygonPoint(-1.0292539544430312, 1.1, 1.362032135164121);
+		Polygon polygon = new Polygon(p);
+
+		double data[] = new double[] { -0.8409555362202437, 0.8999999999999999, 1.362032135164121, -0.5114333043303654, 0.8999999999999999, 1.362032135164121, -0.5114333043303654, 0.6, 1.362032135164121, -0.8409555362202437, 0.6, 1.362032135164121, -0.3702094906632748, 0.8999999999999999, 1.362032135164121, -0.08776186332909341, 0.8999999999999999, 1.362032135164121, -0.08776186332909341, 0.6, 1.362032135164121, -0.3702094906632748, 0.6, 1.362032135164121, 0.053461950337997166, 0.8999999999999999, 1.362032135164121, 0.33590957767217855, 0.8999999999999999, 1.362032135164121, 0.33590957767217855, 0.6, 1.362032135164121, 0.053461950337997166, 0.6, 1.362032135164121, 0.47713339133926946, 0.8999999999999999, 1.362032135164121, 0.6654318095620568, 0.8999999999999999, 1.362032135164121, 0.6654318095620568, 0.5999999999999999, 1.362032135164121, 0.47713339133926946, 0.5999999999999999, 1.362032135164121, -0.7938809316645468, 0.44999999999999996, 1.362032135164121, -0.5114333043303654, 0.44999999999999996, 1.362032135164121, -0.5114333043303654, 0.14999999999999997, 1.362032135164121, -0.7938809316645468, 0.14999999999999997, 1.362032135164121, -0.3702094906632748, 0.44999999999999996, 1.362032135164121, -0.08776186332909341, 0.44999999999999996, 1.362032135164121, -0.08776186332909341, 0.14999999999999994, 1.362032135164121, -0.3702094906632748, 0.14999999999999997, 1.362032135164121, 0.053461950337997166, 0.44999999999999996, 1.362032135164121, 0.33590957767217855, 0.4499999999999999, 1.362032135164121, 0.33590957767217855, 0.1499999999999999, 1.362032135164121, 0.053461950337997166, 0.14999999999999994, 1.362032135164121, 0.47713339133926946, 0.4499999999999999, 1.362032135164121, 0.6654318095620568, 0.4499999999999999, 1.362032135164121, 0.6654318095620568, 0.1499999999999999, 1.362032135164121, 0.47713339133926946, 0.1499999999999999, 1.362032135164121 };
+
+		for (int i = 0; i < data.length; i += 12) {
+			p = new PolygonPoint[] { new PolygonPoint(data[i], data[i + 1], data[i + 2]), new PolygonPoint(data[i + 3], data[i + 4], data[i + 5]), new PolygonPoint(data[i + 6], data[i + 7], data[i + 8]), new PolygonPoint(data[i + 9], data[i + 10], data[i + 11]) };
+			Polygon hole = new Polygon(p);
+			polygon.addHole(hole);
+		}
+
+		Mesh mesh = new Mesh();
+		mesh.setDefaultColor(ColorRGBA.BLUE);
+		root.attachChild(mesh);
+
+		Poly2Tri.triangulate(polygon);
+		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 	}
 
 	public void run() {
@@ -293,20 +328,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			t.printStackTrace();
 		}
 	}
-	
+
 	public void update(final ReadOnlyTimer timer) {
 		if (operationFlag)
 			executeOperation();
-		
+
 		// Scene.getInstance().updateTexture();
 		final double tpf = timer.getTimePerFrame();
 		HousePart.clearDrawFlags();
 		passManager.updatePasses(tpf);
 		logicalLayer.checkTriggers(tpf);
-	
+
 		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
 		Scene.getInstance().update();
-	
+
 		int val = 1;
 		if (rotAnim) {
 			angle = val;
@@ -316,12 +351,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			camera.lookAt(0, 0, val, Vector3.UNIT_Z);
 			root.setRotation(rotate);
 		}
-	
+
 		if (sunAnim) {
 			sunAngle++;
 			updateSunHeliodon();
 		}
-	
+
 		root.updateGeometricState(tpf);
 	}
 
@@ -329,11 +364,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// if (!Scene.getInstance().getParts().isEmpty())
 		// Scene.getInstance().renderTexture(renderer);
 		// Scene.getInstance().init();
-	
+
 		// renderer.draw(root);
 		// if (drawn != null)
 		// com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
-	
+
 		passManager.renderPasses(renderer);
 		return true;
 	}
@@ -383,7 +418,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 	}
 
-
 	private void updateSunHeliodon() {
 		if (sunAnim)
 			sunAngle %= 180;
@@ -400,10 +434,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		DirectionalLight light = (DirectionalLight) lightState.get(0);
 		sunHeliodon.updateWorldTransform(true);
 		light.setDirection(sun.getWorldTranslation().negate(null));
-//		light.setDirection(sun.getTranslation().negate(null));
-//		final Vector3 v = new Vector3(1, 0, 0); 
-//		light.setDirection(m.applyPost(v, v));
-		
+		// light.setDirection(sun.getTranslation().negate(null));
+		// final Vector3 v = new Vector3(1, 0, 0);
+		// light.setDirection(m.applyPost(v, v));
+
 		sunHeliodon.updateGeometricState(0);
 	}
 
@@ -822,12 +856,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setOperation(Operation operation) {
 		this.operation = operation;
-		this.operationFlag  = true;
+		this.operationFlag = true;
 	}
-	
-	public void executeOperation() { 
+
+	public void executeOperation() {
 		this.operationFlag = false;
-	// if (operation == Operation.SELECT) {
+		// if (operation == Operation.SELECT) {
 		// drawn = null;
 		// return;
 		// }
@@ -894,8 +928,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				lightState.setEnabled(enable);
 				root.updateWorldRenderStates(true);
 				if (!enable)
-//					passManager.add(shadowPass);
-//				else
+					// passManager.add(shadowPass);
+					// else
 					passManager.remove(shadowPass);
 				return null;
 			}
@@ -913,7 +947,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.sunControl = selected;
 
 		taskManager.update(new Callable<Object>() {
-			public Object call() throws Exception {				
+			public Object call() throws Exception {
 				if (sunControl)
 					root.attachChild(sunHeliodon);
 				else
@@ -1117,7 +1151,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (shadow)
 			passManager.add(shadowPass);
 		else
-			passManager.remove(shadowPass);		
+			passManager.remove(shadowPass);
 	}
 
 	public CameraNode getCameraNode() {

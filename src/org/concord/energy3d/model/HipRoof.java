@@ -2,8 +2,8 @@ package org.concord.energy3d.model;
 
 import java.util.ArrayList;
 
-import org.poly2tri.polygon.Polygon;
-import org.poly2tri.polygon.PolygonPoint;
+import org.poly2tri.geometry.polygon.Polygon;
+import org.poly2tri.geometry.polygon.PolygonPoint;
 
 import com.ardor3d.math.Vector3;
 

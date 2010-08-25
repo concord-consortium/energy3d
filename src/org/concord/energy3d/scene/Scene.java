@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -30,6 +31,7 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
@@ -284,22 +286,28 @@ public class Scene implements Serializable {
 		instance = (Scene) in.readObject();
 		instance.init();
 		in.close();
-		for (HousePart housePart : instance.getParts()) {
-			originalHouseRoot.attachChild(housePart.getRoot());
-		}
-		for (HousePart housePart : instance.getParts())
-			housePart.draw();
-		for (HousePart housePart : instance.getParts())
-			housePart.draw();
-
-		// } catch (FileNotFoundException e) {
-		// System.out.println("Energy3D saved file not found...creating a new file...");
-		// instance = new Scene();
-		// } catch (Throwable e) {
-		// e.printStackTrace();
-		// instance = new Scene();
-		// }
-		System.out.println("done");
+		SceneManager.taskManager.update(new Callable<Object>() {
+			public Object call() throws Exception {
+				for (HousePart housePart : instance.getParts()) {
+					originalHouseRoot.attachChild(housePart.getRoot());
+				}
+				for (HousePart housePart : instance.getParts())
+					housePart.draw();
+				for (HousePart housePart : instance.getParts())
+					housePart.draw();
+				
+				// } catch (FileNotFoundException e) {
+				// System.out.println("Energy3D saved file not found...creating a new file...");
+				// instance = new Scene();
+				// } catch (Throwable e) {
+				// e.printStackTrace();
+				// instance = new Scene();
+				// }
+				System.out.println("done");
+				
+				return null;
+			}			
+		});
 	}
 
 	public void drawResizeBounds() {

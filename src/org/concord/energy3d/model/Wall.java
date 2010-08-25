@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 import org.poly2tri.Poly2Tri;
-import org.poly2tri.polygon.Polygon;
-import org.poly2tri.polygon.PolygonPoint;
+import org.poly2tri.geometry.polygon.Polygon;
+import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.transform.coordinate.AnyToXYTransform;
 import org.poly2tri.transform.coordinate.XYToAnyTransform;
 import org.poly2tri.triangulation.TriangulationPoint;
@@ -439,8 +439,9 @@ public class Wall extends HousePart {
 //				if (Util.DEBUG)
 //					System.out.println(holePoints);
 				for (PolygonPoint x : holePoints)
-					System.out.print("(" + x.getX() + "," + x.getY() + ","+ x.getZ() + ")-");
-				System.out.println('\b');
+//					System.out.print("(" + x.getX() + "," + x.getY() + ","+ x.getZ() + ")-");
+					System.out.print(x.getX() + "," + x.getY() + ","+ x.getZ() + ",");
+//				System.out.println('\b');
 
 				polygon.addHole(new Polygon(holePoints));
 			}
@@ -460,6 +461,7 @@ public class Wall extends HousePart {
 		try {
 			Poly2Tri.triangulate(polygon);
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
+//			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
 			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
 			mesh.getMeshData().updateVertexCount();

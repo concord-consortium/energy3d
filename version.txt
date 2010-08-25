@@ -297,6 +297,11 @@ Version 0.2
 - add draw flag to avoid redundant drawing of house parts due to parent-child updates
 - fixed problem with roofs and floors jumping to zero height when resizing the house
 - add a compass object to lower right side of the view and have it always point to north.
+- fixed problem with disappearing windows when resizing the house
+- readjusted the initial position of the camera after setting up the compass
+- fixed problem with roof stretched to floor upon loading the model for first time
+- fixed problem with hanging occasionally when opening a house model file
+- improved compass orientation to avoid jumping to angles when parallel to x axis
 
 
 TODO:
