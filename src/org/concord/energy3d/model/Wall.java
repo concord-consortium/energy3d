@@ -412,11 +412,11 @@ public class Wall extends HousePart {
 			System.out.println("drawing holes...");
 		// Add window holes
 		for (HousePart child : children) {
-			if (child instanceof Window) {
+			ArrayList<Vector3> winPoints = child.getPoints();
+			if (child instanceof Window && includeWindow(winPoints)) {
 				// Window win = (Window) child;
-				ArrayList<Vector3> winPoints = child.getPoints();
-				if (winPoints.size() < 4 || Math.abs(winPoints.get(2).getX() - winPoints.get(0).getX()) < 0.1)
-					continue;
+//				if (includeWindow(winPoints))
+//					continue;
 				PolygonPoint pp;
 				ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
 				// System.out.println("win[0] = " + child.getPoints().get(0));
@@ -494,6 +494,10 @@ public class Wall extends HousePart {
 
 
 
+	}
+
+	public boolean includeWindow(ArrayList<Vector3> winPoints) {
+		return winPoints.size() >= 4 && Math.abs(winPoints.get(2).getX() - winPoints.get(0).getX()) >= 0.1;
 	}
 
 	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
@@ -637,21 +641,23 @@ public class Wall extends HousePart {
 		Vector3 p = new Vector3();
 		final Vector3 wallDirection = abspoints.get(2).subtract(abspoints.get(0), null);
 		for (HousePart child : children) {
-			if (child instanceof Window && child.isFirstPointInserted()) {
+//			if (child instanceof Window && child.isFirstPointInserted()) {
+			final ArrayList<Vector3> winPoints = child.getPoints();
+			if (child instanceof Window && includeWindow(winPoints)) {
 				int[] order = order1;
-				Vector3 windowDirection = child.getPoints().get(2).subtract(child.getPoints().get(0), null);
+				Vector3 windowDirection = winPoints.get(2).subtract(winPoints.get(0), null);
 				if (windowDirection.dot(wallDirection) < 0)
 					order = order2;
 				for (int index = 0; index < order.length - 1; index++) {
 					int i = order[index];
-					p.set(child.getPoints().get(i));
+					p.set(winPoints.get(i));
 					vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-					p.set(child.getPoints().get(i)).addLocal(thickness);
+					p.set(winPoints.get(i)).addLocal(thickness);
 					vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 					i = order[index + 1];
-					p.set(child.getPoints().get(i)).addLocal(thickness);
+					p.set(winPoints.get(i)).addLocal(thickness);
 					vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-					p.set(child.getPoints().get(i));
+					p.set(winPoints.get(i));
 					vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
 					if (index == 1 || index == 3) {

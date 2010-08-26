@@ -304,7 +304,7 @@ Version 0.2
 - improved compass orientation to avoid jumping to angles when parallel to x axis
 - automatically apply constraints on the windows so that resizing walls do not cause distorted polygons
 - automatically hide windows upon resizing if the width is too small  
-
+- do not draw window surrounding shelf if the window itself is not being drawn
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar
