@@ -192,7 +192,7 @@ public class Window extends HousePart {
 		// }
 
 		if (container != null) {
-			enforceConstraints();
+//			enforceConstraints();
 			draw();
 			showPoints();
 			container.draw();
@@ -322,15 +322,33 @@ public class Window extends HousePart {
 			label1.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 	}
 
-	public void enforceConstraints() {
-		for (Vector3 p : points) {
-			final double wallx = container.getPoints().get(2).subtract(container.getPoints().get(0), null).length();
-			final double margin = 0.2 / wallx;
-			double x = Math.max(p.getX(), margin);
-			x = Math.min(x, 1 - margin);
-			p.setX(x);
-			// return new Vector3(x, p.getY(), p.getZ());
+//	public void enforceConstraints() {
+//		for (Vector3 p : points) {
+//			final double wallx = container.getPoints().get(2).subtract(container.getPoints().get(0), null).length();
+//			final double margin = 0.2 / wallx;
+//			double x = Math.max(p.getX(), margin);
+//			x = Math.min(x, 1 - margin);
+//			p.setX(x);
+//			// return new Vector3(x, p.getY(), p.getZ());
+//		}
+//	}
+	
+	public Vector3 enforceContraints(Vector3 p) {
+		final double wallx = container.getPoints().get(2).subtract(container.getPoints().get(0), null).length();
+		final double margin = 0.2 / wallx;
+		double x = Math.max(p.getX(), margin);
+		x = Math.min(x, 1 - margin);
+		return new Vector3(x, p.getY(), p.getZ());
+	}
+	
+	protected void computeAbsPoints() {
+		for (int i = 0; i < points.size(); i++) {
+			Vector3 p = enforceContraints(points.get(i));
+			p = toAbsolute(p);
+			abspoints.get(i).set(p);
+			pointsRoot.getChild(i).setTranslation(p);
 		}
 	}
+	
 
 }

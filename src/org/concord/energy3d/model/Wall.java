@@ -399,8 +399,9 @@ public class Wall extends HousePart {
 
 		// keep it for platform resizing
 		if (original == null)
-			for (HousePart child : children)
+			for (HousePart child : children) {
 				child.draw();
+			}
 		
 //		if (Util.DEBUG)
 			System.out.println("drawing polygon...");
@@ -413,12 +414,12 @@ public class Wall extends HousePart {
 		for (HousePart child : children) {
 			if (child instanceof Window) {
 				// Window win = (Window) child;
-				if (child.getPoints().size() < 4)
+				ArrayList<Vector3> winPoints = child.getPoints();
+				if (winPoints.size() < 4 || Math.abs(winPoints.get(2).getX() - winPoints.get(0).getX()) < 0.1)
 					continue;
 				PolygonPoint pp;
 				ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
 				// System.out.println("win[0] = " + child.getPoints().get(0));
-				ArrayList<Vector3> winPoints = child.getPoints();
 				// p = winPoints.get(0);
 				p = winPoints.get(0);
 				pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());

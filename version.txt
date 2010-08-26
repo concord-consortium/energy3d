@@ -302,6 +302,8 @@ Version 0.2
 - fixed problem with roof stretched to floor upon loading the model for first time
 - fixed problem with hanging occasionally when opening a house model file
 - improved compass orientation to avoid jumping to angles when parallel to x axis
+- automatically apply constraints on the windows so that resizing walls do not cause distorted polygons
+- automatically hide windows upon resizing if the width is too small  
 
 
 TODO:

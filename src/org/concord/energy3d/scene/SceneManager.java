@@ -281,7 +281,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (direction.dot(Vector3.UNIT_X) > 0)
 					angle = -angle;
 				angle -= Math.PI / 2;
-				System.out.println(direction + " " + angle);
+//				System.out.println(direction + " " + angle);
 				compass.setRotation(new Matrix3().fromAngleAxis(angle, Vector3.UNIT_Y));
 			}
 		});
@@ -318,15 +318,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void run() {
-		try {
+//		try {
 			frameHandler.init();
 			while (!exit) {
 				frameHandler.updateFrame();
 				Thread.yield();
 			}
-		} catch (final Throwable t) {
-			t.printStackTrace();
-		}
+//		} catch (final Throwable t) {
+//			t.printStackTrace();
+//		}
 	}
 
 	public void update(final ReadOnlyTimer timer) {
