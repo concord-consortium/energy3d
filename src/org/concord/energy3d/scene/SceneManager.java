@@ -22,6 +22,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.util.Blinker;
+import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.lwjgl.LWJGLException;
 import org.poly2tri.Poly2Tri;
@@ -31,6 +32,8 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
+import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
+import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.framework.Canvas;
@@ -72,6 +75,7 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.Renderer;
@@ -101,6 +105,7 @@ import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.scenegraph.shape.Teapot;
+import com.ardor3d.ui.text.BMText;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -109,6 +114,7 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
@@ -220,6 +226,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		try {
 			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(SceneManager.class.getClassLoader().getResource("org/concord/energy3d/images/")));
 			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(SceneManager.class.getClassLoader().getResource("org/concord/energy3d/fonts/")));
+			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, new SimpleResourceLocator(SceneManager.class.getClassLoader().getResource("org/concord/energy3d/resources/")));
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
@@ -240,11 +247,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		lightState.attach(light);
 		root.setRenderState(lightState);
 
-		 root.attachChild(Scene.getRoot());
-		 root.attachChild(createAxis());
-		 root.attachChild(createFloor());
-		 root.attachChild(createSky());
-//		test();
+		root.attachChild(Scene.getRoot());
+		root.attachChild(createAxis());
+		root.attachChild(createFloor());
+		root.attachChild(createSky());
+		// test();
 
 		final RenderPass rootPass = new RenderPass();
 		rootPass.add(root);
@@ -269,22 +276,23 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
 
 		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
-		final Spatial compass = new Teapot("box");
+//		final Spatial compass = new Teapot("box");
+		final Spatial compass = loadCompassModel();
 		compass.setScale(0.1);
 		compass.setTranslation(-1, -0.7, 2);
-		compass.addController(new SpatialController<Spatial>() {
-			public void update(double time, Spatial caller) {
-				final Vector3 direction = Camera.getCurrentCamera().getDirection().normalize(null);
-				direction.setZ(0);
-				direction.normalizeLocal();
-				double angle = -direction.smallestAngleBetween(Vector3.UNIT_Y);
-				if (direction.dot(Vector3.UNIT_X) > 0)
-					angle = -angle;
-				angle -= Math.PI / 2;
-//				System.out.println(direction + " " + angle);
-				compass.setRotation(new Matrix3().fromAngleAxis(angle, Vector3.UNIT_Y));
-			}
-		});
+//		compass.addController(new SpatialController<Spatial>() {
+//			public void update(double time, Spatial caller) {
+//				final Vector3 direction = Camera.getCurrentCamera().getDirection().normalize(null);
+//				direction.setZ(0);
+//				direction.normalizeLocal();
+//				double angle = -direction.smallestAngleBetween(Vector3.UNIT_Y);
+//				if (direction.dot(Vector3.UNIT_X) > 0)
+//					angle = -angle;
+//				angle -= Math.PI / 2;
+//				// System.out.println(direction + " " + angle);
+//				compass.setRotation(new Matrix3().fromAngleAxis(angle, Vector3.UNIT_Y));
+//			}
+//		});
 		cameraNode.attachChild(compass);
 		root.attachChild(cameraNode);
 		cameraNode.updateFromCamera();
@@ -301,7 +309,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		p[3] = new PolygonPoint(-1.0292539544430312, 1.1, 1.362032135164121);
 		Polygon polygon = new Polygon(p);
 
-		double data[] = new double[] { -0.8409555362202437, 0.8999999999999999, 1.362032135164121, -0.5114333043303654, 0.8999999999999999, 1.362032135164121, -0.5114333043303654, 0.6, 1.362032135164121, -0.8409555362202437, 0.6, 1.362032135164121, -0.3702094906632748, 0.8999999999999999, 1.362032135164121, -0.08776186332909341, 0.8999999999999999, 1.362032135164121, -0.08776186332909341, 0.6, 1.362032135164121, -0.3702094906632748, 0.6, 1.362032135164121, 0.053461950337997166, 0.8999999999999999, 1.362032135164121, 0.33590957767217855, 0.8999999999999999, 1.362032135164121, 0.33590957767217855, 0.6, 1.362032135164121, 0.053461950337997166, 0.6, 1.362032135164121, 0.47713339133926946, 0.8999999999999999, 1.362032135164121, 0.6654318095620568, 0.8999999999999999, 1.362032135164121, 0.6654318095620568, 0.5999999999999999, 1.362032135164121, 0.47713339133926946, 0.5999999999999999, 1.362032135164121, -0.7938809316645468, 0.44999999999999996, 1.362032135164121, -0.5114333043303654, 0.44999999999999996, 1.362032135164121, -0.5114333043303654, 0.14999999999999997, 1.362032135164121, -0.7938809316645468, 0.14999999999999997, 1.362032135164121, -0.3702094906632748, 0.44999999999999996, 1.362032135164121, -0.08776186332909341, 0.44999999999999996, 1.362032135164121, -0.08776186332909341, 0.14999999999999994, 1.362032135164121, -0.3702094906632748, 0.14999999999999997, 1.362032135164121, 0.053461950337997166, 0.44999999999999996, 1.362032135164121, 0.33590957767217855, 0.4499999999999999, 1.362032135164121, 0.33590957767217855, 0.1499999999999999, 1.362032135164121, 0.053461950337997166, 0.14999999999999994, 1.362032135164121, 0.47713339133926946, 0.4499999999999999, 1.362032135164121, 0.6654318095620568, 0.4499999999999999, 1.362032135164121, 0.6654318095620568, 0.1499999999999999, 1.362032135164121, 0.47713339133926946, 0.1499999999999999, 1.362032135164121 };
+		double data[] = new double[] { -0.8409555362202437, 0.8999999999999999, 1.362032135164121, -0.5114333043303654, 0.8999999999999999, 1.362032135164121, -0.5114333043303654, 0.6, 1.362032135164121, -0.8409555362202437, 0.6, 1.362032135164121, -0.3702094906632748, 0.8999999999999999, 1.362032135164121, -0.08776186332909341, 0.8999999999999999, 1.362032135164121, -0.08776186332909341, 0.6, 1.362032135164121, -0.3702094906632748, 0.6, 1.362032135164121, 0.053461950337997166, 0.8999999999999999, 1.362032135164121, 0.33590957767217855, 0.8999999999999999, 1.362032135164121, 0.33590957767217855, 0.6, 1.362032135164121, 0.053461950337997166, 0.6, 1.362032135164121, 0.47713339133926946, 0.8999999999999999, 1.362032135164121, 0.6654318095620568, 0.8999999999999999, 1.362032135164121, 0.6654318095620568, 0.5999999999999999, 1.362032135164121, 0.47713339133926946, 0.5999999999999999, 1.362032135164121, -0.7938809316645468, 0.44999999999999996, 1.362032135164121, -0.5114333043303654,
+				0.44999999999999996, 1.362032135164121, -0.5114333043303654, 0.14999999999999997, 1.362032135164121, -0.7938809316645468, 0.14999999999999997, 1.362032135164121, -0.3702094906632748, 0.44999999999999996, 1.362032135164121, -0.08776186332909341, 0.44999999999999996, 1.362032135164121, -0.08776186332909341, 0.14999999999999994, 1.362032135164121, -0.3702094906632748, 0.14999999999999997, 1.362032135164121, 0.053461950337997166, 0.44999999999999996, 1.362032135164121, 0.33590957767217855, 0.4499999999999999, 1.362032135164121, 0.33590957767217855, 0.1499999999999999, 1.362032135164121, 0.053461950337997166, 0.14999999999999994, 1.362032135164121, 0.47713339133926946, 0.4499999999999999, 1.362032135164121, 0.6654318095620568, 0.4499999999999999, 1.362032135164121, 0.6654318095620568, 0.1499999999999999, 1.362032135164121, 0.47713339133926946, 0.1499999999999999, 1.362032135164121 };
 
 		for (int i = 0; i < data.length; i += 12) {
 			p = new PolygonPoint[] { new PolygonPoint(data[i], data[i + 1], data[i + 2]), new PolygonPoint(data[i + 3], data[i + 4], data[i + 5]), new PolygonPoint(data[i + 6], data[i + 7], data[i + 8]), new PolygonPoint(data[i + 9], data[i + 10], data[i + 11]) };
@@ -318,15 +327,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void run() {
-//		try {
-			frameHandler.init();
-			while (!exit) {
-				frameHandler.updateFrame();
-				Thread.yield();
-			}
-//		} catch (final Throwable t) {
-//			t.printStackTrace();
-//		}
+		// try {
+		frameHandler.init();
+		while (!exit) {
+			frameHandler.updateFrame();
+			Thread.yield();
+		}
+		// } catch (final Throwable t) {
+		// t.printStackTrace();
+		// }
 	}
 
 	public void update(final ReadOnlyTimer timer) {
@@ -1157,4 +1166,61 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public CameraNode getCameraNode() {
 		return cameraNode;
 	}
+
+	private Node loadCompassModel() {
+		final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "compass.dae");
+		final ColladaImporter colladaImporter = new ColladaImporter();
+
+		// Load the collada scene
+		final ColladaStorage storage = colladaImporter.load(source);
+		final Node compass = storage.getScene();
+		BMText txt;
+
+		final double Z = 0.15;
+		txt = new BMText("N", "N", FontManager.getInstance().getAnnotationFont());
+		txt.setAutoRotate(false);
+		txt.setTranslation(3, -0.3, Z);
+		txt.setRotation(new Matrix3().fromAngleAxis(-Math.PI / 2, Vector3.UNIT_Y).multiplyLocal(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_Z)));
+		compass.attachChild(txt);
+
+		txt = new BMText("S", "S", FontManager.getInstance().getAnnotationFont());
+		txt.setAutoRotate(false);
+		txt.setTranslation(-2, -0.2, Z);
+		txt.setRotation(new Matrix3().fromAngleAxis(-Math.PI / 2, Vector3.UNIT_Y).multiplyLocal(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_Z)));
+		compass.attachChild(txt);
+
+		txt = new BMText("E", "E", FontManager.getInstance().getAnnotationFont());
+		txt.setAutoRotate(false);
+		txt.setTranslation(-0.2, 2.1, Z);
+		txt.setRotation(new Matrix3().fromAngleAxis(-Math.PI / 2, Vector3.UNIT_X));
+		compass.attachChild(txt);
+
+		txt = new BMText("W", "W", FontManager.getInstance().getAnnotationFont());
+		txt.setAutoRotate(false);
+		txt.setTranslation(-0.4, -2, Z);
+		txt.setRotation(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_X));
+		compass.attachChild(txt);
+		
+		compass.addController(new SpatialController<Spatial>() {
+			public void update(double time, Spatial caller) {
+				final Vector3 direction = Camera.getCurrentCamera().getDirection().normalize(null);
+				direction.setZ(0);
+				direction.normalizeLocal();
+				double angle = -direction.smallestAngleBetween(Vector3.UNIT_Y);
+				if (direction.dot(Vector3.UNIT_X) > 0)
+					angle = -angle;
+				angle -= Math.PI / 2;
+				// System.out.println(direction + " " + angle);
+				compass.setRotation(new Matrix3().fromAngleAxis(angle, Vector3.UNIT_Z));
+			}
+		});		
+		
+		final Node compassNode1 = new Node();
+		compassNode1.setRotation(new Matrix3().fromAngleAxis(-Math.PI / 2, Vector3.UNIT_X));
+		compassNode1.attachChild(compass);
+		final Node compassNode2 = new Node();
+		compassNode2.attachChild(compassNode1);
+		return compassNode2;
+	}
+
 }

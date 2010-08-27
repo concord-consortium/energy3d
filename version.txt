@@ -305,6 +305,8 @@ Version 0.2
 - automatically apply constraints on the windows so that resizing walls do not cause distorted polygons
 - automatically hide windows upon resizing if the width is too small  
 - do not draw window surrounding shelf if the window itself is not being drawn
+- create 3D model of a compass using Blender and export it as a collada object
+- load the compass model in Energy3D and integrate it with the application 
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar

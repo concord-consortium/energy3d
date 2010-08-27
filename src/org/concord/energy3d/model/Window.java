@@ -334,6 +334,8 @@ public class Window extends HousePart {
 //	}
 	
 	public Vector3 enforceContraints(Vector3 p) {
+		if (container == null)
+			return new Vector3(p);
 		final double wallx = container.getPoints().get(2).subtract(container.getPoints().get(0), null).length();
 		final double margin = 0.2 / wallx;
 		double x = Math.max(p.getX(), margin);

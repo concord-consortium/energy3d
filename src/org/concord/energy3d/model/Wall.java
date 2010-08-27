@@ -497,7 +497,7 @@ public class Wall extends HousePart {
 	}
 
 	public boolean includeWindow(ArrayList<Vector3> winPoints) {
-		return winPoints.size() >= 4 && Math.abs(winPoints.get(2).getX() - winPoints.get(0).getX()) >= 0.1;
+		return winPoints.size() >= 4 && Math.abs(winPoints.get(2).getX() - winPoints.get(0).getX()) >= 0.01;
 	}
 
 	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
