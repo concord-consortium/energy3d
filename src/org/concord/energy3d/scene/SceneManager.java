@@ -277,9 +277,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
 //		final Spatial compass = new Teapot("box");
-		final Spatial compass = loadCompassModel();
-		compass.setScale(0.1);
-		compass.setTranslation(-1, -0.7, 2);
+		
+		taskManager.update(new Callable<Object>() {
+			public Object call() throws Exception {
+				final Spatial compass = loadCompassModel();
+				compass.setScale(0.1);
+				compass.setTranslation(-1, -0.7, 2);
+				cameraNode.attachChild(compass);
+				return null;
+			}			
+		});		
 //		compass.addController(new SpatialController<Spatial>() {
 //			public void update(double time, Spatial caller) {
 //				final Vector3 direction = Camera.getCurrentCamera().getDirection().normalize(null);
@@ -293,7 +300,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //				compass.setRotation(new Matrix3().fromAngleAxis(angle, Vector3.UNIT_Y));
 //			}
 //		});
-		cameraNode.attachChild(compass);
 		root.attachChild(cameraNode);
 		cameraNode.updateFromCamera();
 
@@ -1176,7 +1182,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Node compass = storage.getScene();
 		BMText txt;
 
-		final double Z = 0.15;
+		final double Z = 0.2;
 		txt = new BMText("N", "N", FontManager.getInstance().getAnnotationFont());
 		txt.setAutoRotate(false);
 		txt.setTranslation(3, -0.3, Z);
