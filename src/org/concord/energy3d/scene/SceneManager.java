@@ -99,6 +99,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.extension.CameraNode;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Cylinder;
@@ -1240,6 +1241,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Node compassNode2 = new Node();
 		compassNode2.attachChild(compassNode1);
 		return compassNode2;
+	}
+
+	public void setCompassVisible(boolean visible) {
+		cameraNode.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);		
 	}
 
 }

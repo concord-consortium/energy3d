@@ -266,6 +266,7 @@ renderer.releaseCurrentContext();
 		init = true;
 		finish = false;
 		isPrintPreview = printPreview;
+		SceneManager.getInstance().setCompassVisible(!printPreview);
 		// if (printPreview)
 		// SceneManager.getInstance().updatePrintPreviewScene(true);
 	}

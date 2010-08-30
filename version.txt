@@ -310,6 +310,7 @@ Version 0.2
 - fixed the stability problem with loading the compass at startup
 - fixed problem with rotate animation
 - added shading effect to compass
+- make the compass invisible when in print preview mode
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar
