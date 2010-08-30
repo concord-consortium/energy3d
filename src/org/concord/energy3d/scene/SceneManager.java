@@ -361,10 +361,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (rotAnim) {
 			angle = val;
 			rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
-			final Camera camera = canvas.getCanvasRenderer().getCamera();
+			final Camera camera = canvas.getCanvasRenderer().getCamera();			
 			camera.setLocation(rotate.applyPre(camera.getLocation(), null));
 			camera.lookAt(0, 0, val, Vector3.UNIT_Z);
-			root.setRotation(rotate);
+//			root.setRotation(rotate);
+			getCameraNode().updateFromCamera();
 		}
 
 		if (sunAnim) {

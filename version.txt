@@ -308,6 +308,7 @@ Version 0.2
 - create 3D model of a compass using Blender and export it as a collada object
 - load the compass model in Energy3D and integrate it with the application 
 - fixed the stability problem with loading the compass at startup
+- fixed problem with rotate animation
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar
