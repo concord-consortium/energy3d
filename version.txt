@@ -309,6 +309,7 @@ Version 0.2
 - load the compass model in Energy3D and integrate it with the application 
 - fixed the stability problem with loading the compass at startup
 - fixed problem with rotate animation
+- added shading effect to compass
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar

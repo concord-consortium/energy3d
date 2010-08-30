@@ -69,6 +69,7 @@ import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.light.DirectionalLight;
+import com.ardor3d.light.Light;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
@@ -1207,6 +1208,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		txt.setTranslation(-0.4, -2, Z);
 		txt.setRotation(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_X));
 		compass.attachChild(txt);
+		
+		final DirectionalLight light = new DirectionalLight();
+		light.setDirection(new Vector3(0, 0, -1));
+//		light.setAmbient(new ColorRGBA(1, 1, 1, 1));
+		light.setEnabled(true);
+
+		final LightState lightState = new LightState();
+		lightState.attach(light);
+		compass.setRenderState(lightState);
+		
+		compass.updateWorldRenderStates(true);
 		
 		compass.addController(new SpatialController<Spatial>() {
 			public void update(double time, Spatial caller) {
