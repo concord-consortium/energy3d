@@ -311,6 +311,8 @@ Version 0.2
 - fixed problem with rotate animation
 - added shading effect to compass
 - make the compass invisible when in print preview mode
+- write algorithm for scanning triangles of a mesh and grouping them together based on their normal vectors
+- automatically combine the planar triangles of the roof in print-preview mode to allow rectangle and polygon shapes 
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar
