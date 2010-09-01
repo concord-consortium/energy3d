@@ -277,30 +277,9 @@ public abstract class Roof extends HousePart {
 			root.detachChild(mesh);
 			return;			
 		} 
-//		else if (flattenedMeshesRoot != null)
-//			return;
-//		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-
 		for (Spatial child : flattenedMeshesRoot.getChildren()) {
 			flattenQuadTriangle((Mesh)child);
-
-						
-//			double height = p1.getZ();
-//			height = Math.max(height, p2.getZ());
-//			height = Math.max(height, p3.getZ());
-//			if (isQuad) {
-//				height = Math.max(height, p4.getZ());
-//				height = Math.max(height, p5.getZ());
-//				height = Math.max(height, p6.getZ());				
-//				center.set(p1).addLocal(p2).addLocal(p3).addLocal(p4).addLocal(p5).addLocal(p6).multiplyLocal(1.0 / 6.0);				
-//			} else
-//				center.set(p1).addLocal(p2).addLocal(p3).multiplyLocal(1.0 / 3.0);
-//			center.setZ(height + 0.3);
-//			final String text = "(" + (printSequence++ + 1) + ")";
-//			final BMText label = fetchBMText(text, labelNum++);
-//			label.setTranslation(center);			
 		}
-
 		mesh.updateModelBound();
 		if (bottomMesh != null)
 			bottomMesh.getSceneHints().setCullHint(CullHint.Always);
@@ -320,21 +299,15 @@ public abstract class Roof extends HousePart {
 		v.set(p3).subtractLocal(p1).normalizeLocal();
 		
 		final Matrix3 m = new Matrix3().fromAngleAxis(angle, normal.cross(Vector3.UNIT_Y, null));
-//		m.applyPost(p1, p1);
-//		m.applyPost(p2, p2);
-//		m.applyPost(p3, p3);
 		mesh.setRotation(m);
 
 		computePrintCenter();
 		final Vector3 targetCenter = new Vector3(printCenter);
-		final Vector3 currentCenter = v.set(p1).addLocal(p2).addLocal(p3); //.addLocal(isQuad ? fourthPoint : Vector3.ZERO).multiplyLocal(1.0 / (isQuad ? 4.0 : 3.0));
+		final Vector3 currentCenter = v.set(p1).addLocal(p2).addLocal(p3);
 		for (int i=3; i<buf.capacity()/3; i++)
 			currentCenter.addLocal(buf.get(), buf.get(), buf.get());
 		currentCenter.divideLocal(buf.capacity()/3);
 		final Vector3 d = targetCenter.subtractLocal(currentCenter).multiplyLocal(flattenTime);
-//		p1.addLocal(d);
-//		p2.addLocal(d);
-//		p3.addLocal(d);
 		mesh.setTranslation(d);
 	}
 	

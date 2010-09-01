@@ -312,7 +312,10 @@ Version 0.2
 - added shading effect to compass
 - make the compass invisible when in print preview mode
 - write algorithm for scanning triangles of a mesh and grouping them together based on their normal vectors
-- automatically combine the planar triangles of the roof in print-preview mode to allow rectangle and polygon shapes 
+- automatically combine the planar triangles of the roof in print-preview mode to allow rectangle and polygon shapes
+- extract and divide the texture and normal coordinates from the original roof to the print-preview roof meshes
+- apply the original texture and normal coordinates and renderStates to the grouped roof meshes 
+- fixed problem with wrong camera orientation after initiating print-preview 
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar

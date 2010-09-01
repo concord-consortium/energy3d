@@ -273,13 +273,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		SelectUtil.init(floor, Scene.getRoot());
 		registerInputTriggers();
 
-		frameHandler.updateFrame();
-		resetCamera(ViewMode.NORMAL);
-		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
-
 		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
-//		final Spatial compass = new Teapot("box");
-		
 		taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
 				final Spatial compass = loadCompassModel();
@@ -289,6 +283,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				return null;
 			}			
 		});		
+
+		frameHandler.updateFrame();
+		resetCamera(ViewMode.NORMAL);
+		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
+
 //		compass.addController(new SpatialController<Spatial>() {
 //			public void update(double time, Spatial caller) {
 //				final Vector3 direction = Camera.getCurrentCamera().getDirection().normalize(null);
@@ -799,6 +798,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		camera.setFrame(loc, left, up, dir);
 		if (viewMode != ViewMode.TOP_VIEW)
 			resizeCamera(camera);
+		cameraNode.updateFromCamera();
 
 	}
 
