@@ -316,6 +316,9 @@ Version 0.2
 - extract and divide the texture and normal coordinates from the original roof to the print-preview roof meshes
 - apply the original texture and normal coordinates and renderStates to the grouped roof meshes 
 - fixed problem with wrong camera orientation after initiating print-preview 
+- speed up load time the compass model by reducing its polygons
+
+
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar

@@ -403,24 +403,19 @@ public class Wall extends HousePart {
 				child.draw();
 			}
 		
-//		if (Util.DEBUG)
+		if (Util.DEBUG) {
 			System.out.println("drawing polygon...");
-//			System.out.println(polyPoints);
 			for (PolygonPoint x : polyPoints)
 				System.out.print("(" + x.getX() + "," + x.getY() + ","+ x.getZ() + ")-");
 			System.out.println('\b');			
 			System.out.println("drawing holes...");
+		}
 		// Add window holes
 		for (HousePart child : children) {
 			ArrayList<Vector3> winPoints = child.getPoints();
 			if (child instanceof Window && includeWindow(winPoints)) {
-				// Window win = (Window) child;
-//				if (includeWindow(winPoints))
-//					continue;
 				PolygonPoint pp;
 				ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
-				// System.out.println("win[0] = " + child.getPoints().get(0));
-				// p = winPoints.get(0);
 				p = winPoints.get(0);
 				pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 				toXY.transform(pp);
@@ -437,13 +432,10 @@ public class Wall extends HousePart {
 				pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 				toXY.transform(pp);
 				holePoints.add(pp);
-//				if (Util.DEBUG)
-//					System.out.println(holePoints);
+				if (Util.DEBUG) {
 				for (PolygonPoint x : holePoints)
-//					System.out.print("(" + x.getX() + "," + x.getY() + ","+ x.getZ() + ")-");
 					System.out.print(x.getX() + "," + x.getY() + ","+ x.getZ() + ",");
-//				System.out.println('\b');
-
+				}
 				polygon.addHole(new Polygon(holePoints));
 			}
 

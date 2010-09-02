@@ -782,7 +782,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			camera.setFrustumRight(camera.getFrustumRight() * fac);
 			camera.update();
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
-			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
+//			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			// control.setMoveSpeed(MOVE_SPEED / 10);
 			// camera.setProjectionMode(ProjectionMode.Parallel);
 			camera.setProjectionMode(ProjectionMode.Perspective);
@@ -1177,6 +1177,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Node loadCompassModel() {
+		System.out.print("Loading compass...");
 		final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "compass.dae");
 		final ColladaImporter colladaImporter = new ColladaImporter();
 
@@ -1240,6 +1241,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		compassNode1.attachChild(compass);
 		final Node compassNode2 = new Node();
 		compassNode2.attachChild(compassNode1);
+		System.out.println("done");
 		return compassNode2;
 	}
 
