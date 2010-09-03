@@ -319,8 +319,9 @@ Version 0.2
 - speed up load time the compass model by reducing its polygons
 - adjust the translation and orientation of each mesh under roof groups to align them to the center of print position
 - adjust the position of the print label above each of the roof group meshes
-
 - adjust the annotation transformation of each the roof group mesh
+
+- draw the labels in the center of house parts instead of above them
 
 
 TODO:

@@ -301,7 +301,7 @@ public abstract class Roof extends HousePart {
 		computePrintCenter();
 		Vector3 orgCenter = (Vector3) mesh.getUserData();
 		if (orgCenter == null) {
-			final Matrix3 m = new Matrix3().fromAngleAxis(angle, rotAxis);		
+			final Matrix3 m = new Matrix3().fromAngleAxis(angle, rotAxis);
 			m.applyPost(p1, p1);
 			m.applyPost(p2, p2);
 			m.applyPost(p3, p3);
@@ -368,10 +368,8 @@ public abstract class Roof extends HousePart {
 	protected void drawAnnotations() {
 		if (container == null)
 			return;
-		// ReadOnlyVector3 faceDirection = getFaceDirection();
 		int annotCounter = 0, angleAnnotCounter = 0;
 
-		// if (flattenTime == 0) {
 		if (original == null) {
 			for (int i = 0; i < wallUpperPoints.size(); i++) {
 				PolygonPoint p = wallUpperPoints.get(i);
@@ -379,63 +377,51 @@ public abstract class Roof extends HousePart {
 				p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
 				Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
 				fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), original == null, Align.Center, true);
-				// drawSizeAnnot(a, b, faceDirection, annotCounter++, Align.Center, true);
 			}
 		} else {
-			final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-
 			final Vector3 p1 = new Vector3();
 			final Vector3 p2 = new Vector3();
 			final Vector3 p3 = new Vector3();
+			// final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+			for (Spatial mesh : flattenedMeshesRoot.getChildren()) {
+				final FloatBuffer vertexBuffer = ((Mesh) mesh).getMeshData().getVertexBuffer();
+				float pos = 0;
+				for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
+					// int i = 0;
+					pos += 0.5;
+					final int xPos = i * 9;
+					vertexBuffer.position(xPos);
+					p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+					p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+					p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+					mesh.getTransform().applyForward(p1);
+					mesh.getTransform().applyForward(p2);
+					mesh.getTransform().applyForward(p3);
 
-			float pos = 0;
-			for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
-				// int i = 0;
-				pos += 0.5;
-				final int xPos = i * 9;
-				vertexBuffer.position(xPos);
-				p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-				p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-				p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-				// drawSizeAnnot(p1, p2, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
-				// drawSizeAnnot(p2, p3, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
-				// drawSizeAnnot(p3, p1, Vector3.UNIT_Y, annotCounter++, Align.Center, false);
-				fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.UNIT_Y, original == null, Align.Center, false);
-				fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.UNIT_Y, original == null, Align.Center, false);
-				fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.UNIT_Y, original == null, Align.Center, false);
+					// Size annotation
+					fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.UNIT_Y, original == null, Align.Center, false);
+					fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.UNIT_Y, original == null, Align.Center, false);
+					fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.UNIT_Y, original == null, Align.Center, false);
 
-				// Angle annotations
-				fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
-				fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1);
-				fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2);
+					// Angle annotations
+					fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
+					fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1);
+					fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2);
 
+				}
 			}
-
-			// Vector3.releaseTempInstance(p1);
-			// Vector3.releaseTempInstance(p2);
-			// Vector3.releaseTempInstance(p3);
 		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
-
-		// Vector3.releaseTempInstance(a);
-		// Vector3.releaseTempInstance(b);
 	}
-
-	// public int setPrintSequence(int printSequence) {
-	// int numOfPages = 0;
-	// for (int i=0; i<mesh.getMeshData().getVertexCount() / 9; i++)
-	// numOfPages += super.setPrintSequence(printSequence + numOfPages);
-	// return numOfPages;
-	// }
 
 	protected void updateLabels() {
 		final Vector3 p = new Vector3();
 		final Vector3 center = new Vector3();
 		int triangle = 0;
-		for (Spatial roofGroup : flattenedMeshesRoot.getChildren()) {			
-			final FloatBuffer buf = ((Mesh)roofGroup).getMeshData().getVertexBuffer();
+		for (Spatial roofGroup : flattenedMeshesRoot.getChildren()) {
+			final FloatBuffer buf = ((Mesh) roofGroup).getMeshData().getVertexBuffer();
 			buf.rewind();
 			double height = Double.NEGATIVE_INFINITY;
 			center.set(0, 0, 0);
