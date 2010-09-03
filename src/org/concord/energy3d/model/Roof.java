@@ -293,37 +293,25 @@ public abstract class Roof extends HousePart {
 		final Vector3 p3 = new Vector3(buf.get(), buf.get(), buf.get());
 
 		final Vector3 v = new Vector3(p3).subtractLocal(p1);
-		final Vector3 normal = new Vector3(p2).subtractLocal(p1).crossLocal(v);
-		normal.normalizeLocal();
-		double angle = flattenTime * normal.smallestAngleBetween(Vector3.UNIT_Y);
-//		v.set(p3).subtractLocal(p1).normalizeLocal();
-
-		final Matrix3 m = new Matrix3().fromAngleAxis(angle, normal.cross(Vector3.UNIT_Y, null));
-		mesh.setRotation(m);
+		final Vector3 normal = new Vector3(p2).subtractLocal(p1).crossLocal(v).normalizeLocal();
+		final double angle = normal.smallestAngleBetween(Vector3.UNIT_Y);
+		final Vector3 rotAxis = normal.cross(Vector3.UNIT_Y, null);
+		mesh.setRotation(new Matrix3().fromAngleAxis(flattenTime * angle, rotAxis));
 
 		computePrintCenter();
-//		final Vector3 targetCenter = new Vector3(printCenter);
 		Vector3 orgCenter = (Vector3) mesh.getUserData();
 		if (orgCenter == null) {
+			final Matrix3 m = new Matrix3().fromAngleAxis(angle, rotAxis);		
 			m.applyPost(p1, p1);
 			m.applyPost(p2, p2);
 			m.applyPost(p3, p3);
 			orgCenter = new Vector3(p1).addLocal(p2).addLocal(p3);
-//			for (int i = 9; i < buf.capacity() / 3; i += 3)
 			while (buf.hasRemaining())
-				orgCenter.addLocal(buf.get(), buf.get(), buf.get());
+				orgCenter.addLocal(m.applyPost(new Vector3(buf.get(), buf.get(), buf.get()), p1));
 			orgCenter.divideLocal(buf.capacity() / 3);
-			orgCenter = p1;
-//			orgCenter.setY(0);
 			mesh.setUserData(orgCenter);
-//			final Vector3 d = printCenter.subtract(orgCenter, null); //.multiplyLocal(flattenTime);			
-			System.out.println("orgCenter = " + orgCenter);
-//			System.out.println("p1 = " + p1);
 		}
-		final Vector3 d = printCenter.subtract(orgCenter, null).multiplyLocal(flattenTime);
-		
-		
-		mesh.setTranslation(d);
+		mesh.setTranslation(printCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
 	}
 
 	// private boolean flattenQuadTriangle(final Vector3 p1, final Vector3 p2, final Vector3 p3, final Vector3 p4, final Vector3 p5, final Vector3 p6) {

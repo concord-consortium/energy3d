@@ -317,6 +317,7 @@ Version 0.2
 - apply the original texture and normal coordinates and renderStates to the grouped roof meshes 
 - fixed problem with wrong camera orientation after initiating print-preview 
 - speed up load time the compass model by reducing its polygons
+- adjust the translation and orientation of each mesh under roof groups to align them to the center of print position
 
 
 
