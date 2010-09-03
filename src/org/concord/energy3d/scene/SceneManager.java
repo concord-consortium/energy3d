@@ -782,7 +782,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			camera.setFrustumRight(camera.getFrustumRight() * fac);
 			camera.update();
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
-//			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
+			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			// control.setMoveSpeed(MOVE_SPEED / 10);
 			// camera.setProjectionMode(ProjectionMode.Parallel);
 			camera.setProjectionMode(ProjectionMode.Perspective);

@@ -158,8 +158,8 @@ renderer.releaseCurrentContext();
 			}
 
 			if (finishPhase == 10) {
-//				for (HousePart part : Scene.getInstance().getParts())
-//					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
+				for (HousePart part : Scene.getInstance().getParts())
+					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
 				if (Util.DEBUG)
 				System.out.println("Final Finish of Print Preview Animation.");
 			}

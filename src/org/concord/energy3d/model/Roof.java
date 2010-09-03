@@ -431,23 +431,27 @@ public abstract class Roof extends HousePart {
 	// }
 
 	protected void updateLabels() {
-		// final Vector3 p1 = new Vector3();
-		// final Vector3 p2 = new Vector3();
-		// final Vector3 p3 = new Vector3();
-		//
-		// final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-		// buf.rewind();
-		// for (int triangle = 0; triangle < buf.limit() / 9; triangle++) {
-		// p1.set(buf.get(), buf.get(), buf.get());
-		// p2.set(buf.get(), buf.get(), buf.get());
-		// p3.set(buf.get(), buf.get(), buf.get());
-		// double height = Math.max(Math.max(p1.getZ(), p2.getZ()), p3.getZ());
-		// p1.addLocal(p2).addLocal(p3).multiplyLocal(1.0 / 3.0);
-		// p1.setZ(height + 0.3);
-		// final String text = "(" + (printSequence++ + 1) + ")";
-		// final BMText label = fetchBMText(text, triangle);
-		// label.setTranslation(p1);
-		// }
+		final Vector3 p = new Vector3();
+		final Vector3 center = new Vector3();
+		int triangle = 0;
+		for (Spatial roofGroup : flattenedMeshesRoot.getChildren()) {			
+			final FloatBuffer buf = ((Mesh)roofGroup).getMeshData().getVertexBuffer();
+			buf.rewind();
+			double height = Double.NEGATIVE_INFINITY;
+			center.set(0, 0, 0);
+			while (buf.hasRemaining()) {
+				p.set(buf.get(), buf.get(), buf.get());
+				roofGroup.getTransform().applyForward(p);
+				height = Math.max(p.getZ(), height);
+				center.addLocal(p);
+			}
+			center.divideLocal(buf.capacity() / 3);
+			center.setZ(height + 0.3);
+
+			final String text = "(" + (printSequence++ + 1) + ")";
+			final BMText label = fetchBMText(text, triangle++);
+			label.setTranslation(center);
+		}
 	}
 
 	public void updateTexture() {
