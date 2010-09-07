@@ -185,7 +185,7 @@ public class Foundation extends HousePart {
 	}
 
 	protected void flatten() {
-		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
+		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
 		super.flatten();
 	}
 	
@@ -246,5 +246,11 @@ public class Foundation extends HousePart {
 			mesh.setDefaultColor(defaultColor);
 		}
 	}
+
+//	@Override
+//	protected void computePrintCenter() {
+//		super.computePrintCenter();
+//		printCenter.setY(printCenter.getY() + height);
+//	}
 	
 }

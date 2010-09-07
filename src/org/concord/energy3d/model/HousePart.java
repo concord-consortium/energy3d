@@ -531,7 +531,7 @@ public abstract class HousePart implements Serializable {
 
 	protected void flatten() {
 		root.setTranslation(0, 0, 0);
-		computePrintCenter();	//TODO move to setPreview(true) doesnt need to recompute every tme
+		computePrintCenter();	//TODO move to setPreview(true) doesn't need to recompute every time
 		final Vector3 targetCenter = new Vector3(printCenter);
 		final Vector3 currentCenter = new Vector3(center);
 		
@@ -574,9 +574,9 @@ public abstract class HousePart implements Serializable {
 		if (original == null)
 			up.set(getFaceDirection());
 		else
-//			up.set(0, 0, computeLabelTop());
-			computeLabelTop(up);
-		up.addLocal(0, 0, label.getHeight());
+//			computeLabelTop(up);
+			up.set(0, -0.01, 0);
+//		up.addLocal(0, 0, label.getHeight());
 		root.getTransform().applyInverseVector(up);
 		label.setTranslation(center.getX() + up.getX(), center.getY() + up.getY(), center.getZ() + up.getZ());
 	}
@@ -588,7 +588,8 @@ public abstract class HousePart implements Serializable {
 			label.setText(text);
 			label.getSceneHints().setCullHint(CullHint.Inherit);			
 		} else {			
-			label = new BMText("textSpatial1", text, defaultFont, (original == null) ? Align.Center : Align.South, Justify.Center);
+//			label = new BMText("textSpatial1", text, defaultFont, (original == null) ? Align.Center : Align.South, Justify.Center);
+			label = new BMText("textSpatial1", text, defaultFont, Align.Center, Justify.Center);
 			labelsRoot.attachChild(label);
 		}
 		return label;

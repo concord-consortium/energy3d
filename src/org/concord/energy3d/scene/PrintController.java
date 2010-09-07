@@ -235,6 +235,7 @@ renderer.releaseCurrentContext();
 //			camera.setLocation(pos.getX(), pos.getY() - HousePart.PRINT_SPACE * Math.sin(Math.PI / 2 - camera.getFovY()) / Math.sin(camera.getFovY()), pos.getZ());
 			camera.setLocation(pos.getX(), pos.getY() - HousePart.PRINT_SPACE, pos.getZ());
 			camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
+			SceneManager.getInstance().getCameraNode().updateFromCamera();
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
