@@ -118,6 +118,8 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 	public enum Operation {
@@ -622,6 +624,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final MouseState mouseState = inputStates.getCurrent().getMouseState();
 				int x = mouseState.getX();
 				int y = mouseState.getY();
+				
 				if (drawn != null && !drawn.isDrawCompleted()) {
 					drawn.setPreviewPoint(x, y);
 				} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
@@ -630,6 +633,30 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				// enableDisableRotationControl();
 			}
 		}));
+		
+		final KeyHeldCondition cond1 = new KeyHeldCondition(Key.LCONTROL);
+		final MouseMovedCondition cond2 = new MouseMovedCondition();
+		final Predicate<TwoInputStates> condition = Predicates.and(cond1, cond2);		
+		logicalLayer.registerTrigger(new InputTrigger(condition, new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				final MouseState mouseState = inputStates.getCurrent().getMouseState();
+				int x = mouseState.getX();
+				int y = mouseState.getY();
+				
+//				if (inputStates.getCurrent().getKeyboardState().getKeysDown().contains(Key.LCONTROL)) {
+					int dy = inputStates.getCurrent().getMouseState().getDy();
+					if (dy < -4)
+						dy = -4;
+					if (dy > 4)
+						dy = 4;
+						
+					zoom(canvas, tpf, dy / 5.0);
+					
+//					return;
+//				}
+			}
+		}));
+		
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LCONTROL), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				SelectUtil.setPickLayer(0);
@@ -833,7 +860,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		rotAnim = !rotAnim;
 	}
 
-	private void zoom(final Canvas canvas, final double tpf, int val) {
+	private void zoom(final Canvas canvas, final double tpf, double val) {
 		if (viewMode == ViewMode.TOP_VIEW) {
 			// System.out.println(val);
 			// double scale = val > 0 ? val / 10.0 : 0.01 / (-val);

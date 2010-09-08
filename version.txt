@@ -323,6 +323,7 @@ Version 0.2
 - align the front of foundation with y=0 plane when in print preview mode
 - draw the labels in the center of house parts instead of above them
 - fix printing problem due to not updating camera node
+- allow zooming by hold Ctrl + move mouse
 
 
 TODO:
