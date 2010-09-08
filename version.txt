@@ -324,6 +324,10 @@ Version 0.2
 - draw the labels in the center of house parts instead of above them
 - fix printing problem due to not updating camera node
 - allow zooming by hold Ctrl + move mouse
+- change floor texture
+
+- prevent clipping of near objects
+
 
 
 TODO:

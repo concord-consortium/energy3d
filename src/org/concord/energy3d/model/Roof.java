@@ -32,7 +32,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
 	protected static final double GRID_SIZE = 0.5;
-	private transient Mesh mesh;
+	protected transient Mesh mesh;
 	protected transient Mesh bottomMesh;
 	// private transient FloatBuffer vertexBuffer;
 	protected double labelTop;
@@ -132,7 +132,7 @@ public abstract class Roof extends HousePart {
 			buff.put(0);
 	}
 
-	private void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
+	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
 		Poly2Tri.triangulate(polygon);
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());

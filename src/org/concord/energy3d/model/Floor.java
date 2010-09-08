@@ -2,10 +2,19 @@ package org.concord.energy3d.model;
 
 import java.util.ArrayList;
 
+import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
+import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
+import com.ardor3d.image.Texture;
+import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.util.TextureManager;
 
 public class Floor extends Roof {
 	private static final long serialVersionUID = 1L;
@@ -89,6 +98,36 @@ public class Floor extends Roof {
 	public void setHeight(double newHeight, boolean finalize) {
 		super.setHeight(newHeight, finalize);
 		draw();		
+	}
+
+	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
+		Poly2Tri.triangulate(polygon);
+		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
+		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
+		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
+		// ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
+		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 0.1, 0);
+		mesh.getMeshData().updateVertexCount();
+	}
+	
+	public void updateTexture() {
+		if (textureEnabled) {
+			final TextureState ts = new TextureState();
+			ts.setTexture(TextureManager.load("floor3.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+			mesh.setRenderState(ts);
+			mesh.setDefaultColor(ColorRGBA.WHITE);
+			if (bottomMesh != null) {
+				bottomMesh.setRenderState(ts);
+				bottomMesh.setDefaultColor(ColorRGBA.WHITE);
+			}
+		} else {
+			mesh.clearRenderState(StateType.Texture);
+			mesh.setDefaultColor(defaultColor);
+			if (bottomMesh != null) {
+				bottomMesh.clearRenderState(StateType.Texture);
+				bottomMesh.setDefaultColor(defaultColor);
+			}
+		}
 	}	
 	
 }
