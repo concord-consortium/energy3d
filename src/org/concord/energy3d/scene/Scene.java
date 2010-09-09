@@ -37,16 +37,19 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
 
 public class Scene implements Serializable {
-	public static enum Unit {Meter("m"), Centimeter("cm"), Inches("\"");
+	public static enum Unit {
+		Meter("m"), Centimeter("cm"), Inches("\"");
 		private final String notation;
+
 		private Unit(String notation) {
-			this.notation = notation; 
+			this.notation = notation;
 		}
+
 		public String getNotation() {
 			return notation;
 		}
 	};
-	
+
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
 	private static final Node originalHouseRoot = new Node("Original House Root");
@@ -268,15 +271,22 @@ public class Scene implements Serializable {
 	}
 
 	public void newFile() {
-		originalHouseRoot.detachAllChildren();
-		for (Spatial child : root.getChildren())
-			if (child != originalHouseRoot)
-				root.detachChild(child);
+		SceneManager.taskManager.update(new Callable<Object>() {
+			public Object call() throws Exception {
+				originalHouseRoot.detachAllChildren();
+				for (Spatial child : root.getChildren())
+					if (child != originalHouseRoot)
+						root.detachChild(child);
+				root.updateWorldBound(true);
+				SceneManager.getInstance().updateHeliodonSize();
+				return null;
+			}
+		});
 		parts.clear();
 		file = null;
 	}
 
-	public void open(final File file) throws FileNotFoundException, IOException, ClassNotFoundException {		
+	public void open(final File file) throws FileNotFoundException, IOException, ClassNotFoundException {
 		System.out.print("Opening..." + file);
 		instance.newFile();
 		Scene.file = file;
@@ -295,7 +305,7 @@ public class Scene implements Serializable {
 					housePart.draw();
 				for (HousePart housePart : instance.getParts())
 					housePart.draw();
-				
+
 				// } catch (FileNotFoundException e) {
 				// System.out.println("Energy3D saved file not found...creating a new file...");
 				// instance = new Scene();
@@ -304,9 +314,9 @@ public class Scene implements Serializable {
 				// instance = new Scene();
 				// }
 				System.out.println("done");
-				
+				SceneManager.getInstance().updateHeliodonSize();
 				return null;
-			}			
+			}
 		});
 	}
 
@@ -314,7 +324,7 @@ public class Scene implements Serializable {
 		for (HousePart part : parts) {
 			if (part instanceof Foundation) {
 				part.draw();
-//				part.showPoints();
+				// part.showPoints();
 			}
 		}
 	}
@@ -388,30 +398,30 @@ public class Scene implements Serializable {
 		return file;
 	}
 
-	public void setAnnotationsVisible(boolean visible) {		
+	public void setAnnotationsVisible(boolean visible) {
 		for (HousePart part : parts)
 			part.setAnnotationsVisible(visible);
 		for (HousePart part : PrintController.getInstance().getPrintParts())
 			part.setAnnotationsVisible(visible);
-		
+
 		if (visible)
 			redrawAll = true;
 	}
-	
-	public void setTextureEnabled(final boolean visible) {		
+
+	public void setTextureEnabled(final boolean visible) {
 		for (HousePart part : parts)
 			part.updateTexture();
 		for (HousePart part : PrintController.getInstance().getPrintParts())
 			part.updateTexture();
-		
+
 		if (visible)
 			redrawAll = true;
-	}	
-	
+	}
+
 	public void redrawAll() {
 		Snap.clearAnnotationDrawn();
 		for (HousePart part : parts) {
-//			part.forceInit();
+			// part.forceInit();
 			part.draw();
 		}
 		HousePart.setFlattenTime(HousePart.getFlattenTime());
@@ -419,7 +429,7 @@ public class Scene implements Serializable {
 	}
 
 	public void update() {
-		if (redrawAll ) {
+		if (redrawAll) {
 			Snap.clearAnnotationDrawn();
 			for (HousePart part : parts)
 				part.draw();
@@ -441,7 +451,7 @@ public class Scene implements Serializable {
 	}
 
 	public void setAnnotationScale(double scale) {
-		this.annotationScale  = scale;	
+		this.annotationScale = scale;
 		this.redrawAll = true;
 	}
 
