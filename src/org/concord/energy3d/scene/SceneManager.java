@@ -31,6 +31,7 @@ import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.annotation.MainThread;
+import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
@@ -991,9 +992,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
-				if (sunControl)
+				if (sunControl) {
+					sunHeliodon.setScale(((BoundingSphere)Scene.getRoot().getWorldBound()).getRadius() / 5);
 					root.attachChild(sunHeliodon);
-				else
+				} else
 					root.detachChild(sunHeliodon);
 
 				if (bloomRenderPass != null)
