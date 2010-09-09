@@ -284,7 +284,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.updateFrame();
 		resetCamera(ViewMode.NORMAL);
 //		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
-		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);
+////		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);
 
 //		compass.addController(new SpatialController<Spatial>() {
 //			public void update(double time, Spatial caller) {
@@ -823,6 +823,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			resizeCamera(camera);
 		cameraNode.updateFromCamera();
 
+//		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
+		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);		
 	}
 
 	// public void topCameraView() {

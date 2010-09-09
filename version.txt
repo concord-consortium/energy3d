@@ -328,6 +328,7 @@ Version 0.2
 - prevent clipping of near objects
 - fix the problem with jittering and flipping of scene when orbit-rotating the scene to look at it from top
 - put a constraint to avoid rotating the scene more than 180 degrees vertically
+- fix problem with camera distortion when reseting the view due to missing frustum calls in resetCamera 
 
 
 TODO:
