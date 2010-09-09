@@ -325,7 +325,6 @@ Version 0.2
 - fix printing problem due to not updating camera node
 - allow zooming by hold Ctrl + move mouse
 - change floor texture
-
 - prevent clipping of near objects
 
 
