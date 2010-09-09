@@ -326,7 +326,8 @@ Version 0.2
 - allow zooming by hold Ctrl + move mouse
 - change floor texture
 - prevent clipping of near objects
-
+- fix the problem with jittering and flipping of scene when orbit-rotating the scene to look at it from top
+- put a constraint to avoid rotating the scene more than 180 degrees vertically
 
 
 TODO:

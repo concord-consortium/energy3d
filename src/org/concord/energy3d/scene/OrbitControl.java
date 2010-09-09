@@ -91,8 +91,13 @@ public class OrbitControl extends CameraControl {
 		camera.getLocation().subtract(_center, _workerVector);
 		_workerMatrix.applyPost(_workerVector, _workerVector);
 		_workerVector.addLocal(_center);
-		camera.setLocation(_workerVector);
-		camera.lookAt(_center, _upAxis);
+		final Vector3 d = _workerVector.subtract(_center, null).normalizeLocal();
+		final double MIN = 0.1;
+		if (Math.abs(d.getX()) > MIN || Math.abs(d.getY()) > MIN) {
+			camera.setLocation(_workerVector);
+			camera.lookAt(_center, _upAxis);
+		}
+		System.out.println(d);		
 	}
 
 	protected void move(final Camera camera, final double dx, final double dy) {
