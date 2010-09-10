@@ -332,6 +332,8 @@ Version 0.2
 - automatically adjust the size of heliodon according to the size of the scene
 - adjust the heliodon size after selecting open model or new model
 - adjust the heliodon size after inserting new house part or modifying the size of existing parts
+- remove compass from top view and adjust the default view
+- reverse the direction of Up Down arrow rotation in Orbit mode
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar

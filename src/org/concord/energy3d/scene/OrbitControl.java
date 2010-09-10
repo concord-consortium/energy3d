@@ -66,10 +66,10 @@ public class OrbitControl extends CameraControl {
 		// ROTATION
 		int rotX = 0, rotY = 0;
 		if (kb.isDown(Key.UP)) {
-			rotY -= 1;
+			rotY += 1;
 		}
 		if (kb.isDown(Key.DOWN)) {
-			rotY += 1;
+			rotY -= 1;
 		}
 		if (kb.isDown(Key.LEFT)) {
 			rotX += 1;
