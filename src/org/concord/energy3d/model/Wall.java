@@ -15,6 +15,7 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
@@ -96,7 +97,8 @@ public class Wall extends HousePart {
 		root.attachChild(invisibleMesh);
 		invisibleMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		invisibleMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		invisibleMesh.setModelBound(new BoundingBox());
+//		invisibleMesh.setModelBound(new BoundingBox());
+		invisibleMesh.setModelBound(new BoundingSphere());
 		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
 
 		root.attachChild(windowsSurroundMesh);

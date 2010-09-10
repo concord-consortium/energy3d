@@ -101,13 +101,17 @@ public class Floor extends Roof {
 	}
 
 	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
-		Poly2Tri.triangulate(polygon);
-		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
-		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
-		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-		// ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
-		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 0.1, 0);
-		mesh.getMeshData().updateVertexCount();
+		try {
+			Poly2Tri.triangulate(polygon);
+			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
+			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
+			ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
+			// ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
+			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 0.1, 0);
+			mesh.getMeshData().updateVertexCount();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void updateTexture() {

@@ -1272,11 +1272,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void updateHeliodonSize() {
-		final BoundingVolume bounds = Scene.getRoot().getWorldBound();
-		if (bounds == null)
-			sunHeliodon.setScale(1);
-		else
-			sunHeliodon.setScale(Util.findBoundLength(bounds) / 10);
+//		Scene.getRoot().updateWorldBound(true);
+		taskManager.update(new Callable<Object>() {
+			public Object call() throws Exception {
+				final BoundingVolume bounds = Scene.getRoot().getWorldBound();
+				if (bounds == null)
+					sunHeliodon.setScale(1);
+				else {
+					System.out.println(bounds);
+					final double scale = (Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0;
+					System.out.println("Scale = " + scale);
+					sunHeliodon.setScale(scale);
+				}
+				return null;				
+			}
+		});
 	}
 
 }
