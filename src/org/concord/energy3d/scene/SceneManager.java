@@ -170,6 +170,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private CameraNode cameraNode;
 
+	private boolean operationStick = false;
+
 	public static SceneManager getInstance() {
 		return instance;
 	}
@@ -347,8 +349,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void update(final ReadOnlyTimer timer) {
-		if (operationFlag)
-			executeOperation();
+//		if (operationFlag)
+//			executeOperation();
 
 		// Scene.getInstance().updateTexture();
 		final double tpf = timer.getTimePerFrame();
@@ -379,6 +381,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public boolean renderUnto(Renderer renderer) {
+		if (operationFlag)
+			executeOperation();
+		
 		// if (!Scene.getInstance().getParts().isEmpty())
 		// Scene.getInstance().renderTexture(renderer);
 		// Scene.getInstance().init();
@@ -600,9 +605,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 					if (drawn.isDrawCompleted()) {
 						drawn.hidePoints();
-						MainFrame.getInstance().getSelectButton().setSelected(true);
-						operation = Operation.SELECT;
 						drawn = null;
+						if (operationStick)
+							operationFlag = true;
+						else {
+							MainFrame.getInstance().getSelectButton().setSelected(true);
+							operation = Operation.SELECT;
+						}
 					}
 				}
 
@@ -898,23 +907,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setOperation(Operation operation) {
-		this.operation = operation;
-		this.operationFlag = true;
+		setOperation(operation, false);
+	}
+	
+	public void setOperation(Operation operation, boolean stick) {
+		this.operationStick  = stick;
+		if (!stick || operation != this.operation) {
+			this.operation = operation;
+			this.operationFlag = true;
+		}
 	}
 
 	public void executeOperation() {
 		this.operationFlag = false;
-		// if (operation == Operation.SELECT) {
-		// drawn = null;
-		// return;
-		// }
 		if (drawn != null && !drawn.isDrawCompleted())
-			// removeHousePart(drawn);
 			Scene.getInstance().remove(drawn);
-		// if (operation == Operation.RESIZE) {
-		// Foundation.setResizeHouseMode(true);
-		// } else
-		// Foundation.setResizeHouseMode(false);
 		for (HousePart part : Scene.getInstance().getParts())
 			if (part instanceof Foundation) {
 				((Foundation) part).setResizeHouseMode(operation == Operation.RESIZE);
@@ -943,23 +950,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Foundation();
 
 		if (drawn != null)
-			// addHousePart(drawn);
 			Scene.getInstance().add(drawn);
 		return drawn;
 	}
-
-	// private void addHousePart(HousePart drawn) {
-	// housePartsNode.attachChild(drawn.getRoot());
-	// Scene.getInstance().add(drawn);
-	// }
-	//
-	// private void removeHousePart(HousePart drawn) {
-	// if (drawn == null)
-	// return;
-	// housePartsNode.detachChild(drawn.getRoot());
-	// drawn.delete();
-	// Scene.getInstance().remove(drawn);
-	// }
 
 	public Operation getOperation() {
 		return operation;

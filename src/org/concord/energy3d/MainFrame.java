@@ -76,6 +76,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem scaleMenuItem;
 	private JCheckBoxMenuItem shadowMenu;
 	private JCheckBoxMenuItem textureCheckBoxMenuItem;
+	protected Object lastSelection;
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -108,11 +109,13 @@ public class MainFrame extends JFrame {
 			fileMenu.addMenuListener(new MenuListener() {
 				public void menuCanceled(MenuEvent e) {
 				}
+
 				public void menuDeselected(MenuEvent e) {
 				}
+
 				public void menuSelected(MenuEvent e) {
 					getSelectButton().setSelected(true);
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);					
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
 			fileMenu.setText("File");
@@ -199,7 +202,17 @@ public class MainFrame extends JFrame {
 			wallButton.setMaximumSize(new Dimension(38, 28));
 			wallButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
+				}
+			});
+			wallButton.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseClicked(java.awt.event.MouseEvent e) {
+					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+						deselect();
+						lastSelection = null;
+						return;
+					}
+					lastSelection = e.getSource();
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL, e.getClickCount() > 1);
 				}
 			});
 		}
@@ -217,7 +230,17 @@ public class MainFrame extends JFrame {
 			doorButton.setText("Door");
 			doorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
+				}
+			});
+			doorButton.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseClicked(java.awt.event.MouseEvent e) {
+					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+						deselect();
+						lastSelection = null;
+						return;
+					}
+					lastSelection = e.getSource();
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR, e.getClickCount() > 1);
 				}
 			});
 		}
@@ -235,7 +258,17 @@ public class MainFrame extends JFrame {
 			roofButton.setText("Roof");
 			roofButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF);
+				}
+			});
+			roofButton.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseClicked(java.awt.event.MouseEvent e) {
+					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+						deselect();
+						lastSelection = null;
+						return;
+					}
+					lastSelection = e.getSource();
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF, e.getClickCount() > 1);
 				}
 			});
 		}
@@ -254,7 +287,17 @@ public class MainFrame extends JFrame {
 			windowButton.setMaximumSize(new Dimension(59, 28));
 			windowButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
+				}
+			});
+			windowButton.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseClicked(java.awt.event.MouseEvent e) {
+					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+						deselect();
+						lastSelection = null;
+						return;
+					}
+					lastSelection = e.getSource();
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW, e.getClickCount() > 1);
 				}
 			});
 		}
@@ -270,9 +313,21 @@ public class MainFrame extends JFrame {
 		if (foundationButton == null) {
 			foundationButton = new JToggleButton();
 			foundationButton.setText("Foundation");
-			foundationButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
+			// foundationButton.addActionListener(new java.awt.event.ActionListener() {
+			// public void actionPerformed(java.awt.event.ActionEvent e) {
+			// SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
+			// System.out.println("draw foundation");
+			// }
+			// });
+			foundationButton.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseClicked(java.awt.event.MouseEvent e) {
+					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+						deselect();
+						lastSelection = null;
+						return;
+					}
+					lastSelection = e.getSource();
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION, e.getClickCount() > 1);
 				}
 			});
 		}
@@ -386,7 +441,17 @@ public class MainFrame extends JFrame {
 			floorButton.setText("Floor");
 			floorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR);
+				}
+			});
+			floorButton.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseClicked(java.awt.event.MouseEvent e) {
+					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+						deselect();
+						lastSelection = null;
+						return;
+					}
+					lastSelection = e.getSource();
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR, e.getClickCount() > 1);
 				}
 			});
 		}
@@ -404,7 +469,17 @@ public class MainFrame extends JFrame {
 			roofHipButton.setText("Roof Hip");
 			roofHipButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP);
+				}
+			});
+			roofHipButton.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseClicked(java.awt.event.MouseEvent e) {
+					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+						deselect();
+						lastSelection = null;
+						return;
+					}
+					lastSelection = e.getSource();
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP, e.getClickCount() > 1);
 				}
 			});
 		}
@@ -581,8 +656,10 @@ public class MainFrame extends JFrame {
 			cameraMenu.addMenuListener(new MenuListener() {
 				public void menuCanceled(MenuEvent e) {
 				}
+
 				public void menuDeselected(MenuEvent e) {
 				}
+
 				public void menuSelected(MenuEvent e) {
 					getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
@@ -749,11 +826,13 @@ public class MainFrame extends JFrame {
 			viewMenu.addMenuListener(new MenuListener() {
 				public void menuCanceled(MenuEvent e) {
 				}
+
 				public void menuDeselected(MenuEvent e) {
 				}
+
 				public void menuSelected(MenuEvent e) {
 					getSelectButton().setSelected(true);
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);					
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
 			viewMenu.add(getUnitsMenu());
@@ -772,7 +851,7 @@ public class MainFrame extends JFrame {
 		}
 		return unitsMenu;
 	}
-	
+
 	private JCheckBoxMenuItem getShadowMenu() {
 		if (shadowMenu == null) {
 			shadowMenu = new JCheckBoxMenuItem("Shadows", false);
@@ -780,11 +859,10 @@ public class MainFrame extends JFrame {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setShadow(shadowMenu.isSelected());
 				}
-			});			
+			});
 		}
 		return shadowMenu;
 	}
-	
 
 	private JRadioButtonMenuItem getMetersRadioButtonMenuItem() {
 		if (metersRadioButtonMenuItem == null) {
@@ -832,11 +910,13 @@ public class MainFrame extends JFrame {
 			scaleMenu.addMenuListener(new MenuListener() {
 				public void menuCanceled(MenuEvent e) {
 				}
+
 				public void menuDeselected(MenuEvent e) {
 				}
+
 				public void menuSelected(MenuEvent e) {
 					getSelectButton().setSelected(true);
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);					
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
 			scaleMenu.add(getScaleMenuItem());
@@ -853,7 +933,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					boolean done = false;
 					while (!done) {
-//						previousScaleInput = "200%";
+						// previousScaleInput = "200%";
 						String result = JOptionPane.showInputDialog(MainFrame.this, "Please enter the scale factor in percentage:", previousScaleInput).trim();
 						if (result == null)
 							break;
@@ -874,6 +954,7 @@ public class MainFrame extends JFrame {
 		}
 		return scaleMenuItem;
 	}
+
 	private JCheckBoxMenuItem getTextureCheckBoxMenuItem() {
 		if (textureCheckBoxMenuItem == null) {
 			textureCheckBoxMenuItem = new JCheckBoxMenuItem("Texture", true);

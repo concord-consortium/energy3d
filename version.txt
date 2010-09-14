@@ -334,6 +334,7 @@ Version 0.2
 - adjust the heliodon size after inserting new house part or modifying the size of existing parts
 - remove compass from top view and adjust the default view
 - reverse the direction of Up Down arrow rotation in Orbit mode
+- make the draw tool selection sticky when double clicking on them
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar

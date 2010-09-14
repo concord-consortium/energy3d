@@ -232,16 +232,18 @@ public class Scene implements Serializable {
 	public void add(HousePart housePart) {
 		System.out.print("Adding new house part...");
 		originalHouseRoot.attachChild(housePart.getRoot());
-		System.out.println("done");
 		parts.add(housePart);
+		System.out.println("done");
 	}
 
 	public void remove(HousePart housePart) {
 		if (housePart == null)
 			return;
+		System.out.print("Removing house part...");
 		originalHouseRoot.detachChild(housePart.getRoot());
 		housePart.delete();
 		parts.remove(housePart);
+		System.out.println("done");
 	}
 
 	public ArrayList<HousePart> getParts() {

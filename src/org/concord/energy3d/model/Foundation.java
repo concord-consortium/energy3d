@@ -107,6 +107,7 @@ public class Foundation extends HousePart {
 		if (!isFirstPointInserted()) {
 			points.get(1).set(p);
 			points.get(2).set(p);
+			points.get(3).set(p);
 		} else {
 			if (index < 4) {
 				if (index == 0 || index == 3) {
