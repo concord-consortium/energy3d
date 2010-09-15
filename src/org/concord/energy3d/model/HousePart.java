@@ -77,7 +77,7 @@ public abstract class HousePart implements Serializable {
 	public static double PRINT_SPACE = 4;
 	public static int PRINT_COLS = 4;
 	protected static boolean textureEnabled = true;
-	protected static final ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
+	protected static ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
 	private static int globalDrawFlag = 1;
 	private transient int drawFlag;
 	
@@ -122,6 +122,14 @@ public abstract class HousePart implements Serializable {
 	
 	public static void clearPrintSpace() {
 		PRINT_SPACE = 0;
+	}
+
+	public static ReadOnlyColorRGBA getDefaultColor() {
+		return defaultColor;
+	}
+
+	public static void setDefaultColor(ReadOnlyColorRGBA defaultColor) {
+		HousePart.defaultColor = defaultColor;
 	}
 
 	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height) {

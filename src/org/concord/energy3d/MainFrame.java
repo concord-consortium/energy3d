@@ -1,6 +1,7 @@
 package org.concord.energy3d;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,6 +9,7 @@ import java.io.File;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -29,6 +31,10 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
+
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
+
 import javax.swing.event.MenuListener;
 import javax.swing.event.MenuEvent;
 
@@ -77,6 +83,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem shadowMenu;
 	private JCheckBoxMenuItem textureCheckBoxMenuItem;
 	protected Object lastSelection;
+	private JMenuItem colorMenuItem = null;
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -713,6 +720,30 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
+	 * This method initializes colorMenuItem	
+	 * 	
+	 * @return javax.swing.JMenuItem	
+	 */
+	private JMenuItem getColorMenuItem() {
+		if (colorMenuItem == null) {
+			colorMenuItem = new JMenuItem();
+			colorMenuItem.setText("House Color...");
+			colorMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					final ReadOnlyColorRGBA curr = HousePart.getDefaultColor();
+					final Color c = JColorChooser.showDialog(MainFrame.this, "Select House Color", new Color(curr.getRed(), curr.getGreen(), curr.getBlue()));
+					if (c != null) {
+						final float[] newColor = c.getComponents(null);
+						HousePart.setDefaultColor(new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]));
+						Scene.getInstance().setTextureEnabled(getTextureCheckBoxMenuItem().isSelected());
+					}
+				}
+			});
+		}
+		return colorMenuItem;
+	}
+
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -838,6 +869,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getUnitsMenu());
 			viewMenu.add(getShadowMenu());
 			viewMenu.add(getTextureCheckBoxMenuItem());
+			viewMenu.add(getColorMenuItem());
 		}
 		return viewMenu;
 	}
