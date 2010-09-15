@@ -177,6 +177,8 @@ public class Foundation extends HousePart {
 	}
 
 	private void adjustBoundingHeight() {
+		if (!isFirstPointInserted())
+			return;
 		boundingHeight = 0;
 		for (HousePart child : children) {
 			for (Vector3 p : child.getPoints()) {

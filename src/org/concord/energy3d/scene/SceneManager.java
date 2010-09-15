@@ -555,83 +555,89 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void registerInputTriggers() {
-		// control = new FirstPersonControl(Vector3.UNIT_Z) {
-		//
-		// @Override
-		// protected void rotate(Camera camera, double dx, double dy) {
-		// if ((operation == Operation.SELECT || operation == Operation.RESIZE) && !sunControl && (drawn == null || drawn.isDrawCompleted()) && !topView)
-		// super.rotate(camera, dx, dy);
-		// }
-		// };
-		// control = new FirstPersonControl(Vector3.UNIT_Z);
-
-		// setCameraControl(CameraMode.ORBIT);
-		// control = new OrbitControl(Vector3.UNIT_Z);
-		// control.setupKeyboardTriggers(logicalLayer);
-		// control.setupMouseTriggers(logicalLayer, true);
-		// control.setMoveSpeed(MOVE_SPEED);
-		// control.setKeyRotateSpeed(1);
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				MouseState mouseState = inputStates.getCurrent().getMouseState();
-				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-					if (drawn == null || drawn.isDrawCompleted()) {
-						if (drawn != null)
-							drawn.hidePoints();
-						drawn = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
-						System.out.println(drawn);
-						// if (pickLayer != -1)
-						// pickLayer = (pickLayer + 1) % Math.max(1, pickResults.getNumber() / 2);
-						SelectUtil.nextPickLayer();
-					}
-				} else
-					drawn.addPoint(mouseState.getX(), mouseState.getY());
+				taskManager.update(new Callable<Object>() {
+					public Object call() throws Exception {
+						MouseState mouseState = inputStates.getCurrent().getMouseState();
+						if (operation == Operation.SELECT || operation == Operation.RESIZE) {
+							if (drawn == null || drawn.isDrawCompleted()) {
+								if (drawn != null)
+									drawn.hidePoints();
+								drawn = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
+								System.out.println(drawn);
+								SelectUtil.nextPickLayer();
+							}
+						} else
+							drawn.addPoint(mouseState.getX(), mouseState.getY());
+						
+						enableDisableRotationControl();
 
-				enableDisableRotationControl();
+						return null;
+					}
+				});
+				
+				
 			}
 		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				MouseState mouseState = inputStates.getCurrent().getMouseState();
-				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-					if (drawn != null && !drawn.isDrawCompleted())
-						drawn.complete();
-//					return;
-				} else {
-					if (!drawn.isDrawCompleted())
-						drawn.addPoint(mouseState.getX(), mouseState.getY());
-
-					if (drawn.isDrawCompleted()) {
-						drawn.hidePoints();
-						drawn = null;
-						if (operationStick)
-							operationFlag = true;
-						else {
-							MainFrame.getInstance().getSelectButton().setSelected(true);
-							operation = Operation.SELECT;
+				
+				taskManager.update(new Callable<Object>() {
+					public Object call() throws Exception {
+						MouseState mouseState = inputStates.getCurrent().getMouseState();
+						if (operation == Operation.SELECT || operation == Operation.RESIZE) {
+							if (drawn != null && !drawn.isDrawCompleted())
+								drawn.complete();
+						} else {
+							if (!drawn.isDrawCompleted())
+								drawn.addPoint(mouseState.getX(), mouseState.getY());
+							
+							if (drawn.isDrawCompleted()) {
+								drawn.hidePoints();
+								drawn = null;
+								if (operationStick)
+									operationFlag = true;
+								else {
+									MainFrame.getInstance().getSelectButton().setSelected(true);
+									operation = Operation.SELECT;
+								}
+							}
 						}
-					}
-				}
+						
+						enableDisableRotationControl();
+						updateHeliodonSize();
 
-				enableDisableRotationControl();
-				updateHeliodonSize();
+						return null;
+					}
+				});				
+				
 			}
 		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				final MouseState mouseState = inputStates.getCurrent().getMouseState();
-				int x = mouseState.getX();
-				int y = mouseState.getY();
+				
+				taskManager.update(new Callable<Object>() {
+					public Object call() throws Exception {
+						final MouseState mouseState = inputStates.getCurrent().getMouseState();
+						int x = mouseState.getX();
+						int y = mouseState.getY();
+						
+						if (drawn != null && !drawn.isDrawCompleted()) {
+							drawn.setPreviewPoint(x, y);
+						} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
+							drawn = SelectUtil.selectHousePart(x, y, false);
+						}
+						// enableDisableRotationControl();
 
-				if (drawn != null && !drawn.isDrawCompleted()) {
-					drawn.setPreviewPoint(x, y);
-				} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
-					drawn = SelectUtil.selectHousePart(x, y, false);
-				}
-				// enableDisableRotationControl();
+						return null;
+					}
+				});
+				
+				
 			}
 		}));
 
@@ -640,39 +646,27 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Predicate<TwoInputStates> condition = Predicates.and(cond1, cond2);
 		logicalLayer.registerTrigger(new InputTrigger(condition, new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				final MouseState mouseState = inputStates.getCurrent().getMouseState();
-				int x = mouseState.getX();
-				int y = mouseState.getY();
-
-				// if (inputStates.getCurrent().getKeyboardState().getKeysDown().contains(Key.LCONTROL)) {
 				int dy = inputStates.getCurrent().getMouseState().getDy();
 				if (dy < -4)
 					dy = -4;
 				if (dy > 4)
 					dy = 4;
-
 				zoom(canvas, tpf, dy / 5.0);
-
-				// return;
-				// }
 			}
 		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LCONTROL), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				SelectUtil.setPickLayer(0);
-				// pickLayer = 0;
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.LCONTROL), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				SelectUtil.setPickLayer(0);
-				// pickLayer = -1;
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DELETE), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				// removeHousePart(drawn);
 				Scene.getInstance().remove(drawn);
 				drawn = null;
 			}
