@@ -336,6 +336,8 @@ Version 0.2
 - reverse the direction of Up Down arrow rotation in Orbit mode
 - make the draw tool selection sticky when double clicking on them
 - add color menu and dialog to change house color through gui
+- automatically rescale the edit points based of the camera location so that the edit point size stays the same if camera moves back
+- fix problem with resizing height instead of width when moving edit point of platform right after loading the model
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar

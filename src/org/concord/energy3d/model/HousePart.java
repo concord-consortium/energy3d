@@ -264,9 +264,15 @@ public abstract class HousePart implements Serializable {
 			this.orgHeight = newHeight;
 	}
 
-	public void showPoints() {
-		for (int i = 0; i < points.size(); i++)
+	public void showPoints() {		
+		for (int i = 0; i < points.size(); i++) {
 			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
+			updateEditPointScale(i);
+		}
+	}
+
+	protected void updateEditPointScale(int i) {
+		pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
 	}
 
 	public void hidePoints() {

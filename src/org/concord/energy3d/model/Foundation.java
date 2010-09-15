@@ -57,6 +57,8 @@ public class Foundation extends HousePart {
 		UserData userData = new UserData(this);
 		mesh.setUserData(userData);
 		boundingMesh.setUserData(userData);
+		
+		adjustBoundingHeight(); // to fix bug with resizing height instead of width when moving edit point of platform right after loading the model
 	}
 
 	public void setResizeHouseMode(boolean resizeHouseMode) {
@@ -79,8 +81,10 @@ public class Foundation extends HousePart {
 		for (int i = 0; i < points.size(); i++) {
 			if (!resizeHouseMode && i >= 4)
 				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
-			else
+			else {
 				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
+				updateEditPointScale(i);
+			}
 		}
 	}	
 
