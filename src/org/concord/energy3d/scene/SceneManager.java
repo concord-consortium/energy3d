@@ -172,6 +172,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private boolean operationStick = false;
 
+	protected boolean mouseMoveFlag = false;
+
+	protected TwoInputStates inputState;
+
 	public static SceneManager getInstance() {
 		return instance;
 	}
@@ -381,6 +385,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public boolean renderUnto(Renderer renderer) {
+		if (mouseMoveFlag)
+			executeMouseMove();
+		
 		if (operationFlag)
 			executeOperation();
 		
@@ -620,23 +627,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				mouseMoveFlag = true;
+				inputState = inputStates;
 				
-				taskManager.update(new Callable<Object>() {
-					public Object call() throws Exception {
-						final MouseState mouseState = inputStates.getCurrent().getMouseState();
-						int x = mouseState.getX();
-						int y = mouseState.getY();
-						
-						if (drawn != null && !drawn.isDrawCompleted()) {
-							drawn.setPreviewPoint(x, y);
-						} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
-							drawn = SelectUtil.selectHousePart(x, y, false);
-						}
+//				taskManager.update(new Callable<Object>() {
+//					public Object call() throws Exception {
+						executeMouseMove();
 						// enableDisableRotationControl();
 
-						return null;
-					}
-				});
+//						return null;
+//					}
+//				});
 				
 				
 			}
@@ -1165,6 +1166,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				return null;				
 			}
 		});
+	}
+
+	public void executeMouseMove() {
+		this.mouseMoveFlag = false;
+		final MouseState mouseState = inputState.getCurrent().getMouseState();
+		int x = mouseState.getX();
+		int y = mouseState.getY();
+		
+		if (drawn != null && !drawn.isDrawCompleted()) {
+			drawn.setPreviewPoint(x, y);
+		} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
+			drawn = SelectUtil.selectHousePart(x, y, false);
+		}
 	}
 
 }
