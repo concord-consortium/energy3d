@@ -82,7 +82,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem scaleMenuItem;
 	private JCheckBoxMenuItem shadowMenu;
 	private JCheckBoxMenuItem textureCheckBoxMenuItem;
-	protected Object lastSelection;
+	protected Object lastSelection;  //  @jve:decl-index=0:
 	private JMenuItem colorMenuItem = null;
 
 	public static MainFrame getInstance() {
@@ -215,7 +215,6 @@ public class MainFrame extends JFrame {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
 					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
 						deselect();
-						lastSelection = null;
 						return;
 					}
 					lastSelection = e.getSource();
@@ -243,7 +242,7 @@ public class MainFrame extends JFrame {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
 					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
 						deselect();
-						lastSelection = null;
+						
 						return;
 					}
 					lastSelection = e.getSource();
@@ -271,7 +270,7 @@ public class MainFrame extends JFrame {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
 					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
 						deselect();
-						lastSelection = null;
+						
 						return;
 					}
 					lastSelection = e.getSource();
@@ -300,7 +299,7 @@ public class MainFrame extends JFrame {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
 					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
 						deselect();
-						lastSelection = null;
+						
 						return;
 					}
 					lastSelection = e.getSource();
@@ -330,7 +329,7 @@ public class MainFrame extends JFrame {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
 					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
 						deselect();
-						lastSelection = null;
+						
 						return;
 					}
 					lastSelection = e.getSource();
@@ -454,7 +453,7 @@ public class MainFrame extends JFrame {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
 					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
 						deselect();
-						lastSelection = null;
+						
 						return;
 					}
 					lastSelection = e.getSource();
@@ -482,7 +481,7 @@ public class MainFrame extends JFrame {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
 					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
 						deselect();
-						lastSelection = null;
+						
 						return;
 					}
 					lastSelection = e.getSource();
@@ -816,7 +815,8 @@ public class MainFrame extends JFrame {
 		jContentPane.setVisible(visible);
 	}
 
-	private void deselect() {
+	public void deselect() {
+		lastSelection = null;
 		getSelectButton().setSelected(true);
 		SceneManager.getInstance().setOperation(Operation.SELECT);
 	}

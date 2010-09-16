@@ -601,8 +601,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (operationStick)
 									operationFlag = true;
 								else {
-									MainFrame.getInstance().getSelectButton().setSelected(true);
-									operation = Operation.SELECT;
+//									MainFrame.getInstance().getSelectButton().setSelected(true);
+//									operation = Operation.SELECT;
+									MainFrame.getInstance().deselect();
 								}
 							}
 						}

@@ -97,7 +97,6 @@ public class OrbitControl extends CameraControl {
 			camera.setLocation(_workerVector);
 			camera.lookAt(_center, _upAxis);
 		}
-		System.out.println(d);		
 	}
 
 	protected void move(final Camera camera, final double dx, final double dy) {
