@@ -341,6 +341,9 @@ Version 0.2
 - improve stability when drawing/editing house parts by queuing changes instead of performing them instantly
 - fix problem with inserting new house part right after initialization 
 - improve the speed of mouse move when editing house parts 
+- fix problem with color showing as grey when enabling lighting
+- fix problem with the software hanging sometimes when loading a new model
+
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar

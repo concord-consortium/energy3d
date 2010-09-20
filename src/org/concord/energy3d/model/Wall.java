@@ -24,8 +24,10 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.CullState;
+import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.CullState.Face;
+import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Mesh;
@@ -117,6 +119,11 @@ public class Wall extends HousePart {
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.setRenderState(new WireframeState());
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
+		
+		final MaterialState ms = new MaterialState();
+		ms.setColorMaterial(ColorMaterial.Diffuse);
+		mesh.setRenderState(ms);
+//		surroundMesh.setRenderState(ms);
 
 		updateTexture();
 
@@ -133,9 +140,11 @@ public class Wall extends HousePart {
 			ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 			mesh.setRenderState(ts);
 			mesh.setDefaultColor(ColorRGBA.WHITE);
+//			surroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		} else {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(defaultColor);
+//			surroundMesh.setDefaultColor(defaultColor);
 		}
 	}
 

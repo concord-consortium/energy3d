@@ -10,8 +10,10 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
+import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -43,13 +45,9 @@ public class Foundation extends HousePart {
 		
 		updateTexture();
 
-//		if (textureEnabled) {
-//		// Add a texture to the box.
-//		final TextureState ts = new TextureState();
-//		ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-//		mesh.setRenderState(ts);
-//		} else 
-//			mesh.setDefaultColor(defaultColor);
+		final MaterialState ms = new MaterialState();
+		ms.setColorMaterial(ColorMaterial.Diffuse);
+		mesh.setRenderState(ms);		
 
 		WireframeState wire = new WireframeState();
 		boundingMesh.setRenderState(wire);

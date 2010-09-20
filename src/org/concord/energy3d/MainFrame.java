@@ -574,12 +574,12 @@ public class MainFrame extends JFrame {
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
-						try {
+//						try {
 							Scene.getInstance().open(fileChooser.getSelectedFile());
-						} catch (Throwable err) {
-							err.printStackTrace();
-							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-						}
+//						} catch (Throwable err) {
+//							err.printStackTrace();
+//							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+//						}
 					}
 				}
 			});

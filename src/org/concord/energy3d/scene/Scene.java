@@ -288,33 +288,22 @@ public class Scene implements Serializable {
 		file = null;
 	}
 
-	public void open(final File file) throws FileNotFoundException, IOException, ClassNotFoundException {
-		System.out.print("Opening..." + file);
+	public void open(final File file) { // throws FileNotFoundException, IOException, ClassNotFoundException {
 		instance.newFile();
 		Scene.file = file;
-		// try {
-		// ObjectInputStream in = new ObjectInputStream(new FileInputStream("house.ser"));
-		ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-		instance = (Scene) in.readObject();
-		instance.init();
-		in.close();
 		SceneManager.taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
-				for (HousePart housePart : instance.getParts()) {
+				System.out.print("Opening..." + file + "...");
+				ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+				instance = (Scene) in.readObject();
+				instance.init();
+				in.close();
+				for (HousePart housePart : instance.getParts())
 					originalHouseRoot.attachChild(housePart.getRoot());
-				}
 				for (HousePart housePart : instance.getParts())
 					housePart.draw();
 				for (HousePart housePart : instance.getParts())
 					housePart.draw();
-
-				// } catch (FileNotFoundException e) {
-				// System.out.println("Energy3D saved file not found...creating a new file...");
-				// instance = new Scene();
-				// } catch (Throwable e) {
-				// e.printStackTrace();
-				// instance = new Scene();
-				// }
 				System.out.println("done");
 				SceneManager.getInstance().updateHeliodonSize();
 				return null;
