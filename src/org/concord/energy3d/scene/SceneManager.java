@@ -32,7 +32,6 @@ import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.annotation.MainThread;
-import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
@@ -292,22 +291,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		frameHandler.updateFrame();
 		resetCamera(ViewMode.NORMAL);
-		// canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
-		// // canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);
 
-		// compass.addController(new SpatialController<Spatial>() {
-		// public void update(double time, Spatial caller) {
-		// final Vector3 direction = Camera.getCurrentCamera().getDirection().normalize(null);
-		// direction.setZ(0);
-		// direction.normalizeLocal();
-		// double angle = -direction.smallestAngleBetween(Vector3.UNIT_Y);
-		// if (direction.dot(Vector3.UNIT_X) > 0)
-		// angle = -angle;
-		// angle -= Math.PI / 2;
-		// // System.out.println(direction + " " + angle);
-		// compass.setRotation(new Matrix3().fromAngleAxis(angle, Vector3.UNIT_Y));
-		// }
-		// });
 		root.attachChild(cameraNode);
 		cameraNode.updateFromCamera();
 
@@ -573,7 +557,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (drawn != null)
 									drawn.hidePoints();
 								drawn = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
-								System.out.println(drawn);
+								System.out.print(drawn);								
 								SelectUtil.nextPickLayer();
 							}
 						} else
@@ -629,17 +613,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				mouseMoveFlag = true;
 				inputState = inputStates;
-				
-//				taskManager.update(new Callable<Object>() {
-//					public Object call() throws Exception {
-						executeMouseMove();
-						// enableDisableRotationControl();
-
-//						return null;
-//					}
-//				});
-				
-				
 			}
 		}));
 
@@ -769,11 +742,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			part.hidePoints();
 	}
 
-	// private void lookAtZero(final Canvas source) {
-	// source.getCanvasRenderer().getCamera().setLocation(0, -2, 0);
-	// source.getCanvasRenderer().getCamera().lookAt(Vector3.ZERO, Vector3.UNIT_Z); // .negate(null));
-	// }
-
 	public void resetCamera() {
 		resetCamera(this.viewMode);
 	}
@@ -796,8 +764,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			setCompassVisible(false);
 			camera.setProjectionMode(ProjectionMode.Parallel);
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
-			control.setMoveSpeed(MOVE_SPEED / 10);
-			loc = new Vector3(0, 0, 50);
+//			control.setMoveSpeed(MOVE_SPEED / 10);
+//			loc = new Vector3(0, 0, 50);
+			control.setMoveSpeed(5 * MOVE_SPEED);
+			loc = new Vector3(0, 0, 10);			
 			up = new Vector3(0.0f, -1.0f, 0.0f);
 			dir = new Vector3(0.0f, 0.0f, -1.0f);
 			double fac = 1000;
@@ -827,21 +797,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			resizeCamera(camera);
 		cameraNode.updateFromCamera();
 	}
-
-	// public void topCameraView() {
-	// topView = true;
-	// control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
-	// control.setMoveSpeed(MOVE_SPEED * 10);
-	// final Vector3 loc = new Vector3(0, 0, 50);
-	// final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
-	// final Vector3 up = new Vector3(0.0f, -1.0f, 0.0f);
-	// final Vector3 dir = new Vector3(0.0f, 0.0f, -1.0f);
-	//
-	// Camera camera = canvas.getCanvasRenderer().getCamera();
-	// camera.setFrame(loc, left, up, dir);
-	// camera.setProjectionMode(ProjectionMode.Parallel);
-	// resizeCamera(camera);
-	// }
 
 	private void resizeCamera(final Camera camera) {
 		final Dimension size = ((Component) canvas).getSize();
@@ -878,11 +833,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			camera.setFrustumRight(camera.getFrustumRight() * fac);
 			camera.update();
 
-			control.setMoveSpeed(1.1 * fac * control.getMoveSpeed());
+//			control.setMoveSpeed(1.1 * fac * control.getMoveSpeed());
+//			control.setMoveSpeed(val > 0 ? 50 : 0.2 * control.getMoveSpeed());
+			control.setMoveSpeed(2 * camera.getFrustumTop() * camera.getFrustumTop());
 		} else {
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
 			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * MOVE_SPEED * 10 * tpf).addLocal(camera.getLocation());
-			// final Vector3 loc = new Vector3(camera.getLocation()).addLocal(dir);
 			camera.setLocation(loc);
 
 			if (control instanceof OrbitControl)
@@ -897,24 +853,29 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (viewMode == ViewMode.TOP_VIEW)
 			up = !up;
 		loc.multiplyLocal((up ? 1 : -1) * MOVE_SPEED * tpf).addLocal(camera.getLocation());
-		// final Vector3 loc = new Vector3(camera.getLocation());
-		// loc.addLocal(dir);
 		camera.setLocation(loc);
 	}
 
-	public void setOperation(Operation operation) {
-		setOperation(operation, false);
-	}
+//	public void setOperation(Operation operation) {
+//		setOperation(operation, false);
+//	}	
 	
-	public void setOperation(Operation operation, boolean stick) {
-		this.operationStick  = stick;
-		if (!stick || operation != this.operation) {
+	public void setOperation(Operation operation) { // , boolean stick) {
+		System.out.println("setOperation()");
+//		this.operationStick  = false;
+//		if (!stick || operation != this.operation) {
 			this.operation = operation;
 			this.operationFlag = true;
-		}
+			System.out.println("this.operationFlag = true;");
+//		}
+	}
+	
+	public void setOperationStick(boolean stick) {
+		this.operationStick  = stick;
 	}
 
 	public void executeOperation() {
+		System.out.println("executeOperation()");
 		this.operationFlag = false;
 		if (drawn != null && !drawn.isDrawCompleted())
 			Scene.getInstance().remove(drawn);
@@ -981,7 +942,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					passManager.remove(bloomRenderPass);
 				if (sunControl) {
 					bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);
-					// bloomRenderPass.setUseCurrentScene(true);
 					if (!bloomRenderPass.isSupported()) {
 						System.out.println("Bloom not supported!");
 					} else {
@@ -1002,10 +962,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void enableDisableRotationControl() {
 		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted())) // && viewMode != ViewMode.TOP_VIEW) // && viewMode != ViewMode.PRINT_PREVIEW)
-			// control.setMouseRotateSpeed(0.005);
 			control.setMouseEnabled(true);
 		else
-			// control.setMouseRotateSpeed(0.000000001);
 			control.setMouseEnabled(false);
 
 		if (sunControl)
@@ -1179,6 +1137,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
 			drawn = SelectUtil.selectHousePart(x, y, false);
 		}
+	}
+
+	public ViewMode getViewMode() {
+		return viewMode;
 	}
 
 }

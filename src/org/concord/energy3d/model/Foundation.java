@@ -80,8 +80,8 @@ public class Foundation extends HousePart {
 			if (!resizeHouseMode && i >= 4)
 				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 			else {
-				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
 				updateEditPointScale(i);
+				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
 			}
 		}
 	}	
@@ -257,5 +257,11 @@ public class Foundation extends HousePart {
 //		super.computePrintCenter();
 //		printCenter.setY(printCenter.getY() + height);
 //	}
+	
+	public void editPoint(int i) {
+		if (!resizeHouseMode && i > 3)
+			i -= 4;
+		super.editPoint(i);		
+	}	
 	
 }

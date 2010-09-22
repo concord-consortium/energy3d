@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Angle90Annotation;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -272,7 +273,11 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void updateEditPointScale(int i) {
-		pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
+////		final double s = SceneManager.getInstance().getViewMode() == ViewMode.TOP_VIEW ? 0.1 : 1;
+////		if (SceneManager.getInstance().getViewMode() == ViewMode.TOP_VIEW)
+//			pointsRoot.getChild(i).setScale(2);
+////		else
+			pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
 	}
 
 	public void hidePoints() {
@@ -284,6 +289,10 @@ public abstract class HousePart implements Serializable {
 		editPointIndex = i;
 		drawCompleted = false;
 	}
+	
+	public int getEditPoint() {
+		return editPointIndex;
+	}	
 
 	protected Vector3 closestPoint(Vector3 p1, Vector3 p2, int x, int y) {
 //		final Vector2 pos = Vector2.fetchTempInstance().set(x, y);

@@ -82,7 +82,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem scaleMenuItem;
 	private JCheckBoxMenuItem shadowMenu;
 	private JCheckBoxMenuItem textureCheckBoxMenuItem;
-	protected Object lastSelection;  //  @jve:decl-index=0:
+	protected Object lastSelection; // @jve:decl-index=0:
 	private JMenuItem colorMenuItem = null;
 
 	public static MainFrame getInstance() {
@@ -209,16 +209,18 @@ public class MainFrame extends JFrame {
 			wallButton.setMaximumSize(new Dimension(38, 28));
 			wallButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
+					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
 				}
 			});
 			wallButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-						deselect();
-						return;
-					}
-					lastSelection = e.getSource();
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL, e.getClickCount() > 1);
+					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+					// deselect();
+					// return;
+					// }
+					// lastSelection = e.getSource();
+					if (e.getClickCount() > 1)
+						SceneManager.getInstance().setOperationStick(true);					
 				}
 			});
 		}
@@ -236,17 +238,19 @@ public class MainFrame extends JFrame {
 			doorButton.setText("Door");
 			doorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
+					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
 				}
 			});
 			doorButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-						deselect();
-						
-						return;
-					}
-					lastSelection = e.getSource();
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR, e.getClickCount() > 1);
+					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+					// deselect();
+					//
+					// return;
+					// }
+					// lastSelection = e.getSource();
+					if (e.getClickCount() > 1)
+						SceneManager.getInstance().setOperationStick(true);					
 				}
 			});
 		}
@@ -264,17 +268,20 @@ public class MainFrame extends JFrame {
 			roofButton.setText("Roof");
 			roofButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
+					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF);
 				}
 			});
 			roofButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-						deselect();
-						
-						return;
-					}
-					lastSelection = e.getSource();
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF, e.getClickCount() > 1);
+					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+					// deselect();
+					//
+					// return;
+					// }
+					// lastSelection = e.getSource();
+					
+					if (e.getClickCount() > 1)
+						SceneManager.getInstance().setOperationStick(true);					
 				}
 			});
 		}
@@ -293,17 +300,19 @@ public class MainFrame extends JFrame {
 			windowButton.setMaximumSize(new Dimension(59, 28));
 			windowButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
+					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
 				}
 			});
 			windowButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-						deselect();
-						
-						return;
-					}
-					lastSelection = e.getSource();
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW, e.getClickCount() > 1);
+					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+					// deselect();
+					//
+					// return;
+					// }
+					// lastSelection = e.getSource();
+					if (e.getClickCount() > 1)
+						SceneManager.getInstance().setOperationStick(true);					
 				}
 			});
 		}
@@ -319,21 +328,22 @@ public class MainFrame extends JFrame {
 		if (foundationButton == null) {
 			foundationButton = new JToggleButton();
 			foundationButton.setText("Foundation");
-			// foundationButton.addActionListener(new java.awt.event.ActionListener() {
-			// public void actionPerformed(java.awt.event.ActionEvent e) {
-			// SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
-			// System.out.println("draw foundation");
-			// }
-			// });
+			foundationButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
+				}
+			});
 			foundationButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-						deselect();
-						
-						return;
-					}
-					lastSelection = e.getSource();
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION, e.getClickCount() > 1);
+					// System.out.println("Buton pushed");
+					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+					// deselect();
+					// System.out.println("desecting: " + e.getClickCount() + " : " + lastSelection);
+					// return;
+					// }
+					// SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION, e.getClickCount() > 1);
+					if (e.getClickCount() > 1)
+						SceneManager.getInstance().setOperationStick(true);
 				}
 			});
 		}
@@ -447,17 +457,20 @@ public class MainFrame extends JFrame {
 			floorButton.setText("Floor");
 			floorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
+					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR);
 				}
 			});
 			floorButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-						deselect();
-						
-						return;
-					}
-					lastSelection = e.getSource();
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR, e.getClickCount() > 1);
+					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+					// deselect();
+					//
+					// return;
+					// }
+					// lastSelection = e.getSource();
+					
+					if (e.getClickCount() > 1)
+						SceneManager.getInstance().setOperationStick(true);					
 				}
 			});
 		}
@@ -475,17 +488,19 @@ public class MainFrame extends JFrame {
 			roofHipButton.setText("Roof Hip");
 			roofHipButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
+					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP);
 				}
 			});
 			roofHipButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-						deselect();
-						
-						return;
-					}
-					lastSelection = e.getSource();
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP, e.getClickCount() > 1);
+					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
+					// deselect();
+					// return;
+					// }
+					// lastSelection = e.getSource();
+					
+					if (e.getClickCount() > 1)
+						SceneManager.getInstance().setOperationStick(true);					
 				}
 			});
 		}
@@ -574,12 +589,12 @@ public class MainFrame extends JFrame {
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
-//						try {
-							Scene.getInstance().open(fileChooser.getSelectedFile());
-//						} catch (Throwable err) {
-//							err.printStackTrace();
-//							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-//						}
+						// try {
+						Scene.getInstance().open(fileChooser.getSelectedFile());
+						// } catch (Throwable err) {
+						// err.printStackTrace();
+						// JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+						// }
 					}
 				}
 			});
@@ -719,9 +734,9 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes colorMenuItem	
-	 * 	
-	 * @return javax.swing.JMenuItem	
+	 * This method initializes colorMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getColorMenuItem() {
 		if (colorMenuItem == null) {

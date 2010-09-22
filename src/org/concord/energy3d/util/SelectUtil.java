@@ -125,37 +125,25 @@ public class SelectUtil {
 			if (lastHoveredObject != null) {
 				lastHoveredObject.hidePoints();
 				lastHoveredObject = null;
-//				if (blinker != null) {
-//					blinker.finish();
-//					blinker = null;
-//				}
 				Blinker.getInstance().setTarget(null);
 			}
 		} else if (edit && data.getPointIndex() != -1) {
 			drawn = data.getHousePart();
-//			SceneManager.getInstance().setSelectedPart(data.getHousePart());
 			int pointIndex = data.getPointIndex();
 			if (SceneManager.getInstance().isTopView() && drawn instanceof Wall)
 				pointIndex -= 1;
-//			SceneManager.getInstance().getSelectedPart().editPoint(pointIndex);
 			data.getHousePart().editPoint(pointIndex);
 		} else {
 			HousePart housePart = data.getHousePart();
 			drawn = housePart;
-//			SceneManager.getInstance().setSelectedPart(housePart);
 			if (lastHoveredObject != null && lastHoveredObject != housePart) {
 				lastHoveredObject.hidePoints();
 				lastHoveredObject = null;
 			}
 
 			if (lastHoveredObject != housePart) {
-//				if (blinker != null) {
-//					blinker.finish();
-//					blinker = null;
-//				}
 				Blinker.getInstance().setTarget(null);
 				if (data.getHousePart().getOriginal() != null)
-//					blinker = new Blinker(drawn.getOriginal().getRoot());
 					Blinker.getInstance().setTarget(drawn.getOriginal().getRoot());
 			}
 			housePart.showPoints();

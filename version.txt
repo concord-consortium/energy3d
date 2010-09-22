@@ -343,6 +343,7 @@ Version 0.2
 - improve the speed of mouse move when editing house parts 
 - fix problem with color showing as grey when enabling lighting
 - fix problem with the software hanging sometimes when loading a new model
+- fix problem with toolbar button not functioning when dragging instead of clicking
 
 
 TODO:
