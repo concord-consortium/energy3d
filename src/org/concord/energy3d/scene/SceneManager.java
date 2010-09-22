@@ -325,20 +325,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void run() {
-		// try {
-		frameHandler.init();
-		while (!exit) {
-			frameHandler.updateFrame();
-			Thread.yield();
+		try {
+			frameHandler.init();
+			while (!exit) {
+				frameHandler.updateFrame();
+				Thread.yield();
+			}
+		} catch (final Throwable t) {
+			t.printStackTrace();
 		}
-		// } catch (final Throwable t) {
-		// t.printStackTrace();
-		// }
 	}
 
 	public void update(final ReadOnlyTimer timer) {
-//		if (operationFlag)
-//			executeOperation();
+		// if (operationFlag)
+		// executeOperation();
 
 		// Scene.getInstance().updateTexture();
 		final double tpf = timer.getTimePerFrame();
@@ -371,10 +371,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public boolean renderUnto(Renderer renderer) {
 		if (mouseMoveFlag)
 			executeMouseMove();
-		
+
 		if (operationFlag)
 			executeOperation();
-		
+
 		// if (!Scene.getInstance().getParts().isEmpty())
 		// Scene.getInstance().renderTexture(renderer);
 		// Scene.getInstance().init();
@@ -557,25 +557,24 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (drawn != null)
 									drawn.hidePoints();
 								drawn = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
-								System.out.print(drawn);								
+								System.out.print(drawn);
 								SelectUtil.nextPickLayer();
 							}
 						} else
 							drawn.addPoint(mouseState.getX(), mouseState.getY());
-						
+
 						enableDisableRotationControl();
 
 						return null;
 					}
 				});
-				
-				
+
 			}
 		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				
+
 				taskManager.update(new Callable<Object>() {
 					public Object call() throws Exception {
 						MouseState mouseState = inputStates.getCurrent().getMouseState();
@@ -585,27 +584,27 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						} else {
 							if (!drawn.isDrawCompleted())
 								drawn.addPoint(mouseState.getX(), mouseState.getY());
-							
+
 							if (drawn.isDrawCompleted()) {
 								drawn.hidePoints();
 								drawn = null;
 								if (operationStick)
 									operationFlag = true;
 								else {
-//									MainFrame.getInstance().getSelectButton().setSelected(true);
-//									operation = Operation.SELECT;
+									// MainFrame.getInstance().getSelectButton().setSelected(true);
+									// operation = Operation.SELECT;
 									MainFrame.getInstance().deselect();
 								}
 							}
 						}
-						
+
 						enableDisableRotationControl();
 						updateHeliodonSize();
 
 						return null;
 					}
-				});				
-				
+				});
+
 			}
 		}));
 
@@ -764,10 +763,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			setCompassVisible(false);
 			camera.setProjectionMode(ProjectionMode.Parallel);
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
-//			control.setMoveSpeed(MOVE_SPEED / 10);
-//			loc = new Vector3(0, 0, 50);
+			// control.setMoveSpeed(MOVE_SPEED / 10);
+			// loc = new Vector3(0, 0, 50);
 			control.setMoveSpeed(5 * MOVE_SPEED);
-			loc = new Vector3(0, 0, 10);			
+			loc = new Vector3(0, 0, 10);
 			up = new Vector3(0.0f, -1.0f, 0.0f);
 			dir = new Vector3(0.0f, 0.0f, -1.0f);
 			double fac = 1000;
@@ -807,10 +806,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		camera.setFrustumBottom(-scale);
 		camera.setFrustumLeft(-scale * ratio);
 		camera.setFrustumRight(scale * ratio);
-		
+
 		// canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
 		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);
-		
+
 		camera.update();
 	}
 
@@ -833,8 +832,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			camera.setFrustumRight(camera.getFrustumRight() * fac);
 			camera.update();
 
-//			control.setMoveSpeed(1.1 * fac * control.getMoveSpeed());
-//			control.setMoveSpeed(val > 0 ? 50 : 0.2 * control.getMoveSpeed());
+			// control.setMoveSpeed(1.1 * fac * control.getMoveSpeed());
+			// control.setMoveSpeed(val > 0 ? 50 : 0.2 * control.getMoveSpeed());
 			control.setMoveSpeed(2 * camera.getFrustumTop() * camera.getFrustumTop());
 		} else {
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
@@ -856,22 +855,22 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		camera.setLocation(loc);
 	}
 
-//	public void setOperation(Operation operation) {
-//		setOperation(operation, false);
-//	}	
-	
+	// public void setOperation(Operation operation) {
+	// setOperation(operation, false);
+	// }
+
 	public void setOperation(Operation operation) { // , boolean stick) {
 		System.out.println("setOperation()");
-//		this.operationStick  = false;
-//		if (!stick || operation != this.operation) {
-			this.operation = operation;
-			this.operationFlag = true;
-			System.out.println("this.operationFlag = true;");
-//		}
+		// this.operationStick = false;
+		// if (!stick || operation != this.operation) {
+		this.operation = operation;
+		this.operationFlag = true;
+		System.out.println("this.operationFlag = true;");
+		// }
 	}
-	
+
 	public void setOperationStick(boolean stick) {
-		this.operationStick  = stick;
+		this.operationStick = stick;
 	}
 
 	public void executeOperation() {
@@ -1121,7 +1120,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					sunHeliodon.setScale(1);
 				else
 					sunHeliodon.setScale((Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0);
-				return null;				
+				return null;
 			}
 		});
 	}
@@ -1131,7 +1130,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final MouseState mouseState = inputState.getCurrent().getMouseState();
 		int x = mouseState.getX();
 		int y = mouseState.getY();
-		
+
 		if (drawn != null && !drawn.isDrawCompleted()) {
 			drawn.setPreviewPoint(x, y);
 		} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
