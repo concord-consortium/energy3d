@@ -345,6 +345,9 @@ Version 0.2
 - fix problem with the software hanging sometimes when loading a new model
 - fix problem with toolbar button not functioning when dragging instead of clicking
 - fix problem with invisible window when it is placed on a wall parallel to y axis
+- fix problem with infinit bounding box by initializing the roof mesh with a zero bounding box
+- avoid deleting while hold the DEL button, delete one object per key pressed.
+- fixed problem with wrong roof mesh during print preview 
 
 
 TODO:

@@ -707,6 +707,10 @@ public class Wall extends HousePart {
 
 		if (newNeighbor != null)
 			((Wall) newNeighbor.getNeighborOf(this)).setNeighbor(newNeighbor.getSnapPointIndexOfNeighborOf(this), newNeighbor, false);
+		
+//		System.out.println("Neighbor of " + this + " are:");
+//		System.out.println("\t" + neighbors[0]);
+//		System.out.println("\t" + neighbors[1]);
 	}
 
 	private void removeNeighbor(int pointIndex, int requestingPointIndex, Wall wall) {

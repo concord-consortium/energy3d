@@ -117,6 +117,7 @@ import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 	public enum Operation {
@@ -639,7 +640,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				SelectUtil.setPickLayer(0);
 			}
 		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DELETE), new TriggerAction() {
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.DELETE), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				Scene.getInstance().remove(drawn);
 				drawn = null;
@@ -1115,11 +1116,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void updateHeliodonSize() {
 		taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
+				Scene.getRoot().updateWorldBound(true);
 				final BoundingVolume bounds = Scene.getRoot().getWorldBound();
 				if (bounds == null)
 					sunHeliodon.setScale(1);
-				else
-					sunHeliodon.setScale((Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0);
+				else {					
+					final double scale = (Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0;
+					if (Util.DEBUG)
+						System.out.println("Scale = " + scale);
+					sunHeliodon.setScale(scale);
+				}
 				return null;
 			}
 		});

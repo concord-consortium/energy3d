@@ -4,11 +4,13 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.util.MeshLib;
+import org.concord.energy3d.util.Util;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
+import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
@@ -53,9 +55,11 @@ public abstract class Roof extends HousePart {
 
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		mesh.setModelBound(new BoundingSphere());
 
 		bottomMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		bottomMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		bottomMesh.setModelBound(new BoundingSphere());
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
@@ -88,6 +92,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void updateMesh() {
+//		System.out.println("Drawing Roof...");
 		if (container == null) {
 			resetToZero(mesh.getMeshData().getVertexBuffer());
 			if (bottomMesh != null)
@@ -97,6 +102,12 @@ public abstract class Roof extends HousePart {
 		}
 
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
+
+//		if (Util.DEBUG) {
+			for (PolygonPoint p : wallUpperPoints)
+				System.out.print(p + ",");
+			System.out.println();
+//		}
 
 		// center.set(0, 0, 0);
 		// for (PolygonPoint p : wallUpperPoints)
@@ -135,6 +146,16 @@ public abstract class Roof extends HousePart {
 	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
 		Poly2Tri.triangulate(polygon);
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
+
+//		if (Util.DEBUG) {
+//			System.out.println("Mesh: ");
+//			final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+//			vertexBuffer.rewind();
+//			while (vertexBuffer.hasRemaining())
+//				System.out.print(vertexBuffer.get() + ", ");
+//			System.out.println("\b");
+//		}
+
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
 		// ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
@@ -164,7 +185,7 @@ public abstract class Roof extends HousePart {
 		int i = 1;
 		center.set(0, 0, 0);
 		while (currentWall != null && currentWall.isFirstPointInserted()) {
-			currentWall.draw();
+//			currentWall.draw();
 			// System.out.println("wall (" + i++ + "): " + currentWall);
 			Snap next = currentWall.next(prevWall);
 			int pointIndex = 0;
@@ -432,7 +453,7 @@ public abstract class Roof extends HousePart {
 				center.addLocal(p);
 			}
 			center.divideLocal(buf.capacity() / 3);
-//			center.setZ(height + 0.3);
+			// center.setZ(height + 0.3);
 			center.addLocal(0, -0.01, 0);
 
 			final String text = "(" + (printSequence++ + 1) + ")";
