@@ -10,12 +10,16 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Snap;
+import org.concord.energy3d.model.Window;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
@@ -255,6 +259,15 @@ public class Scene implements Serializable {
 	// }
 
 	public void save(final File file) throws FileNotFoundException, IOException {
+		// remove dead objects
+		Iterator<HousePart> itr = parts.iterator();
+		while (itr.hasNext()) {
+			HousePart part = itr.next();
+			if (part instanceof Roof || part instanceof Window || part instanceof Door)
+				if (part.getContainer() == null)
+					itr.remove();
+		}
+		
 		Scene.file = file;
 		if (!file.getName().toLowerCase().endsWith(".ser"))
 			Scene.file = new File(file.toString() + ".ser");

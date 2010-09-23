@@ -348,12 +348,9 @@ Version 0.2
 - fix problem with infinit bounding box by initializing the roof mesh with a zero bounding box
 - avoid deleting while hold the DEL button, delete one object per key pressed.
 - fixed problem with wrong roof mesh during print preview 
-
+- automatically clean up the scene by removing those roofs, windows and doors no longer attached before saving
 
 TODO:
-- fix deleting multiple objects when pressing DEL key
-
-
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar
 - avoid drawing roof if only one attached wall is present
 - change color of floor

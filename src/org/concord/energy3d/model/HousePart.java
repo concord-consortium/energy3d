@@ -723,5 +723,9 @@ public abstract class HousePart implements Serializable {
 	private boolean isDrawn() {		
 		return drawFlag == globalDrawFlag;
 	}
+
+	public HousePart getContainer() {
+		return container;
+	}
 	
 }  

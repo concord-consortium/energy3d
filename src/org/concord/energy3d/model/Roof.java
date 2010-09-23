@@ -104,9 +104,9 @@ public abstract class Roof extends HousePart {
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
 
 //		if (Util.DEBUG) {
-			for (PolygonPoint p : wallUpperPoints)
-				System.out.print(p + ",");
-			System.out.println();
+//			for (PolygonPoint p : wallUpperPoints)
+//				System.out.print(p + ",");
+//			System.out.println();
 //		}
 
 		// center.set(0, 0, 0);
