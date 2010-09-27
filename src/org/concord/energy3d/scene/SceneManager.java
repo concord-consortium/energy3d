@@ -862,7 +862,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setOperation(Operation operation) { // , boolean stick) {
 		System.out.println("setOperation()");
-		// this.operationStick = false;
+		this.operationStick = false;
 		// if (!stick || operation != this.operation) {
 		this.operation = operation;
 		this.operationFlag = true;
@@ -1120,9 +1120,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final BoundingVolume bounds = Scene.getRoot().getWorldBound();
 				if (bounds == null)
 					sunHeliodon.setScale(1);
-				else {					
+				else {
 					final double scale = (Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0;
-					if (Util.DEBUG)
+//					if (Util.DEBUG)
 						System.out.println("Scale = " + scale);
 					sunHeliodon.setScale(scale);
 				}

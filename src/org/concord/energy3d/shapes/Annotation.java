@@ -43,6 +43,7 @@ public abstract class Annotation extends Node {
 		this.attachChild(mesh);
 		this.attachChild(label);
 		mesh.setDefaultColor(ColorRGBA.BLACK);
+		mesh.setModelBound(null);
 //		label.setTextColor(ColorRGBA.BLACK);
 //		label.setFontScale(0.5);
 	}

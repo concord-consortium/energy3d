@@ -22,6 +22,7 @@ public class SizeAnnotation extends Annotation {
 		this.attachChild(arrows);
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		arrows.setDefaultColor(ColorRGBA.BLACK);
+		arrows.setModelBound(null);
 	}
 	
 	protected Mesh getMesh() {

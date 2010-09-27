@@ -317,6 +317,9 @@ public class Scene implements Serializable {
 					housePart.draw();
 				for (HousePart housePart : instance.getParts())
 					housePart.draw();
+				for (HousePart housePart : instance.getParts())
+					housePart.draw();
+				
 				System.out.println("done");
 				SceneManager.getInstance().updateHeliodonSize();
 				return null;

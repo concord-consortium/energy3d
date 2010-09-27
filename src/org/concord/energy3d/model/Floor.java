@@ -1,7 +1,9 @@
 package org.concord.energy3d.model;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import org.concord.energy3d.util.Util;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
@@ -104,6 +106,16 @@ public class Floor extends Roof {
 		try {
 			Poly2Tri.triangulate(polygon);
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
+			
+//			if (Util.DEBUG) {
+				System.out.println("Mesh: ");
+				final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+				vertexBuffer.rewind();
+				while (vertexBuffer.hasRemaining())
+					System.out.print(vertexBuffer.get() + ", ");
+				System.out.println("\b");
+//			}
+			
 			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
 			ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
 			// ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());

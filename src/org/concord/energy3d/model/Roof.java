@@ -93,6 +93,7 @@ public abstract class Roof extends HousePart {
 
 	protected void updateMesh() {
 //		System.out.println("Drawing Roof...");
+		System.out.println("Drawing Floor...");
 		if (container == null) {
 			resetToZero(mesh.getMeshData().getVertexBuffer());
 			if (bottomMesh != null)
@@ -104,9 +105,9 @@ public abstract class Roof extends HousePart {
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
 
 //		if (Util.DEBUG) {
-//			for (PolygonPoint p : wallUpperPoints)
-//				System.out.print(p + ",");
-//			System.out.println();
+			for (PolygonPoint p : wallUpperPoints)
+				System.out.print(p + ",");
+			System.out.println();
 //		}
 
 		// center.set(0, 0, 0);
