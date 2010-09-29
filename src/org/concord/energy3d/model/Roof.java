@@ -40,6 +40,7 @@ public abstract class Roof extends HousePart {
 	protected double labelTop;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient Node flattenedMeshesRoot;
+	private transient boolean wallsUpdated;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -83,6 +84,12 @@ public abstract class Roof extends HousePart {
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
 		bottomMesh.setUserData(userData);
+		
+//		if (container != null) {
+//			exploreWallNeighbors((Wall)container);
+//			updateWalls();
+//		}
+		
 	}
 
 	protected void computeAbsPoints() {
@@ -105,9 +112,9 @@ public abstract class Roof extends HousePart {
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
 
 //		if (Util.DEBUG) {
-			for (PolygonPoint p : wallUpperPoints)
-				System.out.print(p + ",");
-			System.out.println();
+//			for (PolygonPoint p : wallUpperPoints)
+//				System.out.print(p + ",");
+//			System.out.println();
 //		}
 
 		// center.set(0, 0, 0);
@@ -186,7 +193,11 @@ public abstract class Roof extends HousePart {
 		int i = 1;
 		center.set(0, 0, 0);
 		while (currentWall != null && currentWall.isFirstPointInserted()) {
+//			if (!wallsUpdated) {
 //			currentWall.draw();
+			currentWall.computeAbsPoints();
+//			wallsUpdated = true;
+//			}
 			// System.out.println("wall (" + i++ + "): " + currentWall);
 			Snap next = currentWall.next(prevWall);
 			int pointIndex = 0;
@@ -214,6 +225,42 @@ public abstract class Roof extends HousePart {
 
 		return poly;
 	}
+	
+//	private void updateWalls() {
+//		Wall currentWall = (Wall)container;
+//		Wall prevWall = null;
+//		Snap.clearVisits();
+//		while (currentWall != null) {
+//			Snap next = currentWall.next(prevWall);
+//			prevWall = currentWall;
+//			if (next == null || next.isVisited())
+//				break;
+//			currentWall = (Wall) next.getNeighborOf(currentWall);
+//			next.visit();			
+//		}
+//		
+//
+//		Snap.clearVisits();
+//		prevWall = null;
+//		while (currentWall != null && currentWall.isFirstPointInserted()) {
+//			currentWall.init();
+//			currentWall.draw();
+//			Snap next = currentWall.next(prevWall);
+//			int pointIndex = 0;
+//			if (next != null)
+//				pointIndex = next.getSnapPointIndexOf(currentWall);
+//			pointIndex = pointIndex + 1;
+//			prevWall = currentWall;
+//
+//			currentWall.setRoof(this);
+//
+//			if (next == null || next.isVisited())
+//				break;
+//			currentWall = (Wall) next.getNeighborOf(currentWall);
+//			next.visit();
+//		}
+//
+//	}	
 
 	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
 		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());

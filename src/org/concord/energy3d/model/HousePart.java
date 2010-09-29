@@ -161,7 +161,8 @@ public abstract class HousePart implements Serializable {
 		center = new Vector3();
 		abspoints = new ArrayList<Vector3>(numOfEditPoints);
 		for (int i = 0; i < points.size(); i++)
-			abspoints.add(points.get(i).clone());
+//			abspoints.add(points.get(i).clone());
+			abspoints.add(new Vector3());
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");
 		sizeAnnotRoot = new Node("Size Annotations");
@@ -195,7 +196,7 @@ public abstract class HousePart implements Serializable {
 		
 //		PRINT_SPACE = 10;
 		
-//		computeAbsPoints();
+		computeAbsPoints();
 //		computeCenter();		
 		if (Util.DEBUG)
 		System.out.println("done");

@@ -315,10 +315,11 @@ public class Scene implements Serializable {
 					originalHouseRoot.attachChild(housePart.getRoot());
 				for (HousePart housePart : instance.getParts())
 					housePart.draw();
-				for (HousePart housePart : instance.getParts())
-					housePart.draw();
-				for (HousePart housePart : instance.getParts())
-					housePart.draw();
+//				redrawAll = true;
+//				for (HousePart housePart : instance.getParts())
+//					housePart.draw();
+//				for (HousePart housePart : instance.getParts())
+//					housePart.draw();
 				
 				System.out.println("done");
 				SceneManager.getInstance().updateHeliodonSize();

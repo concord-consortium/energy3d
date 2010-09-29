@@ -108,12 +108,12 @@ public class Floor extends Roof {
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 			
 //			if (Util.DEBUG) {
-				System.out.println("Mesh: ");
-				final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-				vertexBuffer.rewind();
-				while (vertexBuffer.hasRemaining())
-					System.out.print(vertexBuffer.get() + ", ");
-				System.out.println("\b");
+//				System.out.println("Mesh: ");
+//				final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+//				vertexBuffer.rewind();
+//				while (vertexBuffer.hasRemaining())
+//					System.out.print(vertexBuffer.get() + ", ");
+//				System.out.println("\b");
 //			}
 			
 			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());

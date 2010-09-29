@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 import org.poly2tri.Poly2Tri;
@@ -132,6 +133,11 @@ public class Wall extends HousePart {
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
 		invisibleMesh.setUserData(userData);
+		
+		for (int i = 0; i< neighbors.length; i++)
+			if (neighbors[i] != null && !Scene.getInstance().getParts().contains(neighbors[i].getNeighborOf(this)))
+				neighbors[i] = null;
+		
 	}
 
 	public void updateTexture() {
@@ -545,7 +551,7 @@ public class Wall extends HousePart {
 		Vector3 p02 = points.get(2).subtract(points.get(0), null).normalizeLocal();
 		Vector3 p01 = points.get(1).subtract(points.get(0), null).normalizeLocal();
 		Vector3 n = p02.crossLocal(p01).normalizeLocal();
-		n.multiplyLocal(wallThickness);
+//		n.multiplyLocal(wallThickness);
 
 		reversedThickness = false;
 
@@ -573,6 +579,7 @@ public class Wall extends HousePart {
 				cull(false);
 			}
 		}
+		n.multiplyLocal(wallThickness);
 		return n;
 	}
 
@@ -723,7 +730,8 @@ public class Wall extends HousePart {
 	public void delete() {
 		for (int i = 0; i < neighbors.length; i++)
 			if (neighbors[i] != null)
-				((Wall) neighbors[i].getNeighborOf(this)).setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false); // .removeNeighbor(this);
+//				((Wall) neighbors[i].getNeighborOf(this)).setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false); // .removeNeighbor(this);
+				((Wall) neighbors[i].getNeighborOf(this)).removeNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), neighbors[i].getSnapPointIndexOf(this), this); 
 	}
 
 	public void setHeight(double newHeight, boolean finalize) {

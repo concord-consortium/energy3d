@@ -351,9 +351,11 @@ Version 0.2
 - automatically clean up the scene by removing those roofs, windows and doors no longer attached before saving
 - added two new house models
 - fix problem with infinite bounds due to annotations
+- fix problem that unless wall redraw is forced when drawing floors, the floor drawing is incomplete at init
+- remove from neighbor when deleting a wall
+- remove neighbors during initialization if they no longer exist
 
 - fix problem with after pressing CTRL, can no longer select objects
-- unless force wall redraw the floors and roofs will be incomplete
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar
