@@ -215,145 +215,37 @@ public class Wall extends HousePart {
 			roof.draw();
 
 	}
-
-	// @Override
-	// protected void updateMesh() {
-	// super.draw();
-	// // if (root == null)
-	// // init();
-	// //
-	// // for (int i = 0; i < points.size(); i++) {
-	// // Vector3 p = points.get(i);
-	// // p = toAbsolute(p);
-	// // pointsRoot.getChild(i).setTranslation(p);
-	// // }
-	//
-	// boolean drawable = points.size() >= 4 && !points.get(0).equals(points.get(2));
-	//
-	// // System.out.println("rel = " + points.get(0));
-	// // System.out.println("abs = " + toAbsolute(points.get(0)));
-	//
-	// ArrayList<Vector3> points = abspoints;
-	//
-	// if (drawable) {
-	// Vector3 normal = points.get(2).subtract(points.get(0), null).cross(points.get(1).subtract(points.get(0), null), null).normalize(null);
-	//
-	// ArrayList<PolygonPoint> polyPoints = new ArrayList<PolygonPoint>();
-	//
-	// FloatBuffer invisibleVertexBuffer = invisibleMesh.getMeshData().getVertexBuffer();
-	// invisibleVertexBuffer.rewind();
-	// Vector3 p;
-	//
-	// p = points.get(0);
-	// // p = toAbsolute(p);
-	// // System.out.println("invis abs Y = " + p.getY());
-	// invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-	// p = points.get(1);
-	// // p = toAbsolute(p);
-	// invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-	// p = points.get(2);
-	// // p = toAbsolute(p);
-	// // System.out.println("abs = " + p);
-	// invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-	// p = points.get(3);
-	// // p = toAbsolute(p);
-	// invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-	//
-	// p = points.get(0);
-	// // p = toAbsolute(p);
-	// polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-	// p = points.get(2);
-	// // p = toAbsolute(p);
-	// polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-	// p = points.get(3);
-	// // p = toAbsolute(p);
-	// polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-	// p = points.get(1);
-	// // p = toAbsolute(p);
-	// polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-	//
-	// try {
-	// AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
-	// XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
-	//
-	// for (TriangulationPoint tp : polyPoints)
-	// toXY.transform(tp);
-	//
-	// Polygon polygon = new Polygon(polyPoints);
-	//
-	// for (HousePart child : children) {
-	// if (child instanceof Window) {
-	// Window win = (Window) child;
-	// if (win.getPoints().size() < 4)
-	// continue;
-	// PolygonPoint pp;
-	// ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
-	// ArrayList<Vector3> winPoints = child.getPoints();
-	// p = winPoints.get(0);
-	// pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-	// toXY.transform(pp);
-	// holePoints.add(pp);
-	// p = winPoints.get(2);
-	// pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-	// toXY.transform(pp);
-	// holePoints.add(pp);
-	// p = winPoints.get(3);
-	// pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-	// toXY.transform(pp);
-	// holePoints.add(pp);
-	// p = winPoints.get(1);
-	// pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-	// toXY.transform(pp);
-	// holePoints.add(pp);
-	// polygon.addHole(new Polygon(holePoints));
-	// }
-	//
-	// }
-	//
-	// Vector3 p01 = points.get(1).subtract(points.get(0), null).normalizeLocal(); // .multiplyLocal(1/TEXTURE_SCALE_Y);
-	// Vector3 p02 = points.get(2).subtract(points.get(0), null).normalizeLocal(); // .multiplyLocal(1/TEXTURE_SCALE_X);
-	// TPoint o = new TPoint(points.get(0).getX(), points.get(0).getY(), points.get(0).getZ());
-	// TPoint u = new TPoint(p01.getX(), p01.getY(), p01.getZ());
-	// TPoint v = new TPoint(p02.getX(), p02.getY(), p02.getZ());
-	//
-	// toXY.transform(o);
-	// toXY.transform(u);
-	// toXY.transform(v);
-	//
-	// Poly2Tri.triangulate(polygon);
-	// ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
-	// ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
-	// ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
-	// mesh.getMeshData().updateVertexCount();
-	//
-	// // if (!isFlatten()) {
-	// Vector3 n = drawBackMesh(polygon, fromXY);
-	// drawSurroundMesh(n);
-	// drawWindowsSurroundMesh(n);
-	// // }
-	//
-	// // force bound update
-	// // mesh.updateModelBound();
-	// // backMesh.updateModelBound();
-	// // surroundMesh.updateModelBound();
-	// // root.updateWorldBound(true);
-	// // mesh.updateModelBound();
-	// // backMesh.updateModelBound();
-	// // surroundMesh.updateModelBound();
-	// invisibleMesh.updateModelBound();
-	// // root.updateGeometricState(0);
-	// CollisionTreeManager.INSTANCE.removeCollisionTree(root);
-	//
-	// for (HousePart child : children)
-	// child.draw();
-	//
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	//
-	// }
-	//
-	// }
+	
+	protected Snap snap(Vector3 p, int index) {
+		if (!isSnapToObjects())
+			return null;
+		Vector3 closestPoint = null;
+		double closestDistance = Double.MAX_VALUE;
+		Wall closestWall = null;
+		int closestPointIndex = -1;
+		for (HousePart housePart : Scene.getInstance().getParts()) {
+			if (housePart instanceof Wall && housePart != this) {
+				Wall wall = (Wall) housePart;
+				int i = 0;
+				for (Vector3 p2 : wall.getPoints()) {
+					double distance = p.distance(p2);
+					if (distance < closestDistance) {
+						closestPoint = p2;
+						closestDistance = distance;
+						closestWall = wall;
+						closestPointIndex = i;
+					}
+					i++;
+				}
+			}
+		}
+		if (closestDistance < SNAP_DISTANCE) {
+			p.set(closestPoint);
+			return new Snap(this, closestWall, index, closestPointIndex);
+		} else {
+			return null;
+		}
+	}	
 
 	private boolean foundationSnap(Vector3 current) {
 		if (container == null)
@@ -710,28 +602,42 @@ public class Wall extends HousePart {
 			return;
 
 		if (oldNeighbor != null)
-			((Wall) oldNeighbor.getNeighborOf(this)).removeNeighbor(oldNeighbor.getSnapPointIndexOfNeighborOf(this), pointIndex, this);
+//			oldNeighbor.getNeighborOf(this).removeNeighbor(oldNeighbor.getSnapPointIndexOfNeighborOf(this), pointIndex, this);
+			oldNeighbor.getNeighborOf(this).removeNeighbor(this);
 
 		if (newNeighbor != null)
-			((Wall) newNeighbor.getNeighborOf(this)).setNeighbor(newNeighbor.getSnapPointIndexOfNeighborOf(this), newNeighbor, false);
+			newNeighbor.getNeighborOf(this).setNeighbor(newNeighbor.getSnapPointIndexOfNeighborOf(this), newNeighbor, false);
 		
 //		System.out.println("Neighbor of " + this + " are:");
 //		System.out.println("\t" + neighbors[0]);
 //		System.out.println("\t" + neighbors[1]);
 	}
 
-	private void removeNeighbor(int pointIndex, int requestingPointIndex, Wall wall) {
-		int i = pointIndex < 2 ? 0 : 1;
-		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall && neighbors[i].getSnapPointIndexOfNeighborOf(this) == requestingPointIndex)
+//	private void removeNeighbor(int pointIndex, int requestingPointIndex, Wall wall) {
+//		int i = pointIndex < 2 ? 0 : 1;
+//		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall && neighbors[i].getSnapPointIndexOfNeighborOf(this) == requestingPointIndex)
+//			neighbors[i] = null;
+//		draw();
+//	}
+
+	private void removeNeighbor(Wall wall) {
+		for (int i = 0; i < neighbors.length; i++)
+		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall)
 			neighbors[i] = null;
+		// if (neighbors[1].getNeighborOf(this) == wall)
+		// neighbors[1] = null;
+		//		int i = pointIndex < 2 ? 0 : 1;
+//		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall && neighbors[i].getSnapPointIndexOfNeighborOf(this) == requestingPointIndex)
+//			neighbors[i] = null;
 		draw();
 	}
-
+	
 	public void delete() {
 		for (int i = 0; i < neighbors.length; i++)
 			if (neighbors[i] != null)
 //				((Wall) neighbors[i].getNeighborOf(this)).setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false); // .removeNeighbor(this);
-				((Wall) neighbors[i].getNeighborOf(this)).removeNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), neighbors[i].getSnapPointIndexOf(this), this); 
+//				neighbors[i].getNeighborOf(this).removeNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), neighbors[i].getSnapPointIndexOf(this), this);
+				neighbors[i].getNeighborOf(this).removeNeighbor(this);
 	}
 
 	public void setHeight(double newHeight, boolean finalize) {

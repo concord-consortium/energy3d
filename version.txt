@@ -354,6 +354,7 @@ Version 0.2
 - fix problem that unless wall redraw is forced when drawing floors, the floor drawing is incomplete at init
 - remove from neighbor when deleting a wall
 - remove neighbors during initialization if they no longer exist
+- simplify the wall neighbors management code design
 
 - fix problem with after pressing CTRL, can no longer select objects
 

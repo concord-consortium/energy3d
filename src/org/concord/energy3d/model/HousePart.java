@@ -427,36 +427,36 @@ public abstract class HousePart implements Serializable {
 	// return pointOnSpace;
 	// }
 
-	protected Snap snap(Vector3 p, int index) {
-		if (!snapToObjects)
-			return null;
-		Vector3 closestPoint = null;
-		double closestDistance = Double.MAX_VALUE;
-		Wall closestWall = null;
-		int closestPointIndex = -1;
-		for (HousePart housePart : Scene.getInstance().getParts()) {
-			if (housePart instanceof Wall && housePart != this) {
-				Wall wall = (Wall) housePart;
-				int i = 0;
-				for (Vector3 p2 : wall.getPoints()) {
-					double distance = p.distance(p2);
-					if (distance < closestDistance) {
-						closestPoint = p2;
-						closestDistance = distance;
-						closestWall = wall;
-						closestPointIndex = i;
-					}
-					i++;
-				}
-			}
-		}
-		if (closestDistance < SNAP_DISTANCE) {
-			p.set(closestPoint);
-			return new Snap(this, closestWall, index, closestPointIndex);
-		} else {
-			return null;
-		}
-	}
+//	protected Snap snap(Vector3 p, int index) {
+//		if (!snapToObjects)
+//			return null;
+//		Vector3 closestPoint = null;
+//		double closestDistance = Double.MAX_VALUE;
+//		Wall closestWall = null;
+//		int closestPointIndex = -1;
+//		for (HousePart housePart : Scene.getInstance().getParts()) {
+//			if (housePart instanceof Wall && housePart != this) {
+//				Wall wall = (Wall) housePart;
+//				int i = 0;
+//				for (Vector3 p2 : wall.getPoints()) {
+//					double distance = p.distance(p2);
+//					if (distance < closestDistance) {
+//						closestPoint = p2;
+//						closestDistance = distance;
+//						closestWall = wall;
+//						closestPointIndex = i;
+//					}
+//					i++;
+//				}
+//			}
+//		}
+//		if (closestDistance < SNAP_DISTANCE) {
+//			p.set(closestPoint);
+//			return new Snap(this, closestWall, index, closestPointIndex);
+//		} else {
+//			return null;
+//		}
+//	}
 
 	protected Vector3 grid(Vector3 p, double gridSize) {
 		return grid(p, gridSize, true);

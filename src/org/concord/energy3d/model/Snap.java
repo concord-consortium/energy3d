@@ -6,8 +6,8 @@ public class Snap implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static int currentAnnotationDrawnStamp = 1;
 	private static int currentVisitStamp = 1;
-	private HousePart neighbor1;
-	private HousePart neighbor2;
+	private Wall neighbor1;
+	private Wall neighbor2;
 	private int pointIndex1;
 	private int pointIndex2;
 	private transient int annotationDrawn;
@@ -21,14 +21,14 @@ public class Snap implements Serializable {
 		currentVisitStamp = ++currentVisitStamp % 1000;
 	}	
 	
-	public Snap(HousePart neighbor1, HousePart neighbor2, int pointIndex1, int pointIndex2) {
+	public Snap(Wall neighbor1, Wall neighbor2, int pointIndex1, int pointIndex2) {
 		this.neighbor1 = neighbor1;
 		this.neighbor2 = neighbor2;
 		this.pointIndex1 = pointIndex1;
 		this.pointIndex2 = pointIndex2;
 	}
 
-	public HousePart getNeighborOf(HousePart housePart) {
+	public Wall getNeighborOf(HousePart housePart) {
 		if (housePart == neighbor1)
 			return neighbor2;
 		else
