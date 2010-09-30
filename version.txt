@@ -355,6 +355,8 @@ Version 0.2
 - remove from neighbor when deleting a wall
 - remove neighbors during initialization if they no longer exist
 - simplify the wall neighbors management code design
+- remove roof when deleting container wall
+- remove all windows when deleting the container wall
 
 - fix problem with after pressing CTRL, can no longer select objects
 

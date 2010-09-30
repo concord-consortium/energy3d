@@ -370,22 +370,26 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public boolean renderUnto(Renderer renderer) {
-		if (mouseMoveFlag)
-			executeMouseMove();
+		try {
+			if (mouseMoveFlag)
+				executeMouseMove();
 
-		if (operationFlag)
-			executeOperation();
+			if (operationFlag)
+				executeOperation();
 
-		// if (!Scene.getInstance().getParts().isEmpty())
-		// Scene.getInstance().renderTexture(renderer);
-		// Scene.getInstance().init();
+			// if (!Scene.getInstance().getParts().isEmpty())
+			// Scene.getInstance().renderTexture(renderer);
+			// Scene.getInstance().init();
 
-		// renderer.draw(root);
-		// if (drawn != null)
-		// com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
-		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
+			// renderer.draw(root);
+			// if (drawn != null)
+			// com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
+			// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
 
-		passManager.renderPasses(renderer);
+			passManager.renderPasses(renderer);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 

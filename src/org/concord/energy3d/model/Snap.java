@@ -66,12 +66,12 @@ public class Snap implements Serializable {
 	}	
 	
 
-//	@Override
-//	public boolean equals(Object obj) {
-//		if (obj instanceof Snap) {
-//			Snap s = (Snap)obj;
-//			return neighbor1 == s.neighbor1 && neighbor2 == s.neighbor2 && neighborPointIndex == s.getNeighborPointIndex();
-//		} else
-//			return false;
-//	}
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof Snap) {
+			Snap s = (Snap)obj;
+			return neighbor1 == s.neighbor1 && neighbor2 == s.neighbor2 && pointIndex1 == s.pointIndex1 && pointIndex2 == s.pointIndex2;
+		} else
+			return false;
+	}
 }

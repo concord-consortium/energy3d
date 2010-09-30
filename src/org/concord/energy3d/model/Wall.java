@@ -134,6 +134,7 @@ public class Wall extends HousePart {
 		surroundMesh.setUserData(userData);
 		invisibleMesh.setUserData(userData);
 		
+		if (neighbors != null)
 		for (int i = 0; i< neighbors.length; i++)
 			if (neighbors[i] != null && !Scene.getInstance().getParts().contains(neighbors[i].getNeighborOf(this)))
 				neighbors[i] = null;
@@ -592,21 +593,29 @@ public class Wall extends HousePart {
 		return null;
 	}
 
-	private void setNeighbor(int pointIndex, Snap newNeighbor, boolean updateNeighbors) {
+	private void setNeighbor(int pointIndex, Snap newSnap, boolean updateNeighbors) {
 		int i = pointIndex < 2 ? 0 : 1;
-		Snap oldNeighbor = neighbors[i];
-		if (updateNeighbors || oldNeighbor == null) // do not update if already has neighbor, unless this update was initiated by this wall
-			neighbors[i] = newNeighbor;
+		Snap oldSnap = neighbors[i];
+		if (newSnap != null)
+			System.out.println("test");
+//		if (updateNeighbors || oldSnap == null) // do not update if already has neighbor, unless this update was initiated by this wall
+			neighbors[i] = newSnap;
 
-		if (!updateNeighbors || oldNeighbor == newNeighbor || (oldNeighbor != null && oldNeighbor.equals(newNeighbor)))
+		if (!updateNeighbors || oldSnap == newSnap || (oldSnap != null && oldSnap.equals(newSnap)))
 			return;
 
-		if (oldNeighbor != null)
+		if (oldSnap != null) {
 //			oldNeighbor.getNeighborOf(this).removeNeighbor(oldNeighbor.getSnapPointIndexOfNeighborOf(this), pointIndex, this);
-			oldNeighbor.getNeighborOf(this).removeNeighbor(this);
+//			oldNeighbor.getNeighborOf(this).removeNeighbor(this);
+			final Wall neighbor = oldSnap.getNeighborOf(this);
+			neighbor.setNeighbor(oldSnap.getSnapPointIndexOfNeighborOf(this), null, false);
+			neighbor.draw();
+		}
 
-		if (newNeighbor != null)
-			newNeighbor.getNeighborOf(this).setNeighbor(newNeighbor.getSnapPointIndexOfNeighborOf(this), newNeighbor, false);
+		if (newSnap != null) {
+			final Wall neighbor = newSnap.getNeighborOf(this);
+			neighbor.setNeighbor(newSnap.getSnapPointIndexOfNeighborOf(this), newSnap, false);			
+		}
 		
 //		System.out.println("Neighbor of " + this + " are:");
 //		System.out.println("\t" + neighbors[0]);
@@ -620,24 +629,29 @@ public class Wall extends HousePart {
 //		draw();
 //	}
 
-	private void removeNeighbor(Wall wall) {
-		for (int i = 0; i < neighbors.length; i++)
-		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall)
-			neighbors[i] = null;
-		// if (neighbors[1].getNeighborOf(this) == wall)
-		// neighbors[1] = null;
-		//		int i = pointIndex < 2 ? 0 : 1;
-//		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall && neighbors[i].getSnapPointIndexOfNeighborOf(this) == requestingPointIndex)
+//	private void removeNeighbor(Wall wall) {
+//		for (int i = 0; i < neighbors.length; i++)
+//		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall)
 //			neighbors[i] = null;
-		draw();
-	}
+//		// if (neighbors[1].getNeighborOf(this) == wall)
+//		// neighbors[1] = null;
+//		//		int i = pointIndex < 2 ? 0 : 1;
+////		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall && neighbors[i].getSnapPointIndexOfNeighborOf(this) == requestingPointIndex)
+////			neighbors[i] = null;
+//		draw();
+//	}
 	
 	public void delete() {
 		for (int i = 0; i < neighbors.length; i++)
 			if (neighbors[i] != null)
-//				((Wall) neighbors[i].getNeighborOf(this)).setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false); // .removeNeighbor(this);
+				neighbors[i].getNeighborOf(this).setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false); // .removeNeighbor(this);
 //				neighbors[i].getNeighborOf(this).removeNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), neighbors[i].getSnapPointIndexOf(this), this);
-				neighbors[i].getNeighborOf(this).removeNeighbor(this);
+//				neighbors[i].getNeighborOf(this).removeNeighbor(this);
+		for (HousePart child : children)
+			Scene.getInstance().remove(child);
+		
+		if (roof != null && roof.getContainer() == this)
+			Scene.getInstance().remove(roof);
 	}
 
 	public void setHeight(double newHeight, boolean finalize) {
