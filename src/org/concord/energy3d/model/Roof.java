@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
@@ -171,60 +172,84 @@ public abstract class Roof extends HousePart {
 		mesh.getMeshData().updateVertexCount();
 	}
 
+//	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
+//		ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
+//		Wall currentWall = startWall;
+//		Wall prevWall = null;
+//		Snap.clearVisits();
+//		while (currentWall != null) {
+//			Snap next = currentWall.next(prevWall);
+//			prevWall = currentWall;
+//			if (next == null || next.isVisited())
+//				break;
+//			currentWall = (Wall) next.getNeighborOf(currentWall);
+//			next.visit();
+//			// if (currentWall == startWall)
+//			// break;
+//		}
+//
+//		Snap.clearVisits();
+//		startWall = currentWall;
+//		prevWall = null;
+//		int i = 1;
+//		center.set(0, 0, 0);
+//		while (currentWall != null && currentWall.isFirstPointInserted()) {
+////			if (!wallsUpdated) {
+////			currentWall.draw();
+//			currentWall.computeAbsPoints();
+////			wallsUpdated = true;
+////			}
+//			// System.out.println("wall (" + i++ + "): " + currentWall);
+//			Snap next = currentWall.next(prevWall);
+//			int pointIndex = 0;
+//			if (next != null)
+//				pointIndex = next.getSnapPointIndexOf(currentWall);
+//			pointIndex = pointIndex + 1;
+//			final Vector3 p1 = currentWall.getPoints().get(pointIndex == 1 ? 3 : 1);
+//			final Vector3 p2 = currentWall.getPoints().get(pointIndex);
+//			addPointToPolygon(poly, p1);
+//			addPointToPolygon(poly, p2);
+//			prevWall = currentWall;
+//
+//			currentWall.setRoof(this);
+//
+//			if (next == null || next.isVisited())
+//				break;
+//			currentWall = (Wall) next.getNeighborOf(currentWall);
+//			next.visit();
+//			// if (currentWall == startWall)
+//			// break;
+//		}
+//
+//		center.multiplyLocal(1.0 / poly.size());
+//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+//
+//		return poly;
+//	}
+	
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
-		ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
-		Wall currentWall = startWall;
-		Wall prevWall = null;
-		Snap.clearVisits();
-		while (currentWall != null) {
-			Snap next = currentWall.next(prevWall);
-			prevWall = currentWall;
-			if (next == null || next.isVisited())
-				break;
-			currentWall = (Wall) next.getNeighborOf(currentWall);
-			next.visit();
-			// if (currentWall == startWall)
-			// break;
-		}
+		final ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
+		startWall.visitNeighbors(new WallVisitor() {
+			public void visit(Wall currentWall, Snap next) {
+				int pointIndex = 0;
+				if (next != null)
+					pointIndex = next.getSnapPointIndexOf(currentWall);
+				pointIndex = pointIndex + 1;
+				final Vector3 p1 = currentWall.getPoints().get(pointIndex == 1 ? 3 : 1);
+				final Vector3 p2 = currentWall.getPoints().get(pointIndex);
+				addPointToPolygon(poly, p1);
+				addPointToPolygon(poly, p2);
 
-		Snap.clearVisits();
-		startWall = currentWall;
-		prevWall = null;
-		int i = 1;
-		center.set(0, 0, 0);
-		while (currentWall != null && currentWall.isFirstPointInserted()) {
-//			if (!wallsUpdated) {
-//			currentWall.draw();
-			currentWall.computeAbsPoints();
-//			wallsUpdated = true;
-//			}
-			// System.out.println("wall (" + i++ + "): " + currentWall);
-			Snap next = currentWall.next(prevWall);
-			int pointIndex = 0;
-			if (next != null)
-				pointIndex = next.getSnapPointIndexOf(currentWall);
-			pointIndex = pointIndex + 1;
-			final Vector3 p1 = currentWall.getPoints().get(pointIndex == 1 ? 3 : 1);
-			final Vector3 p2 = currentWall.getPoints().get(pointIndex);
-			addPointToPolygon(poly, p1);
-			addPointToPolygon(poly, p2);
-			prevWall = currentWall;
-
-			currentWall.setRoof(this);
-
-			if (next == null || next.isVisited())
-				break;
-			currentWall = (Wall) next.getNeighborOf(currentWall);
-			next.visit();
-			// if (currentWall == startWall)
-			// break;
-		}
+				currentWall.setRoof(Roof.this);				
+			}
+			
+		});
 
 		center.multiplyLocal(1.0 / poly.size());
 		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 
 		return poly;
-	}
+	}	
 	
 //	private void updateWalls() {
 //		Wall currentWall = (Wall)container;

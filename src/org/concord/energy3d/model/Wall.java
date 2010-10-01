@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
@@ -596,9 +597,9 @@ public class Wall extends HousePart {
 	private void setNeighbor(int pointIndex, Snap newSnap, boolean updateNeighbors) {
 		int i = pointIndex < 2 ? 0 : 1;
 		Snap oldSnap = neighbors[i];
-		if (newSnap != null)
+		if (newSnap == null)
 			System.out.println("test");
-//		if (updateNeighbors || oldSnap == null) // do not update if already has neighbor, unless this update was initiated by this wall
+		if (updateNeighbors || oldSnap == null) // do not update if already has neighbor (unless this update was initiated by this wall) because otherwise the 2nd wall point will override the first attachement
 			neighbors[i] = newSnap;
 
 		if (!updateNeighbors || oldSnap == newSnap || (oldSnap != null && oldSnap.equals(newSnap)))
@@ -722,15 +723,32 @@ public class Wall extends HousePart {
 
 	}
 
-	// private void drawAnnot(int a, int b, ReadOnlyVector3 faceDirection, int annotCounter, Align align) {
-	// final SizeAnnotation annot;
-	// if (annotCounter < annotRoot.getChildren().size()) {
-	// annot = (SizeAnnotation) annotRoot.getChild(annotCounter);
-	// annot.getSceneHints().setCullHint(CullHint.Inherit);
-	// } else {
-	// annot = new SizeAnnotation();
-	// annotRoot.attachChild(annot);
-	// }
-	// annot.setRange(abspoints.get(a), abspoints.get(b), center, faceDirection, original == null, align);
-	// }
+	protected void visitNeighbors(WallVisitor visitor) {
+		Wall currentWall = this;
+		Wall prevWall = null;
+		Snap.clearVisits();
+		while (currentWall != null) {
+			Snap next = currentWall.next(prevWall);
+			prevWall = currentWall;
+			if (next == null || next.isVisited())
+				break;
+			currentWall = (Wall) next.getNeighborOf(currentWall);
+			next.visit();
+		}
+
+		Snap.clearVisits();
+		prevWall = null;
+		while (currentWall != null) { // && currentWall.isFirstPointInserted()) {
+			Snap next = currentWall.next(prevWall);
+			
+			visitor.visit(currentWall, next);
+			
+			if (next == null || next.isVisited())
+				break;
+			else {
+				currentWall = (Wall) next.getNeighborOf(currentWall);
+				next.visit();
+			}
+		}
+	}	
 }

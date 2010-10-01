@@ -357,6 +357,10 @@ Version 0.2
 - simplify the wall neighbors management code design
 - remove roof when deleting container wall
 - remove all windows when deleting the container wall
+- implement a visitor software pattern for scanning attached walls
+
+- determine the inside of the house more accurately using center of attached walls
+- scan attached walls and add all roofs and floors attached to attached walls
 
 - fix problem with after pressing CTRL, can no longer select objects
 

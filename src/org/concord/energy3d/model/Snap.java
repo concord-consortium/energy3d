@@ -29,17 +29,17 @@ public class Snap implements Serializable {
 	}
 
 	public Wall getNeighborOf(HousePart housePart) {
-		if (housePart == neighbor1)
-			return neighbor2;
-		else
+		if (housePart == neighbor2)
 			return neighbor1;
+		else
+			return neighbor2;
 	}
 
 	public int getSnapPointIndexOf(HousePart housePart) {
-		if (housePart == neighbor1)
-			return pointIndex1;
-		else
+		if (housePart == neighbor2)
 			return pointIndex2;
+		else
+			return pointIndex1;
 	}
 	
 	public int getSnapPointIndexOfNeighborOf(HousePart housePart) {
