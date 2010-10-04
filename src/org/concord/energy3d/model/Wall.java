@@ -22,6 +22,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
@@ -213,8 +214,10 @@ public class Wall extends HousePart {
 				neighbor.getNeighborOf(this).draw();
 			}
 
-		if (roof != null)
-			roof.draw();
+//		if (roof != null)
+//			roof.draw();
+		
+		drawRoof();
 
 	}
 	
@@ -460,6 +463,9 @@ public class Wall extends HousePart {
 			Vector3 a = otherPoints.get(otherPointIndex);
 			Vector3 b = otherPoints.get(otherPointIndex == 0 ? 2 : 0);
 			Vector3 ab = b.subtract(a, null).normalizeLocal();
+			
+//			Vector3 ab = calculateWallsCenter().subtract(center, null).normalizeLocal();
+			
 			if (n.dot(ab) < 0) {
 				n.negateLocal();
 				reversedThickness = true;
@@ -738,11 +744,14 @@ public class Wall extends HousePart {
 
 		Snap.clearVisits();
 		prevWall = null;
+		Snap prev = null;
 		while (currentWall != null) { // && currentWall.isFirstPointInserted()) {
 			Snap next = currentWall.next(prevWall);
 			
-			visitor.visit(currentWall, next);
+			visitor.visit(currentWall, prev, next);
 			
+			prevWall = currentWall;
+			prev = next;
 			if (next == null || next.isVisited())
 				break;
 			else {
@@ -751,4 +760,50 @@ public class Wall extends HousePart {
 			}
 		}
 	}	
+	
+	private Vector3 calculateWallsCenter() {
+		final Vector3 center = new Vector3();
+		final Vector2 n = new Vector2();
+		
+		visitNeighbors(new WallVisitor() {
+			public void visit(Wall wall, Snap prev, Snap next) {
+				if (prev == null)
+					center.addLocal(wall.getPoints().get(next.getSnapPointIndexOf(wall) == 0 ? 2 : 0));
+				else 
+					center.addLocal(wall.getPoints().get(prev.getSnapPointIndexOf(wall)));
+				n.setX(n.getX()+1);
+				
+				if (next == null) {
+					center.addLocal(wall.getPoints().get(prev.getSnapPointIndexOf(wall) == 0 ? 2 : 0));
+					n.setX(n.getX()+1);
+				}
+				
+//				int pointIndex = 0;
+//				if (next != null)
+//					pointIndex = next.getSnapPointIndexOf(Wall.this) == 0 ? 2 : 0;
+//				center.addLocal(wall.getPoints().get(pointIndex));
+//				n.setX(n.getX()+1);
+//				if (next == null) {
+//					center.addLocal(wall.getPoints().get(2));
+//					n.setX(n.getX()+1);
+//				}
+			}
+		});
+		
+		return center.divideLocal(n.getX());
+	}
+	
+	private void drawRoof() {
+		visitNeighbors(new WallVisitor() {
+			public void visit(Wall wall, Snap prev, Snap next) {
+				if (wall.getRoof() != null)
+					wall.getRoof().draw();
+			}
+		});
+	}
+
+	protected Roof getRoof() {
+		return roof;
+	}
+	
 }

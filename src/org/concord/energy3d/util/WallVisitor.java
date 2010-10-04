@@ -4,5 +4,5 @@ import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Wall;
 
 public interface WallVisitor {
-	public void visit(Wall wall, Snap snap);
+	public void visit(Wall wall, Snap prev, Snap next);
 }

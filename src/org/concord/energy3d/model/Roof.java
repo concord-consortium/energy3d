@@ -228,17 +228,18 @@ public abstract class Roof extends HousePart {
 //	}
 	
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
+		center.set(0, 0, 0);
 		final ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
 		startWall.visitNeighbors(new WallVisitor() {
-			public void visit(Wall currentWall, Snap next) {
+			public void visit(Wall currentWall, Snap prev, Snap next) {
 				int pointIndex = 0;
 				if (next != null)
 					pointIndex = next.getSnapPointIndexOf(currentWall);
 				pointIndex = pointIndex + 1;
 				final Vector3 p1 = currentWall.getPoints().get(pointIndex == 1 ? 3 : 1);
 				final Vector3 p2 = currentWall.getPoints().get(pointIndex);
-				addPointToPolygon(poly, p1);
-				addPointToPolygon(poly, p2);
+				addPointToPolygon(poly, p1, center);
+				addPointToPolygon(poly, p2, center);
 
 				currentWall.setRoof(Roof.this);				
 			}
@@ -287,7 +288,7 @@ public abstract class Roof extends HousePart {
 //
 //	}	
 
-	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
+	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p, Vector3 center) {
 		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 		if (!poly.contains(polygonPoint)) {
 			poly.add(polygonPoint);
