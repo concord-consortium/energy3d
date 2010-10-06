@@ -39,6 +39,7 @@ import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
+import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
@@ -465,6 +466,8 @@ public class Wall extends HousePart {
 			Vector3 ab = b.subtract(a, null).normalizeLocal();
 			
 //			Vector3 ab = calculateWallsCenter().subtract(center, null).normalizeLocal();
+			
+			System.out.println(Util.ccwAngleBetween(Vector3.UNIT_X, new Vector3(1, -1, 0).normalizeLocal(), Vector3.UNIT_Z) * 180 / Math.PI);
 			
 			if (n.dot(ab) < 0) {
 				n.negateLocal();
