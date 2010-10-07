@@ -864,11 +864,14 @@ public class Wall extends HousePart {
 
 				final Vector3 n1 = new Vector3(wall.thicknessNormal).normalizeLocal();
 				final Vector3 n2 = new Vector3(prev.getNeighborOf(wall).thicknessNormal).normalizeLocal();
-				final double dot = n1.dot(n2);
+				final double dot = n1.dot(n2);				
 				if (dot == 0) {
-					final double dot2 = n1.dot(v1);
-					if (dot2 < 0)
-						wall.thicknessNormal.negateLocal();
+//					final double dot2 = n1.dot(v1);
+//					if (dot2 < 0)
+//						wall.thicknessNormal.negateLocal();
+					final double angleBetween = Util.angleBetween(n1, n2, Vector3.UNIT_Z);
+					if (angleBetween > Math.PI)
+						wall.thicknessNormal.negateLocal();					
 				} else {
 					if (mustBeSameDirection && dot < 0)
 						wall.thicknessNormal.negateLocal();
@@ -876,6 +879,7 @@ public class Wall extends HousePart {
 						wall.thicknessNormal.negateLocal();
 				}
 
+				
 				System.out.println(angle * 180 / Math.PI);
 				System.out.println(mustBeSameDirection);
 				System.out.println(wall.thicknessNormal);
