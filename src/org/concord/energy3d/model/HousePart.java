@@ -49,6 +49,8 @@ public abstract class HousePart implements Serializable {
 	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = false;
 	private static boolean drawAnnotations = false;
+	private static long idCounter = 1;
+	private long id;
 	protected transient Node root;
 	protected transient Node pointsRoot;
 	protected final int numOfDrawPoints, numOfEditPoints;
@@ -80,7 +82,7 @@ public abstract class HousePart implements Serializable {
 	protected static boolean textureEnabled = true;
 	protected static ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
 	private static int globalDrawFlag = 1;
-	private transient int drawFlag;
+	private transient int drawFlag;	
 	
 	public static void clearDrawFlags() {
 		globalDrawFlag++;
@@ -148,6 +150,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void init() {
+		id = idCounter++;
 		if (Util.DEBUG)
 		System.out.print("Deep cloning...");
 		if (!(this instanceof Window || this instanceof Door)) { // && pos == 0) {
@@ -727,6 +730,10 @@ public abstract class HousePart implements Serializable {
 
 	public HousePart getContainer() {
 		return container;
+	}
+	
+	public String toString() {
+		return this.getClass().getName() + "(" + id + "(";
 	}
 	
 }  

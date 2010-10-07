@@ -56,7 +56,7 @@ public class Wall extends HousePart {
 	private transient Mesh wireframeMesh;
 	private Snap[] neighbors = new Snap[2];
 	private transient boolean reversedThickness;
-	private Vector3 thicknessNormal;
+	private transient Vector3 thicknessNormal;
 	private Roof roof;
 
 	static {
@@ -103,7 +103,7 @@ public class Wall extends HousePart {
 		root.attachChild(invisibleMesh);
 		invisibleMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		invisibleMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-//		invisibleMesh.setModelBound(new BoundingBox());
+		// invisibleMesh.setModelBound(new BoundingBox());
 		invisibleMesh.setModelBound(new BoundingSphere());
 		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
 
@@ -123,11 +123,11 @@ public class Wall extends HousePart {
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.setRenderState(new WireframeState());
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-		
+
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
-//		surroundMesh.setRenderState(ms);
+		// surroundMesh.setRenderState(ms);
 
 		updateTexture();
 
@@ -136,12 +136,12 @@ public class Wall extends HousePart {
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
 		invisibleMesh.setUserData(userData);
-		
+
 		if (neighbors != null)
-		for (int i = 0; i< neighbors.length; i++)
-			if (neighbors[i] != null && !Scene.getInstance().getParts().contains(neighbors[i].getNeighborOf(this)))
-				neighbors[i] = null;
-		
+			for (int i = 0; i < neighbors.length; i++)
+				if (neighbors[i] != null && !Scene.getInstance().getParts().contains(neighbors[i].getNeighborOf(this)))
+					neighbors[i] = null;
+
 	}
 
 	public void updateTexture() {
@@ -150,11 +150,11 @@ public class Wall extends HousePart {
 			ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 			mesh.setRenderState(ts);
 			mesh.setDefaultColor(ColorRGBA.WHITE);
-//			surroundMesh.setDefaultColor(ColorRGBA.GRAY);
+			// surroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		} else {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(defaultColor);
-//			surroundMesh.setDefaultColor(defaultColor);
+			// surroundMesh.setDefaultColor(defaultColor);
 		}
 	}
 
@@ -210,18 +210,20 @@ public class Wall extends HousePart {
 		// for (HousePart child : children)
 		// child.draw();
 
-		for (Snap neighbor : this.neighbors)
-			if (neighbor != null) {
-				neighbor.getNeighborOf(this).draw();
-			}
+		// for (Snap neighbor : this.neighbors)
+		// if (neighbor != null) {
+		// neighbor.getNeighborOf(this).draw();
+		// }
 
-//		if (roof != null)
-//			roof.draw();
-		
+		drawNeighborWalls();
+
+		// if (roof != null)
+		// roof.draw();
+
 		drawRoof();
 
 	}
-	
+
 	protected Snap snap(Vector3 p, int index) {
 		if (!isSnapToObjects())
 			return null;
@@ -251,7 +253,7 @@ public class Wall extends HousePart {
 		} else {
 			return null;
 		}
-	}	
+	}
 
 	private boolean foundationSnap(Vector3 current) {
 		if (container == null)
@@ -317,12 +319,12 @@ public class Wall extends HousePart {
 			for (HousePart child : children) {
 				child.draw();
 			}
-		
+
 		if (Util.DEBUG) {
 			System.out.println("drawing polygon...");
 			for (PolygonPoint x : polyPoints)
-				System.out.print("(" + x.getX() + "," + x.getY() + ","+ x.getZ() + ")-");
-			System.out.println('\b');			
+				System.out.print("(" + x.getX() + "," + x.getY() + "," + x.getZ() + ")-");
+			System.out.println('\b');
 			System.out.println("drawing holes...");
 		}
 		// Add window holes
@@ -348,8 +350,8 @@ public class Wall extends HousePart {
 				toXY.transform(pp);
 				holePoints.add(pp);
 				if (Util.DEBUG) {
-				for (PolygonPoint x : holePoints)
-					System.out.print(x.getX() + "," + x.getY() + ","+ x.getZ() + ",");
+					for (PolygonPoint x : holePoints)
+						System.out.print(x.getX() + "," + x.getY() + "," + x.getZ() + ",");
 				}
 				polygon.addHole(new Polygon(holePoints));
 			}
@@ -369,7 +371,7 @@ public class Wall extends HousePart {
 		try {
 			Poly2Tri.triangulate(polygon);
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
-//			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
+			// ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
 			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
 			mesh.getMeshData().updateVertexCount();
@@ -399,12 +401,10 @@ public class Wall extends HousePart {
 		w = abspoints.get(1);
 		buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
 
-
-
 	}
 
 	public boolean includeWindow(ArrayList<Vector3> winPoints) {
-//		return winPoints.size() >= 4 && Math.abs(winPoints.get(2).getX() - winPoints.get(0).getX()) >= 0.01;
+		// return winPoints.size() >= 4 && Math.abs(winPoints.get(2).getX() - winPoints.get(0).getX()) >= 0.01;
 		return winPoints.size() >= 4 && winPoints.get(2).subtract(winPoints.get(0), null).length() >= 0.1;
 	}
 
@@ -442,14 +442,31 @@ public class Wall extends HousePart {
 		p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
 	}
 
+	// private void reduceBackMeshWidth(Polygon polygon, final Vector3 dir, final int neighbor) {
+	// final int neighborPointIndex = neighbors[neighbor].getSnapPointIndexOfNeighborOf(this);
+	// ArrayList<Vector3> points2 = neighbors[neighbor].getNeighborOf(this).getPoints();
+	// Vector3 dir2 = points2.get(neighborPointIndex == 0 ? 2 : 0).subtract(points2.get(neighborPointIndex), null).normalizeLocal();
+	// final double angle = Math.max(0.1, dir2.smallestAngleBetween(dir) / 2);
+	// final boolean angleBiggerThan90 = Util.angleBetween(dir2, dir, Vector3.UNIT_Z) > Math.PI / 2;
+	// dir.multiplyLocal(wallThickness * Math.sin(Math.PI / 2 - angle) / Math.sin(angle));
+	// if (angleBiggerThan90)
+	// dir.negateLocal();
+	// TriangulationPoint p = polygon.getPoints().get(neighbor == 0 ? 0 : 1);
+	// p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
+	// p = polygon.getPoints().get(neighbor == 0 ? 3 : 2);
+	// p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
+	// }
+
 	private Vector3 decideThicknessNormal() {
+		if (thicknessNormal != null)
+			return thicknessNormal;
 		final ArrayList<Vector3> points = abspoints;
 		cull(true);
 
 		Vector3 p02 = points.get(2).subtract(points.get(0), null).normalizeLocal();
 		Vector3 p01 = points.get(1).subtract(points.get(0), null).normalizeLocal();
 		Vector3 n = p02.crossLocal(p01).normalizeLocal();
-//		n.multiplyLocal(wallThickness);
+		// n.multiplyLocal(wallThickness);
 
 		reversedThickness = false;
 
@@ -464,11 +481,11 @@ public class Wall extends HousePart {
 			Vector3 a = otherPoints.get(otherPointIndex);
 			Vector3 b = otherPoints.get(otherPointIndex == 0 ? 2 : 0);
 			Vector3 ab = b.subtract(a, null).normalizeLocal();
-			
-//			Vector3 ab = calculateWallsCenter().subtract(center, null).normalizeLocal();
-			
-			System.out.println(Util.ccwAngleBetween(Vector3.UNIT_X, new Vector3(1, -1, 0).normalizeLocal(), Vector3.UNIT_Z) * 180 / Math.PI);
-			
+
+			// Vector3 ab = calculateWallsCenter().subtract(center, null).normalizeLocal();
+
+			// System.out.println(Util.angleBetween(Vector3.UNIT_X, new Vector3(1, -1, 0).normalizeLocal(), Vector3.UNIT_Z) * 180 / Math.PI);
+
 			if (n.dot(ab) < 0) {
 				n.negateLocal();
 				reversedThickness = true;
@@ -555,7 +572,7 @@ public class Wall extends HousePart {
 		Vector3 p = new Vector3();
 		final Vector3 wallDirection = abspoints.get(2).subtract(abspoints.get(0), null);
 		for (HousePart child : children) {
-//			if (child instanceof Window && child.isFirstPointInserted()) {
+			// if (child instanceof Window && child.isFirstPointInserted()) {
 			final ArrayList<Vector3> winPoints = child.getPoints();
 			if (child instanceof Window && includeWindow(winPoints)) {
 				int[] order = order1;
@@ -606,8 +623,6 @@ public class Wall extends HousePart {
 	private void setNeighbor(int pointIndex, Snap newSnap, boolean updateNeighbors) {
 		int i = pointIndex < 2 ? 0 : 1;
 		Snap oldSnap = neighbors[i];
-		if (newSnap == null)
-			System.out.println("test");
 		if (updateNeighbors || oldSnap == null) // do not update if already has neighbor (unless this update was initiated by this wall) because otherwise the 2nd wall point will override the first attachement
 			neighbors[i] = newSnap;
 
@@ -615,8 +630,8 @@ public class Wall extends HousePart {
 			return;
 
 		if (oldSnap != null) {
-//			oldNeighbor.getNeighborOf(this).removeNeighbor(oldNeighbor.getSnapPointIndexOfNeighborOf(this), pointIndex, this);
-//			oldNeighbor.getNeighborOf(this).removeNeighbor(this);
+			// oldNeighbor.getNeighborOf(this).removeNeighbor(oldNeighbor.getSnapPointIndexOfNeighborOf(this), pointIndex, this);
+			// oldNeighbor.getNeighborOf(this).removeNeighbor(this);
 			final Wall neighbor = oldSnap.getNeighborOf(this);
 			neighbor.setNeighbor(oldSnap.getSnapPointIndexOfNeighborOf(this), null, false);
 			neighbor.draw();
@@ -624,42 +639,42 @@ public class Wall extends HousePart {
 
 		if (newSnap != null) {
 			final Wall neighbor = newSnap.getNeighborOf(this);
-			neighbor.setNeighbor(newSnap.getSnapPointIndexOfNeighborOf(this), newSnap, false);			
+			neighbor.setNeighbor(newSnap.getSnapPointIndexOfNeighborOf(this), newSnap, false);
 		}
-		
-//		System.out.println("Neighbor of " + this + " are:");
-//		System.out.println("\t" + neighbors[0]);
-//		System.out.println("\t" + neighbors[1]);
+
+		// System.out.println("Neighbor of " + this + " are:");
+		// System.out.println("\t" + neighbors[0]);
+		// System.out.println("\t" + neighbors[1]);
 	}
 
-//	private void removeNeighbor(int pointIndex, int requestingPointIndex, Wall wall) {
-//		int i = pointIndex < 2 ? 0 : 1;
-//		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall && neighbors[i].getSnapPointIndexOfNeighborOf(this) == requestingPointIndex)
-//			neighbors[i] = null;
-//		draw();
-//	}
+	// private void removeNeighbor(int pointIndex, int requestingPointIndex, Wall wall) {
+	// int i = pointIndex < 2 ? 0 : 1;
+	// if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall && neighbors[i].getSnapPointIndexOfNeighborOf(this) == requestingPointIndex)
+	// neighbors[i] = null;
+	// draw();
+	// }
 
-//	private void removeNeighbor(Wall wall) {
-//		for (int i = 0; i < neighbors.length; i++)
-//		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall)
-//			neighbors[i] = null;
-//		// if (neighbors[1].getNeighborOf(this) == wall)
-//		// neighbors[1] = null;
-//		//		int i = pointIndex < 2 ? 0 : 1;
-////		if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall && neighbors[i].getSnapPointIndexOfNeighborOf(this) == requestingPointIndex)
-////			neighbors[i] = null;
-//		draw();
-//	}
-	
+	// private void removeNeighbor(Wall wall) {
+	// for (int i = 0; i < neighbors.length; i++)
+	// if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall)
+	// neighbors[i] = null;
+	// // if (neighbors[1].getNeighborOf(this) == wall)
+	// // neighbors[1] = null;
+	// // int i = pointIndex < 2 ? 0 : 1;
+	// // if (neighbors[i] != null && neighbors[i].getNeighborOf(this) == wall && neighbors[i].getSnapPointIndexOfNeighborOf(this) == requestingPointIndex)
+	// // neighbors[i] = null;
+	// draw();
+	// }
+
 	public void delete() {
 		for (int i = 0; i < neighbors.length; i++)
 			if (neighbors[i] != null)
 				neighbors[i].getNeighborOf(this).setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false); // .removeNeighbor(this);
-//				neighbors[i].getNeighborOf(this).removeNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), neighbors[i].getSnapPointIndexOf(this), this);
-//				neighbors[i].getNeighborOf(this).removeNeighbor(this);
+				// neighbors[i].getNeighborOf(this).removeNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), neighbors[i].getSnapPointIndexOf(this), this);
+				// neighbors[i].getNeighborOf(this).removeNeighbor(this);
 		for (HousePart child : children)
 			Scene.getInstance().remove(child);
-		
+
 		if (roof != null && roof.getContainer() == this)
 			Scene.getInstance().remove(roof);
 	}
@@ -750,9 +765,9 @@ public class Wall extends HousePart {
 		Snap prev = null;
 		while (currentWall != null) { // && currentWall.isFirstPointInserted()) {
 			Snap next = currentWall.next(prevWall);
-			
+
 			visitor.visit(currentWall, prev, next);
-			
+
 			prevWall = currentWall;
 			prev = next;
 			if (next == null || next.isVisited())
@@ -762,40 +777,64 @@ public class Wall extends HousePart {
 				next.visit();
 			}
 		}
-	}	
-	
+	}
+
+	protected void visitNeighborsForward(boolean forward, WallVisitor visitor) {
+		Wall currentWall = this;
+		Wall prevWall = null;
+
+		Snap.clearVisits();
+		Snap prev = neighbors[forward ? 1 : 0];
+		if (prev != null)
+			prevWall = prev.getNeighborOf(this);
+		while (currentWall != null) { // && currentWall.isFirstPointInserted()) {
+			Snap next = currentWall.next(prevWall);
+
+			visitor.visit(currentWall, prev, next);
+
+			prevWall = currentWall;
+			prev = next;
+			if (next == null || next.isVisited())
+				break;
+			else {
+				currentWall = (Wall) next.getNeighborOf(currentWall);
+				next.visit();
+			}
+		}
+	}
+
 	private Vector3 calculateWallsCenter() {
 		final Vector3 center = new Vector3();
 		final Vector2 n = new Vector2();
-		
+
 		visitNeighbors(new WallVisitor() {
 			public void visit(Wall wall, Snap prev, Snap next) {
 				if (prev == null)
 					center.addLocal(wall.getPoints().get(next.getSnapPointIndexOf(wall) == 0 ? 2 : 0));
-				else 
+				else
 					center.addLocal(wall.getPoints().get(prev.getSnapPointIndexOf(wall)));
-				n.setX(n.getX()+1);
-				
+				n.setX(n.getX() + 1);
+
 				if (next == null) {
 					center.addLocal(wall.getPoints().get(prev.getSnapPointIndexOf(wall) == 0 ? 2 : 0));
-					n.setX(n.getX()+1);
+					n.setX(n.getX() + 1);
 				}
-				
-//				int pointIndex = 0;
-//				if (next != null)
-//					pointIndex = next.getSnapPointIndexOf(Wall.this) == 0 ? 2 : 0;
-//				center.addLocal(wall.getPoints().get(pointIndex));
-//				n.setX(n.getX()+1);
-//				if (next == null) {
-//					center.addLocal(wall.getPoints().get(2));
-//					n.setX(n.getX()+1);
-//				}
+
+				// int pointIndex = 0;
+				// if (next != null)
+				// pointIndex = next.getSnapPointIndexOf(Wall.this) == 0 ? 2 : 0;
+				// center.addLocal(wall.getPoints().get(pointIndex));
+				// n.setX(n.getX()+1);
+				// if (next == null) {
+				// center.addLocal(wall.getPoints().get(2));
+				// n.setX(n.getX()+1);
+				// }
 			}
 		});
-		
+
 		return center.divideLocal(n.getX());
 	}
-	
+
 	private void drawRoof() {
 		visitNeighbors(new WallVisitor() {
 			public void visit(Wall wall, Snap prev, Snap next) {
@@ -805,8 +844,49 @@ public class Wall extends HousePart {
 		});
 	}
 
+	private void drawNeighborWalls() {
+		visitNeighborsForward(true, new WallVisitor() {
+			public void visit(Wall wall, Snap prev, Snap next) {
+				if (wall == Wall.this) {
+					System.out.println("--------------------------");
+					return;
+				}
+				final int i = prev.getSnapPointIndexOf(wall);
+				final ArrayList<Vector3> points1 = prev.getNeighborOf(wall).getPoints();
+				Vector3 v1 = points1.get(i == 0 ? 2 : 0).subtract(points1.get(i), null).normalizeLocal();
+
+				final int j = prev.getSnapPointIndexOfNeighborOf(wall);
+				final ArrayList<Vector3> points2 = wall.abspoints; // next.getNeighborOf(wall).getPoints();
+				Vector3 v2 = points2.get(j == 0 ? 2 : 0).subtract(points2.get(j), null).normalizeLocal();
+
+				final double angle = Util.angleBetween(v1, v2, Vector3.UNIT_Z);
+				boolean mustBeSameDirection = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
+
+				final Vector3 n1 = new Vector3(wall.thicknessNormal).normalizeLocal();
+				final Vector3 n2 = new Vector3(prev.getNeighborOf(wall).thicknessNormal).normalizeLocal();
+				final double dot = n1.dot(n2);
+				if (dot == 0) {
+					final double dot2 = n1.dot(v1);
+					if (dot2 < 0)
+						wall.thicknessNormal.negateLocal();
+				} else {
+					if (mustBeSameDirection && dot < 0)
+						wall.thicknessNormal.negateLocal();
+					else if (!mustBeSameDirection && dot > 0)
+						wall.thicknessNormal.negateLocal();
+				}
+
+				System.out.println(angle * 180 / Math.PI);
+				System.out.println(mustBeSameDirection);
+				System.out.println(wall.thicknessNormal);
+
+				wall.draw();
+			}
+		});
+	}
+
 	protected Roof getRoof() {
 		return roof;
 	}
-	
+
 }

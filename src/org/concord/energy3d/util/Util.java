@@ -21,7 +21,7 @@ public class Util {
 	}
 	
 	/** require that a and b are normalized **/
-	public static double ccwAngleBetween(ReadOnlyVector3 a, ReadOnlyVector3 b, ReadOnlyVector3 n) {
+	public static double angleBetween(ReadOnlyVector3 a, ReadOnlyVector3 b, ReadOnlyVector3 n) {
 	    double angle;
 	    Vector3 v = new Vector3(b);
 
