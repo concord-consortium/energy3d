@@ -733,7 +733,7 @@ public abstract class HousePart implements Serializable {
 	}
 	
 	public String toString() {
-		return this.getClass().getName() + "(" + id + "(";
+		return this.getClass().getName() + "(" + id + ")";
 	}
 	
 }  

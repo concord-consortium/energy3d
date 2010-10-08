@@ -362,6 +362,8 @@ Version 0.2
 - scan attached walls and redraw attached roof when modifying a wall
 - implement algorithm for computing vector angles in the 0-360 degrees range 
 - visit all attached walls and reverse normals based on angle between two walls and given the normal of the first wall
+- extend the interior wall for when the interior angle is greater than 180 degrees
+
 
 - scan attached walls and redraw attached floors when modifying a wall
 - determine the inside of the house more accurately using center of attached walls

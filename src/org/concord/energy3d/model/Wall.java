@@ -430,32 +430,38 @@ public class Wall extends HousePart {
 		return thicknessNormal;
 	}
 
-	private void reduceBackMeshWidth(Polygon polygon, final Vector3 dir, final int neighbor) {
-		final int neighborPointIndex = neighbors[neighbor].getSnapPointIndexOfNeighborOf(this);
-		ArrayList<Vector3> points2 = neighbors[neighbor].getNeighborOf(this).getPoints();
-		Vector3 dir2 = points2.get(neighborPointIndex == 0 ? 2 : 0).subtract(points2.get(neighborPointIndex), null).normalizeLocal();
-		final double angle = Math.max(0.1, dir2.smallestAngleBetween(dir) / 2);
-		dir.multiplyLocal(wallThickness * Math.sin(Math.PI / 2 - angle) / Math.sin(angle));
-		TriangulationPoint p = polygon.getPoints().get(neighbor == 0 ? 0 : 1);
-		p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
-		p = polygon.getPoints().get(neighbor == 0 ? 3 : 2);
-		p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
-	}
-
 	// private void reduceBackMeshWidth(Polygon polygon, final Vector3 dir, final int neighbor) {
 	// final int neighborPointIndex = neighbors[neighbor].getSnapPointIndexOfNeighborOf(this);
 	// ArrayList<Vector3> points2 = neighbors[neighbor].getNeighborOf(this).getPoints();
 	// Vector3 dir2 = points2.get(neighborPointIndex == 0 ? 2 : 0).subtract(points2.get(neighborPointIndex), null).normalizeLocal();
 	// final double angle = Math.max(0.1, dir2.smallestAngleBetween(dir) / 2);
-	// final boolean angleBiggerThan90 = Util.angleBetween(dir2, dir, Vector3.UNIT_Z) > Math.PI / 2;
 	// dir.multiplyLocal(wallThickness * Math.sin(Math.PI / 2 - angle) / Math.sin(angle));
-	// if (angleBiggerThan90)
-	// dir.negateLocal();
 	// TriangulationPoint p = polygon.getPoints().get(neighbor == 0 ? 0 : 1);
 	// p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
 	// p = polygon.getPoints().get(neighbor == 0 ? 3 : 2);
 	// p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
 	// }
+
+	private void reduceBackMeshWidth(Polygon polygon, final Vector3 dir, final int neighbor) {
+		final int neighborPointIndex = neighbors[neighbor].getSnapPointIndexOfNeighborOf(this);
+		ArrayList<Vector3> points2 = neighbors[neighbor].getNeighborOf(this).getPoints();
+		Vector3 dir2 = points2.get(neighborPointIndex == 0 ? 2 : 0).subtract(points2.get(neighborPointIndex), null).normalizeLocal();
+		final double angle = Math.max(0.1, dir2.smallestAngleBetween(dir));
+		final double angle360 = Util.angleBetween(dir, dir2, Vector3.UNIT_Z);
+		System.out.println(dir + "-" + dir2 + ": angle360 = " + angle360 * 180 / Math.PI);
+		final boolean angleBiggerThan180 = angle360 >= Math.PI;
+//		if (angleBiggerThan180) {
+			final double scalar = wallThickness * Math.tan((Math.PI - angle) / 2); // * (angle < Math.PI / 2 ? 1 : -1);
+			System.out.println("x = " + scalar);
+			dir.normalizeLocal().multiplyLocal(scalar);
+//		} else
+//			dir.normalizeLocal().multiplyLocal(wallThickness); // * Math.sin(Math.PI / 2 - angle / 2) / Math.sin(angle / 2));
+//			dir.normalizeLocal().multiplyLocal(wallThickness * Math.tan(angle / 2 - angle - Math.PI / 2 * (angle < Math.PI / 2 ? -1 : 1))); // * Math.sin(Math.PI / 2 - angle / 2) / Math.sin(angle / 2));
+		TriangulationPoint p = polygon.getPoints().get(neighbor == 0 ? 0 : 1);
+		p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
+		p = polygon.getPoints().get(neighbor == 0 ? 3 : 2);
+		p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
+	}
 
 	private Vector3 decideThicknessNormal() {
 		if (thicknessNormal != null)
@@ -670,8 +676,8 @@ public class Wall extends HousePart {
 		for (int i = 0; i < neighbors.length; i++)
 			if (neighbors[i] != null)
 				neighbors[i].getNeighborOf(this).setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false); // .removeNeighbor(this);
-				// neighbors[i].getNeighborOf(this).removeNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), neighbors[i].getSnapPointIndexOf(this), this);
-				// neighbors[i].getNeighborOf(this).removeNeighbor(this);
+		// neighbors[i].getNeighborOf(this).removeNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), neighbors[i].getSnapPointIndexOf(this), this);
+		// neighbors[i].getNeighborOf(this).removeNeighbor(this);
 		for (HousePart child : children)
 			Scene.getInstance().remove(child);
 
@@ -864,14 +870,14 @@ public class Wall extends HousePart {
 
 				final Vector3 n1 = new Vector3(wall.thicknessNormal).normalizeLocal();
 				final Vector3 n2 = new Vector3(prev.getNeighborOf(wall).thicknessNormal).normalizeLocal();
-				final double dot = n1.dot(n2);				
+				final double dot = n1.dot(n2);
 				if (dot == 0) {
-//					final double dot2 = n1.dot(v1);
-//					if (dot2 < 0)
-//						wall.thicknessNormal.negateLocal();
+					// final double dot2 = n1.dot(v1);
+					// if (dot2 < 0)
+					// wall.thicknessNormal.negateLocal();
 					final double angleBetween = Util.angleBetween(n1, n2, Vector3.UNIT_Z);
 					if (angleBetween > Math.PI)
-						wall.thicknessNormal.negateLocal();					
+						wall.thicknessNormal.negateLocal();
 				} else {
 					if (mustBeSameDirection && dot < 0)
 						wall.thicknessNormal.negateLocal();
@@ -879,7 +885,6 @@ public class Wall extends HousePart {
 						wall.thicknessNormal.negateLocal();
 				}
 
-				
 				System.out.println(angle * 180 / Math.PI);
 				System.out.println(mustBeSameDirection);
 				System.out.println(wall.thicknessNormal);
