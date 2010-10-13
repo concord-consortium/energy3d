@@ -409,6 +409,8 @@ public class Wall extends HousePart {
 	}
 
 	private Vector3 drawBackMesh(Polygon polygon, XYToAnyTransform fromXY) {
+		thicknessNormal = decideThicknessNormal();
+
 		ArrayList<Vector3> points = abspoints;
 		Vector3 dir = points.get(2).subtract(points.get(0), null).normalizeLocal();
 		if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted())
@@ -423,8 +425,6 @@ public class Wall extends HousePart {
 		ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
 		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
 		backMesh.getMeshData().updateVertexCount();
-
-		thicknessNormal = decideThicknessNormal();
 
 		backMesh.setTranslation(thicknessNormal);
 		return thicknessNormal;
@@ -442,25 +442,36 @@ public class Wall extends HousePart {
 	// p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
 	// }
 
-	private void reduceBackMeshWidth(Polygon polygon, final Vector3 dir, final int neighbor) {
-		final int neighborPointIndex = neighbors[neighbor].getSnapPointIndexOfNeighborOf(this);
-		ArrayList<Vector3> points2 = neighbors[neighbor].getNeighborOf(this).getPoints();
-		Vector3 dir2 = points2.get(neighborPointIndex == 0 ? 2 : 0).subtract(points2.get(neighborPointIndex), null).normalizeLocal();
-		final double angle = Math.max(0.1, dir2.smallestAngleBetween(dir));
-		final double angle360 = Util.angleBetween(dir, dir2, Vector3.UNIT_Z);
-		System.out.println(dir + "-" + dir2 + ": angle360 = " + angle360 * 180 / Math.PI);
-		final boolean angleBiggerThan180 = angle360 >= Math.PI;
-//		if (angleBiggerThan180) {
-			final double scalar = wallThickness * Math.tan((Math.PI - angle) / 2); // * (angle < Math.PI / 2 ? 1 : -1);
-			System.out.println("x = " + scalar);
-			dir.normalizeLocal().multiplyLocal(scalar);
-//		} else
-//			dir.normalizeLocal().multiplyLocal(wallThickness); // * Math.sin(Math.PI / 2 - angle / 2) / Math.sin(angle / 2));
-//			dir.normalizeLocal().multiplyLocal(wallThickness * Math.tan(angle / 2 - angle - Math.PI / 2 * (angle < Math.PI / 2 ? -1 : 1))); // * Math.sin(Math.PI / 2 - angle / 2) / Math.sin(angle / 2));
+	private void reduceBackMeshWidth(final Polygon polygon, final ReadOnlyVector3 wallDir, final int neighbor) {
+		System.out.println(this);
+		final Snap snap = neighbors[neighbor];
+		final int neighborPointIndex = snap.getSnapPointIndexOfNeighborOf(this);
+		final Wall otherWall = snap.getNeighborOf(this);
+		final Vector3 otherWallDir = otherWall.getPoints().get(neighborPointIndex == 0 ? 2 : 0).subtract(otherWall.getPoints().get(neighborPointIndex), null).normalizeLocal();
+		final double angle = Math.max(0.1, otherWallDir.smallestAngleBetween(wallDir));
+//		final double angle360 = Util.angleBetween(wallDir, otherWallDir, Vector3.UNIT_Z);
+		final double angle360;
+		if (wallDir.dot(otherWall.decideThicknessNormal().normalize(null)) < 0)
+//			angle360 = Util.angleBetween(otherWallDir, wallDir, Vector3.UNIT_Z);
+			angle360 = Math.PI + angle;
+		else
+			angle360 = angle; // Util.angleBetween(wallDir, otherWallDir, Vector3.UNIT_Z);
+
+		System.out.println(wallDir + " - " + otherWallDir + ": angle360 = " + angle360 * 180 / Math.PI);
+		boolean reverse = angle360 >= Math.PI; // && thicknessNormal.normalize(null).dot(otherWallDir) < 0;
+		final double length = wallThickness * Math.tan((Math.PI - angle) / 2) * (reverse ? -1 : 1); // * (angle < Math.PI / 2 ? 1 : -1);
+//		if (wallDir.dot(otherWall.decideThicknessNormal().normalize(null)) < 0)
+//			wallDir.negateLocal();
+		
+//		if (snap.isReverse())
+//			wallDir.negateLocal();
+
+		final Vector3 v = wallDir.normalize(null).multiplyLocal(length);
+
 		TriangulationPoint p = polygon.getPoints().get(neighbor == 0 ? 0 : 1);
-		p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
+		p.set(p.getX() + v.getX(), p.getY() + v.getY(), p.getZ());
 		p = polygon.getPoints().get(neighbor == 0 ? 3 : 2);
-		p.set(p.getX() + dir.getX(), p.getY() + dir.getY(), p.getZ());
+		p.set(p.getX() + v.getX(), p.getY() + v.getY(), p.getZ());
 	}
 
 	private Vector3 decideThicknessNormal() {
@@ -853,49 +864,67 @@ public class Wall extends HousePart {
 	private void drawNeighborWalls() {
 		visitNeighborsForward(true, new WallVisitor() {
 			public void visit(Wall wall, Snap prev, Snap next) {
-				if (wall == Wall.this) {
-					System.out.println("--------------------------");
-					return;
-				}
-				final int i = prev.getSnapPointIndexOf(wall);
-				final ArrayList<Vector3> points1 = prev.getNeighborOf(wall).getPoints();
-				Vector3 v1 = points1.get(i == 0 ? 2 : 0).subtract(points1.get(i), null).normalizeLocal();
-
-				final int j = prev.getSnapPointIndexOfNeighborOf(wall);
-				final ArrayList<Vector3> points2 = wall.abspoints; // next.getNeighborOf(wall).getPoints();
-				Vector3 v2 = points2.get(j == 0 ? 2 : 0).subtract(points2.get(j), null).normalizeLocal();
-
-				final double angle = Util.angleBetween(v1, v2, Vector3.UNIT_Z);
-				boolean mustBeSameDirection = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
-
-				final Vector3 n1 = new Vector3(wall.thicknessNormal).normalizeLocal();
-				final Vector3 n2 = new Vector3(prev.getNeighborOf(wall).thicknessNormal).normalizeLocal();
-				final double dot = n1.dot(n2);
-				if (dot == 0) {
-					// final double dot2 = n1.dot(v1);
-					// if (dot2 < 0)
-					// wall.thicknessNormal.negateLocal();
-					final double angleBetween = Util.angleBetween(n1, n2, Vector3.UNIT_Z);
-					if (angleBetween > Math.PI)
-						wall.thicknessNormal.negateLocal();
-				} else {
-					if (mustBeSameDirection && dot < 0)
-						wall.thicknessNormal.negateLocal();
-					else if (!mustBeSameDirection && dot > 0)
-						wall.thicknessNormal.negateLocal();
-				}
-
-				System.out.println(angle * 180 / Math.PI);
-				System.out.println(mustBeSameDirection);
-				System.out.println(wall.thicknessNormal);
-
-				wall.draw();
+				visitWall(wall, prev);
 			}
 		});
+		visitNeighborsForward(false, new WallVisitor() {
+			public void visit(Wall wall, Snap prev, Snap next) {
+				visitWall(wall, prev);
+			}
+		});		
 	}
 
 	protected Roof getRoof() {
 		return roof;
+	}
+
+	public void visitWall(Wall wall, Snap prev) {
+		if (wall == Wall.this) {
+			System.out.println("--------------------------");
+			return;
+		}
+		final int i = prev.getSnapPointIndexOf(wall);
+		final ArrayList<Vector3> points1 = prev.getNeighborOf(wall).getPoints();
+		Vector3 v1 = points1.get(i == 0 ? 2 : 0).subtract(points1.get(i), null).normalizeLocal();
+
+		final int j = prev.getSnapPointIndexOfNeighborOf(wall);
+		final ArrayList<Vector3> points2 = wall.abspoints; // next.getNeighborOf(wall).getPoints();
+		Vector3 v2 = points2.get(j == 0 ? 2 : 0).subtract(points2.get(j), null).normalizeLocal();
+
+		final double angle = Util.angleBetween(v1, v2, Vector3.UNIT_Z);
+		boolean mustBeSameDirection = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
+
+		final Vector3 n1 = new Vector3(wall.thicknessNormal).normalizeLocal();
+		final Vector3 n2 = new Vector3(prev.getNeighborOf(wall).thicknessNormal).normalizeLocal();
+		final double dot = n1.dot(n2);
+		boolean reverse = false;
+		if (dot == 0) {
+			// final double dot2 = n1.dot(v1);
+			// if (dot2 < 0)
+			// wall.thicknessNormal.negateLocal();
+			final double angleBetween = Util.angleBetween(n1, n2, Vector3.UNIT_Z);
+			if (angleBetween > Math.PI)
+//						wall.thicknessNormal.negateLocal();
+				reverse = true;
+		} else {
+			if (mustBeSameDirection && dot < 0)
+//						wall.thicknessNormal.negateLocal();
+				reverse = true;
+			else if (!mustBeSameDirection && dot > 0)
+//						wall.thicknessNormal.negateLocal();
+				reverse = true;
+		}
+		
+		if (reverse) {
+			wall.thicknessNormal.negateLocal();
+			prev.setReverse(reverse);
+		}
+
+		System.out.println(angle * 180 / Math.PI);
+		System.out.println(mustBeSameDirection);
+		System.out.println(wall.thicknessNormal);
+
+		wall.draw();
 	}
 
 }
