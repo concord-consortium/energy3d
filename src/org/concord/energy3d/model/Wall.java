@@ -56,8 +56,9 @@ public class Wall extends HousePart {
 	private transient Mesh wireframeMesh;
 	private Snap[] neighbors = new Snap[2];
 	private transient boolean reversedThickness;
-	private transient Vector3 thicknessNormal;
+	private Vector3 thicknessNormal;
 	private Roof roof;
+	private ArrayList<Floor> floors;
 
 	static {
 		CULL_FRONT.setCullFace(Face.Front);
@@ -69,7 +70,7 @@ public class Wall extends HousePart {
 	}
 
 	protected void init() {
-		super.init();
+		super.init();		
 		mesh = new Mesh("Wall");
 		backMesh = new Mesh("Wall (Back)");
 		surroundMesh = new Mesh("Wall (Surround)");
@@ -220,7 +221,7 @@ public class Wall extends HousePart {
 		// if (roof != null)
 		// roof.draw();
 
-		drawRoof();
+//		drawRoofAndFloors();
 
 	}
 
@@ -640,7 +641,7 @@ public class Wall extends HousePart {
 	private void setNeighbor(int pointIndex, Snap newSnap, boolean updateNeighbors) {
 		int i = pointIndex < 2 ? 0 : 1;
 		Snap oldSnap = neighbors[i];
-		if (updateNeighbors || oldSnap == null) // do not update if already has neighbor (unless this update was initiated by this wall) because otherwise the 2nd wall point will override the first attachement
+//		if (updateNeighbors || oldSnap == null) // do not update if already has neighbor (unless this update was initiated by this wall) because otherwise the 2nd wall point will override the first attachement
 			neighbors[i] = newSnap;
 
 		if (!updateNeighbors || oldSnap == newSnap || (oldSnap != null && oldSnap.equals(newSnap)))
@@ -761,7 +762,17 @@ public class Wall extends HousePart {
 
 	public void setRoof(Roof roof) {
 		this.roof = roof;
-
+	}
+	
+	public void addFloor(Floor floor) {
+		if (floors == null)
+			floors = new ArrayList<Floor>();
+		floors.add(floor);
+	}
+	
+	public void removeFloor(Floor floor) {
+		if (floors != null)
+			floors.remove(floor);		
 	}
 
 	protected void visitNeighbors(WallVisitor visitor) {
@@ -852,11 +863,14 @@ public class Wall extends HousePart {
 		return center.divideLocal(n.getX());
 	}
 
-	private void drawRoof() {
+	private void drawRoofAndFloors() {
 		visitNeighbors(new WallVisitor() {
 			public void visit(Wall wall, Snap prev, Snap next) {
 				if (wall.getRoof() != null)
 					wall.getRoof().draw();
+//				for (HousePart part : wall.getChildren())
+//					if (part instanceof Floor)
+//						part.draw();
 			}
 		});
 	}
@@ -899,30 +913,18 @@ public class Wall extends HousePart {
 		final double dot = n1.dot(n2);
 		boolean reverse = false;
 		if (dot == 0) {
-			// final double dot2 = n1.dot(v1);
-			// if (dot2 < 0)
-			// wall.thicknessNormal.negateLocal();
-			final double angleBetween = Util.angleBetween(n1, n2, Vector3.UNIT_Z);
-			if (angleBetween > Math.PI)
-//						wall.thicknessNormal.negateLocal();
+			if (Util.angleBetween(n1, n2, Vector3.UNIT_Z) > Math.PI)
 				reverse = true;
 		} else {
 			if (mustBeSameDirection && dot < 0)
-//						wall.thicknessNormal.negateLocal();
 				reverse = true;
 			else if (!mustBeSameDirection && dot > 0)
-//						wall.thicknessNormal.negateLocal();
 				reverse = true;
 		}
 		
 		if (reverse) {
 			wall.thicknessNormal.negateLocal();
-			prev.setReverse(reverse);
 		}
-
-		System.out.println(angle * 180 / Math.PI);
-		System.out.println(mustBeSameDirection);
-		System.out.println(wall.thicknessNormal);
 
 		wall.draw();
 	}

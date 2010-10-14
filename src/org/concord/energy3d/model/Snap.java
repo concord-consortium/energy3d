@@ -12,7 +12,6 @@ public class Snap implements Serializable {
 	private int pointIndex2;
 	private transient int annotationDrawn;
 	private transient int visitStamp;
-	private transient boolean reverse = false;
 	
 	public static void clearAnnotationDrawn() {
 		currentAnnotationDrawnStamp = ++currentAnnotationDrawnStamp % 1000;
@@ -75,12 +74,5 @@ public class Snap implements Serializable {
 		} else
 			return false;
 	}
-
-	public void setReverse(boolean reverse) {
-		this.reverse  = reverse;		
-	}
-
-	public boolean isReverse() {
-		return reverse;
-	}
+	
 }
