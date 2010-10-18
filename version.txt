@@ -364,7 +364,11 @@ Version 0.2
 - visit all attached walls and reverse normals based on angle between two walls and given the normal of the first wall
 - extend the interior wall for when the interior angle is greater than 180 degrees
 - automatically decide the inside/outside of all attached walls and redraw them every time a given wall is modified
-- fixed problem with not setting neighbor of neighbor of wall to null when detaching walls
+- fix problem with not setting neighbor of neighbor of wall to null when detaching walls
+- fix problem with no traversing all the attached walls when a roof or floor is attached to one of the walls
+- avoid snapping walls to itself
+- when a snap point of a wall is set to null, first search to see if it is snaped to another wall before setting it to null
+
 
 - scan attached walls and redraw attached floors when modifying a wall
 - determine the inside of the house more accurately using center of attached walls

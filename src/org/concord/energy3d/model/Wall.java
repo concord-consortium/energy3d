@@ -59,6 +59,7 @@ public class Wall extends HousePart {
 	private Vector3 thicknessNormal;
 	private Roof roof;
 	private ArrayList<Floor> floors;
+	private static final double MIN_WALL_LENGTH = 0.1;
 
 	static {
 		CULL_FRONT.setCullFace(Face.Front);
@@ -176,7 +177,13 @@ public class Wall extends HousePart {
 				if (container != null)
 					p.setZ(container.getHeight());
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
-				Snap snap = snap(p, index);
+				final Vector3 p_snap = new Vector3(p);
+				Snap snap = snap(p_snap, index);
+				if (snap != null && (!isFirstPointInserted() || p_snap.subtract(abspoints.get(index == 0 ? 2 : 0), null).length() > MIN_WALL_LENGTH))
+					p.set(p_snap);
+				else
+					snap = null;
+				
 				if (snap == null) {
 					boolean foundationSnap = foundationSnap(p);
 					// if (snap == null)
@@ -186,7 +193,7 @@ public class Wall extends HousePart {
 				setNeighbor(index, snap, true);
 				if (index == 2) // make sure z of 2nd base point is same as 2st (needed for platform picking side)
 					p.setZ(points.get(0).getZ());
-				Vector3 p_rel = toRelative(p);
+				final Vector3 p_rel = toRelative(p);
 				points.get(index).set(p_rel);
 				points.get(index + 1).set(p_rel).setZ(p.getZ() + height);
 			}
@@ -215,8 +222,8 @@ public class Wall extends HousePart {
 		// if (neighbor != null) {
 		// neighbor.getNeighborOf(this).draw();
 		// }
-
-		drawNeighborWalls();
+		if (isDrawable())
+			drawNeighborWalls();
 
 		// if (roof != null)
 		// roof.draw();
@@ -274,10 +281,17 @@ public class Wall extends HousePart {
 		} else
 			return false;
 	}
+	
+	private boolean isDrawable() {
+//		return points.size() >= 4 && !points.get(0).equals(points.get(2)) && abspoints.get(0).subtract(abspoints.get(2), null).length() < MIN_WALL_LENGTH;		
+		return points.size() >= 4 && points.get(0).subtract(points.get(2), null).length() > MIN_WALL_LENGTH;
+	}
 
 	protected void updateMesh() {
-		final boolean drawable = points.size() >= 4 && !points.get(0).equals(points.get(2));
-		if (!drawable)
+//		final boolean drawable = points.size() >= 4 && !points.get(0).equals(points.get(2));
+//		if (!drawable || abspoints.get(0).subtract(abspoints.get(2), null).length() < MIN_WALL_LENGTH)
+//			return;
+		if (!isDrawable())
 			return;
 
 		final ArrayList<Vector3> points = abspoints;
@@ -639,8 +653,28 @@ public class Wall extends HousePart {
 	}
 
 	private void setNeighbor(int pointIndex, Snap newSnap, boolean updateNeighbors) {
+//		if (newSnap != null && newSnap.getNeighborOf(this) != null)
+//			return;
+		
 		int i = pointIndex < 2 ? 0 : 1;
 		Snap oldSnap = neighbors[i];
+		
+		if (newSnap == null && !updateNeighbors) // see if it was previously attached to another wall
+			for (HousePart part : Scene.getInstance().getParts())
+				if (part instanceof Wall && part != this) {
+					final Vector3 point = points.get(pointIndex);
+					final Wall wall = (Wall)part;
+					if (point.distance(part.getPoints().get(0)) < 0.001) {
+						newSnap = new Snap(this, wall, pointIndex, 0);
+						wall.setNeighbor(0, newSnap, false);
+						break;
+					} else if (point.distance(part.getPoints().get(2)) < 0.001) {
+						newSnap = new Snap(this, wall, pointIndex, 2);
+						wall.setNeighbor(2, newSnap, false);
+						break;						
+					}
+				}
+		
 //		if (updateNeighbors || oldSnap == null) // do not update if already has neighbor (unless this update was initiated by this wall) because otherwise the 2nd wall point will override the first attachement
 			neighbors[i] = newSnap;
 
@@ -876,16 +910,24 @@ public class Wall extends HousePart {
 	}
 
 	private void drawNeighborWalls() {
-		visitNeighborsForward(true, new WallVisitor() {
-			public void visit(Wall wall, Snap prev, Snap next) {
-				visitWall(wall, prev);
-			}
-		});
+		final ArrayList<Wall> walls = new ArrayList<Wall>();
+		
+//		visitNeighborsForward(true, new WallVisitor() {
+//			public void visit(Wall wall, Snap prev, Snap next) {
+//				visitWall(wall, prev);
+//			}
+//		});
 		visitNeighborsForward(false, new WallVisitor() {
 			public void visit(Wall wall, Snap prev, Snap next) {
 				visitWall(wall, prev);
+				walls.add(wall);
 			}
-		});		
+		});
+		
+		for (Wall wall : walls) {
+//			System.out.println(wall);
+			wall.draw();
+		}
 	}
 
 	protected Roof getRoof() {
@@ -926,7 +968,7 @@ public class Wall extends HousePart {
 			wall.thicknessNormal.negateLocal();
 		}
 
-		wall.draw();
+//		wall.draw();
 	}
 
 }
