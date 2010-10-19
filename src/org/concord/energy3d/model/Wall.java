@@ -912,11 +912,12 @@ public class Wall extends HousePart {
 	private void drawNeighborWalls() {
 		final ArrayList<Wall> walls = new ArrayList<Wall>();
 		
-//		visitNeighborsForward(true, new WallVisitor() {
-//			public void visit(Wall wall, Snap prev, Snap next) {
-//				visitWall(wall, prev);
-//			}
-//		});
+		visitNeighborsForward(true, new WallVisitor() {
+			public void visit(Wall wall, Snap prev, Snap next) {
+				visitWall(wall, prev);
+				walls.add(wall);
+			}
+		});
 		visitNeighborsForward(false, new WallVisitor() {
 			public void visit(Wall wall, Snap prev, Snap next) {
 				visitWall(wall, prev);

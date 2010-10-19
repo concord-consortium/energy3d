@@ -368,8 +368,6 @@ Version 0.2
 - fix problem with no traversing all the attached walls when a roof or floor is attached to one of the walls
 - avoid snapping walls to itself
 - when a snap point of a wall is set to null, first search to see if it is snaped to another wall before setting it to null
-
-
 - scan attached walls and redraw attached floors when modifying a wall
 - determine the inside of the house more accurately using center of attached walls
 
