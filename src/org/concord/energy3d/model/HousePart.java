@@ -4,9 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.PrintController;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Angle90Annotation;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -14,22 +12,13 @@ import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.bounding.BoundingSphere;
-import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.CollisionTreeManager;
-import com.ardor3d.image.Texture;
-import com.ardor3d.image.TextureStoreFormat;
-import com.ardor3d.intersection.PickResults;
-import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
@@ -37,7 +26,6 @@ import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
-import com.ardor3d.util.TextureManager;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;

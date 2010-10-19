@@ -241,7 +241,7 @@ public abstract class Roof extends HousePart {
 				addPointToPolygon(poly, p1, center);
 				addPointToPolygon(poly, p2, center);
 
-				currentWall.setRoof(Roof.this);				
+//				currentWall.setRoof(Roof.this);				
 			}
 			
 		});
