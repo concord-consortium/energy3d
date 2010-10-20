@@ -94,10 +94,7 @@ public class Door extends HousePart {
 			Vector3 absoluteBase = toAbsolute(base);
 			Vector3 p = closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y);
 			p = grid(p, GRID_SIZE);
-			height = findHeight(absoluteBase, p);
-//			defaultDoorHeight = height;
-//			points.set(1, getUpperPoint(points.get(1)));
-//			points.set(3, getUpperPoint(points.get(3)));
+			height = Math.max(0, p.getZ() - absoluteBase.getZ()); // findHeight(absoluteBase, p);
 			
 			final double rel_z = toRelative(absoluteBase.addLocal(0, 0, height)).getZ();
 			points.get(1).setZ(rel_z);

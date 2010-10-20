@@ -38,7 +38,8 @@ public class Floor extends Roof {
 			Vector3 base = container.getPoints().get(0);
 			Vector3 p = closestPoint(base, base.add(0, 0, 1, null), x, y);
 			p = grid(p, GRID_SIZE);
-			height = findHeight(base, p) + base.getZ();
+//			height = findHeight(base, p) + base.getZ();
+			height = Math.max(0, p.getZ() - base.getZ()) + base.getZ();
 		draw();
 		showPoints();
 			}
@@ -97,10 +98,10 @@ public class Floor extends Roof {
 		return polygon;
 	}
 	
-	public void setHeight(double newHeight, boolean finalize) {
-		super.setHeight(newHeight, finalize);
-		draw();		
-	}
+//	public void setHeight(double newHeight, boolean finalize) {
+//		super.setHeight(newHeight, finalize);
+//		draw();		
+//	}
 
 	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
 		try {

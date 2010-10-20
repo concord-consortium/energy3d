@@ -123,10 +123,11 @@ public class Wall extends HousePart {
 		surroundMesh.setUserData(userData);
 		invisibleMesh.setUserData(userData);
 
-		if (neighbors != null)
-			for (int i = 0; i < neighbors.length; i++)
-				if (neighbors[i] != null && !Scene.getInstance().getParts().contains(neighbors[i].getNeighborOf(this)))
-					neighbors[i] = null;
+		// code commented because it sets neighbors to null when Print Preview creates clones of it that are not added to instance.parts
+//		if (neighbors != null)
+//			for (int i = 0; i < neighbors.length; i++)
+//				if (neighbors[i] != null && !Scene.getInstance().getParts().contains(neighbors[i].getNeighborOf(this)))
+//					neighbors[i] = null;
 
 	}
 
@@ -155,7 +156,7 @@ public class Wall extends HousePart {
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
 				if (container != null)
-					p.setZ(container.getHeight());
+					p.setZ(container.height);
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				final Vector3 p_snap = new Vector3(p);
 				Snap snap = snap(p_snap, index);
@@ -183,7 +184,8 @@ public class Wall extends HousePart {
 			Snap snap = snap(closestPoint, -1);
 			if (snap == null)
 				closestPoint = grid(closestPoint, GRID_SIZE);
-			defaultWallHeight = height = findHeight(base, closestPoint);
+//			defaultWallHeight = height = findHeight(base, closestPoint);
+			defaultWallHeight = height = Math.max(0, closestPoint.getZ() - base.getZ());
 			final double z = height + points.get(0).getZ();
 			points.get(1).setZ(z);
 			points.get(3).setZ(z);			
@@ -623,12 +625,12 @@ public class Wall extends HousePart {
 			Scene.getInstance().remove(child);
 	}
 
-	public void setHeight(final double newHeight, final boolean finalize) {
+	protected void setHeight(final double newHeight, final boolean finalize) {
 		super.setHeight(newHeight, finalize);
 		points.get(1).setZ(newHeight);
 		if (isFirstPointInserted())
 			points.get(3).setZ(newHeight);
-		draw();
+//		draw();
 	}
 
 	protected void flatten() {

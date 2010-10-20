@@ -22,7 +22,8 @@ public class HipRoof extends Roof {
 			Vector3 base = center;
 			Vector3 p = closestPoint(base, base.add(0, 0, 1, null), x, y);
 			p = grid(p, GRID_SIZE);
-			height = findHeight(base, p);
+//			height = findHeight(base, p);
+			height = Math.max(0, p.getZ() - base.getZ());
 		} else if (editPointIndex == 1 || editPointIndex == 2) {
 			Vector3 p = closestPoint(points.get(0), points.get(0).add(Vector3.UNIT_Y, null), x, y);
 			p = grid(p, GRID_SIZE);

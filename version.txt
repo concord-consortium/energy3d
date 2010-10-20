@@ -367,11 +367,14 @@ Version 0.2
 - fix problem with not setting neighbor of neighbor of wall to null when detaching walls
 - fix problem with no traversing all the attached walls when a roof or floor is attached to one of the walls
 - avoid snapping walls to itself
-- when a snap point of a wall is set to null, first search to see if it is snaped to another wall before setting it to null
+- when a snap point of a wall is set to null, first search to see if it is snapped to another wall before setting it to null
 - scan attached walls and redraw attached floors when modifying a wall
 - determine the inside of the house more accurately using center of attached walls
+- cleaned up the code
+- fixed problem with roofs and floors being distorted when print previewing
 
 - fix problem with after pressing CTRL, can no longer select objects
+- put minimum size restrictions on the resize tool
 
 TODO:
 - allow draw tool to stay on if user double-clicks on the tool button in toolbar

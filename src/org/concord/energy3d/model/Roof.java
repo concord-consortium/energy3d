@@ -100,8 +100,6 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void updateMesh() {
-//		System.out.println("Drawing Roof...");
-		System.out.println("Drawing Floor...");
 		if (container == null) {
 			resetToZero(mesh.getMeshData().getVertexBuffer());
 			if (bottomMesh != null)
@@ -112,19 +110,6 @@ public abstract class Roof extends HousePart {
 
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
 
-//		if (Util.DEBUG) {
-//			for (PolygonPoint p : wallUpperPoints)
-//				System.out.print(p + ",");
-//			System.out.println();
-//		}
-
-		// center.set(0, 0, 0);
-		// for (PolygonPoint p : wallUpperPoints)
-		// center.addLocal(p.getX(), p.getY(), p.getZ());
-		// center.multiplyLocal(1.0 / wallUpperPoints.size());
-		// points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
-
-		// final Polygon polygon = makePolygon(wallUpperPoints);
 		if (bottomMesh != null)
 			fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
 		fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
@@ -133,13 +118,6 @@ public abstract class Roof extends HousePart {
 			Vector3 p = points.get(i);
 			pointsRoot.getChild(i).setTranslation(p);
 		}
-
-		// updateLabelLocation();
-
-		// if (flattenTime > 0)
-		// flatten();
-		//
-		// drawAnnotations();
 
 		mesh.updateModelBound();
 		if (bottomMesh != null)

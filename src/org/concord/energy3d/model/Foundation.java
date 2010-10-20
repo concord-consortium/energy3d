@@ -127,7 +127,8 @@ public class Foundation extends HousePart {
 				Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
 				System.out.println("closest = " + closestPoint);
 				closestPoint = grid(closestPoint, GRID_SIZE);
-				newBoundingHeight = findHeight(base, closestPoint);
+//				newBoundingHeight = findHeight(base, closestPoint);
+				newBoundingHeight = Math.max(0, closestPoint.getZ() - base.getZ());
 				applyNewHeight(boundingHeight, newBoundingHeight, false);
 			}
 			for (int i = 0; i < 4; i++)
@@ -154,7 +155,7 @@ public class Foundation extends HousePart {
 	private void applyNewHeight(ArrayList<HousePart> children, double scale, boolean finalize) {
 		for (HousePart child : children) {
 			if (child instanceof Wall || child instanceof Floor || child instanceof Roof) {
-				child.setHeight(child.getHeight() * scale, finalize);
+				child.setHeight(child.orgHeight * scale, finalize);
 				applyNewHeight(child.getChildren(), scale, finalize);
 			}
 		}
