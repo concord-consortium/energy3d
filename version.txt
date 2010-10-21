@@ -372,6 +372,7 @@ Version 0.2
 - determine the inside of the house more accurately using center of attached walls
 - cleaned up the code
 - fixed problem with roofs and floors being distorted when print previewing
+- fix problem with incorrect wall inside/outside normal when walls are perpendicular to each other
 
 - fix problem with after pressing CTRL, can no longer select objects
 - put minimum size restrictions on the resize tool

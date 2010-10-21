@@ -11,6 +11,7 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=ardor3d-lwjgl/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-core/src\/main\/resources&lt;com.ardor3d.renderer.state"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/resources&lt;com.ardor3d.extension.shadow.map"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/resources&lt;com.ardor3d.extension.effect.bloom"/>

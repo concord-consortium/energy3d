@@ -593,7 +593,7 @@ public class Wall extends HousePart {
 						newSnap = new Snap(this, wall, pointIndex, 0);
 						wall.setNeighbor(0, newSnap, false);
 						break;
-					} else if (point.distance(part.getPoints().get(2)) < 0.001) {
+					} else if (part.getPoints().size() > 1 && point.distance(part.getPoints().get(2)) < 0.001) {
 						newSnap = new Snap(this, wall, pointIndex, 2);
 						wall.setNeighbor(2, newSnap, false);
 						break;						
@@ -761,37 +761,62 @@ public class Wall extends HousePart {
 			wall.draw();
 	}
 
+//	private void visitWall(final Wall wall, final Snap prev) {
+//		if (wall == Wall.this) {
+//			return;
+//		}
+////		final int j = prev.getSnapPointIndexOfNeighborOf(wall);
+//		final int pointIndex = prev.getSnapPointIndexOf(wall);
+//		final ArrayList<Vector3> points = wall.abspoints;
+//		final Vector3 wallDir = points.get(pointIndex == 0 ? 2 : 0).subtract(points.get(pointIndex), null).normalizeLocal();
+//
+////		final int i = prev.getSnapPointIndexOf(wall);
+//		final int otherPointIndex = prev.getSnapPointIndexOfNeighborOf(wall);
+//		final ArrayList<Vector3> otherPoints = prev.getNeighborOf(wall).getPoints();
+//		final Vector3 otherWallDir = otherPoints.get(otherPointIndex == 0 ? 2 : 0).subtract(otherPoints.get(otherPointIndex), null).normalizeLocal();
+//		
+//		final double angle = Util.angleBetween(otherWallDir, wallDir, Vector3.UNIT_Z);
+//		final boolean normalsMustBeSameDirection = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
+//
+//		final Vector3 n1 = new Vector3(wall.thicknessNormal).normalizeLocal();
+//		final Vector3 n2 = new Vector3(prev.getNeighborOf(wall).thicknessNormal).normalizeLocal();
+//		final double dot = n1.dot(n2);
+//		boolean reverse = false;
+//		if (dot == 0) {
+//			if (Util.angleBetween(n2, n1, Vector3.UNIT_Z) > Math.PI)
+////			if (n1.dot(otherWallDir) < 0)
+//				reverse = true;
+//		} else {
+//			if (normalsMustBeSameDirection && dot < 0)
+//				reverse = true;
+//			else if (!normalsMustBeSameDirection && dot > 0)
+//				reverse = true;
+//		}
+//		
+//		if (reverse)
+//			wall.thicknessNormal.negateLocal();
+//	}
+	
 	private void visitWall(final Wall wall, final Snap prev) {
-		if (wall == Wall.this) {
+		if (wall == Wall.this)
 			return;
-		}
-		final int i = prev.getSnapPointIndexOf(wall);
-		final ArrayList<Vector3> points1 = prev.getNeighborOf(wall).getPoints();
-		final Vector3 v1 = points1.get(i == 0 ? 2 : 0).subtract(points1.get(i), null).normalizeLocal();
+		final int pointIndex = prev.getSnapPointIndexOf(wall);
+		final ArrayList<Vector3> points = wall.abspoints;
+		final Vector3 wallDir = points.get(pointIndex == 0 ? 2 : 0).subtract(points.get(pointIndex), null).normalizeLocal();
 
-		final int j = prev.getSnapPointIndexOfNeighborOf(wall);
-		final ArrayList<Vector3> points2 = wall.abspoints;
-		final Vector3 v2 = points2.get(j == 0 ? 2 : 0).subtract(points2.get(j), null).normalizeLocal();
-
-		final double angle = Util.angleBetween(v1, v2, Vector3.UNIT_Z);
-		final boolean mustBeSameDirection = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
-
+		final int otherPointIndex = prev.getSnapPointIndexOfNeighborOf(wall);
+		final ArrayList<Vector3> otherPoints = prev.getNeighborOf(wall).getPoints();
+		final Vector3 otherWallDir = otherPoints.get(otherPointIndex == 0 ? 2 : 0).subtract(otherPoints.get(otherPointIndex), null).normalizeLocal();
+		
 		final Vector3 n1 = new Vector3(wall.thicknessNormal).normalizeLocal();
 		final Vector3 n2 = new Vector3(prev.getNeighborOf(wall).thicknessNormal).normalizeLocal();
-		final double dot = n1.dot(n2);
-		boolean reverse = false;
-		if (dot == 0) {
-			if (Util.angleBetween(n1, n2, Vector3.UNIT_Z) > Math.PI)
-				reverse = true;
-		} else {
-			if (mustBeSameDirection && dot < 0)
-				reverse = true;
-			else if (!mustBeSameDirection && dot > 0)
-				reverse = true;
-		}
+		final Vector3 add = n1.add(n2, null).normalizeLocal();
 		
-		if (reverse)
+		final double dotWall1 = Math.signum(add.dot(wallDir));
+		final double dotWall2 = Math.signum(add.dot(otherWallDir));
+		final boolean reverse = dotWall1 != dotWall2;
+		if (reverse || (dotWall1 == 0 && dotWall2 == 0 && n1.dot(n2) < 0))
 			wall.thicknessNormal.negateLocal();
-	}
+	}	
 
 }

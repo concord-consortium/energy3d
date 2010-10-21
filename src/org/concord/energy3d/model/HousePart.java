@@ -38,7 +38,7 @@ public abstract class HousePart implements Serializable {
 	private static boolean snapToGrids = false;
 	private static boolean drawAnnotations = false;
 	private static long idCounter = 1;
-	private long id;
+	private transient long id;
 	protected transient Node root;
 	protected transient Node pointsRoot;
 	protected final int numOfDrawPoints, numOfEditPoints;
@@ -124,8 +124,7 @@ public abstract class HousePart implements Serializable {
 		this(numOfDrawPoints, numOfEditPoints, height, false);
 	}
 
-	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height, boolean relativeToHorizontal) {
-		id = idCounter++;
+	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height, boolean relativeToHorizontal) {		
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
 		this.height = this.orgHeight = height;
@@ -135,7 +134,8 @@ public abstract class HousePart implements Serializable {
 		allocateNewPoint();
 	}
 
-	protected void init() {		
+	protected void init() {	
+		id = idCounter++;
 		if (Util.DEBUG)
 		System.out.print("Deep cloning...");
 		if (!(this instanceof Window || this instanceof Door)) { // && pos == 0) {
