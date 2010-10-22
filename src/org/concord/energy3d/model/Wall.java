@@ -186,7 +186,7 @@ public class Wall extends HousePart {
 				closestPoint = grid(closestPoint, GRID_SIZE);
 //			defaultWallHeight = height = findHeight(base, closestPoint);
 			defaultWallHeight = height = Math.max(0, closestPoint.getZ() - base.getZ());
-			final double z = height + points.get(0).getZ();
+			final double z = height + base.getZ();
 			points.get(1).setZ(z);
 			points.get(3).setZ(z);			
 		}
@@ -593,7 +593,7 @@ public class Wall extends HousePart {
 						newSnap = new Snap(this, wall, pointIndex, 0);
 						wall.setNeighbor(0, newSnap, false);
 						break;
-					} else if (part.getPoints().size() > 1 && point.distance(part.getPoints().get(2)) < 0.001) {
+					} else if (part.getPoints().size() > 2 && point.distance(part.getPoints().get(2)) < 0.001) {
 						newSnap = new Snap(this, wall, pointIndex, 2);
 						wall.setNeighbor(2, newSnap, false);
 						break;						

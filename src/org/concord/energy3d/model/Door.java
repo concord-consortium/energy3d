@@ -60,9 +60,9 @@ public class Door extends HousePart {
 		mesh.setUserData(new UserData(this));
 	}
 
-	private Vector3 getUpperPoint(Vector3 p) {
-		return new Vector3(p.getX(), p.getY(), height);
-	}
+//	private Vector3 getUpperPoint(Vector3 p) {
+//		return new Vector3(p.getX(), p.getY(), height);
+//	}
 
 	public void addPoint(int x, int y) {
 		if (container != null)
@@ -78,15 +78,14 @@ public class Door extends HousePart {
 				Vector3 wallx = container.getPoints().get(2).subtract(wallFirstPoint, null);
 				p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
 				p = grid(p, GRID_SIZE, false);
-				// Convert from absolute coordinates to relative-to-wall coordinates
-//				p = toRelative(p);
-				Vector3 p_rel = toRelative(p);
+//				Vector3 p_rel = toRelative(p);
 
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
-//				points.set(index, p);
-				points.set(index, p_rel);
-//				points.set(index + 1, getUpperPoint(p));
-				points.set(index + 1, toRelative(getUpperPoint(p)));
+//				points.set(index, p_rel);
+				points.set(index, toRelative(p));
+//				points.set(index + 1, toRelative(getUpperPoint(p)));
+				p.setZ(p.getZ() + height);
+				points.set(index + 1, toRelative(p));
 			}
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
 			int lower = (editPointIndex == 1) ? 0 : 2;
@@ -95,6 +94,7 @@ public class Door extends HousePart {
 			Vector3 p = closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - absoluteBase.getZ()); // findHeight(absoluteBase, p);
+//			height = Math.max(0, p.getZ()); 
 			
 			final double rel_z = toRelative(absoluteBase.addLocal(0, 0, height)).getZ();
 			points.get(1).setZ(rel_z);

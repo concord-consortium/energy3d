@@ -84,6 +84,8 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem textureCheckBoxMenuItem;
 	protected Object lastSelection; // @jve:decl-index=0:
 	private JMenuItem colorMenuItem = null;
+	private JMenu debugMenu = null;
+	private JMenuItem infoMenuItem = null;
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -101,6 +103,7 @@ public class MainFrame extends JFrame {
 			appMenuBar.add(getViewMenu());
 			appMenuBar.add(getScaleMenu());
 			appMenuBar.add(getCameraMenu());
+			appMenuBar.add(getDebugMenu());
 		}
 		return appMenuBar;
 	}
@@ -755,6 +758,41 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return colorMenuItem;
+	}
+
+	/**
+	 * This method initializes debugMenu	
+	 * 	
+	 * @return javax.swing.JMenu	
+	 */
+	private JMenu getDebugMenu() {
+		if (debugMenu == null) {
+			debugMenu = new JMenu();
+			debugMenu.setText("Debug");
+			debugMenu.add(getInfoMenuItem());
+		}
+		return debugMenu;
+	}
+
+	/**
+	 * This method initializes infoMenuItem	
+	 * 	
+	 * @return javax.swing.JMenuItem	
+	 */
+	private JMenuItem getInfoMenuItem() {
+		if (infoMenuItem == null) {
+			infoMenuItem = new JMenuItem();
+			infoMenuItem.setText("Print Info");
+			infoMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					System.out.println("******** Scene Info *********");
+					for (final HousePart part : Scene.getInstance().getParts())
+						System.out.println(part + "\t" + part.getRoot().getWorldBound());
+					System.out.println("*****************************");
+				}
+			});
+		}
+		return infoMenuItem;
 	}
 
 	/**

@@ -164,17 +164,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private ViewMode viewMode = ViewMode.NORMAL;
 	public static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private CameraMode cameraMode = CameraMode.ORBIT;
-
 	private boolean operationFlag = false;
 	private static final boolean JOGL = true;
-
 	private CameraNode cameraNode;
-
 	private boolean operationStick = false;
-
 	protected boolean mouseMoveFlag = false;
-
 	protected TwoInputStates inputState;
+	private boolean drawBounds = false;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -381,10 +377,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			// Scene.getInstance().renderTexture(renderer);
 			// Scene.getInstance().init();
 
-			// renderer.draw(root);
-			// if (drawn != null)
-			// com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
-			// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
+			 if (drawBounds && drawn != null)
+				 com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
 
 			passManager.renderPasses(renderer);
 		} catch (Exception e) {
@@ -562,7 +556,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (drawn != null)
 									drawn.hidePoints();
 								drawn = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
-								System.out.print(drawn);
+								System.out.println("Clicked on: " + drawn);
 								SelectUtil.nextPickLayer();
 							}
 						} else
@@ -724,6 +718,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				updateSunHeliodon();
 			}
 		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.B), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				drawBounds = !drawBounds;
+				if (drawBounds)
+					System.out.println("Enabling draw bounds...");
+				else
+					System.out.println("Disabling draw bounds...");
+			}
+		}));		
 	}
 
 	public void setCameraControl(CameraMode type) {
@@ -1126,8 +1129,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					sunHeliodon.setScale(1);
 				else {
 					final double scale = (Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0;
-//					if (Util.DEBUG)
-						System.out.println("Scale = " + scale);
 					sunHeliodon.setScale(scale);
 				}
 				return null;
