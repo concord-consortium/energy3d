@@ -376,13 +376,14 @@ Version 0.2
 - fix problem with door height changing when move the door base
 - draw bounds when B is pressed
 
+- use the correct Save As dialog box in Mac OS X
 
 
 - fix problem with after pressing CTRL, can no longer select objects
 - put minimum size restrictions on the resize tool
 - fix problem with sometimes cannot grab edit points
 - add menu item to print current scene information
-- use the correct Save As dialog box in Mac OS X
+
  
 
 TODO:

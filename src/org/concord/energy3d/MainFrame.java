@@ -619,7 +619,7 @@ public class MainFrame extends JFrame {
 						final File file = Scene.getFile();
 						if (file != null)
 							Scene.getInstance().save(file);
-						else if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
+						else if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
 							Scene.getInstance().save(fileChooser.getSelectedFile());
 					} catch (Throwable err) {
 						err.printStackTrace();
@@ -879,7 +879,7 @@ public class MainFrame extends JFrame {
 			saveasMenuItem = new JMenuItem("Save As...");
 			saveasMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
+					if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
 						try {
 							Scene.getInstance().save(fileChooser.getSelectedFile());
 						} catch (Throwable err) {
