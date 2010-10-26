@@ -375,9 +375,8 @@ Version 0.2
 - fix problem with incorrect wall inside/outside normal when walls are perpendicular to each other
 - fix problem with door height changing when move the door base
 - draw bounds when B is pressed
-
 - use the correct Save As dialog box in Mac OS X
-
+- create 2 new sample models
 
 - fix problem with after pressing CTRL, can no longer select objects
 - put minimum size restrictions on the resize tool
