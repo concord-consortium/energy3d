@@ -7,7 +7,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class Util {
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 	
 	public static double findBoundLength(final BoundingVolume bounds) {
 		double d;
