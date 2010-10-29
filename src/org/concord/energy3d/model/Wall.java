@@ -437,24 +437,27 @@ public class Wall extends HousePart {
 		final Vector3 p01 = points.get(1).subtract(points.get(0), null).normalizeLocal();
 		final Vector3 n = p02.crossLocal(p01).normalizeLocal();
 
-		Snap neighbor = this.neighbors[0];
-		if (neighbor == null)
-			neighbor = this.neighbors[1];
+		final Snap neighbor;
+		if (editPointIndex != -1)
+			neighbor = neighbors[editPointIndex < 2 ? 0 : 1];
+		else if (isFirstPointInserted())
+			neighbor = neighbors[1];
+		else
+			neighbor = neighbors[0];
+		
+//		final Snap neighbor = neighbors[0] != null ? neighbors[0] : neighbors[1];
 
 		if (neighbor != null && neighbor.getNeighborOf(this).getPoints().size() >= 4) {
-			final Wall otherWall = (Wall) neighbor.getNeighborOf(this);
-			final ArrayList<Vector3> otherPoints = otherWall.getPoints();
+			final ArrayList<Vector3> otherPoints = neighbor.getNeighborOf(this).getPoints();
 			final int otherPointIndex = neighbor.getSnapPointIndexOfNeighborOf(this);
-			final Vector3 a = otherPoints.get(otherPointIndex);
-			final Vector3 b = otherPoints.get(otherPointIndex == 0 ? 2 : 0);
-			final Vector3 ab = b.subtract(a, null).normalizeLocal();
+			final Vector3 otherWallDir = otherPoints.get(otherPointIndex == 0 ? 2 : 0).subtract(otherPoints.get(otherPointIndex), null).normalizeLocal();
 
-			if (n.dot(ab) < 0) {
+			if (n.dot(otherWallDir) < 0) {
 				n.negateLocal();
 				cull(false);
 			}
 		} else {
-			ReadOnlyVector3 camera = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getDirection();
+			final ReadOnlyVector3 camera = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getDirection();
 			if (camera.dot(n) < 0) {
 				n.negateLocal();
 				cull(false);

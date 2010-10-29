@@ -378,6 +378,8 @@ Version 0.2
 - use the correct Save As dialog box in Mac OS X
 - create 2 new sample models
 - create 3 new sample models
+- fix problem with always neighbor[0] taking priority in deciding thickness direction even when editing edit-point of neighbor[1]
+- create 2 new sample models 
 
 - fix problem with after pressing CTRL, can no longer select objects
 - put minimum size restrictions on the resize tool
