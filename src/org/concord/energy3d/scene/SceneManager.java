@@ -628,14 +628,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 
-		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LCONTROL), new TriggerAction() {
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LSHIFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				SelectUtil.setPickLayer(0);
 			}
 		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.LCONTROL), new TriggerAction() {
+		logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.LSHIFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				SelectUtil.setPickLayer(0);
+				SelectUtil.setPickLayer(-1);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.DELETE), new TriggerAction() {

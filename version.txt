@@ -380,11 +380,15 @@ Version 0.2
 - create 3 new sample models
 - fix problem with always neighbor[0] taking priority in deciding thickness direction even when editing edit-point of neighbor[1]
 - create 2 new sample models 
+- fix problem with not being able to pick after pressing the Ctrl Key
+- use shift key instead of ctrl key to pick hidden objects
 
 - fix problem with after pressing CTRL, can no longer select objects
 - put minimum size restrictions on the resize tool
 - fix problem with sometimes cannot grab edit points
 - add menu item to print current scene information
+- load all textures at start up and only once
+
 
  
 

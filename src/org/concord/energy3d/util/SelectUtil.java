@@ -67,6 +67,9 @@ public class SelectUtil {
 		double pointDist = Double.MAX_VALUE;
 		int objCounter = 0;
 		HousePart prevHousePart = null;
+		final long pickLayer = SelectUtil.pickLayer == -1 ? -1 : SelectUtil.pickLayer % Math.max(1, pickResults.getNumber());
+		if (pickLayer != -1)
+			System.out.println("->" + pickLayer);
 		for (int i = 0; i < pickResults.getNumber(); i++) {
 			final PickData pick = pickResults.getPickData(i);
 			if (pick.getIntersectionRecord().getNumberOfIntersections() == 0)
@@ -83,7 +86,7 @@ public class SelectUtil {
 			} else if (pickLayer != -1) {
 				continue;
 			}
-			if (pickLayer != -1 && objCounter != pickLayer)
+			if (pickLayer != -1 && objCounter-1 != pickLayer)
 				continue;
 			Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
 			PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
@@ -159,7 +162,8 @@ public class SelectUtil {
 
 	public static void nextPickLayer() {
 		if (pickLayer != -1)
-			pickLayer = (pickLayer + 1) % Math.max(1, pickResults.getNumber() / 2);		
+			pickLayer++; // = (pickLayer + 1) % Math.max(1, pickResults.getNumber() / 2);	
+		System.out.println(pickLayer);
 	}
 
 	public static void setPickLayer(int i) {
