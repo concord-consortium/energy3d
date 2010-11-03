@@ -383,6 +383,7 @@ Version 0.2
 - fix problem with not being able to pick after pressing the Ctrl Key
 - use shift key instead of ctrl key to pick hidden objects
 - fix problem with not being able to adjust wall height properly when the wall is placed on top of a foundation
+- prevent wall height from being dragged to less than 0.1
 
 - fix problem with after pressing CTRL, can no longer select objects
 - put minimum size restrictions on the resize tool

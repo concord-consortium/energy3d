@@ -187,7 +187,7 @@ public class Wall extends HousePart {
 			if (snap == null)
 				closestPoint = grid(closestPoint, GRID_SIZE);
 //			defaultWallHeight = height = findHeight(base, closestPoint);
-			defaultWallHeight = height = Math.max(0, closestPoint.getZ() - base.getZ());
+			defaultWallHeight = height = Math.max(0.1, closestPoint.getZ() - base.getZ());
 			final double z = height + base.getZ();
 			points.get(1).setZ(z);;
 			points.get(3).setZ(z);			
