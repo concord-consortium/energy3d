@@ -179,15 +179,17 @@ public class Wall extends HousePart {
 			}
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
 			int lower = (editPointIndex == 1) ? 0 : 2;
-			Vector3 base = points.get(lower);
-			Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
+//			Vector3 base = points.get(lower);
+			Vector3 base = abspoints.get(lower);
+//			Vector3 closestPoint = closestPoint(base, base.add(0, 0, 10, null), x, y);
+			Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
 			Snap snap = snap(closestPoint, -1);
 			if (snap == null)
 				closestPoint = grid(closestPoint, GRID_SIZE);
 //			defaultWallHeight = height = findHeight(base, closestPoint);
 			defaultWallHeight = height = Math.max(0, closestPoint.getZ() - base.getZ());
 			final double z = height + base.getZ();
-			points.get(1).setZ(z);
+			points.get(1).setZ(z);;
 			points.get(3).setZ(z);			
 		}
 
