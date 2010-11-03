@@ -72,7 +72,7 @@ public class Door extends HousePart {
 				Vector3 p = picked.getPoint();
 				Vector3 wallFirstPoint = container.getPoints().get(0);
 				Vector3 wallx = container.getPoints().get(2).subtract(wallFirstPoint, null);
-				p = closestPoint(wallFirstPoint, wallFirstPoint.add(wallx, null), x, y);
+				p = closestPoint(wallFirstPoint, wallx, x, y);
 				p = grid(p, GRID_SIZE, false);
 
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
@@ -84,7 +84,7 @@ public class Door extends HousePart {
 			int lower = (editPointIndex == 1) ? 0 : 2;
 			Vector3 base = points.get(lower);
 			Vector3 absoluteBase = toAbsolute(base);
-			Vector3 p = closestPoint(absoluteBase, absoluteBase.add(0, 0, 1, null), x, y);
+			Vector3 p = closestPoint(absoluteBase, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - absoluteBase.getZ());
 			

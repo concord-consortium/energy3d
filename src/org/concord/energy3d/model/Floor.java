@@ -34,7 +34,7 @@ public class Floor extends Roof {
 			pick(x, y, Wall.class);
 			if (container != null) {
 			Vector3 base = container.getPoints().get(0);
-			Vector3 p = closestPoint(base, base.add(0, 0, 1, null), x, y);
+			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ()) + base.getZ();
 		draw();

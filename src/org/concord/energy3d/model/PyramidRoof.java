@@ -19,7 +19,7 @@ public class PyramidRoof extends Roof {
 			pick(x, y, Wall.class);
 		} else {
 			Vector3 base = center;
-			Vector3 p = closestPoint(base, base.add(0, 0, 1, null), x, y);
+			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 //			height = findHeight(base, p);
 			height = Math.max(0, p.getZ() - base.getZ());

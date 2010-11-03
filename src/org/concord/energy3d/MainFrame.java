@@ -37,6 +37,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 import javax.swing.event.MenuListener;
 import javax.swing.event.MenuEvent;
+import javax.swing.ImageIcon;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -189,8 +190,9 @@ public class MainFrame extends JFrame {
 	public JToggleButton getSelectButton() {
 		if (selectButton == null) {
 			selectButton = new JToggleButton();
-			selectButton.setText("Select");
+//			selectButton.setText("Select");
 			selectButton.setSelected(true);
+			selectButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/select.png")));
 			selectButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
@@ -208,8 +210,9 @@ public class MainFrame extends JFrame {
 	private JToggleButton getWallButton() {
 		if (wallButton == null) {
 			wallButton = new JToggleButton();
-			wallButton.setText("Wall");
-			wallButton.setMaximumSize(new Dimension(38, 28));
+//			wallButton.setText("");
+			wallButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/wall.png")));
+//			wallButton.setMaximumSize(new Dimension(38, 28));
 			wallButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
@@ -238,7 +241,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getDoorButton() {
 		if (doorButton == null) {
 			doorButton = new JToggleButton();
-			doorButton.setText("Door");
+			doorButton.setText("");
+			doorButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/door.png")));
 			doorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
@@ -299,8 +303,9 @@ public class MainFrame extends JFrame {
 	private JToggleButton getWindowButton() {
 		if (windowButton == null) {
 			windowButton = new JToggleButton();
-			windowButton.setText("Window");
-			windowButton.setMaximumSize(new Dimension(59, 28));
+//			windowButton.setText("");
+			windowButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/window.png")));
+//			windowButton.setMaximumSize(new Dimension(59, 28));
 			windowButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
@@ -330,7 +335,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getFoundationButton() {
 		if (foundationButton == null) {
 			foundationButton = new JToggleButton();
-			foundationButton.setText("Foundation");
+//			foundationButton.setText("Foundation");
+			foundationButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/foundation.png")));
 			foundationButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
@@ -518,7 +524,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getResizeButton() {
 		if (resizeButton == null) {
 			resizeButton = new JToggleButton();
-			resizeButton.setText("Resize");
+//			resizeButton.setText("Resize");
+			resizeButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/resize.png")));
 			resizeButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(Operation.RESIZE);

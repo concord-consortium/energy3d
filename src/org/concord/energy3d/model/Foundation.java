@@ -124,7 +124,7 @@ public class Foundation extends HousePart {
 				System.out.println("x,y = " + x + "," + y);
 				Vector3 base = abspoints.get(lower);
 				System.out.println("base = " + base);
-				Vector3 closestPoint = closestPoint(base, base.add(0, 0, 1, null), x, y);
+				Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
 				System.out.println("closest = " + closestPoint);
 				closestPoint = grid(closestPoint, GRID_SIZE);
 //				newBoundingHeight = findHeight(base, closestPoint);
