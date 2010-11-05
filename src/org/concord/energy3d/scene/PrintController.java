@@ -4,6 +4,7 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.ArrayList;
 
+import org.concord.energy3d.MainFrame;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.PrintExporter;
@@ -31,6 +32,8 @@ public class PrintController implements Updater {
 	private ArrayList<HousePart> printParts = new ArrayList<HousePart>();
 	private double angle;
 	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
+	private boolean shadingSelected;
+	private boolean shadowSelected;
 
 	public static PrintController getInstance() {
 		return instance;
@@ -48,7 +51,7 @@ public class PrintController implements Updater {
 		if (isPrintPreview)
 			rotate();
 
-		if (finish && finishPhase > 20)
+		if (isFinished())
 			return;
 
 		final long time = timer.getTime();
@@ -124,6 +127,10 @@ public class PrintController implements Updater {
 				renderer.makeCurrentContext();
 				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
 				renderer.releaseCurrentContext();
+
+				final MainFrame frame = MainFrame.getInstance();
+				frame.getLightingMenu().setSelected(shadingSelected);
+				frame.getShadowMenu().setSelected(shadowSelected);
 
 				SceneManager.getInstance().updatePrintPreviewScene(false);
 				if (Util.DEBUG)
@@ -206,14 +213,26 @@ public class PrintController implements Updater {
 		init = true;
 		finish = false;
 		isPrintPreview = printPreview;
+
+		final MainFrame frame = MainFrame.getInstance();
+		if (printPreview) {
+			shadingSelected = frame.getLightingMenu().isSelected();
+			shadowSelected = frame.getShadowMenu().isSelected();
+
+			if (shadingSelected)
+				frame.getLightingMenu().setSelected(false);
+			if (shadowSelected)
+				frame.getShadowMenu().setSelected(false);
+		}
+
 		// SceneManager.getInstance().setCompassVisible(!printPreview);
 		// if (printPreview)
 		// SceneManager.getInstance().updatePrintPreviewScene(true);
 	}
-	
+
 	public boolean isPrintPreview() {
 		return isPrintPreview;
-	}	
+	}
 
 	public void rotate() {
 		angle += 0.01;
@@ -227,8 +246,8 @@ public class PrintController implements Updater {
 	public void addPrintCenters(Vector3 p) {
 		printCenters.add(p);
 	}
-	
+
 	public boolean isFinished() {
-		return finish;
+		return finish && finishPhase > 20;
 	}
 }

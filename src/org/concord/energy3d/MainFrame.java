@@ -35,7 +35,6 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import java.awt.Dimension;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -87,6 +86,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem infoMenuItem = null;
 	private JCheckBoxMenuItem lightingMenu = null;
 	private JToggleButton previewButton = null;
+	private JMenu jMenu = null;
+	private JMenuItem exitMenuItem = null;
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -136,6 +137,7 @@ public class MainFrame extends JFrame {
 			fileMenu.add(getSaveasMenuItem());
 			fileMenu.add(getPreviewMenuItem());
 			fileMenu.add(getPrintMenuItem());
+			fileMenu.add(getExitMenuItem());
 		}
 		return fileMenu;
 	}
@@ -359,7 +361,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton getTopViewButton() {
 		if (topViewButton == null) {
 			topViewButton = new JToggleButton();
-			topViewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/top2.png")));
+			topViewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/top.png")));
 			topViewButton.setToolTipText("Top view");
 			topViewButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
@@ -505,7 +507,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton getSunButton() {
 		if (sunButton == null) {
 			sunButton = new JToggleButton();
-			sunButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/heliodon3.png")));
+			sunButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/sun_heliodon.png")));
 			sunButton.setToolTipText("Show sun heliodon");
 			sunButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
@@ -764,7 +766,7 @@ public class MainFrame extends JFrame {
 	 * 	
 	 * @return javax.swing.JCheckBoxMenuItem	
 	 */
-	private JCheckBoxMenuItem getLightingMenu() {
+	public JCheckBoxMenuItem getLightingMenu() {
 		if (lightingMenu == null) {
 			lightingMenu = new JCheckBoxMenuItem();
 			lightingMenu.setText("Shading");
@@ -797,10 +799,27 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
+	 * This method initializes exitMenuItem	
+	 * 	
+	 * @return javax.swing.JMenuItem	
+	 */
+	private JMenuItem getExitMenuItem() {
+		if (exitMenuItem == null) {
+			exitMenuItem = new JMenuItem();
+			exitMenuItem.setText("Exit");
+			exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					System.exit(0);
+				}
+			});
+		}
+		return exitMenuItem;
+	}
+
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				MainFrame thisClass = new MainFrame();
@@ -940,7 +959,7 @@ public class MainFrame extends JFrame {
 		return unitsMenu;
 	}
 
-	private JCheckBoxMenuItem getShadowMenu() {
+	public JCheckBoxMenuItem getShadowMenu() {
 		if (shadowMenu == null) {
 			shadowMenu = new JCheckBoxMenuItem("Shadows", false);
 			shadowMenu.addItemListener(new java.awt.event.ItemListener() {

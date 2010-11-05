@@ -391,6 +391,7 @@ Version 0.2
 - add menu item for shading
 - exit the print-preview mode when opening a new model
 - add print-preview toolbar button and icon
+- automatically turn off shading and shadows when in print-preview mode
 
 
 - fix problem with after pressing CTRL, can no longer select objects
