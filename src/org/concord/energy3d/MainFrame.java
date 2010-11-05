@@ -165,9 +165,8 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getRotAnimButton());
 			appToolbar.add(getTopViewButton());
 			appToolbar.add(getGridButton());
-			appToolbar.add(getSnapButton());
-
 			ButtonGroup bg = new ButtonGroup();
+			appToolbar.add(getSnapButton());
 			bg.add(selectButton);
 			bg.add(resizeButton);
 			bg.add(foundationButton);
@@ -272,7 +271,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getRoofButton() {
 		if (roofButton == null) {
 			roofButton = new JToggleButton();
-			roofButton.setText("Roof");
+//			roofButton.setText("Roof");
+			roofButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/pyramid.png")));
 			roofButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF);
@@ -367,7 +367,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getLightButton() {
 		if (lightButton == null) {
 			lightButton = new JToggleButton();
-			lightButton.setText("Light");
+//			lightButton.setText("Light");
+			lightButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/shadow.png")));
 			lightButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setLighting(lightButton.isSelected());
@@ -385,7 +386,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getTopViewButton() {
 		if (topViewButton == null) {
 			topViewButton = new JToggleButton();
-			topViewButton.setText("Top View");
+//			topViewButton.setText("Top View");
+			topViewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/top2.png")));
 			topViewButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					// JoglAwtCanvas canvas = SceneManager.getInstance().getCanvas();
@@ -408,7 +410,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getRotAnimButton() {
 		if (rotAnimButton == null) {
 			rotAnimButton = new JToggleButton();
-			rotAnimButton.setText("Rotate Anim");
+//			rotAnimButton.setText("Rotate Anim");
+			rotAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/rotate.png")));
 			rotAnimButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().toggleRotation();
@@ -426,7 +429,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getGridButton() {
 		if (gridButton == null) {
 			gridButton = new JToggleButton();
-			gridButton.setText("Grid");
+//			gridButton.setText("Grid");
+			gridButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/grid.png")));
 			gridButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					HousePart.setSnapToGrids(gridButton.isSelected());
@@ -444,8 +448,9 @@ public class MainFrame extends JFrame {
 	private JToggleButton getSnapButton() {
 		if (snapButton == null) {
 			snapButton = new JToggleButton();
-			snapButton.setText("Snap");
+//			snapButton.setText("Snap");
 			snapButton.setSelected(true);
+			snapButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/snap.png")));
 			snapButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					HousePart.setSnapToObjects(snapButton.isSelected());
@@ -463,7 +468,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getFloorButton() {
 		if (floorButton == null) {
 			floorButton = new JToggleButton();
-			floorButton.setText("Floor");
+//			floorButton.setText("Floor");
+			floorButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/floor.png")));
 			floorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR);
@@ -494,7 +500,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getRoofHipButton() {
 		if (roofHipButton == null) {
 			roofHipButton = new JToggleButton();
-			roofHipButton.setText("Roof Hip");
+//			roofHipButton.setText("Roof Hip");
+			roofHipButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/hip.png")));
 			roofHipButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP);
@@ -543,7 +550,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getSunButton() {
 		if (sunButton == null) {
 			sunButton = new JToggleButton();
-			sunButton.setText("Sun");
+//			sunButton.setText("Sun");
+			sunButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/heliodon3.png")));
 			sunButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setSunControl(sunButton.isSelected());
@@ -561,7 +569,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getSunAnimButton() {
 		if (sunAnimButton == null) {
 			sunAnimButton = new JToggleButton();
-			sunAnimButton.setText("Sun Anim");
+//			sunAnimButton.setText("Sun Anim");
+			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/sun_anim.png")));
 			sunAnimButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setSunAnim(sunAnimButton.isSelected());
@@ -901,7 +910,8 @@ public class MainFrame extends JFrame {
 
 	private JToggleButton getAnnotationToggleButton() {
 		if (annotationToggleButton == null) {
-			annotationToggleButton = new JToggleButton("Annotation");
+			annotationToggleButton = new JToggleButton();
+			annotationToggleButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/annotation.png")));
 			annotationToggleButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());

@@ -386,6 +386,8 @@ Version 0.2
 - prevent wall height from being dragged to less than 0.1
 - add 6 icons to gui 
 - update the code in all house parts to behave correctly after the fix with wall height
+- add 11 icons to gui
+
 
 - fix problem with after pressing CTRL, can no longer select objects
 - put minimum size restrictions on the resize tool
