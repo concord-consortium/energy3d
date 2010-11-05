@@ -387,6 +387,10 @@ Version 0.2
 - add 6 icons to gui 
 - update the code in all house parts to behave correctly after the fix with wall height
 - add 11 icons to gui
+- set the tooltips of the toolbar buttons
+- add menu item for shading
+- exit the print-preview mode when opening a new model
+- add print-preview toolbar button and icon
 
 
 - fix problem with after pressing CTRL, can no longer select objects

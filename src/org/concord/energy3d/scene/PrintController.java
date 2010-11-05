@@ -8,12 +8,9 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.PrintExporter;
 import org.concord.energy3d.util.Util;
-import org.lwjgl.LWJGLException;
 
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.Updater;
-import com.ardor3d.framework.jogl.JoglCanvasRenderer;
-import com.ardor3d.framework.lwjgl.LwjglAwtCanvas;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -33,7 +30,6 @@ public class PrintController implements Updater {
 	private Scene sceneClone = null;
 	private ArrayList<HousePart> printParts = new ArrayList<HousePart>();
 	private double angle;
-	private int counter = 0;
 	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
 
 	public static PrintController getInstance() {
@@ -59,32 +55,26 @@ public class PrintController implements Updater {
 		final Spatial originalHouseRoot = Scene.getInstance().getOriginalHouseRoot();
 		if (init) {
 			if (Util.DEBUG)
-			System.out.println("Initializing Print Preview Animation...");
+				System.out.println("Initializing Print Preview Animation...");
 			init = false;
-			startTime = time;			
+			startTime = time;
 			HousePart.setFlatten(true);
 			final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
 			if (isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
 				renderer.makeCurrentContext();
 				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
 				renderer.releaseCurrentContext();
-//				try {
-//					((LwjglAwtCanvas)SceneManager.getInstance().getCanvas()).releaseContext();
-//				} catch (LWJGLException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				};				
 				HousePart.flattenPos = 0;
 				if (Util.DEBUG)
-				System.out.print("Deep cloning...");
+					System.out.print("Deep cloning...");
 				sceneClone = (Scene) ObjectCloner.deepCopy(Scene.getInstance());
 				if (Util.DEBUG)
-				System.out.println("done");
+					System.out.println("done");
 				printParts.clear();
 				for (int i = 0; i < sceneClone.getParts().size(); i++) {
 					final HousePart newPart = sceneClone.getParts().get(i);
 					if (Util.DEBUG)
-					System.out.println("Attaching Print Part...");
+						System.out.println("Attaching Print Part...");
 					Scene.getRoot().attachChild(newPart.getRoot());
 					newPart.draw();
 					newPart.setOriginal(Scene.getInstance().getParts().get(i));
@@ -93,24 +83,22 @@ public class PrintController implements Updater {
 				}
 				applyPreviewScale();
 				SceneManager.getInstance().updatePrintPreviewScene(true);
-				
+
 				originalHouseRoot.setScale(2);
 				originalHouseRoot.updateWorldBound(true);
 				originalHouseRoot.setTranslation(0, 0, -Util.findBoundLength(originalHouseRoot.getWorldBound()) / 3);
 			}
-			 for (HousePart part : Scene.getInstance().getParts())
-			 part.getRoot().getSceneHints().setCullHint(CullHint.Always);
-			 if (Util.DEBUG)
-			 System.out.println("Finished initialization of Print Preview Animation.");
+			for (HousePart part : Scene.getInstance().getParts())
+				part.getRoot().getSceneHints().setCullHint(CullHint.Always);
+			if (Util.DEBUG)
+				System.out.println("Finished initialization of Print Preview Animation.");
 		}
 
 		if (!finish) {
 			final double t = (time - startTime) / 1.0 / timer.getResolution();
-//			final double t = 1;
 			if (Util.DEBUG)
-			System.out.println("t = " + t);
+				System.out.println("t = " + t);
 			HousePart.setFlattenTime(isPrintPreview ? t : 1 - t);
-//			clearPrintCenters();
 			drawPrintParts();
 
 			finish = t > 1;
@@ -119,20 +107,10 @@ public class PrintController implements Updater {
 
 		if (finish) {
 			if (Util.DEBUG)
-			System.out.println("Finishing Print Preview Animation...");
+				System.out.println("Finishing Print Preview Animation...");
 			if (!isPrintPreview)
 				HousePart.setFlatten(false);
 			if (!isPrintPreview && finishPhase == 10) {
-				// HousePart.setFlatten(false);
-				// for (HousePart part : parts)
-				// part.draw();
-				
-//				try {
-//					Thread.sleep(1000);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-				
 				originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
 				angle = 0;
 				for (HousePart housePart : sceneClone.getParts())
@@ -142,62 +120,43 @@ public class PrintController implements Updater {
 				originalHouseRoot.setTranslation(0, 0, 0);
 				originalHouseRoot.updateGeometricState(timer.getTimePerFrame(), true);
 
-final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-renderer.makeCurrentContext();
-renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
-renderer.releaseCurrentContext();	
-//try {
-//	((LwjglAwtCanvas)SceneManager.getInstance().getCanvas()).releaseContext();
-//} catch (LWJGLException e) {
-//	// TODO Auto-generated catch block
-//	e.printStackTrace();
-//};
+				final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
+				renderer.makeCurrentContext();
+				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
+				renderer.releaseCurrentContext();
+
 				SceneManager.getInstance().updatePrintPreviewScene(false);
 				if (Util.DEBUG)
-				System.out.println("Finished Print Preview Animation.");
+					System.out.println("Finished Print Preview Animation.");
 			}
 
 			if (finishPhase == 10) {
 				for (HousePart part : Scene.getInstance().getParts())
 					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
 				if (Util.DEBUG)
-				System.out.println("Final Finish of Print Preview Animation.");
+					System.out.println("Final Finish of Print Preview Animation.");
 			}
 
 			finishPhase++;
-			
-//			if (finishPhase > 20) {
-//				counter++;
-//				if (Util.DEBUG)
-//				System.out.println("PrintPreview Counter: " + counter);
-//				isPrintPreview = !isPrintPreview;
-//				init = true;
-//				finish = false;
-//			}
+
+			// if (finishPhase > 20) {
+			// counter++;
+			// if (Util.DEBUG)
+			// System.out.println("PrintPreview Counter: " + counter);
+			// isPrintPreview = !isPrintPreview;
+			// init = true;
+			// finish = false;
+			// }
 		}
 	}
 
 	private void applyPreviewScale() {
-//		double maxW = 0;
-//		double maxH = 0;
-//		
 		HousePart.clearPrintSpace();
 		for (HousePart part : printParts) {
-//			final double w = part.getPrintWidth();
-//			final double h = part.getPrintHeight();
-//			if (w > maxW)
-//				maxW = w;
-//			if (h > maxH)
-//				maxH = h;
 			part.updatePrintSpace();
 		}
-		
-		HousePart.PRINT_COLS = (int)Math.ceil(Math.sqrt(printParts.size()));
-//		
-//		final double scale = HousePart.PRINT_SPACE / Math.max(maxW, maxH);
-//		for (HousePart part : printParts)
-//			part.getRoot().setScale(scale);
-		
+
+		HousePart.PRINT_COLS = (int) Math.ceil(Math.sqrt(printParts.size()));
 	}
 
 	public void drawPrintParts() {
@@ -210,29 +169,12 @@ renderer.releaseCurrentContext();
 				part.draw();
 		printCenters.size();
 	}
-	
+
 	public void print() {
 		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
-//		PrintExporter printExporter = new PrintExporter(PrintPreviewController.getInstance().getPrintParts().size());		
 		PrintExporter printExporter = new PrintExporter();
-//		double scale = 0.2;
-//		root.setScale(scale);
 		Camera camera = Camera.getCurrentCamera();
-		// Vector3 location = new Vector3(camera.getLocation());
-		// Vector3 direction = new Vector3(camera.getDirection());
-		// ReadOnlyVector3 up = camera.getUp();
-//		for (HousePart part : Scene.getInstance().getPrintParts()) {
-//		for (HousePart part : PrintPreviewController.getInstance().getPrintParts()) {
-		for (Vector3 pos: printCenters) {
-			// if (printExporter.getCurrentPage() < Scene.getInstance().getPrintParts().size()) {
-			// HousePart part = Scene.getInstance().getPrintParts().get(printExporter.getCurrentPage());
-			// Vector3 pos = new Vector3(part.getPrintSequence() * scale, -5, part.getPrintY() * scale);
-//			 Vector3 pos = new Vector3(part.getPrintSequence() % HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale, -5, part.getPrintSequence() / HousePart.PRINT_COLS * HousePart.PRINT_SPACE * scale);
-//			Vector3 pos = part.getPrintCenter();
-			System.out.println(pos);
-//			camera.setLocation(pos.getX(), pos.getY() - 5, pos.getZ());
-//			camera.setLocation(pos.getX(), pos.getY() - 7, pos.getZ());
-//			camera.setLocation(pos.getX(), pos.getY() - HousePart.PRINT_SPACE * Math.sin(Math.PI / 2 - camera.getFovY()) / Math.sin(camera.getFovY()), pos.getZ());
+		for (Vector3 pos : printCenters) {
 			camera.setLocation(pos.getX(), pos.getY() - HousePart.PRINT_SPACE, pos.getZ());
 			camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 			SceneManager.getInstance().getCameraNode().updateFromCamera();
@@ -254,12 +196,9 @@ renderer.releaseCurrentContext();
 			} catch (PrinterException exc) {
 				System.out.println(exc);
 			}
-		// camera.setLocation(location);
-		// camera.lookAt(location.addLocal(direction), up);
-//			resetCamera(viewMode);
-			Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-			SceneManager.getInstance().resetCamera();
-	}	
+		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
+		SceneManager.getInstance().resetCamera();
+	}
 
 	public void setPrintPreview(final boolean printPreview) {
 		if (printPreview == isPrintPreview)
@@ -267,10 +206,14 @@ renderer.releaseCurrentContext();
 		init = true;
 		finish = false;
 		isPrintPreview = printPreview;
-//		SceneManager.getInstance().setCompassVisible(!printPreview);
+		// SceneManager.getInstance().setCompassVisible(!printPreview);
 		// if (printPreview)
 		// SceneManager.getInstance().updatePrintPreviewScene(true);
 	}
+	
+	public boolean isPrintPreview() {
+		return isPrintPreview;
+	}	
 
 	public void rotate() {
 		angle += 0.01;
@@ -281,11 +224,11 @@ renderer.releaseCurrentContext();
 		return printParts;
 	}
 
-//	public void clearPrintCenters() {
-//		printCenters.clear();
-//	}
-	
 	public void addPrintCenters(Vector3 p) {
 		printCenters.add(p);
-	}	
+	}
+	
+	public boolean isFinished() {
+		return finish;
+	}
 }

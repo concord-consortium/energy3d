@@ -2,12 +2,12 @@ package org.concord.energy3d;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
@@ -21,7 +21,8 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileView;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.PrintController;
@@ -34,10 +35,7 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-
-import javax.swing.event.MenuListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.ImageIcon;
+import java.awt.Dimension;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -87,6 +85,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem colorMenuItem = null;
 	private JMenu debugMenu = null;
 	private JMenuItem infoMenuItem = null;
+	private JCheckBoxMenuItem lightingMenu = null;
+	private JToggleButton previewButton = null;
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -162,9 +162,14 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getLightButton());
 			appToolbar.add(getSunButton());
 			appToolbar.add(getSunAnimButton());
+			appToolbar.addSeparator();
 			appToolbar.add(getRotAnimButton());
 			appToolbar.add(getTopViewButton());
 			appToolbar.add(getGridButton());
+			appToolbar.addSeparator();
+			appToolbar.add(getAnnotationToggleButton());
+			appToolbar.add(getPreviewButton());
+			
 			ButtonGroup bg = new ButtonGroup();
 			appToolbar.add(getSnapButton());
 			bg.add(selectButton);
@@ -176,7 +181,6 @@ public class MainFrame extends JFrame {
 			bg.add(roofButton);
 			bg.add(roofHipButton);
 			bg.add(floorButton);
-			appToolbar.add(getAnnotationToggleButton());
 		}
 		return appToolbar;
 	}
@@ -189,8 +193,8 @@ public class MainFrame extends JFrame {
 	public JToggleButton getSelectButton() {
 		if (selectButton == null) {
 			selectButton = new JToggleButton();
-//			selectButton.setText("Select");
 			selectButton.setSelected(true);
+			selectButton.setToolTipText("Select");
 			selectButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/select.png")));
 			selectButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -209,9 +213,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getWallButton() {
 		if (wallButton == null) {
 			wallButton = new JToggleButton();
-//			wallButton.setText("");
 			wallButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/wall.png")));
-//			wallButton.setMaximumSize(new Dimension(38, 28));
+			wallButton.setToolTipText("Draw wall");
 			wallButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
@@ -219,11 +222,6 @@ public class MainFrame extends JFrame {
 			});
 			wallButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-					// deselect();
-					// return;
-					// }
-					// lastSelection = e.getSource();
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);					
 				}
@@ -241,6 +239,7 @@ public class MainFrame extends JFrame {
 		if (doorButton == null) {
 			doorButton = new JToggleButton();
 			doorButton.setText("");
+			doorButton.setToolTipText("Draw door");
 			doorButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/door.png")));
 			doorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -249,12 +248,6 @@ public class MainFrame extends JFrame {
 			});
 			doorButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-					// deselect();
-					//
-					// return;
-					// }
-					// lastSelection = e.getSource();
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);					
 				}
@@ -271,8 +264,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getRoofButton() {
 		if (roofButton == null) {
 			roofButton = new JToggleButton();
-//			roofButton.setText("Roof");
 			roofButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/pyramid.png")));
+			roofButton.setToolTipText("Draw pyramid roof");
 			roofButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF);
@@ -280,13 +273,6 @@ public class MainFrame extends JFrame {
 			});
 			roofButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-					// deselect();
-					//
-					// return;
-					// }
-					// lastSelection = e.getSource();
-					
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);					
 				}
@@ -303,9 +289,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getWindowButton() {
 		if (windowButton == null) {
 			windowButton = new JToggleButton();
-//			windowButton.setText("");
 			windowButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/window.png")));
-//			windowButton.setMaximumSize(new Dimension(59, 28));
+			windowButton.setToolTipText("Draw window");
 			windowButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
@@ -313,12 +298,6 @@ public class MainFrame extends JFrame {
 			});
 			windowButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-					// deselect();
-					//
-					// return;
-					// }
-					// lastSelection = e.getSource();
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);					
 				}
@@ -335,8 +314,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getFoundationButton() {
 		if (foundationButton == null) {
 			foundationButton = new JToggleButton();
-//			foundationButton.setText("Foundation");
 			foundationButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/foundation.png")));
+			foundationButton.setToolTipText("Draw foundation");
 			foundationButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
@@ -344,13 +323,6 @@ public class MainFrame extends JFrame {
 			});
 			foundationButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					// System.out.println("Buton pushed");
-					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-					// deselect();
-					// System.out.println("desecting: " + e.getClickCount() + " : " + lastSelection);
-					// return;
-					// }
-					// SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION, e.getClickCount() > 1);
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
@@ -367,11 +339,12 @@ public class MainFrame extends JFrame {
 	private JToggleButton getLightButton() {
 		if (lightButton == null) {
 			lightButton = new JToggleButton();
-//			lightButton.setText("Light");
 			lightButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/shadow.png")));
+			lightButton.setToolTipText("Show shadows");
 			lightButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setLighting(lightButton.isSelected());
+					lightingMenu.setSelected(lightButton.isSelected());
+					shadowMenu.setSelected(lightButton.isSelected());
 				}
 			});
 		}
@@ -386,15 +359,10 @@ public class MainFrame extends JFrame {
 	private JToggleButton getTopViewButton() {
 		if (topViewButton == null) {
 			topViewButton = new JToggleButton();
-//			topViewButton.setText("Top View");
 			topViewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/top2.png")));
+			topViewButton.setToolTipText("Top view");
 			topViewButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					// JoglAwtCanvas canvas = SceneManager.getInstance().getCanvas();
-					// if (topViewButton.isSelected())
-					// SceneManager.getInstance().topCameraView();
-					// else
-					// SceneManager.getInstance().resetCamera();
 					SceneManager.getInstance().resetCamera(topViewButton.isSelected() ? ViewMode.TOP_VIEW : ViewMode.NORMAL);
 				}
 			});
@@ -410,8 +378,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getRotAnimButton() {
 		if (rotAnimButton == null) {
 			rotAnimButton = new JToggleButton();
-//			rotAnimButton.setText("Rotate Anim");
 			rotAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/rotate.png")));
+			rotAnimButton.setToolTipText("Animate scene roatation");
 			rotAnimButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().toggleRotation();
@@ -429,8 +397,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getGridButton() {
 		if (gridButton == null) {
 			gridButton = new JToggleButton();
-//			gridButton.setText("Grid");
 			gridButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/grid.png")));
+			gridButton.setToolTipText("Grids");
 			gridButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					HousePart.setSnapToGrids(gridButton.isSelected());
@@ -448,8 +416,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getSnapButton() {
 		if (snapButton == null) {
 			snapButton = new JToggleButton();
-//			snapButton.setText("Snap");
 			snapButton.setSelected(true);
+			snapButton.setToolTipText("Snap");
 			snapButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/snap.png")));
 			snapButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -468,8 +436,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getFloorButton() {
 		if (floorButton == null) {
 			floorButton = new JToggleButton();
-//			floorButton.setText("Floor");
 			floorButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/floor.png")));
+			floorButton.setToolTipText("Draw floor");
 			floorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR);
@@ -477,13 +445,6 @@ public class MainFrame extends JFrame {
 			});
 			floorButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-					// deselect();
-					//
-					// return;
-					// }
-					// lastSelection = e.getSource();
-					
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);					
 				}
@@ -500,8 +461,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getRoofHipButton() {
 		if (roofHipButton == null) {
 			roofHipButton = new JToggleButton();
-//			roofHipButton.setText("Roof Hip");
 			roofHipButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/hip.png")));
+			roofHipButton.setToolTipText("Draw hip roof");
 			roofHipButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					 SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP);
@@ -509,12 +470,6 @@ public class MainFrame extends JFrame {
 			});
 			roofHipButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					// if (lastSelection == e.getSource() && e.getClickCount() == 1) {
-					// deselect();
-					// return;
-					// }
-					// lastSelection = e.getSource();
-					
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);					
 				}
@@ -531,8 +486,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getResizeButton() {
 		if (resizeButton == null) {
 			resizeButton = new JToggleButton();
-//			resizeButton.setText("Resize");
 			resizeButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/resize.png")));
+			resizeButton.setToolTipText("Resize house");
 			resizeButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(Operation.RESIZE);
@@ -550,8 +505,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getSunButton() {
 		if (sunButton == null) {
 			sunButton = new JToggleButton();
-//			sunButton.setText("Sun");
 			sunButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/heliodon3.png")));
+			sunButton.setToolTipText("Show sun heliodon");
 			sunButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setSunControl(sunButton.isSelected());
@@ -569,8 +524,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton getSunAnimButton() {
 		if (sunAnimButton == null) {
 			sunAnimButton = new JToggleButton();
-//			sunAnimButton.setText("Sun Anim");
 			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/sun_anim.png")));
+			sunAnimButton.setToolTipText("Animate sun");
 			sunAnimButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setSunAnim(sunAnimButton.isSelected());
@@ -608,12 +563,7 @@ public class MainFrame extends JFrame {
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
-						// try {
 						Scene.getInstance().open(fileChooser.getSelectedFile());
-						// } catch (Throwable err) {
-						// err.printStackTrace();
-						// JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-						// }
 					}
 				}
 			});
@@ -657,7 +607,6 @@ public class MainFrame extends JFrame {
 			printMenuItem = new JMenuItem("Print");
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					// SceneManager.getInstance().print();
 					PrintController.getInstance().print();
 				}
 			});
@@ -670,15 +619,14 @@ public class MainFrame extends JFrame {
 	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
-	private JCheckBoxMenuItem getPreviewMenuItem() {
+	public JCheckBoxMenuItem getPreviewMenuItem() {
 		if (previewMenuItem == null) {
 			previewMenuItem = new JCheckBoxMenuItem("Print Preview");
 			previewMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					// Scene.getInstance().setFlatten(previewMenuItem.isSelected());
 					deselect();
-					// SceneManager.getInstance().setPrintPreview(previewMenuItem.isSelected());
 					PrintController.getInstance().setPrintPreview(previewMenuItem.isSelected());
+					previewButton.setSelected(previewMenuItem.isSelected());
 				}
 			});
 		}
@@ -812,6 +760,43 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
+	 * This method initializes lightingMenu	
+	 * 	
+	 * @return javax.swing.JCheckBoxMenuItem	
+	 */
+	private JCheckBoxMenuItem getLightingMenu() {
+		if (lightingMenu == null) {
+			lightingMenu = new JCheckBoxMenuItem();
+			lightingMenu.setText("Shading");
+			lightingMenu.addItemListener(new java.awt.event.ItemListener() {
+				public void itemStateChanged(java.awt.event.ItemEvent e) {
+					SceneManager.getInstance().setLighting(lightingMenu.isSelected());
+				}
+			});
+		}
+		return lightingMenu;
+	}
+
+	/**
+	 * This method initializes previewButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getPreviewButton() {
+		if (previewButton == null) {
+			previewButton = new JToggleButton();
+			previewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/print_preview.png")));
+			previewButton.setToolTipText("Preview printable parts");
+			previewButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					previewMenuItem.setSelected(previewButton.isSelected());
+				}
+			});
+		}
+		return previewButton;
+	}
+
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -852,7 +837,7 @@ public class MainFrame extends JFrame {
 	 * @return void
 	 */
 	private void initialize() {
-		this.setSize(900, 600);
+		this.setSize(972, 600);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getAppMenuBar());
 		this.setContentPane(getJContentPane());
@@ -873,7 +858,6 @@ public class MainFrame extends JFrame {
 		if (jContentPane == null) {
 			jContentPane = new JPanel();
 			jContentPane.setLayout(new BorderLayout());
-			// jContentPane.setVisible(false);
 			jContentPane.add(getAppToolbar(), BorderLayout.NORTH);
 		}
 		return jContentPane;
@@ -912,6 +896,7 @@ public class MainFrame extends JFrame {
 		if (annotationToggleButton == null) {
 			annotationToggleButton = new JToggleButton();
 			annotationToggleButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/icons/annotation.png")));
+			annotationToggleButton.setToolTipText("Show annotations");
 			annotationToggleButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());
@@ -937,6 +922,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 			viewMenu.add(getUnitsMenu());
+			viewMenu.add(getLightingMenu());
 			viewMenu.add(getShadowMenu());
 			viewMenu.add(getTextureCheckBoxMenuItem());
 			viewMenu.add(getColorMenuItem());
@@ -1069,7 +1055,7 @@ public class MainFrame extends JFrame {
 		}
 		return textureCheckBoxMenuItem;
 	}
-}
+}  //  @jve:decl-index=0:visual-constraint="10,10"
 
 class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 	String description;

@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.concord.energy3d.MainFrame;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -35,7 +36,6 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
@@ -60,14 +60,11 @@ public class Scene implements Serializable {
 	private static Scene instance;
 	private static File file = null;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
-	// private transient ArrayList<HousePart> printParts;
 	private double RADIUS = 0;
 	transient int C; // = 20;
 	transient int size; // = C * C * C * 3;
 	transient ByteBuffer texBuffer;// = BufferUtils.createByteBuffer(size);
 	transient Texture3D tex; // = new Texture3D();
-	// private static double angle = 0;
-	// private static Scene sceneClone = null;
 	private transient boolean redrawAll = false;
 	private Unit unit = Unit.Meter;
 	private double annotationScale = 1;
@@ -254,13 +251,9 @@ public class Scene implements Serializable {
 		return parts;
 	}
 
-	// public ArrayList<HousePart> getPrintParts() {
-	// return printParts;
-	// }
-
 	public void save(final File file) throws FileNotFoundException, IOException {
 		// remove dead objects
-		Iterator<HousePart> itr = parts.iterator();
+		final Iterator<HousePart> itr = parts.iterator();
 		while (itr.hasNext()) {
 			HousePart part = itr.next();
 			if (part instanceof Roof || part instanceof Window || part instanceof Door)
@@ -271,21 +264,22 @@ public class Scene implements Serializable {
 		Scene.file = file;
 		if (!file.getName().toLowerCase().endsWith(".ser"))
 			Scene.file = new File(file.toString() + ".ser");
-		// try {
 		System.out.print("Saving " + Scene.file + "...");
-		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(Scene.file));
+		final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(Scene.file));
 		out.writeObject(this);
 		out.close();
 		System.out.println("done");
-		// } catch (FileNotFoundException e) {
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-
 	}
 
 	public void newFile() {
+		final PrintController printController = PrintController.getInstance();
+		if (printController.isPrintPreview()) {
+//			printController.setPrintPreview(false);
+			MainFrame.getInstance().getPreviewMenuItem().setSelected(false);
+			while (!printController.isFinished())
+				Thread.yield();
+		}
+			
 		SceneManager.taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
 				originalHouseRoot.detachAllChildren();
@@ -306,7 +300,7 @@ public class Scene implements Serializable {
 		Scene.file = file;
 		SceneManager.taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
-				System.out.print("Opening..." + file + "...");
+				System.out.print("Opening..." + file + "...");				
 				ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
 				instance = (Scene) in.readObject();
 				instance.init();
@@ -315,12 +309,6 @@ public class Scene implements Serializable {
 					originalHouseRoot.attachChild(housePart.getRoot());
 				for (HousePart housePart : instance.getParts())
 					housePart.draw();
-//				redrawAll = true;
-//				for (HousePart housePart : instance.getParts())
-//					housePart.draw();
-//				for (HousePart housePart : instance.getParts())
-//					housePart.draw();
-				
 				System.out.println("done");
 				SceneManager.getInstance().updateHeliodonSize();
 				return null;
@@ -330,73 +318,10 @@ public class Scene implements Serializable {
 
 	public void drawResizeBounds() {
 		for (HousePart part : parts) {
-			if (part instanceof Foundation) {
+			if (part instanceof Foundation)
 				part.draw();
-				// part.showPoints();
-			}
 		}
 	}
-
-	// public void flatten(final boolean flatten) {
-	// if (flatten) {
-	// HousePart.flattenPos = 0;
-	// sceneClone = (Scene) ObjectCloner.deepCopy(this);
-	// printParts.clear();
-	// for (int i = 0; i < sceneClone.getParts().size(); i++) {
-	// final HousePart newPart = sceneClone.getParts().get(i);
-	// root.attachChild(newPart.getRoot());
-	// newPart.draw();
-	// newPart.setOriginal(parts.get(i));
-	// if (newPart.isPrintable() && newPart.isDrawCompleted())
-	// printParts.add(newPart);
-	// }
-	// }
-	//
-	// for (HousePart part : getParts())
-	// part.getRoot().getSceneHints().setCullHint(CullHint.Always);
-	//
-	// for (double t = 0; t < 1.1; t += 0.05) {
-	// // double t = 1;
-	// if (flatten)
-	// HousePart.setFlattenTime(t);
-	// else
-	// HousePart.setFlattenTime(1 - t);
-	// for (HousePart part : sceneClone.getParts())
-	// // TODO If draw not completed then it shouldn't even exist at this point!
-	// if (part.isDrawCompleted())
-	// part.draw();
-	// try {
-	// Thread.sleep(30);
-	// } catch (InterruptedException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// }
-	// if (!flatten) {
-	// // HousePart.setFlatten(false);
-	// // for (HousePart part : parts)
-	// // part.draw();
-	// originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
-	// angle = 0;
-	// for (HousePart housePart : sceneClone.getParts())
-	// root.detachChild(housePart.getRoot());
-	// }
-	// originalHouseRoot.setScale(flatten ? 2 : 1);
-	//
-	// for (HousePart part : getParts())
-	// part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
-	//
-	// try {
-	// Thread.sleep(500);
-	// } catch (InterruptedException e) {
-	// e.printStackTrace();
-	// }
-	// }
-
-	// public void rotate() {
-	// angle += 0.01;
-	// originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, angle));
-	// }
 
 	public Spatial getOriginalHouseRoot() {
 		return originalHouseRoot;

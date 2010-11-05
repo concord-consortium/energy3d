@@ -117,7 +117,6 @@ import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 	public enum Operation {
@@ -927,12 +926,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() throws Exception {
 				lightState.setEnabled(enable);
 				root.updateWorldRenderStates(true);
-				if (!enable)
-					passManager.remove(shadowPass);
+//				if (!enable)
+//					passManager.remove(shadowPass);
 				return null;
 			}
 		});
-	}
+	}	
 
 	public void setSunControl(boolean selected) {
 		this.sunControl = selected;
