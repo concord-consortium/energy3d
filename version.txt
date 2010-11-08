@@ -394,6 +394,14 @@ Version 0.2
 - automatically turn off shading and shadows when in print-preview mode
 - about dialog box added
 - set the camera view as soon as possible when SceneManager initializes to avoid observing the view switching from to top to front
+- sample model #20 added
+
+- automatically determine if the user is going with the drag approach or click approach when drawing house parts
+- avoid inserting house parts of length zero or very small dimension
+- draw wire-frame lines around polygons of roofs
+- avoid drawing the triangle lines when displaying the resize box
+- add a list of textures for wall and roof and floor for users to choose from
+
 
 
 - fix problem with after pressing CTRL, can no longer select objects
@@ -401,6 +409,7 @@ Version 0.2
 - fix problem with sometimes cannot grab edit points
 - add menu item to print current scene information
 - load all textures at start up and only once
+
 
 
  
