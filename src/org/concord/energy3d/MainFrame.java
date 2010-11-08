@@ -2,6 +2,7 @@ package org.concord.energy3d;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -35,6 +36,13 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import javax.swing.JDialog;
+import java.awt.Dimension;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.BorderFactory;
+import java.awt.Font;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -88,7 +96,16 @@ public class MainFrame extends JFrame {
 	private JToggleButton previewButton = null;
 	private JMenu jMenu = null;
 	private JMenuItem exitMenuItem = null;
-
+	private JMenu helpMenu = null;
+	private JMenuItem aboutMenuItem = null;
+	private JDialog aboutDialog = null;  //  @jve:decl-index=0:visual-constraint="602,644"
+	private JPanel jContentPane1 = null;
+	private JLabel titleLabel = null;
+	private JLabel copyrightLabel = null;
+	private JLabel authorsLabel = null;
+	private JLabel versionLabel = null;
+	private JLabel developedByLabel = null;
+	private JLabel byLabel = null;
 	public static MainFrame getInstance() {
 		return instance;
 	}
@@ -106,6 +123,7 @@ public class MainFrame extends JFrame {
 			appMenuBar.add(getScaleMenu());
 			appMenuBar.add(getCameraMenu());
 			appMenuBar.add(getDebugMenu());
+			appMenuBar.add(getHelpMenu());
 		}
 		return appMenuBar;
 	}
@@ -168,12 +186,12 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getRotAnimButton());
 			appToolbar.add(getTopViewButton());
 			appToolbar.add(getGridButton());
+			appToolbar.add(getSnapButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getAnnotationToggleButton());
 			appToolbar.add(getPreviewButton());
 			
-			ButtonGroup bg = new ButtonGroup();
-			appToolbar.add(getSnapButton());
+			final ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
 			bg.add(resizeButton);
 			bg.add(foundationButton);
@@ -817,6 +835,99 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
+	 * This method initializes helpMenu	
+	 * 	
+	 * @return javax.swing.JMenu	
+	 */
+	private JMenu getHelpMenu() {
+		if (helpMenu == null) {
+			helpMenu = new JMenu();
+			helpMenu.setText("Help");
+			helpMenu.add(getAboutMenuItem());
+		}
+		return helpMenu;
+	}
+
+	/**
+	 * This method initializes aboutMenuItem	
+	 * 	
+	 * @return javax.swing.JMenuItem	
+	 */
+	private JMenuItem getAboutMenuItem() {
+		if (aboutMenuItem == null) {
+			aboutMenuItem = new JMenuItem();
+			aboutMenuItem.setText("About");
+			aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					final JDialog aboutDialog = getAboutDialog();
+					final Dimension frameSize = MainFrame.this.getSize();
+					final Dimension dialogSize = aboutDialog.getSize();
+					final Point location = MainFrame.this.getLocation();
+					aboutDialog.setLocation((int)(location.getX() + frameSize.getWidth() / 2 - dialogSize.getWidth() / 2), (int)(location.getY() + frameSize.getHeight() / 2 - dialogSize.getHeight() / 2));
+					aboutDialog.setVisible(true);
+				}
+			});
+		}
+		return aboutMenuItem;
+	}
+
+	/**
+	 * This method initializes aboutDialog	
+	 * 	
+	 * @return javax.swing.JDialog	
+	 */
+	private JDialog getAboutDialog() {
+		if (aboutDialog == null) {
+			aboutDialog = new JDialog(this);
+			aboutDialog.setSize(new Dimension(413, 232));
+			aboutDialog.setTitle("About");
+			aboutDialog.setContentPane(getJContentPane1());
+		}
+		return aboutDialog;
+	}
+
+	/**
+	 * This method initializes jContentPane1	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getJContentPane1() {
+		if (jContentPane1 == null) {
+			byLabel = new JLabel();
+			byLabel.setText("by");
+			byLabel.setAlignmentX(0.5F);
+			developedByLabel = new JLabel();
+			developedByLabel.setText("Developed");
+			developedByLabel.setAlignmentX(0.5F);
+			versionLabel = new JLabel();
+			versionLabel.setText("v0.2");
+			versionLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
+			versionLabel.setAlignmentX(0.5F);
+			authorsLabel = new JLabel();
+			authorsLabel.setText("Saeid Nourian & Charles Xie");
+			authorsLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 40, 0));
+			authorsLabel.setAlignmentX(0.5F);
+			copyrightLabel = new JLabel();
+			copyrightLabel.setText("Copyright (c) 2010 Concord Consortium. All rights reserved.");
+			copyrightLabel.setAlignmentX(0.5F);
+			titleLabel = new JLabel();
+			titleLabel.setText("Energy 3D");
+			titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+			titleLabel.setFont(new Font("Dialog", Font.BOLD, 18));
+			titleLabel.setAlignmentX(0.5F);
+			jContentPane1 = new JPanel();
+			jContentPane1.setLayout(new BoxLayout(getJContentPane1(), BoxLayout.Y_AXIS));
+			jContentPane1.add(titleLabel, null);
+			jContentPane1.add(versionLabel, null);
+			jContentPane1.add(developedByLabel, null);
+			jContentPane1.add(byLabel, null);
+			jContentPane1.add(authorsLabel, null);
+			jContentPane1.add(copyrightLabel, null);
+		}
+		return jContentPane1;
+	}
+
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -860,7 +971,7 @@ public class MainFrame extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getAppMenuBar());
 		this.setContentPane(getJContentPane());
-		this.setTitle("Solar House Simulation");
+		this.setTitle("Energy 3D");
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 			public void windowClosing(java.awt.event.WindowEvent e) {
 				SceneManager.getInstance().exit();

@@ -392,6 +392,8 @@ Version 0.2
 - exit the print-preview mode when opening a new model
 - add print-preview toolbar button and icon
 - automatically turn off shading and shadows when in print-preview mode
+- about dialog box added
+- set the camera view as soon as possible when SceneManager initializes to avoid observing the view switching from to top to front
 
 
 - fix problem with after pressing CTRL, can no longer select objects

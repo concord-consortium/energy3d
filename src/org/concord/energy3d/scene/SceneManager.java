@@ -224,7 +224,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@MainThread
 	public void init() {
-		System.out.print("Initializing scene manager models...");
+		System.out.print("Initializing scene manager models...");				
 		AWTImageLoader.registerLoader();
 		try {
 			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(SceneManager.class.getClassLoader().getResource("org/concord/energy3d/images/")));
@@ -233,6 +233,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
+		
+		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
+		root.attachChild(cameraNode);
+		cameraNode.updateFromCamera();
+//		frameHandler.updateFrame();
+		resetCamera(ViewMode.NORMAL);
+		
 
 		// enable depth test
 		final ZBufferState buf = new ZBufferState();
@@ -274,7 +281,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		SelectUtil.init(floor, Scene.getRoot());
 		registerInputTriggers();
 
-		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
 		taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
 				final Spatial compass = loadCompassModel();
@@ -285,11 +291,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		});
 
-		frameHandler.updateFrame();
-		resetCamera(ViewMode.NORMAL);
+//		frameHandler.updateFrame();
+//		resetCamera(ViewMode.NORMAL);
 
-		root.attachChild(cameraNode);
-		cameraNode.updateFromCamera();
 
 		root.updateGeometricState(0, true);
 		System.out.println("done");
