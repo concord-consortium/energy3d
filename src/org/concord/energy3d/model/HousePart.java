@@ -490,7 +490,7 @@ public abstract class HousePart implements Serializable {
 
 	protected void flatten() {
 		root.setTranslation(0, 0, 0);
-		computePrintCenter();	//TODO move to setPreview(true) doesn't need to recompute every time
+//		computePrintCenter();	//TODO move to setPreview(true) doesn't need to recompute every time
 		final Vector3 targetCenter = new Vector3(printCenter);
 		final Vector3 currentCenter = new Vector3(center);
 		
@@ -603,6 +603,10 @@ public abstract class HousePart implements Serializable {
 	public Vector3 getPrintCenter() {
 		return printCenter;
 	}
+	
+	public void setPrintCenter(final Vector3 p) {
+		printCenter = p;
+	}	
 
 	public void setAnnotationsVisible(boolean visible) {
 		drawAnnotations  = visible;

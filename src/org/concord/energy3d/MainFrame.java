@@ -2,17 +2,23 @@ package org.concord.energy3d;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -36,13 +42,6 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import javax.swing.JDialog;
-import java.awt.Dimension;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.BorderFactory;
-import java.awt.Font;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -94,7 +93,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem infoMenuItem = null;
 	private JCheckBoxMenuItem lightingMenu = null;
 	private JToggleButton previewButton = null;
-	private JMenu jMenu = null;
 	private JMenuItem exitMenuItem = null;
 	private JMenu helpMenu = null;
 	private JMenuItem aboutMenuItem = null;

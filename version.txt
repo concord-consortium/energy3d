@@ -401,6 +401,8 @@ Version 0.2
 - draw wire-frame lines around polygons of roofs
 - avoid drawing the triangle lines when displaying the resize box
 - add a list of textures for wall and roof and floor for users to choose from
+- rotate the sky so that the less busy texture is viewable by default
+
 
 
 
