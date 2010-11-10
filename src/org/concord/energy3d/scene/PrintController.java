@@ -88,9 +88,9 @@ public class PrintController implements Updater {
 					if (newPart.isPrintable() && newPart.isDrawCompleted())
 						printParts.add(newPart);
 				}
-				
+
 				computePrintCenters();
-				
+
 				applyPreviewScale();
 				SceneManager.getInstance().updatePrintPreviewScene(true);
 
@@ -257,16 +257,19 @@ public class PrintController implements Updater {
 	public boolean isFinished() {
 		return finish && finishPhase > 20;
 	}
-	
+
 	private void computePrintCenters() {
 		final ArrayList<ArrayList<HousePart>> pages = new ArrayList<ArrayList<HousePart>>();
 		for (HousePart printPart : printParts) {
+			printPart.getRoot().updateWorldBound(true);
 			boolean isFitted = false;
 			for (int pageNum = 0; pageNum < pages.size() && !isFitted; pageNum++) {
 				final ArrayList<HousePart> page = pages.get(pageNum);
-				isFitted = fitInPage(printPart, page, pageNum); 
+				isFitted = fitInPage(printPart, page, getPageCorner(pageNum));
 			}
 			if (!isFitted) {
+				final double x = Math.sin(Math.PI / 4) * ((BoundingSphere) printPart.getRoot().getWorldBound()).getRadius();
+				printPart.setPrintCenter(new Vector3(x, x, 0).addLocal(getPageCorner(pages.size())));
 				final ArrayList<HousePart> page = new ArrayList<HousePart>();
 				page.add(printPart);
 				pages.add(page);
@@ -274,31 +277,33 @@ public class PrintController implements Updater {
 		}
 	}
 
-	private boolean fitInPage(final HousePart printPart, final ArrayList<HousePart> page, final int pageNum) {
-		final Vector3 pageCorner = getPageCorner(pageNum);
+	private boolean fitInPage(final HousePart printPart, final ArrayList<HousePart> page, Vector3 pageCorner) {
+		// final Vector3 pageCorner = getPageCorner(pageNum);
 		final Vector3 v1 = pageCorner.add(3, 0, 0, null);
 		final Vector3 v2 = pageCorner.add(0, -3, 0, null);
-		final double printPartRadius = ((BoundingSphere)printPart.getRoot().getWorldBound()).getRadius();		
+		final double printPartRadius = ((BoundingSphere) printPart.getRoot().getWorldBound()).getRadius();
 		for (HousePart part : page) {
 			final Vector3 p = part.getPrintCenter();
-			final double r = ((BoundingSphere)part.getRoot().getWorldBound()).getRadius();
+			final double r = ((BoundingSphere) part.getRoot().getWorldBound()).getRadius();
 			final double dis = r + printPartRadius;
-			
+
 			final Vector3 disVector = new Vector3(dis, 0, 0);
-			for (double angle = 0; angle < Math.PI*2 ; angle += Math.PI / 4) {
+			for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
 				final Vector3 tryCenter = new Matrix3().fromAngles(0, 0, angle).applyPost(disVector, null);
 				tryCenter.addLocal(p);
-				
+//				final Vector3 v = tryCenter.subtract(pageCorner, null);
 				boolean collision = false;
-				for (HousePart otherPart : page) {
-					if (otherPart == part)
-						continue;
-					collision = tryCenter.subtract(otherPart.getPrintCenter(), null).length() < printPartRadius + ((BoundingSphere)otherPart.getRoot().getWorldBound()).getRadius();
-					final Vector3 v = tryCenter.subtract(pageCorner, null);
-					collision = collision || (0<=v.dot(v1) && v.dot(v1)<=v1.dot(v1) && 0<=v.dot(v2) && v.dot(v2)<=v2.dot(v2));
-					if (collision)
-						break;
-				}
+//				if (0 <= v.dot(v1) && v.dot(v1) <= v1.dot(v1) && 0 <= v.dot(v2) && v.dot(v2) <= v2.dot(v2))
+				if(!isCircleInsideRectangle(tryCenter, printPartRadius, pageCorner, pageCorner.addLocal(3, -3, 0)))
+					collision = true;
+				else
+					for (HousePart otherPart : page) {
+						if (otherPart == part)
+							continue;
+						collision = tryCenter.subtract(otherPart.getPrintCenter(), null).length() < printPartRadius + ((BoundingSphere) otherPart.getRoot().getWorldBound()).getRadius();
+						if (!collision)
+							break;
+					}
 				if (!collision) {
 					printPart.setPrintCenter(tryCenter);
 					page.add(printPart);
@@ -309,7 +314,19 @@ public class PrintController implements Updater {
 		return false;
 	}
 
-	private Vector3 getPageCorner(int pageNum) {		
+	private boolean isCircleInsideRectangle(Vector3 center, double r, Vector3 p1, Vector3 p2) {
+		for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 2) {
+			final Vector3 p = new Matrix3().fromAngles(0, 0, angle).applyPost(new Vector3(r, 0, 0), null);
+			p.addLocal(center);
+			final double x = p.getX();
+			final double y = p.getY();
+			if (x < p1.getX() || x > p2.getX() || y > p1.getY() || y < p2.getY())
+				return false;			
+		}
+		return true;
+	}
+
+	private Vector3 getPageCorner(int pageNum) {
 		return new Vector3(pageNum * 3, 0, 0);
 	}
 }
