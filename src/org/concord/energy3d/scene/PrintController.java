@@ -3,8 +3,6 @@ package org.concord.energy3d.scene;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.concord.energy3d.MainFrame;
 import org.concord.energy3d.model.HousePart;
@@ -12,7 +10,6 @@ import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.PrintExporter;
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.Updater;
@@ -27,6 +24,7 @@ import com.ardor3d.util.screen.ScreenExporter;
 
 public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
+	private static final int PAGE_WIDTH = 7, PAGE_HEIGHT = 7;
 	private boolean isPrintPreview = false;
 	private boolean init = false;
 	private boolean finish = true;
@@ -69,7 +67,7 @@ public class PrintController implements Updater {
 			final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
 			if (isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
 				renderer.makeCurrentContext();
-				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
+//				renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
 				renderer.releaseCurrentContext();
 				HousePart.flattenPos = 0;
 				if (Util.DEBUG)
@@ -259,6 +257,7 @@ public class PrintController implements Updater {
 	}
 
 	private void computePrintCenters() {
+		System.out.println("---------------computing print centers----------------------------------------");
 		final ArrayList<ArrayList<HousePart>> pages = new ArrayList<ArrayList<HousePart>>();
 		for (HousePart printPart : printParts) {
 			printPart.getRoot().updateWorldBound(true);
@@ -268,8 +267,10 @@ public class PrintController implements Updater {
 				isFitted = fitInPage(printPart, page, getPageCorner(pageNum));
 			}
 			if (!isFitted) {
-				final double x = Math.sin(Math.PI / 4) * ((BoundingSphere) printPart.getRoot().getWorldBound()).getRadius();
-				printPart.setPrintCenter(new Vector3(x, x, 0).addLocal(getPageCorner(pages.size())));
+				final double radius = ((BoundingSphere) printPart.getRoot().getWorldBound()).getRadius();
+				final double x = Math.sin(Math.PI / 4) * radius;
+				printPart.setPrintCenter(new Vector3(x, 0, -x).addLocal(getPageCorner(pages.size())));
+				System.out.println("new page: " + printPart.getPrintCenter() + " : " + printPart);
 				final ArrayList<HousePart> page = new ArrayList<HousePart>();
 				page.add(printPart);
 				pages.add(page);
@@ -278,10 +279,8 @@ public class PrintController implements Updater {
 	}
 
 	private boolean fitInPage(final HousePart printPart, final ArrayList<HousePart> page, Vector3 pageCorner) {
-		// final Vector3 pageCorner = getPageCorner(pageNum);
-		final Vector3 v1 = pageCorner.add(3, 0, 0, null);
-		final Vector3 v2 = pageCorner.add(0, -3, 0, null);
 		final double printPartRadius = ((BoundingSphere) printPart.getRoot().getWorldBound()).getRadius();
+		System.out.println("r = " + printPartRadius);
 		for (HousePart part : page) {
 			final Vector3 p = part.getPrintCenter();
 			final double r = ((BoundingSphere) part.getRoot().getWorldBound()).getRadius();
@@ -289,12 +288,10 @@ public class PrintController implements Updater {
 
 			final Vector3 disVector = new Vector3(dis, 0, 0);
 			for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
-				final Vector3 tryCenter = new Matrix3().fromAngles(0, 0, angle).applyPost(disVector, null);
+				final Vector3 tryCenter = new Matrix3().fromAngles(0, angle, 0).applyPost(disVector, null);
 				tryCenter.addLocal(p);
-//				final Vector3 v = tryCenter.subtract(pageCorner, null);
 				boolean collision = false;
-//				if (0 <= v.dot(v1) && v.dot(v1) <= v1.dot(v1) && 0 <= v.dot(v2) && v.dot(v2) <= v2.dot(v2))
-				if(!isCircleInsideRectangle(tryCenter, printPartRadius, pageCorner, pageCorner.addLocal(3, -3, 0)))
+				if(!isCircleInsideRectangle(tryCenter, printPartRadius, pageCorner, pageCorner.add(PAGE_WIDTH, 0, -PAGE_HEIGHT, null)))
 					collision = true;
 				else
 					for (HousePart otherPart : page) {
@@ -306,6 +303,7 @@ public class PrintController implements Updater {
 					}
 				if (!collision) {
 					printPart.setPrintCenter(tryCenter);
+					System.out.println("Existing page #" + printPart.getPrintCenter() + " : " + printPart + " : " + page);
 					page.add(printPart);
 					return true;
 				}
@@ -316,17 +314,17 @@ public class PrintController implements Updater {
 
 	private boolean isCircleInsideRectangle(Vector3 center, double r, Vector3 p1, Vector3 p2) {
 		for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 2) {
-			final Vector3 p = new Matrix3().fromAngles(0, 0, angle).applyPost(new Vector3(r, 0, 0), null);
+			final Vector3 p = new Matrix3().fromAngles(0, angle, 0).applyPost(new Vector3(r, 0, 0), null);
 			p.addLocal(center);
 			final double x = p.getX();
-			final double y = p.getY();
-			if (x < p1.getX() || x > p2.getX() || y > p1.getY() || y < p2.getY())
+			final double z = p.getY();
+			if (x < p1.getX() || x > p2.getX() || z > p1.getZ() || z < p2.getZ())
 				return false;			
 		}
 		return true;
 	}
 
 	private Vector3 getPageCorner(int pageNum) {
-		return new Vector3(pageNum * 3, 0, 0);
+		return new Vector3(pageNum * PAGE_WIDTH, 0, 0);
 	}
 }
