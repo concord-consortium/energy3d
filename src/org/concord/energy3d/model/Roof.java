@@ -2,6 +2,8 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.Util;
@@ -42,6 +44,7 @@ public abstract class Roof extends HousePart {
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient Node flattenedMeshesRoot;
 	private transient boolean wallsUpdated;
+	private transient Map<Mesh, Vector3> orgCenters;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -344,13 +347,13 @@ public abstract class Roof extends HousePart {
 	// }
 
 	protected void flatten() {
-		if (flattenedMeshesRoot == null) {
-			flattenedMeshesRoot = MeshLib.groupByPlanner(mesh);
-			root.attachChild(flattenedMeshesRoot);
-			root.detachChild(mesh);
-			return;
-		}
-		for (Spatial child : flattenedMeshesRoot.getChildren()) {
+//		if (flattenedMeshesRoot == null) {
+//			flattenedMeshesRoot = MeshLib.groupByPlanner(mesh);
+//			root.attachChild(flattenedMeshesRoot);
+//			root.detachChild(mesh);
+//			return;
+//		}
+		for (Spatial child : getFlattenedMeshesRoot().getChildren()) {
 			flattenQuadTriangle((Mesh) child);
 		}
 		mesh.updateModelBound();
@@ -371,8 +374,11 @@ public abstract class Roof extends HousePart {
 		final Vector3 rotAxis = normal.cross(Vector3.UNIT_Y, null);
 		mesh.setRotation(new Matrix3().fromAngleAxis(flattenTime * angle, rotAxis));
 
-		computePrintCenter();
-		Vector3 orgCenter = (Vector3) mesh.getUserData();
+//		computePrintCenter();
+//		Vector3 orgCenter = (Vector3) mesh.getUserData();
+		if (orgCenters == null)
+			orgCenters = new HashMap<Mesh, Vector3>();
+		Vector3 orgCenter = orgCenters.get(mesh);
 		if (orgCenter == null) {
 			final Matrix3 m = new Matrix3().fromAngleAxis(angle, rotAxis);
 			m.applyPost(p1, p1);
@@ -382,9 +388,13 @@ public abstract class Roof extends HousePart {
 			while (buf.hasRemaining())
 				orgCenter.addLocal(m.applyPost(new Vector3(buf.get(), buf.get(), buf.get()), p1));
 			orgCenter.divideLocal(buf.capacity() / 3);
-			mesh.setUserData(orgCenter);
+//			mesh.setUserData(orgCenter);
+			orgCenters.put(mesh, orgCenter);
 		}
-		mesh.setTranslation(printCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
+//		mesh.setTranslation(printCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
+		final Vector3 targetPrintCenter = (Vector3) mesh.getUserData();
+//		if (targetPrintCenter != null)
+			mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
 	}
 
 	// private boolean flattenQuadTriangle(final Vector3 p1, final Vector3 p2, final Vector3 p3, final Vector3 p4, final Vector3 p5, final Vector3 p6) {
@@ -532,6 +542,15 @@ public abstract class Roof extends HousePart {
 				bottomMesh.setDefaultColor(defaultColor);
 			}
 		}
+	}
+
+	public Node getFlattenedMeshesRoot() {
+		if (flattenedMeshesRoot == null) {
+			flattenedMeshesRoot = MeshLib.groupByPlanner(mesh);
+			root.attachChild(flattenedMeshesRoot);
+			root.detachChild(mesh);
+		}		
+		return flattenedMeshesRoot;
 	}
 
 }

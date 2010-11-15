@@ -491,7 +491,8 @@ public abstract class HousePart implements Serializable {
 	protected void flatten() {
 		root.setTranslation(0, 0, 0);
 //		computePrintCenter();	//TODO move to setPreview(true) doesn't need to recompute every time
-		final Vector3 targetCenter = new Vector3(printCenter);
+//		final Vector3 targetCenter = new Vector3(printCenter);
+		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) root.getUserData());
 		final Vector3 currentCenter = new Vector3(center);
 		
 		root.getTransform().applyForward(currentCenter);

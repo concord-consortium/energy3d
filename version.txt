@@ -395,6 +395,10 @@ Version 0.2
 - about dialog box added
 - set the camera view as soon as possible when SceneManager initializes to avoid observing the view switching from to top to front
 - sample model #20 added
+- write algorithm to compute the best way to fit print parts in print pages
+- implement the above best-fit using the spherical bounds of each object
+- redesign the HousePart computerCenter structure to allow print preview using the new best-fit form
+
 
 - automatically determine if the user is going with the drag approach or click approach when drawing house parts
 - avoid inserting house parts of length zero or very small dimension

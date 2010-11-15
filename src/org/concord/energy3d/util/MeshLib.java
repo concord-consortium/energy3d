@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.RenderState;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.geom.BufferUtils;
@@ -31,7 +29,6 @@ public class MeshLib {
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
 		final Vector3 n = new Vector3();
-//		final Map<Vector3, ArrayList<Vector3>> groups = new HashMap<Vector3, ArrayList<Vector3>>();
 		final Map<Vector3, GroupData> groups = new HashMap<Vector3, GroupData>();
 		for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
 			final Vector3 p1 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
@@ -60,7 +57,6 @@ public class MeshLib {
 		final Node root = new Node("Grouped by Normal Root "); 
 		for (GroupData group : groups.values()) {
 			final Mesh newMesh = new Mesh();
-//			newMesh.setDefaultColor(ColorRGBA.RED);
 			
 			FloatBuffer buf = BufferUtils.createVector3Buffer(group.vertices.size());
 			for (Vector3 v : group.vertices)
@@ -77,6 +73,7 @@ public class MeshLib {
 				buf.put(v.getXf()).put(v.getYf());
 			newMesh.getMeshData().setTextureBuffer(buf, 0);
 
+			newMesh.updateModelBound();
 			root.attachChild(newMesh);			
 		}
 		for (RenderState rs : mesh.getLocalRenderStates().values())
