@@ -811,7 +811,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private void resizeCamera(final Camera camera) {
 		final Dimension size = ((Component) canvas).getSize();
 		camera.resize(size.width, size.height);
-		final double scale = 0.4; // 4; //topView ? 4 : 0.5;
+		final double scale = 0.4;
 		final double ratio = (double) camera.getWidth() / camera.getHeight();
 		camera.setFrustumTop(scale);
 		camera.setFrustumBottom(-scale);
@@ -819,10 +819,26 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		camera.setFrustumRight(scale * ratio);
 
 		// canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
-		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);
-
-		camera.update();
+//		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);
+		camera.setFrustumPerspective(45.0, ratio, 0.01, 200);
+//		camera.update();
 	}
+	
+	public void resizeCamera(final int width, final int height) {
+		final Camera camera = canvas.getCanvasRenderer().getCamera();
+		camera.resize(width, height);
+		final double scale = 0.4;
+		final double ratio = (double)width / height;
+		camera.setFrustumTop(scale);
+		camera.setFrustumBottom(-scale);
+		camera.setFrustumLeft(-scale * ratio);
+		camera.setFrustumRight(scale * ratio);
+
+		// canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
+//		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);
+		camera.setFrustumPerspective(45.0, ratio, 0.01, 200);
+//		camera.update();
+	}	
 
 	public void toggleRotation() {
 		rotAnim = !rotAnim;

@@ -197,20 +197,22 @@ public class PrintController implements Updater {
 	public void drawPrintParts() {
 		if (sceneClone == null)
 			return;
-		printCenters.clear();
+//		printCenters.clear();
 		for (HousePart part : sceneClone.getParts())
 			// TODO If draw not completed then it shouldn't even exist at this point!
 			if (part.isDrawCompleted())
 				part.draw();
-		printCenters.size();
+//		printCenters.size();
 	}
 
-	public void print() {
+	public void print() {		
 		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 		PrintExporter printExporter = new PrintExporter();
 		Camera camera = Camera.getCurrentCamera();
+//		camera.resize(800, 1100);
+		SceneManager.getInstance().resizeCamera(800, 1100);
 		for (Vector3 pos : printCenters) {
-			camera.setLocation(pos.getX(), pos.getY() - HousePart.PRINT_SPACE, pos.getZ());
+			camera.setLocation(pos.getX(), pos.getY() - PAGE_WIDTH * 2, pos.getZ());
 			camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 			SceneManager.getInstance().getCameraNode().updateFromCamera();
 			try {
@@ -279,31 +281,6 @@ public class PrintController implements Updater {
 		return finish && finishPhase > 20;
 	}
 
-	//
-	// private void computePrintCenters() {
-	// System.out.println("---------------computing print centers----------------------------------------");
-	// final ArrayList<ArrayList<HousePart>> pages = new ArrayList<ArrayList<HousePart>>();
-	// for (HousePart printPart : printParts) {
-	// if (printPart instanceof Roof)
-	// continue;
-	// printPart.getRoot().updateWorldBound(true);
-	// boolean isFitted = false;
-	// for (int pageNum = 0; pageNum < pages.size() && !isFitted; pageNum++) {
-	// final ArrayList<HousePart> page = pages.get(pageNum);
-	// isFitted = fitInPage(printPart, page, getPageCorner(pageNum));
-	// }
-	// if (!isFitted) {
-	// final double radius = ((BoundingSphere) printPart.getRoot().getWorldBound()).getRadius();
-	// // final double x = Math.sin(Math.PI / 4) * radius;
-	// printPart.setPrintCenter(new Vector3(radius, 0, -radius).addLocal(getPageCorner(pages.size())));
-	// System.out.println("new page: " + printPart.getPrintCenter() + " : " + printPart);
-	// final ArrayList<HousePart> page = new ArrayList<HousePart>();
-	// page.add(printPart);
-	// pages.add(page);
-	// }
-	// }
-	// }
-
 	private void computePageDimension() {
 		double maxSize = 0;
 		for (final HousePart printPart : printParts) {
@@ -318,25 +295,26 @@ public class PrintController implements Updater {
 	}
 
 	private void arrangePrintPages(final ArrayList<ArrayList<Spatial>> pages) {
-//		final int rows = (int) Math.round(Math.sqrt(pages.size() / 2));
-//		final int cols = 2 * rows;
-		
 		int cols = (int) Math.round(Math.sqrt(pages.size() * 2));
 		if (cols % 2 == 0)
 			cols++;
-		int rows = (int) Math.ceil(cols / 2.0);
-//		if (rows * cols == pages.size())	// because we cannot draw a page in the center (occupied by rotating model) then # of rows will be increased
-//			rows++;
+		final int rows = (int) Math.ceil(cols / 2.0);
 
 		int pageNum = 0;
+		printCenters.clear();
 		for (final ArrayList<Spatial> page : pages) {
 			final Vector3 currentCorner = new Vector3();
+			double x, y;
 			do {
 				final int margin = 5;
-				currentCorner.setX((pageNum % cols - cols / 2) * (PAGE_WIDTH + margin) - PAGE_WIDTH / 2);
-				currentCorner.setZ((-pageNum / cols + rows / 2) * (PAGE_HEIGHT + margin) + PAGE_HEIGHT / 2);
+				x = (pageNum % cols - cols / 2) * (PAGE_WIDTH + margin);
+				y = (-pageNum / cols + rows / 2) * (PAGE_HEIGHT + margin);
+				currentCorner.setX(x - PAGE_WIDTH / 2);
+				currentCorner.setZ(y + PAGE_HEIGHT / 2);
 				pageNum++;
 			} while (currentCorner.length() < PAGE_WIDTH);
+			
+			printCenters.add(new Vector3(x, 0, y));
 			
 			for (final Spatial printSpatial : page)
 				((Vector3)printSpatial.getUserData()).addLocal(currentCorner);
@@ -349,7 +327,6 @@ public class PrintController implements Updater {
 	}
 
 	private void computePrintCenters(final ArrayList<ArrayList<Spatial>> pages) {
-		System.out.println("---------------computing print centers----------------------------------------");
 		for (HousePart printPartOrg : printParts) {
 			if (printPartOrg instanceof Roof)
 				continue;
@@ -359,7 +336,6 @@ public class PrintController implements Updater {
 	}
 
 	private void computePrintCentersForRoofAndFloor(final ArrayList<ArrayList<Spatial>> pages) {
-		System.out.println("---------------computing ROOF print centers----------------------------------------");
 		for (HousePart printPart : printParts) {
 			if (!(printPart instanceof Roof))
 				continue;
@@ -373,62 +349,21 @@ public class PrintController implements Updater {
 		printPart.updateWorldBound(true);
 		boolean isFitted = false;
 		for (int pageNum = 0; pageNum < pages.size() && !isFitted; pageNum++) {
-			// isFitted = fitInPage(printPart, pages.get(pageNum), getPageCorner(pageNum));
 			isFitted = fitInPage(printPart, pages.get(pageNum));
 		}
 		if (!isFitted) {
-//			final double radius = ((BoundingSphere) printPart.getWorldBound()).getRadius();
 			final double radius = Util.findBoundLength(printPart.getWorldBound()) / 2;
-			// printPart.setUserData(new Vector3(radius, 0, -radius).addLocal(getPageCorner(pages.size())));
 			printPart.setUserData(new Vector3(radius, 0, -radius));
-			System.out.println("new page: " + printPart.getUserData() + " : " + printPart);
 			final ArrayList<Spatial> page = new ArrayList<Spatial>();
 			page.add(printPart);
 			pages.add(page);
 		}
 	}
 
-	// private boolean fitInPage(final HousePart printPart, final ArrayList<HousePart> page, Vector3 pageCorner) {
-	// final double printPartRadius = ((BoundingSphere) printPart.getRoot().getWorldBound()).getRadius();
-	// System.out.println("r = " + printPartRadius);
-	// for (HousePart part : page) {
-	// final Vector3 p = part.getPrintCenter();
-	// final double r = ((BoundingSphere) part.getRoot().getWorldBound()).getRadius();
-	// final double dis = r + printPartRadius;
-	//
-	// final Vector3 disVector = new Vector3(dis, 0, 0);
-	// for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
-	// final Vector3 tryCenter = new Matrix3().fromAngles(0, angle, 0).applyPost(disVector, null);
-	// tryCenter.addLocal(p);
-	// boolean collision = false;
-	// if (!isCircleInsideRectangle(tryCenter, printPartRadius, pageCorner, pageCorner.add(PAGE_WIDTH, 0, -PAGE_HEIGHT, null)))
-	// collision = true;
-	// else
-	// for (HousePart otherPart : page) {
-	// if (otherPart == part)
-	// continue;
-	// collision = tryCenter.subtract(otherPart.getPrintCenter(), null).length() < printPartRadius + ((BoundingSphere) otherPart.getRoot().getWorldBound()).getRadius();
-	// if (collision)
-	// break;
-	// }
-	// if (!collision) {
-	// printPart.setPrintCenter(tryCenter);
-	// System.out.println("Existing page #" + printPart.getPrintCenter() + " : " + printPart + " : " + page);
-	// page.add(printPart);
-	// return true;
-	// }
-	// }
-	// }
-	// return false;
-	// }
-
 	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
-//		final double printPartRadius = ((BoundingSphere) printPart.getWorldBound()).getRadius();
 		final double printPartRadius = Util.findBoundLength(printPart.getWorldBound()) / 2;
-		System.out.println("r = " + printPartRadius);
 		for (Spatial part : page) {
 			final Vector3 p = (Vector3) part.getUserData();
-//			final double r = ((BoundingSphere) part.getWorldBound()).getRadius();
 			final double r = Util.findBoundLength(part.getWorldBound()) / 2;
 			final double dis = r + printPartRadius;
 
@@ -437,7 +372,6 @@ public class PrintController implements Updater {
 				final Vector3 tryCenter = new Matrix3().fromAngles(0, angle, 0).applyPost(disVector, null);
 				tryCenter.addLocal(p);
 				boolean collision = false;
-				// if (!isCircleInsideRectangle(tryCenter, printPartRadius, pageCorner, pageCorner.add(PAGE_WIDTH, 0, -PAGE_HEIGHT, null)))
 				if (!isCircleInsideRectangle(tryCenter, printPartRadius, new Vector3(), new Vector3(PAGE_WIDTH, 0, -PAGE_HEIGHT)))
 					collision = true;
 				else
@@ -450,7 +384,6 @@ public class PrintController implements Updater {
 					}
 				if (!collision) {
 					printPart.setUserData(tryCenter);
-					System.out.println("Existing page #" + printPart.getUserData() + " : " + printPart + " : " + page);
 					page.add(printPart);
 					return true;
 				}
@@ -471,7 +404,4 @@ public class PrintController implements Updater {
 		return true;
 	}
 
-	private Vector3 getPageCorner(int pageNum) {
-		return new Vector3(pageNum * PAGE_WIDTH, 0, 0);
-	}
 }

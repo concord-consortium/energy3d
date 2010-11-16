@@ -401,6 +401,9 @@ Version 0.2
 - arrange the new print preview pages around the rotating model
 - draw white pages behind the print preview pages to show the boundaries of the page
 
+- set look & feel to operating system look & feel
+- update the print functionalities to allow printing of pages
+
 - automatically determine if the user is going with the drag approach or click approach when drawing house parts
 - avoid inserting house parts of length zero or very small dimension
 - draw wire-frame lines around polygons of roofs
