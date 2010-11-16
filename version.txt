@@ -398,7 +398,8 @@ Version 0.2
 - write algorithm to compute the best way to fit print parts in print pages
 - implement the above best-fit using the spherical bounds of each object
 - redesign the HousePart computerCenter structure to allow print preview using the new best-fit form
-
+- arrange the new print preview pages around the rotating model
+- draw white pages behind the print preview pages to show the boundaries of the page
 
 - automatically determine if the user is going with the drag approach or click approach when drawing house parts
 - avoid inserting house parts of length zero or very small dimension

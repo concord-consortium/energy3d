@@ -1150,9 +1150,11 @@ public class MainFrame extends JFrame {
 					boolean done = false;
 					while (!done) {
 						// previousScaleInput = "200%";
-						String result = JOptionPane.showInputDialog(MainFrame.this, "Please enter the scale factor in percentage:", previousScaleInput).trim();
+						String result = JOptionPane.showInputDialog(MainFrame.this, "Please enter the scale factor in percentage:", previousScaleInput);
 						if (result == null)
 							break;
+						else
+							result = result.trim();
 						if (result.endsWith("%") && result.length() >= 1)
 							result = result.substring(0, result.length() - 1);
 						try {

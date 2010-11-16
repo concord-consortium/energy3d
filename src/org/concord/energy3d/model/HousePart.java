@@ -12,6 +12,7 @@ import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
@@ -166,6 +167,7 @@ public abstract class HousePart implements Serializable {
 			Sphere pointShape = new Sphere("Point", origin, 8, 8, 0.05);
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
+			pointShape.setModelBound(new BoundingBox());
 			pointShape.updateModelBound(); // important
 			pointShape.getSceneHints().setCullHint(CullHint.Always);
 		}
