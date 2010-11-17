@@ -209,14 +209,12 @@ public class PrintController implements Updater {
 		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 		PrintExporter printExporter = new PrintExporter();
 		Camera camera = Camera.getCurrentCamera();
-//		camera.resize(800, 1100);
-		SceneManager.getInstance().resizeCamera(800, 1100);
 		for (Vector3 pos : printCenters) {
 			camera.setLocation(pos.getX(), pos.getY() - PAGE_WIDTH * 2, pos.getZ());
 			camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 			SceneManager.getInstance().getCameraNode().updateFromCamera();
 			try {
-				Thread.sleep(100);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

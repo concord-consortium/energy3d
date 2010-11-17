@@ -966,6 +966,7 @@ public class MainFrame extends JFrame {
 	 */
 	private void initialize() {
 		this.setSize(972, 600);
+//		this.setSize(172, 600);
 //		this.setSize(400*2, 550*2);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getAppMenuBar());

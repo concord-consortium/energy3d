@@ -14,9 +14,7 @@ import com.ardor3d.util.screen.ScreenExportable;
 
 public class PrintExporter implements ScreenExportable, Printable {
 	protected boolean _useAlpha;
-//	private BufferedImage[] images;
 	private ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
-//	private int currentPage = 0;
 
 	public PrintExporter() {
 		this(false);
@@ -24,12 +22,9 @@ public class PrintExporter implements ScreenExportable, Printable {
 
 	public PrintExporter(boolean useAlpha) {
 		_useAlpha = useAlpha;
-//		images = new BufferedImage[pages];
-
 	}
 
 	public void export(final ByteBuffer data, final int width, final int height) {
-//		images[currentPage] = new BufferedImage(width, height, _useAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
 		final BufferedImage img = new BufferedImage(width, height, _useAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
 		images.add(img);
 
@@ -48,31 +43,10 @@ public class PrintExporter implements ScreenExportable, Printable {
 					a = ((data.get(index + 3)));
 					argb |= (a & 0xFF) << 24;
 				}
-
-//				images[currentPage].setRGB(x, y, argb);
 				img.setRGB(x, y, argb);
 			}
 		}
-//		currentPage++;
-		// print(img);
-
 	}
-
-	// private void print(BufferedImage img) {
-	// PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-	// pras.add(new Copies(1));
-	// PrintService pss[] = PrintServiceLookup.lookupPrintServices(DocFlavor.INPUT_STREAM.GIF, pras);
-	// if (pss.length == 0)
-	// throw new RuntimeException("No printer services available.");
-	// PrintService ps = pss[0];
-	// System.out.println("Printing to " + ps);
-	// DocPrintJob job = ps.createPrintJob();
-	// job.setPrintable(new PrintInterface(img));
-	// FileInputStream fin = new FileInputStream("YOurImageFileName.PNG");
-	// Doc doc = new SimpleDoc(fin, DocFlavor.INPUT_STREAM.GIF, null);
-	// job.print(doc, pras);
-	// fin.close();
-	// }
 
 	public ImageDataFormat getFormat() {
 		if (_useAlpha) {
@@ -97,20 +71,24 @@ public class PrintExporter implements ScreenExportable, Printable {
 		}
 
 		Graphics2D g2d = (Graphics2D) graphics;
-		g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+//		g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 
-//		graphics.drawImage(images[pageIndex], 0, 0, 600, 600 * images[pageIndex].getHeight() / images[pageIndex].getWidth() , null);
 		final BufferedImage img = images.get(pageIndex);
-		graphics.drawImage(img, 0, 0, 600, 600 * img.getHeight() / img.getWidth() , null);
+		
+		final int w = img.getWidth();
+		final int h = img.getHeight();
+		final double pageRatio = pageFormat.getWidth() / pageFormat.getHeight();
+		final BufferedImage croppedImg;
+		if (w / h > pageRatio)
+			croppedImg = img.getSubimage((int)(w-h * pageRatio)/2, 0, (int)(h * pageRatio), h);
+		else
+			croppedImg = img.getSubimage(0, (int)(h-w / pageRatio)/2, w, (int)(w / pageRatio));
+		
+//		graphics.drawImage(img, 0, 0, 600, 600 * h / w , null);
+//		graphics.drawImage(croppedImg, 0, 0, 600, 600 * h / w , null);
+		graphics.drawImage(croppedImg, 0, 0, (int)pageFormat.getWidth(), (int)pageFormat.getHeight() , null);
 
-		// AffineTransform at = AffineTransform.getScaleInstance((double) width / images[pageIndex].getWidth(), (double) height / images[pageIndex].getHeight());
-		// graphics.drawImage(images[pageIndex], at);
-
-//		return NO_SUCH_PAGE;
 		return PAGE_EXISTS;
 	}
 
-//	public int getCurrentPage() {
-//		return currentPage;
-//	}
 }
