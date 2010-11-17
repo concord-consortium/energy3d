@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.concord.energy3d.MainFrame;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.PrintExporter;
 import org.concord.energy3d.util.Util;
@@ -18,6 +19,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -27,7 +29,7 @@ import com.ardor3d.util.screen.ScreenExporter;
 
 public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
-	private static double PAGE_WIDTH, PAGE_HEIGHT;
+	private double pageWidth, pageHeight;
 	private boolean isPrintPreview = false;
 	private boolean init = false;
 	private boolean finish = true;
@@ -207,10 +209,12 @@ public class PrintController implements Updater {
 
 	public void print() {		
 		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
-		PrintExporter printExporter = new PrintExporter();
-		Camera camera = Camera.getCurrentCamera();
+		final PrintExporter printExporter = new PrintExporter();
+		final Camera camera = Camera.getCurrentCamera();
+//		camera.setProjectionMode(ProjectionMode.Parallel);
+		SceneManager.getInstance().resetCamera(ViewMode.PRINT);
 		for (Vector3 pos : printCenters) {
-			camera.setLocation(pos.getX(), pos.getY() - PAGE_WIDTH * 2, pos.getZ());
+			camera.setLocation(pos.getX(), pos.getY() - pageWidth * 2, pos.getZ());
 			camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 			SceneManager.getInstance().getCameraNode().updateFromCamera();
 			try {
@@ -232,7 +236,7 @@ public class PrintController implements Updater {
 				System.out.println(exc);
 			}
 		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-		SceneManager.getInstance().resetCamera();
+		SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
 	}
 
 	public void setPrintPreview(final boolean printPreview) {
@@ -288,15 +292,16 @@ public class PrintController implements Updater {
 			if (!Double.isInfinite(d) && d > maxSize)
 				maxSize = d;
 		}
-		PAGE_WIDTH = maxSize;
-		PAGE_HEIGHT = PAGE_WIDTH * 4 / 3;
+		pageWidth = maxSize;
+		pageHeight = pageWidth * 4 / 3;
 	}
 
 	private void arrangePrintPages(final ArrayList<ArrayList<Spatial>> pages) {
-		int cols = (int) Math.round(Math.sqrt(pages.size() * 2));
+		final double ratio = (double) Camera.getCurrentCamera().getWidth() / Camera.getCurrentCamera().getHeight();
+		int cols = (int) Math.round(Math.sqrt((pages.size() + 1) * ratio));
 		if (cols % 2 == 0)
 			cols++;
-		final int rows = (int) Math.ceil(cols / 2.0);
+		final int rows = (int) Math.ceil((pages.size() + 1) / cols);
 
 		int pageNum = 0;
 		printCenters.clear();
@@ -305,12 +310,12 @@ public class PrintController implements Updater {
 			double x, y;
 			do {
 				final int margin = 5;
-				x = (pageNum % cols - cols / 2) * (PAGE_WIDTH + margin);
-				y = (-pageNum / cols + rows / 2) * (PAGE_HEIGHT + margin);
-				currentCorner.setX(x - PAGE_WIDTH / 2);
-				currentCorner.setZ(y + PAGE_HEIGHT / 2);
+				x = (pageNum % cols - cols / 2) * (pageWidth + margin);
+				y = (-pageNum / cols + rows / 2) * (pageHeight + margin);
+				currentCorner.setX(x - pageWidth / 2);
+				currentCorner.setZ(y + pageHeight / 2);
 				pageNum++;
-			} while (currentCorner.length() < PAGE_WIDTH);
+			} while (currentCorner.length() < pageWidth);
 			
 			printCenters.add(new Vector3(x, 0, y));
 			
@@ -318,7 +323,7 @@ public class PrintController implements Updater {
 				((Vector3)printSpatial.getUserData()).addLocal(currentCorner);
 			
 			final Box box = new Box("Page Boundary");
-			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(PAGE_WIDTH, 0.2, -PAGE_HEIGHT, null));
+			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
 			pageBoundaryNode.attachChild(box);
 		}
 		
@@ -370,7 +375,7 @@ public class PrintController implements Updater {
 				final Vector3 tryCenter = new Matrix3().fromAngles(0, angle, 0).applyPost(disVector, null);
 				tryCenter.addLocal(p);
 				boolean collision = false;
-				if (!isCircleInsideRectangle(tryCenter, printPartRadius, new Vector3(), new Vector3(PAGE_WIDTH, 0, -PAGE_HEIGHT)))
+				if (!isCircleInsideRectangle(tryCenter, printPartRadius, new Vector3(), new Vector3(pageWidth, 0, -pageHeight)))
 					collision = true;
 				else
 					for (Spatial otherPart : page) {
@@ -401,5 +406,13 @@ public class PrintController implements Updater {
 		}
 		return true;
 	}
+
+	public double getPageWidth() {
+		return pageWidth;
+	}
+	
+	public double getPageHeight() {
+		return pageHeight;
+	}	
 
 }

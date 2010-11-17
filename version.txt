@@ -403,6 +403,9 @@ Version 0.2
 - set look & feel to operating system look & feel
 - update the print functionalities to allow printing of pages
 - automatically crop the print image and up-scale it so that it fits perfectly in the entire page format
+- reorganized camera reset system
+- set the camera mode to Parallel when printing
+- automatically set frustum parameters when print to fit the page inside canvas to maximize size while not hiding parts.
  
 
 

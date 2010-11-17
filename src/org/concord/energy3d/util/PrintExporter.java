@@ -70,7 +70,7 @@ public class PrintExporter implements ScreenExportable, Printable {
 			return NO_SUCH_PAGE;
 		}
 
-		Graphics2D g2d = (Graphics2D) graphics;
+//		Graphics2D g2d = (Graphics2D) graphics;
 //		g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 
 		final BufferedImage img = images.get(pageIndex);
