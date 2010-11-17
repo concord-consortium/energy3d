@@ -91,7 +91,7 @@ public class Wall extends HousePart {
 		root.attachChild(invisibleMesh);
 		invisibleMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		invisibleMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		invisibleMesh.setModelBound(new BoundingSphere());
+//		invisibleMesh.setModelBound(new BoundingSphere());
 //		invisibleMesh.setModelBound(new BoundingBox());
 		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
 

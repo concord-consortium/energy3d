@@ -375,6 +375,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 			 if (drawBounds && drawn != null)
 				 com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
+				 
+//			 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
+			 
 
 			passManager.renderPasses(renderer);
 		} catch (Exception e) {
@@ -853,7 +856,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
-			loc = new Vector3(0, -HousePart.PRINT_SPACE * HousePart.PRINT_COLS, 0);
+			final double w = PrintController.getInstance().getCols() * (PrintController.getInstance().getPageWidth() + PrintController.getMargin()); 
+			final int rows = PrintController.getInstance().getRows();
+			final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin(); 
+			final double h = rows * pageHeight;
+			loc = new Vector3(0, -Math.max(w, h), rows % 2 == 0 ? 0 : pageHeight / 2);
 			resizeCamera(PrintController.getInstance().getPageWidth());
 		} else {
 			camera.setProjectionMode(ProjectionMode.Perspective);
