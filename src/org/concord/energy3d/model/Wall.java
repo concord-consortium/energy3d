@@ -45,10 +45,10 @@ public class Wall extends HousePart {
 	private final double wallThickness = 0.1;
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
-	private transient Mesh mesh;
+	private transient Mesh frontMesh;
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
-	private transient Mesh invisibleMesh;
+//	private transient Mesh mesh; // used to be called invisibleMesh
 	private transient Mesh windowsSurroundMesh;
 	private transient Mesh wireframeMesh;
 
@@ -58,19 +58,19 @@ public class Wall extends HousePart {
 
 	protected void init() {
 		super.init();		
-		mesh = new Mesh("Wall");
+		frontMesh = new Mesh("Wall");
 		backMesh = new Mesh("Wall (Back)");
 		surroundMesh = new Mesh("Wall (Surround)");
-		invisibleMesh = new Mesh("Wall (Invisible)");
+		mesh = new Mesh("Wall (Invisible)");
 		windowsSurroundMesh = new Mesh("Wall (Windows Surround)");
 		wireframeMesh = new Mesh("Wall (Wireframe)");
 
-		root.attachChild(mesh);
-		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
-		mesh.setModelBound(null);
-		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		root.attachChild(frontMesh);
+		frontMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		frontMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		frontMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
+		frontMesh.setModelBound(null);
+		frontMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 
 		root.attachChild(backMesh);
 		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
@@ -88,12 +88,12 @@ public class Wall extends HousePart {
 		surroundMesh.setModelBound(null);
 		surroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 
-		root.attachChild(invisibleMesh);
-		invisibleMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		invisibleMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		root.attachChild(mesh);
+		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 //		invisibleMesh.setModelBound(new BoundingSphere());
 //		invisibleMesh.setModelBound(new BoundingBox());
-		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
+		mesh.getSceneHints().setCullHint(CullHint.Always);
 
 		root.attachChild(windowsSurroundMesh);
 		windowsSurroundMesh.getMeshData().setIndexMode(IndexMode.Quads);
@@ -114,16 +114,16 @@ public class Wall extends HousePart {
 
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
-		mesh.setRenderState(ms);
+		frontMesh.setRenderState(ms);
 		// surroundMesh.setRenderState(ms);
 
 		updateTexture();
 
 		UserData userData = new UserData(this);
-		mesh.setUserData(userData);
+		frontMesh.setUserData(userData);
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
-		invisibleMesh.setUserData(userData);
+		mesh.setUserData(userData);
 
 		// code commented because it sets neighbors to null when Print Preview creates clones of it that are not added to instance.parts
 //		if (neighbors != null)
@@ -137,12 +137,12 @@ public class Wall extends HousePart {
 		if (textureEnabled) {
 			final TextureState ts = new TextureState();
 			ts.setTexture(TextureManager.load("wall7.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-			mesh.setRenderState(ts);
-			mesh.setDefaultColor(ColorRGBA.WHITE);
+			frontMesh.setRenderState(ts);
+			frontMesh.setDefaultColor(ColorRGBA.WHITE);
 			// surroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		} else {
-			mesh.clearRenderState(StateType.Texture);
-			mesh.setDefaultColor(defaultColor);
+			frontMesh.clearRenderState(StateType.Texture);
+			frontMesh.setDefaultColor(defaultColor);
 			// surroundMesh.setDefaultColor(defaultColor);
 		}
 	}
@@ -267,7 +267,7 @@ public class Wall extends HousePart {
 
 		final ArrayList<PolygonPoint> polyPoints = new ArrayList<PolygonPoint>();
 
-		final FloatBuffer invisibleVertexBuffer = invisibleMesh.getMeshData().getVertexBuffer();
+		final FloatBuffer invisibleVertexBuffer = mesh.getMeshData().getVertexBuffer();
 		invisibleVertexBuffer.rewind();
 		Vector3 p;
 
@@ -352,16 +352,16 @@ public class Wall extends HousePart {
 
 		try {
 			Poly2Tri.triangulate(polygon);
-			ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
-			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
-			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
-			mesh.getMeshData().updateVertexCount();
+			ArdorMeshMapper.updateTriangleMesh(frontMesh, polygon, fromXY);
+			ArdorMeshMapper.updateVertexNormals(frontMesh, polygon.getTriangles(), fromXY);
+			ArdorMeshMapper.updateTextureCoordinates(frontMesh, polygon.getTriangles(), 1, o, u, v);
+			frontMesh.getMeshData().updateVertexCount();
 
 			Vector3 n = drawBackMesh(polygon, fromXY);
 			drawSurroundMesh(n);
 			drawWindowsSurroundMesh(n);
 
-			invisibleMesh.updateModelBound();
+			mesh.updateModelBound();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

@@ -20,7 +20,7 @@ public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.2; // 0.25;
 	private static double defaultDoorHeight = 0.8f;
-	private transient Mesh mesh;
+//	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer normalBuffer;
 	private transient FloatBuffer textureBuffer;

@@ -15,6 +15,7 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
@@ -25,7 +26,7 @@ public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.5;
 	private transient boolean resizeHouseMode = false;
-	private transient Box mesh;
+//	private transient Box mesh;
 	private transient Box boundingMesh;
 	private double boundingHeight;
 	private transient double newBoundingHeight;
@@ -164,7 +165,7 @@ public class Foundation extends HousePart {
 	protected void updateMesh() {
 		final boolean drawable = points.size() == 8;
 		if (drawable) {
-			mesh.setData(points.get(0), points.get(3).add(0, 0, height, null));
+			((Box)mesh).setData(points.get(0), points.get(3).add(0, 0, height, null));
 			mesh.updateModelBound();
 			boundingMesh.setData(points.get(0), points.get(7));
 			boundingMesh.updateModelBound();
@@ -214,7 +215,7 @@ public class Foundation extends HousePart {
 	protected void computeLabelTop(final Vector3 top) {
 //		top.set(0, labelTop, 0);
 //		return labelTop;
-		top.set(0, 0, mesh.getYExtent() + 0.5);
+		top.set(0, 0, ((Box)mesh).getYExtent() + 0.5);
 	}	
 	
 	protected void drawAnnotations() {

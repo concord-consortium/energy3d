@@ -860,7 +860,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final int rows = PrintController.getInstance().getRows();
 			final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin(); 
 			final double h = rows * pageHeight;
-			loc = new Vector3(0, -Math.max(w, h), rows % 2 == 0 ? 0 : pageHeight / 2);
+			loc = new Vector3(0, -Math.max(w, h), rows % 2 != 0 ? 0 : pageHeight / 2);
 			resizeCamera(PrintController.getInstance().getPageWidth());
 		} else {
 			camera.setProjectionMode(ProjectionMode.Perspective);

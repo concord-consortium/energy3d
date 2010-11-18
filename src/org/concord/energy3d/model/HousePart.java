@@ -20,7 +20,9 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMFont;
@@ -69,6 +71,7 @@ public abstract class HousePart implements Serializable {
 	protected static ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
 	private static int globalDrawFlag = 1;
 	private transient int drawFlag;	
+	protected transient Mesh mesh;
 	
 	public static void clearDrawFlags() {
 		globalDrawFlag++;
@@ -494,7 +497,8 @@ public abstract class HousePart implements Serializable {
 		root.setTranslation(0, 0, 0);
 //		computePrintCenter();	//TODO move to setPreview(true) doesn't need to recompute every time
 //		final Vector3 targetCenter = new Vector3(printCenter);
-		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) root.getUserData());
+//		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) root.getUserData());
+		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) mesh.getUserData());
 		final Vector3 currentCenter = new Vector3(center);
 		
 		root.getTransform().applyForward(currentCenter);
@@ -647,6 +651,10 @@ public abstract class HousePart implements Serializable {
 	
 	public String toString() {
 		return this.getClass().getName() + "(" + id + ")";
+	}
+
+	public Mesh getMesh() {
+		return mesh;
 	}
 	
 }  

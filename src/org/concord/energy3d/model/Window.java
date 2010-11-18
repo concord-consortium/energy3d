@@ -25,7 +25,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.15;
-	private transient Mesh mesh;
+//	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer normalBuffer;
 	private transient BMText label1;

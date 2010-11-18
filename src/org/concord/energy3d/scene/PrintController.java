@@ -2,16 +2,14 @@ package org.concord.energy3d.scene;
 
 import java.awt.print.PageFormat;
 import java.awt.print.Pageable;
+import java.awt.print.Paper;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.ArrayList;
 
-import javax.print.attribute.Attribute;
-import javax.print.attribute.AttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
@@ -234,24 +232,29 @@ public class PrintController implements Updater {
 			canvasRenderer.releaseCurrentContext();
 		}
 		final PrinterJob job = PrinterJob.getPrinterJob();
-		job.setPrintable(printExporter);
-//		job.setPageable(new Pageable() {
-//			
-//			@Override
-//			public Printable getPrintable(int arg0) throws IndexOutOfBoundsException {
-//				return printExporter;
-//			}
-//			
-//			@Override
-//			public PageFormat getPageFormat(int arg0) throws IndexOutOfBoundsException {
-//				return new PageFormat();
-//			}
-//			
-//			@Override
-//			public int getNumberOfPages() {
-//				return printCenters.size();
-//			}
-//		});
+//		job.setPrintable(printExporter);
+		final PageFormat pageFormat = new PageFormat();
+		final Paper paper = new Paper();
+		paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+		pageFormat.setPaper(paper);
+		
+		job.setPageable(new Pageable() {
+			
+			@Override
+			public Printable getPrintable(int arg0) throws IndexOutOfBoundsException {
+				return printExporter;
+			}
+			
+			@Override
+			public PageFormat getPageFormat(int arg0) throws IndexOutOfBoundsException {
+				return pageFormat;
+			}
+			
+			@Override
+			public int getNumberOfPages() {
+				return printCenters.size();
+			}
+		});
 		if (job.printDialog())
 			try {
 				job.print();
@@ -310,7 +313,7 @@ public class PrintController implements Updater {
 		double maxSize = 0;
 		for (final HousePart printPart : printParts) {
 			printPart.getRoot().updateWorldBound(true);
-			double d = 2 + Util.findBoundLength(printPart.getRoot().getWorldBound());
+			double d = 2 + Util.findBoundLength(printPart.getMesh().getWorldBound());
 
 			if (!Double.isInfinite(d) && d > maxSize)
 				maxSize = d;
@@ -324,7 +327,7 @@ public class PrintController implements Updater {
 		cols = (int) Math.round(Math.sqrt((pages.size() + 1) * ratio));
 		if (cols % 2 == 0)
 			cols++;
-		rows = (int) Math.ceil((pages.size() + 1) / cols);
+		rows = (int) Math.ceil((pages.size() + 1.0) / cols);
 
 		int pageNum = 0;
 		printCenters.clear();
@@ -333,7 +336,7 @@ public class PrintController implements Updater {
 			double x, y;
 			do {
 				x = (pageNum % cols - cols / 2) * (pageWidth + MARGIN);
-				y = (pageNum / cols + rows / 2) * (pageHeight + MARGIN);
+				y = (pageNum / cols - (rows - 1) / 2) * (pageHeight + MARGIN);
 				currentCorner.setX(x - pageWidth / 2);
 				currentCorner.setZ(y + pageHeight / 2);
 				pageNum++;
@@ -353,16 +356,16 @@ public class PrintController implements Updater {
 
 	private void computePrintCenters(final ArrayList<ArrayList<Spatial>> pages) {
 		for (HousePart printPartOrg : printParts) {
-			if (printPartOrg instanceof Roof)
-				continue;
-			Spatial printPart = printPartOrg.getRoot();
+			if (!(printPartOrg instanceof Roof) || printPartOrg instanceof Floor) {
+			Spatial printPart = printPartOrg.getMesh();
 			computePrintCenterOf(printPart, pages);
+			}
 		}
 	}
 
 	private void computePrintCentersForRoofAndFloor(final ArrayList<ArrayList<Spatial>> pages) {
 		for (HousePart printPart : printParts) {
-			if (!(printPart instanceof Roof))
+			if (!(printPart instanceof Roof) || printPart instanceof Floor)
 				continue;
 			for (Spatial roofPart : ((Roof) printPart).getFlattenedMeshesRoot().getChildren()) {
 				computePrintCenterOf(roofPart, pages);

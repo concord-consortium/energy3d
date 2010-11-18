@@ -410,9 +410,16 @@ Version 0.2
 - move the rotating model to correct center position in print preview
 - remove Hidden Window test case and Lwjgl test case
 - reorganize packages
+- fix problem with roof no texture
+- fix problem with floor no texture (concluded that floor must be superclass)
+- use mesh instead of root to calculate best fit bounds
+- show correct number of pages in Print dialog
+- maximize the printing space (margin of zero) in page format settings
+
 
  
 
+- TODO: fix problem with floor no texture (concluded that floor must be superclass)
 
 
 TODO:
