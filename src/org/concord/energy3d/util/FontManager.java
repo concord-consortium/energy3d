@@ -18,7 +18,7 @@ public class FontManager {
 	private FontManager() {
 		System.out.print("Loading fonts...");
 		partNumberFont = loadFont("DejaVuSansCondensed-20-bold-regular.fnt");
-		annotationFont = loadFont("f6.fnt");
+		annotationFont = loadFont("SimpleFont.fnt");
 		System.out.println("done");
 	}
 	

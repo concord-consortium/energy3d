@@ -6,7 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-collada"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-effects"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-examples"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-jogl"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-lwjgl"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-swt"/>

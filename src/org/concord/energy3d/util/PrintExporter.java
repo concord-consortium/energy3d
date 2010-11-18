@@ -77,7 +77,8 @@ public class PrintExporter implements ScreenExportable, Printable {
 		
 		final int w = img.getWidth();
 		final int h = img.getHeight();
-		final double pageRatio = pageFormat.getWidth() / pageFormat.getHeight();
+//		final double pageRatio = pageFormat.getWidth() / pageFormat.getHeight();
+		final double pageRatio = pageFormat.getImageableWidth() / pageFormat.getImageableHeight();
 		final BufferedImage croppedImg;
 		if (w / h > pageRatio)
 			croppedImg = img.getSubimage((int)(w-h * pageRatio)/2, 0, (int)(h * pageRatio), h);

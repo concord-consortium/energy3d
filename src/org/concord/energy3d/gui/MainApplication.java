@@ -1,4 +1,4 @@
-package org.concord.energy3d;
+package org.concord.energy3d.gui;
 
 import javax.swing.UIManager;
 

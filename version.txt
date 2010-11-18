@@ -408,6 +408,9 @@ Version 0.2
 - automatically set frustum parameters when print to fit the page inside canvas to maximize size while not hiding parts.
 - when switching to print preview zoom out to ensure all pages are visible
 - move the rotating model to correct center position in print preview
+- remove Hidden Window test case and Lwjgl test case
+- reorganize packages
+
  
 
 

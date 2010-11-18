@@ -1,10 +1,17 @@
 package org.concord.energy3d.scene;
 
+import java.awt.print.PageFormat;
+import java.awt.print.Pageable;
+import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.ArrayList;
 
-import org.concord.energy3d.MainFrame;
+import javax.print.attribute.Attribute;
+import javax.print.attribute.AttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
@@ -211,7 +218,6 @@ public class PrintController implements Updater {
 		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 		final PrintExporter printExporter = new PrintExporter();
 		final Camera camera = Camera.getCurrentCamera();
-//		camera.setProjectionMode(ProjectionMode.Parallel);
 		SceneManager.getInstance().resetCamera(ViewMode.PRINT);
 		for (Vector3 pos : printCenters) {
 			camera.setLocation(pos.getX(), pos.getY() - pageWidth * 2, pos.getZ());
@@ -227,13 +233,30 @@ public class PrintController implements Updater {
 			ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printExporter);
 			canvasRenderer.releaseCurrentContext();
 		}
-		PrinterJob job = PrinterJob.getPrinterJob();
+		final PrinterJob job = PrinterJob.getPrinterJob();
 		job.setPrintable(printExporter);
+//		job.setPageable(new Pageable() {
+//			
+//			@Override
+//			public Printable getPrintable(int arg0) throws IndexOutOfBoundsException {
+//				return printExporter;
+//			}
+//			
+//			@Override
+//			public PageFormat getPageFormat(int arg0) throws IndexOutOfBoundsException {
+//				return new PageFormat();
+//			}
+//			
+//			@Override
+//			public int getNumberOfPages() {
+//				return printCenters.size();
+//			}
+//		});
 		if (job.printDialog())
 			try {
 				job.print();
 			} catch (PrinterException exc) {
-				System.out.println(exc);
+				exc.printStackTrace();
 			}
 		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
 		SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
