@@ -415,6 +415,7 @@ Version 0.2
 - use mesh instead of root to calculate best fit bounds
 - show correct number of pages in Print dialog
 - maximize the printing space (margin of zero) in page format settings
+- fix problem with roof texture not turning off in print preview
 
 
  

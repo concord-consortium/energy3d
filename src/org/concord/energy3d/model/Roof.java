@@ -531,12 +531,13 @@ public abstract class Roof extends HousePart {
 			mesh.setRenderState(ts);
 			mesh.setDefaultColor(ColorRGBA.WHITE);
 
-			if (flattenedMeshesRoot != null)
+			if (flattenedMeshesRoot != null) {
+				flattenedMeshesRoot.setRenderState(ts);
 				for (Spatial s : flattenedMeshesRoot.getChildren()) {
 					Mesh mesh = (Mesh) s;
-					mesh.setRenderState(ts);
 					mesh.setDefaultColor(ColorRGBA.WHITE);
 				}
+			}
 			if (bottomMesh != null) {
 				bottomMesh.setRenderState(ts);
 				bottomMesh.setDefaultColor(ColorRGBA.WHITE);
@@ -544,12 +545,13 @@ public abstract class Roof extends HousePart {
 		} else {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(defaultColor);
-			if (flattenedMeshesRoot != null)
+			if (flattenedMeshesRoot != null) {
+				flattenedMeshesRoot.clearRenderState(StateType.Texture);
 				for (Spatial s : flattenedMeshesRoot.getChildren()) {
 					Mesh mesh = (Mesh) s;
-					mesh.clearRenderState(StateType.Texture);
-					mesh.setDefaultColor(defaultColor);					
+					mesh.setDefaultColor(defaultColor);		
 				}
+			}
 			if (bottomMesh != null) {
 				bottomMesh.clearRenderState(StateType.Texture);
 				bottomMesh.setDefaultColor(defaultColor);
