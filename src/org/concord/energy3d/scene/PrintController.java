@@ -319,7 +319,8 @@ public class PrintController implements Updater {
 				maxSize = d;
 		}
 		pageWidth = maxSize;
-		pageHeight = pageWidth * 4 / 3;
+		final Paper paper = new Paper();
+		pageHeight = pageWidth * paper.getHeight() / paper.getWidth();
 	}
 
 	private void arrangePrintPages(final ArrayList<ArrayList<Spatial>> pages) {
