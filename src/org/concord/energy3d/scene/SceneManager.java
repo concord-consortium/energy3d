@@ -217,7 +217,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@MainThread
 	public void init() {
-		System.out.print("Initializing scene manager models...");				
+		System.out.print("Initializing scene manager models...");
 		AWTImageLoader.registerLoader();
 		try {
 			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(SceneManager.class.getClassLoader().getResource("org/concord/energy3d/resources/images/")));
@@ -226,13 +226,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
-		
+
 		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
 		root.attachChild(cameraNode);
 		cameraNode.updateFromCamera();
-//		frameHandler.updateFrame();
+		// frameHandler.updateFrame();
 		resetCamera(ViewMode.NORMAL);
-		
 
 		// enable depth test
 		final ZBufferState buf = new ZBufferState();
@@ -284,9 +283,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		});
 
-//		frameHandler.updateFrame();
-//		resetCamera(ViewMode.NORMAL);
-
+		// frameHandler.updateFrame();
+		// resetCamera(ViewMode.NORMAL);
 
 		root.updateGeometricState(0, true);
 		System.out.println("done");
@@ -373,11 +371,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			// Scene.getInstance().renderTexture(renderer);
 			// Scene.getInstance().init();
 
-			 if (drawBounds && drawn != null)
-				 com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
-				 
+			if (drawBounds && drawn != null)
+				com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
+
 //			 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
-			 
 
 			passManager.renderPasses(renderer);
 		} catch (Exception e) {
@@ -725,7 +722,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				else
 					System.out.println("Disabling draw bounds...");
 			}
-		}));		
+		}));
 	}
 
 	public void setCameraControl(CameraMode type) {
@@ -748,78 +745,78 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			part.hidePoints();
 	}
 
-//	public void resetCamera() {
-//		resetCamera(this.viewMode);
-//	}
+	// public void resetCamera() {
+	// resetCamera(this.viewMode);
+	// }
 
-//	public void resetCamera(final ViewMode viewMode) {
-//		this.viewMode = viewMode;
-//		final Camera camera = canvas.getCanvasRenderer().getCamera();
-//
-//		// resizeCamera(camera);
-//
-//		setCameraControl(cameraMode);
-//		control.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
-//		control.setMoveSpeed(MOVE_SPEED);
-//		Vector3 loc = new Vector3(1.0f, -8.0f, 1.0f);
-//		Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
-//		Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
-//		Vector3 dir = new Vector3(0.0f, 1.0f, 0.0f);
-//
-//		if (viewMode == ViewMode.TOP_VIEW) {
-//			setCompassVisible(false);
-//			camera.setProjectionMode(ProjectionMode.Parallel);
-//			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
-//			// control.setMoveSpeed(MOVE_SPEED / 10);
-//			// loc = new Vector3(0, 0, 50);
-//			control.setMoveSpeed(5 * MOVE_SPEED);
-//			loc = new Vector3(0, 0, 10);
-//			up = new Vector3(0.0f, -1.0f, 0.0f);
-//			dir = new Vector3(0.0f, 0.0f, -1.0f);
-//			double fac = 1000;
-//			camera.setFrustumTop(camera.getFrustumTop() * fac);
-//			camera.setFrustumBottom(camera.getFrustumBottom() * fac);
-//			camera.setFrustumLeft(camera.getFrustumLeft() * fac);
-//			camera.setFrustumRight(camera.getFrustumRight() * fac);
-//			camera.update();
-//		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
-//			setCompassVisible(false);
-//			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
-//			camera.setProjectionMode(ProjectionMode.Parallel);
-//			loc = new Vector3(0, -HousePart.PRINT_SPACE * HousePart.PRINT_COLS, 0);
-////			camera.setFrustum(camera, far, left, right, top, bottom)
-//		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
-//			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
-//			camera.setProjectionMode(ProjectionMode.Parallel);
-//			loc = new Vector3(0, -HousePart.PRINT_SPACE * HousePart.PRINT_COLS, 0);
-//		} else {
-//			setCompassVisible(true);
-//			camera.setProjectionMode(ProjectionMode.Perspective);
-//			root.setScale(1);
-//		}
-//
-//		camera.setFrame(loc, left, up, dir);
-//		if (viewMode != ViewMode.TOP_VIEW)
-//			resizeCamera(camera);
-//		cameraNode.updateFromCamera();
-//	}
-//
-//	private void resizeCamera(final Camera camera) {
-//		final Dimension size = ((Component) canvas).getSize();
-//		camera.resize(size.width, size.height);
-//		final double ratio = (double) camera.getWidth() / camera.getHeight();
-////		final double scale = 0.4;
-////		camera.setFrustumTop(scale);
-////		camera.setFrustumBottom(-scale);
-////		camera.setFrustumLeft(-scale * ratio);
-////		camera.setFrustumRight(scale * ratio);
-//
-//		// canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
-////		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);
-//		camera.setFrustumPerspective(45.0, ratio, 0.01, 200);
-////		camera.update();
-//	}
-	
+	// public void resetCamera(final ViewMode viewMode) {
+	// this.viewMode = viewMode;
+	// final Camera camera = canvas.getCanvasRenderer().getCamera();
+	//
+	// // resizeCamera(camera);
+	//
+	// setCameraControl(cameraMode);
+	// control.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
+	// control.setMoveSpeed(MOVE_SPEED);
+	// Vector3 loc = new Vector3(1.0f, -8.0f, 1.0f);
+	// Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
+	// Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
+	// Vector3 dir = new Vector3(0.0f, 1.0f, 0.0f);
+	//
+	// if (viewMode == ViewMode.TOP_VIEW) {
+	// setCompassVisible(false);
+	// camera.setProjectionMode(ProjectionMode.Parallel);
+	// control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
+	// // control.setMoveSpeed(MOVE_SPEED / 10);
+	// // loc = new Vector3(0, 0, 50);
+	// control.setMoveSpeed(5 * MOVE_SPEED);
+	// loc = new Vector3(0, 0, 10);
+	// up = new Vector3(0.0f, -1.0f, 0.0f);
+	// dir = new Vector3(0.0f, 0.0f, -1.0f);
+	// double fac = 1000;
+	// camera.setFrustumTop(camera.getFrustumTop() * fac);
+	// camera.setFrustumBottom(camera.getFrustumBottom() * fac);
+	// camera.setFrustumLeft(camera.getFrustumLeft() * fac);
+	// camera.setFrustumRight(camera.getFrustumRight() * fac);
+	// camera.update();
+	// } else if (viewMode == ViewMode.PRINT_PREVIEW) {
+	// setCompassVisible(false);
+	// control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
+	// camera.setProjectionMode(ProjectionMode.Parallel);
+	// loc = new Vector3(0, -HousePart.PRINT_SPACE * HousePart.PRINT_COLS, 0);
+	// // camera.setFrustum(camera, far, left, right, top, bottom)
+	// } else if (viewMode == ViewMode.PRINT_PREVIEW) {
+	// control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
+	// camera.setProjectionMode(ProjectionMode.Parallel);
+	// loc = new Vector3(0, -HousePart.PRINT_SPACE * HousePart.PRINT_COLS, 0);
+	// } else {
+	// setCompassVisible(true);
+	// camera.setProjectionMode(ProjectionMode.Perspective);
+	// root.setScale(1);
+	// }
+	//
+	// camera.setFrame(loc, left, up, dir);
+	// if (viewMode != ViewMode.TOP_VIEW)
+	// resizeCamera(camera);
+	// cameraNode.updateFromCamera();
+	// }
+	//
+	// private void resizeCamera(final Camera camera) {
+	// final Dimension size = ((Component) canvas).getSize();
+	// camera.resize(size.width, size.height);
+	// final double ratio = (double) camera.getWidth() / camera.getHeight();
+	// // final double scale = 0.4;
+	// // camera.setFrustumTop(scale);
+	// // camera.setFrustumBottom(-scale);
+	// // camera.setFrustumLeft(-scale * ratio);
+	// // camera.setFrustumRight(scale * ratio);
+	//
+	// // canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
+	// // canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);
+	// camera.setFrustumPerspective(45.0, ratio, 0.01, 200);
+	// // camera.update();
+	// }
+
 	public void resetCamera(final ViewMode viewMode) {
 		this.viewMode = viewMode;
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
@@ -831,10 +828,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
 		Vector3 dir = new Vector3(0.0f, 1.0f, 0.0f);
-		
+
 		setCompassVisible(viewMode == ViewMode.NORMAL);
 
-		if (viewMode == ViewMode.TOP_VIEW) {
+		if (viewMode == ViewMode.NORMAL) {
+			camera.setProjectionMode(ProjectionMode.Perspective);
+			resizeCamera();
+		} else if (viewMode == ViewMode.TOP_VIEW) {
 			camera.setProjectionMode(ProjectionMode.Parallel);
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
 			control.setMoveSpeed(5 * MOVE_SPEED);
@@ -845,7 +845,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (viewMode == ViewMode.PRINT) {
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Parallel);
-			loc = new Vector3(0, -HousePart.PRINT_SPACE * HousePart.PRINT_COLS, 0);
+			loc = new Vector3(0, -1, 0);
 			final double pageWidth = PrintController.getInstance().getPageWidth();
 			final double pageHeight = PrintController.getInstance().getPageHeight();
 			final double ratio = (double) camera.getWidth() / camera.getHeight();
@@ -856,15 +856,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
-			final double w = PrintController.getInstance().getCols() * (PrintController.getInstance().getPageWidth() + PrintController.getMargin()); 
 			final int rows = PrintController.getInstance().getRows();
-			final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin(); 
+			final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin();
+			final double w = PrintController.getInstance().getCols() * (PrintController.getInstance().getPageWidth() + PrintController.getMargin());
 			final double h = rows * pageHeight;
 			loc = new Vector3(0, -Math.max(w, h), rows % 2 != 0 ? 0 : pageHeight / 2);
 			resizeCamera(PrintController.getInstance().getPageWidth());
-		} else {
-			camera.setProjectionMode(ProjectionMode.Perspective);
-			resizeCamera();
 		}
 
 		camera.setFrame(loc, left, up, dir);
@@ -874,7 +871,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private void resizeCamera() {
 		resizeCamera(2);
 	}
-	
+
 	private void resizeCamera(final double viewWidth) {
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
 		if (camera == null)
@@ -884,19 +881,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final double ratio = (double) size.width / size.height;
 
 		// canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 1, 1000);
-//		canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);
+		// canvas.getCanvasRenderer().getCamera().setFrustumPerspective(45.0, 16 / 10.0, 0.01, 200);
 		if (camera.getProjectionMode() == ProjectionMode.Parallel)
 			camera.setFrustum(0.01, 200, -viewWidth / 2, viewWidth / 2, -viewWidth / ratio / 2, viewWidth / ratio / 2);
 		else
 			camera.setFrustumPerspective(45.0, ratio, 0.01, 200);
-	}	
-	
+	}
+
 	public void toggleRotation() {
 		rotAnim = !rotAnim;
 	}
 
 	private void zoom(final Canvas canvas, final double tpf, double val) {
-//		if (viewMode == ViewMode.TOP_VIEW) {
+		// if (viewMode == ViewMode.TOP_VIEW) {
 		if (Camera.getCurrentCamera().getProjectionMode() == ProjectionMode.Parallel) {
 			// System.out.println(val);
 			// double scale = val > 0 ? val / 10.0 : 0.01 / (-val);
@@ -998,12 +995,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() throws Exception {
 				lightState.setEnabled(enable);
 				root.updateWorldRenderStates(true);
-//				if (!enable)
-//					passManager.remove(shadowPass);
+				// if (!enable)
+				// passManager.remove(shadowPass);
 				return null;
 			}
 		});
-	}	
+	}
 
 	public void setSunControl(boolean selected) {
 		this.sunControl = selected;
@@ -1192,19 +1189,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void updateHeliodonSize() {
-		taskManager.update(new Callable<Object>() {
-			public Object call() throws Exception {
-				Scene.getRoot().updateWorldBound(true);
-				final BoundingVolume bounds = Scene.getRoot().getWorldBound();
-				if (bounds == null)
-					sunHeliodon.setScale(1);
-				else {
-					final double scale = (Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0;
-					sunHeliodon.setScale(scale);
+		if (sunControl)
+			taskManager.update(new Callable<Object>() {
+				public Object call() throws Exception {
+					Scene.getRoot().updateWorldBound(true);
+					final BoundingVolume bounds = Scene.getRoot().getWorldBound();
+					if (bounds == null)
+						sunHeliodon.setScale(1);
+					else {
+						final double scale = (Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0;
+						sunHeliodon.setScale(scale);
+					}
+					return null;
 				}
-				return null;
-			}
-		});
+			});
 	}
 
 	public void executeMouseMove() {

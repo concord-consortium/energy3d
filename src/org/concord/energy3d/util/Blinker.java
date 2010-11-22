@@ -24,7 +24,7 @@ public class Blinker implements Updater {
 
 	public void update(ReadOnlyTimer timer) {
 		final double t = timer.getTimeInSeconds();
-		if (target != null && t > lastTime + 0.5) {
+		if (target != null && t > lastTime + 0.3) {
 			lastTime = t;
 			final SceneHints sceneHints = target.getSceneHints();
 			sceneHints.setCullHint(sceneHints.getCullHint() == CullHint.Always ? CullHint.Inherit : CullHint.Always);

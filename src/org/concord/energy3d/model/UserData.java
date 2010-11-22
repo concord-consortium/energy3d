@@ -1,8 +1,11 @@
 package org.concord.energy3d.model;
 
+import com.ardor3d.math.Vector3;
+
 public class UserData {
 	private HousePart housePart;
 	private int pointIndex;
+	private Vector3 printCenter;
 	
 	public UserData(HousePart housePart) {
 		this(housePart, -1);
@@ -23,5 +26,13 @@ public class UserData {
 
 	public String toString() {
 		return housePart + " index = " + pointIndex;
+	}
+
+	public Vector3 getPrintCenter() {
+		return printCenter;
+	}
+
+	public void setPrintCenter(Vector3 printCenter) {
+		this.printCenter = printCenter;
 	}
 }

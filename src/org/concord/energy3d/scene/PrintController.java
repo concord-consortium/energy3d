@@ -12,6 +12,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.PrintExporter;
@@ -33,6 +34,7 @@ import com.ardor3d.util.screen.ScreenExporter;
 public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
 	private static final int MARGIN = 5;
+	private static final double PRINT_MARGIN = 0.5;
 	private double pageWidth, pageHeight;
 	private boolean isPrintPreview = false;
 	private boolean init = false;
@@ -45,7 +47,7 @@ public class PrintController implements Updater {
 	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
 	private boolean shadingSelected;
 	private boolean shadowSelected;
-	private Node pageBoundaryNode = new Node();
+	private Node pagesRoot = new Node();
 	private int cols;
 	private int rows;
 
@@ -78,13 +80,12 @@ public class PrintController implements Updater {
 			HousePart.setFlatten(true);
 			final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
 			if (!isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
-				Scene.getRoot().detachChild(pageBoundaryNode);
-				pageBoundaryNode.detachAllChildren();
+				Scene.getRoot().detachChild(pagesRoot);
+				pagesRoot.detachAllChildren();
 			} else {
 				renderer.makeCurrentContext();
 				// renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
 				renderer.releaseCurrentContext();
-				HousePart.flattenPos = 0;
 				if (Util.DEBUG)
 					System.out.print("Deep cloning...");
 				sceneClone = (Scene) ObjectCloner.deepCopy(Scene.getInstance());
@@ -101,10 +102,12 @@ public class PrintController implements Updater {
 					newPart.setOriginal(Scene.getInstance().getParts().get(i));
 					if (newPart.isPrintable() && newPart.isDrawCompleted())
 						printParts.add(newPart);
+//					newPart.getRoot().updateWorldBound(true);
+//					System.out.println(newPart.getRoot().);
 				}
-				// Scene.getRoot().updateWorldBound(false);
-				// for (HousePart part : printParts)
-				// System.out.println(part.getRoot().getWorldBound());
+//				 Scene.getRoot().updateWorldBound(true);
+//				 for (HousePart part : printParts)
+//				 System.out.println(part + "\t" + part.getRoot().getWorldBound());
 
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
 				computePageDimension();
@@ -143,8 +146,12 @@ public class PrintController implements Updater {
 		if (finish) {
 			if (Util.DEBUG)
 				System.out.println("Finishing Print Preview Animation...");
-			if (isPrintPreview)
-				Scene.getRoot().attachChild(pageBoundaryNode);
+			if (isPrintPreview) {
+				Scene.getRoot().attachChild(pagesRoot);
+				 Scene.getRoot().updateWorldBound(true);
+				 for (HousePart part : printParts)
+				 System.out.println(part + "\t" + part.getRoot().getWorldBound());				
+			}
 			if (!isPrintPreview)
 				HousePart.setFlatten(false);
 			if (!isPrintPreview && finishPhase == 10) {
@@ -190,15 +197,6 @@ public class PrintController implements Updater {
 			// finish = false;
 			// }
 		}
-	}
-
-	private void applyPreviewScale() {
-		HousePart.clearPrintSpace();
-		for (HousePart part : printParts) {
-			part.updatePrintSpace();
-		}
-
-		HousePart.PRINT_COLS = (int) Math.ceil(Math.sqrt(printParts.size()));
 	}
 
 	public void drawPrintParts() {
@@ -346,11 +344,13 @@ public class PrintController implements Updater {
 			printCenters.add(new Vector3(x, 0, y));
 			
 			for (final Spatial printSpatial : page)
-				((Vector3)printSpatial.getUserData()).addLocal(currentCorner);
+//				((Vector3)printSpatial.getUserData()).addLocal(currentCorner);
+				((UserData)printSpatial.getUserData()).getPrintCenter().addLocal(currentCorner);
 			
 			final Box box = new Box("Page Boundary");
 			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
-			pageBoundaryNode.attachChild(box);
+			box.setModelBound(null);
+			pagesRoot.attachChild(box);
 		}
 		
 	}
@@ -382,7 +382,8 @@ public class PrintController implements Updater {
 		}
 		if (!isFitted) {
 			final double radius = Util.findBoundLength(printPart.getWorldBound()) / 2;
-			printPart.setUserData(new Vector3(radius, 0, -radius));
+//			printPart.setUserData(new Vector3(radius, 0, -radius));
+			((UserData)printPart.getUserData()).setPrintCenter(new Vector3(radius + PRINT_MARGIN, 0, -radius - PRINT_MARGIN));
 			final ArrayList<Spatial> page = new ArrayList<Spatial>();
 			page.add(printPart);
 			pages.add(page);
@@ -392,7 +393,8 @@ public class PrintController implements Updater {
 	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
 		final double printPartRadius = Util.findBoundLength(printPart.getWorldBound()) / 2;
 		for (Spatial part : page) {
-			final Vector3 p = (Vector3) part.getUserData();
+//			final Vector3 p = (Vector3) part.getUserData();
+			final Vector3 p = ((UserData) part.getUserData()).getPrintCenter();
 			final double r = Util.findBoundLength(part.getWorldBound()) / 2;
 			final double dis = r + printPartRadius;
 
@@ -401,18 +403,19 @@ public class PrintController implements Updater {
 				final Vector3 tryCenter = new Matrix3().fromAngles(0, angle, 0).applyPost(disVector, null);
 				tryCenter.addLocal(p);
 				boolean collision = false;
-				if (!isCircleInsideRectangle(tryCenter, printPartRadius, new Vector3(), new Vector3(pageWidth, 0, -pageHeight)))
+				if (!isCircleInsideRectangle(tryCenter, printPartRadius, new Vector3(PRINT_MARGIN, 0, -PRINT_MARGIN), new Vector3(pageWidth - PRINT_MARGIN, 0, -pageHeight + PRINT_MARGIN)))
 					collision = true;
 				else
 					for (Spatial otherPart : page) {
 						if (otherPart == part)
 							continue;
-						collision = tryCenter.subtract((Vector3) otherPart.getUserData(), null).length() < printPartRadius + Util.findBoundLength(otherPart.getWorldBound()) / 2;
+						collision = tryCenter.subtract(((UserData) otherPart.getUserData()).getPrintCenter(), null).length() < printPartRadius + Util.findBoundLength(otherPart.getWorldBound()) / 2;
 						if (collision)
 							break;
 					}
 				if (!collision) {
-					printPart.setUserData(tryCenter);
+//					printPart.setUserData(tryCenter);
+					((UserData)printPart.getUserData()).setPrintCenter(tryCenter);
 					page.add(printPart);
 					return true;
 				}

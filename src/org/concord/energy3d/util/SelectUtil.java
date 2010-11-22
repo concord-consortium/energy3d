@@ -85,7 +85,8 @@ public class SelectUtil {
 				}
 			} else if (pickLayer != -1) {
 				continue;
-			}
+			} else
+				System.out.println("ss");
 			if (pickLayer != -1 && objCounter-1 != pickLayer)
 				continue;
 			Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);

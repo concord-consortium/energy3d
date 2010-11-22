@@ -100,7 +100,8 @@ public class Floor extends Roof {
 		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
 		
 		root.setTranslation(0, 0, 0);
-		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) mesh.getUserData());
+//		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) mesh.getUserData());
+		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
 		final Vector3 currentCenter = new Vector3(center);
 		
 		root.getTransform().applyForward(currentCenter);

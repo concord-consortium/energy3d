@@ -392,7 +392,8 @@ public abstract class Roof extends HousePart {
 			orgCenters.put(mesh, orgCenter);
 		}
 		// mesh.setTranslation(printCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
-		final Vector3 targetPrintCenter = (Vector3) mesh.getUserData();
+//		final Vector3 targetPrintCenter = (Vector3) mesh.getUserData();
+		final Vector3 targetPrintCenter = ((UserData) mesh.getUserData()).getPrintCenter();
 		// if (targetPrintCenter != null)
 		mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
 	}
@@ -565,6 +566,8 @@ public abstract class Roof extends HousePart {
 			root.attachChild(flattenedMeshesRoot);
 			root.detachChild(mesh);
 			updateTexture();
+			for (final Spatial child : flattenedMeshesRoot.getChildren())
+				child.setUserData(new UserData(this));
 		}
 		return flattenedMeshesRoot;
 	}

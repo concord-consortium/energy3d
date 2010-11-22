@@ -417,6 +417,7 @@ Version 0.2
 - maximize the printing space (margin of zero) in page format settings
 - fix problem with roof texture not turning off in print preview
 - adjust visual paper size according to default Paper class dimensions
+- fix problem with parts no longer blinking in print preview mode
 
  
 

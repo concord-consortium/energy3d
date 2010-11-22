@@ -3,7 +3,6 @@ package org.concord.energy3d.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Angle90Annotation;
 import org.concord.energy3d.shapes.AngleAnnotation;
@@ -22,56 +21,48 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Sphere;
-import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 
 public abstract class HousePart implements Serializable {
-	private static final long serialVersionUID = 1L;
-	protected static final double SNAP_DISTANCE = 0.5;
-	private static final BMFont defaultFont = FontManager.getInstance().getPartNumberFont();
-	private static boolean isFlatten = false;
-	protected static double flattenTime = 0;
-	public static double flattenPos = -10;
-	private static boolean snapToObjects = true;
-	private static boolean snapToGrids = false;
-	private static boolean drawAnnotations = false;
-	private static long idCounter = 1;
-	private transient long id;
-	protected transient Node root;
-	protected transient Node pointsRoot;
+	static final private long serialVersionUID = 1L;
+	static final protected double SNAP_DISTANCE = 0.5;
+	static protected double flattenTime = 0;
+	static protected int printSequence;
+	static protected int printPage;
+	static protected boolean textureEnabled = true;
+	static protected ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
+	static private boolean isFlatten = false;
+	static private boolean snapToObjects = true;
+	static private boolean snapToGrids = false;
+	static private boolean drawAnnotations = false;
+	static private long idCounter = 1;
+	static private int globalDrawFlag = 1;
 	protected final int numOfDrawPoints, numOfEditPoints;
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
 	protected HousePart container = null;
 	protected boolean drawCompleted = false;
 	protected int editPointIndex = -1;
-	private boolean firstPointInserted = false;
-	protected transient ArrayList<Vector3> abspoints;
 	protected double height;
-	protected transient double orgHeight;
 	protected boolean relativeToHorizontal;
-	protected double pos;
-	protected transient HousePart original = null;
-	protected static int printSequence;
-	protected static int printPage;
-	protected transient Vector3 center;
-	protected transient Node labelsRoot;
-	private transient ReadOnlyVector3 defaultDirection;
-	protected transient Node sizeAnnotRoot;
-	protected transient Node angleAnnotRoot;
-	protected transient Vector3 printCenter;
-	public static double PRINT_SPACE = 4;
-	public static int PRINT_COLS = 4;
-	protected static boolean textureEnabled = true;
-	protected static ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
-	private static int globalDrawFlag = 1;
-	private transient int drawFlag;	
-	protected transient Mesh mesh;
+	private boolean firstPointInserted = false;
+	transient protected Node root;
+	transient protected Node pointsRoot;
+	transient protected ArrayList<Vector3> abspoints;
+	transient protected double orgHeight;
+	transient protected HousePart original = null;
+	transient protected Vector3 center;
+	transient protected Node labelsRoot;
+	transient protected Node sizeAnnotRoot;
+	transient protected Node angleAnnotRoot;
+	transient protected Mesh mesh;
+	transient private long id;
+	transient private ReadOnlyVector3 defaultDirection;
+	transient private int drawFlag;	
 	
 	public static void clearDrawFlags() {
 		globalDrawFlag++;
@@ -112,10 +103,6 @@ public abstract class HousePart implements Serializable {
 		HousePart.snapToGrids = snapToGrid;
 	}
 	
-	public static void clearPrintSpace() {
-		PRINT_SPACE = 0;
-	}
-
 	public static ReadOnlyColorRGBA getDefaultColor() {
 		return defaultColor;
 	}
@@ -142,10 +129,6 @@ public abstract class HousePart implements Serializable {
 		id = idCounter++;
 		if (Util.DEBUG)
 		System.out.print("Deep cloning...");
-		if (!(this instanceof Window || this instanceof Door)) { // && pos == 0) {
-			pos = flattenPos;
-			flattenPos += 1;
-		}
 		if (Util.DEBUG)
 		System.out.print("Instantiating Nodes...");
 		defaultDirection = new Vector3(0, 0, 0.5);
@@ -160,8 +143,6 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot = new Node("Angle Annotations");
 		labelsRoot = new Node("Labels");
 		
-		printCenter = new Vector3();
-
 		// Set up a reusable pick results
 		if (Util.DEBUG)
 		System.out.print("Creating Edit Points...");
@@ -170,7 +151,7 @@ public abstract class HousePart implements Serializable {
 			Sphere pointShape = new Sphere("Point", origin, 8, 8, 0.05);
 			pointsRoot.attachChild(pointShape);
 			pointShape.setUserData(new UserData(this, i));
-			pointShape.setModelBound(new BoundingBox());
+//			pointShape.setModelBound(new BoundingBox());
 			pointShape.updateModelBound(); // important
 			pointShape.getSceneHints().setCullHint(CullHint.Always);
 		}
@@ -498,27 +479,13 @@ public abstract class HousePart implements Serializable {
 //		computePrintCenter();	//TODO move to setPreview(true) doesn't need to recompute every time
 //		final Vector3 targetCenter = new Vector3(printCenter);
 //		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) root.getUserData());
-		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) mesh.getUserData());
+//		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) mesh.getUserData());
+		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
 		final Vector3 currentCenter = new Vector3(center);
 		
 		root.getTransform().applyForward(currentCenter);
 		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
 		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));
-	}
-
-	protected void computePrintCenter() {
-		while (true) {
-			int printColsX = PRINT_COLS * 4/3;
-			if (printColsX % 2 == 0)
-				printColsX++;
-			printCenter.set((-(printColsX - 1) / 2.0 + printPage % printColsX) * PRINT_SPACE, 0, (-(PRINT_COLS - 1) / 2.0 + printPage / printColsX) * PRINT_SPACE);
-			if (printCenter.length() >= PRINT_SPACE)
-				break;
-			else
-				printPage++;				
-		}
-		PrintController.getInstance().addPrintCenters(new Vector3(printCenter));
-		printPage++;
 	}
 
 	public boolean isPrintable() {
@@ -551,7 +518,7 @@ public abstract class HousePart implements Serializable {
 			label.setText(text);
 			label.getSceneHints().setCullHint(CullHint.Inherit);			
 		} else {			
-			label = new BMText("textSpatial1", text, defaultFont, Align.Center, Justify.Center);
+			label = new BMText("Label Text", text, FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
 			labelsRoot.attachChild(label);
 		}
 		return label;
@@ -607,14 +574,6 @@ public abstract class HousePart implements Serializable {
 
 	protected abstract void updateMesh();
 
-	public Vector3 getPrintCenter() {
-		return printCenter;
-	}
-	
-	public void setPrintCenter(final Vector3 p) {
-		printCenter = p;
-	}	
-
 	public void setAnnotationsVisible(boolean visible) {
 		drawAnnotations  = visible;
 		final CullHint cull = visible ? CullHint.Inherit : CullHint.Always;
@@ -622,27 +581,16 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot.getSceneHints().setCullHint(cull);
 	}
 
-	public void updatePrintSpace() {	
-		root.updateWorldBound(true);
-		double d;
-		d = Util.findBoundLength(root.getWorldBound());
-		
-		d += 2;
-		
-		if (!Double.isInfinite(d) && d > PRINT_SPACE)
-			PRINT_SPACE = d;
-	}
-	
 	public void log(String s) {
 		if (Util.DEBUG)
-		System.out.println(this + "\t" + s);
+			System.out.println(this + "\t" + s);
 	}
 
 	public static void setTextureEnabled(boolean enabled) {
 		textureEnabled  = enabled;		
 	}
 
-	public void updateTexture() {		
+	public void updateTexture() {
 	}
 	
 	public HousePart getContainer() {
