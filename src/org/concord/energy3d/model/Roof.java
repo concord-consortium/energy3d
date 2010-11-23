@@ -42,7 +42,7 @@ public abstract class Roof extends HousePart {
 	// private transient FloatBuffer vertexBuffer;
 	protected double labelTop;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
-	private transient Node flattenedMeshesRoot;
+	protected transient Node flattenedMeshesRoot;
 	private transient boolean wallsUpdated;
 	private transient Map<Mesh, Vector3> orgCenters;
 

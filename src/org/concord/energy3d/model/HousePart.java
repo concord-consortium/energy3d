@@ -22,6 +22,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -140,7 +141,9 @@ public abstract class HousePart implements Serializable {
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");
 		sizeAnnotRoot = new Node("Size Annotations");
+		sizeAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		angleAnnotRoot = new Node("Angle Annotations");
+		angleAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		labelsRoot = new Node("Labels");
 		
 		// Set up a reusable pick results

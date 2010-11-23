@@ -16,6 +16,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.util.TextureManager;
 
@@ -75,12 +76,41 @@ public class Floor extends Roof {
 		}
 	}
 	
+//	public void updateTexture() {
+//		if (textureEnabled) {
+//			final TextureState ts = new TextureState();
+//			ts.setTexture(TextureManager.load("floor3.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+//			mesh.setRenderState(ts);
+//			mesh.setDefaultColor(ColorRGBA.WHITE);
+//			if (bottomMesh != null) {
+//				bottomMesh.setRenderState(ts);
+//				bottomMesh.setDefaultColor(ColorRGBA.WHITE);
+//			}
+//		} else {
+//			mesh.clearRenderState(StateType.Texture);
+//			mesh.setDefaultColor(defaultColor);
+//			if (bottomMesh != null) {
+//				bottomMesh.clearRenderState(StateType.Texture);
+//				bottomMesh.setDefaultColor(defaultColor);
+//			}
+//		}
+//		mesh.updateGeometricState(0);
+//	}	
+
 	public void updateTexture() {
 		if (textureEnabled) {
 			final TextureState ts = new TextureState();
 			ts.setTexture(TextureManager.load("floor3.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 			mesh.setRenderState(ts);
 			mesh.setDefaultColor(ColorRGBA.WHITE);
+
+			if (flattenedMeshesRoot != null) {
+				flattenedMeshesRoot.setRenderState(ts);
+				for (Spatial s : flattenedMeshesRoot.getChildren()) {
+					Mesh mesh = (Mesh) s;
+					mesh.setDefaultColor(ColorRGBA.WHITE);
+				}
+			}
 			if (bottomMesh != null) {
 				bottomMesh.setRenderState(ts);
 				bottomMesh.setDefaultColor(ColorRGBA.WHITE);
@@ -88,38 +118,43 @@ public class Floor extends Roof {
 		} else {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(defaultColor);
+			if (flattenedMeshesRoot != null) {
+				flattenedMeshesRoot.clearRenderState(StateType.Texture);
+				for (Spatial s : flattenedMeshesRoot.getChildren()) {
+					Mesh mesh = (Mesh) s;
+					mesh.setDefaultColor(defaultColor);		
+				}
+			}
 			if (bottomMesh != null) {
 				bottomMesh.clearRenderState(StateType.Texture);
 				bottomMesh.setDefaultColor(defaultColor);
 			}
 		}
-		mesh.updateGeometricState(0);
 	}	
+//	protected void flatten() {
+//		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
+//		
+//		root.setTranslation(0, 0, 0);
+////		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) mesh.getUserData());
+//		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
+//		final Vector3 currentCenter = new Vector3(center);
+//		
+//		root.getTransform().applyForward(currentCenter);
+//		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
+//		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));		
+//	}
 	
-	protected void flatten() {
-		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
-		
-		root.setTranslation(0, 0, 0);
-//		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) mesh.getUserData());
-		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
-		final Vector3 currentCenter = new Vector3(center);
-		
-		root.getTransform().applyForward(currentCenter);
-		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
-		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));		
-	}
-	
-	protected void updateLabels() {
-		final String text = "(" + (printSequence++ + 1) + ")";
-		final BMText label = fetchBMText(text, 0);
-				
-		label.setTranslation(center);
-		Vector3 up = new Vector3();
-		if (original == null)
-			up.set(getFaceDirection());
-		else
-			up.set(0, -0.01, 0);
-		root.getTransform().applyInverseVector(up);
-		label.setTranslation(center.getX() + up.getX(), center.getY() + up.getY(), center.getZ() + up.getZ());
-	}	
+//	protected void updateLabels() {
+//		final String text = "(" + (printSequence++ + 1) + ")";
+//		final BMText label = fetchBMText(text, 0);
+//				
+//		label.setTranslation(center);
+//		Vector3 up = new Vector3();
+//		if (original == null)
+//			up.set(getFaceDirection());
+//		else
+//			up.set(0, -0.01, 0);
+//		root.getTransform().applyInverseVector(up);
+//		label.setTranslation(center.getX() + up.getX(), center.getY() + up.getY(), center.getZ() + up.getZ());
+//	}	
 }

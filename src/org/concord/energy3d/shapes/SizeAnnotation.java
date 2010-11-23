@@ -11,26 +11,30 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.hint.PickingHint;
+import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class SizeAnnotation extends Annotation {
 	protected final Mesh arrows = new Mesh("Arrows");
+	protected final BMText label = makeNewLabel();
 	
 	public SizeAnnotation() {
-		super(null); // TODO temporarly
-		this.attachChild(arrows);
+		super( new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null));
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		arrows.setDefaultColor(ColorRGBA.BLACK);
-		arrows.setModelBound(null);
+		this.attachChild(arrows);
+		this.attachChild(label);
+//		arrows.setModelBound(null);
 	}
 	
-	protected Mesh getMesh() {
-		if (mesh != null)
-			return mesh;
-		else
-			return new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null);
-	}
+//	protected Mesh getMesh() {
+//		if (mesh != null)
+//			return mesh;
+//		else
+//			return new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null);
+//	}
 
 	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipDirection) {
 		final double C = 0.1;

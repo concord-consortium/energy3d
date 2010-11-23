@@ -418,6 +418,8 @@ Version 0.2
 - fix problem with roof texture not turning off in print preview
 - adjust visual paper size according to default Paper class dimensions
 - fix problem with parts no longer blinking in print preview mode
+- fix problem with annotations disappearing in print-preview mode upon moving the camera away from origin
+
 
  
 

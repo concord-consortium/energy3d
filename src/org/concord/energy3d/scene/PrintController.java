@@ -148,9 +148,9 @@ public class PrintController implements Updater {
 				System.out.println("Finishing Print Preview Animation...");
 			if (isPrintPreview) {
 				Scene.getRoot().attachChild(pagesRoot);
-				 Scene.getRoot().updateWorldBound(true);
-				 for (HousePart part : printParts)
-				 System.out.println(part + "\t" + part.getRoot().getWorldBound());				
+//				 Scene.getRoot().updateWorldBound(true);
+//				 for (HousePart part : printParts)
+//				 System.out.println(part + "\t" + part.getRoot().getWorldBound());				
 			}
 			if (!isPrintPreview)
 				HousePart.setFlatten(false);
@@ -291,8 +291,10 @@ public class PrintController implements Updater {
 	}
 
 	public void rotate() {
-		angle += 0.01;
-		Scene.getInstance().getOriginalHouseRoot().setRotation(new Matrix3().fromAngles(0, 0, angle));
+		if (SceneManager.getInstance().isRotationAnimationOn()) {
+			angle += 0.01;
+			Scene.getInstance().getOriginalHouseRoot().setRotation(new Matrix3().fromAngles(0, 0, angle));
+		}
 	}
 
 	public ArrayList<HousePart> getPrintParts() {
@@ -357,7 +359,8 @@ public class PrintController implements Updater {
 
 	private void computePrintCenters(final ArrayList<ArrayList<Spatial>> pages) {
 		for (HousePart printPartOrg : printParts) {
-			if (!(printPartOrg instanceof Roof) || printPartOrg instanceof Floor) {
+//			if (!(printPartOrg instanceof Roof) || printPartOrg instanceof Floor) {
+			if (!(printPartOrg instanceof Roof)) {
 			Spatial printPart = printPartOrg.getMesh();
 			computePrintCenterOf(printPart, pages);
 			}
@@ -366,7 +369,8 @@ public class PrintController implements Updater {
 
 	private void computePrintCentersForRoofAndFloor(final ArrayList<ArrayList<Spatial>> pages) {
 		for (HousePart printPart : printParts) {
-			if (!(printPart instanceof Roof) || printPart instanceof Floor)
+//			if (!(printPart instanceof Roof) || printPart instanceof Floor)
+			if (!(printPart instanceof Roof))
 				continue;
 			for (Spatial roofPart : ((Roof) printPart).getFlattenedMeshesRoot().getChildren()) {
 				computePrintCenterOf(roofPart, pages);

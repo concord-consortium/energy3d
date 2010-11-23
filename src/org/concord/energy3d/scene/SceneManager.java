@@ -341,7 +341,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Scene.getInstance().update();
 
 		int val = 1;
-		if (rotAnim) {
+		if (rotAnim && viewMode == ViewMode.NORMAL) {
 			angle = val;
 			rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
@@ -1220,6 +1220,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public ViewMode getViewMode() {
 		return viewMode;
+	}
+
+	public boolean isRotationAnimationOn() {
+		return rotAnim;
 	}
 
 }

@@ -684,10 +684,10 @@ public class Wall extends HousePart {
 
 		// Angle annotations
 		annotCounter = 0;
-		fetchAngleAnnot90(annotCounter++).setRange(abspoints.get(0), abspoints.get(2), abspoints.get(1));
-		fetchAngleAnnot90(annotCounter++).setRange(abspoints.get(1), abspoints.get(3), abspoints.get(0));
-		fetchAngleAnnot90(annotCounter++).setRange(abspoints.get(2), abspoints.get(0), abspoints.get(3));
-		fetchAngleAnnot90(annotCounter++).setRange(abspoints.get(3), abspoints.get(1), abspoints.get(2));
+		fetchAngleAnnot90(annotCounter++).setRange(abspoints.get(0), abspoints.get(2), abspoints.get(1), getFaceDirection());
+		fetchAngleAnnot90(annotCounter++).setRange(abspoints.get(1), abspoints.get(3), abspoints.get(0), getFaceDirection());
+		fetchAngleAnnot90(annotCounter++).setRange(abspoints.get(2), abspoints.get(0), abspoints.get(3), getFaceDirection());
+		fetchAngleAnnot90(annotCounter++).setRange(abspoints.get(3), abspoints.get(1), abspoints.get(2), getFaceDirection());
 
 	}
 

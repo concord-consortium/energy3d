@@ -161,6 +161,7 @@ public class Window extends HousePart {
 
 	private ReadOnlyVector3 abspointsTrans(int i, ReadOnlyTransform trans, Vector3 v) {
 		v.set(abspoints.get(i));
+//		v.setY(v.getY() - 1);
 		return trans.applyForward(v);
 	}
 
