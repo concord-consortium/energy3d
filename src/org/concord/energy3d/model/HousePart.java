@@ -13,12 +13,16 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.image.Texture;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -27,6 +31,7 @@ import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
+import com.ardor3d.util.TextureManager;
 
 public abstract class HousePart implements Serializable {
 	static final private long serialVersionUID = 1L;
@@ -50,6 +55,7 @@ public abstract class HousePart implements Serializable {
 	protected int editPointIndex = -1;
 	protected double height;
 	protected boolean relativeToHorizontal;
+	protected String textureFileName;
 	private boolean firstPointInserted = false;
 	transient protected Node root;
 	transient protected Node pointsRoot;
@@ -112,7 +118,7 @@ public abstract class HousePart implements Serializable {
 		HousePart.defaultColor = defaultColor;
 	}
 
-	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height) {
+	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height, String textureFileName) {
 		this(numOfDrawPoints, numOfEditPoints, height, false);
 	}
 
@@ -120,7 +126,7 @@ public abstract class HousePart implements Serializable {
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
 		this.height = this.orgHeight = height;
-		this.relativeToHorizontal = relativeToHorizontal;
+		this.relativeToHorizontal = relativeToHorizontal;		
 		points = new ArrayList<Vector3>(numOfEditPoints);
 		init();
 		allocateNewPoint();
@@ -166,8 +172,15 @@ public abstract class HousePart implements Serializable {
 		root.attachChild(labelsRoot);
 		
 		computeAbsPoints();
+		
+		if (textureFileName == null)
+			textureFileName = getDefaultTextureFileName();
 		if (Util.DEBUG)
 		System.out.println("done");
+	}
+	
+	protected String getDefaultTextureFileName() {
+		return null;
 	}
 
 	public void setOriginal(HousePart original) {
@@ -594,6 +607,15 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void updateTexture() {
+		if (textureEnabled) {
+			final TextureState ts = new TextureState();
+			ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+			mesh.setRenderState(ts);
+			mesh.setDefaultColor(ColorRGBA.WHITE);
+		} else {
+			mesh.clearRenderState(StateType.Texture);
+			mesh.setDefaultColor(defaultColor);
+		}
 	}
 	
 	public HousePart getContainer() {

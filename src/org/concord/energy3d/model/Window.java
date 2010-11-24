@@ -31,7 +31,7 @@ public class Window extends HousePart {
 	private transient BMText label1;
 
 	public Window() {
-		super(2, 4, 0.30);
+		super(2, 4, 0.30, null);
 	}
 
 	protected void init() {
@@ -205,5 +205,8 @@ public class Window extends HousePart {
 			abspoints.get(i).set(p);
 			pointsRoot.getChild(i).setTranslation(p);
 		}
+	}
+	
+	public void updateTexture() {
 	}
 }

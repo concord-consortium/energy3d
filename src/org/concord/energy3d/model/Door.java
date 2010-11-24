@@ -26,7 +26,7 @@ public class Door extends HousePart {
 	private transient FloatBuffer textureBuffer;
 
 	public Door() {
-		super(2, 4, defaultDoorHeight);
+		super(2, 4, defaultDoorHeight, "door.jpg");
 	}
 
 	protected void init() {
@@ -131,5 +131,9 @@ public class Door extends HousePart {
 
 	public boolean isPrintable() {
 		return false;
+	}
+	
+	public void updateTexture() {
+		
 	}
 }

@@ -32,7 +32,7 @@ public class Foundation extends HousePart {
 	private transient double newBoundingHeight;
 
 	public Foundation() {
-		super(2, 8, 0.1);
+		super(2, 8, 0.1, "concrete.jpg");
 	}
 
 	protected void init() {
@@ -242,17 +242,17 @@ public class Foundation extends HousePart {
 			super.hidePoints();
 	}	
 	
-	public void updateTexture() {
-		if (textureEnabled) {
-			final TextureState ts = new TextureState();
-			ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-			mesh.setRenderState(ts);
-			mesh.setDefaultColor(ColorRGBA.WHITE);
-		} else {
-			mesh.clearRenderState(StateType.Texture);
-			mesh.setDefaultColor(defaultColor);
-		}
-	}
+//	public void updateTexture() {
+//		if (textureEnabled) {
+//			final TextureState ts = new TextureState();
+//			ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+//			mesh.setRenderState(ts);
+//			mesh.setDefaultColor(ColorRGBA.WHITE);
+//		} else {
+//			mesh.clearRenderState(StateType.Texture);
+//			mesh.setDefaultColor(defaultColor);
+//		}
+//	}
 
 //	@Override
 //	protected void computePrintCenter() {

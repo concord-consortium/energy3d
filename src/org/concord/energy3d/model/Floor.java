@@ -1,69 +1,89 @@
 package org.concord.energy3d.model;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
+import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.ui.text.BMText;
+import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.geom.BufferUtils;
 
-public class Floor extends Roof {
+public class Floor extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.2;
+	protected double labelTop;
+	private transient ArrayList<PolygonPoint> wallUpperPoints;
 
 	public Floor() {
-		super(1, 1, 0.5);
+		super(1, 1, 0.5, "floor3.jpg");
 	}
-	
+
 	protected void init() {
 		super.init();
-		root.detachChild(bottomMesh);
-		bottomMesh = null;
+		mesh = new Mesh("Floor");
+		root.attachChild(mesh);
+
+		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		mesh.setModelBound(new BoundingSphere());
+
+		// Add a material to the box, to show both vertex color and lighting/shading.
+		final MaterialState ms = new MaterialState();
+		ms.setColorMaterial(ColorMaterial.Diffuse);
+		mesh.setRenderState(ms);
+
+		updateTexture();
+
+		final UserData userData = new UserData(this);
+		mesh.setUserData(userData);
 	}
 
 	public void setPreviewPoint(int x, int y) {
-			pick(x, y, Wall.class);
-			if (container != null) {
+		pick(x, y, Wall.class);
+		if (container != null) {
 			Vector3 base = container.getPoints().get(0);
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ()) + base.getZ();
-		draw();
-		showPoints();
-			}
-
+			draw();
+			showPoints();
+		}
 	}
 
-	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
+	private Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
 		center.set(0, 0, 0);
 		double maxY = wallUpperPoints.get(0).getY();
 		for (PolygonPoint p : wallUpperPoints) {
 			center.addLocal(p.getX(), p.getY(), height);
 			p.set(p.getX(), p.getY(), height);
 			if (p.getY() > maxY)
-				maxY = p.getY();			
+				maxY = p.getY();
 		}
 		center.multiplyLocal(1.0 / wallUpperPoints.size());
-		labelTop = (maxY-center.getY());
+		labelTop = (maxY - center.getY());
 		points.get(0).set(center);
-		final Polygon polygon = new Polygon(wallUpperPoints);
-		return polygon;
+		return new Polygon(wallUpperPoints);
 	}
-	
-	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
+
+	private void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
 		try {
 			Poly2Tri.triangulate(polygon);
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
@@ -79,82 +99,99 @@ public class Floor extends Roof {
 //	public void updateTexture() {
 //		if (textureEnabled) {
 //			final TextureState ts = new TextureState();
-//			ts.setTexture(TextureManager.load("floor3.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+//			ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 //			mesh.setRenderState(ts);
 //			mesh.setDefaultColor(ColorRGBA.WHITE);
-//			if (bottomMesh != null) {
-//				bottomMesh.setRenderState(ts);
-//				bottomMesh.setDefaultColor(ColorRGBA.WHITE);
-//			}
 //		} else {
 //			mesh.clearRenderState(StateType.Texture);
 //			mesh.setDefaultColor(defaultColor);
-//			if (bottomMesh != null) {
-//				bottomMesh.clearRenderState(StateType.Texture);
-//				bottomMesh.setDefaultColor(defaultColor);
-//			}
 //		}
-//		mesh.updateGeometricState(0);
-//	}	
-
-	public void updateTexture() {
-		if (textureEnabled) {
-			final TextureState ts = new TextureState();
-			ts.setTexture(TextureManager.load("floor3.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-			mesh.setRenderState(ts);
-			mesh.setDefaultColor(ColorRGBA.WHITE);
-
-			if (flattenedMeshesRoot != null) {
-				flattenedMeshesRoot.setRenderState(ts);
-				for (Spatial s : flattenedMeshesRoot.getChildren()) {
-					Mesh mesh = (Mesh) s;
-					mesh.setDefaultColor(ColorRGBA.WHITE);
-				}
-			}
-			if (bottomMesh != null) {
-				bottomMesh.setRenderState(ts);
-				bottomMesh.setDefaultColor(ColorRGBA.WHITE);
-			}
-		} else {
-			mesh.clearRenderState(StateType.Texture);
-			mesh.setDefaultColor(defaultColor);
-			if (flattenedMeshesRoot != null) {
-				flattenedMeshesRoot.clearRenderState(StateType.Texture);
-				for (Spatial s : flattenedMeshesRoot.getChildren()) {
-					Mesh mesh = (Mesh) s;
-					mesh.setDefaultColor(defaultColor);		
-				}
-			}
-			if (bottomMesh != null) {
-				bottomMesh.clearRenderState(StateType.Texture);
-				bottomMesh.setDefaultColor(defaultColor);
-			}
-		}
-	}	
-//	protected void flatten() {
-//		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
-//		
-//		root.setTranslation(0, 0, 0);
-////		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) mesh.getUserData());
-//		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
-//		final Vector3 currentCenter = new Vector3(center);
-//		
-//		root.getTransform().applyForward(currentCenter);
-//		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
-//		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));		
 //	}
-	
-//	protected void updateLabels() {
-//		final String text = "(" + (printSequence++ + 1) + ")";
-//		final BMText label = fetchBMText(text, 0);
-//				
-//		label.setTranslation(center);
-//		Vector3 up = new Vector3();
-//		if (original == null)
-//			up.set(getFaceDirection());
-//		else
-//			up.set(0, -0.01, 0);
-//		root.getTransform().applyInverseVector(up);
-//		label.setTranslation(center.getX() + up.getX(), center.getY() + up.getY(), center.getZ() + up.getZ());
-//	}	
+
+	protected void computeAbsPoints() {
+	}
+
+	protected void computeCenter() {
+	}
+
+	protected void updateMesh() {
+		if (container == null) {
+			resetToZero(mesh.getMeshData().getVertexBuffer());
+			hidePoints();
+			return;
+		}
+
+		wallUpperPoints = exploreWallNeighbors((Wall) container);
+
+		fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
+
+		for (int i = 0; i < points.size(); i++)
+			pointsRoot.getChild(i).setTranslation(points.get(i));
+
+		mesh.updateModelBound();
+	}
+
+	private void resetToZero(final FloatBuffer buff) {
+		buff.rewind();
+		while (buff.hasRemaining())
+			buff.put(0);
+	}
+
+
+	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
+		center.set(0, 0, 0);
+		final ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
+		startWall.visitNeighbors(new WallVisitor() {
+			public void visit(Wall currentWall, Snap prev, Snap next) {
+				int pointIndex = 0;
+				if (next != null)
+					pointIndex = next.getSnapPointIndexOf(currentWall);
+				pointIndex = pointIndex + 1;
+				final Vector3 p1 = currentWall.getPoints().get(pointIndex == 1 ? 3 : 1);
+				final Vector3 p2 = currentWall.getPoints().get(pointIndex);
+				addPointToPolygon(poly, p1, center);
+				addPointToPolygon(poly, p2, center);
+			}
+
+		});
+
+		center.multiplyLocal(1.0 / poly.size());
+		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+
+		return poly;
+	}
+
+	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p, Vector3 center) {
+		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+		if (!poly.contains(polygonPoint)) {
+			poly.add(polygonPoint);
+			center.addLocal(p);
+		}
+	}
+
+	protected void computeLabelTop(final Vector3 top) {
+		top.set(0, 0, labelTop);
+	}
+
+	public ReadOnlyVector3 getFaceDirection() {
+		return Vector3.UNIT_Z;
+	}
+
+	protected void drawAnnotations() {
+		if (container == null)
+			return;
+		int annotCounter = 0;
+
+		for (int i = 0; i < wallUpperPoints.size(); i++) {
+			PolygonPoint p = wallUpperPoints.get(i);
+			Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
+			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
+			Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
+			fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), original == null, Align.Center, true);
+		}
+
+		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
+			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
+	}
+
 }

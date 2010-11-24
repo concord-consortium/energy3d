@@ -33,7 +33,7 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
-public abstract class Roof extends HousePart {
+public abstract class CopyOfRoof extends HousePart {
 	private static final long serialVersionUID = 1L;
 	protected static final double GRID_SIZE = 0.5;
 	protected transient Mesh bottomMesh;
@@ -42,8 +42,8 @@ public abstract class Roof extends HousePart {
 	protected transient Node flattenedMeshesRoot;
 	private transient Map<Mesh, Vector3> orgCenters;
 
-	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
-		super(numOfDrawPoints, numOfEditPoints, height, "roof2.jpg");
+	public CopyOfRoof(int numOfDrawPoints, int numOfEditPoints, double height) {
+		super(numOfDrawPoints, numOfEditPoints, height);
 	}
 
 	protected void init() {
