@@ -1,6 +1,5 @@
 package org.concord.energy3d.shapes;
 
-import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.util.FontManager;
 
 import com.ardor3d.math.ColorRGBA;
@@ -16,9 +15,8 @@ public abstract class Annotation extends Node {
 	public static BMText makeNewLabel() {
 		final BMText label = new BMText("Annotation Label", "0.0", FontManager.getInstance().getAnnotationFont(), BMText.Align.Center, BMText.Justify.Center);
 		label.setTextColor(ColorRGBA.BLACK);
-		label.setFontScale(0.5);
 		label.setAutoScale(AutoScale.Off);
-		label.setFontScale(0.1);
+		label.setFontScale(0.12);
 		return label;
 	}
 	

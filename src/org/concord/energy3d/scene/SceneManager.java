@@ -25,7 +25,6 @@ import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
-import org.lwjgl.LWJGLException;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
@@ -43,8 +42,6 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
-import com.ardor3d.framework.lwjgl.LwjglAwtCanvas;
-import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -81,7 +78,6 @@ import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
-import com.ardor3d.renderer.lwjgl.LwjglTextureRendererProvider;
 import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -175,7 +171,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return instance;
 	}
 
-	public SceneManager(final Container panel) throws LWJGLException {
+	public SceneManager(final Container panel) {// throws LWJGLException {
 		System.out.print("Initializing scene manager...");
 		instance = this;
 		// root.attachChild(Scene.getRoot());
@@ -184,8 +180,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 8, false, false);
 		if (JOGL)
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
-		else
-			canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
+//		else
+//			canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
 
 		frameHandler = new FrameHandler(new Timer());
 		frameHandler.addCanvas(canvas);
@@ -203,8 +199,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (JOGL)
 			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
-		else
-			TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
+//		else
+//			TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
 
 		panel.addComponentListener(new java.awt.event.ComponentAdapter() {
 			public void componentResized(java.awt.event.ComponentEvent e) {

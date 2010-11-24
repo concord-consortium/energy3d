@@ -45,8 +45,9 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private static final JFileChooser fileChooser = new JFileChooser();
 	private static final MainFrame instance = new MainFrame();
+	private final JFileChooser fileChooser;
+	private final JColorChooser colorChooser;
 	private JPanel jContentPane = null;
 	private JMenuBar appMenuBar = null;
 	private JMenu fileMenu = null;
@@ -104,10 +105,11 @@ public class MainFrame extends JFrame {
 	private JLabel versionLabel = null;
 	private JLabel developedByLabel = null;
 	private JLabel byLabel = null;
+	
 	public static MainFrame getInstance() {
 		return instance;
 	}
-
+	
 	/**
 	 * This method initializes appMenuBar
 	 * 
@@ -729,13 +731,17 @@ public class MainFrame extends JFrame {
 			colorMenuItem.setText("House Color...");
 			colorMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					final ReadOnlyColorRGBA curr = HousePart.getDefaultColor();
-					final Color c = JColorChooser.showDialog(MainFrame.this, "Select House Color", new Color(curr.getRed(), curr.getGreen(), curr.getBlue()));
-					if (c != null) {
-						final float[] newColor = c.getComponents(null);
-						HousePart.setDefaultColor(new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]));
-						Scene.getInstance().setTextureEnabled(getTextureCheckBoxMenuItem().isSelected());
-					}
+					final ActionListener actionListener = new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							final Color c = colorChooser.getColor();
+							final float[] newColor = c.getComponents(null);
+							HousePart.setDefaultColor(new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]));
+							Scene.getInstance().setTextureEnabled(getTextureCheckBoxMenuItem().isSelected());						
+						}
+					};
+					textureCheckBoxMenuItem.setSelected(false);
+					final JDialog colorDialog = JColorChooser.createDialog(MainFrame.this, "Select House Color", true, colorChooser, actionListener, null);
+					colorDialog.setVisible(true);
 				}
 			});
 		}
@@ -942,21 +948,22 @@ public class MainFrame extends JFrame {
 	 * This is the default constructor
 	 */
 	private MainFrame() {
-		super();
-		initialize();
-
+		super();		
 		final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
 		if (!dir.exists()) {
 			System.out.print("Making save directory...");
 			final boolean success = dir.mkdir();
 			System.out.println(success ? "done" : "failed");
 		}
+		fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(dir);
 		fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
+		
+		colorChooser = new JColorChooser();
+		final ReadOnlyColorRGBA defaultColor = HousePart.getDefaultColor();
+		colorChooser.setColor(new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue()));
 
-		// fileChooser.setFileView(new FileView() {
-		//
-		// });
+		initialize();
 	}
 
 	/**
@@ -1178,8 +1185,8 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem getTextureCheckBoxMenuItem() {
 		if (textureCheckBoxMenuItem == null) {
 			textureCheckBoxMenuItem = new JCheckBoxMenuItem("Texture", true);
-			textureCheckBoxMenuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+			textureCheckBoxMenuItem.addItemListener(new java.awt.event.ItemListener() {
+				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					HousePart.setTextureEnabled(textureCheckBoxMenuItem.isSelected());
 					Scene.getInstance().setTextureEnabled(textureCheckBoxMenuItem.isSelected());
 				}
