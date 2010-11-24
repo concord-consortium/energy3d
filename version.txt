@@ -422,11 +422,14 @@ Version 0.2
 - remember the previously selected colors in color dialog box
 - automatically disable textures when a color menu item is clicked
 - make new executable jar
+- put window in center by default
  
 
 - TODO: fix problem with floor no texture (concluded that floor must be superclass)
 - problem with house5 roof, one of them is still in triangle form
 - do not render unless mouse move to save cpu cycle
+- save position and state of window in registry
+
 
 
 

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -926,6 +927,8 @@ public class MainFrame extends JFrame {
 	 */
 	private void initialize() {
 		this.setSize(972, 600);
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		this.setLocation((int)(screenSize.getWidth() - this.getSize().getWidth()) / 2, (int)(screenSize.getHeight() - this.getSize().getHeight()) / 2);
 //		this.setSize(172, 600);
 //		this.setSize(400*2, 550*2);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
