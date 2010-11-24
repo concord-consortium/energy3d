@@ -3,14 +3,12 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
@@ -98,13 +96,6 @@ public class MainFrame extends JFrame {
 	private JMenu helpMenu = null;
 	private JMenuItem aboutMenuItem = null;
 	private JDialog aboutDialog = null;  //  @jve:decl-index=0:visual-constraint="602,644"
-	private JPanel jContentPane1 = null;
-	private JLabel titleLabel = null;
-	private JLabel copyrightLabel = null;
-	private JLabel authorsLabel = null;
-	private JLabel versionLabel = null;
-	private JLabel developedByLabel = null;
-	private JLabel byLabel = null;
 	
 	public static MainFrame getInstance() {
 		return instance;
@@ -883,52 +874,14 @@ public class MainFrame extends JFrame {
 	private JDialog getAboutDialog() {
 		if (aboutDialog == null) {
 			aboutDialog = new JDialog(this);
-			aboutDialog.setSize(new Dimension(413, 232));
 			aboutDialog.setTitle("About");
-			aboutDialog.setContentPane(getJContentPane1());
+			JPanel p = new JPanel(new BorderLayout());
+			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+			p.add(new JLabel("<html><h2>Energy3D</h2><hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grant #0918449 to the Concord Consortium. </html>"), BorderLayout.CENTER);
+			aboutDialog.setContentPane(p);
+			aboutDialog.pack();
 		}
 		return aboutDialog;
-	}
-
-	/**
-	 * This method initializes jContentPane1	
-	 * 	
-	 * @return javax.swing.JPanel	
-	 */
-	private JPanel getJContentPane1() {
-		if (jContentPane1 == null) {
-			byLabel = new JLabel();
-			byLabel.setText("by");
-			byLabel.setAlignmentX(0.5F);
-			developedByLabel = new JLabel();
-			developedByLabel.setText("Developed");
-			developedByLabel.setAlignmentX(0.5F);
-			versionLabel = new JLabel();
-			versionLabel.setText("v0.2");
-			versionLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
-			versionLabel.setAlignmentX(0.5F);
-			authorsLabel = new JLabel();
-			authorsLabel.setText("Saeid Nourian & Charles Xie");
-			authorsLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 40, 0));
-			authorsLabel.setAlignmentX(0.5F);
-			copyrightLabel = new JLabel();
-			copyrightLabel.setText("Copyright (c) 2010 Concord Consortium. All rights reserved.");
-			copyrightLabel.setAlignmentX(0.5F);
-			titleLabel = new JLabel();
-			titleLabel.setText("Energy 3D");
-			titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-			titleLabel.setFont(new Font("Dialog", Font.BOLD, 18));
-			titleLabel.setAlignmentX(0.5F);
-			jContentPane1 = new JPanel();
-			jContentPane1.setLayout(new BoxLayout(getJContentPane1(), BoxLayout.Y_AXIS));
-			jContentPane1.add(titleLabel, null);
-			jContentPane1.add(versionLabel, null);
-			jContentPane1.add(developedByLabel, null);
-			jContentPane1.add(byLabel, null);
-			jContentPane1.add(authorsLabel, null);
-			jContentPane1.add(copyrightLabel, null);
-		}
-		return jContentPane1;
 	}
 
 	/**
