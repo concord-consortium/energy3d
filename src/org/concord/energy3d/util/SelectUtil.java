@@ -20,10 +20,8 @@ import com.ardor3d.scenegraph.Spatial;
 
 public class SelectUtil {
 	private static final PickResults pickResults = new PrimitivePickResults();
-//	private static Blinker blinker = null;
 	private static Mesh floor;
 	private static Node housePartsNode;	
-//	protected static HousePart lastHoveredObject;	
 	private static int pickLayer = -1;
 	
 	static {
@@ -35,10 +33,6 @@ public class SelectUtil {
 		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, null);
 		PickingUtil.findPick(target, pickRay, pickResults);
 	}
-
-//	public PickedHousePart findMousePoint(int x, int y) {
-//		return findMousePoint(x, y, floor);
-//	}
 
 	public static PickedHousePart pickPart(int x, int y, Spatial target) {
 		if (target == null)
@@ -74,7 +68,6 @@ public class SelectUtil {
 			final PickData pick = pickResults.getPickData(i);
 			if (pick.getIntersectionRecord().getNumberOfIntersections() == 0)
 				continue;
-//			Object obj = pick.getTargetMesh().getUserData();
 			Object obj = ((Mesh)pick.getTarget()).getUserData();
 			UserData userData = null;
 			if (obj instanceof UserData) {
@@ -85,13 +78,11 @@ public class SelectUtil {
 				}
 			} else if (pickLayer != -1) {
 				continue;
-			} else
-				System.out.println("ss");
+			}
 			if (pickLayer != -1 && objCounter-1 != pickLayer)
 				continue;
 			Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
 			PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
-//			double polyDist_i = pick.getClosestDistance();
 			double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {
@@ -163,7 +154,7 @@ public class SelectUtil {
 
 	public static void nextPickLayer() {
 		if (pickLayer != -1)
-			pickLayer++; // = (pickLayer + 1) % Math.max(1, pickResults.getNumber() / 2);	
+			pickLayer++;
 		System.out.println(pickLayer);
 	}
 
@@ -171,32 +162,3 @@ public class SelectUtil {
 		pickLayer = i;
 	}
 }
-
-//class Blinker extends Thread {
-//	Node target;
-//
-//	public Blinker(Node target) {
-//		this.target = target;
-//		this.start();
-//	}
-//
-//	public void run() {
-//		while (target != null) {
-//			// if (target != null) {
-//			CullHint cullHint = target.getSceneHints().getCullHint();
-//			target.getSceneHints().setCullHint(cullHint == CullHint.Always ? cullHint = CullHint.Inherit : CullHint.Always);
-//			// }
-//			try {
-//				sleep(300);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
-//
-//	public void finish() {
-//		target.getSceneHints().setCullHint(CullHint.Inherit);
-//		this.target = null;
-//	}
-//}
-

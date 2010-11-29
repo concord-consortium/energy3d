@@ -487,7 +487,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// reverseNormals(sky.getMeshData().getNormalBuffer());
 
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("sky6.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		ts.setTexture(TextureManager.load("sky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		sky.setRenderState(ts);
 
 		// final MaterialState ms = new MaterialState();

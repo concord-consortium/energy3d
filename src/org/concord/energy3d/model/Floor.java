@@ -13,6 +13,7 @@ import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
@@ -33,7 +34,7 @@ public class Floor extends HousePart {
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 
 	public Floor() {
-		super(1, 1, 0.5, "floor3.jpg");
+		super(1, 1, 0.5);
 	}
 
 	protected void init() {
@@ -193,5 +194,13 @@ public class Floor extends HousePart {
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 	}
-
+	
+	protected String getDefaultTextureFileName() {
+		return "floor.jpg";
+	}
+	
+	protected void flatten() {
+		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
+		super.flatten();
+	}	
 }

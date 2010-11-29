@@ -41,7 +41,7 @@ public abstract class HousePart implements Serializable {
 	static protected int printPage;
 	static protected boolean textureEnabled = true;
 	static protected ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
-	static private boolean isFlatten = false;
+	static protected boolean isFlatten = false;
 	static private boolean snapToObjects = true;
 	static private boolean snapToGrids = false;
 	static private boolean drawAnnotations = false;
@@ -118,7 +118,7 @@ public abstract class HousePart implements Serializable {
 		HousePart.defaultColor = defaultColor;
 	}
 
-	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height, String textureFileName) {
+	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height) {
 		this(numOfDrawPoints, numOfEditPoints, height, false);
 	}
 

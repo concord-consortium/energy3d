@@ -30,6 +30,7 @@ public class HipRoof extends Roof {
 			points.get(editPointIndex).set(p);
 		}
 		draw();
+//		createIndividualMeshes();
 		if (container != null)
 			showPoints();
 

@@ -32,7 +32,7 @@ public class Foundation extends HousePart {
 	private transient double newBoundingHeight;
 
 	public Foundation() {
-		super(2, 8, 0.1, "concrete.jpg");
+		super(2, 8, 0.1);
 	}
 
 	protected void init() {
@@ -263,7 +263,11 @@ public class Foundation extends HousePart {
 	public void editPoint(int i) {
 		if (!resizeHouseMode && i > 3)
 			i -= 4;
-		super.editPoint(i);		
-	}	
+		super.editPoint(i);
+	}
+	
+	protected String getDefaultTextureFileName() {
+		return "foundation.jpg";
+	}
 	
 }

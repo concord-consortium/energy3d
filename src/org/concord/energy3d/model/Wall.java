@@ -56,10 +56,6 @@ public class Wall extends HousePart {
 		super(2, 4, defaultWallHeight, true);
 	}
 	
-	protected String getDefaultTextureFileName() {
-		return "wall7.jpg";
-	}
-
 	protected void init() {
 		super.init();		
 		mesh = new Mesh("Wall");
@@ -73,7 +69,7 @@ public class Wall extends HousePart {
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
-		mesh.setModelBound(null);
+//		mesh.setModelBound(null);
 		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 
 		root.attachChild(backMesh);
@@ -81,7 +77,7 @@ public class Wall extends HousePart {
 		backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		backMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		backMesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
-		backMesh.setModelBound(null);
+//		backMesh.setModelBound(null);
 		backMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 
 		root.attachChild(surroundMesh);
@@ -89,7 +85,7 @@ public class Wall extends HousePart {
 		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
 		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
-		surroundMesh.setModelBound(null);
+//		surroundMesh.setModelBound(null);
 		surroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 
 		root.attachChild(invisibleMesh);
@@ -104,13 +100,13 @@ public class Wall extends HousePart {
 		windowsSurroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
 		windowsSurroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(1000));
 		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
-		windowsSurroundMesh.setModelBound(null);
+//		windowsSurroundMesh.setModelBound(null);
 		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 
 		root.attachChild(wireframeMesh);
 		wireframeMesh.getMeshData().setIndexMode(IndexMode.Quads);
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		wireframeMesh.setModelBound(null);
+//		wireframeMesh.setModelBound(null);
 		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.setRenderState(new WireframeState());
@@ -358,6 +354,7 @@ public class Wall extends HousePart {
 			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
 			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
 			mesh.getMeshData().updateVertexCount();
+			mesh.updateModelBound();
 
 			Vector3 n = drawBackMesh(polygon, fromXY);
 			drawSurroundMesh(n);
@@ -828,4 +825,8 @@ public class Wall extends HousePart {
 			wall.thicknessNormal.negateLocal();
 	}	
 
+	protected String getDefaultTextureFileName() {
+		return "wall.jpg";
+	}
+	
 }

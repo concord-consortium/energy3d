@@ -25,7 +25,7 @@ public class UserData {
 	}
 
 	public String toString() {
-		return housePart + " index = " + pointIndex;
+		return housePart + " index = " + pointIndex + " print center = " + printCenter;
 	}
 
 	public Vector3 getPrintCenter() {

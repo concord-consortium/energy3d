@@ -43,14 +43,17 @@ public abstract class Roof extends HousePart {
 	private transient Map<Mesh, Vector3> orgCenters;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
-		super(numOfDrawPoints, numOfEditPoints, height, "roof2.jpg");
+		super(numOfDrawPoints, numOfEditPoints, height);
 	}
 
 	protected void init() {
 		super.init();
+		flattenedMeshesRoot = new Node("Floor Meshes Root");
+		root.attachChild(flattenedMeshesRoot);
+		
 		mesh = new Mesh("Roof/Floor");
 		bottomMesh = new Mesh("Roof/Floor (bottom)");
-		root.attachChild(mesh);
+//		root.attachChild(mesh);
 		root.attachChild(bottomMesh);
 
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
@@ -90,17 +93,20 @@ public abstract class Roof extends HousePart {
 		}
 
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
+		
 
 		if (bottomMesh != null)
 			fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
 		fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
+		if (!isFlatten || flattenedMeshesRoot.getNumberOfChildren() == 0)
+			createIndividualMeshes();
 
 		for (int i = 0; i < points.size(); i++) {
 			Vector3 p = points.get(i);
 			pointsRoot.getChild(i).setTranslation(p);
 		}
 
-		mesh.updateModelBound();
+//		mesh.updateModelBound();
 		if (bottomMesh != null)
 			bottomMesh.updateModelBound();
 	}
@@ -192,6 +198,7 @@ public abstract class Roof extends HousePart {
 			orgCenters.put(mesh, orgCenter);
 		}
 		final Vector3 targetPrintCenter = ((UserData) mesh.getUserData()).getPrintCenter();
+		System.out.println(mesh.getUserData());
 		mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
 	}
 
@@ -278,7 +285,7 @@ public abstract class Roof extends HousePart {
 	public void updateTexture() {
 		if (textureEnabled) {
 			final TextureState ts = new TextureState();
-			ts.setTexture(TextureManager.load("roof2.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+			ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 			mesh.setRenderState(ts);
 			mesh.setDefaultColor(ColorRGBA.WHITE);
 
@@ -312,14 +319,24 @@ public abstract class Roof extends HousePart {
 
 	public Node getFlattenedMeshesRoot() {
 		if (flattenedMeshesRoot == null) {
-			flattenedMeshesRoot = MeshLib.groupByPlanner(mesh);
-			root.attachChild(flattenedMeshesRoot);
-			root.detachChild(mesh);
-			updateTexture();
-			for (final Spatial child : flattenedMeshesRoot.getChildren())
-				child.setUserData(new UserData(this));
+			createIndividualMeshes();
 		}
 		return flattenedMeshesRoot;
 	}
 
+	private void createIndividualMeshes() {
+		System.out.println("createIndividualMeshes()");
+//		root.detachChild(flattenedMeshesRoot);
+		MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
+//		root.attachChild(flattenedMeshesRoot);
+//		root.detachChild(mesh);
+//		updateTexture();
+		for (final Spatial child : flattenedMeshesRoot.getChildren())
+			child.setUserData(new UserData(this));
+	}
+	
+	protected String getDefaultTextureFileName() {
+		return "roof.jpg";
+	}
+	
 }

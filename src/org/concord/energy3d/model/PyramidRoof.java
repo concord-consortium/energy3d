@@ -25,6 +25,7 @@ public class PyramidRoof extends Roof {
 			height = Math.max(0, p.getZ() - base.getZ());
 		}
 		draw();
+//		createIndividualMeshes();
 		if (container != null)
 			showPoints();
 	}

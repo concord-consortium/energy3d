@@ -31,7 +31,7 @@ public class Window extends HousePart {
 	private transient BMText label1;
 
 	public Window() {
-		super(2, 4, 0.30, null);
+		super(2, 4, 0.30);
 	}
 
 	protected void init() {
