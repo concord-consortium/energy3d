@@ -934,7 +934,7 @@ public class MainFrame extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getAppMenuBar());
 		this.setContentPane(getJContentPane());
-		this.setTitle("Energy 3D");
+		this.setTitle("Energy3D");
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 			public void windowClosing(java.awt.event.WindowEvent e) {
 				SceneManager.getInstance().exit();
