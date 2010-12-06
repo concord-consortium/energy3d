@@ -93,7 +93,6 @@ public abstract class Roof extends HousePart {
 		}
 
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
-		
 
 		if (bottomMesh != null)
 			fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
