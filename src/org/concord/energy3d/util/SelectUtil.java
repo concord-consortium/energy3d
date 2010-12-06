@@ -31,6 +31,7 @@ public class SelectUtil {
 	private static void pick(int x, int y, Spatial target) {
 		final Vector2 pos = new Vector2(x, y);
 		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, null);
+		Scene.getInstance().getParts();
 		PickingUtil.findPick(target, pickRay, pickResults);
 	}
 

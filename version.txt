@@ -426,6 +426,7 @@ Version 0.2
 
 - floor is no longer a subclass of roof
 - roof instances are no longer represented by a single mesh even when not in print preview mode
+- fix problem with pick exception due to not updating vertex count in MeshLib.groupByPlanner()
  
  
 

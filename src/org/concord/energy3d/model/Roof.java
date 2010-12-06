@@ -48,12 +48,12 @@ public abstract class Roof extends HousePart {
 
 	protected void init() {
 		super.init();
-		flattenedMeshesRoot = new Node("Floor Meshes Root");
+		flattenedMeshesRoot = new Node("Roof Meshes Root");
 		root.attachChild(flattenedMeshesRoot);
-		
+
 		mesh = new Mesh("Roof/Floor");
 		bottomMesh = new Mesh("Roof/Floor (bottom)");
-//		root.attachChild(mesh);
+		// root.attachChild(mesh);
 		root.attachChild(bottomMesh);
 
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
@@ -84,30 +84,34 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void updateMesh() {
-		if (container == null) {
-			resetToZero(mesh.getMeshData().getVertexBuffer());
+		try {
+			if (container == null) {
+				resetToZero(mesh.getMeshData().getVertexBuffer());
+				if (bottomMesh != null)
+					resetToZero(bottomMesh.getMeshData().getVertexBuffer());
+				hidePoints();
+				return;
+			}
+
+			wallUpperPoints = exploreWallNeighbors((Wall) container);
+
 			if (bottomMesh != null)
-				resetToZero(bottomMesh.getMeshData().getVertexBuffer());
-			hidePoints();
-			return;
+				fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
+			fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
+			if (!isFlatten || flattenedMeshesRoot.getNumberOfChildren() == 0)
+				createIndividualMeshes();
+
+			for (int i = 0; i < points.size(); i++) {
+				Vector3 p = points.get(i);
+				pointsRoot.getChild(i).setTranslation(p);
+			}
+
+			// mesh.updateModelBound();
+			if (bottomMesh != null)
+				bottomMesh.updateModelBound();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		wallUpperPoints = exploreWallNeighbors((Wall) container);
-
-		if (bottomMesh != null)
-			fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
-		fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
-		if (!isFlatten || flattenedMeshesRoot.getNumberOfChildren() == 0)
-			createIndividualMeshes();
-
-		for (int i = 0; i < points.size(); i++) {
-			Vector3 p = points.get(i);
-			pointsRoot.getChild(i).setTranslation(p);
-		}
-
-//		mesh.updateModelBound();
-		if (bottomMesh != null)
-			bottomMesh.updateModelBound();
 	}
 
 	private void resetToZero(final FloatBuffer buff) {
@@ -306,7 +310,7 @@ public abstract class Roof extends HousePart {
 				flattenedMeshesRoot.clearRenderState(StateType.Texture);
 				for (Spatial s : flattenedMeshesRoot.getChildren()) {
 					Mesh mesh = (Mesh) s;
-					mesh.setDefaultColor(defaultColor);		
+					mesh.setDefaultColor(defaultColor);
 				}
 			}
 			if (bottomMesh != null) {
@@ -325,17 +329,17 @@ public abstract class Roof extends HousePart {
 
 	private void createIndividualMeshes() {
 		System.out.println("createIndividualMeshes()");
-//		root.detachChild(flattenedMeshesRoot);
+		// root.detachChild(flattenedMeshesRoot);
 		MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
-//		root.attachChild(flattenedMeshesRoot);
-//		root.detachChild(mesh);
-//		updateTexture();
+		// root.attachChild(flattenedMeshesRoot);
+		// root.detachChild(mesh);
+		// updateTexture();
 		for (final Spatial child : flattenedMeshesRoot.getChildren())
 			child.setUserData(new UserData(this));
 	}
-	
+
 	protected String getDefaultTextureFileName() {
 		return "roof.jpg";
 	}
-	
+
 }

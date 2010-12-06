@@ -210,7 +210,7 @@ public class Wall extends HousePart {
 		Wall closestWall = null;
 		int closestPointIndex = -1;
 		for (HousePart housePart : Scene.getInstance().getParts()) {
-			if (housePart instanceof Wall && housePart != this) {
+			if (housePart instanceof Wall && housePart != this) { // && (neighbors[0] == null || neighbors[0].getNeighborOf(this) != housePart) && (neighbors[1] == null || neighbors[1].getNeighborOf(this) != housePart)) {
 				Wall wall = (Wall) housePart;
 				int i = 0;
 				for (Vector3 p2 : wall.getPoints()) {

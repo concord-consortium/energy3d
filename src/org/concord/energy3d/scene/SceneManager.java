@@ -312,15 +312,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void run() {
-		try {
+//		try {
 			frameHandler.init();
 			while (!exit) {
 				frameHandler.updateFrame();
 				Thread.yield();
 			}
-		} catch (final Throwable t) {
-			t.printStackTrace();
-		}
+//		} catch (final Throwable t) {
+//			t.printStackTrace();
+//		}
 	}
 
 	public void update(final ReadOnlyTimer timer) {
@@ -356,7 +356,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public boolean renderUnto(Renderer renderer) {
-		try {
+//		try {
 			if (mouseMoveFlag)
 				executeMouseMove();
 
@@ -373,9 +373,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //			 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
 
 			passManager.renderPasses(renderer);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		return true;
 	}
 

@@ -9,6 +9,7 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class MeshLib {
@@ -57,15 +58,17 @@ public class MeshLib {
 		int meshIndex = 0;
 		for (GroupData group : groups.values()) {
 			final Mesh newMesh;
-			if (meshIndex < root.getNumberOfChildren())
+			if (meshIndex < root.getNumberOfChildren()) {
 				newMesh = (Mesh)root.getChild(meshIndex);
-			else {
-				newMesh = new Mesh();
+				newMesh.getSceneHints().setCullHint(CullHint.Inherit);
+			} else {
+				newMesh = new Mesh("Roof Part #" + meshIndex);
 				root.attachChild(newMesh);
 			}
 			
 			FloatBuffer buf = newMesh.getMeshData().getVertexBuffer();
 			int n = group.vertices.size();
+			System.out.println(newMesh + "\t primitives = " + newMesh.getMeshData().getPrimitiveCount(0));
 			if (buf == null || buf.capacity() / 3 < n) {
 				buf = BufferUtils.createVector3Buffer(n);
 				newMesh.getMeshData().setVertexBuffer(buf);
@@ -97,8 +100,13 @@ public class MeshLib {
 			for (Vector2 v : group.textures)
 				buf.put(v.getXf()).put(v.getYf());
 
+			newMesh.getMeshData().updateVertexCount();
 			newMesh.updateModelBound();
 			newMesh.updateWorldBound(false);
+			meshIndex++;
+		}		
+		while(meshIndex < root.getNumberOfChildren()) {
+			root.getChild(meshIndex).getSceneHints().setCullHint(CullHint.Always);
 			meshIndex++;
 		}
 //		for (RenderState rs : mesh.getLocalRenderStates().values())
