@@ -68,6 +68,7 @@ public class Scene implements Serializable {
 	private transient boolean redrawAll = false;
 	private Unit unit = Unit.Meter;
 	private double annotationScale = 1;
+	static private boolean isTextureEnabled = true;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -341,13 +342,14 @@ public class Scene implements Serializable {
 			redrawAll = true;
 	}
 
-	public void setTextureEnabled(final boolean visible) {
+	public void setTextureEnabled(final boolean enabled) {
+		isTextureEnabled  = enabled;
 		for (HousePart part : parts)
-			part.updateTexture();
+			part.updateTexture(enabled);
 		for (HousePart part : PrintController.getInstance().getPrintParts())
-			part.updateTexture();
+			part.updateTexture(enabled);
 
-		if (visible)
+		if (enabled)
 			redrawAll = true;
 	}
 
@@ -392,5 +394,9 @@ public class Scene implements Serializable {
 		if (annotationScale == 0)
 			annotationScale = 1;
 		return annotationScale;
+	}
+
+	public boolean isTextureEnabled() {
+		return isTextureEnabled;
 	}
 }

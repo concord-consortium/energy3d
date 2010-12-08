@@ -240,11 +240,11 @@ public abstract class HousePart implements Serializable {
 	public void showPoints() {		
 		for (int i = 0; i < points.size(); i++) {
 			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
-			updateEditPointScale(i);
+			computeEditPointScale(i);
 		}
 	}
 
-	protected void updateEditPointScale(int i) {
+	protected void computeEditPointScale(int i) {
 			pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
 	}
 
@@ -427,57 +427,35 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void draw() {
-//		System.out.println("(" + printSequence + ")");
 		if (drawFlag == globalDrawFlag)
 			return;		
 		drawFlag = globalDrawFlag;
 		
-		if (Util.DEBUG)
-		System.out.println("drawing..." + this);
-		if (root == null) {
-			log("init()");
+		if (root == null)
 			init();
-		}
 
-		log("computeAbsPoints()");
 		computeAbsPoints();
-		log("computeCenter()");
 		computeCenter();
 
-		log("updateMesh()");
-		updateMesh();
+		drawMesh();
 
-		log("CollisionTreeManager.INSTANCE.removeCollisionTree()");
 		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
-
-		if (isFlatten && original != null && isPrintable() && isDrawCompleted()) { // && flattenTime >= 0) // TODO If draw not completed then it shouldn't even exist at this point!
-			log("flatten()");
+		if (isFlatten && original != null && isPrintable() && isDrawCompleted()) // && flattenTime >= 0) // TODO If draw not completed then it shouldn't even exist at this point!
 			flatten();
-		}
 
-		if (original != null && isPrintable()) {
-			log("updateLabels()");
-			updateLabels();
-		}
+		if (original != null && isPrintable())
+			drawLabels();
 
-		if (drawAnnotations) {
-			log("drawAnnotations()");
+		if (drawAnnotations)
 			drawAnnotations();
-		}		
-
-//		for (HousePart child : children)
-//			child.draw();
-
-		// for (HousePart child : children)
-		// child.draw();
-				
 	}
 
 	protected void computeAbsPoints() {
 		for (int i = 0; i < points.size(); i++) {
-			Vector3 p = points.get(i);
-			p = toAbsolute(p);
+//			Vector3 p = points.get(i);
+//			p = toAbsolute(p);
+			final Vector3 p = toAbsolute(points.get(i));
 			abspoints.get(i).set(p);
 			pointsRoot.getChild(i).setTranslation(p);
 		}
@@ -492,10 +470,6 @@ public abstract class HousePart implements Serializable {
 
 	protected void flatten() {
 		root.setTranslation(0, 0, 0);
-//		computePrintCenter();	//TODO move to setPreview(true) doesn't need to recompute every time
-//		final Vector3 targetCenter = new Vector3(printCenter);
-//		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) root.getUserData());
-//		final Vector3 targetCenter = new Vector3((ReadOnlyVector3) mesh.getUserData());
 		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
 		final Vector3 currentCenter = new Vector3(center);
 		
@@ -513,7 +487,7 @@ public abstract class HousePart implements Serializable {
 ////		return height / 1;
 //	}
 
-	protected void updateLabels() {
+	protected void drawLabels() {
 		final String text = "(" + (printSequence++ + 1) + ")";
 		final BMText label = fetchBMText(text, 0);
 				
@@ -588,7 +562,7 @@ public abstract class HousePart implements Serializable {
 	protected void drawAnnotations() {
 	}
 
-	protected abstract void updateMesh();
+	protected abstract void drawMesh();
 
 	public void setAnnotationsVisible(boolean visible) {
 		drawAnnotations  = visible;
@@ -597,16 +571,16 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot.getSceneHints().setCullHint(cull);
 	}
 
-	public void log(String s) {
-		if (Util.DEBUG)
-			System.out.println(this + "\t" + s);
-	}
+//	public void log(String s) {
+//		if (Util.DEBUG)
+//			System.out.println(this + "\t" + s);
+//	}
 
 	public static void setTextureEnabled(boolean enabled) {
 		textureEnabled  = enabled;		
 	}
 
-	public void updateTexture() {
+	public void updateTexture(final boolean textureEnabled) {
 		if (textureEnabled) {
 			final TextureState ts = new TextureState();
 			ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));

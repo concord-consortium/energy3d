@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.util.ArrayList;
 
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.SelectUtil;
 
@@ -44,7 +45,7 @@ public class Foundation extends HousePart {
 		boundingMesh = new Box("Foundation (Bounding)", new Vector3(), new Vector3());
 		root.attachChild(mesh);
 		
-		updateTexture();
+		updateTexture(Scene.getInstance().isTextureEnabled());
 
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
@@ -81,7 +82,7 @@ public class Foundation extends HousePart {
 			if (!resizeHouseMode && i >= 4)
 				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 			else {
-				updateEditPointScale(i);
+				computeEditPointScale(i);
 				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
 			}
 		}
@@ -162,7 +163,7 @@ public class Foundation extends HousePart {
 		}
 	}
 
-	protected void updateMesh() {
+	protected void drawMesh() {
 		final boolean drawable = points.size() == 8;
 		if (drawable) {
 			((Box)mesh).setData(points.get(0), points.get(3).add(0, 0, height, null));

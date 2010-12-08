@@ -117,7 +117,7 @@ public class Wall extends HousePart {
 		mesh.setRenderState(ms);
 		// surroundMesh.setRenderState(ms);
 
-		updateTexture();
+		updateTexture(Scene.getInstance().isTextureEnabled());
 
 		UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -256,7 +256,7 @@ public class Wall extends HousePart {
 		return points.size() >= 4 && points.get(0).subtract(points.get(2), null).length() > MIN_WALL_LENGTH;
 	}
 
-	protected void updateMesh() {
+	protected void drawMesh() {
 		if (!isDrawable())
 			return;
 

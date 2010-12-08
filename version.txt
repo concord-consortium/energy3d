@@ -423,11 +423,10 @@ Version 0.2
 - automatically disable textures when a color menu item is clicked
 - make new executable jar
 - put window in center by default
-
 - floor is no longer a subclass of roof
 - roof instances are no longer represented by a single mesh even when not in print preview mode
 - fix problem with pick exception due to not updating vertex count in MeshLib.groupByPlanner()
- 
+- clean up the code 
  
 
 - TODO: fix problem with floor no texture (concluded that floor must be superclass)

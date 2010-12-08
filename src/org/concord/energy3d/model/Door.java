@@ -98,7 +98,7 @@ public class Door extends HousePart {
 		}
 	}
 
-	protected void updateMesh() {
+	protected void drawMesh() {
 		if (points.size() < 4)
 			return;		
 
@@ -133,7 +133,7 @@ public class Door extends HousePart {
 		return false;
 	}
 	
-	public void updateTexture() {
+	public void updateTexture(final boolean textureEnabled) {
 		
 	}
 

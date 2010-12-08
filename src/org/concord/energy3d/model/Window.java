@@ -1,68 +1,55 @@
 package org.concord.energy3d.model;
 
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-
 import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 
-import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.15;
 //	private transient Mesh mesh;
-	private transient FloatBuffer vertexBuffer;
-	private transient FloatBuffer normalBuffer;
-	private transient BMText label1;
+//	private transient FloatBuffer vertexBuffer;
+//	private transient FloatBuffer normalBuffer;
+	transient private BMText label1;
 
 	public Window() {
 		super(2, 4, 0.30);
 	}
 
-	protected void init() {
-		super.init();
-		for (int i = 0; i < points.size(); i++)
-			abspoints.get(i).set(toAbsolute(abspoints.get(i)));
-		mesh = new Mesh("Window");
-		vertexBuffer = BufferUtils.createVector3Buffer(4);
-		normalBuffer = BufferUtils.createVector3Buffer(4);
-		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		mesh.getMeshData().setVertexBuffer(vertexBuffer);
-		mesh.getMeshData().setNormalBuffer(normalBuffer);
-		mesh.setModelBound(new BoundingBox());
-
-		// Transparency
-		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.4f, 0.5f, 0.7f));
-		BlendState blendState = new BlendState();
-		blendState.setBlendEnabled(true);
-		blendState.setTestEnabled(true);
-		mesh.setRenderState(blendState);
-		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-
-		// Add a material to the box, to show both vertex color and lighting/shading.
-		final MaterialState ms = new MaterialState();
-		ms.setColorMaterial(ColorMaterial.AmbientAndDiffuse);
-		mesh.setRenderState(ms);
-
-		mesh.setUserData(new UserData(this));
-		
+//	protected void init() {
+//		super.init();
+////		for (int i = 0; i < points.size(); i++)
+////			abspoints.get(i).set(toAbsolute(abspoints.get(i)));
+//		mesh = new Mesh("Window");
+//		vertexBuffer = BufferUtils.createVector3Buffer(4);
+//		normalBuffer = BufferUtils.createVector3Buffer(4);
+//		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+//		mesh.getMeshData().setVertexBuffer(vertexBuffer);
+//		mesh.getMeshData().setNormalBuffer(normalBuffer);
+//		mesh.setModelBound(new BoundingBox());
+//
+//		// Transparency
+//		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.4f, 0.5f, 0.7f));
+//		BlendState blendState = new BlendState();
+//		blendState.setBlendEnabled(true);
+//		blendState.setTestEnabled(true);
+//		mesh.setRenderState(blendState);
+//		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+//
+//		// Add a material to the box, to show both vertex color and lighting/shading.
+//		final MaterialState ms = new MaterialState();
+//		ms.setColorMaterial(ColorMaterial.AmbientAndDiffuse);
+//		mesh.setRenderState(ms);
+//		mesh.setUserData(new UserData(this));
+//		
 //		root.attachChild(mesh);
-	}
+//	}
 
 	public void addPoint(int x, int y) {
 		if (container != null)
@@ -107,22 +94,21 @@ public class Window extends HousePart {
 		}
 	}
 
-	protected void updateMesh() {
-		if (points.size() < 4)
-			return;
-		vertexBuffer.rewind();
-		for (Vector3 p : abspoints)
-			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-
-		// Compute normals
-		final Vector3 normal = abspoints.get(2).subtract(abspoints.get(0), null).crossLocal(abspoints.get(1).subtract(abspoints.get(0), null)).normalizeLocal();
-		normal.negateLocal();
-		normalBuffer.rewind();
-		for (int i = 0; i < points.size(); i++)
-			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
-
-		mesh.updateModelBound();
-
+	protected void drawMesh() {
+//		if (points.size() < 4)
+//			return;
+//		vertexBuffer.rewind();
+//		for (Vector3 p : abspoints)
+//			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+//
+//		// Compute normals
+//		final Vector3 normal = abspoints.get(2).subtract(abspoints.get(0), null).crossLocal(abspoints.get(1).subtract(abspoints.get(0), null)).normalizeLocal();
+//		normal.negateLocal();
+//		normalBuffer.rewind();
+//		for (int i = 0; i < points.size(); i++)
+//			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+//
+//		mesh.updateModelBound();
 	}
 
 	protected void drawAnnotations() {
@@ -161,7 +147,6 @@ public class Window extends HousePart {
 
 	private ReadOnlyVector3 abspointsTrans(int i, ReadOnlyTransform trans, Vector3 v) {
 		v.set(abspoints.get(i));
-//		v.setY(v.getY() - 1);
 		return trans.applyForward(v);
 	}
 
@@ -170,12 +155,6 @@ public class Window extends HousePart {
 			container.children.remove(this);
 			container.draw();
 		}
-	}
-
-	public ArrayList<Vector3> getPoints() {
-		if (root == null)
-			init();
-		return abspoints;
 	}
 
 	public boolean isPrintable() {
@@ -187,8 +166,16 @@ public class Window extends HousePart {
 		if (label1 != null)
 			label1.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 	}
-
-	public Vector3 enforceContraints(Vector3 p) {
+	
+	protected void computeAbsPoints() {
+		for (int i = 0; i < points.size(); i++) {
+			final Vector3 p = toAbsolute(enforceContraints(points.get(i)));
+			abspoints.get(i).set(p);
+			pointsRoot.getChild(i).setTranslation(p);
+		}
+	}
+	
+	private Vector3 enforceContraints(Vector3 p) {
 		if (container == null)
 			return new Vector3(p);
 		final double wallx = container.getPoints().get(2).subtract(container.getPoints().get(0), null).length();
@@ -198,15 +185,6 @@ public class Window extends HousePart {
 		return new Vector3(x, p.getY(), p.getZ());
 	}
 	
-	protected void computeAbsPoints() {
-		for (int i = 0; i < points.size(); i++) {
-			Vector3 p = enforceContraints(points.get(i));
-			p = toAbsolute(p);
-			abspoints.get(i).set(p);
-			pointsRoot.getChild(i).setTranslation(p);
-		}
-	}
-	
-	public void updateTexture() {
+	public void updateTexture(final boolean textureEnabled) {
 	}
 }
