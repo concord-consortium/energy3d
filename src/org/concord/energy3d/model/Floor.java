@@ -168,9 +168,9 @@ public class Floor extends HousePart {
 		}
 	}
 
-	public ReadOnlyVector3 getFaceDirection() {
-		return Vector3.UNIT_Z;
-	}
+//	public ReadOnlyVector3 getFaceDirection() {
+//		return Vector3.UNIT_Z;
+//	}
 
 	protected void drawAnnotations() {
 		if (container == null)
@@ -193,8 +193,8 @@ public class Floor extends HousePart {
 		return "floor.jpg";
 	}
 	
-	protected void flatten() {
+	public void flatten(double flattenTime) {
 		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
-		super.flatten();
+		super.flatten(flattenTime);
 	}	
 }

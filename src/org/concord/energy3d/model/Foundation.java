@@ -192,9 +192,9 @@ public class Foundation extends HousePart {
 		newBoundingHeight = boundingHeight;
 	}
 
-	protected void flatten() {
+	public void flatten(double flattenTime) {
 		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
-		super.flatten();
+		super.flatten(flattenTime);
 	}
 	
 	protected void computeCenter() {

@@ -353,26 +353,26 @@ public class Scene implements Serializable {
 			redrawAll = true;
 	}
 
-	public void redrawAll() {
-		Snap.clearAnnotationDrawn();
-		for (HousePart part : parts) {
-			// part.forceInit();
-			part.draw();
-		}
-		HousePart.setFlattenTime(HousePart.getFlattenTime());
-		PrintController.getInstance().drawPrintParts();
-	}
+//	public void redrawAll() {
+//		Snap.clearAnnotationDrawn();
+//		for (HousePart part : parts) {
+//			// part.forceInit();
+//			part.draw();
+//		}
+//		HousePart.setFlattenTime(HousePart.getFlattenTime());
+////		PrintController.getInstance().drawPrintParts();
+//	}
 
-	public void update() {
-		if (redrawAll) {
-			Snap.clearAnnotationDrawn();
-			for (HousePart part : parts)
-				part.draw();
-			HousePart.setFlattenTime(HousePart.getFlattenTime());
-			PrintController.getInstance().drawPrintParts();
-		}
-		redrawAll = false;
-	}
+//	public void update() {
+//		if (redrawAll) {
+//			Snap.clearAnnotationDrawn();
+//			for (HousePart part : parts)
+//				part.draw();
+//			HousePart.setFlattenTime(HousePart.getFlattenTime());
+////			PrintController.getInstance().drawPrintParts();
+//		}
+//		redrawAll = false;
+//	}
 
 	public void setUnit(Unit unit) {
 		this.unit = unit;

@@ -639,7 +639,7 @@ public class Wall extends HousePart {
 //		draw();
 	}
 
-	protected void flatten() {
+	public void flatten(double flattenTime) {
 		thicknessNormal = decideThicknessNormal();
 		final Vector3 n = thicknessNormal.normalize(null);
 		double angle = n.smallestAngleBetween(Vector3.UNIT_X);
@@ -649,13 +649,18 @@ public class Wall extends HousePart {
 			angle = Math.PI - angle;
 
 		root.setRotation((new Matrix3().fromAngles(0, 0, -flattenTime * angle)));
-		super.flatten();
+		super.flatten(flattenTime);
+		
+		for (HousePart part : children)
+			if (!part.isPrintable())
+				part.draw();
 	}
 
 	public ReadOnlyVector3 getFaceDirection() {
 		if (thicknessNormal == null)
 			thicknessNormal = decideThicknessNormal();
-		return thicknessNormal.negate(null).normalizeLocal().multiplyLocal(0.5);
+//		return thicknessNormal.negate(null).normalizeLocal().multiplyLocal(0.5);
+		return thicknessNormal.negate(null).normalizeLocal();
 	}
 
 	protected void drawAnnotations() {

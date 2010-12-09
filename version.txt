@@ -427,7 +427,9 @@ Version 0.2
 - roof instances are no longer represented by a single mesh even when not in print preview mode
 - fix problem with pick exception due to not updating vertex count in MeshLib.groupByPlanner()
 - clean up the code 
- 
+- remove static attributes for controlling print preview animation
+- avoid re-generating mesh when animating for print preview
+- clean up HousePart class 
 
 - TODO: fix problem with floor no texture (concluded that floor must be superclass)
 - problem with house5 roof, one of them is still in triangle form

@@ -67,7 +67,6 @@ public class MeshLib {
 			
 			FloatBuffer buf = newMesh.getMeshData().getVertexBuffer();
 			int n = group.vertices.size();
-			System.out.println(newMesh + "\t primitives = " + newMesh.getMeshData().getPrimitiveCount(0));
 			if (buf == null || buf.capacity() / 3 < n) {
 				buf = BufferUtils.createVector3Buffer(n);
 				newMesh.getMeshData().setVertexBuffer(buf);

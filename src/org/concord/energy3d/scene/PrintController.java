@@ -71,50 +71,32 @@ public class PrintController implements Updater {
 			return;
 
 		final long time = timer.getTime();
-		final Spatial originalHouseRoot = Scene.getInstance().getOriginalHouseRoot();
+		final Spatial originalHouseRoot = Scene.getInstance().getOriginalHouseRoot();		
 		if (init) {
-			if (Util.DEBUG)
-				System.out.println("Initializing Print Preview Animation...");
 			init = false;
 			startTime = time;
-			HousePart.setFlatten(true);
-			final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
+//			HousePart.setFlatten(true);
+//			final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
 			if (!isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
 				Scene.getRoot().detachChild(pagesRoot);
 				pagesRoot.detachAllChildren();
 			} else {
-				renderer.makeCurrentContext();
-				// renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
-				renderer.releaseCurrentContext();
-				if (Util.DEBUG)
-					System.out.print("Deep cloning...");
+//				renderer.makeCurrentContext();
+//				// renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
+//				renderer.releaseCurrentContext();				
 				sceneClone = (Scene) ObjectCloner.deepCopy(Scene.getInstance());
-				if (Util.DEBUG)
-					System.out.println("done");
 				printParts.clear();
-				// HousePart.clearDrawFlags();
 				for (int i = 0; i < sceneClone.getParts().size(); i++) {
 					final HousePart newPart = sceneClone.getParts().get(i);
-					if (Util.DEBUG)
-						System.out.println("Attaching Print Part...");
 					Scene.getRoot().attachChild(newPart.getRoot());
 					newPart.draw();
-//					if (newPart instanceof Roof)
-//						((Roof)newPart).createIndividualMeshes();
 					newPart.setOriginal(Scene.getInstance().getParts().get(i));
 					if (newPart.isPrintable() && newPart.isDrawCompleted())
 						printParts.add(newPart);
-					// newPart.getRoot().updateWorldBound(true);
-					// System.out.println(newPart.getRoot().);
 				}
-				// Scene.getRoot().updateWorldBound(true);
-				// for (HousePart part : printParts)
-				// System.out.println(part + "\t" + part.getRoot().getWorldBound());
-
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
 				computePageDimension();
 				computePrintCenters(pages);
-//				computePrintCentersForRoof(pages);
 				arrangePrintPages(pages);
 				System.out.println("Total # of Print Pages = " + pages.size());
 
@@ -126,36 +108,22 @@ public class PrintController implements Updater {
 			}
 			for (HousePart part : Scene.getInstance().getParts())
 				part.getRoot().getSceneHints().setCullHint(CullHint.Always);
-			if (Util.DEBUG)
-				System.out.println("Finished initialization of Print Preview Animation.");
 		}
 
 		if (!finish) {
 			final double t = (time - startTime) / 1.0 / timer.getResolution();
-			if (Util.DEBUG)
-				System.out.println("t = " + t);
-			HousePart.setFlattenTime(isPrintPreview ? t : 1 - t);
-			drawPrintParts();
+//			HousePart.setFlattenTime(isPrintPreview ? t : 1 - t);
+			drawPrintParts(isPrintPreview ? t : 1 - t);
 
 			finish = t > 1;
 			finishPhase = 0;
-
-			// for (HousePart part : printParts)
-			// System.out.println(part.getRoot().getWorldBound());
-
 		}
 
 		if (finish) {
-			if (Util.DEBUG)
-				System.out.println("Finishing Print Preview Animation...");
-			if (isPrintPreview) {
+			if (isPrintPreview)
 				Scene.getRoot().attachChild(pagesRoot);
-				// Scene.getRoot().updateWorldBound(true);
-				// for (HousePart part : printParts)
-				// System.out.println(part + "\t" + part.getRoot().getWorldBound());
-			}
-			if (!isPrintPreview)
-				HousePart.setFlatten(false);
+//			if (!isPrintPreview)
+//				HousePart.setFlatten(false);
 			if (!isPrintPreview && finishPhase == 10) {
 				originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
 				angle = 0;
@@ -176,16 +144,14 @@ public class PrintController implements Updater {
 				frame.getShadowMenu().setSelected(shadowSelected);
 
 				SceneManager.getInstance().updatePrintPreviewScene(false);
-				if (Util.DEBUG)
-					System.out.println("Finished Print Preview Animation.");
 			}
 
 			if (finishPhase == 10) {
-				for (HousePart part : Scene.getInstance().getParts())
+				int printSequence = 0;
+				for (HousePart part : Scene.getInstance().getParts()) {
 					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
-				if (Util.DEBUG)
-					System.out.println("Final Finish of Print Preview Animation.");
-
+					printSequence = part.drawLabels(printSequence);
+				}
 			}
 
 			finishPhase++;
@@ -201,15 +167,25 @@ public class PrintController implements Updater {
 		}
 	}
 
-	public void drawPrintParts() {
+	public void drawPrintParts(double flattenTime) {
 		if (sceneClone == null)
 			return;
-		// printCenters.clear();
-		for (HousePart part : sceneClone.getParts())
+		if (flattenTime < 0)
+			flattenTime = 0;
+		if (flattenTime > 1)
+			flattenTime = 1;			
+		
+		int printSequence = 0;
+		for (HousePart part : sceneClone.getParts()) {
 			// TODO If draw not completed then it shouldn't even exist at this point!
-			if (part.isDrawCompleted())
-				part.draw();
-		// printCenters.size();
+			if (part.isDrawCompleted() && part.isPrintable()) {
+//				part.draw();
+				part.flatten(flattenTime);
+				printSequence = part.drawLabels(printSequence);
+			}
+			
+		}
+			
 	}
 
 	public void print() {

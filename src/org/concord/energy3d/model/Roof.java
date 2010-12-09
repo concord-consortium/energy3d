@@ -104,7 +104,8 @@ public abstract class Roof extends HousePart {
 			if (!root.hasChild(bottomMesh))
 				root.attachChild(bottomMesh);
 			fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
-			if (!isFlatten || flattenedMeshesRoot.getNumberOfChildren() == 0)
+//			if (!isFlatten || flattenedMeshesRoot.getNumberOfChildren() == 0)
+			if (flattenedMeshesRoot.getNumberOfChildren() == 0)
 				createIndividualMeshes();
 
 			for (int i = 0; i < points.size(); i++) {
@@ -170,15 +171,15 @@ public abstract class Roof extends HousePart {
 		return new Polygon(wallUpperPoints);
 	}
 
-	protected void flatten() {
+	public void flatten(double flattenTime) {
 		for (Spatial child : getFlattenedMeshesRoot().getChildren())
-			flattenQuadTriangle((Mesh) child);
+			flattenQuadTriangle((Mesh) child, flattenTime);
 		mesh.updateModelBound();
 		if (bottomMesh != null)
 			bottomMesh.getSceneHints().setCullHint(CullHint.Always);
 	}
 
-	private void flattenQuadTriangle(final Mesh mesh) {
+	private void flattenQuadTriangle(final Mesh mesh, final double flattenTime) {
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		buf.rewind();
 		final Vector3 p1 = new Vector3(buf.get(), buf.get(), buf.get());
@@ -206,13 +207,12 @@ public abstract class Roof extends HousePart {
 			orgCenters.put(mesh, orgCenter);
 		}
 		final Vector3 targetPrintCenter = ((UserData) mesh.getUserData()).getPrintCenter();
-		System.out.println(mesh.getUserData());
 		mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
 	}
 
-	public ReadOnlyVector3 getFaceDirection() {
-		return Vector3.UNIT_Z;
-	}
+//	public ReadOnlyVector3 getFaceDirection() {
+//		return Vector3.UNIT_Z;
+//	}
 
 	protected void drawAnnotations() {
 		if (container == null)
@@ -262,7 +262,7 @@ public abstract class Roof extends HousePart {
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 	}
 
-	protected void drawLabels() {
+	public int drawLabels(int printSequence) {
 		final Vector3 p = new Vector3();
 		final Vector3 center = new Vector3();
 		int triangle = 0;
@@ -281,9 +281,11 @@ public abstract class Roof extends HousePart {
 			center.addLocal(0, -0.01, 0);
 
 			final String text = "(" + (printSequence++ + 1) + ")";
+//			final String text = "(" + id + "." + (triangle + 1) + ")";
 			final BMText label = fetchBMText(text, triangle++);
 			label.setTranslation(center);
 		}
+		return printSequence;
 	}
 
 	public void updateTexture(final boolean textureEnabled) {
@@ -329,7 +331,6 @@ public abstract class Roof extends HousePart {
 	}
 
 	private void createIndividualMeshes() {
-		System.out.println("createIndividualMeshes()");
 		MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
 		for (final Spatial child : flattenedMeshesRoot.getChildren())
 			child.setUserData(new UserData(this));

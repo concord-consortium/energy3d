@@ -1143,7 +1143,7 @@ public class MainFrame extends JFrame {
 			textureCheckBoxMenuItem = new JCheckBoxMenuItem("Texture", true);
 			textureCheckBoxMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					HousePart.setTextureEnabled(textureCheckBoxMenuItem.isSelected());
+//					HousePart.setTextureEnabled(textureCheckBoxMenuItem.isSelected());
 					Scene.getInstance().setTextureEnabled(textureCheckBoxMenuItem.isSelected());
 				}
 			});

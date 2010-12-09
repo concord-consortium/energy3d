@@ -334,7 +334,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.checkTriggers(tpf);
 
 		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
-		Scene.getInstance().update();
+//		Scene.getInstance().update();
 
 		int val = 1;
 		if (rotAnim && viewMode == ViewMode.NORMAL) {
