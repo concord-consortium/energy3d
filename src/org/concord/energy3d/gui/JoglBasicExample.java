@@ -10,38 +10,23 @@
 
 package org.concord.energy3d.gui;
 
-import java.net.URISyntaxException;
-
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
-import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.jogl.JoglCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
-import com.ardor3d.image.Texture;
-import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
-import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
-import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.controller.SpatialController;
-import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ContextGarbageCollector;
-import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
  * <p>

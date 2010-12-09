@@ -13,14 +13,11 @@ import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
-import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -32,7 +29,6 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class Roof extends HousePart {
 	static private final long serialVersionUID = 1L;
@@ -53,27 +49,15 @@ public abstract class Roof extends HousePart {
 
 		mesh = new Mesh("Roof");
 		bottomMesh = new Mesh("Roof (bottom)");
-//		root.attachChild(bottomMesh);
-
-//		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-//		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-//		mesh.setModelBound(new BoundingSphere());
-//
-//		bottomMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-//		bottomMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-//		bottomMesh.setModelBound(new BoundingSphere());
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
-//		mesh.setRenderState(ms);
 		bottomMesh.setRenderState(ms);
 
-		updateTexture(Scene.getInstance().isTextureEnabled());
+		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 
-		final UserData userData = new UserData(this);
-//		mesh.setUserData(userData);
-		bottomMesh.setUserData(userData);
+		bottomMesh.setUserData(new UserData(this));
 	}
 
 	protected void computeAbsPoints() {
@@ -85,28 +69,28 @@ public abstract class Roof extends HousePart {
 	protected void drawMesh() {
 		try {
 			if (container == null) {
-//				resetToZero(mesh.getMeshData().getVertexBuffer());
-//				if (bottomMesh != null)
-//					resetToZero(bottomMesh.getMeshData().getVertexBuffer());
 				flattenedMeshesRoot.getSceneHints().setCullHint(CullHint.Always);
 				bottomMesh.getSceneHints().setCullHint(CullHint.Always);
 				hidePoints();
 				return;
 			}
-
 			flattenedMeshesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 			bottomMesh.getSceneHints().setCullHint(CullHint.Inherit);
-			
+
 			wallUpperPoints = exploreWallNeighbors((Wall) container);
 
-//			if (bottomMesh != null)
 			fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
 			if (!root.hasChild(bottomMesh))
 				root.attachChild(bottomMesh);
 			fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
-//			if (!isFlatten || flattenedMeshesRoot.getNumberOfChildren() == 0)
-			if (flattenedMeshesRoot.getNumberOfChildren() == 0)
-				createIndividualMeshes();
+			// if (flattenedMeshesRoot.getNumberOfChildren() == 0) {
+			// createIndividualMeshes();
+			
+			// create roof parts
+			MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
+			for (final Spatial child : flattenedMeshesRoot.getChildren())
+				child.setUserData(new UserData(this));
+			// }
 
 			for (int i = 0; i < points.size(); i++) {
 				Vector3 p = points.get(i);
@@ -119,12 +103,6 @@ public abstract class Roof extends HousePart {
 			e.printStackTrace();
 		}
 	}
-
-//	private void resetToZero(final FloatBuffer buff) {
-//		buff.rewind();
-//		while (buff.hasRemaining())
-//			buff.put(0);
-//	}
 
 	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
 		Poly2Tri.triangulate(polygon);
@@ -210,10 +188,6 @@ public abstract class Roof extends HousePart {
 		mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
 	}
 
-//	public ReadOnlyVector3 getFaceDirection() {
-//		return Vector3.UNIT_Z;
-//	}
-
 	protected void drawAnnotations() {
 		if (container == null)
 			return;
@@ -281,14 +255,13 @@ public abstract class Roof extends HousePart {
 			center.addLocal(0, -0.01, 0);
 
 			final String text = "(" + (printSequence++ + 1) + ")";
-//			final String text = "(" + id + "." + (triangle + 1) + ")";
 			final BMText label = fetchBMText(text, triangle++);
 			label.setTranslation(center);
 		}
 		return printSequence;
 	}
 
-	public void updateTexture(final boolean textureEnabled) {
+	public void updateTextureAndColor(final boolean textureEnabled) {
 		if (textureEnabled) {
 			final TextureState ts = new TextureState();
 			ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
@@ -324,17 +297,17 @@ public abstract class Roof extends HousePart {
 	}
 
 	public Node getFlattenedMeshesRoot() {
-		if (flattenedMeshesRoot == null) {
-			createIndividualMeshes();
-		}
+		// if (flattenedMeshesRoot == null) {
+		// createIndividualMeshes();
+		// }
 		return flattenedMeshesRoot;
 	}
 
-	private void createIndividualMeshes() {
-		MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
-		for (final Spatial child : flattenedMeshesRoot.getChildren())
-			child.setUserData(new UserData(this));
-	}
+	// private void createIndividualMeshes() {
+	// MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
+	// for (final Spatial child : flattenedMeshesRoot.getChildren())
+	// child.setUserData(new UserData(this));
+	// }
 
 	protected String getDefaultTextureFileName() {
 		return "roof.jpg";

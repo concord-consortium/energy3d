@@ -1,6 +1,5 @@
 package org.concord.energy3d.model;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
@@ -13,7 +12,6 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -41,12 +39,11 @@ public class Floor extends HousePart {
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.setModelBound(new BoundingSphere());
 
-		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
 
-		updateTexture(Scene.getInstance().isTextureEnabled());
+		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -92,18 +89,6 @@ public class Floor extends HousePart {
 		}
 	}
 	
-//	public void updateTexture() {
-//		if (textureEnabled) {
-//			final TextureState ts = new TextureState();
-//			ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-//			mesh.setRenderState(ts);
-//			mesh.setDefaultColor(ColorRGBA.WHITE);
-//		} else {
-//			mesh.clearRenderState(StateType.Texture);
-//			mesh.setDefaultColor(defaultColor);
-//		}
-//	}
-
 	protected void computeAbsPoints() {
 	}
 
@@ -112,16 +97,13 @@ public class Floor extends HousePart {
 
 	protected void drawMesh() {
 		if (container == null) {
-//			resetToZero(mesh.getMeshData().getVertexBuffer());
 			mesh.getSceneHints().setCullHint(CullHint.Always);
 			hidePoints();
 			return;
 		}
 		
 		mesh.getSceneHints().setCullHint(CullHint.Inherit);
-
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
-
 		fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
 
 		for (int i = 0; i < points.size(); i++)
@@ -129,13 +111,6 @@ public class Floor extends HousePart {
 
 		mesh.updateModelBound();
 	}
-
-//	private void resetToZero(final FloatBuffer buff) {
-//		buff.rewind();
-//		while (buff.hasRemaining())
-//			buff.put(0);
-//	}
-
 
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
 		center.set(0, 0, 0);
@@ -167,10 +142,6 @@ public class Floor extends HousePart {
 			center.addLocal(p);
 		}
 	}
-
-//	public ReadOnlyVector3 getFaceDirection() {
-//		return Vector3.UNIT_Z;
-//	}
 
 	protected void drawAnnotations() {
 		if (container == null)

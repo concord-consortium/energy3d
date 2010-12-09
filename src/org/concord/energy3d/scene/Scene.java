@@ -345,9 +345,9 @@ public class Scene implements Serializable {
 	public void setTextureEnabled(final boolean enabled) {
 		isTextureEnabled  = enabled;
 		for (HousePart part : parts)
-			part.updateTexture(enabled);
+			part.updateTextureAndColor(enabled);
 		for (HousePart part : PrintController.getInstance().getPrintParts())
-			part.updateTexture(enabled);
+			part.updateTextureAndColor(enabled);
 
 		if (enabled)
 			redrawAll = true;
@@ -363,16 +363,16 @@ public class Scene implements Serializable {
 ////		PrintController.getInstance().drawPrintParts();
 //	}
 
-//	public void update() {
-//		if (redrawAll) {
-//			Snap.clearAnnotationDrawn();
-//			for (HousePart part : parts)
-//				part.draw();
+	public void update() {
+		if (redrawAll) {
+			Snap.clearAnnotationDrawn();
+			for (HousePart part : parts)
+				part.draw();
 //			HousePart.setFlattenTime(HousePart.getFlattenTime());
-////			PrintController.getInstance().drawPrintParts();
-//		}
-//		redrawAll = false;
-//	}
+//			PrintController.getInstance().drawPrintParts();
+		}
+		redrawAll = false;
+	}
 
 	public void setUnit(Unit unit) {
 		this.unit = unit;

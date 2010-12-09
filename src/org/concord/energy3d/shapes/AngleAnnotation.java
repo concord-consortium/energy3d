@@ -6,7 +6,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 
@@ -18,16 +17,6 @@ public class AngleAnnotation extends Annotation {
 		this.attachChild(label);
 	}
 
-//	protected Mesh getMesh() {
-//		if (mesh != null)
-//			return mesh;
-//		else {
-//			final Arc arc = new Arc("Angle annotation arc");
-//			return arc;
-//			
-//		}
-//	}
-	
 	public void setRange(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
 		final Vector3 a = new Vector3().set(p2).subtractLocal(p1).normalizeLocal();
 		final Vector3 b = new Vector3().set(p3).subtractLocal(p1).normalizeLocal();		

@@ -133,7 +133,7 @@ public class Door extends HousePart {
 		return false;
 	}
 	
-	public void updateTexture(final boolean textureEnabled) {
+	public void updateTextureAndColor(final boolean textureEnabled) {
 		
 	}
 

@@ -185,6 +185,6 @@ public class Window extends HousePart {
 		return new Vector3(x, p.getY(), p.getZ());
 	}
 	
-	public void updateTexture(final boolean textureEnabled) {
+	public void updateTextureAndColor(final boolean textureEnabled) {
 	}
 }

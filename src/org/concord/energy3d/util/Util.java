@@ -1,6 +1,5 @@
 package org.concord.energy3d.util;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.model.HousePart;
@@ -8,15 +7,11 @@ import org.concord.energy3d.model.HousePart;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
-import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
 
 public class Util {
-	public static final boolean DEBUG = false;
+//	public static final boolean DEBUG = false;
 	
 	public static double findBoundLength(final BoundingVolume bounds) {
 		double d;
@@ -28,37 +23,6 @@ public class Util {
 		}
 		return d;
 	}
-	
-//	public static double findExactHeight(final Spatial obj) {
-//		final Vector2 maxMin = new Vector2(Double.MAX_VALUE, Double.MIN_VALUE);
-//		findExactHeight(obj, maxMin);
-//		return maxMin.getX() - maxMin.getY();
-//	}
-	
-	
-	
-//	private static void findExactHeight(Spatial obj, Vector2 maxMin) {
-//		if (obj instanceof Node) {
-//			for (Spatial child : ((Node)obj).getChildren())
-//				findExactHeight(child, maxMin);
-//		} else if (obj instanceof Mesh) {
-//			System.out.println(obj);
-//			final FloatBuffer vertexBuffer = ((Mesh)obj).getMeshData().getVertexBuffer();
-//			while (vertexBuffer.hasRemaining()) {
-//				vertexBuffer.get();
-//				if (!vertexBuffer.hasRemaining())
-//					break;
-//				vertexBuffer.get();
-//				if (!vertexBuffer.hasRemaining())
-//					break;				
-//				final double z = vertexBuffer.get();
-//				if (z > maxMin.getX())
-//					maxMin.setX(z);
-//				if (z < maxMin.getY())
-//					maxMin.setY(z);
-//			}
-//		}
-//	}
 	
 	public static double findExactHeight(final ArrayList<HousePart> parts) {
 		double min = Double.MAX_VALUE;

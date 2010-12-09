@@ -6,28 +6,20 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.SelectUtil;
 
-import com.ardor3d.image.Texture;
-import com.ardor3d.image.TextureStoreFormat;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BMText.Align;
-import com.ardor3d.util.TextureManager;
 
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.5;
 	private transient boolean resizeHouseMode = false;
-//	private transient Box mesh;
 	private transient Box boundingMesh;
 	private double boundingHeight;
 	private transient double newBoundingHeight;
@@ -36,6 +28,7 @@ public class Foundation extends HousePart {
 		super(2, 8, 0.1);
 	}
 
+	@Override
 	protected void init() {
 		super.init();
 		resizeHouseMode = false;
@@ -45,7 +38,7 @@ public class Foundation extends HousePart {
 		boundingMesh = new Box("Foundation (Bounding)", new Vector3(), new Vector3());
 		root.attachChild(mesh);
 		
-		updateTexture(Scene.getInstance().isTextureEnabled());
+		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
@@ -77,6 +70,7 @@ public class Foundation extends HousePart {
 		return resizeHouseMode;
 	}
 
+	@Override
 	public void showPoints() {
 		for (int i = 0; i < points.size(); i++) {
 			if (!resizeHouseMode && i >= 4)
@@ -88,6 +82,7 @@ public class Foundation extends HousePart {
 		}
 	}	
 
+	@Override	
 	public void complete() {
 		super.complete();
 		applyNewHeight(boundingHeight, newBoundingHeight, true);
@@ -129,7 +124,6 @@ public class Foundation extends HousePart {
 				Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
 				System.out.println("closest = " + closestPoint);
 				closestPoint = grid(closestPoint, GRID_SIZE);
-//				newBoundingHeight = findHeight(base, closestPoint);
 				newBoundingHeight = Math.max(0, closestPoint.getZ() - base.getZ());
 				applyNewHeight(boundingHeight, newBoundingHeight, false);
 			}
@@ -139,9 +133,6 @@ public class Foundation extends HousePart {
 
 		draw();
 		showPoints();
-
-//		for (HousePart child : children)
-//			child.draw();
 	}
 
 	private void applyNewHeight(double oldHeight, double newHeight, boolean finalize) {
@@ -192,11 +183,13 @@ public class Foundation extends HousePart {
 		newBoundingHeight = boundingHeight;
 	}
 
+	@Override
 	public void flatten(double flattenTime) {
 		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
 		super.flatten(flattenTime);
 	}
 	
+	@Override	
 	protected void computeCenter() {
 		center.set(0, 0, 0);
 		for (int i = 0; i < points.size() / 2; i++) {
@@ -209,16 +202,11 @@ public class Foundation extends HousePart {
 		center.multiplyLocal(1.0 / points.size() * 2);
 	}	
 
-//	protected double computeLabelTop() {
-//		return mesh.getYExtent() * 1.5;
-//	}
-	
 	protected void computeLabelTop(final Vector3 top) {
-//		top.set(0, labelTop, 0);
-//		return labelTop;
 		top.set(0, 0, ((Box)mesh).getYExtent() + 0.5);
 	}	
 	
+	@Override	
 	protected void drawAnnotations() {
 		int[] order = {0, 1, 3, 2, 0};
 		int annotCounter = 0;
@@ -242,31 +230,15 @@ public class Foundation extends HousePart {
 		if (!resizeHouseMode)
 			super.hidePoints();
 	}	
-	
-//	public void updateTexture() {
-//		if (textureEnabled) {
-//			final TextureState ts = new TextureState();
-//			ts.setTexture(TextureManager.load("concrete.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-//			mesh.setRenderState(ts);
-//			mesh.setDefaultColor(ColorRGBA.WHITE);
-//		} else {
-//			mesh.clearRenderState(StateType.Texture);
-//			mesh.setDefaultColor(defaultColor);
-//		}
-//	}
 
-//	@Override
-//	protected void computePrintCenter() {
-//		super.computePrintCenter();
-//		printCenter.setY(printCenter.getY() + height);
-//	}
-	
+	@Override	
 	public void editPoint(int i) {
 		if (!resizeHouseMode && i > 3)
 			i -= 4;
 		super.editPoint(i);
 	}
 	
+	@Override	
 	protected String getDefaultTextureFileName() {
 		return "foundation.jpg";
 	}

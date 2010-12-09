@@ -9,7 +9,6 @@ import java.awt.print.PrinterJob;
 import java.util.ArrayList;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.UserData;
@@ -75,15 +74,10 @@ public class PrintController implements Updater {
 		if (init) {
 			init = false;
 			startTime = time;
-//			HousePart.setFlatten(true);
-//			final CanvasRenderer renderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-			if (!isPrintPreview) { // && !renderer.getBackgroundColor().equals(ColorRGBA.WHITE))
+			if (!isPrintPreview) {
 				Scene.getRoot().detachChild(pagesRoot);
 				pagesRoot.detachAllChildren();
 			} else {
-//				renderer.makeCurrentContext();
-//				// renderer.getRenderer().setBackgroundColor(ColorRGBA.WHITE);
-//				renderer.releaseCurrentContext();				
 				sceneClone = (Scene) ObjectCloner.deepCopy(Scene.getInstance());
 				printParts.clear();
 				for (int i = 0; i < sceneClone.getParts().size(); i++) {
@@ -91,16 +85,14 @@ public class PrintController implements Updater {
 					Scene.getRoot().attachChild(newPart.getRoot());
 					newPart.draw();
 					newPart.setOriginal(Scene.getInstance().getParts().get(i));
-					if (newPart.isPrintable() && newPart.isDrawCompleted())
+					if (newPart.isPrintable())
 						printParts.add(newPart);
 				}
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
 				computePageDimension();
 				computePrintCenters(pages);
 				arrangePrintPages(pages);
-				System.out.println("Total # of Print Pages = " + pages.size());
 
-				// applyPreviewScale();
 				SceneManager.getInstance().updatePrintPreviewScene(true);
 
 				originalHouseRoot.setScale(2);
@@ -112,7 +104,6 @@ public class PrintController implements Updater {
 
 		if (!finish) {
 			final double t = (time - startTime) / 1.0 / timer.getResolution();
-//			HousePart.setFlattenTime(isPrintPreview ? t : 1 - t);
 			drawPrintParts(isPrintPreview ? t : 1 - t);
 
 			finish = t > 1;
@@ -122,8 +113,6 @@ public class PrintController implements Updater {
 		if (finish) {
 			if (isPrintPreview)
 				Scene.getRoot().attachChild(pagesRoot);
-//			if (!isPrintPreview)
-//				HousePart.setFlatten(false);
 			if (!isPrintPreview && finishPhase == 10) {
 				originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
 				angle = 0;
@@ -155,15 +144,6 @@ public class PrintController implements Updater {
 			}
 
 			finishPhase++;
-
-			// if (finishPhase > 20) {
-			// counter++;
-			// if (Util.DEBUG)
-			// System.out.println("PrintPreview Counter: " + counter);
-			// isPrintPreview = !isPrintPreview;
-			// init = true;
-			// finish = false;
-			// }
 		}
 	}
 
@@ -177,9 +157,7 @@ public class PrintController implements Updater {
 		
 		int printSequence = 0;
 		for (HousePart part : sceneClone.getParts()) {
-			// TODO If draw not completed then it shouldn't even exist at this point!
-			if (part.isDrawCompleted() && part.isPrintable()) {
-//				part.draw();
+			if (part.isPrintable()) {
 				part.flatten(flattenTime);
 				printSequence = part.drawLabels(printSequence);
 			}
@@ -208,7 +186,6 @@ public class PrintController implements Updater {
 			canvasRenderer.releaseCurrentContext();
 		}
 		final PrinterJob job = PrinterJob.getPrinterJob();
-		// job.setPrintable(printExporter);
 		final PageFormat pageFormat = new PageFormat();
 		final Paper paper = new Paper();
 		paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
@@ -258,10 +235,6 @@ public class PrintController implements Updater {
 			if (shadowSelected)
 				frame.getShadowMenu().setSelected(false);
 		}
-
-		// SceneManager.getInstance().setCompassVisible(!printPreview);
-		// if (printPreview)
-		// SceneManager.getInstance().updatePrintPreviewScene(true);
 	}
 
 	public boolean isPrintPreview() {
@@ -335,7 +308,6 @@ public class PrintController implements Updater {
 
 			final Box box = new Box("Page Boundary");
 			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
-//			box.setDefaultColor(ColorRGBA.BLUE);
 			box.setModelBound(null);
 			pagesRoot.attachChild(box);
 		}
@@ -352,16 +324,6 @@ public class PrintController implements Updater {
 		}
 	}
 
-//	private void computePrintCentersForRoof(final ArrayList<ArrayList<Spatial>> pages) {
-//		for (HousePart printPart : printParts) {
-//			if (!(printPart instanceof Roof))
-//				continue;
-//			for (Spatial roofPart : ((Roof) printPart).getFlattenedMeshesRoot().getChildren()) {
-//				computePrintCenterOf(roofPart, pages);
-//			}
-//		}
-//	}
-
 	public void computePrintCenterOf(final Spatial printPart, final ArrayList<ArrayList<Spatial>> pages) {
 		printPart.updateWorldBound(true);
 		boolean isFitted = false;
@@ -370,7 +332,6 @@ public class PrintController implements Updater {
 		}
 		if (!isFitted) {
 			final double radius = Util.findBoundLength(printPart.getWorldBound()) / 2;
-			// printPart.setUserData(new Vector3(radius, 0, -radius));
 			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(radius + PRINT_MARGIN, 0, -radius - PRINT_MARGIN));
 			final ArrayList<Spatial> page = new ArrayList<Spatial>();
 			page.add(printPart);
@@ -381,7 +342,6 @@ public class PrintController implements Updater {
 	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
 		final double printPartRadius = Util.findBoundLength(printPart.getWorldBound()) / 2;
 		for (Spatial part : page) {
-			// final Vector3 p = (Vector3) part.getUserData();
 			final Vector3 p = ((UserData) part.getUserData()).getPrintCenter();
 			final double r = Util.findBoundLength(part.getWorldBound()) / 2;
 			final double dis = r + printPartRadius;
@@ -402,7 +362,6 @@ public class PrintController implements Updater {
 							break;
 					}
 				if (!collision) {
-					// printPart.setUserData(tryCenter);
 					((UserData) printPart.getUserData()).setPrintCenter(tryCenter);
 					page.add(printPart);
 					return true;
@@ -443,5 +402,4 @@ public class PrintController implements Updater {
 	public static int getMargin() {
 		return MARGIN;
 	}
-
 }
