@@ -12,9 +12,11 @@ public class MainApplication {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		MainFrame frame = MainFrame.getInstance();
-		SceneManager scene = new SceneManager(frame.getContentPane());		
-		frame.setVisible(true);
+//		MainFrame frame = MainFrame.getInstance();
+//		SceneManager scene = new SceneManager(frame.getContentPane());		
+		final SceneManager scene = SceneManager.getInstance();
+		MainFrame.getInstance().setVisible(true);
+//		frame.setVisible(true);
 		new Thread(scene, "Energy 3D Application").start();
 	}
 

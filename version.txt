@@ -430,6 +430,7 @@ Version 0.2
 - remove static attributes for controlling print preview animation
 - avoid re-generating mesh when animating for print preview
 - clean up HousePart class 
+- experiment with rendering only when scene changes to see its effects on lowering cpu cycles
 
 - TODO: fix problem with floor no texture (concluded that floor must be superclass)
 - problem with house5 roof, one of them is still in triangle form
