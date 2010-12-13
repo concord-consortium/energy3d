@@ -432,6 +432,7 @@ Version 0.2
 - clean up HousePart class 
 - experiment with rendering only when scene changes to see its effects on lowering cpu cycles
 - reduce cpu usage by limiting refresh rate to 60fps
+- fix problem with roof triangles not being properly attached together due to normal roundoff errors
 
 - TODO: fix problem with floor no texture (concluded that floor must be superclass)
 - problem with house5 roof, one of them is still in triangle form

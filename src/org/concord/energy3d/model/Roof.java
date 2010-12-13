@@ -252,7 +252,10 @@ public abstract class Roof extends HousePart {
 				center.addLocal(p);
 			}
 			center.divideLocal(buf.capacity() / 3);
-			center.addLocal(0, -0.01, 0);
+			if (original == null)
+				center.setZ(height);
+			else
+				center.addLocal(0, -0.01, 0);
 
 			final String text = "(" + (printSequence++ + 1) + ")";
 			final BMText label = fetchBMText(text, triangle++);

@@ -3,11 +3,6 @@ package org.concord.energy3d.scene;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.concurrent.Callable;
 
@@ -145,7 +140,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private HousePart drawn = null;
 	private Operation operation = Operation.SELECT;
 	private double sunAngle = 45, sunBaseAngle = 135;
-	// private Matrix3 rotate = new Matrix3();
 	private CameraControl control;
 	private ParallelSplitShadowMapPass shadowPass;
 	private Sphere sun;
@@ -154,15 +148,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean sunControl;
 	private boolean sunAnim;
 	private BloomRenderPass bloomRenderPass;
-	// private Line axis;
-	// private boolean dirtyRenderer;
-	// private Dome sky;
 	private ViewMode viewMode = ViewMode.NORMAL;
-	// private CameraMode cameraMode = CameraMode.ORBIT;
 	private boolean operationFlag = false;
 	private CameraNode cameraNode;
 	private boolean operationStick = false;
-	// private boolean mouseMoveFlag = false;
 	private TwoInputStates moveState;
 	private boolean drawBounds = false;
 	private long lastRenderTime;
@@ -226,7 +215,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
 		root.attachChild(cameraNode);
 		cameraNode.updateFromCamera();
-		// frameHandler.updateFrame();
 		setCameraControl(CameraMode.ORBIT);
 		resetCamera(ViewMode.NORMAL);
 
@@ -241,7 +229,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		light.setAmbient(new ColorRGBA(1, 1, 1, 1));
 		light.setEnabled(true);
 
-		// lightState = new LightState();
 		lightState.setEnabled(false);
 		lightState.attach(light);
 		root.setRenderState(lightState);
@@ -280,9 +267,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		});
 
-		// frameHandler.updateFrame();
-		// resetCamera(ViewMode.NORMAL);
-
 		root.updateGeometricState(0, true);
 		System.out.println("done");
 	}
@@ -315,17 +299,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void run() {
 		frameHandler.init();
 		while (!exit) {
-//			logicalLayer.checkTriggers(0);
-//			if (moveState != null)
-				frameHandler.updateFrame();
-			// Thread.yield();
+			frameHandler.updateFrame();
 			final double syncNS = 1000000000.0 / 60;
-			final long nanoTime = System.nanoTime();
-			long sinceLast = nanoTime - lastRenderTime;
-			System.out.println(sinceLast / 1000000000);
+			long sinceLast = System.nanoTime() - lastRenderTime;
 			if (sinceLast < syncNS) {
 				try {
-					System.out.println((Math.round((syncNS - sinceLast) / 1000000L)));
 					Thread.sleep(Math.round((syncNS - sinceLast) / 1000000L));
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -339,7 +317,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final double tpf = timer.getTimePerFrame();
 		HousePart.clearDrawFlags();
 		passManager.updatePasses(tpf);
-		 logicalLayer.checkTriggers(tpf);
+		logicalLayer.checkTriggers(tpf);
 
 		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
 		Scene.getInstance().update();
