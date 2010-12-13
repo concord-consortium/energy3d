@@ -83,14 +83,12 @@ public abstract class Roof extends HousePart {
 			if (!root.hasChild(bottomMesh))
 				root.attachChild(bottomMesh);
 			fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
-			// if (flattenedMeshesRoot.getNumberOfChildren() == 0) {
-			// createIndividualMeshes();
 			
 			// create roof parts
+			int meshIndex = 0;
 			MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
 			for (final Spatial child : flattenedMeshesRoot.getChildren())
-				child.setUserData(new UserData(this));
-			// }
+				child.setUserData(new UserData(this, meshIndex++));
 
 			for (int i = 0; i < points.size(); i++) {
 				Vector3 p = points.get(i);
@@ -300,17 +298,8 @@ public abstract class Roof extends HousePart {
 	}
 
 	public Node getFlattenedMeshesRoot() {
-		// if (flattenedMeshesRoot == null) {
-		// createIndividualMeshes();
-		// }
 		return flattenedMeshesRoot;
 	}
-
-	// private void createIndividualMeshes() {
-	// MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
-	// for (final Spatial child : flattenedMeshesRoot.getChildren())
-	// child.setUserData(new UserData(this));
-	// }
 
 	protected String getDefaultTextureFileName() {
 		return "roof.jpg";

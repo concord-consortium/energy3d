@@ -433,11 +433,8 @@ Version 0.2
 - experiment with rendering only when scene changes to see its effects on lowering cpu cycles
 - reduce cpu usage by limiting refresh rate to 60fps
 - fix problem with roof triangles not being properly attached together due to normal roundoff errors
-
-- TODO: fix problem with floor no texture (concluded that floor must be superclass)
-- problem with house5 roof, one of them is still in triangle form
-- do not render unless mouse move to save cpu cycle
-- save position and state of window in registry
+- blink the specific roof part instead of the entire roof when hovering mouse over a roof part in print preview
+- hide the edit points when in print preview mode
 
 
 
@@ -463,3 +460,5 @@ TODO:
 - new Orbit
 - combine the wall meshed into one
 - insert window in oriented wall attached to other walls
+
+- save position and state of window in registry

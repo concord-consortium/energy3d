@@ -28,7 +28,6 @@ public class MeshLib {
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
 		final Vector3 norm = new Vector3();
-//		final Map<Vector3, GroupData> groups = new HashMap<Vector3, GroupData>();
 		final ArrayList<GroupData> groups = new ArrayList<GroupData>();
 		for (int i = 0; i < vertexBuffer.limit() / 9; i++) {
 			final Vector3 p1 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
@@ -38,26 +37,18 @@ public class MeshLib {
 			p3.subtract(p1, v2);
 			v1.cross(v2, norm);
 			norm.normalizeLocal();
-//			System.out.print(norm + "\t");
-//			norm.set(round(norm.getX()), round(norm.getY()), round(norm.getZ()));
-//			System.out.println(norm);
 			
 			GroupData group = null;
 			for (final GroupData g : groups) {
-//				if (Math.round(g.key.dot(norm) * 1000000) / 1000000 == 1 ||  g.key.smallestAngleBetween(norm) < 0.05) {
 				if (g.key.dot(norm) > 0.999) {	// if there is less than 2 degrees difference between the two vectors
-					System.out.println(g.key.smallestAngleBetween(norm));
 					group = g;
 					break;
 				}
 			}			
 			
-//			GroupData group = groups.get(norm);
 			if (group == null) {
 				group = new GroupData();
 				group.key.set(norm);
-//				System.out.println(norm);
-//				groups.put(new Vector3(norm), group);
 				groups.add(group);
 			}
 			group.vertices.add(p1);
@@ -72,7 +63,6 @@ public class MeshLib {
 		}
 		
 		int meshIndex = 0;
-//		for (GroupData group : groups.values()) {
 		for (final GroupData group : groups) {
 			final Mesh newMesh;
 			if (meshIndex < root.getNumberOfChildren()) {
@@ -126,9 +116,4 @@ public class MeshLib {
 			meshIndex++;
 		}
 	}	
-
-//	private static double round(double x) {
-//		return Math.round(x * 10) / 10.0;
-//	}
-
 }

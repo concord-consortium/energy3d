@@ -1,14 +1,14 @@
 package org.concord.energy3d.util;
 
 import com.ardor3d.framework.Updater;
-import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.SceneHints;
 import com.ardor3d.util.ReadOnlyTimer;
 
 public class Blinker implements Updater {
 	private static final Blinker instance = new Blinker();
-	private Node target = null;
+	private Spatial target = null;
 	private double lastTime;	
 
 	public static Blinker getInstance() {
@@ -32,11 +32,11 @@ public class Blinker implements Updater {
 
 	}
 
-	public Node getTarget() {
+	public Spatial getTarget() {
 		return target;
 	}
 
-	public void setTarget(Node target) {
+	public void setTarget(Spatial target) {
 		if (this.target != null)
 			this.target.getSceneHints().setCullHint(CullHint.Inherit);
 		this.target = target;

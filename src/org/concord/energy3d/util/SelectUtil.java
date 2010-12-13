@@ -2,10 +2,12 @@ package org.concord.energy3d.util;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PickedHousePart;
+import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SceneManager.ViewMode;
 
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
@@ -139,10 +141,16 @@ public class SelectUtil {
 
 			if (lastHoveredObject != housePart) {
 				Blinker.getInstance().setTarget(null);
-				if (data.getHousePart().getOriginal() != null)
-					Blinker.getInstance().setTarget(drawn.getOriginal().getRoot());
+				if (data.getHousePart().getOriginal() != null) {
+					if (drawn instanceof Roof)
+						Blinker.getInstance().setTarget(((Roof)drawn.getOriginal()).getFlattenedMeshesRoot().getChild(data.getPointIndex()));
+					else
+						Blinker.getInstance().setTarget(drawn.getOriginal().getRoot());
+				}
 			}
-			housePart.showPoints();
+			final ViewMode viewMode = SceneManager.getInstance().getViewMode();
+			if (viewMode == ViewMode.NORMAL || viewMode == ViewMode.TOP_VIEW)
+				housePart.showPoints();
 			lastHoveredObject = housePart;
 		}
 		return drawn;
