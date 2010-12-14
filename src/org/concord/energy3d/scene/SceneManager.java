@@ -598,8 +598,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.DELETE), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				Scene.getInstance().remove(drawn);
-				drawn = null;
+				taskManager.update(new Callable<Object>() {
+					public Object call() throws Exception {
+						Scene.getInstance().remove(drawn);
+						drawn = null;
+						return null;
+					}
+				});
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.ESCAPE), new TriggerAction() {

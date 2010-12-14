@@ -435,6 +435,7 @@ Version 0.2
 - fix problem with roof triangles not being properly attached together due to normal roundoff errors
 - blink the specific roof part instead of the entire roof when hovering mouse over a roof part in print preview
 - hide the edit points when in print preview mode
+- fix concurrency problem with removing house parts
 
 
 
