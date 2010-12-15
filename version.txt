@@ -436,8 +436,8 @@ Version 0.2
 - blink the specific roof part instead of the entire roof when hovering mouse over a roof part in print preview
 - hide the edit points when in print preview mode
 - fix concurrency problem with removing house parts
-
-
+- make the model rotation speed independent of frame rate
+ 
 
 
 TODO:

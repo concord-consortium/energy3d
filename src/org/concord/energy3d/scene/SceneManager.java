@@ -324,7 +324,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (rotAnim && viewMode == ViewMode.NORMAL) {
 			final Matrix3 rotate = new Matrix3();
-			rotate.fromAngleNormalAxis(1 * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
+			rotate.fromAngleNormalAxis(45 * tpf * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
 			camera.setLocation(rotate.applyPre(camera.getLocation(), null));
 			camera.lookAt(0, 0, 1, Vector3.UNIT_Z);
