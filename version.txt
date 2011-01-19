@@ -437,7 +437,9 @@ Version 0.2
 - hide the edit points when in print preview mode
 - fix concurrency problem with removing house parts
 - make the model rotation speed independent of frame rate
- 
+- fix problem with exception thrown when enable heliodon due to not updating bounding of all wall meshes 
+
+- make the walls shorter by the thickness value  
 
 
 TODO:
@@ -451,15 +453,8 @@ TODO:
 - fix problem with sometimes cannot grab edit points
 - add menu item to print current scene information
 - load all textures at start up and only once
- 
-
-- allow draw tool to stay on if user double-clicks on the tool button in toolbar
-- avoid drawing roof if only one attached wall is present
-- change color of floor
-- change/remove textures of all parts
- 
+- avoid drawing roof if only one attached wall is present 
 - new Orbit
 - combine the wall meshed into one
 - insert window in oriented wall attached to other walls
-
 - save position and state of window in registry

@@ -1048,6 +1048,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						sunHeliodon.setScale(1);
 					else {
 						final double scale = (Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0;
+						System.out.println("scale = " + scale);
 						sunHeliodon.setScale(scale);
 					}
 					return null;

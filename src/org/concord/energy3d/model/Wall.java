@@ -308,8 +308,12 @@ public class Wall extends HousePart {
 
 			Vector3 n = drawBackMesh(polygon, fromXY);
 			drawSurroundMesh(n);
-			drawWindowsSurroundMesh(n);
+			drawWindowsSurroundMesh(n);						
 
+			backMesh.updateModelBound();
+			surroundMesh.updateModelBound();
+			windowsSurroundMesh.updateModelBound();
+			wireframeMesh.updateModelBound();
 			invisibleMesh.updateModelBound();
 		} catch (Throwable e) {
 			e.printStackTrace();
