@@ -3,15 +3,15 @@ package org.concord.energy3d.model;
 import java.io.Serializable;
 
 public class Snap implements Serializable {
-	private static final long serialVersionUID = 1L;
-	private static int currentAnnotationDrawnStamp = 1;
-	private static int currentVisitStamp = 1;
+	static private final long serialVersionUID = 1L;
+	static private int currentAnnotationDrawnStamp = 1;
+	static private int currentVisitStamp = 1;
+	transient private int annotationDrawn;
+	transient private int visitStamp;
 	private Wall neighbor1;
 	private Wall neighbor2;
 	private int pointIndex1;
-	private int pointIndex2;
-	private transient int annotationDrawn;
-	private transient int visitStamp;
+	private int pointIndex2;	
 	
 	public static void clearAnnotationDrawn() {
 		currentAnnotationDrawnStamp = ++currentAnnotationDrawnStamp % 1000;

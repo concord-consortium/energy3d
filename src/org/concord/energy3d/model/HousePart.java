@@ -40,16 +40,6 @@ public abstract class HousePart implements Serializable {
 	static private boolean snapToGrids = false;
 	static private boolean drawAnnotations = false;
 	static private int globalDrawFlag = 1;
-	protected final int numOfDrawPoints, numOfEditPoints;
-	protected final ArrayList<Vector3> points;
-	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
-	protected HousePart container = null;
-	protected boolean drawCompleted = false;
-	protected int editPointIndex = -1;
-	protected double height;
-	protected boolean relativeToHorizontal;
-	protected String textureFileName;
-	private boolean firstPointInserted = false;
 	transient protected Node root;
 	transient protected Node pointsRoot;
 	transient protected ArrayList<Vector3> abspoints;
@@ -61,6 +51,16 @@ public abstract class HousePart implements Serializable {
 	transient protected Node angleAnnotRoot;
 	transient protected Mesh mesh;
 	transient private int drawFlag;	
+	protected final int numOfDrawPoints, numOfEditPoints;
+	protected final ArrayList<Vector3> points;
+	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
+	protected HousePart container = null;
+	protected boolean drawCompleted = false;
+	protected int editPointIndex = -1;
+	protected double height;
+	protected boolean relativeToHorizontal;
+	protected String textureFileName;
+	private boolean firstPointInserted = false;
 	
 	public static void clearDrawFlags() {
 		globalDrawFlag++;

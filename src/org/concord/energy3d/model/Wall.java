@@ -30,18 +30,19 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
-	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.5;
-	private static final double MIN_WALL_LENGTH = 0.1;
-	private static double defaultWallHeight = 1f;
+	static private final long serialVersionUID = 1L;
+	static private final double GRID_SIZE = 0.5;
+	static private final double MIN_WALL_LENGTH = 0.1;
+	static private double defaultWallHeight = 1f;
+	transient private Mesh backMesh;
+	transient private Mesh surroundMesh;
+	transient private Mesh invisibleMesh;
+	transient private Mesh windowsSurroundMesh;
+	transient private Mesh wireframeMesh;
 	private final double wallThickness = 0.1;
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
-	private transient Mesh backMesh;
-	private transient Mesh surroundMesh;
-	private transient Mesh invisibleMesh;
-	private transient Mesh windowsSurroundMesh;
-	private transient Mesh wireframeMesh;
+	private boolean isShortWall; 
 
 	public Wall() {
 		super(2, 4, defaultWallHeight, true);
@@ -299,6 +300,17 @@ public class Wall extends HousePart {
 		toXY.transform(v);
 
 		try {
+			if (isShortWall) {
+				final Vector3 dir = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
+				if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted())
+					reduceBackMeshWidth(polygon, dir, 0);
+	
+				if (neighbors[1] != null && neighbors[1].getNeighborOf(this).isFirstPointInserted()) {
+					dir.normalizeLocal().negateLocal();
+					reduceBackMeshWidth(polygon, dir, 1);
+				}
+			}
+			
 			Poly2Tri.triangulate(polygon);
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
 			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
@@ -306,9 +318,12 @@ public class Wall extends HousePart {
 			mesh.getMeshData().updateVertexCount();
 			mesh.updateModelBound();
 
-			Vector3 n = drawBackMesh(polygon, fromXY);
-			drawSurroundMesh(n);
-			drawWindowsSurroundMesh(n);						
+//			Vector3 n = drawBackMesh(polygon, fromXY);
+			drawBackMesh(polygon, fromXY);
+//			drawSurroundMesh(n);
+			drawSurroundMesh(thicknessNormal);
+//			drawWindowsSurroundMesh(n);						
+			drawWindowsSurroundMesh(thicknessNormal);
 
 			backMesh.updateModelBound();
 			surroundMesh.updateModelBound();
@@ -338,11 +353,12 @@ public class Wall extends HousePart {
 		return winPoints.size() >= 4 && winPoints.get(2).subtract(winPoints.get(0), null).length() >= 0.1;
 	}
 
-	private Vector3 drawBackMesh(final Polygon polygon, final XYToAnyTransform fromXY) {
-		thicknessNormal = decideThicknessNormal();
+	private void drawBackMesh(final Polygon polygon, final XYToAnyTransform fromXY) {
+//		thicknessNormal = getThicknessNormal();
 
-		final ArrayList<Vector3> points = abspoints;
-		final Vector3 dir = points.get(2).subtract(points.get(0), null).normalizeLocal();
+//		final ArrayList<Vector3> points = abspoints;
+//		final Vector3 dir = points.get(2).subtract(points.get(0), null).normalizeLocal();
+		final Vector3 dir = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
 		if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted())
 			reduceBackMeshWidth(polygon, dir, 0);
 
@@ -356,8 +372,9 @@ public class Wall extends HousePart {
 		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
 		backMesh.getMeshData().updateVertexCount();
 
-		backMesh.setTranslation(thicknessNormal);
-		return thicknessNormal;
+//		backMesh.setTranslation(thicknessNormal);
+		backMesh.setTranslation(getThicknessNormal());
+//		return thicknessNormal;
 	}
 
 	private void reduceBackMeshWidth(final Polygon polygon, final ReadOnlyVector3 wallDir, final int neighbor) {
@@ -367,7 +384,7 @@ public class Wall extends HousePart {
 		final Vector3 otherWallDir = otherWall.getPoints().get(neighborPointIndex == 0 ? 2 : 0).subtract(otherWall.getPoints().get(neighborPointIndex), null).normalizeLocal();
 		final double angle = Math.max(0.1, otherWallDir.smallestAngleBetween(wallDir));
 		final double angle360;
-		if (wallDir.dot(otherWall.decideThicknessNormal().normalize(null)) < 0)
+		if (wallDir.dot(otherWall.getThicknessNormal().normalize(null)) < 0)
 			angle360 = Math.PI + angle;
 		else
 			angle360 = angle;
@@ -384,7 +401,7 @@ public class Wall extends HousePart {
 		
 	}
 
-	private Vector3 decideThicknessNormal() {
+	private Vector3 getThicknessNormal() {
 		if (thicknessNormal != null)
 			return thicknessNormal;
 		final ArrayList<Vector3> points = abspoints;
@@ -419,7 +436,8 @@ public class Wall extends HousePart {
 			}
 		}
 		n.multiplyLocal(wallThickness);
-		return n;
+		thicknessNormal = n;
+		return thicknessNormal;
 	}
 
 	private void cull(boolean back) {
@@ -445,13 +463,13 @@ public class Wall extends HousePart {
 		final Vector3 p2 = new Vector3();
 		final int[] order;
 
-		if (neighbors[0] != null && neighbors[1] != null)
-			order = new int[] { 1, 3 };
-		else if (neighbors[0] != null)
-			order = new int[] { 1, 3, 2 };
-		else if (neighbors[1] != null)
-			order = new int[] { 0, 1, 3 };
-		else
+//		if (neighbors[0] != null && neighbors[1] != null)
+//			order = new int[] { 1, 3 };
+//		else if (neighbors[0] != null)
+//			order = new int[] { 1, 3, 2 };
+//		else if (neighbors[1] != null)
+//			order = new int[] { 0, 1, 3 };
+//		else
 			order = new int[] { 0, 1, 3, 2 };
 
 		final Vector3 sideNormal = thickness.cross(0, 0, 1, null).normalizeLocal();
@@ -591,7 +609,7 @@ public class Wall extends HousePart {
 	}
 
 	public void flatten(double flattenTime) {
-		thicknessNormal = decideThicknessNormal();
+		thicknessNormal = getThicknessNormal();
 		final Vector3 n = thicknessNormal.normalize(null);
 		double angle = n.smallestAngleBetween(Vector3.UNIT_X);
 		angle -= Math.PI / 2;
@@ -609,7 +627,7 @@ public class Wall extends HousePart {
 
 	public ReadOnlyVector3 getFaceDirection() {
 		if (thicknessNormal == null)
-			thicknessNormal = decideThicknessNormal();
+			thicknessNormal = getThicknessNormal();
 		return thicknessNormal.negate(null).normalizeLocal();
 	}
 
@@ -703,18 +721,26 @@ public class Wall extends HousePart {
 
 	private void drawNeighborWalls() {
 		final ArrayList<Wall> walls = new ArrayList<Wall>();
-		
+		isShortWall = true;
 		visitNeighborsForward(true, new WallVisitor() {
+			boolean nextIsShort = !isShortWall;
+			
 			public void visit(Wall wall, Snap prev, Snap next) {
 				visitWall(wall, prev);
 				walls.add(wall);
+				wall.isShortWall = nextIsShort;
+				nextIsShort = !nextIsShort;
 			}
 		});
 
 		visitNeighborsForward(false, new WallVisitor() {
+			boolean nextIsShort = !isShortWall;
+			
 			public void visit(Wall wall, Snap prev, Snap next) {
 				visitWall(wall, prev);
 				walls.add(wall);
+				wall.isShortWall = nextIsShort;
+				nextIsShort = !nextIsShort;				
 			}
 		});
 		
