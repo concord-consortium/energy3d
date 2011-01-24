@@ -300,7 +300,7 @@ public class Wall extends HousePart {
 		toXY.transform(v);
 
 		try {
-			if (isShortWall) {
+			if (Scene.getInstance().isDrawThickness() && isShortWall) {
 				final Vector3 dir = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
 				if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted())
 					reduceBackMeshWidth(polygon, dir, 0);
@@ -463,13 +463,15 @@ public class Wall extends HousePart {
 		final Vector3 p2 = new Vector3();
 		final int[] order;
 
-//		if (neighbors[0] != null && neighbors[1] != null)
-//			order = new int[] { 1, 3 };
-//		else if (neighbors[0] != null)
-//			order = new int[] { 1, 3, 2 };
-//		else if (neighbors[1] != null)
-//			order = new int[] { 0, 1, 3 };
-//		else
+		if (Scene.getInstance().isDrawThickness())
+			order = new int[] { 0, 1, 3, 2 };
+		else if (neighbors[0] != null && neighbors[1] != null)
+			order = new int[] { 1, 3 };
+		else if (neighbors[0] != null)
+			order = new int[] { 1, 3, 2 };
+		else if (neighbors[1] != null)
+			order = new int[] { 0, 1, 3 };
+		else
 			order = new int[] { 0, 1, 3, 2 };
 
 		final Vector3 sideNormal = thickness.cross(0, 0, 1, null).normalizeLocal();

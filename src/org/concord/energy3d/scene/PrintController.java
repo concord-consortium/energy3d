@@ -139,7 +139,10 @@ public class PrintController implements Updater {
 				int printSequence = 0;
 				for (HousePart part : Scene.getInstance().getParts()) {
 					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
-					printSequence = part.drawLabels(printSequence);
+					if (isPrintPreview)
+						printSequence = part.drawLabels(printSequence);
+					else
+						part.hideLabels();
 				}
 			}
 
@@ -166,7 +169,7 @@ public class PrintController implements Updater {
 			
 	}
 
-	public void print() {
+	public void print() {		
 		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 		final PrintExporter printExporter = new PrintExporter();
 		final Camera camera = Camera.getCurrentCamera();

@@ -442,7 +442,10 @@ Version 0.2
 - alternate between short and long walls
 - make the current wall being edited the wall with shorter width
 - draw the surround polygons of the walls even when they have neighbors
-- save the short/long configuration of walls in the model  
+- save the short/long configuration of walls in the model
+- add menu item for enabling/disabling drawing and printing of wall thickness
+- when click on print, initiate print preview if not already displayed
+- hide labels when exiting print preview mode
 
 
 TODO:

@@ -97,6 +97,7 @@ public class MainFrame extends JFrame {
 	private JMenu helpMenu = null;
 	private JMenuItem aboutMenuItem = null;
 	private JDialog aboutDialog = null;  //  @jve:decl-index=0:visual-constraint="602,644"
+	private JCheckBoxMenuItem wallThicknessMenuItem = null;
 	
 	public static MainFrame getInstance() {
 		return instance;
@@ -619,6 +620,12 @@ public class MainFrame extends JFrame {
 			printMenuItem = new JMenuItem("Print");
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
+					final PrintController printController = PrintController.getInstance();
+					if (!printController.isPrintPreview()) {
+						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
+						while (!printController.isFinished())
+							Thread.yield();
+					}					
 					PrintController.getInstance().print();
 				}
 			});
@@ -886,6 +893,24 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
+	 * This method initializes wallThicknessMenuItem	
+	 * 	
+	 * @return javax.swing.JCheckBoxMenuItem	
+	 */
+	private JCheckBoxMenuItem getWallThicknessMenuItem() {
+		if (wallThicknessMenuItem == null) {
+			wallThicknessMenuItem = new JCheckBoxMenuItem();
+			wallThicknessMenuItem.setText("Draw Wall Thickness");
+			wallThicknessMenuItem.addItemListener(new java.awt.event.ItemListener() {
+				public void itemStateChanged(java.awt.event.ItemEvent e) {
+					Scene.getInstance().setDrawThickness(wallThicknessMenuItem.isSelected());
+				}
+			});
+		}
+		return wallThicknessMenuItem;
+	}
+
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -1019,6 +1044,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getShadowMenu());
 			viewMenu.add(getTextureCheckBoxMenuItem());
 			viewMenu.add(getColorMenuItem());
+			viewMenu.add(getWallThicknessMenuItem());
 		}
 		return viewMenu;
 	}

@@ -23,6 +23,7 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.shape.Sphere;
@@ -406,6 +407,11 @@ public abstract class HousePart implements Serializable {
 		label.setTranslation(offset);
 		return printSequence;
 	}
+	
+	public void hideLabels() {
+		for (final Spatial label : labelsRoot.getChildren())
+			label.getSceneHints().setCullHint(CullHint.Always);
+	}	
 	
 	protected BMText fetchBMText(final String text, final int index) {
 		final BMText label;

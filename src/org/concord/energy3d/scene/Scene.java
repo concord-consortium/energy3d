@@ -69,6 +69,7 @@ public class Scene implements Serializable {
 	private Unit unit = Unit.Meter;
 	private double annotationScale = 1;
 	static private boolean isTextureEnabled = true;
+	static private boolean drawThickness = false;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -352,6 +353,16 @@ public class Scene implements Serializable {
 		if (enabled)
 			redrawAll = true;
 	}
+	
+	public void setDrawThickness(final boolean draw) {
+		drawThickness = draw; 
+		redrawAll = true;
+	}
+	
+	public boolean isDrawThickness() {
+		return drawThickness;
+	}
+	
 
 //	public void redrawAll() {
 //		Snap.clearAnnotationDrawn();
@@ -367,6 +378,8 @@ public class Scene implements Serializable {
 		if (redrawAll) {
 			Snap.clearAnnotationDrawn();
 			for (HousePart part : parts)
+				part.draw();
+			for (HousePart part : PrintController.getInstance().getPrintParts())
 				part.draw();
 //			HousePart.setFlattenTime(HousePart.getFlattenTime());
 //			PrintController.getInstance().drawPrintParts();
