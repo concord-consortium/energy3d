@@ -446,6 +446,11 @@ Version 0.2
 - add menu item for enabling/disabling drawing and printing of wall thickness
 - when click on print, initiate print preview if not already displayed
 - hide labels when exiting print preview mode
+- in thickness mode, do not draw wall thickness when drawing walls at an angle other than 90 degrees
+- in thickness mode, only draw surround mesh of the longer wall
+- in thickness mode, do not draw surround mesh when neighbor angle is not 90 degrees
+
+- *fix problem with drawing thickness wall when walls do not form a loop 
 
 
 TODO:

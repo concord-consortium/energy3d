@@ -39,10 +39,11 @@ public class Wall extends HousePart {
 	transient private Mesh invisibleMesh;
 	transient private Mesh windowsSurroundMesh;
 	transient private Mesh wireframeMesh;
+//	transient private boolean[] neightborPerpendicular; 
 	private final double wallThickness = 0.1;
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
-	private boolean isShortWall; 
+	private boolean isShortWall;
 
 	public Wall() {
 		super(2, 4, defaultWallHeight, true);
@@ -108,6 +109,8 @@ public class Wall extends HousePart {
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
 		invisibleMesh.setUserData(userData);
+		
+//		neightborPerpendicular = new boolean[2];
 	}
 
 	public void setPreviewPoint(final int x, final int y) {
@@ -302,12 +305,16 @@ public class Wall extends HousePart {
 		try {
 			if (Scene.getInstance().isDrawThickness() && isShortWall) {
 				final Vector3 dir = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
-				if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted())
-					reduceBackMeshWidth(polygon, dir, 0);
+
+				if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted()) {
+					if (isPerpendicularToNeighbor(0))
+						reduceBackMeshWidth(polygon, dir, 0);
+				}
 	
 				if (neighbors[1] != null && neighbors[1].getNeighborOf(this).isFirstPointInserted()) {
 					dir.normalizeLocal().negateLocal();
-					reduceBackMeshWidth(polygon, dir, 1);
+					if (isPerpendicularToNeighbor(1))
+						reduceBackMeshWidth(polygon, dir, 1);
 				}
 			}
 			
@@ -349,15 +356,19 @@ public class Wall extends HousePart {
 
 	}
 
+	public boolean isPerpendicularToNeighbor(final int neighbor) {
+		final Vector3 dir = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
+		final ArrayList<Vector3> abspoints = neighbors[neighbor].getNeighborOf(this).abspoints;
+		final int i = neighbors[neighbor].getSnapPointIndexOfNeighborOf(this);
+		final Vector3 otherDir = abspoints.get(i == 0 ? 2 : 0).subtract(abspoints.get(i), null).normalizeLocal();
+		return dir.dot(otherDir) == 0;
+	}
+
 	public boolean includeWindow(ArrayList<Vector3> winPoints) {
 		return winPoints.size() >= 4 && winPoints.get(2).subtract(winPoints.get(0), null).length() >= 0.1;
 	}
 
 	private void drawBackMesh(final Polygon polygon, final XYToAnyTransform fromXY) {
-//		thicknessNormal = getThicknessNormal();
-
-//		final ArrayList<Vector3> points = abspoints;
-//		final Vector3 dir = points.get(2).subtract(points.get(0), null).normalizeLocal();
 		final Vector3 dir = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
 		if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted())
 			reduceBackMeshWidth(polygon, dir, 0);
@@ -372,9 +383,7 @@ public class Wall extends HousePart {
 		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
 		backMesh.getMeshData().updateVertexCount();
 
-//		backMesh.setTranslation(thicknessNormal);
 		backMesh.setTranslation(getThicknessNormal());
-//		return thicknessNormal;
 	}
 
 	private void reduceBackMeshWidth(final Polygon polygon, final ReadOnlyVector3 wallDir, final int neighbor) {
@@ -455,28 +464,53 @@ public class Wall extends HousePart {
 	}
 
 	private void drawSurroundMesh(final ReadOnlyVector3 thickness) {
-		final ArrayList<Vector3> points = abspoints;
+//		final ArrayList<Vector3> abspoints = abspoints;
 		final FloatBuffer vertexBuffer = surroundMesh.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = surroundMesh.getMeshData().getNormalBuffer();
 		vertexBuffer.position(0);
 		normalBuffer.position(0);
 		final Vector3 p2 = new Vector3();
-		final int[] order;
-
-		if (Scene.getInstance().isDrawThickness())
-			order = new int[] { 0, 1, 3, 2 };
-		else if (neighbors[0] != null && neighbors[1] != null)
-			order = new int[] { 1, 3 };
-		else if (neighbors[0] != null)
-			order = new int[] { 1, 3, 2 };
-		else if (neighbors[1] != null)
-			order = new int[] { 0, 1, 3 };
-		else
-			order = new int[] { 0, 1, 3, 2 };
+//		final int[] order;
+//		
+//		if (neighbors[0] == null && neighbors[1] == null)
+//			order = new int[] { 0, 1, 3, 2 };
+//		else if (neighbors[0] == null) {
+//			if (Scene.getInstance().isDrawThickness() && !this.isShortWall && neightborPerpendicular[1])
+//				order = new int[] { 0, 1, 3, 2 };
+//			else
+//				order = new int[] { 0, 1, 3 };
+//		} else if (neighbors[1] == null) {
+//			if (Scene.getInstance().isDrawThickness() && !this.isShortWall && neightborPerpendicular[0])
+//				order = new int[] { 0, 1, 3, 2 };
+//			else
+//				order = new int[] { 1, 3, 2 };			
+//		} else {
+//			
+//		}
+		
+		final ArrayList<Integer> order = new ArrayList<Integer>(4);
+		order.add(1);
+		order.add(3);
+		final boolean drawThicknessAndIsLongWall = Scene.getInstance().isDrawThickness() && !this.isShortWall;
+		if (neighbors[0] == null || (drawThicknessAndIsLongWall && isPerpendicularToNeighbor(0)))
+			order.add(0, 0);
+		if (neighbors[1] == null || (drawThicknessAndIsLongWall && isPerpendicularToNeighbor(1)))
+			order.add(2);
+		
+//		if (Scene.getInstance().isDrawThickness() && !this.isShortWall)
+//			order = new int[] { 0, 1, 3, 2 };
+//		else if (neighbors[0] != null && neighbors[1] != null)
+//			order = new int[] { 1, 3 };
+//		else if (neighbors[0] != null)
+//			order = new int[] { 1, 3, 2 };
+//		else if (neighbors[1] != null)
+//			order = new int[] { 0, 1, 3 };
+//		else
+//			order = new int[] { 0, 1, 3, 2 };
 
 		final Vector3 sideNormal = thickness.cross(0, 0, 1, null).normalizeLocal();
 		for (int i : order) {
-			final ReadOnlyVector3 p = points.get(i);
+			final ReadOnlyVector3 p = abspoints.get(i);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			p2.set(p).addLocal(thickness);
 			vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
