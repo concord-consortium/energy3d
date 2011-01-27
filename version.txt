@@ -451,8 +451,7 @@ Version 0.2
 - in thickness mode, do not draw surround mesh when neighbor angle is not 90 degrees
 - fix problem with drawing thickness wall when walls do not form a loop
 - avoid reducing back mesh of walls when already reduced due to thickness when in thickness mode
- 
-- *put the turning off of shadow in the safe queue
+ - fixed problem with exception when switching shadow off. put the turning off of shadow in the safe queue
 
 
 TODO:

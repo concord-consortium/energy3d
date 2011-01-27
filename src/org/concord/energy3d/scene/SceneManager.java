@@ -955,11 +955,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		backgroundRoot.getSceneHints().setCullHint(printPreview ? CullHint.Always : CullHint.Inherit);
 	}
 
-	public void setShadow(boolean shadow) {
-		if (shadow)
-			passManager.add(shadowPass);
-		else
-			passManager.remove(shadowPass);
+	public void setShadow(final boolean shadow) {
+		taskManager.update(new Callable<Object>() {
+			public Object call() throws Exception {
+				if (shadow)
+					passManager.add(shadowPass);
+				else
+					passManager.remove(shadowPass);
+				return null;
+			}
+		});		
 	}
 
 	public CameraNode getCameraNode() {
