@@ -451,8 +451,10 @@ Version 0.2
 - in thickness mode, do not draw surround mesh when neighbor angle is not 90 degrees
 - fix problem with drawing thickness wall when walls do not form a loop
 - avoid reducing back mesh of walls when already reduced due to thickness when in thickness mode
- - fixed problem with exception when switching shadow off. put the turning off of shadow in the safe queue
+- fixed problem with exception when switching shadow off. put the turning off of shadow in the safe queue
+- pick edit points of wall joints in a smarter manner using faceDirection of walls as guide
 
+- *fix problem with orbit view sometimes with wrong center of rotation 
 
 TODO:
 - automatically determine if the user is going with the drag approach or click approach when drawing house parts

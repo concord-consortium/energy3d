@@ -30,35 +30,43 @@ public class SelectUtil {
 		pickResults.setCheckDistance(true);		
 	}
 	
-	private static void pick(int x, int y, Spatial target) {
-		final Vector2 pos = new Vector2(x, y);
-		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(pos, false, null);
-		Scene.getInstance().getParts();
-		PickingUtil.findPick(target, pickRay, pickResults);
-	}
+//	private static void pick(int x, int y, Spatial target) {
+////		final Vector2 pos = new Vector2(x, y);
+//		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
+////		Scene.getInstance().getParts();
+//		PickingUtil.findPick(target, pickRay, pickResults);
+//	}
 
 	public static PickedHousePart pickPart(int x, int y, Spatial target) {
 		if (target == null)
 			target = floor;
 		pickResults.clear();
-		pick(x, y, target);
+//		pick(x, y, target);
+		
+		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
+		PickingUtil.findPick(target, pickRay, pickResults);		
 
-		return getPickResult();
+		return getPickResult(pickRay);
 	}
 
 	public static PickedHousePart pickPart(int x, int y, Class<?> typeOfHousePart) {
 		pickResults.clear();
+		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);		
+		
 		if (typeOfHousePart == null)
-			pick(x, y, floor);
+//			pick(x, y, floor);
+			PickingUtil.findPick(floor, pickRay, pickResults);
 		else
 			for (HousePart housePart : Scene.getInstance().getParts())
 				if (typeOfHousePart.isInstance(housePart)) // && housePart != except)
-					pick(x, y, housePart.getRoot());
+//					pick(x, y, housePart.getRoot());
+					PickingUtil.findPick(housePart.getRoot(), pickRay, pickResults);
 
-		return getPickResult();
+		return getPickResult(pickRay);
 	}
 
-	private static PickedHousePart getPickResult() {
+//	private static PickedHousePart getPickResult() {
+	private static PickedHousePart getPickResult(final Ray3 pickRay) {
 		PickedHousePart pickedHousePart = null;
 		double polyDist = Double.MAX_VALUE;
 		double pointDist = Double.MAX_VALUE;
@@ -87,11 +95,13 @@ public class SelectUtil {
 			Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
 			PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
 			double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
+//			double polyDist_i = userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection();
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {
 				for (Vector3 p : userData.getHousePart().getPoints()) {
 					pointDist_i = p.distance(intersectionPoint);
-					if (userData.getHousePart() == SceneManager.getInstance().getSelectedPart())
+//					if (userData.getHousePart() == SceneManager.getInstance().getSelectedPart())
+					if (userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) > 0.8)					
 						pointDist_i -= 0.1;
 					if (pointDist_i < pointDist && 
 							(userData.getPointIndex() != -1 || pickedHousePart == null || 
