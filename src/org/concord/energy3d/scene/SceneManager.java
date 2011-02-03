@@ -3,6 +3,7 @@ package org.concord.energy3d.scene;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.concurrent.Callable;
 
@@ -971,7 +972,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return cameraNode;
 	}
 
-	private Node loadCompassModel() {
+	private Node loadCompassModel() throws IOException {
 		System.out.print("Loading compass...");
 		final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "compass.dae");
 		final ColladaImporter colladaImporter = new ColladaImporter();

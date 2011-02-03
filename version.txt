@@ -453,6 +453,7 @@ Version 0.2
 - avoid reducing back mesh of walls when already reduced due to thickness when in thickness mode
 - fixed problem with exception when switching shadow off. put the turning off of shadow in the safe queue
 - pick edit points of wall joints in a smarter manner using faceDirection of walls as guide
+- fix problem with roof texture being stretched when resizing along x axis 
 
 - *fix problem with orbit view sometimes with wrong center of rotation 
 
