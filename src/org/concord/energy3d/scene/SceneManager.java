@@ -17,6 +17,7 @@ import org.concord.energy3d.model.PyramidRoof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
@@ -141,6 +142,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private HousePart drawn = null;
 	private Operation operation = Operation.SELECT;
 	private double sunAngle = 45, sunBaseAngle = 135;
+	private Heliodon heliodon;
 	private CameraControl control;
 	private ParallelSplitShadowMapPass shadowPass;
 	private Sphere sun;
@@ -251,8 +253,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.add(Scene.getRoot());
 		shadowPass.addOccluder(Scene.getRoot());
 
-		createSunHeliodon();
-		updateSunHeliodon();
+//		createSunHeliodon();
+		heliodon = new Heliodon(root, light, passManager);
+//		updateSunHeliodon();
 		Scene.getInstance();
 
 		SelectUtil.init(floor, Scene.getRoot());
@@ -333,8 +336,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		if (sunAnim) {
-			sunAngle++;
-			updateSunHeliodon();
+//			sunAngle++;
+			heliodon.setSunAngle(heliodon.getSunAngle() + 1);
+//			updateSunHeliodon();
 		}
 
 		root.updateGeometricState(tpf);
@@ -369,38 +373,38 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return true;
 	}
 
-	private Spatial createSunHeliodon() {
-		sunHeliodon = new Node();
-		Cylinder cyl = new Cylinder("Sun Curve", 10, 50, 5, 0.3);
-		Transform trans = new Transform();
-		trans.setMatrix(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_X));
-		cyl.setDefaultColor(ColorRGBA.YELLOW);
-		cyl.setTransform(trans);
-		sunHeliodon.attachChild(cyl);
-
-		final ClipState cs = new ClipState();
-		cs.setEnableClipPlane(0, true);
-		cs.setClipPlaneEquation(0, 0, 0, 1, -0.19);
-		cyl.setRenderState(cs);
-
-		Cylinder baseCyl = new Cylinder("Sun Curve", 10, 50, 5, 0.2);
-		baseCyl.setTranslation(0, 0, 0.1);
-		sunHeliodon.attachChild(baseCyl);
-
-		sun = new Sphere("Sun", 20, 20, 0.3);
-		sun.setTranslation(0, 0, 5);
-		sunRot = new Node("Sun Root");
-		sunRot.attachChild(sun);
-		sunHeliodon.attachChild(sunRot);
-
-		reverseNormals(sun.getMeshData().getNormalBuffer());
-
-		MaterialState material = new MaterialState();
-		material.setEmissive(ColorRGBA.WHITE);
-		sun.setRenderState(material);
-
-		return sunHeliodon;
-	}
+//	private Spatial createSunHeliodon() {
+//		sunHeliodon = new Node();
+//		Cylinder cyl = new Cylinder("Sun Curve", 10, 50, 5, 0.3);
+//		Transform trans = new Transform();
+//		trans.setMatrix(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_X));
+//		cyl.setDefaultColor(ColorRGBA.YELLOW);
+//		cyl.setTransform(trans);
+//		sunHeliodon.attachChild(cyl);
+//
+//		final ClipState cs = new ClipState();
+//		cs.setEnableClipPlane(0, true);
+//		cs.setClipPlaneEquation(0, 0, 0, 1, -0.19);
+//		cyl.setRenderState(cs);
+//
+//		Cylinder baseCyl = new Cylinder("Sun Curve", 10, 50, 5, 0.2);
+//		baseCyl.setTranslation(0, 0, 0.1);
+//		sunHeliodon.attachChild(baseCyl);
+//
+//		sun = new Sphere("Sun", 20, 20, 0.3);
+//		sun.setTranslation(0, 0, 5);
+//		sunRot = new Node("Sun Root");
+//		sunRot.attachChild(sun);
+//		sunHeliodon.attachChild(sunRot);
+//
+//		reverseNormals(sun.getMeshData().getNormalBuffer());
+//
+//		MaterialState material = new MaterialState();
+//		material.setEmissive(ColorRGBA.WHITE);
+//		sun.setRenderState(material);
+//
+//		return sunHeliodon;
+//	}
 
 	private void reverseNormals(FloatBuffer normalBuffer) {
 		normalBuffer.rewind();
@@ -654,32 +658,37 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!sunControl)
 					return;
-				sunAngle--;
-				updateSunHeliodon();
+//				sunAngle--;
+//				updateSunHeliodon();
+				heliodon.setSunAngle(heliodon.getSunAngle() - 1);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DOWN), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!sunControl)
 					return;
-				sunAngle++;
-				updateSunHeliodon();
+//				sunAngle++;
+//				updateSunHeliodon();
+				heliodon.setSunAngle(heliodon.getSunAngle() + 1);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.RIGHT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!sunControl)
 					return;
-				sunBaseAngle++;
-				updateSunHeliodon();
+//				sunBaseAngle++;
+//				updateSunHeliodon();
+//				heliodon.setBaseAngle(heliodon.getBaseAngle() + 1);
+				heliodon.setOffset(heliodon.getOffset() + 0.01);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!sunControl)
 					return;
-				sunBaseAngle--;
-				updateSunHeliodon();
+//				sunBaseAngle--;
+//				updateSunHeliodon();
+				heliodon.setBaseAngle(heliodon.getBaseAngle() - 1);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.B), new TriggerAction() {
@@ -879,31 +888,33 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setSunControl(boolean selected) {
 		this.sunControl = selected;
+		heliodon.setVisible(selected);
+		enableDisableRotationControl();
 
-		taskManager.update(new Callable<Object>() {
-			public Object call() throws Exception {
-				if (sunControl) {
-					updateHeliodonSize();
-					root.attachChild(sunHeliodon);
-				} else
-					root.detachChild(sunHeliodon);
-
-				if (bloomRenderPass != null)
-					passManager.remove(bloomRenderPass);
-				if (sunControl) {
-					bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);
-					if (!bloomRenderPass.isSupported()) {
-						System.out.println("Bloom not supported!");
-					} else {
-						bloomRenderPass.add(sun);
-					}
-					passManager.add(bloomRenderPass);
-				}
-
-				enableDisableRotationControl();
-				return null;
-			}
-		});
+//		taskManager.update(new Callable<Object>() {
+//			public Object call() throws Exception {
+//				if (sunControl) {
+//					updateHeliodonSize();
+//					root.attachChild(sunHeliodon);
+//				} else
+//					root.detachChild(sunHeliodon);
+//
+//				if (bloomRenderPass != null)
+//					passManager.remove(bloomRenderPass);
+//				if (sunControl) {
+//					bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);
+//					if (!bloomRenderPass.isSupported()) {
+//						System.out.println("Bloom not supported!");
+//					} else {
+//						bloomRenderPass.add(sun);
+//					}
+//					passManager.add(bloomRenderPass);
+//				}
+//
+//				enableDisableRotationControl();
+//				return null;
+//			}
+//		});
 	}
 
 	public void setSunAnim(boolean selected) {
@@ -1048,15 +1059,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (sunControl)
 			taskManager.update(new Callable<Object>() {
 				public Object call() throws Exception {
-					Scene.getRoot().updateWorldBound(true);
-					final BoundingVolume bounds = Scene.getRoot().getWorldBound();
-					if (bounds == null)
-						sunHeliodon.setScale(1);
-					else {
-						final double scale = (Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0;
-						System.out.println("scale = " + scale);
-						sunHeliodon.setScale(scale);
-					}
+//					Scene.getRoot().updateWorldBound(true);
+//					final BoundingVolume bounds = Scene.getRoot().getWorldBound();
+//					if (bounds == null)
+//						sunHeliodon.setScale(1);
+//					else {
+//						final double scale = (Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0;
+//						System.out.println("scale = " + scale);
+//						sunHeliodon.setScale(scale);
+//					}
+					heliodon.updateSize();
 					return null;
 				}
 			});
