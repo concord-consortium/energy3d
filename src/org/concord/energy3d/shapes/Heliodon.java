@@ -60,7 +60,7 @@ public class Heliodon {
 		cyl.setTransform(trans);
 		sunRing.attachChild(cyl);
 //		sunRing.setTranslation(0, offset, 0);
-		sunRing.setRotation(new Matrix3().fromAngleAxis(-tiltAngle, Vector3.UNIT_X));
+//		sunRing.setRotation(new Matrix3().fromAngleAxis(-tiltAngle, Vector3.UNIT_X));
 
 		final ClipState cs = new ClipState();
 		cs.setEnableClipPlane(0, true);
@@ -269,17 +269,23 @@ public class Heliodon {
 //		final double add = (declinationAngle < 0 ? Math.PI : 0) + (observerLatitude < 0 ? Math.PI : 0);
 //		final double mul = (declinationAngle < 0 ? -1 : 1) * (observerLatitude < 0 ? -1 : 1);
 //		final double add = (declinationAngle < 0 || observerLatitude < 0? Math.PI : 0);
+		final double add = (declinationAngle < 0) ? Math.PI : 0;
 //		final double mul = (declinationAngle < 0 || observerLatitude < 0? -1 : 1);		
 		final double altitudeAngle = Math.asin(Math.sin(declinationAngle) * Math.sin(observerLatitude) + Math.cos(declinationAngle) * Math.cos(hourAngle) * Math.cos(observerLatitude));
 //		final double altitudeAngle = add + mul * Math.asin(Math.sin(declinationAngle) * Math.sin(observerLatitude) + Math.cos(declinationAngle) * Math.cos(hourAngle) * Math.cos(observerLatitude));
-		final double azimuthAsin = Math.sin(hourAngle) * Math.cos(declinationAngle) / Math.cos(altitudeAngle);
-		final double azimuthAngle;
-		if (azimuthAsin < -1)
-			azimuthAngle = -Math.PI / 2;
-		else if (azimuthAsin > 1)
-			azimuthAngle = Math.PI / 2;
-		else
-			azimuthAngle = Math.asin(azimuthAsin);
+		
+//		final double azimuthAsin = Math.sin(hourAngle) * Math.cos(declinationAngle) / Math.cos(altitudeAngle);		
+//		final double azimuthAngle;
+//		if (azimuthAsin < -1)
+//			azimuthAngle = (-Math.PI / 2);
+//		else if (azimuthAsin > 1)
+//			azimuthAngle = Math.PI / 2;
+//		else
+//			azimuthAngle = Math.asin(azimuthAsin);
+		
+		final double x_azm = Math.sin(hourAngle) * Math.cos(declinationAngle);
+		final double y_azm = (-(Math.cos(hourAngle))*Math.cos(declinationAngle)*Math.sin(observerLatitude))+(Math.cos(observerLatitude)* Math.sin(declinationAngle));
+		final double azimuthAngle = Math.atan2(y_azm, x_azm);		
 		
 		final double r = 5;
 		final double x = r * Math.cos(azimuthAngle) * Math.sin(Math.PI / 2 - altitudeAngle);

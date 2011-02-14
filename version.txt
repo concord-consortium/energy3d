@@ -459,6 +459,7 @@ Version 0.2
 - implement the sun path computations
 - draw arc to denote the sun path
 - allow setting the observer location, season and time of the day 
+- fix problem with computing azimuth angle of the sun due to asin range limitation by finding a new formula. 
 
 - *fix problem with orbit view sometimes with wrong center of rotation 
 
