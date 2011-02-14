@@ -62,11 +62,6 @@ public class Heliodon {
 //		sunRing.setTranslation(0, offset, 0);
 //		sunRing.setRotation(new Matrix3().fromAngleAxis(-tiltAngle, Vector3.UNIT_X));
 
-		final ClipState cs = new ClipState();
-		cs.setEnableClipPlane(0, true);
-//		cs.setClipPlaneEquation(0, 0, 0, 1, -0.19);
-		cs.setClipPlaneEquation(0, 0, 0, 1, 0);
-		cyl.setRenderState(cs);
 
 		final Cylinder baseCyl = new Cylinder("Base", 10, 50, 5, 0.2);
 		baseCyl.setTranslation(0, 0, 0.1);
@@ -87,6 +82,12 @@ public class Heliodon {
 		material.setEmissive(ColorRGBA.WHITE);
 		sun.setRenderState(material);		
 		
+		final ClipState cs = new ClipState();
+		cs.setEnableClipPlane(0, true);
+//		cs.setClipPlaneEquation(0, 0, 0, 1, -0.19);
+		cs.setClipPlaneEquation(0, 0, 0, 1, 0);
+		cyl.setRenderState(cs);
+		sunPath.setRenderState(cs);
 	}
 
 	public Node getRoot() {
@@ -316,8 +317,8 @@ public class Heliodon {
 	private void drawSunPath() {
 		final FloatBuffer vertexBuffer = sunPath.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();		
-		final double from = -Math.PI / 2.0;
-		final double to = Math.PI / 2.0;
+		final double from = -Math.PI;
+		final double to = Math.PI;
 		final double step = (to - from) / (vertexBuffer.capacity() / 3.0 - 1);
 		for (double hourAngle = from; hourAngle < to; hourAngle += step) {
 			final Vector3 v = computeSunLocation(hourAngle, declinationAngle, observerLatitude);

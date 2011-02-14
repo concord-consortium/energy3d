@@ -654,6 +654,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
 			}
 		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.X), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				heliodon.setHourAngle(heliodon.getHourAngle() + 0.03);
+			}
+		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				heliodon.setHourAngle(heliodon.getHourAngle() - 0.03);
+			}
+		}));		
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.UP), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!sunControl)
