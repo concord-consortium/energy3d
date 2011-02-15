@@ -202,7 +202,7 @@ public class Heliodon {
 	}
 
 	public void setHourAngle(double hourAngle) {
-		this.hourAngle = toPlusMinusPIRange(hourAngle);
+		this.hourAngle = toPlusMinusPIRange(hourAngle, -Math.PI, Math.PI);
 		draw();
 	}
 
@@ -211,7 +211,8 @@ public class Heliodon {
 	}
 
 	public void setDeclinationAngle(double declinationAngle) {
-		this.declinationAngle = toPlusMinusPIRange(declinationAngle);
+		final double maxDeclination = 23.45 / 180 * Math.PI;
+		this.declinationAngle = toPlusMinusPIRange(declinationAngle, -maxDeclination, maxDeclination);	
 		draw();
 	}
 
@@ -220,7 +221,7 @@ public class Heliodon {
 	}
 
 	public void setObserverLatitude(double observerLatitude) {
-		this.observerLatitude = toPlusMinusPIRange(observerLatitude);
+		this.observerLatitude = toPlusMinusPIRange(observerLatitude, -Math.PI / 2.0, Math.PI / 2.0);		
 		draw();
 	}
 
@@ -298,15 +299,15 @@ public class Heliodon {
 		return new Vector3(x, y, z);
 	}
 	
-	private double toPlusMinusPIRange(final double radian) {
+	private double toPlusMinusPIRange(final double radian, double min, double max) {
 		final double twoPI = Math.PI * 2.0;
-		final double twoPIRange = radian -(int)(radian / twoPI) * twoPI;
-		final double result;
-		if (Math.abs(twoPIRange) < Math.PI)
-			result = twoPIRange;
-		else
-			result = -Math.signum(twoPIRange) * (twoPI - Math.abs(twoPIRange));
-//		System.out.println("Converted from " + toDegree(radian) + " to " + toDegree(result));
+		double result = radian -(int)(radian / twoPI) * twoPI;
+		if (Math.abs(result) > Math.PI)
+			result = -Math.signum(result) * (twoPI - Math.abs(result));
+		if (result < min)
+			result = min;
+		else if (result > max)
+			result = max;
 		return result;
 	}
 

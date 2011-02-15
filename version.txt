@@ -462,6 +462,7 @@ Version 0.2
 - fix problem with computing azimuth angle of the sun due to asin range limitation by finding a new formula
 - draw the complete sun path circle
 - clip the sub path circle under the horizon
+- put limit on the range of declination and latitude angles
 
 - *fix problem with orbit view sometimes with wrong center of rotation 
 
