@@ -450,7 +450,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
-		blendState.setTestEnabled(true);
+//		blendState.setTestEnabled(true);
 		floor.setRenderState(blendState);
 		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		floor.getSceneHints().setLightCombineMode(LightCombineMode.Off);

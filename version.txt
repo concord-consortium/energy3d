@@ -463,6 +463,7 @@ Version 0.2
 - draw the complete sun path circle
 - clip the sub path circle under the horizon
 - put limit on the range of declination and latitude angles
+- draw sun region by rendering a glassy dome that shows the sun range in different seasons
 
 - *fix problem with orbit view sometimes with wrong center of rotation 
 
