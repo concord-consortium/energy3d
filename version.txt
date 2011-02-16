@@ -464,6 +464,7 @@ Version 0.2
 - clip the sub path circle under the horizon
 - put limit on the range of declination and latitude angles
 - draw sun region by rendering a glassy dome that shows the sun range in different seasons
+- optimize memory consumption by sun region dome
 
 - *fix problem with orbit view sometimes with wrong center of rotation 
 

@@ -58,13 +58,13 @@ public class Heliodon {
 		root.attachChild(sunPath);
 
 		sunRegion = new Mesh("Sun Region");		
-		sunRegion.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10000));
+		sunRegion.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(5040 / 3));
 		sunRegion.getMeshData().setIndexMode(IndexMode.Quads);
 		sunRegion.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 0.5f));
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);		
-//		blendState.setTestEnabled(false);
-		sunRegion.setRenderState(blendState);
+		sunRegion.setRenderState(blendState);		
+//		sunRegion.setRenderState(new WireframeState());
 		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		sunRegion.getSceneHints().setLightCombineMode(LightCombineMode.Off);		
 		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);		
@@ -89,7 +89,6 @@ public class Heliodon {
 		sunRing.attachChild(sunRot);
 		root.attachChild(sunRing);
 		root.attachChild(sun);
-//		drawSunPath();
 		draw();
 
 		scene.attachChild(root);
@@ -102,7 +101,6 @@ public class Heliodon {
 
 		final ClipState cs = new ClipState();
 		cs.setEnableClipPlane(0, true);
-		// cs.setClipPlaneEquation(0, 0, 0, 1, -0.19);
 		cs.setClipPlaneEquation(0, 0, 0, 1, 0);
 		cyl.setRenderState(cs);
 		sunPath.setRenderState(cs);
@@ -160,7 +158,6 @@ public class Heliodon {
 	}
 
 	public void setDeclinationAngle(double declinationAngle) {
-		// final double maxDeclination = 23.45 / 180 * Math.PI;
 		this.declinationAngle = toPlusMinusPIRange(declinationAngle, -tiltAngle, tiltAngle);
 		draw();
 	}
@@ -209,9 +206,9 @@ public class Heliodon {
 		return new Vector3(x, y, z);
 	}
 
-	private int toDegree(final double radian) {
-		return (int) (radian / Math.PI * 180);
-	}
+//	private int toDegree(final double radian) {
+//		return (int) (radian / Math.PI * 180);
+//	}
 
 	private double toPlusMinusPIRange(final double radian, double min, double max) {
 		final double twoPI = Math.PI * 2.0;
@@ -229,24 +226,29 @@ public class Heliodon {
 		final FloatBuffer buf = sunRegion.getMeshData().getVertexBuffer();
 		buf.limit(buf.capacity());
 		buf.rewind();
-		final double declinationStep = 2.0 * tiltAngle / (Math.sqrt(buf.capacity() / 3.0 / 4.0) - 1.0);
-		final double hourStep = 2.0 * Math.PI / (Math.sqrt(buf.capacity() / 3.0 / 4.0) - 1.0);
+		final double declinationStep = 2.0 * tiltAngle / 10.0;
+		final double hourStep = 2.0 * Math.PI / 70.0;
 		int limit = 0;
-		for (double hourAngle = -Math.PI; hourAngle < Math.PI; hourAngle += hourStep) {
-			for (double declinationAngle = -tiltAngle; declinationAngle < tiltAngle; declinationAngle += declinationStep) {
+		for (double hourAngle = -Math.PI; hourAngle < Math.PI - hourStep / 2.0; hourAngle += hourStep) {
+			for (double declinationAngle = -tiltAngle; declinationAngle < tiltAngle - declinationStep / 2.0; declinationAngle += declinationStep) {
+				double hourAngle2 = hourAngle + hourStep;
+				double declinationAngle2 = declinationAngle + declinationStep;
+				if (hourAngle2 > Math.PI)
+					hourAngle2 = Math.PI;
+				if (declinationAngle2 > tiltAngle)
+					declinationAngle2 = tiltAngle;
 				final Vector3 v1 = computeSunLocation(hourAngle, declinationAngle, observerLatitude);
-				final Vector3 v2 = computeSunLocation(hourAngle + hourStep, declinationAngle, observerLatitude);
-				final Vector3 v3 = computeSunLocation(hourAngle + hourStep, declinationAngle + declinationStep, observerLatitude);
-				final Vector3 v4 = computeSunLocation(hourAngle, declinationAngle + declinationStep, observerLatitude);
+				final Vector3 v2 = computeSunLocation(hourAngle2, declinationAngle, observerLatitude);
+				final Vector3 v3 = computeSunLocation(hourAngle2, declinationAngle2, observerLatitude);
+				final Vector3 v4 = computeSunLocation(hourAngle, declinationAngle2, observerLatitude);
 				if (v1.getZ() >= 0 || v2.getZ() >= 0 || v3.getZ() >= 0 || v4.getZ() >= 0) {
 					buf.put(v1.getXf()).put(v1.getYf()).put(v1.getZf()).put(v2.getXf()).put(v2.getYf()).put(v2.getZf()).put(v3.getXf()).put(v3.getYf()).put(v3.getZf()).put(v4.getXf()).put(v4.getYf()).put(v4.getZf());
 					limit += 12;
 				}
-//				break;
 			}
-//			break;
 		}
 		buf.limit(limit);
+		System.out.println("limit = " + limit + " / " + buf.capacity());
 	}
 
 	private void drawSunPath() {
@@ -255,16 +257,12 @@ public class Heliodon {
 		buf.rewind();
 		final double step = 2.0 * Math.PI / (buf.capacity() / 3.0 - 1.0);
 		int limit = 0;
-		for (double hourAngle = -Math.PI; hourAngle < Math.PI; hourAngle += step) {
+		for (double hourAngle = -Math.PI; hourAngle < Math.PI + step / 2.0; hourAngle += step) {
 			final Vector3 v = computeSunLocation(hourAngle, declinationAngle, observerLatitude);
 			buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 			limit += 3;
 		}
 		buf.limit(limit);
-//		while (buf.hasRemaining()) {
-//			final Vector3 v = computeSunLocation(Math.PI, declinationAngle, observerLatitude);
-//			buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
-//		}
 		sunPath.updateModelBound();
 	}
 
