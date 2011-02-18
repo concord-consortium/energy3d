@@ -466,6 +466,9 @@ Version 0.2
 - draw sun region by rendering a glassy dome that shows the sun range in different seasons
 - optimize memory consumption by sun region dome
 
+- allow moving the sun along sun path using mouse
+ 
+
 - *fix problem with orbit view sometimes with wrong center of rotation 
 
 TODO:

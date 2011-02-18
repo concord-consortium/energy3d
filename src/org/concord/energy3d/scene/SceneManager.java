@@ -67,6 +67,7 @@ import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
@@ -158,6 +159,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private TwoInputStates moveState;
 	private boolean drawBounds = false;
 	private long lastRenderTime;
+	private boolean mouseControlEnabled;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -197,6 +199,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		panel.addComponentListener(new java.awt.event.ComponentAdapter() {
 			public void componentResized(java.awt.event.ComponentEvent e) {
 				resizeCamera();
+				if (heliodon != null)
+					heliodon.updateBloom();
 			}
 		});
 		panel.add((Component) canvas, "Center");
@@ -254,7 +258,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.addOccluder(Scene.getRoot());
 
 //		createSunHeliodon();
-		heliodon = new Heliodon(root, light, passManager);
+		heliodon = new Heliodon(root, light, passManager, logicalLayer);
 //		updateSunHeliodon();
 		Scene.getInstance();
 
@@ -647,6 +651,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				resetCamera(viewMode);
+//				cameraNode.setRotation(new Quaternion(1, 0, 0, 1));
+				
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
@@ -943,7 +949,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void enableDisableRotationControl() {
-		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted())) // && viewMode != ViewMode.TOP_VIEW) // && viewMode != ViewMode.PRINT_PREVIEW)
+		if (!mouseControlEnabled)
+			return;
+		
+		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted()))
 			control.setMouseEnabled(true);
 		else
 			control.setMouseEnabled(false);
@@ -972,18 +981,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void updatePrintPreviewScene(boolean printPreview) {
-		// if (printPreview) {
-		// resetCamera(ViewMode.PRINT_PREVIEW);
-		// root.detachChild(floor);
-		// root.detachChild(axis);
-		// root.detachChild(sky);
-		// } else {
-		// resetCamera(ViewMode.NORMAL);
-		// root.attachChild(floor);
-		// root.attachChild(axis);
-		// root.attachChild(sky);
-		// }
-
 		resetCamera(printPreview ? ViewMode.PRINT_PREVIEW : ViewMode.NORMAL);
 		backgroundRoot.getSceneHints().setCullHint(printPreview ? CullHint.Always : CullHint.Inherit);
 	}
@@ -1096,6 +1093,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void executeMouseMove() {
+		if (!mouseControlEnabled)
+			return;
 		// this.mouseMoveFlag = false;
 		final MouseState mouseState = moveState.getCurrent().getMouseState();
 		moveState = null;
@@ -1115,6 +1114,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public boolean isRotationAnimationOn() {
 		return rotAnim;
+	}
+
+	public void setMouseControlEnabled(final boolean enabled) {
+		this.mouseControlEnabled = enabled;
+		control.setMouseEnabled(enabled);	
+		System.out.println("mouse " + mouseControlEnabled);
 	}
 
 }

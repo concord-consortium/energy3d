@@ -8,10 +8,26 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
+import com.ardor3d.framework.Canvas;
+import com.ardor3d.input.ButtonState;
+import com.ardor3d.input.Key;
+import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.logical.InputTrigger;
+import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.MouseButtonPressedCondition;
+import com.ardor3d.input.logical.MouseButtonReleasedCondition;
+import com.ardor3d.input.logical.MouseMovedCondition;
+import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Transform;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.pass.BasicPassManager;
@@ -19,12 +35,14 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TransparencyType;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.geom.BufferUtils;
@@ -45,9 +63,16 @@ public class Heliodon {
 	private double observerLatitude;
 	private final Line sunPath;
 	private final Mesh sunRegion;
+	private final Mesh line;
+	private boolean sunGrabbed = false;
+	private final PickResults pickResults;
 
-	public Heliodon(final Node scene, final DirectionalLight light, final BasicPassManager passManager) {
+	public Heliodon(final Node scene, final DirectionalLight light, final BasicPassManager passManager, final LogicalLayer logicalLayer) {
 		this.light = light;
+		
+		this.pickResults = new PrimitivePickResults();
+		this.pickResults.setCheckDistance(true);
+		
 		this.bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
 		passManager.add(bloomRenderPass);
 		bloomRenderPass.add(sun);
@@ -56,6 +81,13 @@ public class Heliodon {
 		sunPath.getMeshData().setIndexMode(IndexMode.LineStrip);
 		sunPath.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		root.attachChild(sunPath);
+		
+		final FloatBuffer cbuf = BufferUtils.createColorBuffer(2);
+		cbuf.put(1).put(0).put(0).put(0).put(0).put(0).put(1);
+		line = new Line("Line", BufferUtils.createVector3Buffer(2), null, cbuf, null);
+		line.getMeshData().setIndexMode(IndexMode.LineStrip);
+		line.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+		root.attachChild(line);		
 
 		sunRegion = new Mesh("Sun Region");		
 		sunRegion.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(5040 / 3));
@@ -64,7 +96,8 @@ public class Heliodon {
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);		
 		sunRegion.setRenderState(blendState);		
-//		sunRegion.setRenderState(new WireframeState());
+		sunRegion.setRenderState(new WireframeState());
+		sunRegion.getSceneHints().setTransparencyType(TransparencyType.TwoPass);
 		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		sunRegion.getSceneHints().setLightCombineMode(LightCombineMode.Off);		
 		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);		
@@ -105,6 +138,99 @@ public class Heliodon {
 		cyl.setRenderState(cs);
 		sunPath.setRenderState(cs);
 		sunRegion.setRenderState(cs);
+		
+		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				final int x = inputStates.getCurrent().getMouseState().getX();
+				final int y = inputStates.getCurrent().getMouseState().getY();
+				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
+				pickResults.clear();
+				PickingUtil.findPick(sun, pickRay, pickResults);
+				if (pickResults.getNumber() != 0)
+					sunGrabbed = true;
+				else
+					sunGrabbed = false;
+				SceneManager.getInstance().setMouseControlEnabled(!sunGrabbed);
+			}
+		}));
+
+		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				sunGrabbed = false;
+				SceneManager.getInstance().setMouseControlEnabled(true);
+			}
+		}));
+
+		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (!sunGrabbed)
+					return;
+				final int x = inputStates.getCurrent().getMouseState().getX();
+				final int y = inputStates.getCurrent().getMouseState().getY();
+				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
+
+//				if (inputStates.getCurrent().getKeyboardState().isDown(Key.P)) {
+//				final FloatBuffer buf1 = line.getMeshData().getVertexBuffer();
+//				buf1.rewind();
+//				buf1.put(pickRay.getOrigin().getXf()).put(pickRay.getOrigin().getYf()).put(pickRay.getOrigin().getZf());
+//				System.out.println(pickRay.getOrigin());
+////				buf1.put(1).put(-7).put(3);
+//				final Vector3 pp = pickRay.getOrigin().add(pickRay.getDirection().multiply(10, null), null);
+//				buf1.put(pp.getXf()).put(pp.getYf()).put(pp.getZf());
+////				buf1.put(0).put(0).put(0);
+//				
+////				System.out.println("origin = " + (int)pickRay.getOrigin().getXf() + ", " + (int)pickRay.getOrigin().getYf() + ", " + (int)pickRay.getOrigin().getZf());
+////				pp.set(pickRay.getDirection());
+////				System.out.println("\tp2 = " + (int)pp.getXf() + ", " + (int)pp.getYf() + ", " + (int)pp.getZf());
+////				System.out.println("\tdirection = " + (int)(pp.getXf()*10) + ", " + (int)(10*pp.getYf()) + ", " + (int)(10*pp.getZf()));
+////				System.out.println(pickRay);
+////				System.out.println(pp);
+////				System.out.println(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getModelViewMatrix());
+//				}
+				
+//				final double d = pickRay.distanceSquared(sun.getTranslation(), null);
+//				System.out.println("d2 = " + d);
+				
+				double smallestDistance = Double.MAX_VALUE;
+				final Vector3 p = new Vector3();
+				final Vector3 result = new Vector3();
+				FloatBuffer buf = sunPath.getMeshData().getVertexBuffer();
+				buf.rewind();
+				while (buf.hasRemaining()) {
+					p.set(buf.get(), buf.get(), buf.get());
+					final double d = pickRay.distanceSquared(p, null);
+					if (d < smallestDistance) {
+						smallestDistance = d;
+						result.set(p);
+					}
+				}
+				int rowCounter = 0;
+				int resultRow = 0;
+				if (smallestDistance > 0.1) {
+					buf = sunRegion.getMeshData().getVertexBuffer();
+					buf.rewind();
+					final double r = 5.0 / 2.0;
+					final Vector3 prev = new Vector3();
+					while (buf.hasRemaining()) {
+						p.set(buf.get(), buf.get(), buf.get());
+						final double d = pickRay.distanceSquared(p, null);
+						if (d < smallestDistance) {
+							smallestDistance = d;
+							result.set(p);
+							resultRow = rowCounter;
+						}
+						if (prev.distance(p) > r)
+							rowCounter++;
+						prev.set(p);
+					}
+				}
+				sun.setTranslation(result);
+				System.out.println("declinationAngle = " + computeDeclinationAngle(result.getX(), result.getY(), result.getZ()));
+				declinationAngle = computeDeclinationAngle(result.getX(), result.getY(), result.getZ());
+				if (!Double.isNaN(declinationAngle))
+				drawSunPath();
+			}
+		}));		
 	}
 
 	public Node getRoot() {
@@ -205,6 +331,30 @@ public class Heliodon {
 
 		return new Vector3(x, y, z);
 	}
+	
+	private double computeDeclinationAngle(final double x, final double y, final double z) {
+		final double hourAngle = 1;
+		
+		final double r = 5;
+		final double altitudeAngle = -(Math.acos(z / r) - Math.PI / 2.0); 
+		final double azimuthAngle =  Math.asin(y / r / Math.sin(Math.PI / 2.0 - altitudeAngle));
+		return Math.acos(Math.sin(azimuthAngle) / Math.sin(hourAngle) * Math.cos(altitudeAngle));
+			
+//		final double altitudeAngle = Math.asin(Math.sin(declinationAngle) * Math.sin(observerLatitude) + Math.cos(declinationAngle) * Math.cos(hourAngle) * Math.cos(observerLatitude));
+//		final double x_azm = Math.sin(hourAngle) * Math.cos(declinationAngle);
+//		final double y_azm = (-(Math.cos(hourAngle)) * Math.cos(declinationAngle) * Math.sin(observerLatitude)) + (Math.cos(observerLatitude) * Math.sin(declinationAngle));
+//		final double azimuthAngle = Math.atan2(y_azm, x_azm);
+//		
+//		final double azimuthAngle = Math.asin(Math.sin(hourAngle) * Math.cos(declinationAngle) / Math.cos(altitudeAngle));
+//
+//		final double x = r * Math.cos(azimuthAngle) * Math.sin(Math.PI / 2.0 - altitudeAngle);
+//		final double y = r * Math.sin(azimuthAngle) * Math.sin(Math.PI / 2.0 - altitudeAngle);
+//		final double z = r * Math.cos(Math.PI / 2.0 - altitudeAngle);
+//
+//		// System.out.println("houseAngle = " + toDegree(hourAngle) + ", declinationAngle = " + toDegree(declinationAngle) + ", observerLatitude = " + toDegree(observerLatitude) + " --> altitudeAngle = " + toDegree(altitudeAngle) + ", azimuthAngle = " + toDegree(azimuthAngle) + " (" + x + ", " + y + ", " + z + ")");
+//
+//		return new Vector3(x, y, z);
+	}	
 
 //	private int toDegree(final double radian) {
 //		return (int) (radian / Math.PI * 180);
@@ -259,8 +409,10 @@ public class Heliodon {
 		int limit = 0;
 		for (double hourAngle = -Math.PI; hourAngle < Math.PI + step / 2.0; hourAngle += step) {
 			final Vector3 v = computeSunLocation(hourAngle, declinationAngle, observerLatitude);
-			buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
-			limit += 3;
+			if (v.getZ() > 0) {
+				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
+				limit += 3;
+			}
 		}
 		buf.limit(limit);
 		sunPath.updateModelBound();
@@ -279,5 +431,10 @@ public class Heliodon {
 		drawSunRegion();
 		drawSunPath();
 		drawSun();
+	}
+
+	public void updateBloom() {
+		bloomRenderPass.markNeedsRefresh();
+		
 	}
 }
