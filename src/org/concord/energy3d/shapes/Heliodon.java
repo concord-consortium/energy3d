@@ -19,6 +19,7 @@ import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.MouseMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -29,8 +30,11 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.pass.BasicPassManager;
+import com.ardor3d.renderer.pass.RenderPass;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
@@ -51,7 +55,7 @@ public class Heliodon {
 	private final Node root = new Node("Heliodon Root");
 	private final Node sunRing = new Node("Sun Ring");
 	private final Node sunRot = new Node("Sun Rot");
-	private final Spatial sun = new Sphere("Sun", 20, 20, 0.3);
+	private final Spatial sun = new Sphere("Sun", 20, 20, 0.03);
 	private final DirectionalLight light;
 	private final BloomRenderPass bloomRenderPass;
 	private double tiltAngle = 23.45 / 180 * Math.PI; // 50.0 / 180 * Math.PI;
@@ -76,7 +80,7 @@ public class Heliodon {
 
 		this.bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
 		passManager.add(bloomRenderPass);
-		bloomRenderPass.add(sun);
+//		bloomRenderPass.add(sun);
 
 		sunPath = new Line("Sun Path", BufferUtils.createVector3Buffer(100), null, null, null);
 		sunPath.getMeshData().setIndexMode(IndexMode.LineStrip);
@@ -97,12 +101,17 @@ public class Heliodon {
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
 		sunRegion.setRenderState(blendState);
-		sunRegion.setRenderState(new WireframeState());
+//		sunRegion.setRenderState(new WireframeState());
 		sunRegion.getSceneHints().setTransparencyType(TransparencyType.TwoPass);
 		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		sunRegion.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		root.attachChild(sunRegion);
+		
+		final RenderPass wireframePass = new RenderPass();
+		wireframePass.setPassState(new WireframeState());
+		wireframePass.add(sunRegion);
+		passManager.add(wireframePass);
 
 		root.getSceneHints().setCullHint(CullHint.Always);
 		final Cylinder cyl = new Cylinder("Curve", 10, 50, 5, 0.3);
@@ -168,55 +177,78 @@ public class Heliodon {
 					return;
 				final int x = inputStates.getCurrent().getMouseState().getX();
 				final int y = inputStates.getCurrent().getMouseState().getY();
-				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
-
-				// if (inputStates.getCurrent().getKeyboardState().isDown(Key.P)) {
-				// final FloatBuffer buf1 = line.getMeshData().getVertexBuffer();
-				// buf1.rewind();
-				// buf1.put(pickRay.getOrigin().getXf()).put(pickRay.getOrigin().getYf()).put(pickRay.getOrigin().getZf());
-				// System.out.println(pickRay.getOrigin());
-				// // buf1.put(1).put(-7).put(3);
-				// final Vector3 pp = pickRay.getOrigin().add(pickRay.getDirection().multiply(10, null), null);
-				// buf1.put(pp.getXf()).put(pp.getYf()).put(pp.getZf());
-				// // buf1.put(0).put(0).put(0);
-				//
-				// // System.out.println("origin = " + (int)pickRay.getOrigin().getXf() + ", " + (int)pickRay.getOrigin().getYf() + ", " + (int)pickRay.getOrigin().getZf());
-				// // pp.set(pickRay.getDirection());
-				// // System.out.println("\tp2 = " + (int)pp.getXf() + ", " + (int)pp.getYf() + ", " + (int)pp.getZf());
-				// // System.out.println("\tdirection = " + (int)(pp.getXf()*10) + ", " + (int)(10*pp.getYf()) + ", " + (int)(10*pp.getZf()));
-				// // System.out.println(pickRay);
-				// // System.out.println(pp);
-				// // System.out.println(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getModelViewMatrix());
-				// }
+				final Camera camera = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera();
+				final Ray3 pickRay = camera.getPickRay(new Vector2(x, y), false, null);
+//				final ReadOnlyVector3 cameraLocation = camera.getLocation();	
+				
+				
+//				 if (inputStates.getCurrent().getKeyboardState().isDown(Key.P)) {
+				 final FloatBuffer buf1 = line.getMeshData().getVertexBuffer();
+				 buf1.rewind();
+				 buf1.put(pickRay.getOrigin().getXf()).put(pickRay.getOrigin().getYf()).put(pickRay.getOrigin().getZf());
+				 System.out.println(pickRay.getOrigin());
+				 // buf1.put(1).put(-7).put(3);
+				 final Vector3 pp = pickRay.getOrigin().add(pickRay.getDirection().multiply(20, null), null);
+				 buf1.put(pp.getXf()).put(pp.getYf()).put(pp.getZf());
+				 // buf1.put(0).put(0).put(0);
+				
+				 // System.out.println("origin = " + (int)pickRay.getOrigin().getXf() + ", " + (int)pickRay.getOrigin().getYf() + ", " + (int)pickRay.getOrigin().getZf());
+				 // pp.set(pickRay.getDirection());
+				 // System.out.println("\tp2 = " + (int)pp.getXf() + ", " + (int)pp.getYf() + ", " + (int)pp.getZf());
+				 // System.out.println("\tdirection = " + (int)(pp.getXf()*10) + ", " + (int)(10*pp.getYf()) + ", " + (int)(10*pp.getZf()));
+				 // System.out.println(pickRay);
+				 // System.out.println(pp);
+				 // System.out.println(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getModelViewMatrix());
+//				 }
 
 				// final double d = pickRay.distanceSquared(sun.getTranslation(), null);
-				// System.out.println("d2 = " + d);
+				// System.out.println("d2 = " + d);				
+				
+				
+				pickResults.clear();
+				PickingUtil.findPick(sunRegion, pickRay, pickResults);
+				final Vector3 intersectionPoint;
+				if (pickResults.getNumber() > 0) {
+					final IntersectionRecord intersectionRecord = pickResults.getPickData(0).getIntersectionRecord();
+					System.out.println(intersectionRecord.getNumberOfIntersections());
+					intersectionPoint = intersectionRecord.getIntersectionPoint(intersectionRecord.getFurthestIntersection());
+//					intersectionPoint = intersectionRecord.getIntersectionPoint(0);
+				} else
+					intersectionPoint = null;
 
 				double smallestDistance = Double.MAX_VALUE;
-				final Vector3 p = new Vector3();
 				final Vector3 result = new Vector3();
+				final Vector3 p = new Vector3();
 				FloatBuffer buf = sunPath.getMeshData().getVertexBuffer();
-				buf.rewind();
-				while (buf.hasRemaining()) {
-					p.set(buf.get(), buf.get(), buf.get());
-					final double d = pickRay.distanceSquared(p, null);
-					if (d < smallestDistance) {
-						smallestDistance = d;
-						result.set(p);
-					}
-				}
+//				buf.rewind();
+//				while (buf.hasRemaining()) {
+//					p.set(buf.get(), buf.get(), buf.get());
+//					final double d;
+//					if (intersectionPoint != null)
+//						d = intersectionPoint.distanceSquared(p);
+//					else
+//						d = pickRay.distanceSquared(p, null);
+//					if (d < smallestDistance) {
+//						smallestDistance = d;
+//						result.set(p);
+//					}
+//				}
 				int rowCounter = 0;
 				int resultRow = -1;
 				if (smallestDistance > 0.1) {
 					buf = sunRegion.getMeshData().getVertexBuffer();
 					buf.rewind();
-//					buf.position(3);
 					final double r = 5.0 / 2.0;
 					final Vector3 prev = new Vector3();
 					int vertexCounter = 0;
 					while (buf.hasRemaining()) {
 						p.set(buf.get(), buf.get(), buf.get());
-						final double d = pickRay.distanceSquared(p, null);
+//						final double d = pickRay.distanceSquared(p, null);
+						final double d;
+						if (intersectionPoint != null)
+							d = intersectionPoint.distanceSquared(p);
+						else
+							d = pickRay.distanceSquared(p, null);						
 						if (d < smallestDistance) {
 							smallestDistance = d;
 							result.set(p);
@@ -229,8 +261,10 @@ public class Heliodon {
 					}
 				}
 				rowCounter++;
-				sun.setTranslation(result);
-				System.out.println("resultRow = " + resultRow + " / " + rowCounter);
+//				sun.setTranslation(result);
+				if (intersectionPoint != null)
+				sun.setTranslation(intersectionPoint);
+				System.out.println(smallestDistance + "\t" + intersectionPoint);
 				if (resultRow != -1)
 					declinationAngle = -tiltAngle + (2.0 * tiltAngle * resultRow / rowCounter);
 				 drawSunPath();
@@ -332,7 +366,7 @@ public class Heliodon {
 		final double y = r * Math.sin(azimuthAngle) * Math.sin(Math.PI / 2 - altitudeAngle);
 		final double z = r * Math.cos(Math.PI / 2 - altitudeAngle);
 
-		System.out.println("houseAngle = " + toDegree(hourAngle) + ", declinationAngle = " + toDegree(declinationAngle) + ", observerLatitude = " + toDegree(observerLatitude) + " --> altitudeAngle = " + toDegree(altitudeAngle) + ", azimuthAngle = " + toDegree(azimuthAngle) + " (" + x + ", " + y + ", " + z + ")");
+//		System.out.println("houseAngle = " + toDegree(hourAngle) + ", declinationAngle = " + toDegree(declinationAngle) + ", observerLatitude = " + toDegree(observerLatitude) + " --> altitudeAngle = " + toDegree(altitudeAngle) + ", azimuthAngle = " + toDegree(azimuthAngle) + " (" + x + ", " + y + ", " + z + ")");
 
 		return new Vector3(x, y, z);
 	}
@@ -425,6 +459,8 @@ public class Heliodon {
 			}
 		}
 		buf.limit(limit);
+		sunRegion.getMeshData().updateVertexCount();
+		sunRegion.updateModelBound();
 		System.out.println("limit = " + limit + " / " + buf.capacity());
 	}
 

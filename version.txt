@@ -467,6 +467,9 @@ Version 0.2
 - optimize memory consumption by sun region dome
 - allow moving the sun along sun path using mouse
 
+- show sun region in wireframe and solid simultaneously  
+- fix problem with moving the sun to sun region farthest from camera by using picking
+
  
 
 - *fix problem with orbit view sometimes with wrong center of rotation 
