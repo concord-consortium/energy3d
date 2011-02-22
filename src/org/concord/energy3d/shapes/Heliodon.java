@@ -233,9 +233,6 @@ public class Heliodon {
 				System.out.println("resultRow = " + resultRow + " / " + rowCounter);
 				if (resultRow != -1)
 					declinationAngle = -tiltAngle + (2.0 * tiltAngle * resultRow / rowCounter);
-				// System.out.println("declinationAngle = " + computeDeclinationAngle(result.getX(), result.getY(), result.getZ()));
-				// declinationAngle = computeDeclinationAngle(result.getX(), result.getY(), result.getZ());
-				// if (!Double.isNaN(declinationAngle))
 				 drawSunPath();
 			}
 		}));
