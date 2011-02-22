@@ -68,11 +68,12 @@ public class Heliodon {
 	private final PickResults pickResults;
 
 	public Heliodon(final Node scene, final DirectionalLight light, final BasicPassManager passManager, final LogicalLayer logicalLayer) {
+		// computeDeclinationAngle(0,0,5);
 		this.light = light;
-		
+
 		this.pickResults = new PrimitivePickResults();
 		this.pickResults.setCheckDistance(true);
-		
+
 		this.bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
 		passManager.add(bloomRenderPass);
 		bloomRenderPass.add(sun);
@@ -81,26 +82,26 @@ public class Heliodon {
 		sunPath.getMeshData().setIndexMode(IndexMode.LineStrip);
 		sunPath.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		root.attachChild(sunPath);
-		
+
 		final FloatBuffer cbuf = BufferUtils.createColorBuffer(2);
 		cbuf.put(1).put(0).put(0).put(0).put(0).put(0).put(1);
 		line = new Line("Line", BufferUtils.createVector3Buffer(2), null, cbuf, null);
 		line.getMeshData().setIndexMode(IndexMode.LineStrip);
 		line.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-		root.attachChild(line);		
+		root.attachChild(line);
 
-		sunRegion = new Mesh("Sun Region");		
+		sunRegion = new Mesh("Sun Region");
 		sunRegion.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(5040 / 3));
 		sunRegion.getMeshData().setIndexMode(IndexMode.Quads);
 		sunRegion.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 0.5f));
 		final BlendState blendState = new BlendState();
-		blendState.setBlendEnabled(true);		
-		sunRegion.setRenderState(blendState);		
+		blendState.setBlendEnabled(true);
+		sunRegion.setRenderState(blendState);
 		sunRegion.setRenderState(new WireframeState());
 		sunRegion.getSceneHints().setTransparencyType(TransparencyType.TwoPass);
 		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-		sunRegion.getSceneHints().setLightCombineMode(LightCombineMode.Off);		
-		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);		
+		sunRegion.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		root.attachChild(sunRegion);
 
 		root.getSceneHints().setCullHint(CullHint.Always);
@@ -109,7 +110,7 @@ public class Heliodon {
 		trans.setMatrix(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_X));
 		cyl.setDefaultColor(ColorRGBA.YELLOW);
 		cyl.setTransform(trans);
-//		sunRing.attachChild(cyl);
+		// sunRing.attachChild(cyl);
 		// sunRing.setTranslation(0, offset, 0);
 		// sunRing.setRotation(new Matrix3().fromAngleAxis(-tiltAngle, Vector3.UNIT_X));
 
@@ -138,7 +139,7 @@ public class Heliodon {
 		cyl.setRenderState(cs);
 		sunPath.setRenderState(cs);
 		sunRegion.setRenderState(cs);
-		
+
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				final int x = inputStates.getCurrent().getMouseState().getX();
@@ -169,28 +170,28 @@ public class Heliodon {
 				final int y = inputStates.getCurrent().getMouseState().getY();
 				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
 
-//				if (inputStates.getCurrent().getKeyboardState().isDown(Key.P)) {
-//				final FloatBuffer buf1 = line.getMeshData().getVertexBuffer();
-//				buf1.rewind();
-//				buf1.put(pickRay.getOrigin().getXf()).put(pickRay.getOrigin().getYf()).put(pickRay.getOrigin().getZf());
-//				System.out.println(pickRay.getOrigin());
-////				buf1.put(1).put(-7).put(3);
-//				final Vector3 pp = pickRay.getOrigin().add(pickRay.getDirection().multiply(10, null), null);
-//				buf1.put(pp.getXf()).put(pp.getYf()).put(pp.getZf());
-////				buf1.put(0).put(0).put(0);
-//				
-////				System.out.println("origin = " + (int)pickRay.getOrigin().getXf() + ", " + (int)pickRay.getOrigin().getYf() + ", " + (int)pickRay.getOrigin().getZf());
-////				pp.set(pickRay.getDirection());
-////				System.out.println("\tp2 = " + (int)pp.getXf() + ", " + (int)pp.getYf() + ", " + (int)pp.getZf());
-////				System.out.println("\tdirection = " + (int)(pp.getXf()*10) + ", " + (int)(10*pp.getYf()) + ", " + (int)(10*pp.getZf()));
-////				System.out.println(pickRay);
-////				System.out.println(pp);
-////				System.out.println(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getModelViewMatrix());
-//				}
-				
-//				final double d = pickRay.distanceSquared(sun.getTranslation(), null);
-//				System.out.println("d2 = " + d);
-				
+				// if (inputStates.getCurrent().getKeyboardState().isDown(Key.P)) {
+				// final FloatBuffer buf1 = line.getMeshData().getVertexBuffer();
+				// buf1.rewind();
+				// buf1.put(pickRay.getOrigin().getXf()).put(pickRay.getOrigin().getYf()).put(pickRay.getOrigin().getZf());
+				// System.out.println(pickRay.getOrigin());
+				// // buf1.put(1).put(-7).put(3);
+				// final Vector3 pp = pickRay.getOrigin().add(pickRay.getDirection().multiply(10, null), null);
+				// buf1.put(pp.getXf()).put(pp.getYf()).put(pp.getZf());
+				// // buf1.put(0).put(0).put(0);
+				//
+				// // System.out.println("origin = " + (int)pickRay.getOrigin().getXf() + ", " + (int)pickRay.getOrigin().getYf() + ", " + (int)pickRay.getOrigin().getZf());
+				// // pp.set(pickRay.getDirection());
+				// // System.out.println("\tp2 = " + (int)pp.getXf() + ", " + (int)pp.getYf() + ", " + (int)pp.getZf());
+				// // System.out.println("\tdirection = " + (int)(pp.getXf()*10) + ", " + (int)(10*pp.getYf()) + ", " + (int)(10*pp.getZf()));
+				// // System.out.println(pickRay);
+				// // System.out.println(pp);
+				// // System.out.println(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getModelViewMatrix());
+				// }
+
+				// final double d = pickRay.distanceSquared(sun.getTranslation(), null);
+				// System.out.println("d2 = " + d);
+
 				double smallestDistance = Double.MAX_VALUE;
 				final Vector3 p = new Vector3();
 				final Vector3 result = new Vector3();
@@ -205,32 +206,39 @@ public class Heliodon {
 					}
 				}
 				int rowCounter = 0;
-				int resultRow = 0;
+				int resultRow = -1;
 				if (smallestDistance > 0.1) {
 					buf = sunRegion.getMeshData().getVertexBuffer();
 					buf.rewind();
+//					buf.position(3);
 					final double r = 5.0 / 2.0;
 					final Vector3 prev = new Vector3();
+					int vertexCounter = 0;
 					while (buf.hasRemaining()) {
 						p.set(buf.get(), buf.get(), buf.get());
 						final double d = pickRay.distanceSquared(p, null);
 						if (d < smallestDistance) {
 							smallestDistance = d;
 							result.set(p);
-							resultRow = rowCounter;
+							resultRow = vertexCounter >= 2 ? rowCounter + 1 : rowCounter;
 						}
-						if (prev.distance(p) > r)
+						if (prev.distance(p) > r && prev.lengthSquared() != 0)
 							rowCounter++;
 						prev.set(p);
+						vertexCounter = (vertexCounter + 1) % 4;
 					}
 				}
+				rowCounter++;
 				sun.setTranslation(result);
-				System.out.println("declinationAngle = " + computeDeclinationAngle(result.getX(), result.getY(), result.getZ()));
-				declinationAngle = computeDeclinationAngle(result.getX(), result.getY(), result.getZ());
-				if (!Double.isNaN(declinationAngle))
-				drawSunPath();
+				System.out.println("resultRow = " + resultRow + " / " + rowCounter);
+				if (resultRow != -1)
+					declinationAngle = -tiltAngle + (2.0 * tiltAngle * resultRow / rowCounter);
+				// System.out.println("declinationAngle = " + computeDeclinationAngle(result.getX(), result.getY(), result.getZ()));
+				// declinationAngle = computeDeclinationAngle(result.getX(), result.getY(), result.getZ());
+				// if (!Double.isNaN(declinationAngle))
+				 drawSunPath();
 			}
-		}));		
+		}));
 	}
 
 	public Node getRoot() {
@@ -327,38 +335,60 @@ public class Heliodon {
 		final double y = r * Math.sin(azimuthAngle) * Math.sin(Math.PI / 2 - altitudeAngle);
 		final double z = r * Math.cos(Math.PI / 2 - altitudeAngle);
 
-		// System.out.println("houseAngle = " + toDegree(hourAngle) + ", declinationAngle = " + toDegree(declinationAngle) + ", observerLatitude = " + toDegree(observerLatitude) + " --> altitudeAngle = " + toDegree(altitudeAngle) + ", azimuthAngle = " + toDegree(azimuthAngle) + " (" + x + ", " + y + ", " + z + ")");
+		System.out.println("houseAngle = " + toDegree(hourAngle) + ", declinationAngle = " + toDegree(declinationAngle) + ", observerLatitude = " + toDegree(observerLatitude) + " --> altitudeAngle = " + toDegree(altitudeAngle) + ", azimuthAngle = " + toDegree(azimuthAngle) + " (" + x + ", " + y + ", " + z + ")");
 
 		return new Vector3(x, y, z);
 	}
-	
-	private double computeDeclinationAngle(final double x, final double y, final double z) {
-		final double hourAngle = 1;
-		
-		final double r = 5;
-		final double altitudeAngle = -(Math.acos(z / r) - Math.PI / 2.0); 
-		final double azimuthAngle =  Math.asin(y / r / Math.sin(Math.PI / 2.0 - altitudeAngle));
-		return Math.acos(Math.sin(azimuthAngle) / Math.sin(hourAngle) * Math.cos(altitudeAngle));
-			
-//		final double altitudeAngle = Math.asin(Math.sin(declinationAngle) * Math.sin(observerLatitude) + Math.cos(declinationAngle) * Math.cos(hourAngle) * Math.cos(observerLatitude));
-//		final double x_azm = Math.sin(hourAngle) * Math.cos(declinationAngle);
-//		final double y_azm = (-(Math.cos(hourAngle)) * Math.cos(declinationAngle) * Math.sin(observerLatitude)) + (Math.cos(observerLatitude) * Math.sin(declinationAngle));
-//		final double azimuthAngle = Math.atan2(y_azm, x_azm);
-//		
-//		final double azimuthAngle = Math.asin(Math.sin(hourAngle) * Math.cos(declinationAngle) / Math.cos(altitudeAngle));
-//
-//		final double x = r * Math.cos(azimuthAngle) * Math.sin(Math.PI / 2.0 - altitudeAngle);
-//		final double y = r * Math.sin(azimuthAngle) * Math.sin(Math.PI / 2.0 - altitudeAngle);
-//		final double z = r * Math.cos(Math.PI / 2.0 - altitudeAngle);
-//
-//		// System.out.println("houseAngle = " + toDegree(hourAngle) + ", declinationAngle = " + toDegree(declinationAngle) + ", observerLatitude = " + toDegree(observerLatitude) + " --> altitudeAngle = " + toDegree(altitudeAngle) + ", azimuthAngle = " + toDegree(azimuthAngle) + " (" + x + ", " + y + ", " + z + ")");
-//
-//		return new Vector3(x, y, z);
-	}	
 
-//	private int toDegree(final double radian) {
-//		return (int) (radian / Math.PI * 180);
-//	}
+	// private double computeDeclinationAngle(double x, double y, double z) {
+	// final double hourAngle = 3.0368729;
+	// x = 0.4111789607654713;
+	// y = 1.9897431565380506;
+	// z = -4.5685724283668545;
+	//
+	// final double r = 5;
+	// final double altitudeAngle = -(Math.acos(z / r) - Math.PI / 2.0);
+	// double azimuthAngle = Math.asin(y / r / Math.sin(Math.PI / 2.0 - altitudeAngle));
+	// // if (Double.isNaN(azimuthAngle))
+	// // azimuthAngle = 0;
+	// // double declinationAngle = Math.acos(Math.sin(azimuthAngle) / Math.sin(hourAngle) * Math.cos(altitudeAngle));
+	// // double declinationAngle = Math.asin(-Math.cos(azimuthAngle)*Math.cos(altitudeAngle)*Math.cos(observerLatitude)-Math.sin(altitudeAngle)*Math.sin(observerLatitude));
+	//
+	// Math.tan(azimuthAngle) = y_azm / x_azm;
+	// Math.cos(declinationAngle) = x_azm / Math.sin(hourAngle);
+	//
+	// Math.cos(declinationAngle) = (-(Math.cos(hourAngle)) * Math.cos(declinationAngle) * Math.sin(observerLatitude)) + (Math.cos(observerLatitude) * Math.sin(declinationAngle)) / Math.tan(azimuthAngle) / Math.sin(hourAngle);
+	//
+	// Math.tan(azimuthAngle) * x_azm = (-(Math.cos(hourAngle)) * Math.cos(declinationAngle) * Math.sin(observerLatitude)) + (Math.cos(observerLatitude) * Math.sin(declinationAngle));
+	//
+	// final double x_azm = Math.sin(hourAngle) * Math.cos(declinationAngle);
+	// final double y_azm = (-(Math.cos(hourAngle)) * Math.cos(declinationAngle) * Math.sin(observerLatitude)) + (Math.cos(observerLatitude) * Math.sin(declinationAngle));
+	// final double azimuthAngle = Math.atan2(y_azm, x_azm);
+	//
+	// System.out.println("Altitude = " + toDegree(altitudeAngle) + "\tAzimuth = " + toDegree(azimuthAngle) + "\tDeclination = " + toDegree(declinationAngle));
+	// if (Double.isNaN(declinationAngle))
+	// declinationAngle = 0;
+	// return declinationAngle;
+	//
+	// // final double altitudeAngle = Math.asin(Math.sin(declinationAngle) * Math.sin(observerLatitude) + Math.cos(declinationAngle) * Math.cos(hourAngle) * Math.cos(observerLatitude));
+	// // final double x_azm = Math.sin(hourAngle) * Math.cos(declinationAngle);
+	// // final double y_azm = (-(Math.cos(hourAngle)) * Math.cos(declinationAngle) * Math.sin(observerLatitude)) + (Math.cos(observerLatitude) * Math.sin(declinationAngle));
+	// // final double azimuthAngle = Math.atan2(y_azm, x_azm);
+	// //
+	// // final double azimuthAngle = Math.asin(Math.sin(hourAngle) * Math.cos(declinationAngle) / Math.cos(altitudeAngle));
+	// //
+	// // final double x = r * Math.cos(azimuthAngle) * Math.sin(Math.PI / 2.0 - altitudeAngle);
+	// // final double y = r * Math.sin(azimuthAngle) * Math.sin(Math.PI / 2.0 - altitudeAngle);
+	// // final double z = r * Math.cos(Math.PI / 2.0 - altitudeAngle);
+	// //
+	// // // System.out.println("houseAngle = " + toDegree(hourAngle) + ", declinationAngle = " + toDegree(declinationAngle) + ", observerLatitude = " + toDegree(observerLatitude) + " --> altitudeAngle = " + toDegree(altitudeAngle) + ", azimuthAngle = " + toDegree(azimuthAngle) + " (" + x + ", " + y + ", " + z + ")");
+	// //
+	// // return new Vector3(x, y, z);
+	// }
+
+	private int toDegree(final double radian) {
+		return (int) (radian / Math.PI * 180);
+	}
 
 	private double toPlusMinusPIRange(final double radian, double min, double max) {
 		final double twoPI = Math.PI * 2.0;
@@ -379,8 +409,8 @@ public class Heliodon {
 		final double declinationStep = 2.0 * tiltAngle / 10.0;
 		final double hourStep = 2.0 * Math.PI / 70.0;
 		int limit = 0;
-		for (double hourAngle = -Math.PI; hourAngle < Math.PI - hourStep / 2.0; hourAngle += hourStep) {
-			for (double declinationAngle = -tiltAngle; declinationAngle < tiltAngle - declinationStep / 2.0; declinationAngle += declinationStep) {
+		for (double declinationAngle = -tiltAngle; declinationAngle < tiltAngle - declinationStep / 2.0; declinationAngle += declinationStep) {
+			for (double hourAngle = -Math.PI; hourAngle < Math.PI - hourStep / 2.0; hourAngle += hourStep) {
 				double hourAngle2 = hourAngle + hourStep;
 				double declinationAngle2 = declinationAngle + declinationStep;
 				if (hourAngle2 > Math.PI)
@@ -435,6 +465,6 @@ public class Heliodon {
 
 	public void updateBloom() {
 		bloomRenderPass.markNeedsRefresh();
-		
+
 	}
 }
