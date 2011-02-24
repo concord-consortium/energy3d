@@ -466,11 +466,14 @@ Version 0.2
 - draw sun region by rendering a glassy dome that shows the sun range in different seasons
 - optimize memory consumption by sun region dome
 - allow moving the sun along sun path using mouse
-
 - show sun region in wireframe and solid simultaneously  
 - fix problem with moving the sun to sun region farthest from camera by using picking
 - report bug with Ardor3D picking
 - debug mode: have a working picking technique for moving the sun sphere on the heliodon sun region
+
+- only change declination with mouse if mouse is dragged beyond threshold
+
+- *use ardor3d FastMath/MathUtils for trigonometry and spherical coordinates computations
 
  
 
