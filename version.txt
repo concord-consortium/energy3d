@@ -470,10 +470,9 @@ Version 0.2
 - fix problem with moving the sun to sun region farthest from camera by using picking
 - report bug with Ardor3D picking
 - debug mode: have a working picking technique for moving the sun sphere on the heliodon sun region
-
-- only change declination with mouse if mouse is dragged beyond threshold
-
-- *use ardor3d FastMath/MathUtils for trigonometry and spherical coordinates computations
+- only drag declination with mouse if mouse is dragged beyond a threshold
+- use ardor3d FastMath/MathUtils for trigonometry and spherical coordinates computations
+- fix problem with incorrect declination/rowCount computation when the observation latitude hides entire rows of sun region mesh  
 
  
 

@@ -56,8 +56,8 @@ public class Heliodon {
 	private final Spatial sun = new Sphere("Sun", 20, 20, 0.3);
 	private final DirectionalLight light;
 	private final BloomRenderPass bloomRenderPass;
-	private double tiltAngle = 23.45 / 180 * Math.PI; // 50.0 / 180 * Math.PI;
-	private double offset = 0; // -Math.PI / 2;
+	private double tiltAngle = 23.45 / 180.0 * Math.PI;
+	private double offset = 0;
 	private double baseAngle = 0;
 	private double sunAngle = 90;
 	private double hourAngle;
@@ -97,7 +97,7 @@ public class Heliodon {
 		sunRegion.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		root.attachChild(sunRegion);
-		
+
 		// Sun Region Wireframe
 		final RenderPass wireframePass = new RenderPass();
 		wireframePass.setPassState(new WireframeState());
@@ -107,7 +107,7 @@ public class Heliodon {
 		root.getSceneHints().setCullHint(CullHint.Always);
 		final Cylinder cyl = new Cylinder("Curve", 10, 50, 5, 0.3);
 		final Transform trans = new Transform();
-		trans.setMatrix(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_X));
+		trans.setMatrix(new Matrix3().fromAngleAxis(MathUtils.HALF_PI, Vector3.UNIT_X));
 		cyl.setDefaultColor(ColorRGBA.YELLOW);
 		cyl.setTransform(trans);
 		// sunRing.attachChild(cyl);
@@ -171,7 +171,7 @@ public class Heliodon {
 				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(mouse.getX(), mouse.getY()), false, null);
 
 				pickResults.clear();
-				PickingUtil.findPick(sunRegion, pickRay, pickResults);				
+				PickingUtil.findPick(sunRegion, pickRay, pickResults);
 				final Vector3 intersectionPoint;
 				if (pickResults.getNumber() > 0) {
 					final IntersectionRecord intersectionRecord = pickResults.getPickData(0).getIntersectionRecord();
@@ -209,31 +209,39 @@ public class Heliodon {
 					final double r = 5.0 / 2.0;
 					final Vector3 prev = new Vector3();
 					int vertexCounter = 0;
+					final double maxFloatInRow = 70.0 * 4.0;
+					int rowVertexCounter = 0;
 					while (buf.hasRemaining()) {
 						p.set(buf.get(), buf.get(), buf.get());
 						final double d;
 						if (intersectionPoint != null)
 							d = intersectionPoint.distanceSquared(p);
 						else
-							d = pickRay.distanceSquared(p, null);						
+							d = pickRay.distanceSquared(p, null);
 						if (d < smallestDistance) {
 							smallestDistance = d;
 							newSunLocation.set(p);
 							resultRow = vertexCounter >= 2 ? rowCounter + 1 : rowCounter;
 						}
-						if (prev.distance(p) > r && prev.lengthSquared() != 0)
+						if (prev.lengthSquared() != 0 && (prev.distance(p) > r || rowVertexCounter >= maxFloatInRow)) {
 							rowCounter++;
+							rowVertexCounter = 0;
+						}
 						prev.set(p);
 						vertexCounter = (vertexCounter + 1) % 4;
+						rowVertexCounter++;
 					}
 					rowCounter++;
+					System.out.println("rowCounter = " + rowCounter);
 					if (resultRow != -1) {
-						double newDeclinationAngle = -tiltAngle + (2.0 * tiltAngle * resultRow / rowCounter);
+						if (rowCounter < 10 && observerLatitude > 0)
+							resultRow += 10 - rowCounter;
+						double newDeclinationAngle = -tiltAngle + (2.0 * tiltAngle * resultRow / 10);
 						if (Math.abs(newDeclinationAngle - declinationAngle) > MathUtils.EPSILON) {
 							declinationAngle = newDeclinationAngle;
 							drawSunPath();
 						}
-					}
+					}					
 				}
 				sun.setTranslation(newSunLocation);
 			}
@@ -300,7 +308,7 @@ public class Heliodon {
 	}
 
 	public void setObserverLatitude(double observerLatitude) {
-		this.observerLatitude = toPlusMinusPIRange(observerLatitude, -Math.PI / 2.0, Math.PI / 2.0);
+		this.observerLatitude = toPlusMinusPIRange(observerLatitude, -MathUtils.HALF_PI, MathUtils.HALF_PI);
 		draw();
 	}
 
@@ -324,23 +332,24 @@ public class Heliodon {
 	}
 
 	private Vector3 computeSunLocation(final double hourAngle, final double declinationAngle, final double observerLatitude) {
-		final double altitudeAngle = Math.asin(Math.sin(declinationAngle) * Math.sin(observerLatitude) + Math.cos(declinationAngle) * Math.cos(hourAngle) * Math.cos(observerLatitude));
-		final double x_azm = Math.sin(hourAngle) * Math.cos(declinationAngle);
-		final double y_azm = (-(Math.cos(hourAngle)) * Math.cos(declinationAngle) * Math.sin(observerLatitude)) + (Math.cos(observerLatitude) * Math.sin(declinationAngle));
+		final double altitudeAngle = MathUtils.asin(MathUtils.sin(declinationAngle) * MathUtils.sin(observerLatitude) + MathUtils.cos(declinationAngle) * MathUtils.cos(hourAngle) * MathUtils.cos(observerLatitude));
+		final double x_azm = MathUtils.sin(hourAngle) * MathUtils.cos(declinationAngle);
+		final double y_azm = (-(MathUtils.cos(hourAngle)) * MathUtils.cos(declinationAngle) * MathUtils.sin(observerLatitude)) + (MathUtils.cos(observerLatitude) * MathUtils.sin(declinationAngle));
 		final double azimuthAngle = Math.atan2(y_azm, x_azm);
 
 		final double r = 5;
-		final double x = r * Math.cos(azimuthAngle) * Math.sin(Math.PI / 2 - altitudeAngle);
-		final double y = r * Math.sin(azimuthAngle) * Math.sin(Math.PI / 2 - altitudeAngle);
-		final double z = r * Math.cos(Math.PI / 2 - altitudeAngle);
-		return new Vector3(x, y, z);
+//		final double x = r * Math.cos(azimuthAngle) * Math.sin(Math.PI / 2 - altitudeAngle);
+//		final double y = r * Math.sin(azimuthAngle) * Math.sin(Math.PI / 2 - altitudeAngle);
+//		final double z = r * Math.cos(Math.PI / 2 - altitudeAngle);
+//		return new Vector3(x, y, z);
+		final Vector3 coords = new Vector3(r, azimuthAngle, altitudeAngle);
+		return MathUtils.sphericalToCartesianZ(coords, coords);
 	}
 
 	private double toPlusMinusPIRange(final double radian, double min, double max) {
-		final double twoPI = Math.PI * 2.0;
-		double result = radian - (int) (radian / twoPI) * twoPI;
+		double result = radian - (int) (radian / MathUtils.TWO_PI) * MathUtils.TWO_PI;
 		if (Math.abs(result) > Math.PI)
-			result = -Math.signum(result) * (twoPI - Math.abs(result));
+			result = -Math.signum(result) * (MathUtils.TWO_PI - Math.abs(result));
 		if (result < min)
 			result = min;
 		else if (result > max)
@@ -353,7 +362,7 @@ public class Heliodon {
 		buf.limit(buf.capacity());
 		buf.rewind();
 		final double declinationStep = 2.0 * tiltAngle / 10.0;
-		final double hourStep = 2.0 * Math.PI / 70.0;
+		final double hourStep = MathUtils.TWO_PI / 70.0;
 		int limit = 0;
 		for (double declinationAngle = -tiltAngle; declinationAngle < tiltAngle - declinationStep / 2.0; declinationAngle += declinationStep) {
 			for (double hourAngle = -Math.PI; hourAngle < Math.PI - hourStep / 2.0; hourAngle += hourStep) {
@@ -383,7 +392,7 @@ public class Heliodon {
 		final FloatBuffer buf = sunPath.getMeshData().getVertexBuffer();
 		buf.limit(buf.capacity());
 		buf.rewind();
-		final double step = 2.0 * Math.PI / (buf.capacity() / 3.0 - 1.0);
+		final double step = MathUtils.TWO_PI / (buf.capacity() / 3.0 - 1.0);
 		int limit = 0;
 		for (double hourAngle = -Math.PI; hourAngle < Math.PI + step / 2.0; hourAngle += step) {
 			final Vector3 v = computeSunLocation(hourAngle, declinationAngle, observerLatitude);
@@ -391,18 +400,17 @@ public class Heliodon {
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 				limit += 3;
 			}
-		}
+		}		
 		buf.limit(limit);
+		System.out.println("sunpath limit = " + limit + " / " + buf.capacity());
 		sunPath.updateModelBound();
+		sunPath.getSceneHints().setCullHint(limit == 0 ? CullHint.Always : CullHint.Inherit);
 	}
 
 	private void drawSun() {
 		final Vector3 sunLocation = computeSunLocation(hourAngle, declinationAngle, observerLatitude);
-		if (!Double.isNaN(sunLocation.length())) {
-			sun.setTranslation(sunLocation);
-			light.setDirection(sunLocation.negate(null));
-		} else
-			new RuntimeException().printStackTrace();
+		sun.setTranslation(sunLocation);
+		light.setDirection(sunLocation.negateLocal());
 	}
 
 	private void draw() {
