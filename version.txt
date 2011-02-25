@@ -472,7 +472,10 @@ Version 0.2
 - debug mode: have a working picking technique for moving the sun sphere on the heliodon sun region
 - only drag declination with mouse if mouse is dragged beyond a threshold
 - use ardor3d FastMath/MathUtils for trigonometry and spherical coordinates computations
-- fix problem with incorrect declination/rowCount computation when the observation latitude hides entire rows of sun region mesh  
+- fix problem with incorrect declination/rowCount computation when the observation latitude hides entire rows of sun region mesh
+- hide the sun region dome by default and make it appear when dragging the sun far away from its path
+- make 24*4 divisions for hours and 12 divisions for declination
+  
 
  
 

@@ -50,6 +50,10 @@ import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Heliodon {
+	private static final double DECLINATION_DIVISIONS = 12.0;
+	private static final double HOUR_DIVISIONS = 96.0;
+	private static final int SUN_REGION_VERTICES = 8064 / 3;
+	private static final int SUN_PATH_VERTICES = 291 / 3;
 	private final Node root = new Node("Heliodon Root");
 	private final Node sunRing = new Node("Sun Ring");
 	private final Node sunRot = new Node("Sun Rot");
@@ -78,15 +82,17 @@ public class Heliodon {
 		passManager.add(bloomRenderPass);
 		bloomRenderPass.add(sun);
 
-		// Sun Path
-		sunPath = new Line("Sun Path", BufferUtils.createVector3Buffer(100), null, null, null);
+		sunPath = new Line("Sun Path", BufferUtils.createVector3Buffer(SUN_PATH_VERTICES), null, null, null);
+		sunPath.setDefaultColor(ColorRGBA.YELLOW);
+		sunPath.setLineWidth(3);
 		sunPath.getMeshData().setIndexMode(IndexMode.LineStrip);
 		sunPath.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		root.attachChild(sunPath);
 
 		// Sun Region Semi-Transparent
 		sunRegion = new Mesh("Sun Region");
-		sunRegion.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(5040 / 3));
+		sunRegion.getSceneHints().setCullHint(CullHint.Always);
+		sunRegion.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(SUN_REGION_VERTICES));
 		sunRegion.getMeshData().setIndexMode(IndexMode.Quads);
 		sunRegion.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 0.5f));
 		final BlendState blendState = new BlendState();
@@ -159,6 +165,7 @@ public class Heliodon {
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				sunGrabbed = false;
+				sunRegion.getSceneHints().setCullHint(CullHint.Always);
 				SceneManager.getInstance().setMouseControlEnabled(true);
 			}
 		}));
@@ -201,7 +208,8 @@ public class Heliodon {
 				if (smallestDistance > 1)
 					selectDifferentDeclinationWithMouse = true;
 
-				if (smallestDistance > 1) {
+				if (selectDifferentDeclinationWithMouse) {
+					sunRegion.getSceneHints().setCullHint(CullHint.Inherit);
 					int rowCounter = 0;
 					int resultRow = -1;
 					final FloatBuffer buf = sunRegion.getMeshData().getVertexBuffer();
@@ -361,8 +369,8 @@ public class Heliodon {
 		final FloatBuffer buf = sunRegion.getMeshData().getVertexBuffer();
 		buf.limit(buf.capacity());
 		buf.rewind();
-		final double declinationStep = 2.0 * tiltAngle / 10.0;
-		final double hourStep = MathUtils.TWO_PI / 70.0;
+		final double declinationStep = 2.0 * tiltAngle / DECLINATION_DIVISIONS;
+		final double hourStep = MathUtils.TWO_PI / HOUR_DIVISIONS;
 		int limit = 0;
 		for (double declinationAngle = -tiltAngle; declinationAngle < tiltAngle - declinationStep / 2.0; declinationAngle += declinationStep) {
 			for (double hourAngle = -Math.PI; hourAngle < Math.PI - hourStep / 2.0; hourAngle += hourStep) {
@@ -392,7 +400,8 @@ public class Heliodon {
 		final FloatBuffer buf = sunPath.getMeshData().getVertexBuffer();
 		buf.limit(buf.capacity());
 		buf.rewind();
-		final double step = MathUtils.TWO_PI / (buf.capacity() / 3.0 - 1.0);
+//		final double step = MathUtils.TWO_PI / (buf.capacity() / 3.0 - 1.0);
+		final double step = MathUtils.TWO_PI / HOUR_DIVISIONS;
 		int limit = 0;
 		for (double hourAngle = -Math.PI; hourAngle < Math.PI + step / 2.0; hourAngle += step) {
 			final Vector3 v = computeSunLocation(hourAngle, declinationAngle, observerLatitude);
