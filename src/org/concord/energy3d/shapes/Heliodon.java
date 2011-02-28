@@ -30,6 +30,8 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
@@ -189,23 +191,26 @@ public class Heliodon {
 				double smallestDistance = Double.MAX_VALUE;
 				final Vector3 newSunLocation = new Vector3();
 				final Vector3 p = new Vector3();
+				final Vector3 p_abs = new Vector3();
+				final ReadOnlyTransform rootTansform = root.getTransform();
 				if (!selectDifferentDeclinationWithMouse) {
 					final FloatBuffer buf = sunPath.getMeshData().getVertexBuffer();
 					buf.rewind();
 					while (buf.hasRemaining()) {
 						p.set(buf.get(), buf.get(), buf.get());
+						rootTansform.applyForward(p, p_abs);
 						final double d;
 						if (intersectionPoint != null)
-							d = intersectionPoint.distanceSquared(p);
+							d = intersectionPoint.distanceSquared(p_abs);
 						else
-							d = pickRay.distanceSquared(p, null);
+							d = pickRay.distanceSquared(p_abs, null);
 						if (d < smallestDistance) {
 							smallestDistance = d;
 							newSunLocation.set(p);
 						}
 					}
 				}
-				if (smallestDistance > 1)
+				if (smallestDistance > root.getTransform().getScale().getX() * root.getTransform().getScale().getX())
 					selectDifferentDeclinationWithMouse = true;
 
 				if (selectDifferentDeclinationWithMouse) {
@@ -217,21 +222,23 @@ public class Heliodon {
 					final double r = 5.0 / 2.0;
 					final Vector3 prev = new Vector3();
 					int vertexCounter = 0;
-					final double maxFloatInRow = 70.0 * 4.0;
+//					final double maxFloatInRow = 70.0 * 4.0;
+					final double maxVertexInRow = HOUR_DIVISIONS * 4.0;
 					int rowVertexCounter = 0;
 					while (buf.hasRemaining()) {
 						p.set(buf.get(), buf.get(), buf.get());
+						rootTansform.applyForward(p, p_abs);
 						final double d;
 						if (intersectionPoint != null)
-							d = intersectionPoint.distanceSquared(p);
+							d = intersectionPoint.distanceSquared(p_abs);
 						else
-							d = pickRay.distanceSquared(p, null);
+							d = pickRay.distanceSquared(p_abs, null);
 						if (d < smallestDistance) {
 							smallestDistance = d;
 							newSunLocation.set(p);
 							resultRow = vertexCounter >= 2 ? rowCounter + 1 : rowCounter;
 						}
-						if (prev.lengthSquared() != 0 && (prev.distance(p) > r || rowVertexCounter >= maxFloatInRow)) {
+						if (prev.lengthSquared() != 0 && (prev.distance(p) > r || rowVertexCounter >= maxVertexInRow)) {
 							rowCounter++;
 							rowVertexCounter = 0;
 						}
@@ -244,14 +251,15 @@ public class Heliodon {
 					if (resultRow != -1) {
 						if (rowCounter < 10 && observerLatitude > 0)
 							resultRow += 10 - rowCounter;
-						double newDeclinationAngle = -tiltAngle + (2.0 * tiltAngle * resultRow / 10);
+						double newDeclinationAngle = -tiltAngle + (2.0 * tiltAngle * resultRow / DECLINATION_DIVISIONS);
 						if (Math.abs(newDeclinationAngle - declinationAngle) > MathUtils.EPSILON) {
 							declinationAngle = newDeclinationAngle;
 							drawSunPath();
 						}
 					}					
 				}
-				sun.setTranslation(newSunLocation);
+//				sun.setTranslation(newSunLocation);
+				setSunLocation(newSunLocation);
 			}
 		}));
 	}
@@ -418,8 +426,12 @@ public class Heliodon {
 
 	private void drawSun() {
 		final Vector3 sunLocation = computeSunLocation(hourAngle, declinationAngle, observerLatitude);
+		setSunLocation(sunLocation);
+	}
+
+	public void setSunLocation(final ReadOnlyVector3 sunLocation) {
 		sun.setTranslation(sunLocation);
-		light.setDirection(sunLocation.negateLocal());
+		light.setDirection(sunLocation.negate(null));
 	}
 
 	private void draw() {
