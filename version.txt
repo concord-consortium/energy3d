@@ -476,11 +476,12 @@ Version 0.2
 - hide the sun region dome by default and make it appear when dragging the sun far away from its path
 - make 24*4 divisions for hours and 12 divisions for declination
 - fix problem with drag threshold being smaller when heliodon is smaller in scale
+- create a new base for heliodon with ticks and grey-white compass angle indications 
 
 - *redesign the base of heliodon and add compass info to it
 - *compute hour and declination angles based on time and date
 - *add gui elements to allow users to set the time and date and location
-- *allow rotation of scene with repsect to north
+- *allow rotation of scene with respect to north
 
 
  

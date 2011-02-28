@@ -39,7 +39,9 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.WireframeState;
+import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -74,6 +76,8 @@ public class Heliodon {
 	private boolean sunGrabbed = false;
 	private final PickResults pickResults;
 	private boolean selectDifferentDeclinationWithMouse = false;
+	private final Mesh base;
+	private final Mesh baseTicks;
 
 	public Heliodon(final Node scene, final DirectionalLight light, final BasicPassManager passManager, final LogicalLayer logicalLayer) {
 		this.light = light;
@@ -122,13 +126,31 @@ public class Heliodon {
 		// sunRing.setTranslation(0, offset, 0);
 		// sunRing.setRotation(new Matrix3().fromAngleAxis(-tiltAngle, Vector3.UNIT_X));
 
-		final Cylinder baseCyl = new Cylinder("Base", 10, 50, 5, 0.2);
-		baseCyl.setTranslation(0, 0, 0.1);
-		root.attachChild(baseCyl);
+//		final Cylinder baseCyl = new Cylinder("Base", 10, 50, 5, 0.2);
+//		baseCyl.setTranslation(0, 0, 0.1);
+//		root.attachChild(baseCyl);
+		
+		final int base_n = 72;
+        base = new Mesh("Base");
+		base.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(base_n * 4));
+		base.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(base_n * 4));
+		base.getMeshData().setIndexMode(IndexMode.Quads);
+		final OffsetState offsetState = new OffsetState();
+		offsetState.setTypeEnabled(OffsetType.Fill, true);
+		offsetState.setFactor(0.2f);
+		offsetState.setUnits(3f);		
+		base.setRenderState(offsetState);
+		
+		baseTicks = new Mesh("Base Ticks");
+		baseTicks.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(base_n * 2));
+		baseTicks.getMeshData().setIndexMode(IndexMode.Lines);
+		baseTicks.setDefaultColor(ColorRGBA.BLACK);		
 
 		sun.setTranslation(0, 0, 5);
 		// sunRot.attachChild(sun);
-		sunRing.attachChild(sunRot);
+		root.attachChild(base);
+		root.attachChild(baseTicks);
+//		sunRing.attachChild(sunRot);
 		root.attachChild(sunRing);
 		root.attachChild(sun);
 		draw();
@@ -435,6 +457,7 @@ public class Heliodon {
 	}
 
 	private void draw() {
+		drawBase();
 		drawSunRegion();
 		drawSunPath();
 		drawSun();
@@ -443,4 +466,49 @@ public class Heliodon {
 	public void updateBloom() {
 		bloomRenderPass.markNeedsRefresh();
 	}
+	
+	private void drawBase() {
+		final FloatBuffer buf = base.getMeshData().getVertexBuffer();
+		buf.rewind();
+		final FloatBuffer cbuf = base.getMeshData().getColorBuffer();
+		cbuf.rewind();
+		final FloatBuffer lbuf = baseTicks.getMeshData().getVertexBuffer();
+		lbuf.rewind();
+		final Vector3 p = new Vector3();
+		final double r = 5.0;
+		final double step = MathUtils.TWO_PI / (buf.capacity() / 3.0 / 4.0);
+//		boolean greyColor = false;
+		int counter = 0;
+		for (double angle = 0 ; angle < MathUtils.TWO_PI - step / 2.0; angle += step) {
+//		for (double angle = 0 ; angle < step * 10.0; angle += step) {
+			float width = 0.3f;
+			float zoffset = 0f;
+			MathUtils.sphericalToCartesianZ(p.set(r, angle, 0), p);
+			buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + zoffset);			
+			MathUtils.sphericalToCartesianZ(p.set(r, angle + step, 0), p);
+			buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + zoffset);
+			MathUtils.sphericalToCartesianZ(p.set(r + width, angle + step, 0), p);
+			buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + zoffset);
+			MathUtils.sphericalToCartesianZ(p.set(r + width, angle, 0), p);
+			buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + zoffset);
+			
+			final float c = (counter / 3) % 2 == 0 ? 0.5f : 1.0f;
+			cbuf.put(c).put(c).put(c).put(c);
+			cbuf.put(c).put(c).put(c).put(c);
+			cbuf.put(c).put(c).put(c).put(c);
+			cbuf.put(c).put(c).put(c).put(c);
+//			greyColor = !greyColor;
+			
+			width = counter % 3 == 0 ? 0.5f : 0.3f;
+			MathUtils.sphericalToCartesianZ(p.set(r, angle, 0), p);
+			lbuf.put(p.getXf()).put(p.getYf()).put(p.getZf() + zoffset);
+			MathUtils.sphericalToCartesianZ(p.set(r + width, angle, 0), p);
+			lbuf.put(p.getXf()).put(p.getYf()).put(p.getZf() + zoffset);
+			
+			counter++;
+		}
+		base.updateModelBound();
+		baseTicks.updateModelBound();
+	}
+		
 }

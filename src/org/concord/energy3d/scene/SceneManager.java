@@ -83,7 +83,9 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
@@ -452,6 +454,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// floor = new Quad("Floor", 200, 200);
 		floor.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
 
+		final OffsetState offsetState = new OffsetState();
+		offsetState.setTypeEnabled(OffsetType.Fill, true);
+		offsetState.setFactor(1.1f);
+		offsetState.setUnits(4f);		
+		floor.setRenderState(offsetState);
+		
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
 //		blendState.setTestEnabled(true);
