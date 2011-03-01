@@ -343,7 +343,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (sunAnim) {
 //			sunAngle++;
-			heliodon.setSunAngle(heliodon.getSunAngle() + 1);
+			heliodon.setHourAngle(heliodon.getHourAngle() + 0.01);
 //			updateSunHeliodon();
 		}
 

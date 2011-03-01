@@ -1,9 +1,13 @@
 package org.concord.energy3d.shapes;
 
 import java.nio.FloatBuffer;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingVolume;
@@ -53,6 +57,11 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TransparencyType;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.ui.text.BMText.AutoFade;
+import com.ardor3d.ui.text.BMText.AutoScale;
+import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Heliodon {
@@ -63,15 +72,15 @@ public class Heliodon {
 	private static final int SUN_REGION_VERTICES = 8064 / 3;
 	private static final int SUN_PATH_VERTICES = 291 / 3;
 	private final Node root = new Node("Heliodon Root");
-	private final Node sunRing = new Node("Sun Ring");
-	private final Node sunRot = new Node("Sun Rot");
+//	private final Node sunRing = new Node("Sun Ring");
+//	private final Node sunRot = new Node("Sun Rot");
 	private final Spatial sun = new Sphere("Sun", 20, 20, 0.3);
 	private final DirectionalLight light;
 	private final BloomRenderPass bloomRenderPass;
 	private double tiltAngle = 23.45 / 180.0 * Math.PI;
-	private double offset = 0;
+//	private double offset = 0;
 	private double baseAngle = 0;
-	private double sunAngle = 90;
+//	private double sunAngle = 90;
 	private double hourAngle;
 	private double declinationAngle;
 	private double observerLatitude;
@@ -82,16 +91,24 @@ public class Heliodon {
 	private boolean selectDifferentDeclinationWithMouse = false;
 	private final Mesh base;
 	private final Mesh baseTicks;
+	private final Calendar calendar = new GregorianCalendar();
 
 	public Heliodon(final Node scene, final DirectionalLight light, final BasicPassManager passManager, final LogicalLayer logicalLayer) {
 		this.light = light;
 		this.pickResults = new PrimitivePickResults();
 		this.pickResults.setCheckDistance(true);
-
+		
+		// Sun
 		this.bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
 		passManager.add(bloomRenderPass);
 		bloomRenderPass.add(sun);
+		final MaterialState material = new MaterialState();
+		material.setEmissive(ColorRGBA.WHITE);
+		sun.setRenderState(material);		
+		sun.setTranslation(0, 0, 5);
+		root.attachChild(sun);
 
+		// Sun Path
 		sunPath = new Line("Sun Path", BufferUtils.createVector3Buffer(SUN_PATH_VERTICES), null, null, null);
 		sunPath.setDefaultColor(ColorRGBA.YELLOW);
 		sunPath.setLineWidth(3);
@@ -99,7 +116,7 @@ public class Heliodon {
 		sunPath.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		root.attachChild(sunPath);
 
-		// Sun Region Semi-Transparent
+		// Sun Region
 		sunRegion = new Mesh("Sun Region");
 		sunRegion.getSceneHints().setCullHint(CullHint.Always);
 		sunRegion.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(SUN_REGION_VERTICES));
@@ -111,7 +128,6 @@ public class Heliodon {
 		sunRegion.getSceneHints().setTransparencyType(TransparencyType.TwoPass);
 		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		sunRegion.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-		sunRegion.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		root.attachChild(sunRegion);
 
 		// Sun Region Wireframe
@@ -120,20 +136,8 @@ public class Heliodon {
 		wireframePass.add(sunRegion);
 		passManager.add(wireframePass);
 
-		root.getSceneHints().setCullHint(CullHint.Always);
-		final Cylinder cyl = new Cylinder("Curve", 10, 50, 5, 0.3);
-		final Transform trans = new Transform();
-		trans.setMatrix(new Matrix3().fromAngleAxis(MathUtils.HALF_PI, Vector3.UNIT_X));
-		cyl.setDefaultColor(ColorRGBA.YELLOW);
-		cyl.setTransform(trans);
-		// sunRing.attachChild(cyl);
-		// sunRing.setTranslation(0, offset, 0);
-		// sunRing.setRotation(new Matrix3().fromAngleAxis(-tiltAngle, Vector3.UNIT_X));
-
-//		final Cylinder baseCyl = new Cylinder("Base", 10, 50, 5, 0.2);
-//		baseCyl.setTranslation(0, 0, 0.1);
-//		root.attachChild(baseCyl);
 		
+		// Base
         base = new Mesh("Base");
 		base.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(BASE_VERTICES + 2));
 		base.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(BASE_VERTICES + 2));
@@ -146,33 +150,66 @@ public class Heliodon {
 		final ShadingState shadingState = new ShadingState();
 		shadingState.setShadingMode(ShadingMode.Flat);
 		base.setRenderState(shadingState);
+		base.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+		root.attachChild(base);
 		
+		// Base Ticks
 		baseTicks = new Mesh("Base Ticks");
 		baseTicks.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(BASE_VERTICES));
 		baseTicks.getMeshData().setIndexMode(IndexMode.Lines);
-		baseTicks.setDefaultColor(ColorRGBA.BLACK);		
-
-		sun.setTranslation(0, 0, 5);
-		// sunRot.attachChild(sun);
-		root.attachChild(base);
+		baseTicks.setDefaultColor(ColorRGBA.BLACK);
+		baseTicks.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		root.attachChild(baseTicks);
-//		sunRing.attachChild(sunRot);
-		root.attachChild(sunRing);
-		root.attachChild(sun);
-		draw();
+		
+		// Compass Labels N S E W
+		final BMText northLabel = new BMText("North", "N", FontManager.getInstance().getAnnotationFont(), Align.Center, Justify.Left, false);
+		northLabel.setAutoRotate(false);
+		northLabel.setAutoScale(AutoScale.Off);
+		northLabel.setAutoFade(AutoFade.Off);
+		northLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, 0));
+		northLabel.setTranslation(0, 6, 0);
+		root.attachChild(northLabel);
+		final BMText southLabel = new BMText("South", "S", FontManager.getInstance().getAnnotationFont(), Align.Center);
+		southLabel.setAutoRotate(false);
+		southLabel.setAutoScale(AutoScale.Off);
+		southLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, Math.PI));
+		southLabel.setTranslation(0, -6, 0);
+		root.attachChild(southLabel);
+		final BMText eastLabel = new BMText("East", "E", FontManager.getInstance().getAnnotationFont(), Align.Center);
+		eastLabel.setAutoRotate(false);
+		eastLabel.setAutoScale(AutoScale.Off);
+		eastLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, -MathUtils.HALF_PI));
+		eastLabel.setTranslation(6, 0, 0);
+		root.attachChild(eastLabel);
+		final BMText westLabel = new BMText("West", "W", FontManager.getInstance().getAnnotationFont(), Align.Center);
+		westLabel.setAutoRotate(false);
+		westLabel.setAutoScale(AutoScale.Off);
+		westLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, MathUtils.HALF_PI));
+		westLabel.setTranslation(-6, 0, 0);
+		root.attachChild(westLabel);
 
+		
+
+		
+		// sunRot.attachChild(sun);
+
+//		sunRing.attachChild(sunRot);
+//		root.attachChild(sunRing);
+		
+		root.getSceneHints().setCullHint(CullHint.Always);
 		scene.attachChild(root);
+		
+
+		draw();
+		
 
 		// reverseNormals(sun.getMeshData().getNormalBuffer());
 
-		final MaterialState material = new MaterialState();
-		material.setEmissive(ColorRGBA.WHITE);
-		sun.setRenderState(material);
 
+		// Clip
 		final ClipState cs = new ClipState();
 		cs.setEnableClipPlane(0, true);
 		cs.setClipPlaneEquation(0, 0, 0, 1, 0);
-		cyl.setRenderState(cs);
 		sunPath.setRenderState(cs);
 		sunRegion.setRenderState(cs);
 
@@ -242,7 +279,7 @@ public class Heliodon {
 						}
 					}
 				}
-				if (smallestDistance > root.getTransform().getScale().getX() * root.getTransform().getScale().getX())
+				if (smallestDistance > 5.0 * root.getTransform().getScale().getX() * root.getTransform().getScale().getX())
 					selectDifferentDeclinationWithMouse = true;
 
 				if (selectDifferentDeclinationWithMouse) {
@@ -306,9 +343,9 @@ public class Heliodon {
 		this.tiltAngle = tiltAngle;
 	}
 
-	public double getOffset() {
-		return offset;
-	}
+//	public double getOffset() {
+//		return offset;
+//	}
 
 	public double getBaseAngle() {
 		return baseAngle;
@@ -321,15 +358,15 @@ public class Heliodon {
 
 	}
 
-	public double getSunAngle() {
-		return sunAngle;
-	}
+//	public double getSunAngle() {
+//		return sunAngle;
+//	}
 
-	public void setSunAngle(final double sunAngle) {
-		this.sunAngle = sunAngle;
-		sunRot.setRotation(new Matrix3().fromAngleAxis((-90 + sunAngle) * Math.PI / 180, Vector3.UNIT_Y));
-		drawSun();
-	}
+//	public void setSunAngle(final double sunAngle) {
+//		this.sunAngle = sunAngle;
+//		sunRot.setRotation(new Matrix3().fromAngleAxis((-90 + sunAngle) * Math.PI / 180, Vector3.UNIT_Y));
+//		drawSun();
+//	}
 
 	public double getHourAngle() {
 		return hourAngle;
@@ -337,6 +374,7 @@ public class Heliodon {
 
 	public void setHourAngle(double hourAngle) {
 		this.hourAngle = toPlusMinusPIRange(hourAngle, -Math.PI, Math.PI);
+		light.setEnabled(this.hourAngle >= -MathUtils.HALF_PI && this.hourAngle <= MathUtils.HALF_PI);			
 		draw();
 	}
 

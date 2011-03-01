@@ -41,6 +41,10 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerDateModel;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -98,6 +102,11 @@ public class MainFrame extends JFrame {
 	private JMenuItem aboutMenuItem = null;
 	private JDialog aboutDialog = null;  //  @jve:decl-index=0:visual-constraint="602,644"
 	private JCheckBoxMenuItem wallThicknessMenuItem = null;
+	private JPanel calendarPanel = null;
+	private JLabel dateLabel = null;
+	private JSpinner dateSpinner = null;
+	private JLabel timeLabel = null;
+	private JSpinner timeSpinner = null;
 	
 	public static MainFrame getInstance() {
 		return instance;
@@ -183,6 +192,7 @@ public class MainFrame extends JFrame {
 			appToolbar.addSeparator();
 			appToolbar.add(getAnnotationToggleButton());
 			appToolbar.add(getPreviewButton());
+			appToolbar.add(getCalendarPanel());
 			
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
@@ -908,6 +918,71 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return wallThicknessMenuItem;
+	}
+
+	/**
+	 * This method initializes calendarPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getCalendarPanel() {
+		if (calendarPanel == null) {
+			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
+			gridBagConstraints3.gridx = 1;
+			gridBagConstraints3.weightx = 1.0;
+			gridBagConstraints3.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints3.gridy = 1;
+			GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
+			gridBagConstraints2.gridx = 0;
+			gridBagConstraints2.gridy = 1;
+			timeLabel = new JLabel();
+			timeLabel.setText(" Time: ");
+			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
+			gridBagConstraints1.gridx = 1;
+			gridBagConstraints1.weightx = 1.0;
+			gridBagConstraints1.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints1.gridy = 0;
+			GridBagConstraints gridBagConstraints = new GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 0;
+			dateLabel = new JLabel();
+			dateLabel.setText(" Date: ");
+			calendarPanel = new JPanel();
+			calendarPanel.setLayout(new GridBagLayout());
+			calendarPanel.add(dateLabel, gridBagConstraints);
+			calendarPanel.add(getDateSpinner(), gridBagConstraints1);
+			calendarPanel.add(timeLabel, gridBagConstraints2);
+			calendarPanel.add(getTimeSpinner(), gridBagConstraints3);
+		}
+		return calendarPanel;
+	}
+
+	/**
+	 * This method initializes dateSpinner	
+	 * 	
+	 * @return javax.swing.JSpinner	
+	 */
+	private JSpinner getDateSpinner() {
+		if (dateSpinner == null) {
+			dateSpinner = new JSpinner();			
+			dateSpinner.setModel(new SpinnerDateModel());
+			dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MM/dd/yyyy"));
+		}
+		return dateSpinner;
+	}
+
+	/**
+	 * This method initializes timeSpinner	
+	 * 	
+	 * @return javax.swing.JSpinner	
+	 */
+	private JSpinner getTimeSpinner() {
+		if (timeSpinner == null) {
+			timeSpinner = new JSpinner();
+			timeSpinner.setModel(new SpinnerDateModel());
+			timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
+		}
+		return timeSpinner;
 	}
 
 	/**
