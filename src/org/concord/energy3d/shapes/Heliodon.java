@@ -91,7 +91,7 @@ public class Heliodon {
 	private boolean selectDifferentDeclinationWithMouse = false;
 	private final Mesh base;
 	private final Mesh baseTicks;
-	private final Calendar calendar = new GregorianCalendar();
+	private final Calendar calendar = Calendar.getInstance();
 
 	public Heliodon(final Node scene, final DirectionalLight light, final BasicPassManager passManager, final LogicalLayer logicalLayer) {
 		this.light = light;
@@ -554,5 +554,26 @@ public class Heliodon {
 		base.updateModelBound();
 		baseTicks.updateModelBound();
 	}
+
+	public void setTime(final Date time) {
+		final Calendar timeCalendar = Calendar.getInstance();
+		timeCalendar.setTime(time);
+		calendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
+		calendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
 		
+		final int minutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE) - 12 * 60;
+		this.hourAngle = minutes / (12.0 * 60.0) * Math.PI;		
+		drawSun();		
+	}
+
+	public void setDate(final Date date) {
+		final Calendar dateCalendar = Calendar.getInstance();
+		dateCalendar.setTime(date);
+		calendar.set(dateCalendar.get(Calendar.YEAR), dateCalendar.get(Calendar.MONTH), dateCalendar.get(Calendar.DAY_OF_MONTH));		
+		
+		final int days = calendar.get(Calendar.DAY_OF_YEAR);
+		this.declinationAngle = tiltAngle * MathUtils.sin(MathUtils.TWO_PI*(284+days)/365.25);
+		draw();
+	}
+	
 }

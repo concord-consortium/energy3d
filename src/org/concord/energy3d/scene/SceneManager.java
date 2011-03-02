@@ -1130,4 +1130,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.out.println("mouse " + mouseControlEnabled);
 	}
 
+	public Heliodon getHeliodon() {
+		return heliodon;		
+	}
+
 }

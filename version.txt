@@ -479,6 +479,7 @@ Version 0.2
 - create a new base for heliodon with ticks and grey-white compass angle indications 
 - render the heliodon base more efficiently using quadstrip instead of quads
 - add gui for setting the date and time of the sun
+- implement gui for controlling the sun and sun path based on the value of date and time
 
 - *redesign the base of heliodon and add compass info to it
 - *compute hour and declination angles based on time and date

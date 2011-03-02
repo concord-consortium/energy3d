@@ -8,6 +8,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -967,6 +969,11 @@ public class MainFrame extends JFrame {
 			dateSpinner = new JSpinner();			
 			dateSpinner.setModel(new SpinnerDateModel());
 			dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MM/dd/yyyy"));
+			dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+				public void stateChanged(javax.swing.event.ChangeEvent e) {
+					SceneManager.getInstance().getHeliodon().setDate((Date)dateSpinner.getValue());
+				}
+			});
 		}
 		return dateSpinner;
 	}
@@ -981,6 +988,11 @@ public class MainFrame extends JFrame {
 			timeSpinner = new JSpinner();
 			timeSpinner.setModel(new SpinnerDateModel());
 			timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
+			timeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+				public void stateChanged(javax.swing.event.ChangeEvent e) {					
+					SceneManager.getInstance().getHeliodon().setTime((Date)timeSpinner.getValue());
+				}
+			});
 		}
 		return timeSpinner;
 	}
