@@ -964,11 +964,11 @@ public class MainFrame extends JFrame {
 	 * 	
 	 * @return javax.swing.JSpinner	
 	 */
-	private JSpinner getDateSpinner() {
+	public JSpinner getDateSpinner() {
 		if (dateSpinner == null) {
 			dateSpinner = new JSpinner();			
 			dateSpinner.setModel(new SpinnerDateModel());
-			dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MM/dd/yyyy"));
+			dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
 			dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
 				public void stateChanged(javax.swing.event.ChangeEvent e) {
 					SceneManager.getInstance().getHeliodon().setDate((Date)dateSpinner.getValue());
@@ -983,7 +983,7 @@ public class MainFrame extends JFrame {
 	 * 	
 	 * @return javax.swing.JSpinner	
 	 */
-	private JSpinner getTimeSpinner() {
+	public JSpinner getTimeSpinner() {
 		if (timeSpinner == null) {
 			timeSpinner = new JSpinner();
 			timeSpinner.setModel(new SpinnerDateModel());

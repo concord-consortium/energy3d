@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.FontManager;
@@ -92,6 +93,7 @@ public class Heliodon {
 	private final Mesh base;
 	private final Mesh baseTicks;
 	private final Calendar calendar = Calendar.getInstance();
+	private boolean lock = false;
 
 	public Heliodon(final Node scene, final DirectionalLight light, final BasicPassManager passManager, final LogicalLayer logicalLayer) {
 		this.light = light;
@@ -219,6 +221,7 @@ public class Heliodon {
 	private void setupMouse(final LogicalLayer logicalLayer) {
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				lock = true;
 				final int x = inputStates.getCurrent().getMouseState().getX();
 				final int y = inputStates.getCurrent().getMouseState().getY();
 				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
@@ -234,10 +237,11 @@ public class Heliodon {
 		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {				
 				sunGrabbed = false;
 				sunRegion.getSceneHints().setCullHint(CullHint.Always);
 				SceneManager.getInstance().setMouseControlEnabled(true);
+				lock = false;
 			}
 		}));
 
@@ -258,13 +262,15 @@ public class Heliodon {
 					intersectionPoint = null;
 
 				double smallestDistance = Double.MAX_VALUE;
+				int hourVertex = -1;
+				int totalHourVertices = 0;
 				final Vector3 newSunLocation = new Vector3();
 				final Vector3 p = new Vector3();
 				final Vector3 p_abs = new Vector3();
 				final ReadOnlyTransform rootTansform = root.getTransform();
 				if (!selectDifferentDeclinationWithMouse) {
 					final FloatBuffer buf = sunPath.getMeshData().getVertexBuffer();
-					buf.rewind();
+					buf.rewind();					
 					while (buf.hasRemaining()) {
 						p.set(buf.get(), buf.get(), buf.get());
 						rootTansform.applyForward(p, p_abs);
@@ -275,11 +281,13 @@ public class Heliodon {
 							d = pickRay.distanceSquared(p_abs, null);
 						if (d < smallestDistance) {
 							smallestDistance = d;
+							hourVertex = buf.position() / 3;
 							newSunLocation.set(p);
 						}
 					}
+					totalHourVertices = buf.limit() / 3;
 				}
-				if (smallestDistance > 5.0 * root.getTransform().getScale().getX() * root.getTransform().getScale().getX())
+//				if (smallestDistance > 5.0 * root.getTransform().getScale().getX() * root.getTransform().getScale().getX())
 					selectDifferentDeclinationWithMouse = true;
 
 				if (selectDifferentDeclinationWithMouse) {
@@ -293,6 +301,7 @@ public class Heliodon {
 					int vertexCounter = 0;
 					final double maxVertexInRow = HOUR_DIVISIONS * 4.0;
 					int rowVertexCounter = 0;
+					boolean foundInThisRow = false;
 					while (buf.hasRemaining()) {
 						p.set(buf.get(), buf.get(), buf.get());
 						rootTansform.applyForward(p, p_abs);
@@ -301,13 +310,18 @@ public class Heliodon {
 							d = intersectionPoint.distanceSquared(p_abs);
 						else
 							d = pickRay.distanceSquared(p_abs, null);
-						if (d < smallestDistance) {
+						if (d < smallestDistance) { 
 							smallestDistance = d;
 							newSunLocation.set(p);
 							resultRow = vertexCounter >= 2 ? rowCounter + 1 : rowCounter;
+							hourVertex = rowVertexCounter / 4;
+							foundInThisRow = true;
 						}
 						if (prev.lengthSquared() != 0 && (prev.distance(p) > r || rowVertexCounter >= maxVertexInRow)) {
 							rowCounter++;
+							if (foundInThisRow)
+								totalHourVertices = rowVertexCounter / 4;
+							foundInThisRow = false;
 							rowVertexCounter = 0;
 						}
 						prev.set(p);
@@ -321,12 +335,21 @@ public class Heliodon {
 							resultRow += 10 - rowCounter;
 						double newDeclinationAngle = -tiltAngle + (2.0 * tiltAngle * resultRow / DECLINATION_DIVISIONS);
 						if (Math.abs(newDeclinationAngle - declinationAngle) > MathUtils.EPSILON) {
-							declinationAngle = newDeclinationAngle;
+//							declinationAngle = newDeclinationAngle;
+							setDeclinationAngle(newDeclinationAngle);
+							final Date time = calendar.getTime();
+							MainFrame.getInstance().getDateSpinner().setValue(time);
+//							MainFrame.getInstance().getTimeSpinner().setValue(time);
 							drawSunPath();
 						}
 					}					
+				}				
+				final double newHourAngle = ((double)hourVertex - Math.ceil(totalHourVertices / 2.0)) * Math.PI / 48.0;
+				if (Math.abs(newHourAngle - hourAngle) > MathUtils.EPSILON) {
+					setHourAngle(newHourAngle);
+					MainFrame.getInstance().getTimeSpinner().setValue(calendar.getTime());
+					setSunLocation(newSunLocation);
 				}
-				setSunLocation(newSunLocation);
 			}
 		}));
 	}
@@ -374,8 +397,15 @@ public class Heliodon {
 
 	public void setHourAngle(double hourAngle) {
 		this.hourAngle = toPlusMinusPIRange(hourAngle, -Math.PI, Math.PI);
+		final int minutes = (int)Math.round(this.hourAngle / Math.PI * 12 * 60 + 12 * 60);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, minutes);
+		System.out.println(hourAngle + "\t" + minutes);
+		
 		light.setEnabled(this.hourAngle >= -MathUtils.HALF_PI && this.hourAngle <= MathUtils.HALF_PI);			
-		draw();
+//		draw();
+		if (!lock)
+			drawSun();
 	}
 
 	public double getDeclinationAngle() {
@@ -384,7 +414,13 @@ public class Heliodon {
 
 	public void setDeclinationAngle(double declinationAngle) {
 		this.declinationAngle = toPlusMinusPIRange(declinationAngle, -tiltAngle, tiltAngle);
-		draw();
+		final double days = MathUtils.asin(this.declinationAngle / tiltAngle) / MathUtils.TWO_PI * 365.25 - 284.0;
+		calendar.set(calendar.get(Calendar.YEAR), 0, (int)Math.round(days));
+//		draw();
+		if (!lock) {
+			drawSunPath();
+			drawSun();
+		}
 	}
 
 	public double getObserverLatitude() {
@@ -556,6 +592,8 @@ public class Heliodon {
 	}
 
 	public void setTime(final Date time) {
+		if (lock )
+			return;		
 		final Calendar timeCalendar = Calendar.getInstance();
 		timeCalendar.setTime(time);
 		calendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
@@ -567,6 +605,8 @@ public class Heliodon {
 	}
 
 	public void setDate(final Date date) {
+		if (lock)
+			return;
 		final Calendar dateCalendar = Calendar.getInstance();
 		dateCalendar.setTime(date);
 		calendar.set(dateCalendar.get(Calendar.YEAR), dateCalendar.get(Calendar.MONTH), dateCalendar.get(Calendar.DAY_OF_MONTH));		

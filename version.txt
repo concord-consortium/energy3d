@@ -481,6 +481,8 @@ Version 0.2
 - add gui for setting the date and time of the sun
 - implement gui for controlling the sun and sun path based on the value of date and time
 
+- *update the gui date and time when the mouse is used to change the sun location and declination
+
 - *redesign the base of heliodon and add compass info to it
 - *compute hour and declination angles based on time and date
 - *add gui elements to allow users to set the time and date and location
