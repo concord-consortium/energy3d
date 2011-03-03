@@ -21,15 +21,8 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
-import org.concord.energy3d.util.Util;
-import org.poly2tri.Poly2Tri;
-import org.poly2tri.geometry.polygon.Polygon;
-import org.poly2tri.geometry.polygon.PolygonPoint;
-import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.annotation.MainThread;
-import com.ardor3d.bounding.BoundingVolume;
-import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
@@ -67,9 +60,7 @@ import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Ray3;
-import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.ProjectionMode;
@@ -80,11 +71,10 @@ import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
@@ -96,10 +86,8 @@ import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.extension.CameraNode;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
-import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
@@ -144,16 +132,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean rotAnim = false;
 	private HousePart drawn = null;
 	private Operation operation = Operation.SELECT;
-	private double sunAngle = 45, sunBaseAngle = 135;
 	private Heliodon heliodon;
 	private CameraControl control;
 	private ParallelSplitShadowMapPass shadowPass;
-	private Sphere sun;
-	private Node sunHeliodon;
-	private Node sunRot;
 	private boolean sunControl;
 	private boolean sunAnim;
-	private BloomRenderPass bloomRenderPass;
 	private ViewMode viewMode = ViewMode.NORMAL;
 	private boolean operationFlag = false;
 	private CameraNode cameraNode;
@@ -161,7 +144,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private TwoInputStates moveState;
 	private boolean drawBounds = false;
 	private long lastRenderTime;
-	private boolean mouseControlEnabled;
+	private boolean mouseControlEnabled = true;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -169,9 +152,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private SceneManager(final Container panel) {// throws LWJGLException {
 		System.out.print("Initializing scene manager...");
-		// instance = this;
-		// root.attachChild(Scene.getRoot());
-
 		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
 		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 8, false, false);
 		if (JOGL)
@@ -259,13 +239,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.add(Scene.getRoot());
 		shadowPass.addOccluder(Scene.getRoot());
 
-//		createSunHeliodon();
 		heliodon = new Heliodon(root, light, passManager, logicalLayer);
-//		updateSunHeliodon();
 		Scene.getInstance();
 
 		SelectUtil.init(floor, Scene.getRoot());
-		registerInputTriggers();
+		initMouse();
 
 		taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
@@ -279,31 +257,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		root.updateGeometricState(0, true);
 		System.out.println("done");
-	}
-
-	protected void test() {
-		PolygonPoint p[] = new PolygonPoint[4];
-		p[0] = new PolygonPoint(-1.0292539544430312, 0.09999999999999999, 1.362032135164121);
-		p[1] = new PolygonPoint(0.8537302277848444, 0.09999999999999991, 1.362032135164121);
-		p[2] = new PolygonPoint(0.8537302277848444, 1.1, 1.362032135164121);
-		p[3] = new PolygonPoint(-1.0292539544430312, 1.1, 1.362032135164121);
-		Polygon polygon = new Polygon(p);
-
-		double data[] = new double[] { -0.8409555362202437, 0.8999999999999999, 1.362032135164121, -0.5114333043303654, 0.8999999999999999, 1.362032135164121, -0.5114333043303654, 0.6, 1.362032135164121, -0.8409555362202437, 0.6, 1.362032135164121, -0.3702094906632748, 0.8999999999999999, 1.362032135164121, -0.08776186332909341, 0.8999999999999999, 1.362032135164121, -0.08776186332909341, 0.6, 1.362032135164121, -0.3702094906632748, 0.6, 1.362032135164121, 0.053461950337997166, 0.8999999999999999, 1.362032135164121, 0.33590957767217855, 0.8999999999999999, 1.362032135164121, 0.33590957767217855, 0.6, 1.362032135164121, 0.053461950337997166, 0.6, 1.362032135164121, 0.47713339133926946, 0.8999999999999999, 1.362032135164121, 0.6654318095620568, 0.8999999999999999, 1.362032135164121, 0.6654318095620568, 0.5999999999999999, 1.362032135164121, 0.47713339133926946, 0.5999999999999999, 1.362032135164121, -0.7938809316645468, 0.44999999999999996, 1.362032135164121, -0.5114333043303654,
-				0.44999999999999996, 1.362032135164121, -0.5114333043303654, 0.14999999999999997, 1.362032135164121, -0.7938809316645468, 0.14999999999999997, 1.362032135164121, -0.3702094906632748, 0.44999999999999996, 1.362032135164121, -0.08776186332909341, 0.44999999999999996, 1.362032135164121, -0.08776186332909341, 0.14999999999999994, 1.362032135164121, -0.3702094906632748, 0.14999999999999997, 1.362032135164121, 0.053461950337997166, 0.44999999999999996, 1.362032135164121, 0.33590957767217855, 0.4499999999999999, 1.362032135164121, 0.33590957767217855, 0.1499999999999999, 1.362032135164121, 0.053461950337997166, 0.14999999999999994, 1.362032135164121, 0.47713339133926946, 0.4499999999999999, 1.362032135164121, 0.6654318095620568, 0.4499999999999999, 1.362032135164121, 0.6654318095620568, 0.1499999999999999, 1.362032135164121, 0.47713339133926946, 0.1499999999999999, 1.362032135164121 };
-
-		for (int i = 0; i < data.length; i += 12) {
-			p = new PolygonPoint[] { new PolygonPoint(data[i], data[i + 1], data[i + 2]), new PolygonPoint(data[i + 3], data[i + 4], data[i + 5]), new PolygonPoint(data[i + 6], data[i + 7], data[i + 8]), new PolygonPoint(data[i + 9], data[i + 10], data[i + 11]) };
-			Polygon hole = new Polygon(p);
-			polygon.addHole(hole);
-		}
-
-		Mesh mesh = new Mesh();
-		mesh.setDefaultColor(ColorRGBA.BLUE);
-		root.attachChild(mesh);
-
-		Poly2Tri.triangulate(polygon);
-		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 	}
 
 	public void run() {
@@ -379,69 +332,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return true;
 	}
 
-//	private Spatial createSunHeliodon() {
-//		sunHeliodon = new Node();
-//		Cylinder cyl = new Cylinder("Sun Curve", 10, 50, 5, 0.3);
-//		Transform trans = new Transform();
-//		trans.setMatrix(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_X));
-//		cyl.setDefaultColor(ColorRGBA.YELLOW);
-//		cyl.setTransform(trans);
-//		sunHeliodon.attachChild(cyl);
-//
-//		final ClipState cs = new ClipState();
-//		cs.setEnableClipPlane(0, true);
-//		cs.setClipPlaneEquation(0, 0, 0, 1, -0.19);
-//		cyl.setRenderState(cs);
-//
-//		Cylinder baseCyl = new Cylinder("Sun Curve", 10, 50, 5, 0.2);
-//		baseCyl.setTranslation(0, 0, 0.1);
-//		sunHeliodon.attachChild(baseCyl);
-//
-//		sun = new Sphere("Sun", 20, 20, 0.3);
-//		sun.setTranslation(0, 0, 5);
-//		sunRot = new Node("Sun Root");
-//		sunRot.attachChild(sun);
-//		sunHeliodon.attachChild(sunRot);
-//
-//		reverseNormals(sun.getMeshData().getNormalBuffer());
-//
-//		MaterialState material = new MaterialState();
-//		material.setEmissive(ColorRGBA.WHITE);
-//		sun.setRenderState(material);
-//
-//		return sunHeliodon;
-//	}
-
-	private void reverseNormals(FloatBuffer normalBuffer) {
-		normalBuffer.rewind();
-		int i = 0;
-		while (normalBuffer.hasRemaining()) {
-			float f = normalBuffer.get();
-			normalBuffer.position(i);
-			normalBuffer.put(-f);
-			i++;
-		}
-	}
-
-	private void updateSunHeliodon() {
-		if (sunAnim)
-			sunAngle %= 180;
-		else {
-			sunAngle = Math.max(sunAngle, 1);
-			sunAngle = Math.min(sunAngle, 179);
-		}
-		final Matrix3 m = new Matrix3().fromAngleAxis((-90 + sunAngle) * Math.PI / 180, Vector3.UNIT_Y);
-		sunRot.setRotation(m);
-
-		sunBaseAngle = sunBaseAngle % 360;
-		sunHeliodon.setRotation(new Matrix3().fromAngleAxis(sunBaseAngle * Math.PI / 180, Vector3.UNIT_Z));
-
-		DirectionalLight light = (DirectionalLight) lightState.get(0);
-		sunHeliodon.updateWorldTransform(true);
-		light.setDirection(sun.getWorldTranslation().negate(null));
-		sunHeliodon.updateGeometricState(0);
-	}
-
 	public PickResults doPick(Ray3 pickRay) {
 		return null;
 	}
@@ -451,7 +341,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createFloor() {
-		// floor = new Quad("Floor", 200, 200);
 		floor.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
 
 		final OffsetState offsetState = new OffsetState();
@@ -462,7 +351,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
-//		blendState.setTestEnabled(true);
 		floor.setRenderState(blendState);
 		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		floor.getSceneHints().setLightCombineMode(LightCombineMode.Off);
@@ -521,7 +409,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return axis;
 	}
 
-	private void registerInputTriggers() {
+	private void initMouse() {
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -737,8 +625,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 	}
 
-	public void setCameraControl(CameraMode type) {
-		// this.cameraMode = type;
+	public void setCameraControl(final CameraMode type) {
 		if (control != null)
 			control.removeTriggers(logicalLayer);
 
@@ -761,7 +648,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.viewMode = viewMode;
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
 
-		// setCameraControl(cameraMode);
 		control.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 		control.setMoveSpeed(MOVE_SPEED);
 		Vector3 loc = new Vector3(1.0f, -8.0f, 1.0f);
@@ -925,31 +811,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.sunControl = selected;
 		heliodon.setVisible(selected);
 		enableDisableRotationControl();
-
-//		taskManager.update(new Callable<Object>() {
-//			public Object call() throws Exception {
-//				if (sunControl) {
-//					updateHeliodonSize();
-//					root.attachChild(sunHeliodon);
-//				} else
-//					root.detachChild(sunHeliodon);
-//
-//				if (bloomRenderPass != null)
-//					passManager.remove(bloomRenderPass);
-//				if (sunControl) {
-//					bloomRenderPass = new BloomRenderPass(canvas.getCanvasRenderer().getCamera(), 4);
-//					if (!bloomRenderPass.isSupported()) {
-//						System.out.println("Bloom not supported!");
-//					} else {
-//						bloomRenderPass.add(sun);
-//					}
-//					passManager.add(bloomRenderPass);
-//				}
-//
-//				enableDisableRotationControl();
-//				return null;
-//			}
-//		});
 	}
 
 	public void setSunAnim(boolean selected) {
@@ -1046,7 +907,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		final DirectionalLight light = new DirectionalLight();
 		light.setDirection(new Vector3(0, 0, -1));
-		// light.setAmbient(new ColorRGBA(1, 1, 1, 1));
 		light.setEnabled(true);
 
 		final LightState lightState = new LightState();
@@ -1085,15 +945,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (sunControl)
 			taskManager.update(new Callable<Object>() {
 				public Object call() throws Exception {
-//					Scene.getRoot().updateWorldBound(true);
-//					final BoundingVolume bounds = Scene.getRoot().getWorldBound();
-//					if (bounds == null)
-//						sunHeliodon.setScale(1);
-//					else {
-//						final double scale = (Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0;
-//						System.out.println("scale = " + scale);
-//						sunHeliodon.setScale(scale);
-//					}
 					heliodon.updateSize();
 					return null;
 				}
@@ -1103,7 +954,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void executeMouseMove() {
 		if (!mouseControlEnabled)
 			return;
-		// this.mouseMoveFlag = false;
 		final MouseState mouseState = moveState.getCurrent().getMouseState();
 		moveState = null;
 		int x = mouseState.getX();
@@ -1127,7 +977,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void setMouseControlEnabled(final boolean enabled) {
 		this.mouseControlEnabled = enabled;
 		control.setMouseEnabled(enabled);	
-		System.out.println("mouse " + mouseControlEnabled);
 	}
 
 	public Heliodon getHeliodon() {

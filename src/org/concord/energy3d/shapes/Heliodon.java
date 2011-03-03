@@ -389,7 +389,9 @@ public class Heliodon {
 
 	public void setObserverLatitude(double observerLatitude) {
 		this.observerLatitude = toPlusMinusPIRange(observerLatitude, -MathUtils.HALF_PI, MathUtils.HALF_PI);
-		draw();
+		drawSunRegion();
+		drawSunPath();
+		drawSun();		
 	}
 
 	public void setVisible(final boolean visible) {

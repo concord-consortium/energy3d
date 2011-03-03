@@ -47,6 +47,9 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
+import javax.swing.JComboBox;
+import javax.swing.SpinnerNumberModel;
+import java.awt.Insets;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -109,6 +112,9 @@ public class MainFrame extends JFrame {
 	private JSpinner dateSpinner = null;
 	private JLabel timeLabel = null;
 	private JSpinner timeSpinner = null;
+	private JLabel latitudeLabel = null;
+	private JComboBox cityComboBox = null;
+	private JSpinner latitudeSpinner = null;
 	
 	public static MainFrame getInstance() {
 		return instance;
@@ -935,6 +941,24 @@ public class MainFrame extends JFrame {
 	 */
 	private JPanel getCalendarPanel() {
 		if (calendarPanel == null) {
+			GridBagConstraints gridBagConstraints4 = new GridBagConstraints();
+			gridBagConstraints4.gridx = 3;
+			gridBagConstraints4.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints4.weightx = 1.0;
+			gridBagConstraints4.insets = new Insets(0, 0, 0, 1);
+			gridBagConstraints4.gridy = 1;
+			GridBagConstraints gridBagConstraints31 = new GridBagConstraints();
+			gridBagConstraints31.fill = GridBagConstraints.BOTH;
+			gridBagConstraints31.gridy = 0;
+			gridBagConstraints31.weightx = 1.0;
+			gridBagConstraints31.insets = new Insets(0, 1, 0, 1);
+			gridBagConstraints31.gridwidth = 2;
+			gridBagConstraints31.gridx = 2;
+			GridBagConstraints gridBagConstraints21 = new GridBagConstraints();
+			gridBagConstraints21.gridx = 2;
+			gridBagConstraints21.gridy = 1;
+			latitudeLabel = new JLabel();
+			latitudeLabel.setText(" Latitude:");
 			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
 			gridBagConstraints3.gridx = 1;
 			gridBagConstraints3.weightx = 1.0;
@@ -957,13 +981,17 @@ public class MainFrame extends JFrame {
 			dateLabel.setText(" Date: ");
 			calendarPanel = new JPanel();
 			calendarPanel.setLayout(new GridBagLayout());
-			calendarPanel.setMaximumSize(new Dimension(100, 2147483647));
-			calendarPanel.setPreferredSize(new Dimension(100, 40));
-			calendarPanel.setMinimumSize(new Dimension(100, 40));
+			calendarPanel.setMaximumSize(new Dimension(180, 2147483647));
+			calendarPanel.setPreferredSize(new Dimension(180, 40));
+			calendarPanel.setMinimumSize(new Dimension(180, 40));
+			calendarPanel.setVisible(true);
 			calendarPanel.add(dateLabel, gridBagConstraints);
 			calendarPanel.add(getDateSpinner(), gridBagConstraints1);
 			calendarPanel.add(timeLabel, gridBagConstraints2);
 			calendarPanel.add(getTimeSpinner(), gridBagConstraints3);
+			calendarPanel.add(latitudeLabel, gridBagConstraints21);
+			calendarPanel.add(getCityComboBox(), gridBagConstraints31);
+			calendarPanel.add(getLatitudeSpinner(), gridBagConstraints4);
 		}
 		return calendarPanel;
 	}
@@ -1007,6 +1035,68 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
+	 * This method initializes cityComboBox	
+	 * 	
+	 * @return javax.swing.JComboBox	
+	 */
+	private JComboBox getCityComboBox() {
+		if (cityComboBox == null) {
+			cityComboBox = new JComboBox();
+			cityComboBox.addItem("");
+			cityComboBox.addItem("Boston");
+			cityComboBox.addItem("Washington DC");
+			cityComboBox.addItem("Los Angeles");
+			cityComboBox.addItem("San Francisco");
+			cityComboBox.addItem("Tehran");
+			cityComboBox.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					int latitude = 0;
+					switch (cityComboBox.getSelectedIndex()) {
+					case 1:
+						latitude = 42;
+						break;
+					case 2:
+						latitude = 38;
+						break;
+					case 3:
+						latitude = 34;
+						break;
+					case 4:
+						latitude = 37;
+						break;
+					case 5:
+						latitude = 35;
+						break;
+					case 6:
+						latitude = 39;
+						break;
+					}
+					latitudeSpinner.setValue(latitude);
+				}
+			});
+		}
+		return cityComboBox;
+	}
+
+	/**
+	 * This method initializes latitudeSpinner	
+	 * 	
+	 * @return javax.swing.JSpinner	
+	 */
+	private JSpinner getLatitudeSpinner() {
+		if (latitudeSpinner == null) {
+			latitudeSpinner = new JSpinner();
+			latitudeSpinner.setModel(new SpinnerNumberModel(0, -90, 90, 1));
+			latitudeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+				public void stateChanged(javax.swing.event.ChangeEvent e) {
+					SceneManager.getInstance().getHeliodon().setObserverLatitude(((Integer)latitudeSpinner.getValue()) / 180.0 * Math.PI);
+				}
+			});
+		}
+		return latitudeSpinner;
+	}
+
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -1047,7 +1137,7 @@ public class MainFrame extends JFrame {
 	 * @return void
 	 */
 	private void initialize() {
-		this.setSize(972, 600);
+		this.setSize(1092, 600);
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int)(screenSize.getWidth() - this.getSize().getWidth()) / 2, (int)(screenSize.getHeight() - this.getSize().getHeight()) / 2);
 //		this.setSize(172, 600);

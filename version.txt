@@ -484,6 +484,7 @@ Version 0.2
 - compute the hour angle when changing the declination angle with mouse
 - finalize and cleanup the heliodon code
 - update the calendar gui visibility based on whether or not heliodon or shadow is enabled.
+- add gui for setting the latitude or selecting a city as the location
 
 - *redesign the base of heliodon and add compass info to it
 - *compute hour and declination angles based on time and date
