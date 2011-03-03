@@ -480,8 +480,9 @@ Version 0.2
 - render the heliodon base more efficiently using quadstrip instead of quads
 - add gui for setting the date and time of the sun
 - implement gui for controlling the sun and sun path based on the value of date and time
-
-- *update the gui date and time when the mouse is used to change the sun location and declination
+- update the gui date and time when the mouse is used to change the sun location and declination
+- compute the hour angle when changing the declination angle with mouse
+- finalize and cleanup the heliodon code
 
 - *redesign the base of heliodon and add compass info to it
 - *compute hour and declination angles based on time and date

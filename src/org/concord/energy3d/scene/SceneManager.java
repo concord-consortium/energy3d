@@ -343,7 +343,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (sunAnim) {
 //			sunAngle++;
-			heliodon.setHourAngle(heliodon.getHourAngle() + 0.01);
+			heliodon.setHourAngle(heliodon.getHourAngle() + 0.01, true, true);
 //			updateSunHeliodon();
 		}
 
@@ -670,12 +670,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.X), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				heliodon.setHourAngle(heliodon.getHourAngle() + 0.03);
+				heliodon.setHourAngle(heliodon.getHourAngle() + 0.03, true, true);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				heliodon.setHourAngle(heliodon.getHourAngle() - 0.03);
+				heliodon.setHourAngle(heliodon.getHourAngle() - 0.03, true, true);
 			}
 		}));		
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.UP), new TriggerAction() {
@@ -708,7 +708,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //				heliodon.setOffset(heliodon.getOffset() + 0.01);
 //				heliodon.computeSunLocation(1, 0.5, 0.5);
 //				heliodon.setHourAngle(heliodon.getHourAngle() + 0.1);
-				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() + 0.01);
+				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() + 0.01, true, true);
 //				heliodon.setObserverLatitude(heliodon.getObserverLatitude() + 0.01);
 			}
 		}));
@@ -722,7 +722,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //				heliodon.setOffset(heliodon.getOffset() - 0.01);
 //				heliodon.computeSunLocation(-1, 0.5, 0.5);
 //				heliodon.setHourAngle(heliodon.getHourAngle() - 0.1);
-				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() - 0.01);
+				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() - 0.01, true, true);
 //				heliodon.setObserverLatitude(heliodon.getObserverLatitude() - 0.01);
 			}
 		}));
