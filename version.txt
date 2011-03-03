@@ -483,6 +483,7 @@ Version 0.2
 - update the gui date and time when the mouse is used to change the sun location and declination
 - compute the hour angle when changing the declination angle with mouse
 - finalize and cleanup the heliodon code
+- update the calendar gui visibility based on whether or not heliodon or shadow is enabled.
 
 - *redesign the base of heliodon and add compass info to it
 - *compute hour and declination angles based on time and date

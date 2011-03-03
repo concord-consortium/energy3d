@@ -186,6 +186,7 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getLightButton());
 			appToolbar.add(getSunButton());
 			appToolbar.add(getSunAnimButton());
+			appToolbar.add(getCalendarPanel());
 			appToolbar.addSeparator();
 			appToolbar.add(getRotAnimButton());
 			appToolbar.add(getTopViewButton());
@@ -194,7 +195,6 @@ public class MainFrame extends JFrame {
 			appToolbar.addSeparator();
 			appToolbar.add(getAnnotationToggleButton());
 			appToolbar.add(getPreviewButton());
-			appToolbar.add(getCalendarPanel());
 			
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
@@ -370,6 +370,9 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					lightingMenu.setSelected(lightButton.isSelected());
 					shadowMenu.setSelected(lightButton.isSelected());
+					final boolean showSunTools = lightButton.isSelected() || sunButton.isSelected();
+					calendarPanel.setVisible(showSunTools);
+					sunAnimButton.setEnabled(showSunTools);
 				}
 			});
 		}
@@ -535,6 +538,9 @@ public class MainFrame extends JFrame {
 			sunButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setSunControl(sunButton.isSelected());
+					final boolean showSunTools = lightButton.isSelected() || sunButton.isSelected();
+					calendarPanel.setVisible(showSunTools);
+					sunAnimButton.setEnabled(showSunTools);					
 				}
 			});
 		}
@@ -951,6 +957,9 @@ public class MainFrame extends JFrame {
 			dateLabel.setText(" Date: ");
 			calendarPanel = new JPanel();
 			calendarPanel.setLayout(new GridBagLayout());
+			calendarPanel.setMaximumSize(new Dimension(100, 2147483647));
+			calendarPanel.setPreferredSize(new Dimension(100, 40));
+			calendarPanel.setMinimumSize(new Dimension(100, 40));
 			calendarPanel.add(dateLabel, gridBagConstraints);
 			calendarPanel.add(getDateSpinner(), gridBagConstraints1);
 			calendarPanel.add(timeLabel, gridBagConstraints2);
