@@ -485,6 +485,7 @@ Version 0.2
 - finalize and cleanup the heliodon code
 - update the calendar gui visibility based on whether or not heliodon or shadow is enabled.
 - add gui for setting the latitude or selecting a city as the location
+- fix issue with light being off even when it's all time summer in south pole
 
 - *redesign the base of heliodon and add compass info to it
 - *compute hour and declination angles based on time and date

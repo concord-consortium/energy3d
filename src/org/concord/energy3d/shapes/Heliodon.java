@@ -113,7 +113,7 @@ public class Heliodon {
 
 		// Sun Region
 		sunRegion = new Mesh("Sun Region");
-		sunRegion.getSceneHints().setCullHint(CullHint.Always);
+//		sunRegion.getSceneHints().setCullHint(CullHint.Always);
 		sunRegion.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(SUN_REGION_VERTICES));
 		sunRegion.getMeshData().setIndexMode(IndexMode.Quads);
 		sunRegion.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 0.5f));
@@ -217,7 +217,7 @@ public class Heliodon {
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {				
 				sunGrabbed = false;
-				sunRegion.getSceneHints().setCullHint(CullHint.Always);
+//				sunRegion.getSceneHints().setCullHint(CullHint.Always);
 				SceneManager.getInstance().setMouseControlEnabled(true);
 				lock = false;
 			}
@@ -354,9 +354,7 @@ public class Heliodon {
 		this.hourAngle = toPlusMinusPIRange(hourAngle, -Math.PI, Math.PI);
 		final int minutes = (int)Math.round(this.hourAngle / Math.PI * 12 * 60 + 12 * 60);
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		calendar.set(Calendar.MINUTE, minutes);
-		
-		light.setEnabled(this.hourAngle >= -MathUtils.HALF_PI && this.hourAngle <= MathUtils.HALF_PI);
+		calendar.set(Calendar.MINUTE, minutes);		
 		
 		if (updateGUI)
 			MainFrame.getInstance().getTimeSpinner().setValue(calendar.getTime());
@@ -493,6 +491,7 @@ public class Heliodon {
 	private void setSunLocation(final ReadOnlyVector3 sunLocation) {
 		sun.setTranslation(sunLocation);
 		light.setDirection(sunLocation.negate(null));
+		light.setEnabled(sunLocation.getZ() >= 0);
 	}
 
 	private void draw() {
