@@ -489,8 +489,8 @@ Version 0.2
 - initialize the size of calendar gui panel to its exact preferred size
 - fix problem with flickering heliodon
 - fix problem with dragging sun path when at 90 degrees latitude 
+- draw the helion within update method using dirty flags in order to prevent it from being rendered when draw not completed
 
-- *draw the helion within game queue in order to prevent it from being rendered even when not completed
 - *allow rotation of scene with respect to north
 
 
