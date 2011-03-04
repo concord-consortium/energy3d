@@ -5,6 +5,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.MainFrame;
@@ -239,7 +241,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.add(Scene.getRoot());
 		shadowPass.addOccluder(Scene.getRoot());
 
-		heliodon = new Heliodon(root, light, passManager, logicalLayer);
+		final Date today = Calendar.getInstance().getTime();
+		MainFrame.getInstance().getDateSpinner().setValue(today);
+		MainFrame.getInstance().getTimeSpinner().setValue(today);
+		heliodon = new Heliodon(root, light, passManager, logicalLayer, today);
+
 		Scene.getInstance();
 
 		SelectUtil.init(floor, Scene.getRoot());
@@ -293,12 +299,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			camera.lookAt(0, 0, 1, Vector3.UNIT_Z);
 			getCameraNode().updateFromCamera();
 		}
+		
 
 		if (sunAnim) {
 //			sunAngle++;
 			heliodon.setHourAngle(heliodon.getHourAngle() + 0.01, true, true);
 //			updateSunHeliodon();
 		}
+		
+		heliodon.update();
 
 		root.updateGeometricState(tpf);
 	}
@@ -352,7 +361,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
 		floor.setRenderState(blendState);
-		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+//		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		floor.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
 		final MaterialState ms = new MaterialState();

@@ -40,6 +40,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
+import org.concord.energy3d.shapes.Heliodon;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -944,13 +945,11 @@ public class MainFrame extends JFrame {
 			GridBagConstraints gridBagConstraints4 = new GridBagConstraints();
 			gridBagConstraints4.gridx = 3;
 			gridBagConstraints4.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints4.weightx = 1.0;
 			gridBagConstraints4.insets = new Insets(0, 0, 0, 1);
 			gridBagConstraints4.gridy = 1;
 			GridBagConstraints gridBagConstraints31 = new GridBagConstraints();
 			gridBagConstraints31.fill = GridBagConstraints.BOTH;
 			gridBagConstraints31.gridy = 0;
-			gridBagConstraints31.weightx = 1.0;
 			gridBagConstraints31.insets = new Insets(0, 1, 0, 1);
 			gridBagConstraints31.gridwidth = 2;
 			gridBagConstraints31.gridx = 2;
@@ -961,9 +960,8 @@ public class MainFrame extends JFrame {
 			latitudeLabel.setText(" Latitude:");
 			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
 			gridBagConstraints3.gridx = 1;
-			gridBagConstraints3.weightx = 1.0;
-			gridBagConstraints3.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints3.gridy = 1;
+			gridBagConstraints3.fill = GridBagConstraints.HORIZONTAL;
 			GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
 			gridBagConstraints2.gridx = 0;
 			gridBagConstraints2.gridy = 1;
@@ -971,9 +969,9 @@ public class MainFrame extends JFrame {
 			timeLabel.setText(" Time: ");
 			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
 			gridBagConstraints1.gridx = 1;
+			gridBagConstraints1.gridy = 0;
 			gridBagConstraints1.weightx = 1.0;
 			gridBagConstraints1.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints1.gridy = 0;
 			GridBagConstraints gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = 0;
@@ -981,10 +979,7 @@ public class MainFrame extends JFrame {
 			dateLabel.setText(" Date: ");
 			calendarPanel = new JPanel();
 			calendarPanel.setLayout(new GridBagLayout());
-			calendarPanel.setMaximumSize(new Dimension(180, 2147483647));
-			calendarPanel.setPreferredSize(new Dimension(180, 40));
-			calendarPanel.setMinimumSize(new Dimension(180, 40));
-			calendarPanel.setVisible(true);
+			calendarPanel.setVisible(false);
 			calendarPanel.add(dateLabel, gridBagConstraints);
 			calendarPanel.add(getDateSpinner(), gridBagConstraints1);
 			calendarPanel.add(timeLabel, gridBagConstraints2);
@@ -992,6 +987,8 @@ public class MainFrame extends JFrame {
 			calendarPanel.add(latitudeLabel, gridBagConstraints21);
 			calendarPanel.add(getCityComboBox(), gridBagConstraints31);
 			calendarPanel.add(getLatitudeSpinner(), gridBagConstraints4);
+			
+			calendarPanel.setMaximumSize(new Dimension(calendarPanel.getPreferredSize().width, 2147483647));
 		}
 		return calendarPanel;
 	}
@@ -1003,12 +1000,18 @@ public class MainFrame extends JFrame {
 	 */
 	public JSpinner getDateSpinner() {
 		if (dateSpinner == null) {
-			dateSpinner = new JSpinner();			
-			dateSpinner.setModel(new SpinnerDateModel());
+			final SpinnerDateModel model = new SpinnerDateModel();
+			final Calendar date = Calendar.getInstance();
+			// initially set the date to September 29 so that it will resize itself to max
+			date.set(2011, 8, 29);
+			model.setValue(date.getTime());
+			dateSpinner = new JSpinner(model);
 			dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
 			dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
 				public void stateChanged(javax.swing.event.ChangeEvent e) {
-					SceneManager.getInstance().getHeliodon().setDate((Date)dateSpinner.getValue());
+					final Heliodon heliodon = SceneManager.getInstance().getHeliodon();
+					if (heliodon != null)
+						heliodon.setDate((Date)dateSpinner.getValue());
 				}
 			});
 		}
@@ -1022,12 +1025,13 @@ public class MainFrame extends JFrame {
 	 */
 	public JSpinner getTimeSpinner() {
 		if (timeSpinner == null) {
-			timeSpinner = new JSpinner();
-			timeSpinner.setModel(new SpinnerDateModel());
+			timeSpinner = new JSpinner(new SpinnerDateModel());
 			timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
 			timeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
 				public void stateChanged(javax.swing.event.ChangeEvent e) {					
-					SceneManager.getInstance().getHeliodon().setTime((Date)timeSpinner.getValue());
+					final Heliodon heliodon = SceneManager.getInstance().getHeliodon();
+					if (heliodon != null)
+						heliodon.setTime((Date)timeSpinner.getValue());
 				}
 			});
 		}
