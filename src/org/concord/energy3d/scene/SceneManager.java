@@ -91,6 +91,7 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -889,29 +890,29 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Node compass = storage.getScene();
 		BMText txt;
 
-		final double Z = 0.2;
-		txt = new BMText("N", "N", FontManager.getInstance().getAnnotationFont());
+		final double Z = 0.1;
+		txt = new BMText("N", "N", FontManager.getInstance().getAnnotationFont(), Align.South);
 		txt.setAutoRotate(false);
-		txt.setTranslation(3, -0.3, Z);
-		txt.setRotation(new Matrix3().fromAngleAxis(-Math.PI / 2, Vector3.UNIT_Y).multiplyLocal(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_Z)));
+		txt.setTranslation(2, 0.0, Z);
+		txt.setRotation(new Matrix3().fromAngles(0.0, MathUtils.HALF_PI, -MathUtils.HALF_PI));
 		compass.attachChild(txt);
 
-		txt = new BMText("S", "S", FontManager.getInstance().getAnnotationFont());
+		txt = new BMText("S", "S", FontManager.getInstance().getAnnotationFont(), Align.South);
 		txt.setAutoRotate(false);
-		txt.setTranslation(-2, -0.2, Z);
-		txt.setRotation(new Matrix3().fromAngleAxis(-Math.PI / 2, Vector3.UNIT_Y).multiplyLocal(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_Z)));
+		txt.setTranslation(-2, -0.0, Z);
+		txt.setRotation(new Matrix3().fromAngles(0.0, -MathUtils.HALF_PI, MathUtils.HALF_PI));
 		compass.attachChild(txt);
 
-		txt = new BMText("E", "E", FontManager.getInstance().getAnnotationFont());
+		txt = new BMText("W", "W", FontManager.getInstance().getAnnotationFont(), Align.South);
 		txt.setAutoRotate(false);
-		txt.setTranslation(-0.2, 2.1, Z);
-		txt.setRotation(new Matrix3().fromAngleAxis(-Math.PI / 2, Vector3.UNIT_X));
+		txt.setTranslation(-0.0, 2, Z);
+		txt.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0.0, 0.0));
 		compass.attachChild(txt);
 
-		txt = new BMText("W", "W", FontManager.getInstance().getAnnotationFont());
+		txt = new BMText("E", "E", FontManager.getInstance().getAnnotationFont(), Align.South);
 		txt.setAutoRotate(false);
-		txt.setTranslation(-0.4, -2, Z);
-		txt.setRotation(new Matrix3().fromAngleAxis(Math.PI / 2, Vector3.UNIT_X));
+		txt.setTranslation(-0.0, -2, Z);
+		txt.setRotation(new Matrix3().fromAngles(MathUtils.HALF_PI, MathUtils.PI, 0.0));
 		compass.attachChild(txt);
 
 		final DirectionalLight light = new DirectionalLight();
@@ -924,6 +925,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		compass.updateWorldRenderStates(true);
 
+
+		final Node compassNode = new Node();
+		compassNode.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0.0, 0.0));
+		compassNode.attachChild(compass);
+		System.out.println("done");
+		
 		compass.addController(new SpatialController<Spatial>() {
 			public void update(double time, Spatial caller) {
 				final Vector3 direction = Camera.getCurrentCamera().getDirection().normalize(null);
@@ -932,18 +939,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				double angle = -direction.smallestAngleBetween(Vector3.UNIT_Y);
 				if (direction.dot(Vector3.UNIT_X) > 0)
 					angle = -angle;
-				angle -= Math.PI / 2;
-				compass.setRotation(new Matrix3().fromAngleAxis(angle, Vector3.UNIT_Z));
+				angle -= MathUtils.HALF_PI;
+				compass.setRotation(new Matrix3().fromAngleAxis(angle -0.3, Vector3.UNIT_Z));
 			}
 		});
-
-		final Node compassNode1 = new Node();
-		compassNode1.setRotation(new Matrix3().fromAngleAxis(-Math.PI / 2, Vector3.UNIT_X));
-		compassNode1.attachChild(compass);
-		final Node compassNode2 = new Node();
-		compassNode2.attachChild(compassNode1);
-		System.out.println("done");
-		return compassNode2;
+		
+		return compassNode;
 	}
 
 	public void setCompassVisible(boolean visible) {

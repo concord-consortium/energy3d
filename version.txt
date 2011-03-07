@@ -489,7 +489,10 @@ Version 0.2
 - initialize the size of calendar gui panel to its exact preferred size
 - fix problem with flickering heliodon
 - fix problem with dragging sun path when at 90 degrees latitude 
-- draw the helion within update method using dirty flags in order to prevent it from being rendered when draw not completed
+- draw the heliodon within update method using dirty flags in order to prevent it from being rendered when draw not completed
+- fix swing popup problems
+- fix the reversed east and west in the compass
+- adjust the compass to make it point forward when at north
 
 - *allow rotation of scene with respect to north
 

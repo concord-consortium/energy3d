@@ -25,6 +25,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -1141,11 +1142,10 @@ public class MainFrame extends JFrame {
 	 * @return void
 	 */
 	private void initialize() {
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		this.setSize(1092, 600);
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int)(screenSize.getWidth() - this.getSize().getWidth()) / 2, (int)(screenSize.getHeight() - this.getSize().getHeight()) / 2);
-//		this.setSize(172, 600);
-//		this.setSize(400*2, 550*2);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getAppMenuBar());
 		this.setContentPane(getJContentPane());
