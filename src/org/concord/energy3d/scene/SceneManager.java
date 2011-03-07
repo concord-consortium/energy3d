@@ -8,6 +8,8 @@ import java.nio.FloatBuffer;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Door;
@@ -25,7 +27,9 @@ import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.annotation.MainThread;
+import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
+import com.ardor3d.extension.model.collada.jdom.ColladaMaterialUtils;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.shadow.map.ParallelSplitShadowMapPass;
 import com.ardor3d.framework.Canvas;
@@ -88,6 +92,7 @@ import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.extension.CameraNode;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TransparencyType;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.ui.text.BMText;
@@ -362,7 +367,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
 		floor.setRenderState(blendState);
-//		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+//		floor.getSceneHints().setTransparencyType(TransparencyType.TwoPass);
 		floor.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
 		final MaterialState ms = new MaterialState();
@@ -886,6 +892,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final ColladaImporter colladaImporter = new ColladaImporter();
 
 		// Load the collada scene
+		Logger.getLogger(ColladaAnimUtils.class.getName()).setLevel(Level.SEVERE);
+		Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
 		final ColladaStorage storage = colladaImporter.load(source);
 		final Node compass = storage.getScene();
 		BMText txt;
@@ -940,7 +948,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (direction.dot(Vector3.UNIT_X) > 0)
 					angle = -angle;
 				angle -= MathUtils.HALF_PI;
-				compass.setRotation(new Matrix3().fromAngleAxis(angle -0.3, Vector3.UNIT_Z));
+				compass.setRotation(new Matrix3().fromAngles(0.0, 0.0, angle -0.3));
 			}
 		});
 		

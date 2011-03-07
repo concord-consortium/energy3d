@@ -7,15 +7,19 @@ import java.util.Date;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.InputTrigger;
+import com.ardor3d.input.logical.KeyHeldCondition;
+import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
@@ -89,6 +93,7 @@ public class Heliodon {
 	private boolean lock = false;
 	private boolean dirtySunRegion = false;
 	private boolean dirtySunPath = false;
+	private boolean forceSunRegionOn = false;
 
 	public Heliodon(final Node scene, final DirectionalLight light, final BasicPassManager passManager, final LogicalLayer logicalLayer, final Date timeAndDate) {
 		this.light = light;
@@ -115,7 +120,8 @@ public class Heliodon {
 
 		// Sun Region
 		sunRegion = new Mesh("Sun Region");
-//		sunRegion.getSceneHints().setCullHint(CullHint.Always);
+		sunRegion.setTranslation(0, 0, 0.001);		// to avoid flickering
+		sunRegion.getSceneHints().setCullHint(CullHint.Always);
 		sunRegion.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(SUN_REGION_VERTICES));
 		sunRegion.getMeshData().setIndexMode(IndexMode.Quads);
 		sunRegion.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 0.5f));
@@ -158,10 +164,10 @@ public class Heliodon {
 		root.attachChild(baseTicks);
 		
 		// Compass Labels N S E W
-		final BMText northLabel = new BMText("North", "N", FontManager.getInstance().getAnnotationFont(), Align.Center, Justify.Left, false);
+		final BMText northLabel = new BMText("North", "N", FontManager.getInstance().getAnnotationFont(), Align.Center);
 		northLabel.setAutoRotate(false);
 		northLabel.setAutoScale(AutoScale.Off);
-		northLabel.setAutoFade(AutoFade.Off);
+//		northLabel.setAutoFade(AutoFade.Off);
 		northLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, 0));
 		northLabel.setTranslation(0, 6, 0);
 		root.attachChild(northLabel);
@@ -189,7 +195,7 @@ public class Heliodon {
 		cs.setEnableClipPlane(0, true);
 		cs.setClipPlaneEquation(0, 0, 0, 1, 0);
 		sunPath.setRenderState(cs);
-		sunRegion.setRenderState(cs);
+		sunRegion.setRenderState(cs);		
 		
 		initMouse(logicalLayer);
 		
@@ -203,6 +209,16 @@ public class Heliodon {
 	}
 
 	private void initMouse(final LogicalLayer logicalLayer) {
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.F), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				forceSunRegionOn = !forceSunRegionOn;	
+				System.out.println("forceSunRegionOn = " + forceSunRegionOn);
+				if (forceSunRegionOn)
+					sunRegion.getSceneHints().setCullHint(CullHint.Inherit);
+				else
+					sunRegion.getSceneHints().setCullHint(CullHint.Always);
+			}
+		}));		
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				lock = true;
@@ -215,6 +231,9 @@ public class Heliodon {
 					sunGrabbed = true;
 				else
 					sunGrabbed = false;
+				if (forceSunRegionOn)
+					selectDifferentDeclinationWithMouse = true;
+				else
 				selectDifferentDeclinationWithMouse = false;
 				SceneManager.getInstance().setMouseControlEnabled(!sunGrabbed);
 			}
@@ -223,7 +242,8 @@ public class Heliodon {
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {				
 				sunGrabbed = false;
-//				sunRegion.getSceneHints().setCullHint(CullHint.Always);
+				if (!forceSunRegionOn)
+					sunRegion.getSceneHints().setCullHint(CullHint.Always);
 				SceneManager.getInstance().setMouseControlEnabled(true);
 				lock = false;
 			}
@@ -259,9 +279,9 @@ public class Heliodon {
 						p.set(buf.get(), buf.get(), buf.get());
 						rootTansform.applyForward(p, p_abs);
 						final double d;
-						if (intersectionPoint != null)
-							d = intersectionPoint.distanceSquared(p_abs);
-						else
+//						if (intersectionPoint != null)
+//							d = intersectionPoint.distanceSquared(p_abs);
+//						else
 							d = pickRay.distanceSquared(p_abs, null);
 						if (d < smallestDistance) {
 							smallestDistance = d;
@@ -271,6 +291,10 @@ public class Heliodon {
 					}
 					totalHourVertices = buf.limit() / 3;
 				}
+				
+//				final Vector3 screenCoordinates = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getScreenCoordinates(newSunLocation);
+//				screenCoordinates.setZ(0);
+//				if (screenCoordinates.distanceSquared(mouse.getX(), mouse.getY(), 0) > 100000)
 				if (smallestDistance > 5.0 * root.getTransform().getScale().getX() * root.getTransform().getScale().getX())
 					selectDifferentDeclinationWithMouse = true;
 				
@@ -482,7 +506,7 @@ public class Heliodon {
 			}
 			counter++;
 		}
-		System.out.println("\nbase limit = " + buf.position() + " / " + buf.capacity());
+//		System.out.println("\nbase limit = " + buf.position() + " / " + buf.capacity());
 		base.updateModelBound();
 		baseTicks.updateModelBound();
 	}	
@@ -528,7 +552,7 @@ public class Heliodon {
 		int limit = 0;
 		for (double hourAngle = -Math.PI; hourAngle < Math.PI + step / 2.0; hourAngle += step) {
 			final Vector3 v = computeSunLocation(hourAngle, declinationAngle, observerLatitude);
-			if (v.getZ() > -MathUtils.ZERO_TOLERANCE) {
+			if (v.getZ() > -0.3) {
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 				limit += 3;
 			}
@@ -592,7 +616,7 @@ public class Heliodon {
 			drawSunRegion();
 		if (dirtySunPath) {
 			drawSunPath();
-			drawSunRegion();
+			drawSun();
 		}
 		
 	}

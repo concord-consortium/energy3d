@@ -493,6 +493,14 @@ Version 0.2
 - fix swing popup problems
 - fix the reversed east and west in the compass
 - adjust the compass to make it point forward when at north
+- avoid heliodon flickering while enabling floor transparency
+- stretch sun path all the way to floor
+- add short key "F" to force sun region on
+
+- release version 0.3
+
+**********************************************************************************************
+Version 0.3 - March 7, 2011
 
 - *allow rotation of scene with respect to north
 
