@@ -174,7 +174,7 @@ public class SelectUtil {
 	public static void nextPickLayer() {
 		if (pickLayer != -1)
 			pickLayer++;
-		System.out.println(pickLayer);
+		System.out.println("\tpickLayer = " + pickLayer);
 	}
 
 	public static void setPickLayer(int i) {

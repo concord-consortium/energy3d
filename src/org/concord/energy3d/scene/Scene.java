@@ -75,7 +75,7 @@ public class Scene implements Serializable {
 		if (instance == null) {
 			instance = new Scene();
 			try {
-				instance.open(new File("house.ser"));
+				instance.open(new File("./Energy3D Projects/Default.ser"));
 			} catch (Throwable e) {
 				instance = new Scene();
 			}
@@ -299,6 +299,8 @@ public class Scene implements Serializable {
 
 	public void open(final File file) { // throws FileNotFoundException, IOException, ClassNotFoundException {
 		instance.newFile();
+		if (!file.exists())
+			return;
 		Scene.file = file;
 		SceneManager.taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {

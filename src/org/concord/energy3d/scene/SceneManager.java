@@ -92,7 +92,6 @@ import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.extension.CameraNode;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.scenegraph.hint.TransparencyType;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.ui.text.BMText;
@@ -159,7 +158,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private SceneManager(final Container panel) {// throws LWJGLException {
-		System.out.print("Initializing scene manager...");
+		System.out.print("Constructing SceneManager...");
 		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
 		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 8, false, false);
 		if (JOGL)
@@ -199,7 +198,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@MainThread
 	public void init() {
-		System.out.print("Initializing scene manager models...");
+		System.out.print("Initializing SceneManager...");
 		AWTImageLoader.registerLoader();
 		try {
 			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(SceneManager.class.getClassLoader().getResource("org/concord/energy3d/resources/images/")));
@@ -259,7 +258,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
-				final Spatial compass = loadCompassModel();
+				final Spatial compass = createCompass();
 				compass.setScale(0.1);
 				compass.setTranslation(-1, -0.7, 2);
 				cameraNode.attachChild(compass);
@@ -268,7 +267,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 
 		root.updateGeometricState(0, true);
-		System.out.println("done");
+		System.out.println("Finished initialization.");
 	}
 
 	public void run() {
@@ -437,7 +436,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (drawn != null)
 									drawn.hidePoints();
 								drawn = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
-								System.out.println("Clicked on: " + drawn);
+								System.out.print("Clicked on: " + drawn + ", ");
 								SelectUtil.nextPickLayer();
 							}
 						} else
@@ -458,12 +457,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				taskManager.update(new Callable<Object>() {
 					public Object call() throws Exception {
 						MouseState mouseState = inputStates.getCurrent().getMouseState();
+						boolean sceneChanged = false;
 						if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-							if (drawn != null && !drawn.isDrawCompleted())
+							if (drawn != null && !drawn.isDrawCompleted()) {								
 								drawn.complete();
+								sceneChanged = true;
+							}
 						} else {
-							if (!drawn.isDrawCompleted())
+							if (!drawn.isDrawCompleted()) {
 								drawn.addPoint(mouseState.getX(), mouseState.getY());
+								sceneChanged = true;
+							}
 
 							if (drawn.isDrawCompleted()) {
 								drawn.hidePoints();
@@ -477,7 +481,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 
 						enableDisableRotationControl();
-						updateHeliodonSize();
+						if (sceneChanged)
+							updateHeliodonSize();
 
 						return null;
 					}
@@ -886,7 +891,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return cameraNode;
 	}
 
-	private Node loadCompassModel() throws IOException {
+	private Node createCompass() throws IOException {
 		System.out.print("Loading compass...");
 		final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "compass.dae");
 		final ColladaImporter colladaImporter = new ColladaImporter();
@@ -895,7 +900,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Logger.getLogger(ColladaAnimUtils.class.getName()).setLevel(Level.SEVERE);
 		Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
 		final ColladaStorage storage = colladaImporter.load(source);
-		final Node compass = storage.getScene();
+		final Node compass = storage.getScene();		
 		BMText txt;
 
 		final double Z = 0.1;
@@ -930,6 +935,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final LightState lightState = new LightState();
 		lightState.attach(light);
 		compass.setRenderState(lightState);
+		compass.getSceneHints().setLightCombineMode(LightCombineMode.Replace);
 
 		compass.updateWorldRenderStates(true);
 

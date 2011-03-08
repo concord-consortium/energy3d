@@ -7,7 +7,6 @@ import java.util.Date;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
@@ -18,7 +17,6 @@ import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.InputTrigger;
-import com.ardor3d.input.logical.KeyHeldCondition;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseButtonPressedCondition;
@@ -61,9 +59,7 @@ import com.ardor3d.scenegraph.hint.TransparencyType;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
-import com.ardor3d.ui.text.BMText.AutoFade;
 import com.ardor3d.ui.text.BMText.AutoScale;
-import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Heliodon {
@@ -212,7 +208,7 @@ public class Heliodon {
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.F), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				forceSunRegionOn = !forceSunRegionOn;	
-				System.out.println("forceSunRegionOn = " + forceSunRegionOn);
+//				System.out.println("forceSunRegionOn = " + forceSunRegionOn);
 				if (forceSunRegionOn)
 					sunRegion.getSceneHints().setCullHint(CullHint.Inherit);
 				else
@@ -345,7 +341,7 @@ public class Heliodon {
 						double newDeclinationAngle = -TILT_ANGLE + (2.0 * TILT_ANGLE * resultRow / DECLINATION_DIVISIONS);
 						declinationChanged = Math.abs(newDeclinationAngle - declinationAngle) > MathUtils.EPSILON;
 						if (declinationChanged) {							
-							System.out.println("resultRow = " + resultRow + " / " + DECLINATION_DIVISIONS);
+//							System.out.println("resultRow = " + resultRow + " / " + DECLINATION_DIVISIONS);
 							setDeclinationAngle(newDeclinationAngle, false, true);			
 //							drawSunPath();
 							dirtySunPath = true;
@@ -384,6 +380,7 @@ public class Heliodon {
 
 	public void setHourAngle(final double hourAngle, final boolean redrawHeliodon, final boolean updateGUI) {
 		this.hourAngle = toPlusMinusPIRange(hourAngle, -Math.PI, Math.PI);
+		
 		final int minutes = (int)Math.round(this.hourAngle / Math.PI * 12 * 60 + 12 * 60);
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, minutes);		
@@ -401,17 +398,15 @@ public class Heliodon {
 
 	public void setDeclinationAngle(final double declinationAngle, final boolean redrawHeliodon, final boolean updateGUI) {
 		this.declinationAngle = toPlusMinusPIRange(declinationAngle, -TILT_ANGLE, TILT_ANGLE);
+		
 		final double days = MathUtils.asin(this.declinationAngle / TILT_ANGLE) / MathUtils.TWO_PI * 365.25 - 284.0;
 		calendar.set(calendar.get(Calendar.YEAR), 0, (int)Math.round(days));
 		
 		if (updateGUI)
 			MainFrame.getInstance().getDateSpinner().setValue(calendar.getTime());
 		
-		if (redrawHeliodon) {
-//			drawSunPath();
-//			drawSun();
+		if (redrawHeliodon)
 			dirtySunPath = true;
-		}
 	}
 
 	public double getObserverLatitude() {
@@ -420,9 +415,7 @@ public class Heliodon {
 
 	public void setObserverLatitude(double observerLatitude) {
 		this.observerLatitude = toPlusMinusPIRange(observerLatitude, -MathUtils.HALF_PI, MathUtils.HALF_PI);
-//		drawSunRegion();
-//		drawSunPath();
-//		drawSun();
+
 		dirtySunRegion = true;
 		dirtySunPath = true;
 	}
@@ -454,7 +447,9 @@ public class Heliodon {
 
 		final double r = 5;
 		final Vector3 coords = new Vector3(r, azimuthAngle, altitudeAngle);
-		return MathUtils.sphericalToCartesianZ(coords, coords);
+		MathUtils.sphericalToCartesianZ(coords, coords);
+		coords.setX(-coords.getX());	// reverse the x so that sun moves from east to west
+		return coords;
 	}
 
 	private double toPlusMinusPIRange(final double radian, double min, double max) {

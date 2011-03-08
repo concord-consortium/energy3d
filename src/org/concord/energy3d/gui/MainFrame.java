@@ -1120,6 +1120,7 @@ public class MainFrame extends JFrame {
 	 */
 	private MainFrame() {
 		super();		
+		System.out.print("Initiating GUI...");
 		final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
 		if (!dir.exists()) {
 			System.out.print("Making save directory...");
@@ -1135,6 +1136,7 @@ public class MainFrame extends JFrame {
 		colorChooser.setColor(new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue()));
 
 		initialize();
+		System.out.println("done");
 	}
 
 	/**

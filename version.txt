@@ -496,7 +496,12 @@ Version 0.2
 - avoid heliodon flickering while enabling floor transparency
 - stretch sun path all the way to floor
 - add short key "F" to force sun region on
-
+- add readme.txt
+- reverse the x component of sun computation so that it moves from east to west
+- make the compass unaffected by sun light source and only affected by its own light
+- load the dll files from the bin folder by forcing java.library.path to null
+- change the default model from house.ser to Energy3D Projects\default.ser
+- prevent re-scaling heliodon after each click 
 - release version 0.3
 
 **********************************************************************************************
