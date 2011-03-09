@@ -507,6 +507,8 @@ Version 0.2
 **********************************************************************************************
 Version 0.3 - March 7, 2011
 
+- add custom roof 
+
 - *allow rotation of scene with respect to north
 
 

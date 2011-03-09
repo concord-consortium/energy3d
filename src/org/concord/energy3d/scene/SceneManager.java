@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -803,7 +804,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else if (operation == Operation.DRAW_ROOF)
 			drawn = new PyramidRoof();
 		else if (operation == Operation.DRAW_ROOF_HIP)
-			drawn = new HipRoof();
+//			drawn = new HipRoof();
+			drawn = new CustomRoof();
 		else if (operation == Operation.DRAW_FLOOR)
 			drawn = new Floor();
 		else if (operation == Operation.DRAW_FOUNDATION)
