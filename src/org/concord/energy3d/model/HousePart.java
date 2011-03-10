@@ -519,6 +519,4 @@ public abstract class HousePart implements Serializable {
 		return this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + "), editPoint = " + editPointIndex;
 	}
 	
-	
-	
 }  

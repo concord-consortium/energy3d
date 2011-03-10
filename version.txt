@@ -510,7 +510,12 @@ Version 0.3 - March 7, 2011
 - add custom roof 
 - add one edit point per wall for custom roof
 - allow changing the custom roof by dragging the edit points
-- add isEditPoint to UserData to avoid confusion between edit point indices and triangles of roofs indices  
+- add isEditPoint to UserData to avoid confusion between edit point indices and triangles of roofs indices
+- finalize custom roof
+- redesign the explore-wall architecture in roof class and no longer allow overriding it
+- add abstract processRoofPoints method for a more convenient way of manipulating roof points
+- add wallNormals to roof to be used for overhang and custom roof points computations 
+- fix problem with picking house parts instead of edit points by giving more priority to edit points 
 
 
 - *fix problem with edit point disappearing after clicking on it

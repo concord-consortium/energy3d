@@ -6,6 +6,7 @@ import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class PyramidRoof extends Roof {
 	private static final long serialVersionUID = 1L;
@@ -34,8 +35,9 @@ public class PyramidRoof extends Roof {
 		return polygon;		
 	}
 
-	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
-		final ArrayList<PolygonPoint> wallUpperPoints = super.exploreWallNeighbors(startWall);
+//	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
+	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
+//		final ArrayList<PolygonPoint> wallUpperPoints = super.exploreWallNeighbors(startWall);
 		final double edgeLenght = 0.3;
 		Vector3 op = new Vector3();
 		double maxY;
@@ -48,7 +50,7 @@ public class PyramidRoof extends Roof {
 				maxY = p.getY();			
 		}
 		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
-		return wallUpperPoints;
+//		return wallUpperPoints;
 	}
 	
 }

@@ -16,7 +16,6 @@ import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.model.HipRoof;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PyramidRoof;
 import org.concord.energy3d.model.Wall;

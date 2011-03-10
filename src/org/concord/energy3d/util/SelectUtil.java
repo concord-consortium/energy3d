@@ -30,18 +30,10 @@ public class SelectUtil {
 		pickResults.setCheckDistance(true);		
 	}
 	
-//	private static void pick(int x, int y, Spatial target) {
-////		final Vector2 pos = new Vector2(x, y);
-//		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
-////		Scene.getInstance().getParts();
-//		PickingUtil.findPick(target, pickRay, pickResults);
-//	}
-
 	public static PickedHousePart pickPart(int x, int y, Spatial target) {
 		if (target == null)
 			target = floor;
 		pickResults.clear();
-//		pick(x, y, target);
 		
 		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
 		PickingUtil.findPick(target, pickRay, pickResults);		
@@ -54,18 +46,15 @@ public class SelectUtil {
 		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);		
 		
 		if (typeOfHousePart == null)
-//			pick(x, y, floor);
 			PickingUtil.findPick(floor, pickRay, pickResults);
 		else
 			for (HousePart housePart : Scene.getInstance().getParts())
-				if (typeOfHousePart.isInstance(housePart)) // && housePart != except)
-//					pick(x, y, housePart.getRoot());
+				if (typeOfHousePart.isInstance(housePart))
 					PickingUtil.findPick(housePart.getRoot(), pickRay, pickResults);
 
 		return getPickResult(pickRay);
 	}
 
-//	private static PickedHousePart getPickResult() {
 	private static PickedHousePart getPickResult(final Ray3 pickRay) {
 		PickedHousePart pickedHousePart = null;
 		double polyDist = Double.MAX_VALUE;
@@ -95,20 +84,26 @@ public class SelectUtil {
 			Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
 			PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
 			double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
-//			double polyDist_i = userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection();
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {
 				for (Vector3 p : userData.getHousePart().getPoints()) {
 					pointDist_i = p.distance(intersectionPoint);
-//					if (userData.getHousePart() == SceneManager.getInstance().getSelectedPart())
+					double adjust = 0;
 					if (userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) > 0.8)					
-						pointDist_i -= 0.1;
-					if (pointDist_i < pointDist && 
+//						pointDist_i -= 0.1;
+						adjust -= 0.1;	// give more priority because the wall is facing the camera
+					if (pickedHousePart != null && pickedHousePart.getUserData().isEditPoint() && !userData.isEditPoint())						
+//						pointDist_i += 1;
+						adjust += 1;	// give less priority because this is not a edit point and an edit point is already found
+					if (pointDist_i + adjust < pointDist && 
 							(userData.getIndex() != -1 || pickedHousePart == null || 
 									pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getIndex() == -1)) {
+						if (pickedHousePart != null)
+							System.out.println("> " + (pickedHousePart != null) + " and " +  pickedHousePart.getUserData().isEditPoint() + " and " + !userData.isEditPoint());
 						pickedHousePart = picked_i;
 						polyDist = polyDist_i;
 						pointDist = pointDist_i;
+						System.out.println(pick.getTarget());
 					}
 				}
 			}
@@ -122,12 +117,16 @@ public class SelectUtil {
 	}
 
 	public static HousePart selectHousePart(int x, int y, boolean edit) {
+		System.out.println("--------selectHousePart()-------------");
 		HousePart drawn = null;
 		HousePart lastHoveredObject = SceneManager.getInstance().getSelectedPart();
 		PickedHousePart selectedMesh = pickPart(x, y, housePartsNode);
+		System.out.println(selectedMesh);
 		UserData data = null;
 		if (selectedMesh != null)
 			data = selectedMesh.getUserData();
+		
+		System.out.println(data);
 
 		if (data == null) {
 			if (lastHoveredObject != null) {
@@ -135,7 +134,7 @@ public class SelectUtil {
 				lastHoveredObject = null;
 				Blinker.getInstance().setTarget(null);
 			}
-		} else if (edit && data.isEditPoint()) { //data.getIndex() != -1) {
+		} else if (edit && data.isEditPoint()) {
 			drawn = data.getHousePart();
 			int pointIndex = data.getIndex();
 			if (SceneManager.getInstance().isTopView() && drawn instanceof Wall)
