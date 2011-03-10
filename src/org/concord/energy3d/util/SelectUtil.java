@@ -104,8 +104,8 @@ public class SelectUtil {
 					if (userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) > 0.8)					
 						pointDist_i -= 0.1;
 					if (pointDist_i < pointDist && 
-							(userData.getPointIndex() != -1 || pickedHousePart == null || 
-									pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getPointIndex() == -1)) {
+							(userData.getIndex() != -1 || pickedHousePart == null || 
+									pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getIndex() == -1)) {
 						pickedHousePart = picked_i;
 						polyDist = polyDist_i;
 						pointDist = pointDist_i;
@@ -135,9 +135,9 @@ public class SelectUtil {
 				lastHoveredObject = null;
 				Blinker.getInstance().setTarget(null);
 			}
-		} else if (edit && data.getPointIndex() != -1) {
+		} else if (edit && data.isEditPoint()) { //data.getIndex() != -1) {
 			drawn = data.getHousePart();
-			int pointIndex = data.getPointIndex();
+			int pointIndex = data.getIndex();
 			if (SceneManager.getInstance().isTopView() && drawn instanceof Wall)
 				pointIndex -= 1;
 			data.getHousePart().editPoint(pointIndex);
@@ -153,7 +153,7 @@ public class SelectUtil {
 				Blinker.getInstance().setTarget(null);
 				if (data.getHousePart().getOriginal() != null) {
 					if (drawn instanceof Roof)
-						Blinker.getInstance().setTarget(((Roof)drawn.getOriginal()).getFlattenedMeshesRoot().getChild(data.getPointIndex()));
+						Blinker.getInstance().setTarget(((Roof)drawn.getOriginal()).getFlattenedMeshesRoot().getChild(data.getIndex()));
 					else
 						Blinker.getInstance().setTarget(drawn.getOriginal().getRoot());
 				}

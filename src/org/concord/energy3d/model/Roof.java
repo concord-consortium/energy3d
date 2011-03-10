@@ -89,11 +89,14 @@ public abstract class Roof extends HousePart {
 			int meshIndex = 0;
 			MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
 			for (final Spatial child : flattenedMeshesRoot.getChildren())
-				child.setUserData(new UserData(this, meshIndex++));
+				child.setUserData(new UserData(this, meshIndex++, false));
 
+//			System.out.println("pointsRoot");
 			for (int i = 0; i < points.size(); i++) {
 				Vector3 p = points.get(i);
-				pointsRoot.getChild(i).setTranslation(p);
+//				System.out.println(p);
+//				pointsRoot.getChild(i).setTranslation(p);
+				getEditPointShape(i).setTranslation(p);
 			}
 
 			if (bottomMesh != null)

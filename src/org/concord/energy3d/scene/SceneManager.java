@@ -437,7 +437,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (drawn != null)
 									drawn.hidePoints();
 								drawn = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
-								System.out.print("Clicked on: " + drawn + ", ");
+								System.out.print("Clicked on: " + drawn);
 								SelectUtil.nextPickLayer();
 							}
 						} else

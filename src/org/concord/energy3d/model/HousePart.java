@@ -122,14 +122,10 @@ public abstract class HousePart implements Serializable {
 		labelsRoot = new Node("Labels");
 		
 		// Set up a reusable pick results
-		final Vector3 origin = new Vector3();
-		for (int i = 0; i < numOfEditPoints; i++) {
-			Sphere pointShape = new Sphere("Point", origin, 8, 8, 0.05);
-			pointsRoot.attachChild(pointShape);
-			pointShape.setUserData(new UserData(this, i));
-			pointShape.updateModelBound(); // important
-			pointShape.getSceneHints().setCullHint(CullHint.Always);
-		}
+//		final Vector3 origin = new Vector3();
+		for (int i = 0; i < numOfEditPoints; i++)
+			addNewEditPointShape(i);
+		
 		root.attachChild(pointsRoot);
 		root.attachChild(sizeAnnotRoot);
 		root.attachChild(angleAnnotRoot);
@@ -139,6 +135,21 @@ public abstract class HousePart implements Serializable {
 		
 		if (textureFileName == null)
 			textureFileName = getDefaultTextureFileName();
+	}
+
+	private void addNewEditPointShape(int i) {
+		final Sphere pointShape = new Sphere("Point", Vector3.ZERO, 8, 8, 0.05);
+		pointShape.setUserData(new UserData(this, i, true));
+		pointShape.updateModelBound(); // important
+		pointShape.getSceneHints().setCullHint(CullHint.Always);
+		pointsRoot.attachChild(pointShape);
+//		System.out.println(i);
+	}
+	
+	protected Spatial getEditPointShape(final int i) {
+		if (i >= pointsRoot.getNumberOfChildren())
+			addNewEditPointShape(i);
+		return pointsRoot.getChild(i);
 	}
 	
 	protected String getDefaultTextureFileName() {
@@ -500,7 +511,14 @@ public abstract class HousePart implements Serializable {
 	}
 	
 	public Mesh getMesh() {
-		return mesh;
+		return mesh;	
 	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + "), editPoint = " + editPointIndex;
+	}
+	
+	
 	
 }  
