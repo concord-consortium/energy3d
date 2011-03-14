@@ -518,6 +518,8 @@ Version 0.3 - March 7, 2011
 - fix problem with picking house parts instead of edit points by giving more priority to edit points
 - in custom roof use one edit point per wall for easier manipulation
 - fix problem with longer overhang on one side
+- control the custom roof height with a blue edit point
+- adjust the wall-top polygon offset so that the roof will render above it 
 
 
 - *fix problem with edit point disappearing after clicking on it
