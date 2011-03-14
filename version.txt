@@ -519,7 +519,11 @@ Version 0.3 - March 7, 2011
 - in custom roof use one edit point per wall for easier manipulation
 - fix problem with longer overhang on one side
 - control the custom roof height with a blue edit point
-- adjust the wall-top polygon offset so that the roof will render above it 
+- adjust the wall-top polygon offset so that the roof will render above it
+
+- add custom roof button to toolbar
+- make icon for the roof button
+- properly compute roof texture coordinates so that it appears horizontal on all sides
 
 
 - *fix problem with edit point disappearing after clicking on it
