@@ -66,13 +66,10 @@ public class CustomRoof extends Roof {
 		// shift the wall according to edgeLength
 		final double edgeLenght = 0.3;
 		final Vector3 op = new Vector3();
-//		for (PolygonPoint p : wallUpperPoints) {
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			final PolygonPoint p = wallUpperPoints.get(i);
-//			op.set(p.getX(), p.getY(), 0).subtractLocal(center.getX(), center.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
 			op.set(wallNormals.get(i)).multiplyLocal(edgeLenght);
 			op.addLocal(p.getX(), p.getY(), p.getZ());
-//			p.set(op.getX(), op.getY(), op.getZ() + 0.01);
 			p.set(op.getX(), op.getY(), op.getZ());
 		}
 		final double z = 2; // center.getZ() + height;
@@ -80,7 +77,6 @@ public class CustomRoof extends Roof {
 
 		if (wallUpperPoints.size() > points.size() * 2) {
 			final Vector3 v = new Vector3();
-//			System.out.println("Roof Edit Points:");
 			for (int i = 0; i < wallUpperPoints.size() - 1; i = i + 2) {
 				final PolygonPoint p1 = wallUpperPoints.get(i);
 				final PolygonPoint p2 = wallUpperPoints.get(i + 1);
@@ -93,7 +89,6 @@ public class CustomRoof extends Roof {
 					points.get(i + 1).set(v);
 				else
 					points.add(v.clone());
-//				System.out.println(v);
 			}
 		}
 	}

@@ -517,6 +517,7 @@ Version 0.3 - March 7, 2011
 - add wallNormals to roof to be used for overhang and custom roof points computations 
 - fix problem with picking house parts instead of edit points by giving more priority to edit points
 - in custom roof use one edit point per wall for easier manipulation
+- fix problem with longer overhang on one side
 
 
 - *fix problem with edit point disappearing after clicking on it

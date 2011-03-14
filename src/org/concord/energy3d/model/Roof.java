@@ -17,6 +17,7 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -151,8 +152,12 @@ public abstract class Roof extends HousePart {
 			poly.add(polygonPoint);
 			center.addLocal(p);
 			wallNormals.add(normal);
-		} else
-			wallNormals.set(index, wallNormals.get(index).add(normal, null));
+		} else {
+			final ReadOnlyVector3 n1 = wallNormals.get(index);
+			final double d = 1.0 / MathUtils.cos(n1.smallestAngleBetween(normal) / 2.0); // assuming thickness is 1
+			System.out.println("angle = " + n1.smallestAngleBetween(normal) + "\td = " + d);
+			wallNormals.set(index, n1.add(normal, null).normalizeLocal().multiplyLocal(d));
+		}
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {

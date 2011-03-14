@@ -62,8 +62,6 @@ public class SelectUtil {
 		int objCounter = 0;
 		HousePart prevHousePart = null;
 		final long pickLayer = SelectUtil.pickLayer == -1 ? -1 : SelectUtil.pickLayer % Math.max(1, pickResults.getNumber());
-		if (pickLayer != -1)
-			System.out.println("->" + pickLayer);
 		for (int i = 0; i < pickResults.getNumber(); i++) {
 			final PickData pick = pickResults.getPickData(i);
 			if (pick.getIntersectionRecord().getNumberOfIntersections() == 0)
@@ -90,20 +88,15 @@ public class SelectUtil {
 					pointDist_i = p.distance(intersectionPoint);
 					double adjust = 0;
 					if (userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) > 0.8)					
-//						pointDist_i -= 0.1;
 						adjust -= 0.1;	// give more priority because the wall is facing the camera
 					if (pickedHousePart != null && pickedHousePart.getUserData().isEditPoint() && !userData.isEditPoint())						
-//						pointDist_i += 1;
 						adjust += 1;	// give less priority because this is not a edit point and an edit point is already found
 					if (pointDist_i + adjust < pointDist && 
 							(userData.getIndex() != -1 || pickedHousePart == null || 
 									pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getIndex() == -1)) {
-						if (pickedHousePart != null)
-							System.out.println("> " + (pickedHousePart != null) + " and " +  pickedHousePart.getUserData().isEditPoint() + " and " + !userData.isEditPoint());
 						pickedHousePart = picked_i;
 						polyDist = polyDist_i;
 						pointDist = pointDist_i;
-						System.out.println(pick.getTarget());
 					}
 				}
 			}
@@ -117,17 +110,13 @@ public class SelectUtil {
 	}
 
 	public static HousePart selectHousePart(int x, int y, boolean edit) {
-		System.out.println("--------selectHousePart()-------------");
 		HousePart drawn = null;
 		HousePart lastHoveredObject = SceneManager.getInstance().getSelectedPart();
 		PickedHousePart selectedMesh = pickPart(x, y, housePartsNode);
-		System.out.println(selectedMesh);
 		UserData data = null;
 		if (selectedMesh != null)
 			data = selectedMesh.getUserData();
 		
-		System.out.println(data);
-
 		if (data == null) {
 			if (lastHoveredObject != null) {
 				lastHoveredObject.hidePoints();
