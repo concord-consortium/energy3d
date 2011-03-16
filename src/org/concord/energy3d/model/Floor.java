@@ -78,17 +78,12 @@ public class Floor extends HousePart {
 	}
 
 	private void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
-		try {
 			Poly2Tri.triangulate(polygon);
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
 			ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-//			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 0.1, 0);
 			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, new TPoint(0,0,0), new TPoint(1,0,0), new TPoint(0,1,0));
 			mesh.getMeshData().updateVertexCount();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
 	protected void computeAbsPoints() {
@@ -98,20 +93,24 @@ public class Floor extends HousePart {
 	}
 
 	protected void drawMesh() {
-		if (container == null) {
-			mesh.getSceneHints().setCullHint(CullHint.Always);
-			hidePoints();
-			return;
+		try {
+			if (container == null) {
+				mesh.getSceneHints().setCullHint(CullHint.Always);
+				hidePoints();
+				return;
+			}
+			
+			mesh.getSceneHints().setCullHint(CullHint.Inherit);
+			wallUpperPoints = exploreWallNeighbors((Wall) container);
+			fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
+
+			for (int i = 0; i < points.size(); i++)
+				pointsRoot.getChild(i).setTranslation(points.get(i));
+
+			mesh.updateModelBound();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		mesh.getSceneHints().setCullHint(CullHint.Inherit);
-		wallUpperPoints = exploreWallNeighbors((Wall) container);
-		fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
-
-		for (int i = 0; i < points.size(); i++)
-			pointsRoot.getChild(i).setTranslation(points.get(i));
-
-		mesh.updateModelBound();
 	}
 
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {

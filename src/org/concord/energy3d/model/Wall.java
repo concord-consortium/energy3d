@@ -334,11 +334,8 @@ public class Wall extends HousePart {
 			mesh.getMeshData().updateVertexCount();
 			mesh.updateModelBound();
 
-			// Vector3 n = drawBackMesh(polygon, fromXY);
 			drawBackMesh(polygon, fromXY);
-			// drawSurroundMesh(n);
 			drawSurroundMesh(thicknessNormal);
-			// drawWindowsSurroundMesh(n);
 			drawWindowsSurroundMesh(thicknessNormal);
 
 			backMesh.updateModelBound();
@@ -387,12 +384,11 @@ public class Wall extends HousePart {
 				reduceBackMeshWidth(polygon, dir, 1);
 			}
 
-		Poly2Tri.triangulate(polygon);
-		ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
-		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
-		backMesh.getMeshData().updateVertexCount();
-
-		backMesh.setTranslation(getThicknessNormal());
+			Poly2Tri.triangulate(polygon);
+			ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
+			ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
+			backMesh.getMeshData().updateVertexCount();	
+			backMesh.setTranslation(getThicknessNormal());
 	}
 
 	private void reduceBackMeshWidth(final Polygon polygon, final ReadOnlyVector3 wallDir, final int neighbor) {

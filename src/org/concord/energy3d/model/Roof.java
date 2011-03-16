@@ -110,13 +110,13 @@ public abstract class Roof extends HousePart {
 	}	
 
 	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
-		Poly2Tri.triangulate(polygon);
-		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
+			Poly2Tri.triangulate(polygon);
+			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 
-		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
-		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 2, new TPoint(0,0,0), new TPoint(1,0,0), new TPoint(0,1,0));
-		mesh.getMeshData().updateVertexCount();
+			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
+			ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
+			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 2, new TPoint(0,0,0), new TPoint(1,0,0), new TPoint(0,1,0));
+			mesh.getMeshData().updateVertexCount();
 	}
 
 	private void exploreWallNeighbors(Wall startWall) {
@@ -153,9 +153,12 @@ public abstract class Roof extends HousePart {
 			center.addLocal(p);
 			wallNormals.add(normal);
 		} else {
+			// calculate wall normal in such a way to help in drawing overhang of roofs
 			final ReadOnlyVector3 n1 = wallNormals.get(index);
-			final double d = 1.0 / MathUtils.cos(n1.smallestAngleBetween(normal) / 2.0); // assuming thickness is 1
+			final double d = 1.0 / MathUtils.cos(n1.normalize(null).smallestAngleBetween(normal) / 2.0); // assuming thickness is 1
 			System.out.println("angle = " + n1.smallestAngleBetween(normal) + "\td = " + d);
+			if (Double.isNaN(d))
+				System.out.println("nan");
 			wallNormals.set(index, n1.add(normal, null).normalizeLocal().multiplyLocal(d));
 		}
 	}

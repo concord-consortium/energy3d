@@ -712,6 +712,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		camera.setFrame(loc, left, up, dir);
+		control.reset();
 		cameraNode.updateFromCamera();
 	}
 

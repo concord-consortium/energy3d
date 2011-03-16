@@ -522,6 +522,8 @@ Version 0.3 - March 7, 2011
 - adjust the wall-top polygon offset so that the roof will render above it
 - properly compute roof texture coordinates so that it appears horizontal on all sides
 - compute roof texture coordinates so that texture size remains constant visually when resizing the roof
+- fix bug with wrong camera rotation after using mouse-scroll to zoom out when in print-preview mode
+- fix problem with orbit view sometimes with wrong center of rotation
 
 - add custom roof button to toolbar
 - make icon for the roof button
@@ -533,7 +535,7 @@ Version 0.3 - March 7, 2011
 
  
 
-- *fix problem with orbit view sometimes with wrong center of rotation 
+ 
 
 TODO:
 - automatically determine if the user is going with the drag approach or click approach when drawing house parts

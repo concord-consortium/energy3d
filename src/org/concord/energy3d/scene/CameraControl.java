@@ -219,4 +219,8 @@ public abstract class CameraControl {
 	public boolean isMouseEnabled() {
 		return mouseEnabled;
 	}
+	
+	public void reset() {
+		
+	}
 }
