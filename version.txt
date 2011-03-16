@@ -524,6 +524,7 @@ Version 0.3 - March 7, 2011
 - compute roof texture coordinates so that texture size remains constant visually when resizing the roof
 - fix bug with wrong camera rotation after using mouse-scroll to zoom out when in print-preview mode
 - fix problem with orbit view sometimes with wrong center of rotation
+- fix problem roof triangulation null pointer exception
 
 - add custom roof button to toolbar
 - make icon for the roof button
