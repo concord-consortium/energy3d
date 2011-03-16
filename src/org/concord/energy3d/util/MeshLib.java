@@ -74,69 +74,45 @@ public class MeshLib {
 	
 	private static void computeHorizontalTextureCoords(ArrayList<GroupData> groups) {
 		for (final GroupData group : groups) {
-//			int baseIndex_1 = 0;
-//			int baseIndex_2 = 1;
-//			for (int i = 2; i < group.vertices.size(); i++) {
-//				final double z = group.vertices.get(i).getZ();
-//				if (z < group.vertices.get(baseIndex_1).getZ())
-//					baseIndex_1 = i;
-//				else if (z < group.vertices.get(baseIndex_2).getZ())
-//					baseIndex_2 = i;
-//			}
-//			final Vector3 normal = new Vector3(group.normals.get(0));
-//			normal.setZ(0);
-//			final double angle = normal.smallestAngleBetween(Vector3.UNIT_Y.negate(null));
-////			final Vector3 rotAxis = normal.cross(Vector3.UNIT_Y, null);
-//			final Matrix3 matrix = new Matrix3().fromAngles(0, 0, angle); //.fromAngleAxis(angle, rotAxis);
-////			final Vector3 base = new Vector3(group.vertices.get(baseIndex_2)).subtractLocal(group.vertices.get(baseIndex_1)).normalizeLocal();
-////			final double angle_2 = base.smallestAngleBetween(Vector3.UNIT_X);
-////			matrix.multiplyLocal(new Matrix3().fromAngles(0, angle_2, 0));
-//			System.out.println("angle = " + (int)(angle / Math.PI * 180));
-//			matrix.fromAngles(0, 0, angle);
-//			base.su
-
+//			System.out.println("---");
 			final Vector3 normal = group.normals.get(0);
+//			System.out.println("normal = " + Util.toString(normal));
+			
 			final Vector3 n1 = new Vector3();
 			n1.set(normal.getX(), normal.getY(), 0).normalizeLocal();
-//			normal.setZ(0);
-//			normal.normalizeLocal();
-//			final double angle = normal.smallestAngleBetween(Vector3.UNIT_Y.negate(null));
-			final double angle = -n1.smallestAngleBetween(Vector3.UNIT_Y);
+			double angleZ = n1.smallestAngleBetween(Vector3.NEG_UNIT_Y);
 			
+			if (n1.dot(Vector3.UNIT_X) > 0)
+				angleZ = -angleZ;
+				
 			
-			final Matrix3 matrix = new Matrix3().fromAngles(0, 0, angle);
+			final Matrix3 matrixZ = new Matrix3().fromAngles(0, 0, angleZ);
+//			System.out.println("angle = " + Util.degree(angleZ));
 			
 			final Vector3 n2 = new Vector3();
-			matrix.applyPost(normal, n2);
-			System.out.println("n2 = " + n2);
-			final double angleX = n2.smallestAngleBetween(Vector3.UNIT_Y.negate(null));
-			System.out.println("angleX = " + (int)(angleX / Math.PI * 180));
-			matrix.multiplyLocal(new Matrix3().fromAngles(-angleX, 0, 0));
+			matrixZ.applyPost(normal, n2);
+//			System.out.println("n2 = " + Util.toString(n2));
+			final double angleX = n2.smallestAngleBetween(Vector3.NEG_UNIT_Y);						
 			
-			final Vector3 min = new Vector3(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-			final Vector3 max = new Vector3(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
-			for (final Vector3 p : group.vertices) {
-				min.set(Math.min(min.getX(), p.getX()), Math.min(min.getY(), p.getY()), Math.min(min.getZ(), p.getZ()));
-				max.set(Math.max(max.getX(), p.getX()), Math.max(max.getY(), p.getY()), Math.max(max.getZ(), p.getZ()));
-			}
-			final double maxV = max.getZ() - min.getZ();
-			min.setZ(0);
-			max.setZ(0);
-			final double maxU = min.distance(max);
-			System.out.println("---");
+//			System.out.println("angleX = " + Util.degree(angleX));
+			final Matrix3 matrix = new Matrix3().fromAngles(angleX, 0, 0).multiplyLocal(matrixZ);
+			
+			double minV = Double.MAX_VALUE;
+			
 			for (int i = 0; i < group.vertices.size(); i++) {
 				final Vector3 p = group.vertices.get(i).clone();
-//				System.out.println(p);
+//				System.out.println(Util.toString(p));
 				matrix.applyPost(p, p);
-//				System.out.println(p);
-//				p.subtractLocal(min);
 				final double v = p.getZ();
-				System.out.println("z = " + p.getZ());
-//				p.setZ(0);
 				final double u = p.getX();
 				group.textures.get(i).set(u, v);
-				System.out.println(u + ", " + v + "\t\t\t" + p);
+				if (minV > v)
+					minV = v;
+//				System.out.println(Util.toString(p) + "\t" + Util.toString(u) + ", " + Util.toString(v));
 			}
+			
+			for (final Vector2 t : group.textures)
+				t.addLocal(0, -minV);			
 		}
 	}
 
