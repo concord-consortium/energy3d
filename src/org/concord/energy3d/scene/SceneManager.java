@@ -434,10 +434,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						MouseState mouseState = inputStates.getCurrent().getMouseState();
 						if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 							if (drawn == null || drawn.isDrawCompleted()) {
-								if (drawn != null)
-									drawn.hidePoints();
+								final HousePart previousDrawn = drawn;
 								drawn = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
 								System.out.print("Clicked on: " + drawn);
+								if (previousDrawn != null && previousDrawn != drawn)
+									previousDrawn.hidePoints();								
 								SelectUtil.nextPickLayer();
 							}
 						} else

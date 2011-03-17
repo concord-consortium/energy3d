@@ -210,6 +210,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void hidePoints() {
+		System.out.println("HidePoints: " + this);
 		for (int i = 0; i < points.size(); i++)
 			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 	}

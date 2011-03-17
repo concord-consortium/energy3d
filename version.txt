@@ -532,8 +532,8 @@ Version 0.3 - March 7, 2011
 - make icon for the roof button
 - improve the overhang in hip and pyramid roofs
 - make the height edit point blue in hip and pyramid roofs
+- fix problem with edit point hiding after clicking on it
 
-- *fix problem with edit point disappearing after clicking on it
 - *allow rotation of scene with respect to north
 
 
