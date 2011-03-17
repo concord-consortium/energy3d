@@ -37,6 +37,7 @@ import com.ardor3d.util.TextureManager;
 public abstract class Roof extends HousePart {
 	static private final long serialVersionUID = 1L;
 	static protected final double GRID_SIZE = 0.5;
+	static private final double OVERHANG_LENGHT = 0.3;
 	transient protected Mesh bottomMesh;
 	transient protected Node flattenedMeshesRoot;
 	transient private ArrayList<PolygonPoint> wallUpperPoints;
@@ -64,7 +65,9 @@ public abstract class Roof extends HousePart {
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		bottomMesh.setRenderState(ms);
 
-		updateTextureAndColor(Scene.getInstance().isTextureEnabled());		
+		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
+		
+		((Mesh)getEditPointShape(0)).setDefaultColor(ColorRGBA.CYAN);
 	}
 
 	protected void computeAbsPoints() {
@@ -334,5 +337,14 @@ public abstract class Roof extends HousePart {
 		return "roof.jpg";
 	}
 
-	protected abstract void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals);
+	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
+		final Vector3 op = new Vector3();
+		for (int i = 0; i < wallUpperPoints.size(); i++) {
+			final PolygonPoint p = wallUpperPoints.get(i);
+			op.set(wallNormals.get(i)).multiplyLocal(OVERHANG_LENGHT);
+			op.addLocal(p.getX(), p.getY(), p.getZ());
+			p.set(op.getX(), op.getY(), op.getZ());
+		}
+		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+	}
 }

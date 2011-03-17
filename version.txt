@@ -530,7 +530,8 @@ Version 0.3 - March 7, 2011
 - avoid attaching two roof parts (in print-preview) when they have a same normal but are not attached to each other
 - add custom roof button to toolbar
 - make icon for the roof button
-
+- improve the overhang in hip and pyramid roofs
+- make the height edit point blue in hip and pyramid roofs
 
 - *fix problem with edit point disappearing after clicking on it
 - *allow rotation of scene with respect to north

@@ -19,8 +19,7 @@ public class CustomRoof extends Roof {
 	private static final double GRID_SIZE = 0.5;
 
 	public CustomRoof() {
-		super(1, 1, 0.5);
-		((Mesh)getEditPointShape(0)).setDefaultColor(ColorRGBA.CYAN);
+		super(1, 1, 0.5);		
 	}
 
 	public void setPreviewPoint(int x, int y) {
@@ -71,17 +70,20 @@ public class CustomRoof extends Roof {
 
 	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
 		// shift the wall according to edgeLength
-		final double edgeLenght = 0.3;
-		final Vector3 op = new Vector3();
-		for (int i = 0; i < wallUpperPoints.size(); i++) {
-			final PolygonPoint p = wallUpperPoints.get(i);
-			op.set(wallNormals.get(i)).multiplyLocal(edgeLenght);
-			op.addLocal(p.getX(), p.getY(), p.getZ());
-			p.set(op.getX(), op.getY(), op.getZ());
-		}
+//		final double edgeLenght = 0.3;
+//		final Vector3 op = new Vector3();
+//		for (int i = 0; i < wallUpperPoints.size(); i++) {
+//			final PolygonPoint p = wallUpperPoints.get(i);
+//			op.set(wallNormals.get(i)).multiplyLocal(OVERHANG_LENGHT);
+//			op.addLocal(p.getX(), p.getY(), p.getZ());
+//			p.set(op.getX(), op.getY(), op.getZ());
+//		}
+		
+		super.processRoofPoints(wallUpperPoints, wallNormals);
+		
 		final double z = center.getZ() + height;
-		System.out.println(z);
-		points.get(0).set(center.getX(), center.getY(), z);
+//		System.out.println(z);
+//		points.get(0).set(center.getX(), center.getY(), z);
 
 		if (wallUpperPoints.size() > points.size() * 2) {
 			final Vector3 v = new Vector3();
