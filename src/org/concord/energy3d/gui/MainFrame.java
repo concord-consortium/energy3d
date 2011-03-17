@@ -117,6 +117,7 @@ public class MainFrame extends JFrame {
 	private JLabel latitudeLabel = null;
 	private JComboBox cityComboBox = null;
 	private JSpinner latitudeSpinner = null;
+	private JToggleButton roofCustomButton = null;
 	
 	public static MainFrame getInstance() {
 		return instance;
@@ -189,6 +190,7 @@ public class MainFrame extends JFrame {
 			appToolbar.add(getWindowButton());
 			appToolbar.add(getRoofButton());
 			appToolbar.add(getRoofHipButton());
+			appToolbar.add(getRoofCustomButton());
 			appToolbar.add(getFloorButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
@@ -213,6 +215,7 @@ public class MainFrame extends JFrame {
 			bg.add(windowButton);
 			bg.add(roofButton);
 			bg.add(roofHipButton);
+			bg.add(roofCustomButton);
 			bg.add(floorButton);
 		}
 		return appToolbar;
@@ -297,7 +300,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton getRoofButton() {
 		if (roofButton == null) {
 			roofButton = new JToggleButton();
-			roofButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/pyramid.png")));
+			roofButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_pyramid.png")));
 			roofButton.setToolTipText("Draw pyramid roof");
 			roofButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -497,7 +500,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton getRoofHipButton() {
 		if (roofHipButton == null) {
 			roofHipButton = new JToggleButton();
-			roofHipButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/hip.png")));
+			roofHipButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_hip.png")));
 			roofHipButton.setToolTipText("Draw hip roof");
 			roofHipButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -1100,6 +1103,31 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return latitudeSpinner;
+	}
+
+	/**
+	 * This method initializes roofCustomButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getRoofCustomButton() {
+		if (roofCustomButton == null) {
+			roofCustomButton = new JToggleButton();
+			roofCustomButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_custom.png")));
+			roofCustomButton.setToolTipText("Draw custom roof");
+			roofCustomButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_CUSTOM);
+				}
+			});
+			roofCustomButton.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseClicked(java.awt.event.MouseEvent e) {
+					if (e.getClickCount() > 1)
+						SceneManager.getInstance().setOperationStick(true);
+				}
+			});
+		}
+		return roofCustomButton;
 	}
 
 	/**

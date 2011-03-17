@@ -528,8 +528,6 @@ Version 0.3 - March 7, 2011
 - fix problem with fatal exception when the angle between two neighboring walls is too small
 - fix problem with new wall thickness direction computed based on camera instead of neighbors
 - avoid attaching two roof parts (in print-preview) when they have a same normal but are not attached to each other
-
-
 - add custom roof button to toolbar
 - make icon for the roof button
 

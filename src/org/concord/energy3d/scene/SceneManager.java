@@ -16,6 +16,7 @@ import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HipRoof;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PyramidRoof;
 import org.concord.energy3d.model.Wall;
@@ -111,7 +112,7 @@ import com.google.common.base.Predicates;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 	public enum Operation {
-		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR
+		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM
 	}
 
 	public enum CameraMode {
@@ -804,7 +805,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else if (operation == Operation.DRAW_ROOF)
 			drawn = new PyramidRoof();
 		else if (operation == Operation.DRAW_ROOF_HIP)
-//			drawn = new HipRoof();
+			drawn = new HipRoof();
+		else if (operation == Operation.DRAW_ROOF_CUSTOM)
 			drawn = new CustomRoof();
 		else if (operation == Operation.DRAW_FLOOR)
 			drawn = new Floor();
