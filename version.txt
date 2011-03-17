@@ -525,6 +525,8 @@ Version 0.3 - March 7, 2011
 - fix bug with wrong camera rotation after using mouse-scroll to zoom out when in print-preview mode
 - fix problem with orbit view sometimes with wrong center of rotation
 - fix problem roof triangulation null pointer exception
+- fix problem with fatal exception when the angle between two neighboring walls is too small
+- fix problem with new wall thickness direction computed based on camera instead of neighbors
 
 - add custom roof button to toolbar
 - make icon for the roof button

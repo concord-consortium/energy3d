@@ -384,11 +384,21 @@ public class Wall extends HousePart {
 				reduceBackMeshWidth(polygon, dir, 1);
 			}
 
-			Poly2Tri.triangulate(polygon);
+			backMesh.setTranslation(getThicknessNormal());
+
+//			Poly2Tri.triangulate(polygon);
+			try {
+				Poly2Tri.triangulate(polygon);
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				System.out.println("Triangulate exception received with the following polygon:");
+				for (TriangulationPoint p : polygon.getPoints())
+					System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
+				throw e;
+			}
 			ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
 			ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
 			backMesh.getMeshData().updateVertexCount();	
-			backMesh.setTranslation(getThicknessNormal());
 	}
 
 	private void reduceBackMeshWidth(final Polygon polygon, final ReadOnlyVector3 wallDir, final int neighbor) {
@@ -424,14 +434,14 @@ public class Wall extends HousePart {
 		final Vector3 p02 = points.get(2).subtract(points.get(0), null).normalizeLocal();
 		final Vector3 p01 = points.get(1).subtract(points.get(0), null).normalizeLocal();
 		final Vector3 n = p02.crossLocal(p01).normalizeLocal();
-
+		
 		final Snap neighbor;
-		if (editPointIndex != -1)
-			neighbor = neighbors[editPointIndex < 2 ? 0 : 1];
-		else if (isFirstPointInserted())
-			neighbor = neighbors[1];
-		else
-			neighbor = neighbors[0];
+//		if (editPointIndex != -1)
+			neighbor = neighbors[editPointIndex == 0 || editPointIndex == 1 ? 1 : 0];
+//		else if (isFirstPointInserted())
+//			neighbor = neighbors[1];
+//		else
+//			neighbor = neighbors[0];
 
 		if (neighbor != null && neighbor.getNeighborOf(this).getPoints().size() >= 4) {
 			final ArrayList<Vector3> otherPoints = neighbor.getNeighborOf(this).getPoints();
@@ -449,6 +459,7 @@ public class Wall extends HousePart {
 				cull(false);
 			}
 		}
+		System.out.println(n + "");
 		n.multiplyLocal(wallThickness);
 		thicknessNormal = n;
 		return thicknessNormal;

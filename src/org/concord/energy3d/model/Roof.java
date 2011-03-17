@@ -11,6 +11,7 @@ import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
+import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
@@ -110,7 +111,15 @@ public abstract class Roof extends HousePart {
 	}	
 
 	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
-			Poly2Tri.triangulate(polygon);
+			try {
+				Poly2Tri.triangulate(polygon);
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				System.out.println("Triangulate exception received with the following polygon:");
+				for (TriangulationPoint p : polygon.getPoints())
+					System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
+				throw e;
+			}
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 
 			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
