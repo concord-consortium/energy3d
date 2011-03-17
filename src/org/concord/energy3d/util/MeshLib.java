@@ -48,9 +48,13 @@ public class MeshLib {
 			
 			GroupData group = null;
 			for (final GroupData g : groups) {
-				if (g.key.dot(norm) > 0.999) {	// if there is less than 2 degrees difference between the two vectors
-					group = g;
-					break;
+//				if (g.key.dot(norm) > 0.999) {	// if there is less than 2 degrees difference between the two vectors
+				if (g.key.dot(norm) > 0.99) {	// if there is less than 8 degrees difference between the two vectors
+					for (final Vector3 groupPoint : g.vertices)
+						if (groupPoint.equals(p1) || groupPoint.equals(p2) || groupPoint.equals(p3)) {
+							group = g;
+							break;
+						}
 				}
 			}			
 			
