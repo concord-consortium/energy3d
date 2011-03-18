@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.MeshLib;
+import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
@@ -135,29 +136,29 @@ public abstract class Roof extends HousePart {
 		wallUpperPoints.clear();
 		wallNormals.clear();
 		center.set(0, 0, 0);
-//		final ArrayList<PolygonPoint> wallUpperPoints = new ArrayList<PolygonPoint>();
 		startWall.visitNeighbors(new WallVisitor() {
-			public void visit(Wall currentWall, Snap prev, Snap next) {
-				int pointIndex = 0;
-				if (next != null)
-					pointIndex = next.getSnapPointIndexOf(currentWall);
-				pointIndex = pointIndex + 1;
-				final Vector3 p1 = currentWall.getPoints().get(pointIndex == 1 ? 3 : 1);
-				final Vector3 p2 = currentWall.getPoints().get(pointIndex);
+			public void visit(Wall currentWall, Snap prevSnap, Snap nextSnap) {
+				final int pointIndex2;
+				if (nextSnap != null)
+					pointIndex2 = nextSnap.getSnapPointIndexOf(currentWall) + 1;
+				else
+					pointIndex2 = 0 + 1;
+				final int pointIndex1 = pointIndex2 == 1 ? 3 : 1;
+				final Vector3 p1 = currentWall.getPoints().get(pointIndex1);
+				final Vector3 p2 = currentWall.getPoints().get(pointIndex2);
 				final ReadOnlyVector3 normal = currentWall.getFaceDirection();
 				addPointToPolygon(wallUpperPoints, p1, center, wallNormals, normal);
 				addPointToPolygon(wallUpperPoints, p2, center, wallNormals, normal);
 			}
-
 		});
 
 		center.multiplyLocal(1.0 / wallUpperPoints.size());
 		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
-
-//		return wallUpperPoints;
 	}
 
 	private void addPointToPolygon(final ArrayList<PolygonPoint> poly, final Vector3 p, final Vector3 center, final ArrayList<ReadOnlyVector3> wallNormals, final ReadOnlyVector3 normal) {
+		System.out.println("-----------------------");
+		System.out.println(Util.toString(p));
 		final PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 		final int index = poly.indexOf(polygonPoint);
 		if (index == -1) {
@@ -168,10 +169,12 @@ public abstract class Roof extends HousePart {
 			// calculate wall normal in such a way to help in drawing overhang of roofs
 			final ReadOnlyVector3 n1 = wallNormals.get(index);
 			final double d = 1.0 / MathUtils.cos(n1.normalize(null).smallestAngleBetween(normal) / 2.0); // assuming thickness is 1
-			System.out.println("angle = " + n1.smallestAngleBetween(normal) + "\td = " + d);
-			if (Double.isNaN(d))
-				System.out.println("nan");
-			wallNormals.set(index, n1.add(normal, null).normalizeLocal().multiplyLocal(d));
+//			System.out.println("angle = " + Util.degree(n1.smallestAngleBetween(normal)) + "\td = " + d);
+//			System.out.println("normal = " + Util.toString(normal));
+//			System.out.println("n1 = " + Util.toString(n1));
+			final Vector3 result = n1.add(normal, null).normalizeLocal().multiplyLocal(d);
+//			System.out.println("result = " + Util.toString(result));
+			wallNormals.set(index, result);
 		}
 	}
 

@@ -533,8 +533,11 @@ Version 0.3 - March 7, 2011
 - improve the overhang in hip and pyramid roofs
 - make the height edit point blue in hip and pyramid roofs
 - fix problem with edit point hiding after clicking on it
+- improve wall visitor to avoid visiting the last wall when in the loop
+- fix problem with uneven overhang length in the roofs
 
 - *allow rotation of scene with respect to north
+- after deleting roof it stays in draw list
 
 
  

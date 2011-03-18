@@ -5,9 +5,9 @@ import java.io.Serializable;
 public class Snap implements Serializable {
 	static private final long serialVersionUID = 1L;
 	static private int currentAnnotationDrawnStamp = 1;
-	static private int currentVisitStamp = 1;
 	transient private int annotationDrawn;
-	transient private int visitStamp;
+//	static private int currentVisitStamp = 1;
+//	transient private int visitStamp;
 	private Wall neighbor1;
 	private Wall neighbor2;
 	private int pointIndex1;
@@ -17,9 +17,9 @@ public class Snap implements Serializable {
 		currentAnnotationDrawnStamp = ++currentAnnotationDrawnStamp % 1000;
 	}
 	
-	public static void clearVisits() {
-		currentVisitStamp = ++currentVisitStamp % 1000;
-	}	
+//	public static void clearVisits() {
+//		currentVisitStamp = ++currentVisitStamp % 1000;
+//	}	
 	
 	public Snap(Wall neighbor1, Wall neighbor2, int pointIndex1, int pointIndex2) {
 		this.neighbor1 = neighbor1;
@@ -57,13 +57,13 @@ public class Snap implements Serializable {
 		return annotationDrawn == currentAnnotationDrawnStamp;
 	}
 
-	public boolean isVisited() {
-		return visitStamp == currentVisitStamp;
-	}
-
-	public void visit() {
-		visitStamp = currentVisitStamp;
-	}	
+//	public boolean isVisited() {
+//		return visitStamp == currentVisitStamp;
+//	}
+//
+//	public void visit() {
+//		visitStamp = currentVisitStamp;
+//	}	
 	
 
 	@Override

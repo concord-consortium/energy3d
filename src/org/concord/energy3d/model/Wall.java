@@ -36,6 +36,8 @@ public class Wall extends HousePart {
 	static private final double GRID_SIZE = 0.5;
 	static private final double MIN_WALL_LENGTH = 0.1;
 	static private double defaultWallHeight = 1f;
+	static private int currentVisitStamp = 1;
+	transient private int visitStamp;
 	transient private Mesh backMesh;
 	transient private Mesh surroundMesh;
 	transient private Mesh invisibleMesh;
@@ -46,6 +48,10 @@ public class Wall extends HousePart {
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
+	
+	public static void clearVisits() {
+		currentVisitStamp = ++currentVisitStamp % 1000;
+	}	
 
 	public Wall() {
 		super(2, 4, defaultWallHeight, true);
@@ -725,32 +731,43 @@ public class Wall extends HousePart {
 	protected void visitNeighbors(final WallVisitor visitor) {
 		Wall currentWall = this;
 		Wall prevWall = null;
-		Snap.clearVisits();
-		while (currentWall != null) {
-			final Snap next = currentWall.next(prevWall);
+//		Snap.clearVisits();
+		Wall.clearVisits();
+		
+//		while (currentWall != null) {
+		while (currentWall != null && !currentWall.isVisited()) {
+//			if (next == null || next.isVisited())
+//			if (currentWall.isVisited())
+//				break;
+			currentWall.visit();
 			prevWall = currentWall;
-			if (next == null || next.isVisited())
-				break;
+			final Snap next = currentWall.next(prevWall);
 			currentWall = (Wall) next.getNeighborOf(currentWall);
-			next.visit();
+//			next.visit();
 		}
 
-		Snap.clearVisits();
+//		Snap.clearVisits();
+		Wall.clearVisits();
 		prevWall = null;
 		Snap prev = null;
-		while (currentWall != null) {
+//		while (currentWall != null) {
+		while (currentWall != null && !currentWall.isVisited()) {
+
+//			if (next == null || next.isVisited())
+//			if (currentWall.isVisited())
+//				break;
+//			else {
+//				next.visit();
+//				(neighbors[0] != next ? neighbors[0] : neighbors[1]).visit();
+//				currentWall.neighbors[0].visit();
+//				currentWall.neighbors[1].visit();
 			final Snap next = currentWall.next(prevWall);
-
 			visitor.visit(currentWall, prev, next);
-
-			prevWall = currentWall;
-			prev = next;
-			if (next == null || next.isVisited())
-				break;
-			else {
+				currentWall.visit();
+				prev = next;
+				prevWall = currentWall;
 				currentWall = (Wall) next.getNeighborOf(currentWall);
-				next.visit();
-			}
+//			}
 		}
 	}
 
@@ -780,31 +797,28 @@ public class Wall extends HousePart {
 
 	protected void visitNeighborsForward(final boolean forward, final WallVisitor visitor) {
 		Wall currentWall = null;
-		// Wall prevWall = null;
 
-		Snap.clearVisits();
+//		Snap.clearVisits();
+		Wall.clearVisits();
 		Snap prev = neighbors[forward ? 0 : 1];
 		Snap next = neighbors[forward ? 1 : 0];
 		if (next == null)
 			return;
 		else
 			currentWall = next.getNeighborOf(this);
-		// if (prev != null)
-		// prevWall = prev.getNeighborOf(this);
 		while (currentWall != null) {
 			prev = next;
 			next = currentWall.next(next);
-			// final Snap next = currentWall.next(prevWall);
 
 			visitor.visit(currentWall, prev, next);
 
-			// prevWall = currentWall;
-			// prev = next;
-			if (next == null || next.isVisited())
+//			if (next == null || next.isVisited())
+			if (currentWall.isVisited())
 				break;
 			else {
+				currentWall.visit();
 				currentWall = (Wall) next.getNeighborOf(currentWall);
-				next.visit();
+//				next.visit();
 			}
 		}
 	}
@@ -864,4 +878,12 @@ public class Wall extends HousePart {
 		return "wall.jpg";
 	}
 
+	public boolean isVisited() {
+		return visitStamp == currentVisitStamp;
+	}
+
+	public void visit() {
+		visitStamp = currentVisitStamp;
+	}	
+	
 }
