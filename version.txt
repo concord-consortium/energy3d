@@ -536,6 +536,7 @@ Version 0.3 - March 7, 2011
 - improve wall visitor to avoid visiting the last wall when in the loop
 - fix problem with uneven overhang length in the roofs
 - make the wall visitor implementation more efficient
+- hide the bottom mesh of the roof when the height is zero
 
 - *allow rotation of scene with respect to north
 - after deleting roof it stays in draw list

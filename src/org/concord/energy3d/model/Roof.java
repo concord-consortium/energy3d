@@ -86,7 +86,7 @@ public abstract class Roof extends HousePart {
 				return;
 			}
 			flattenedMeshesRoot.getSceneHints().setCullHint(CullHint.Inherit);
-			bottomMesh.getSceneHints().setCullHint(CullHint.Inherit);
+			bottomMesh.getSceneHints().setCullHint(height > 0 ? CullHint.Inherit : CullHint.Always);
 
 			exploreWallNeighbors((Wall) container);
 			processRoofPoints(wallUpperPoints, wallNormals);
