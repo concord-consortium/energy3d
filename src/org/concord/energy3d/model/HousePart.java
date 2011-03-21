@@ -9,6 +9,7 @@ import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
@@ -516,7 +517,12 @@ public abstract class HousePart implements Serializable {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + "), editPoint = " + editPointIndex;
+//		return this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + "), editPoint = " + editPointIndex;
+		String s = this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + ")";
+		for (int i = 0; i < points.size(); i += 2)
+			s += "\t" + Util.toString(points.get(i));
+		s += ("\teditPoint = " + editPointIndex);
+		return s;
 	}
 	
 }  

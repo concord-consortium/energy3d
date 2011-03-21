@@ -118,11 +118,11 @@ public class Foundation extends HousePart {
 				}
 			} else {
 				int lower = (editPointIndex == 1) ? 0 : 2;
-				System.out.println("x,y = " + x + "," + y);
+//				System.out.println("x,y = " + x + "," + y);
 				Vector3 base = abspoints.get(lower);
-				System.out.println("base = " + base);
+//				System.out.println("base = " + base);
 				Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
-				System.out.println("closest = " + closestPoint);
+//				System.out.println("closest = " + closestPoint);
 				closestPoint = grid(closestPoint, GRID_SIZE);
 				newBoundingHeight = Math.max(0, closestPoint.getZ() - base.getZ());
 				applyNewHeight(boundingHeight, newBoundingHeight, false);

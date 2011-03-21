@@ -157,8 +157,8 @@ public abstract class Roof extends HousePart {
 	}
 
 	private void addPointToPolygon(final ArrayList<PolygonPoint> poly, final Vector3 p, final Vector3 center, final ArrayList<ReadOnlyVector3> wallNormals, final ReadOnlyVector3 normal) {
-		System.out.println("-----------------------");
-		System.out.println(Util.toString(p));
+//		System.out.println("-----------------------");
+//		System.out.println(Util.toString(p));
 		final PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 		final int index = poly.indexOf(polygonPoint);
 		if (index == -1) {

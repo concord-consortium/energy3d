@@ -38,7 +38,7 @@ public class CustomRoof extends Roof {
 			final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
 			Vector3 p = new Vector3();
 			if (pickRay.intersectsPlane(new Plane(Vector3.UNIT_Z, points.get(0).getZ()), p)) {
-				System.out.println("moving to: " + p);
+//				System.out.println("moving to: " + p);
 				// Vector3 p = closestPoint(points.get(0), Vector3.UNIT_Y, x, y);
 				p = grid(p, GRID_SIZE);
 				points.get(editPointIndex).set(p);
