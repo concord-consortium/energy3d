@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.MeshLib;
-import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
@@ -68,7 +67,7 @@ public abstract class Roof extends HousePart {
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 		
-		((Mesh)getEditPointShape(0)).setDefaultColor(ColorRGBA.CYAN);
+		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
 	}
 
 	protected void computeAbsPoints() {

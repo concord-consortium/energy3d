@@ -232,10 +232,10 @@ public class Foundation extends HousePart {
 	}	
 
 	@Override	
-	public void editPoint(int i) {
+	public void setEditPoint(int i) {
 		if (!resizeHouseMode && i > 3)
 			i -= 4;
-		super.editPoint(i);
+		super.setEditPoint(i);
 	}
 	
 	@Override	

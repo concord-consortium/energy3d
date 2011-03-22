@@ -6,13 +6,11 @@ import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.scenegraph.Mesh;
 
 public class CustomRoof extends Roof {
 	private static final long serialVersionUID = 1L;
@@ -31,15 +29,12 @@ public class CustomRoof extends Roof {
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ());
 			final double z = center.getZ() + height;
-//			points.get(0).set(center.getX(), center.getY(), z);
 			for (final Vector3 v : points)
 				v.setZ(z);
-		} else if (editPointIndex > 0) { // 1 || editPointIndex == 2) {
+		} else if (editPointIndex > 0) {
 			final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
 			Vector3 p = new Vector3();
 			if (pickRay.intersectsPlane(new Plane(Vector3.UNIT_Z, points.get(0).getZ()), p)) {
-//				System.out.println("moving to: " + p);
-				// Vector3 p = closestPoint(points.get(0), Vector3.UNIT_Y, x, y);
 				p = grid(p, GRID_SIZE);
 				points.get(editPointIndex).set(p);
 			}
@@ -51,15 +46,6 @@ public class CustomRoof extends Roof {
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
-		// upper points
-//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
-		// if (editPointIndex == -1) {
-		// points.get(1).set(center.getX(), center.getY()-1, center.getZ() + height);
-		// points.get(2).set(center.getX(), center.getY()+1, center.getZ() + height);
-		// } else {
-		// points.get(1).setZ(center.getZ() + height);
-		// points.get(2).setZ(center.getZ() + height);
-		// }
 		final Polygon polygon = new Polygon(wallUpperPoints);
 		for (int i = 1; i < points.size(); i++) {
 			final Vector3 p = points.get(i);
@@ -69,22 +55,10 @@ public class CustomRoof extends Roof {
 	}
 
 	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
-		// shift the wall according to edgeLength
-//		final double edgeLenght = 0.3;
-//		final Vector3 op = new Vector3();
-//		for (int i = 0; i < wallUpperPoints.size(); i++) {
-//			final PolygonPoint p = wallUpperPoints.get(i);
-//			op.set(wallNormals.get(i)).multiplyLocal(OVERHANG_LENGHT);
-//			op.addLocal(p.getX(), p.getY(), p.getZ());
-//			p.set(op.getX(), op.getY(), op.getZ());
-//		}
-		
 		super.processRoofPoints(wallUpperPoints, wallNormals);
 		
+		// add or update edit points
 		final double z = center.getZ() + height;
-//		System.out.println(z);
-//		points.get(0).set(center.getX(), center.getY(), z);
-
 		if (wallUpperPoints.size() > points.size()) {
 			final Vector3 v = new Vector3();
 			for (int i = 0; i < wallUpperPoints.size() - 1; i = i + 1) {

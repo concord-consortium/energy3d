@@ -147,10 +147,10 @@ public abstract class HousePart implements Serializable {
 //		System.out.println(i);
 	}
 	
-	protected Spatial getEditPointShape(final int i) {
+	public Mesh getEditPointShape(final int i) {
 		if (i >= pointsRoot.getNumberOfChildren())
 			addNewEditPointShape(i);
-		return pointsRoot.getChild(i);
+		return (Mesh)pointsRoot.getChild(i);
 	}
 	
 	protected String getDefaultTextureFileName() {
@@ -215,7 +215,7 @@ public abstract class HousePart implements Serializable {
 			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 	}
 
-	public void editPoint(int i) {
+	public void setEditPoint(int i) {
 		editPointIndex = i;
 		drawCompleted = false;
 	}

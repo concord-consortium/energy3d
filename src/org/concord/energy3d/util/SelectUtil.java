@@ -1,5 +1,7 @@
 package org.concord.energy3d.util;
 
+import java.awt.Color;
+
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.Roof;
@@ -13,9 +15,11 @@ import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -25,6 +29,8 @@ public class SelectUtil {
 	private static Mesh floor;
 	private static Node housePartsNode;	
 	private static int pickLayer = -1;
+	private static ColorRGBA currentEditPointOriginalColor = new ColorRGBA();
+	private static Mesh currentEditPointShape;
 	
 	static {
 		pickResults.setCheckDistance(true);		
@@ -116,6 +122,19 @@ public class SelectUtil {
 		UserData data = null;
 		if (selectedMesh != null)
 			data = selectedMesh.getUserData();
+
+		// set the color of edit point that the mouse currently hovers on to red
+		if (data == null || !data.isEditPoint() || currentEditPointShape != data.getHousePart().getEditPointShape(data.getIndex())) {
+			if (currentEditPointShape != null) {
+				currentEditPointShape.setDefaultColor(currentEditPointOriginalColor);
+				currentEditPointShape = null;
+			}
+		}
+		if (data != null && data.isEditPoint() && currentEditPointShape != data.getHousePart().getEditPointShape(data.getIndex())) {
+			currentEditPointShape = data.getHousePart().getEditPointShape(data.getIndex());
+			currentEditPointOriginalColor.set(currentEditPointShape.getDefaultColor());
+			currentEditPointShape.setDefaultColor(ColorRGBA.YELLOW);
+		}
 		
 		if (data == null) {
 			if (lastHoveredObject != null) {
@@ -124,11 +143,11 @@ public class SelectUtil {
 				Blinker.getInstance().setTarget(null);
 			}
 		} else if (edit && data.isEditPoint()) {
-			drawn = data.getHousePart();
+			drawn = data.getHousePart();			
 			int pointIndex = data.getIndex();
 			if (SceneManager.getInstance().isTopView() && drawn instanceof Wall)
 				pointIndex -= 1;
-			data.getHousePart().editPoint(pointIndex);
+			data.getHousePart().setEditPoint(pointIndex);
 		} else {
 			HousePart housePart = data.getHousePart();
 			drawn = housePart;

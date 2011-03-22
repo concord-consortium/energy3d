@@ -540,6 +540,8 @@ Version 0.3 - March 7, 2011
 - add one edit point per wall in custom roof
 - create House 22 - L Shape model
 - create House 23 - Complex Roof model
+- highlight the edit point with a yellow color when the mouse hovers on it 
+
 
 - *allow rotation of scene with respect to north
 - after deleting roof it stays in draw list
