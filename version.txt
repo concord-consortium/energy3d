@@ -543,7 +543,7 @@ Version 0.3 - March 7, 2011
 - highlight the edit point with a yellow color when the mouse hovers on it
 - fix problem with exception thrown when mouse hovered over the invisible bottom mesh of the roofs in print preview mode
 - render only the bottom face of the bottom mesh in roofs in order to make it easier to see flashing part in in print preview mode
-
+- update the sample models
 
 - *allow rotation of scene with respect to north
 - after deleting roof it stays in draw list
