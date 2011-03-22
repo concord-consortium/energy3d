@@ -540,7 +540,9 @@ Version 0.3 - March 7, 2011
 - add one edit point per wall in custom roof
 - create House 22 - L Shape model
 - create House 23 - Complex Roof model
-- highlight the edit point with a yellow color when the mouse hovers on it 
+- highlight the edit point with a yellow color when the mouse hovers on it
+- fix problem with exception thrown when mouse hovered over the invisible bottom mesh of the roofs in print preview mode
+- render only the bottom face of the bottom mesh in roofs in order to make it easier to see flashing part in in print preview mode
 
 
 - *allow rotation of scene with respect to north

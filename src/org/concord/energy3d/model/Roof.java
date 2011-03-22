@@ -16,12 +16,14 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.TextureCubeMap.Face;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -30,6 +32,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.TextureManager;
@@ -58,7 +61,9 @@ public abstract class Roof extends HousePart {
 
 		mesh = new Mesh("Roof");
 		bottomMesh = new Mesh("Roof (bottom)");
-		bottomMesh.setUserData(new UserData(this));
+		final CullState cullState = new CullState();
+		cullState.setCullFace(com.ardor3d.renderer.state.CullState.Face.Front);
+		bottomMesh.setRenderState(cullState);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
@@ -85,7 +90,9 @@ public abstract class Roof extends HousePart {
 				return;
 			}
 			flattenedMeshesRoot.getSceneHints().setCullHint(CullHint.Inherit);
-			bottomMesh.getSceneHints().setCullHint(height > 0 ? CullHint.Inherit : CullHint.Always);
+			final boolean bottomMeshVisible = height > 0;
+			bottomMesh.getSceneHints().setCullHint(bottomMeshVisible ? CullHint.Inherit : CullHint.Always);
+			bottomMesh.getSceneHints().setPickingHint(PickingHint.Pickable, bottomMeshVisible);
 
 			exploreWallNeighbors((Wall) container);
 			processRoofPoints(wallUpperPoints, wallNormals);
@@ -186,8 +193,10 @@ public abstract class Roof extends HousePart {
 		for (Spatial child : getFlattenedMeshesRoot().getChildren())
 			flattenQuadTriangle((Mesh) child, flattenTime);
 		mesh.updateModelBound();
-		if (bottomMesh != null)
+		if (bottomMesh != null) {
 			bottomMesh.getSceneHints().setCullHint(CullHint.Always);
+			bottomMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		}
 	}
 
 	private void flattenQuadTriangle(final Mesh mesh, final double flattenTime) {

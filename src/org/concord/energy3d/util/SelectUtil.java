@@ -118,7 +118,7 @@ public class SelectUtil {
 	public static HousePart selectHousePart(int x, int y, boolean edit) {
 		HousePart drawn = null;
 		HousePart lastHoveredObject = SceneManager.getInstance().getSelectedPart();
-		PickedHousePart selectedMesh = pickPart(x, y, housePartsNode);
+		PickedHousePart selectedMesh = pickPart(x+0, y, housePartsNode);
 		UserData data = null;
 		if (selectedMesh != null)
 			data = selectedMesh.getUserData();
@@ -160,7 +160,7 @@ public class SelectUtil {
 				Blinker.getInstance().setTarget(null);
 				if (data.getHousePart().getOriginal() != null) {
 					if (drawn instanceof Roof)
-						Blinker.getInstance().setTarget(((Roof)drawn.getOriginal()).getFlattenedMeshesRoot().getChild(data.getIndex()));
+						Blinker.getInstance().setTarget(((Roof)drawn.getOriginal()).getFlattenedMeshesRoot().getChild(data.getIndex()-0));
 					else
 						Blinker.getInstance().setTarget(drawn.getOriginal().getRoot());
 				}
