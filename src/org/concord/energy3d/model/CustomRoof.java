@@ -85,9 +85,9 @@ public class CustomRoof extends Roof {
 //		System.out.println(z);
 //		points.get(0).set(center.getX(), center.getY(), z);
 
-		if (wallUpperPoints.size() > points.size() * 2) {
+		if (wallUpperPoints.size() > points.size()) {
 			final Vector3 v = new Vector3();
-			for (int i = 0; i < wallUpperPoints.size() - 1; i = i + 2) {
+			for (int i = 0; i < wallUpperPoints.size() - 1; i = i + 1) {
 				final PolygonPoint p1 = wallUpperPoints.get(i);
 				final PolygonPoint p2 = wallUpperPoints.get(i + 1);
 				// middle of wall = (p1 + p2) / 2

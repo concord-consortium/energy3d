@@ -175,7 +175,6 @@ public class Wall extends HousePart {
 		thicknessNormal = null;
 		isShortWall = true;
 		draw();
-		System.out.println("------------------");
 		showPoints();
 
 		if (isDrawable())

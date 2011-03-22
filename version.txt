@@ -537,6 +537,9 @@ Version 0.3 - March 7, 2011
 - fix problem with uneven overhang length in the roofs
 - make the wall visitor implementation more efficient
 - hide the bottom mesh of the roof when the height is zero
+- add one edit point per wall in custom roof
+- create House 22 - L Shape model
+- create House 23 - Complex Roof model
 
 - *allow rotation of scene with respect to north
 - after deleting roof it stays in draw list

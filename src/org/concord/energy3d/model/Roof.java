@@ -130,6 +130,7 @@ public abstract class Roof extends HousePart {
 			ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
 			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 2, new TPoint(0,0,0), new TPoint(1,0,0), new TPoint(0,1,0));
 			mesh.getMeshData().updateVertexCount();
+			mesh.updateModelBound();
 	}
 
 	private void exploreWallNeighbors(Wall startWall) {
