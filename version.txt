@@ -544,6 +544,7 @@ Version 0.3 - March 7, 2011
 - fix problem with exception thrown when mouse hovered over the invisible bottom mesh of the roofs in print preview mode
 - render only the bottom face of the bottom mesh in roofs in order to make it easier to see flashing part in in print preview mode
 - update the sample models
+- fix problem with delay in updating the size of edit points after a zoom followed by mouse hover 
 
 - *allow rotation of scene with respect to north
 - after deleting roof it stays in draw list
