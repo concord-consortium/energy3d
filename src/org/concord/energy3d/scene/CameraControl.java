@@ -136,7 +136,10 @@ public abstract class CameraControl {
                     	final boolean left = mouse.getButtonState(MouseButton.LEFT) == ButtonState.DOWN;
                     	final boolean right = mouse.getButtonState(MouseButton.RIGHT) == ButtonState.DOWN;
 						if (left && leftButtonAction == ButtonAction.MOVE || right && rightButtonAction == ButtonAction.MOVE) {
-                    		control.move(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
+							final double fac = Camera.getCurrentCamera().getLocation().length() * 150;
+                    		final double dx = -mouse.getDx() * fac / Camera.getCurrentCamera().getWidth();
+							final double dy = -mouse.getDy() * fac / Camera.getCurrentCamera().getHeight() / 4.0;
+							control.move(source.getCanvasRenderer().getCamera(), dx, dy);
                     		SceneManager.getInstance().getCameraNode().updateFromCamera();
 						} else if (left && leftButtonAction == ButtonAction.ROTATE || right && rightButtonAction == ButtonAction.ROTATE) {
                     		control.rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());

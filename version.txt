@@ -545,7 +545,9 @@ Version 0.3 - March 7, 2011
 - render only the bottom face of the bottom mesh in roofs in order to make it easier to see flashing part in in print preview mode
 - update the sample models
 - fix problem with delay in updating the size of edit points after a zoom followed by mouse hover 
-
+- adjust the camera move speed when dragging mouse after a zoom or window resize by considering the width and height of the view
+- adjust the zoom speed to make it slightly slower to allow more precision zoom
+ 
 - *allow rotation of scene with respect to north
 - after deleting roof it stays in draw list
 

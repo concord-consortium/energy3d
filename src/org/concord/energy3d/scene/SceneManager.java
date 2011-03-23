@@ -752,7 +752,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			control.setMoveSpeed(2 * camera.getFrustumTop() * camera.getFrustumTop());
 		} else {
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
-			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * MOVE_SPEED * 10 * tpf).addLocal(camera.getLocation());
+			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * MOVE_SPEED * 2 * tpf).addLocal(camera.getLocation());
 			camera.setLocation(loc);
 
 			if (control instanceof OrbitControl)
