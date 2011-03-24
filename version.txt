@@ -547,6 +547,9 @@ Version 0.3 - March 7, 2011
 - fix problem with delay in updating the size of edit points after a zoom followed by mouse hover 
 - adjust the camera move speed when dragging mouse after a zoom or window resize by considering the width and height of the view
 - adjust the zoom speed to make it slightly slower to allow more precision zoom
+- allow resizing the foundation without scaling the entire house
+- fix problem with house height shrinking a little when selecting the resize tool
+- improve the resize tool so that it find the exact height of the house
  
 - *allow rotation of scene with respect to north
 - after deleting roof it stays in draw list

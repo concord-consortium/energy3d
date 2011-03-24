@@ -70,8 +70,8 @@ public class Door extends HousePart {
 			PickedHousePart picked = pick(x, y, Wall.class);
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
-				Vector3 wallFirstPoint = container.getPoints().get(0);
-				Vector3 wallx = container.getPoints().get(2).subtract(wallFirstPoint, null);
+				Vector3 wallFirstPoint = container.getAbsPoints().get(0);
+				Vector3 wallx = container.getAbsPoints().get(2).subtract(wallFirstPoint, null);
 				p = closestPoint(wallFirstPoint, wallx, x, y);
 				p = grid(p, GRID_SIZE, false);
 
@@ -125,7 +125,7 @@ public class Door extends HousePart {
 		mesh.updateModelBound();
 	}
 
-	public ArrayList<Vector3> getPoints() {
+	public ArrayList<Vector3> getAbsPoints() {
 		return abspoints;
 	}
 

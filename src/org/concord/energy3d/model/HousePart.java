@@ -171,12 +171,25 @@ public abstract class HousePart implements Serializable {
 		return root;
 	}
 
-	public ArrayList<Vector3> getPoints() {
+	public ArrayList<Vector3> getAbsPoints() {
 		if (root == null)
 			init();
 		return abspoints;
 	}
 
+	private static int counter = 0;
+	
+	public ArrayList<Vector3> getPoints() {
+		if (this instanceof Wall) {
+			System.out.println("getPoint counter = " + counter++);
+			if (points.get(1).getZ() < 1.1)
+				counter = counter;
+		}
+		if (root == null)
+			init();
+		return points;
+	}
+	
 	public void complete() {
 		drawCompleted = true;
 	}
@@ -296,7 +309,7 @@ public abstract class HousePart implements Serializable {
 	protected Vector3 toRelative(Vector3 org) {
 		if (container == null)
 			return org;
-		ArrayList<Vector3> wallPoints = container.getPoints();
+		ArrayList<Vector3> wallPoints = container.getAbsPoints();
 		Vector3 origin = wallPoints.get(0);
 		Vector3 p = org.subtract(origin, null);
 		Vector3 wallx = wallPoints.get(2).subtract(origin, null);
@@ -308,7 +321,7 @@ public abstract class HousePart implements Serializable {
 	protected Vector3 toAbsolute(Vector3 p) {
 		if (container == null)
 			return p;
-		ArrayList<Vector3> containerPoints = container.getPoints();
+		ArrayList<Vector3> containerPoints = container.getAbsPoints();
 		Vector3 origin = containerPoints.get(0);
 		Vector3 wallx = containerPoints.get(2).subtract(origin, null);
 		Vector3 wally = containerPoints.get(1).subtract(origin, null);

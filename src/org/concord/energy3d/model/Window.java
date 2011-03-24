@@ -118,13 +118,13 @@ public class Window extends HousePart {
 
 		Vector3 v = new Vector3();
 		Vector3 v1 = new Vector3();
-		double len = v.set(container.getPoints().get(2)).subtractLocal(container.getPoints().get(0)).length();
+		double len = v.set(container.getAbsPoints().get(2)).subtractLocal(container.getAbsPoints().get(0)).length();
 		if (label1 == null) {
 			label1 = Annotation.makeNewLabel();
 			label1.setAlign(Align.NorthWest);
 			root.attachChild(label1);
 		}
-		v.set(abspoints.get(1)).subtractLocal(container.getPoints().get(0));
+		v.set(abspoints.get(1)).subtractLocal(container.getAbsPoints().get(0));
 		double xy = Math.sqrt(v.getX() * v.getX() + v.getY() * v.getY());
 		if (xy < 0)
 			xy = len + xy;
@@ -178,7 +178,7 @@ public class Window extends HousePart {
 	private Vector3 enforceContraints(Vector3 p) {
 		if (container == null)
 			return new Vector3(p);
-		final double wallx = container.getPoints().get(2).subtract(container.getPoints().get(0), null).length();
+		final double wallx = container.getAbsPoints().get(2).subtract(container.getAbsPoints().get(0), null).length();
 		final double margin = 0.2 / wallx;
 		double x = Math.max(p.getX(), margin);
 		x = Math.min(x, 1 - margin);

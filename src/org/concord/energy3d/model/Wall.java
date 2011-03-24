@@ -193,7 +193,7 @@ public class Wall extends HousePart {
 			if (housePart instanceof Wall && housePart != this) { // && (neighbors[0] == null || neighbors[0].getNeighborOf(this) != housePart) && (neighbors[1] == null || neighbors[1].getNeighborOf(this) != housePart)) {
 				Wall wall = (Wall) housePart;
 				int i = 0;
-				for (Vector3 p2 : wall.getPoints()) {
+				for (Vector3 p2 : wall.getAbsPoints()) {
 					double distance = p.distance(p2);
 					if (distance < closestDistance) {
 						closestPoint = p2;
@@ -218,7 +218,7 @@ public class Wall extends HousePart {
 			return false;
 		Vector3 snapPoint = null;
 		double snapDistance = Double.MAX_VALUE;
-		for (Vector3 p : container.getPoints()) {
+		for (Vector3 p : container.getAbsPoints()) {
 			final double d = p.distance(current);
 			if (d < snapDistance) {
 				snapDistance = d;
@@ -283,7 +283,7 @@ public class Wall extends HousePart {
 
 		// Add window holes
 		for (HousePart child : children) {
-			ArrayList<Vector3> winPoints = child.getPoints();
+			ArrayList<Vector3> winPoints = child.getAbsPoints();
 			if (child instanceof Window && includeWindow(winPoints)) {
 				PolygonPoint pp;
 				ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
@@ -411,7 +411,7 @@ public class Wall extends HousePart {
 		final Snap snap = neighbors[neighbor];
 		final int neighborPointIndex = snap.getSnapPointIndexOfNeighborOf(this);
 		final Wall otherWall = snap.getNeighborOf(this);
-		final Vector3 otherWallDir = otherWall.getPoints().get(neighborPointIndex == 0 ? 2 : 0).subtract(otherWall.getPoints().get(neighborPointIndex), null).normalizeLocal();
+		final Vector3 otherWallDir = otherWall.getAbsPoints().get(neighborPointIndex == 0 ? 2 : 0).subtract(otherWall.getAbsPoints().get(neighborPointIndex), null).normalizeLocal();
 		final double angle = Math.max(0.1, otherWallDir.smallestAngleBetween(wallDir));
 		final double angle360;
 		if (wallDir.dot(otherWall.getThicknessNormal().normalize(null)) < 0)
@@ -449,8 +449,8 @@ public class Wall extends HousePart {
 		// else
 		// neighbor = neighbors[0];
 
-		if (neighbor != null && neighbor.getNeighborOf(this).getPoints().size() >= 4) {
-			final ArrayList<Vector3> otherPoints = neighbor.getNeighborOf(this).getPoints();
+		if (neighbor != null && neighbor.getNeighborOf(this).getAbsPoints().size() >= 4) {
+			final ArrayList<Vector3> otherPoints = neighbor.getNeighborOf(this).getAbsPoints();
 			final int otherPointIndex = neighbor.getSnapPointIndexOfNeighborOf(this);
 			final Vector3 otherWallDir = otherPoints.get(otherPointIndex == 0 ? 2 : 0).subtract(otherPoints.get(otherPointIndex), null).normalizeLocal();
 
@@ -566,7 +566,7 @@ public class Wall extends HousePart {
 		final Vector3 p = new Vector3();
 		final Vector3 wallDirection = abspoints.get(2).subtract(abspoints.get(0), null);
 		for (HousePart child : children) {
-			final ArrayList<Vector3> winPoints = child.getPoints();
+			final ArrayList<Vector3> winPoints = child.getAbsPoints();
 			if (child instanceof Window && includeWindow(winPoints)) {
 				int[] order = order1;
 				final Vector3 windowDirection = winPoints.get(2).subtract(winPoints.get(0), null);
@@ -632,11 +632,11 @@ public class Wall extends HousePart {
 				if (part instanceof Wall && part != this) {
 					final Vector3 point = points.get(pointIndex);
 					final Wall wall = (Wall) part;
-					if (point.distance(part.getPoints().get(0)) < 0.001) {
+					if (point.distance(part.getAbsPoints().get(0)) < 0.001) {
 						newSnap = new Snap(this, wall, pointIndex, 0);
 						wall.setNeighbor(0, newSnap, false);
 						break;
-					} else if (part.getPoints().size() > 2 && point.distance(part.getPoints().get(2)) < 0.001) {
+					} else if (part.getAbsPoints().size() > 2 && point.distance(part.getAbsPoints().get(2)) < 0.001) {
 						newSnap = new Snap(this, wall, pointIndex, 2);
 						wall.setNeighbor(2, newSnap, false);
 						break;
@@ -670,9 +670,9 @@ public class Wall extends HousePart {
 
 	protected void setHeight(final double newHeight, final boolean finalize) {
 		super.setHeight(newHeight, finalize);
-		points.get(1).setZ(newHeight);
+		points.get(1).setZ(newHeight + container.height);
 		if (isFirstPointInserted())
-			points.get(3).setZ(newHeight);
+			points.get(3).setZ(newHeight + container.height);
 	}
 
 	public void flatten(double flattenTime) {
@@ -824,7 +824,7 @@ public class Wall extends HousePart {
 		final Vector3 wallDir = points.get(pointIndex == 0 ? 2 : 0).subtract(points.get(pointIndex), null).normalizeLocal();
 
 		final int otherPointIndex = prev.getSnapPointIndexOfNeighborOf(wall);
-		final ArrayList<Vector3> otherPoints = prev.getNeighborOf(wall).getPoints();
+		final ArrayList<Vector3> otherPoints = prev.getNeighborOf(wall).getAbsPoints();
 		final Vector3 otherWallDir = otherPoints.get(otherPointIndex == 0 ? 2 : 0).subtract(otherPoints.get(otherPointIndex), null).normalizeLocal();
 
 		final Vector3 n1 = new Vector3(wall.getThicknessNormal()).normalizeLocal();

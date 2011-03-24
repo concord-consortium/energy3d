@@ -53,6 +53,7 @@ public abstract class Roof extends HousePart {
 
 	protected void init() {
 		super.init();
+		abspoints = points;	// there is no need for abspoints. this is hack for foundation bounds.
 		wallUpperPoints = new ArrayList<PolygonPoint>();
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		
@@ -76,6 +77,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void computeAbsPoints() {
+		
 	}
 
 	protected void computeCenter() {
@@ -151,8 +153,8 @@ public abstract class Roof extends HousePart {
 				else
 					pointIndex2 = 0 + 1;
 				final int pointIndex1 = pointIndex2 == 1 ? 3 : 1;
-				final Vector3 p1 = currentWall.getPoints().get(pointIndex1);
-				final Vector3 p2 = currentWall.getPoints().get(pointIndex2);
+				final Vector3 p1 = currentWall.getAbsPoints().get(pointIndex1);
+				final Vector3 p2 = currentWall.getAbsPoints().get(pointIndex2);
 				final ReadOnlyVector3 normal = currentWall.getFaceDirection();
 				addPointToPolygon(wallUpperPoints, p1, center, wallNormals, normal);
 				addPointToPolygon(wallUpperPoints, p2, center, wallNormals, normal);
