@@ -77,4 +77,13 @@ public class CustomRoof extends Roof {
 		}
 	}
 
+	@Override
+	protected void setHeight(double newHeight, boolean finalize) {
+		super.setHeight(newHeight, finalize);
+		for (final Vector3 p : points)
+			p.setZ(center.getZ() + newHeight);
+	}
+	
+	
+
 }

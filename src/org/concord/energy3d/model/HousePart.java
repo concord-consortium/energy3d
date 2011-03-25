@@ -177,14 +177,7 @@ public abstract class HousePart implements Serializable {
 		return abspoints;
 	}
 
-	private static int counter = 0;
-	
 	public ArrayList<Vector3> getPoints() {
-		if (this instanceof Wall) {
-			System.out.println("getPoint counter = " + counter++);
-			if (points.get(1).getZ() < 1.1)
-				counter = counter;
-		}
 		if (root == null)
 			init();
 		return points;
@@ -192,6 +185,7 @@ public abstract class HousePart implements Serializable {
 	
 	public void complete() {
 		drawCompleted = true;
+		orgHeight = height;
 	}
 
 	public boolean isDrawCompleted() {

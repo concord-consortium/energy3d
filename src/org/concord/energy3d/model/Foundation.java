@@ -130,17 +130,15 @@ public class Foundation extends HousePart {
 			points.get(2).set(p);
 			points.get(3).set(p);
 		} else {
-			if (index < 4) {
-				if (index == 0 || index == 3) {
-					points.get(1).set(points.get(0).getX(), points.get(3).getY(), 0);
-					points.get(2).set(points.get(3).getX(), points.get(0).getY(), 0);
-				} else {
-					points.get(0).set(points.get(1).getX(), points.get(2).getY(), 0);
-					points.get(3).set(points.get(2).getX(), points.get(1).getY(), 0);
-				}
+			if (index == 0 || index == 3) {
+				points.get(1).set(points.get(0).getX(), points.get(3).getY(), 0);
+				points.get(2).set(points.get(3).getX(), points.get(0).getY(), 0);
+			} else if (index == 1 || index == 2) {
+				points.get(0).set(points.get(1).getX(), points.get(2).getY(), 0);
+				points.get(3).set(points.get(2).getX(), points.get(1).getY(), 0);
 			} else {
-				int lower = (editPointIndex == 1) ? 0 : 2;
-				Vector3 base = abspoints.get(lower);
+				final int lower = (editPointIndex == 1) ? 0 : 2;
+				final Vector3 base = abspoints.get(lower);
 				Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
 				closestPoint = grid(closestPoint, GRID_SIZE);
 				newBoundingHeight = Math.max(0, closestPoint.getZ() - base.getZ());
@@ -198,7 +196,7 @@ public class Foundation extends HousePart {
 		// }
 		// }
 		boundingHeight = scanChildrenHeight(this);
-//		boundingHeight += 0.5;
+		// boundingHeight += 0.5;
 		for (int i = 4; i < 8; i++)
 			points.get(i).setZ(boundingHeight);
 		newBoundingHeight = boundingHeight;

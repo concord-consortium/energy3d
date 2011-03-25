@@ -550,6 +550,8 @@ Version 0.3 - March 7, 2011
 - allow resizing the foundation without scaling the entire house
 - fix problem with house height shrinking a little when selecting the resize tool
 - improve the resize tool so that it find the exact height of the house
+- fix problem with resizing the height of custom roof
+- fix problem with reseting the roof height when resizing height of the house right after changing roof height manually
  
 - *allow rotation of scene with respect to north
 - after deleting roof it stays in draw list
