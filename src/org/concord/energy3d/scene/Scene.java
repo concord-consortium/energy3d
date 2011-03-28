@@ -238,16 +238,23 @@ public class Scene implements Serializable {
 		parts.add(housePart);
 		System.out.println("done");
 	}
+	
+	public void remove(HousePart housePart)  {
+		final HousePart container = housePart.getContainer();
+		if (container != null)
+			container.getChildren().remove(housePart);
+		removeTree(housePart);
+		if (container != null)
+			container.draw();
+	}
 
-	public void remove(HousePart housePart) {
-		if (housePart == null)
-			return;
+	private void removeTree(HousePart housePart) {
 		System.out.println("Removing: " + housePart);
 		originalHouseRoot.detachChild(housePart.getRoot());
 		parts.remove(housePart);
 		housePart.delete();
 		for (final HousePart child : housePart.getChildren())
-			remove(child);
+			removeTree(child);
 		housePart.getChildren().clear();
 	}
 	
