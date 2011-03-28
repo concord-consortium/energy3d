@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -664,8 +665,12 @@ public class Wall extends HousePart {
 		for (int i = 0; i < neighbors.length; i++)
 			if (neighbors[i] != null)
 				neighbors[i].getNeighborOf(this).setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false);
-		for (HousePart child : children)
-			Scene.getInstance().remove(child);
+//		final ArrayList<HousePart> children = (ArrayList<HousePart>)this.children.clone();
+//		final Iterator<HousePart> children = this.children.iterator();
+//		while (children.hasNext())
+//		for (HousePart child : children)
+//			Scene.getInstance().remove(child);
+//		children.clear();
 	}
 
 	protected void setHeight(final double newHeight, final boolean finalize) {

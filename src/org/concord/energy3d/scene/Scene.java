@@ -242,13 +242,15 @@ public class Scene implements Serializable {
 	public void remove(HousePart housePart) {
 		if (housePart == null)
 			return;
-		System.out.print("Removing house part...");
+		System.out.println("Removing: " + housePart);
 		originalHouseRoot.detachChild(housePart.getRoot());
-		housePart.delete();
 		parts.remove(housePart);
-		System.out.println("done");
+		housePart.delete();
+		for (final HousePart child : housePart.getChildren())
+			remove(child);
+		housePart.getChildren().clear();
 	}
-
+	
 	public ArrayList<HousePart> getParts() {
 		return parts;
 	}
@@ -327,7 +329,7 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public Spatial getOriginalHouseRoot() {
+	public Node getOriginalHouseRoot() {
 		return originalHouseRoot;
 	}
 

@@ -646,6 +646,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					System.out.println("Disabling draw bounds...");
 			}
 		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.I), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				System.out.println("---- Parts: ------------------------");
+				System.out.println("size = " + Scene.getInstance().getParts().size());
+				for (final HousePart part : Scene.getInstance().getParts())
+					System.out.println(part);
+				System.out.println("---- Scene: ------------------------");
+				System.out.println("size = " + Scene.getInstance().getOriginalHouseRoot().getNumberOfChildren());
+				for (final Spatial mesh : Scene.getInstance().getOriginalHouseRoot().getChildren()) {
+					System.out.println(mesh);
+				}
+			}
+		}));		
 	}
 
 	public void setCameraControl(final CameraMode type) {

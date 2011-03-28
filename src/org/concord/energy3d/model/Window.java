@@ -150,12 +150,12 @@ public class Window extends HousePart {
 		return trans.applyForward(v);
 	}
 
-	public void delete() {
-		if (container != null) {
-			container.children.remove(this);
-			container.draw();
-		}
-	}
+//	public void delete() {
+//		if (container != null) {
+//			container.children.remove(this);
+//			container.draw();
+//		}
+//	}
 
 	public boolean isPrintable() {
 		return false;

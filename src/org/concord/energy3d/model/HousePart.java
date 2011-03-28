@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Angle90Annotation;
 import org.concord.energy3d.shapes.AngleAnnotation;
@@ -489,6 +490,15 @@ public abstract class HousePart implements Serializable {
 	public abstract void setPreviewPoint(int x, int y);
 
 	public void delete() {
+//		System.out.println("Removing: " + this);
+//		Scene.getInstance().getOriginalHouseRoot().detachChild(root);
+//		Scene.getInstance().getParts().remove(this);
+//		
+//		for (HousePart child : children)
+//			child.delete();
+////			Scene.getInstance().remove(child);
+//		children.clear();
+//		
 	}
 
 	protected void drawAnnotations() {
