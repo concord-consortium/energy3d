@@ -553,7 +553,8 @@ Version 0.3 - March 7, 2011
 - fix problem with resizing the height of custom roof
 - fix problem with reseting the roof height when resizing height of the house right after changing roof height manually
 - fix problem with deleting all of the children of a house part
- 
+- make it work with LWJGL rendering platform
+
 - *allow rotation of scene with respect to north
 
 

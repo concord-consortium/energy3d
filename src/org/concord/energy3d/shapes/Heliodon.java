@@ -1,5 +1,6 @@
 package org.concord.energy3d.shapes;
 
+import java.awt.Container;
 import java.nio.FloatBuffer;
 import java.util.Calendar;
 import java.util.Date;
@@ -73,7 +74,6 @@ public class Heliodon {
 	private final Node root = new Node("Heliodon Root");
 	private final Spatial sun = new Sphere("Sun", 20, 20, 0.3);
 	private final DirectionalLight light;
-	private final BloomRenderPass bloomRenderPass;
 	private final Line sunPath;
 	private final Mesh sunRegion;
 	private final PickResults pickResults;
@@ -90,16 +90,16 @@ public class Heliodon {
 	private boolean dirtySunRegion = false;
 	private boolean dirtySunPath = false;
 	private boolean forceSunRegionOn = false;
+	private BloomRenderPass bloomRenderPass;
+	private BasicPassManager passManager;
 
 	public Heliodon(final Node scene, final DirectionalLight light, final BasicPassManager passManager, final LogicalLayer logicalLayer, final Date timeAndDate) {
 		this.light = light;
+		this.passManager = passManager;
 		this.pickResults = new PrimitivePickResults();
 		this.pickResults.setCheckDistance(true);
 		
 		// Sun
-		this.bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
-		passManager.add(bloomRenderPass);
-		bloomRenderPass.add(sun);
 		final MaterialState material = new MaterialState();
 		material.setEmissive(ColorRGBA.WHITE);
 		sun.setRenderState(material);		
@@ -421,6 +421,11 @@ public class Heliodon {
 	}
 
 	public void setVisible(final boolean visible) {
+		if (bloomRenderPass == null) {
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
+			passManager.add(bloomRenderPass);
+			bloomRenderPass.add(sun);			
+		}
 		root.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 		bloomRenderPass.setEnabled(visible);
 		if (visible)

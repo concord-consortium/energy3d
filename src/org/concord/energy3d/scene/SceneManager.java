@@ -26,6 +26,7 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
+import org.lwjgl.LWJGLException;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
@@ -39,6 +40,8 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
+import com.ardor3d.framework.lwjgl.LwjglAwtCanvas;
+import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -74,6 +77,7 @@ import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
+import com.ardor3d.renderer.lwjgl.LwjglTextureRendererProvider;
 import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -127,7 +131,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	static public final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	static private final SceneManager instance = new SceneManager(MainFrame.getInstance().getContentPane());
-	static private final boolean JOGL = true;
+	static private final boolean JOGL = false;
 	private final Canvas canvas;
 	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
@@ -162,10 +166,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.out.print("Constructing SceneManager...");
 		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
 		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 8, false, false);
-		if (JOGL)
+		if (JOGL) {
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
-		// else
-		// canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
+			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
+		} else {
+			try {
+				canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
+				TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
+			} catch (LWJGLException e) {
+				throw new RuntimeException(e);
+			}
+		}
 
 		frameHandler = new FrameHandler(new Timer());
 		frameHandler.addCanvas(canvas);
@@ -180,11 +191,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.addUpdater(this);
 		frameHandler.addUpdater(PrintController.getInstance());
 		frameHandler.addUpdater(Blinker.getInstance());
-
-		if (JOGL)
-			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
-		// else
-		// TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
 
 		panel.addComponentListener(new java.awt.event.ComponentAdapter() {
 			public void componentResized(java.awt.event.ComponentEvent e) {
@@ -209,11 +215,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			ex.printStackTrace();
 		}
 
-		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
-		root.attachChild(cameraNode);
-		cameraNode.updateFromCamera();
-		setCameraControl(CameraMode.ORBIT);
-		resetCamera(ViewMode.NORMAL);
+//		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
+//		root.attachChild(cameraNode);
+//		cameraNode.updateFromCamera();
+//		setCameraControl(CameraMode.ORBIT);
+//		resetCamera(ViewMode.NORMAL);
 
 		// enable depth test
 		final ZBufferState zbuf = new ZBufferState();
@@ -305,20 +311,26 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			camera.lookAt(0, 0, 1, Vector3.UNIT_Z);
 			getCameraNode().updateFromCamera();
 		}
-		
 
 		if (sunAnim) {
-//			sunAngle++;
+			// sunAngle++;
 			heliodon.setHourAngle(heliodon.getHourAngle() + 0.01, true, true);
-//			updateSunHeliodon();
+			// updateSunHeliodon();
 		}
-		
+
 		heliodon.update();
 
 		root.updateGeometricState(tpf);
 	}
 
 	public boolean renderUnto(Renderer renderer) {
+		if (cameraNode == null) {
+			cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
+			root.attachChild(cameraNode);
+			cameraNode.updateFromCamera();
+			setCameraControl(CameraMode.ORBIT);
+			resetCamera(ViewMode.NORMAL);			
+		}
 		// try {
 		// final boolean doRender = moveState != null;
 
@@ -361,14 +373,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
 		offsetState.setFactor(1.1f);
-		offsetState.setUnits(4f);		
+		offsetState.setUnits(4f);
 		floor.setRenderState(offsetState);
-		
+
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
 		floor.setRenderState(blendState);
 		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-//		floor.getSceneHints().setTransparencyType(TransparencyType.TwoPass);
+		// floor.getSceneHints().setTransparencyType(TransparencyType.TwoPass);
 		floor.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
 		final MaterialState ms = new MaterialState();
@@ -438,7 +450,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								drawn = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
 								System.out.print("Clicked on: " + drawn);
 								if (previousDrawn != null && previousDrawn != drawn)
-									previousDrawn.hidePoints();								
+									previousDrawn.hidePoints();
 								SelectUtil.nextPickLayer();
 							}
 						} else
@@ -461,7 +473,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						MouseState mouseState = inputStates.getCurrent().getMouseState();
 						boolean sceneChanged = false;
 						if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-							if (drawn != null && !drawn.isDrawCompleted()) {								
+							if (drawn != null && !drawn.isDrawCompleted()) {
 								drawn.complete();
 								sceneChanged = true;
 							}
@@ -570,8 +582,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				resetCamera(viewMode);
-//				cameraNode.setRotation(new Quaternion(1, 0, 0, 1));
-				
+				// cameraNode.setRotation(new Quaternion(1, 0, 0, 1));
+
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
@@ -588,14 +600,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				heliodon.setHourAngle(heliodon.getHourAngle() - 0.03, true, true);
 			}
-		}));		
+		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.UP), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!sunControl)
 					return;
-//				sunAngle--;
-//				updateSunHeliodon();
-//				heliodon.setSunAngle(heliodon.getSunAngle() - 1);
+				// sunAngle--;
+				// updateSunHeliodon();
+				// heliodon.setSunAngle(heliodon.getSunAngle() - 1);
 				heliodon.setObserverLatitude(heliodon.getObserverLatitude() + 0.01);
 			}
 		}));
@@ -603,9 +615,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!sunControl)
 					return;
-//				sunAngle++;
-//				updateSunHeliodon();
-//				heliodon.setSunAngle(heliodon.getSunAngle() + 1);
+				// sunAngle++;
+				// updateSunHeliodon();
+				// heliodon.setSunAngle(heliodon.getSunAngle() + 1);
 				heliodon.setObserverLatitude(heliodon.getObserverLatitude() - 0.01);
 			}
 		}));
@@ -613,28 +625,28 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!sunControl)
 					return;
-//				sunBaseAngle++;
-//				updateSunHeliodon();
-//				heliodon.setBaseAngle(heliodon.getBaseAngle() + 1);
-//				heliodon.setOffset(heliodon.getOffset() + 0.01);
-//				heliodon.computeSunLocation(1, 0.5, 0.5);
-//				heliodon.setHourAngle(heliodon.getHourAngle() + 0.1);
+				// sunBaseAngle++;
+				// updateSunHeliodon();
+				// heliodon.setBaseAngle(heliodon.getBaseAngle() + 1);
+				// heliodon.setOffset(heliodon.getOffset() + 0.01);
+				// heliodon.computeSunLocation(1, 0.5, 0.5);
+				// heliodon.setHourAngle(heliodon.getHourAngle() + 0.1);
 				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() + 0.01, true, true);
-//				heliodon.setObserverLatitude(heliodon.getObserverLatitude() + 0.01);
+				// heliodon.setObserverLatitude(heliodon.getObserverLatitude() + 0.01);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!sunControl)
 					return;
-//				sunBaseAngle--;
-//				updateSunHeliodon();
-//				heliodon.setBaseAngle(heliodon.getBaseAngle() - 1);
-//				heliodon.setOffset(heliodon.getOffset() - 0.01);
-//				heliodon.computeSunLocation(-1, 0.5, 0.5);
-//				heliodon.setHourAngle(heliodon.getHourAngle() - 0.1);
+				// sunBaseAngle--;
+				// updateSunHeliodon();
+				// heliodon.setBaseAngle(heliodon.getBaseAngle() - 1);
+				// heliodon.setOffset(heliodon.getOffset() - 0.01);
+				// heliodon.computeSunLocation(-1, 0.5, 0.5);
+				// heliodon.setHourAngle(heliodon.getHourAngle() - 0.1);
 				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() - 0.01, true, true);
-//				heliodon.setObserverLatitude(heliodon.getObserverLatitude() - 0.01);
+				// heliodon.setObserverLatitude(heliodon.getObserverLatitude() - 0.01);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.B), new TriggerAction() {
@@ -658,7 +670,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					System.out.println(mesh);
 				}
 			}
-		}));		
+		}));
 	}
 
 	public void setCameraControl(final CameraMode type) {
@@ -859,7 +871,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void enableDisableRotationControl() {
 		if (!mouseControlEnabled)
 			return;
-		
+
 		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted()))
 			control.setMouseEnabled(true);
 		else
@@ -902,7 +914,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					passManager.remove(shadowPass);
 				return null;
 			}
-		});		
+		});
 	}
 
 	public CameraNode getCameraNode() {
@@ -918,7 +930,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Logger.getLogger(ColladaAnimUtils.class.getName()).setLevel(Level.SEVERE);
 		Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
 		final ColladaStorage storage = colladaImporter.load(source);
-		final Node compass = storage.getScene();		
+		final Node compass = storage.getScene();
 		BMText txt;
 
 		final double Z = 0.1;
@@ -957,12 +969,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		compass.updateWorldRenderStates(true);
 
-
 		final Node compassNode = new Node();
 		compassNode.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0.0, 0.0));
 		compassNode.attachChild(compass);
 		System.out.println("done");
-		
+
 		compass.addController(new SpatialController<Spatial>() {
 			public void update(double time, Spatial caller) {
 				final Vector3 direction = Camera.getCurrentCamera().getDirection().normalize(null);
@@ -972,10 +983,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (direction.dot(Vector3.UNIT_X) > 0)
 					angle = -angle;
 				angle -= MathUtils.HALF_PI;
-				compass.setRotation(new Matrix3().fromAngles(0.0, 0.0, angle -0.3));
+				compass.setRotation(new Matrix3().fromAngles(0.0, 0.0, angle - 0.3));
 			}
 		});
-		
+
 		return compassNode;
 	}
 
@@ -1018,11 +1029,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setMouseControlEnabled(final boolean enabled) {
 		this.mouseControlEnabled = enabled;
-		control.setMouseEnabled(enabled);	
+		control.setMouseEnabled(enabled);
 	}
 
 	public Heliodon getHeliodon() {
-		return heliodon;		
+		return heliodon;
 	}
 
 }
