@@ -56,7 +56,7 @@ import java.awt.Insets;
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
-	private final JFileChooser fileChooser;
+	private JFileChooser fileChooser;
 	private final JColorChooser colorChooser;
 	private JPanel jContentPane = null;
 	private JMenuBar appMenuBar = null;
@@ -1149,15 +1149,21 @@ public class MainFrame extends JFrame {
 	private MainFrame() {
 		super();		
 		System.out.print("Initiating GUI...");
-		final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
-		if (!dir.exists()) {
-			System.out.print("Making save directory...");
-			final boolean success = dir.mkdir();
-			System.out.println(success ? "done" : "failed");
+		try {
+			final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
+			if (!dir.exists()) {
+				System.out.print("Making save directory...");
+				final boolean success = dir.mkdir();
+				System.out.println(success ? "done" : "failed");
+			}
+			fileChooser = new JFileChooser();
+			fileChooser.setCurrentDirectory(dir);
+			fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
+		} catch (Exception e) {
+			fileChooser = null;
+			System.err.println("MainFrame()");
+//			e.printStackTrace();
 		}
-		fileChooser = new JFileChooser();
-		fileChooser.setCurrentDirectory(dir);
-		fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
 		
 		colorChooser = new JColorChooser();
 		final ReadOnlyColorRGBA defaultColor = HousePart.getDefaultColor();
@@ -1177,7 +1183,7 @@ public class MainFrame extends JFrame {
 		this.setSize(1092, 600);
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int)(screenSize.getWidth() - this.getSize().getWidth()) / 2, (int)(screenSize.getHeight() - this.getSize().getHeight()) / 2);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getAppMenuBar());
 		this.setContentPane(getJContentPane());
 		this.setTitle("Energy3D");

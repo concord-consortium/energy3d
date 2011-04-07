@@ -1,0 +1,20 @@
+<applet code="org.jdesktop.applet.util.JNLPAppletLauncher"
+      width=600 
+      height=400 
+      archive="http://jogamp.org/deployment/util/applet-launcher.jar,
+               http://jogamp.org/deployment/webstart/newt.all.jar,
+               http://jogamp.org/deployment/webstart/jogl.all.jar,
+               http://jogamp.org/deployment/webstart/nativewindow.all.jar,
+               http://jogamp.org/deployment/webstart/gluegen-rt.jar,
+               energy3d.jar"> 
+   <param name="codebase_lookup" value="false"> 
+   <param name="subapplet.classname" value="org.concord.energy3d.gui.MainApplet">
+   <param name="subapplet.displayname" value="Energy3D Applet"> 
+   <param name="noddraw.check" value="true"> 
+   <param name="progressbar" value="true"> 
+   <param name="jnlpNumExtensions" value="1"> 
+   <param name="jnlpExtension1"
+          value="http://jogamp.org/deployment/webstart/jogl-core.jnlp"> 
+   <param name="java_arguments" value="-Dsun.java2d.noddraw=true">
+   <param name="jnlp_href" value="applet-energy3d.jnlp">
+</applet> 

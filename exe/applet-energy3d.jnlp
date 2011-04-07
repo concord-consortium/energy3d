@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<jnlp>
+  
+<information>
+    
+	<title>Energy3D</title>
+    
+	<vendor>Concord Consortium</vendor>
+    
+	<homepage href="http://www.concord.org/"/>
+    
+	<description>Energy3D</description>
+    
+	<description kind="short">A tool for designing and building energy efficient houses in 3D.</description>
+    	
+</information>
+
+    
+<resources>
+      
+	<j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+"/>
+      
+	<property name="sun.java2d.noddraw" value="true"/>
+      
+	<jar href="energy3d.jar" main="true"/>
+      
+	<extension name="jogl" href="http://download.java.net/media/jogl/builds/archive/jsr-231-1.x-webstart-current/jogl.jnlp" />
+    
+</resources>
+
+  
+<applet-desc 
+      
+	name="Energy3D"
+      
+	main-class="org.concord.energy3d.gui.MainApplet"
+      
+	width="640" 
+      
+	height="480">
+  
+</applet-desc>
+
+</jnlp>

@@ -131,7 +131,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	static public final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	static private final SceneManager instance = new SceneManager(MainFrame.getInstance().getContentPane());
-	static private final boolean JOGL = false;
+	static private final boolean JOGL = true;
 	private final Canvas canvas;
 	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
@@ -177,7 +177,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				throw new RuntimeException(e);
 			}
 		}
-
+		
 		frameHandler = new FrameHandler(new Timer());
 		frameHandler.addCanvas(canvas);
 
@@ -220,6 +220,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //		cameraNode.updateFromCamera();
 //		setCameraControl(CameraMode.ORBIT);
 //		resetCamera(ViewMode.NORMAL);
+		
+		if (JOGL)
+			initCamera();			
 
 		// enable depth test
 		final ZBufferState zbuf = new ZBufferState();
@@ -324,13 +327,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public boolean renderUnto(Renderer renderer) {
-		if (cameraNode == null) {
-			cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
-			root.attachChild(cameraNode);
-			cameraNode.updateFromCamera();
-			setCameraControl(CameraMode.ORBIT);
-			resetCamera(ViewMode.NORMAL);			
-		}
+		if (cameraNode == null)
+			initCamera();			
 		// try {
 		// final boolean doRender = moveState != null;
 
@@ -357,6 +355,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// e.printStackTrace();
 		// }
 		return true;
+	}
+
+	public void initCamera() {
+		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
+		root.attachChild(cameraNode);
+		cameraNode.updateFromCamera();
+		setCameraControl(CameraMode.ORBIT);
+		resetCamera(ViewMode.NORMAL);
 	}
 
 	public PickResults doPick(Ray3 pickRay) {
