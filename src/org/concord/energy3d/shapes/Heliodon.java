@@ -1,6 +1,5 @@
 package org.concord.energy3d.shapes;
 
-import java.awt.Container;
 import java.nio.FloatBuffer;
 import java.util.Calendar;
 import java.util.Date;
@@ -386,7 +385,7 @@ public class Heliodon {
 		calendar.set(Calendar.MINUTE, minutes);		
 		
 		if (updateGUI)
-			MainFrame.getInstance().getTimeSpinner().setValue(calendar.getTime());
+			MainFrame.getInstance().getMainPanel().getTimeSpinner().setValue(calendar.getTime());
 		
 		if (redrawHeliodon)
 			drawSun();				
@@ -403,7 +402,7 @@ public class Heliodon {
 		calendar.set(calendar.get(Calendar.YEAR), 0, (int)Math.round(days));
 		
 		if (updateGUI)
-			MainFrame.getInstance().getDateSpinner().setValue(calendar.getTime());
+			MainFrame.getInstance().getMainPanel().getDateSpinner().setValue(calendar.getTime());
 		
 		if (redrawHeliodon)
 			dirtySunPath = true;

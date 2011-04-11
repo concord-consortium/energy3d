@@ -1,5 +1,7 @@
 package org.concord.energy3d.scene;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -12,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -130,10 +133,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private static final double MOVE_SPEED = 5;
 
 	static public final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
-	static private final SceneManager instance = new SceneManager(MainFrame.getInstance().getContentPane());
+	static private final SceneManager instance = new SceneManager(MainPanel.getInstance());
 	static private final boolean JOGL = true;
 	private final Canvas canvas;
-	private final FrameHandler frameHandler;
+	public final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
 	private final Node root = new Node("Root");
 	private final Node backgroundRoot = new Node("Scenary Root");
@@ -194,12 +197,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		panel.addComponentListener(new java.awt.event.ComponentAdapter() {
 			public void componentResized(java.awt.event.ComponentEvent e) {
+				System.out.println("resize");
 				resizeCamera();
 				if (heliodon != null)
 					heliodon.updateBloom();
 			}
 		});
-		panel.add((Component) canvas, "Center");
+//		panel.setBackground(Color.RED);
+//		panel.add((Component) canvas, "Center");
+		panel.add((Component) canvas, BorderLayout.CENTER);
+//		((Component) canvas).setVisible(true);
 		System.out.println("done");
 	}
 
@@ -257,8 +264,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.addOccluder(Scene.getRoot());
 
 		final Date today = Calendar.getInstance().getTime();
-		MainFrame.getInstance().getDateSpinner().setValue(today);
-		MainFrame.getInstance().getTimeSpinner().setValue(today);
+		MainFrame.getInstance().getMainPanel().getDateSpinner().setValue(today);
+		MainFrame.getInstance().getMainPanel().getTimeSpinner().setValue(today);
 		heliodon = new Heliodon(root, light, passManager, logicalLayer, today);
 
 		Scene.getInstance();
@@ -271,7 +278,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final Spatial compass = createCompass();
 				compass.setScale(0.1);
 				compass.setTranslation(-1, -0.7, 2);
-				cameraNode.attachChild(compass);
+//				cameraNode.attachChild(compass);
 				return null;
 			}
 		});
@@ -282,7 +289,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void run() {
 		frameHandler.init();
-		while (!exit) {
+//		while (!exit) {			
 			frameHandler.updateFrame();
 			final double syncNS = 1000000000.0 / 60;
 			long sinceLast = System.nanoTime() - lastRenderTime;
@@ -294,7 +301,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}
 			lastRenderTime = System.nanoTime();
-		}
+//		}
 	}
 
 	public void update(final ReadOnlyTimer timer) {
@@ -327,6 +334,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public boolean renderUnto(Renderer renderer) {
+		System.out.println("renderUnto");
 		if (cameraNode == null)
 			initCamera();			
 		// try {
