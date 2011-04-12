@@ -278,7 +278,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable { //,
 				final Spatial compass = createCompass();
 				compass.setScale(0.1);
 				compass.setTranslation(-1, -0.7, 2);
-//				cameraNode.attachChild(compass);
+				cameraNode.attachChild(compass);
 				return null;
 			}
 		});
@@ -306,7 +306,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable { //,
 
 //	public void update(final ReadOnlyTimer timer) {
 	public boolean renderUnto(Renderer renderer) {
-		final double tpf = 0; //timer.getTimePerFrame();
+		final double tpf = 0.10; //timer.getTimePerFrame();
 		HousePart.clearDrawFlags();
 		passManager.updatePasses(tpf);
 		logicalLayer.checkTriggers(tpf);
@@ -336,7 +336,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable { //,
 
 //	public boolean renderUnto(Renderer renderer) {
 		if (cameraNode == null)
-			initCamera();			
+			initCamera();					
 		// try {
 		// final boolean doRender = moveState != null;
 
@@ -503,7 +503,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable { //,
 								if (operationStick)
 									operationFlag = true;
 								else {
-									MainFrame.getInstance().deselect();
+//									MainFrame.getInstance().deselect();
+									MainPanel.getInstance().deselect();
 								}
 							}
 						}
