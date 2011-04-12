@@ -1,6 +1,7 @@
 package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Graphics;
 
 import javax.swing.JApplet;
@@ -8,6 +9,18 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.scene.SceneManager;
+
+import com.ardor3d.framework.DisplaySettings;
+import com.ardor3d.framework.FrameHandler;
+import com.ardor3d.framework.Scene;
+import com.ardor3d.framework.jogl.JoglAwtCanvas;
+import com.ardor3d.framework.jogl.JoglCanvasRenderer;
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.math.Ray3;
+import com.ardor3d.renderer.Renderer;
+import com.ardor3d.util.Timer;
+
+import javax.swing.JButton;
 
 public class MainApplet extends JApplet {
 	private static final long serialVersionUID = 1L;
@@ -33,16 +46,38 @@ public class MainApplet extends JApplet {
 			err.printStackTrace();
 		}
 		this.setSize(300, 200);
-		this.setContentPane(getJContentPane());		
+//		this.setContentPane(getJContentPane());
+		this.setContentPane(getMainPanel());
+		
+//        final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(SceneManager.getInstance());
+
+//        final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
+//        final JoglAwtCanvas theCanvas = new JoglAwtCanvas(settings, canvasRenderer);
+
+//        this.getMainPanel().add((Component)SceneManager.getInstance().getCanvas());
+
+//        final Timer timer = new Timer();
+//        final FrameHandler frameWork = new FrameHandler(timer);        
+//        frameWork.addCanvas(theCanvas);
+        
+//        setVisible(true);
+
+//        frameWork.init();
+//        while (true) {
+//            frameWork.updateFrame();
+//            Thread.yield();
+//        }        
+		
 		
 //		SceneManager.getInstance();
 //		new Thread(SceneManager.getInstance(), "Energy 3D Application").start();
 		
 //		SceneManager.getInstance().frameHandler.init();
-//		while (!exit) {			
-//		SceneManager.getInstance().frameHandler.updateFrame();
-		
-//		SceneManager.getInstance().renderUnto(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer());
+//		while (true) {			
+//			SceneManager.getInstance().frameHandler.updateFrame();		
+//////			SceneManager.getInstance().renderUnto(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer());
+//			Thread.yield();
+//		}
 		
 		
 		
@@ -56,14 +91,14 @@ public class MainApplet extends JApplet {
 	 * 
 	 * @return javax.swing.JPanel
 	 */
-	private JPanel getJContentPane() {
-		if (jContentPane == null) {
-			jContentPane = new JPanel();
-			jContentPane.setLayout(new BorderLayout());
-			jContentPane.add(getMainPanel(), BorderLayout.CENTER);
-		}
-		return jContentPane;
-	}
+//	private JPanel getJContentPane() {
+//		if (jContentPane == null) {
+//			jContentPane = new JPanel();
+//			jContentPane.setLayout(new BorderLayout());
+//			jContentPane.add(getMainPanel(), BorderLayout.CENTER);
+//		}
+//		return jContentPane;
+//	}
 
 	/**
 	 * This method initializes mainPanel	
@@ -80,13 +115,13 @@ public class MainApplet extends JApplet {
 	@Override
 	public void start() {
 //		SceneManager.getInstance();
-//		new Thread(SceneManager.getInstance(), "Energy 3D Application").start();
+		new Thread(SceneManager.getInstance(), "Energy 3D Application").start();
 //		SceneManager.getInstance().renderUnto(null);
 	}
 
 	@Override
 	public void stop() {
-//		SceneManager.getInstance().exit();		
+		SceneManager.getInstance().exit();		
 	}
 	
 //	@Override

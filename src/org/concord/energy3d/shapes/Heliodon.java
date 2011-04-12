@@ -439,7 +439,8 @@ public class Heliodon {
 		else {
 			final double scale = (Util.findBoundLength(bounds) / 2.0 + bounds.getCenter().length()) / 5.0;
 			System.out.println("Heliodon scale = " + scale);
-			root.setScale(scale);
+			if (!Double.isInfinite(scale))
+				root.setScale(scale);
 		}
 	}
 
@@ -582,6 +583,7 @@ public class Heliodon {
 	}
 
 	public void updateBloom() {
+		if (bloomRenderPass != null)
 		bloomRenderPass.markNeedsRefresh();
 	}
 

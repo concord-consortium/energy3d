@@ -117,7 +117,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
-public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
+public class SceneManager implements com.ardor3d.framework.Scene, Runnable { //, Updater {
 	public enum Operation {
 		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM
 	}
@@ -191,7 +191,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final PhysicalLayer physicalLayer = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
 		logicalLayer.registerInput(canvas, physicalLayer);
 
-		frameHandler.addUpdater(this);
+//		frameHandler.addUpdater(this);
 		frameHandler.addUpdater(PrintController.getInstance());
 		frameHandler.addUpdater(Blinker.getInstance());
 
@@ -208,10 +208,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		panel.add((Component) canvas, BorderLayout.CENTER);
 //		((Component) canvas).setVisible(true);
 		System.out.println("done");
-	}
-
-	@MainThread
-	public void init() {
+//	}
+//
+//	@MainThread
+//	public void init() {
 		System.out.print("Initializing SceneManager...");
 		AWTImageLoader.registerLoader();
 		try {
@@ -228,8 +228,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //		setCameraControl(CameraMode.ORBIT);
 //		resetCamera(ViewMode.NORMAL);
 		
-		if (JOGL)
-			initCamera();			
+//		if (JOGL)
+//			initCamera();
 
 		// enable depth test
 		final ZBufferState zbuf = new ZBufferState();
@@ -264,8 +264,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.addOccluder(Scene.getRoot());
 
 		final Date today = Calendar.getInstance().getTime();
-		MainFrame.getInstance().getMainPanel().getDateSpinner().setValue(today);
-		MainFrame.getInstance().getMainPanel().getTimeSpinner().setValue(today);
+//		MainFrame.getInstance().getMainPanel().getDateSpinner().setValue(today);
+//		MainFrame.getInstance().getMainPanel().getTimeSpinner().setValue(today);
 		heliodon = new Heliodon(root, light, passManager, logicalLayer, today);
 
 		Scene.getInstance();
@@ -289,7 +289,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void run() {
 		frameHandler.init();
-//		while (!exit) {			
+		while (!exit) {			
 			frameHandler.updateFrame();
 			final double syncNS = 1000000000.0 / 60;
 			long sinceLast = System.nanoTime() - lastRenderTime;
@@ -301,11 +301,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}
 			lastRenderTime = System.nanoTime();
-//		}
+		}
 	}
 
-	public void update(final ReadOnlyTimer timer) {
-		final double tpf = timer.getTimePerFrame();
+//	public void update(final ReadOnlyTimer timer) {
+	public boolean renderUnto(Renderer renderer) {
+		final double tpf = 0; //timer.getTimePerFrame();
 		HousePart.clearDrawFlags();
 		passManager.updatePasses(tpf);
 		logicalLayer.checkTriggers(tpf);
@@ -331,10 +332,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		heliodon.update();
 
 		root.updateGeometricState(tpf);
-	}
+//	}
 
-	public boolean renderUnto(Renderer renderer) {
-		System.out.println("renderUnto");
+//	public boolean renderUnto(Renderer renderer) {
 		if (cameraNode == null)
 			initCamera();			
 		// try {
