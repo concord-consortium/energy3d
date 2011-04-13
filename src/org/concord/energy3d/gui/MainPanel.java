@@ -23,6 +23,7 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
 
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
@@ -33,6 +34,7 @@ import java.awt.Color;
 public class MainPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final MainPanel instance = new MainPanel();
+	private MainFrame mainFrame;
 	private JToolBar appToolbar = null;
 	private JToggleButton selectButton = null;
 	private JToggleButton wallButton = null;
@@ -65,6 +67,14 @@ public class MainPanel extends JPanel {
 
 	public static MainPanel getInstance() {
 		return instance;
+	}
+
+	public void setMainFrame(MainFrame mainFrame) {
+		this.mainFrame = mainFrame;
+	}
+
+	public MainFrame getMainFrame() {
+		return mainFrame;
 	}
 
 	/**
@@ -296,8 +306,13 @@ public class MainPanel extends JPanel {
 			lightButton.setToolTipText("Show shadows");
 			lightButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					MainFrame.getInstance().getLightingMenu().setSelected(lightButton.isSelected());
-					MainFrame.getInstance().getShadowMenu().setSelected(lightButton.isSelected());
+					if (mainFrame != null) {
+						mainFrame.getLightingMenu().setSelected(lightButton.isSelected());
+						mainFrame.getShadowMenu().setSelected(lightButton.isSelected());
+					} else {
+						SceneManager.getInstance().setShading(lightButton.isSelected());
+						SceneManager.getInstance().setShadow(lightButton.isSelected());
+					}
 					final boolean showSunTools = lightButton.isSelected() || sunButton.isSelected();
 					calendarPanel.setVisible(showSunTools);
 					sunAnimButton.setEnabled(showSunTools);
@@ -506,7 +521,11 @@ public class MainPanel extends JPanel {
 			previewButton.setToolTipText("Preview printable parts");
 			previewButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					MainFrame.getInstance().getPreviewMenuItem().setSelected(previewButton.isSelected());
+					if (mainFrame != null)
+						mainFrame.getPreviewMenuItem().setSelected(previewButton.isSelected());
+					deselect();
+					PrintController.getInstance().setPrintPreview(previewButton.isSelected());					
+						
 				}
 			});
 		}

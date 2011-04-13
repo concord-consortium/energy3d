@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.util.Config;
 
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
@@ -32,6 +33,7 @@ public class MainApplet extends JApplet {
 	 */
 	public MainApplet() {
 		super();
+		Config.setApplet(this);
 	}
 
 	/**

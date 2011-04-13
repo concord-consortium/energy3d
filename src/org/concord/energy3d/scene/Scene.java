@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -75,7 +76,8 @@ public class Scene implements Serializable {
 		if (instance == null) {
 			instance = new Scene();
 			try {
-				instance.open(new File("./Energy3D Projects/Default.ser"));
+//				instance.open(new File("./Energy3D Projects/Default.ser"));
+				instance.open(new File("Energy3D Projects/Default.ser"));
 			} catch (Throwable e) {
 				instance = new Scene();
 			}
@@ -286,7 +288,8 @@ public class Scene implements Serializable {
 		final PrintController printController = PrintController.getInstance();
 		if (printController.isPrintPreview()) {
 //			printController.setPrintPreview(false);
-			MainFrame.getInstance().getPreviewMenuItem().setSelected(false);
+//			MainFrame.getInstance().getPreviewMenuItem().setSelected(false);
+			MainPanel.getInstance().getPreviewButton().setSelected(false);
 			while (!printController.isFinished())
 				Thread.yield();
 		}
@@ -308,12 +311,14 @@ public class Scene implements Serializable {
 
 	public void open(final File file) { // throws FileNotFoundException, IOException, ClassNotFoundException {
 		instance.newFile();
-		if (!file.exists())
+		if (!file.exists()) {
+			System.out.println("File does not exist: " + file.getAbsolutePath());
 			return;
+		}
 		Scene.file = file;
 		SceneManager.taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
-				System.out.print("Opening..." + file + "...");				
+				System.out.print("Opening..." + file.getAbsolutePath() + "...");				
 				ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
 				instance = (Scene) in.readObject();
 				instance.init();

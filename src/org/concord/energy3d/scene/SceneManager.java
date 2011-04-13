@@ -117,7 +117,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
-public class SceneManager implements com.ardor3d.framework.Scene, Runnable { //, Updater {
+public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 	public enum Operation {
 		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM
 	}
@@ -191,7 +191,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable { //,
 		final PhysicalLayer physicalLayer = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
 		logicalLayer.registerInput(canvas, physicalLayer);
 
-//		frameHandler.addUpdater(this);
+		frameHandler.addUpdater(this);
 		frameHandler.addUpdater(PrintController.getInstance());
 		frameHandler.addUpdater(Blinker.getInstance());
 
@@ -304,8 +304,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable { //,
 		}
 	}
 
-//	public void update(final ReadOnlyTimer timer) {
-	public boolean renderUnto(Renderer renderer) {
+	public void update(final ReadOnlyTimer timer) {
+//	public boolean renderUnto(Renderer renderer) {
 		final double tpf = 0.10; //timer.getTimePerFrame();
 		HousePart.clearDrawFlags();
 		passManager.updatePasses(tpf);
@@ -332,9 +332,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable { //,
 		heliodon.update();
 
 		root.updateGeometricState(tpf);
-//	}
+	}
 
-//	public boolean renderUnto(Renderer renderer) {
+	public boolean renderUnto(Renderer renderer) {
 		if (cameraNode == null)
 			initCamera();					
 		// try {
@@ -863,7 +863,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable { //,
 		return operation;
 	}
 
-	public void setLighting(final boolean enable) {
+	public void setShading(final boolean enable) {
 		taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
 				lightState.setEnabled(enable);
@@ -1049,6 +1049,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable { //,
 
 	public Heliodon getHeliodon() {
 		return heliodon;
+	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public boolean isShadingEnabled() {
+		return lightState.isEnabled();
+	}
+
+	public boolean isShadowEnaled() {
+		return passManager.contains(shadowPass);
 	}
 
 }

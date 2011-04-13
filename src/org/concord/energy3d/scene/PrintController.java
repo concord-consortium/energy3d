@@ -9,6 +9,7 @@ import java.awt.print.PrinterJob;
 import java.util.ArrayList;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.UserData;
@@ -128,9 +129,11 @@ public class PrintController implements Updater {
 				renderer.getRenderer().setBackgroundColor(ColorRGBA.BLACK);
 				renderer.releaseCurrentContext();
 
-				final MainFrame frame = MainFrame.getInstance();
-				frame.getLightingMenu().setSelected(shadingSelected);
-				frame.getShadowMenu().setSelected(shadowSelected);
+//				final MainFrame frame = MainFrame.getInstance();
+//				frame.getLightingMenu().setSelected(shadingSelected);
+//				frame.getShadowMenu().setSelected(shadowSelected);
+				SceneManager.getInstance().setShading(shadingSelected);
+				SceneManager.getInstance().setShadow(shadowSelected);
 
 				SceneManager.getInstance().updatePrintPreviewScene(false);
 			}
@@ -228,16 +231,25 @@ public class PrintController implements Updater {
 		finish = false;
 		isPrintPreview = printPreview;
 
-		final MainFrame frame = MainFrame.getInstance();
+//		final MainFrame frame = MainFrame.getInstance();
+//		if (printPreview) {
+//			shadingSelected = frame.getLightingMenu().isSelected();
+//			shadowSelected = frame.getShadowMenu().isSelected();
+//
+//			if (shadingSelected)
+//				frame.getLightingMenu().setSelected(false);
+//			if (shadowSelected)
+//				frame.getShadowMenu().setSelected(false);
+//		}
 		if (printPreview) {
-			shadingSelected = frame.getLightingMenu().isSelected();
-			shadowSelected = frame.getShadowMenu().isSelected();
+			shadingSelected = SceneManager.getInstance().isShadingEnabled();
+			shadowSelected = SceneManager.getInstance().isShadowEnaled();
 
 			if (shadingSelected)
-				frame.getLightingMenu().setSelected(false);
+				SceneManager.getInstance().setShading(false);
 			if (shadowSelected)
-				frame.getShadowMenu().setSelected(false);
-		}
+				SceneManager.getInstance().setShadow(false);
+		}		
 	}
 
 	public boolean isPrintPreview() {

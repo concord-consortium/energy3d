@@ -89,6 +89,7 @@ public class MainFrame extends JFrame {
 	public MainPanel getMainPanel() {
 		if (mainPanel == null) {
 			mainPanel = MainPanel.getInstance();
+			mainPanel.setMainFrame(this);
 		}
 		return mainPanel;
 	}
@@ -302,8 +303,8 @@ public class MainFrame extends JFrame {
 			previewMenuItem = new JCheckBoxMenuItem("Print Preview");
 			previewMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					deselect();
-					PrintController.getInstance().setPrintPreview(previewMenuItem.isSelected());
+//					deselect();
+//					PrintController.getInstance().setPrintPreview(previewMenuItem.isSelected());
 					mainPanel.getPreviewButton().setSelected(previewMenuItem.isSelected());
 				}
 			});
@@ -452,7 +453,7 @@ public class MainFrame extends JFrame {
 			lightingMenu.setText("Shading");
 			lightingMenu.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					SceneManager.getInstance().setLighting(lightingMenu.isSelected());
+					SceneManager.getInstance().setShading(lightingMenu.isSelected());
 				}
 			});
 		}

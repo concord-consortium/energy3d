@@ -27,7 +27,7 @@ public class MainApplication {
 			e.printStackTrace();
 		}
 		final SceneManager scene = SceneManager.getInstance();
-		MainFrame.getInstance().setVisible(true);
+		MainFrame.getInstance().setVisible(true);		
 		new Thread(scene, "Energy 3D Application").start();
 	}
 

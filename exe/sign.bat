@@ -1,0 +1,1 @@
+jarsigner energy3d.jar mykey

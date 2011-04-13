@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.FontManager;
@@ -385,7 +386,7 @@ public class Heliodon {
 		calendar.set(Calendar.MINUTE, minutes);		
 		
 		if (updateGUI)
-			MainFrame.getInstance().getMainPanel().getTimeSpinner().setValue(calendar.getTime());
+			MainPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
 		
 		if (redrawHeliodon)
 			drawSun();				
@@ -402,7 +403,7 @@ public class Heliodon {
 		calendar.set(calendar.get(Calendar.YEAR), 0, (int)Math.round(days));
 		
 		if (updateGUI)
-			MainFrame.getInstance().getMainPanel().getDateSpinner().setValue(calendar.getTime());
+			MainPanel.getInstance().getDateSpinner().setValue(calendar.getTime());
 		
 		if (redrawHeliodon)
 			dirtySunPath = true;

@@ -561,6 +561,12 @@ Version 0.3 - March 7, 2011
 - create and test html page to host the applet for both newer jnlp based and older JNLPAppletLauncher based applets
 - use the new deployJava.runApplet mechanism to run the applet
 - included signed jogl.jar and gluegen-rt.jar in the lib folder so that both applet and application will run without exception
+- separate main panel from the main frame
+- create embedded applet gui
+- move initialization code from init to the constructor
+- sign the applet to deal with security exceptions
+- avoid loading the mainFrame when in applet mode
+- package a fully embedded applet
 
 - *allow rotation of scene with respect to north
 
