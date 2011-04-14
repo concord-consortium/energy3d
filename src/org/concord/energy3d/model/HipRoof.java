@@ -6,7 +6,6 @@ import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class HipRoof extends Roof {
 	private static final long serialVersionUID = 1L;

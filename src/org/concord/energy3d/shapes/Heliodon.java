@@ -4,7 +4,6 @@ import java.nio.FloatBuffer;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;

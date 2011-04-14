@@ -3,7 +3,6 @@ package org.concord.energy3d.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Angle90Annotation;
 import org.concord.energy3d.shapes.AngleAnnotation;

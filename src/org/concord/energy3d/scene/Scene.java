@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
@@ -22,6 +21,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.util.Config;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
@@ -77,7 +77,12 @@ public class Scene implements Serializable {
 			instance = new Scene();
 			try {
 //				instance.open(new File("./Energy3D Projects/Default.ser"));
-				instance.open(new File("Energy3D Projects/Default.ser"));
+				if (!Config.isApplet())
+					instance.open(new File("Energy3D Projects/Default.ser"));
+				else if (Config.getApplet().getParameter("file") != null)
+					instance.open(new File(Config.getApplet().getParameter("file")));
+				else
+					instance.open(new File("Default.ser"));
 			} catch (Throwable e) {
 				instance = new Scene();
 			}

@@ -8,8 +8,6 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.ArrayList;
 
-import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.UserData;

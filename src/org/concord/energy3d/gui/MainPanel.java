@@ -29,7 +29,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
-import java.awt.Color;
+import org.concord.energy3d.util.Config;
 
 public class MainPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -96,7 +96,6 @@ public class MainPanel extends JPanel {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		this.setSize(1000, 300);
 		this.setLayout(new BorderLayout());
-		this.setBackground(new Color(255, 204, 102));
 		this.add(getAppToolbar(), BorderLayout.NORTH);
 	}
 
@@ -108,42 +107,51 @@ public class MainPanel extends JPanel {
 	private JToolBar getAppToolbar() {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
-			appToolbar.add(getSelectButton());
-			appToolbar.add(getResizeButton());
-			appToolbar.addSeparator();
-			appToolbar.add(getFoundationButton());
-			appToolbar.add(getWallButton());
-			appToolbar.add(getDoorButton());
-			appToolbar.add(getWindowButton());
-			appToolbar.add(getRoofButton());
-			appToolbar.add(getRoofHipButton());
-			appToolbar.add(getRoofCustomButton());
-			appToolbar.add(getFloorButton());
-			appToolbar.addSeparator();
+			final boolean showEditTools = Config.isEditable();
+			if (showEditTools) {
+				appToolbar.add(getSelectButton());
+				appToolbar.add(getResizeButton());
+				appToolbar.addSeparator();
+				appToolbar.add(getFoundationButton());
+				appToolbar.add(getWallButton());
+				appToolbar.add(getDoorButton());
+				appToolbar.add(getWindowButton());
+				appToolbar.add(getRoofButton());
+				appToolbar.add(getRoofHipButton());
+				appToolbar.add(getRoofCustomButton());
+				appToolbar.add(getFloorButton());
+				appToolbar.addSeparator();
+			}
 			appToolbar.add(getLightButton());
 			appToolbar.add(getSunButton());
 			appToolbar.add(getSunAnimButton());
 			appToolbar.add(getCalendarPanel());
-			appToolbar.addSeparator();
-			appToolbar.add(getRotAnimButton());
-			appToolbar.add(getTopViewButton());
-			appToolbar.add(getGridButton());
-			appToolbar.add(getSnapButton());
-			appToolbar.addSeparator();
+			if (showEditTools) {
+				appToolbar.addSeparator();
+				appToolbar.add(getRotAnimButton());
+				appToolbar.add(getTopViewButton());
+				appToolbar.add(getGridButton());
+				appToolbar.add(getSnapButton());
+				appToolbar.addSeparator();
+			} else
+				appToolbar.add(getRotAnimButton());
+
 			appToolbar.add(getAnnotationToggleButton());
 			appToolbar.add(getPreviewButton());
 
-			final ButtonGroup bg = new ButtonGroup();
-			bg.add(selectButton);
-			bg.add(resizeButton);
-			bg.add(foundationButton);
-			bg.add(wallButton);
-			bg.add(doorButton);
-			bg.add(windowButton);
-			bg.add(roofButton);
-			bg.add(roofHipButton);
-			bg.add(roofCustomButton);
-			bg.add(floorButton);
+			if (showEditTools) {
+				final ButtonGroup bg = new ButtonGroup();
+				bg.add(selectButton);
+				bg.add(resizeButton);
+				bg.add(foundationButton);
+				bg.add(wallButton);
+				bg.add(doorButton);
+				bg.add(windowButton);
+				bg.add(roofButton);
+				bg.add(roofHipButton);
+				bg.add(roofCustomButton);
+				bg.add(floorButton);
+			}
 		}
 		return appToolbar;
 	}
@@ -499,6 +507,7 @@ public class MainPanel extends JPanel {
 		if (sunAnimButton == null) {
 			sunAnimButton = new JToggleButton();
 			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/sun_anim.png")));
+			sunAnimButton.setEnabled(false);
 			sunAnimButton.setToolTipText("Animate sun");
 			sunAnimButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
@@ -524,8 +533,8 @@ public class MainPanel extends JPanel {
 					if (mainFrame != null)
 						mainFrame.getPreviewMenuItem().setSelected(previewButton.isSelected());
 					deselect();
-					PrintController.getInstance().setPrintPreview(previewButton.isSelected());					
-						
+					PrintController.getInstance().setPrintPreview(previewButton.isSelected());
+
 				}
 			});
 		}

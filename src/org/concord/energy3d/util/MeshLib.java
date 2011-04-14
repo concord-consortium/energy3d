@@ -3,7 +3,6 @@ package org.concord.energy3d.util;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;

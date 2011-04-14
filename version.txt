@@ -567,6 +567,10 @@ Version 0.3 - March 7, 2011
 - sign the applet to deal with security exceptions
 - avoid loading the mainFrame when in applet mode
 - package a fully embedded applet
+- fix security warnings due to depending libraries by signing them
+- allow "file" parameter passed to applet
+- allow "edit" parameter passed to applet to customize the toolbar and only show non-editing tools
+- clean up the applet
 
 - *allow rotation of scene with respect to north
 

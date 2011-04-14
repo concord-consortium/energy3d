@@ -1,7 +1,5 @@
 package org.concord.energy3d.util;
 
-import java.awt.Color;
-
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.Roof;
@@ -19,7 +17,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
