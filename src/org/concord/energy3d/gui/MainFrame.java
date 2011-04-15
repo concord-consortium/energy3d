@@ -8,6 +8,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -236,7 +238,11 @@ public class MainFrame extends JFrame {
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
-						Scene.getInstance().open(fileChooser.getSelectedFile());
+						try {
+							Scene.getInstance().open(fileChooser.getSelectedFile().toURI().toURL());
+						} catch (MalformedURLException e1) {
+							e1.printStackTrace();
+						}
 					}
 				}
 			});
@@ -255,11 +261,11 @@ public class MainFrame extends JFrame {
 			saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					try {
-						final File file = Scene.getFile();
-						if (file != null)
-							Scene.getInstance().save(file);
+						final URL url = Scene.getURL();
+						if (url != null)
+							Scene.getInstance().save(url);
 						else if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
-							Scene.getInstance().save(fileChooser.getSelectedFile());
+							Scene.getInstance().save(fileChooser.getSelectedFile().toURI().toURL());
 					} catch (Throwable err) {
 						err.printStackTrace();
 						JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -565,7 +571,10 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
 						try {
-							Scene.getInstance().save(fileChooser.getSelectedFile());
+							File file = fileChooser.getSelectedFile();
+							if (!file.getName().toLowerCase().endsWith(".ser"))
+								file = new File(file.toString() + ".ser");
+							Scene.getInstance().save(file.toURI().toURL());
 						} catch (Throwable err) {
 							err.printStackTrace();
 							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

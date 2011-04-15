@@ -571,6 +571,7 @@ Version 0.3 - March 7, 2011
 - allow "file" parameter passed to applet
 - allow "edit" parameter passed to applet to customize the toolbar and only show non-editing tools
 - clean up the applet
+- use URL instead of File to locate files
 
 - *allow rotation of scene with respect to north
 

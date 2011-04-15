@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -59,7 +61,7 @@ public class Scene implements Serializable {
 	private static final Node root = new Node("House Root");
 	private static final Node originalHouseRoot = new Node("Original House Root");
 	private static Scene instance;
-	private static File file = null;
+	private static URL url = null;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private double RADIUS = 0;
 	transient int C; // = 20;
@@ -78,12 +80,13 @@ public class Scene implements Serializable {
 			try {
 //				instance.open(new File("./Energy3D Projects/Default.ser"));
 				if (!Config.isApplet())
-					instance.open(new File("Energy3D Projects/Default.ser"));
+					instance.open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
 				else if (Config.getApplet().getParameter("file") != null)
-					instance.open(new File(Config.getApplet().getParameter("file")));
+					instance.open(new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file")));
 				else
-					instance.open(new File("Default.ser"));
+					instance.open(new URL(Config.getApplet().getCodeBase(), "Energy3D Projects/Default.ser"));
 			} catch (Throwable e) {
+				e.printStackTrace();
 				instance = new Scene();
 			}
 			root.attachChild(originalHouseRoot);
@@ -269,7 +272,7 @@ public class Scene implements Serializable {
 		return parts;
 	}
 
-	public void save(final File file) throws FileNotFoundException, IOException {
+	public void save(final URL url) throws FileNotFoundException, IOException {
 		// remove dead objects
 		final Iterator<HousePart> itr = parts.iterator();
 		while (itr.hasNext()) {
@@ -279,13 +282,16 @@ public class Scene implements Serializable {
 					itr.remove();
 		}
 		
-		Scene.file = file;
-		if (!file.getName().toLowerCase().endsWith(".ser"))
-			Scene.file = new File(file.toString() + ".ser");
-		System.out.print("Saving " + Scene.file + "...");
-		final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(Scene.file));
-		out.writeObject(this);
-		out.close();
+		Scene.url = url;
+		System.out.print("Saving " + Scene.url + "...");
+		ObjectOutputStream out;
+		try {
+			out = new ObjectOutputStream(new FileOutputStream(Scene.url.toURI().getPath()));
+			out.writeObject(this);
+			out.close();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
 		System.out.println("done");
 	}
 
@@ -311,23 +317,23 @@ public class Scene implements Serializable {
 			}
 		});
 		parts.clear();
-		file = null;
+		url = null;
 	}
 
-	public void open(final File file) { // throws FileNotFoundException, IOException, ClassNotFoundException {
+	public void open(final URL file) { // throws FileNotFoundException, IOException, ClassNotFoundException {
 		instance.newFile();
-		if (!file.exists()) {
-			System.out.println("File does not exist: " + file.getAbsolutePath());
-			return;
-		}
-		Scene.file = file;
+//		if (!file.exists()) {
+//			System.out.println("File does not exist: " + file.getAbsolutePath());
+//			return;
+//		}
+		Scene.url = file;
 		SceneManager.taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
-				System.out.print("Opening..." + file.getAbsolutePath() + "...");				
-				ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-				instance = (Scene) in.readObject();
-				instance.init();
+				System.out.print("Opening..." + file + "...");				
+				ObjectInputStream in = new ObjectInputStream(file.openStream());
+				instance = (Scene) in.readObject();				
 				in.close();
+				instance.init();
 				for (HousePart housePart : instance.getParts())
 					originalHouseRoot.attachChild(housePart.getRoot());
 				for (HousePart housePart : instance.getParts())
@@ -350,8 +356,8 @@ public class Scene implements Serializable {
 		return originalHouseRoot;
 	}
 
-	public static File getFile() {
-		return file;
+	public static URL getURL() {
+		return url;
 	}
 
 	public void setAnnotationsVisible(boolean visible) {

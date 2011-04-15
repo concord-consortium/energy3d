@@ -1005,7 +1005,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		compass.addController(new SpatialController<Spatial>() {
 			public void update(double time, Spatial caller) {
-				final Vector3 direction = Camera.getCurrentCamera().getDirection().normalize(null);
+				final Vector3 direction = canvas.getCanvasRenderer().getCamera().getDirection().normalize(null);
 				direction.setZ(0);
 				direction.normalizeLocal();
 				double angle = -direction.smallestAngleBetween(Vector3.UNIT_Y);

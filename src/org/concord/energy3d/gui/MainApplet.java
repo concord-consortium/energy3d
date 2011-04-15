@@ -24,6 +24,7 @@ public class MainApplet extends JApplet {
 //		this.setSize(300, 200);
 		this.setContentPane(getMainPanel());
 		SceneManager.getInstance();
+		
 	}	
 
 	private MainPanel getMainPanel() {
