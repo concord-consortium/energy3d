@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -81,10 +82,13 @@ public class Scene implements Serializable {
 //				instance.open(new File("./Energy3D Projects/Default.ser"));
 				if (!Config.isApplet())
 					instance.open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
-				else if (Config.getApplet().getParameter("file") != null)
-					instance.open(new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file")));
-				else
-					instance.open(new URL(Config.getApplet().getCodeBase(), "Energy3D Projects/Default.ser"));
+				else if (Config.getApplet().getParameter("file") != null) {
+					final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));					
+					instance.open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
+				} else {
+					final URL url = new URL(Config.getApplet().getCodeBase(), "Energy3D Projects/Default.ser");
+					instance.open((new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL()));
+				}
 			} catch (Throwable e) {
 				e.printStackTrace();
 				instance = new Scene();
