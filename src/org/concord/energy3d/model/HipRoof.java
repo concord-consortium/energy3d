@@ -22,7 +22,6 @@ public class HipRoof extends Roof {
 			Vector3 base = center;
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
-//			height = findHeight(base, p);
 			height = Math.max(0, p.getZ() - base.getZ());
 		} else if (editPointIndex == 1 || editPointIndex == 2) {
 			Vector3 p = closestPoint(points.get(0), Vector3.UNIT_Y, x, y);
@@ -30,22 +29,12 @@ public class HipRoof extends Roof {
 			points.get(editPointIndex).set(p);
 		}
 		draw();
-//		createIndividualMeshes();
 		if (container != null)
 			showPoints();
 
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
-//		final double edgeLenght = 0.3;
-//		Vector3 op = new Vector3();
-//		for (PolygonPoint p : wallUpperPoints) {
-//			op.set(p.getX(), p.getY(), 0).subtractLocal(center.getX(), center.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
-//			op.addLocal(p.getX(), p.getY(), p.getZ());
-//			p.set(op.getX(), op.getY(), op.getZ()+0.01);
-//		}
-//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
-		
 		// upper points
 		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 		if (editPointIndex == -1) {
@@ -62,21 +51,4 @@ public class HipRoof extends Roof {
 		polygon.addSteinerPoint(roofUpperPoint2);
 		return polygon;						
 	}
-	
-////	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
-//	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
-////		final ArrayList<PolygonPoint> wallUpperPoints = super.exploreWallNeighbors(startWall);
-//
-//		final double edgeLenght = 0.3;
-//		Vector3 op = new Vector3();
-//		for (PolygonPoint p : wallUpperPoints) {
-//			op.set(p.getX(), p.getY(), 0).subtractLocal(center.getX(), center.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
-//			op.addLocal(p.getX(), p.getY(), p.getZ());
-//			p.set(op.getX(), op.getY(), op.getZ()+0.01);
-//		}
-//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);		
-//		
-////		return wallUpperPoints;
-//	}	
-
 }
