@@ -7,6 +7,7 @@ import java.util.Date;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
@@ -200,18 +201,16 @@ public class Heliodon {
 		setDate(timeAndDate);
 		setTime(timeAndDate);
 		
+		if (!Config.isHeliodonMode())
+			setSunRegionAlwaysVisible(true);
+		
 		draw();
 	}
 
 	private void initMouse(final LogicalLayer logicalLayer) {
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.F), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				forceSunRegionOn = !forceSunRegionOn;	
-//				System.out.println("forceSunRegionOn = " + forceSunRegionOn);
-				if (forceSunRegionOn)
-					sunRegion.getSceneHints().setCullHint(CullHint.Inherit);
-				else
-					sunRegion.getSceneHints().setCullHint(CullHint.Always);
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {				
+				setSunRegionAlwaysVisible(!forceSunRegionOn);
 			}
 		}));		
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
@@ -620,6 +619,14 @@ public class Heliodon {
 			drawSun();
 		}
 		
+	}
+
+	public void setSunRegionAlwaysVisible(final boolean forceSunRegionOn) {
+		this.forceSunRegionOn = forceSunRegionOn;
+		if (forceSunRegionOn)
+			sunRegion.getSceneHints().setCullHint(CullHint.Inherit);
+		else
+			sunRegion.getSceneHints().setCullHint(CullHint.Always);
 	}
 	
 }

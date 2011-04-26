@@ -44,9 +44,11 @@ public class HipRoof extends Roof {
 			points.get(1).setZ(center.getZ() + height);
 			points.get(2).setZ(center.getZ() + height);
 		}
+//		addPointToPolygon(points.get(1), Vector3.UNIT_Y.negate(null));
+//		addPointToPolygon(points.get(2), Vector3.UNIT_X);
+		final Polygon polygon = new Polygon(wallUpperPoints);
 		PolygonPoint roofUpperPoint1 = new PolygonPoint(points.get(1).getX(), points.get(1).getY(), points.get(1).getZ());
 		PolygonPoint roofUpperPoint2 = new PolygonPoint(points.get(2).getX(), points.get(2).getY(), points.get(2).getZ());
-		final Polygon polygon = new Polygon(wallUpperPoints);
 		polygon.addSteinerPoint(roofUpperPoint1);
 		polygon.addSteinerPoint(roofUpperPoint2);
 		return polygon;						

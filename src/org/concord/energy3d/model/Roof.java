@@ -155,8 +155,8 @@ public abstract class Roof extends HousePart {
 				final Vector3 p1 = currentWall.getAbsPoints().get(pointIndex1);
 				final Vector3 p2 = currentWall.getAbsPoints().get(pointIndex2);
 				final ReadOnlyVector3 normal = currentWall.getFaceDirection();
-				addPointToPolygon(wallUpperPoints, p1, center, wallNormals, normal);
-				addPointToPolygon(wallUpperPoints, p2, center, wallNormals, normal);
+				addPointToPolygon(p1, normal);
+				addPointToPolygon(p2, normal);
 			}
 		});
 
@@ -164,24 +164,18 @@ public abstract class Roof extends HousePart {
 		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 	}
 
-	private void addPointToPolygon(final ArrayList<PolygonPoint> poly, final Vector3 p, final Vector3 center, final ArrayList<ReadOnlyVector3> wallNormals, final ReadOnlyVector3 normal) {
-//		System.out.println("-----------------------");
-//		System.out.println(Util.toString(p));
+	protected void addPointToPolygon(final Vector3 p, final ReadOnlyVector3 normal) {
 		final PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-		final int index = poly.indexOf(polygonPoint);
+		final int index = wallUpperPoints.indexOf(polygonPoint);
 		if (index == -1) {
-			poly.add(polygonPoint);
+			wallUpperPoints.add(polygonPoint);
 			center.addLocal(p);
 			wallNormals.add(normal);
 		} else {
 			// calculate wall normal in such a way to help in drawing overhang of roofs
 			final ReadOnlyVector3 n1 = wallNormals.get(index);
 			final double d = 1.0 / MathUtils.cos(n1.normalize(null).smallestAngleBetween(normal) / 2.0); // assuming thickness is 1
-//			System.out.println("angle = " + Util.degree(n1.smallestAngleBetween(normal)) + "\td = " + d);
-//			System.out.println("normal = " + Util.toString(normal));
-//			System.out.println("n1 = " + Util.toString(n1));
 			final Vector3 result = n1.add(normal, null).normalizeLocal().multiplyLocal(d);
-//			System.out.println("result = " + Util.toString(result));
 			wallNormals.set(index, result);
 		}
 	}

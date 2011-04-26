@@ -50,7 +50,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton floorButton = null;
 	private JToggleButton roofHipButton = null;
 	private JToggleButton resizeButton = null;
-	private JToggleButton sunButton = null;
+	private JToggleButton heliodonButton = null;
 	private JToggleButton sunAnimButton = null;
 	private JToggleButton annotationToggleButton;
 	protected Object lastSelection; // @jve:decl-index=0:
@@ -107,7 +107,7 @@ public class MainPanel extends JPanel {
 	private JToolBar getAppToolbar() {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
-			final boolean showEditTools = Config.isEditable();
+			final boolean showEditTools = !Config.isHeliodonMode();
 			if (showEditTools) {
 				appToolbar.add(getSelectButton());
 				appToolbar.add(getResizeButton());
@@ -123,7 +123,7 @@ public class MainPanel extends JPanel {
 				appToolbar.addSeparator();
 			}
 			appToolbar.add(getLightButton());
-			appToolbar.add(getSunButton());
+			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimButton());
 			appToolbar.add(getCalendarPanel());
 			if (showEditTools) {
@@ -137,7 +137,8 @@ public class MainPanel extends JPanel {
 				appToolbar.add(getRotAnimButton());
 
 			appToolbar.add(getAnnotationToggleButton());
-			appToolbar.add(getPreviewButton());
+			if (showEditTools)
+				appToolbar.add(getPreviewButton());
 
 			if (showEditTools) {
 				final ButtonGroup bg = new ButtonGroup();
@@ -321,7 +322,7 @@ public class MainPanel extends JPanel {
 						SceneManager.getInstance().setShading(lightButton.isSelected());
 						SceneManager.getInstance().setShadow(lightButton.isSelected());
 					}
-					final boolean showSunTools = lightButton.isSelected() || sunButton.isSelected();
+					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
 					calendarPanel.setVisible(showSunTools);
 					sunAnimButton.setEnabled(showSunTools);
 				}
@@ -477,25 +478,25 @@ public class MainPanel extends JPanel {
 	}
 
 	/**
-	 * This method initializes sunButton
+	 * This method initializes heliodonButton
 	 * 
 	 * @return javax.swing.JToggleButton
 	 */
-	private JToggleButton getSunButton() {
-		if (sunButton == null) {
-			sunButton = new JToggleButton();
-			sunButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/sun_heliodon.png")));
-			sunButton.setToolTipText("Show sun heliodon");
-			sunButton.addItemListener(new java.awt.event.ItemListener() {
+	public JToggleButton getHeliodonButton() {
+		if (heliodonButton == null) {
+			heliodonButton = new JToggleButton();
+			heliodonButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/sun_heliodon.png")));
+			heliodonButton.setToolTipText("Show sun heliodon");
+			heliodonButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					SceneManager.getInstance().setSunControl(sunButton.isSelected());
-					final boolean showSunTools = lightButton.isSelected() || sunButton.isSelected();
+					SceneManager.getInstance().setSunControl(heliodonButton.isSelected());
+					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
 					calendarPanel.setVisible(showSunTools);
 					sunAnimButton.setEnabled(showSunTools);
 				}
 			});
 		}
-		return sunButton;
+		return heliodonButton;
 	}
 
 	/**

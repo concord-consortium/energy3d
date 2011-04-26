@@ -357,7 +357,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
 
 		// if (doRender)
-		passManager.renderPasses(renderer);
+		try {
+			passManager.renderPasses(renderer);
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+			passManager.remove(shadowPass);
+		}
 		// } catch (Exception e) {
 		// e.printStackTrace();
 		// }
@@ -462,7 +467,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private void initMouse() {
 
-		if (Config.isEditable())
+		if (!Config.isHeliodonMode())
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 					taskManager.update(new Callable<Object>() {
@@ -489,7 +494,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}));
 
-		if (Config.isEditable())
+		if (!Config.isHeliodonMode())
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 
@@ -531,7 +536,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}));
 
-		if (Config.isEditable())
+		if (!Config.isHeliodonMode())
 			logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 					// mouseMoveFlag = true;
@@ -1069,6 +1074,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void init() {
 		 if (JOGL)
 			 initCamera();
+		if (Config.isHeliodonMode())
+			MainPanel.getInstance().getHeliodonButton().setSelected(true);
+
 
 	}
 

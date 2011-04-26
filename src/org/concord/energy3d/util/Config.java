@@ -17,7 +17,10 @@ public class Config {
 		return Config.applet != null;
 	}
 
-	public static boolean isEditable() {
-		return !Config.isApplet() || !"false".equalsIgnoreCase(Config.getApplet().getParameter("edit"));
+	public static boolean isHeliodonMode() {
+		if (!isApplet())
+			return false;
+		else
+			return "true".equalsIgnoreCase(Config.getApplet().getParameter("heliodon"));
 	}
 }
