@@ -257,30 +257,36 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		// shadowPass = new ParallelSplitShadowMapPass(light, 512, 3);
 		shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
+		shadowPass.setEnabled(false);
 		shadowPass.setUseObjectCullFace(true);
 		shadowPass.add(floor);
 		shadowPass.add(Scene.getRoot());
 		shadowPass.addOccluder(Scene.getRoot());
 
 		final Date today = Calendar.getInstance().getTime();
-		// MainFrame.getInstance().getMainPanel().getDateSpinner().setValue(today);
-		// MainFrame.getInstance().getMainPanel().getTimeSpinner().setValue(today);
 		heliodon = new Heliodon(root, light, passManager, logicalLayer, today);
+		taskManager.update(new Callable<Object>() {
+			public Object call() throws Exception {
+				MainPanel.getInstance().getDateSpinner().setValue(today);
+				MainPanel.getInstance().getTimeSpinner().setValue(today);
+				return null;
+			}
+		});
 
 		Scene.getInstance();
 
 		SelectUtil.init(floor, Scene.getRoot());
 		initMouse();
 
-//		taskManager.update(new Callable<Object>() {
-//			public Object call() throws Exception {
-//				final Spatial compass = createCompass();
-//				compass.setScale(0.1);
-//				compass.setTranslation(-1, -0.7, 2);
-//				cameraNode.attachChild(compass);
-//				return null;
-//			}
-//		});
+		// taskManager.update(new Callable<Object>() {
+		// public Object call() throws Exception {
+		// final Spatial compass = createCompass();
+		// compass.setScale(0.1);
+		// compass.setTranslation(-1, -0.7, 2);
+		// cameraNode.attachChild(compass);
+		// return null;
+		// }
+		// });
 
 		root.updateGeometricState(0, true);
 		System.out.println("Finished initialization.");
@@ -333,7 +339,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		root.updateGeometricState(tpf);
 	}
 
-	public boolean renderUnto(Renderer renderer) {
+	public boolean renderUnto(final Renderer renderer) {
 		if (cameraNode == null)
 			initCamera();
 		// try {
@@ -357,11 +363,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
 
 		// if (doRender)
+		passManager.renderPasses(renderer);
+
 		try {
-			passManager.renderPasses(renderer);
-		} catch (IllegalStateException e) {
+			shadowPass.renderPass(renderer);
+		} catch (Exception e) {
 			e.printStackTrace();
-			passManager.remove(shadowPass);
+			shadowPass.setEnabled(false);
 		}
 		// } catch (Exception e) {
 		// e.printStackTrace();
@@ -375,7 +383,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		cameraNode.updateFromCamera();
 		setCameraControl(CameraMode.ORBIT);
 		resetCamera(ViewMode.NORMAL);
-		
+
 		taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
 				final Spatial compass = createCompass();
@@ -384,7 +392,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				cameraNode.attachChild(compass);
 				return null;
 			}
-		});		
+		});
 	}
 
 	public PickResults doPick(Ray3 pickRay) {
@@ -703,6 +711,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}
 		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.Z), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				System.out.println("----zzzzzzzzz---------------------");
+			}
+		}));
 	}
 
 	public void setCameraControl(final CameraMode type) {
@@ -772,7 +785,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		camera.setFrame(loc, left, up, dir);
 		camera.lookAt(dir, Vector3.UNIT_Z);
-		
+
 		control.reset();
 		cameraNode.updateFromCamera();
 	}
@@ -942,10 +955,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void setShadow(final boolean shadow) {
 		taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
-				if (shadow)
-					passManager.add(shadowPass);
-				else
-					passManager.remove(shadowPass);
+				shadowPass.setEnabled(shadow);
+				// if (shadow)
+				// passManager.add(shadowPass);
+				// else
+				// passManager.remove(shadowPass);
 				return null;
 			}
 		});
@@ -1072,11 +1086,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public void init() {
-		 if (JOGL)
-			 initCamera();
+		if (JOGL)
+			initCamera();
 		if (Config.isHeliodonMode())
 			MainPanel.getInstance().getHeliodonButton().setSelected(true);
-
 
 	}
 
@@ -1085,7 +1098,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public boolean isShadowEnaled() {
-		return passManager.contains(shadowPass);
+		// return passManager.contains(shadowPass);
+		return shadowPass.isEnabled();
 	}
 
 }

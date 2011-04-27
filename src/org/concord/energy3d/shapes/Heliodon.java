@@ -201,7 +201,7 @@ public class Heliodon {
 		setDate(timeAndDate);
 		setTime(timeAndDate);
 		
-		if (!Config.isHeliodonMode())
+		if (Config.isHeliodonMode())
 			setSunRegionAlwaysVisible(true);
 		
 		draw();

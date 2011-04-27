@@ -40,8 +40,6 @@
       
 	height="480">
   
-<param name="heliodon" value="true" />
-<param name="file" value="Energy3D Projects/Default.ser" />
 </applet-desc>
 
 </jnlp>
