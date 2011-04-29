@@ -573,6 +573,9 @@ Version 0.3 - March 7, 2011
 - clean up the applet
 - use URL instead of File to locate files
 - use URI to allow urls that have space characters in them
+- Make jnlp work in Mac OS X
+- Make applet work in PCs
+- prevent crashing when shadow is not supported
 
 - *allow rotation of scene with respect to north
 
