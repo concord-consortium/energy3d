@@ -25,7 +25,7 @@
       
 	<jar href="energy3d.jar" main="true"/>
       
-	<extension name="jogl" href="http://download.java.net/media/jogl/builds/archive/jsr-231-1.x-webstart-current/jogl.jnlp" />
+	<extension name="jogl.jnlp" />
     
 </resources>
 

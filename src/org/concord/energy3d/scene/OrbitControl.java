@@ -119,7 +119,8 @@ public class OrbitControl extends CameraControl {
 	}
 	
 	public void computeNewFrontDistance() {
-		final Camera currentCamera = Camera.getCurrentCamera();
+//		final Camera currentCamera = Camera.getCurrentCamera();
+		final Camera currentCamera = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera();
 		if (currentCamera != null) {
 			frontDistance = _center.subtractLocal(currentCamera.getLocation()).length();
 			clearOrbitCenter();

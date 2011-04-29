@@ -28,6 +28,7 @@ public class SelectUtil {
 	private static int pickLayer = -1;
 	private static ColorRGBA currentEditPointOriginalColor = new ColorRGBA();
 	private static Mesh currentEditPointShape;
+	private static PickedHousePart pickedHousePart = null;
 	
 	static {
 		pickResults.setCheckDistance(true);		
@@ -115,10 +116,10 @@ public class SelectUtil {
 	public static HousePart selectHousePart(int x, int y, boolean edit) {
 		HousePart drawn = null;
 		HousePart lastHoveredObject = SceneManager.getInstance().getSelectedPart();
-		PickedHousePart selectedMesh = pickPart(x+0, y, housePartsNode);
+		pickedHousePart  = pickPart(x+0, y, housePartsNode);
 		UserData data = null;
-		if (selectedMesh != null)
-			data = selectedMesh.getUserData();
+		if (pickedHousePart != null)
+			data = pickedHousePart.getUserData();
 
 		// set the color of edit point that the mouse currently hovers on to red
 		if (data == null || !data.isEditPoint() || currentEditPointShape != data.getHousePart().getEditPointShape(data.getIndex())) {
@@ -183,5 +184,9 @@ public class SelectUtil {
 
 	public static void setPickLayer(int i) {
 		pickLayer = i;
+	}
+
+	public static PickedHousePart getPickedHousePart() {
+		return pickedHousePart;
 	}
 }

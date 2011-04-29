@@ -33,7 +33,7 @@
 
 	main-class="org.concord.energy3d.gui.MainApplet"
 	width="800"
-	height="700">
+	height="600">
 
 <param name="heliodon" value="true" />
 <param name="file" value="Energy3D Projects/Default.ser" />
