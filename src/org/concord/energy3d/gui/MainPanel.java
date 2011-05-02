@@ -30,6 +30,7 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Config;
+import javax.swing.JButton;
 
 public class MainPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -64,7 +65,7 @@ public class MainPanel extends JPanel {
 	private JComboBox cityComboBox = null;
 	private JSpinner latitudeSpinner = null;
 	private JToggleButton roofCustomButton = null;
-
+	private JToggleButton zoomToggleButton = null;
 	public static MainPanel getInstance() {
 		return instance;
 	}
@@ -140,6 +141,7 @@ public class MainPanel extends JPanel {
 			if (showEditTools)
 				appToolbar.add(getPreviewButton());
 
+				appToolbar.add(getZoomToggleButton());
 			if (showEditTools) {
 				final ButtonGroup bg = new ButtonGroup();
 				bg.add(selectButton);
@@ -750,5 +752,23 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return annotationToggleButton;
+	}
+
+	/**
+	 * This method initializes zoomToggleButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getZoomToggleButton() {
+		if (zoomToggleButton == null) {
+			zoomToggleButton = new JToggleButton();
+			zoomToggleButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/zoom.png")));
+			zoomToggleButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setZoomLock(zoomToggleButton.isSelected());
+				}
+			});
+		}
+		return zoomToggleButton;
 	}
 } // @jve:decl-index=0:visual-constraint="10,10"

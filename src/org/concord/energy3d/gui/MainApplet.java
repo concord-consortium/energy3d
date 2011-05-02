@@ -9,8 +9,12 @@ import java.awt.Toolkit;
 import javax.swing.JApplet;
 import javax.swing.UIManager;
 
+import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
+
+import com.ardor3d.math.ColorRGBA;
 
 public class MainApplet extends JApplet {
 	private static final long serialVersionUID = 1L;
@@ -43,6 +47,13 @@ public class MainApplet extends JApplet {
 //		this.setSize(300, 200);
 		this.setContentPane(getMainPanel());
 		SceneManager.getInstance();
+		
+		try {
+			HousePart.setDefaultColor(ColorRGBA.parseColor(this.getParameter("color"), null));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+		Scene.getInstance().setTextureEnabled(!"false".equalsIgnoreCase(this.getParameter("texture")));
 	}	
 
 	private MainPanel getMainPanel() {

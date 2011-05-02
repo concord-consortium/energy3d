@@ -106,8 +106,15 @@ public abstract class Roof extends HousePart {
 			// create roof parts
 			int meshIndex = 0;
 			MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
-			for (final Spatial child : flattenedMeshesRoot.getChildren())
+			for (final Spatial child : flattenedMeshesRoot.getChildren()) {				
 				child.setUserData(new UserData(this, meshIndex++, false));
+				final Mesh mesh = (Mesh)child;
+				if (!Scene.getInstance().isTextureEnabled())
+					mesh.setDefaultColor(defaultColor);
+				final MaterialState ms = new MaterialState();
+				ms.setColorMaterial(ColorMaterial.Diffuse);
+				mesh.setRenderState(ms);				
+			}
 
 			for (int i = 0; i < points.size(); i++) {
 				Vector3 p = points.get(i);

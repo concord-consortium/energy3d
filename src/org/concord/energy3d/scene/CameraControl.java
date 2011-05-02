@@ -17,7 +17,11 @@ import com.ardor3d.input.KeyboardState;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.InputTrigger;
+import com.ardor3d.input.logical.KeyHeldCondition;
+import com.ardor3d.input.logical.KeyReleasedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.MouseMovedCondition;
+import com.ardor3d.input.logical.MouseWheelMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -25,11 +29,12 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 public abstract class CameraControl {
-	public enum ButtonAction {MOVE, ROTATE, NONE};
+	public enum ButtonAction {MOVE, ROTATE, ZOOM, NONE};
     protected final Vector3 _upAxis = new Vector3();
     protected double _mouseRotateSpeed = .005;
     protected double _moveSpeed = 50;
@@ -122,7 +127,8 @@ public abstract class CameraControl {
         // Mouse look
         final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(), Predicates
                 .or(TriggerConditions.rightButtonDown(), TriggerConditions.middleButtonDown()));
-        final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), someMouseDown);
+        final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), Predicates.and(someMouseDown, Predicates.not(new KeyHeldCondition(Key.LCONTROL))));
+//        final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), someMouseDown);
         final TriggerAction dragAction = new TriggerAction() {
 
             // Test boolean to allow us to ignore first mouse event. First event can wildly vary based on platform.
@@ -144,6 +150,13 @@ public abstract class CameraControl {
 						} else if (left && leftButtonAction == ButtonAction.ROTATE || right && rightButtonAction == ButtonAction.ROTATE) {
                     		control.rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
                     		SceneManager.getInstance().getCameraNode().updateFromCamera();
+						} else if (left && leftButtonAction == ButtonAction.ZOOM || right && rightButtonAction == ButtonAction.ZOOM) {
+							int dy = inputStates.getCurrent().getMouseState().getDy();
+							if (dy < -4)
+								dy = -4;
+							if (dy > 4)
+								dy = 4;
+							zoom(source, tpf, dy / 1.0);
 						}
                     } else {
                         firstPing = false;
@@ -161,7 +174,28 @@ public abstract class CameraControl {
 //        	public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 //        		zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
 //        	}
-//        }));        
+//        })); 
+
+        
+		layer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
+			}
+		}));
+		
+		final KeyHeldCondition cond1 = new KeyHeldCondition(Key.LCONTROL);
+		final MouseMovedCondition cond2 = new MouseMovedCondition();
+		final Predicate<TwoInputStates> condition = Predicates.and(cond1, Predicates.and(cond2, someMouseDown));
+		layer.registerTrigger(new InputTrigger(condition, new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				int dy = inputStates.getCurrent().getMouseState().getDy();
+				if (dy < -4)
+					dy = -4;
+				if (dy > 4)
+					dy = 4;
+				zoom(source, tpf, dy / 1.0);
+			}
+		}));	        
     }
 
     public Predicate<TwoInputStates> setupKeyboardTriggers(final LogicalLayer layer) {
@@ -190,7 +224,8 @@ public abstract class CameraControl {
             }
         };
         _keyTrigger = new InputTrigger(keysHeld, moveAction);
-        layer.registerTrigger(_keyTrigger);
+        layer.registerTrigger(_keyTrigger);	
+        
         return keysHeld;
     }
 
@@ -225,5 +260,26 @@ public abstract class CameraControl {
 	
 	public void reset() {
 		
+	}
+	
+	private void zoom(final Canvas canvas, final double tpf, double val) {
+		if (Camera.getCurrentCamera().getProjectionMode() == ProjectionMode.Parallel) {
+			final double fac = val > 0 ? 1.1 : 0.9;
+			final Camera camera = canvas.getCanvasRenderer().getCamera();
+			camera.setFrustumTop(camera.getFrustumTop() * fac);
+			camera.setFrustumBottom(camera.getFrustumBottom() * fac);
+			camera.setFrustumLeft(camera.getFrustumLeft() * fac);
+			camera.setFrustumRight(camera.getFrustumRight() * fac);
+			camera.update();
+			setMoveSpeed(2 * camera.getFrustumTop() * camera.getFrustumTop());
+		} else {
+			final Camera camera = canvas.getCanvasRenderer().getCamera();
+			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * _moveSpeed * 2 * tpf).addLocal(camera.getLocation());
+			camera.setLocation(loc);
+
+			if (this instanceof OrbitControl)
+				((OrbitControl) this).computeNewFrontDistance();
+		}
+		SceneManager.getInstance().getCameraNode().updateFromCamera();
 	}
 }

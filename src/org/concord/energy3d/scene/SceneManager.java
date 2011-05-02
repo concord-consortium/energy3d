@@ -536,19 +536,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}));
 
-		final KeyHeldCondition cond1 = new KeyHeldCondition(Key.LCONTROL);
-		final MouseMovedCondition cond2 = new MouseMovedCondition();
-		final Predicate<TwoInputStates> condition = Predicates.and(cond1, cond2);
-		logicalLayer.registerTrigger(new InputTrigger(condition, new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				int dy = inputStates.getCurrent().getMouseState().getDy();
-				if (dy < -4)
-					dy = -4;
-				if (dy > 4)
-					dy = 4;
-				zoom(canvas, tpf, dy / 5.0);
-			}
-		}));
+//		final KeyHeldCondition cond1 = new KeyHeldCondition(Key.LCONTROL);
+//		final MouseMovedCondition cond2 = new MouseMovedCondition();
+//		final Predicate<TwoInputStates> condition = Predicates.and(cond1, cond2);
+//		logicalLayer.registerTrigger(new InputTrigger(condition, new TriggerAction() {
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				int dy = inputStates.getCurrent().getMouseState().getDy();
+//				if (dy < -4)
+//					dy = -4;
+//				if (dy > 4)
+//					dy = 4;
+//				zoom(canvas, tpf, dy / 5.0);
+//			}
+//		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LSHIFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -610,11 +610,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 			}
 		}));
-		logicalLayer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
-			}
-		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
+//			}
+//		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.X), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				heliodon.setHourAngle(heliodon.getHourAngle() + 0.03, true, true);
@@ -799,26 +799,26 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		rotAnim = !rotAnim;
 	}
 
-	private void zoom(final Canvas canvas, final double tpf, double val) {
-		if (Camera.getCurrentCamera().getProjectionMode() == ProjectionMode.Parallel) {
-			final double fac = val > 0 ? 1.1 : 0.9;
-			final Camera camera = canvas.getCanvasRenderer().getCamera();
-			camera.setFrustumTop(camera.getFrustumTop() * fac);
-			camera.setFrustumBottom(camera.getFrustumBottom() * fac);
-			camera.setFrustumLeft(camera.getFrustumLeft() * fac);
-			camera.setFrustumRight(camera.getFrustumRight() * fac);
-			camera.update();
-			control.setMoveSpeed(2 * camera.getFrustumTop() * camera.getFrustumTop());
-		} else {
-			final Camera camera = canvas.getCanvasRenderer().getCamera();
-			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * MOVE_SPEED * 2 * tpf).addLocal(camera.getLocation());
-			camera.setLocation(loc);
-
-			if (control instanceof OrbitControl)
-				((OrbitControl) control).computeNewFrontDistance();
-		}
-		getCameraNode().updateFromCamera();
-	}
+//	private void zoom(final Canvas canvas, final double tpf, double val) {
+//		if (Camera.getCurrentCamera().getProjectionMode() == ProjectionMode.Parallel) {
+//			final double fac = val > 0 ? 1.1 : 0.9;
+//			final Camera camera = canvas.getCanvasRenderer().getCamera();
+//			camera.setFrustumTop(camera.getFrustumTop() * fac);
+//			camera.setFrustumBottom(camera.getFrustumBottom() * fac);
+//			camera.setFrustumLeft(camera.getFrustumLeft() * fac);
+//			camera.setFrustumRight(camera.getFrustumRight() * fac);
+//			camera.update();
+//			control.setMoveSpeed(2 * camera.getFrustumTop() * camera.getFrustumTop());
+//		} else {
+//			final Camera camera = canvas.getCanvasRenderer().getCamera();
+//			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * MOVE_SPEED * 2 * tpf).addLocal(camera.getLocation());
+//			camera.setLocation(loc);
+//
+//			if (control instanceof OrbitControl)
+//				((OrbitControl) control).computeNewFrontDistance();
+//		}
+//		getCameraNode().updateFromCamera();
+//	}
 
 	private void moveUpDown(final Canvas canvas, final double tpf, boolean up) {
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
@@ -1087,6 +1087,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public boolean isShadowEnaled() {
 		// return passManager.contains(shadowPass);
 		return shadowPass.isEnabled();
+	}
+
+	public void setZoomLock(boolean zoomLock) {
+		control.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);
 	}
 
 }

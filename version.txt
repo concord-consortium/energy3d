@@ -576,7 +576,12 @@ Version 0.3 - March 7, 2011
 - Make jnlp work in Mac OS X
 - Make applet work in PCs
 - prevent crashing when shadow is not supported
-- create applet and jnlp that work locally without internet connection 
+- create applet and jnlp that work locally without internet connection
+- add applet parameters for texture and color
+- fix problem with roof color
+- fix problem with roof shading color
+- fix problem with Ctrl+Mouse Zoom not working when mouse is outside of canvas
+- add zoom button to toolbar
 
 - *allow rotation of scene with respect to north
 
