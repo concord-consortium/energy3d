@@ -33,6 +33,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -48,7 +49,7 @@ public abstract class Roof extends HousePart {
 	transient private ArrayList<PolygonPoint> wallUpperPoints;
 	transient private ArrayList<ReadOnlyVector3> wallNormals;
 	transient private Map<Mesh, Vector3> orgCenters;
-	transient private Mesh wireframeMesh;
+	transient private Line wireframeMesh;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -74,9 +75,13 @@ public abstract class Roof extends HousePart {
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		bottomMesh.setRenderState(ms);
 		
-		wireframeMesh = new Mesh("Roof (wireframe)");
+		wireframeMesh = new Line("Roof (wireframe)");
 		wireframeMesh.getMeshData().setIndexMode(IndexMode.Lines);
-		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(100));	
+		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(100));
+		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+		wireframeMesh.getSceneHints().setCastsShadows(false);
+		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);		
 		root.attachChild(wireframeMesh);
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());

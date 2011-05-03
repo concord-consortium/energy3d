@@ -17,6 +17,7 @@ import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BMText.Align;
@@ -59,6 +60,7 @@ public class Foundation extends HousePart {
 		wireframeMesh.getMeshData().setIndexMode(IndexMode.Quads);
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(16));
 		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.setRenderState(new WireframeState());
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);		

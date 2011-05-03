@@ -760,6 +760,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			else
 				resizeCamera(pageWidth);
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
+			loc = new Vector3(1.0f, -8.0f, 1.0f);
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			final int rows = PrintController.getInstance().getRows();
