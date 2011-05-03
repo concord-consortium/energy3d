@@ -22,11 +22,13 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -35,6 +37,7 @@ import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class Roof extends HousePart {
 	static private final long serialVersionUID = 1L;
@@ -45,6 +48,7 @@ public abstract class Roof extends HousePart {
 	transient private ArrayList<PolygonPoint> wallUpperPoints;
 	transient private ArrayList<ReadOnlyVector3> wallNormals;
 	transient private Map<Mesh, Vector3> orgCenters;
+	transient private Mesh wireframeMesh;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -69,6 +73,11 @@ public abstract class Roof extends HousePart {
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		bottomMesh.setRenderState(ms);
+		
+		wireframeMesh = new Mesh("Roof (wireframe)");
+		wireframeMesh.getMeshData().setIndexMode(IndexMode.Lines);
+		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(100));	
+		root.attachChild(wireframeMesh);
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 		
@@ -106,15 +115,23 @@ public abstract class Roof extends HousePart {
 			// create roof parts
 			int meshIndex = 0;
 			MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
-			for (final Spatial child : flattenedMeshesRoot.getChildren()) {				
-				child.setUserData(new UserData(this, meshIndex++, false));
+			final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
+			wireframeVertexBuffer.rewind();
+			wireframeVertexBuffer.limit(wireframeVertexBuffer.capacity());
+			for (final Spatial child : flattenedMeshesRoot.getChildren()) {
+				if (child.getSceneHints().getCullHint() == CullHint.Always)
+					break;	// reached the end of visible flatten meshes
+				child.setUserData(new UserData(this, meshIndex++, false));				
 				final Mesh mesh = (Mesh)child;
+				MeshLib.addConvexWireframe(wireframeVertexBuffer, mesh.getMeshData().getVertexBuffer());
 				if (!Scene.getInstance().isTextureEnabled())
 					mesh.setDefaultColor(defaultColor);
 				final MaterialState ms = new MaterialState();
 				ms.setColorMaterial(ColorMaterial.Diffuse);
 				mesh.setRenderState(ms);				
 			}
+			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
+			wireframeMesh.getMeshData().updateVertexCount();
 
 			for (int i = 0; i < points.size(); i++) {
 				Vector3 p = points.get(i);

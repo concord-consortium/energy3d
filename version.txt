@@ -582,6 +582,8 @@ Version 0.3 - March 7, 2011
 - fix problem with roof shading color
 - fix problem with Ctrl+Mouse Zoom not working when mouse is outside of canvas
 - add zoom button to toolbar
+- compute convex polygon around roof parts
+- draw lines for roof edges 
 
 - *allow rotation of scene with respect to north
 

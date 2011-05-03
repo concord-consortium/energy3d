@@ -343,6 +343,19 @@ public class Wall extends HousePart {
 			drawBackMesh(polygon, fromXY);
 			drawSurroundMesh(thicknessNormal);
 			drawWindowsSurroundMesh(thicknessNormal);
+			
+			// draw wireframe
+			final FloatBuffer buf = wireframeMesh.getMeshData().getVertexBuffer();
+			buf.rewind();
+			Vector3 w;
+			w = abspoints.get(0);
+			buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
+			w = abspoints.get(2);
+			buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
+			w = abspoints.get(3);
+			buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
+			w = abspoints.get(1);
+			buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
 
 			backMesh.updateModelBound();
 			surroundMesh.updateModelBound();
@@ -352,20 +365,6 @@ public class Wall extends HousePart {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-
-		// draw wireframe
-		final FloatBuffer buf = wireframeMesh.getMeshData().getVertexBuffer();
-		buf.rewind();
-		Vector3 w;
-		w = abspoints.get(0);
-		buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
-		w = abspoints.get(2);
-		buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
-		w = abspoints.get(3);
-		buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
-		w = abspoints.get(1);
-		buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
-
 	}
 
 	public boolean isPerpendicularToNeighbor(final int neighbor) {

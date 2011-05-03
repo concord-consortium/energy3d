@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -18,13 +19,13 @@ public class MeshLib {
 		final ArrayList<Vector3> normals = new ArrayList<Vector3>();
 		final ArrayList<Vector2> textures = new ArrayList<Vector2>();
 	}
-	
+
 	public static void groupByPlanner(final Mesh mesh, final Node root) {
 		final ArrayList<GroupData> groups = extractGroups(mesh);
 		computeHorizontalTextureCoords(groups);
 		createMeshes(root, groups);
 	}
-	
+
 	public static ArrayList<GroupData> extractGroups(final Mesh mesh) {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
@@ -44,19 +45,19 @@ public class MeshLib {
 			p3.subtract(p1, v2);
 			v1.cross(v2, norm);
 			norm.normalizeLocal();
-			
+
 			GroupData group = null;
 			for (final GroupData g : groups) {
-//				if (g.key.dot(norm) > 0.999) {	// if there is less than 2 degrees difference between the two vectors
-				if (g.key.dot(norm) > 0.99) {	// if there is less than 8 degrees difference between the two vectors
+				// if (g.key.dot(norm) > 0.999) { // if there is less than 2 degrees difference between the two vectors
+				if (g.key.dot(norm) > 0.99) { // if there is less than 8 degrees difference between the two vectors
 					for (final Vector3 groupPoint : g.vertices)
 						if (groupPoint.equals(p1) || groupPoint.equals(p2) || groupPoint.equals(p3)) {
 							group = g;
 							break;
 						}
 				}
-			}			
-			
+			}
+
 			if (group == null) {
 				group = new GroupData();
 				group.key.set(norm);
@@ -74,48 +75,47 @@ public class MeshLib {
 		}
 		return groups;
 	}
-	
+
 	private static void computeHorizontalTextureCoords(ArrayList<GroupData> groups) {
 		for (final GroupData group : groups) {
-//			System.out.println("---");
+			// System.out.println("---");
 			final Vector3 normal = group.normals.get(0);
-//			System.out.println("normal = " + Util.toString(normal));
-			
+			// System.out.println("normal = " + Util.toString(normal));
+
 			final Vector3 n1 = new Vector3();
 			n1.set(normal.getX(), normal.getY(), 0).normalizeLocal();
 			double angleZ = n1.smallestAngleBetween(Vector3.NEG_UNIT_Y);
-			
+
 			if (n1.dot(Vector3.UNIT_X) > 0)
 				angleZ = -angleZ;
-				
-			
+
 			final Matrix3 matrixZ = new Matrix3().fromAngles(0, 0, angleZ);
-//			System.out.println("angle = " + Util.degree(angleZ));
-			
+			// System.out.println("angle = " + Util.degree(angleZ));
+
 			final Vector3 n2 = new Vector3();
 			matrixZ.applyPost(normal, n2);
-//			System.out.println("n2 = " + Util.toString(n2));
-			final double angleX = n2.smallestAngleBetween(Vector3.NEG_UNIT_Y);						
-			
-//			System.out.println("angleX = " + Util.degree(angleX));
+			// System.out.println("n2 = " + Util.toString(n2));
+			final double angleX = n2.smallestAngleBetween(Vector3.NEG_UNIT_Y);
+
+			// System.out.println("angleX = " + Util.degree(angleX));
 			final Matrix3 matrix = new Matrix3().fromAngles(angleX, 0, 0).multiplyLocal(matrixZ);
-			
+
 			double minV = Double.MAX_VALUE;
-			
+
 			for (int i = 0; i < group.vertices.size(); i++) {
 				final Vector3 p = group.vertices.get(i).clone();
-//				System.out.println(Util.toString(p));
+				// System.out.println(Util.toString(p));
 				matrix.applyPost(p, p);
 				final double v = p.getZ();
 				final double u = p.getX();
 				group.textures.get(i).set(u, v);
 				if (minV > v)
 					minV = v;
-//				System.out.println(Util.toString(p) + "\t" + Util.toString(u) + ", " + Util.toString(v));
+				// System.out.println(Util.toString(p) + "\t" + Util.toString(u) + ", " + Util.toString(v));
 			}
-			
+
 			for (final Vector2 t : group.textures)
-				t.addLocal(0, -minV);			
+				t.addLocal(0, -minV);
 		}
 	}
 
@@ -124,13 +124,13 @@ public class MeshLib {
 		for (final GroupData group : groups) {
 			final Mesh newMesh;
 			if (meshIndex < root.getNumberOfChildren()) {
-				newMesh = (Mesh)root.getChild(meshIndex);
+				newMesh = (Mesh) root.getChild(meshIndex);
 				newMesh.getSceneHints().setCullHint(CullHint.Inherit);
 			} else {
 				newMesh = new Mesh("Roof Part #" + meshIndex);
 				root.attachChild(newMesh);
 			}
-			
+
 			FloatBuffer buf = newMesh.getMeshData().getVertexBuffer();
 			int n = group.vertices.size();
 			if (buf == null || buf.capacity() / 3 < n) {
@@ -141,7 +141,7 @@ public class MeshLib {
 			buf.limit(n * 3);
 			for (final Vector3 v : group.vertices)
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
-			
+
 			buf = newMesh.getMeshData().getNormalBuffer();
 			n = group.normals.size();
 			if (buf == null || buf.capacity() / 3 < n) {
@@ -149,18 +149,18 @@ public class MeshLib {
 				newMesh.getMeshData().setNormalBuffer(buf);
 			}
 			buf.rewind();
-			buf.limit(n * 3);			
+			buf.limit(n * 3);
 			for (Vector3 v : group.normals)
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
-			
+
 			buf = newMesh.getMeshData().getTextureBuffer(0);
 			n = group.textures.size();
 			if (buf == null || buf.capacity() / 2 < n) {
 				buf = BufferUtils.createVector2Buffer(n);
 				newMesh.getMeshData().setTextureBuffer(buf, 0);
-			}				
+			}
 			buf.rewind();
-			buf.limit(n * 2);			
+			buf.limit(n * 2);
 			for (Vector2 v : group.textures)
 				buf.put(v.getXf()).put(v.getYf());
 
@@ -168,12 +168,53 @@ public class MeshLib {
 			newMesh.updateModelBound();
 			newMesh.updateWorldBound(false);
 			meshIndex++;
-		}		
-		while(meshIndex < root.getNumberOfChildren()) {
+		}
+		while (meshIndex < root.getNumberOfChildren()) {
 			root.getChild(meshIndex).getSceneHints().setCullHint(CullHint.Always);
 			meshIndex++;
 		}
 	}
 
-	
+	public static void addConvexWireframe(final FloatBuffer wireframeVertexBuffer, final FloatBuffer vertexBuffer) {
+		vertexBuffer.rewind();
+		final Vector3 leftVertex = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
+		while(vertexBuffer.hasRemaining()) {
+			final double x = vertexBuffer.get();
+			if (x < leftVertex.getX())
+				leftVertex.set(x, vertexBuffer.get(), vertexBuffer.get());
+			else
+				vertexBuffer.position(vertexBuffer.position() + 2);
+		}
+		
+//		if (wireframeVertexBuffer.position() > 100)
+//			return;
+
+		final ReadOnlyVector3 normal = Vector3.UNIT_Z;
+		final Vector3 pointOnHull = new Vector3(leftVertex);
+		final Vector3 endpoint = new Vector3();
+		final Vector3 sj = new Vector3();
+		System.out.println("----------------------------");
+		do {
+			System.out.println(pointOnHull);
+			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
+			endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
+//			endpoint.set(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5));
+		    for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
+		    	sj.set(vertexBuffer.get(j*3), vertexBuffer.get(j*3+1), vertexBuffer.get(j*3+2));
+//		        if (S[j] is on left of line from P[i] to endpoint)
+		        final double dot = normal.cross(endpoint.subtract(pointOnHull, null), null).dot(sj.subtract(pointOnHull, null));
+				if (!sj.equals(pointOnHull) && dot > 0)
+		            endpoint.set(sj);   // found greater left turn, update endpoint
+				else if (!sj.equals(pointOnHull) && dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
+					endpoint.set(sj);   // found greater left turn, update endpoint
+		    }
+		    pointOnHull.set(endpoint);
+		    wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
+//		    wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
+		} while (!endpoint.equals(leftVertex));
+//		   until endpoint == P[0]      // wrapped around to first hull point
+		
+//		wireframeVertexBuffer.put(leftVertex.getXf()).put(leftVertex.getYf()).put(leftVertex.getZf());
+		
+	}
 }
