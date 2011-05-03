@@ -280,6 +280,14 @@ public class Wall extends HousePart {
 			for (HousePart child : children) {
 				child.draw();
 			}
+		
+		FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
+		final int requiredSize = (1 + children.size()) * 4 * 3;
+		if (wireframeVertexBuffer.capacity() < requiredSize) {
+			wireframeVertexBuffer = BufferUtils.createVector3Buffer((1 + children.size()) * 4);
+			wireframeMesh.getMeshData().setVertexBuffer(wireframeVertexBuffer);
+		} else
+			wireframeVertexBuffer.rewind();
 
 		// Add window holes
 		for (HousePart child : children) {
@@ -288,18 +296,22 @@ public class Wall extends HousePart {
 				PolygonPoint pp;
 				ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
 				p = winPoints.get(0);
+				wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 				pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 				toXY.transform(pp);
 				holePoints.add(pp);
 				p = winPoints.get(2);
+				wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 				pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 				toXY.transform(pp);
 				holePoints.add(pp);
 				p = winPoints.get(3);
+				wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 				pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 				toXY.transform(pp);
 				holePoints.add(pp);
 				p = winPoints.get(1);
+				wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 				pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 				toXY.transform(pp);
 				holePoints.add(pp);
@@ -345,17 +357,19 @@ public class Wall extends HousePart {
 			drawWindowsSurroundMesh(thicknessNormal);
 			
 			// draw wireframe
-			final FloatBuffer buf = wireframeMesh.getMeshData().getVertexBuffer();
-			buf.rewind();
+//			final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
+//			wireframeVertexBuffer.rewind();
 			Vector3 w;
 			w = abspoints.get(0);
-			buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
+			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf() + 0.01f);
 			w = abspoints.get(2);
-			buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
+			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf() + 0.01f);
 			w = abspoints.get(3);
-			buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
+			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
 			w = abspoints.get(1);
-			buf.put(w.getXf()).put(w.getYf()).put(w.getZf());
+			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
+			
+			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
 
 			backMesh.updateModelBound();
 			surroundMesh.updateModelBound();

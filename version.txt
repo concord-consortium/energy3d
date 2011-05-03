@@ -583,7 +583,10 @@ Version 0.3 - March 7, 2011
 - fix problem with Ctrl+Mouse Zoom not working when mouse is outside of canvas
 - add zoom button to toolbar
 - compute convex polygon around roof parts
-- draw lines for roof edges 
+- draw wireframe lines for roof edges
+- draw wireframe lines for each window on the walls
+- draw wireframe lines for the foundation
+
 
 - *allow rotation of scene with respect to north
 

@@ -1,20 +1,26 @@
 package org.concord.energy3d.model;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.SelectUtil;
 
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.WireframeState;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.util.geom.BufferUtils;
 
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
@@ -23,6 +29,7 @@ public class Foundation extends HousePart {
 	transient private Box boundingMesh;
 	transient private double newBoundingHeight;
 	transient private ArrayList<Vector3> orgPoints;
+	transient private Mesh wireframeMesh;
 	private double boundingHeight;
 
 	public Foundation() {
@@ -47,6 +54,15 @@ public class Foundation extends HousePart {
 
 		WireframeState wire = new WireframeState();
 		boundingMesh.setRenderState(wire);
+		
+		wireframeMesh = new Mesh("Foundation (wireframe)");
+		wireframeMesh.getMeshData().setIndexMode(IndexMode.Quads);
+		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(16));
+		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		wireframeMesh.getSceneHints().setCastsShadows(false);
+		wireframeMesh.setRenderState(new WireframeState());
+		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);		
+		root.attachChild(wireframeMesh);
 
 		UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -179,11 +195,31 @@ public class Foundation extends HousePart {
 			mesh.updateModelBound();
 			boundingMesh.setData(points.get(0), points.get(7));
 			boundingMesh.updateModelBound();
+			
+			// draw wireframe
+			final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
+			wireframeVertexBuffer.rewind();
+			drawSideWireframe(wireframeVertexBuffer, 0, 1);
+			drawSideWireframe(wireframeVertexBuffer, 1, 3);
+			drawSideWireframe(wireframeVertexBuffer, 3, 2);
+			drawSideWireframe(wireframeVertexBuffer, 2, 0);
 
 			if (original == null && resizeHouseMode)
 				for (HousePart child : children)
 					child.draw();
 		}
+	}
+
+	public void drawSideWireframe(final FloatBuffer wireframeVertexBuffer, final int i, final int j) {
+		Vector3 p;
+		p = abspoints.get(i);
+		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		p = abspoints.get(i);
+		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float)height);
+		p = abspoints.get(j);
+		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float)height);
+		p = abspoints.get(j);
+		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 	}
 
 	private void scanChildrenHeight() {
