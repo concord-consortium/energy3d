@@ -288,8 +288,11 @@ public class Wall extends HousePart {
 		if (wireframeVertexBuffer.capacity() < requiredSize) {
 			wireframeVertexBuffer = BufferUtils.createVector3Buffer((1 + children.size()) * 4);
 			wireframeMesh.getMeshData().setVertexBuffer(wireframeVertexBuffer);
-		} else
+		} else {
 			wireframeVertexBuffer.rewind();
+			wireframeVertexBuffer.limit(wireframeVertexBuffer.capacity());
+		}
+		
 
 		// Add window holes
 		for (HousePart child : children) {

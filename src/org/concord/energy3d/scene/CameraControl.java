@@ -156,7 +156,7 @@ public abstract class CameraControl {
 								dy = -4;
 							if (dy > 4)
 								dy = 4;
-							zoom(source, tpf, dy / 1.0);
+							zoom(source, tpf, -dy / 1.0);
 						}
                     } else {
                         firstPing = false;
@@ -193,7 +193,7 @@ public abstract class CameraControl {
 					dy = -4;
 				if (dy > 4)
 					dy = 4;
-				zoom(source, tpf, dy / 1.0);
+				zoom(source, tpf, -dy / 1.0);
 			}
 		}));	        
     }

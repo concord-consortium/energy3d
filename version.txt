@@ -587,6 +587,9 @@ Version 0.3 - March 7, 2011
 - draw wireframe lines for each window on the walls
 - draw wireframe lines for the foundation
 - fix problem with global line thickness
+- fix problem with heliodon not resizing
+- fix problem with print preview initial camera view
+- reverse the zoom control
 
 
 - *allow rotation of scene with respect to north

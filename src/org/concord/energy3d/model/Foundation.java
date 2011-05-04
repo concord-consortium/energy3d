@@ -205,6 +205,7 @@ public class Foundation extends HousePart {
 			drawSideWireframe(wireframeVertexBuffer, 1, 3);
 			drawSideWireframe(wireframeVertexBuffer, 3, 2);
 			drawSideWireframe(wireframeVertexBuffer, 2, 0);
+			wireframeMesh.updateModelBound();
 
 			if (original == null && resizeHouseMode)
 				for (HousePart child : children)

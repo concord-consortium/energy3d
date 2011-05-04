@@ -77,7 +77,7 @@ public abstract class Roof extends HousePart {
 		
 		wireframeMesh = new Line("Roof (wireframe)");
 		wireframeMesh.getMeshData().setIndexMode(IndexMode.Lines);
-		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(100));
+		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
 		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
@@ -137,6 +137,7 @@ public abstract class Roof extends HousePart {
 			}
 			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
 			wireframeMesh.getMeshData().updateVertexCount();
+			wireframeMesh.updateModelBound();
 
 			for (int i = 0; i < points.size(); i++) {
 				Vector3 p = points.get(i);
