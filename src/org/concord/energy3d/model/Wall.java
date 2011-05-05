@@ -449,7 +449,7 @@ public class Wall extends HousePart {
 
 	}
 
-	private Vector3 getThicknessNormal() {
+	public Vector3 getThicknessNormal() {
 		if (thicknessNormal != null)
 			return thicknessNormal;
 		final ArrayList<Vector3> points = abspoints;
@@ -872,5 +872,4 @@ public class Wall extends HousePart {
 		visitStamp = currentVisitStamp;
 //		System.out.println(this);
 	}
-
 }

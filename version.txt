@@ -590,6 +590,7 @@ Version 0.3 - March 7, 2011
 - fix problem with heliodon not resizing
 - fix problem with print preview initial camera view
 - reverse the zoom control
+- draw window frames
 
 
 - *allow rotation of scene with respect to north

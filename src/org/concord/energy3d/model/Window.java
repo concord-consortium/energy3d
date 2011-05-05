@@ -1,14 +1,24 @@
 package org.concord.energy3d.model;
 
+import java.nio.FloatBuffer;
+
 import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.util.Util;
 
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.scenegraph.Line;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.util.geom.BufferUtils;
+import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
@@ -17,13 +27,14 @@ public class Window extends HousePart {
 //	private transient FloatBuffer vertexBuffer;
 //	private transient FloatBuffer normalBuffer;
 	transient private BMText label1;
+	transient private Mesh bars;
 
 	public Window() {
 		super(2, 4, 0.30);
 	}
 
-//	protected void init() {
-//		super.init();
+	protected void init() {
+		super.init();
 ////		for (int i = 0; i < points.size(); i++)
 ////			abspoints.get(i).set(toAbsolute(abspoints.get(i)));
 //		mesh = new Mesh("Window");
@@ -49,7 +60,17 @@ public class Window extends HousePart {
 //		mesh.setUserData(new UserData(this));
 //		
 //		root.attachChild(mesh);
-//	}
+		
+		bars = new Line("Window (bars)");
+//		bars.setDefaultColor(ColorRGBA.BLACK);
+		((Line)bars).setLineWidth(3);
+		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
+		bars.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
+//		final MaterialState ms = new MaterialState();
+//		ms.setColorMaterial(ColorMaterial.Diffuse);
+//		bars.setRenderState(ms);
+		root.attachChild(bars);
+	}
 
 	public void addPoint(int x, int y) {
 		if (container != null)
@@ -95,8 +116,8 @@ public class Window extends HousePart {
 	}
 
 	protected void drawMesh() {
-//		if (points.size() < 4)
-//			return;
+		if (points.size() < 4)
+			return;
 //		vertexBuffer.rewind();
 //		for (Vector3 p : abspoints)
 //			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
@@ -109,6 +130,67 @@ public class Window extends HousePart {
 //			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
 //
 //		mesh.updateModelBound();
+		
+		final double divisionLength = 0.5;
+		final Vector3 halfThickness = ((Wall)container).getThicknessNormal().multiply(0.5, null);
+		FloatBuffer barsVertices = bars.getMeshData().getVertexBuffer();
+		FloatBuffer barsNormals = bars.getMeshData().getNormalBuffer();
+		final int cols = (int)Math.max(2, abspoints.get(0).distance(abspoints.get(2)) / divisionLength);
+		final int rows = (int)Math.max(2, abspoints.get(0).distance(abspoints.get(1)) / divisionLength);
+		if (barsVertices.capacity() < (4 + rows + cols) * 6) {
+			barsVertices = BufferUtils.createVector3Buffer((4 + rows + cols) * 2);
+			barsNormals = BufferUtils.createVector3Buffer((4 + rows + cols) * 2);
+			bars.getMeshData().setVertexBuffer(barsVertices);
+			bars.getMeshData().setNormalBuffer(barsVertices);
+		} else {
+			barsVertices.rewind();
+			barsVertices.limit(barsVertices.capacity());
+			barsNormals.rewind();
+			barsNormals.limit(barsVertices.capacity());			
+		}
+			
+		barsVertices.rewind();		
+		final Vector3 p = new Vector3();
+		abspoints.get(0).add(halfThickness, p);
+		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		abspoints.get(1).add(halfThickness, p);
+		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		abspoints.get(1).add(halfThickness, p);
+		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		abspoints.get(3).add(halfThickness, p);
+		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		abspoints.get(3).add(halfThickness, p);
+		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		abspoints.get(2).add(halfThickness, p);
+		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		abspoints.get(2).add(halfThickness, p);
+		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		abspoints.get(0).add(halfThickness, p);
+		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());		
+		
+		final ReadOnlyVector3 o = abspoints.get(0).add(halfThickness, null);
+		final ReadOnlyVector3 u = abspoints.get(2).subtract(abspoints.get(0), null);
+		final ReadOnlyVector3 v = abspoints.get(1).subtract(abspoints.get(0), null);
+		for (int col = 1; col < cols; col++) {
+			u.multiply((double)col/cols, p).addLocal(o);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p.addLocal(v);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
+		for (int row = 1; row < rows; row++) {
+			v.multiply((double)row/rows, p).addLocal(o);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p.addLocal(u);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
+		p.set(halfThickness).negateLocal().normalizeLocal();
+		for (int i = 0; i < barsVertices.position() / 3; i++) {
+//			barsNormals.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			barsNormals.put(1).put(1).put(1);
+		}
+		barsVertices.limit(barsVertices.position());
+		bars.getMeshData().updateVertexCount();
+		bars.updateModelBound();
 	}
 
 	protected void drawAnnotations() {
