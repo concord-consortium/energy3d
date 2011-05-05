@@ -64,8 +64,10 @@ public class Window extends HousePart {
 		bars = new Line("Window (bars)");
 //		bars.setDefaultColor(ColorRGBA.BLACK);
 		((Line)bars).setLineWidth(3);
+		((Line)bars).setAntialiased(true);
+		bars.getSceneHints().setCastsShadows(false);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
-		bars.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
+//		bars.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
 //		final MaterialState ms = new MaterialState();
 //		ms.setColorMaterial(ColorMaterial.Diffuse);
 //		bars.setRenderState(ms);
@@ -131,22 +133,22 @@ public class Window extends HousePart {
 //
 //		mesh.updateModelBound();
 		
-		final double divisionLength = 0.5;
+		final double divisionLength = 0.3;
 		final Vector3 halfThickness = ((Wall)container).getThicknessNormal().multiply(0.5, null);
 		FloatBuffer barsVertices = bars.getMeshData().getVertexBuffer();
-		FloatBuffer barsNormals = bars.getMeshData().getNormalBuffer();
+//		FloatBuffer barsNormals = bars.getMeshData().getNormalBuffer();
 		final int cols = (int)Math.max(2, abspoints.get(0).distance(abspoints.get(2)) / divisionLength);
 		final int rows = (int)Math.max(2, abspoints.get(0).distance(abspoints.get(1)) / divisionLength);
 		if (barsVertices.capacity() < (4 + rows + cols) * 6) {
 			barsVertices = BufferUtils.createVector3Buffer((4 + rows + cols) * 2);
-			barsNormals = BufferUtils.createVector3Buffer((4 + rows + cols) * 2);
+//			barsNormals = BufferUtils.createVector3Buffer((4 + rows + cols) * 2);
 			bars.getMeshData().setVertexBuffer(barsVertices);
 			bars.getMeshData().setNormalBuffer(barsVertices);
 		} else {
 			barsVertices.rewind();
 			barsVertices.limit(barsVertices.capacity());
-			barsNormals.rewind();
-			barsNormals.limit(barsVertices.capacity());			
+//			barsNormals.rewind();
+//			barsNormals.limit(barsVertices.capacity());			
 		}
 			
 		barsVertices.rewind();		
@@ -186,9 +188,10 @@ public class Window extends HousePart {
 		p.set(halfThickness).negateLocal().normalizeLocal();
 		for (int i = 0; i < barsVertices.position() / 3; i++) {
 //			barsNormals.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			barsNormals.put(1).put(1).put(1);
+//			barsNormals.put(1).put(1).put(1);
 		}
 		barsVertices.limit(barsVertices.position());
+//		barsNormals.limit(barsNormals.position());
 		bars.getMeshData().updateVertexCount();
 		bars.updateModelBound();
 	}
