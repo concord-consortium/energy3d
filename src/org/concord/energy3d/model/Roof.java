@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.MeshLib;
+import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
@@ -28,6 +29,7 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -383,5 +385,42 @@ public abstract class Roof extends HousePart {
 			p.set(op.getX(), op.getY(), op.getZ());
 		}
 		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+	}
+
+	public void setGable(int index) {
+		final Mesh mesh = (Mesh)getFlattenedMeshesRoot().getChild(index);
+		mesh.getSceneHints().setCullHint(CullHint.Always);
+		final Vector3 center = new Vector3();
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		vertexBuffer.rewind();
+		while (vertexBuffer.hasRemaining()) 
+			center.addLocal(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+		center.multiplyLocal(vertexBuffer.capacity() / 3);
+		System.out.println("center of roof mesh = " + center);
+//		Vector3 closestEditPoint = abspoints.get(0);
+		Vector3 base_1 = null;
+		Vector3 base_2 = null;
+		for (final Vector3 p : points) {
+//			if (closestEditPoint.distance(center) > p.distance(center))
+//				closestEditPoint = p;
+			if (p.getZ() - container.getAbsPoints().get(1).getZ() < MathUtils.ZERO_TOLERANCE) {
+				if (base_1 == null)
+					base_1 = p;
+				else {
+					base_2 = p;
+					break;
+				}
+			}
+		}
+		
+//		if (base_1 == null || base_2 == null)
+//			return;
+		
+		final Vector3 n = base_2.subtract(base_1, null).crossLocal(Vector3.UNIT_Z).negateLocal().normalizeLocal();
+		
+		for (final Vector3 p : points) {
+			final double distance = p.subtract(base_1, null).dot(n); 
+			p.addLocal(n.multiply(distance, null));
+		}		
 	}
 }

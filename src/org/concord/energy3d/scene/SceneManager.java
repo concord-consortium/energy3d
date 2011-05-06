@@ -20,6 +20,8 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HipRoof;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PyramidRoof;
+import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
@@ -117,7 +119,7 @@ import com.google.common.base.Predicates;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 	public enum Operation {
-		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM
+		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE
 	}
 
 	public enum CameraMode {
@@ -465,14 +467,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					taskManager.update(new Callable<Object>() {
 						public Object call() throws Exception {
 							MouseState mouseState = inputStates.getCurrent().getMouseState();
-							if (operation == Operation.SELECT || operation == Operation.RESIZE) {
+							if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.DRAW_ROOF_GABLE) {
 								if (drawn == null || drawn.isDrawCompleted()) {
 									final HousePart previousDrawn = drawn;
-									drawn = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
+									final UserData pick = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
+									drawn = pick.getHousePart();
 									System.out.print("Clicked on: " + drawn);
 									if (previousDrawn != null && previousDrawn != drawn)
 										previousDrawn.hidePoints();
 									SelectUtil.nextPickLayer();
+									if (operation == Operation.DRAW_ROOF_GABLE && drawn instanceof Roof) {
+										System.out.println(drawn);
+										System.out.println("deleting roof #" + pick.getIndex());
+										((Roof)drawn).setGable(pick.getIndex());
+									}
 								}
 							} else
 								drawn.addPoint(mouseState.getX(), mouseState.getY());
@@ -1051,7 +1059,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (drawn != null && !drawn.isDrawCompleted()) {
 			drawn.setPreviewPoint(x, y);
 		} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
-			drawn = SelectUtil.selectHousePart(x, y, false);
+			final UserData pick = SelectUtil.selectHousePart(x, y, false);
+			if (pick != null)
+				drawn = pick.getHousePart();
+			else
+				drawn = null;
 		}
 	}
 

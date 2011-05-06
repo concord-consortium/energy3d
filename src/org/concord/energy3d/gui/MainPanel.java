@@ -66,6 +66,7 @@ public class MainPanel extends JPanel {
 	private JSpinner latitudeSpinner = null;
 	private JToggleButton roofCustomButton = null;
 	private JToggleButton zoomToggleButton = null;
+	private JToggleButton roofGableToggleButton = null;
 	public static MainPanel getInstance() {
 		return instance;
 	}
@@ -142,6 +143,7 @@ public class MainPanel extends JPanel {
 				appToolbar.add(getPreviewButton());
 
 				appToolbar.add(getZoomToggleButton());
+				appToolbar.add(getRoofGableToggleButton());
 			if (showEditTools) {
 				final ButtonGroup bg = new ButtonGroup();
 				bg.add(selectButton);
@@ -770,5 +772,23 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return zoomToggleButton;
+	}
+
+	/**
+	 * This method initializes roofGableToggleButton	
+	 * 	
+	 * @return javax.swing.JToggleButton	
+	 */
+	private JToggleButton getRoofGableToggleButton() {
+		if (roofGableToggleButton == null) {
+			roofGableToggleButton = new JToggleButton();
+			roofGableToggleButton.setText("G");
+			roofGableToggleButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().setOperation(Operation.DRAW_ROOF_GABLE);
+				}
+			});
+		}
+		return roofGableToggleButton;
 	}
 } // @jve:decl-index=0:visual-constraint="10,10"

@@ -1,5 +1,6 @@
 package org.concord.energy3d.util;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.model.HousePart;
@@ -76,4 +77,13 @@ public class Util {
 	public static String toString(final double v) {
 		return "" + Math.round(v*100) / 100.0;
 	}
+
+	public static Vector3 get(final Vector3 p, final FloatBuffer buf) {		
+		return p.set(buf.get(), buf.get(), buf.get());
+	}
+
+	public static void put(final Vector3 p, final FloatBuffer buf) {		
+		buf.put(p.getXf()).put(p.getYf()).put(p.getZf());		
+	}
+	
 }

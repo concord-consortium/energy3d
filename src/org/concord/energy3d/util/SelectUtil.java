@@ -27,8 +27,8 @@ public class SelectUtil {
 	private static Node housePartsNode;	
 	private static int pickLayer = -1;
 	private static ColorRGBA currentEditPointOriginalColor = new ColorRGBA();
-	private static Mesh currentEditPointShape;
-	private static PickedHousePart pickedHousePart = null;
+	private static Mesh currentEditPointMesh;
+//	private static PickedHousePart pickedHousePart = null;
 	
 	static {
 		pickResults.setCheckDistance(true);		
@@ -113,62 +113,65 @@ public class SelectUtil {
 		return pickedHousePart;
 	}
 
-	public static HousePart selectHousePart(int x, int y, boolean edit) {
-		HousePart drawn = null;
-		HousePart lastHoveredObject = SceneManager.getInstance().getSelectedPart();
-		pickedHousePart  = pickPart(x+0, y, housePartsNode);
+	public static UserData selectHousePart(int x, int y, boolean edit) {
+		final HousePart lastHoveredObject = SceneManager.getInstance().getSelectedPart();
+		final PickedHousePart pickedHousePart  = pickPart(x+0, y, housePartsNode);
 		UserData data = null;
 		if (pickedHousePart != null)
 			data = pickedHousePart.getUserData();
 
 		// set the color of edit point that the mouse currently hovers on to red
-		if (data == null || !data.isEditPoint() || currentEditPointShape != data.getHousePart().getEditPointShape(data.getIndex())) {
-			if (currentEditPointShape != null) {
-				currentEditPointShape.setDefaultColor(currentEditPointOriginalColor);
-				currentEditPointShape = null;
+		if (data == null || !data.isEditPoint() || currentEditPointMesh != data.getHousePart().getEditPointShape(data.getIndex())) {
+			if (currentEditPointMesh != null) {
+				currentEditPointMesh.setDefaultColor(currentEditPointOriginalColor);
+				currentEditPointMesh = null;
 			}
 		}
-		if (data != null && data.isEditPoint() && currentEditPointShape != data.getHousePart().getEditPointShape(data.getIndex())) {
-			currentEditPointShape = data.getHousePart().getEditPointShape(data.getIndex());
-			currentEditPointOriginalColor.set(currentEditPointShape.getDefaultColor());
-			currentEditPointShape.setDefaultColor(ColorRGBA.YELLOW);
+		if (data != null && data.isEditPoint() && currentEditPointMesh != data.getHousePart().getEditPointShape(data.getIndex())) {
+			currentEditPointMesh = data.getHousePart().getEditPointShape(data.getIndex());
+			currentEditPointOriginalColor.set(currentEditPointMesh.getDefaultColor());
+			currentEditPointMesh.setDefaultColor(ColorRGBA.YELLOW);
 		}
 		
+//		final HousePart drawn;
 		if (data == null) {
+//			drawn = null;
 			if (lastHoveredObject != null) {
 				lastHoveredObject.hidePoints();
-				lastHoveredObject = null;
+//				lastHoveredObject = null;
 				Blinker.getInstance().setTarget(null);
 			}
 		} else if (edit && data.isEditPoint()) {
-			drawn = data.getHousePart();			
+//			drawn = data.getHousePart();			
 			int pointIndex = data.getIndex();
-			if (SceneManager.getInstance().isTopView() && drawn instanceof Wall)
+			if (SceneManager.getInstance().isTopView() && data.getHousePart() instanceof Wall)
 				pointIndex -= 1;
 			data.getHousePart().setEditPoint(pointIndex);
 		} else {
-			HousePart housePart = data.getHousePart();
-			drawn = housePart;
-			if (lastHoveredObject != null && lastHoveredObject != housePart) {
+//			HousePart housePart = data.getHousePart();
+//			drawn = housePart;
+//			drawn = data.getHousePart();
+			if (lastHoveredObject != null && lastHoveredObject != data.getHousePart()) {
 				lastHoveredObject.hidePoints();
-				lastHoveredObject = null;
+//				lastHoveredObject = null;
 			}
 
-			if (lastHoveredObject != housePart) {
+			if (lastHoveredObject != data.getHousePart()) {
 				Blinker.getInstance().setTarget(null);
 				if (data.getHousePart().getOriginal() != null) {
-					if (drawn instanceof Roof)
-						Blinker.getInstance().setTarget(((Roof)drawn.getOriginal()).getFlattenedMeshesRoot().getChild(data.getIndex()-0));
+					if (data.getHousePart() instanceof Roof)
+						Blinker.getInstance().setTarget(((Roof)data.getHousePart().getOriginal()).getFlattenedMeshesRoot().getChild(data.getIndex()-0));
 					else
-						Blinker.getInstance().setTarget(drawn.getOriginal().getRoot());
+						Blinker.getInstance().setTarget(data.getHousePart().getOriginal().getRoot());
 				}
 			}
 			final ViewMode viewMode = SceneManager.getInstance().getViewMode();
 			if (viewMode == ViewMode.NORMAL || viewMode == ViewMode.TOP_VIEW)
-				housePart.showPoints();
-			lastHoveredObject = housePart;
+				data.getHousePart().showPoints();
+//			lastHoveredObject = drawn;
 		}
-		return drawn;
+//		return drawn;
+		return data;
 	}
 
 	public static void init(Mesh floor, Node housePartsNode) {
@@ -186,7 +189,7 @@ public class SelectUtil {
 		pickLayer = i;
 	}
 
-	public static PickedHousePart getPickedHousePart() {
-		return pickedHousePart;
-	}
+//	public static PickedHousePart getPickedHousePart() {
+//		return pickedHousePart;
+//	}
 }
