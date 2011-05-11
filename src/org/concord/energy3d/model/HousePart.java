@@ -206,8 +206,9 @@ public abstract class HousePart implements Serializable {
 			this.orgHeight = newHeight;
 	}
 
-	public void showPoints() {		
-		for (int i = 0; i < points.size(); i++) {
+	public void showPoints() {
+//		for (int i = 0; i < points.size(); i++) {
+		for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
 			computeEditPointScale(i);
 			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
 		}
@@ -219,8 +220,10 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void hidePoints() {
-		for (int i = 0; i < points.size(); i++)
-			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
+//		for (int i = 0; i < points.size(); i++)
+//			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
+		for (final Spatial child : pointsRoot.getChildren())
+			child.getSceneHints().setCullHint(CullHint.Always);		
 	}
 
 	public void setEditPoint(int i) {
@@ -386,7 +389,7 @@ public abstract class HousePart implements Serializable {
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 p = toAbsolute(points.get(i));
 			abspoints.get(i).set(p);
-			pointsRoot.getChild(i).setTranslation(p);
+//			pointsRoot.getChild(i).setTranslation(p);
 		}
 	}
 
@@ -396,6 +399,13 @@ public abstract class HousePart implements Serializable {
 			center.addLocal(abspoints.get(i));
 		center.multiplyLocal(1.0 / abspoints.size());
 	}
+	
+	protected void updateEditShapes() {
+		int i = 0;
+		for (final Spatial editShape : pointsRoot.getChildren()) {
+			editShape.setTranslation(abspoints.get(i++));
+		}
+	}	
 
 	public void flatten(double flattenTime) {
 		root.setTranslation(0, 0, 0);

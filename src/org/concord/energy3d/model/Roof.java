@@ -52,6 +52,8 @@ public abstract class Roof extends HousePart {
 	transient private ArrayList<ReadOnlyVector3> wallNormals;
 	transient private Map<Mesh, Vector3> orgCenters;
 	transient private Line wireframeMesh;
+	transient private ArrayList<Vector3[]> gableMeshIndices;
+	transient private ArrayList<Vector3> gablePoints;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -59,10 +61,10 @@ public abstract class Roof extends HousePart {
 
 	protected void init() {
 		super.init();
-		abspoints = points;	// there is no need for abspoints. this is hack for foundation bounds.
+		abspoints = points; // there is no need for abspoints. this is hack for foundation bounds.
 		wallUpperPoints = new ArrayList<PolygonPoint>();
 		wallNormals = new ArrayList<ReadOnlyVector3>();
-		
+
 		flattenedMeshesRoot = new Node("Roof Meshes Root");
 		root.attachChild(flattenedMeshesRoot);
 
@@ -76,23 +78,23 @@ public abstract class Roof extends HousePart {
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		bottomMesh.setRenderState(ms);
-		
+
 		wireframeMesh = new Line("Roof (wireframe)");
 		wireframeMesh.getMeshData().setIndexMode(IndexMode.Lines);
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
 		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
-		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);		
+		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		root.attachChild(wireframeMesh);
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
-		
+
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
 	}
 
 	protected void computeAbsPoints() {
-		
+
 	}
 
 	protected void computeCenter() {
@@ -113,29 +115,34 @@ public abstract class Roof extends HousePart {
 
 			exploreWallNeighbors((Wall) container);
 			processRoofPoints(wallUpperPoints, wallNormals);
+			computeGableEditPoints();
+			updateEditShapes();
 
 			fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
 			if (!root.hasChild(bottomMesh))
 				root.attachChild(bottomMesh);
-			fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
-			
+			final Polygon polygon = makePolygon(wallUpperPoints);
+			addGablePointsToPolygon(polygon);
+			fillMeshWithPolygon(mesh, polygon);
+
 			// create roof parts
 			int meshIndex = 0;
 			MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
+			hideGableMeshes();
 			final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
 			wireframeVertexBuffer.rewind();
 			wireframeVertexBuffer.limit(wireframeVertexBuffer.capacity());
 			for (final Spatial child : flattenedMeshesRoot.getChildren()) {
-				if (child.getSceneHints().getCullHint() == CullHint.Always)
-					break;	// reached the end of visible flatten meshes
-				child.setUserData(new UserData(this, meshIndex++, false));				
-				final Mesh mesh = (Mesh)child;
-				MeshLib.addConvexWireframe(wireframeVertexBuffer, mesh.getMeshData().getVertexBuffer());
-				if (!Scene.getInstance().isTextureEnabled())
-					mesh.setDefaultColor(defaultColor);
-				final MaterialState ms = new MaterialState();
-				ms.setColorMaterial(ColorMaterial.Diffuse);
-				mesh.setRenderState(ms);				
+				if (child.getSceneHints().getCullHint() != CullHint.Always) {
+					child.setUserData(new UserData(this, meshIndex++, false));
+					final Mesh mesh = (Mesh) child;
+					MeshLib.addConvexWireframe(wireframeVertexBuffer, mesh.getMeshData().getVertexBuffer());
+					if (!Scene.getInstance().isTextureEnabled())
+						mesh.setDefaultColor(defaultColor);
+					final MaterialState ms = new MaterialState();
+					ms.setColorMaterial(ColorMaterial.Diffuse);
+					mesh.setRenderState(ms);
+				}
 			}
 			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
 			wireframeMesh.getMeshData().updateVertexCount();
@@ -151,25 +158,31 @@ public abstract class Roof extends HousePart {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}	
+	}
+
+	private void addGablePointsToPolygon(final Polygon polygon) {
+		// if (gablePoints != null)
+		// for (final Vector3 p : gablePoints)
+		// polygon.addSteinerPoint(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+	}
 
 	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
-			try {
-				Poly2Tri.triangulate(polygon);
-			} catch (RuntimeException e) {
-				e.printStackTrace();
-				System.out.println("Triangulate exception received with the following polygon:");
-				for (TriangulationPoint p : polygon.getPoints())
-					System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
-				throw e;
-			}
-			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
+		try {
+			Poly2Tri.triangulate(polygon);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			System.out.println("Triangulate exception received with the following polygon:");
+			for (TriangulationPoint p : polygon.getPoints())
+				System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
+			throw e;
+		}
+		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 
-			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
-			ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 2, new TPoint(0,0,0), new TPoint(1,0,0), new TPoint(0,1,0));
-			mesh.getMeshData().updateVertexCount();
-			mesh.updateModelBound();
+		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
+		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
+		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 2, new TPoint(0, 0, 0), new TPoint(1, 0, 0), new TPoint(0, 1, 0));
+		mesh.getMeshData().updateVertexCount();
+		mesh.updateModelBound();
 	}
 
 	private void exploreWallNeighbors(Wall startWall) {
@@ -388,39 +401,81 @@ public abstract class Roof extends HousePart {
 	}
 
 	public void setGable(int index) {
-		final Mesh mesh = (Mesh)getFlattenedMeshesRoot().getChild(index);
-		mesh.getSceneHints().setCullHint(CullHint.Always);
-		final Vector3 center = new Vector3();
-		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-		vertexBuffer.rewind();
-		while (vertexBuffer.hasRemaining()) 
-			center.addLocal(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-		center.multiplyLocal(vertexBuffer.capacity() / 3);
-		System.out.println("center of roof mesh = " + center);
-//		Vector3 closestEditPoint = abspoints.get(0);
-		Vector3 base_1 = null;
-		Vector3 base_2 = null;
-		for (final Vector3 p : points) {
-//			if (closestEditPoint.distance(center) > p.distance(center))
-//				closestEditPoint = p;
-			if (p.getZ() - container.getAbsPoints().get(1).getZ() < MathUtils.ZERO_TOLERANCE) {
-				if (base_1 == null)
-					base_1 = p;
-				else {
-					base_2 = p;
+		if (gableMeshIndices == null)
+			gableMeshIndices = new ArrayList<Vector3[]>();
+		final Vector3[] base = findBasePoints((Mesh) getFlattenedMeshesRoot().getChild(index), null);
+		gableMeshIndices.add(base);
+		draw();
+	}
+
+	private void computeGableEditPoints() {
+		if (gableMeshIndices == null)
+			return;
+		final ArrayList<Vector3> meshUpperPoints = new ArrayList<Vector3>();
+		for (final Vector3[] base_i : gableMeshIndices) {
+			// final Mesh mesh = (Mesh) getFlattenedMeshesRoot().getChild(index);
+			// mesh.getSceneHints().setCullHint(CullHint.Always);
+			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
+
+				meshUpperPoints.clear();
+				final Vector3[] base = findBasePoints((Mesh) mesh, meshUpperPoints);
+				if (base[0].equals(base_i[0]) && base[1].equals(base_i[1])) {
+
+					final Vector3 n = base[1].subtract(base[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
+
+					if (gablePoints == null)
+						gablePoints = new ArrayList<Vector3>();
+					else
+						gablePoints.clear();
+					for (final Vector3 editPoint : points) {
+						for (final Vector3 meshPoint : meshUpperPoints) {
+							if (meshPoint.distance(editPoint) < MathUtils.ZERO_TOLERANCE) {
+								final double distance = -editPoint.subtract(base[0], null).dot(n);
+								editPoint.addLocal(n.multiply(distance, null));
+								// gablePoints.add(editPoint.add(n.multiply(distance, null), null));
+								// points.add(editPoint.add(n.multiply(distance, null), null));
+							}
+						}
+					}
 					break;
 				}
 			}
+			// points.addAll(gablePoints);
 		}
-		
-//		if (base_1 == null || base_2 == null)
-//			return;
-		
-		final Vector3 n = base_2.subtract(base_1, null).crossLocal(Vector3.UNIT_Z).negateLocal().normalizeLocal();
-		
-		for (final Vector3 p : points) {
-			final double distance = p.subtract(base_1, null).dot(n); 
-			p.addLocal(n.multiply(distance, null));
-		}		
+	}
+
+	public Vector3[] findBasePoints(final Mesh mesh, final ArrayList<Vector3> storeUpperPoints) {
+		final Vector3[] base = new Vector3[2];
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		vertexBuffer.rewind();
+		while (vertexBuffer.hasRemaining()) {
+			final Vector3 meshPoint = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+			if (meshPoint.getZ() - container.getAbsPoints().get(1).getZ() < MathUtils.ZERO_TOLERANCE) {
+				if (base[0] == null)
+					base[0] = meshPoint;
+				else if (!meshPoint.equals(base[0])) {
+					base[1] = meshPoint;
+				}
+			} else if (storeUpperPoints != null)
+				storeUpperPoints.add(meshPoint);
+		}
+		return base;
+	}
+
+	private void hideGableMeshes() {
+		if (gableMeshIndices == null)
+			return;
+		// for (final int index : gableMeshIndices)
+		// getFlattenedMeshesRoot().getChild(index).getSceneHints().setCullHint(CullHint.Always);
+
+		for (final Vector3[] base_i : gableMeshIndices) {
+			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
+				final Vector3[] base = findBasePoints((Mesh) mesh, null);
+				if (base[0].equals(base_i[0]) && base[1].equals(base_i[1])) {
+					mesh.getSceneHints().setCullHint(CullHint.Always);
+				}
+			}
+		}
+
 	}
 }

@@ -591,7 +591,7 @@ Version 0.3 - March 7, 2011
 - fix problem with print preview initial camera view
 - reverse the zoom control
 - draw window frames
-
+- write algorithm to remove the gable roof face and move the edit points toward the gable roof
 
 - *allow rotation of scene with respect to north
 

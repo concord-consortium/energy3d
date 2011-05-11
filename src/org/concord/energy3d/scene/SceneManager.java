@@ -294,12 +294,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void run() {
 		frameHandler.init();
 		while (!exit) {
-			try {
+//			try {
 				frameHandler.updateFrame();
-			} catch (Exception e1) {
-				e1.printStackTrace();
-				shadowPass.setEnabled(false);
-			}
+//			} catch (Exception e1) {
+//				e1.printStackTrace();
+//				shadowPass.setEnabled(false);
+//			}
 			final double syncNS = 1000000000.0 / 60;
 			long sinceLast = System.nanoTime() - lastRenderTime;
 			if (sinceLast < syncNS) {
@@ -471,7 +471,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (drawn == null || drawn.isDrawCompleted()) {
 									final HousePart previousDrawn = drawn;
 									final UserData pick = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
-									drawn = pick.getHousePart();
+									if (pick == null)
+										drawn = null;
+									else
+										drawn = pick.getHousePart();
 									System.out.print("Clicked on: " + drawn);
 									if (previousDrawn != null && previousDrawn != drawn)
 										previousDrawn.hidePoints();
@@ -606,11 +609,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					moveUpDown(source, tpf, false);
 			}
 		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				toggleRotation();
-			}
-		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				toggleRotation();
+//			}
+//		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				resetCamera(viewMode);
@@ -703,10 +706,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}
 		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.Z), new TriggerAction() {
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				System.out.println("----zzzzzzzzz---------------------");
-//				if (SelectUtil.getPickedHousePart().get)
+				Scene.getInstance().redrawAll();
 			}
 		}));
 	}

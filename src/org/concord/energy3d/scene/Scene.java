@@ -403,6 +403,10 @@ public class Scene implements Serializable {
 //		HousePart.setFlattenTime(HousePart.getFlattenTime());
 ////		PrintController.getInstance().drawPrintParts();
 //	}
+	
+	public void redrawAll() {
+		redrawAll = true;
+	}
 
 	public void update() {
 		if (redrawAll) {

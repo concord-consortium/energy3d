@@ -18,7 +18,7 @@ public class PyramidRoof extends Roof {
 		if (editPointIndex == -1) {
 			pick(x, y, Wall.class);
 		} else {
-			Vector3 base = center;
+			Vector3 base = points.get(0); //center;
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ());
@@ -30,9 +30,16 @@ public class PyramidRoof extends Roof {
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
+//		final Polygon polygon = new Polygon(wallUpperPoints);
+////		polygon.addSteinerPoint(new PolygonPoint(center.getX(), center.getY(), center.getZ() + height));
+//		polygon.addSteinerPoint(new PolygonPoint(points.get(0).getX(), points.get(0).getY(), points.get(0).getZ()));
+		
 		final Polygon polygon = new Polygon(wallUpperPoints);
-		polygon.addSteinerPoint(new PolygonPoint(center.getX(), center.getY(), center.getZ() + height));
-		return polygon;		
+		for (int i = 0; i < points.size(); i++) {
+			final Vector3 p = points.get(i);
+			polygon.addSteinerPoint(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+		}		
+		return polygon;
 	}
 
 ////	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
