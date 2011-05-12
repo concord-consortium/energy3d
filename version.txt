@@ -593,11 +593,7 @@ Version 0.3 - March 7, 2011
 - draw window frames
 - write algorithm to remove the gable roof face and move the edit points toward the gable roof
 - hide the correct gable mesh by comparing the base points in reverse direction as well
-
-- *allow rotation of scene with respect to north
-
-
- 
+- extend the wall to top of gable roof
 
  
 
@@ -617,3 +613,4 @@ TODO:
 - combine the wall meshed into one
 - insert window in oriented wall attached to other walls
 - save position and state of window in registry
+- *allow rotation of scene with respect to north

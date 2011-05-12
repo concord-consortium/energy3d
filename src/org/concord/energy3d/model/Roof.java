@@ -54,16 +54,19 @@ public abstract class Roof extends HousePart {
 	transient private Line wireframeMesh;
 	transient private ArrayList<Vector3[]> gableMeshIndices;
 	transient private ArrayList<Vector3> gablePoints;
+	transient private ArrayList<Wall> walls;
+	transient private ArrayList<Vector3> wallGablePoints;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
 	}
 
 	protected void init() {
-		super.init();
+		super.init();		
 		abspoints = points; // there is no need for abspoints. this is hack for foundation bounds.
 		wallUpperPoints = new ArrayList<PolygonPoint>();
 		wallNormals = new ArrayList<ReadOnlyVector3>();
+		walls = new ArrayList<Wall>();
 
 		flattenedMeshesRoot = new Node("Roof Meshes Root");
 		root.attachChild(flattenedMeshesRoot);
@@ -147,6 +150,8 @@ public abstract class Roof extends HousePart {
 			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
 			wireframeMesh.getMeshData().updateVertexCount();
 			wireframeMesh.updateModelBound();
+			
+			drawGableWalls();
 
 			for (int i = 0; i < points.size(); i++) {
 				Vector3 p = points.get(i);
@@ -185,12 +190,14 @@ public abstract class Roof extends HousePart {
 		mesh.updateModelBound();
 	}
 
-	private void exploreWallNeighbors(Wall startWall) {
+	private void exploreWallNeighbors(final Wall startWall) {
+		walls.clear();
 		wallUpperPoints.clear();
 		wallNormals.clear();
 		center.set(0, 0, 0);
 		startWall.visitNeighbors(new WallVisitor() {
-			public void visit(Wall currentWall, Snap prevSnap, Snap nextSnap) {
+			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
+				walls.add(currentWall);
 				final int pointIndex2;
 				if (nextSnap != null)
 					pointIndex2 = nextSnap.getSnapPointIndexOf(currentWall) + 1;
@@ -413,10 +420,7 @@ public abstract class Roof extends HousePart {
 			return;
 		final ArrayList<Vector3> meshUpperPoints = new ArrayList<Vector3>();
 		for (final Vector3[] base_i : gableMeshIndices) {
-			// final Mesh mesh = (Mesh) getFlattenedMeshesRoot().getChild(index);
-			// mesh.getSceneHints().setCullHint(CullHint.Always);
 			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
-
 				meshUpperPoints.clear();
 				final Vector3[] base = findBasePoints((Mesh) mesh, meshUpperPoints);
 				if (base[0].equals(base_i[0]) && base[1].equals(base_i[1])) {
@@ -427,11 +431,16 @@ public abstract class Roof extends HousePart {
 						gablePoints = new ArrayList<Vector3>();
 					else
 						gablePoints.clear();
+					if (wallGablePoints == null)
+						wallGablePoints = new ArrayList<Vector3>();
 					for (final Vector3 editPoint : points) {
 						for (final Vector3 meshPoint : meshUpperPoints) {
 							if (meshPoint.distance(editPoint) < MathUtils.ZERO_TOLERANCE) {
 								final double distance = -editPoint.subtract(base[0], null).dot(n);
 								editPoint.addLocal(n.multiply(distance, null));
+								final Vector3 wallGablePoint = n.multiply(-OVERHANG_LENGHT, null).addLocal(editPoint);
+//								wallGablePoint.setZ(1);
+								wallGablePoints.add(wallGablePoint);
 								// gablePoints.add(editPoint.add(n.multiply(distance, null), null));
 								// points.add(editPoint.add(n.multiply(distance, null), null));
 							}
@@ -471,11 +480,33 @@ public abstract class Roof extends HousePart {
 		for (final Vector3[] base_i : gableMeshIndices) {
 			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
 				final Vector3[] base = findBasePoints((Mesh) mesh, null);
-				if ((base[0].equals(base_i[0]) && base[1].equals(base_i[1])) || (base[0].equals(base_i[1]) && base[1].equals(base_i[0]))) {
+				if (isSameBasePoints(base_i, base)) {
 					mesh.getSceneHints().setCullHint(CullHint.Always);
 				}
 			}
 		}
 
+	}
+
+	public boolean isSameBasePoints(final Vector3[] base_1, final Vector3[] base_2) {
+//		return (base_2[0].equals(base_1[0]) && base_2[1].equals(base_1[1])) || (base_2[0].equals(base_1[1]) && base_2[1].equals(base_1[0]));
+		return (base_2[0].distance(base_1[0]) < MathUtils.ZERO_TOLERANCE && base_2[1].distance(base_1[1]) < MathUtils.ZERO_TOLERANCE) || (base_2[0].distance(base_1[1]) < MathUtils.ZERO_TOLERANCE && base_2[1].distance(base_1[0]) < MathUtils.ZERO_TOLERANCE);
+	}
+	
+	private void drawGableWalls() {
+		final Vector3[] wallBase = new Vector3[2];
+		wallBase[0] = new Vector3();
+		wallBase[1] = new Vector3();
+		for (final Vector3[] base : gableMeshIndices) {
+			int normalIndex = 0;
+			for (final Wall wall : walls) {
+				wallBase[0].set(wallNormals.get(normalIndex++)).multiplyLocal(OVERHANG_LENGHT).addLocal(wall.getAbsPoints().get(1));
+				wallBase[1].set(wallNormals.get(normalIndex++)).multiplyLocal(OVERHANG_LENGHT).addLocal(wall.getAbsPoints().get(3));
+				if (isSameBasePoints(base, wallBase)) {
+					wall.setGablePoints(wallGablePoints);
+					wall.draw();
+				}
+			}
+		}
 	}
 }

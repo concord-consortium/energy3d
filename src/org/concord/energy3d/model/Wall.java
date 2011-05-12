@@ -49,6 +49,7 @@ public class Wall extends HousePart {
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
+	private ArrayList<Vector3> wallGablePoints;
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -266,6 +267,11 @@ public class Wall extends HousePart {
 		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p = points.get(3);
 		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+		
+		if (wallGablePoints != null)
+			for (final Vector3 gablePoint : wallGablePoints)
+				polyPoints.add(new PolygonPoint(gablePoint.getX(), gablePoint.getY(), gablePoint.getZ()));
+
 		p = points.get(1);
 		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 
@@ -871,5 +877,9 @@ public class Wall extends HousePart {
 	public void visit() {
 		visitStamp = currentVisitStamp;
 //		System.out.println(this);
+	}
+
+	public void setGablePoints(final ArrayList<Vector3> wallGablePoints) {
+		this.wallGablePoints = wallGablePoints;		
 	}
 }
