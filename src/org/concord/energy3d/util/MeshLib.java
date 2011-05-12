@@ -178,16 +178,13 @@ public class MeshLib {
 	public static void addConvexWireframe(final FloatBuffer wireframeVertexBuffer, final FloatBuffer vertexBuffer) {
 		vertexBuffer.rewind();
 		final Vector3 leftVertex = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
-		while(vertexBuffer.hasRemaining()) {
+		while (vertexBuffer.hasRemaining()) {
 			final double x = vertexBuffer.get();
 			if (x < leftVertex.getX())
 				leftVertex.set(x, vertexBuffer.get(), vertexBuffer.get());
 			else
 				vertexBuffer.position(vertexBuffer.position() + 2);
 		}
-		
-//		if (wireframeVertexBuffer.position() > 100)
-//			return;
 
 		final ReadOnlyVector3 normal = Vector3.UNIT_Z;
 		final Vector3 pointOnHull = new Vector3(leftVertex);
@@ -195,26 +192,20 @@ public class MeshLib {
 		final Vector3 sj = new Vector3();
 		System.out.println("----------------------------");
 		do {
-			System.out.println(pointOnHull);
+			System.out.println(Util.toString(pointOnHull));			
 			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
 			endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
-//			endpoint.set(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5));
-		    for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
-		    	sj.set(vertexBuffer.get(j*3), vertexBuffer.get(j*3+1), vertexBuffer.get(j*3+2));
-//		        if (S[j] is on left of line from P[i] to endpoint)
-		        final double dot = normal.cross(endpoint.subtract(pointOnHull, null), null).dot(sj.subtract(pointOnHull, null));
+			for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
+				sj.set(vertexBuffer.get(j * 3), vertexBuffer.get(j * 3 + 1), vertexBuffer.get(j * 3 + 2));
+				// if (S[j] is on left of line from P[i] to endpoint)
+				final double dot = normal.cross(endpoint.subtract(pointOnHull, null), null).dot(sj.subtract(pointOnHull, null));
 				if (!sj.equals(pointOnHull) && dot > 0)
-		            endpoint.set(sj);   // found greater left turn, update endpoint
+					endpoint.set(sj); // found greater left turn, update endpoint
 				else if (!sj.equals(pointOnHull) && dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
-					endpoint.set(sj);   // found greater left turn, update endpoint
-		    }
-		    pointOnHull.set(endpoint);
-		    wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
-//		    wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
+					endpoint.set(sj); // found greater left turn, update endpoint
+			}
+			pointOnHull.set(endpoint);
+			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
 		} while (!endpoint.equals(leftVertex));
-//		   until endpoint == P[0]      // wrapped around to first hull point
-		
-//		wireframeVertexBuffer.put(leftVertex.getXf()).put(leftVertex.getYf()).put(leftVertex.getZf());
-		
 	}
 }

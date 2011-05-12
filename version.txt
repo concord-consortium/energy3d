@@ -592,6 +592,7 @@ Version 0.3 - March 7, 2011
 - reverse the zoom control
 - draw window frames
 - write algorithm to remove the gable roof face and move the edit points toward the gable roof
+- hide the correct gable mesh by comparing the base points in reverse direction as well
 
 - *allow rotation of scene with respect to north
 

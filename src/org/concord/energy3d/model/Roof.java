@@ -471,7 +471,7 @@ public abstract class Roof extends HousePart {
 		for (final Vector3[] base_i : gableMeshIndices) {
 			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
 				final Vector3[] base = findBasePoints((Mesh) mesh, null);
-				if (base[0].equals(base_i[0]) && base[1].equals(base_i[1])) {
+				if ((base[0].equals(base_i[0]) && base[1].equals(base_i[1])) || (base[0].equals(base_i[1]) && base[1].equals(base_i[0]))) {
 					mesh.getSceneHints().setCullHint(CullHint.Always);
 				}
 			}
