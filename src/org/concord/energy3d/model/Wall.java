@@ -267,6 +267,9 @@ public class Wall extends HousePart {
 		p = points.get(3);
 		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
+		// start the polygon with (1) then 0, 2, 3, [roof points] so that roof points are appended to the end of vertex list
+		p = points.get(1);
+		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p = points.get(0);
 		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p = points.get(2);
@@ -276,8 +279,6 @@ public class Wall extends HousePart {
 		if (wallGablePoints != null)
 			for (final Vector3 gablePoint : wallGablePoints)
 				polyPoints.add(new PolygonPoint(gablePoint.getX(), gablePoint.getY(), gablePoint.getZ()));
-		p = points.get(1);
-		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 
 		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
@@ -375,14 +376,18 @@ public class Wall extends HousePart {
 //			final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
 //			wireframeVertexBuffer.rewind();
 			Vector3 w;
+			w = abspoints.get(1);
+			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf() + 0.01f);
 			w = abspoints.get(0);
 			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf() + 0.01f);
 			w = abspoints.get(2);
-			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf() + 0.01f);
+			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
 			w = abspoints.get(3);
 			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
-			w = abspoints.get(1);
-			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
+			if (wallGablePoints == null) {
+				w = abspoints.get(3);
+				wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
+			}
 			
 			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
 
@@ -452,9 +457,9 @@ public class Wall extends HousePart {
 
 		final Vector3 v = wallDir.normalize(null).multiplyLocal(length);
 
-		final TriangulationPoint p1 = polygon.getPoints().get(neighbor == 0 ? 0 : 1);
+		final TriangulationPoint p1 = polygon.getPoints().get(neighbor == 0 ? 1 : 2);
 		p1.set(p1.getX() + v.getX(), p1.getY() + v.getY(), p1.getZ());
-		final TriangulationPoint p2 = polygon.getPoints().get(neighbor == 0 ? 3 : 2);
+		final TriangulationPoint p2 = polygon.getPoints().get(neighbor == 0 ? 0 : 3);
 		p2.set(p2.getX() + v.getX(), p2.getY() + v.getY(), p2.getZ());
 
 	}

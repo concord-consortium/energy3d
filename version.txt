@@ -597,6 +597,7 @@ Version 0.3 - March 7, 2011
 - allow multiple gable on a single roof
 - allow gables with multiple upper points (sort the points)
 - allow window to be drawn on the gable wall
+- fix problem with incorrect wall back reduction due to adding roof points to middle of polygon instead of its end
 
  
 
