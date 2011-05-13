@@ -49,7 +49,7 @@ public class Wall extends HousePart {
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
-	private ArrayList<Vector3> wallGablePoints;
+	transient private ArrayList<Vector3> wallGablePoints;
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -252,12 +252,18 @@ public class Wall extends HousePart {
 		invisibleVertexBuffer.rewind();
 		Vector3 p;
 
+		float z = 0;
+		if (wallGablePoints != null)
+			for (final Vector3 gablePoint : wallGablePoints)
+				if (gablePoint.getZf() > z)
+					z = gablePoint.getZf();
+		
 		p = points.get(0);
 		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		p = points.get(1);
-		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
 		p = points.get(2);
-		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
 		p = points.get(3);
 		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
@@ -266,12 +272,10 @@ public class Wall extends HousePart {
 		p = points.get(2);
 		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p = points.get(3);
-		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-		
+		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));		
 		if (wallGablePoints != null)
 			for (final Vector3 gablePoint : wallGablePoints)
 				polyPoints.add(new PolygonPoint(gablePoint.getX(), gablePoint.getY(), gablePoint.getZ()));
-
 		p = points.get(1);
 		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 
