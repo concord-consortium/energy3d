@@ -594,6 +594,8 @@ Version 0.3 - March 7, 2011
 - write algorithm to remove the gable roof face and move the edit points toward the gable roof
 - hide the correct gable mesh by comparing the base points in reverse direction as well
 - extend the wall to top of gable roof
+- allow multiple gable on a single roof
+- allow gables with multiple upper points (sort the points)
 
  
 
