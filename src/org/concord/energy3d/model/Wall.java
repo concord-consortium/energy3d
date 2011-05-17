@@ -382,8 +382,8 @@ public class Wall extends HousePart {
 			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf() + 0.01f);
 			w = abspoints.get(2);
 			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
-			w = abspoints.get(3);
-			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
+//			w = abspoints.get(3);
+//			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
 			if (wallGablePoints == null) {
 				w = abspoints.get(3);
 				wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());

@@ -50,6 +50,8 @@ public class HipRoof extends Roof {
 		final Polygon polygon = new Polygon(wallUpperPoints);
 		PolygonPoint roofUpperPoint1 = new PolygonPoint(points.get(1).getX(), points.get(1).getY(), points.get(1).getZ());
 		PolygonPoint roofUpperPoint2 = new PolygonPoint(points.get(2).getX(), points.get(2).getY(), points.get(2).getZ());
+		System.out.println("new SteinerPoint(" + roofUpperPoint1.getX() + ", " + roofUpperPoint1.getY() + ", " + roofUpperPoint1.getZ() + ")");
+		System.out.println("new SteinerPoint(" + roofUpperPoint2.getX() + ", " + roofUpperPoint2.getY() + ", " + roofUpperPoint2.getZ() + ")");
 		polygon.addSteinerPoint(roofUpperPoint1);
 		polygon.addSteinerPoint(roofUpperPoint2);
 		return polygon;						

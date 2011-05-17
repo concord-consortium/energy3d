@@ -47,7 +47,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class Roof extends HousePart {
 	static private final long serialVersionUID = 1L;
 	static protected final double GRID_SIZE = 0.5;
-	static private final double OVERHANG_LENGHT = 0.3;
+	static private final double OVERHANG_LENGHT = 0; //0.3;
 	transient protected Mesh bottomMesh;
 	transient protected Node flattenedMeshesRoot;
 	transient private ArrayList<PolygonPoint> wallUpperPoints;
@@ -123,7 +123,7 @@ public abstract class Roof extends HousePart {
 			computeGableEditPoints();
 			updateEditShapes();
 
-			fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
+//			fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
 //			if (!root.hasChild(bottomMesh))
 //				root.attachChild(bottomMesh);
 			final Polygon polygon = makePolygon(wallUpperPoints);
@@ -183,6 +183,9 @@ public abstract class Roof extends HousePart {
 				System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
 			throw e;
 		}
+		for (TriangulationPoint p : polygon.getPoints())
+			System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
+		
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
@@ -437,13 +440,10 @@ public abstract class Roof extends HousePart {
 					for (final Vector3 editPoint : points) {
 						for (final Vector3 meshPoint : meshUpperPoints) {
 							if (meshPoint.distance(editPoint) < MathUtils.ZERO_TOLERANCE) {
-								final double distance = -editPoint.subtract(meshBase[0], null).dot(n);
+								double distance = -editPoint.subtract(meshBase[0], null).dot(n);
+								distance += -Math.signum(distance)*0.0001;	// in order to avoid crazy roof that stretches to floor
 								editPoint.addLocal(n.multiply(distance, null));
-//								final Vector3 wallGablePoint = n.multiply(-OVERHANG_LENGHT, null).addLocal(editPoint);
-//								wallGablePoints.add(wallGablePoint);
 								wallGablePoints.add(editPoint.clone());
-								// gablePoints.add(editPoint.add(n.multiply(distance, null), null));
-								// points.add(editPoint.add(n.multiply(distance, null), null));
 							}
 						}
 					}
@@ -451,7 +451,6 @@ public abstract class Roof extends HousePart {
 					break;
 				}
 			}
-			// points.addAll(gablePoints);
 		}
 	}
 
