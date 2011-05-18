@@ -414,6 +414,10 @@ public class Wall extends HousePart {
 	}
 
 	private void drawBackMesh(final Polygon polygon, final XYToAnyTransform fromXY) {
+		System.out.println("Before reduction:");
+		for (TriangulationPoint p : polygon.getPoints())
+			System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
+		
 		final Vector3 dir = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
 		if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted() && !(Scene.getInstance().isDrawThickness() && isShortWall && isPerpendicularToNeighbor(0)))
 			reduceBackMeshWidth(polygon, dir, 0);
@@ -427,6 +431,9 @@ public class Wall extends HousePart {
 
 		// Poly2Tri.triangulate(polygon);
 		try {
+			System.out.println("After reduction:");
+			for (TriangulationPoint p : polygon.getPoints())
+				System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");			
 			Poly2Tri.triangulate(polygon);
 		} catch (RuntimeException e) {
 			e.printStackTrace();
@@ -461,6 +468,29 @@ public class Wall extends HousePart {
 		p1.set(p1.getX() + v.getX(), p1.getY() + v.getY(), p1.getZ());
 		final TriangulationPoint p2 = polygon.getPoints().get(neighbor == 0 ? 0 : 3);
 		p2.set(p2.getX() + v.getX(), p2.getY() + v.getY(), p2.getZ());
+		
+//		final TriangulationPoint p1 = polygon.getPoints().get(neighbor == 0 ? 0 : 3);
+//		p1.set(p1.getX() + v.getX(), p1.getY() + v.getY(), p1.getZ());
+//		final TriangulationPoint p2 = polygon.getPoints().get(neighbor == 0 ? 1 : 2);
+//		p2.set(p2.getX() + v.getX(), p2.getY() + v.getY(), p2.getZ());
+		
+//		double minX = Math.min(p1.getX(), p2.getX());
+//		double maxX = Math.max(p1.getX(), p2.getX());
+//		double minY = Math.min(polygon.getPoints().get(0).getY(), polygon.getPoints().get(1).getY());
+//		double maxY = Math.max(polygon.getPoints().get(0).getY(), polygon.getPoints().get(1).getY());
+		
+//		for (int i=4; i<polygon.pointCount(); i++) {
+//			final TriangulationPoint p = polygon.getPoints().get(i);
+//			if (p.getX() < minX)
+//				p.set(minX, p1.getY(), p1.getZ());
+//			if (p.getX() > maxX)
+//				p.set(maxX, p1.getY(), p1.getZ());			
+//			
+//			if (p.getY() < minY)
+//				p.set(p.getX(), minY, p1.getZ());
+//			if (p.getY() > maxY)
+//				p.set(p.getX(), maxY, p1.getZ());			
+//		}
 
 	}
 
@@ -891,4 +921,10 @@ public class Wall extends HousePart {
 	public void setGablePoints(final ArrayList<Vector3> wallGablePoints) {
 		this.wallGablePoints = wallGablePoints;		
 	}
+
+//	public void drawNeighbors() {
+//		for (final Snap snap : neighbors)
+//			if (snap != null)
+//				snap.getNeighborOf(this).draw();		
+//	}
 }

@@ -139,7 +139,7 @@ public abstract class Roof extends HousePart {
 			wireframeVertexBuffer.limit(wireframeVertexBuffer.capacity());
 			for (final Spatial child : flattenedMeshesRoot.getChildren()) {
 				if (child.getSceneHints().getCullHint() != CullHint.Always) {
-					child.setUserData(new UserData(this, meshIndex++, false));
+					child.setUserData(new UserData(this, meshIndex, false));
 					final Mesh mesh = (Mesh) child;
 					MeshLib.addConvexWireframe(wireframeVertexBuffer, mesh.getMeshData().getVertexBuffer());
 					if (!Scene.getInstance().isTextureEnabled())
@@ -148,6 +148,7 @@ public abstract class Roof extends HousePart {
 					ms.setColorMaterial(ColorMaterial.Diffuse);
 					mesh.setRenderState(ms);
 				}
+				meshIndex++;
 			}
 			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
 			wireframeMesh.getMeshData().updateVertexCount();
@@ -443,15 +444,19 @@ public abstract class Roof extends HousePart {
 								double distance = -editPoint.subtract(meshBase[0], null).dot(n);
 								distance += -Math.signum(distance)*0.0001;	// in order to avoid crazy roof that stretches to floor
 								editPoint.addLocal(n.multiply(distance, null));
-								wallGablePoints.add(editPoint.clone());
+//								wallGablePoints.add(editPoint.clone());
+								wallGablePoints.add(editPoint);
 							}
 						}
 					}
-					drawGableWall(base, wallGablePoints);
+					computeGableWallPoints(base, wallGablePoints);
 					break;
 				}
 			}
 		}
+		for (final Wall wall : walls)
+			wall.draw();
+		
 	}
 
 	public Vector3[] findBasePoints(final Mesh mesh, final ArrayList<Vector3> storeUpperPoints) {
@@ -493,8 +498,8 @@ public abstract class Roof extends HousePart {
 		// return (base_2[0].equals(base_1[0]) && base_2[1].equals(base_1[1])) || (base_2[0].equals(base_1[1]) && base_2[1].equals(base_1[0]));
 		return (base_2[0].distance(base_1[0]) < MathUtils.ZERO_TOLERANCE && base_2[1].distance(base_1[1]) < MathUtils.ZERO_TOLERANCE) || (base_2[0].distance(base_1[1]) < MathUtils.ZERO_TOLERANCE && base_2[1].distance(base_1[0]) < MathUtils.ZERO_TOLERANCE);
 	}
-
-	private void drawGableWall(final Vector3[] targetBase, final ArrayList<Vector3> wallGablePoints) {
+	
+	private void computeGableWallPoints(final Vector3[] targetBase, final ArrayList<Vector3> wallGablePoints) {
 		final Vector3[] wallBase = new Vector3[2];
 		wallBase[0] = new Vector3();
 		wallBase[1] = new Vector3();
@@ -509,7 +514,6 @@ public abstract class Roof extends HousePart {
 				for (final Vector3 p : wallGablePoints)
 					p.addLocal(d);
 				Collections.sort(wallGablePoints, new Comparator<Vector3>() {
-
 					@Override
 					public int compare(Vector3 o1, Vector3 o2) {
 						if (o1.distance(wallFirstPoint) > o2.distance(wallFirstPoint))
@@ -520,7 +524,6 @@ public abstract class Roof extends HousePart {
 					
 				});
 				wall.setGablePoints(wallGablePoints);
-				wall.draw();
 				break;
 			}
 		}
