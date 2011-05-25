@@ -417,8 +417,10 @@ public abstract class Roof extends HousePart {
 		if (gableBases == null)
 			gableBases = new ArrayList<Vector3[]>();
 		final Vector3[] base = findBasePoints((Mesh) getFlattenedMeshesRoot().getChild(index), null);
-		gableBases.add(base);
-		draw();
+		if (base != null) {
+			gableBases.add(base);
+			draw();
+		}
 	}
 
 	private void computeGableEditPoints() {
@@ -429,7 +431,7 @@ public abstract class Roof extends HousePart {
 			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
 				meshUpperPoints.clear();
 				final Vector3[] meshBase = findBasePoints((Mesh) mesh, meshUpperPoints);
-				if (meshBase[0].equals(base[0]) && meshBase[1].equals(base[1])) {
+				if (meshBase != null && meshBase[0].equals(base[0]) && meshBase[1].equals(base[1])) {
 					final Vector3 n = meshBase[1].subtract(meshBase[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
 
 					if (gablePoints == null)
@@ -474,7 +476,10 @@ public abstract class Roof extends HousePart {
 			} else if (storeUpperPoints != null)
 				storeUpperPoints.add(meshPoint);
 		}
-		return base;
+		if (base[1] == null)
+			return null;
+		else
+			return base;
 	}
 
 	private void hideGableMeshes() {
@@ -486,9 +491,8 @@ public abstract class Roof extends HousePart {
 		for (final Vector3[] base_i : gableBases) {
 			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
 				final Vector3[] base = findBasePoints((Mesh) mesh, null);
-				if (isSameBasePoints(base_i, base)) {
+				if (base != null && isSameBasePoints(base_i, base))
 					mesh.getSceneHints().setCullHint(CullHint.Always);
-				}
 			}
 		}
 

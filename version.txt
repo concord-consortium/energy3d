@@ -599,7 +599,8 @@ Version 0.3 - March 7, 2011
 - allow window to be drawn on the gable wall
 - fix problem with incorrect wall back reduction due to adding roof points to middle of polygon instead of its end
 - create shed roof using gable roof
-
+- add obi polygon library to project
+- fix exception with adjacent gable roofs in L-Shaped house model by reducing gable points in reduceBackMesh function
  
 
 TODO:
