@@ -426,6 +426,15 @@ public class Wall extends HousePart {
 			dir.normalizeLocal().negateLocal();
 			reduceBackMeshWidth(polygon, dir, 1);
 		}
+		
+
+		// reduce height of backMesh by 0.5
+		final TriangulationPoint d = new TPoint(0,0,0.5);
+		fromXY.transform(d);
+		for (int i = 4; i < polygon.pointCount(); i++) {
+			final TriangulationPoint p = polygon.getPoints().get(i);		
+			p.set(p.getX() + d.getX(), p.getY() + d.getY(), p.getZ() + d.getZ());
+		}
 
 		backMesh.setTranslation(getThicknessNormal());
 
