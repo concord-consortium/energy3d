@@ -65,8 +65,8 @@ public class MainPanel extends JPanel {
 	private JComboBox cityComboBox = null;
 	private JSpinner latitudeSpinner = null;
 	private JToggleButton roofCustomButton = null;
-	private JToggleButton zoomToggleButton = null;
-	private JToggleButton roofGableToggleButton = null;
+	private JToggleButton zoomButton = null;
+	private JToggleButton roofGableButton = null;
 	public static MainPanel getInstance() {
 		return instance;
 	}
@@ -113,6 +113,7 @@ public class MainPanel extends JPanel {
 			if (showEditTools) {
 				appToolbar.add(getSelectButton());
 				appToolbar.add(getResizeButton());
+				appToolbar.add(getZoomButton());
 				appToolbar.addSeparator();
 				appToolbar.add(getFoundationButton());
 				appToolbar.add(getWallButton());
@@ -121,6 +122,7 @@ public class MainPanel extends JPanel {
 				appToolbar.add(getRoofButton());
 				appToolbar.add(getRoofHipButton());
 				appToolbar.add(getRoofCustomButton());
+				appToolbar.add(getRoofGableButton());
 				appToolbar.add(getFloorButton());
 				appToolbar.addSeparator();
 			}
@@ -142,12 +144,11 @@ public class MainPanel extends JPanel {
 			if (showEditTools)
 				appToolbar.add(getPreviewButton());
 
-				appToolbar.add(getZoomToggleButton());
-				appToolbar.add(getRoofGableToggleButton());
 			if (showEditTools) {
 				final ButtonGroup bg = new ButtonGroup();
 				bg.add(selectButton);
 				bg.add(resizeButton);
+				bg.add(zoomButton);
 				bg.add(foundationButton);
 				bg.add(wallButton);
 				bg.add(doorButton);
@@ -156,6 +157,7 @@ public class MainPanel extends JPanel {
 				bg.add(roofHipButton);
 				bg.add(roofCustomButton);
 				bg.add(floorButton);
+				bg.add(roofGableButton);
 			}
 		}
 		return appToolbar;
@@ -757,38 +759,45 @@ public class MainPanel extends JPanel {
 	}
 
 	/**
-	 * This method initializes zoomToggleButton	
+	 * This method initializes zoomButton	
 	 * 	
 	 * @return javax.swing.JToggleButton	
 	 */
-	private JToggleButton getZoomToggleButton() {
-		if (zoomToggleButton == null) {
-			zoomToggleButton = new JToggleButton();
-			zoomToggleButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/zoom.png")));
-			zoomToggleButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setZoomLock(zoomToggleButton.isSelected());
+	private JToggleButton getZoomButton() {
+		if (zoomButton == null) {
+			zoomButton = new JToggleButton();
+			zoomButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/zoom.png")));
+			zoomButton.addItemListener(new java.awt.event.ItemListener() {
+				public void itemStateChanged(java.awt.event.ItemEvent e) {
+					SceneManager.getInstance().setZoomLock(zoomButton.isSelected());
 				}
 			});
 		}
-		return zoomToggleButton;
+		return zoomButton;
 	}
 
 	/**
-	 * This method initializes roofGableToggleButton	
+	 * This method initializes roofGableButton	
 	 * 	
 	 * @return javax.swing.JToggleButton	
 	 */
-	private JToggleButton getRoofGableToggleButton() {
-		if (roofGableToggleButton == null) {
-			roofGableToggleButton = new JToggleButton();
-			roofGableToggleButton.setText("G");
-			roofGableToggleButton.addActionListener(new java.awt.event.ActionListener() {
+	private JToggleButton getRoofGableButton() {
+		if (roofGableButton == null) {
+			roofGableButton = new JToggleButton();
+			roofGableButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_gable.png")));
+			roofGableButton.setToolTipText("Convert to gable roof");
+			roofGableButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(Operation.DRAW_ROOF_GABLE);
 				}
 			});
+			roofGableButton.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseClicked(java.awt.event.MouseEvent e) {
+					if (e.getClickCount() > 1)
+						SceneManager.getInstance().setOperationStick(true);
+				}
+			});			
 		}
-		return roofGableToggleButton;
+		return roofGableButton;
 	}
 } // @jve:decl-index=0:visual-constraint="10,10"
