@@ -602,6 +602,7 @@ Version 0.3 - March 7, 2011
 - add obi polygon library to project
 - fix exception with adjacent gable roofs in L-Shaped house model by reducing gable points in reduceBackMesh function
 - reduce hight of the back wall when part of gable roof
+- fix problem with pyramidroof resetting the edit point to center after 2nd gable side
  
 
 TODO:

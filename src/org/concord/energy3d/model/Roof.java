@@ -219,7 +219,7 @@ public abstract class Roof extends HousePart {
 		});
 
 		center.multiplyLocal(1.0 / wallUpperPoints.size());
-		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 	}
 
 	protected void addPointToPolygon(final Vector3 p, final ReadOnlyVector3 normal) {
@@ -410,7 +410,7 @@ public abstract class Roof extends HousePart {
 			op.addLocal(p.getX(), p.getY(), p.getZ());
 			p.set(op.getX(), op.getY(), op.getZ());
 		}
-		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 	}
 
 	public void setGable(int index) {

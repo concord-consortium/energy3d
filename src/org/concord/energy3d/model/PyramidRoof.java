@@ -6,9 +6,11 @@ import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class PyramidRoof extends Roof {
 	private static final long serialVersionUID = 1L;
+	transient private boolean recalculateEditPoints;
 
 	public PyramidRoof() {
 		super(1, 1, 0.5);
@@ -17,6 +19,7 @@ public class PyramidRoof extends Roof {
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1) {
 			pick(x, y, Wall.class);
+			recalculateEditPoints = true;
 		} else {
 			Vector3 base = points.get(0); //center;
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
@@ -59,5 +62,15 @@ public class PyramidRoof extends Roof {
 //		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 ////		return wallUpperPoints;
 //	}
+	
+	@Override
+	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
+		super.processRoofPoints(wallUpperPoints, wallNormals);
+		
+		if (recalculateEditPoints) {
+			points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+			recalculateEditPoints = false;
+		}
+	}	
 	
 }
