@@ -95,7 +95,7 @@ public class Wall extends HousePart {
 		surroundMesh.setRenderState(offsetState);
 
 		root.attachChild(invisibleMesh);
-		invisibleMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		invisibleMesh.getMeshData().setIndexMode(IndexMode.Quads);
 		invisibleMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
 
@@ -243,6 +243,8 @@ public class Wall extends HousePart {
 	protected void drawMesh() {
 		if (!isDrawable())
 			return;
+		
+		updateEditShapes();
 
 		final ArrayList<Vector3> points = abspoints;
 		final Vector3 normal = points.get(2).subtract(points.get(0), null).cross(points.get(1).subtract(points.get(0), null), null).normalize(null);
@@ -259,9 +261,9 @@ public class Wall extends HousePart {
 				if (gablePoint.getZf() > z)
 					z = gablePoint.getZf();
 
-		p = points.get(0);
-		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		p = points.get(1);
+		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		p = points.get(0);
 		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
 		p = points.get(2);
 		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);

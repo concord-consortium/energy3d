@@ -605,6 +605,7 @@ Version 0.3 - March 7, 2011
 - fix problem with pyramidroof resetting the edit point to center after 2nd gable side
 - add gable roof icon
 - cleanup the gui
+- fix problem with not being able to select wall at some areas
  
 
 TODO:

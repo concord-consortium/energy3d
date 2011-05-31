@@ -115,7 +115,7 @@ public class SelectUtil {
 
 	public static UserData selectHousePart(int x, int y, boolean edit) {
 		final HousePart lastHoveredObject = SceneManager.getInstance().getSelectedPart();
-		final PickedHousePart pickedHousePart  = pickPart(x+0, y, housePartsNode);
+		final PickedHousePart pickedHousePart  = pickPart(x, y, housePartsNode);
 		UserData data = null;
 		if (pickedHousePart != null)
 			data = pickedHousePart.getUserData();

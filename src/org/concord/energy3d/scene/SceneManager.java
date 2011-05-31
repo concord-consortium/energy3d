@@ -1061,7 +1061,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (drawn != null && !drawn.isDrawCompleted()) {
 			drawn.setPreviewPoint(x, y);
 		} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
-			final UserData pick = SelectUtil.selectHousePart(x, y, false);
+			final UserData pick = SelectUtil.selectHousePart(x, y, false);			
 			if (pick != null)
 				drawn = pick.getHousePart();
 			else
