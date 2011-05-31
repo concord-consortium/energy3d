@@ -21,7 +21,7 @@ public class PyramidRoof extends Roof {
 			pick(x, y, Wall.class);
 			recalculateEditPoints = true;
 		} else {
-			Vector3 base = points.get(0); //center;
+			Vector3 base = center; //.get(0); //center;
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ());
@@ -70,7 +70,8 @@ public class PyramidRoof extends Roof {
 		if (recalculateEditPoints) {
 			points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 			recalculateEditPoints = false;
-		}
+		} else
+			points.get(0).setZ(center.getZ() + height);
 	}	
 	
 }

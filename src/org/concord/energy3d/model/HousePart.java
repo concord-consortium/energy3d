@@ -358,6 +358,10 @@ public abstract class HousePart implements Serializable {
 			abspoints.add(new Vector3());
 		}
 	}
+	
+	protected void clearDrawFlag() {
+		drawFlag = 0;
+	}
 
 	public void draw() {
 		if (drawFlag == globalDrawFlag)

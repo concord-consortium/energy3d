@@ -431,7 +431,8 @@ public abstract class Roof extends HousePart {
 			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
 				meshUpperPoints.clear();
 				final Vector3[] meshBase = findBasePoints((Mesh) mesh, meshUpperPoints);
-				if (meshBase != null && meshBase[0].equals(base[0]) && meshBase[1].equals(base[1])) {
+//				if (meshBase != null && meshBase[0].equals(base[0]) && meshBase[1].equals(base[1])) {
+				if (meshBase != null && isSameBasePoints(base, meshBase)) {
 					final Vector3 n = meshBase[1].subtract(meshBase[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
 
 					if (gablePoints == null)
