@@ -606,9 +606,9 @@ Version 0.3 - March 7, 2011
 - add gable roof icon
 - cleanup the gui
 - fix problem with not being able to select wall at some areas
-
 - fix problem with no longer able to adjust pyramid roof height
-- *fix problem with not being able to adjust hip roof edit points
+- fix problem with not being able to adjust hip roof edit points
+- pick the nearest editpoint for gable mesh so that gable wall is redrawn properly when moving edit points
 
  
 

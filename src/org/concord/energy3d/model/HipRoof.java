@@ -30,10 +30,10 @@ public class HipRoof extends Roof {
 			Vector3 p = closestPoint(points.get(editPointIndex), Vector3.UNIT_Y, x, y);
 			p = grid(p, GRID_SIZE);
 			points.get(editPointIndex).set(p);
-			draw();
-			clearDrawFlag();
-			draw();
-			clearDrawFlag();
+//			draw();
+//			clearDrawFlag();
+//			draw();
+//			clearDrawFlag();
 		}
 		draw();
 		if (container != null)

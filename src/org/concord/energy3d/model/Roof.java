@@ -441,17 +441,34 @@ public abstract class Roof extends HousePart {
 						gablePoints.clear();
 //					if (wallGablePoints == null)
 					final ArrayList<Vector3> wallGablePoints = new ArrayList<Vector3>();
-					for (final Vector3 editPoint : points) {
-						for (final Vector3 meshPoint : meshUpperPoints) {
-							if (meshPoint.distance(editPoint) < MathUtils.ZERO_TOLERANCE) {
-								double distance = -editPoint.subtract(meshBase[0], null).dot(n);
-								distance += -Math.signum(distance)*0.0001;	// in order to avoid crazy roof that stretches to floor
-								editPoint.addLocal(n.multiply(distance, null));
-//								wallGablePoints.add(editPoint.clone());
-								wallGablePoints.add(editPoint);
+//					for (final Vector3 editPoint : points) {
+//						for (final Vector3 meshPoint : meshUpperPoints) {
+//							if (meshPoint.distance(editPoint) < MathUtils.ZERO_TOLERANCE) {
+//								double distance = -editPoint.subtract(meshBase[0], null).dot(n);
+//								distance += -Math.signum(distance)*0.0001;	// in order to avoid crazy roof that stretches to floor
+//								editPoint.addLocal(n.multiply(distance, null));
+////								wallGablePoints.add(editPoint.clone());
+//								wallGablePoints.add(editPoint);
+//							}
+//						}
+//					}
+					for (final Vector3 meshPoint : meshUpperPoints) {
+						double smallestDistanceToEditPoint = Double.MAX_VALUE;
+						Vector3 nearestEditPoint = null;
+						// select the nearest point so that one edit point per upper mesh point is selected
+						for (final Vector3 editPoint : points) {
+							final double distanceToEditPoint = meshPoint.distance(editPoint);							
+							if (distanceToEditPoint < smallestDistanceToEditPoint) {
+								smallestDistanceToEditPoint = distanceToEditPoint;
+								nearestEditPoint = editPoint;
 							}
 						}
-					}
+								double distance = -nearestEditPoint.subtract(meshBase[0], null).dot(n);
+								distance += -Math.signum(distance)*0.0001;	// in order to avoid crazy roof that stretches to floor
+								nearestEditPoint.addLocal(n.multiply(distance, null));
+//								wallGablePoints.add(editPoint.clone());
+								wallGablePoints.add(nearestEditPoint);
+					}					
 					computeGableWallPoints(base, wallGablePoints);
 					break;
 				}

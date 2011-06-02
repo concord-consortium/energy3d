@@ -359,9 +359,9 @@ public abstract class HousePart implements Serializable {
 		}
 	}
 	
-	protected void clearDrawFlag() {
-		drawFlag = 0;
-	}
+//	protected void clearDrawFlag() {
+//		drawFlag = 0;
+//	}
 
 	public void draw() {
 		if (drawFlag == globalDrawFlag)

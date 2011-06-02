@@ -25,7 +25,7 @@ public class PyramidRoof extends Roof {
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ());
-//			setHeight(Math.max(0, p.getZ() - base.getZ()), true);
+//			setHeight(Math.max(0, p.getZ() - base.getZ()), true);			
 		}
 		draw();
 		if (container != null)
