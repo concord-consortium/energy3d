@@ -609,7 +609,7 @@ Version 0.3 - March 7, 2011
 - fix problem with no longer able to adjust pyramid roof height
 - fix problem with not being able to adjust hip roof edit points
 - pick the nearest editpoint for gable mesh so that gable wall is redrawn properly when moving edit points
-
+- fix problem with not being able to select wall after turned into a gable wall
  
 
 TODO:

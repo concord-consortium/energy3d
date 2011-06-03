@@ -255,20 +255,20 @@ public class Wall extends HousePart {
 		invisibleVertexBuffer.rewind();
 		Vector3 p;
 
-		float z = 0;
+		float z = (float)height;
 		if (wallGablePoints != null)
 			for (final Vector3 gablePoint : wallGablePoints)
 				if (gablePoint.getZf() > z)
 					z = gablePoint.getZf();
 
 		p = points.get(1);
-		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
 		p = points.get(0);
-		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
-		p = points.get(2);
-		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
-		p = points.get(3);
 		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		p = points.get(2);
+		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		p = points.get(3);
+		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);		
 
 		// start the polygon with (1) then 0, 2, 3, [roof points] so that roof points are appended to the end of vertex list
 		p = points.get(1);
