@@ -610,6 +610,9 @@ Version 0.3 - March 7, 2011
 - fix problem with not being able to adjust hip roof edit points
 - pick the nearest editpoint for gable mesh so that gable wall is redrawn properly when moving edit points
 - fix problem with not being able to select wall after turned into a gable wall
+
+- remove all overhang computations before the call to drawOverhang
+- *add overhang to roofs including gable roof
  
 
 TODO:

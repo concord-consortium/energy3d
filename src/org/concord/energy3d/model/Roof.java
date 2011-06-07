@@ -47,7 +47,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class Roof extends HousePart {
 	static private final long serialVersionUID = 1L;
 	static protected final double GRID_SIZE = 0.5;
-	static private final double OVERHANG_LENGHT = 0; //0.3;
+	static private final double OVERHANG_LENGHT = 0.3;
 	transient protected Mesh bottomMesh;
 	transient protected Node flattenedMeshesRoot;
 	transient private ArrayList<PolygonPoint> wallUpperPoints;
@@ -126,8 +126,9 @@ public abstract class Roof extends HousePart {
 //			fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
 //			if (!root.hasChild(bottomMesh))
 //				root.attachChild(bottomMesh);
+//			drawOverhang(wallUpperPoints);
 			final Polygon polygon = makePolygon(wallUpperPoints);
-			addGablePointsToPolygon(polygon);
+//			addGablePointsToPolygon(polygon);
 			fillMeshWithPolygon(mesh, polygon);
 
 			// create roof parts
@@ -155,6 +156,8 @@ public abstract class Roof extends HousePart {
 			wireframeMesh.updateModelBound();
 
 //			drawGableWalls();
+			
+			drawOverhang();
 
 			for (int i = 0; i < points.size(); i++) {
 				Vector3 p = points.get(i);
@@ -168,11 +171,11 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-	private void addGablePointsToPolygon(final Polygon polygon) {
-		// if (gablePoints != null)
-		// for (final Vector3 p : gablePoints)
-		// polygon.addSteinerPoint(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-	}
+//	private void addGablePointsToPolygon(final Polygon polygon) {
+//		// if (gablePoints != null)
+//		// for (final Vector3 p : gablePoints)
+//		// polygon.addSteinerPoint(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+//	}
 
 	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
 		try {
@@ -403,13 +406,13 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
-		final Vector3 op = new Vector3();
-		for (int i = 0; i < wallUpperPoints.size(); i++) {
-			final PolygonPoint p = wallUpperPoints.get(i);
-			op.set(wallNormals.get(i)).multiplyLocal(OVERHANG_LENGHT);
-			op.addLocal(p.getX(), p.getY(), p.getZ());
-			p.set(op.getX(), op.getY(), op.getZ());
-		}
+//		final Vector3 op = new Vector3();
+//		for (int i = 0; i < wallUpperPoints.size(); i++) {
+//			final PolygonPoint p = wallUpperPoints.get(i);
+//			op.set(wallNormals.get(i)).multiplyLocal(OVERHANG_LENGHT);
+//			op.addLocal(p.getX(), p.getY(), p.getZ());
+//			p.set(op.getX(), op.getY(), op.getZ());
+//		}
 //		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 	}
 
@@ -528,13 +531,15 @@ public abstract class Roof extends HousePart {
 		int normalIndex = 0;
 		for (final Wall wall : walls) {
 			final Vector3 wallFirstPoint = wall.getAbsPoints().get(1);
-			wallBase[0].set(wallNormals.get(normalIndex)).multiplyLocal(OVERHANG_LENGHT).addLocal(wallFirstPoint);
-			wallBase[1].set(wallNormals.get(normalIndex + 1 < wallNormals.size() ? normalIndex + 1 : 0)).multiplyLocal(OVERHANG_LENGHT).addLocal(wall.getAbsPoints().get(3));
+//			wallBase[0].set(wallNormals.get(normalIndex)).multiplyLocal(OVERHANG_LENGHT).addLocal(wallFirstPoint);
+//			wallBase[1].set(wallNormals.get(normalIndex + 1 < wallNormals.size() ? normalIndex + 1 : 0)).multiplyLocal(OVERHANG_LENGHT).addLocal(wall.getAbsPoints().get(3));
+			wallBase[0].set(wallFirstPoint);
+			wallBase[1].set(wall.getAbsPoints().get(3));			
 			normalIndex++;
-			final Vector3 d = wall.getFaceDirection().multiply(OVERHANG_LENGHT, null).negateLocal();
+//			final Vector3 d = wall.getFaceDirection().multiply(OVERHANG_LENGHT, null).negateLocal();
 			if (isSameBasePoints(targetBase, wallBase)) {
-				for (final Vector3 p : wallGablePoints)
-					p.addLocal(d);
+//				for (final Vector3 p : wallGablePoints)
+//					p.addLocal(d);
 				Collections.sort(wallGablePoints, new Comparator<Vector3>() {
 					@Override
 					public int compare(Vector3 o1, Vector3 o2) {
@@ -548,6 +553,33 @@ public abstract class Roof extends HousePart {
 				wall.setGablePoints(wallGablePoints);
 				break;
 			}
+		}
+	}
+	
+	private void drawOverhang() {
+		for (int i = 0; i < flattenedMeshesRoot.getNumberOfChildren(); i++) {
+			final Mesh mesh = (Mesh) flattenedMeshesRoot.getChild(i);
+			final ArrayList<Vector3> upperPoints = new ArrayList<Vector3>();
+			final Vector3[] base = findBasePoints(mesh, upperPoints);
+			for (final Vector3 base_i : base) {
+				Vector3 closestUpperPoint = null;
+				for (final Vector3 upperPoint : upperPoints) {
+					if (closestUpperPoint == null || closestUpperPoint.distance(base_i) > upperPoint.distance(base_i))
+						closestUpperPoint = upperPoint;
+				}
+				final Vector3 direction = base_i.subtract(closestUpperPoint, null);
+//				final Vector3 newBase_i = direction.multiply(1 + OVERHANG_LENGHT / direction.length(), null).addLocal(closestUpperPoint);
+//				final Vector3 newBase_i = direction.multiply(1 + OVERHANG_LENGHT / direction.normalize(null).dot(Vector3.NEG_UNIT_Z) / direction.length(), null).addLocal(closestUpperPoint);
+				final Vector3 newBase_i = direction.multiply(1 + OVERHANG_LENGHT / MathUtils.sin(MathUtils.acos(direction.normalize(null).dot(Vector3.NEG_UNIT_Z))) / direction.length(), null).addLocal(closestUpperPoint);
+				final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+				for (int j = 0; j < vertexBuffer.limit(); j += 3) {
+					if (vertexBuffer.get(j) == base_i.getXf() && vertexBuffer.get(j + 1) == base_i.getYf() && vertexBuffer.get(j + 2) == base_i.getZf()) {
+						vertexBuffer.position(j);
+						vertexBuffer.put(newBase_i.getXf()).put(newBase_i.getYf()).put(newBase_i.getZf());
+					}
+				}
+			}
+			
 		}
 	}
 }
