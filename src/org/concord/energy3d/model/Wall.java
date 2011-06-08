@@ -18,6 +18,7 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
@@ -279,9 +280,17 @@ public class Wall extends HousePart {
 		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p = points.get(3);
 		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-		if (wallGablePoints != null)
-			for (final Vector3 gablePoint : wallGablePoints)
-				polyPoints.add(new PolygonPoint(gablePoint.getX(), gablePoint.getY(), gablePoint.getZ()));
+		if (wallGablePoints != null) {
+			final Vector3 n = getFaceDirection().negate(null).multiplyLocal(Roof.OVERHANG_LENGHT);
+			for (final Vector3 gablePoint : wallGablePoints) {
+				final Vector3 v = gablePoint.add(n, null);
+				final Vector2 min = new Vector2(Math.min(points.get(0).getX(), points.get(2).getX()), Math.min(points.get(0).getY(), points.get(2).getY())); 
+				final Vector2 max = new Vector2(Math.max(points.get(0).getX(), points.get(2).getX()), Math.max(points.get(0).getY(), points.get(2).getY()));
+				v.set(Math.max(v.getX(), min.getX()), Math.max(v.getY(), min.getY()), v.getZ()); 
+				v.set(Math.min(v.getX(), max.getX()), Math.min(v.getY(), max.getY()), v.getZ());
+				polyPoints.add(new PolygonPoint(v.getX(), v.getY(), v.getZ()));
+			}
+		}
 
 		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
