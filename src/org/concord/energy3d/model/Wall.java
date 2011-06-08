@@ -15,9 +15,13 @@ import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -52,6 +56,7 @@ public class Wall extends HousePart {
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
 	transient private ArrayList<Vector3> wallGablePoints;
+	transient private Roof roof;
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -273,13 +278,13 @@ public class Wall extends HousePart {
 
 		// start the polygon with (1) then 0, 2, 3, [roof points] so that roof points are appended to the end of vertex list
 		p = points.get(1);
-		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection(p)));
 		p = points.get(0);
 		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p = points.get(2);
 		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p = points.get(3);
-		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+		polyPoints.add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection(p)));
 		if (wallGablePoints != null) {
 			final Vector3 n = getFaceDirection().negate(null).multiplyLocal(Roof.OVERHANG_LENGHT);
 			for (final Vector3 gablePoint : wallGablePoints) {
@@ -288,7 +293,7 @@ public class Wall extends HousePart {
 				final Vector2 max = new Vector2(Math.max(points.get(0).getX(), points.get(2).getX()), Math.max(points.get(0).getY(), points.get(2).getY()));
 				v.set(Math.max(v.getX(), min.getX()), Math.max(v.getY(), min.getY()), v.getZ()); 
 				v.set(Math.min(v.getX(), max.getX()), Math.min(v.getY(), max.getY()), v.getZ());
-				polyPoints.add(new PolygonPoint(v.getX(), v.getY(), v.getZ()));
+				polyPoints.add(new PolygonPoint(v.getX(), v.getY(), findRoofIntersection(v)));
 			}
 		}
 
@@ -410,6 +415,18 @@ public class Wall extends HousePart {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+	}
+
+	public double findRoofIntersection(final Vector3 v) {
+		if (roof == null)
+			return v.getZ();
+		final PickResults pickResults = new PrimitivePickResults();
+		PickingUtil.findPick(roof.getFlattenedMeshesRoot(), new Ray3(new Vector3(v.getX(), v.getY(), 0), Vector3.UNIT_Z), pickResults);
+		if (pickResults.getNumber() == 0)
+			return v.getZ();
+		final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
+		final double height = intersectionPoint.getZ();
+		return height;
 	}
 
 	public boolean isPerpendicularToNeighbor(final int neighbor) {
@@ -956,8 +973,9 @@ public class Wall extends HousePart {
 		// System.out.println(this);
 	}
 
-	public void setGablePoints(final ArrayList<Vector3> wallGablePoints) {
+	public void setGablePoints(final ArrayList<Vector3> wallGablePoints, final Roof roof) {
 		this.wallGablePoints = wallGablePoints;
+		this.roof = roof;
 	}
 
 	// public void drawNeighbors() {

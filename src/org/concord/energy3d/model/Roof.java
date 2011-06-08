@@ -550,7 +550,7 @@ public abstract class Roof extends HousePart {
 					}
 					
 				});
-				wall.setGablePoints(gableRoofMeshEditPoints);
+				wall.setGablePoints(gableRoofMeshEditPoints, this);
 				break;
 			}
 		}
