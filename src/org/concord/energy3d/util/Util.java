@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.model.HousePart;
+import org.poly2tri.geometry.polygon.PolygonPoint;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
@@ -84,6 +85,10 @@ public class Util {
 
 	public static void put(final Vector3 p, final FloatBuffer buf) {		
 		buf.put(p.getXf()).put(p.getYf()).put(p.getZf());		
+	}
+
+	public static PolygonPoint toPolygonPoint(Vector3 p) {
+		return new PolygonPoint(p.getX(), p.getY(), p.getZ());
 	}
 	
 }

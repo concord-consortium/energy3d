@@ -187,8 +187,8 @@ public abstract class Roof extends HousePart {
 				System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
 			throw e;
 		}
-		for (TriangulationPoint p : polygon.getPoints())
-			System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
+//		for (TriangulationPoint p : polygon.getPoints())
+//			System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
 		
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 
@@ -207,6 +207,7 @@ public abstract class Roof extends HousePart {
 		startWall.visitNeighbors(new WallVisitor() {
 			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
 				walls.add(currentWall);
+				currentWall.setRoof(Roof.this);
 				final int pointIndex2;
 				if (nextSnap != null)
 					pointIndex2 = nextSnap.getSnapPointIndexOf(currentWall) + 1;
@@ -550,7 +551,7 @@ public abstract class Roof extends HousePart {
 					}
 					
 				});
-				wall.setGablePoints(gableRoofMeshEditPoints, this);
+				wall.setGablePoints(gableRoofMeshEditPoints);
 				break;
 			}
 		}

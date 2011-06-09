@@ -267,4 +267,8 @@ public class Polygon implements Triangulatable
         }
     }
 
+	public ArrayList<Polygon> getHoles() {
+		return _holes;
+	}
+
 }

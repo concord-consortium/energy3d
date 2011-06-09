@@ -190,9 +190,9 @@ public class MeshLib {
 		final Vector3 pointOnHull = new Vector3(leftVertex);
 		final Vector3 endpoint = new Vector3();
 		final Vector3 sj = new Vector3();
-		System.out.println("----------------------------");
+//		System.out.println("----------------------------");
 		do {
-			System.out.println(Util.toString(pointOnHull));			
+//			System.out.println(Util.toString(pointOnHull));			
 			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
 			endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
 			for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
