@@ -617,7 +617,7 @@ Version 0.3 - March 7, 2011
 - stretch the gable walls all the way to the roof by picking
 - stretch all walls all the way to the roof
 - stretch the back mesh all the way to the roof separately from the front mesh to get a more accurate result
-- *stretch the back mesh "after" reducing its neighboring sides to get a more accurate result
+- stretch the back mesh "after" reducing its neighboring sides to get a more accurate result
  
 
 TODO:

@@ -277,7 +277,7 @@ public class Wall extends HousePart {
 		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);		
 
 				
-		final Polygon polygon = computeWallAndWindowPolygon(false);
+		final Polygon polygon = toXY(stretchToRoof(computeWallAndWindowPolygon(false)));
 
 		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
@@ -412,13 +412,15 @@ public class Wall extends HousePart {
 		Vector3 p = new Vector3();
 		// Start the polygon with (1) then 0, 2, 3, [roof points] so that roof points are appended to the end of vertex list
 		p.set(abspoints.get(1)).addLocal(trans);
-		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection(p, backMesh)));
+//		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection(p, backMesh)));
+		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p.set(abspoints.get(0)).addLocal(trans);
 		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p.set(abspoints.get(2)).addLocal(trans);
 		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p.set(abspoints.get(3)).addLocal(trans);
-		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection(p, backMesh)));
+//		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection(p, backMesh)));
+		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		if (wallGablePoints != null) {
 			final Vector3 n = getFaceDirection().negate(null).multiplyLocal(Roof.OVERHANG_LENGHT);
 			for (final Vector3 gablePoint : wallGablePoints) {
@@ -428,7 +430,8 @@ public class Wall extends HousePart {
 				v.set(Math.max(v.getX(), min.getX()), Math.max(v.getY(), min.getY()), v.getZ()); 
 				v.set(Math.min(v.getX(), max.getX()), Math.min(v.getY(), max.getY()), v.getZ());
 				v.addLocal(trans);
-				polygonPoints.add(new PolygonPoint(v.getX(), v.getY(), findRoofIntersection(v, backMesh)));
+//				polygonPoints.add(new PolygonPoint(v.getX(), v.getY(), findRoofIntersection(v, backMesh)));
+				polygonPoints.add(new PolygonPoint(v.getX(), v.getY(), v.getZ()));
 			}
 		}
 		
@@ -449,8 +452,13 @@ public class Wall extends HousePart {
 				holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
 				polygon.addHole(new Polygon(holePoints));
 			}
-		}
+		}		
 		
+		
+		return polygon;
+	}
+
+	private Polygon toXY(final Polygon polygon) {
 		final Vector3 normal = computeNormal();
 		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 
@@ -462,11 +470,18 @@ public class Wall extends HousePart {
 			for (final TriangulationPoint tp : hole.getPoints())
 				toXY.transform(tp);
 		}
-		
-		
 		return polygon;
 	}
 
+	private Polygon stretchToRoof(final Polygon polygon) {
+		for (int i = 0; i < polygon.pointCount(); i++)
+			if (i != 1 && i != 2) {
+				final TriangulationPoint tp = polygon.getPoints().get(i);
+				tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), tp.getZ()), false));
+			}
+		return polygon;
+	}
+	
 	public double findRoofIntersection(final ReadOnlyVector3 v, final boolean backMesh) {
 		if (roof == null)
 			return v.getZ();
@@ -520,6 +535,9 @@ public class Wall extends HousePart {
 //		}
 
 		// Poly2Tri.triangulate(polygon);
+		
+		toXY(stretchToRoof(polygon));
+		
 		try {
 //			System.out.println("After reduction:");
 //			for (TriangulationPoint p : polygon.getPoints())
