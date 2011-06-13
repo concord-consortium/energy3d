@@ -179,7 +179,6 @@ public class Wall extends HousePart {
 			defaultWallHeight = height = Math.max(0.1, closestPoint.getZ() - base.getZ());
 			final double z = height + base.getZ();
 			points.get(1).setZ(z);
-			;
 			points.get(3).setZ(z);
 		}
 
@@ -438,7 +437,7 @@ public class Wall extends HousePart {
 		final Polygon polygon = new Polygon(polygonPoints);
 		
 		// Add window holes
-		for (HousePart child : children) {
+		for (final HousePart child : children) {
 			final ArrayList<Vector3> winPoints = child.getAbsPoints();
 			if (child instanceof Window && includeWindow(winPoints)) {
 				ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();

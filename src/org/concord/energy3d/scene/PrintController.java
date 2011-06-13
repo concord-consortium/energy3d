@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.UserData;
+import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.PrintExporter;
@@ -164,6 +165,8 @@ public class PrintController implements Updater {
 			if (part.isPrintable()) {
 				part.flatten(flattenTime);
 				printSequence = part.drawLabels(printSequence);
+			} else if (part instanceof Window) {
+				((Window)part).hideBars();
 			}
 			
 		}

@@ -120,6 +120,11 @@ public class Window extends HousePart {
 	protected void drawMesh() {
 		if (points.size() < 4)
 			return;
+		
+		for (final Vector3 p : abspoints)
+			container.getRoot().getTransform().applyForward(p);
+
+			
 //		vertexBuffer.rewind();
 //		for (Vector3 p : abspoints)
 //			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
@@ -271,5 +276,10 @@ public class Window extends HousePart {
 	}
 	
 	public void updateTextureAndColor(final boolean textureEnabled) {
+	}
+	
+	public void hideBars() {
+		if (bars != null)
+			bars.getSceneHints().setCullHint(CullHint.Always);
 	}
 }

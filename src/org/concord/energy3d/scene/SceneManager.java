@@ -743,7 +743,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
 //		Vector3 dir = new Vector3(0.0f, 1.0f, 0.0f);
-		Vector3 dir = new Vector3(0.0f, 0.0f, 0.0f);
+		Vector3 lookAt = new Vector3(0.0f, 0.0f, 0.0f);
 
 		setCompassVisible(viewMode == ViewMode.NORMAL);
 
@@ -756,7 +756,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			control.setMoveSpeed(5 * MOVE_SPEED);
 			loc = new Vector3(0, 0, 10);
 			up = new Vector3(0.0f, -1.0f, 0.0f);
-			dir = new Vector3(0.0f, 0.0f, -1.0f);
+			lookAt = new Vector3(0.0f, 0.0f, -1.0f);
 			resizeCamera(2);
 		} else if (viewMode == ViewMode.PRINT) {
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
@@ -770,19 +770,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			else
 				resizeCamera(pageWidth);
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
-			loc = new Vector3(0.0f, -8.0f, 0.0f);
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			final int rows = PrintController.getInstance().getRows();
 			final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin();
 			final double w = PrintController.getInstance().getCols() * (PrintController.getInstance().getPageWidth() + PrintController.getMargin());
 			final double h = rows * pageHeight;
+//			loc = new Vector3(0.0f, -8.0f, 0.0f);
 			loc = new Vector3(0, -Math.max(w, h), rows % 2 != 0 ? 0 : pageHeight / 2);
+			lookAt = loc.clone().addLocal(0, 1, 0);
 			resizeCamera(PrintController.getInstance().getPageWidth());
 		}
 
-		camera.setFrame(loc, left, up, dir);
-		camera.lookAt(dir, Vector3.UNIT_Z);
+		camera.setFrame(loc, left, up, lookAt);
+		camera.lookAt(lookAt, Vector3.UNIT_Z);
 
 		control.reset();
 		cameraNode.updateFromCamera();

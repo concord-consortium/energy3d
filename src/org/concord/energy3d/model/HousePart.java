@@ -393,7 +393,7 @@ public abstract class HousePart implements Serializable {
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 p = toAbsolute(points.get(i));
 			abspoints.get(i).set(p);
-//			pointsRoot.getChild(i).setTranslation(p);
+			pointsRoot.getChild(i).setTranslation(p);
 		}
 	}
 

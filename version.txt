@@ -618,6 +618,13 @@ Version 0.3 - March 7, 2011
 - stretch all walls all the way to the roof
 - stretch the back mesh all the way to the roof separately from the front mesh to get a more accurate result
 - stretch the back mesh "after" reducing its neighboring sides to get a more accurate result
+- fix problem with wall edit point not moving when inserting new wall
+- hide windows when in print-preview
+- fix problem with camera angle in print-preview
+
+
+- *fix problem with distorted back mesh when gabled
+
  
 
 TODO:
