@@ -621,9 +621,7 @@ Version 0.3 - March 7, 2011
 - fix problem with wall edit point not moving when inserting new wall
 - hide windows when in print-preview
 - fix problem with camera angle in print-preview
-
-
-- *fix problem with distorted back mesh when gabled
+- fix problem with distorted back mesh when gabled
 
  
 

@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -276,8 +277,17 @@ public class Wall extends HousePart {
 		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);		
 
 				
-		final Polygon polygon = toXY(stretchToRoof(computeWallAndWindowPolygon(false)));
+		
+		final Polygon polygon = stretchToRoof(enforceRangeAndRemoveDuplicatedGablePoints(computeWallAndWindowPolygon(false)));
 
+		System.out.println("-------------------------------");
+		System.out.println("Before reduction:");
+		for (TriangulationPoint tp : polygon.getPoints())
+			System.out.println("new PolygonPoint(" + tp.getX() + ", " + tp.getY() + ", " + tp.getZ() + ")");
+		
+		toXY(polygon);
+		
+		
 		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
 
@@ -424,15 +434,16 @@ public class Wall extends HousePart {
 			final Vector3 n = getFaceDirection().negate(null).multiplyLocal(Roof.OVERHANG_LENGHT);
 			for (final Vector3 gablePoint : wallGablePoints) {
 				final Vector3 v = gablePoint.add(n, null);
-				final Vector2 min = new Vector2(Math.min(abspoints.get(0).getX(), abspoints.get(2).getX()), Math.min(abspoints.get(0).getY(), abspoints.get(2).getY())); 
-				final Vector2 max = new Vector2(Math.max(abspoints.get(0).getX(), abspoints.get(2).getX()), Math.max(abspoints.get(0).getY(), abspoints.get(2).getY()));
-				v.set(Math.max(v.getX(), min.getX()), Math.max(v.getY(), min.getY()), v.getZ()); 
-				v.set(Math.min(v.getX(), max.getX()), Math.min(v.getY(), max.getY()), v.getZ());
+//				final Vector2 min = new Vector2(Math.min(abspoints.get(0).getX(), abspoints.get(2).getX()), Math.min(abspoints.get(0).getY(), abspoints.get(2).getY())); 
+//				final Vector2 max = new Vector2(Math.max(abspoints.get(0).getX(), abspoints.get(2).getX()), Math.max(abspoints.get(0).getY(), abspoints.get(2).getY()));
+//				v.set(Math.max(v.getX(), min.getX()), Math.max(v.getY(), min.getY()), v.getZ()); 
+//				v.set(Math.min(v.getX(), max.getX()), Math.min(v.getY(), max.getY()), v.getZ());
 				v.addLocal(trans);
 //				polygonPoints.add(new PolygonPoint(v.getX(), v.getY(), findRoofIntersection(v, backMesh)));
 				polygonPoints.add(new PolygonPoint(v.getX(), v.getY(), v.getZ()));
 			}
 		}
+		
 		
 		final Polygon polygon = new Polygon(polygonPoints);
 		
@@ -505,18 +516,27 @@ public class Wall extends HousePart {
 	}
 
 	private void drawBackMesh(final Polygon polygon, final XYToAnyTransform fromXY) {
+		final List<TriangulationPoint> polygonPoints = polygon.getPoints();
+//		System.out.println("-------------------------------");
 //		System.out.println("Before reduction:");
-//		for (TriangulationPoint p : polygon.getPoints())
+//		for (TriangulationPoint p : polygonPoints)
 //			System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
 
 		final Vector3 dir = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
-		if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted() && !(Scene.getInstance().isDrawThickness() && isShortWall && isPerpendicularToNeighbor(0)))
-			reduceBackMeshWidth(polygon, dir, 0);
+		if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted() && !(Scene.getInstance().isDrawThickness() && isShortWall && isPerpendicularToNeighbor(0))) {
+//			reduceBackMeshWidth(polygon, dir, 0);
+		}
 
 		if (neighbors[1] != null && neighbors[1].getNeighborOf(this).isFirstPointInserted() && !(Scene.getInstance().isDrawThickness() && isShortWall && isPerpendicularToNeighbor(1))) {
 			dir.normalizeLocal().negateLocal();
 			reduceBackMeshWidth(polygon, dir, 1);
 		}
+
+//		System.out.println("After reduction:");
+//		for (TriangulationPoint p : polygonPoints)
+//			System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");		
+		
+		enforceRangeAndRemoveDuplicatedGablePoints(polygon);
 		
 
 		// reduce height of backMesh by 0.5
@@ -534,13 +554,14 @@ public class Wall extends HousePart {
 //		}
 
 		// Poly2Tri.triangulate(polygon);
+
+//		System.out.println("After range enforcement:");
+//		for (TriangulationPoint p : polygonPoints)
+//			System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
 		
 		toXY(stretchToRoof(polygon));
 		
 		try {
-//			System.out.println("After reduction:");
-//			for (TriangulationPoint p : polygon.getPoints())
-//				System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
 			Poly2Tri.triangulate(polygon);
 		} catch (RuntimeException e) {
 			e.printStackTrace();
@@ -552,6 +573,26 @@ public class Wall extends HousePart {
 		ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
 		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
 		backMesh.getMeshData().updateVertexCount();
+	}
+
+	private Polygon enforceRangeAndRemoveDuplicatedGablePoints(final Polygon polygon) {
+		final List<TriangulationPoint> polygonPoints = polygon.getPoints();
+		for (int i = 4; i < polygon.pointCount(); i++) {
+			final Vector2 min = new Vector2(Math.min(polygonPoints.get(1).getX(), polygonPoints.get(2).getX()), Math.min(polygonPoints.get(1).getY(), polygonPoints.get(2).getY())); 
+			final Vector2 max = new Vector2(Math.max(polygonPoints.get(1).getX(), polygonPoints.get(2).getX()), Math.max(polygonPoints.get(1).getY(), polygonPoints.get(2).getY()));
+			final TriangulationPoint tp = polygonPoints.get(i);
+			tp.set(Math.max(tp.getX(), min.getX()), Math.max(tp.getY(), min.getY()), tp.getZ()); 
+			tp.set(Math.min(tp.getX(), max.getX()), Math.min(tp.getY(), max.getY()), tp.getZ());
+			for (int j = 0; j < i; j++) {
+				final TriangulationPoint tpj = polygon.getPoints().get(j);
+				if (Math.abs(tpj.getX() - tp.getX()) < MathUtils.ZERO_TOLERANCE && Math.abs(tpj.getY() - tp.getY()) < MathUtils.ZERO_TOLERANCE) {
+					polygonPoints.remove(i);
+					i--;
+					break;
+				}
+			}
+		}
+		return polygon;
 	}
 
 	private void reduceBackMeshWidth(final Polygon polygon, final ReadOnlyVector3 wallDir, final int neighbor) {
