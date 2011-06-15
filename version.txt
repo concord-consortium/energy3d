@@ -626,6 +626,7 @@ Version 0.3 - March 7, 2011
 - remove duplicated gable points and those already aligned with wall upper points
 - fix problem with L-Shaped gable not stretching the wall
 - find the gable wall by searching through all walls and pick the parllel wall that has closest edit points to targetBase
+- fix null exception when picking the gable wall in L-Shaped wall
 
  
 

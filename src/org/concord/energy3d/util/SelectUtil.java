@@ -93,7 +93,7 @@ public class SelectUtil {
 					double adjust = 0;
 					if (userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) > 0.8)					
 						adjust -= 0.1;	// give more priority because the wall is facing the camera
-					if (pickedHousePart != null && pickedHousePart.getUserData().isEditPoint() && !userData.isEditPoint())
+					if (pickedHousePart != null && pickedHousePart.getUserData() != null && pickedHousePart.getUserData().isEditPoint() && !userData.isEditPoint())
 						adjust += 1;	// give less priority because this is not a edit point and an edit point is already found
 					if (pointDist_i + adjust < pointDist && 
 							(userData.getIndex() != -1 || pickedHousePart == null || 
