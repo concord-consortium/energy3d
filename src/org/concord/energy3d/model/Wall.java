@@ -34,6 +34,7 @@ import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
@@ -496,11 +497,18 @@ public class Wall extends HousePart {
 		if (roof == null)
 			return v.getZ();
 		final PickResults pickResults = new PrimitivePickResults();
-		PickingUtil.findPick(roof.getFlattenedMeshesRoot(), new Ray3(new Vector3(v.getX(), v.getY(), 0), Vector3.UNIT_Z), pickResults);
-		if (pickResults.getNumber() == 0)
-			return v.getZ();
+//		PickingUtil.findPick(roof.getFlattenedMeshesRoot(), new Ray3(new Vector3(v.getX(), v.getY(), 0), Vector3.UNIT_Z), pickResults);
+		if (wallGablePoints != null) {
+		final ArrayList<Spatial> meshes = roof.findMeshesContainingEditPoints(wallGablePoints);
+		for (Spatial mesh : meshes) {
+		PickingUtil.findPick(mesh, new Ray3(new Vector3(v.getX(), v.getY(), 0), Vector3.UNIT_Z), pickResults);
+		if (pickResults.getNumber() > 0) {			
 		final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
 		return intersectionPoint.getZ() - (backMesh ? 0.1 : 0.0);
+		}
+		}
+		}
+		return v.getZ();
 	}
 
 	public boolean isPerpendicularToNeighbor(final int neighbor) {
@@ -1102,4 +1110,5 @@ public class Wall extends HousePart {
 	// if (snap != null)
 	// snap.getNeighborOf(this).draw();
 	// }
+	
 }
