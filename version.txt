@@ -629,7 +629,9 @@ Version 0.3 - March 7, 2011
 - fix null exception when picking the gable wall in L-Shaped wall
 - instead of keeping track of gablebase track the wall
 - stretch wall only to the roof section right above that wall
+- stretch all walls along periodic points on the upper edge all the way to the roof using picking
 
+- *fix problem with not being able to select window on gable wall
 - *fix problem with resize tool
 - *fix problem custom roof editing
 

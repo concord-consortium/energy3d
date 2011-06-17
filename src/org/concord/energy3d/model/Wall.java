@@ -276,7 +276,8 @@ public class Wall extends HousePart {
 		p = abspoints.get(3);
 		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
 
-		final Polygon polygon = stretchToRoof(enforceRangeAndRemoveDuplicatedGablePoints(computeWallAndWindowPolygon(false)));
+//		final Polygon polygon = stretchToRoof(enforceRangeAndRemoveDuplicatedGablePoints(computeWallAndWindowPolygon(false)));
+		final Polygon polygon = stretchToRoof(computeWallAndWindowPolygon(false));
 
 		System.out.println("-------------------------------");
 		System.out.println("Before reduction:");
@@ -427,19 +428,19 @@ public class Wall extends HousePart {
 		p.set(abspoints.get(3)).addLocal(trans);
 		// polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection(p, backMesh)));
 		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-		if (wallGablePoints != null) {
-			final Vector3 n = getFaceDirection().negate(null).multiplyLocal(Roof.OVERHANG_LENGHT);
-			for (final Vector3 gablePoint : wallGablePoints) {
-				final Vector3 v = gablePoint.add(n, null);
-				// final Vector2 min = new Vector2(Math.min(abspoints.get(0).getX(), abspoints.get(2).getX()), Math.min(abspoints.get(0).getY(), abspoints.get(2).getY()));
-				// final Vector2 max = new Vector2(Math.max(abspoints.get(0).getX(), abspoints.get(2).getX()), Math.max(abspoints.get(0).getY(), abspoints.get(2).getY()));
-				// v.set(Math.max(v.getX(), min.getX()), Math.max(v.getY(), min.getY()), v.getZ());
-				// v.set(Math.min(v.getX(), max.getX()), Math.min(v.getY(), max.getY()), v.getZ());
-				v.addLocal(trans);
-				// polygonPoints.add(new PolygonPoint(v.getX(), v.getY(), findRoofIntersection(v, backMesh)));
-				polygonPoints.add(new PolygonPoint(v.getX(), v.getY(), v.getZ()));
-			}
-		}
+//		if (wallGablePoints != null) {
+//			final Vector3 n = getFaceDirection().negate(null).multiplyLocal(Roof.OVERHANG_LENGHT);
+//			for (final Vector3 gablePoint : wallGablePoints) {
+//				final Vector3 v = gablePoint.add(n, null);
+//				// final Vector2 min = new Vector2(Math.min(abspoints.get(0).getX(), abspoints.get(2).getX()), Math.min(abspoints.get(0).getY(), abspoints.get(2).getY()));
+//				// final Vector2 max = new Vector2(Math.max(abspoints.get(0).getX(), abspoints.get(2).getX()), Math.max(abspoints.get(0).getY(), abspoints.get(2).getY()));
+//				// v.set(Math.max(v.getX(), min.getX()), Math.max(v.getY(), min.getY()), v.getZ());
+//				// v.set(Math.min(v.getX(), max.getX()), Math.min(v.getY(), max.getY()), v.getZ());
+//				v.addLocal(trans);
+//				// polygonPoints.add(new PolygonPoint(v.getX(), v.getY(), findRoofIntersection(v, backMesh)));
+//				polygonPoints.add(new PolygonPoint(v.getX(), v.getY(), v.getZ()));
+//			}
+//		}
 
 		final Polygon polygon = new Polygon(polygonPoints);
 
@@ -478,14 +479,38 @@ public class Wall extends HousePart {
 		return polygon;
 	}
 
+//	private Polygon stretchToRoof(final Polygon polygon) {
+//		for (int i = 0; i < polygon.pointCount(); i++)
+//			if (i != 1 && i != 2) {
+//				final TriangulationPoint tp = polygon.getPoints().get(i);
+//				tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), tp.getZ()), false));
+//			}
+//		return polygon;
+//	}
+	
 	private Polygon stretchToRoof(final Polygon polygon) {
-		for (int i = 0; i < polygon.pointCount(); i++)
-			if (i != 1 && i != 2) {
-				final TriangulationPoint tp = polygon.getPoints().get(i);
-				tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), tp.getZ()), false));
-			}
+		final int[] upper = {0, 3};
+		
+		for (final int i : upper) {
+			final TriangulationPoint tp = polygon.getPoints().get(i);
+			tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), tp.getZ()), false));
+		}
+		
+		TriangulationPoint tp = polygon.getPoints().get(0);
+		final Vector3 o = new Vector3(tp.getX(), tp.getY(), tp.getZ());
+		tp = polygon.getPoints().get(3);
+		final Vector3 dir = new Vector3(tp.getX(), tp.getY(), tp.getZ()).subtract(o, null);
+		final double length = dir.length();
+		dir.normalizeLocal();
+		
+		for (double d = length - 0.1; d > 0.1 ; d -= 0.1) {
+			final Vector3 p = dir.multiply(d, null).addLocal(o);
+			polygon.getPoints().add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection(p, false)));
+		}
+		
 		return polygon;
 	}
+	
 
 	public double findRoofIntersection(final ReadOnlyVector3 v, final boolean backMesh) {
 		if (roof == null)
