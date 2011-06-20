@@ -11,6 +11,7 @@ import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
@@ -143,6 +144,7 @@ public abstract class HousePart implements Serializable {
 		pointShape.setUserData(new UserData(this, i, true));
 		pointShape.updateModelBound(); // important
 		pointShape.getSceneHints().setCullHint(CullHint.Always);
+		pointShape.setModelBound(new BoundingBox());
 		pointsRoot.attachChild(pointShape);
 //		System.out.println(i);
 	}

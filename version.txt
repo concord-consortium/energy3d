@@ -630,8 +630,11 @@ Version 0.3 - March 7, 2011
 - instead of keeping track of gablebase track the wall
 - stretch wall only to the roof section right above that wall
 - stretch all walls along periodic points on the upper edge all the way to the roof using picking
+- convert all bounds from sphere to box
+- fix problem with not being able to select window on gable wall
+- improve the fitting of parts in print preview pages using bounding box instead of bounding sphere
 
-- *fix problem with not being able to select window on gable wall
+- *remove roof wireframe lines from print preview
 - *fix problem with resize tool
 - *fix problem custom roof editing
 

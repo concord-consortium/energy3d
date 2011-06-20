@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.Vector3;
@@ -35,7 +36,6 @@ public class Door extends HousePart {
 		vertexBuffer = BufferUtils.createVector3Buffer(4);
 		normalBuffer = BufferUtils.createVector3Buffer(4);
 		textureBuffer = BufferUtils.createVector2Buffer(4);
-		root.attachChild(mesh);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(vertexBuffer);
 		mesh.getMeshData().setNormalBuffer(normalBuffer);
@@ -57,7 +57,9 @@ public class Door extends HousePart {
 		offsetState.setUnits(-1);
 		mesh.setRenderState(offsetState);
 
+		mesh.setModelBound(new BoundingBox());	
 		mesh.setUserData(new UserData(this));
+		root.attachChild(mesh);
 	}
 
 	public void addPoint(int x, int y) {

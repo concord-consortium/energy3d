@@ -17,10 +17,12 @@ import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.PrintExporter;
 import org.concord.energy3d.util.Util;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Node;
@@ -88,6 +90,7 @@ public class PrintController implements Updater {
 					if (newPart.isPrintable())
 						printParts.add(newPart);
 				}
+				drawPrintParts(1);
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
 				computePageDimension();
 				computePrintCenters(pages);
@@ -332,6 +335,9 @@ public class PrintController implements Updater {
 
 	private void computePrintCenters(final ArrayList<ArrayList<Spatial>> pages) {
 		for (HousePart printPart : printParts) {
+			printPart.getRoot().updateWorldTransform(true);
+			printPart.getRoot().updateWorldBound(true);
+			
 			if (printPart instanceof Roof) {
 				for (Spatial roofPart : ((Roof) printPart).getFlattenedMeshesRoot().getChildren())
 					computePrintCenterOf(roofPart, pages);
@@ -348,34 +354,81 @@ public class PrintController implements Updater {
 		}
 		if (!isFitted) {
 			final double radius = Util.findBoundLength(printPart.getWorldBound()) / 2;
-			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(radius + PRINT_MARGIN, 0, -radius - PRINT_MARGIN));
+			final BoundingBox bounds = (BoundingBox)printPart.getWorldBound();
+			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getXExtent() + PRINT_MARGIN, 0, -bounds.getZExtent() - PRINT_MARGIN));
 			final ArrayList<Spatial> page = new ArrayList<Spatial>();
 			page.add(printPart);
 			pages.add(page);
 		}
+		System.out.println(Util.toString(((UserData) printPart.getUserData()).getPrintCenter()) + "\t" + printPart);
 	}
 
+//	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
+//		final double printPartRadius = Util.findBoundLength(printPart.getWorldBound()) / 2;
+//		for (Spatial part : page) {
+//			final Vector3 p = ((UserData) part.getUserData()).getPrintCenter();
+//			final double r = Util.findBoundLength(part.getWorldBound()) / 2;
+//			final double dis = r + printPartRadius;
+//
+//			final Vector3 disVector = new Vector3(dis, 0, 0);
+//			for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 2) {
+//				final Vector3 tryCenter = new Matrix3().fromAngles(0, angle, 0).applyPost(disVector, null);
+//				tryCenter.addLocal(p);
+//				boolean collision = false;
+//				if (!isCircleInsideRectangle(tryCenter, printPartRadius, new Vector3(PRINT_MARGIN, 0, -PRINT_MARGIN), new Vector3(pageWidth - PRINT_MARGIN, 0, -pageHeight + PRINT_MARGIN)))
+//					collision = true;
+//				else
+//					for (Spatial otherPart : page) {
+//						if (otherPart == part)
+//							continue;
+//						collision = tryCenter.subtract(((UserData) otherPart.getUserData()).getPrintCenter(), null).length() < printPartRadius + Util.findBoundLength(otherPart.getWorldBound()) / 2;
+//						if (collision)
+//							break;
+//					}
+//				if (!collision) {
+//					((UserData) printPart.getUserData()).setPrintCenter(tryCenter);
+//					page.add(printPart);
+//					return true;
+//				}
+//			}
+//		}
+//		return false;
+//	}
+	
 	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
-		final double printPartRadius = Util.findBoundLength(printPart.getWorldBound()) / 2;
-		for (Spatial part : page) {
-			final Vector3 p = ((UserData) part.getUserData()).getPrintCenter();
-			final double r = Util.findBoundLength(part.getWorldBound()) / 2;
-			final double dis = r + printPartRadius;
-
-			final Vector3 disVector = new Vector3(dis, 0, 0);
-			for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
-				final Vector3 tryCenter = new Matrix3().fromAngles(0, angle, 0).applyPost(disVector, null);
-				tryCenter.addLocal(p);
-				boolean collision = false;
-				if (!isCircleInsideRectangle(tryCenter, printPartRadius, new Vector3(PRINT_MARGIN, 0, -PRINT_MARGIN), new Vector3(pageWidth - PRINT_MARGIN, 0, -pageHeight + PRINT_MARGIN)))
+		final double printPartHalfRadius = Util.findBoundLength(printPart.getWorldBound()) / 2;
+		for (Spatial neighborPart : page) {
+			final Vector3 neighborPartCenter = ((UserData) neighborPart.getUserData()).getPrintCenter();
+			final BoundingBox neighborBound = (BoundingBox)neighborPart.getWorldBound();
+			final BoundingBox printPartBound = (BoundingBox)printPart.getWorldBound();
+			final double PADDING = 0.5;
+			final double xExtend = neighborBound.getXExtent() + printPartBound.getXExtent() + PADDING;
+			final double zExtend = neighborBound.getZExtent() + printPartBound.getZExtent() + PADDING;
+			
+			for (double angleQuarter = 0; angleQuarter < 4; angleQuarter++) {
+				final boolean isHorizontal = angleQuarter % 2 == 0;
+				final Vector3 tryCenter = new Matrix3().fromAngles(0, angleQuarter * Math.PI / 2.0, 0).applyPost(new Vector3(isHorizontal ? xExtend : zExtend, 0, 0), null);
+				tryCenter.addLocal(neighborPartCenter);
+				if (!isHorizontal)
+//					if (tryCenter.getX() - printPartBound.getXExtent() < PRINT_MARGIN)
+						tryCenter.setX(PRINT_MARGIN + printPartBound.getXExtent());
+//					else if (tryCenter.getX() + printPartBound.getXExtent() > pageWidth - PRINT_MARGIN)
+//						tryCenter.setX(pageWidth - PRINT_MARGIN - printPartBound.getXExtent());
+				boolean collision = false;				
+//				if (!isCircleInsideRectangle(tryCenter, printPartHalfRadius, new Vector3(PRINT_MARGIN, 0, -PRINT_MARGIN), new Vector3(pageWidth - PRINT_MARGIN, 0, -pageHeight + PRINT_MARGIN)))
+				if (tryCenter.getX() - printPartBound.getXExtent() < PRINT_MARGIN || tryCenter.getX() + printPartBound.getXExtent() > pageWidth - PRINT_MARGIN || tryCenter.getZ() + printPartBound.getZExtent() > PRINT_MARGIN || tryCenter.getZ() - printPartBound.getZExtent() < -pageHeight + PRINT_MARGIN)
 					collision = true;
 				else
 					for (Spatial otherPart : page) {
-						if (otherPart == part)
+						if (otherPart == neighborPart)
 							continue;
-						collision = tryCenter.subtract(((UserData) otherPart.getUserData()).getPrintCenter(), null).length() < printPartRadius + Util.findBoundLength(otherPart.getWorldBound()) / 2;
-						if (collision)
+//						collision = tryCenter.subtract(((UserData) otherPart.getUserData()).getPrintCenter(), null).length() < printPartHalfRadius + Util.findBoundLength(otherPart.getWorldBound()) / 2;
+						printPartBound.setCenter(tryCenter);
+						otherPart.getWorldBound().setCenter(((UserData)otherPart.getUserData()).getPrintCenter());
+						if (otherPart.getWorldBound().intersects(printPartBound)) {
+							collision = true;
 							break;
+						}
 					}
 				if (!collision) {
 					((UserData) printPart.getUserData()).setPrintCenter(tryCenter);
@@ -386,6 +439,7 @@ public class PrintController implements Updater {
 		}
 		return false;
 	}
+	
 
 	private boolean isCircleInsideRectangle(Vector3 center, double r, Vector3 p1, Vector3 p2) {
 		for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 2) {

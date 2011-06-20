@@ -17,6 +17,7 @@ import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -71,27 +72,28 @@ public class Wall extends HousePart {
 
 	protected void init() {
 		super.init();
-		mesh = new Mesh("Wall");
-		backMesh = new Mesh("Wall (Back)");
-		surroundMesh = new Mesh("Wall (Surround)");
-		invisibleMesh = new Mesh("Wall (Invisible)");
-		windowsSurroundMesh = new Mesh("Wall (Windows Surround)");
-		wireframeMesh = new Mesh("Wall (Wireframe)");
 
-		root.attachChild(mesh);
+		mesh = new Mesh("Wall");
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		final MaterialState ms = new MaterialState();
+		ms.setColorMaterial(ColorMaterial.Diffuse);
+		mesh.setRenderState(ms);
+		mesh.setModelBound(new BoundingBox());
+		root.attachChild(mesh);
 
-		root.attachChild(backMesh);
+		backMesh = new Mesh("Wall (Back)");
 		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		backMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		backMesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		backMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		backMesh.setModelBound(new BoundingBox());
+		root.attachChild(backMesh);
 
-		root.attachChild(surroundMesh);
+		surroundMesh = new Mesh("Wall (Surround)");
 		surroundMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
@@ -102,20 +104,26 @@ public class Wall extends HousePart {
 		offsetState.setFactor(1.1f);
 		offsetState.setUnits(4f);
 		surroundMesh.setRenderState(offsetState);
+		surroundMesh.setModelBound(new BoundingBox());
+		root.attachChild(surroundMesh);
 
-		root.attachChild(invisibleMesh);
+		invisibleMesh = new Mesh("Wall (Invisible)");
 		invisibleMesh.getMeshData().setIndexMode(IndexMode.Quads);
 		invisibleMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
+		invisibleMesh.setModelBound(new BoundingBox());
+		root.attachChild(invisibleMesh);
 
-		root.attachChild(windowsSurroundMesh);
+		windowsSurroundMesh = new Mesh("Wall (Windows Surround)");
 		windowsSurroundMesh.getMeshData().setIndexMode(IndexMode.Quads);
 		windowsSurroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
 		windowsSurroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(1000));
 		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		windowsSurroundMesh.setModelBound(new BoundingBox());
+		root.attachChild(windowsSurroundMesh);
 
-		root.attachChild(wireframeMesh);
+		wireframeMesh = new Mesh("Wall (Wireframe)");
 		wireframeMesh.getMeshData().setIndexMode(IndexMode.Quads);
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
@@ -123,10 +131,8 @@ public class Wall extends HousePart {
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setRenderState(new WireframeState());
-
-		final MaterialState ms = new MaterialState();
-		ms.setColorMaterial(ColorMaterial.Diffuse);
-		mesh.setRenderState(ms);
+		wireframeMesh.setModelBound(new BoundingBox());
+		root.attachChild(wireframeMesh);
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 
@@ -135,8 +141,6 @@ public class Wall extends HousePart {
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
 		invisibleMesh.setUserData(userData);
-
-		// neightborPerpendicular = new boolean[2];
 	}
 
 	public void setPreviewPoint(final int x, final int y) {

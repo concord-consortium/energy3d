@@ -7,6 +7,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.SelectUtil;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -43,18 +44,18 @@ public class Foundation extends HousePart {
 		resizeHouseMode = false;
 		if (boundingHeight == 0)
 			boundingHeight = 2;
+
 		mesh = new Box("Foundation", new Vector3(), new Vector3());
-		boundingMesh = new Box("Foundation (Bounding)", new Vector3(), new Vector3());
-		root.attachChild(mesh);
-
-		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
-
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
+		mesh.setModelBound(new BoundingBox());
+		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
+		root.attachChild(mesh);
 
-		WireframeState wire = new WireframeState();
-		boundingMesh.setRenderState(wire);
+		boundingMesh = new Box("Foundation (Bounding)", new Vector3(), new Vector3());
+		boundingMesh.setRenderState(new WireframeState());
+		boundingMesh.setModelBound(new BoundingBox());
 		
 		wireframeMesh = new Mesh("Foundation (wireframe)");
 		wireframeMesh.getMeshData().setIndexMode(IndexMode.Quads);
@@ -63,7 +64,8 @@ public class Foundation extends HousePart {
 		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.setRenderState(new WireframeState());
-		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);		
+		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
+		wireframeMesh.setModelBound(new BoundingBox());
 		root.attachChild(wireframeMesh);
 
 		UserData userData = new UserData(this);

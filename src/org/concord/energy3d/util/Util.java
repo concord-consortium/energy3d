@@ -21,7 +21,7 @@ public class Util {
 			d = ((BoundingSphere)bounds).getRadius() * 2;
 		else {
 			final BoundingBox boundingBox = (BoundingBox)bounds;
-			d = Math.max(boundingBox.getXExtent(), Math.max(boundingBox.getYExtent(), boundingBox.getZExtent()));
+			d = 2 * Math.max(boundingBox.getXExtent(), Math.max(boundingBox.getYExtent(), boundingBox.getZExtent()));
 		}
 		return d;
 	}

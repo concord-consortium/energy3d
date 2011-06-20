@@ -19,6 +19,7 @@ import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
@@ -78,6 +79,8 @@ public abstract class Roof extends HousePart {
 		root.attachChild(flattenedMeshesRoot);
 
 		mesh = new Mesh("Roof");
+		mesh.setModelBound(new BoundingBox());
+		
 		bottomMesh = new Mesh("Roof (bottom)");
 		final CullState cullState = new CullState();
 		cullState.setCullFace(com.ardor3d.renderer.state.CullState.Face.Front);
@@ -95,6 +98,7 @@ public abstract class Roof extends HousePart {
 		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
+		wireframeMesh.setModelBound(new BoundingBox());
 		root.attachChild(wireframeMesh);
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
@@ -578,8 +582,10 @@ public abstract class Roof extends HousePart {
 			final Vector3[] base_i = {wall.getAbsPoints().get(0), wall.getAbsPoints().get(2)};
 			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
 				final Vector3[] base = findBasePoints((Mesh) mesh, null);
-				if (base != null && isSameBasePoints(base_i, base))
+				if (base != null && isSameBasePoints(base_i, base)) {
 					mesh.getSceneHints().setCullHint(CullHint.Always);
+					mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+				}
 			}
 		}
 	}

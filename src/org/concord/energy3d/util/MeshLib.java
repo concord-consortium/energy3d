@@ -3,6 +3,7 @@ package org.concord.energy3d.util;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -128,6 +129,7 @@ public class MeshLib {
 				newMesh.getSceneHints().setCullHint(CullHint.Inherit);
 			} else {
 				newMesh = new Mesh("Roof Part #" + meshIndex);
+				newMesh.setModelBound(new BoundingBox());
 				root.attachChild(newMesh);
 			}
 

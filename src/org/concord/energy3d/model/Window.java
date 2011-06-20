@@ -6,6 +6,7 @@ import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.Util;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
@@ -62,6 +63,7 @@ public class Window extends HousePart {
 //		root.attachChild(mesh);
 		
 		bars = new Line("Window (bars)");
+		bars.setModelBound(new BoundingBox());
 //		bars.setDefaultColor(ColorRGBA.BLACK);
 		((Line)bars).setLineWidth(3);
 		((Line)bars).setAntialiased(true);

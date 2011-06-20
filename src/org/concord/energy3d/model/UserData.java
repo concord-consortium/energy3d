@@ -6,7 +6,7 @@ public class UserData {
 	private final HousePart housePart;
 	private final int index;
 	private final boolean isEditPoint; 
-	private Vector3 printCenter;
+	private Vector3 printCenter = new Vector3();
 	
 	public UserData(final HousePart housePart) {
 		this(housePart, -1, false);
