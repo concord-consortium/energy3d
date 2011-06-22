@@ -161,6 +161,15 @@ public abstract class HousePart implements Serializable {
 
 	public void setOriginal(HousePart original) {
 		this.original = original;
+		this.center = original.center;
+		if (original.mesh != null) {
+			root.detachChild(this.mesh);
+			this.mesh = original.mesh.makeCopy(false);
+			this.mesh.setUserData(original.mesh.getUserData());
+			mesh.updateWorldBound(true);
+			root.attachChild(this.mesh);
+			root.updateWorldBound(true);
+		}
 	}
 
 	public HousePart getOriginal() {

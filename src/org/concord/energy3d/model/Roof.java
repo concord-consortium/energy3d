@@ -11,6 +11,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
+import org.easymock.internal.AlwaysMatcher;
 import org.easymock.internal.matchers.Same;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
@@ -58,8 +59,8 @@ public abstract class Roof extends HousePart {
 	transient private Map<Mesh, Vector3> orgCenters;
 	transient private Line wireframeMesh;
 //	transient private ArrayList<Vector3[]> gableBases;
-	transient private ArrayList<Wall> gableWalls;
-	transient private ArrayList<Vector3> gablePoints;
+	private ArrayList<Wall> gableWalls;
+//	transient private ArrayList<Vector3> gablePoints;
 	transient private ArrayList<Wall> walls;
 
 	// transient private ArrayList<Vector3> wallGablePoints;
@@ -256,7 +257,8 @@ public abstract class Roof extends HousePart {
 
 	public void flatten(double flattenTime) {
 		for (Spatial child : getFlattenedMeshesRoot().getChildren())
-			flattenQuadTriangle((Mesh) child, flattenTime);
+			if (child.getSceneHints().getCullHint() != CullHint.Always)
+				flattenQuadTriangle((Mesh) child, flattenTime);
 		mesh.updateModelBound();
 		if (bottomMesh != null) {
 			bottomMesh.getSceneHints().setCullHint(CullHint.Always);
@@ -511,10 +513,10 @@ public abstract class Roof extends HousePart {
 				if (meshBase != null && isSameBasePoints(base, meshBase)) {
 					final Vector3 n = meshBase[1].subtract(meshBase[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
 
-					if (gablePoints == null)
-						gablePoints = new ArrayList<Vector3>();
-					else
-						gablePoints.clear();
+//					if (gablePoints == null)
+//						gablePoints = new ArrayList<Vector3>();
+//					else
+//						gablePoints.clear();
 					final ArrayList<Vector3> gableRoofMeshEditPoints = new ArrayList<Vector3>();
 					for (final Vector3 meshPoint : meshUpperPoints) {
 						double smallestDistanceToEditPoint = Double.MAX_VALUE;
@@ -744,4 +746,13 @@ public abstract class Roof extends HousePart {
 		}		
 		return meshes;
 	}
+
+	@Override
+	public void delete() {
+		super.delete();
+		for (final Wall wall : walls)
+			wall.setRoof(null);
+	}
+	
+	
 }

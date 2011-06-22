@@ -412,6 +412,8 @@ public class Wall extends HousePart {
 			windowsSurroundMesh.updateModelBound();
 			wireframeMesh.updateModelBound();
 			invisibleMesh.updateModelBound();
+			
+			root.updateWorldBound(true);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

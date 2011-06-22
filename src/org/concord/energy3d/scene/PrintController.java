@@ -85,11 +85,15 @@ public class PrintController implements Updater {
 				for (int i = 0; i < sceneClone.getParts().size(); i++) {
 					final HousePart newPart = sceneClone.getParts().get(i);
 					Scene.getRoot().attachChild(newPart.getRoot());
-					newPart.draw();
+//					newPart.draw();					
 					newPart.setOriginal(Scene.getInstance().getParts().get(i));
 					if (newPart.isPrintable())
 						printParts.add(newPart);
 				}
+//				Scene.getRoot().updateWorldBound(true);
+//				for (final HousePart part : sceneClone.getParts())
+//					part.draw();
+				
 				drawPrintParts(1);
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
 				computePageDimension();
@@ -271,10 +275,6 @@ public class PrintController implements Updater {
 		return printParts;
 	}
 
-	public void addPrintCenters(Vector3 p) {
-		printCenters.add(p);
-	}
-
 	public boolean isFinished() {
 		return finish && finishPhase > 20;
 	}
@@ -327,7 +327,7 @@ public class PrintController implements Updater {
 
 			final Box box = new Box("Page Boundary");
 			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
-			box.setModelBound(null);
+//			box.setModelBound(null);
 			pagesRoot.attachChild(box);
 		}
 
@@ -340,7 +340,8 @@ public class PrintController implements Updater {
 			
 			if (printPart instanceof Roof) {
 				for (Spatial roofPart : ((Roof) printPart).getFlattenedMeshesRoot().getChildren())
-					computePrintCenterOf(roofPart, pages);
+					if (roofPart.getSceneHints().getCullHint() != CullHint.Always)
+						computePrintCenterOf(roofPart, pages);
 			} else 
 				computePrintCenterOf(printPart.getMesh(), pages);
 		}
