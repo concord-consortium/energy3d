@@ -634,13 +634,14 @@ Version 0.3 - March 7, 2011
 - fix problem with not being able to select window on gable wall
 - improve the fitting of parts in print preview pages using bounding box instead of bounding sphere
 - draw gable walls in print preview
-
+- fix problem with gable wall being too close to parts above it in print preview
+- compute the center after the mesh is drawn
 
 - *fix problem with resize tool
 - *fix problem custom roof editing
 - *remove roof wireframe lines from print preview
 - *remove printparts from print controller
-- *fix problem with gable wall being too close to parts above it in print preview
+
  
 
 TODO:

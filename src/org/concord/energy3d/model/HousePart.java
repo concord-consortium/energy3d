@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.io.Serializable;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.SceneManager;
@@ -383,9 +384,10 @@ public abstract class HousePart implements Serializable {
 			init();
 
 		computeAbsPoints();
-		computeCenter();
 
 		drawMesh();
+		
+		computeCenter();
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 
@@ -408,12 +410,48 @@ public abstract class HousePart implements Serializable {
 		}
 	}
 
+//	protected void computeCenter() {
+//		center.set(0, 0, 0);
+//		for (int i = 0; i < abspoints.size(); i++)
+//			center.addLocal(abspoints.get(i));
+//		center.multiplyLocal(1.0 / abspoints.size());
+//	}
+	
 	protected void computeCenter() {
 		center.set(0, 0, 0);
 		for (int i = 0; i < abspoints.size(); i++)
 			center.addLocal(abspoints.get(i));
 		center.multiplyLocal(1.0 / abspoints.size());
+		
+		if (mesh == null)
+			return;
+		double minX, minY, minZ;
+		double maxX, maxY, maxZ;
+		minX = minY = minZ = Double.MAX_VALUE;
+		maxX = maxY = maxZ = -Double.MAX_VALUE;
+		
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		buf.rewind();
+		while (buf.hasRemaining()) {
+			final double x = buf.get(); 
+			final double y = buf.get();
+			final double z = buf.get();
+			if (x < minX)
+				minX = x;
+			if (y < minY)
+				minY = y;
+			if (z < minZ)
+				minZ = z;
+			if (x > maxX)
+				maxX = x;
+			if (y > maxY)
+				maxY = y;
+			if (z > maxZ)
+				maxZ = z;
+		}
+		center.set(minX + (maxX - minX) / 2.0, minY + (maxY - minY) / 2.0, minZ + (maxZ - minZ) / 2.0);		
 	}
+	
 	
 	protected void updateEditShapes() {
 		int i = 0;
@@ -426,8 +464,10 @@ public abstract class HousePart implements Serializable {
 		root.setTranslation(0, 0, 0);
 		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
 		final Vector3 currentCenter = new Vector3(center);
-		
 		root.getTransform().applyForward(currentCenter);
+		
+//		final Vector3 currentCenter = new Vector3(mesh.getWorldBound().getCenter());
+		
 		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
 		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));
 	}

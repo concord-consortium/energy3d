@@ -349,8 +349,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (operationFlag)
 			executeOperation();
 
-		if (drawBounds && drawn != null)
+		if (drawBounds && drawn != null) {
 			com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
+			System.out.println(drawn.getMesh().getWorldBound());
+		}
 		
 //		com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
 
