@@ -638,11 +638,11 @@ Version 0.3 - March 7, 2011
 - compute the center after the mesh is drawn
 - print preview roof parts without redrawing by coping mesh
 - transform children of walls in print preview animation instead of redrawing them
+- instead of cloning the entire scene object in print controller clone the print parts only
 
 - *fix problem with resize tool
 - *fix problem custom roof editing
 - *remove roof wireframe lines from print preview
-- *remove printparts from print controller
 
  
 
