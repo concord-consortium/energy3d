@@ -108,6 +108,7 @@ public class Door extends HousePart {
 		for (Vector3 p : abspoints) {				
 			container.getRoot().getTransform().applyForward(p);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+//			vertexBuffer.put(p.getXf()*2).put(p.getYf()).put(p.getZf());
 		}
 
 		// Compute normals

@@ -960,7 +960,8 @@ public class Wall extends HousePart {
 
 		for (HousePart part : children)
 			if (!part.isPrintable())
-				part.draw();
+//				part.draw();
+				part.getRoot().setTransform(root.getTransform());
 	}
 
 	public ReadOnlyVector3 getFaceDirection() {

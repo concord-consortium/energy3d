@@ -636,6 +636,8 @@ Version 0.3 - March 7, 2011
 - draw gable walls in print preview
 - fix problem with gable wall being too close to parts above it in print preview
 - compute the center after the mesh is drawn
+- print preview roof parts without redrawing by coping mesh
+- transform children of walls in print preview animation instead of redrawing them
 
 - *fix problem with resize tool
 - *fix problem custom roof editing
