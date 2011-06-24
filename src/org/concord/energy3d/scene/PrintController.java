@@ -22,7 +22,6 @@ import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Node;
@@ -30,6 +29,7 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
+import com.ardor3d.util.Timer;
 import com.ardor3d.util.screen.ScreenExporter;
 
 public class PrintController implements Updater {
@@ -39,11 +39,11 @@ public class PrintController implements Updater {
 	private double pageWidth, pageHeight;
 	private boolean isPrintPreview = false;
 	private boolean init = false;
-	private boolean finish = true;
-	private int finishPhase = 100;
-	private long startTime;
-	// private Scene sceneClone = null;
-	private ArrayList<HousePart> printParts; // = new ArrayList<HousePart>();
+	private boolean finish = false;
+	private boolean finished = true;
+//	private int finishPhase = 100;
+//	private double startTime;
+	private ArrayList<HousePart> printParts;
 	private double angle;
 	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
 	private boolean shadingSelected;
@@ -51,6 +51,7 @@ public class PrintController implements Updater {
 	private Node pagesRoot = new Node();
 	private int cols;
 	private int rows;
+	private Timer timer = new Timer();
 
 	public static PrintController getInstance() {
 		return instance;
@@ -64,34 +65,27 @@ public class PrintController implements Updater {
 
 	}
 
-	public void update(ReadOnlyTimer timer) {
+	public void update(final ReadOnlyTimer globalTimer) {
 		if (isPrintPreview)
 			rotate();
 
 		if (isFinished())
 			return;
 
-		final long time = timer.getTime();
+//		final double time = timer.getTimeInSeconds();
 		final Spatial originalHouseRoot = Scene.getInstance().getOriginalHouseRoot();
 		if (init) {
 			init = false;
-			startTime = time;
+			finish = false;
+//			startTime = time;			
 			if (!isPrintPreview) {
 				Scene.getRoot().detachChild(pagesRoot);
 				pagesRoot.detachAllChildren();
 			} else {
-				// sceneClone = (Scene) ObjectCloner.deepCopy(Scene.getInstance());
-				// printParts.clear();
 				printParts = (ArrayList<HousePart>) ObjectCloner.deepCopy(Scene.getInstance().getParts());
-				// for (int i = 0; i < sceneClone.getParts().size(); i++) {
 				for (int i = 0; i < printParts.size(); i++) {
-					// final HousePart newPart = sceneClone.getParts().get(i);
-					// final HousePart newPart = printParts.get(i);
 					Scene.getRoot().attachChild(printParts.get(i).getRoot());
-					// newPart.draw();
 					printParts.get(i).setOriginal(Scene.getInstance().getParts().get(i));
-					// if (newPart.isPrintable())
-					// printParts.add(newPart);
 				}
 
 				drawPrintParts(1);
@@ -104,28 +98,36 @@ public class PrintController implements Updater {
 
 				originalHouseRoot.setScale(2);
 				originalHouseRoot.setTranslation(0, 0, -Util.findExactHeight(printParts));
+				
+				drawPrintParts(0);
 			}
-			for (HousePart part : Scene.getInstance().getParts())
-				part.getRoot().getSceneHints().setCullHint(CullHint.Always);
+			originalHouseRoot.getSceneHints().setCullHint(CullHint.Always);
+//			for (HousePart part : Scene.getInstance().getParts())
+//				part.getRoot().getSceneHints().setCullHint(CullHint.Always);
+			timer.reset();
 		}
 
-		if (!finish) {
-			final double t = (time - startTime) / 1.0 / timer.getResolution();
+		final double viewSwitchDelay = 0.5;
+		if (!finish && (!isPrintPreview || timer.getTimeInSeconds() > viewSwitchDelay)) {
+//			final double t = (time - startTime) / 1.0; // / timer.getResolution();
+			final double t = timer.getTimeInSeconds() - (isPrintPreview ? viewSwitchDelay : 0);
 			drawPrintParts(isPrintPreview ? t : 1 - t);
 
 			finish = t > 1;
-			finishPhase = 0;
+			if (finish)
+//				startTime = time;
+				timer.reset();
 		}
 
 		if (finish) {
 			if (isPrintPreview)
 				Scene.getRoot().attachChild(pagesRoot);
-			if (!isPrintPreview && finishPhase == 10) {
+			final boolean doTheEndAnimation = timer.getTimeInSeconds() > viewSwitchDelay; //(time - startTime) > 1.0;
+			if (!isPrintPreview && doTheEndAnimation) {
 				originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
 				angle = 0;
 				for (final HousePart housePart : printParts)
 					Scene.getRoot().detachChild(housePart.getRoot());
-				// printParts.clear();
 				printParts = null;
 				originalHouseRoot.setScale(1);
 				originalHouseRoot.setTranslation(0, 0, 0);
@@ -139,12 +141,14 @@ public class PrintController implements Updater {
 				SceneManager.getInstance().setShading(shadingSelected);
 				SceneManager.getInstance().setShadow(shadowSelected);
 				SceneManager.getInstance().updatePrintPreviewScene(false);
+				finished = true;
 			}
 
-			if (finishPhase == 10) {
+			if (isPrintPreview || doTheEndAnimation) {
 				int printSequence = 0;
-				for (HousePart part : Scene.getInstance().getParts()) {
-					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
+				originalHouseRoot.getSceneHints().setCullHint(CullHint.Inherit);
+				for (final HousePart part : Scene.getInstance().getParts()) {
+//					part.getRoot().getSceneHints().setCullHint(CullHint.Inherit);
 					if (isPrintPreview)
 						printSequence = part.drawLabels(printSequence);
 					else
@@ -152,7 +156,7 @@ public class PrintController implements Updater {
 				}
 			}
 
-			finishPhase++;
+//			finishPhase++;
 		}
 	}
 
@@ -172,9 +176,7 @@ public class PrintController implements Updater {
 			} else if (part instanceof Window) {
 				((Window) part).hideBars();
 			}
-
 		}
-
 	}
 
 	public void print() {
@@ -219,6 +221,7 @@ public class PrintController implements Updater {
 				return printCenters.size();
 			}
 		});
+
 		if (job.printDialog())
 			try {
 				job.print();
@@ -233,7 +236,7 @@ public class PrintController implements Updater {
 		if (printPreview == isPrintPreview)
 			return;
 		init = true;
-		finish = false;
+		finished = false;
 		isPrintPreview = printPreview;
 
 		if (printPreview) {
@@ -263,7 +266,7 @@ public class PrintController implements Updater {
 	}
 
 	public boolean isFinished() {
-		return finish && finishPhase > 20;
+		return finished; // && finishPhase > 100;
 	}
 
 	private void computePageDimension() {
@@ -388,18 +391,6 @@ public class PrintController implements Updater {
 		}
 		return false;
 	}
-
-	// private boolean isCircleInsideRectangle(Vector3 center, double r, Vector3 p1, Vector3 p2) {
-	// for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 2) {
-	// final Vector3 p = new Matrix3().fromAngles(0, angle, 0).applyPost(new Vector3(r, 0, 0), null);
-	// p.addLocal(center);
-	// final double x = p.getX();
-	// final double z = p.getZ();
-	// if (x < p1.getX() || x > p2.getX() || z > p1.getZ() || z < p2.getZ())
-	// return false;
-	// }
-	// return true;
-	// }
 
 	public double getPageWidth() {
 		return pageWidth;

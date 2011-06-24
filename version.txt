@@ -639,6 +639,8 @@ Version 0.3 - March 7, 2011
 - print preview roof parts without redrawing by coping mesh
 - transform children of walls in print preview animation instead of redrawing them
 - instead of cloning the entire scene object in print controller clone the print parts only
+- clean up the animation code for print preview 
+
 
 - *fix problem with resize tool
 - *fix problem custom roof editing
