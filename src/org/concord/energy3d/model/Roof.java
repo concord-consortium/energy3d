@@ -289,9 +289,11 @@ public abstract class Roof extends HousePart {
 				orgCenter.addLocal(m.applyPost(new Vector3(buf.get(), buf.get(), buf.get()), p1));
 			orgCenter.divideLocal(buf.capacity() / 3);
 			orgCenters.put(mesh, orgCenter);
-		}
+		}		
 		final Vector3 targetPrintCenter = ((UserData) mesh.getUserData()).getPrintCenter();
 		mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
+		mesh.updateModelBound();
+		mesh.updateWorldBound(false);
 	}
 
 	protected void drawAnnotations() {

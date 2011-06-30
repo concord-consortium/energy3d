@@ -640,11 +640,17 @@ Version 0.3 - March 7, 2011
 - transform children of walls in print preview animation instead of redrawing them
 - instead of cloning the entire scene object in print controller clone the print parts only
 - clean up the animation code for print preview 
+- remove texture3D code from Scene class
+- fix bounding typecase exception with model 3
+- maximize model size based on both width and height of biggest part
+- fix hanging with open new file while in print preview
+
 
 
 - *fix problem with resize tool
 - *fix problem custom roof editing
-- *remove roof wireframe lines from print preview
+- *remove roof wireframe lines from print preview - no longer exists?
+- *auto redraw gable wall when inserting gable or editing gable
 
  
 

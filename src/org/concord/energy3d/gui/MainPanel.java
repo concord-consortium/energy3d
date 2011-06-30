@@ -535,13 +535,13 @@ public class MainPanel extends JPanel {
 			previewButton = new JToggleButton();
 			previewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/print_preview.png")));
 			previewButton.setToolTipText("Preview printable parts");
-			previewButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+			// must be ItemListner to be triggered when selection is changed by code
+			previewButton.addItemListener(new java.awt.event.ItemListener() {
+				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					if (mainFrame != null)
 						mainFrame.getPreviewMenuItem().setSelected(previewButton.isSelected());
 					deselect();
 					PrintController.getInstance().setPrintPreview(previewButton.isSelected());
-
 				}
 			});
 		}
