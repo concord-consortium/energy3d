@@ -289,7 +289,7 @@ public abstract class Roof extends HousePart {
 				orgCenter.addLocal(m.applyPost(new Vector3(buf.get(), buf.get(), buf.get()), p1));
 			orgCenter.divideLocal(buf.capacity() / 3);
 			orgCenters.put(mesh, orgCenter);
-		}		
+		}
 		final Vector3 targetPrintCenter = ((UserData) mesh.getUserData()).getPrintCenter();
 		mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
 		mesh.updateModelBound();
@@ -349,25 +349,28 @@ public abstract class Roof extends HousePart {
 		final Vector3 center = new Vector3();
 		int triangle = 0;
 		for (Spatial roofGroup : flattenedMeshesRoot.getChildren()) {
-			final FloatBuffer buf = ((Mesh) roofGroup).getMeshData().getVertexBuffer();
-			buf.rewind();
-			double height = Double.NEGATIVE_INFINITY;
-			center.set(0, 0, 0);
-			while (buf.hasRemaining()) {
-				p.set(buf.get(), buf.get(), buf.get());
-				roofGroup.getTransform().applyForward(p);
-				height = Math.max(p.getZ(), height);
-				center.addLocal(p);
-			}
-			center.divideLocal(buf.capacity() / 3);
-			if (original == null)
-				center.setZ(height);
-			else
-				center.addLocal(0, -0.01, 0);
+			final Mesh mesh = (Mesh) roofGroup;
+			if (mesh.getSceneHints().getCullHint() != CullHint.Always) {
+				final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+				buf.rewind();
+				double height = Double.NEGATIVE_INFINITY;
+				center.set(0, 0, 0);
+				while (buf.hasRemaining()) {
+					p.set(buf.get(), buf.get(), buf.get());
+					roofGroup.getTransform().applyForward(p);
+					height = Math.max(p.getZ(), height);
+					center.addLocal(p);
+				}
+				center.divideLocal(buf.capacity() / 3);
+				if (original == null)
+					center.setZ(height);
+				else
+					center.addLocal(0, -0.01, 0);
 
-			final String text = "(" + (printSequence++ + 1) + ")";
-			final BMText label = fetchBMText(text, triangle++);
-			label.setTranslation(center);
+				final String text = "(" + (printSequence++ + 1) + ")";
+				final BMText label = fetchBMText(text, triangle++);
+				label.setTranslation(center);
+			}
 		}
 		return printSequence;
 	}
@@ -755,10 +758,10 @@ public abstract class Roof extends HousePart {
 	@Override
 	public void setOriginal(final HousePart original) {
 		this.original = original;
-//		this.center = original.center;
-		this.flattenedMeshesRoot = ((Roof)original).flattenedMeshesRoot.makeCopy(true);
+		// this.center = original.center;
+		this.flattenedMeshesRoot = ((Roof) original).flattenedMeshesRoot.makeCopy(true);
 		for (int i = 0; i < flattenedMeshesRoot.getNumberOfChildren(); i++)
-			flattenedMeshesRoot.getChild(i).setUserData(((Roof)original).flattenedMeshesRoot.getChild(i).getUserData());
+			flattenedMeshesRoot.getChild(i).setUserData(((Roof) original).flattenedMeshesRoot.getChild(i).getUserData());
 		root.attachChild(flattenedMeshesRoot);
 		root.updateWorldBound(true);
 	}
