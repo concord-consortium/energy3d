@@ -166,7 +166,7 @@ public abstract class HousePart implements Serializable {
 		if (original.mesh != null) {
 			root.detachChild(this.mesh);
 			this.mesh = original.mesh.makeCopy(true);
-			this.mesh.setUserData(original.mesh.getUserData());
+			this.mesh.setUserData(new UserData(this, ((UserData)original.mesh.getUserData()).getIndex(), false));
 			root.attachChild(this.mesh);
 			root.updateWorldBound(true);
 		}
@@ -469,6 +469,7 @@ public abstract class HousePart implements Serializable {
 		
 		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
 		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));
+		root.updateWorldBound(true);
 	}
 
 	public boolean isPrintable() {
@@ -599,9 +600,12 @@ public abstract class HousePart implements Serializable {
 	@Override
 	public String toString() {
 //		return this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + "), editPoint = " + editPointIndex;
-		String s = this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + ")";
+		String s = this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + ")";		
 		for (int i = 0; i < points.size(); i += 2)
-			s += "\t" + Util.toString(points.get(i));
+			if (root == null)
+				s += "\t" + Util.toString(points.get(i));
+			else
+				s += "\t" + Util.toString(root.getTransform().applyForward(points.get(i), null));		
 		s += ("\teditPoint = " + editPointIndex);
 		return s;
 	}

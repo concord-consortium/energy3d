@@ -78,11 +78,13 @@ public class PrintController implements Updater {
 				pagesRoot.detachAllChildren();
 			} else {
 				printParts = (ArrayList<HousePart>) ObjectCloner.deepCopy(Scene.getInstance().getParts());
-				for (int i = 0; i < printParts.size(); i++) {
+				for (int i = 0; i < printParts.size(); i++) {					
+//					Scene.getInstance().getParts().get(i).getRoot().getSceneHints().setPickingHint(PickingHint.Pickable, false);
+//					Scene.getInstance().getOriginalHouseRoot().detachChild(Scene.getInstance().getParts().get(i).getRoot());
 					Scene.getRoot().attachChild(printParts.get(i).getRoot());
 					printParts.get(i).setOriginal(Scene.getInstance().getParts().get(i));
 				}
-
+				
 				drawPrintParts(1);
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
 				computePageDimension();
@@ -144,6 +146,7 @@ public class PrintController implements Updater {
 					else
 						part.hideLabels();
 				}
+				finished = true;
 			}
 		}
 	}
@@ -324,7 +327,7 @@ public class PrintController implements Updater {
 
 			final Box box = new Box("Page Boundary");
 			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
-			pagesRoot.attachChild(box);
+//			pagesRoot.attachChild(box);
 		}
 
 	}

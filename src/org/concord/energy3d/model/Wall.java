@@ -283,10 +283,10 @@ public class Wall extends HousePart {
 //		final Polygon polygon = stretchToRoof(enforceRangeAndRemoveDuplicatedGablePoints(computeWallAndWindowPolygon(false)));
 		final Polygon polygon = stretchToRoof(computeWallAndWindowPolygon(false));
 
-		System.out.println("-------------------------------");
-		System.out.println("Before reduction:");
-		for (TriangulationPoint tp : polygon.getPoints())
-			System.out.println("new PolygonPoint(" + tp.getX() + ", " + tp.getY() + ", " + tp.getZ() + ")");
+//		System.out.println("-------------------------------");
+//		System.out.println("Before reduction:");
+//		for (TriangulationPoint tp : polygon.getPoints())
+//			System.out.println("new PolygonPoint(" + tp.getX() + ", " + tp.getY() + ", " + tp.getZ() + ")");
 
 		toXY(polygon);
 
@@ -1136,5 +1136,15 @@ public class Wall extends HousePart {
 	// if (snap != null)
 	// snap.getNeighborOf(this).draw();
 	// }
+	
+	@Override
+	public void setOriginal(final HousePart original) {
+		root.detachChild(this.invisibleMesh);
+		final Mesh orgInvisibleMesh = ((Wall)original).invisibleMesh;
+		this.invisibleMesh = orgInvisibleMesh.makeCopy(true);
+		this.invisibleMesh.setUserData(new UserData(this, ((UserData)orgInvisibleMesh.getUserData()).getIndex(), false));
+		root.attachChild(invisibleMesh);
+		super.setOriginal(original);
+	}
 
 }

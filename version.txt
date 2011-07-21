@@ -645,6 +645,10 @@ Version 0.3 - March 7, 2011
 - maximize model size based on both width and height of biggest part
 - fix hanging with open new file while in print preview
 - hide the gable roof part label in print preview mode
+- fix problem with preview blinker no longer working
+- in setOrignal() do not copy the userData, instead generate a new one pointing to the new part
+- in setOriginal() copy the bounding info of the invisible mesh for walls 
+- in setOriginal() duplicate invisible mesh for walls
 
 
 
@@ -652,7 +656,7 @@ Version 0.3 - March 7, 2011
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with edit point switching sometimes when custom roof editing
 - *fix problem with resizing custome roof
-- *fix problem with preview blinker no longer working 
+
 
  
 

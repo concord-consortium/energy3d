@@ -5,6 +5,7 @@ import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
@@ -41,7 +42,6 @@ public class SelectUtil {
 		
 		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
 		PickingUtil.findPick(target, pickRay, pickResults);		
-
 		return getPickResult(pickRay);
 	}
 
