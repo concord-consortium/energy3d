@@ -649,11 +649,11 @@ Version 0.3 - March 7, 2011
 - in setOrignal() do not copy the userData, instead generate a new one pointing to the new part
 - in setOriginal() copy the bounding info of the invisible mesh for walls 
 - in setOriginal() duplicate invisible mesh for walls
+- fix the problem with incomplete gable wall when moving the edit point of gable roof
+- fix problem with incorrect height calculation when dragging edit point of gabled pyrimid roof
 
 
 - *auto redraw gable wall when inserting gable or editing gable
-- *fix the problem with incomplete gable wall when moving the edit point of gable roof
-
 - *fix problem with resize tool
 - *fix problem with edit point switching sometimes when custom roof editing
 - *fix problem with resizing custome roof

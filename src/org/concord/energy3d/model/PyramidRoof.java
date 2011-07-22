@@ -21,11 +21,10 @@ public class PyramidRoof extends Roof {
 			pick(x, y, Wall.class);
 			recalculateEditPoints = true;
 		} else {
-			Vector3 base = center; //.get(0); //center;
+			final ReadOnlyVector3 base = new Vector3(points.get(0).getX(), points.get(0).getY(), center.getZ());
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ());
-//			setHeight(Math.max(0, p.getZ() - base.getZ()), true);			
 		}
 		draw();
 		if (container != null)
@@ -33,10 +32,6 @@ public class PyramidRoof extends Roof {
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
-//		final Polygon polygon = new Polygon(wallUpperPoints);
-////		polygon.addSteinerPoint(new PolygonPoint(center.getX(), center.getY(), center.getZ() + height));
-//		polygon.addSteinerPoint(new PolygonPoint(points.get(0).getX(), points.get(0).getY(), points.get(0).getZ()));
-		
 		final Polygon polygon = new Polygon(wallUpperPoints);
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 p = points.get(i);
@@ -45,24 +40,6 @@ public class PyramidRoof extends Roof {
 		return polygon;
 	}
 
-////	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
-//	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
-////		final ArrayList<PolygonPoint> wallUpperPoints = super.exploreWallNeighbors(startWall);
-//		final double edgeLenght = 0.3;
-//		Vector3 op = new Vector3();
-//		double maxY;
-//		maxY = wallUpperPoints.get(0).getY();
-//		for (PolygonPoint p : wallUpperPoints) {
-//			op.set(p.getX(), p.getY(), 0).subtractLocal(center.getX(), center.getY(), 0).normalizeLocal().multiplyLocal(edgeLenght);
-//			op.addLocal(p.getX(), p.getY(), p.getZ());
-//			p.set(op.getX(), op.getY(), op.getZ()+0.01);
-//			if (p.getY() > maxY)
-//				maxY = p.getY();			
-//		}
-//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
-////		return wallUpperPoints;
-//	}
-	
 	@Override
 	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
 		super.processRoofPoints(wallUpperPoints, wallNormals);

@@ -5,7 +5,6 @@ import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
-import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
@@ -29,7 +28,6 @@ public class SelectUtil {
 	private static int pickLayer = -1;
 	private static ColorRGBA currentEditPointOriginalColor = new ColorRGBA();
 	private static Mesh currentEditPointMesh;
-//	private static PickedHousePart pickedHousePart = null;
 	
 	static {
 		pickResults.setCheckDistance(true);		
@@ -133,27 +131,19 @@ public class SelectUtil {
 			currentEditPointMesh.setDefaultColor(ColorRGBA.YELLOW);
 		}
 		
-//		final HousePart drawn;
 		if (data == null) {
-//			drawn = null;
 			if (lastHoveredObject != null) {
 				lastHoveredObject.hidePoints();
-//				lastHoveredObject = null;
 				Blinker.getInstance().setTarget(null);
 			}
 		} else if (edit && data.isEditPoint()) {
-//			drawn = data.getHousePart();			
 			int pointIndex = data.getIndex();
 			if (SceneManager.getInstance().isTopView() && data.getHousePart() instanceof Wall)
 				pointIndex -= 1;
 			data.getHousePart().setEditPoint(pointIndex);
 		} else {
-//			HousePart housePart = data.getHousePart();
-//			drawn = housePart;
-//			drawn = data.getHousePart();
 			if (lastHoveredObject != null && lastHoveredObject != data.getHousePart()) {
 				lastHoveredObject.hidePoints();
-//				lastHoveredObject = null;
 			}
 
 			if (lastHoveredObject != data.getHousePart()) {
@@ -168,9 +158,7 @@ public class SelectUtil {
 			final ViewMode viewMode = SceneManager.getInstance().getViewMode();
 			if (viewMode == ViewMode.NORMAL || viewMode == ViewMode.TOP_VIEW)
 				data.getHousePart().showPoints();
-//			lastHoveredObject = drawn;
 		}
-//		return drawn;
 		return data;
 	}
 
@@ -188,8 +176,4 @@ public class SelectUtil {
 	public static void setPickLayer(int i) {
 		pickLayer = i;
 	}
-
-//	public static PickedHousePart getPickedHousePart() {
-//		return pickedHousePart;
-//	}
 }

@@ -1,5 +1,7 @@
 package org.concord.energy3d.model;
 
+import org.concord.energy3d.util.Util;
+
 import com.ardor3d.math.Vector3;
 
 public class UserData {
@@ -40,7 +42,7 @@ public class UserData {
 
 	@Override
 	public String toString() {
-		return housePart + " index = " + index + " print center = " + printCenter;
+		return housePart + " index = " + index + " PrintCenter = " + Util.toString(printCenter);
 	}
 
 }

@@ -602,10 +602,10 @@ public abstract class HousePart implements Serializable {
 //		return this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + "), editPoint = " + editPointIndex;
 		String s = this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + ")";		
 		for (int i = 0; i < points.size(); i += 2)
-			if (root == null)
-				s += "\t" + Util.toString(points.get(i));
-			else
-				s += "\t" + Util.toString(root.getTransform().applyForward(points.get(i), null));		
+//			if (root == null)
+				s += "\t" + Util.toString(abspoints.get(i));
+//			else
+//				s += "\t" + Util.toString(root.getTransform().applyForward(points.get(i), null));		
 		s += ("\teditPoint = " + editPointIndex);
 		return s;
 	}
