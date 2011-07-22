@@ -606,32 +606,6 @@ public abstract class Roof extends HousePart {
 	}
 
 	private void computeGableWallPoints(final Vector3[] targetBase, final ArrayList<Vector3> gableRoofMeshEditPoints) {
-		System.out.println("-----------------------------------------------------");
-		System.out.println(Util.toString(targetBase[0]) + "\t" + Util.toString(targetBase[1]));
-		System.out.println("-----------------------------------------------------");
-		// for (final Wall wall : walls) {
-		// final Vector3 wallFirstPoint = wall.getAbsPoints().get(1);
-		// final int normalIndex = wallUpperPoints.indexOf(new PolygonPoint(wallFirstPoint.getX(), wallFirstPoint.getY(), wallFirstPoint.getZ()));
-		// wallBase[0].set(wallNormals.get(normalIndex)).multiplyLocal(OVERHANG_LENGHT).addLocal(wallFirstPoint);
-		// wallBase[1].set(wallNormals.get(normalIndex + 1 < wallNormals.size() ? normalIndex + 1 : 0)).multiplyLocal(OVERHANG_LENGHT).addLocal(wall.getAbsPoints().get(3));
-		// System.out.println(Util.toString(wallBase[0]) + "\t" + Util.toString(wallBase[1]));
-		// // normalIndex++;
-		// if (isSameBasePoints(targetBase, wallBase)) {
-		// Collections.sort(gableRoofMeshEditPoints, new Comparator<Vector3>() {
-		// @Override
-		// public int compare(Vector3 o1, Vector3 o2) {
-		// if (o1.distance(wallFirstPoint) > o2.distance(wallFirstPoint))
-		// return -1;
-		// else
-		// return 1;
-		// }
-		//
-		// });
-		// wall.setGablePoints(gableRoofMeshEditPoints);
-		// break;
-		// }
-		// }
-
 		Wall targetWall = findGableWall(targetBase);
 
 		final Wall wall = targetWall;
