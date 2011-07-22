@@ -651,9 +651,10 @@ Version 0.3 - March 7, 2011
 - in setOriginal() duplicate invisible mesh for walls
 
 
+- *auto redraw gable wall when inserting gable or editing gable
+- *fix the problem with incomplete gable wall when moving the edit point of gable roof
 
 - *fix problem with resize tool
-- *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with edit point switching sometimes when custom roof editing
 - *fix problem with resizing custome roof
 

@@ -356,19 +356,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		
 //		com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
 		
-		if (PrintController.getInstance().getPrintParts() != null)
-			for (final HousePart part : PrintController.getInstance().getPrintParts())
-				if (!(part instanceof Roof)) {
-					part.getRoot().updateWorldBound(true);
-					com.ardor3d.util.geom.Debugger.drawBounds(part.getMesh(), renderer, true);
-				}
-		
-		if (Scene.getInstance().getParts() != null)
-			for (final HousePart part : Scene.getInstance().getParts())
-				if (!(part instanceof Roof)) {
-					part.getRoot().updateWorldBound(true);
-					com.ardor3d.util.geom.Debugger.drawBounds(part.getMesh(), renderer, true);
-				}
+//		if (PrintController.getInstance().getPrintParts() != null)
+//			for (final HousePart part : PrintController.getInstance().getPrintParts())
+//				if (!(part instanceof Roof)) {
+//					part.getRoot().updateWorldBound(true);
+//					com.ardor3d.util.geom.Debugger.drawBounds(part.getMesh(), renderer, true);
+//				}
+//		
+//		if (Scene.getInstance().getParts() != null)
+//			for (final HousePart part : Scene.getInstance().getParts())
+//				if (!(part instanceof Roof)) {
+//					part.getRoot().updateWorldBound(true);
+//					com.ardor3d.util.geom.Debugger.drawBounds(part.getMesh(), renderer, true);
+//				}
 		
 		
 		passManager.renderPasses(renderer);
