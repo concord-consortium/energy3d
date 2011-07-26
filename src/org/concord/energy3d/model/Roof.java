@@ -742,4 +742,26 @@ public abstract class Roof extends HousePart {
 		root.attachChild(flattenedMeshesRoot);
 		root.updateWorldBound(true);
 	}
+	
+//	protected boolean isPointInsideRoof(final ReadOnlyVector3 point) {
+//		ReadOnlyVector3 p1, p2;
+//		double dis = Double.MAX_VALUE;
+//		for (final PolygonPoint pp : wallUpperPoints) {
+//			Vector3 p = new Vector3(pp.getX(), pp.getY(), pp.getZ());
+//			final double d = point.distance(p);
+//			if (d < dis) {
+//				dis = d;
+//				p1 = p;
+//			}		
+//		}
+//		double dis = Double.MAX_VALUE;
+//		for (final PolygonPoint pp : wallUpperPoints) {
+//			Vector3 p = new Vector3(pp.getX(), pp.getY(), pp.getZ());
+//			final double d = point.distance(p);
+//			if (d < dis) {
+//				dis = d;
+//				p1 = p;
+//			}		
+//		}		
+//	}
 }

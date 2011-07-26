@@ -197,8 +197,9 @@ public class Scene implements Serializable {
 	public void setAnnotationsVisible(boolean visible) {
 		for (HousePart part : parts)
 			part.setAnnotationsVisible(visible);
-		for (HousePart part : PrintController.getInstance().getPrintParts())
-			part.setAnnotationsVisible(visible);
+		if (PrintController.getInstance().isPrintPreview())
+			for (HousePart part : PrintController.getInstance().getPrintParts())
+				part.setAnnotationsVisible(visible);
 
 		if (visible)
 			redrawAll = true;

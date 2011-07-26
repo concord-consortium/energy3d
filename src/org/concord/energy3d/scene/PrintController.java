@@ -327,7 +327,7 @@ public class PrintController implements Updater {
 
 			final Box box = new Box("Page Boundary");
 			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
-//			pagesRoot.attachChild(box);
+			pagesRoot.attachChild(box);
 		}
 
 	}
