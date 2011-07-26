@@ -57,6 +57,8 @@ public class CustomRoof extends Roof {
 	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
 		super.processRoofPoints(wallUpperPoints, wallNormals);
 		
+		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+		
 		// add or update edit points
 		final double z = center.getZ() + height;
 		if (wallUpperPoints.size() > points.size()) {

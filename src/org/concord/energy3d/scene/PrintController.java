@@ -261,28 +261,21 @@ public class PrintController implements Updater {
 	}
 
 	private void computePageDimension() {
-//		double maxSize = 0;
 		double maxWidth = 0;
 		double maxHeight = 0;
 		for (final HousePart printPart : printParts) {
 			if (printPart.isPrintable()) {
 				if (printPart instanceof Roof) {
 					for (final Spatial mesh : ((Roof) printPart).getFlattenedMeshesRoot().getChildren()) {
-						((Mesh)mesh).updateModelBound();
-						mesh.updateWorldBound(true);
-//						double d = 2 + Util.findBoundLength(mesh.getWorldBound());
-//						if (!Double.isInfinite(d) && d > maxSize)
-//							maxSize = d;
+//						((Mesh)mesh).updateModelBound();
+//						mesh.updateWorldBound(true);
 						maxWidth = Math.max(maxWidth, ((BoundingBox)mesh.getWorldBound()).getXExtent() * 2);
 						maxHeight = Math.max(maxHeight, ((BoundingBox)mesh.getWorldBound()).getZExtent() * 2);
 					}
 				} else {
-					printPart.getRoot().updateWorldBound(true);
-//					double d = 2 + Util.findBoundLength(printPart.getMesh().getWorldBound());
-//					if (!Double.isInfinite(d) && d > maxSize)
-//						maxSize = d;
-					maxWidth = Math.max(maxWidth, ((BoundingBox)printPart.getMesh().getWorldBound()).getXExtent() * 2);
-					maxHeight = Math.max(maxHeight, ((BoundingBox)printPart.getMesh().getWorldBound()).getZExtent() * 2);					
+//					printPart.getRoot().updateWorldBound(true);
+					maxWidth = Math.max(maxWidth, ((BoundingBox)printPart.getRoot().getWorldBound()).getXExtent() * 2);
+					maxHeight = Math.max(maxHeight, ((BoundingBox)printPart.getRoot().getWorldBound()).getZExtent() * 2);					
 				}
 			}
 		}
@@ -297,6 +290,9 @@ public class PrintController implements Updater {
 			pageHeight = maxHeight  + PRINT_MARGIN * 2;
 			pageWidth = pageHeight * ratio;			
 		}
+		
+//		pageWidth = maxWidth;
+//		pageHeight = maxHeight;
 			
 	}
 

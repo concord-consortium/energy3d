@@ -84,6 +84,8 @@ public class Floor extends HousePart {
 			ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
 			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, new TPoint(0,0,0), new TPoint(1,0,0), new TPoint(0,1,0));
 			mesh.getMeshData().updateVertexCount();
+			mesh.updateModelBound();
+			root.updateWorldBound(true);
 	}
 	
 	protected void computeAbsPoints() {
@@ -167,6 +169,7 @@ public class Floor extends HousePart {
 	
 	public void flatten(double flattenTime) {
 		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
+		root.updateWorldTransform(true);
 		super.flatten(flattenTime);
 	}	
 }

@@ -366,7 +366,8 @@ public abstract class HousePart implements Serializable {
 	private void allocateNewPoint() {
 		for (int i = 0; i < numOfEditPoints / numOfDrawPoints; i++) {
 			points.add(new Vector3());
-			abspoints.add(new Vector3());
+			if (points != abspoints)
+				abspoints.add(new Vector3());
 		}
 	}
 	
@@ -460,15 +461,20 @@ public abstract class HousePart implements Serializable {
 	}	
 
 	public void flatten(double flattenTime) {
-		root.setTranslation(0, 0, 0);
+		mesh.updateModelBound();
+		root.updateWorldTransform(true);
+		root.updateWorldBound(true);
 		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
-		final Vector3 currentCenter = new Vector3(center);
+		root.setTranslation(0, 0, 0);
+		Vector3 currentCenter = new Vector3(center);
 		root.getTransform().applyForward(currentCenter);
 		
-//		final Vector3 currentCenter = new Vector3(mesh.getWorldBound().getCenter());
+//		root.updateWorldBound(true);
+//		currentCenter = new Vector3(root.getWorldBound().getCenter());
 		
 		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
 		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));
+		root.updateWorldTransform(true);
 		root.updateWorldBound(true);
 	}
 

@@ -652,6 +652,9 @@ Version 0.3 - March 7, 2011
 - fix the problem with incomplete gable wall when moving the edit point of gable roof
 - fix problem with incorrect height calculation when dragging edit point of gabled pyrimid roof
 
+- fix problem with pyramid roof adding extra 2nd point
+- fix problem with custom roof points initiating at z=0
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

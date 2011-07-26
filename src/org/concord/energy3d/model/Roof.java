@@ -210,6 +210,8 @@ public abstract class Roof extends HousePart {
 		wallUpperPoints.clear();
 		wallNormals.clear();
 		center.set(0, 0, 0);
+		final Vector3 min = new Vector3();
+		final Vector3 max = new Vector3();
 		startWall.visitNeighbors(new WallVisitor() {
 			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
 				walls.add(currentWall);
@@ -225,10 +227,16 @@ public abstract class Roof extends HousePart {
 				final ReadOnlyVector3 normal = currentWall.getFaceDirection();
 				addPointToPolygon(p1, normal);
 				addPointToPolygon(p2, normal);
+				min.set(Math.min(min.getX(), p1.getX()), Math.min(min.getY(), p1.getY()), Math.min(min.getZ(), p1.getZ()));
+				min.set(Math.min(min.getX(), p2.getX()), Math.min(min.getY(), p2.getY()), Math.min(min.getZ(), p2.getZ()));
+				max.set(Math.max(max.getX(), p1.getX()), Math.max(max.getY(), p1.getY()), Math.max(max.getZ(), p1.getZ()));
+				max.set(Math.max(max.getX(), p2.getX()), Math.max(max.getY(), p2.getY()), Math.max(max.getZ(), p2.getZ()));
 			}
 		});
 
 		center.multiplyLocal(1.0 / wallUpperPoints.size());
+//		max.addLocal(min).multiplyLocal(0.5);
+		center.set(max).addLocal(min).multiplyLocal(0.5).setZ(max.getZ());
 		// points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 	}
 
@@ -288,12 +296,16 @@ public abstract class Roof extends HousePart {
 			while (buf.hasRemaining())
 				orgCenter.addLocal(m.applyPost(new Vector3(buf.get(), buf.get(), buf.get()), p1));
 			orgCenter.divideLocal(buf.capacity() / 3);
+			mesh.updateWorldTransform(true);
+			mesh.updateWorldBound(true);
+			orgCenter.set(mesh.getWorldBound().getCenter());
 			orgCenters.put(mesh, orgCenter);
 		}
 		final Vector3 targetPrintCenter = ((UserData) mesh.getUserData()).getPrintCenter();
 		mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
+		mesh.updateWorldTransform(true);
 		mesh.updateModelBound();
-		mesh.updateWorldBound(false);
+		mesh.updateWorldBound(true);
 	}
 
 	protected void drawAnnotations() {
