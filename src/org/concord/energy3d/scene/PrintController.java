@@ -18,6 +18,7 @@ import org.concord.energy3d.util.PrintExporter;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.math.ColorRGBA;
@@ -83,9 +84,16 @@ public class PrintController implements Updater {
 //					Scene.getInstance().getOriginalHouseRoot().detachChild(Scene.getInstance().getParts().get(i).getRoot());
 					Scene.getRoot().attachChild(printParts.get(i).getRoot());
 					printParts.get(i).setOriginal(Scene.getInstance().getParts().get(i));
+					
+//					if (!(printParts.get(i) instanceof Roof))
+//							printParts.get(i).getRoot().getSceneHints().setCullHint(CullHint.Always);
 				}
 				
-				drawPrintParts(1);
+//				drawPrintParts(1);
+				for (final HousePart part : printParts)
+					if (part.isPrintable())
+						part.flattenInit();
+					
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
 				computePageDimension();
 				computePrintCenters(pages);
@@ -104,7 +112,7 @@ public class PrintController implements Updater {
 
 		final double viewSwitchDelay = 0.5;
 		if (!finish && (!isPrintPreview || timer.getTimeInSeconds() > viewSwitchDelay)) {
-			final double t = timer.getTimeInSeconds() - (isPrintPreview ? viewSwitchDelay : 0);			
+			final double t = timer.getTimeInSeconds() / 10 - (isPrintPreview ? viewSwitchDelay : 0);			
 			drawPrintParts(isPrintPreview ? t : 1 - t);
 
 			finish = t > 1;
@@ -139,7 +147,7 @@ public class PrintController implements Updater {
 
 			if (isPrintPreview || doTheEndAnimation) {
 				int printSequence = 0;
-				originalHouseRoot.getSceneHints().setCullHint(CullHint.Inherit);
+//				originalHouseRoot.getSceneHints().setCullHint(CullHint.Inherit);
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (isPrintPreview)
 						printSequence = part.drawLabels(printSequence);
@@ -360,8 +368,8 @@ public class PrintController implements Updater {
 	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
 		for (Spatial neighborPart : page) {
 			final Vector3 neighborPartCenter = ((UserData) neighborPart.getUserData()).getPrintCenter();
-			final BoundingBox neighborBound = (BoundingBox) neighborPart.getWorldBound();
-			final BoundingBox printPartBound = (BoundingBox) printPart.getWorldBound();
+			final BoundingBox neighborBound = (BoundingBox) neighborPart.getWorldBound().clone(null);
+			final BoundingBox printPartBound = (BoundingBox) printPart.getWorldBound().clone(null);
 			final double PADDING = 0.5;
 			final double xExtend = neighborBound.getXExtent() + printPartBound.getXExtent() + PADDING;
 			final double zExtend = neighborBound.getZExtent() + printPartBound.getZExtent() + PADDING;
@@ -385,7 +393,8 @@ public class PrintController implements Updater {
 					for (final Spatial otherPart : page) {
 //						if (otherPart != neighborPart) {
 							printPartBound.setCenter(tryCenter);
-							otherPart.getWorldBound().setCenter(((UserData) otherPart.getUserData()).getPrintCenter());
+							final BoundingVolume otherPartBound = otherPart.getWorldBound().clone(null);
+							otherPartBound.setCenter(((UserData) otherPart.getUserData()).getPrintCenter());
 							if (otherPart.getWorldBound().intersects(printPartBound)) {
 								collision = true;
 								break;

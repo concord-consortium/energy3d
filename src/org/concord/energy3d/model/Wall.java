@@ -1111,10 +1111,15 @@ public class Wall extends HousePart {
 	@Override
 	public void setOriginal(final HousePart original) {
 		root.detachChild(this.invisibleMesh);
+		root.detachChild(backMesh);
+		root.detachChild(surroundMesh);
+		root.detachChild(windowsSurroundMesh);
+		root.detachChild(wireframeMesh);
 		final Mesh orgInvisibleMesh = ((Wall) original).invisibleMesh;
 		this.invisibleMesh = orgInvisibleMesh.makeCopy(true);
 		this.invisibleMesh.setUserData(new UserData(this, ((UserData) orgInvisibleMesh.getUserData()).getIndex(), false));
 		root.attachChild(invisibleMesh);
+		
 		super.setOriginal(original);
 	}
 

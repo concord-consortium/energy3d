@@ -53,7 +53,7 @@ public abstract class Roof extends HousePart {
 	transient protected Node flattenedMeshesRoot;
 	transient private ArrayList<PolygonPoint> wallUpperPoints;
 	transient private ArrayList<ReadOnlyVector3> wallNormals;
-	transient private Map<Mesh, Vector3> orgCenters;
+	transient private Map<Mesh, ReadOnlyVector3> orgCenters;
 	transient private Line wireframeMesh;
 	// transient private ArrayList<Vector3[]> gableBases;
 	private ArrayList<Wall> gableWalls;
@@ -260,10 +260,28 @@ public abstract class Roof extends HousePart {
 		return new Polygon(wallUpperPoints);
 	}
 
+	public void flattenInit() {
+		if (orgCenters == null)
+			orgCenters = new HashMap<Mesh, ReadOnlyVector3>();
+		else
+			orgCenters.clear();
+		flatten(1.0);
+		for (final Spatial mesh : flattenedMeshesRoot.getChildren()) {
+//			mesh.setTranslation(0, 0, 0);
+//			mesh.updateWorldTransform(true);
+//			mesh.updateWorldBound(true);
+			
+			orgCenters.put((Mesh)mesh, mesh.getWorldBound().getCenter());
+			
+		}
+	}
+	
 	public void flatten(double flattenTime) {
-		for (Spatial child : getFlattenedMeshesRoot().getChildren())
+		for (Spatial child : getFlattenedMeshesRoot().getChildren()) {
 			if (child.getSceneHints().getCullHint() != CullHint.Always)
 				flattenQuadTriangle((Mesh) child, flattenTime);
+//			break;	
+		}
 		mesh.updateModelBound();
 		if (bottomMesh != null) {
 			bottomMesh.getSceneHints().setCullHint(CullHint.Always);
@@ -284,10 +302,13 @@ public abstract class Roof extends HousePart {
 		final Vector3 rotAxis = normal.cross(Vector3.UNIT_Y, null);
 		mesh.setRotation(new Matrix3().fromAngleAxis(flattenTime * angle, rotAxis));
 
-		if (orgCenters == null)
-			orgCenters = new HashMap<Mesh, Vector3>();
-		Vector3 orgCenter = orgCenters.get(mesh);
-		if (orgCenter == null) {
+//		if (orgCenters == null)
+//			orgCenters = new HashMap<Mesh, Vector3>();
+//		ReadOnlyVector3 orgCenter = orgCenters.get(mesh);
+		Vector3 orgCenter = new Vector3(); //orgCenters.get(mesh));
+//		if (orgCenter == null)
+//			orgCenter = Vector3.ZERO;
+//		if (orgCenter == null) {
 			final Matrix3 m = new Matrix3().fromAngleAxis(angle, rotAxis);
 			m.applyPost(p1, p1);
 			m.applyPost(p2, p2);
@@ -299,13 +320,14 @@ public abstract class Roof extends HousePart {
 			mesh.updateWorldTransform(true);
 			mesh.updateWorldBound(true);
 			orgCenter.set(mesh.getWorldBound().getCenter());
-			orgCenters.put(mesh, orgCenter);
-		}
+//			orgCenters.put(mesh, orgCenter);
+//		}
 		final Vector3 targetPrintCenter = ((UserData) mesh.getUserData()).getPrintCenter();
+		if (!targetPrintCenter.equals(Vector3.ZERO))
 		mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
-		mesh.updateWorldTransform(true);
-		mesh.updateModelBound();
-		mesh.updateWorldBound(true);
+//		mesh.updateWorldTransform(true);
+//		mesh.updateModelBound();
+//		mesh.updateWorldBound(true);
 	}
 
 	protected void drawAnnotations() {
@@ -776,4 +798,6 @@ public abstract class Roof extends HousePart {
 //			}		
 //		}		
 //	}
+	
+	
 }

@@ -65,6 +65,7 @@ public abstract class HousePart implements Serializable {
 	protected double height;
 	protected boolean relativeToHorizontal;
 	private boolean firstPointInserted = false;
+	private Vector3 flattenCenter;
 	
 	public static void clearDrawFlags() {
 		globalDrawFlag++;
@@ -168,8 +169,9 @@ public abstract class HousePart implements Serializable {
 			this.mesh = original.mesh.makeCopy(true);
 			this.mesh.setUserData(new UserData(this, ((UserData)original.mesh.getUserData()).getIndex(), false));
 			root.attachChild(this.mesh);
-			root.updateWorldBound(true);
+			root.updateWorldBound(true);			
 		}
+		root.detachChild(pointsRoot);
 	}
 
 	public HousePart getOriginal() {
@@ -458,22 +460,46 @@ public abstract class HousePart implements Serializable {
 		for (final Spatial editShape : pointsRoot.getChildren()) {
 			editShape.setTranslation(abspoints.get(i++));
 		}
-	}	
+	}
+	
+	public void flattenInit() {
+		flattenCenter = new Vector3();
+		flatten(1.0);
+		flattenCenter = new Vector3(root.getWorldBound().getCenter());
+	}
 
 	public void flatten(double flattenTime) {
 		mesh.updateModelBound();
 		root.updateWorldTransform(true);
 		root.updateWorldBound(true);
 		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
-		root.setTranslation(0, 0, 0);
+//		root.setTranslation(0, 0, 0);
+		
+		
+//		if (flattenTime == 1.0)
+//			center = new Vector3(root.getWorldBound().getCenter());
+
 		Vector3 currentCenter = new Vector3(center);
-		root.getTransform().applyForward(currentCenter);
+		
+//		root.getTransform().applyForward(currentCenter);
+//		Vector3 center = root.getRotation().applyPost(this.center, null);
 		
 //		root.updateWorldBound(true);
-//		currentCenter = new Vector3(root.getWorldBound().getCenter());
+		if (this instanceof Floor) {
+			System.out.print(flattenTime + "\t" + Util.toString(currentCenter) + "\t");
+			currentCenter = new Vector3(root.getWorldBound().getCenter());
+			System.out.println(Util.toString(currentCenter) + "\t" + Util.toString(targetCenter));
+			if (flattenTime == 1.0)
+				System.out.println("pause");
+//			
+		}
 		
-		final Vector3 subtractLocal = targetCenter.subtractLocal(currentCenter);
-		root.setTranslation(subtractLocal.multiplyLocal(flattenTime));
+//		if (flattenTime == 1.0) {
+//			root.setTranslation(targetCenter);
+//		} else {			
+			final Vector3 subtractLocal = targetCenter.subtractLocal(flattenCenter);
+			root.setTranslation(subtractLocal.multiplyLocal(flattenTime));
+//		}
 		root.updateWorldTransform(true);
 		root.updateWorldBound(true);
 	}

@@ -86,6 +86,7 @@ public class Floor extends HousePart {
 			mesh.getMeshData().updateVertexCount();
 			mesh.updateModelBound();
 			root.updateWorldBound(true);
+			center = new Vector3(root.getWorldBound().getCenter());
 	}
 	
 	protected void computeAbsPoints() {
@@ -116,7 +117,9 @@ public class Floor extends HousePart {
 	}
 
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
-		center.set(0, 0, 0);
+//		center.set(0, 0, 0);
+		final Vector3 min = new Vector3();
+		final Vector3 max = new Vector3();		
 		final ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
 		startWall.visitNeighbors(new WallVisitor() {
 			public void visit(Wall currentWall, Snap prev, Snap next) {
@@ -128,11 +131,17 @@ public class Floor extends HousePart {
 				final Vector3 p2 = currentWall.getAbsPoints().get(pointIndex);
 				addPointToPolygon(poly, p1, center);
 				addPointToPolygon(poly, p2, center);
+				min.set(Math.min(min.getX(), p1.getX()), Math.min(min.getY(), p1.getY()), Math.min(min.getZ(), p1.getZ()));
+				min.set(Math.min(min.getX(), p2.getX()), Math.min(min.getY(), p2.getY()), Math.min(min.getZ(), p2.getZ()));
+				max.set(Math.max(max.getX(), p1.getX()), Math.max(max.getY(), p1.getY()), Math.max(max.getZ(), p1.getZ()));
+				max.set(Math.max(max.getX(), p2.getX()), Math.max(max.getY(), p2.getY()), Math.max(max.getZ(), p2.getZ()));
 			}
 
 		});
 
 		center.multiplyLocal(1.0 / poly.size());
+		center.set(max).addLocal(min).multiplyLocal(0.5); //.setZ(max.getZ());
+		
 		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 
 		return poly;
