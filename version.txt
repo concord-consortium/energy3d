@@ -656,8 +656,8 @@ Version 0.3 - March 7, 2011
 - use the center info of the bounding box for print preview instead of calculating our own center
 - fix the problem with printer centers being biased toward mesh areas with more points
 - fix the problem with roof part sticking out of the page boarders
-
 - fix problem with null exception when some roof parts are hidden
+- fix problem with roof being reversed in print preview
 
 
 - *auto redraw gable wall when inserting gable or editing gable

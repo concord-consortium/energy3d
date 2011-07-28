@@ -299,8 +299,10 @@ public abstract class Roof extends HousePart {
 
 		final Vector3 v = new Vector3(p3).subtractLocal(p1);
 		final Vector3 normal = new Vector3(p2).subtractLocal(p1).crossLocal(v).normalizeLocal();
-		final double angle = normal.smallestAngleBetween(Vector3.UNIT_Y);
-		final Vector3 rotAxis = normal.cross(Vector3.UNIT_Y, null);
+//		if (normal.dot(Vector3.UNIT_Z) < 0)
+//			normal.negateLocal();
+		final double angle = normal.smallestAngleBetween(Vector3.NEG_UNIT_Y);
+		final Vector3 rotAxis = normal.cross(Vector3.NEG_UNIT_Y, null);
 		mesh.setRotation(new Matrix3().fromAngleAxis(flattenTime * angle, rotAxis));
 
 //		if (orgCenters == null)
