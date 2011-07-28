@@ -775,8 +775,10 @@ public abstract class Roof extends HousePart {
 		// this.center = original.center;
 		this.flattenedMeshesRoot = ((Roof) original).flattenedMeshesRoot.makeCopy(true);
 		for (int i = 0; i < flattenedMeshesRoot.getNumberOfChildren(); i++) {
-			final UserData orgUserData = (UserData)((Roof) original).flattenedMeshesRoot.getChild(i).getUserData();
-			flattenedMeshesRoot.getChild(i).setUserData(new UserData(this, orgUserData.getIndex(), false));
+			if (flattenedMeshesRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
+				final UserData orgUserData = (UserData)((Roof) original).flattenedMeshesRoot.getChild(i).getUserData();
+				flattenedMeshesRoot.getChild(i).setUserData(new UserData(this, orgUserData.getIndex(), false));
+			}
 		}
 		root.attachChild(flattenedMeshesRoot);
 		root.updateWorldBound(true);
