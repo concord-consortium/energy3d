@@ -26,7 +26,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -37,8 +36,8 @@ import com.ardor3d.util.screen.ScreenExporter;
 
 public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
-	private static final int MARGIN = 5;
-	private static final double PRINT_MARGIN = 0.5;
+	private static final int MARGIN = 0; //5;
+	private static final double PRINT_MARGIN = 0; //0.5;
 	private double pageWidth, pageHeight;
 	private boolean isPrintPreview = false;
 	private boolean init = false;
@@ -80,13 +79,8 @@ public class PrintController implements Updater {
 			} else {
 				printParts = (ArrayList<HousePart>) ObjectCloner.deepCopy(Scene.getInstance().getParts());
 				for (int i = 0; i < printParts.size(); i++) {					
-//					Scene.getInstance().getParts().get(i).getRoot().getSceneHints().setPickingHint(PickingHint.Pickable, false);
-//					Scene.getInstance().getOriginalHouseRoot().detachChild(Scene.getInstance().getParts().get(i).getRoot());
 					Scene.getRoot().attachChild(printParts.get(i).getRoot());
 					printParts.get(i).setOriginal(Scene.getInstance().getParts().get(i));
-					
-//					if (!(printParts.get(i) instanceof Roof))
-//							printParts.get(i).getRoot().getSceneHints().setCullHint(CullHint.Always);
 				}
 				
 //				drawPrintParts(1);
@@ -112,7 +106,7 @@ public class PrintController implements Updater {
 
 		final double viewSwitchDelay = 0.5;
 		if (!finish && (!isPrintPreview || timer.getTimeInSeconds() > viewSwitchDelay)) {
-			final double t = timer.getTimeInSeconds() / 10 - (isPrintPreview ? viewSwitchDelay : 0);			
+			final double t = timer.getTimeInSeconds() - (isPrintPreview ? viewSwitchDelay : 0);			
 			drawPrintParts(isPrintPreview ? t : 1 - t);
 
 			finish = t > 1;
@@ -147,7 +141,7 @@ public class PrintController implements Updater {
 
 			if (isPrintPreview || doTheEndAnimation) {
 				int printSequence = 0;
-//				originalHouseRoot.getSceneHints().setCullHint(CullHint.Inherit);
+				originalHouseRoot.getSceneHints().setCullHint(CullHint.Inherit);
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (isPrintPreview)
 						printSequence = part.drawLabels(printSequence);
@@ -275,21 +269,16 @@ public class PrintController implements Updater {
 			if (printPart.isPrintable()) {
 				if (printPart instanceof Roof) {
 					for (final Spatial mesh : ((Roof) printPart).getFlattenedMeshesRoot().getChildren()) {
-//						((Mesh)mesh).updateModelBound();
-//						mesh.updateWorldBound(true);
 						maxWidth = Math.max(maxWidth, ((BoundingBox)mesh.getWorldBound()).getXExtent() * 2);
 						maxHeight = Math.max(maxHeight, ((BoundingBox)mesh.getWorldBound()).getZExtent() * 2);
 					}
 				} else {
-//					printPart.getRoot().updateWorldBound(true);
 					maxWidth = Math.max(maxWidth, ((BoundingBox)printPart.getRoot().getWorldBound()).getXExtent() * 2);
 					maxHeight = Math.max(maxHeight, ((BoundingBox)printPart.getRoot().getWorldBound()).getZExtent() * 2);					
 				}
 			}
 		}
-//		pageWidth = maxSize;
 		final Paper paper = new Paper();
-//		pageHeight = pageWidth * paper.getHeight() / paper.getWidth();
 		final double ratio = paper.getWidth() / paper.getHeight();
 		if (maxWidth / maxHeight > ratio) {
 			pageWidth = maxWidth + PRINT_MARGIN * 2;
@@ -298,10 +287,6 @@ public class PrintController implements Updater {
 			pageHeight = maxHeight  + PRINT_MARGIN * 2;
 			pageWidth = pageHeight * ratio;			
 		}
-		
-//		pageWidth = maxWidth;
-//		pageHeight = maxHeight;
-			
 	}
 
 	private void arrangePrintPages(final ArrayList<ArrayList<Spatial>> pages) {
@@ -370,7 +355,7 @@ public class PrintController implements Updater {
 			final Vector3 neighborPartCenter = ((UserData) neighborPart.getUserData()).getPrintCenter();
 			final BoundingBox neighborBound = (BoundingBox) neighborPart.getWorldBound().clone(null);
 			final BoundingBox printPartBound = (BoundingBox) printPart.getWorldBound().clone(null);
-			final double PADDING = 0.5;
+			final double PADDING = 0; //0.5;
 			final double xExtend = neighborBound.getXExtent() + printPartBound.getXExtent() + PADDING;
 			final double zExtend = neighborBound.getZExtent() + printPartBound.getZExtent() + PADDING;
 
