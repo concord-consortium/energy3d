@@ -352,6 +352,10 @@ public class PrintController implements Updater {
 	}
 
 	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
+//		if (printPart.getName().startsWith("Roof"))
+//			System.out.println();
+//		printPart.updateWorldTransform(true);
+//		printPart.updateWorldBound(true);
 		for (Spatial neighborPart : page) {
 			final Vector3 neighborPartCenter = ((UserData) neighborPart.getUserData()).getPrintCenter();
 			final BoundingBox neighborBound = (BoundingBox) neighborPart.getWorldBound().clone(null);
@@ -370,7 +374,7 @@ public class PrintController implements Updater {
 				if (!isHorizontal)
 					tryCenter.setX(MathUtils.clamp(tryCenter.getX(), PRINT_MARGIN + printPartBound.getXExtent(), pageWidth - PRINT_MARGIN - printPartBound.getXExtent()));
 				else
-					tryCenter.setZ(MathUtils.clamp(tryCenter.getZ(), -pageHeight + PRINT_MARGIN + printPartBound.getZExtent(), -PRINT_MARGIN - printPartBound.getYExtent()));
+					tryCenter.setZ(MathUtils.clamp(tryCenter.getZ(), -pageHeight + PRINT_MARGIN + printPartBound.getZExtent(), -PRINT_MARGIN - printPartBound.getZExtent()));
 				
 				tryCenter.setY(0);
 				

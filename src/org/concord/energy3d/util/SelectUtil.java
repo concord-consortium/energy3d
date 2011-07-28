@@ -69,6 +69,7 @@ public class SelectUtil {
 			if (pick.getIntersectionRecord().getNumberOfIntersections() == 0)
 				continue;
 			Object obj = ((Mesh)pick.getTarget()).getUserData();
+//			System.out.println(pick.getTarget());
 			UserData userData = null;
 			if (obj instanceof UserData) {
 				userData = (UserData) obj;

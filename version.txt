@@ -655,6 +655,10 @@ Version 0.3 - March 7, 2011
 - fix problem with pyramid roof adding extra 2nd point
 - fix problem with custom roof points initiating at z=0
 
+- use the center info of the bounding box for print preview instead of calculating our own center
+- fix the problem with printer centers being biased toward mesh areas with more points
+- fix the problem with roof part sticking out of the page boarders
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

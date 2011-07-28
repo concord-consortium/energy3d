@@ -367,10 +367,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		
 		if (PrintController.getInstance().getPrintParts() != null)
 		for (HousePart part : PrintController.getInstance().getPrintParts()) {
-//			if (part instanceof Roof)
+			if (part instanceof Roof)
 //				for (Spatial mesh : ((Roof)part).getFlattenedMeshesRoot().getChildren())
 //					com.ardor3d.util.geom.Debugger.drawBounds(mesh, renderer, true);
-//				com.ardor3d.util.geom.Debugger.drawBounds(((Roof)part).getFlattenedMeshesRoot().getChild(3), renderer, true);
+				com.ardor3d.util.geom.Debugger.drawBounds(((Roof)part).getFlattenedMeshesRoot().getChild(0), renderer, true);
 //			com.ardor3d.util.geom.Debugger.drawBounds(part.getRoot(), renderer, true);
 			
 		}
