@@ -315,6 +315,7 @@ public class PrintController implements Updater {
 				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(currentCorner);
 
 			final Box box = new Box("Page Boundary");
+			box.setDefaultColor(ColorRGBA.GRAY);
 			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
 			pagesRoot.attachChild(box);
 		}
@@ -371,6 +372,8 @@ public class PrintController implements Updater {
 				else
 					tryCenter.setZ(MathUtils.clamp(tryCenter.getZ(), -pageHeight + PRINT_MARGIN + printPartBound.getZExtent(), -PRINT_MARGIN - printPartBound.getYExtent()));
 				
+				tryCenter.setY(0);
+				
 				boolean collision = false;
 				if (tryCenter.getX() - printPartBound.getXExtent() < PRINT_MARGIN || tryCenter.getX() + printPartBound.getXExtent() > pageWidth - PRINT_MARGIN || tryCenter.getZ() + printPartBound.getZExtent() > PRINT_MARGIN || tryCenter.getZ() - printPartBound.getZExtent() < -pageHeight + PRINT_MARGIN)
 					collision = true;
@@ -380,7 +383,7 @@ public class PrintController implements Updater {
 							printPartBound.setCenter(tryCenter);
 							final BoundingVolume otherPartBound = otherPart.getWorldBound().clone(null);
 							otherPartBound.setCenter(((UserData) otherPart.getUserData()).getPrintCenter());
-							if (otherPart.getWorldBound().intersects(printPartBound)) {
+							if (otherPartBound.intersects(printPartBound)) {
 								collision = true;
 								break;
 							}

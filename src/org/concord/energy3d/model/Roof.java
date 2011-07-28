@@ -271,7 +271,8 @@ public abstract class Roof extends HousePart {
 //			mesh.updateWorldTransform(true);
 //			mesh.updateWorldBound(true);
 			
-			orgCenters.put((Mesh)mesh, mesh.getWorldBound().getCenter());
+			mesh.setTranslation(0, 0, 0);
+			orgCenters.put((Mesh)mesh, new Vector3(mesh.getWorldBound().getCenter()));
 			
 		}
 	}
@@ -304,30 +305,31 @@ public abstract class Roof extends HousePart {
 
 //		if (orgCenters == null)
 //			orgCenters = new HashMap<Mesh, Vector3>();
-//		ReadOnlyVector3 orgCenter = orgCenters.get(mesh);
-		Vector3 orgCenter = new Vector3(); //orgCenters.get(mesh));
-//		if (orgCenter == null)
-//			orgCenter = Vector3.ZERO;
-//		if (orgCenter == null) {
-			final Matrix3 m = new Matrix3().fromAngleAxis(angle, rotAxis);
-			m.applyPost(p1, p1);
-			m.applyPost(p2, p2);
-			m.applyPost(p3, p3);
-			orgCenter = new Vector3(p1).addLocal(p2).addLocal(p3);
-			while (buf.hasRemaining())
-				orgCenter.addLocal(m.applyPost(new Vector3(buf.get(), buf.get(), buf.get()), p1));
-			orgCenter.divideLocal(buf.capacity() / 3);
-			mesh.updateWorldTransform(true);
-			mesh.updateWorldBound(true);
-			orgCenter.set(mesh.getWorldBound().getCenter());
-//			orgCenters.put(mesh, orgCenter);
-//		}
+		ReadOnlyVector3 orgCenter = orgCenters.get(mesh);
+//		Vector3 orgCenter = new Vector3(); //orgCenters.get(mesh));
+////		if (orgCenter == null)
+////			orgCenter = Vector3.ZERO;
+////		if (orgCenter == null) {
+//			final Matrix3 m = new Matrix3().fromAngleAxis(angle, rotAxis);
+//			m.applyPost(p1, p1);
+//			m.applyPost(p2, p2);
+//			m.applyPost(p3, p3);
+//			orgCenter = new Vector3(p1).addLocal(p2).addLocal(p3);
+//			while (buf.hasRemaining())
+//				orgCenter.addLocal(m.applyPost(new Vector3(buf.get(), buf.get(), buf.get()), p1));
+//			orgCenter.divideLocal(buf.capacity() / 3);
+//			mesh.updateWorldTransform(true);
+//			mesh.updateWorldBound(true);
+//			orgCenter.set(mesh.getWorldBound().getCenter());
+////			orgCenters.put(mesh, orgCenter);
+////		}
 		final Vector3 targetPrintCenter = ((UserData) mesh.getUserData()).getPrintCenter();
+//		if (!targetPrintCenter.equals(Vector3.ZERO) && ((UserData) mesh.getUserData()).getIndex() != 3)
 		if (!targetPrintCenter.equals(Vector3.ZERO))
-		mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
-//		mesh.updateWorldTransform(true);
-//		mesh.updateModelBound();
-//		mesh.updateWorldBound(true);
+			mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
+		mesh.updateWorldTransform(true);
+		mesh.updateModelBound();
+		mesh.updateWorldBound(true);
 	}
 
 	protected void drawAnnotations() {
@@ -337,6 +339,7 @@ public abstract class Roof extends HousePart {
 
 		if (original == null) {
 			for (int i = 0; i < wallUpperPoints.size(); i++) {
+				
 				PolygonPoint p = wallUpperPoints.get(i);
 				Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
 				p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
@@ -767,6 +770,8 @@ public abstract class Roof extends HousePart {
 	@Override
 	public void setOriginal(final HousePart original) {
 		this.original = original;
+		this.root.detachChild(pointsRoot);
+		this.root.detachChild(wireframeMesh);
 		// this.center = original.center;
 		this.flattenedMeshesRoot = ((Roof) original).flattenedMeshesRoot.makeCopy(true);
 		for (int i = 0; i < flattenedMeshesRoot.getNumberOfChildren(); i++) {
