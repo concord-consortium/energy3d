@@ -36,8 +36,8 @@ import com.ardor3d.util.screen.ScreenExporter;
 
 public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
-	private static final int MARGIN = 0; //5;
-	private static final double PRINT_MARGIN = 0; //0.5;
+	private static final int MARGIN = 5;
+	private static final double PRINT_MARGIN = 0.5;
 	private double pageWidth, pageHeight;
 	private boolean isPrintPreview = false;
 	private boolean init = false;
@@ -355,7 +355,7 @@ public class PrintController implements Updater {
 			final Vector3 neighborPartCenter = ((UserData) neighborPart.getUserData()).getPrintCenter();
 			final BoundingBox neighborBound = (BoundingBox) neighborPart.getWorldBound().clone(null);
 			final BoundingBox printPartBound = (BoundingBox) printPart.getWorldBound().clone(null);
-			final double PADDING = 0; //0.5;
+			final double PADDING = 0.5;
 			final double xExtend = neighborBound.getXExtent() + printPartBound.getXExtent() + PADDING;
 			final double zExtend = neighborBound.getZExtent() + printPartBound.getZExtent() + PADDING;
 
