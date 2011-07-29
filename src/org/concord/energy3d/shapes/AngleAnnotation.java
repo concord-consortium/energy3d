@@ -30,7 +30,7 @@ public class AngleAnnotation extends Annotation {
 		double end = a.smallestAngleBetween(b);
 		
 		v.set(n).crossLocal(Vector3.UNIT_Z).normalizeLocal();
-		double angleOffset = -a.smallestAngleBetween(Vector3.UNIT_X);
+		double angleOffset = a.smallestAngleBetween(Vector3.UNIT_X);
 		if (a.dot(Vector3.UNIT_Z) < 0)
 			angleOffset = -angleOffset;
 		start += angleOffset;

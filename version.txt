@@ -660,11 +660,13 @@ Version 0.3 - March 7, 2011
 - fix problem with roof being reversed in print preview
 - fix problem with shift in print parts position due to different values for height of root and mesh (using mesh height everywhere now)
 - fix problem with some roof parts being behind paper in print preview mode due to inaccurate centers of bounding boxes after rotations
+- fix problem with roof part angle annotations due to reversing of roof part
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
 - *fix problem with edit point switching sometimes when custom roof editing
 - *fix problem with resizing custome roof
+- *put the main model in the exact middle of print preview view using its bounding box
 
 
  

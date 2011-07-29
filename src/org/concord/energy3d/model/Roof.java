@@ -358,9 +358,7 @@ public abstract class Roof extends HousePart {
 			final Vector3 p3 = new Vector3();
 			for (Spatial mesh : flattenedMeshesRoot.getChildren()) {
 				final FloatBuffer vertexBuffer = ((Mesh) mesh).getMeshData().getVertexBuffer();
-				float pos = 0;
 				for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
-					pos += 0.5;
 					final int xPos = i * 9;
 					vertexBuffer.position(xPos);
 					p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
@@ -371,9 +369,9 @@ public abstract class Roof extends HousePart {
 					mesh.getTransform().applyForward(p3);
 
 					// Size annotation
-					fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.UNIT_Y, original == null, Align.Center, false);
-					fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.UNIT_Y, original == null, Align.Center, false);
-					fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.UNIT_Y, original == null, Align.Center, false);
+					fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
+					fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
+					fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
 
 					// Angle annotations
 					fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
