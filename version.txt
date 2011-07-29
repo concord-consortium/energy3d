@@ -658,7 +658,8 @@ Version 0.3 - March 7, 2011
 - fix the problem with roof part sticking out of the page boarders
 - fix problem with null exception when some roof parts are hidden
 - fix problem with roof being reversed in print preview
-
+- fix problem with shift in print parts position due to different values for height of root and mesh (using mesh height everywhere now)
+- fix problem with some roof parts being behind paper in print preview mode due to inaccurate centers of bounding boxes after rotations
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

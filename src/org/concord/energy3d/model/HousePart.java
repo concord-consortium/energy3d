@@ -465,7 +465,7 @@ public abstract class HousePart implements Serializable {
 	public void flattenInit() {
 		flattenCenter = new Vector3();
 		flatten(1.0);
-		flattenCenter = new Vector3(root.getWorldBound().getCenter());
+		flattenCenter = new Vector3(mesh.getWorldBound().getCenter());
 	}
 
 	public void flatten(double flattenTime) {

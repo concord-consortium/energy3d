@@ -267,13 +267,17 @@ public abstract class Roof extends HousePart {
 			orgCenters.clear();
 		flatten(1.0);
 		for (final Spatial mesh : flattenedMeshesRoot.getChildren()) {
-//			mesh.setTranslation(0, 0, 0);
-//			mesh.updateWorldTransform(true);
-//			mesh.updateWorldBound(true);
-			
 			mesh.setTranslation(0, 0, 0);
-			orgCenters.put((Mesh)mesh, new Vector3(mesh.getWorldBound().getCenter()));
 			
+			// The following code is needed because the center of bounding box is not accurate. If oriented bounding box is usde then this code is no longer required.
+			final FloatBuffer buf = ((Mesh)mesh).getMeshData().getVertexBuffer();
+			buf.rewind();
+			final Vector3 p = new Vector3(buf.get(), buf.get(), buf.get());
+			mesh.getTransform().applyForward(p);
+			
+			final Vector3 orgCenter = new Vector3(mesh.getWorldBound().getCenter());
+			orgCenter.setY(p.getY());
+			orgCenters.put((Mesh)mesh, orgCenter);
 		}
 	}
 	
