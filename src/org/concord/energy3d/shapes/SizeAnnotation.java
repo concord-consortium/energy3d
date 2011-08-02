@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import org.concord.energy3d.scene.Scene;
 
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
@@ -25,20 +26,30 @@ public class SizeAnnotation extends Annotation {
 		this.attachChild(label);
 	}
 	
-	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipDirection) {
+	public void setRange(ReadOnlyVector3 from, ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipDirection) {
 		final double C = 0.1;
 		final Vector3 v = new Vector3();
+//		if (to.subtract(from, null).normalizeLocal().crossLocal(faceDirection).dot(Vector3.NEG_UNIT_Z) < 0) {
+//			final ReadOnlyVector3 tmp = from;
+//			from = to;
+//			to = tmp;
+//		}
 		final Vector3 offset = new Vector3();
 		if (front)
 			offset.set(faceDirection).normalizeLocal().multiplyLocal(C);
 		else {
-			offset.set(to).subtractLocal(from).crossLocal(faceDirection).normalizeLocal().multiplyLocal(C);
+			offset.set(to).subtractLocal(from).normalizeLocal().crossLocal(faceDirection).multiplyLocal(C);
 			if (autoFlipDirection) {
 				v.set(from).subtractLocal(center).normalizeLocal();
 				if (v.dot(offset) < 0)
 					offset.negateLocal();
 			}
 		}
+		
+		double angle = faceDirection.smallestAngleBetween(Vector3.NEG_UNIT_Y);
+		if (faceDirection.dot(Vector3.UNIT_X) < 0)
+			angle = -angle;
+		label.setRotation(new Matrix3().fromAngles(0, 0, angle));
 
 		FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();

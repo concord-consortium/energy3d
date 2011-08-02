@@ -61,7 +61,7 @@ public class Wall extends HousePart {
 	private boolean isShortWall;
 	transient private ArrayList<Vector3> wallGablePoints; // TODO remove this
 	transient private Roof roof;
-	transient private ArrayList<ReadOnlyVector3> wallGableStretchPoints;
+	transient private ArrayList<ReadOnlyVector3> wallPolygonPoints;
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -281,31 +281,14 @@ public class Wall extends HousePart {
 		p = abspoints.get(3);
 		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
 
-		// final Polygon polygon = stretchToRoof(enforceRangeAndRemoveDuplicatedGablePoints(computeWallAndWindowPolygon(false)));
 		final Polygon polygon = stretchToRoof(computeWallAndWindowPolygon(false));
 		
-		wallGableStretchPoints = computeWallGablePoints(polygon);
-
-		// System.out.println("-------------------------------");
-		// System.out.println("Before reduction:");
-		// for (TriangulationPoint tp : polygon.getPoints())
-		// System.out.println("new PolygonPoint(" + tp.getX() + ", " + tp.getY() + ", " + tp.getZ() + ")");
+		wallPolygonPoints = extractPolygonPoints(polygon);
 
 		toXY(polygon);
 
 		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
-
-		// for (final TriangulationPoint tp : polygon.getPoints())
-		// toXY.transform(tp);
-		//
-		// if (polygon.getHoles() != null)
-		// for (final Polygon hole : polygon.getHoles()) {
-		// for (final TriangulationPoint tp : hole.getPoints())
-		// toXY.transform(tp);
-		// }
-
-		// final Polygon polygon = new Polygon(polygonPoints);
 
 		// keep it for platform resizing
 		if (original == null)
@@ -322,36 +305,6 @@ public class Wall extends HousePart {
 			wireframeVertexBuffer.rewind();
 			wireframeVertexBuffer.limit(wireframeVertexBuffer.capacity());
 		}
-
-		// // Add window holes
-		// for (HousePart child : children) {
-		// ArrayList<Vector3> winPoints = child.getAbsPoints();
-		// if (child instanceof Window && includeWindow(winPoints)) {
-		// PolygonPoint pp;
-		// ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
-		// p = winPoints.get(0);
-		// wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		// pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-		// toXY.transform(pp);
-		// holePoints.add(pp);
-		// p = winPoints.get(2);
-		// wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		// pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-		// toXY.transform(pp);
-		// holePoints.add(pp);
-		// p = winPoints.get(3);
-		// wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		// pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-		// toXY.transform(pp);
-		// holePoints.add(pp);
-		// p = winPoints.get(1);
-		// wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		// pp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-		// toXY.transform(pp);
-		// holePoints.add(pp);
-		// polygon.addHole(new Polygon(holePoints));
-		// }
-		// }
 
 		Vector3 p01 = abspoints.get(1).subtract(abspoints.get(0), null).normalizeLocal();
 		Vector3 p02 = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
@@ -386,14 +339,11 @@ public class Wall extends HousePart {
 			mesh.getMeshData().updateVertexCount();
 			mesh.updateModelBound();
 
-			// drawBackMesh(polygon, fromXY);
 			drawBackMesh(computeWallAndWindowPolygon(true), fromXY);
 			drawSurroundMesh(thicknessNormal);
 			drawWindowsSurroundMesh(thicknessNormal);
 
 			// draw wireframe
-			// final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
-			// wireframeVertexBuffer.rewind();
 			Vector3 w;
 			w = abspoints.get(1);
 			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf() + 0.01f);
@@ -401,8 +351,6 @@ public class Wall extends HousePart {
 			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf() + 0.01f);
 			w = abspoints.get(2);
 			wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
-			// w = abspoints.get(3);
-			// wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
 			if (wallGablePoints == null) {
 				w = abspoints.get(3);
 				wireframeVertexBuffer.put(w.getXf()).put(w.getYf()).put(w.getZf());
@@ -428,28 +376,13 @@ public class Wall extends HousePart {
 		Vector3 p = new Vector3();
 		// Start the polygon with (1) then 0, 2, 3, [roof points] so that roof points are appended to the end of vertex list
 		p.set(abspoints.get(1)).addLocal(trans);
-		// polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection(p, backMesh)));
 		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p.set(abspoints.get(0)).addLocal(trans);
 		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p.set(abspoints.get(2)).addLocal(trans);
 		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		p.set(abspoints.get(3)).addLocal(trans);
-		// polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection(p, backMesh)));
 		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-		// if (wallGablePoints != null) {
-		// final Vector3 n = getFaceDirection().negate(null).multiplyLocal(Roof.OVERHANG_LENGHT);
-		// for (final Vector3 gablePoint : wallGablePoints) {
-		// final Vector3 v = gablePoint.add(n, null);
-		// // final Vector2 min = new Vector2(Math.min(abspoints.get(0).getX(), abspoints.get(2).getX()), Math.min(abspoints.get(0).getY(), abspoints.get(2).getY()));
-		// // final Vector2 max = new Vector2(Math.max(abspoints.get(0).getX(), abspoints.get(2).getX()), Math.max(abspoints.get(0).getY(), abspoints.get(2).getY()));
-		// // v.set(Math.max(v.getX(), min.getX()), Math.max(v.getY(), min.getY()), v.getZ());
-		// // v.set(Math.min(v.getX(), max.getX()), Math.min(v.getY(), max.getY()), v.getZ());
-		// v.addLocal(trans);
-		// // polygonPoints.add(new PolygonPoint(v.getX(), v.getY(), findRoofIntersection(v, backMesh)));
-		// polygonPoints.add(new PolygonPoint(v.getX(), v.getY(), v.getZ()));
-		// }
-		// }
 
 		final Polygon polygon = new Polygon(polygonPoints);
 
@@ -561,7 +494,6 @@ public class Wall extends HousePart {
 //	}	
 
 	private Polygon stretchToRoof(final Polygon polygon) {
-//		wallGableStretchPoints = new ArrayList<ReadOnlyVector3>();
 		final int[] upper = { 0, 3 };
  
 		for (final int i : upper) {
@@ -569,8 +501,6 @@ public class Wall extends HousePart {
 			tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), tp.getZ()), false));
 		}
 		
-//		wallGableStretchPoints.add(new Vector3(polygon.getPoints().get(3).getX(), polygon.getPoints().get(3).getY(), polygon.getPoints().get(3).getZ()));
-
 		TriangulationPoint tp = polygon.getPoints().get(0);
 		final Vector3 o = new Vector3(tp.getX(), tp.getY(), tp.getZ());
 		tp = polygon.getPoints().get(3);
@@ -587,25 +517,20 @@ public class Wall extends HousePart {
 			final double findRoofIntersection = findRoofIntersection(p, false);
 			
 			final ReadOnlyVector3 currentStretchPoint = new Vector3(p.getX(), p.getY(), findRoofIntersection);
-//			final ReadOnlyVector3 previousStretchPoint = wallGableStretchPoints.get(wallGableStretchPoints.size() - 1);
 			final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();
 			
 			if (direction == null) {
 				direction = currentDirection;
 			} else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE){
 				direction = null;
-//				wallGableStretchPoints.add(currentStretchPoint);
 				polygon.getPoints().add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection));				
 			}
 			previousStretchPoint = currentStretchPoint;
 		}
-		
-//		wallGableStretchPoints.add(new Vector3(polygon.getPoints().get(0).getX(), polygon.getPoints().get(0).getY(), polygon.getPoints().get(0).getZ()));
-
 		return polygon;
 	}
 	
-	private ArrayList<ReadOnlyVector3> computeWallGablePoints(final Polygon polygon) {
+	private ArrayList<ReadOnlyVector3> extractPolygonPoints(final Polygon polygon) {
 		final ArrayList<ReadOnlyVector3> gablePoints = new ArrayList<ReadOnlyVector3>();
 		
 		gablePoints.add(new Vector3(polygon.getPoints().get(3).getX(), polygon.getPoints().get(3).getY(), polygon.getPoints().get(3).getZ()));
@@ -618,7 +543,6 @@ public class Wall extends HousePart {
 		
 		return gablePoints;
 	}
-	
 	
 	public double findRoofIntersection(final ReadOnlyVector3 v, final boolean backMesh) {
 		if (roof == null)
@@ -649,7 +573,7 @@ public class Wall extends HousePart {
 
 		final Vector3 dir = abspoints.get(2).subtract(abspoints.get(0), null).normalizeLocal();
 		if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted() && !(Scene.getInstance().isDrawThickness() && isShortWall && isPerpendicularToNeighbor(0))) {
-			// reduceBackMeshWidth(polygon, dir, 0);
+			 reduceBackMeshWidth(polygon, dir, 0);
 		}
 
 		if (neighbors[1] != null && neighbors[1].getNeighborOf(this).isFirstPointInserted() && !(Scene.getInstance().isDrawThickness() && isShortWall && isPerpendicularToNeighbor(1))) {
@@ -1039,8 +963,8 @@ public class Wall extends HousePart {
 //		if (original != null)
 //			fetchSizeAnnot(annotCounter++).setRange(abspoints.get(1), abspoints.get(3), center, faceDirection, original == null, Align.Center, true);
 		
-		for (int i = 0; i < wallGableStretchPoints.size() - 1; i++)
-			fetchSizeAnnot(annotCounter++).setRange(wallGableStretchPoints.get(i), wallGableStretchPoints.get(i + 1), center, faceDirection, false, Align.Center, true);
+		for (int i = 0; i < wallPolygonPoints.size() - 1; i++)
+			fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i + 1), center, faceDirection, false, Align.Center, true);
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
@@ -1200,7 +1124,7 @@ public class Wall extends HousePart {
 		this.invisibleMesh = orgInvisibleMesh.makeCopy(true);
 		this.invisibleMesh.setUserData(new UserData(this, ((UserData) orgInvisibleMesh.getUserData()).getIndex(), false));
 		root.attachChild(invisibleMesh);
-		wallGableStretchPoints = ((Wall)original).wallGableStretchPoints;
+		wallPolygonPoints = ((Wall)original).wallPolygonPoints;
 		
 		super.setOriginal(original);
 	}

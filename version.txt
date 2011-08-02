@@ -662,6 +662,8 @@ Version 0.3 - March 7, 2011
 - fix problem with some roof parts being behind paper in print preview mode due to inaccurate centers of bounding boxes after rotations
 - fix problem with roof part angle annotations due to reversing of roof part
 - draw annotations for the gable walls
+- make the size annotation label none rotatable
+- automatically reverse the annotation label to make it readable from front
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

@@ -16,6 +16,7 @@ public abstract class Annotation extends Node {
 		label.setTextColor(ColorRGBA.BLACK);
 		label.setAutoScale(AutoScale.Off);
 		label.setFontScale(0.12);
+		label.setAutoRotate(false);
 		return label;
 	}
 	
