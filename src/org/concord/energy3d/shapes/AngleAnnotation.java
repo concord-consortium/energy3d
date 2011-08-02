@@ -39,6 +39,8 @@ public class AngleAnnotation extends Annotation {
 		Arc arc = (Arc)mesh;
 		arc.set(10, 0.2, start, end);
 		
+		mesh.updateModelBound();
+		
 		m1.fromAngleAxis(-n.smallestAngleBetween(Vector3.UNIT_Z), v);
 		mesh.setRotation(m1);
 		this.setTranslation(p1.getX(), p1.getY()-0.01, p1.getZ());
@@ -52,6 +54,8 @@ public class AngleAnnotation extends Annotation {
 		label.setTranslation(v);
 		label.setTextColor(ColorRGBA.WHITE);
 		label.setText(""+Math.round(a.smallestAngleBetween(b)*180/Math.PI)+"\u00B0");
+		
+		label.updateModelBound();
 	}	
 	
 	private Align getPreferedAlignment(Vector3 dir) {

@@ -27,6 +27,8 @@ public class Arc extends Line {
 	public Arc(String name) {
 		super(name);
 		setAntialiased(true);
+		getMeshData().setIndexMode(IndexMode.LineStrip);
+		getSceneHints().setLightCombineMode(LightCombineMode.Off);
 	}
 
 	public void set(int samples, double radius, double start, double end) {
@@ -34,12 +36,10 @@ public class Arc extends Line {
 //		FloatBuffer normalBuf = createNormal(samples);
 //		FloatBuffer colorBuf = createColor(samples);
 
-		getMeshData().setVertexBuffer(vertexBuf);
+		getMeshData().setVertexBuffer(vertexBuf);		
 //		getMeshData().setNormalBuffer(normalBuf);
 //		getMeshData().setColorBuffer(colorBuf);
-		getMeshData().setIndexMode(IndexMode.LineStrip);
-		getSceneHints().setLightCombineMode(LightCombineMode.Off);
-		setAntialiased(true);
+//		setAntialiased(true);
 	}
 
 //	private FloatBuffer createColor(int samples) {

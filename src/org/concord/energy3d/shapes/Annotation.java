@@ -10,7 +10,6 @@ import com.ardor3d.ui.text.BMText.AutoScale;
 
 public abstract class Annotation extends Node {	
 	protected final Mesh mesh;
-//	protected final HousePart housePart;
 	
 	public static BMText makeNewLabel() {
 		final BMText label = new BMText("Annotation Label", "0.0", FontManager.getInstance().getAnnotationFont(), BMText.Align.Center, BMText.Justify.Center);
@@ -22,11 +21,8 @@ public abstract class Annotation extends Node {
 	
 	public Annotation(final Mesh mesh) {
 		super();
-//		this.housePart = housePart;
 		this.mesh = mesh;
 		this.attachChild(mesh);
-//		this.attachChild(label);
 		mesh.setDefaultColor(ColorRGBA.BLACK);
 	}
-	
 }

@@ -18,7 +18,7 @@ public class SizeAnnotation extends Annotation {
 	protected final BMText label = makeNewLabel();
 	
 	public SizeAnnotation() {
-		super( new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null));
+		super(new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null));
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		arrows.setDefaultColor(ColorRGBA.BLACK);
 		this.attachChild(arrows);
@@ -58,13 +58,13 @@ public class SizeAnnotation extends Annotation {
 
 		offset.multiplyLocal(0.5);
 		// from End
-		v.set(from);// .subtractLocal(offset);
+		v.set(from);
 		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
 		v.set(newFrom).addLocal(offset);
 		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
 
 		// to End
-		v.set(to);// .subtractLocal(offset);
+		v.set(to);
 		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
 		v.set(newTo).addLocal(offset);
 		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
@@ -72,16 +72,8 @@ public class SizeAnnotation extends Annotation {
 		// arrow
 		offset.multiplyLocal(0.5);
 		body.set(to).subtractLocal(from).normalizeLocal().multiplyLocal(0.05);
-		// // arrow right side
-		// v.set(newFrom);
-		// vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		// v.addLocal(offset).addLocal(body);
-		// vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		// // arrow left side
-		// v.set(newFrom);
-		// vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		// v.subtractLocal(offset).addLocal(body);
-		// vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+		
+		mesh.updateModelBound();
 
 		vertexBuffer = arrows.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
@@ -100,10 +92,13 @@ public class SizeAnnotation extends Annotation {
 		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
 		v.set(newTo).subtractLocal(offset).addLocal(body);
 		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+				
+		arrows.updateModelBound();
 
-		// Vector3 middle = Vector3.fetchTempInstance().set(newFrom).addLocal(newTo).multiplyLocal(0.5);
 		label.setTranslation(middle);		
 		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 100) / 100.0 + Scene.getInstance().getUnit().getNotation());
 		label.setAlign(align);
+		
+		label.updateModelBound();
 	}
 }

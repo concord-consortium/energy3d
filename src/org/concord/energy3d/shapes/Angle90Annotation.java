@@ -13,26 +13,11 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Angle90Annotation extends Annotation {
 
 	public Angle90Annotation(HousePart housePart) {
-//		super(housePart);
 		super(new Mesh());
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(3));
 		mesh.getMeshData().setIndexMode(IndexMode.LineStrip);
-		
-//		this.detachChild(label);	// TODO move label to subclass
 	}
 
-//	protected Mesh getMesh() {
-//		if (mesh != null)
-//			return mesh;
-//		else {
-//			final Mesh mesh = new Mesh();
-//			mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(3));
-//			mesh.getMeshData().setIndexMode(IndexMode.LineStrip);
-//			return mesh;
-//			
-//		}
-//	}
-	
 	public void setRange(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3, final ReadOnlyVector3 faceDirection) {
 		final Vector3 a = new Vector3(p2).subtractLocal(p1).normalizeLocal();
 		final Vector3 b = new Vector3(p3).subtractLocal(p1).normalizeLocal();		
@@ -44,7 +29,6 @@ public class Angle90Annotation extends Annotation {
 		b.multiplyLocal(length);
 		c.set(a).addLocal(b);
 		
-//		final ReadOnlyVector3 faceDirection = housePart.getFaceDirection();
 		v.set(faceDirection).scaleAddLocal(0.01f, p1);
 		a.addLocal(v);
 		b.addLocal(v);
@@ -55,6 +39,7 @@ public class Angle90Annotation extends Annotation {
 		vertexBuffer.put(a.getXf()).put(a.getYf()).put(a.getZf());
 		vertexBuffer.put(c.getXf()).put(c.getYf()).put(c.getZf());
 		vertexBuffer.put(b.getXf()).put(b.getYf()).put(b.getZf());
+		mesh.updateModelBound();
 	}	
 	
 }

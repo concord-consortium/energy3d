@@ -201,8 +201,8 @@ public class Scene implements Serializable {
 			for (HousePart part : PrintController.getInstance().getPrintParts())
 				part.setAnnotationsVisible(visible);
 
-		if (visible)
-			redrawAll = true;
+//		if (visible)
+//			redrawAll = true;
 	}
 
 	public void setTextureEnabled(final boolean enabled) {

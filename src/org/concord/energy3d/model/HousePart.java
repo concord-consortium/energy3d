@@ -169,9 +169,12 @@ public abstract class HousePart implements Serializable {
 			this.mesh = original.mesh.makeCopy(true);
 			this.mesh.setUserData(new UserData(this, ((UserData)original.mesh.getUserData()).getIndex(), false));
 			root.attachChild(this.mesh);
-			root.updateWorldBound(true);			
+//			this.sizeAnnotRoot = original.sizeAnnotRoot.makeCopy(false);
+//			root.attachChild(sizeAnnotRoot);
+			drawAnnotations();
 		}
 		root.detachChild(pointsRoot);
+		root.updateWorldBound(true);	
 	}
 
 	public HousePart getOriginal() {
@@ -400,7 +403,7 @@ public abstract class HousePart implements Serializable {
 //		if (isPrintable())
 //			drawLabels();
 
-		if (drawAnnotations)
+//		if (drawAnnotations)
 			drawAnnotations();
 	}
 
