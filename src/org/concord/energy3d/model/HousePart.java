@@ -66,6 +66,7 @@ public abstract class HousePart implements Serializable {
 	protected boolean relativeToHorizontal;
 	private boolean firstPointInserted = false;
 	private Vector3 flattenCenter;
+	private double labelOffset = -0.01;
 	
 	public static void clearDrawFlags() {
 		globalDrawFlag++;
@@ -520,8 +521,9 @@ public abstract class HousePart implements Serializable {
 		final Vector3 offset;
 		if (original == null)
 			offset = getFaceDirection().multiply(0.5, null);
-		else
-			offset = new Vector3(0, -0.01, 0);
+		else {
+			offset = new Vector3(0, labelOffset, 0);
+		}
 		root.getTransform().applyInverseVector(offset);
 		offset.addLocal(center);
 		label.setTranslation(offset);
@@ -643,6 +645,10 @@ public abstract class HousePart implements Serializable {
 //				s += "\t" + Util.toString(root.getTransform().applyForward(points.get(i), null));		
 		s += ("\teditPoint = " + editPointIndex);
 		return s;
+	}
+
+	public void setLabelOffset(double labelOffset) {
+		this.labelOffset = labelOffset;
 	}
 	
 }  

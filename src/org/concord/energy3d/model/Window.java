@@ -8,6 +8,8 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -64,15 +66,10 @@ public class Window extends HousePart {
 		
 		bars = new Line("Window (bars)");
 		bars.setModelBound(new BoundingBox());
-//		bars.setDefaultColor(ColorRGBA.BLACK);
 		((Line)bars).setLineWidth(3);
 		((Line)bars).setAntialiased(true);
 		bars.getSceneHints().setCastsShadows(false);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
-//		bars.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
-//		final MaterialState ms = new MaterialState();
-//		ms.setColorMaterial(ColorMaterial.Diffuse);
-//		bars.setRenderState(ms);
 		root.attachChild(bars);
 	}
 
@@ -208,39 +205,79 @@ public class Window extends HousePart {
 			return;
 		int annotCounter = 0;
 
-		Vector3 v = new Vector3();
-		Vector3 v1 = new Vector3();
-		double len = v.set(container.getAbsPoints().get(2)).subtractLocal(container.getAbsPoints().get(0)).length();
+//		Vector3 v = new Vector3();
+//		Vector3 v1 = new Vector3();
+		final ReadOnlyVector3 v02 = container.getAbsPoints().get(2).subtract(container.getAbsPoints().get(0), null);
+//		double len = v.set(container.getAbsPoints().get(2)).subtractLocal(container.getAbsPoints().get(0)).length();
 		if (label1 == null) {
 			label1 = Annotation.makeNewLabel();
 			label1.setAlign(Align.NorthWest);
 			root.attachChild(label1);
 		}
-		v.set(abspoints.get(1)).subtractLocal(container.getAbsPoints().get(0));
-		double xy = Math.sqrt(v.getX() * v.getX() + v.getY() * v.getY());
-		if (xy < 0)
-			xy = len + xy;
-		label1.setText("(" + Math.round(10 * xy) / 10.0 + ", " + Math.round(10 * v.getZf()) / 10.0 + ")");
+		
+		final boolean reversedFace = v02.normalize(null).crossLocal(container.getFaceDirection()).dot(Vector3.NEG_UNIT_Z) < 0.0;
+		final boolean reversedH;
+		if (points.get(0).getX() > points.get(2).getX())
+			reversedH = !reversedFace;
+		else
+			reversedH = reversedFace;
+		final boolean reversedV = abspoints.get(0).getZ() > abspoints.get(1).getZ();
+		
+		final int i0, i1, i2;
+		if (reversedH && reversedV) {
+			i0 = 3;
+			i2 = 1;
+			i1 = 2;
+		} else if (reversedH) {
+			i0 = 2;
+			i1 = 3;
+			i2 = 0;
+		} else if (reversedV) {
+			i0 = 1;
+			i1 = 0;
+			i2 = 3;
+		} else {
+			i0 = 0;
+			i1 = 1;
+			i2 = 2;
+		}
+		
+//		label1.setRotation(new Matrix3().fromAngles(0, 0, Util.angleBetween(v, Vector3.UNIT_X, Vector3.UNIT_Z)));
+//		v.set(abspoints.get(1)).subtractLocal(container.getAbsPoints().get(0));
+//		final ReadOnlyVector3 v01 = abspoints.get(1).subtract(container.getAbsPoints().get(0), null);
+//		double xy = Math.sqrt(v01.getX() * v01.getX() + v01.getY() * v01.getY());
+		double xy = Math.sqrt(abspoints.get(i1).getX() * abspoints.get(i1).getX() + abspoints.get(i1).getY() * abspoints.get(i1).getY());
+//		if (xy < 0)
+//			xy = len + xy;
+//			xy = v02.length() + xy;
+		if (reversedFace)
+			xy = v02.length() - xy; 
+		label1.setText("(" + Math.round(10 * xy) / 10.0 + ", " + Math.round(10 * abspoints.get(i1).getZf()) / 10.0 + ")");
+		
 		final ReadOnlyTransform trans = container.getRoot().getTransform();
 		Vector3 faceDirection = new Vector3(container.getFaceDirection());
 		Vector3 moveToFront = new Vector3();
 		trans.applyForwardVector(faceDirection);
 		moveToFront.set(faceDirection).multiplyLocal(0.04);
-		label1.setTranslation(abspointsTrans(1, trans, v));
+//		label1.setTranslation(abspointsTrans(1, trans, v));
+		label1.setTranslation(trans.applyForward(abspoints.get(i1), null));
+//		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 		trans.applyForward(center);
-		annot.setRange(abspointsTrans(0, trans, v), abspointsTrans(1, trans, v1), center, faceDirection, false, Align.Center, true);
+//		annot.setRange(abspointsTrans(0, trans, v), abspointsTrans(1, trans, v1), center, faceDirection, false, Align.Center, true);
+		annot.setRange(trans.applyForward(abspoints.get(i0), null), trans.applyForward(abspoints.get(i1), null), center, faceDirection, false, Align.Center, true);
 		annot.setTranslation(moveToFront);
 
 		annot = fetchSizeAnnot(annotCounter++);
-		annot.setRange(abspointsTrans(0, trans, v), abspointsTrans(2, trans, v1), center, faceDirection, false, Align.Center, true);
+//		annot.setRange(abspointsTrans(0, trans, v), abspointsTrans(2, trans, v1), center, faceDirection, false, Align.Center, true);
+		annot.setRange(trans.applyForward(abspoints.get(i0), null), trans.applyForward(abspoints.get(i2), null), center, faceDirection, false, Align.Center, true);
 		annot.setTranslation(moveToFront);
 	}
 
-	private ReadOnlyVector3 abspointsTrans(int i, ReadOnlyTransform trans, Vector3 v) {
-		v.set(abspoints.get(i));
-		return trans.applyForward(v);
-	}
+//	private ReadOnlyVector3 abspointsTrans(int i, ReadOnlyTransform trans, Vector3 v) {
+//		v.set(abspoints.get(i));
+//		return trans.applyForward(v);
+//	}
 
 //	public void delete() {
 //		if (container != null) {

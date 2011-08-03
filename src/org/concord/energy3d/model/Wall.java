@@ -962,9 +962,11 @@ public class Wall extends HousePart {
 //		}
 //		if (original != null)
 //			fetchSizeAnnot(annotCounter++).setRange(abspoints.get(1), abspoints.get(3), center, faceDirection, original == null, Align.Center, true);
-		
-		for (int i = 0; i < wallPolygonPoints.size() - 1; i++)
-			fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i + 1), center, faceDirection, false, Align.Center, true);
+		if (wallPolygonPoints != null)
+		for (int i = 0; i < wallPolygonPoints.size() - 1; i++) {
+			final boolean front = i == wallPolygonPoints.size() - 3 && original == null;
+			fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i + 1), center, faceDirection, front, front ? Align.South : Align.Center, true);
+		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);

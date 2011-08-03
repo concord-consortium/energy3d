@@ -3,8 +3,10 @@ package org.concord.energy3d.shapes;
 import java.nio.FloatBuffer;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -13,6 +15,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
+import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 
 public class SizeAnnotation extends Annotation {
 	protected final Mesh arrows = new Mesh("Arrows");
@@ -27,6 +30,10 @@ public class SizeAnnotation extends Annotation {
 	}
 	
 	public void setRange(ReadOnlyVector3 from, ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipDirection) {
+		setRange(from, to, center, faceDirection, front, align, autoFlipDirection, false);
+	}
+	
+	public void setRange(ReadOnlyVector3 from, ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipDirection, final boolean rotateTextAlongLine) {
 		final double C = 0.1;
 		final Vector3 v = new Vector3();
 //		if (to.subtract(from, null).normalizeLocal().crossLocal(faceDirection).dot(Vector3.NEG_UNIT_Z) < 0) {
@@ -49,7 +56,12 @@ public class SizeAnnotation extends Annotation {
 		double angle = faceDirection.smallestAngleBetween(Vector3.NEG_UNIT_Y);
 		if (faceDirection.dot(Vector3.UNIT_X) < 0)
 			angle = -angle;
-		label.setRotation(new Matrix3().fromAngles(0, 0, angle));
+//		if (faceDirection.dot(Vector3.UNIT_Z) > 1.0 - MathUtils.ZERO_TOLERANCE) {
+		if (rotateTextAlongLine) {
+			final double zRot = Util.angleBetween(Vector3.NEG_UNIT_Y, offset.normalize(null), Vector3.UNIT_Z);
+			label.setRotation(new Matrix3().fromAngles(-Math.PI / 2, 0, zRot));
+		} else
+			label.setRotation(new Matrix3().fromAngles(0, 0, angle));
 
 		FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();

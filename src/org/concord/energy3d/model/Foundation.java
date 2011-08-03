@@ -73,6 +73,8 @@ public class Foundation extends HousePart {
 		boundingMesh.setUserData(userData);
 
 		scanChildrenHeight(); // to fix bug with resizing height instead of width when moving edit point of platform right after loading the model
+		
+		setLabelOffset(-0.11);
 	}
 
 	public void setResizeHouseMode(boolean resizeHouseMode) {
@@ -230,14 +232,7 @@ public class Foundation extends HousePart {
 	private void scanChildrenHeight() {
 		if (!isFirstPointInserted())
 			return;
-		// boundingHeight = 0;
-		// for (HousePart child : children) {
-		// for (Vector3 p : child.getAbsPoints()) {
-		// boundingHeight = Math.max(boundingHeight, p.getZ());
-		// }
-		// }
 		boundingHeight = scanChildrenHeight(this);
-		// boundingHeight += 0.5;
 		for (int i = 4; i < 8; i++)
 			points.get(i).setZ(boundingHeight);
 		newBoundingHeight = boundingHeight;
@@ -256,7 +251,7 @@ public class Foundation extends HousePart {
 
 	@Override
 	public void flatten(double flattenTime) {
-		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
+		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 		super.flatten(flattenTime);
 	}
 
@@ -273,10 +268,6 @@ public class Foundation extends HousePart {
 		center.multiplyLocal(1.0 / points.size() * 2);
 	}
 
-	protected void computeLabelTop(final Vector3 top) {
-		top.set(0, 0, ((Box) mesh).getYExtent() + 0.5);
-	}
-
 	@Override
 	protected void drawAnnotations() {
 		int[] order = { 0, 1, 3, 2, 0 };
@@ -289,7 +280,8 @@ public class Foundation extends HousePart {
 				annot = new SizeAnnotation();
 				sizeAnnotRoot.attachChild(annot);
 			}
-			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false, original == null ? Align.South : Align.Center, true);
+//			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false, original == null ? Align.South : Align.Center, true);
+			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false, Align.Center, true, true);
 		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)

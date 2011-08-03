@@ -664,6 +664,8 @@ Version 0.3 - March 7, 2011
 - draw annotations for the gable walls
 - make the size annotation label none rotatable
 - automatically reverse the annotation label to make it readable from front
+- flatten foundation annotations
+- rotate the windows annotations based on reversed walls and reversed windows
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
