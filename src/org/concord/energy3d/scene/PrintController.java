@@ -106,7 +106,7 @@ public class PrintController implements Updater {
 
 		final double viewSwitchDelay = 0.5;
 		if (!finish && (!isPrintPreview || timer.getTimeInSeconds() > viewSwitchDelay)) {
-			final double t = timer.getTimeInSeconds() / 10 - (isPrintPreview ? viewSwitchDelay : 0);			
+			final double t = timer.getTimeInSeconds() - (isPrintPreview ? viewSwitchDelay : 0);			
 			drawPrintParts(isPrintPreview ? t : 1 - t);
 
 			finish = t > 1;

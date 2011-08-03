@@ -51,15 +51,17 @@ public class SizeAnnotation extends Annotation {
 			}
 		}
 		
-		double angle = faceDirection.smallestAngleBetween(Vector3.NEG_UNIT_Y);
-		if (faceDirection.dot(Vector3.UNIT_X) < 0)
-			angle = -angle;
+//		double angle = faceDirection.smallestAngleBetween(Vector3.NEG_UNIT_Y);
+//		if (faceDirection.dot(Vector3.UNIT_X) < 0)
+//			angle = -angle;
+//		final double angle = -Util.angleBetween(faceDirection, Vector3.NEG_UNIT_Y, Vector3.UNIT_Z);
+		
 //		if (faceDirection.dot(Vector3.UNIT_Z) > 1.0 - MathUtils.ZERO_TOLERANCE) {
-		if (rotateTextAlongLine) {
-			final double zRot = Util.angleBetween(Vector3.NEG_UNIT_Y, offset.normalize(null), Vector3.UNIT_Z);
-			label.setRotation(new Matrix3().fromAngles(-Math.PI / 2, 0, zRot));
-		} else
-			label.setRotation(new Matrix3().fromAngles(0, 0, angle));
+		if (rotateTextAlongLine)
+//			final double zRot = Util.angleBetween(Vector3.NEG_UNIT_Y, offset.normalize(null), Vector3.UNIT_Z);
+			label.setRotation(new Matrix3().fromAngles(-Math.PI / 2, 0, Util.angleBetween(Vector3.NEG_UNIT_Y, offset.normalize(null), Vector3.UNIT_Z)));
+		else
+			label.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(faceDirection, Vector3.NEG_UNIT_Y, Vector3.UNIT_Z)));
 
 		FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();

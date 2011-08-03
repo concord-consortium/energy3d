@@ -232,8 +232,8 @@ public class Scene implements Serializable {
 	public void update() {
 		if (redrawAll) {
 			Snap.clearAnnotationDrawn();
-//			for (HousePart part : parts)
-//				part.draw();
+			for (HousePart part : parts)
+				part.draw();
 			if (PrintController.getInstance().getPrintParts() != null)
 				for (HousePart part : PrintController.getInstance().getPrintParts())
 					part.draw();

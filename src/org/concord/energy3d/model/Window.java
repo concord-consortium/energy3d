@@ -7,21 +7,16 @@ import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
-import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
@@ -205,13 +200,10 @@ public class Window extends HousePart {
 			return;
 		int annotCounter = 0;
 
-//		Vector3 v = new Vector3();
-//		Vector3 v1 = new Vector3();
 		final ReadOnlyVector3 v02 = container.getAbsPoints().get(2).subtract(container.getAbsPoints().get(0), null);
-//		double len = v.set(container.getAbsPoints().get(2)).subtractLocal(container.getAbsPoints().get(0)).length();
 		if (label1 == null) {
 			label1 = Annotation.makeNewLabel();
-			label1.setAlign(Align.NorthWest);
+			label1.setAlign(Align.SouthWest);
 			root.attachChild(label1);
 		}
 		
@@ -242,51 +234,28 @@ public class Window extends HousePart {
 			i2 = 2;
 		}
 		
-//		label1.setRotation(new Matrix3().fromAngles(0, 0, Util.angleBetween(v, Vector3.UNIT_X, Vector3.UNIT_Z)));
-//		v.set(abspoints.get(1)).subtractLocal(container.getAbsPoints().get(0));
-//		final ReadOnlyVector3 v01 = abspoints.get(1).subtract(container.getAbsPoints().get(0), null);
-//		double xy = Math.sqrt(v01.getX() * v01.getX() + v01.getY() * v01.getY());
-		double xy = Math.sqrt(abspoints.get(i1).getX() * abspoints.get(i1).getX() + abspoints.get(i1).getY() * abspoints.get(i1).getY());
-//		if (xy < 0)
-//			xy = len + xy;
-//			xy = v02.length() + xy;
+		
+		final Vector3 cornerXY = abspoints.get(i0).subtract(container.abspoints.get(0), null);
+		cornerXY.setZ(0);		
+		double xy = cornerXY.length(); //Math.sqrt(abspoints.get(i1).getX() * abspoints.get(i1).getX() + abspoints.get(i1).getY() * abspoints.get(i1).getY());
 		if (reversedFace)
 			xy = v02.length() - xy; 
-		label1.setText("(" + Math.round(10 * xy) / 10.0 + ", " + Math.round(10 * abspoints.get(i1).getZf()) / 10.0 + ")");
+		label1.setText("(" + Math.round(10 * xy) / 10.0 + ", " + Math.round(10 * abspoints.get(i0).getZf()) / 10.0 + ")");
 		
 		final ReadOnlyTransform trans = container.getRoot().getTransform();
 		final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getFaceDirection(), null);
 		final ReadOnlyVector3 moveToFront = faceDirection.multiply(0.04, null);
-//		label1.setTranslation(abspointsTrans(1, trans, v));
-//		label1.setTranslation(trans.applyForward(abspoints.get(i1), null));
-		label1.setTranslation(abspoints.get(i1));
+		label1.setTranslation(abspoints.get(i0));
 		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 		trans.applyForward(center);
-//		annot.setRange(abspointsTrans(0, trans, v), abspointsTrans(1, trans, v1), center, faceDirection, false, Align.Center, true);
-//		annot.setRange(trans.applyForward(abspoints.get(i0), null), trans.applyForward(abspoints.get(i1), null), center, faceDirection, false, Align.Center, true);
 		annot.setRange(abspoints.get(i0), abspoints.get(i1), center, faceDirection, false, Align.Center, true);
 		annot.setTranslation(moveToFront);
 
 		annot = fetchSizeAnnot(annotCounter++);
-//		annot.setRange(abspointsTrans(0, trans, v), abspointsTrans(2, trans, v1), center, faceDirection, false, Align.Center, true);
-//		annot.setRange(trans.applyForward(abspoints.get(i0), null), trans.applyForward(abspoints.get(i2), null), center, faceDirection, false, Align.Center, true);
-//		annot.setRange(trans.applyForward(abspoints.get(i0), null), trans.applyForward(abspoints.get(i2), null), center, faceDirection, false, Align.Center, true);
 		annot.setRange(abspoints.get(i0), abspoints.get(i2), center, faceDirection, false, Align.Center, true);
 		annot.setTranslation(moveToFront);
 	}
-
-//	private ReadOnlyVector3 abspointsTrans(int i, ReadOnlyTransform trans, Vector3 v) {
-//		v.set(abspoints.get(i));
-//		return trans.applyForward(v);
-//	}
-
-//	public void delete() {
-//		if (container != null) {
-//			container.children.remove(this);
-//			container.draw();
-//		}
-//	}
 
 	public boolean isPrintable() {
 		return false;
