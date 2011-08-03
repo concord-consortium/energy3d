@@ -666,6 +666,7 @@ Version 0.3 - March 7, 2011
 - automatically reverse the annotation label to make it readable from front
 - flatten foundation annotations
 - rotate the windows annotations based on reversed walls and reversed windows
+- fix problem with windows annotation not visible in print preview
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

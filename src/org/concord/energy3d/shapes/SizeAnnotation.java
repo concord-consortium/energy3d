@@ -6,7 +6,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -15,7 +14,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
-import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 
 public class SizeAnnotation extends Annotation {
 	protected final Mesh arrows = new Mesh("Arrows");

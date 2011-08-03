@@ -172,8 +172,8 @@ public abstract class HousePart implements Serializable {
 			root.attachChild(this.mesh);
 //			this.sizeAnnotRoot = original.sizeAnnotRoot.makeCopy(false);
 //			root.attachChild(sizeAnnotRoot);
-			drawAnnotations();
 		}
+		drawAnnotations();
 		root.detachChild(pointsRoot);
 		root.updateWorldBound(true);	
 	}

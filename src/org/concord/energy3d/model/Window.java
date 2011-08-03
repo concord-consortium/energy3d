@@ -255,22 +255,24 @@ public class Window extends HousePart {
 		label1.setText("(" + Math.round(10 * xy) / 10.0 + ", " + Math.round(10 * abspoints.get(i1).getZf()) / 10.0 + ")");
 		
 		final ReadOnlyTransform trans = container.getRoot().getTransform();
-		Vector3 faceDirection = new Vector3(container.getFaceDirection());
-		Vector3 moveToFront = new Vector3();
-		trans.applyForwardVector(faceDirection);
-		moveToFront.set(faceDirection).multiplyLocal(0.04);
+		final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getFaceDirection(), null);
+		final ReadOnlyVector3 moveToFront = faceDirection.multiply(0.04, null);
 //		label1.setTranslation(abspointsTrans(1, trans, v));
-		label1.setTranslation(trans.applyForward(abspoints.get(i1), null));
-//		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
+//		label1.setTranslation(trans.applyForward(abspoints.get(i1), null));
+		label1.setTranslation(abspoints.get(i1));
+		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 		trans.applyForward(center);
 //		annot.setRange(abspointsTrans(0, trans, v), abspointsTrans(1, trans, v1), center, faceDirection, false, Align.Center, true);
-		annot.setRange(trans.applyForward(abspoints.get(i0), null), trans.applyForward(abspoints.get(i1), null), center, faceDirection, false, Align.Center, true);
+//		annot.setRange(trans.applyForward(abspoints.get(i0), null), trans.applyForward(abspoints.get(i1), null), center, faceDirection, false, Align.Center, true);
+		annot.setRange(abspoints.get(i0), abspoints.get(i1), center, faceDirection, false, Align.Center, true);
 		annot.setTranslation(moveToFront);
 
 		annot = fetchSizeAnnot(annotCounter++);
 //		annot.setRange(abspointsTrans(0, trans, v), abspointsTrans(2, trans, v1), center, faceDirection, false, Align.Center, true);
-		annot.setRange(trans.applyForward(abspoints.get(i0), null), trans.applyForward(abspoints.get(i2), null), center, faceDirection, false, Align.Center, true);
+//		annot.setRange(trans.applyForward(abspoints.get(i0), null), trans.applyForward(abspoints.get(i2), null), center, faceDirection, false, Align.Center, true);
+//		annot.setRange(trans.applyForward(abspoints.get(i0), null), trans.applyForward(abspoints.get(i2), null), center, faceDirection, false, Align.Center, true);
+		annot.setRange(abspoints.get(i0), abspoints.get(i2), center, faceDirection, false, Align.Center, true);
 		annot.setTranslation(moveToFront);
 	}
 
