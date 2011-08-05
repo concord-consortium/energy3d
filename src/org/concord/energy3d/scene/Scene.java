@@ -47,6 +47,7 @@ public class Scene implements Serializable {
 	private static URL url = null;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private transient boolean redrawAll = false;
+//	private transient boolean redrawAnnotations = false;
 	private Unit unit = Unit.Meter;
 	private double annotationScale = 1;
 	static private boolean isTextureEnabled = true;
@@ -202,7 +203,7 @@ public class Scene implements Serializable {
 				part.setAnnotationsVisible(visible);
 
 //		if (visible)
-//			redrawAll = true;
+//			redrawAnnotations = true;
 	}
 
 	public void setTextureEnabled(final boolean enabled) {
@@ -237,8 +238,17 @@ public class Scene implements Serializable {
 			if (PrintController.getInstance().getPrintParts() != null)
 				for (HousePart part : PrintController.getInstance().getPrintParts())
 					part.draw();
+			redrawAll = false;
 		}
-		redrawAll = false;
+//		if (redrawAnnotations) {
+//			Snap.clearAnnotationDrawn();
+//			for (HousePart part : parts)
+//				part.drawAnnotations();
+//			if (PrintController.getInstance().getPrintParts() != null)
+//				for (HousePart part : PrintController.getInstance().getPrintParts())
+//					part.drawAnnotations();
+//			redrawAnnotations = false;
+//		}
 	}
 
 	public void setUnit(Unit unit) {

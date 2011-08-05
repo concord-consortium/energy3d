@@ -126,6 +126,11 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		labelsRoot = new Node("Labels");
 		
+//		sizeAnnotRoot.getSceneHints().setCullHint(CullHint.Always);
+//		angleAnnotRoot.getSceneHints().setCullHint(CullHint.Always);
+		
+		setAnnotationsVisible(drawAnnotations);
+		
 		// Set up a reusable pick results
 //		final Vector3 origin = new Vector3();
 		for (int i = 0; i < numOfEditPoints; i++)
@@ -164,6 +169,7 @@ public abstract class HousePart implements Serializable {
 
 	public void setOriginal(HousePart original) {
 		this.original = original;
+		root.detachChild(pointsRoot);
 		this.center = original.center;
 		if (original.mesh != null) {
 			root.detachChild(this.mesh);
@@ -173,8 +179,8 @@ public abstract class HousePart implements Serializable {
 //			this.sizeAnnotRoot = original.sizeAnnotRoot.makeCopy(false);
 //			root.attachChild(sizeAnnotRoot);
 		}
-		drawAnnotations();
-		root.detachChild(pointsRoot);
+//		drawAnnotations();
+//		setAnnotationsVisible(drawAnnotations);
 		root.updateWorldBound(true);	
 	}
 
@@ -504,6 +510,7 @@ public abstract class HousePart implements Serializable {
 			final Vector3 subtractLocal = targetCenter.subtractLocal(flattenCenter);
 			root.setTranslation(subtractLocal.multiplyLocal(flattenTime));
 //		}
+		drawAnnotations();
 		root.updateWorldTransform(true);
 		root.updateWorldBound(true);
 	}

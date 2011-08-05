@@ -235,7 +235,7 @@ public abstract class Roof extends HousePart {
 		});
 
 		center.multiplyLocal(1.0 / wallUpperPoints.size());
-//		max.addLocal(min).multiplyLocal(0.5);
+		// max.addLocal(min).multiplyLocal(0.5);
 		center.set(max).addLocal(min).multiplyLocal(0.5).setZ(max.getZ());
 		// points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 	}
@@ -268,26 +268,27 @@ public abstract class Roof extends HousePart {
 		flatten(1.0);
 		for (final Spatial mesh : flattenedMeshesRoot.getChildren()) {
 			mesh.setTranslation(0, 0, 0);
-			
+
 			// The following code is needed because the center of bounding box is not accurate. If oriented bounding box is usde then this code is no longer required.
-			final FloatBuffer buf = ((Mesh)mesh).getMeshData().getVertexBuffer();
+			final FloatBuffer buf = ((Mesh) mesh).getMeshData().getVertexBuffer();
 			buf.rewind();
 			final Vector3 p = new Vector3(buf.get(), buf.get(), buf.get());
 			mesh.getTransform().applyForward(p);
-			
+
 			final Vector3 orgCenter = new Vector3(mesh.getWorldBound().getCenter());
 			orgCenter.setY(p.getY());
-			orgCenters.put((Mesh)mesh, orgCenter);
+			orgCenters.put((Mesh) mesh, orgCenter);
 		}
 	}
-	
+
 	public void flatten(double flattenTime) {
 		for (Spatial child : getFlattenedMeshesRoot().getChildren()) {
 			if (child.getSceneHints().getCullHint() != CullHint.Always)
 				flattenQuadTriangle((Mesh) child, flattenTime);
-//			break;	
+			// break;
 		}
 		mesh.updateModelBound();
+		drawAnnotations();
 		if (bottomMesh != null) {
 			bottomMesh.getSceneHints().setCullHint(CullHint.Always);
 			bottomMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
@@ -303,34 +304,34 @@ public abstract class Roof extends HousePart {
 
 		final Vector3 v = new Vector3(p3).subtractLocal(p1);
 		final Vector3 normal = new Vector3(p2).subtractLocal(p1).crossLocal(v).normalizeLocal();
-//		if (normal.dot(Vector3.UNIT_Z) < 0)
-//			normal.negateLocal();
+		// if (normal.dot(Vector3.UNIT_Z) < 0)
+		// normal.negateLocal();
 		final double angle = normal.smallestAngleBetween(Vector3.NEG_UNIT_Y);
 		final Vector3 rotAxis = normal.cross(Vector3.NEG_UNIT_Y, null);
 		mesh.setRotation(new Matrix3().fromAngleAxis(flattenTime * angle, rotAxis));
 
-//		if (orgCenters == null)
-//			orgCenters = new HashMap<Mesh, Vector3>();
+		// if (orgCenters == null)
+		// orgCenters = new HashMap<Mesh, Vector3>();
 		ReadOnlyVector3 orgCenter = orgCenters.get(mesh);
-//		Vector3 orgCenter = new Vector3(); //orgCenters.get(mesh));
-////		if (orgCenter == null)
-////			orgCenter = Vector3.ZERO;
-////		if (orgCenter == null) {
-//			final Matrix3 m = new Matrix3().fromAngleAxis(angle, rotAxis);
-//			m.applyPost(p1, p1);
-//			m.applyPost(p2, p2);
-//			m.applyPost(p3, p3);
-//			orgCenter = new Vector3(p1).addLocal(p2).addLocal(p3);
-//			while (buf.hasRemaining())
-//				orgCenter.addLocal(m.applyPost(new Vector3(buf.get(), buf.get(), buf.get()), p1));
-//			orgCenter.divideLocal(buf.capacity() / 3);
-//			mesh.updateWorldTransform(true);
-//			mesh.updateWorldBound(true);
-//			orgCenter.set(mesh.getWorldBound().getCenter());
-////			orgCenters.put(mesh, orgCenter);
-////		}
+		// Vector3 orgCenter = new Vector3(); //orgCenters.get(mesh));
+		// // if (orgCenter == null)
+		// // orgCenter = Vector3.ZERO;
+		// // if (orgCenter == null) {
+		// final Matrix3 m = new Matrix3().fromAngleAxis(angle, rotAxis);
+		// m.applyPost(p1, p1);
+		// m.applyPost(p2, p2);
+		// m.applyPost(p3, p3);
+		// orgCenter = new Vector3(p1).addLocal(p2).addLocal(p3);
+		// while (buf.hasRemaining())
+		// orgCenter.addLocal(m.applyPost(new Vector3(buf.get(), buf.get(), buf.get()), p1));
+		// orgCenter.divideLocal(buf.capacity() / 3);
+		// mesh.updateWorldTransform(true);
+		// mesh.updateWorldBound(true);
+		// orgCenter.set(mesh.getWorldBound().getCenter());
+		// // orgCenters.put(mesh, orgCenter);
+		// // }
 		final Vector3 targetPrintCenter = ((UserData) mesh.getUserData()).getPrintCenter();
-//		if (!targetPrintCenter.equals(Vector3.ZERO) && ((UserData) mesh.getUserData()).getIndex() != 3)
+		// if (!targetPrintCenter.equals(Vector3.ZERO) && ((UserData) mesh.getUserData()).getIndex() != 3)
 		if (!targetPrintCenter.equals(Vector3.ZERO))
 			mesh.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
 		mesh.updateWorldTransform(true);
@@ -338,6 +339,7 @@ public abstract class Roof extends HousePart {
 		mesh.updateWorldBound(true);
 	}
 
+	@Override
 	protected void drawAnnotations() {
 		if (container == null)
 			return;
@@ -345,38 +347,40 @@ public abstract class Roof extends HousePart {
 
 		if (original == null) {
 			for (int i = 0; i < wallUpperPoints.size(); i++) {
-				
+
 				PolygonPoint p = wallUpperPoints.get(i);
 				Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
 				p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
 				Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
-				fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), original == null, Align.Center, true);
+				fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), original == null, Align.Center, true, true);
 			}
 		} else {
 			final Vector3 p1 = new Vector3();
 			final Vector3 p2 = new Vector3();
 			final Vector3 p3 = new Vector3();
 			for (Spatial mesh : flattenedMeshesRoot.getChildren()) {
-				final FloatBuffer vertexBuffer = ((Mesh) mesh).getMeshData().getVertexBuffer();
-				for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
-					final int xPos = i * 9;
-					vertexBuffer.position(xPos);
-					p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-					p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-					p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-					mesh.getTransform().applyForward(p1);
-					mesh.getTransform().applyForward(p2);
-					mesh.getTransform().applyForward(p3);
+				if (mesh.getSceneHints().getCullHint() != CullHint.Always) {
+					final FloatBuffer vertexBuffer = ((Mesh) mesh).getMeshData().getVertexBuffer();
+					for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
+						final int xPos = i * 9;
+						vertexBuffer.position(xPos);
+						p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+						p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+						p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+						mesh.getTransform().applyForward(p1);
+						mesh.getTransform().applyForward(p2);
+						mesh.getTransform().applyForward(p3);
 
-					// Size annotation
-					fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
-					fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
-					fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
+						// Size annotation
+						fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
+						fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
+						fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
 
-					// Angle annotations
-					fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
-					fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1);
-					fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2);
+						// Angle annotations
+						fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
+						fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1);
+						fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2);
+					}
 				}
 			}
 		}
@@ -776,39 +780,40 @@ public abstract class Roof extends HousePart {
 		this.original = original;
 		this.root.detachChild(pointsRoot);
 		this.root.detachChild(wireframeMesh);
+		this.root.detachChild(flattenedMeshesRoot);
 		// this.center = original.center;
 		this.flattenedMeshesRoot = ((Roof) original).flattenedMeshesRoot.makeCopy(true);
 		for (int i = 0; i < flattenedMeshesRoot.getNumberOfChildren(); i++) {
 			if (flattenedMeshesRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
-				final UserData orgUserData = (UserData)((Roof) original).flattenedMeshesRoot.getChild(i).getUserData();
+				final UserData orgUserData = (UserData) ((Roof) original).flattenedMeshesRoot.getChild(i).getUserData();
 				flattenedMeshesRoot.getChild(i).setUserData(new UserData(this, orgUserData.getIndex(), false));
 			}
 		}
 		root.attachChild(flattenedMeshesRoot);
+		// drawAnnotations();
 		root.updateWorldBound(true);
 	}
-	
-//	protected boolean isPointInsideRoof(final ReadOnlyVector3 point) {
-//		ReadOnlyVector3 p1, p2;
-//		double dis = Double.MAX_VALUE;
-//		for (final PolygonPoint pp : wallUpperPoints) {
-//			Vector3 p = new Vector3(pp.getX(), pp.getY(), pp.getZ());
-//			final double d = point.distance(p);
-//			if (d < dis) {
-//				dis = d;
-//				p1 = p;
-//			}		
-//		}
-//		double dis = Double.MAX_VALUE;
-//		for (final PolygonPoint pp : wallUpperPoints) {
-//			Vector3 p = new Vector3(pp.getX(), pp.getY(), pp.getZ());
-//			final double d = point.distance(p);
-//			if (d < dis) {
-//				dis = d;
-//				p1 = p;
-//			}		
-//		}		
-//	}
-	
-	
+
+	// protected boolean isPointInsideRoof(final ReadOnlyVector3 point) {
+	// ReadOnlyVector3 p1, p2;
+	// double dis = Double.MAX_VALUE;
+	// for (final PolygonPoint pp : wallUpperPoints) {
+	// Vector3 p = new Vector3(pp.getX(), pp.getY(), pp.getZ());
+	// final double d = point.distance(p);
+	// if (d < dis) {
+	// dis = d;
+	// p1 = p;
+	// }
+	// }
+	// double dis = Double.MAX_VALUE;
+	// for (final PolygonPoint pp : wallUpperPoints) {
+	// Vector3 p = new Vector3(pp.getX(), pp.getY(), pp.getZ());
+	// final double d = point.distance(p);
+	// if (d < dis) {
+	// dis = d;
+	// p1 = p;
+	// }
+	// }
+	// }
+
 }

@@ -668,6 +668,9 @@ Version 0.3 - March 7, 2011
 - rotate the windows annotations based on reversed walls and reversed windows
 - fix problem with windows annotation not visible in print preview
 - complete windows annotations
+- always create annotations even when invisible
+- properly initialize the annotation visibility states in both regular and print parts
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

@@ -32,6 +32,7 @@ public class Window extends HousePart {
 	}
 
 	protected void init() {
+		label1 = Annotation.makeNewLabel();
 		super.init();
 ////		for (int i = 0; i < points.size(); i++)
 ////			abspoints.get(i).set(toAbsolute(abspoints.get(i)));
@@ -58,6 +59,9 @@ public class Window extends HousePart {
 //		mesh.setUserData(new UserData(this));
 //		
 //		root.attachChild(mesh);
+		
+		label1.setAlign(Align.SouthWest);
+		root.attachChild(label1);
 		
 		bars = new Line("Window (bars)");
 		bars.setModelBound(new BoundingBox());
@@ -195,17 +199,18 @@ public class Window extends HousePart {
 		bars.updateModelBound();
 	}
 
+	@Override
 	protected void drawAnnotations() {
 		if (points.size() < 4)
 			return;
 		int annotCounter = 0;
 
 		final ReadOnlyVector3 v02 = container.getAbsPoints().get(2).subtract(container.getAbsPoints().get(0), null);
-		if (label1 == null) {
-			label1 = Annotation.makeNewLabel();
-			label1.setAlign(Align.SouthWest);
-			root.attachChild(label1);
-		}
+//		if (label1 == null) {
+//			label1 = Annotation.makeNewLabel();
+//			label1.setAlign(Align.SouthWest);
+//			root.attachChild(label1);
+//		}
 		
 		final boolean reversedFace = v02.normalize(null).crossLocal(container.getFaceDirection()).dot(Vector3.NEG_UNIT_Z) < 0.0;
 		final boolean reversedH;
