@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.MeshLib;
-import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
@@ -345,16 +344,16 @@ public abstract class Roof extends HousePart {
 			return;
 		int annotCounter = 0, angleAnnotCounter = 0;
 
-		if (original == null) {
-			for (int i = 0; i < wallUpperPoints.size(); i++) {
-
-				PolygonPoint p = wallUpperPoints.get(i);
-				Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
-				p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
-				Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
-				fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), false, Align.Center, true, true);
-			}
-		} else {
+//		if (original == null) {
+//			for (int i = 0; i < wallUpperPoints.size(); i++) {
+//
+//				PolygonPoint p = wallUpperPoints.get(i);
+//				Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
+//				p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
+//				Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
+//				fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), false, Align.Center, true, true);
+//			}
+//		} else {
 			final Vector3 p1 = new Vector3();
 			final Vector3 p2 = new Vector3();
 			final Vector3 p3 = new Vector3();
@@ -372,18 +371,20 @@ public abstract class Roof extends HousePart {
 						mesh.getTransform().applyForward(p3);
 
 						// Size annotation
-						fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
-						fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
-						fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.NEG_UNIT_Y, original == null, Align.Center, false);
+						fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
+						fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
+						fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
 
 						// Angle annotations
-						fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3);
-						fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1);
-						fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2);
+//						final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal());
+						final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).negateLocal();
+						fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3, n);
+						fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1, n);
+						fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2, n);
 					}
 				}
 			}
-		}
+//		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
