@@ -352,7 +352,7 @@ public abstract class Roof extends HousePart {
 				Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
 				p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
 				Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
-				fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), original == null, Align.Center, true, true);
+				fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), false, Align.Center, true, true);
 			}
 		} else {
 			final Vector3 p1 = new Vector3();

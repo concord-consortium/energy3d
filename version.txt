@@ -670,6 +670,7 @@ Version 0.3 - March 7, 2011
 - complete windows annotations
 - always create annotations even when invisible
 - properly initialize the annotation visibility states in both regular and print parts
+- draw roof annotation labels facing upward when in regular view
 
 
 - *auto redraw gable wall when inserting gable or editing gable
