@@ -25,7 +25,10 @@ public class AngleAnnotation extends Annotation {
 		final Vector3 v = new Vector3();
 //		final Matrix3 m1 = new Matrix3();
 		
-		final Matrix3 toFlat = new Matrix3().fromAngleAxis(Util.angleBetween(n, Vector3.UNIT_Z, n.cross(Vector3.UNIT_Z, null)), n.cross(Vector3.UNIT_Z, null));
+		final Vector3 axis = n.cross(Vector3.UNIT_Z, null).normalizeLocal();
+		final Matrix3 toFlat = new Matrix3().fromAngleAxis(Util.angleBetween(n, Vector3.UNIT_Z, n.cross(Vector3.UNIT_Z, null).normalizeLocal()), axis);
+//		System.out.println(Util.angleBetween(n, Vector3.UNIT_Z, n.cross(Vector3.UNIT_Z, null).normalizeLocal()));
+//		final Matrix3 toFlat = new Matrix3().fromAngleAxis(0.37, n.cross(Vector3.UNIT_Z, null));
 		final ReadOnlyVector3 aFlat = toFlat.applyPost(a, null);
 		final ReadOnlyVector3 bFlat = toFlat.applyPost(b, null);
 		
@@ -67,7 +70,7 @@ public class AngleAnnotation extends Annotation {
 //		m1.fromAngleAxis(n.smallestAngleBetween(Vector3.UNIT_Z), v);
 //		mesh.setRotation(m1);
 		
-		mesh.setRotation(toFlat.invertLocal());
+		mesh.setRotation(toFlat.invertLocal().multiplyLocal(1.5));
 //		this.setRotation(toFlat.invertLocal());
 		
 //		mesh.setRotation(new Matrix3());

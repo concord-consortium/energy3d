@@ -360,7 +360,7 @@ public abstract class Roof extends HousePart {
 			for (Spatial mesh : flattenedMeshesRoot.getChildren()) {
 				if (mesh.getSceneHints().getCullHint() != CullHint.Always) {
 					final FloatBuffer vertexBuffer = ((Mesh) mesh).getMeshData().getVertexBuffer();
-					for (int i = 0; i < vertexBuffer.capacity() / 9; i++) {
+					for (int i = 0; i < vertexBuffer.limit() / 9; i++) {
 						final int xPos = i * 9;
 						vertexBuffer.position(xPos);
 						p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
