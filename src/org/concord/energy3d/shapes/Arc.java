@@ -24,22 +24,27 @@ public class Arc extends Line {
 	 *            sampling rate
 	 * @param radius
 	 */
-	public Arc(String name) {
+	public Arc(final String name, final int vertices) {
 		super(name);
 		setAntialiased(true);
 		getMeshData().setIndexMode(IndexMode.LineStrip);
-		getSceneHints().setLightCombineMode(LightCombineMode.Off);
+		getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(vertices));
+		getSceneHints().setLightCombineMode(LightCombineMode.Off);		
 	}
 
-	public void set(int samples, double radius, double start, double end) {
-		FloatBuffer vertexBuf = createVertex(samples, radius, start, end);
-//		FloatBuffer normalBuf = createNormal(samples);
-//		FloatBuffer colorBuf = createColor(samples);
-
-		getMeshData().setVertexBuffer(vertexBuf);		
-//		getMeshData().setNormalBuffer(normalBuf);
-//		getMeshData().setColorBuffer(colorBuf);
-//		setAntialiased(true);
+	public void set(final double radius, final double start, final double end) {
+		final FloatBuffer buf = getMeshData().getVertexBuffer();
+		buf.limit(buf.capacity());
+		buf.rewind();
+		double arc = end - start;
+		final int n = buf.limit() / 3;
+		for (int i = 0; i < n; i++) {
+			double theta = start + arc / (n - 1) * i;
+			float x = (float) (MathUtils.cos(theta) * radius);
+			float y = (float) (MathUtils.sin(theta) * radius);
+			buf.put(x).put(y).put(0);
+		}
+		getMeshData().updateVertexCount();
 	}
 
 //	private FloatBuffer createColor(int samples) {
@@ -58,17 +63,4 @@ public class Arc extends Line {
 //		return buf;
 //	}
 
-	private FloatBuffer createVertex(int sample, double radius, double start, double end) {
-		FloatBuffer buf = BufferUtils.createVector3Buffer(sample);
-
-		buf.rewind();
-		double arc = end - start;
-		for (int i = 0; i < sample; i++) {
-			double theta = start + arc / (sample - 1) * i;
-			float x = (float) (MathUtils.cos(theta) * radius);
-			float y = (float) (MathUtils.sin(theta) * radius);
-			buf.put(x).put(y).put(0);
-		}
-		return buf;
-	}
 }

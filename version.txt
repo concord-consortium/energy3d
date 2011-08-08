@@ -675,6 +675,7 @@ Version 0.3 - March 7, 2011
 - draw angle annotation numbers in the middle of angle arc
 - draw angle annotation numbers with bottom pointing to the angle point
 - rotate the angle annotations precisely over the oriented roof parts
+- instead of using two classes for angle and angle90 use a single class that automatically draws angle90 square when the angle is 90
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
