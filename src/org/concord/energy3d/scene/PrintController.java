@@ -26,6 +26,8 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.state.OffsetState;
+import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -58,7 +60,11 @@ public class PrintController implements Updater {
 	}
 
 	public void init() {
-
+		final OffsetState offsetState = new OffsetState();
+		offsetState.setTypeEnabled(OffsetType.Fill, true);
+		offsetState.setFactor(1);
+		offsetState.setUnits(50); // TODO 
+		pagesRoot.setRenderState(offsetState);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -136,9 +142,10 @@ public class PrintController implements Updater {
 				SceneManager.getInstance().setShading(shadingSelected);
 				SceneManager.getInstance().setShadow(shadowSelected);
 				SceneManager.getInstance().updatePrintPreviewScene(false);
-				finished = true;
-			}
-
+				if (!doTheEndAnimation)	// to avoid concurrency exception
+					finished = true;
+			} 
+			
 			if (isPrintPreview || doTheEndAnimation) {
 				int printSequence = 0;
 				originalHouseRoot.getSceneHints().setCullHint(CullHint.Inherit);
@@ -316,7 +323,8 @@ public class PrintController implements Updater {
 
 			final Box box = new Box("Page Boundary");
 //			box.setDefaultColor(ColorRGBA.GRAY);
-			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
+//			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
+			box.setData(currentCorner, currentCorner.add(pageWidth, 0.1, -pageHeight, null));			
 			pagesRoot.attachChild(box);
 		}
 
