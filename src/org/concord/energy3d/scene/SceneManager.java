@@ -431,18 +431,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Mesh createFloor() {
 		floor.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
 
-//		final OffsetState offsetState = new OffsetState();
-//		offsetState.setTypeEnabled(OffsetType.Fill, true);
-//		offsetState.setFactor(1.1f);
-//		offsetState.setUnits(4f);
-//		floor.setRenderState(offsetState);
+		final OffsetState offsetState = new OffsetState();
+		offsetState.setTypeEnabled(OffsetType.Fill, true);
+		offsetState.setFactor(1.1f);
+		offsetState.setUnits(4f);
+		floor.setRenderState(offsetState);
 
-//		final BlendState blendState = new BlendState();
-//		blendState.setBlendEnabled(true);
-//		floor.setRenderState(blendState);
-//		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-//		// floor.getSceneHints().setTransparencyType(TransparencyType.TwoPass);
-//		floor.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+		final BlendState blendState = new BlendState();
+		blendState.setBlendEnabled(true);
+		floor.setRenderState(blendState);
+		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		// floor.getSceneHints().setTransparencyType(TransparencyType.TwoPass);
+		floor.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);

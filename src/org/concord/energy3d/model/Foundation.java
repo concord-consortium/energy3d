@@ -159,7 +159,8 @@ public class Foundation extends HousePart {
 				points.get(0).set(points.get(1).getX(), points.get(2).getY(), 0);
 				points.get(3).set(points.get(2).getX(), points.get(1).getY(), 0);
 			} else {
-				final int lower = (editPointIndex == 1) ? 0 : 2;
+//				final int lower = (editPointIndex == 1) ? 0 : 2;
+				final int lower = editPointIndex - 4;
 				final Vector3 base = abspoints.get(lower);
 				Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
 				closestPoint = grid(closestPoint, GRID_SIZE);

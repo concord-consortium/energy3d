@@ -678,6 +678,8 @@ Version 0.3 - March 7, 2011
 - instead of using two classes for angle and angle90 use a single class that automatically draws angle90 square when the angle is 90
 - enable backspace key for deleting objects
 
+- fix offset problem when dragging resize edit points 
+
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
 - *fix problem with edit point switching sometimes when custom roof editing
