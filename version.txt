@@ -681,6 +681,7 @@ Version 0.3 - March 7, 2011
 - fix problem with print preview parts being half as large as they can  
 - offset the print preview page
 - resize roof edit points when resizing the house
+- Debug: remove abspoints and use getPoint(i) instead
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

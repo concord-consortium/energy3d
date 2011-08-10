@@ -11,6 +11,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -161,7 +162,7 @@ public class Foundation extends HousePart {
 			} else {
 //				final int lower = (editPointIndex == 1) ? 0 : 2;
 				final int lower = editPointIndex - 4;
-				final Vector3 base = abspoints.get(lower);
+				final Vector3 base = getAbsPoint(lower);
 				Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
 				closestPoint = grid(closestPoint, GRID_SIZE);
 				newBoundingHeight = Math.max(0, closestPoint.getZ() - base.getZ());
@@ -220,13 +221,13 @@ public class Foundation extends HousePart {
 
 	public void drawSideWireframe(final FloatBuffer wireframeVertexBuffer, final int i, final int j) {
 		Vector3 p;
-		p = abspoints.get(i);
+		p = getAbsPoint(i);
 		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		p = abspoints.get(i);
+		p = getAbsPoint(i);
 		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float)height);
-		p = abspoints.get(j);
+		p = getAbsPoint(j);
 		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float)height);
-		p = abspoints.get(j);
+		p = getAbsPoint(j);
 		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 	}
 
@@ -242,8 +243,11 @@ public class Foundation extends HousePart {
 	private double scanChildrenHeight(final HousePart part) {
 		double maxHeight = 0;
 		if (part instanceof Wall || part instanceof Roof) {
-			for (final Vector3 p : part.getAbsPoints())
+//			for (final Vector3 p : part.getAbsPoints())
+			for (int i = 0; i < part.points.size(); i++) {
+				final ReadOnlyVector3 p = part.getAbsPoint(i);			
 				maxHeight = Math.max(maxHeight, p.getZ());
+			}
 		}
 		for (final HousePart child : part.children)
 			maxHeight = Math.max(maxHeight, scanChildrenHeight(child));
@@ -263,7 +267,7 @@ public class Foundation extends HousePart {
 			Vector3 p = points.get(i);
 			p = toAbsolute(p);
 			pointsRoot.getChild(i).setTranslation(p);
-			abspoints.get(i).set(p);
+			getAbsPoint(i).set(p);
 			center.addLocal(p);
 		}
 		center.multiplyLocal(1.0 / points.size() * 2);
@@ -281,8 +285,8 @@ public class Foundation extends HousePart {
 				annot = new SizeAnnotation();
 				sizeAnnotRoot.attachChild(annot);
 			}
-//			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false, original == null ? Align.South : Align.Center, true);
-			annot.setRange(abspoints.get(order[i]), abspoints.get(order[i + 1]), center, getFaceDirection(), false, Align.Center, true, true);
+//			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), center, getFaceDirection(), false, original == null ? Align.South : Align.Center, true);
+			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), center, getFaceDirection(), false, Align.Center, true, true);
 		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)

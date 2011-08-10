@@ -7,6 +7,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.OffsetState;
@@ -72,8 +73,8 @@ public class Door extends HousePart {
 			PickedHousePart picked = pickContainer(x, y, Wall.class);
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
-				Vector3 wallFirstPoint = container.getAbsPoints().get(0);
-				Vector3 wallx = container.getAbsPoints().get(2).subtract(wallFirstPoint, null);
+				Vector3 wallFirstPoint = container.getAbsPoint(0);
+				Vector3 wallx = container.getAbsPoint(2).subtract(wallFirstPoint, null);
 				p = closestPoint(wallFirstPoint, wallx, x, y);
 				p = grid(p, GRID_SIZE, false);
 
@@ -105,13 +106,14 @@ public class Door extends HousePart {
 			return;		
 
 		vertexBuffer.rewind();
-		for (Vector3 p : abspoints) {				
-//			container.getRoot().getTransform().applyForward(p);
+//		for (Vector3 p : abspoints) {
+		for (int i = 0; i < points.size(); i++) {
+			final ReadOnlyVector3 p = getAbsPoint(i);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 
 		// Compute normals
-		Vector3 normal = abspoints.get(2).subtract(abspoints.get(0), null).crossLocal(abspoints.get(1).subtract(abspoints.get(0), null)).normalizeLocal();
+		Vector3 normal = getAbsPoint(2).subtract(getAbsPoint(0), null).crossLocal(getAbsPoint(1).subtract(getAbsPoint(0), null)).normalizeLocal();
 		normal.negateLocal();
 		normalBuffer.rewind();
 		for (int i = 0; i < points.size(); i++)
@@ -127,9 +129,9 @@ public class Door extends HousePart {
 		mesh.updateModelBound();
 	}
 
-	public ArrayList<Vector3> getAbsPoints() {
-		return abspoints;
-	}
+//	public ArrayList<Vector3> getAbsPoints() {
+//		return abspoints;
+//	}
 
 	public boolean isPrintable() {
 		return false;

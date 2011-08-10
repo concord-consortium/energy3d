@@ -29,7 +29,8 @@ public class Util {
 		double min = Double.MAX_VALUE;
 		double max = Double.MIN_VALUE;
 		for (final HousePart part : parts) {
-			for (final Vector3 p : part.getAbsPoints()) {
+			for (int i = 0; i < part.getPoints().size(); i++) {
+				final Vector3 p = part.getAbsPoint(i);
 				final double z = p.getZ();
 				if (z > max)
 					max = z;

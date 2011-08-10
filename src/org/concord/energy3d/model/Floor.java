@@ -53,7 +53,7 @@ public class Floor extends HousePart {
 	public void setPreviewPoint(int x, int y) {
 		pickContainer(x, y, Wall.class);
 		if (container != null) {
-			Vector3 base = container.getAbsPoints().get(0);
+			Vector3 base = container.getAbsPoint(0);
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ()) + base.getZ();
@@ -127,8 +127,8 @@ public class Floor extends HousePart {
 				if (next != null)
 					pointIndex = next.getSnapPointIndexOf(currentWall);
 				pointIndex = pointIndex + 1;
-				final Vector3 p1 = currentWall.getAbsPoints().get(pointIndex == 1 ? 3 : 1);
-				final Vector3 p2 = currentWall.getAbsPoints().get(pointIndex);
+				final Vector3 p1 = currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1);
+				final Vector3 p2 = currentWall.getAbsPoint(pointIndex);
 				addPointToPolygon(poly, p1, center);
 				addPointToPolygon(poly, p2, center);
 				min.set(Math.min(min.getX(), p1.getX()), Math.min(min.getY(), p1.getY()), Math.min(min.getZ(), p1.getZ()));

@@ -62,7 +62,8 @@ public abstract class Roof extends HousePart {
 	// transient private ArrayList<Vector3> wallGablePoints;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
-		super(numOfDrawPoints, numOfEditPoints, height, true);
+//		super(numOfDrawPoints, numOfEditPoints, height, true);
+		super(numOfDrawPoints, numOfEditPoints, height);
 	}
 
 	protected void init() {
@@ -125,7 +126,7 @@ public abstract class Roof extends HousePart {
 //			return;
 //		for (int i = 0; i < points.size(); i++) {
 //			final ReadOnlyVector3 p = toAbsolute(points.get(i), container.getContainer());
-//			abspoints.get(i).set(p);
+//			getAbsPoint(i).set(p);
 //			pointsRoot.getChild(i).setTranslation(p);
 //		}
 //	}	
@@ -246,8 +247,8 @@ public abstract class Roof extends HousePart {
 				else
 					pointIndex2 = 0 + 1;
 				final int pointIndex1 = pointIndex2 == 1 ? 3 : 1;
-				final Vector3 p1 = currentWall.getAbsPoints().get(pointIndex1);
-				final Vector3 p2 = currentWall.getAbsPoints().get(pointIndex2);
+				final Vector3 p1 = currentWall.getAbsPoint(pointIndex1);
+				final Vector3 p2 = currentWall.getAbsPoint(pointIndex2);
 				final ReadOnlyVector3 normal = currentWall.getFaceDirection();
 				addPointToPolygon(p1, normal);
 				addPointToPolygon(p2, normal);
@@ -579,7 +580,7 @@ public abstract class Roof extends HousePart {
 			return;
 		final ArrayList<Vector3> meshUpperPoints = new ArrayList<Vector3>();
 		for (final Wall wall : gableWalls) {
-			final Vector3[] base = { wall.getAbsPoints().get(0), wall.getAbsPoints().get(2) };
+			final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
 			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
 				meshUpperPoints.clear();
 				final Vector3[] meshBase = findBasePoints((Mesh) mesh, meshUpperPoints);
@@ -623,7 +624,7 @@ public abstract class Roof extends HousePart {
 		vertexBuffer.rewind();
 		while (vertexBuffer.hasRemaining()) {
 			final Vector3 meshPoint = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-			if (meshPoint.getZ() - container.getAbsPoints().get(1).getZ() < MathUtils.ZERO_TOLERANCE) {
+			if (meshPoint.getZ() - container.getAbsPoint(1).getZ() < MathUtils.ZERO_TOLERANCE) {
 				if (base[0] == null)
 					base[0] = meshPoint;
 				else if (!meshPoint.equals(base[0])) {
@@ -654,7 +655,7 @@ public abstract class Roof extends HousePart {
 		if (gableWalls == null)
 			return;
 		for (final Wall wall : gableWalls) {
-			final Vector3[] base_i = { wall.getAbsPoints().get(0), wall.getAbsPoints().get(2) };
+			final Vector3[] base_i = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
 			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
 				final Vector3[] base = findBasePoints((Mesh) mesh, null);
 				if (base != null && isSameBasePoints(base_i, base)) {
@@ -686,7 +687,7 @@ public abstract class Roof extends HousePart {
 			Collections.sort(gableRoofMeshEditPoints, new Comparator<Vector3>() {
 				@Override
 				public int compare(Vector3 o1, Vector3 o2) {
-					final Vector3 wallFirstPoint = wall.getAbsPoints().get(0);
+					final Vector3 wallFirstPoint = wall.getAbsPoint(0);
 					if (o1.distance(wallFirstPoint) > o2.distance(wallFirstPoint))
 						return -1;
 					else
@@ -704,8 +705,8 @@ public abstract class Roof extends HousePart {
 	// double distance = Double.MAX_VALUE;
 	//
 	// for (final Wall wall : walls) {
-	// Vector3 p1 = wall.getAbsPoints().get(0);
-	// Vector3 p2 = wall.getAbsPoints().get(2);
+	// Vector3 p1 = wall.getAbsPoint(0);
+	// Vector3 p2 = wall.getAbsPoint(2);
 	// final Vector3 wallDirection = p2.subtract(p1, null).normalizeLocal();
 	// double dot = wallDirection.dot(targetDirection);
 	// if (dot < 0) {
@@ -727,7 +728,7 @@ public abstract class Roof extends HousePart {
 
 	private Wall findGableWall(final Vector3[] targetBase) {
 		for (final Wall wall : walls) {
-			if (isSameBasePoints(targetBase, new Vector3[] { wall.getAbsPoints().get(0), wall.getAbsPoints().get(2) }))
+			if (isSameBasePoints(targetBase, new Vector3[] { wall.getAbsPoint(0), wall.getAbsPoint(2) }))
 				return wall;
 		}
 		return null;
@@ -761,7 +762,7 @@ public abstract class Roof extends HousePart {
 	// }
 
 	// public Spatial findRoofMeshOfWall(final Wall wall) {
-	// final Vector3[] base = {wall.getAbsPoints().get(0), wall.getAbsPoints().get(2)};
+	// final Vector3[] base = {wall.getAbsPoint(0), wall.getAbsPoint(2)};
 	// for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
 	// final Vector3[] meshBase = findBasePoints((Mesh) mesh, null);
 	// if (meshBase != null && isSameBasePoints(base, meshBase)) {
@@ -842,7 +843,7 @@ public abstract class Roof extends HousePart {
 	// }
 	// }
 
-	protected Vector3 getAbsPoint(final int index) {
+	public Vector3 getAbsPoint(final int index) {
 		return toAbsolute(points.get(index), container.getContainer());
 	}
 	

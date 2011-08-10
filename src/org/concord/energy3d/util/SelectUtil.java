@@ -87,7 +87,8 @@ public class SelectUtil {
 			double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {
-				for (Vector3 p : userData.getHousePart().getAbsPoints()) {
+				for (int j = 0; j < userData.getHousePart().getPoints().size(); j ++) {
+					Vector3 p = userData.getHousePart().getAbsPoint(j);
 					pointDist_i = p.distance(intersectionPoint);
 					double adjust = 0;
 					if (userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) > 0.8)					

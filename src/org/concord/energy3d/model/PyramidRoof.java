@@ -21,7 +21,7 @@ public class PyramidRoof extends Roof {
 			pickContainer(x, y, Wall.class);
 			recalculateEditPoints = true;
 		} else {
-			final ReadOnlyVector3 base = new Vector3(abspoints.get(0).getX(), abspoints.get(0).getY(), center.getZ());
+			final ReadOnlyVector3 base = new Vector3(getAbsPoint(0).getX(), getAbsPoint(0).getY(), center.getZ());
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ());
