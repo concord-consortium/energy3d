@@ -51,11 +51,11 @@ public class Door extends HousePart {
 		ts.setTexture(TextureManager.load("door.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		mesh.setRenderState(ts);
 
-		OffsetState offsetState = new OffsetState();
-		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(-1);
-		offsetState.setUnits(-1);
-		mesh.setRenderState(offsetState);
+//		OffsetState offsetState = new OffsetState();
+//		offsetState.setTypeEnabled(OffsetType.Fill, true);
+//		offsetState.setFactor(-1);
+//		offsetState.setUnits(-1);
+//		mesh.setRenderState(offsetState);
 
 		mesh.setModelBound(new BoundingBox());	
 		mesh.setUserData(new UserData(this));

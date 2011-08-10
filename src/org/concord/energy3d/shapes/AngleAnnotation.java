@@ -9,9 +9,9 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.OffsetState;
+import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.ui.text.BMText;
-import com.ardor3d.ui.text.BMText.Align;
-import com.ardor3d.util.geom.BufferUtils;
 
 public class AngleAnnotation extends Annotation {
 	protected final BMText label = makeNewLabel();
@@ -20,6 +20,12 @@ public class AngleAnnotation extends Annotation {
 		super(new Arc("Angle annotation arc", 10));
 		mesh.setDefaultColor(ColorRGBA.WHITE);		
 		label.setTextColor(ColorRGBA.WHITE);
+
+//		final OffsetState offsetState = new OffsetState();
+//		offsetState.setTypeEnabled(OffsetType.Line, true);
+//		offsetState.setFactor(1);
+//		offsetState.setUnits(1);
+//		this.setRenderState(offsetState);
 	}
 
 	public void setRange(final ReadOnlyVector3 mainPoint, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3, final ReadOnlyVector3 n) {
@@ -39,10 +45,9 @@ public class AngleAnnotation extends Annotation {
 			start = Util.angleBetween(Vector3.UNIT_X, bFlat, Vector3.UNIT_Z);
 			end = start + Util.angleBetween(bFlat, aFlat, Vector3.UNIT_Z);
 		}
-//		final long angle = Math.round(a.smallestAngleBetween(b)*180/Math.PI);
 		final long angle = Math.round((end - start) * 180.0 / Math.PI);
 
-		final double radius = 0.3 / (end - start);
+		final double radius = 0.3 / Math.sqrt(end - start);
 		if (angle == 90) {
 			final ReadOnlyVector3[] p = new ReadOnlyVector3[3];
 			p[0] = a.normalize(null).multiplyLocal(0.2);
@@ -58,7 +63,7 @@ public class AngleAnnotation extends Annotation {
 			this.detachChild(label);
 		} else {
 			((Arc)mesh).set(radius, start, end);
-			mesh.setRotation(toFlat.invertLocal().multiplyLocal(1.5));
+			mesh.setRotation(toFlat.invertLocal());
 
 			label.setText("" + angle + "\u00B0");
 			label.updateModelBound();
@@ -68,7 +73,6 @@ public class AngleAnnotation extends Annotation {
 			this.attachChild(label);
 		}
 		mesh.updateModelBound();
-		
 		
 		this.setTranslation(mainPoint);
 	}	

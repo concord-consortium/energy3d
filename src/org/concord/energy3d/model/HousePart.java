@@ -22,7 +22,9 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -140,6 +142,13 @@ public abstract class HousePart implements Serializable {
 		root.attachChild(sizeAnnotRoot);
 		root.attachChild(angleAnnotRoot);
 		root.attachChild(labelsRoot);
+		
+//		final OffsetState offsetState = new OffsetState();
+//		offsetState.setTypeEnabled(OffsetType.Line, true);
+//		offsetState.setFactor(1);
+//		offsetState.setUnits(10);
+//		root.setRenderState(offsetState);		
+		
 		
 		computeAbsPoints();
 		

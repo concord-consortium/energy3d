@@ -98,11 +98,11 @@ public class Wall extends HousePart {
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
 		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		surroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		final OffsetState offsetState = new OffsetState();
-		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(1.1f);
-		offsetState.setUnits(4f);
-		surroundMesh.setRenderState(offsetState);
+//		final OffsetState offsetState = new OffsetState();
+//		offsetState.setTypeEnabled(OffsetType.Fill, true);
+//		offsetState.setFactor(1.1f);
+//		offsetState.setUnits(4f);
+//		surroundMesh.setRenderState(offsetState);
 		surroundMesh.setModelBound(new BoundingBox());
 		root.attachChild(surroundMesh);
 
@@ -335,7 +335,7 @@ public class Wall extends HousePart {
 			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
 			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
 			mesh.getMeshData().updateVertexCount();
-			mesh.updateModelBound();
+			mesh.updateModelBound();			
 
 			drawBackMesh(computeWallAndWindowPolygon(true), fromXY);
 			drawSurroundMesh(thicknessNormal);
@@ -953,7 +953,7 @@ public class Wall extends HousePart {
 				if (i > 0)
 					fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i - 1), wallPolygonPoints.get(i + 1), getFaceDirection());
 //				else
-//					fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(0), wallPolygonPoints.get(wallPolygonPoints.size() - 1), wallPolygonPoints.get(1));
+//					fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(0), wallPolygonPoints.get(wallPolygonPoints.size() - 1), wallPolygonPoints.get(1), getFaceDirection());
 			}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
