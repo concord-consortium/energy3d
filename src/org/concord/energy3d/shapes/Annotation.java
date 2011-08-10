@@ -14,8 +14,9 @@ public abstract class Annotation extends Node {
 	public static BMText makeNewLabel() {
 		final BMText label = new BMText("Annotation Label", "0.0", FontManager.getInstance().getAnnotationFont(), BMText.Align.Center, BMText.Justify.Center);
 		label.setTextColor(ColorRGBA.BLACK);
-		label.setAutoScale(AutoScale.Off);
-		label.setFontScale(0.12);
+//		label.setAutoScale(AutoScale.Off);
+//		label.setFontScale(0.12);
+		label.setFontScale(0.5);
 		label.setAutoRotate(false);
 		return label;
 	}
