@@ -19,7 +19,7 @@ public class HipRoof extends Roof {
 
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1) {
-			pick(x, y, Wall.class);
+			pickContainer(x, y, Wall.class);
 			recalculateEditPoints = true;
 		} else if (editPointIndex == 0) {
 			Vector3 base = center;
@@ -27,13 +27,10 @@ public class HipRoof extends Roof {
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ());
 		} else if (editPointIndex == 1 || editPointIndex == 2) {
-			Vector3 p = closestPoint(points.get(editPointIndex), Vector3.UNIT_Y, x, y);
+//			Vector3 p = closestPoint(points.get(editPointIndex), Vector3.UNIT_Y, x, y);
+			Vector3 p = closestPoint(getAbsPoint(editPointIndex), Vector3.UNIT_Y, x, y);
 			p = grid(p, GRID_SIZE);
-			points.get(editPointIndex).set(p);
-//			draw();
-//			clearDrawFlag();
-//			draw();
-//			clearDrawFlag();
+			points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 		}
 		draw();
 		if (container != null)
@@ -42,20 +39,11 @@ public class HipRoof extends Roof {
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
-		// // upper points
-		// points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
-		// if (editPointIndex == -1) {
-		// points.get(1).set(center.getX(), center.getY()-1, center.getZ() + height);
-		// points.get(2).set(center.getX(), center.getY()+1, center.getZ() + height);
-		// } else {
-		// points.get(1).setZ(center.getZ() + height);
-		// points.get(2).setZ(center.getZ() + height);
-		// }
 		final Polygon polygon = new Polygon(wallUpperPoints);
-		PolygonPoint roofUpperPoint1 = new PolygonPoint(points.get(1).getX(), points.get(1).getY(), points.get(1).getZ());
-		PolygonPoint roofUpperPoint2 = new PolygonPoint(points.get(2).getX(), points.get(2).getY(), points.get(2).getZ());
-//		System.out.println("new SteinerPoint(" + roofUpperPoint1.getX() + ", " + roofUpperPoint1.getY() + ", " + roofUpperPoint1.getZ() + ")");
-//		System.out.println("new SteinerPoint(" + roofUpperPoint2.getX() + ", " + roofUpperPoint2.getY() + ", " + roofUpperPoint2.getZ() + ")");
+		final Vector3 p1 = getAbsPoint(1);
+		PolygonPoint roofUpperPoint1 = new PolygonPoint(p1.getX(), p1.getY(), p1.getZ());
+		final Vector3 p2 = getAbsPoint(2);
+		PolygonPoint roofUpperPoint2 = new PolygonPoint(p2.getX(), p2.getY(), p2.getZ());
 		polygon.addSteinerPoint(roofUpperPoint1);
 		polygon.addSteinerPoint(roofUpperPoint2);
 		return polygon;
@@ -67,10 +55,13 @@ public class HipRoof extends Roof {
 
 		if (recalculateEditPoints) {
 			// upper points
-			points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+//			points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+			points.get(0).set(toRelative(center, container.getContainer()).addLocal(0, 0, height));
 			if (editPointIndex == -1) {
-				points.get(1).set(center.getX(), center.getY() - 1, center.getZ() + height);
-				points.get(2).set(center.getX(), center.getY() + 1, center.getZ() + height);
+//				points.get(1).set(center.getX(), center.getY() - 1, center.getZ() + height);
+//				points.get(2).set(center.getX(), center.getY() + 1, center.getZ() + height);
+				points.get(1).set(toRelative(center, container.getContainer()).addLocal(0, -0.2, height));
+				points.get(2).set(toRelative(center, container.getContainer()).addLocal(0, 0.2, height));
 			}
 			recalculateEditPoints = false;
 		} else {

@@ -16,12 +16,12 @@ public class PyramidRoof extends Roof {
 		super(1, 1, 0.5);
 	}
 	
-	public void setPreviewPoint(int x, int y) {
+	public void setPreviewPoint(int x, int y) {		
 		if (editPointIndex == -1) {
-			pick(x, y, Wall.class);
+			pickContainer(x, y, Wall.class);
 			recalculateEditPoints = true;
 		} else {
-			final ReadOnlyVector3 base = new Vector3(points.get(0).getX(), points.get(0).getY(), center.getZ());
+			final ReadOnlyVector3 base = new Vector3(abspoints.get(0).getX(), abspoints.get(0).getY(), center.getZ());
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ());
@@ -34,8 +34,8 @@ public class PyramidRoof extends Roof {
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
 		final Polygon polygon = new Polygon(wallUpperPoints);
 		for (int i = 0; i < points.size(); i++) {
-			final Vector3 p = points.get(i);
-			polygon.addSteinerPoint(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+			final Vector3 abspoint = getAbsPoint(i);
+			polygon.addSteinerPoint(new PolygonPoint(abspoint.getX(), abspoint.getY(), abspoint.getZ()));
 		}		
 		return polygon;
 	}
@@ -46,6 +46,7 @@ public class PyramidRoof extends Roof {
 		
 		if (recalculateEditPoints) {
 			points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+			points.get(0).set(toRelative(points.get(0), container.getContainer()));
 			recalculateEditPoints = false;
 		} else
 			points.get(0).setZ(center.getZ() + height);

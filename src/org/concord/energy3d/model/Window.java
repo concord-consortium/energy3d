@@ -85,7 +85,7 @@ public class Window extends HousePart {
 			else
 				index = 0;
 		}
-		PickedHousePart pick = pick(x, y, Wall.class);
+		PickedHousePart pick = pickContainer(x, y, Wall.class);
 		Vector3 p = points.get(index);
 		if (pick != null) {
 			p = pick.getPoint();

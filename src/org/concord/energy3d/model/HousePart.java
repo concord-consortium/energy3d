@@ -22,9 +22,7 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -304,14 +302,14 @@ public abstract class HousePart implements Serializable {
 
 	protected PickedHousePart pick(int x, int y, Class<?>[] typesOfHousePart) {
 		for (Class<?> c : typesOfHousePart) {
-			PickedHousePart picked = pick(x, y, c);
+			PickedHousePart picked = pickContainer(x, y, c);
 			if (picked != null)
 				return picked;
 		}
 		return null;
 	}
 
-	protected PickedHousePart pick(int x, int y, Class<?> typeOfHousePart) {
+	protected PickedHousePart pickContainer(int x, int y, Class<?> typeOfHousePart) {
 		PickedHousePart picked = null;
 		if (!firstPointInserted || container == null)
 			picked = SelectUtil.pickPart(x, y, typeOfHousePart);
@@ -334,10 +332,14 @@ public abstract class HousePart implements Serializable {
 		}
 		return picked;
 	}
-
+	
 	protected Vector3 toRelative(Vector3 org) {
+		return toRelative(org, container);
+	}
+
+	protected Vector3 toRelative(final ReadOnlyVector3 org, final HousePart container) {
 		if (container == null)
-			return org;
+			return new Vector3(org);
 		ArrayList<Vector3> wallPoints = container.getAbsPoints();
 		Vector3 origin = wallPoints.get(0);
 		Vector3 p = org.subtract(origin, null);
@@ -346,10 +348,14 @@ public abstract class HousePart implements Serializable {
 		Vector3 pointOnWall = new Vector3(wallx.getX() == 0 ? p.getY() / wallx.getY() : p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY() : org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
 		return pointOnWall;
 	}
+	
+	protected Vector3 toAbsolute(final ReadOnlyVector3 p) {
+		return toAbsolute(p, container); 
+	}
 
-	protected Vector3 toAbsolute(Vector3 p) {
+	protected Vector3 toAbsolute(final ReadOnlyVector3 p, final HousePart container) {
 		if (container == null)
-			return p;
+			return new Vector3(p);
 		ArrayList<Vector3> containerPoints = container.getAbsPoints();
 		Vector3 origin = containerPoints.get(0);
 		Vector3 wallx = containerPoints.get(2).subtract(origin, null);
@@ -475,10 +481,13 @@ public abstract class HousePart implements Serializable {
 	
 	
 	protected void updateEditShapes() {
-		int i = 0;
-		for (final Spatial editShape : pointsRoot.getChildren()) {
-			editShape.setTranslation(abspoints.get(i++));
-		}
+//		int i = 0;
+//		for (final Spatial editShape : pointsRoot.getChildren()) {
+//			editShape.setTranslation(abspoints.get(i++));
+//		}
+		
+		for (int i = 0; i < points.size(); i++)
+			getEditPointShape(i).setTranslation(getAbsPoint(i));
 	}
 	
 	public void flattenInit() {
@@ -656,7 +665,8 @@ public abstract class HousePart implements Serializable {
 		String s = this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + ")";		
 		for (int i = 0; i < points.size(); i += 2)
 //			if (root == null)
-				s += "\t" + Util.toString(abspoints.get(i));
+//				s += "\t" + Util.toString(abspoints.get(i));
+				s += "\t" + Util.toString(getAbsPoint(i));
 //			else
 //				s += "\t" + Util.toString(root.getTransform().applyForward(points.get(i), null));		
 		s += ("\teditPoint = " + editPointIndex);
@@ -665,6 +675,10 @@ public abstract class HousePart implements Serializable {
 
 	public void setLabelOffset(double labelOffset) {
 		this.labelOffset = labelOffset;
+	}
+	
+	protected Vector3 getAbsPoint(final int index) {
+		return toAbsolute(points.get(index));
 	}
 	
 }  

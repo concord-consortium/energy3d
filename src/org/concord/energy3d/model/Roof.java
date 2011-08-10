@@ -62,12 +62,13 @@ public abstract class Roof extends HousePart {
 	// transient private ArrayList<Vector3> wallGablePoints;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
-		super(numOfDrawPoints, numOfEditPoints, height);
+		super(numOfDrawPoints, numOfEditPoints, height, true);
 	}
 
 	protected void init() {
 		super.init();
-		abspoints = points; // there is no need for abspoints. this is hack for foundation bounds.
+		relativeToHorizontal = true; // TODO move all parameters of HousePart constructor to init
+//		abspoints = points; // there is no need for abspoints. this is hack for foundation bounds.
 		wallUpperPoints = new ArrayList<PolygonPoint>();
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
@@ -96,16 +97,38 @@ public abstract class Roof extends HousePart {
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setModelBound(new BoundingBox());
-		root.attachChild(wireframeMesh);
+//		root.attachChild(wireframeMesh);
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
+		
+		boolean convert = false;
+//		for (final ReadOnlyVector3 p : points)
+//			if (p.getX() < 0 || p.getX() > 1 || p.getY() < 0 || p.getY() > 1) {
+//				convert = true;
+//				break;
+//			}
+		if (convert) {
+			for (final Vector3 p : points)
+				p.set(toRelative(p, container.getContainer()));
+		}
+				
 	}
 
 	protected void computeAbsPoints() {
 
 	}
+	
+//	protected void computeAbsPoints() {
+//		if (container == null)
+//			return;
+//		for (int i = 0; i < points.size(); i++) {
+//			final ReadOnlyVector3 p = toAbsolute(points.get(i), container.getContainer());
+//			abspoints.get(i).set(p);
+//			pointsRoot.getChild(i).setTranslation(p);
+//		}
+//	}	
 
 	protected void computeCenter() {
 	}
@@ -126,7 +149,7 @@ public abstract class Roof extends HousePart {
 			exploreWallNeighbors((Wall) container);
 			processRoofPoints(wallUpperPoints, wallNormals);
 			computeGableEditPoints();
-			updateEditShapes();
+//			updateEditShapes();
 
 			// fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
 			// if (!root.hasChild(bottomMesh))
@@ -147,7 +170,7 @@ public abstract class Roof extends HousePart {
 				if (child.getSceneHints().getCullHint() != CullHint.Always) {
 					child.setUserData(new UserData(this, meshIndex, false));
 					final Mesh mesh = (Mesh) child;
-					MeshLib.addConvexWireframe(wireframeVertexBuffer, mesh.getMeshData().getVertexBuffer());
+//					MeshLib.addConvexWireframe(wireframeVertexBuffer, mesh.getMeshData().getVertexBuffer());
 					if (!Scene.getInstance().isTextureEnabled())
 						mesh.setDefaultColor(defaultColor);
 					final MaterialState ms = new MaterialState();
@@ -164,10 +187,12 @@ public abstract class Roof extends HousePart {
 
 			// drawOverhang();
 
-			for (int i = 0; i < points.size(); i++) {
-				Vector3 p = points.get(i);
-				getEditPointShape(i).setTranslation(p);
-			}
+//			for (int i = 0; i < points.size(); i++) {
+//				Vector3 p = points.get(i);
+//				getEditPointShape(i).setTranslation(p);
+//			}
+			
+			updateEditShapes();
 
 			if (bottomMesh != null)
 				bottomMesh.updateModelBound();
@@ -817,4 +842,8 @@ public abstract class Roof extends HousePart {
 	// }
 	// }
 
+	protected Vector3 getAbsPoint(final int index) {
+		return toAbsolute(points.get(index), container.getContainer());
+	}
+	
 }

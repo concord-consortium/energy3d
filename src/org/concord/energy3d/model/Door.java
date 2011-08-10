@@ -69,7 +69,7 @@ public class Door extends HousePart {
 
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
-			PickedHousePart picked = pick(x, y, Wall.class);
+			PickedHousePart picked = pickContainer(x, y, Wall.class);
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
 				Vector3 wallFirstPoint = container.getAbsPoints().get(0);

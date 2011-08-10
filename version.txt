@@ -680,13 +680,14 @@ Version 0.3 - March 7, 2011
 - fix offset problem when dragging resize edit points
 - fix problem with print preview parts being half as large as they can  
 - offset the print preview page
+- resize roof edit points when resizing the house
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
 - *fix problem with edit point switching sometimes when custom roof editing
 - *fix problem with resizing custome roof
 - *put the main model in the exact middle of print preview view using its bounding box
-
+- *move all parameters of HousePart constructor to init
 
  
 

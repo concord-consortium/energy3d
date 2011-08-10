@@ -14,7 +14,8 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class CustomRoof extends Roof {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.5;
+	private static final double GRID_SIZE = 0.5;	
+	transient private boolean recalculateEditPoints;
 
 	public CustomRoof() {
 		super(1, 1, 0.5);		
@@ -22,7 +23,8 @@ public class CustomRoof extends Roof {
 
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1) {
-			pick(x, y, Wall.class);
+			recalculateEditPoints = true;
+			pickContainer(x, y, Wall.class);
 		} else if (editPointIndex == 0) {
 			Vector3 base = center;
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
@@ -36,7 +38,7 @@ public class CustomRoof extends Roof {
 			Vector3 p = new Vector3();
 			if (pickRay.intersectsPlane(new Plane(Vector3.UNIT_Z, points.get(0).getZ()), p)) {
 				p = grid(p, GRID_SIZE);
-				points.get(editPointIndex).set(p);
+				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 			}
 		}
 		draw();
@@ -48,7 +50,8 @@ public class CustomRoof extends Roof {
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
 		final Polygon polygon = new Polygon(wallUpperPoints);
 		for (int i = 1; i < points.size(); i++) {
-			final Vector3 p = points.get(i);
+//			final Vector3 p = points.get(i);
+			final Vector3 p = getAbsPoint(i);
 			polygon.addSteinerPoint(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		}
 		return polygon;
@@ -57,7 +60,10 @@ public class CustomRoof extends Roof {
 	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
 		super.processRoofPoints(wallUpperPoints, wallNormals);
 		
-		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+		if (recalculateEditPoints) {
+			recalculateEditPoints = false;
+//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+		points.get(0).set(toRelative(center, container.getContainer()).addLocal(0, 0, height));
 		
 		// add or update edit points
 		final double z = center.getZ() + height;
@@ -71,11 +77,16 @@ public class CustomRoof extends Roof {
 				v.setZ(z);
 				// add -normal*0.2 to middle point of wall
 				v.addLocal(wallNormals.get(i).multiply(0.2, null).negateLocal());
+				v.set(toRelative(v, container.getContainer()));
 				if (i + 1 < points.size())
 					points.get(i + 1).set(v);
 				else
 					points.add(v.clone());
 			}
+		}
+		} else {
+			for (final Vector3 p : points)
+				p.setZ(center.getZ() + height);
 		}
 	}
 

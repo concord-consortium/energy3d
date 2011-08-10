@@ -51,7 +51,7 @@ public class Floor extends HousePart {
 	}
 
 	public void setPreviewPoint(int x, int y) {
-		pick(x, y, Wall.class);
+		pickContainer(x, y, Wall.class);
 		if (container != null) {
 			Vector3 base = container.getAbsPoints().get(0);
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
