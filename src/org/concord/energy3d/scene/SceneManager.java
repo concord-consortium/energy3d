@@ -65,7 +65,6 @@ import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.MouseMovedCondition;
-import com.ardor3d.input.logical.MouseWheelMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.intersection.PickResults;
@@ -114,8 +113,6 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 	public enum Operation {

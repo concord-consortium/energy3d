@@ -45,13 +45,12 @@ public class Scene implements Serializable {
 	private static final Node originalHouseRoot = new Node("Original House Root");
 	private static Scene instance;
 	private static URL url = null;
+	private static boolean redrawAll = false;
+	private static boolean isTextureEnabled = true;
+	private static boolean drawThickness = false;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
-	private transient boolean redrawAll = false;
-//	private transient boolean redrawAnnotations = false;
 	private Unit unit = Unit.Meter;
 	private double annotationScale = 1;
-	static private boolean isTextureEnabled = true;
-	static private boolean drawThickness = false;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -171,8 +170,9 @@ public class Scene implements Serializable {
 				in.close();
 				for (HousePart housePart : instance.getParts())
 					originalHouseRoot.attachChild(housePart.getRoot());
-				for (HousePart housePart : instance.getParts())
-					housePart.draw();
+//				for (HousePart housePart : instance.getParts())
+//					housePart.draw();
+				redrawAll = true;
 				System.out.println("done");
 				SceneManager.getInstance().updateHeliodonSize();
 				return null;
@@ -233,8 +233,12 @@ public class Scene implements Serializable {
 	public void update() {
 		if (redrawAll) {
 			Snap.clearAnnotationDrawn();
-			for (HousePart part : parts)
-				part.draw();
+			for (final HousePart part : parts)
+				if (part instanceof Roof)
+					part.draw();			
+			for (final HousePart part : parts)
+				if (!(part instanceof Roof))
+					part.draw();					
 			if (PrintController.getInstance().getPrintParts() != null)
 				for (HousePart part : PrintController.getInstance().getPrintParts())
 					part.draw();

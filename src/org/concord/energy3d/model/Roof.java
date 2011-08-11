@@ -54,22 +54,16 @@ public abstract class Roof extends HousePart {
 	transient private ArrayList<ReadOnlyVector3> wallNormals;
 	transient private Map<Mesh, ReadOnlyVector3> orgCenters;
 	transient private Line wireframeMesh;
-	// transient private ArrayList<Vector3[]> gableBases;
 	private ArrayList<Wall> gableWalls;
-	// transient private ArrayList<Vector3> gablePoints;
 	transient private ArrayList<Wall> walls;
 
-	// transient private ArrayList<Vector3> wallGablePoints;
-
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
-//		super(numOfDrawPoints, numOfEditPoints, height, true);
 		super(numOfDrawPoints, numOfEditPoints, height);
 	}
 
 	protected void init() {
 		super.init();
 		relativeToHorizontal = true; // TODO move all parameters of HousePart constructor to init
-//		abspoints = points; // there is no need for abspoints. this is hack for foundation bounds.
 		wallUpperPoints = new ArrayList<PolygonPoint>();
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
@@ -98,40 +92,23 @@ public abstract class Roof extends HousePart {
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setModelBound(new BoundingBox());
-//		root.attachChild(wireframeMesh);
+		// root.attachChild(wireframeMesh);
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
-		
+
 		boolean convert = false;
-//		for (final ReadOnlyVector3 p : points)
-//			if (p.getX() < 0 || p.getX() > 1 || p.getY() < 0 || p.getY() > 1) {
-//				convert = true;
-//				break;
-//			}
+		// for (final ReadOnlyVector3 p : points)
+		// if (p.getX() < 0 || p.getX() > 1 || p.getY() < 0 || p.getY() > 1) {
+		// convert = true;
+		// break;
+		// }
 		if (convert) {
 			for (final Vector3 p : points)
 				p.set(toRelative(p, container.getContainer()));
 		}
-				
-	}
 
-	protected void computeAbsPoints() {
-
-	}
-	
-//	protected void computeAbsPoints() {
-//		if (container == null)
-//			return;
-//		for (int i = 0; i < points.size(); i++) {
-//			final ReadOnlyVector3 p = toAbsolute(points.get(i), container.getContainer());
-//			getAbsPoint(i).set(p);
-//			pointsRoot.getChild(i).setTranslation(p);
-//		}
-//	}	
-
-	protected void computeCenter() {
 	}
 
 	protected void drawMesh() {
@@ -150,7 +127,7 @@ public abstract class Roof extends HousePart {
 			exploreWallNeighbors((Wall) container);
 			processRoofPoints(wallUpperPoints, wallNormals);
 			computeGableEditPoints();
-//			updateEditShapes();
+			// updateEditShapes();
 
 			// fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
 			// if (!root.hasChild(bottomMesh))
@@ -171,7 +148,7 @@ public abstract class Roof extends HousePart {
 				if (child.getSceneHints().getCullHint() != CullHint.Always) {
 					child.setUserData(new UserData(this, meshIndex, false));
 					final Mesh mesh = (Mesh) child;
-//					MeshLib.addConvexWireframe(wireframeVertexBuffer, mesh.getMeshData().getVertexBuffer());
+					// MeshLib.addConvexWireframe(wireframeVertexBuffer, mesh.getMeshData().getVertexBuffer());
 					if (!Scene.getInstance().isTextureEnabled())
 						mesh.setDefaultColor(defaultColor);
 					final MaterialState ms = new MaterialState();
@@ -183,23 +160,39 @@ public abstract class Roof extends HousePart {
 			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
 			wireframeMesh.getMeshData().updateVertexCount();
 			wireframeMesh.updateModelBound();
+			
+			root.updateWorldBound(true);
 
 			// drawGableWalls();
 
 			// drawOverhang();
 
-//			for (int i = 0; i < points.size(); i++) {
-//				Vector3 p = points.get(i);
-//				getEditPointShape(i).setTranslation(p);
-//			}
-			
-//			updateEditShapes();
+			// for (int i = 0; i < points.size(); i++) {
+			// Vector3 p = points.get(i);
+			// getEditPointShape(i).setTranslation(p);
+			// }
+
+			// updateEditShapes();
 
 			if (bottomMesh != null)
 				bottomMesh.updateModelBound();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		System.out.println("draw roof");
+
+//		drawWalls();
+	}
+
+	protected void drawWalls() {
+		if (container != null)
+			((Wall) container).visitNeighbors(new WallVisitor() {
+				public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
+					currentWall.draw();
+				}
+			});
 	}
 
 	// private void addGablePointsToPolygon(final Polygon polygon) {
@@ -234,9 +227,9 @@ public abstract class Roof extends HousePart {
 		walls.clear();
 		wallUpperPoints.clear();
 		wallNormals.clear();
-//		center.set(0, 0, 0);
-//		final Vector3 min = new Vector3();
-//		final Vector3 max = new Vector3();
+		// center.set(0, 0, 0);
+		// final Vector3 min = new Vector3();
+		// final Vector3 max = new Vector3();
 		startWall.visitNeighbors(new WallVisitor() {
 			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
 				walls.add(currentWall);
@@ -252,16 +245,16 @@ public abstract class Roof extends HousePart {
 				final ReadOnlyVector3 normal = currentWall.getFaceDirection();
 				addPointToPolygon(p1, normal);
 				addPointToPolygon(p2, normal);
-//				min.set(Math.min(min.getX(), p1.getX()), Math.min(min.getY(), p1.getY()), Math.min(min.getZ(), p1.getZ()));
-//				min.set(Math.min(min.getX(), p2.getX()), Math.min(min.getY(), p2.getY()), Math.min(min.getZ(), p2.getZ()));
-//				max.set(Math.max(max.getX(), p1.getX()), Math.max(max.getY(), p1.getY()), Math.max(max.getZ(), p1.getZ()));
-//				max.set(Math.max(max.getX(), p2.getX()), Math.max(max.getY(), p2.getY()), Math.max(max.getZ(), p2.getZ()));
+				// min.set(Math.min(min.getX(), p1.getX()), Math.min(min.getY(), p1.getY()), Math.min(min.getZ(), p1.getZ()));
+				// min.set(Math.min(min.getX(), p2.getX()), Math.min(min.getY(), p2.getY()), Math.min(min.getZ(), p2.getZ()));
+				// max.set(Math.max(max.getX(), p1.getX()), Math.max(max.getY(), p1.getY()), Math.max(max.getZ(), p1.getZ()));
+				// max.set(Math.max(max.getX(), p2.getX()), Math.max(max.getY(), p2.getY()), Math.max(max.getZ(), p2.getZ()));
 			}
 		});
 
-//		center.multiplyLocal(1.0 / wallUpperPoints.size());
+		// center.multiplyLocal(1.0 / wallUpperPoints.size());
 		// max.addLocal(min).multiplyLocal(0.5);
-//		center.set(max).addLocal(min).multiplyLocal(0.5).setZ(max.getZ());
+		// center.set(max).addLocal(min).multiplyLocal(0.5).setZ(max.getZ());
 		// points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 	}
 
@@ -270,7 +263,7 @@ public abstract class Roof extends HousePart {
 		final int index = wallUpperPoints.indexOf(polygonPoint);
 		if (index == -1) {
 			wallUpperPoints.add(polygonPoint);
-//			center.addLocal(p);
+			// center.addLocal(p);
 			wallNormals.add(normal);
 		} else {
 			// calculate wall normal in such a way to help in drawing overhang of roofs
@@ -370,48 +363,48 @@ public abstract class Roof extends HousePart {
 			return;
 		int annotCounter = 0, angleAnnotCounter = 0;
 
-//		if (original == null) {
-//			for (int i = 0; i < wallUpperPoints.size(); i++) {
-//
-//				PolygonPoint p = wallUpperPoints.get(i);
-//				Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
-//				p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
-//				Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
-//				fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), false, Align.Center, true, true);
-//			}
-//		} else {
-			final Vector3 p1 = new Vector3();
-			final Vector3 p2 = new Vector3();
-			final Vector3 p3 = new Vector3();
-			for (Spatial mesh : flattenedMeshesRoot.getChildren()) {
-				if (mesh.getSceneHints().getCullHint() != CullHint.Always) {
-					final FloatBuffer vertexBuffer = ((Mesh) mesh).getMeshData().getVertexBuffer();
-					for (int i = 0; i < vertexBuffer.limit() / 9; i++) {
-						final int xPos = i * 9;
-						vertexBuffer.position(xPos);
-						p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-						p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-						p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-						mesh.getTransform().applyForward(p1);
-						mesh.getTransform().applyForward(p2);
-						mesh.getTransform().applyForward(p3);
+		// if (original == null) {
+		// for (int i = 0; i < wallUpperPoints.size(); i++) {
+		//
+		// PolygonPoint p = wallUpperPoints.get(i);
+		// Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
+		// p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
+		// Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
+		// fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), false, Align.Center, true, true);
+		// }
+		// } else {
+		final Vector3 p1 = new Vector3();
+		final Vector3 p2 = new Vector3();
+		final Vector3 p3 = new Vector3();
+		for (Spatial mesh : flattenedMeshesRoot.getChildren()) {
+			if (mesh.getSceneHints().getCullHint() != CullHint.Always) {
+				final FloatBuffer vertexBuffer = ((Mesh) mesh).getMeshData().getVertexBuffer();
+				for (int i = 0; i < vertexBuffer.limit() / 9; i++) {
+					final int xPos = i * 9;
+					vertexBuffer.position(xPos);
+					p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+					p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+					p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+					mesh.getTransform().applyForward(p1);
+					mesh.getTransform().applyForward(p2);
+					mesh.getTransform().applyForward(p3);
 
-						// Size annotation
-						final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
-						fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
-						fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
-						fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
+					// Size annotation
+					final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
+					fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
+					fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
+					fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
 
-						// Angle annotations
-//						final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal());
-						final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).negateLocal();
-						fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3, n);
-						fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1, n);
-						fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2, n);
-					}
+					// Angle annotations
+					// final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal());
+					final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).negateLocal();
+					fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3, n);
+					fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1, n);
+					fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2, n);
 				}
 			}
-//		}
+		}
+		// }
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
@@ -517,6 +510,7 @@ public abstract class Roof extends HousePart {
 		if (base != null) {
 			gableWalls.add(wall);
 			draw();
+			drawWalls();
 		}
 	}
 
@@ -576,43 +570,43 @@ public abstract class Roof extends HousePart {
 	//
 	// }
 
-//	private void computeGableEditPoints() {
-//		if (gableWalls == null)
-//			return;
-//		final ArrayList<Vector3> meshUpperPoints = new ArrayList<Vector3>();
-//		for (final Wall wall : gableWalls) {
-//			final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
-//			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
-//				meshUpperPoints.clear();
-//				final Vector3[] meshBase = findBasePoints((Mesh) mesh, meshUpperPoints);
-//				if (meshBase != null && isSameBasePoints(base, meshBase)) {
-//					final Vector3 n = meshBase[1].subtract(meshBase[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
-//					final ArrayList<Vector3> gableRoofMeshEditPoints = new ArrayList<Vector3>();
-//					for (final Vector3 meshPoint : meshUpperPoints) {
-//						double smallestDistanceToEditPoint = Double.MAX_VALUE;
-//						Vector3 nearestEditPoint = null;
-//						// select the nearest point so that one edit point per upper mesh point is selected
-//						for (final Vector3 editPoint : points) {
-//							final double distanceToEditPoint = meshPoint.distance(editPoint);
-//							if (distanceToEditPoint < smallestDistanceToEditPoint) {
-//								smallestDistanceToEditPoint = distanceToEditPoint;
-//								nearestEditPoint = editPoint;
-//							}
-//						}
-//						double distance = -nearestEditPoint.subtract(meshBase[0], null).dot(n);
-//						distance += -Math.signum(distance) * 0.0001; // in order to avoid crazy roof that stretches to floor
-//						nearestEditPoint.addLocal(n.multiply(distance, null));
-//						gableRoofMeshEditPoints.add(nearestEditPoint);
-//					}
-//					computeGableWallPoints(base, gableRoofMeshEditPoints);
-//					break;
-//				}
-//			}
-//		}
-//		for (final Wall wall : walls)
-//			wall.draw();
-//
-//	}
+	// private void computeGableEditPoints() {
+	// if (gableWalls == null)
+	// return;
+	// final ArrayList<Vector3> meshUpperPoints = new ArrayList<Vector3>();
+	// for (final Wall wall : gableWalls) {
+	// final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
+	// for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
+	// meshUpperPoints.clear();
+	// final Vector3[] meshBase = findBasePoints((Mesh) mesh, meshUpperPoints);
+	// if (meshBase != null && isSameBasePoints(base, meshBase)) {
+	// final Vector3 n = meshBase[1].subtract(meshBase[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
+	// final ArrayList<Vector3> gableRoofMeshEditPoints = new ArrayList<Vector3>();
+	// for (final Vector3 meshPoint : meshUpperPoints) {
+	// double smallestDistanceToEditPoint = Double.MAX_VALUE;
+	// Vector3 nearestEditPoint = null;
+	// // select the nearest point so that one edit point per upper mesh point is selected
+	// for (final Vector3 editPoint : points) {
+	// final double distanceToEditPoint = meshPoint.distance(editPoint);
+	// if (distanceToEditPoint < smallestDistanceToEditPoint) {
+	// smallestDistanceToEditPoint = distanceToEditPoint;
+	// nearestEditPoint = editPoint;
+	// }
+	// }
+	// double distance = -nearestEditPoint.subtract(meshBase[0], null).dot(n);
+	// distance += -Math.signum(distance) * 0.0001; // in order to avoid crazy roof that stretches to floor
+	// nearestEditPoint.addLocal(n.multiply(distance, null));
+	// gableRoofMeshEditPoints.add(nearestEditPoint);
+	// }
+	// computeGableWallPoints(base, gableRoofMeshEditPoints);
+	// break;
+	// }
+	// }
+	// }
+	// for (final Wall wall : walls)
+	// wall.draw();
+	//
+	// }
 
 	private void computeGableEditPoints() {
 		if (gableWalls == null)
@@ -655,7 +649,7 @@ public abstract class Roof extends HousePart {
 			wall.draw();
 
 	}
-	
+
 	public Vector3[] findBasePoints(final Mesh mesh, final ArrayList<Vector3> storeUpperPoints) {
 		final Vector3[] base = new Vector3[2];
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();

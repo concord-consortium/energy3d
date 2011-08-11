@@ -684,6 +684,8 @@ Version 0.3 - March 7, 2011
 - remove abspoints and use getPoint(i) instead
 - fix enforceWindowSize problem
 - remove center and use mesh bounding center instead 
+- automatically redraw and stretch wall to roof
+- *draw flag no longer required
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

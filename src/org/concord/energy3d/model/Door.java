@@ -1,7 +1,6 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.image.Texture;
@@ -10,10 +9,10 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.OffsetState;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;

@@ -192,6 +192,7 @@ public class Wall extends HousePart {
 		thicknessNormal = null;
 		isShortWall = true;
 		draw();
+		drawChildren();
 		showPoints();
 
 		if (isDrawable())
@@ -262,6 +263,8 @@ public class Wall extends HousePart {
 	protected void drawMesh() {
 		if (!isDrawable())
 			return;
+		
+		System.out.println("draw wall");
 
 		updateEditShapes();
 
@@ -297,10 +300,10 @@ public class Wall extends HousePart {
 		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
 
 		// keep it for platform resizing
-		if (original == null)
-			for (HousePart child : children) {
-				child.draw();
-			}
+//		if (original == null)
+//			for (HousePart child : children) {
+//				child.draw();
+//			}
 
 		FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
 		final int requiredSize = (1 + children.size()) * 4 * 3;
@@ -1134,6 +1137,19 @@ public class Wall extends HousePart {
 		wallPolygonPoints = ((Wall) original).wallPolygonPoints;
 
 		super.setOriginal(original);
+	}
+	
+	@Override
+	protected void drawChildren() {
+		super.drawChildren();
+		visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall wall, final Snap prev, final Snap next) {
+				for (final HousePart child : wall.getChildren())
+					if (child instanceof Roof || child instanceof Floor)
+						child.draw();
+			}
+		});
 	}
 
 }

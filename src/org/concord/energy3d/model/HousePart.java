@@ -1,7 +1,6 @@
 package org.concord.energy3d.model;
 
 import java.io.Serializable;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.SceneManager;
@@ -411,8 +410,8 @@ public abstract class HousePart implements Serializable {
 	// }
 
 	public void draw() {
-		if (drawFlag == globalDrawFlag)
-			return;
+//		if (drawFlag == globalDrawFlag)
+//			return;
 		drawFlag = globalDrawFlag;
 
 		if (root == null)
@@ -666,6 +665,11 @@ public abstract class HousePart implements Serializable {
 
 	public Vector3 getAbsPoint(final int index) {
 		return toAbsolute(points.get(index));
+	}
+	
+	protected void drawChildren() {
+		for (final HousePart child : children)
+			child.draw();
 	}
 
 }

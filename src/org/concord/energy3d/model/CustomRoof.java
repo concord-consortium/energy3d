@@ -22,6 +22,7 @@ public class CustomRoof extends Roof {
 	}
 
 	public void setPreviewPoint(int x, int y) {
+		System.out.println(x + ", " + y);
 		if (container != null)
 			points.get(0).set(toRelative(getCenter(), container.getContainer())).addLocal(0, 0, height);			
 			
@@ -44,7 +45,8 @@ public class CustomRoof extends Roof {
 				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 			}
 		}
-		draw();		
+		draw();
+		drawWalls();
 		if (container != null) {
 			showPoints();
 		}
