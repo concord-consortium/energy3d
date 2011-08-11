@@ -522,7 +522,8 @@ public class Wall extends HousePart {
 		Vector3 direction = null;
 		ReadOnlyVector3 previousStretchPoint = new Vector3(polygon.getPoints().get(3).getX(), polygon.getPoints().get(3).getY(), polygon.getPoints().get(3).getZ());
 
-		for (double d = length - 0.1; d > 0.1; d -= 0.1) {
+		final double step = 0.01;
+		for (double d = length - step; d > step; d -= step) {
 			final Vector3 p = dir.multiply(d, null).addLocal(o);
 			final double findRoofIntersection = findRoofIntersection(p, false);
 

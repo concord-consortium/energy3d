@@ -423,6 +423,8 @@ public abstract class HousePart implements Serializable {
 
 		drawMesh();
 		
+		updateEditShapes();
+		
 		computeCenter();
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(root);

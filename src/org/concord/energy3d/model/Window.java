@@ -272,14 +272,14 @@ public class Window extends HousePart {
 			label1.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 	}
 	
-	protected void computeAbsPoints() {
-		for (int i = 0; i < points.size(); i++) {
-			final Vector3 p = toAbsolute(enforceContraints(points.get(i)));
-			getAbsPoint(i).set(p);
-			toAbsolute(enforceContraints(points.get(i)));
-			pointsRoot.getChild(i).setTranslation(p);
-		}
-	}
+//	protected void computeAbsPoints() {
+//		for (int i = 0; i < points.size(); i++) {
+//			final Vector3 p = toAbsolute(enforceContraints(points.get(i)));
+//			getAbsPoint(i).set(p);
+//			toAbsolute(enforceContraints(points.get(i)));
+//			pointsRoot.getChild(i).setTranslation(p);
+//		}
+//	}
 	
 	private Vector3 enforceContraints(Vector3 p) {
 		if (container == null)
@@ -300,7 +300,7 @@ public class Window extends HousePart {
 	}
 	
 	public Vector3 getAbsPoint(final int index) {
-		return container.getRoot().getTransform().applyForward(toAbsolute(points.get(index)));
+		return container.getRoot().getTransform().applyForward(toAbsolute(enforceContraints(points.get(index))));
 	}
 	
 }
