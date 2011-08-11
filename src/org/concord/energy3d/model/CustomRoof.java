@@ -22,15 +22,18 @@ public class CustomRoof extends Roof {
 	}
 
 	public void setPreviewPoint(int x, int y) {
+		if (container != null)
+			points.get(0).set(toRelative(getCenter(), container.getContainer())).addLocal(0, 0, height);			
+			
 		if (editPointIndex == -1) {
 			recalculateEditPoints = true;
 			pickContainer(x, y, Wall.class);
 		} else if (editPointIndex == 0) {
-			Vector3 base = center;
+			final ReadOnlyVector3 base = getCenter();
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
-			height = Math.max(0, p.getZ() - base.getZ());
-			final double z = center.getZ() + height;
+			height = Math.max(0, p.getZ() - container.getPoints().get(1).getZ());
+			final double z = container.getPoints().get(1).getZ() + height;
 			for (final Vector3 v : points)
 				v.setZ(z);
 		} else if (editPointIndex > 0) {
@@ -41,16 +44,16 @@ public class CustomRoof extends Roof {
 				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 			}
 		}
-		draw();
-		if (container != null)
+		draw();		
+		if (container != null) {
 			showPoints();
+		}
 
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
 		final Polygon polygon = new Polygon(wallUpperPoints);
 		for (int i = 1; i < points.size(); i++) {
-//			final Vector3 p = points.get(i);
 			final Vector3 p = getAbsPoint(i);
 			polygon.addSteinerPoint(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		}
@@ -62,11 +65,9 @@ public class CustomRoof extends Roof {
 		
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
-//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
-		points.get(0).set(toRelative(center, container.getContainer()).addLocal(0, 0, height));
-		
+			
 		// add or update edit points
-		final double z = center.getZ() + height;
+		final double z = container.getPoints().get(1).getZ() + height;
 		if (wallUpperPoints.size() > points.size()) {
 			final Vector3 v = new Vector3();
 			for (int i = 0; i < wallUpperPoints.size() - 1; i = i + 1) {
@@ -86,7 +87,7 @@ public class CustomRoof extends Roof {
 		}
 		} else {
 			for (final Vector3 p : points)
-				p.setZ(center.getZ() + height);
+				p.setZ(container.getPoints().get(1).getZ() + height);
 		}
 	}
 
@@ -94,9 +95,6 @@ public class CustomRoof extends Roof {
 	protected void setHeight(double newHeight, boolean finalize) {
 		super.setHeight(newHeight, finalize);
 		for (final Vector3 p : points)
-			p.setZ(center.getZ() + newHeight);
+			p.setZ(container.getPoints().get(1).getZ() + newHeight);
 	}
-	
-	
-
 }

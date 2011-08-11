@@ -22,7 +22,7 @@ public class HipRoof extends Roof {
 			pickContainer(x, y, Wall.class);
 			recalculateEditPoints = true;
 		} else if (editPointIndex == 0) {
-			Vector3 base = center;
+			final ReadOnlyVector3 base = getCenter();
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, GRID_SIZE);
 			height = Math.max(0, p.getZ() - base.getZ());
@@ -53,6 +53,8 @@ public class HipRoof extends Roof {
 	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
 		super.processRoofPoints(wallUpperPoints, wallNormals);
 
+		final ReadOnlyVector3 center = getCenter();
+		
 		if (recalculateEditPoints) {
 			// upper points
 //			points.get(0).set(center.getX(), center.getY(), center.getZ() + height);

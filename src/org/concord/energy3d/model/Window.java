@@ -7,10 +7,16 @@ import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -36,29 +42,27 @@ public class Window extends HousePart {
 		super.init();
 ////		for (int i = 0; i < points.size(); i++)
 ////			getAbsPoint(i).set(toAbsolute(getAbsPoint(i)));
-//		mesh = new Mesh("Window");
-//		vertexBuffer = BufferUtils.createVector3Buffer(4);
-//		normalBuffer = BufferUtils.createVector3Buffer(4);
-//		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-//		mesh.getMeshData().setVertexBuffer(vertexBuffer);
-//		mesh.getMeshData().setNormalBuffer(normalBuffer);
-//		mesh.setModelBound(new BoundingBox());
-//
-//		// Transparency
-//		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.4f, 0.5f, 0.7f));
-//		BlendState blendState = new BlendState();
-//		blendState.setBlendEnabled(true);
-//		blendState.setTestEnabled(true);
-//		mesh.setRenderState(blendState);
-//		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-//
-//		// Add a material to the box, to show both vertex color and lighting/shading.
-//		final MaterialState ms = new MaterialState();
-//		ms.setColorMaterial(ColorMaterial.AmbientAndDiffuse);
-//		mesh.setRenderState(ms);
-//		mesh.setUserData(new UserData(this));
-//		
-//		root.attachChild(mesh);
+		mesh = new Mesh("Window");
+		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
+		mesh.setModelBound(new BoundingBox());
+
+		// Transparency
+		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.4f, 0.5f, 0.7f));
+		BlendState blendState = new BlendState();
+		blendState.setBlendEnabled(true);
+		blendState.setTestEnabled(true);
+		mesh.setRenderState(blendState);
+		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+
+		// Add a material to the box, to show both vertex color and lighting/shading.
+		final MaterialState ms = new MaterialState();
+		ms.setColorMaterial(ColorMaterial.AmbientAndDiffuse);
+		mesh.setRenderState(ms);
+		mesh.setUserData(new UserData(this));
+		
+		root.attachChild(mesh);
 		
 		label1.setAlign(Align.SouthWest);
 		root.attachChild(label1);
@@ -119,22 +123,22 @@ public class Window extends HousePart {
 		if (points.size() < 4)
 			return;
 		
-//		for (final Vector3 p : abspoints)
-//			container.getRoot().getTransform().applyForward(p);
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		vertexBuffer.rewind();
+		for (int i = 0; i < points.size(); i++) {
+			final ReadOnlyVector3 p = getAbsPoint(i);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
 
-			
-//		vertexBuffer.rewind();
-//		for (Vector3 p : abspoints)
-//			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-//
-//		// Compute normals
-//		final Vector3 normal = getAbsPoint(2).subtract(getAbsPoint(0), null).crossLocal(getAbsPoint(1).subtract(getAbsPoint(0), null)).normalizeLocal();
-//		normal.negateLocal();
-//		normalBuffer.rewind();
-//		for (int i = 0; i < points.size(); i++)
-//			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
-//
-//		mesh.updateModelBound();
+		// Compute normals
+		final Vector3 normal = getAbsPoint(2).subtract(getAbsPoint(0), null).crossLocal(getAbsPoint(1).subtract(getAbsPoint(0), null)).normalizeLocal();
+		normal.negateLocal();
+		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
+		normalBuffer.rewind();
+		for (int i = 0; i < points.size(); i++)
+			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+
+		mesh.updateModelBound();
 		
 		final double divisionLength = 0.3;
 		final Vector3 halfThickness = ((Wall)container).getThicknessNormal().multiply(0.5, null);
@@ -189,10 +193,10 @@ public class Window extends HousePart {
 			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 		p.set(halfThickness).negateLocal().normalizeLocal();
-		for (int i = 0; i < barsVertices.position() / 3; i++) {
+//		for (int i = 0; i < barsVertices.position() / 3; i++) {
 //			barsNormals.put(p.getXf()).put(p.getYf()).put(p.getZf());
 //			barsNormals.put(1).put(1).put(1);
-		}
+//		}
 		barsVertices.limit(barsVertices.position());
 //		barsNormals.limit(barsNormals.position());
 		bars.getMeshData().updateVertexCount();
@@ -253,7 +257,7 @@ public class Window extends HousePart {
 		label1.setTranslation(getAbsPoint(i0));
 		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
-		trans.applyForward(center);
+		final Vector3 center = trans.applyForward(getCenter(), null);
 		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true);
 		annot.setTranslation(moveToFront);
 

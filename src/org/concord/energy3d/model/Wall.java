@@ -965,7 +965,7 @@ public class Wall extends HousePart {
 		if (wallPolygonPoints != null)
 			for (int i = 0; i < wallPolygonPoints.size() - 1; i++) {
 				final boolean front = i == wallPolygonPoints.size() - 3 && original == null;
-				fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i + 1), center, faceDirection, front, front ? Align.South : Align.Center, true);
+				fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i + 1), getCenter(), faceDirection, front, front ? Align.South : Align.Center, true);
 				if (i > 0)
 					fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i - 1), wallPolygonPoints.get(i + 1), getFaceDirection());
 //				else

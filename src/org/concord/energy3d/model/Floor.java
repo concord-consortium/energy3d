@@ -24,7 +24,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Floor extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.2;
-	protected double labelTop;
+//	protected double labelTop;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 
 	public Floor() {
@@ -33,6 +33,7 @@ public class Floor extends HousePart {
 
 	protected void init() {
 		super.init();
+		relativeToHorizontal = true;
 		mesh = new Mesh("Floor");
 		root.attachChild(mesh);
 
@@ -63,17 +64,17 @@ public class Floor extends HousePart {
 	}
 
 	private Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
-		center.set(0, 0, 0);
+//		center.set(0, 0, 0);
 		double maxY = wallUpperPoints.get(0).getY();
 		for (PolygonPoint p : wallUpperPoints) {
-			center.addLocal(p.getX(), p.getY(), height);
+//			center.addLocal(p.getX(), p.getY(), height);
 			p.set(p.getX(), p.getY(), height);
 			if (p.getY() > maxY)
 				maxY = p.getY();
 		}
-		center.multiplyLocal(1.0 / wallUpperPoints.size());
-		labelTop = (maxY - center.getY());
-		points.get(0).set(center);
+//		center.multiplyLocal(1.0 / wallUpperPoints.size());
+//		labelTop = (maxY - center.getY());
+		points.get(0).set(toRelative(getCenter(), container.getContainer()));
 		return new Polygon(wallUpperPoints);
 	}
 
@@ -86,7 +87,7 @@ public class Floor extends HousePart {
 			mesh.getMeshData().updateVertexCount();
 			mesh.updateModelBound();
 			root.updateWorldBound(true);
-			center = new Vector3(root.getWorldBound().getCenter());
+//			center = new Vector3(root.getWorldBound().getCenter());
 	}
 	
 	protected void computeAbsPoints() {
@@ -118,8 +119,8 @@ public class Floor extends HousePart {
 
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
 //		center.set(0, 0, 0);
-		final Vector3 min = new Vector3();
-		final Vector3 max = new Vector3();		
+//		final Vector3 min = new Vector3();
+//		final Vector3 max = new Vector3();		
 		final ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
 		startWall.visitNeighbors(new WallVisitor() {
 			public void visit(Wall currentWall, Snap prev, Snap next) {
@@ -129,30 +130,28 @@ public class Floor extends HousePart {
 				pointIndex = pointIndex + 1;
 				final Vector3 p1 = currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1);
 				final Vector3 p2 = currentWall.getAbsPoint(pointIndex);
-				addPointToPolygon(poly, p1, center);
-				addPointToPolygon(poly, p2, center);
-				min.set(Math.min(min.getX(), p1.getX()), Math.min(min.getY(), p1.getY()), Math.min(min.getZ(), p1.getZ()));
-				min.set(Math.min(min.getX(), p2.getX()), Math.min(min.getY(), p2.getY()), Math.min(min.getZ(), p2.getZ()));
-				max.set(Math.max(max.getX(), p1.getX()), Math.max(max.getY(), p1.getY()), Math.max(max.getZ(), p1.getZ()));
-				max.set(Math.max(max.getX(), p2.getX()), Math.max(max.getY(), p2.getY()), Math.max(max.getZ(), p2.getZ()));
+				addPointToPolygon(poly, p1);
+				addPointToPolygon(poly, p2);
+//				min.set(Math.min(min.getX(), p1.getX()), Math.min(min.getY(), p1.getY()), Math.min(min.getZ(), p1.getZ()));
+//				min.set(Math.min(min.getX(), p2.getX()), Math.min(min.getY(), p2.getY()), Math.min(min.getZ(), p2.getZ()));
+//				max.set(Math.max(max.getX(), p1.getX()), Math.max(max.getY(), p1.getY()), Math.max(max.getZ(), p1.getZ()));
+//				max.set(Math.max(max.getX(), p2.getX()), Math.max(max.getY(), p2.getY()), Math.max(max.getZ(), p2.getZ()));
 			}
 
 		});
 
-		center.multiplyLocal(1.0 / poly.size());
-		center.set(max).addLocal(min).multiplyLocal(0.5); //.setZ(max.getZ());
+//		center.multiplyLocal(1.0 / poly.size());
+//		center.set(max).addLocal(min).multiplyLocal(0.5); //.setZ(max.getZ());
 		
-		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
+//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 
 		return poly;
 	}
 
-	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p, Vector3 center) {
+	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
 		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-		if (!poly.contains(polygonPoint)) {
+		if (!poly.contains(polygonPoint))
 			poly.add(polygonPoint);
-			center.addLocal(p);
-		}
 	}
 
 	protected void drawAnnotations() {
@@ -165,7 +164,7 @@ public class Floor extends HousePart {
 			Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
 			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
 			Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
-			fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), original == null, Align.Center, true);
+			fetchSizeAnnot(annotCounter++).setRange(a, b, getCenter(), getFaceDirection(), original == null, Align.Center, true);
 		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
@@ -180,5 +179,10 @@ public class Floor extends HousePart {
 		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
 		root.updateWorldTransform(true);
 		super.flatten(flattenTime);
-	}	
+	}
+	
+	public Vector3 getAbsPoint(final int index) {
+		return toAbsolute(points.get(index), container == null ? null : container.getContainer());
+	}
+	
 }

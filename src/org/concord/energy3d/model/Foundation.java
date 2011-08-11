@@ -260,18 +260,18 @@ public class Foundation extends HousePart {
 		super.flatten(flattenTime);
 	}
 
-	@Override
-	protected void computeCenter() {
-		center.set(0, 0, 0);
-		for (int i = 0; i < points.size() / 2; i++) {
-			Vector3 p = points.get(i);
-			p = toAbsolute(p);
-			pointsRoot.getChild(i).setTranslation(p);
-			getAbsPoint(i).set(p);
-			center.addLocal(p);
-		}
-		center.multiplyLocal(1.0 / points.size() * 2);
-	}
+//	@Override
+//	protected void computeCenter() {
+//		center.set(0, 0, 0);
+//		for (int i = 0; i < points.size() / 2; i++) {
+//			Vector3 p = points.get(i);
+//			p = toAbsolute(p);
+//			pointsRoot.getChild(i).setTranslation(p);
+//			getAbsPoint(i).set(p);
+//			center.addLocal(p);
+//		}
+//		center.multiplyLocal(1.0 / points.size() * 2);
+//	}
 
 	@Override
 	protected void drawAnnotations() {
@@ -286,7 +286,7 @@ public class Foundation extends HousePart {
 				sizeAnnotRoot.attachChild(annot);
 			}
 //			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), center, getFaceDirection(), false, original == null ? Align.South : Align.Center, true);
-			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), center, getFaceDirection(), false, Align.Center, true, true);
+			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), getCenter(), getFaceDirection(), false, Align.Center, true, true);
 		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
