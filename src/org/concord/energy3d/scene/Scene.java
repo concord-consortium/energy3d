@@ -170,8 +170,8 @@ public class Scene implements Serializable {
 				in.close();
 				for (HousePart housePart : instance.getParts())
 					originalHouseRoot.attachChild(housePart.getRoot());
-//				for (HousePart housePart : instance.getParts())
-//					housePart.draw();
+				// for (HousePart housePart : instance.getParts())
+				// housePart.draw();
 				redrawAll = true;
 				System.out.println("done");
 				SceneManager.getInstance().updateHeliodonSize();
@@ -202,16 +202,17 @@ public class Scene implements Serializable {
 			for (HousePart part : PrintController.getInstance().getPrintParts())
 				part.setAnnotationsVisible(visible);
 
-//		if (visible)
-//			redrawAnnotations = true;
+		// if (visible)
+		// redrawAnnotations = true;
 	}
 
 	public void setTextureEnabled(final boolean enabled) {
 		isTextureEnabled = enabled;
 		for (HousePart part : parts)
 			part.updateTextureAndColor(enabled);
-		for (HousePart part : PrintController.getInstance().getPrintParts())
-			part.updateTextureAndColor(enabled);
+		if (PrintController.getInstance().getPrintParts() != null)
+			for (HousePart part : PrintController.getInstance().getPrintParts())
+				part.updateTextureAndColor(enabled);
 
 		if (enabled)
 			redrawAll = true;
@@ -235,24 +236,24 @@ public class Scene implements Serializable {
 			Snap.clearAnnotationDrawn();
 			for (final HousePart part : parts)
 				if (part instanceof Roof)
-					part.draw();			
+					part.draw();
 			for (final HousePart part : parts)
 				if (!(part instanceof Roof))
-					part.draw();					
+					part.draw();
 			if (PrintController.getInstance().getPrintParts() != null)
 				for (HousePart part : PrintController.getInstance().getPrintParts())
 					part.draw();
 			redrawAll = false;
 		}
-//		if (redrawAnnotations) {
-//			Snap.clearAnnotationDrawn();
-//			for (HousePart part : parts)
-//				part.drawAnnotations();
-//			if (PrintController.getInstance().getPrintParts() != null)
-//				for (HousePart part : PrintController.getInstance().getPrintParts())
-//					part.drawAnnotations();
-//			redrawAnnotations = false;
-//		}
+		// if (redrawAnnotations) {
+		// Snap.clearAnnotationDrawn();
+		// for (HousePart part : parts)
+		// part.drawAnnotations();
+		// if (PrintController.getInstance().getPrintParts() != null)
+		// for (HousePart part : PrintController.getInstance().getPrintParts())
+		// part.drawAnnotations();
+		// redrawAnnotations = false;
+		// }
 	}
 
 	public void setUnit(Unit unit) {

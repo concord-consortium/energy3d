@@ -965,15 +965,21 @@ public class Wall extends HousePart {
 		// }
 		// if (original != null)
 		// fetchSizeAnnot(annotCounter++).setRange(getAbsPoint(1), getAbsPoint(3), center, faceDirection, original == null, Align.Center, true);
-		if (wallPolygonPoints != null)
+		
+		
+		if (wallPolygonPoints != null) {
+			final Vector3 actualNormal = wallPolygonPoints.get(1).subtract(wallPolygonPoints.get(2), null).normalizeLocal().crossLocal(wallPolygonPoints.get(3).subtract(wallPolygonPoints.get(2), null).normalizeLocal());
+			final boolean reverse = actualNormal.dot(getFaceDirection()) > 0;
+				
 			for (int i = 0; i < wallPolygonPoints.size() - 1; i++) {
 				final boolean front = i == wallPolygonPoints.size() - 3 && original == null;
-				fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i + 1), getCenter(), faceDirection, front, front ? Align.South : Align.Center, true);
+				fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i + 1), getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, true, reverse);
 				if (i > 0)
 					fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i - 1), wallPolygonPoints.get(i + 1), getFaceDirection());
 //				else
 //					fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(0), wallPolygonPoints.get(wallPolygonPoints.size() - 1), wallPolygonPoints.get(1), getFaceDirection());
 			}
+		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.MeshLib;
+import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
@@ -160,7 +161,7 @@ public abstract class Roof extends HousePart {
 			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
 			wireframeMesh.getMeshData().updateVertexCount();
 			wireframeMesh.updateModelBound();
-			
+
 			root.updateWorldBound(true);
 
 			// drawGableWalls();
@@ -183,7 +184,7 @@ public abstract class Roof extends HousePart {
 
 		System.out.println("draw roof");
 
-//		drawWalls();
+		// drawWalls();
 	}
 
 	protected void drawWalls() {
@@ -373,37 +374,65 @@ public abstract class Roof extends HousePart {
 		// fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), false, Align.Center, true, true);
 		// }
 		// } else {
-		final Vector3 p1 = new Vector3();
-		final Vector3 p2 = new Vector3();
-		final Vector3 p3 = new Vector3();
+//		final Vector3 p1 = new Vector3();
+//		final Vector3 p2 = new Vector3();
+//		final Vector3 p3 = new Vector3();
 		for (Spatial mesh : flattenedMeshesRoot.getChildren()) {
 			if (mesh.getSceneHints().getCullHint() != CullHint.Always) {
-				final FloatBuffer vertexBuffer = ((Mesh) mesh).getMeshData().getVertexBuffer();
-				for (int i = 0; i < vertexBuffer.limit() / 9; i++) {
-					final int xPos = i * 9;
-					vertexBuffer.position(xPos);
-					p1.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-					p2.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-					p3.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+				final FloatBuffer buf = ((Mesh) mesh).getMeshData().getVertexBuffer();
+//				for (int i = 0; i < buf.limit() / 9; i++) {
+//					final int xPos = i * 9;
+//					buf.position(xPos);
+//					p1.set(buf.get(), buf.get(), buf.get());
+//					p2.set(buf.get(), buf.get(), buf.get());
+//					p3.set(buf.get(), buf.get(), buf.get());
+//					mesh.getTransform().applyForward(p1);
+//					mesh.getTransform().applyForward(p2);
+//					mesh.getTransform().applyForward(p3);
+//
+//					// Size annotation
+//					final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
+//					fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
+//					fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
+//					fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
+//
+//					// Angle annotations
+//					// final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal());
+//					final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).negateLocal();
+//					fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3, n);
+//					fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1, n);
+//					fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2, n);
+//				}
+				
+				
+				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(buf);
+				for (ReadOnlyVector3 v : convexHull) {
+					System.out.println(Util.toString(v));
+				}
+					
+				final int n = convexHull.size() - 1;
+				for (int i = 0; i < n; i++) {
+					final Vector3 p1, p2, p3;
+					p1 = new Vector3(convexHull.get(i));
+					p2 = new Vector3(convexHull.get(i + 1));
+					p3 = new Vector3(convexHull.get((i + 2) % n));
 					mesh.getTransform().applyForward(p1);
 					mesh.getTransform().applyForward(p2);
 					mesh.getTransform().applyForward(p3);
 
+					final Vector3 normal = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).normalizeLocal();
+					
 					// Size annotation
 					final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
-					fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
-					fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
-					fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
+					fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, normal, false, Align.Center, true, true, true);
 
 					// Angle annotations
-					// final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal());
-					final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).negateLocal();
-					fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3, n);
-					fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1, n);
-					fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2, n);
+					fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1, normal);
 				}
 			}
 		}
+		
+		
 		// }
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)

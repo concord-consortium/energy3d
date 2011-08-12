@@ -210,4 +210,42 @@ public class MeshLib {
 			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
 		} while (!endpoint.equals(leftVertex));
 	}
+
+	public static ArrayList<ReadOnlyVector3> computeConvexHull(final FloatBuffer vertexBuffer) {
+		vertexBuffer.rewind();
+		final Vector3 leftVertex = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
+		while (vertexBuffer.hasRemaining()) {
+			final double x = vertexBuffer.get();
+			if (x < leftVertex.getX())
+				leftVertex.set(x, vertexBuffer.get(), vertexBuffer.get());
+			else
+				vertexBuffer.position(vertexBuffer.position() + 2);
+		}
+
+		final ReadOnlyVector3 normal = Vector3.UNIT_Z;
+		final Vector3 pointOnHull = new Vector3(leftVertex);
+		final Vector3 endpoint = new Vector3();
+		final Vector3 sj = new Vector3();
+		final ArrayList<ReadOnlyVector3> convexHull = new ArrayList<ReadOnlyVector3>();
+		convexHull.add(pointOnHull);
+		do {
+//			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
+			endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
+			for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
+				sj.set(vertexBuffer.get(j * 3), vertexBuffer.get(j * 3 + 1), vertexBuffer.get(j * 3 + 2));
+				// if (S[j] is on left of line from P[i] to endpoint)
+				final double dot = normal.cross(endpoint.subtract(pointOnHull, null).normalizeLocal(), null).dot(sj.subtract(pointOnHull, null).normalizeLocal());				
+				if (!sj.equals(pointOnHull) && dot > 0) {
+					endpoint.set(sj); // found greater left turn, update endpoint
+				}
+				else if (!sj.equals(pointOnHull) && dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
+					endpoint.set(sj); // found greater left turn, update endpoint
+			}
+			pointOnHull.set(endpoint);
+			convexHull.add(new Vector3(pointOnHull));
+//			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
+		} while (!endpoint.equals(leftVertex));
+		return convexHull;
+	}
+	
 }
