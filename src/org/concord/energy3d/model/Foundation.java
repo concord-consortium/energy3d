@@ -172,7 +172,8 @@ public class Foundation extends HousePart {
 				points.get(i + 4).set(points.get(i)).setZ(newBoundingHeight);
 		}
 
-		draw();
+//		draw();
+		Scene.getInstance().redrawAll();
 		showPoints();
 	}
 
@@ -213,9 +214,9 @@ public class Foundation extends HousePart {
 			drawSideWireframe(wireframeVertexBuffer, 2, 0);
 			wireframeMesh.updateModelBound();
 
-			if (original == null && resizeHouseMode)
-				for (HousePart child : children)
-					child.draw();
+//			if (original == null && resizeHouseMode)
+//				for (HousePart child : children)
+//					child.draw();
 		}
 	}
 

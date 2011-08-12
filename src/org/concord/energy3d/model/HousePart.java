@@ -42,7 +42,7 @@ public abstract class HousePart implements Serializable {
 	static private boolean snapToObjects = true;
 	static private boolean snapToGrids = false;
 	static private boolean drawAnnotations = false;
-	static private int globalDrawFlag = 1;
+//	static private int globalDrawFlag = 1;
 	transient protected Node root;
 	transient protected Node pointsRoot;
 	// transient protected ArrayList<Vector3> abspoints;
@@ -53,7 +53,7 @@ public abstract class HousePart implements Serializable {
 	transient protected Node sizeAnnotRoot;
 	transient protected Node angleAnnotRoot;
 	transient protected Mesh mesh;
-	transient private int drawFlag;
+//	transient private int drawFlag;
 	transient protected String textureFileName;
 	transient protected boolean relativeToHorizontal;
 	protected final int numOfDrawPoints;
@@ -68,11 +68,11 @@ public abstract class HousePart implements Serializable {
 	private Vector3 flattenCenter;
 	private double labelOffset = -0.01;
 
-	public static void clearDrawFlags() {
-		globalDrawFlag++;
-		if (globalDrawFlag >= Integer.MAX_VALUE)
-			globalDrawFlag = 1;
-	}
+//	public static void clearDrawFlags() {
+//		globalDrawFlag++;
+//		if (globalDrawFlag >= Integer.MAX_VALUE)
+//			globalDrawFlag = 1;
+//	}
 
 	public static boolean isSnapToObjects() {
 		return snapToObjects;
@@ -412,7 +412,7 @@ public abstract class HousePart implements Serializable {
 	public void draw() {
 //		if (drawFlag == globalDrawFlag)
 //			return;
-		drawFlag = globalDrawFlag;
+//		drawFlag = globalDrawFlag;
 
 		if (root == null)
 			init();

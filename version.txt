@@ -685,7 +685,8 @@ Version 0.3 - March 7, 2011
 - fix enforceWindowSize problem
 - remove center and use mesh bounding center instead 
 - automatically redraw and stretch wall to roof
-- *draw flag no longer required
+- remove draw flags
+- keep the edit points on after clicking on a part and use a separate hover attribute to turn on the hovered parts as well
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

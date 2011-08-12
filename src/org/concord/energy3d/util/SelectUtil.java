@@ -135,7 +135,7 @@ public class SelectUtil {
 		
 		if (data == null) {
 			if (lastHoveredObject != null) {
-				lastHoveredObject.hidePoints();
+//				lastHoveredObject.hidePoints();
 				Blinker.getInstance().setTarget(null);
 			}
 		} else if (edit && data.isEditPoint()) {
@@ -145,7 +145,7 @@ public class SelectUtil {
 			data.getHousePart().setEditPoint(pointIndex);
 		} else {
 			if (lastHoveredObject != null && lastHoveredObject != data.getHousePart()) {
-				lastHoveredObject.hidePoints();
+//				lastHoveredObject.hidePoints();
 			}
 
 			if (lastHoveredObject != data.getHousePart()) {
@@ -158,8 +158,8 @@ public class SelectUtil {
 				}
 			}
 			final ViewMode viewMode = SceneManager.getInstance().getViewMode();
-			if (viewMode == ViewMode.NORMAL || viewMode == ViewMode.TOP_VIEW)
-				data.getHousePart().showPoints();
+//			if (viewMode == ViewMode.NORMAL || viewMode == ViewMode.TOP_VIEW)
+//				data.getHousePart().showPoints();
 		}
 		return data;
 	}

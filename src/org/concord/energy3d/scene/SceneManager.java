@@ -143,6 +143,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean exit = false;
 	private boolean rotAnim = false;
 	private HousePart drawn = null;
+	private HousePart hoveredHousePart = null;
 	private Operation operation = Operation.SELECT;
 	private Heliodon heliodon;
 	private CameraControl control;
@@ -314,7 +315,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void update(final ReadOnlyTimer timer) {
 		final double tpf = timer.getTimePerFrame();
-		HousePart.clearDrawFlags();
+//		HousePart.clearDrawFlags();
 		passManager.updatePasses(tpf);
 		logicalLayer.checkTriggers(tpf);
 
@@ -514,6 +515,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									System.out.print("Clicked on: " + pick);
 									if (previousDrawn != null && previousDrawn != drawn)
 										previousDrawn.hidePoints();
+									if (drawn != null && drawn != previousDrawn)
+										drawn.showPoints();
 									SelectUtil.nextPickLayer();
 									if (operation == Operation.DRAW_ROOF_GABLE && drawn instanceof Roof) {
 										System.out.println(drawn);
@@ -1110,10 +1113,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn.setPreviewPoint(x, y);
 		} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
 			pick = SelectUtil.selectHousePart(x, y, false);
-			if (pick != null)
-				drawn = pick.getHousePart();
-			else
-				drawn = null;
+			if (pick != null) {
+//				drawn = pick.getHousePart();
+				if (hoveredHousePart != null && hoveredHousePart != drawn)
+					hoveredHousePart.hidePoints();				
+				hoveredHousePart = pick.getHousePart();
+				if (hoveredHousePart != null && hoveredHousePart != drawn)
+					hoveredHousePart.showPoints();
+			} else {
+//				drawn = null;
+				if (hoveredHousePart != null && hoveredHousePart != drawn)
+					hoveredHousePart.hidePoints();
+				hoveredHousePart = null;
+			}
 		}
 	}
 
