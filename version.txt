@@ -693,10 +693,14 @@ Version 0.3 - March 7, 2011
 - adjust polygon offsets
 - add the last wall angle
 - make tooltips heavyweight
+- prevent gable edit point of custom roofs from exiting gable wall direction line in free mode
+- prevent gable edit point of custom roofs from exiting gable wall direction line in grid mode
+- initialize the above preventions by calling computeGableEditPoints twice during mesh draw
+- fix problem with edit point switching sometimes when custom roof editing
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
-- *fix problem with edit point switching sometimes when custom roof editing
 - *fix problem with resizing custome roof
 - *put the main model in the exact middle of print preview view using its bounding box
 - *move all parameters of HousePart constructor to init

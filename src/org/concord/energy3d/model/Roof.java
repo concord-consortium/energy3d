@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
@@ -57,6 +58,7 @@ public abstract class Roof extends HousePart {
 	transient private Line wireframeMesh;
 	private ArrayList<Wall> gableWalls;
 	transient private ArrayList<Wall> walls;
+	transient protected Map<Integer, Wall> gableEditPointToWallMap;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -68,6 +70,7 @@ public abstract class Roof extends HousePart {
 		wallUpperPoints = new ArrayList<PolygonPoint>();
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
+		gableEditPointToWallMap = new Hashtable<Integer, Wall>();
 
 		flattenedMeshesRoot = new Node("Roof Meshes Root");
 		root.attachChild(flattenedMeshesRoot);
@@ -140,7 +143,7 @@ public abstract class Roof extends HousePart {
 
 			// create roof parts
 			int meshIndex = 0;
-			MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
+			MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);			
 			hideGableMeshes();
 			final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
 			wireframeVertexBuffer.rewind();
@@ -163,6 +166,8 @@ public abstract class Roof extends HousePart {
 			wireframeMesh.updateModelBound();
 
 			root.updateWorldBound(true);
+			
+			computeGableEditPoints();
 
 			// drawGableWalls();
 
@@ -640,6 +645,7 @@ public abstract class Roof extends HousePart {
 	private void computeGableEditPoints() {
 		if (gableWalls == null)
 			return;
+		gableEditPointToWallMap.clear();
 		final ArrayList<Vector3> meshUpperPoints = new ArrayList<Vector3>();
 		for (final Wall wall : gableWalls) {
 			final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
@@ -653,6 +659,7 @@ public abstract class Roof extends HousePart {
 						double smallestDistanceToEditPoint = Double.MAX_VALUE;
 						Vector3 nearestEditPoint = null;
 						Vector3 nearestEditPointRel = null;
+						int nearestIndex = -1;
 						// select the nearest point so that one edit point per upper mesh point is selected
 						for (int i = 0; i < points.size(); i++) {
 							final Vector3 editPoint = getAbsPoint(i);
@@ -661,6 +668,7 @@ public abstract class Roof extends HousePart {
 								smallestDistanceToEditPoint = distanceToEditPoint;
 								nearestEditPoint = editPoint;
 								nearestEditPointRel = points.get(i);
+								nearestIndex = i;
 							}
 						}
 						double distance = -nearestEditPoint.subtract(meshBase[0], null).dot(n);
@@ -668,6 +676,7 @@ public abstract class Roof extends HousePart {
 						nearestEditPoint.addLocal(n.multiply(distance, null));
 						nearestEditPointRel.set(toRelative(nearestEditPoint, container.getContainer()));
 						gableRoofMeshEditPoints.add(nearestEditPoint);
+						gableEditPointToWallMap.put(nearestIndex, wall);
 					}
 					computeGableWallPoints(base, gableRoofMeshEditPoints);
 					break;

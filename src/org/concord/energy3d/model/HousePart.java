@@ -272,7 +272,7 @@ public abstract class HousePart implements Serializable {
 		return closest;
 	}
 
-	private Vector3 closestPoint(ReadOnlyVector3 p1, ReadOnlyVector3 p21, ReadOnlyVector3 p3, ReadOnlyVector3 p43) {
+	protected Vector3 closestPoint(ReadOnlyVector3 p1, ReadOnlyVector3 p21, ReadOnlyVector3 p3, ReadOnlyVector3 p43) {
 		final double EPS = 0.0001;
 		Vector3 p13;
 		double d1343, d4321, d1321, d4343, d2121;

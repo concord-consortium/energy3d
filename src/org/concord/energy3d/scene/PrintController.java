@@ -60,11 +60,11 @@ public class PrintController implements Updater {
 	}
 
 	public void init() {
-		final OffsetState offsetState = new OffsetState();
-		offsetState.setTypeEnabled(OffsetType.Fill, true);
-//		offsetState.setFactor(1);
-		offsetState.setUnits(1);
-		pagesRoot.setRenderState(offsetState);
+//		final OffsetState offsetState = new OffsetState();
+//		offsetState.setTypeEnabled(OffsetType.Fill, true);
+//		offsetState.setFactor(10);
+//		offsetState.setUnits(10);
+//		pagesRoot.setRenderState(offsetState);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -323,8 +323,8 @@ public class PrintController implements Updater {
 
 			final Box box = new Box("Page Boundary");
 //			box.setDefaultColor(ColorRGBA.GRAY);
-//			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
-			box.setData(currentCorner, currentCorner.add(pageWidth, 0.1, -pageHeight, null));			
+			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
+//			box.setData(currentCorner, currentCorner.add(pageWidth, 0.1, -pageHeight, null));			
 			pagesRoot.attachChild(box);
 		}
 
