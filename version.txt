@@ -691,6 +691,7 @@ Version 0.3 - March 7, 2011
 - use the mesh bounds instead of root bounds to compute page size
 - fix the problem with reversed annotation text in wall of L-Shaped roof
 - adjust polygon offsets
+- add the last wall angle
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
