@@ -968,7 +968,8 @@ public class Wall extends HousePart {
 		
 		
 		if (wallPolygonPoints != null) {
-			final Vector3 actualNormal = wallPolygonPoints.get(1).subtract(wallPolygonPoints.get(2), null).normalizeLocal().crossLocal(wallPolygonPoints.get(3).subtract(wallPolygonPoints.get(2), null).normalizeLocal());
+			final int n = wallPolygonPoints.size();
+			final Vector3 actualNormal = wallPolygonPoints.get(n - 3).subtract(wallPolygonPoints.get(n - 2), null).normalizeLocal().crossLocal(wallPolygonPoints.get(n - 1).subtract(wallPolygonPoints.get(n - 2), null).normalizeLocal());
 			final boolean reverse = actualNormal.dot(getFaceDirection()) > 0;
 				
 			for (int i = 0; i < wallPolygonPoints.size() - 1; i++) {
