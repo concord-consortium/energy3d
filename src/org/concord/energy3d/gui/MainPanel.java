@@ -21,6 +21,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.ToolTipManager;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.PrintController;
@@ -85,6 +86,7 @@ public class MainPanel extends JPanel {
 	private MainPanel() {
 		super();
 		System.out.print("Initiating GUI Panel...");
+		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		initialize();
 		System.out.println("done");
 	}
@@ -767,6 +769,7 @@ public class MainPanel extends JPanel {
 		if (zoomButton == null) {
 			zoomButton = new JToggleButton();
 			zoomButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/zoom.png")));
+			zoomButton.setToolTipText("Zoom");
 			zoomButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setZoomLock(zoomButton.isSelected());
