@@ -82,6 +82,11 @@ public class Wall extends HousePart {
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
+		final OffsetState offsetState = new OffsetState();
+		offsetState.setTypeEnabled(OffsetType.Fill, true);
+		offsetState.setFactor(1f);
+		offsetState.setUnits(1f);
+		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new BoundingBox());
 		root.attachChild(mesh);
 
@@ -100,11 +105,13 @@ public class Wall extends HousePart {
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
 		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		surroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		final OffsetState offsetState = new OffsetState();
-		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(1.1f);
-		offsetState.setUnits(4f);
-		surroundMesh.setRenderState(offsetState);
+//		final OffsetState offsetState = new OffsetState();
+//		offsetState.setTypeEnabled(OffsetType.Fill, true);
+////		offsetState.setFactor(1.1f);
+////		offsetState.setUnits(4f);
+//		offsetState.setFactor(1);
+//		offsetState.setUnits(1);		
+//		surroundMesh.setRenderState(offsetState);
 		surroundMesh.setModelBound(new BoundingBox());
 		root.attachChild(surroundMesh);
 

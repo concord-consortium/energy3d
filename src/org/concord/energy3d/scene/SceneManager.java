@@ -431,8 +431,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(1.1f);
-		offsetState.setUnits(4f);
+//		offsetState.setFactor(1.1f);
+//		offsetState.setUnits(4f);
+		offsetState.setFactor(0.5f);
+		offsetState.setUnits(0.5f);		
 		floor.setRenderState(offsetState);
 
 		final BlendState blendState = new BlendState();

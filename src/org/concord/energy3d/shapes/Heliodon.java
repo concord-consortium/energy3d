@@ -142,8 +142,10 @@ public class Heliodon {
 		base.getMeshData().setIndexMode(IndexMode.QuadStrip);
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(0.2f);
-		offsetState.setUnits(3f);		
+//		offsetState.setFactor(0.2f);
+//		offsetState.setUnits(3f);
+		offsetState.setFactor(0.1f);
+		offsetState.setUnits(0.1f);		
 		base.setRenderState(offsetState);
 		final ShadingState shadingState = new ShadingState();
 		shadingState.setShadingMode(ShadingMode.Flat);

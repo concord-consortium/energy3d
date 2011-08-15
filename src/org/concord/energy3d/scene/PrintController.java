@@ -62,8 +62,8 @@ public class PrintController implements Updater {
 	public void init() {
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(1);
-		offsetState.setUnits(50); // TODO 
+//		offsetState.setFactor(1);
+		offsetState.setUnits(1);
 		pagesRoot.setRenderState(offsetState);
 	}
 

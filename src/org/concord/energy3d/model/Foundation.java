@@ -256,6 +256,12 @@ public class Foundation extends HousePart {
 	}
 
 	@Override
+	public void flattenInit() {
+		super.flattenInit();
+		flattenCenter.setY(0);
+	}
+	
+	@Override
 	public void flatten(double flattenTime) {
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 		super.flatten(flattenTime);

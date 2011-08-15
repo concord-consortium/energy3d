@@ -65,7 +65,7 @@ public abstract class HousePart implements Serializable {
 	protected int editPointIndex = -1;
 	protected double height;
 	private boolean firstPointInserted = false;
-	private Vector3 flattenCenter;
+	protected Vector3 flattenCenter;
 	private double labelOffset = -0.01;
 
 //	public static void clearDrawFlags() {
