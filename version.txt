@@ -700,6 +700,8 @@ Version 0.3 - March 7, 2011
 - ensure wall stays withing borders of foundation
 - move wall to foundation completely when dragging wall from floor to foundation
 - do not draw children if changing foundation not in resize mode
+- compute roof gable edit point based on the wall instead of the roof mesh
+- call compute gable edit point only once
 
 
 - *auto redraw gable wall when inserting gable or editing gable
