@@ -34,6 +34,7 @@ public class SizeAnnotation extends Annotation {
 	}
 	
 	public void setRange(ReadOnlyVector3 from, ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipOffset, final boolean rotateTextAlongLine, final boolean upsideDownText) {
+		updateTextSize();
 		final double C = 0.1;
 		final Vector3 v = new Vector3();
 //		if (to.subtract(from, null).normalizeLocal().crossLocal(faceDirection).dot(Vector3.NEG_UNIT_Z) < 0) {
@@ -125,4 +126,13 @@ public class SizeAnnotation extends Annotation {
 		this.updateWorldTransform(true);		
 		this.updateWorldBound(true);
 	}
+	
+	protected void updateTextSize() {
+		final BoundingBox bounds = (BoundingBox)Scene.getInstance().getOriginalHouseRoot().getWorldBound();
+		if (bounds != null) {
+		final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
+		label.setFontScale(size / 20.0);
+		}
+	}
+	
 }

@@ -47,6 +47,7 @@ public class Window extends HousePart {
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.setModelBound(new BoundingBox());
+		mesh.getSceneHints().setCullHint(CullHint.Always);
 
 		// Transparency
 		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.4f, 0.5f, 0.7f));
@@ -73,6 +74,7 @@ public class Window extends HousePart {
 		((Line)bars).setAntialiased(true);
 		bars.getSceneHints().setCastsShadows(false);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
+		bars.getSceneHints().setCullHint(CullHint.Always);
 		root.attachChild(bars);
 	}
 

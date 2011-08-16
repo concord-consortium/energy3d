@@ -195,6 +195,8 @@ public class Wall extends HousePart {
 					p.getZ();;
 				}
 			}
+			if (p == null)
+				return;
 			if (container != null)
 				p.setZ(container.height);
 			int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
