@@ -89,6 +89,8 @@ public class Scene implements Serializable {
 	}
 
 	public void remove(HousePart housePart) {
+		if (housePart == null)
+			return;
 		final HousePart container = housePart.getContainer();
 		if (container != null)
 			container.getChildren().remove(housePart);

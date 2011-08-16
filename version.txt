@@ -697,6 +697,8 @@ Version 0.3 - March 7, 2011
 - prevent gable edit point of custom roofs from exiting gable wall direction line in grid mode
 - initialize the above preventions by calling computeGableEditPoints twice during mesh draw
 - fix problem with edit point switching sometimes when custom roof editing
+- ensure wall stays withing borders of foundation
+- move wall to foundation completely when dragging wall from floor to foundation
 
 
 - *auto redraw gable wall when inserting gable or editing gable

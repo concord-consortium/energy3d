@@ -47,7 +47,7 @@ public class AngleAnnotation extends Annotation {
 		}
 		final long angle = Math.round((end - start) * 180.0 / Math.PI);
 
-		final double radius = 0.3 / Math.sqrt(end - start);
+		final double radius = end == start ? 0.0 : 0.3 / Math.sqrt(end - start);
 		if (angle == 90) {
 			final ReadOnlyVector3[] p = new ReadOnlyVector3[3];
 			p[0] = a.normalize(null).multiplyLocal(0.2);
