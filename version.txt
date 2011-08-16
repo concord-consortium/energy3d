@@ -703,6 +703,7 @@ Version 0.3 - March 7, 2011
 - compute roof gable edit point based on the wall instead of the roof mesh
 - call compute gable edit point only once
 - fix problem oversized scene bounding box by forcing annotations to use bounding box instead of bounding sphere
+- make the wall top surround mesh invisible when there is a roof 
 
 
 - *auto redraw gable wall when inserting gable or editing gable

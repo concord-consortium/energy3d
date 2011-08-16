@@ -33,6 +33,7 @@ public class HipRoof extends Roof {
 			points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 		}
 		draw();
+		drawWalls();
 		if (container != null)
 			showPoints();
 

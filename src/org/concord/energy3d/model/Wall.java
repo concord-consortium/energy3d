@@ -102,9 +102,9 @@ public class Wall extends HousePart {
 		root.attachChild(backMesh);
 
 		surroundMesh = new Mesh("Wall (Surround)");
-		surroundMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
-		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(8));
+		surroundMesh.getMeshData().setIndexMode(IndexMode.Quads);
+		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(12));
+		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(12));
 		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		surroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		// final OffsetState offsetState = new OffsetState();
@@ -767,70 +767,46 @@ public class Wall extends HousePart {
 	}
 
 	private void drawSurroundMesh(final ReadOnlyVector3 thickness) {
-		// final ArrayList<Vector3> abspoints = abspoints;
+		final boolean drawThicknessAndIsLongWall = Scene.getInstance().isDrawThickness() && !this.isShortWall;
+		final boolean noNeighbor0 = neighbors[0] == null || (drawThicknessAndIsLongWall && isPerpendicularToNeighbor(0));
+		final boolean noNeighbor1 = neighbors[1] == null || (drawThicknessAndIsLongWall && isPerpendicularToNeighbor(1));
+		
+		final boolean visible = roof == null || noNeighbor0 || noNeighbor1;
+		surroundMesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+		if (!visible)
+			return;
+		
 		final FloatBuffer vertexBuffer = surroundMesh.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = surroundMesh.getMeshData().getNormalBuffer();
-		vertexBuffer.position(0);
-		normalBuffer.position(0);
-		final Vector3 p2 = new Vector3();
-		// final int[] order;
-		//
-		// if (neighbors[0] == null && neighbors[1] == null)
-		// order = new int[] { 0, 1, 3, 2 };
-		// else if (neighbors[0] == null) {
-		// if (Scene.getInstance().isDrawThickness() && !this.isShortWall && neightborPerpendicular[1])
-		// order = new int[] { 0, 1, 3, 2 };
-		// else
-		// order = new int[] { 0, 1, 3 };
-		// } else if (neighbors[1] == null) {
-		// if (Scene.getInstance().isDrawThickness() && !this.isShortWall && neightborPerpendicular[0])
-		// order = new int[] { 0, 1, 3, 2 };
-		// else
-		// order = new int[] { 1, 3, 2 };
-		// } else {
-		//
-		// }
-
-		final ArrayList<Integer> order = new ArrayList<Integer>(4);
-		order.add(1);
-		order.add(3);
-		final boolean drawThicknessAndIsLongWall = Scene.getInstance().isDrawThickness() && !this.isShortWall;
-		if (neighbors[0] == null || (drawThicknessAndIsLongWall && isPerpendicularToNeighbor(0)))
-			order.add(0, 0);
-		if (neighbors[1] == null || (drawThicknessAndIsLongWall && isPerpendicularToNeighbor(1)))
-			order.add(2);
-
-		// if (Scene.getInstance().isDrawThickness() && !this.isShortWall)
-		// order = new int[] { 0, 1, 3, 2 };
-		// else if (neighbors[0] != null && neighbors[1] != null)
-		// order = new int[] { 1, 3 };
-		// else if (neighbors[0] != null)
-		// order = new int[] { 1, 3, 2 };
-		// else if (neighbors[1] != null)
-		// order = new int[] { 0, 1, 3 };
-		// else
-		// order = new int[] { 0, 1, 3, 2 };
-
+		vertexBuffer.rewind();
+		normalBuffer.rewind();
+		vertexBuffer.limit(vertexBuffer.capacity());
+		normalBuffer.limit(normalBuffer.capacity());
+		
 		final Vector3 sideNormal = thickness.cross(0, 0, 1, null).normalizeLocal();
-		for (int i : order) {
-			final ReadOnlyVector3 p = getAbsPoint(i);
-			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p2.set(p).addLocal(thickness);
-			vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+		if (noNeighbor0)
+			addSurroundQuad(0, 1, sideNormal.negate(null), thickness, vertexBuffer, normalBuffer);
+		if (noNeighbor1)
+			addSurroundQuad(3, 2, sideNormal, thickness, vertexBuffer, normalBuffer);
+		if (roof == null)
+			addSurroundQuad(1, 3, Vector3.UNIT_Z, thickness, vertexBuffer, normalBuffer);
 
-			if (i == 1 || i == 3) {
-				normalBuffer.put(0).put(0).put(1);
-				normalBuffer.put(0).put(0).put(1);
-			} else if (i == 0 || i == 2) {
-				if (i == 2)
-					sideNormal.negateLocal();
-				normalBuffer.put(sideNormal.getXf()).put(sideNormal.getYf()).put(sideNormal.getZf());
-				normalBuffer.put(sideNormal.getXf()).put(sideNormal.getYf()).put(sideNormal.getZf());
-			}
-		}
+		vertexBuffer.limit(vertexBuffer.position());
+		normalBuffer.limit(normalBuffer.position());
+	}
 
-		while (vertexBuffer.position() < vertexBuffer.capacity())
-			vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+	protected void addSurroundQuad(int i1, int i2, ReadOnlyVector3 n, final ReadOnlyVector3 thickness, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {
+		final ReadOnlyVector3 p1 = getAbsPoint(i1);
+		final ReadOnlyVector3 p2 = p1.add(thickness, null);
+		final ReadOnlyVector3 p3 = getAbsPoint(i2);
+		final ReadOnlyVector3 p4 = p3.add(thickness, null);
+		vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+		vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
+		vertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
+		vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+
+		for (int i = 0; i < 4; i++)
+			normalBuffer.put(n.getXf()).put(n.getYf()).put(n.getZf());
 	}
 
 	private void drawWindowsSurroundMesh(final Vector3 thickness) {
