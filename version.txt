@@ -704,6 +704,8 @@ Version 0.3 - March 7, 2011
 - call compute gable edit point only once
 - fix problem oversized scene bounding box by forcing annotations to use bounding box instead of bounding sphere
 - make the wall top surround mesh invisible when there is a roof 
+- draw wireframe lines for gable roof
+- draw wireframe lines for windows 
 
 
 - *auto redraw gable wall when inserting gable or editing gable

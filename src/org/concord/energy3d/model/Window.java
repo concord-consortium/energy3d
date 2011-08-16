@@ -306,7 +306,10 @@ public class Window extends HousePart {
 	}
 	
 	public Vector3 getAbsPoint(final int index) {
-		return container.getRoot().getTransform().applyForward(toAbsolute(enforceContraints(points.get(index))));
+		final Vector3 absolute = toAbsolute(enforceContraints(points.get(index)));
+		if (container != null)
+			container.getRoot().getTransform().applyForward(absolute);
+		return absolute;
 	}
 	
 }
