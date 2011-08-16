@@ -173,7 +173,10 @@ public class Foundation extends HousePart {
 		}
 
 //		draw();
-		Scene.getInstance().redrawAll();
+		if (resizeHouseMode)
+			Scene.getInstance().redrawAll();
+		else
+			draw();
 		showPoints();
 	}
 

@@ -699,6 +699,7 @@ Version 0.3 - March 7, 2011
 - fix problem with edit point switching sometimes when custom roof editing
 - ensure wall stays withing borders of foundation
 - move wall to foundation completely when dragging wall from floor to foundation
+- do not draw children if changing foundation not in resize mode
 
 
 - *auto redraw gable wall when inserting gable or editing gable
