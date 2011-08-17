@@ -77,9 +77,9 @@ public abstract class Roof extends HousePart {
 		flattenedMeshesRoot = new Node("Roof Meshes Root");
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(0.1f);
-		offsetState.setUnits(0.1f);
-		flattenedMeshesRoot.setRenderState(offsetState);		
+		offsetState.setFactor(10);
+		offsetState.setUnits(10);
+//		flattenedMeshesRoot.setRenderState(offsetState);		
 		root.attachChild(flattenedMeshesRoot);
 
 		mesh = new Mesh("Roof");

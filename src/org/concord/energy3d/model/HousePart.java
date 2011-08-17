@@ -186,7 +186,7 @@ public abstract class HousePart implements Serializable {
 			// this.sizeAnnotRoot = original.sizeAnnotRoot.makeCopy(false);
 			// root.attachChild(sizeAnnotRoot);
 		}
-		// drawAnnotations();
+		 drawAnnotations();
 		// setAnnotationsVisible(drawAnnotations);
 		root.updateWorldBound(true);
 	}
@@ -512,9 +512,10 @@ public abstract class HousePart implements Serializable {
 	public void flatten(double flattenTime) {
 		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
 		root.setTranslation(targetCenter.subtractLocal(flattenCenter).multiplyLocal(flattenTime));
-		drawAnnotations();
-		root.updateWorldTransform(true);
-		root.updateWorldBound(true);
+//		drawAnnotations();
+//		root.updateWorldTransform(true);
+//		root.updateWorldBound(true);
+		root.updateGeometricState(0);
 	}
 
 	public boolean isPrintable() {

@@ -712,6 +712,8 @@ Version 0.3 - March 7, 2011
 - create the invisible mesh of walls from the exact wall polygon
 - update the label size of all BMText objects by going through scene roof
 - update the label sizes at load time and after each edit of major parts
+- fix problem with windows annotation not showing in print preview mode
+
 
 
 

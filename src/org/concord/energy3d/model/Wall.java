@@ -990,9 +990,11 @@ public class Wall extends HousePart {
 		super.flatten(flattenTime);
 
 		for (HousePart part : children)
-			if (!part.isPrintable())
+			if (!part.isPrintable()) {
 				// part.draw();
 				part.getRoot().setTransform(root.getTransform());
+				part.getRoot().updateGeometricState(0);
+			}
 	}
 
 	public ReadOnlyVector3 getFaceDirection() {

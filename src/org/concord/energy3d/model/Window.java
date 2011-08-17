@@ -74,7 +74,6 @@ public class Window extends HousePart {
 		((Line)bars).setAntialiased(true);
 		bars.getSceneHints().setCastsShadows(false);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
-		bars.getSceneHints().setCullHint(CullHint.Always);
 		root.attachChild(bars);
 	}
 
@@ -310,6 +309,13 @@ public class Window extends HousePart {
 		if (container != null)
 			container.getRoot().getTransform().applyForward(absolute);
 		return absolute;
+	}
+	
+	@Override
+	public void setOriginal(final HousePart original) {
+		super.setOriginal(original);
+//		root.detachChild(sizeAnnotRoot);
+//		container.getRoot().attachChild(sizeAnnotRoot);
 	}
 	
 }

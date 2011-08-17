@@ -325,7 +325,7 @@ public class PrintController implements Updater {
 //			box.setDefaultColor(ColorRGBA.GRAY);
 			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
 //			box.setData(currentCorner, currentCorner.add(pageWidth, 0.1, -pageHeight, null));			
-			pagesRoot.attachChild(box);
+//			pagesRoot.attachChild(box);
 		}
 
 	}
