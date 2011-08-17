@@ -357,7 +357,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					System.out.println(flattenedMeshesRoot.getChild(pick.getIndex()).getWorldBound());
 				}
 			} else {
-				com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
+				if (drawn instanceof Wall)
+					com.ardor3d.util.geom.Debugger.drawBounds(((Wall)drawn).getRoot().getChild(3), renderer, true);
+				else
+					com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
 				if (drawn.getMesh() != null)
 					System.out.println(drawn.getMesh().getWorldBound());
 			}

@@ -21,10 +21,13 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.util.Config;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.ui.text.BMText;
 
 public class Scene implements Serializable {
 	public static enum Unit {
@@ -245,6 +248,7 @@ public class Scene implements Serializable {
 			if (PrintController.getInstance().getPrintParts() != null)
 				for (HousePart part : PrintController.getInstance().getPrintParts())
 					part.draw();
+			updateTextSizes();
 			redrawAll = false;
 		}
 		// if (redrawAnnotations) {
@@ -282,6 +286,26 @@ public class Scene implements Serializable {
 
 	public boolean isTextureEnabled() {
 		return isTextureEnabled;
+	}
+	
+	public void updateTextSizes() {
+		getOriginalHouseRoot().updateWorldBound(true);
+		final BoundingBox bounds = (BoundingBox) getOriginalHouseRoot().getWorldBound();
+		if (bounds != null) {
+			final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
+			final double fontSize = size / 20.0;
+			Annotation.setFontSize(fontSize);
+			updateTextSizes(root, fontSize);
+		}		
+	}
+
+	private void updateTextSizes(final Spatial spatial, double size) {
+		if (spatial instanceof BMText) {
+			((BMText) spatial).setFontScale(size);
+		} else if (spatial instanceof Node) {
+			for (final Spatial child : ((Node) spatial).getChildren())
+				updateTextSizes(child, size);
+		}
 	}
 		
 }

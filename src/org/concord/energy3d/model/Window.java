@@ -111,8 +111,8 @@ public class Window extends HousePart {
 			}
 		}
 
-		draw();
-		showPoints();
+//		draw();
+//		showPoints();
 
 		if (container != null) {
 			draw();
@@ -255,17 +255,17 @@ public class Window extends HousePart {
 		
 		final ReadOnlyTransform trans = container.getRoot().getTransform();
 		final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getFaceDirection(), null);
-		final ReadOnlyVector3 moveToFront = faceDirection.multiply(0.04, null);
+//		final ReadOnlyVector3 moveToFront = faceDirection.multiply(0.04, null);
 		label1.setTranslation(getAbsPoint(i0));
 		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 		final Vector3 center = trans.applyForward(getCenter(), null);
-		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, false, false);
-		annot.setTranslation(moveToFront);
+		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, false, true);
+//		annot.setTranslation(moveToFront);
 
 		annot = fetchSizeAnnot(annotCounter++);
 		annot.setRange(getAbsPoint(i0), getAbsPoint(i2), center, faceDirection, false, Align.Center, true, false, false);
-		annot.setTranslation(moveToFront);
+//		annot.setTranslation(moveToFront);
 	}
 
 	public boolean isPrintable() {

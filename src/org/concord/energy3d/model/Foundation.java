@@ -178,6 +178,7 @@ public class Foundation extends HousePart {
 		else
 			draw();
 		showPoints();
+		Scene.getInstance().updateTextSizes();
 	}
 
 	private void applyNewHeight(double oldHeight, double newHeight, boolean finalize) {

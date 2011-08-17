@@ -27,7 +27,6 @@ public class SizeAnnotation extends Annotation {
 	}
 
 	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipOffset, final boolean rotateTextAlongLine, final boolean upsideDownText) {
-		updateTextSize();
 		final double C = 0.1;
 		final Vector3 v = new Vector3();
 		final Vector3 offset = new Vector3();
@@ -105,7 +104,9 @@ public class SizeAnnotation extends Annotation {
 		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 100) / 100.0 + Scene.getInstance().getUnit().getNotation());
 		label.setAlign(align);
 		label.updateModelBound();
-
+		System.out.println(label.getWorldBound());
+		label.updateWorldBound(false);
+		System.out.println(label.getWorldBound());
 		this.updateWorldTransform(true);
 		this.updateWorldBound(true);
 	}

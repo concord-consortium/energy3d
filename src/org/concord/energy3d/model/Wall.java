@@ -15,6 +15,7 @@ import org.poly2tri.transform.coordinate.AnyToXYTransform;
 import org.poly2tri.transform.coordinate.XYToAnyTransform;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
+import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -36,6 +37,7 @@ import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -62,7 +64,7 @@ public class Wall extends HousePart {
 	private boolean isShortWall;
 	transient private ArrayList<Vector3> wallGablePoints; // TODO remove this
 	transient private Roof roof;
-	transient private ArrayList<ReadOnlyVector3> wallPolygonPoints;
+	transient private ArrayList<Vector3> wallPolygonPoints;
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -195,7 +197,6 @@ public class Wall extends HousePart {
 					p.setX(MathUtils.clamp(p.getX(), Math.min(container.points.get(0).getX(), container.points.get(2).getX()), Math.max(container.points.get(0).getX(), container.points.get(2).getX())));
 					p.setY(MathUtils.clamp(p.getY(), Math.min(container.points.get(0).getY(), container.points.get(1).getY()), Math.max(container.points.get(0).getY(), container.points.get(1).getY())));
 					p.getZ();
-					;
 				}
 			}
 			if (p == null)
@@ -242,6 +243,8 @@ public class Wall extends HousePart {
 
 		if (isDrawable())
 			drawNeighborWalls();
+		
+		Scene.getInstance().updateTextSizes();
 
 	}
 
@@ -313,24 +316,24 @@ public class Wall extends HousePart {
 
 		final Vector3 normal = computeNormal();
 
-		final FloatBuffer invisibleVertexBuffer = invisibleMesh.getMeshData().getVertexBuffer();
-		invisibleVertexBuffer.rewind();
-		Vector3 p;
-
-		float z = (float) height;
-		if (wallGablePoints != null)
-			for (final Vector3 gablePoint : wallGablePoints)
-				if (gablePoint.getZf() > z)
-					z = gablePoint.getZf();
-
-		p = getAbsPoint(1);
-		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
-		p = getAbsPoint(0);
-		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		p = getAbsPoint(2);
-		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		p = getAbsPoint(3);
-		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
+//		final FloatBuffer invisibleVertexBuffer = invisibleMesh.getMeshData().getVertexBuffer();
+//		invisibleVertexBuffer.rewind();
+//		Vector3 p;
+//
+//		float z = (float) height;
+//		if (wallGablePoints != null)
+//			for (final Vector3 gablePoint : wallGablePoints)
+//				if (gablePoint.getZf() > z)
+//					z = gablePoint.getZf();
+//
+//		p = getAbsPoint(1);
+//		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
+//		p = getAbsPoint(0);
+//		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+//		p = getAbsPoint(2);
+//		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+//		p = getAbsPoint(3);
+//		invisibleVertexBuffer.put(p.getXf()).put(p.getYf()).put(z);
 
 		final Polygon polygon = stretchToRoof(computeWallAndWindowPolygon(false));
 
@@ -375,6 +378,13 @@ public class Wall extends HousePart {
 			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
 			mesh.getMeshData().updateVertexCount();
 			mesh.updateModelBound();
+			
+			final Polygon invisiblePolygon = new Polygon(ArdorVector3PolygonPoint.toPoints(extractPolygonPoints(polygon)));
+			Poly2Tri.triangulate(invisiblePolygon);
+			ArdorMeshMapper.updateTriangleMesh(invisibleMesh, invisiblePolygon, fromXY);
+			invisibleMesh.getMeshData().updateVertexCount();
+			invisibleMesh.updateModelBound();
+			
 
 			drawBackMesh(computeWallAndWindowPolygon(true), fromXY);
 			drawSurroundMesh(thicknessNormal);
@@ -405,7 +415,7 @@ public class Wall extends HousePart {
 		}
 	}
 
-	private void drawWireframe(final ArrayList<ReadOnlyVector3> wallPolygonPoints, final ArrayList<ReadOnlyVector3> wallPolygonHoles) {
+	private void drawWireframe(final ArrayList<? extends ReadOnlyVector3> wallPolygonPoints, final ArrayList<ReadOnlyVector3> wallPolygonHoles) {
 		FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
 		final int requiredSize = 2 * (wallPolygonPoints.size() + wallPolygonHoles.size());
 		if (wireframeVertexBuffer.capacity() / 3 < requiredSize) {
@@ -612,8 +622,8 @@ public class Wall extends HousePart {
 	// return gablePoints;
 	// }
 
-	private ArrayList<ReadOnlyVector3> extractPolygonPoints(final Polygon polygon) {
-		final ArrayList<ReadOnlyVector3> gablePoints = new ArrayList<ReadOnlyVector3>();
+	private ArrayList<Vector3> extractPolygonPoints(final Polygon polygon) {
+		final ArrayList<Vector3> gablePoints = new ArrayList<Vector3>();
 		for (int i = 0; i < polygon.getPoints().size(); i++)
 			gablePoints.add(new Vector3(polygon.getPoints().get(i).getX(), polygon.getPoints().get(i).getY(), polygon.getPoints().get(i).getZ()));
 		return gablePoints;
@@ -1017,20 +1027,22 @@ public class Wall extends HousePart {
 			final Vector3 actualNormal = wallPolygonPoints.get(0).subtract(wallPolygonPoints.get(1), null).normalizeLocal().crossLocal(wallPolygonPoints.get(2).subtract(wallPolygonPoints.get(1), null).normalizeLocal()).negateLocal();
 			final boolean reverse = actualNormal.dot(getFaceDirection()) < 0;
 
-			for (int i = 0; i < wallPolygonPoints.size() - 1; i++) {
+			for (int i = 0; i < wallPolygonPoints.size(); i++) {
 				final boolean front = i == 1 && original == null;
-				fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i + 1), getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, true, reverse);
-				if (i > 0)
-					fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i - 1), wallPolygonPoints.get(i + 1), getFaceDirection());
-				else
-					fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(0), wallPolygonPoints.get(wallPolygonPoints.size() - 1), wallPolygonPoints.get(1), getFaceDirection());
+				fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get((i + 1) % wallPolygonPoints.size()), getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, true, reverse);
+				fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get((i + 1) % wallPolygonPoints.size()), wallPolygonPoints.get(i), wallPolygonPoints.get((i + 2) % wallPolygonPoints.size()), getFaceDirection());
+//				if (i > 0)
+//					fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i - 1), wallPolygonPoints.get(i + 1), getFaceDirection());
+//				else
+//					fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(0), wallPolygonPoints.get(wallPolygonPoints.size() - 1), wallPolygonPoints.get(1), getFaceDirection());
 			}
 
-			fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(wallPolygonPoints.size() - 1), wallPolygonPoints.get(wallPolygonPoints.size() - 2), wallPolygonPoints.get(0), getFaceDirection());
+//			fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i + 1), getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, true, reverse);
+//			fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(wallPolygonPoints.size() - 1), wallPolygonPoints.get(wallPolygonPoints.size() - 2), wallPolygonPoints.get(0), getFaceDirection());
 		}
 
-		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
-			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
+//		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
+//			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 
 		// Angle annotations
 		// annotCounter = 0;
@@ -1179,7 +1191,7 @@ public class Wall extends HousePart {
 
 	@Override
 	public void setOriginal(final HousePart original) {
-		root.detachChild(this.invisibleMesh);
+		root.detachChild(invisibleMesh);
 		root.detachChild(backMesh);
 		root.detachChild(surroundMesh);
 		root.detachChild(windowsSurroundMesh);

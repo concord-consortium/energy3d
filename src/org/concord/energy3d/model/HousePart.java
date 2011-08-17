@@ -562,11 +562,13 @@ public abstract class HousePart implements Serializable {
 		return Vector3.UNIT_Z;
 	}
 
-	protected SizeAnnotation fetchSizeAnnot(int annotCounter) {
+	protected SizeAnnotation fetchSizeAnnot(final int annotCounter) {
 		final SizeAnnotation annot;
 		if (annotCounter < sizeAnnotRoot.getChildren().size()) {
 			annot = (SizeAnnotation) sizeAnnotRoot.getChild(annotCounter);
 			annot.getSceneHints().setCullHint(CullHint.Inherit);
+			for (int i = annotCounter + 1; i < sizeAnnotRoot.getChildren().size(); i++)
+				sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);			
 		} else {
 			annot = new SizeAnnotation();
 			sizeAnnotRoot.attachChild(annot);
@@ -574,11 +576,13 @@ public abstract class HousePart implements Serializable {
 		return annot;
 	}
 
-	protected AngleAnnotation fetchAngleAnnot(int annotCounter) {
+	protected AngleAnnotation fetchAngleAnnot(final int annotCounter) {
 		final AngleAnnotation annot;
 		if (annotCounter < angleAnnotRoot.getChildren().size()) {
 			annot = (AngleAnnotation) angleAnnotRoot.getChild(annotCounter);
 			annot.getSceneHints().setCullHint(CullHint.Inherit);
+			for (int i = annotCounter + 1; i < angleAnnotRoot.getChildren().size(); i++)
+				angleAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);			
 		} else {
 			annot = new AngleAnnotation(this);
 			angleAnnotRoot.attachChild(annot);

@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.util.ArrayList;
 
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
@@ -22,7 +23,6 @@ public class CustomRoof extends Roof {
 	}
 
 	public void setPreviewPoint(int x, int y) {
-		System.out.println(x + ", " + y);
 		if (container != null)
 			points.get(0).set(toRelative(getCenter(), container.getContainer())).addLocal(0, 0, height);			
 			
@@ -59,7 +59,7 @@ public class CustomRoof extends Roof {
 		if (container != null) {
 			showPoints();
 		}
-
+		Scene.getInstance().updateTextSizes();
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {

@@ -445,10 +445,6 @@ public abstract class Roof extends HousePart {
 		}
 		
 		
-		// }
-
-		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
-			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 	}
 
 	public int drawLabels(int printSequence) {

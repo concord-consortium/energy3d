@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.util.ArrayList;
 
+import org.concord.energy3d.scene.Scene;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 
@@ -36,6 +37,7 @@ public class HipRoof extends Roof {
 		drawWalls();
 		if (container != null)
 			showPoints();
+		Scene.getInstance().updateTextSizes();
 
 	}
 

@@ -166,17 +166,14 @@ public class Floor extends HousePart {
 			Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
 			fetchSizeAnnot(annotCounter++).setRange(a, b, getCenter(), getFaceDirection(), original == null, Align.Center, true, false, false);
 		}
-
-		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
-			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 	}
 	
 	protected String getDefaultTextureFileName() {
 		return "floor.jpg";
 	}
-	
+		
 	public void flatten(double flattenTime) {
-		root.setRotation((new Matrix3().fromAngles(-flattenTime * Math.PI / 2, 0, 0)));
+		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 		root.updateWorldTransform(true);
 		super.flatten(flattenTime);
 	}
@@ -184,5 +181,10 @@ public class Floor extends HousePart {
 	public Vector3 getAbsPoint(final int index) {
 		return toAbsolute(points.get(index), container == null ? null : container.getContainer());
 	}
-	
+
+	@Override
+	public void setOriginal(final HousePart original) {
+		super.setOriginal(original);
+		wallUpperPoints = ((Floor) original).wallUpperPoints;
+	}
 }

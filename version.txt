@@ -709,6 +709,10 @@ Version 0.3 - March 7, 2011
 - offset the roof for annotation
 - lower the wall by 0.2 to avoid sticking out
 - update the label size of all annotations upon redraw
+- create the invisible mesh of walls from the exact wall polygon
+- update the label size of all BMText objects by going through scene roof
+- update the label sizes at load time and after each edit of major parts
+
 
 
 - *auto redraw gable wall when inserting gable or editing gable
