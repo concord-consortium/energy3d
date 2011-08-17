@@ -125,12 +125,22 @@ public class MeshLib {
 		for (final GroupData group : groups) {
 			final Mesh newMesh;
 			if (meshIndex < root.getNumberOfChildren()) {
-				newMesh = (Mesh) root.getChild(meshIndex);
-				newMesh.getSceneHints().setCullHint(CullHint.Inherit);
+				final Node node = (Node) root.getChild(meshIndex);
+				newMesh = (Mesh) node.getChild(0);
+				node.getSceneHints().setCullHint(CullHint.Inherit);
 			} else {
-				newMesh = new Mesh("Roof Part #" + meshIndex);
+				newMesh = new Mesh("Roof Mesh #" + meshIndex);
 				newMesh.setModelBound(new BoundingBox());
-				root.attachChild(newMesh);
+				final Node node = new Node("Roof Part #" + meshIndex);
+				node.attachChild(newMesh);
+				node.attachChild(new Node("Roof Size Annot"));
+				node.attachChild(new Node("Roof Angle Annot"));
+				root.attachChild(node);
+				Vector3 normal = new Vector3();
+				for (Vector3 v : group.normals)
+					normal.addLocal(v);
+				normal.normalizeLocal();
+				node.setUserData(normal);
 			}
 
 			FloatBuffer buf = newMesh.getMeshData().getVertexBuffer();

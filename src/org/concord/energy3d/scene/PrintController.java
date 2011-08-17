@@ -28,6 +28,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -325,7 +326,7 @@ public class PrintController implements Updater {
 //			box.setDefaultColor(ColorRGBA.GRAY);
 			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
 //			box.setData(currentCorner, currentCorner.add(pageWidth, 0.1, -pageHeight, null));			
-//			pagesRoot.attachChild(box);
+			pagesRoot.attachChild(box);
 		}
 
 	}
@@ -339,14 +340,14 @@ public class PrintController implements Updater {
 				if (printPart instanceof Roof) {
 					for (final Spatial roofPart : ((Roof) printPart).getFlattenedMeshesRoot().getChildren())
 						if (roofPart.getSceneHints().getCullHint() != CullHint.Always)
-							computePrintCenterOf(roofPart, pages);
+							computePrintCenterOf((Mesh) ((Node) roofPart).getChild(0), pages);
 				} else
 					computePrintCenterOf(printPart.getMesh(), pages);
 			}
 		}
 	}
 
-	private void computePrintCenterOf(final Spatial printPart, final ArrayList<ArrayList<Spatial>> pages) {
+	private void computePrintCenterOf(final Mesh printPart, final ArrayList<ArrayList<Spatial>> pages) {
 		boolean isFitted = false;
 		for (int pageNum = 0; pageNum < pages.size() && !isFitted; pageNum++)
 			isFitted = fitInPage(printPart, pages.get(pageNum));

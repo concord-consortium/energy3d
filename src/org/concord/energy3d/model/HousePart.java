@@ -40,7 +40,7 @@ public abstract class HousePart implements Serializable {
 	static protected ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
 	static private boolean snapToObjects = true;
 	static private boolean snapToGrids = false;
-	static private boolean drawAnnotations = false;
+	static protected boolean drawAnnotations = false;
 //	static private int globalDrawFlag = 1;
 	transient protected Node root;
 	transient protected Node pointsRoot;
@@ -564,6 +564,10 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected SizeAnnotation fetchSizeAnnot(final int annotCounter) {
+		return fetchSizeAnnot(annotCounter, sizeAnnotRoot);
+	}
+	
+	protected SizeAnnotation fetchSizeAnnot(final int annotCounter, final Node sizeAnnotRoot) {
 		final SizeAnnotation annot;
 		if (annotCounter < sizeAnnotRoot.getChildren().size()) {
 			annot = (SizeAnnotation) sizeAnnotRoot.getChild(annotCounter);
@@ -578,6 +582,10 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected AngleAnnotation fetchAngleAnnot(final int annotCounter) {
+		return fetchAngleAnnot(annotCounter, angleAnnotRoot);
+	}
+	
+	protected AngleAnnotation fetchAngleAnnot(final int annotCounter, final Node angleAnnotRoot) {
 		final AngleAnnotation annot;
 		if (annotCounter < angleAnnotRoot.getChildren().size()) {
 			annot = (AngleAnnotation) angleAnnotRoot.getChild(annotCounter);
@@ -585,7 +593,7 @@ public abstract class HousePart implements Serializable {
 			for (int i = annotCounter + 1; i < angleAnnotRoot.getChildren().size(); i++)
 				angleAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);			
 		} else {
-			annot = new AngleAnnotation(this);
+			annot = new AngleAnnotation();
 			angleAnnotRoot.attachChild(annot);
 		}
 		return annot;

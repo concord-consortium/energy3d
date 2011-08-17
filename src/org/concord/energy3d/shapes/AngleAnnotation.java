@@ -12,7 +12,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class AngleAnnotation extends Annotation {
 
-	public AngleAnnotation(final HousePart housePart) {
+	public AngleAnnotation() {
 		super(new Arc("Angle annotation arc", 10));
 		mesh.setDefaultColor(ColorRGBA.WHITE);		
 		label.setTextColor(ColorRGBA.WHITE);

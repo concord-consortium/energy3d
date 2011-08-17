@@ -8,22 +8,12 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.util.geom.BufferUtils;
 
-/**
- * As Circle consists of Line Segments, you can use Line methods to set property such as width, stipple.
- * 
- * @author mulova
- */
 public class Arc extends Line {
 
-	/**
-	 * create line with
-	 * 
-	 * @param name
-	 *            mesh name
-	 * @param samples
-	 *            sampling rate
-	 * @param radius
-	 */
+	public Arc() {
+		
+	}
+	
 	public Arc(final String name, final int vertices) {
 		super(name);
 		setAntialiased(true);
