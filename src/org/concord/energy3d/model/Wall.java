@@ -635,7 +635,7 @@ public class Wall extends HousePart {
 		PickingUtil.findPick(roof.getFlattenedMeshesRoot(), new Ray3(new Vector3(v.getX(), v.getY(), 0), Vector3.UNIT_Z), pickResults);
 		if (pickResults.getNumber() > 0) {
 			final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
-			return intersectionPoint.getZ() - (backMesh ? 0.1 : 0.0);
+			return intersectionPoint.getZ() - 0.02; //(backMesh ? 0.1 : 0.0);
 		}
 		return v.getZ();
 	}

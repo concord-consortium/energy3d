@@ -9,26 +9,17 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.state.OffsetState;
-import com.ardor3d.renderer.state.OffsetState.OffsetType;
-import com.ardor3d.ui.text.BMText;
 
 public class AngleAnnotation extends Annotation {
-	protected final BMText label = makeNewLabel();
 
 	public AngleAnnotation(final HousePart housePart) {
 		super(new Arc("Angle annotation arc", 10));
 		mesh.setDefaultColor(ColorRGBA.WHITE);		
 		label.setTextColor(ColorRGBA.WHITE);
-
-//		final OffsetState offsetState = new OffsetState();
-//		offsetState.setTypeEnabled(OffsetType.Line, true);
-//		offsetState.setFactor(1);
-//		offsetState.setUnits(1);
-//		this.setRenderState(offsetState);
 	}
 
 	public void setRange(final ReadOnlyVector3 mainPoint, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3, final ReadOnlyVector3 n) {
+		updateTextSize();
 		final ReadOnlyVector3 a = new Vector3().set(p2).subtractLocal(mainPoint).normalizeLocal();
 		final ReadOnlyVector3 b = new Vector3().set(p3).subtractLocal(mainPoint).normalizeLocal();		
 		
@@ -67,7 +58,7 @@ public class AngleAnnotation extends Annotation {
 
 			label.setText("" + angle + "\u00B0");
 			label.updateModelBound();
-			label.setTranslation(a.add(b, null).normalizeLocal().multiplyLocal(radius / 1.6));
+			label.setTranslation(a.add(b, null).normalizeLocal().multiplyLocal(radius / 2.0));
 			final ReadOnlyVector3 ab = a.add(b, null).normalizeLocal();
 			label.setRotation(new Matrix3().fromAxes(n.cross(ab, null).normalizeLocal().negateLocal(), n, ab));
 			this.attachChild(label);

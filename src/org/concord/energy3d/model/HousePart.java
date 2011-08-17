@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.shapes.Angle90Annotation;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.FontManager;
@@ -582,18 +581,6 @@ public abstract class HousePart implements Serializable {
 			annot.getSceneHints().setCullHint(CullHint.Inherit);
 		} else {
 			annot = new AngleAnnotation(this);
-			angleAnnotRoot.attachChild(annot);
-		}
-		return annot;
-	}
-
-	protected Angle90Annotation fetchAngleAnnot90(int annotCounter) {
-		final Angle90Annotation annot;
-		if (annotCounter < angleAnnotRoot.getChildren().size()) {
-			annot = (Angle90Annotation) angleAnnotRoot.getChild(annotCounter);
-			annot.getSceneHints().setCullHint(CullHint.Inherit);
-		} else {
-			annot = new Angle90Annotation(this);
 			angleAnnotRoot.attachChild(annot);
 		}
 		return annot;

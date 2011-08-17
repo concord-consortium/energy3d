@@ -706,6 +706,9 @@ Version 0.3 - March 7, 2011
 - make the wall top surround mesh invisible when there is a roof 
 - draw wireframe lines for gable roof
 - draw wireframe lines for windows 
+- offset the roof for annotation
+- lower the wall by 0.2 to avoid sticking out
+- update the label size of all annotations upon redraw
 
 
 - *auto redraw gable wall when inserting gable or editing gable

@@ -31,7 +31,9 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
@@ -73,6 +75,11 @@ public abstract class Roof extends HousePart {
 		gableEditPointToWallMap = new Hashtable<Integer, Wall>();
 
 		flattenedMeshesRoot = new Node("Roof Meshes Root");
+		final OffsetState offsetState = new OffsetState();
+		offsetState.setTypeEnabled(OffsetType.Fill, true);
+		offsetState.setFactor(0.1f);
+		offsetState.setUnits(0.1f);
+		flattenedMeshesRoot.setRenderState(offsetState);		
 		root.attachChild(flattenedMeshesRoot);
 
 		mesh = new Mesh("Roof");

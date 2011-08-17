@@ -164,7 +164,7 @@ public class Floor extends HousePart {
 			Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
 			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
 			Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
-			fetchSizeAnnot(annotCounter++).setRange(a, b, getCenter(), getFaceDirection(), original == null, Align.Center, true);
+			fetchSizeAnnot(annotCounter++).setRange(a, b, getCenter(), getFaceDirection(), original == null, Align.Center, true, false, false);
 		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)

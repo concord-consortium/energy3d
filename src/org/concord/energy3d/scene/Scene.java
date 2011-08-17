@@ -283,4 +283,5 @@ public class Scene implements Serializable {
 	public boolean isTextureEnabled() {
 		return isTextureEnabled;
 	}
+		
 }
