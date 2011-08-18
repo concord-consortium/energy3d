@@ -22,6 +22,7 @@ public class SizeAnnotation extends Annotation {
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		arrows.setDefaultColor(ColorRGBA.BLACK);
 		arrows.setModelBound(new BoundingBox());
+		arrows.getSceneHints().setCastsShadows(false);
 		this.attachChild(arrows);
 		this.attachChild(label);
 	}
@@ -104,9 +105,7 @@ public class SizeAnnotation extends Annotation {
 		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 100) / 100.0 + Scene.getInstance().getUnit().getNotation());
 		label.setAlign(align);
 		label.updateModelBound();
-		System.out.println(label.getWorldBound());
 		label.updateWorldBound(false);
-		System.out.println(label.getWorldBound());
 		this.updateWorldTransform(true);
 		this.updateWorldBound(true);
 	}

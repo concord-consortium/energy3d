@@ -52,7 +52,7 @@ public abstract class Roof extends HousePart {
 	static private final long serialVersionUID = 1L;
 	static protected final double GRID_SIZE = 0.5;
 	static public final double OVERHANG_LENGHT = 0.3;
-	transient protected Mesh bottomMesh;
+	// transient protected Mesh bottomMesh;
 	transient protected Node flattenedMeshesRoot;
 	transient private ArrayList<PolygonPoint> wallUpperPoints;
 	transient private ArrayList<ReadOnlyVector3> wallNormals;
@@ -61,6 +61,7 @@ public abstract class Roof extends HousePart {
 	private ArrayList<Wall> gableWalls;
 	transient private ArrayList<Wall> walls;
 	transient protected Map<Integer, Wall> gableEditPointToWallMap;
+	transient private boolean isTextureApplied;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -73,27 +74,28 @@ public abstract class Roof extends HousePart {
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
 		gableEditPointToWallMap = new Hashtable<Integer, Wall>();
+		isTextureApplied = false;
 
 		flattenedMeshesRoot = new Node("Roof Meshes Root");
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(10);
-		offsetState.setUnits(10);
-		// flattenedMeshesRoot.setRenderState(offsetState);
+		offsetState.setFactor(1);
+		offsetState.setUnits(1);
+//		flattenedMeshesRoot.setRenderState(offsetState);
 		root.attachChild(flattenedMeshesRoot);
 
 		mesh = new Mesh("Roof");
 		mesh.setModelBound(new BoundingBox());
 
-		bottomMesh = new Mesh("Roof (bottom)");
-		final CullState cullState = new CullState();
-		cullState.setCullFace(com.ardor3d.renderer.state.CullState.Face.Front);
-		bottomMesh.setRenderState(cullState);
+		// bottomMesh = new Mesh("Roof (bottom)");
+		// final CullState cullState = new CullState();
+		// cullState.setCullFace(com.ardor3d.renderer.state.CullState.Face.Front);
+		// bottomMesh.setRenderState(cullState);
 
 		// Add a material to the box, to show both vertex color and lighting/shading.
-		final MaterialState ms = new MaterialState();
-		ms.setColorMaterial(ColorMaterial.Diffuse);
-		bottomMesh.setRenderState(ms);
+		// final MaterialState ms = new MaterialState();
+		// ms.setColorMaterial(ColorMaterial.Diffuse);
+		// bottomMesh.setRenderState(ms);
 
 		wireframeMesh = new Line("Roof (wireframe)");
 		wireframeMesh.getMeshData().setIndexMode(IndexMode.Lines);
@@ -105,7 +107,6 @@ public abstract class Roof extends HousePart {
 		wireframeMesh.setModelBound(new BoundingBox());
 		// root.attachChild(wireframeMesh);
 
-		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
 
@@ -123,17 +124,18 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void drawMesh() {
+		
 		try {
 			if (container == null) {
 				flattenedMeshesRoot.getSceneHints().setCullHint(CullHint.Always);
-				bottomMesh.getSceneHints().setCullHint(CullHint.Always);
+				// bottomMesh.getSceneHints().setCullHint(CullHint.Always);
 				hidePoints();
 				return;
 			}
 			flattenedMeshesRoot.getSceneHints().setCullHint(CullHint.Inherit);
-			final boolean bottomMeshVisible = height > 0;
-			bottomMesh.getSceneHints().setCullHint(bottomMeshVisible ? CullHint.Inherit : CullHint.Always);
-			bottomMesh.getSceneHints().setPickingHint(PickingHint.Pickable, bottomMeshVisible);
+			// final boolean bottomMeshVisible = height > 0;
+			// bottomMesh.getSceneHints().setCullHint(bottomMeshVisible ? CullHint.Inherit : CullHint.Always);
+			// bottomMesh.getSceneHints().setPickingHint(PickingHint.Pickable, bottomMeshVisible);
 
 			exploreWallNeighbors((Wall) container);
 			processRoofPoints(wallUpperPoints, wallNormals);
@@ -173,6 +175,11 @@ public abstract class Roof extends HousePart {
 			wireframeMesh.getMeshData().updateVertexCount();
 			wireframeMesh.updateModelBound();
 
+			if (!isTextureApplied) {
+				updateTextureAndColor(Scene.getInstance().isTextureEnabled());
+				isTextureApplied = true;
+			}
+			
 			root.updateWorldBound(true);
 
 			// computeGableEditPoints();
@@ -188,14 +195,12 @@ public abstract class Roof extends HousePart {
 
 			// updateEditShapes();
 
-			if (bottomMesh != null)
-				bottomMesh.updateModelBound();
+			// if (bottomMesh != null)
+			// bottomMesh.updateModelBound();
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		System.out.println("draw roof");
 
 		// drawWalls();
 	}
@@ -313,7 +318,7 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-	public void flatten(double flattenTime) {
+	public void flatten(final double flattenTime) {
 		for (Spatial child : getFlattenedMeshesRoot().getChildren()) {
 			if (child.getSceneHints().getCullHint() != CullHint.Always)
 				flattenQuadTriangle((Node) child, flattenTime);
@@ -321,10 +326,10 @@ public abstract class Roof extends HousePart {
 		}
 		mesh.updateModelBound();
 		// drawAnnotations();
-		if (bottomMesh != null) {
-			bottomMesh.getSceneHints().setCullHint(CullHint.Always);
-			bottomMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		}
+		// if (bottomMesh != null) {
+		// bottomMesh.getSceneHints().setCullHint(CullHint.Always);
+		// bottomMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		// }
 	}
 
 	// private void flattenQuadTriangle(final Mesh mesh, final double flattenTime) {
@@ -439,6 +444,7 @@ public abstract class Roof extends HousePart {
 					System.out.println(Util.toString(v));
 				}
 
+//				final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
 				final int n = convexHull.size() - 1;
 				for (int i = 0; i < n; i++) {
 					final Vector3 p1, p2, p3;
@@ -449,7 +455,10 @@ public abstract class Roof extends HousePart {
 					// node.getTransform().applyForward(p2);
 					// node.getTransform().applyForward(p3);
 
-					final Vector3 normal = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).normalizeLocal();
+					 final Vector3 normal = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).normalizeLocal();
+//					final Vector3 nn = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).normalizeLocal();
+//					System.out.println("cal = " + Util.toString(nn));
+//					System.out.println(Util.toString(normal));
 
 					// Size annotation
 					final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
@@ -494,37 +503,55 @@ public abstract class Roof extends HousePart {
 		return printSequence;
 	}
 
-	public void updateTextureAndColor(final boolean textureEnabled) {
-		if (textureEnabled) {
-			final TextureState ts = new TextureState();
-			ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-			mesh.setRenderState(ts);
-			mesh.setDefaultColor(ColorRGBA.WHITE);
+	// public void updateTextureAndColor(final boolean textureEnabled) {
+	// if (textureEnabled) {
+	// final TextureState ts = new TextureState();
+	// ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+	// mesh.setRenderState(ts);
+	// mesh.setDefaultColor(ColorRGBA.WHITE);
+	//
+	// if (flattenedMeshesRoot != null) {
+	// flattenedMeshesRoot.setRenderState(ts);
+	// for (Spatial s : flattenedMeshesRoot.getChildren()) {
+	// Mesh mesh = (Mesh) s;
+	// mesh.setDefaultColor(ColorRGBA.WHITE);
+	// }
+	// }
+	// if (bottomMesh != null) {
+	// bottomMesh.setRenderState(ts);
+	// bottomMesh.setDefaultColor(ColorRGBA.WHITE);
+	// }
+	// } else {
+	// mesh.clearRenderState(StateType.Texture);
+	// mesh.setDefaultColor(defaultColor);
+	// if (flattenedMeshesRoot != null) {
+	// flattenedMeshesRoot.clearRenderState(StateType.Texture);
+	// for (Spatial s : flattenedMeshesRoot.getChildren()) {
+	// Mesh mesh = (Mesh) s;
+	// mesh.setDefaultColor(defaultColor);
+	// }
+	// }
+	// if (bottomMesh != null) {
+	// bottomMesh.clearRenderState(StateType.Texture);
+	// bottomMesh.setDefaultColor(defaultColor);
+	// }
+	// }
+	// }
 
-			if (flattenedMeshesRoot != null) {
-				flattenedMeshesRoot.setRenderState(ts);
-				for (Spatial s : flattenedMeshesRoot.getChildren()) {
-					Mesh mesh = (Mesh) s;
+	public void updateTextureAndColor(final boolean textureEnabled) {
+		if (flattenedMeshesRoot != null) {
+			for (final Spatial roofPartNode : flattenedMeshesRoot.getChildren()) {
+				final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
+				if (textureEnabled) {
+					final TextureState ts = new TextureState();
+					ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+					mesh.setRenderState(ts);
 					mesh.setDefaultColor(ColorRGBA.WHITE);
-				}
-			}
-			if (bottomMesh != null) {
-				bottomMesh.setRenderState(ts);
-				bottomMesh.setDefaultColor(ColorRGBA.WHITE);
-			}
-		} else {
-			mesh.clearRenderState(StateType.Texture);
-			mesh.setDefaultColor(defaultColor);
-			if (flattenedMeshesRoot != null) {
-				flattenedMeshesRoot.clearRenderState(StateType.Texture);
-				for (Spatial s : flattenedMeshesRoot.getChildren()) {
-					Mesh mesh = (Mesh) s;
+
+				} else {
+					mesh.clearRenderState(StateType.Texture);
 					mesh.setDefaultColor(defaultColor);
 				}
-			}
-			if (bottomMesh != null) {
-				bottomMesh.clearRenderState(StateType.Texture);
-				bottomMesh.setDefaultColor(defaultColor);
 			}
 		}
 	}

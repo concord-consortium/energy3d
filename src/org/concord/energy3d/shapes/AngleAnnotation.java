@@ -46,6 +46,7 @@ public class AngleAnnotation extends Annotation {
 			final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 			buf.rewind();
 			buf.limit(9);
+			mesh.getMeshData().updateVertexCount();
 			buf.rewind();
 			for (final ReadOnlyVector3 v : p)
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
@@ -54,7 +55,6 @@ public class AngleAnnotation extends Annotation {
 		} else {
 			((Arc)mesh).set(radius, start, end);
 			mesh.setRotation(toFlat.invertLocal());
-
 			label.setText("" + angle + "\u00B0");
 			label.updateModelBound();
 			label.setTranslation(a.add(b, null).normalizeLocal().multiplyLocal(radius / 2.0));
@@ -64,7 +64,7 @@ public class AngleAnnotation extends Annotation {
 		}
 		mesh.updateModelBound();
 		
-		this.setTranslation(mainPoint);
+		this.setTranslation(mainPoint.add(n.multiply(0.001, null), null));
 	}	
 	
 }

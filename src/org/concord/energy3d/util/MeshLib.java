@@ -8,6 +8,8 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.OffsetState;
+import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -131,12 +133,17 @@ public class MeshLib {
 			} else {
 				newMesh = new Mesh("Roof Mesh #" + meshIndex);
 				newMesh.setModelBound(new BoundingBox());
+				final OffsetState offsetState = new OffsetState();
+				offsetState.setTypeEnabled(OffsetType.Fill, true);
+				offsetState.setFactor(1);
+				offsetState.setUnits(1);
+				newMesh.setRenderState(offsetState);
 				final Node node = new Node("Roof Part #" + meshIndex);
 				node.attachChild(newMesh);
 				node.attachChild(new Node("Roof Size Annot"));
 				node.attachChild(new Node("Roof Angle Annot"));
 				root.attachChild(node);
-				Vector3 normal = new Vector3();
+				final Vector3 normal = new Vector3();
 				for (Vector3 v : group.normals)
 					normal.addLocal(v);
 				normal.normalizeLocal();
@@ -202,9 +209,9 @@ public class MeshLib {
 		final Vector3 pointOnHull = new Vector3(leftVertex);
 		final Vector3 endpoint = new Vector3();
 		final Vector3 sj = new Vector3();
-//		System.out.println("----------------------------");
+		// System.out.println("----------------------------");
 		do {
-//			System.out.println(Util.toString(pointOnHull));			
+			// System.out.println(Util.toString(pointOnHull));
 			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
 			endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
 			for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
@@ -239,23 +246,22 @@ public class MeshLib {
 		final ArrayList<ReadOnlyVector3> convexHull = new ArrayList<ReadOnlyVector3>();
 		convexHull.add(pointOnHull);
 		do {
-//			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
+			// wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
 			endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
 			for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
 				sj.set(vertexBuffer.get(j * 3), vertexBuffer.get(j * 3 + 1), vertexBuffer.get(j * 3 + 2));
 				// if (S[j] is on left of line from P[i] to endpoint)
-				final double dot = normal.cross(endpoint.subtract(pointOnHull, null).normalizeLocal(), null).dot(sj.subtract(pointOnHull, null).normalizeLocal());				
+				final double dot = normal.cross(endpoint.subtract(pointOnHull, null).normalizeLocal(), null).dot(sj.subtract(pointOnHull, null).normalizeLocal());
 				if (!sj.equals(pointOnHull) && dot > 0) {
 					endpoint.set(sj); // found greater left turn, update endpoint
-				}
-				else if (!sj.equals(pointOnHull) && dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
+				} else if (!sj.equals(pointOnHull) && dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
 					endpoint.set(sj); // found greater left turn, update endpoint
 			}
 			pointOnHull.set(endpoint);
 			convexHull.add(new Vector3(pointOnHull));
-//			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
+			// wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
 		} while (!endpoint.equals(leftVertex));
 		return convexHull;
 	}
-	
+
 }

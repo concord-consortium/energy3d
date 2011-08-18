@@ -6,6 +6,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.AutoScale;
 
@@ -30,8 +31,10 @@ public abstract class Annotation extends Node {
 	}
 	
 	public Annotation(final Mesh mesh) {
-		super();		
+		super();
 		this.mesh = mesh;
+		this.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		mesh.getSceneHints().setCastsShadows(false);
 		mesh.setModelBound(new BoundingBox());
 		mesh.setDefaultColor(ColorRGBA.BLACK);
 		this.attachChild(mesh);

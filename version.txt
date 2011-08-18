@@ -713,7 +713,8 @@ Version 0.3 - March 7, 2011
 - update the label size of all BMText objects by going through scene roof
 - update the label sizes at load time and after each edit of major parts
 - fix problem with windows annotation not showing in print preview mode
-
+- add the annotations as children of flattenRoofMesh to eliminate the need of redrawing them during print preview animation
+- ensure that the roof part angle annotations are drawn on top of the roof parts
 
 
 

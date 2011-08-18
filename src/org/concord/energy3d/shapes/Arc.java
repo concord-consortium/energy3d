@@ -25,6 +25,7 @@ public class Arc extends Line {
 	public void set(final double radius, final double start, final double end) {
 		final FloatBuffer buf = getMeshData().getVertexBuffer();
 		buf.limit(buf.capacity());
+		this.getMeshData().updateVertexCount();
 		buf.rewind();
 		double arc = end - start;
 		final int n = buf.limit() / 3;
