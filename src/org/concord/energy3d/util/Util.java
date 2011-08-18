@@ -43,7 +43,10 @@ public class Util {
 
 	/** require that a and b are normalized **/
 	public static double angleBetween(ReadOnlyVector3 a, ReadOnlyVector3 b, ReadOnlyVector3 n) {
-	    return Math.atan2(b.dot(n.cross(a, null)), b.dot(a));
+	    double angle = Math.atan2(b.dot(n.cross(a, null)), b.dot(a));
+//	    if (angle < 0)
+//	    	angle = Math.PI * 2.0 + angle;
+		return angle;
 	}
 	
 	public static long degree(final double radian) {

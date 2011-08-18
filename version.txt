@@ -715,7 +715,7 @@ Version 0.3 - March 7, 2011
 - fix problem with windows annotation not showing in print preview mode
 - add the annotations as children of flattenRoofMesh to eliminate the need of redrawing them during print preview animation
 - ensure that the roof part angle annotations are drawn on top of the roof parts
-
+- compute the precise rotation for angle annotations label including those that have two parallel neighboring vectors
 
 
 - *auto redraw gable wall when inserting gable or editing gable

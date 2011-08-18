@@ -6,6 +6,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -27,18 +28,19 @@ public class AngleAnnotation extends Annotation {
 		final ReadOnlyVector3 aFlat = toFlat.applyPost(a, null);
 		final ReadOnlyVector3 bFlat = toFlat.applyPost(b, null);
 		
-		final double start, end;
+		final double start, angle;
 		if (Util.angleBetween(aFlat, bFlat, Vector3.UNIT_Z) >= 0) {
 			start = Util.angleBetween(Vector3.UNIT_X, aFlat, Vector3.UNIT_Z);
-			end = start + Util.angleBetween(aFlat, bFlat, Vector3.UNIT_Z);
+			angle = Util.angleBetween(aFlat, bFlat, Vector3.UNIT_Z);
 		} else {
 			start = Util.angleBetween(Vector3.UNIT_X, bFlat, Vector3.UNIT_Z);
-			end = start + Util.angleBetween(bFlat, aFlat, Vector3.UNIT_Z);
+			angle = Util.angleBetween(bFlat, aFlat, Vector3.UNIT_Z);
 		}
-		final long angle = Math.round((end - start) * 180.0 / Math.PI);
+		final double end = start + angle;
+		final long angleDegrees = Math.round((end - start) * 180.0 / Math.PI);
 
 		final double radius = end == start ? 0.0 : 0.3 / Math.sqrt(end - start);
-		if (angle == 90) {
+		if (angleDegrees == 90) {
 			final ReadOnlyVector3[] p = new ReadOnlyVector3[3];
 			p[0] = a.normalize(null).multiplyLocal(0.2);
 			p[1] = a.normalize(null).addLocal(b.normalize(null)).multiplyLocal(0.2);
@@ -54,12 +56,25 @@ public class AngleAnnotation extends Annotation {
 			this.detachChild(label);
 		} else {
 			((Arc)mesh).set(radius, start, end);
+//			if (start < 0)
+//				start = Math.PI * 2 + start;
+//			angle = Math.round((start) * 180.0 / Math.PI);
+			
 			mesh.setRotation(toFlat.invertLocal());
-			label.setText("" + angle + "\u00B0");
-			label.updateModelBound();
-			label.setTranslation(a.add(b, null).normalizeLocal().multiplyLocal(radius / 2.0));
-			final ReadOnlyVector3 ab = a.add(b, null).normalizeLocal();
-			label.setRotation(new Matrix3().fromAxes(n.cross(ab, null).normalizeLocal().negateLocal(), n, ab));
+			label.setText("" + angleDegrees + "\u00B0");
+//			label.updateModelBound();
+//			label.setTranslation(a.add(b, null).normalizeLocal().multiplyLocal(radius / 2.0));
+//			final ReadOnlyVector3 ab = a.add(b, null).normalizeLocal();
+//			label.setRotation(new Matrix3().fromAxes(n.cross(ab, null).normalizeLocal().negateLocal(), n, ab));
+//			label.setRotation(new Matrix3().fromAxes(n.negate(null).cross(Vector3.UNIT_Z, null).normalizeLocal(), n.negate(null), n.negate(null).cross(Vector3.UNIT_X, null).negateLocal().normalizeLocal()));
+//			label.setRotation(toFlat.multiplyLocal(new Matrix3().fromAngles(-Math.PI / 2.0, 0, 0))); //new Matrix3().fromAxes(n.negate(null).cross(Vector3.UNIT_Z, null).normalizeLocal(), n.negate(null), ab));
+			final double start360 = start < 0 ? MathUtils.TWO_PI + start : start;
+			final double angle360 = angle < 0 ? MathUtils.TWO_PI + angle : angle;
+			final double end360 = start360 + angle360;
+			final Matrix3 rotMatrix = toFlat.multiplyLocal(new Matrix3().fromAngles(-Math.PI / 2.0, 0, -Math.PI / 2.0 + (start360 + end360) / 2.0));
+			label.setRotation(rotMatrix);
+			final Vector3 trans = new Vector3(0, 0, radius / 2.0);
+			label.setTranslation(rotMatrix.applyPost(trans, trans));
 			this.attachChild(label);
 		}
 		mesh.updateModelBound();

@@ -444,7 +444,7 @@ public abstract class Roof extends HousePart {
 					System.out.println(Util.toString(v));
 				}
 
-//				final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
+				final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
 				final int n = convexHull.size() - 1;
 				for (int i = 0; i < n; i++) {
 					final Vector3 p1, p2, p3;
@@ -455,7 +455,7 @@ public abstract class Roof extends HousePart {
 					// node.getTransform().applyForward(p2);
 					// node.getTransform().applyForward(p3);
 
-					 final Vector3 normal = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).normalizeLocal();
+//					 final Vector3 normal = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).normalizeLocal();
 //					final Vector3 nn = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).normalizeLocal();
 //					System.out.println("cal = " + Util.toString(nn));
 //					System.out.println(Util.toString(normal));
@@ -465,7 +465,7 @@ public abstract class Roof extends HousePart {
 					fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1)).setRange(p2, p3, center, normal, false, Align.Center, true, true, true);
 
 					// Angle annotations
-					fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2)).setRange(p2, p3, p1, normal);
+					fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2)).setRange(p2, p1, p3, normal);
 				}
 			}
 		}
