@@ -473,12 +473,11 @@ public abstract class Roof extends HousePart {
 	}
 
 	public int drawLabels(int printSequence) {
-		final Vector3 p = new Vector3();
-		final Vector3 center = new Vector3();
+//		final Vector3 center = new Vector3();
 		int triangle = 0;
-		for (Spatial roofGroup : flattenedMeshesRoot.getChildren()) {
+		for (Spatial roofPartNode : flattenedMeshesRoot.getChildren()) {
 			// final Mesh mesh = (Mesh) roofGroup;
-			if (roofGroup.getSceneHints().getCullHint() != CullHint.Always) {
+			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
 				// final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 				// buf.rewind();
 				// double height = Double.NEGATIVE_INFINITY;
@@ -494,15 +493,25 @@ public abstract class Roof extends HousePart {
 				// center.setZ(height);
 				// else
 				// center.addLocal(0, -0.01, 0);
+				
+				
 
 				final String text = "(" + (printSequence++ + 1) + ")";
-				final BMText label = fetchBMText(text, triangle++);
-				label.setTranslation(center);
+//				final BMText label = fetchBMText(text, triangle++);
+				final BMText label = (BMText) ((Node) roofPartNode).getChild(3);
+				label.getSceneHints().setCullHint(CullHint.Inherit);
+				label.setText(text);
+//				label.setTranslation(((Node) roofPartNode).getChild(0).getWorldBound().getCenter());
 			}
 		}
 		return printSequence;
 	}
-
+	
+	public void hideLabels() {
+		for (Spatial roofPartNode : flattenedMeshesRoot.getChildren())
+			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)	
+				((Node) roofPartNode).getChild(3).getSceneHints().setCullHint(CullHint.Always);
+	}
 	// public void updateTextureAndColor(final boolean textureEnabled) {
 	// if (textureEnabled) {
 	// final TextureState ts = new TextureState();

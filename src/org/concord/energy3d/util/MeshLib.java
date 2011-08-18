@@ -13,6 +13,9 @@ import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class MeshLib {
@@ -125,9 +128,10 @@ public class MeshLib {
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
 		int meshIndex = 0;
 		for (final GroupData group : groups) {
+			final Node node;
 			final Mesh newMesh;
 			if (meshIndex < root.getNumberOfChildren()) {
-				final Node node = (Node) root.getChild(meshIndex);
+				node = (Node) root.getChild(meshIndex);
 				newMesh = (Mesh) node.getChild(0);
 				node.getSceneHints().setCullHint(CullHint.Inherit);
 			} else {
@@ -138,17 +142,19 @@ public class MeshLib {
 				offsetState.setFactor(1);
 				offsetState.setUnits(1);
 				newMesh.setRenderState(offsetState);
-				final Node node = new Node("Roof Part #" + meshIndex);
+				node = new Node("Roof Part #" + meshIndex);
 				node.attachChild(newMesh);
 				node.attachChild(new Node("Roof Size Annot"));
 				node.attachChild(new Node("Roof Angle Annot"));
+				node.attachChild(new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center));
+				node.getChild(3).getSceneHints().setCullHint(CullHint.Always);
 				root.attachChild(node);
-				final Vector3 normal = new Vector3();
-				for (Vector3 v : group.normals)
-					normal.addLocal(v);
-				normal.normalizeLocal();
-				node.setUserData(normal);
 			}
+			final Vector3 normal = new Vector3();
+			for (Vector3 v : group.normals)
+				normal.addLocal(v);
+			normal.normalizeLocal();
+			node.setUserData(normal);
 
 			FloatBuffer buf = newMesh.getMeshData().getVertexBuffer();
 			int n = group.vertices.size();
@@ -158,8 +164,12 @@ public class MeshLib {
 			}
 			buf.rewind();
 			buf.limit(n * 3);
-			for (final Vector3 v : group.vertices)
+			final Vector3 center = new Vector3();
+			for (final Vector3 v : group.vertices) {
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
+				center.addLocal(v);
+			}
+			center.multiplyLocal(1.0 / group.vertices.size());
 
 			buf = newMesh.getMeshData().getNormalBuffer();
 			n = group.normals.size();
@@ -186,6 +196,9 @@ public class MeshLib {
 			newMesh.getMeshData().updateVertexCount();
 			newMesh.updateModelBound();
 			newMesh.updateWorldBound(false);
+			
+			node.getChild(3).setTranslation(center.add(normal.multiply(0.1, null), null));
+
 			meshIndex++;
 		}
 		while (meshIndex < root.getNumberOfChildren()) {

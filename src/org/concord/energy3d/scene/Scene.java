@@ -29,6 +29,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BMText.AutoScale;
 
 public class Scene implements Serializable {
 	public static enum Unit {
@@ -308,7 +309,9 @@ public class Scene implements Serializable {
 
 	private void updateTextSizes(final Spatial spatial, double size) {
 		if (spatial instanceof BMText) {
-			((BMText) spatial).setFontScale(size);
+			final BMText label = (BMText) spatial;
+			if (label.getAutoScale() == AutoScale.Off)
+				label.setFontScale(size);
 		} else if (spatial instanceof Node) {
 			for (final Spatial child : ((Node) spatial).getChildren())
 				updateTextSizes(child, size);

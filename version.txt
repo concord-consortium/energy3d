@@ -716,8 +716,9 @@ Version 0.3 - March 7, 2011
 - add the annotations as children of flattenRoofMesh to eliminate the need of redrawing them during print preview animation
 - ensure that the roof part angle annotations are drawn on top of the roof parts
 - compute the precise rotation for angle annotations label including those that have two parallel neighboring vectors
-- compute the space in the middle of size annotation based on the length of the label 
-
+- compute the space in the middle of size annotation based on the length of the label
+- add roof part label to the flatten roof branch under each roof part node
+- avoid scaling labels if they are set to auto scale
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
