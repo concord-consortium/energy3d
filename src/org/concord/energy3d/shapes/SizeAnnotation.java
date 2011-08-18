@@ -45,6 +45,7 @@ public class SizeAnnotation extends Annotation {
 		final ReadOnlyVector3 dir = to.subtract(from, null).normalizeLocal();
 		final int scale = upsideDownText ? -1 : 1;
 		label.setRotation(new Matrix3().fromAxes(dir.multiply(scale, null), faceDirection, faceDirection.cross(dir, null).multiplyLocal(scale)));
+		
 
 		FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
@@ -54,11 +55,19 @@ public class SizeAnnotation extends Annotation {
 		final Vector3 newTo = new Vector3(to).addLocal(offset);
 		final Vector3 middle = new Vector3(newFrom).addLocal(newTo).multiplyLocal(0.5);
 		final Vector3 body = new Vector3(to).subtractLocal(from).multiplyLocal(0.5);
+		
+		label.setTranslation(middle);
+		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 100) / 100.0 + Scene.getInstance().getUnit().getNotation());
+		label.setAlign(align);
+		label.updateWorldBound(false);			
+		
+		
 		vertexBuffer.put(newFrom.getXf()).put(newFrom.getYf()).put(newFrom.getZf());
-		double s = (body.length() - 0.15) / body.length();
-		v.set(body).multiplyLocal(s).addLocal(newFrom);
+		final double bankSpace = label.getWidth() * 0.70;
+		double blankSpaceFactor = Math.max(0, body.length() - bankSpace) / body.length();
+		v.set(body).multiplyLocal(blankSpaceFactor).addLocal(newFrom);
 		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		v.set(body).multiplyLocal(-s).addLocal(newTo);
+		v.set(body).multiplyLocal(-blankSpaceFactor).addLocal(newTo);
 		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
 		vertexBuffer.put(newTo.getXf()).put(newTo.getYf()).put(newTo.getZf());
 
@@ -101,11 +110,10 @@ public class SizeAnnotation extends Annotation {
 
 		arrows.updateModelBound();
 
-		label.setTranslation(middle);
-		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 100) / 100.0 + Scene.getInstance().getUnit().getNotation());
-		label.setAlign(align);
-		label.updateModelBound();
-		label.updateWorldBound(false);
+//		label.setTranslation(middle);
+//		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 100) / 100.0 + Scene.getInstance().getUnit().getNotation());
+//		label.setAlign(align);
+//		label.updateWorldBound(false);
 		this.updateWorldTransform(true);
 		this.updateWorldBound(true);
 	}

@@ -1220,4 +1220,8 @@ public class Wall extends HousePart {
 		});
 	}
 
+	public HousePart getRoof() {
+		return roof;
+	}
+
 }

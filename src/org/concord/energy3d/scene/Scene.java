@@ -20,6 +20,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Snap;
+import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.util.Config;
@@ -239,9 +240,15 @@ public class Scene implements Serializable {
 	public void update() {
 		if (redrawAll) {
 			Snap.clearAnnotationDrawn();
+//			final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
 			for (final HousePart part : parts)
 				if (part instanceof Roof)
-					part.draw();
+//					if (part.getContainer() == null || part.getContainer().getChildren().contains(part) != part)
+//						toBeRemoved.add(part);
+//					else
+						part.draw();
+//			for (final HousePart part : toBeRemoved)
+//				remove(part);
 			for (final HousePart part : parts)
 				if (!(part instanceof Roof))
 					part.draw();
