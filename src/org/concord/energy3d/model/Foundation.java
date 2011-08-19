@@ -97,12 +97,11 @@ public class Foundation extends HousePart {
 	@Override
 	public void showPoints() {
 		for (int i = 0; i < points.size(); i++) {
+			computeEditPointScale(i);
 			if (!resizeHouseMode && i >= 4)
 				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
-			else {
-				computeEditPointScale(i);
+			else
 				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
-			}
 		}
 	}
 
@@ -240,9 +239,11 @@ public class Foundation extends HousePart {
 		if (!isFirstPointInserted())
 			return;
 		boundingHeight = scanChildrenHeight(this);
-		for (int i = 4; i < 8; i++)
+		for (int i = 4; i < 8; i++) {
 			points.get(i).setZ(boundingHeight);
+		}
 		newBoundingHeight = boundingHeight;
+		updateEditShapes();
 	}
 
 	private double scanChildrenHeight(final HousePart part) {

@@ -312,7 +312,7 @@ public class Wall extends HousePart {
 		if (!isDrawable())
 			return;
 
-		updateEditShapes();
+//		updateEditShapes();
 
 		final Vector3 normal = computeNormal();
 

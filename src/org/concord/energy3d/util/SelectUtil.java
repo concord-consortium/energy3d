@@ -1,5 +1,6 @@
 package org.concord.energy3d.util;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.Roof;
@@ -100,6 +101,8 @@ public class SelectUtil {
 //						adjust += 1;	// give less priority because this is not a edit point and an edit point is already found
 					if (userData.isEditPoint())
 						adjust -= 0.1;	// give more priority because this is an edit point
+					if (userData.isEditPoint() && userData.getHousePart() instanceof Foundation && ((Foundation) userData.getHousePart()).isResizeHouseMode())
+						adjust -= 0.1;
 					pointDist_i += adjust;
 //					if (pointDist_i + adjust < pointDist && 
 //							(userData.getIndex() != -1 || pickedHousePart == null || 
