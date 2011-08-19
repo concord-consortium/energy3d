@@ -154,9 +154,9 @@ public abstract class Roof extends HousePart {
 			MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
 			setAnnotationsVisible(drawAnnotations);
 			hideGableMeshes();
-//			final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
-//			wireframeVertexBuffer.rewind();
-//			wireframeVertexBuffer.limit(wireframeVertexBuffer.capacity());
+			// final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
+			// wireframeVertexBuffer.rewind();
+			// wireframeVertexBuffer.limit(wireframeVertexBuffer.capacity());
 			for (final Spatial child : flattenedMeshesRoot.getChildren()) {
 				if (child.getSceneHints().getCullHint() != CullHint.Always) {
 					final Mesh mesh = (Mesh) ((Node) child).getChild(0);
@@ -170,10 +170,10 @@ public abstract class Roof extends HousePart {
 				}
 				meshIndex++;
 			}
-//			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
-//			wireframeMesh.getMeshData().updateVertexCount();
-//			wireframeMesh.updateModelBound();
-			
+			// wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
+			// wireframeMesh.getMeshData().updateVertexCount();
+			// wireframeMesh.updateModelBound();
+
 			drawWireframe();
 
 			if (!isTextureApplied) {
@@ -431,7 +431,6 @@ public abstract class Roof extends HousePart {
 		if (container == null)
 			return;
 
-
 		final ArrayList<ArrayList<ReadOnlyVector3>> convexHulls = new ArrayList<ArrayList<ReadOnlyVector3>>();
 		int totalVertices = 0;
 
@@ -447,8 +446,7 @@ public abstract class Roof extends HousePart {
 				totalVertices += convexHull.size();
 			}
 		}
-		
-		
+
 		final FloatBuffer buf;
 		if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
 			buf = wireframeMesh.getMeshData().getVertexBuffer();
@@ -572,7 +570,7 @@ public abstract class Roof extends HousePart {
 		// }
 		if (gableWalls == null)
 			gableWalls = new ArrayList<Wall>();
-		final Vector3[] base = findBasePoints((Mesh) getFlattenedMeshesRoot().getChild(index), null);
+		final Vector3[] base = findBasePoints((Mesh) ((Node) getFlattenedMeshesRoot().getChild(index)).getChild(0), null);
 		final Wall wall = findGableWall(base);
 		if (base != null) {
 			gableWalls.add(wall);
