@@ -725,6 +725,8 @@ Version 0.3 - March 7, 2011
 - fix problem with not updating the pick bounds of foundation edit point shapes after recalculating the resize height
 - fix problem of picking wall point instead of resize point by giving more priority to foundation when in resize mode
 - re-enable the code for picking multiple edit points in roof for generating gable roof
+- adjust camera near and far distance to improve resolution in Mac OS X and fix choppyness with back wall meshes and edges 
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

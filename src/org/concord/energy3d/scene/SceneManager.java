@@ -858,10 +858,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		camera.resize(size.width, size.height);
 		final double ratio = (double) size.width / size.height;
 
+		final double near = 1;
+		final double far = 1000;
 		if (camera.getProjectionMode() == ProjectionMode.Parallel)
-			camera.setFrustum(0.01, 200, -orthoWidth / 2, orthoWidth / 2, -orthoWidth / ratio / 2, orthoWidth / ratio / 2);
+			camera.setFrustum(near, far, -orthoWidth / 2, orthoWidth / 2, -orthoWidth / ratio / 2, orthoWidth / ratio / 2);
 		else
-			camera.setFrustumPerspective(45.0, ratio, 0.01, 200);
+			camera.setFrustumPerspective(45.0, ratio, near, far);
 	}
 
 	public void toggleRotation() {
