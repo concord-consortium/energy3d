@@ -40,7 +40,7 @@ public class SelectUtil {
 		pickResults.clear();
 		
 		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
-		PickingUtil.findPick(target, pickRay, pickResults);		
+		PickingUtil.findPick(target, pickRay, pickResults);;		
 		return getPickResult(pickRay);
 	}
 

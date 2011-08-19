@@ -728,7 +728,9 @@ Version 0.3 - March 7, 2011
 - adjust camera near and far distance to improve resolution in Mac OS X and fix choppyness with back wall meshes and edges 
 - enable anti-aliased lines by adding blend to them
 - fix problem with selecting gable wall
-
+- fix problem with too many annotations created and left behind when resizing
+- add feature to draw annotations inward
+- add menu to swtich between inward and outward annotations
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

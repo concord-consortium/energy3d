@@ -9,6 +9,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
@@ -403,10 +404,10 @@ public abstract class Roof extends HousePart {
 	protected void drawAnnotations() {
 		if (container == null)
 			return;
-		int annotCounter = 0, angleAnnotCounter = 0;
 
 		for (Spatial roofPart : flattenedMeshesRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				int annotCounter = 0, angleAnnotCounter = 0;
 				final Node roofPartNode = (Node) roofPart;
 				final FloatBuffer buf = ((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer();
 
@@ -424,9 +425,16 @@ public abstract class Roof extends HousePart {
 
 					// Size annotation
 					final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
-					fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1)).setRange(p2, p3, center, normal, false, Align.Center, true, true, true);
+//					fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1)).setRange(p2, p3, center, normal, false, Align.Center, true, true, true);
+					final SizeAnnotation sizeAnnot = fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1));
+					sizeAnnot.setRange(p2, p3, center, normal, false, Align.Center, true, true, true, Scene.isDrawAnnotationsInside());
+					if (Scene.isDrawAnnotationsInside())
+						sizeAnnot.setColor(ColorRGBA.WHITE);
+					else
+						sizeAnnot.setColor(ColorRGBA.BLACK);
 
 					// Angle annotations
+//					fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2)).setRange(p2, p1, p3, normal);
 					fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2)).setRange(p2, p1, p3, normal);
 				}
 			}

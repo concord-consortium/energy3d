@@ -264,11 +264,11 @@ public class Window extends HousePart {
 		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 		final Vector3 center = trans.applyForward(getCenter(), null);
-		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, false, true);
+		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, false, true, false);
 //		annot.setTranslation(moveToFront);
 
 		annot = fetchSizeAnnot(annotCounter++);
-		annot.setRange(getAbsPoint(i0), getAbsPoint(i2), center, faceDirection, false, Align.Center, true, false, false);
+		annot.setRange(getAbsPoint(i0), getAbsPoint(i2), center, faceDirection, false, Align.Center, true, false, false, false);
 //		annot.setTranslation(moveToFront);
 	}
 

@@ -26,6 +26,7 @@ import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.util.Config;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.ui.text.BMText;
@@ -53,6 +54,7 @@ public class Scene implements Serializable {
 	private static boolean redrawAll = false;
 	private static boolean isTextureEnabled = true;
 	private static boolean drawThickness = false;
+	private static boolean drawAnnotationsInside = true;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private Unit unit = Unit.Meter;
 	private double annotationScale = 1;
@@ -234,6 +236,15 @@ public class Scene implements Serializable {
 		return drawThickness;
 	}
 
+	public static boolean isDrawAnnotationsInside() {
+		return drawAnnotationsInside;
+	}
+
+	public static void setDrawAnnotationsInside(boolean drawAnnotationsInside) {
+		Scene.drawAnnotationsInside = drawAnnotationsInside;
+		redrawAll = true;
+	}
+
 	public void redrawAll() {
 		redrawAll = true;
 	}
@@ -316,6 +327,16 @@ public class Scene implements Serializable {
 			for (final Spatial child : ((Node) spatial).getChildren())
 				updateTextSizes(child, size);
 		}
+	}
+
+	public void removeAllRoofs() {
+		final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
+		for (final HousePart part : parts)
+			if (part instanceof Roof)
+				roofs.add(part);
+		
+		for (final HousePart part : roofs)
+			remove(part);
 	}
 		
 }

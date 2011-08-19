@@ -368,7 +368,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}
 
-		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getRoot(), renderer, true);
+//		 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getRoot(), renderer, true);
 
 		// if (PrintController.getInstance().getPrintParts() != null)
 		// for (HousePart part : PrintController.getInstance().getPrintParts()) {
@@ -820,6 +820,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				Scene.getInstance().redrawAll();
 			}
 		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.X), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				Scene.getInstance().removeAllRoofs();
+			}
+		}));		
 	}
 
 	public void setCameraControl(final CameraMode type) {

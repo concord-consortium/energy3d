@@ -41,6 +41,8 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import javax.swing.Action;
+import javax.swing.AbstractAction;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -79,6 +81,9 @@ public class MainFrame extends JFrame {
 	private JDialog aboutDialog = null; // @jve:decl-index=0:visual-constraint="602,644"
 	private JCheckBoxMenuItem wallThicknessMenuItem = null;
 	private MainPanel mainPanel = null;
+	private Action action;
+	private JCheckBoxMenuItem drawAnnotationsInward;
+	private Action action_1;
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -607,6 +612,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getTextureCheckBoxMenuItem());
 			viewMenu.add(getColorMenuItem());
 			viewMenu.add(getWallThicknessMenuItem());
+			viewMenu.add(getDrawAnnotationsInward());
 		}
 		return viewMenu;
 	}
@@ -737,6 +743,18 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return textureCheckBoxMenuItem;
+	}
+	private JCheckBoxMenuItem getDrawAnnotationsInward() {
+		if (drawAnnotationsInward == null) {
+			drawAnnotationsInward = new JCheckBoxMenuItem("Draw Annotations Inward");
+			drawAnnotationsInward.addItemListener(new java.awt.event.ItemListener() {
+				public void itemStateChanged(java.awt.event.ItemEvent e) {
+					Scene.setDrawAnnotationsInside(drawAnnotationsInward.isSelected());
+				}
+			});
+			
+		}
+		return drawAnnotationsInward;
 	}
 }  //  @jve:decl-index=0:visual-constraint="10,-112"
 

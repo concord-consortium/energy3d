@@ -8,6 +8,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Line;
@@ -25,18 +26,18 @@ public class SizeAnnotation extends Annotation {
         blend.setBlendEnabled(true);
         mesh.setRenderState(blend);		
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-		arrows.setDefaultColor(ColorRGBA.BLACK);
 		arrows.setModelBound(new BoundingBox());
 		arrows.getSceneHints().setCastsShadows(false);
+		setColor(ColorRGBA.BLACK);
 		this.attachChild(arrows);
 		this.attachChild(label);
 	}
 
-	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipOffset, final boolean rotateTextAlongLine, final boolean upsideDownText) {
+	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipOffset, final boolean rotateTextAlongLine, final boolean upsideDownText, final boolean drawInside) {
 		final double C = 0.1;
 		final Vector3 v = new Vector3();
 		final Vector3 offset = new Vector3();
-		if (front)
+		if (front && !drawInside)
 			offset.set(faceDirection).normalizeLocal().multiplyLocal(C);
 		else {
 			offset.set(to).subtractLocal(from).normalizeLocal().crossLocal(faceDirection).multiplyLocal(C);
@@ -46,6 +47,9 @@ public class SizeAnnotation extends Annotation {
 					offset.negateLocal();
 			}
 		}
+		
+		if (drawInside)
+			offset.negateLocal();
 
 		final ReadOnlyVector3 dir = to.subtract(from, null).normalizeLocal();
 		final int scale = upsideDownText ? -1 : 1;
@@ -130,5 +134,10 @@ public class SizeAnnotation extends Annotation {
 //			label.setFontScale(size / 20.0);
 //		}
 //	}
+	
+	public void setColor(final ReadOnlyColorRGBA color) {
+		super.setColor(color);
+		arrows.setDefaultColor(color);
+	}	
 
 }
