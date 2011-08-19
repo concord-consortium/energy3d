@@ -588,9 +588,9 @@ public abstract class Roof extends HousePart {
 		final ArrayList<Vector3> meshUpperPoints = new ArrayList<Vector3>();
 		for (final Wall wall : gableWalls) {
 			final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
-			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
+			for (final Spatial roofPartNode : getFlattenedMeshesRoot().getChildren()) {
 				meshUpperPoints.clear();
-				final Vector3[] meshBase = findBasePoints((Mesh) mesh, meshUpperPoints);
+				final Vector3[] meshBase = findBasePoints((Mesh) ((Node) roofPartNode).getChild(0), meshUpperPoints);
 				if (meshBase != null && isSameBasePoints(base, meshBase)) {
 					final Vector3 n = meshBase[1].subtract(meshBase[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
 					final ArrayList<Vector3> gableRoofMeshEditPoints = new ArrayList<Vector3>();
