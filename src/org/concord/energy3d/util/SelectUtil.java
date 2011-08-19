@@ -91,13 +91,22 @@ public class SelectUtil {
 					Vector3 p = userData.getHousePart().getAbsPoint(j);
 					pointDist_i = p.distance(intersectionPoint);
 					double adjust = 0;
-					if (userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) > 0.8)					
-						adjust -= 0.1;	// give more priority because the wall is facing the camera
-					if (pickedHousePart != null && pickedHousePart.getUserData() != null && pickedHousePart.getUserData().isEditPoint() && !userData.isEditPoint())
-						adjust += 1;	// give less priority because this is not a edit point and an edit point is already found
-					if (pointDist_i + adjust < pointDist && 
+//					if (userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) > 0.8)					
+//						adjust -= 0.1;	// give more priority because the wall is facing the camera
+					adjust -= Math.abs(userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) / 10.0);
+					if (userData.getHousePart() == SceneManager.getInstance().getSelectedPart())					
+						adjust -= 0.1;	// give more priority because the object is selected					
+//					if (pickedHousePart != null && pickedHousePart.getUserData() != null && pickedHousePart.getUserData().isEditPoint() && !userData.isEditPoint())
+//						adjust += 1;	// give less priority because this is not a edit point and an edit point is already found
+					if (userData.isEditPoint())
+						adjust -= 0.1;	// give more priority because this is an edit point
+					pointDist_i += adjust;
+//					if (pointDist_i + adjust < pointDist && 
+//							(userData.getIndex() != -1 || pickedHousePart == null || 
+//									pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getIndex() == -1)) {
+					if (pointDist_i < pointDist && 
 							(userData.getIndex() != -1 || pickedHousePart == null || 
-									pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getIndex() == -1)) {
+									pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getIndex() == -1)) {					
 						pickedHousePart = picked_i;
 						polyDist = polyDist_i;
 						pointDist = pointDist_i;

@@ -720,6 +720,9 @@ Version 0.3 - March 7, 2011
 - add roof part label to the flatten roof branch under each roof part node
 - avoid scaling labels if they are set to auto scale
 - draw wireframe for roofs
+- when selecting edit point give priority to parts already selected with a click
+- when selecting edit point consider facing camera direction for all parts that partially face camera instead of only those that face camera directly
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
