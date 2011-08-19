@@ -592,40 +592,36 @@ public abstract class Roof extends HousePart {
 				if (meshBase != null && isSameBasePoints(base, meshBase)) {
 					final Vector3 n = meshBase[1].subtract(meshBase[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
 					final ArrayList<Vector3> gableRoofMeshEditPoints = new ArrayList<Vector3>();
-					// for (final Vector3 meshPoint : meshUpperPoints) {
-					double smallestDistanceToEditPoint = Double.MAX_VALUE;
-					Vector3 nearestEditPoint = null;
-					Vector3 nearestEditPointRel = null;
-					int nearestIndex = -1;
-					// select the nearest point so that one edit point per upper mesh point is selected
-					for (int i = 0; i < points.size(); i++) {
-						final Vector3 editPoint = getAbsPoint(i);
-						// final double distanceToEditPoint = meshPoint.distance(editPoint);
-						final double distanceToEditPoint = base[0].distance(editPoint) + base[1].distance(editPoint);
-						if (distanceToEditPoint < smallestDistanceToEditPoint) {
-							smallestDistanceToEditPoint = distanceToEditPoint;
-							nearestEditPoint = editPoint;
-							nearestEditPointRel = points.get(i);
-							nearestIndex = i;
+					for (final Vector3 meshPoint : meshUpperPoints) {
+						double smallestDistanceToEditPoint = Double.MAX_VALUE;
+						Vector3 nearestEditPoint = null;
+						Vector3 nearestEditPointRel = null;
+						int nearestIndex = -1;
+						// select the nearest point so that one edit point per upper mesh point is selected
+						for (int i = 0; i < points.size(); i++) {
+							final Vector3 editPoint = getAbsPoint(i);
+							 final double distanceToEditPoint = meshPoint.distance(editPoint);
+//							final double distanceToEditPoint = base[0].distance(editPoint) + base[1].distance(editPoint);
+							if (distanceToEditPoint < smallestDistanceToEditPoint) {
+								smallestDistanceToEditPoint = distanceToEditPoint;
+								nearestEditPoint = editPoint;
+								nearestEditPointRel = points.get(i);
+								nearestIndex = i;
+							}
 						}
+						double distance = -nearestEditPoint.subtract(meshBase[0], null).dot(n);
+						// distance += -Math.signum(distance) * 0.0001; // in order to avoid crazy roof that stretches to floor
+						// distance += -Math.signum(distance) * 0.1; // in order to avoid crazy roof that stretches to floor
+						nearestEditPoint.addLocal(n.multiply(distance, null));
+						nearestEditPointRel.set(toRelative(nearestEditPoint, container.getContainer()));
+						gableRoofMeshEditPoints.add(nearestEditPoint);
+						gableEditPointToWallMap.put(nearestIndex, wall);
 					}
-					double distance = -nearestEditPoint.subtract(meshBase[0], null).dot(n);
-					// distance += -Math.signum(distance) * 0.0001; // in order to avoid crazy roof that stretches to floor
-					// distance += -Math.signum(distance) * 0.1; // in order to avoid crazy roof that stretches to floor
-					nearestEditPoint.addLocal(n.multiply(distance, null));
-					nearestEditPointRel.set(toRelative(nearestEditPoint, container.getContainer()));
-					;
-					gableRoofMeshEditPoints.add(nearestEditPoint);
-					gableEditPointToWallMap.put(nearestIndex, wall);
-					// }
 					computeGableWallPoints(base, gableRoofMeshEditPoints);
 					break;
 				}
 			}
 		}
-		// for (final Wall wall : walls)
-		// wall.draw();
-
 	}
 
 	public Vector3[] findBasePoints(final Mesh mesh, final ArrayList<Vector3> storeUpperPoints) {
