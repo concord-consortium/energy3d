@@ -137,15 +137,15 @@ public class Wall extends HousePart {
 		root.attachChild(windowsSurroundMesh);
 
 		wireframeMesh = new Line("Wall (Wireframe)");
-		wireframeMesh.setAntialiased(true);
 		// wireframeMesh.getMeshData().setIndexMode(IndexMode.LineLoop);
-		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		wireframeMesh.setAntialiased(true);
 		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
+		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-		wireframeMesh.setRenderState(new WireframeState());
 		wireframeMesh.setModelBound(new BoundingBox());
+//		wireframeMesh.setRenderState(new WireframeState());
+		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		root.attachChild(wireframeMesh);
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());

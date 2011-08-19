@@ -81,7 +81,7 @@ public abstract class Roof extends HousePart {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
 		offsetState.setFactor(1);
 		offsetState.setUnits(1);
-//		flattenedMeshesRoot.setRenderState(offsetState);
+		// flattenedMeshesRoot.setRenderState(offsetState);
 		root.attachChild(flattenedMeshesRoot);
 
 		mesh = new Mesh("Roof");
@@ -98,15 +98,14 @@ public abstract class Roof extends HousePart {
 		// bottomMesh.setRenderState(ms);
 
 		wireframeMesh = new Line("Roof (wireframe)");
-		wireframeMesh.getMeshData().setIndexMode(IndexMode.Lines);
-		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
+		wireframeMesh.setAntialiased(true);
 		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
+		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setModelBound(new BoundingBox());
-		// root.attachChild(wireframeMesh);
-
+		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
+		root.attachChild(wireframeMesh);
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
 
@@ -124,7 +123,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void drawMesh() {
-		
+
 		try {
 			if (container == null) {
 				flattenedMeshesRoot.getSceneHints().setCullHint(CullHint.Always);
@@ -155,9 +154,9 @@ public abstract class Roof extends HousePart {
 			MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
 			setAnnotationsVisible(drawAnnotations);
 			hideGableMeshes();
-			final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
-			wireframeVertexBuffer.rewind();
-			wireframeVertexBuffer.limit(wireframeVertexBuffer.capacity());
+//			final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
+//			wireframeVertexBuffer.rewind();
+//			wireframeVertexBuffer.limit(wireframeVertexBuffer.capacity());
 			for (final Spatial child : flattenedMeshesRoot.getChildren()) {
 				if (child.getSceneHints().getCullHint() != CullHint.Always) {
 					final Mesh mesh = (Mesh) ((Node) child).getChild(0);
@@ -171,15 +170,17 @@ public abstract class Roof extends HousePart {
 				}
 				meshIndex++;
 			}
-			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
-			wireframeMesh.getMeshData().updateVertexCount();
-			wireframeMesh.updateModelBound();
+//			wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
+//			wireframeMesh.getMeshData().updateVertexCount();
+//			wireframeMesh.updateModelBound();
+			
+			drawWireframe();
 
 			if (!isTextureApplied) {
 				updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 				isTextureApplied = true;
 			}
-			
+
 			root.updateWorldBound(true);
 
 			// computeGableEditPoints();
@@ -398,46 +399,10 @@ public abstract class Roof extends HousePart {
 			return;
 		int annotCounter = 0, angleAnnotCounter = 0;
 
-		// if (original == null) {
-		// for (int i = 0; i < wallUpperPoints.size(); i++) {
-		//
-		// PolygonPoint p = wallUpperPoints.get(i);
-		// Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
-		// p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
-		// Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
-		// fetchSizeAnnot(annotCounter++).setRange(a, b, center, getFaceDirection(), false, Align.Center, true, true);
-		// }
-		// } else {
-		// final Vector3 p1 = new Vector3();
-		// final Vector3 p2 = new Vector3();
-		// final Vector3 p3 = new Vector3();
 		for (Spatial roofPart : flattenedMeshesRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Node roofPartNode = (Node) roofPart;
 				final FloatBuffer buf = ((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer();
-				// for (int i = 0; i < buf.limit() / 9; i++) {
-				// final int xPos = i * 9;
-				// buf.position(xPos);
-				// p1.set(buf.get(), buf.get(), buf.get());
-				// p2.set(buf.get(), buf.get(), buf.get());
-				// p3.set(buf.get(), buf.get(), buf.get());
-				// mesh.getTransform().applyForward(p1);
-				// mesh.getTransform().applyForward(p2);
-				// mesh.getTransform().applyForward(p3);
-				//
-				// // Size annotation
-				// final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
-				// fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
-				// fetchSizeAnnot(annotCounter++).setRange(p2, p3, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
-				// fetchSizeAnnot(annotCounter++).setRange(p3, p1, center, Vector3.NEG_UNIT_Y, false, Align.Center, false);
-				//
-				// // Angle annotations
-				// // final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal());
-				// final Vector3 n = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).negateLocal();
-				// fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p2, p3, n);
-				// fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p3, p1, n);
-				// fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p1, p2, n);
-				// }
 
 				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(buf);
 				for (ReadOnlyVector3 v : convexHull) {
@@ -447,18 +412,9 @@ public abstract class Roof extends HousePart {
 				final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
 				final int n = convexHull.size() - 1;
 				for (int i = 0; i < n; i++) {
-					final Vector3 p1, p2, p3;
-					p1 = new Vector3(convexHull.get(i));
-					p2 = new Vector3(convexHull.get(i + 1));
-					p3 = new Vector3(convexHull.get((i + 2) % n));
-					// node.getTransform().applyForward(p1);
-					// node.getTransform().applyForward(p2);
-					// node.getTransform().applyForward(p3);
-
-//					 final Vector3 normal = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).normalizeLocal();
-//					final Vector3 nn = p1.subtract(p2, null).normalizeLocal().crossLocal(p3.subtract(p2, null).normalizeLocal()).normalizeLocal();
-//					System.out.println("cal = " + Util.toString(nn));
-//					System.out.println(Util.toString(normal));
+					final ReadOnlyVector3 p1 = convexHull.get(i);
+					final ReadOnlyVector3 p2 = convexHull.get(i + 1);
+					final ReadOnlyVector3 p3 = convexHull.get((i + 2) % n);
 
 					// Size annotation
 					final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
@@ -469,49 +425,71 @@ public abstract class Roof extends HousePart {
 				}
 			}
 		}
+	}
 
+	protected void drawWireframe() {
+		if (container == null)
+			return;
+
+
+		final ArrayList<ArrayList<ReadOnlyVector3>> convexHulls = new ArrayList<ArrayList<ReadOnlyVector3>>();
+		int totalVertices = 0;
+
+		for (Spatial roofPart : flattenedMeshesRoot.getChildren()) {
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				final Node roofPartNode = (Node) roofPart;
+
+				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
+				for (ReadOnlyVector3 v : convexHull) {
+					System.out.println(Util.toString(v));
+				}
+				convexHulls.add(convexHull);
+				totalVertices += convexHull.size();
+			}
+		}
+		
+		
+		final FloatBuffer buf;
+		if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
+			buf = wireframeMesh.getMeshData().getVertexBuffer();
+			buf.limit(buf.capacity());
+			buf.rewind();
+		} else {
+			buf = BufferUtils.createVector3Buffer(totalVertices * 2);
+			wireframeMesh.getMeshData().setVertexBuffer(buf);
+		}
+
+		for (final ArrayList<ReadOnlyVector3> convexHull : convexHulls) {
+			for (int i = 0; i < convexHull.size(); i++) {
+				final ReadOnlyVector3 p1 = convexHull.get(i);
+				final ReadOnlyVector3 p2 = convexHull.get((i + 1) % convexHull.size());
+
+				buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+				buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+			}
+		}
+		buf.limit(buf.position());
+		wireframeMesh.getMeshData().updateVertexCount();
 	}
 
 	public int drawLabels(int printSequence) {
-//		final Vector3 center = new Vector3();
-		int triangle = 0;
 		for (Spatial roofPartNode : flattenedMeshesRoot.getChildren()) {
-			// final Mesh mesh = (Mesh) roofGroup;
 			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
-				// final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-				// buf.rewind();
-				// double height = Double.NEGATIVE_INFINITY;
-				// center.set(0, 0, 0);
-				// while (buf.hasRemaining()) {
-				// p.set(buf.get(), buf.get(), buf.get());
-				// roofGroup.getTransform().applyForward(p);
-				// height = Math.max(p.getZ(), height);
-				// center.addLocal(p);
-				// }
-				// center.divideLocal(buf.capacity() / 3);
-				// if (original == null)
-				// center.setZ(height);
-				// else
-				// center.addLocal(0, -0.01, 0);
-				
-				
-
 				final String text = "(" + (printSequence++ + 1) + ")";
-//				final BMText label = fetchBMText(text, triangle++);
 				final BMText label = (BMText) ((Node) roofPartNode).getChild(3);
 				label.getSceneHints().setCullHint(CullHint.Inherit);
 				label.setText(text);
-//				label.setTranslation(((Node) roofPartNode).getChild(0).getWorldBound().getCenter());
 			}
 		}
 		return printSequence;
 	}
-	
+
 	public void hideLabels() {
 		for (Spatial roofPartNode : flattenedMeshesRoot.getChildren())
-			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)	
+			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
 				((Node) roofPartNode).getChild(3).getSceneHints().setCullHint(CullHint.Always);
 	}
+
 	// public void updateTextureAndColor(final boolean textureEnabled) {
 	// if (textureEnabled) {
 	// final TextureState ts = new TextureState();

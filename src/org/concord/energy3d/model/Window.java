@@ -20,6 +20,7 @@ import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
@@ -31,7 +32,7 @@ public class Window extends HousePart {
 //	private transient FloatBuffer vertexBuffer;
 //	private transient FloatBuffer normalBuffer;
 	transient private BMText label1;
-	transient private Mesh bars;
+	transient private Line bars;
 
 	public Window() {
 		super(2, 4, 0.30);
@@ -69,10 +70,11 @@ public class Window extends HousePart {
 		root.attachChild(label1);
 		
 		bars = new Line("Window (bars)");
+		bars.setAntialiased(true);
+		bars.setLineWidth(3);
 		bars.setModelBound(new BoundingBox());
-		((Line)bars).setLineWidth(3);
-		((Line)bars).setAntialiased(true);
 		bars.getSceneHints().setCastsShadows(false);
+		bars.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		root.attachChild(bars);
 	}

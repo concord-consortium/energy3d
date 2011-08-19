@@ -2,10 +2,13 @@ package org.concord.energy3d.shapes;
 
 import java.nio.FloatBuffer;
 
+import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Arc extends Line {
@@ -17,9 +20,9 @@ public class Arc extends Line {
 	public Arc(final String name, final int vertices) {
 		super(name);
 		setAntialiased(true);
+		getSceneHints().setLightCombineMode(LightCombineMode.Off);		
 		getMeshData().setIndexMode(IndexMode.LineStrip);
 		getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(vertices));
-		getSceneHints().setLightCombineMode(LightCombineMode.Off);		
 	}
 
 	public void set(final double radius, final double start, final double end) {

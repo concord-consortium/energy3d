@@ -719,6 +719,7 @@ Version 0.3 - March 7, 2011
 - compute the space in the middle of size annotation based on the length of the label
 - add roof part label to the flatten roof branch under each roof part node
 - avoid scaling labels if they are set to auto scale
+- draw wireframe for roofs
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
