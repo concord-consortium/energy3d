@@ -6,6 +6,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
@@ -20,6 +21,9 @@ public class Arc extends Line {
 	public Arc(final String name, final int vertices) {
 		super(name);
 		setAntialiased(true);
+        final BlendState blend = new BlendState();
+        blend.setBlendEnabled(true);
+        setRenderState(blend);
 		getSceneHints().setLightCombineMode(LightCombineMode.Off);		
 		getMeshData().setIndexMode(IndexMode.LineStrip);
 		getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(vertices));

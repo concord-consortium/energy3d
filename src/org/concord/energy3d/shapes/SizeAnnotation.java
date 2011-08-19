@@ -9,6 +9,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.ui.text.BMText.Align;
@@ -19,6 +20,10 @@ public class SizeAnnotation extends Annotation {
 
 	public SizeAnnotation() {
 		super(new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null));
+		((Line)mesh).setAntialiased(true);
+        final BlendState blend = new BlendState();
+        blend.setBlendEnabled(true);
+        mesh.setRenderState(blend);		
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		arrows.setDefaultColor(ColorRGBA.BLACK);
 		arrows.setModelBound(new BoundingBox());

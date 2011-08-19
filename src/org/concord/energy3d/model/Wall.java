@@ -30,6 +30,7 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.OffsetState;
@@ -139,6 +140,9 @@ public class Wall extends HousePart {
 		wireframeMesh = new Line("Wall (Wireframe)");
 		// wireframeMesh.getMeshData().setIndexMode(IndexMode.LineLoop);
 		wireframeMesh.setAntialiased(true);
+        final BlendState blend = new BlendState();
+        blend.setBlendEnabled(true);
+        wireframeMesh.setRenderState(blend);      
 		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);

@@ -71,6 +71,9 @@ public class Window extends HousePart {
 		
 		bars = new Line("Window (bars)");
 		bars.setAntialiased(true);
+        final BlendState blend = new BlendState();
+        blend.setBlendEnabled(true);
+        bars.setRenderState(blend);		
 		bars.setLineWidth(3);
 		bars.setModelBound(new BoundingBox());
 		bars.getSceneHints().setCastsShadows(false);

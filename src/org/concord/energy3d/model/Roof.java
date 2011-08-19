@@ -29,6 +29,7 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.OffsetState;
@@ -99,6 +100,9 @@ public abstract class Roof extends HousePart {
 
 		wireframeMesh = new Line("Roof (wireframe)");
 		wireframeMesh.setAntialiased(true);
+        final BlendState blend = new BlendState();
+        blend.setBlendEnabled(true);
+        wireframeMesh.setRenderState(blend);				
 		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
@@ -127,11 +131,13 @@ public abstract class Roof extends HousePart {
 		try {
 			if (container == null) {
 				flattenedMeshesRoot.getSceneHints().setCullHint(CullHint.Always);
+				wireframeMesh.getSceneHints().setCullHint(CullHint.Always);
 				// bottomMesh.getSceneHints().setCullHint(CullHint.Always);
 				hidePoints();
 				return;
 			}
 			flattenedMeshesRoot.getSceneHints().setCullHint(CullHint.Inherit);
+			wireframeMesh.getSceneHints().setCullHint(CullHint.Inherit);
 			// final boolean bottomMeshVisible = height > 0;
 			// bottomMesh.getSceneHints().setCullHint(bottomMeshVisible ? CullHint.Inherit : CullHint.Always);
 			// bottomMesh.getSceneHints().setPickingHint(PickingHint.Pickable, bottomMeshVisible);

@@ -84,6 +84,8 @@ import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.BlendState.DestinationFunction;
+import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -315,7 +317,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void update(final ReadOnlyTimer timer) {
 		final double tpf = timer.getTimePerFrame();
-//		HousePart.clearDrawFlags();
+		// HousePart.clearDrawFlags();
 		passManager.updatePasses(tpf);
 		logicalLayer.checkTriggers(tpf);
 
@@ -358,25 +360,25 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			} else {
 				if (drawn instanceof Wall)
-					com.ardor3d.util.geom.Debugger.drawBounds(((Wall)drawn).getRoot().getChild(3), renderer, true);
+					com.ardor3d.util.geom.Debugger.drawBounds(((Wall) drawn).getRoot().getChild(3), renderer, true);
 				else
 					com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
 				if (drawn.getMesh() != null)
 					System.out.println(drawn.getMesh().getWorldBound());
 			}
 		}
-		
-//		com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getRoot(), renderer, true);
-		
-//		if (PrintController.getInstance().getPrintParts() != null)
-//		for (HousePart part : PrintController.getInstance().getPrintParts()) {
-//			if (part instanceof Roof)
-//				for (Spatial mesh : ((Roof)part).getFlattenedMeshesRoot().getChildren())
-//					com.ardor3d.util.geom.Debugger.drawBounds(mesh, renderer, true);
-//				com.ardor3d.util.geom.Debugger.drawBounds(((Roof)part).getFlattenedMeshesRoot().getChild(0), renderer, true);
-//			com.ardor3d.util.geom.Debugger.drawBounds(part.getRoot(), renderer, true);
-			
-//		}
+
+		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getRoot(), renderer, true);
+
+		// if (PrintController.getInstance().getPrintParts() != null)
+		// for (HousePart part : PrintController.getInstance().getPrintParts()) {
+		// if (part instanceof Roof)
+		// for (Spatial mesh : ((Roof)part).getFlattenedMeshesRoot().getChildren())
+		// com.ardor3d.util.geom.Debugger.drawBounds(mesh, renderer, true);
+		// com.ardor3d.util.geom.Debugger.drawBounds(((Roof)part).getFlattenedMeshesRoot().getChild(0), renderer, true);
+		// com.ardor3d.util.geom.Debugger.drawBounds(part.getRoot(), renderer, true);
+
+		// }
 
 		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
 
@@ -436,10 +438,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
-//		offsetState.setFactor(1.1f);
-//		offsetState.setUnits(4f);
+		// offsetState.setFactor(1.1f);
+		// offsetState.setUnits(4f);
 		offsetState.setFactor(0.5f);
-		offsetState.setUnits(0.5f);		
+		offsetState.setUnits(0.5f);
 		floor.setRenderState(offsetState);
 
 		final BlendState blendState = new BlendState();
@@ -447,7 +449,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		floor.setRenderState(blendState);
 		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		// floor.getSceneHints().setTransparencyType(TransparencyType.TwoPass);
-		floor.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+		// floor.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
@@ -466,42 +468,92 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return sky;
 	}
 
+//	private Spatial createAxis() {
+//		final int axisLen = 100;
+//
+//		final FloatBuffer verts = BufferUtils.createVector3Buffer(12);
+//		verts.put(0).put(0).put(0);
+//		verts.put(-axisLen).put(0).put(0);
+//		verts.put(0).put(0).put(0);
+//		verts.put(axisLen).put(0).put(0);
+//		verts.put(0).put(0).put(0);
+//		verts.put(0).put(-axisLen).put(0);
+//		verts.put(0).put(0).put(0);
+//		verts.put(0).put(axisLen).put(0);
+//		verts.put(0).put(0).put(0);
+//		verts.put(0).put(0).put(-axisLen);
+//		verts.put(0).put(0).put(0);
+//		verts.put(0).put(0).put(axisLen);
+//
+////		final FloatBuffer colors = BufferUtils.createColorBuffer(12);
+////		colors.put(1).put(0).put(0).put(0);
+////		colors.put(1).put(0).put(0).put(0);
+////		colors.put(1).put(0).put(0).put(0);
+////		colors.put(1).put(0).put(0).put(0);
+////		colors.put(0).put(1).put(0).put(0);
+////		colors.put(0).put(1).put(0).put(0);
+////		colors.put(0).put(1).put(0).put(0);
+////		colors.put(0).put(1).put(0).put(0);
+////		colors.put(0).put(0).put(1).put(0);
+////		colors.put(0).put(0).put(1).put(0);
+////		colors.put(0).put(0).put(1).put(0);
+////		colors.put(0).put(0).put(1).put(0);
+//
+//		final Line axis = new Line("Axis", verts, null, null, null);
+//		axis.setDefaultColor(ColorRGBA.RED);
+//		axis.setAntialiased(true);
+//		// axis.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+//		final BlendState blend = new BlendState();
+//		blend.setBlendEnabled(true);
+//		blend.setSourceFunction(SourceFunction.SourceAlpha);
+//		blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
+//		axis.setRenderState(blend);
+//
+//		return axis;
+//	}
+	
 	private Spatial createAxis() {
 		final int axisLen = 100;
+		
+		final Node axisRoot = new Node();
 
-		final FloatBuffer verts = BufferUtils.createVector3Buffer(12);
-		verts.put(0).put(0).put(0);
-		verts.put(-axisLen).put(0).put(0);
-		verts.put(0).put(0).put(0);
-		verts.put(axisLen).put(0).put(0);
-		verts.put(0).put(0).put(0);
-		verts.put(0).put(-axisLen).put(0);
-		verts.put(0).put(0).put(0);
-		verts.put(0).put(axisLen).put(0);
-		verts.put(0).put(0).put(0);
-		verts.put(0).put(0).put(-axisLen);
-		verts.put(0).put(0).put(0);
-		verts.put(0).put(0).put(axisLen);
+		FloatBuffer buf;
+		Line line;
+		final BlendState blend = new BlendState();
+		blend.setBlendEnabled(true);
+		
+		// X-Axis
+		buf = BufferUtils.createVector3Buffer(2);
+		buf.put(-axisLen).put(0).put(0);
+		buf.put(axisLen).put(0).put(0);
+		line = new Line("X-Axis", buf, null, null, null);
+		line.setAntialiased(true);
+		line.setRenderState(blend);
+		line.setDefaultColor(ColorRGBA.RED);
+		axisRoot.attachChild(line);
 
-		final FloatBuffer colors = BufferUtils.createColorBuffer(12);
-		colors.put(1).put(0).put(0).put(0);
-		colors.put(1).put(0).put(0).put(0);
-		colors.put(1).put(0).put(0).put(0);
-		colors.put(1).put(0).put(0).put(0);
-		colors.put(0).put(1).put(0).put(0);
-		colors.put(0).put(1).put(0).put(0);
-		colors.put(0).put(1).put(0).put(0);
-		colors.put(0).put(1).put(0).put(0);
-		colors.put(0).put(0).put(1).put(0);
-		colors.put(0).put(0).put(1).put(0);
-		colors.put(0).put(0).put(1).put(0);
-		colors.put(0).put(0).put(1).put(0);
+		// Y-Axis
+		buf = BufferUtils.createVector3Buffer(2);
+		buf.put(0).put(-axisLen).put(0);
+		buf.put(0).put(axisLen).put(0);
+		line = new Line("Y-Axis", buf, null, null, null);
+		line.setAntialiased(true);
+		line.setRenderState(blend);
+		line.setDefaultColor(ColorRGBA.GREEN);
+		axisRoot.attachChild(line);
+		
+		// Z-Axis		
+		buf = BufferUtils.createVector3Buffer(2);
+		buf.put(0).put(0).put(-axisLen);
+		buf.put(0).put(0).put(axisLen);
+		line = new Line("Z-Axis", buf, null, null, null);
+		line.setAntialiased(true);
+		line.setRenderState(blend);
+		line.setDefaultColor(ColorRGBA.BLUE);
+		axisRoot.attachChild(line);
 
-		final Line axis = new Line("Axis", verts, null, colors, null);
-		axis.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-
-		return axis;
-	}
+		return axisRoot;
+	}	
 
 	private void initMouse() {
 
@@ -1123,14 +1175,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
 			pick = SelectUtil.selectHousePart(x, y, false);
 			if (pick != null) {
-//				drawn = pick.getHousePart();
+				// drawn = pick.getHousePart();
 				if (hoveredHousePart != null && hoveredHousePart != drawn)
-					hoveredHousePart.hidePoints();				
+					hoveredHousePart.hidePoints();
 				hoveredHousePart = pick.getHousePart();
 				if (hoveredHousePart != null && hoveredHousePart != drawn)
 					hoveredHousePart.showPoints();
 			} else {
-//				drawn = null;
+				// drawn = null;
 				if (hoveredHousePart != null && hoveredHousePart != drawn)
 					hoveredHousePart.hidePoints();
 				hoveredHousePart = null;

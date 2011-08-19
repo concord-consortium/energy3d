@@ -108,8 +108,12 @@ public class Heliodon {
 
 		// Sun Path
 		sunPath = new Line("Sun Path", BufferUtils.createVector3Buffer(SUN_PATH_VERTICES), null, null, null);
-		sunPath.setDefaultColor(ColorRGBA.YELLOW);
+		sunPath.setAntialiased(true);
+        final BlendState blend = new BlendState();
+        blend.setBlendEnabled(true);
+        sunPath.setRenderState(blend);		
 		sunPath.setLineWidth(3);
+		sunPath.setDefaultColor(ColorRGBA.YELLOW);
 		sunPath.getMeshData().setIndexMode(IndexMode.LineStrip);
 		sunPath.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		root.attachChild(sunPath);
