@@ -673,8 +673,7 @@ public abstract class Roof extends HousePart {
 				if (base != null && isSameBasePoints(base_i, base)) {
 					mesh.getSceneHints().setCullHint(CullHint.Always);
 					mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-				} else
-					mesh.getSceneHints().setPickingHint(PickingHint.Pickable, true);
+				}
 			}
 		}
 	}
