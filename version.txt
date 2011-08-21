@@ -731,13 +731,18 @@ Version 0.3 - March 7, 2011
 - fix problem with too many annotations created and left behind when resizing
 - add feature to draw annotations inward
 - add menu to swtich between inward and outward annotations
+- fix problem untextured roof parts
+- fix problem with unpickable roof parts when gabled
+- remove duplicated steiner points from customer roof polygon to avoid exceptions
+
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
 - *fix problem with resizing custome roof
 - *put the main model in the exact middle of print preview view using its bounding box
 - *move all parameters of HousePart constructor to init
-
+- *too slow
  
 
 TODO:

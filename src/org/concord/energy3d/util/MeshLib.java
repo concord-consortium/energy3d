@@ -13,6 +13,7 @@ import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -134,6 +135,7 @@ public class MeshLib {
 				node = (Node) root.getChild(meshIndex);
 				newMesh = (Mesh) node.getChild(0);
 				node.getSceneHints().setCullHint(CullHint.Inherit);
+				node.getSceneHints().setPickingHint(PickingHint.Pickable, true);
 			} else {
 				newMesh = new Mesh("Roof Mesh #" + meshIndex);
 				newMesh.setModelBound(new BoundingBox());
@@ -195,7 +197,7 @@ public class MeshLib {
 
 			newMesh.getMeshData().updateVertexCount();
 			newMesh.updateModelBound();
-			newMesh.updateWorldBound(false);
+//			newMesh.updateWorldBound(false);
 			
 			node.getChild(3).setTranslation(center.add(normal.multiply(0.1, null), null));
 
@@ -203,6 +205,7 @@ public class MeshLib {
 		}
 		while (meshIndex < root.getNumberOfChildren()) {
 			root.getChild(meshIndex).getSceneHints().setCullHint(CullHint.Always);
+			root.getChild(meshIndex).getSceneHints().setPickingHint(PickingHint.Pickable, false);
 			meshIndex++;
 		}
 	}

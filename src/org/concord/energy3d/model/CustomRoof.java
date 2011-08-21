@@ -23,6 +23,7 @@ public class CustomRoof extends Roof {
 	}
 
 	public void setPreviewPoint(int x, int y) {
+		System.out.println("----------- CustomerRoof.setPreview(" + x + ", " + y);
 		if (container != null)
 			points.get(0).set(toRelative(getCenter(), container.getContainer())).addLocal(0, 0, height);			
 			
@@ -64,10 +65,14 @@ public class CustomRoof extends Roof {
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
 		final Polygon polygon = new Polygon(wallUpperPoints);
+		final ArrayList<ReadOnlyVector3> steinerPoints = new ArrayList<ReadOnlyVector3>();
 		for (int i = 1; i < points.size(); i++) {
 			final Vector3 p = getAbsPoint(i);
-			polygon.addSteinerPoint(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+			if (!steinerPoints.contains(p))
+				steinerPoints.add(p);
 		}
+		for (final ReadOnlyVector3 p : steinerPoints)
+			polygon.addSteinerPoint(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		return polygon;
 	}
 

@@ -63,7 +63,7 @@ public abstract class Roof extends HousePart {
 	private ArrayList<Wall> gableWalls;
 	transient private ArrayList<Wall> walls;
 	transient protected Map<Integer, Wall> gableEditPointToWallMap;
-	transient private boolean isTextureApplied;
+//	transient private boolean isTextureApplied;
 
 	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -76,7 +76,7 @@ public abstract class Roof extends HousePart {
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
 		gableEditPointToWallMap = new Hashtable<Integer, Wall>();
-		isTextureApplied = false;
+//		isTextureApplied = false;
 
 		flattenedMeshesRoot = new Node("Roof Meshes Root");
 		final OffsetState offsetState = new OffsetState();
@@ -101,9 +101,9 @@ public abstract class Roof extends HousePart {
 
 		wireframeMesh = new Line("Roof (wireframe)");
 		wireframeMesh.setAntialiased(true);
-        final BlendState blend = new BlendState();
-        blend.setBlendEnabled(true);
-        wireframeMesh.setRenderState(blend);				
+		final BlendState blend = new BlendState();
+		blend.setBlendEnabled(true);
+		wireframeMesh.setRenderState(blend);
 		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		wireframeMesh.getSceneHints().setCastsShadows(false);
 		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
@@ -183,12 +183,14 @@ public abstract class Roof extends HousePart {
 
 			drawWireframe();
 
-			if (!isTextureApplied) {
+//			if (!isTextureApplied) {
 				updateTextureAndColor(Scene.getInstance().isTextureEnabled());
-				isTextureApplied = true;
-			}
+//				isTextureApplied = true;
+//			}
 
-			root.updateWorldBound(true);
+			// root.updateWorldBound(true);
+
+			root.updateGeometricState(0);
 
 			// computeGableEditPoints();
 
@@ -331,8 +333,9 @@ public abstract class Roof extends HousePart {
 			if (child.getSceneHints().getCullHint() != CullHint.Always)
 				flattenQuadTriangle((Node) child, flattenTime);
 			// break;
+			root.updateGeometricState(0);
 		}
-		mesh.updateModelBound();
+		// mesh.updateModelBound();
 		// drawAnnotations();
 		// if (bottomMesh != null) {
 		// bottomMesh.getSceneHints().setCullHint(CullHint.Always);
@@ -396,8 +399,8 @@ public abstract class Roof extends HousePart {
 		final Vector3 targetPrintCenter = ((UserData) ((Node) roofPartNode).getChild(0).getUserData()).getPrintCenter();
 		if (!targetPrintCenter.equals(Vector3.ZERO))
 			roofPartNode.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
-		roofPartNode.updateWorldTransform(true);
-		roofPartNode.updateWorldBound(true);
+		// roofPartNode.updateWorldTransform(true);
+		// roofPartNode.updateWorldBound(true);
 	}
 
 	@Override
@@ -412,9 +415,6 @@ public abstract class Roof extends HousePart {
 				final FloatBuffer buf = ((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer();
 
 				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(buf);
-				for (ReadOnlyVector3 v : convexHull) {
-					System.out.println(Util.toString(v));
-				}
 
 				final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
 				final int n = convexHull.size() - 1;
@@ -425,7 +425,7 @@ public abstract class Roof extends HousePart {
 
 					// Size annotation
 					final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
-//					fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1)).setRange(p2, p3, center, normal, false, Align.Center, true, true, true);
+					// fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1)).setRange(p2, p3, center, normal, false, Align.Center, true, true, true);
 					final SizeAnnotation sizeAnnot = fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1));
 					sizeAnnot.setRange(p2, p3, center, normal, false, Align.Center, true, true, true, Scene.isDrawAnnotationsInside());
 					if (Scene.isDrawAnnotationsInside())
@@ -434,7 +434,7 @@ public abstract class Roof extends HousePart {
 						sizeAnnot.setColor(ColorRGBA.BLACK);
 
 					// Angle annotations
-//					fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2)).setRange(p2, p1, p3, normal);
+					// fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2)).setRange(p2, p1, p3, normal);
 					fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2)).setRange(p2, p1, p3, normal);
 				}
 			}
@@ -453,9 +453,6 @@ public abstract class Roof extends HousePart {
 				final Node roofPartNode = (Node) roofPart;
 
 				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
-				for (ReadOnlyVector3 v : convexHull) {
-					System.out.println(Util.toString(v));
-				}
 				convexHulls.add(convexHull);
 				totalVertices += convexHull.size();
 			}
@@ -540,16 +537,18 @@ public abstract class Roof extends HousePart {
 	public void updateTextureAndColor(final boolean textureEnabled) {
 		if (flattenedMeshesRoot != null) {
 			for (final Spatial roofPartNode : flattenedMeshesRoot.getChildren()) {
-				final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
-				if (textureEnabled) {
-					final TextureState ts = new TextureState();
-					ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-					mesh.setRenderState(ts);
-					mesh.setDefaultColor(ColorRGBA.WHITE);
+				if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
+					final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
+					if (textureEnabled) {
+						final TextureState ts = new TextureState();
+						ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+						mesh.setRenderState(ts);
+						mesh.setDefaultColor(ColorRGBA.WHITE);
 
-				} else {
-					mesh.clearRenderState(StateType.Texture);
-					mesh.setDefaultColor(defaultColor);
+					} else {
+						mesh.clearRenderState(StateType.Texture);
+						mesh.setDefaultColor(defaultColor);
+					}
 				}
 			}
 		}
@@ -614,8 +613,8 @@ public abstract class Roof extends HousePart {
 						// select the nearest point so that one edit point per upper mesh point is selected
 						for (int i = 0; i < points.size(); i++) {
 							final Vector3 editPoint = getAbsPoint(i);
-							 final double distanceToEditPoint = meshPoint.distance(editPoint);
-//							final double distanceToEditPoint = base[0].distance(editPoint) + base[1].distance(editPoint);
+							final double distanceToEditPoint = meshPoint.distance(editPoint);
+							// final double distanceToEditPoint = base[0].distance(editPoint) + base[1].distance(editPoint);
 							if (distanceToEditPoint < smallestDistanceToEditPoint) {
 								smallestDistanceToEditPoint = distanceToEditPoint;
 								nearestEditPoint = editPoint;
@@ -681,6 +680,7 @@ public abstract class Roof extends HousePart {
 				if (base != null && isSameBasePoints(base_i, base)) {
 					mesh.getSceneHints().setCullHint(CullHint.Always);
 					mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+					break;
 				}
 			}
 		}

@@ -645,7 +645,7 @@ public class Wall extends HousePart {
 	public double findRoofIntersection(final ReadOnlyVector3 v, final boolean backMesh) {
 		if (roof == null)
 			return v.getZ();
-		final PickResults pickResults = new PrimitivePickResults();
+		final PickResults pickResults = new PrimitivePickResults();;
 		PickingUtil.findPick(roof.getFlattenedMeshesRoot(), new Ray3(new Vector3(v.getX(), v.getY(), 0), Vector3.UNIT_Z), pickResults);
 		if (pickResults.getNumber() > 0) {
 			final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
