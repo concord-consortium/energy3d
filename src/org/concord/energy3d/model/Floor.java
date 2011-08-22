@@ -184,7 +184,8 @@ public class Floor extends HousePart {
 
 	@Override
 	public void setOriginal(final HousePart original) {
-		super.setOriginal(original);
 		wallUpperPoints = ((Floor) original).wallUpperPoints;
+		super.setOriginal(original);
 	}
+	
 }

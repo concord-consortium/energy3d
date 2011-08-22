@@ -179,10 +179,19 @@ public abstract class HousePart implements Serializable {
 		root.detachChild(pointsRoot);
 //		this.center = original.center;
 		if (original.mesh != null) {
-			root.detachChild(this.mesh);
-			this.mesh = original.mesh.makeCopy(true);
-			this.mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getIndex(), false));
-			root.attachChild(this.mesh);
+			root.detachChild(mesh);
+			mesh = original.mesh.makeCopy(true);
+			mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getIndex(), false));
+			root.attachChild(mesh);
+			
+//			root.detachChild(sizeAnnotRoot);
+//			sizeAnnotRoot = original.sizeAnnotRoot.makeCopy(true);
+//			root.attachChild(sizeAnnotRoot);
+//			
+//			root.detachChild(angleAnnotRoot);
+//			angleAnnotRoot = original.sizeAnnotRoot.makeCopy(true);
+//			root.attachChild(angleAnnotRoot);
+			
 			// this.sizeAnnotRoot = original.sizeAnnotRoot.makeCopy(false);
 			// root.attachChild(sizeAnnotRoot);
 		}

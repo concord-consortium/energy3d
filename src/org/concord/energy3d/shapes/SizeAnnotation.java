@@ -13,14 +13,15 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class SizeAnnotation extends Annotation {
-	protected final Mesh arrows = new Mesh("Arrows");
+	protected transient final Mesh arrows = new Mesh("Arrows");
 
 	public SizeAnnotation() {
-		super(new Line("Size annotation lines", BufferUtils.createVector3Buffer(12), null, null, null));
+		super(new Line("Size annotation lines", BufferUtils.createVector3Buffer(8), null, null, null));
 		((Line)mesh).setAntialiased(true);
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);
@@ -97,7 +98,7 @@ public class SizeAnnotation extends Annotation {
 		offset.multiplyLocal(0.5);
 		body.set(to).subtractLocal(from).normalizeLocal().multiplyLocal(0.05);
 
-		mesh.updateModelBound();
+		mesh.updateModelBound();;
 
 		vertexBuffer = arrows.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
@@ -139,5 +140,15 @@ public class SizeAnnotation extends Annotation {
 		super.setColor(color);
 		arrows.setDefaultColor(color);
 	}	
+
+    @Override
+    public Node makeCopy(final boolean shareGeometricData) {
+        // get copy of basic spatial info
+        final Node node = (Node) super.makeCopy(shareGeometricData);
+        node.detachChildAt(0);
+        node.detachChildAt(1);
+        node.detachChildAt(2);
+        return node;
+    }
 
 }

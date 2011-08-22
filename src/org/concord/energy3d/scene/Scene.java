@@ -54,7 +54,7 @@ public class Scene implements Serializable {
 	private static boolean redrawAll = false;
 	private static boolean isTextureEnabled = true;
 	private static boolean drawThickness = false;
-	private static boolean drawAnnotationsInside = true;
+	private static boolean drawAnnotationsInside = false;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private Unit unit = Unit.Meter;
 	private double annotationScale = 1;

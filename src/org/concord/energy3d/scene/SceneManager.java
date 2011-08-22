@@ -356,6 +356,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final Node flattenedMeshesRoot = ((Roof) drawn).getFlattenedMeshesRoot();
 				if (flattenedMeshesRoot != null && pick != null) {
 					com.ardor3d.util.geom.Debugger.drawBounds(flattenedMeshesRoot.getChild(pick.getIndex()), renderer, true);
+//					com.ardor3d.util.geom.Debugger.drawBounds(((Node) flattenedMeshesRoot.getChild(pick.getIndex())).getChild(0), renderer, true);
 					System.out.println(flattenedMeshesRoot.getChild(pick.getIndex()).getWorldBound());
 				}
 			} else {

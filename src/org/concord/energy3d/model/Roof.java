@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
@@ -47,6 +48,7 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -333,8 +335,8 @@ public abstract class Roof extends HousePart {
 			if (child.getSceneHints().getCullHint() != CullHint.Always)
 				flattenQuadTriangle((Node) child, flattenTime);
 			// break;
-			root.updateGeometricState(0);
 		}
+		root.updateGeometricState(0);
 		// mesh.updateModelBound();
 		// drawAnnotations();
 		// if (bottomMesh != null) {
@@ -401,6 +403,7 @@ public abstract class Roof extends HousePart {
 			roofPartNode.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
 		// roofPartNode.updateWorldTransform(true);
 		// roofPartNode.updateWorldBound(true);
+//		roofPartNode.updateGeometricState(0);
 	}
 
 	@Override
@@ -826,6 +829,27 @@ public abstract class Roof extends HousePart {
 		this.original = original;
 		this.root.detachChild(pointsRoot);
 		this.root.detachChild(wireframeMesh);
+//		this.root.detachChild(flattenedMeshesRoot);
+		// this.center = original.center;
+////		this.flattenedMeshesRoot = ((Roof) original).flattenedMeshesRoot.makeCopy(true);;
+//		final Node originalFlattenedMeshesRoot = ((Roof)original).flattenedMeshesRoot;
+//		for (int i = 0; i < originalFlattenedMeshesRoot.getNumberOfChildren(); i++) {
+//			if (originalFlattenedMeshesRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
+//				final Node node = new Node();
+//				node.attachChild(((Node) originalFlattenedMeshesRoot.getChild(i)).getChild(0).makeCopy(true));
+//				node.attachChild(new Node("Roof Size Annot"));
+//				node.attachChild(new Node("Roof Angle Annot"));
+//				node.attachChild(((Node) originalFlattenedMeshesRoot.getChild(i)).getChild(3).makeCopy(true));
+//				flattenedMeshesRoot.attachChild(node);
+//				final UserData orgUserData = (UserData) ((Node) originalFlattenedMeshesRoot.getChild(i)).getChild(0).getUserData();
+//				((Node) flattenedMeshesRoot.getChild(i)).getChild(0).setUserData(new UserData(this, orgUserData.getIndex(), false));
+//				flattenedMeshesRoot.getChild(i).setUserData(originalFlattenedMeshesRoot.getChild(i).getUserData());
+//				flattenedMeshesRoot.updateGeometricState(0);
+//			}
+//		}
+//		root.attachChild(flattenedMeshesRoot);
+//		 drawAnnotations();
+		
 		this.root.detachChild(flattenedMeshesRoot);
 		// this.center = original.center;
 		this.flattenedMeshesRoot = ((Roof) original).flattenedMeshesRoot.makeCopy(true);
@@ -837,7 +861,7 @@ public abstract class Roof extends HousePart {
 			}
 		}
 		root.attachChild(flattenedMeshesRoot);
-		// drawAnnotations();
+		drawAnnotations();
 		root.updateWorldBound(true);
 	}
 
@@ -869,8 +893,17 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	protected ReadOnlyVector3 getCenter() {
-		final ReadOnlyVector3 center = super.getCenter();
-		return new Vector3(center.getX(), center.getY(), container.getPoints().get(1).getZ());
+//		final ReadOnlyVector3 center = super.getCenter();
+//		return new Vector3(center.getX(), center.getY(), container.getPoints().get(1).getZ());
+		final Vector3 min = new Vector3(wallUpperPoints.get(0).getX(), wallUpperPoints.get(0).getY(), wallUpperPoints.get(0).getZ());
+		final Vector3 max = new Vector3(wallUpperPoints.get(0).getX(), wallUpperPoints.get(0).getY(), wallUpperPoints.get(0).getZ());
+		for (final PolygonPoint p : wallUpperPoints) {
+			min.setX(Math.min(min.getX(), p.getX()));
+			min.setY(Math.min(min.getY(), p.getY()));
+			max.setX(Math.max(max.getX(), p.getX()));
+			max.setY(Math.max(max.getY(), p.getY()));
+		}
+		return min.addLocal(max).multiplyLocal(new Vector3(0.5, 0.5, 0)).addLocal(0, 0, container.getPoints().get(1).getZ());
 	}
 
 	@Override
@@ -883,4 +916,5 @@ public abstract class Roof extends HousePart {
 				((Node) roofPart).getChild(2).getSceneHints().setCullHint(cull);
 			}
 	}
+
 }

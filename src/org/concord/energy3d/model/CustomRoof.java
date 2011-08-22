@@ -15,18 +15,18 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class CustomRoof extends Roof {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.5;	
+	private static final double GRID_SIZE = 0.5;
 	transient private boolean recalculateEditPoints;
 
 	public CustomRoof() {
-		super(1, 1, 0.5);		
+		super(1, 1, 0.5);
 	}
 
 	public void setPreviewPoint(int x, int y) {
 		System.out.println("----------- CustomerRoof.setPreview(" + x + ", " + y);
 		if (container != null)
-			points.get(0).set(toRelative(getCenter(), container.getContainer())).addLocal(0, 0, height);			
-			
+			points.get(0).set(toRelative(getCenter(), container.getContainer())).addLocal(0, 0, height);
+
 		if (editPointIndex == -1) {
 			recalculateEditPoints = true;
 			pickContainer(x, y, Wall.class);
@@ -38,7 +38,7 @@ public class CustomRoof extends Roof {
 			final double z = container.getPoints().get(1).getZ() + height;
 			for (final Vector3 v : points)
 				v.setZ(z);
-		} else if (gableEditPointToWallMap.containsKey(editPointIndex)) { 
+		} else if (gableEditPointToWallMap.containsKey(editPointIndex)) {
 			final Wall wall = gableEditPointToWallMap.get(editPointIndex);
 			final Vector3 base = wall.getAbsPoint(0);
 			final Vector3 dir = wall.getAbsPoint(2).subtract(base, null).normalizeLocal();
@@ -78,29 +78,29 @@ public class CustomRoof extends Roof {
 
 	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
 		super.processRoofPoints(wallUpperPoints, wallNormals);
-		
+
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
-			
-		// add or update edit points
-		final double z = container.getPoints().get(1).getZ() + height;
-		if (wallUpperPoints.size() > points.size()) {
-			final Vector3 v = new Vector3();
-			for (int i = 0; i < wallUpperPoints.size() - 1; i = i + 1) {
-				final PolygonPoint p1 = wallUpperPoints.get(i);
-				final PolygonPoint p2 = wallUpperPoints.get(i + 1);
-				// middle of wall = (p1 + p2) / 2
-				v.set(p1.getX() + p2.getX(), p1.getY() + p2.getY(), 0).multiplyLocal(0.5);
-				v.setZ(z);
-				// add -normal*0.2 to middle point of wall
-				v.addLocal(wallNormals.get(i).multiply(0.2, null).negateLocal());
-				v.set(toRelative(v, container.getContainer()));
-				if (i + 1 < points.size())
-					points.get(i + 1).set(v);
-				else
-					points.add(v.clone());
+
+			// add or update edit points
+			final double z = container.getPoints().get(1).getZ() + height;
+			if (wallUpperPoints.size() > points.size()) {
+				final Vector3 v = new Vector3();
+				for (int i = 0; i < wallUpperPoints.size() - 1; i = i + 1) {
+					final PolygonPoint p1 = wallUpperPoints.get(i);
+					final PolygonPoint p2 = wallUpperPoints.get(i + 1);
+					// middle of wall = (p1 + p2) / 2
+					v.set(p1.getX() + p2.getX(), p1.getY() + p2.getY(), 0).multiplyLocal(0.5);
+					v.setZ(z);
+					// add -normal*0.2 to middle point of wall
+					v.addLocal(wallNormals.get(i).multiply(0.2, null).negateLocal());
+					v.set(toRelative(v, container.getContainer()));
+					if (i + 1 < points.size())
+						points.get(i + 1).set(v);
+					else
+						points.add(v.clone());
+				}
 			}
-		}
 		} else {
 			for (final Vector3 p : points)
 				p.setZ(container.getPoints().get(1).getZ() + height);

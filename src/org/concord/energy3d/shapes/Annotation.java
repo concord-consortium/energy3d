@@ -7,14 +7,15 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.AutoScale;
 
 public abstract class Annotation extends Node {
 	private static double fontSize = 0.1; 
-	protected final Mesh mesh;
-	protected final BMText label = makeNewLabel();
+	protected transient final Mesh mesh;
+	protected final transient BMText label = makeNewLabel();
 	
 	public static void setFontSize(double fontSize) {
 		Annotation.fontSize = fontSize;
@@ -54,4 +55,6 @@ public abstract class Annotation extends Node {
 //			label.setFontScale(size / 20.0);
 //		}
 //	}
+	
+	
 }

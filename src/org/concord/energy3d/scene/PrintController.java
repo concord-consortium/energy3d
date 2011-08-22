@@ -347,7 +347,7 @@ public class PrintController implements Updater {
 		}
 	}
 
-	private void computePrintCenterOf(final Mesh printPart, final ArrayList<ArrayList<Spatial>> pages) {
+	private void computePrintCenterOf(final Spatial printPart, final ArrayList<ArrayList<Spatial>> pages) {
 		boolean isFitted = false;
 		for (int pageNum = 0; pageNum < pages.size() && !isFitted; pageNum++)
 			isFitted = fitInPage(printPart, pages.get(pageNum));
@@ -368,7 +368,7 @@ public class PrintController implements Updater {
 		for (Spatial neighborPart : page) {
 			final Vector3 neighborPartCenter = ((UserData) neighborPart.getUserData()).getPrintCenter();
 			final BoundingBox neighborBound = (BoundingBox) neighborPart.getWorldBound().clone(null);
-			final BoundingBox printPartBound = (BoundingBox) printPart.getWorldBound().clone(null);
+			final BoundingBox printPartBound = (BoundingBox) printPart.getWorldBound().clone(null);;
 			final double PADDING = 0.5;
 			final double xExtend = neighborBound.getXExtent() + printPartBound.getXExtent() + PADDING;
 			final double zExtend = neighborBound.getZExtent() + printPartBound.getZExtent() + PADDING;
