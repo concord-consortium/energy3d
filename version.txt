@@ -738,7 +738,7 @@ Version 0.3 - March 7, 2011
 - avoid drawing annotations in setOriginal
 - fix problem with annotations not drawn for non-roof parts
 - fix problem with some roof parts overlaping in print preview
-
+- automatically update the library path to load the correct jogl native libraries 32 versus 64 for all OS
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

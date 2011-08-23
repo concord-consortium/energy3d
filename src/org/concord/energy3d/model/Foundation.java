@@ -327,5 +327,9 @@ public class Foundation extends HousePart {
 	protected String getDefaultTextureFileName() {
 		return "foundation.jpg";
 	}
+	
+//	public boolean isPrintable() {
+//		return false;
+//	}	
 
 }
