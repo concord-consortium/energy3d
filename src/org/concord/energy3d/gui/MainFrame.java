@@ -538,7 +538,7 @@ public class MainFrame extends JFrame {
 			aboutDialog.setTitle("About");
 			JPanel p = new JPanel(new BorderLayout());
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			final String version = "0.3";
+			final String version = "0.4";
 			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + version + "<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grant #0918449 to the Concord Consortium. </html>"), BorderLayout.CENTER);
 			aboutDialog.setContentPane(p);
 			aboutDialog.pack();

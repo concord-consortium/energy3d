@@ -739,6 +739,14 @@ Version 0.3 - March 7, 2011
 - fix problem with annotations not drawn for non-roof parts
 - fix problem with some roof parts overlaping in print preview
 - automatically update the library path to load the correct jogl native libraries 32 versus 64 for all OS
+- fix problem with infinit loop when computing convex hull
+- fix problem with gable edit point being slightly outside of roof range and causing blank roof part
+- reduce overhang length by half
+- reduce height of backwall mesh
+- release version 0.4 
+**********************************************************************************************
+Version 0.4 - Auguest 24, 2011
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

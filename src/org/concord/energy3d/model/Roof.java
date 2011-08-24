@@ -626,7 +626,7 @@ public abstract class Roof extends HousePart {
 							}
 						}
 						double distance = -nearestEditPoint.subtract(meshBase[0], null).dot(n);
-						// distance += -Math.signum(distance) * 0.0001; // in order to avoid crazy roof that stretches to floor
+						distance += -Math.signum(distance) * 0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
 						// distance += -Math.signum(distance) * 0.1; // in order to avoid crazy roof that stretches to floor
 						nearestEditPoint.addLocal(n.multiply(distance, null));
 						nearestEditPointRel.set(toRelative(nearestEditPoint, container.getContainer()));

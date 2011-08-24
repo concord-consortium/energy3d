@@ -249,10 +249,11 @@ public class MeshLib {
 		final Vector3 leftVertex = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
 		while (vertexBuffer.hasRemaining()) {
 			final double x = vertexBuffer.get();
-			if (x < leftVertex.getX())
-				leftVertex.set(x, vertexBuffer.get(), vertexBuffer.get());
+			final double y = vertexBuffer.get();
+			if (x < leftVertex.getX() || (x == leftVertex.getX() && y < leftVertex.getY()))
+				leftVertex.set(x, y, vertexBuffer.get());
 			else
-				vertexBuffer.position(vertexBuffer.position() + 2);
+				vertexBuffer.position(vertexBuffer.position() + 1);
 		}
 
 		final ReadOnlyVector3 normal = Vector3.UNIT_Z;
@@ -260,7 +261,7 @@ public class MeshLib {
 		final Vector3 endpoint = new Vector3();
 		final Vector3 sj = new Vector3();
 		final ArrayList<ReadOnlyVector3> convexHull = new ArrayList<ReadOnlyVector3>();
-		convexHull.add(pointOnHull);
+		convexHull.add(new Vector3(pointOnHull));
 		do {
 			// wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
 			endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
@@ -277,6 +278,7 @@ public class MeshLib {
 			convexHull.add(new Vector3(pointOnHull));
 			// wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
 		} while (!endpoint.equals(leftVertex));
+		convexHull.contains(endpoint);
 		return convexHull;
 	}
 

@@ -679,8 +679,14 @@ public class Wall extends HousePart {
 
 		enforceRangeAndRemoveDuplicatedGablePoints(polygon);
 
-		toXY(stretchToRoof(polygon));
+		stretchToRoof(polygon);
+		
+		// reduce the height of the back mesh a little
+		for (final TriangulationPoint tp : polygon.getPoints())
+			tp.set(tp.getX(), tp.getY(), tp.getZ() - 0.01);
 
+		toXY(polygon);
+				
 		Poly2Tri.triangulate(polygon);
 		ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
 		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
