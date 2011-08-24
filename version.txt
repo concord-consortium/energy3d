@@ -743,6 +743,7 @@ Version 0.3 - March 7, 2011
 - fix problem with gable edit point being slightly outside of roof range and causing blank roof part
 - reduce overhang length by half
 - reduce height of backwall mesh
+- rename sample models and move them to samples folder
 - release version 0.4 
 **********************************************************************************************
 Version 0.4 - Auguest 24, 2011
