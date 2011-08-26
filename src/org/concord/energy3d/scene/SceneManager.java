@@ -163,6 +163,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private UserData pick;
 
+	private boolean update = true;
+
 	public static SceneManager getInstance() {
 		return instance;
 	}
@@ -293,11 +295,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.out.println("Finished initialization.");
 	}
 
-	public void run() {
+	public synchronized void run() {
 		frameHandler.init();
 		while (!exit) {
 			// try {
-			frameHandler.updateFrame();
+			logicalLayer.checkTriggers(frameHandler.getTimer().getTimePerFrame());
+			if (update || taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || !PrintController.getInstance().isFinished()) {
+				frameHandler.updateFrame();
+				update = false;
+			} else
+				frameHandler.getTimer().update();
 			// } catch (Exception e1) {
 			// e1.printStackTrace();
 			// shadowPass.setEnabled(false);
@@ -307,6 +314,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (sinceLast < syncNS) {
 				try {
 					Thread.sleep(Math.round((syncNS - sinceLast) / 1000000L));
+//					this.wait();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -319,9 +327,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final double tpf = timer.getTimePerFrame();
 		// HousePart.clearDrawFlags();
 		passManager.updatePasses(tpf);
-		logicalLayer.checkTriggers(tpf);
+//		logicalLayer.checkTriggers(tpf);
 
 		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
+		
+		if (operationFlag)
+			executeOperation();
+		
+		if (moveState != null)
+			executeMouseMove();
+		
+		
 		Scene.getInstance().update();
 
 		if (rotAnim && viewMode == ViewMode.NORMAL) {
@@ -345,11 +361,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (cameraNode == null)
 			initCamera();
 
-		if (moveState != null)
-			executeMouseMove();
-
-		if (operationFlag)
-			executeOperation();
+//		taskManager.getQueue(GameTaskQueue.RENDER).execute(renderer);
+		
+//		if (moveState != null)
+//			executeMouseMove();
+//
+//		if (operationFlag)
+//			executeOperation();
 
 		if (drawBounds && drawn != null) {
 			if (drawn instanceof Roof) {
@@ -559,8 +577,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private void initMouse() {
 
 		if (!Config.isHeliodonMode())
-			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
+			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {				
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+					update = true;
 					taskManager.update(new Callable<Object>() {
 						public Object call() throws Exception {
 							MouseState mouseState = inputStates.getCurrent().getMouseState();
@@ -599,7 +618,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (!Config.isHeliodonMode())
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-
+					update = true;
 					taskManager.update(new Callable<Object>() {
 						public Object call() throws Exception {
 							MouseState mouseState = inputStates.getCurrent().getMouseState();
@@ -641,6 +660,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (!Config.isHeliodonMode())
 			logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+					update = true;
 					// mouseMoveFlag = true;
 					moveState = inputStates;
 				}
@@ -1233,6 +1253,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setZoomLock(boolean zoomLock) {
 		control.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);
+	}
+
+	public void update() {
+		update = true;
 	}
 
 }

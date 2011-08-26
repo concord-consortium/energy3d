@@ -178,6 +178,7 @@ public class PrintController implements Updater {
 				((Window) part).hideBars();
 			}
 		}
+//		SceneManager.getInstance().update();
 	}
 
 	public void print() {
