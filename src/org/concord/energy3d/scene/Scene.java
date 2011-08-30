@@ -213,6 +213,7 @@ public class Scene implements Serializable {
 
 		// if (visible)
 		// redrawAnnotations = true;
+		SceneManager.getInstance().update();
 	}
 
 	public void setTextureEnabled(final boolean enabled) {
@@ -294,7 +295,7 @@ public class Scene implements Serializable {
 
 	public void setAnnotationScale(double scale) {
 		this.annotationScale = scale;
-		this.redrawAll = true;
+		redrawAll = true;
 	}
 
 	public double getAnnotationScale() {
@@ -337,6 +338,10 @@ public class Scene implements Serializable {
 		
 		for (final HousePart part : roofs)
 			remove(part);
+	}
+
+	public static boolean isRedrawAll() {
+		return redrawAll;
 	}
 		
 }

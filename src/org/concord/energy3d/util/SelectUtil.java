@@ -126,7 +126,7 @@ public class SelectUtil {
 	}
 
 	public static UserData selectHousePart(int x, int y, boolean edit) {
-		final HousePart lastHoveredObject = SceneManager.getInstance().getSelectedPart();
+//		final HousePart lastHoveredObject = SceneManager.getInstance().getSelectedPart();
 		final PickedHousePart pickedHousePart  = pickPart(x, y, housePartsNode);
 		UserData data = null;
 		if (pickedHousePart != null)
@@ -146,30 +146,30 @@ public class SelectUtil {
 		}
 		
 		if (data == null) {
-			if (lastHoveredObject != null) {
+//			if (lastHoveredObject != null) {
 //				lastHoveredObject.hidePoints();
 				Blinker.getInstance().setTarget(null);
-			}
+//			}
 		} else if (edit && data.isEditPoint()) {
 			int pointIndex = data.getIndex();
 			if (SceneManager.getInstance().isTopView() && data.getHousePart() instanceof Wall)
 				pointIndex -= 1;
 			data.getHousePart().setEditPoint(pointIndex);
 		} else {
-			if (lastHoveredObject != null && lastHoveredObject != data.getHousePart()) {
+//			if (lastHoveredObject != null && lastHoveredObject != data.getHousePart()) {
 //				lastHoveredObject.hidePoints();
-			}
+//			}
 
-			if (lastHoveredObject != data.getHousePart()) {
-				Blinker.getInstance().setTarget(null);
-				if (data.getHousePart().getOriginal() != null) {
-					if (data.getHousePart() instanceof Roof)
-						Blinker.getInstance().setTarget(((Roof)data.getHousePart().getOriginal()).getFlattenedMeshesRoot().getChild(data.getIndex()-0));
-					else
-						Blinker.getInstance().setTarget(data.getHousePart().getOriginal().getRoot());
-				}
-			}
-			final ViewMode viewMode = SceneManager.getInstance().getViewMode();
+//			if (lastHoveredObject != data.getHousePart()) {
+//				Blinker.getInstance().setTarget(null);
+				if (data.getHousePart().getOriginal() == null)
+					Blinker.getInstance().setTarget(null);
+				else if (data.getHousePart() instanceof Roof)
+					Blinker.getInstance().setTarget(((Roof)data.getHousePart().getOriginal()).getFlattenedMeshesRoot().getChild(data.getIndex()-0));
+				else
+					Blinker.getInstance().setTarget(data.getHousePart().getOriginal().getRoot());
+//			}
+//			final ViewMode viewMode = SceneManager.getInstance().getViewMode();
 //			if (viewMode == ViewMode.NORMAL || viewMode == ViewMode.TOP_VIEW)
 //				data.getHousePart().showPoints();
 		}

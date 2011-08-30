@@ -13,6 +13,7 @@ import java.util.Date;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -21,6 +22,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 
 import org.concord.energy3d.model.HousePart;
@@ -31,7 +33,12 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Config;
+
+import sun.awt.AppContext;
+
 import javax.swing.JButton;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -87,6 +94,7 @@ public class MainPanel extends JPanel {
 		super();
 		System.out.print("Initiating GUI Panel...");
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		initialize();
 		System.out.println("done");
 	}
@@ -112,7 +120,7 @@ public class MainPanel extends JPanel {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
 			final boolean showEditTools = !Config.isHeliodonMode();
-			if (showEditTools) {
+//			if (showEditTools) {
 				appToolbar.add(getSelectButton());
 				appToolbar.add(getResizeButton());
 				appToolbar.add(getZoomButton());
@@ -127,26 +135,26 @@ public class MainPanel extends JPanel {
 				appToolbar.add(getRoofGableButton());
 				appToolbar.add(getFloorButton());
 				appToolbar.addSeparator();
-			}
+//			}
 			appToolbar.add(getLightButton());
 			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimButton());
 			appToolbar.add(getCalendarPanel());
-			if (showEditTools) {
+//			if (showEditTools) {
 				appToolbar.addSeparator();
 				appToolbar.add(getRotAnimButton());
 				appToolbar.add(getTopViewButton());
 				appToolbar.add(getGridButton());
 				appToolbar.add(getSnapButton());
 				appToolbar.addSeparator();
-			} else
-				appToolbar.add(getRotAnimButton());
+//			} else
+//				appToolbar.add(getRotAnimButton());
 
 			appToolbar.add(getAnnotationToggleButton());
-			if (showEditTools)
+//			if (showEditTools)
 				appToolbar.add(getPreviewButton());
 
-			if (showEditTools) {
+//			if (showEditTools) {
 				final ButtonGroup bg = new ButtonGroup();
 				bg.add(selectButton);
 				bg.add(resizeButton);
@@ -160,7 +168,7 @@ public class MainPanel extends JPanel {
 				bg.add(roofCustomButton);
 				bg.add(floorButton);
 				bg.add(roofGableButton);
-			}
+//			}
 		}
 		return appToolbar;
 	}
@@ -173,6 +181,12 @@ public class MainPanel extends JPanel {
 	public JToggleButton getSelectButton() {
 		if (selectButton == null) {
 			selectButton = new JToggleButton();
+			selectButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			selectButton.setSelected(true);
 			selectButton.setToolTipText("Select");
 			selectButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/select.png")));
@@ -205,6 +219,10 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
 			});
 		}
 		return wallButton;
@@ -231,6 +249,10 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
 			});
 		}
 		return doorButton;
@@ -255,6 +277,10 @@ public class MainPanel extends JPanel {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
+				}
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
 				}
 			});
 		}
@@ -281,6 +307,10 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
 			});
 		}
 		return windowButton;
@@ -306,6 +336,10 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
 			});
 		}
 		return foundationButton;
@@ -319,6 +353,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton getLightButton() {
 		if (lightButton == null) {
 			lightButton = new JToggleButton();
+			lightButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			lightButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/shadow.png")));
 			lightButton.setToolTipText("Show shadows");
 			lightButton.addActionListener(new java.awt.event.ActionListener() {
@@ -347,6 +387,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton getTopViewButton() {
 		if (topViewButton == null) {
 			topViewButton = new JToggleButton();
+			topViewButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			topViewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/top.png")));
 			topViewButton.setToolTipText("Top view");
 			topViewButton.addItemListener(new java.awt.event.ItemListener() {
@@ -366,6 +412,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton getRotAnimButton() {
 		if (rotAnimButton == null) {
 			rotAnimButton = new JToggleButton();
+			rotAnimButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			rotAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/rotate.png")));
 			rotAnimButton.setToolTipText("Animate scene roatation");
 			rotAnimButton.addActionListener(new java.awt.event.ActionListener() {
@@ -385,6 +437,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton getGridButton() {
 		if (gridButton == null) {
 			gridButton = new JToggleButton();
+			gridButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			gridButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/grid.png")));
 			gridButton.setToolTipText("Grids");
 			gridButton.addActionListener(new java.awt.event.ActionListener() {
@@ -404,6 +462,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton getSnapButton() {
 		if (snapButton == null) {
 			snapButton = new JToggleButton();
+			snapButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			snapButton.setSelected(true);
 			snapButton.setToolTipText("Snap");
 			snapButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/snap.png")));
@@ -436,6 +500,10 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
 			});
 		}
 		return floorButton;
@@ -461,6 +529,10 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
 			});
 		}
 		return roofHipButton;
@@ -474,6 +546,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton getResizeButton() {
 		if (resizeButton == null) {
 			resizeButton = new JToggleButton();
+			resizeButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			resizeButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/resize.png")));
 			resizeButton.setToolTipText("Resize house");
 			resizeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -493,6 +571,12 @@ public class MainPanel extends JPanel {
 	public JToggleButton getHeliodonButton() {
 		if (heliodonButton == null) {
 			heliodonButton = new JToggleButton();
+			heliodonButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			heliodonButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/sun_heliodon.png")));
 			heliodonButton.setToolTipText("Show sun heliodon");
 			heliodonButton.addItemListener(new java.awt.event.ItemListener() {
@@ -515,6 +599,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton getSunAnimButton() {
 		if (sunAnimButton == null) {
 			sunAnimButton = new JToggleButton();
+			sunAnimButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/sun_anim.png")));
 			sunAnimButton.setEnabled(false);
 			sunAnimButton.setToolTipText("Animate sun");
@@ -535,6 +625,12 @@ public class MainPanel extends JPanel {
 	public JToggleButton getPreviewButton() {
 		if (previewButton == null) {
 			previewButton = new JToggleButton();
+			previewButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			previewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/print_preview.png")));
 			previewButton.setToolTipText("Preview printable parts");
 			// must be ItemListner to be triggered when selection is changed by code
@@ -735,6 +831,10 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
 			});
 		}
 		return roofCustomButton;
@@ -749,6 +849,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton getAnnotationToggleButton() {
 		if (annotationToggleButton == null) {
 			annotationToggleButton = new JToggleButton();
+			annotationToggleButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			annotationToggleButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/annotation.png")));
 			annotationToggleButton.setToolTipText("Show annotations");
 			annotationToggleButton.addActionListener(new ActionListener() {
@@ -768,6 +874,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton getZoomButton() {
 		if (zoomButton == null) {
 			zoomButton = new JToggleButton();
+			zoomButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
+				}
+			});
 			zoomButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/zoom.png")));
 			zoomButton.setToolTipText("Zoom");
 			zoomButton.addItemListener(new java.awt.event.ItemListener() {
@@ -798,6 +910,10 @@ public class MainPanel extends JPanel {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
+				}
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					SceneManager.getInstance().update();
 				}
 			});			
 		}

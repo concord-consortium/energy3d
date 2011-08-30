@@ -393,7 +393,10 @@ public class Heliodon {
 			MainPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
 		
 		if (redrawHeliodon)
-			drawSun();				
+			drawSun();	
+		
+		if (SceneManager.getInstance() != null)
+			SceneManager.getInstance().update();
 	}
 
 	public double getDeclinationAngle() {
@@ -411,6 +414,9 @@ public class Heliodon {
 		
 		if (redrawHeliodon)
 			dirtySunPath = true;
+		
+		if (SceneManager.getInstance() != null)
+			SceneManager.getInstance().update();
 	}
 
 	public double getObserverLatitude() {
@@ -422,6 +428,9 @@ public class Heliodon {
 
 		dirtySunRegion = true;
 		dirtySunPath = true;
+		
+		if (SceneManager.getInstance() != null)
+			SceneManager.getInstance().update();		
 	}
 
 	public void setVisible(final boolean visible) {
@@ -432,8 +441,12 @@ public class Heliodon {
 		}
 		root.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 		bloomRenderPass.setEnabled(visible);
+		
 		if (visible)
 			updateSize();
+		
+		if (SceneManager.getInstance() != null)
+			SceneManager.getInstance().update();
 	}
 
 	public void updateSize() {
@@ -447,6 +460,8 @@ public class Heliodon {
 			if (!Double.isInfinite(scale))
 				root.setScale(scale);
 		}
+		if (SceneManager.getInstance() != null)
+			SceneManager.getInstance().update();
 	}
 
 	private Vector3 computeSunLocation(final double hourAngle, final double declinationAngle, final double observerLatitude) {
@@ -615,6 +630,9 @@ public class Heliodon {
 		setDeclinationAngle(TILT_ANGLE * MathUtils.sin(MathUtils.TWO_PI*(284+days)/365.25), true, false);
 		
 		dirtySunPath = true;
+		
+		if (SceneManager.getInstance() != null)
+			SceneManager.getInstance().update();
 	}
 
 	public void update() {

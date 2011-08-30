@@ -36,8 +36,8 @@ public class Blinker implements Updater {
 		return target;
 	}
 
-	public void setTarget(Spatial target) {
-		if (this.target != null)
+	public void setTarget(final Spatial target) {
+		if (this.target != null && this.target != target)
 			this.target.getSceneHints().setCullHint(CullHint.Inherit);
 		this.target = target;
 	}

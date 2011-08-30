@@ -745,9 +745,12 @@ Version 0.3 - March 7, 2011
 - reduce height of backwall mesh
 - rename sample models and move them to samples folder
 - release version 0.4 
+
 **********************************************************************************************
 Version 0.4 - Auguest 24, 2011
+
 - reduce cpu usage by not refreshing the frameHandler unless update flag is on or there is something in the queue
+- ensure that all user interactions result in canvas refresh
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

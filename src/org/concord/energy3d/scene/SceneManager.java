@@ -165,6 +165,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private boolean update = true;
 
+	private double updateTime = -1;
+
 	public static SceneManager getInstance() {
 		return instance;
 	}
@@ -300,16 +302,22 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		while (!exit) {
 			// try {
 			logicalLayer.checkTriggers(frameHandler.getTimer().getTimePerFrame());
-			if (update || taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || !PrintController.getInstance().isFinished()) {
-				frameHandler.updateFrame();
+			System.out.println(frameHandler.getTimer().getTimeInSeconds());
+			final boolean isUpdateTime = updateTime != -1 && updateTime < frameHandler.getTimer().getTimeInSeconds();
+			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0;
+			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
+			if (update || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim) {
+				if (isUpdateTime)
+					updateTime = -1;
 				update = false;
+				frameHandler.updateFrame();
 			} else
 				frameHandler.getTimer().update();
 			// } catch (Exception e1) {
 			// e1.printStackTrace();
 			// shadowPass.setEnabled(false);
 			// }
-			final double syncNS = 1000000000.0 / 60;
+			final double syncNS = 1000000000.0 / 60.0;
 			long sinceLast = System.nanoTime() - lastRenderTime;
 			if (sinceLast < syncNS) {
 				try {
@@ -594,7 +602,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									System.out.print("Clicked on: " + pick);
 									if (previousDrawn != null && previousDrawn != drawn)
 										previousDrawn.hidePoints();
-									if (drawn != null && drawn != previousDrawn)
+									if (drawn != null && drawn != previousDrawn && !PrintController.getInstance().isPrintPreview())
 										drawn.showPoints();
 									SelectUtil.nextPickLayer();
 									if (operation == Operation.DRAW_ROOF_GABLE && drawn instanceof Roof) {
@@ -976,6 +984,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			up = !up;
 		loc.multiplyLocal((up ? 1 : -1) * MOVE_SPEED * tpf).addLocal(camera.getLocation());
 		camera.setLocation(loc);
+		cameraNode.updateFromCamera();
+		SceneManager.getInstance().update();
 	}
 
 	public void setOperation(Operation operation) {
@@ -1205,7 +1215,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (hoveredHousePart != null && hoveredHousePart != drawn)
 					hoveredHousePart.hidePoints();
 				hoveredHousePart = pick.getHousePart();
-				if (hoveredHousePart != null && hoveredHousePart != drawn)
+				if (hoveredHousePart != null && hoveredHousePart != drawn && !PrintController.getInstance().isPrintPreview())
 					hoveredHousePart.showPoints();
 			} else {
 				// drawn = null;
@@ -1257,6 +1267,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void update() {
 		update = true;
+	}
+
+	public void update(final double updateTime) {
+		this.updateTime  = frameHandler.getTimer().getTimeInSeconds() + updateTime;
 	}
 
 }

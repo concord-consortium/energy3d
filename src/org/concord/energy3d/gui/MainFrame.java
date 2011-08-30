@@ -43,6 +43,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import javax.swing.Action;
 import javax.swing.AbstractAction;
+import java.awt.event.WindowEvent;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -160,8 +161,13 @@ public class MainFrame extends JFrame {
 		this.setJMenuBar(getAppMenuBar());
 		this.setContentPane(getMainPanel());
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
+			@Override
 			public void windowClosing(java.awt.event.WindowEvent e) {
 				SceneManager.getInstance().exit();
+			}
+			@Override
+			public void windowDeiconified(final WindowEvent e) {
+				SceneManager.getInstance().update();
 			}
 		});
 	}
@@ -197,8 +203,8 @@ public class MainFrame extends JFrame {
 				}
 
 				public void menuDeselected(MenuEvent e) {
+					SceneManager.getInstance().update();
 				}
-
 				public void menuSelected(MenuEvent e) {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
@@ -243,6 +249,7 @@ public class MainFrame extends JFrame {
 			openMenuItem = new JMenuItem("Open...");
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().update(0);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						try {
 							Scene.getInstance().open(fileChooser.getSelectedFile().toURI().toURL());
@@ -335,10 +342,9 @@ public class MainFrame extends JFrame {
 			cameraMenu.addMenuListener(new MenuListener() {
 				public void menuCanceled(MenuEvent e) {
 				}
-
 				public void menuDeselected(MenuEvent e) {
+					SceneManager.getInstance().update();
 				}
-
 				public void menuSelected(MenuEvent e) {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
@@ -597,10 +603,9 @@ public class MainFrame extends JFrame {
 			viewMenu.addMenuListener(new MenuListener() {
 				public void menuCanceled(MenuEvent e) {
 				}
-
 				public void menuDeselected(MenuEvent e) {
+					SceneManager.getInstance().update();
 				}
-
 				public void menuSelected(MenuEvent e) {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);

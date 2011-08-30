@@ -91,10 +91,14 @@ public class PrintController implements Updater {
 				}
 				
 //				drawPrintParts(1);
+				int printSequence = 0;
 				for (final HousePart part : printParts)
-					if (part.isPrintable())
+					if (part.isPrintable()) {
 						part.flattenInit();
-					
+						part.drawLabels(printSequence);
+						printSequence = part.getOriginal().drawLabels(printSequence);
+					}
+				
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
 				computePageDimension();
 				computePrintCenters(pages);
@@ -157,6 +161,9 @@ public class PrintController implements Updater {
 						part.hideLabels();
 				}
 				finished = true;
+//				timer.reset();
+//				SceneManager.getInstance().update(1.0);
+//				SceneManager.getInstance().update();
 			}
 		}
 	}
@@ -173,7 +180,7 @@ public class PrintController implements Updater {
 		for (final HousePart part : printParts) {
 			if (part.isPrintable()) {
 				part.flatten(flattenTime);
-				printSequence = part.drawLabels(printSequence);
+//				printSequence = part.drawLabels(printSequence);
 			} else if (part instanceof Window) {
 				((Window) part).hideBars();
 			}
@@ -190,7 +197,8 @@ public class PrintController implements Updater {
 			camera.setLocation(pos.getX(), pos.getY() - pageWidth * 2, pos.getZ());
 			camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 			SceneManager.getInstance().getCameraNode().updateFromCamera();
-			try {
+			SceneManager.getInstance().update();
+			try {				
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
