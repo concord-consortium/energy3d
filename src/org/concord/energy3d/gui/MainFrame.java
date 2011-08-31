@@ -249,7 +249,7 @@ public class MainFrame extends JFrame {
 			openMenuItem = new JMenuItem("Open...");
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().update(0);
+					SceneManager.getInstance().update(1);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						try {
 							Scene.getInstance().open(fileChooser.getSelectedFile().toURI().toURL());

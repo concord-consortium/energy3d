@@ -302,14 +302,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		while (!exit) {
 			// try {
 			logicalLayer.checkTriggers(frameHandler.getTimer().getTimePerFrame());
-			System.out.println(frameHandler.getTimer().getTimeInSeconds());
-			final boolean isUpdateTime = updateTime != -1 && updateTime < frameHandler.getTimer().getTimeInSeconds();
+//			System.out.println(frameHandler.getTimer().getTimeInSeconds());
+			final double now = frameHandler.getTimer().getTimeInSeconds();
+			final boolean isUpdateTime = updateTime != -1 && now <= updateTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
 			if (update || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim) {
-				if (isUpdateTime)
-					updateTime = -1;
+//				if (now > updateTime)
+//					updateTime = -1;
 				update = false;
+				System.out.println("render");
 				frameHandler.updateFrame();
 			} else
 				frameHandler.getTimer().update();
