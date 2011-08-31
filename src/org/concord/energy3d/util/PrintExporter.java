@@ -32,9 +32,9 @@ public class PrintExporter implements ScreenExportable, Printable {
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				index = (_useAlpha ? 4 : 3) * ((height - y - 1) * width + x);
-				r = ((data.get(index + 0)));
-				g = ((data.get(index + 1)));
-				b = ((data.get(index + 2)));
+				r = data.get(index + 0);
+				g = data.get(index + 1);
+				b = data.get(index + 2);
 
 				argb = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
 
@@ -46,6 +46,30 @@ public class PrintExporter implements ScreenExportable, Printable {
 			}
 		}
 	}
+	
+	public void export(final int[] data, final int width, final int height) {
+		final BufferedImage img = new BufferedImage(width, height, _useAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
+		images.add(img);
+
+		int index, r, g, b, a;
+		int argb;
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				index = (_useAlpha ? 4 : 3) * ((height - y - 1) * width + x);
+				r = data[index + 0];
+				g = data[index + 1];
+				b = data[index + 2];
+
+				argb = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+
+				if (_useAlpha) {
+					a = data[index + 3];
+					argb |= (a & 0xFF) << 24;
+				}
+				img.setRGB(x, y, argb);
+			}
+		}
+	}	
 
 	public ImageDataFormat getFormat() {
 		if (_useAlpha) {

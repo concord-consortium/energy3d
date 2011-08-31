@@ -299,12 +299,12 @@ public class MainFrame extends JFrame {
 			printMenuItem = new JMenuItem("Print");
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					final PrintController printController = PrintController.getInstance();
-					if (!printController.isPrintPreview()) {
-						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
-						while (!printController.isFinished())
-							Thread.yield();
-					}
+//					final PrintController printController = PrintController.getInstance();
+//					if (!printController.isPrintPreview()) {
+//						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
+//						while (!printController.isFinished())
+//							Thread.yield();
+//					}
 					PrintController.getInstance().print();
 				}
 			});
