@@ -307,14 +307,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isUpdateTime = updateTime != -1 && now <= updateTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
-			if (update || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim) {
+//			if (update || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim) {
 //				if (now > updateTime)
 //					updateTime = -1;
 				update = false;
 				System.out.println("render");
 				frameHandler.updateFrame();
-			} else
-				frameHandler.getTimer().update();
+//			} else
+//				frameHandler.getTimer().update();
 			// } catch (Exception e1) {
 			// e1.printStackTrace();
 			// shadowPass.setEnabled(false);
@@ -907,8 +907,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Parallel);
 			loc = new Vector3(0, -1, 0);
-			final double pageWidth = PrintController.getInstance().getPageWidth();
-			final double pageHeight = PrintController.getInstance().getPageHeight();
+//			final double pageWidth = PrintController.getInstance().getPageWidth();
+//			final double pageHeight = PrintController.getInstance().getPageHeight();
+			
+			final double pageWidth = PrintController.getInstance().getPageWidth() * 2;
+			final double pageHeight = PrintController.getInstance().getPageHeight() * 2;
+			
 			final double ratio = (double) camera.getWidth() / camera.getHeight();
 			if (ratio > pageWidth / pageHeight)
 				resizeCamera(pageHeight * ratio);

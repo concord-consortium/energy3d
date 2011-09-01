@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -41,6 +42,8 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.util.GameTaskQueue;
+
 import javax.swing.Action;
 import javax.swing.AbstractAction;
 import java.awt.event.WindowEvent;
@@ -165,6 +168,7 @@ public class MainFrame extends JFrame {
 			public void windowClosing(java.awt.event.WindowEvent e) {
 				SceneManager.getInstance().exit();
 			}
+
 			@Override
 			public void windowDeiconified(final WindowEvent e) {
 				SceneManager.getInstance().update();
@@ -205,6 +209,7 @@ public class MainFrame extends JFrame {
 				public void menuDeselected(MenuEvent e) {
 					SceneManager.getInstance().update();
 				}
+
 				public void menuSelected(MenuEvent e) {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
@@ -299,13 +304,18 @@ public class MainFrame extends JFrame {
 			printMenuItem = new JMenuItem("Print");
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-//					final PrintController printController = PrintController.getInstance();
-//					if (!printController.isPrintPreview()) {
-//						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
-//						while (!printController.isFinished())
-//							Thread.yield();
-//					}
-					PrintController.getInstance().print();
+//					SceneManager.taskManager.update(new Callable<Object>() {
+//						public Object call() throws Exception {
+							// final PrintController printController = PrintController.getInstance();
+							// if (!printController.isPrintPreview()) {
+							// MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
+							// while (!printController.isFinished())
+							// Thread.yield();
+							// }
+							PrintController.getInstance().print();
+//							return null;
+//						}
+//					});
 				}
 			});
 		}
@@ -322,8 +332,8 @@ public class MainFrame extends JFrame {
 			previewMenuItem = new JCheckBoxMenuItem("Print Preview");
 			previewMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-//					deselect();
-//					PrintController.getInstance().setPrintPreview(previewMenuItem.isSelected());
+					// deselect();
+					// PrintController.getInstance().setPrintPreview(previewMenuItem.isSelected());
 					mainPanel.getPreviewButton().setSelected(previewMenuItem.isSelected());
 				}
 			});
@@ -342,9 +352,11 @@ public class MainFrame extends JFrame {
 			cameraMenu.addMenuListener(new MenuListener() {
 				public void menuCanceled(MenuEvent e) {
 				}
+
 				public void menuDeselected(MenuEvent e) {
 					SceneManager.getInstance().update();
 				}
+
 				public void menuSelected(MenuEvent e) {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
@@ -603,9 +615,11 @@ public class MainFrame extends JFrame {
 			viewMenu.addMenuListener(new MenuListener() {
 				public void menuCanceled(MenuEvent e) {
 				}
+
 				public void menuDeselected(MenuEvent e) {
 					SceneManager.getInstance().update();
 				}
+
 				public void menuSelected(MenuEvent e) {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
@@ -749,6 +763,7 @@ public class MainFrame extends JFrame {
 		}
 		return textureCheckBoxMenuItem;
 	}
+
 	private JCheckBoxMenuItem getDrawAnnotationsInward() {
 		if (drawAnnotationsInward == null) {
 			drawAnnotationsInward = new JCheckBoxMenuItem("Draw Annotations Inward");
@@ -757,11 +772,11 @@ public class MainFrame extends JFrame {
 					Scene.setDrawAnnotationsInside(drawAnnotationsInward.isSelected());
 				}
 			});
-			
+
 		}
 		return drawAnnotationsInward;
 	}
-}  //  @jve:decl-index=0:visual-constraint="10,-112"
+} // @jve:decl-index=0:visual-constraint="10,-112"
 
 class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 	String description;
