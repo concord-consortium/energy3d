@@ -753,6 +753,8 @@ Version 0.4 - Auguest 24, 2011
 - ensure that all user interactions result in canvas refresh
 - make SceneManager.update(t) behave such that it continuously renders until time t
 - print in high resolution regardless of the window size by increasing the canvas size just before printing
+- avoid printing the blank first page
+- properly queue printing in render queue
  
  
 - *auto redraw gable wall when inserting gable or editing gable

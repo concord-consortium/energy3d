@@ -304,27 +304,20 @@ public class MainFrame extends JFrame {
 			printMenuItem = new JMenuItem("Print");
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					// SceneManager.taskManager.update(new Callable<Object>() {
-					// public Object call() throws Exception {
 					final PrintController printController = PrintController.getInstance();
 					if (!printController.isPrintPreview()) {
 						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
 						SceneManager.taskManager.update(new Callable<Object>() {
 							public Object call() throws Exception {
-//								while (!printController.isFinished())
 								if (printController.isFinished())
 									PrintController.getInstance().print();
 								else 
 									SceneManager.taskManager.update(this);
-//									Thread.yield();
 								return null;
 							}
 						});
 					} else
 						PrintController.getInstance().print();
-					// return null;
-					// }
-					// });
 				}
 			});
 		}
