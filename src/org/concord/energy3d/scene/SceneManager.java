@@ -913,7 +913,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final double pageWidth = PrintController.getInstance().getPageWidth();
 			final double pageHeight = PrintController.getInstance().getPageHeight();
 						
-			final double ratio = (double) camera.getWidth() / camera.getHeight();
+//			final double ratio = (double) camera.getWidth() / camera.getHeight();
+			final Dimension canvasSize = ((Component) canvas).getSize();
+			final double ratio = (double) canvasSize.width / canvasSize.height;
+			
 			if (ratio > pageWidth / pageHeight)
 				resizeCamera(pageHeight * ratio);
 			else

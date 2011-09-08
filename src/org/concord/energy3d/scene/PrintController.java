@@ -268,18 +268,21 @@ public class PrintController implements Updater {
 				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 				final PrintExporter printExporter = new PrintExporter();
 				// final Camera camera = Camera.getCurrentCamera();
-				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
+//				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
 				// camera.resize(1000, 1000);
 				// final Dimension orgSize = ((java.awt.Component)SceneManager.getInstance().getCanvas()).getSize();
 				final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
 				final Dimension orgSize = canvas.getSize();
 				final Paper paper = new Paper();
-				final int resolutionHeight = 5000;
+				final int resolutionHeight = 1000;
 				final Dimension newSize = new Dimension((int)(resolutionHeight * paper.getWidth() / paper.getHeight()), resolutionHeight);
 				canvas.setSize(newSize);
 //				canvas.setLocation((int) (orgSize.getWidth() - newSize.getWidth()) / 2, (int) (orgSize.getHeight() - newSize.getHeight()) / 2);
 //				canvas.setLocation(-100, -100);
 //				canvas.repaint();
+				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
+				
+				
 
 				// // currentPrintPage = 0;
 				// final Vector3 pos = printCenters.get(0);

@@ -755,6 +755,7 @@ Version 0.4 - Auguest 24, 2011
 - print in high resolution regardless of the window size by increasing the canvas size just before printing
 - avoid printing the blank first page
 - properly queue printing in render queue
+- fix problem with incorrect camera position when taking snapshot for printing when the resolution is different than actual
  
  
 - *auto redraw gable wall when inserting gable or editing gable
@@ -763,6 +764,8 @@ Version 0.4 - Auguest 24, 2011
 - *put the main model in the exact middle of print preview view using its bounding box
 - *move all parameters of HousePart constructor to init
 - *too slow
+- fix problem with foundation bottom size annotation and label not showing in printout
+- reduce size of annotatoin font in printout 
  
 
 TODO:
