@@ -102,16 +102,17 @@ public abstract class Roof extends HousePart {
 		// bottomMesh.setRenderState(ms);
 
 		wireframeMesh = new Line("Roof (wireframe)");
-		wireframeMesh.setAntialiased(true);
-		final BlendState blend = new BlendState();
-		blend.setBlendEnabled(true);
-		wireframeMesh.setRenderState(blend);
-		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		wireframeMesh.getSceneHints().setCastsShadows(false);
-		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+//		wireframeMesh.setAntialiased(true);
+//		final BlendState blend = new BlendState();
+//		blend.setBlendEnabled(true);
+//		wireframeMesh.setRenderState(blend);
+//		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+//		wireframeMesh.getSceneHints().setCastsShadows(false);
+//		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setModelBound(new BoundingBox());
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
+		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
@@ -430,7 +431,7 @@ public abstract class Roof extends HousePart {
 					final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
 					// fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1)).setRange(p2, p3, center, normal, false, Align.Center, true, true, true);
 					final SizeAnnotation sizeAnnot = fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1));
-					sizeAnnot.setRange(p2, p3, center, normal, false, Align.Center, true, true, true, Scene.isDrawAnnotationsInside());
+					sizeAnnot.setRange(p2, p3, center, normal, false, Align.Center, true, true, Scene.isDrawAnnotationsInside());
 					if (Scene.isDrawAnnotationsInside())
 						sizeAnnot.setColor(ColorRGBA.WHITE);
 					else

@@ -26,6 +26,7 @@ import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.util.Config;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -58,6 +59,7 @@ public class Scene implements Serializable {
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private Unit unit = Unit.Meter;
 	private double annotationScale = 1;
+//	private transient BoundingVolume sceneBound;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -160,7 +162,7 @@ public class Scene implements Serializable {
 					if (child != originalHouseRoot)
 						root.detachChild(child);
 				root.updateWorldBound(true);
-				SceneManager.getInstance().updateHeliodonSize();
+				SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 				return null;
 			}
 		});
@@ -183,7 +185,7 @@ public class Scene implements Serializable {
 				// housePart.draw();
 				redrawAll = true;
 				System.out.println("done");
-				SceneManager.getInstance().updateHeliodonSize();
+				SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 				return null;
 			}
 		});
@@ -313,6 +315,7 @@ public class Scene implements Serializable {
 		final BoundingBox bounds = (BoundingBox) getOriginalHouseRoot().getWorldBound();
 		if (bounds != null) {
 			final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
+//			final double fontSize = Math.min(size, 10) / 20.0;
 			final double fontSize = size / 20.0;
 			Annotation.setFontSize(fontSize);
 			updateTextSizes(root, fontSize);
@@ -322,11 +325,16 @@ public class Scene implements Serializable {
 	private void updateTextSizes(final Spatial spatial, double size) {
 		if (spatial instanceof BMText) {
 			final BMText label = (BMText) spatial;
-			if (label.getAutoScale() == AutoScale.Off)
+			if (label.getAutoScale() == AutoScale.Off) {
 				label.setFontScale(size);
+				label.updateGeometricState(0);
+			}
 		} else if (spatial instanceof Node) {
 			for (final Spatial child : ((Node) spatial).getChildren())
 				updateTextSizes(child, size);
+			// now that text font is updated redraw the annotation
+			if (spatial instanceof Annotation)
+				((Annotation)spatial).draw();
 		}
 	}
 
@@ -343,5 +351,9 @@ public class Scene implements Serializable {
 	public static boolean isRedrawAll() {
 		return redrawAll;
 	}
+
+//	public void setSceneBounds(final BoundingVolume sceneBound) {
+//		this.sceneBound = sceneBound;
+//	}
 		
 }

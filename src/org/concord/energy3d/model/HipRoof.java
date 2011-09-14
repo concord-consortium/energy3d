@@ -37,7 +37,7 @@ public class HipRoof extends Roof {
 		drawWalls();
 		if (container != null)
 			showPoints();
-		Scene.getInstance().updateTextSizes();
+//		Scene.getInstance().updateTextSizes();
 
 	}
 

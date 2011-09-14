@@ -3,6 +3,7 @@ package org.concord.energy3d.shapes;
 import java.nio.FloatBuffer;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
@@ -18,23 +19,50 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class SizeAnnotation extends Annotation {
-	protected transient final Mesh arrows = new Mesh("Arrows");
+	private final Mesh arrows = new Mesh("Arrows");
+	private ReadOnlyVector3 from;
+	private ReadOnlyVector3 to;
+	private ReadOnlyVector3 center;
+	private ReadOnlyVector3 faceDirection;
+	private boolean front;
+	private Align align;
+	private boolean autoFlipOffset;
+	private boolean upsideDownText;
+	private boolean drawInside;
 
 	public SizeAnnotation() {
 		super(new Line("Size annotation lines", BufferUtils.createVector3Buffer(8), null, null, null));
-		((Line)mesh).setAntialiased(true);
-        final BlendState blend = new BlendState();
-        blend.setBlendEnabled(true);
-        mesh.setRenderState(blend);		
+//		((Line)mesh).setAntialiased(true);
+//        final BlendState blend = new BlendState();
+//        blend.setBlendEnabled(true);
+//        mesh.setRenderState(blend);	
+				
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		arrows.setModelBound(new BoundingBox());
-		arrows.getSceneHints().setCastsShadows(false);
+		Util.disablePickShadowLight(arrows);
+//		arrows.getSceneHints().setCastsShadows(false);
+		
+//		Util.disablePickShadowLight(mesh);
+//		Util.disablePickShadowLight(arrows);
 		setColor(ColorRGBA.BLACK);
 		this.attachChild(arrows);
 		this.attachChild(label);
 	}
 
-	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipOffset, final boolean rotateTextAlongLine, final boolean upsideDownText, final boolean drawInside) {
+	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipOffset, final boolean upsideDownText, final boolean drawInside) {
+		this.from = from;
+		this.to = to;
+		this.center = center;
+		this.faceDirection = faceDirection;
+		this.front = front;
+		this.align = align;
+		this.autoFlipOffset = autoFlipOffset;
+		this.upsideDownText = upsideDownText;
+		this.drawInside = drawInside;		
+		draw();
+	}
+	
+	public void draw() {
 		final double C = 0.1;
 		final Vector3 v = new Vector3();
 		final Vector3 offset = new Vector3();

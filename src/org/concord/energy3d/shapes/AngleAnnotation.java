@@ -2,7 +2,6 @@ package org.concord.energy3d.shapes;
 
 import java.nio.FloatBuffer;
 
-import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
@@ -12,6 +11,10 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class AngleAnnotation extends Annotation {
+	private ReadOnlyVector3 mainPoint;
+	private ReadOnlyVector3 p2;
+	private ReadOnlyVector3 p3;
+	private ReadOnlyVector3 n;
 
 	public AngleAnnotation() {
 		super(new Arc("Angle annotation arc", 10));
@@ -19,6 +22,14 @@ public class AngleAnnotation extends Annotation {
 	}
 
 	public void setRange(final ReadOnlyVector3 mainPoint, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3, final ReadOnlyVector3 n) {
+		this.mainPoint = mainPoint;
+		this.p2 = p2;
+		this.p3 = p3;
+		this.n = n;
+		draw();
+	}
+	
+	public void draw() {
 		final ReadOnlyVector3 a = new Vector3().set(p2).subtractLocal(mainPoint).normalizeLocal();
 		final ReadOnlyVector3 b = new Vector3().set(p3).subtractLocal(mainPoint).normalizeLocal();		
 		

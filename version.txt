@@ -756,6 +756,11 @@ Version 0.4 - Auguest 24, 2011
 - avoid printing the blank first page
 - properly queue printing in render queue
 - fix problem with incorrect camera position when taking snapshot for printing when the resolution is different than actual
+- fix problem with debth test in Intel graphics cards by reducing anti-aliasing samples from 8 to 4
+- turn off anti aliasing on lines to improve performance (quality stays the same)
+- redraw annotations as soon as their text size is updated
+- update annotation size only after new house part is drawn at same time as updating heliodon size
+ 
  
  
 - *auto redraw gable wall when inserting gable or editing gable

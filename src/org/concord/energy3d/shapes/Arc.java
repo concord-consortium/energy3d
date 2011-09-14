@@ -2,6 +2,8 @@ package org.concord.energy3d.shapes;
 
 import java.nio.FloatBuffer;
 
+import org.concord.energy3d.util.Util;
+
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -20,13 +22,14 @@ public class Arc extends Line {
 	
 	public Arc(final String name, final int vertices) {
 		super(name);
-		setAntialiased(true);
-        final BlendState blend = new BlendState();
-        blend.setBlendEnabled(true);
-        setRenderState(blend);
-		getSceneHints().setLightCombineMode(LightCombineMode.Off);		
+//		setAntialiased(true);
+//        final BlendState blend = new BlendState();
+//        blend.setBlendEnabled(true);
+//        setRenderState(blend);
+//		getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		getMeshData().setIndexMode(IndexMode.LineStrip);
 		getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(vertices));
+		Util.disablePickShadowLight(this);
 	}
 
 	public void set(final double radius, final double start, final double end) {

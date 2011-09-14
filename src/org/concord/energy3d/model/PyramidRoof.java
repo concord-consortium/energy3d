@@ -31,7 +31,7 @@ public class PyramidRoof extends Roof {
 		drawWalls();
 		if (container != null)
 			showPoints();
-		Scene.getInstance().updateTextSizes();
+//		Scene.getInstance().updateTextSizes();
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {

@@ -177,7 +177,7 @@ public class Foundation extends HousePart {
 		else
 			draw();
 		showPoints();
-		Scene.getInstance().updateTextSizes();
+//		Scene.getInstance().updateTextSizes();
 	}
 
 	private void applyNewHeight(double oldHeight, double newHeight, boolean finalize) {
@@ -298,7 +298,7 @@ public class Foundation extends HousePart {
 				sizeAnnotRoot.attachChild(annot);
 			}
 //			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), center, getFaceDirection(), false, original == null ? Align.South : Align.Center, true);
-			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), getCenter(), getFaceDirection(), false, Align.Center, true, true, true, false);
+			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), getCenter(), getFaceDirection(), false, Align.Center, true, true, false);
 		}
 
 		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)

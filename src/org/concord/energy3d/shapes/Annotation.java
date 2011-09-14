@@ -1,6 +1,7 @@
 package org.concord.energy3d.shapes;
 
 import org.concord.energy3d.util.FontManager;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
@@ -36,9 +37,11 @@ public abstract class Annotation extends Node {
 		super();
 		this.mesh = mesh;
 //		this.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		mesh.getSceneHints().setCastsShadows(false);
+//		mesh.getSceneHints().setCastsShadows(false);
 		mesh.setModelBound(new BoundingBox());
 		mesh.setDefaultColor(ColorRGBA.BLACK);
+		Util.disablePickShadowLight(mesh);
+		Util.disablePickShadowLight(label);
 		this.attachChild(mesh);
 	}
 	
@@ -56,5 +59,5 @@ public abstract class Annotation extends Node {
 //		}
 //	}
 	
-	
+	public abstract void draw();
 }

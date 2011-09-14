@@ -20,6 +20,7 @@ import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -70,14 +71,16 @@ public class Window extends HousePart {
 		root.attachChild(label1);
 		
 		bars = new Line("Window (bars)");
-		bars.setAntialiased(true);
-        final BlendState blend = new BlendState();
-        blend.setBlendEnabled(true);
-        bars.setRenderState(blend);		
+//		bars.setAntialiased(true);
+//        final BlendState blend = new BlendState();
+//        blend.setBlendEnabled(true);
+//        bars.setRenderState(blend);		
 		bars.setLineWidth(3);
 		bars.setModelBound(new BoundingBox());
-		bars.getSceneHints().setCastsShadows(false);
-		bars.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+//		bars.getSceneHints().setCastsShadows(false);
+//		bars.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+//		bars.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+		Util.disablePickShadowLight(bars);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		root.attachChild(bars);
 	}
@@ -264,11 +267,11 @@ public class Window extends HousePart {
 		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 		final Vector3 center = trans.applyForward(getCenter(), null);
-		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, false, true, false);
+		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, true, false);
 //		annot.setTranslation(moveToFront);
 
 		annot = fetchSizeAnnot(annotCounter++);
-		annot.setRange(getAbsPoint(i0), getAbsPoint(i2), center, faceDirection, false, Align.Center, true, false, false, false);
+		annot.setRange(getAbsPoint(i0), getAbsPoint(i2), center, faceDirection, false, Align.Center, true, false, false);
 //		annot.setTranslation(moveToFront);
 	}
 

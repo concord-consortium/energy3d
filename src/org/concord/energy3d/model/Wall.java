@@ -7,6 +7,7 @@ import java.util.List;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.SelectUtil;
+import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
@@ -139,17 +140,18 @@ public class Wall extends HousePart {
 
 		wireframeMesh = new Line("Wall (Wireframe)");
 		// wireframeMesh.getMeshData().setIndexMode(IndexMode.LineLoop);
-		wireframeMesh.setAntialiased(true);
-        final BlendState blend = new BlendState();
-        blend.setBlendEnabled(true);
-        wireframeMesh.setRenderState(blend);      
-		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		wireframeMesh.getSceneHints().setCastsShadows(false);
-		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+//		wireframeMesh.setAntialiased(true);
+//        final BlendState blend = new BlendState();
+//        blend.setBlendEnabled(true);
+//        wireframeMesh.setRenderState(blend);      
+//		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+//		wireframeMesh.getSceneHints().setCastsShadows(false);
+//		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setModelBound(new BoundingBox());
 //		wireframeMesh.setRenderState(new WireframeState());
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
@@ -248,7 +250,7 @@ public class Wall extends HousePart {
 		if (isDrawable())
 			drawNeighborWalls();
 		
-		Scene.getInstance().updateTextSizes();
+//		Scene.getInstance().updateTextSizes();
 
 	}
 
@@ -1041,7 +1043,7 @@ public class Wall extends HousePart {
 
 			for (int i = 0; i < wallPolygonPoints.size(); i++) {
 				final boolean front = i == 1 && original == null;
-				fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get((i + 1) % wallPolygonPoints.size()), getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, true, reverse, Scene.isDrawAnnotationsInside());
+				fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get((i + 1) % wallPolygonPoints.size()), getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, reverse, Scene.isDrawAnnotationsInside());
 				fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get((i + 1) % wallPolygonPoints.size()), wallPolygonPoints.get(i), wallPolygonPoints.get((i + 2) % wallPolygonPoints.size()), getFaceDirection());
 //				if (i > 0)
 //					fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get(i - 1), wallPolygonPoints.get(i + 1), getFaceDirection());

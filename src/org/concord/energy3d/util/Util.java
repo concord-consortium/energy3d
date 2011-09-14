@@ -11,6 +11,10 @@ import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.PickingHint;
 
 public class Util {
 	
@@ -71,5 +75,11 @@ public class Util {
 
 	public static PolygonPoint toPolygonPoint(Vector3 p) {
 		return new PolygonPoint(p.getX(), p.getY(), p.getZ());
+	}
+	
+	public static void disablePickShadowLight(final Spatial spatial) {
+		spatial.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		spatial.getSceneHints().setCastsShadows(false);
+		spatial.getSceneHints().setLightCombineMode(LightCombineMode.Off);		
 	}
 }

@@ -30,8 +30,10 @@ import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
+import org.concord.energy3d.util.Util;
 import org.lwjgl.LWJGLException;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.ColladaMaterialUtils;
@@ -133,7 +135,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	static public final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	static private final SceneManager instance = new SceneManager(MainPanel.getInstance());
-	static private final boolean JOGL = false;
+	static private final boolean JOGL = true;
 	private final Canvas canvas;
 	public final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
@@ -174,7 +176,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
 		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
-		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 8, false, false);
+		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 4, false, false);
 		if (JOGL) {
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
 			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
@@ -368,6 +370,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public boolean renderUnto(final Renderer renderer) {
+		
+//		canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.WHITE);
+		
 		if (cameraNode == null)
 			initCamera();
 
@@ -551,17 +556,28 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		FloatBuffer buf;
 		Line line;
-		final BlendState blend = new BlendState();
-		blend.setBlendEnabled(true);
+//		final BlendState blend = new BlendState();
+//		blend.setBlendEnabled(true);
+		
+//		final BlendState blendState = new BlendState();
+//		blendState.setBlendEnabled(true);
+//		blendState.setSourceFunction(SourceFunction.SourceAlpha);
+//		blendState.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
+//		blendState.setDestinationFunction(DestinationFunction.SourceAlpha);
+//		blendState.setSourceFunction(SourceFunction.OneMinusSourceAlpha);
 		
 		// X-Axis
 		buf = BufferUtils.createVector3Buffer(2);
 		buf.put(-axisLen).put(0).put(0);
 		buf.put(axisLen).put(0).put(0);
 		line = new Line("X-Axis", buf, null, null, null);
-		line.setAntialiased(true);
-		line.setRenderState(blend);
 		line.setDefaultColor(ColorRGBA.RED);
+		Util.disablePickShadowLight(line);
+//		line.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+//		line.setLineWidth(2f);
+//		line.setAntialiased(true);
+//		line.setRenderState(blendState);
+//		line.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		axisRoot.attachChild(line);
 
 		// Y-Axis
@@ -569,9 +585,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		buf.put(0).put(-axisLen).put(0);
 		buf.put(0).put(axisLen).put(0);
 		line = new Line("Y-Axis", buf, null, null, null);
-		line.setAntialiased(true);
-		line.setRenderState(blend);
 		line.setDefaultColor(ColorRGBA.GREEN);
+		Util.disablePickShadowLight(line);
+//		line.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+//		line.setLineWidth(2f);
+//		line.setRenderState(blend);
+//		line.setAntialiased(true);
+//		line.setRenderState(blendState);
+//		line.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		axisRoot.attachChild(line);
 		
 		// Z-Axis		
@@ -579,9 +600,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		buf.put(0).put(0).put(-axisLen);
 		buf.put(0).put(0).put(axisLen);
 		line = new Line("Z-Axis", buf, null, null, null);
-		line.setAntialiased(true);
-		line.setRenderState(blend);
+		Util.disablePickShadowLight(line);
 		line.setDefaultColor(ColorRGBA.BLUE);
+//		line.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+//		line.setLineWidth(2f);
+//		line.setAntialiased(true);
+//		line.setRenderState(blendState);
+//		line.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		axisRoot.attachChild(line);
 
 		return axisRoot;
@@ -661,7 +686,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 							enableDisableRotationControl();
 							if (sceneChanged)
-								updateHeliodonSize();
+								updateHeliodonAndAnnotationSize();
 
 							return null;
 						}
@@ -955,6 +980,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		final double near = 1;
 		final double far = 1000;
+//		final double far = 20;
 		if (camera.getProjectionMode() == ProjectionMode.Parallel)
 			camera.setFrustum(near, far, -orthoWidth / 2, orthoWidth / 2, -orthoWidth / ratio / 2, orthoWidth / ratio / 2);
 		else
@@ -1023,6 +1049,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private HousePart newHousePart() {
+//		Scene.getInstance().setSceneBounds(Scene.getInstance().getOriginalHouseRoot().getWorldBound());
 		HousePart drawn = null;
 		if (operation == Operation.DRAW_WALL)
 			drawn = new Wall();
@@ -1197,10 +1224,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		cameraNode.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 	}
 
-	public void updateHeliodonSize() {
+	public void updateHeliodonAndAnnotationSize() {
 		if (sunControl)
 			taskManager.update(new Callable<Object>() {
 				public Object call() throws Exception {
+					Scene.getInstance().updateTextSizes();
 					heliodon.updateSize();
 					return null;
 				}
