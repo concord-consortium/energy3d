@@ -768,6 +768,7 @@ Version 0.4 - Auguest 24, 2011
 - update google-collection-1.0 to guava-r09
 - remove roof call to wall.setGablePoints
 - remove jnlp and applet stuff from exe folder
+- move jnlp stuff from webstart to parent folder exe 
  
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
