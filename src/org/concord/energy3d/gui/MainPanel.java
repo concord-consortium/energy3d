@@ -398,6 +398,7 @@ public class MainPanel extends JPanel {
 			topViewButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().resetCamera(topViewButton.isSelected() ? ViewMode.TOP_VIEW : ViewMode.NORMAL);
+					SceneManager.getInstance().update();
 				}
 			});
 		}

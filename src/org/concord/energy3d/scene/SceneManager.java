@@ -203,10 +203,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.addUpdater(PrintController.getInstance());
 		frameHandler.addUpdater(Blinker.getInstance());
 
-		panel.addComponentListener(new java.awt.event.ComponentAdapter() {
+		panel.addComponentListener(new java.awt.event.ComponentAdapter() {			
 			public void componentResized(java.awt.event.ComponentEvent e) {
-				System.out.println("resize");
+//				System.out.println("resize");
 				resizeCamera();
+				update();
 				if (heliodon != null)
 					heliodon.updateBloom();
 			}
@@ -302,7 +303,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public synchronized void run() {
 		frameHandler.init();
 		while (!exit) {
-			// try {
 			logicalLayer.checkTriggers(frameHandler.getTimer().getTimePerFrame());
 //			System.out.println(frameHandler.getTimer().getTimeInSeconds());
 			final double now = frameHandler.getTimer().getTimeInSeconds();
@@ -313,20 +313,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (now > updateTime)
 					updateTime = -1;
 				update = false;
-				System.out.println("render");
+//				System.out.println("render");
 				frameHandler.updateFrame();
 			} else
 				frameHandler.getTimer().update();
-			// } catch (Exception e1) {
-			// e1.printStackTrace();
-			// shadowPass.setEnabled(false);
-			// }
 			final double syncNS = 1000000000.0 / 60.0;
 			long sinceLast = System.nanoTime() - lastRenderTime;
 			if (sinceLast < syncNS) {
 				try {
 					Thread.sleep(Math.round((syncNS - sinceLast) / 1000000L));
-//					this.wait();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1027,6 +1022,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.operationStick = false;
 		this.operation = operation;
 		this.operationFlag = true;
+		update();
 	}
 
 	public void setOperationStick(boolean stick) {
@@ -1034,7 +1030,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void executeOperation() {
-		System.out.println("executeOperation()");
+//		System.out.println("executeOperation()");
 		this.operationFlag = false;
 		if (drawn != null && !drawn.isDrawCompleted())
 			Scene.getInstance().remove(drawn);

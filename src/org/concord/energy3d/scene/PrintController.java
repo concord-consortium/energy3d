@@ -272,7 +272,7 @@ public class PrintController implements Updater {
 				// camera.resize(1000, 1000);
 				// final Dimension orgSize = ((java.awt.Component)SceneManager.getInstance().getCanvas()).getSize();
 				final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
-				final Dimension orgSize = canvas.getSize();
+//				final Dimension orgSize = canvas.getSize();
 				final Paper paper = new Paper();
 				final int resolutionHeight = 1000;
 				final Dimension newSize = new Dimension((int)(resolutionHeight * paper.getWidth() / paper.getHeight()), resolutionHeight);
@@ -290,7 +290,7 @@ public class PrintController implements Updater {
 				// camera.setLocation(pos.getX(), -1.0, pos.getZ());
 				// camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 
-				System.err.println("init ");
+//				System.err.println("init ");
 				print(-1, printExporter);
 				return null;
 			}
@@ -301,7 +301,7 @@ public class PrintController implements Updater {
 	private void print(final int pageNum, final PrintExporter printExporter) {
 		SceneManager.taskManager.render(new Callable<Object>() {
 			public Object call() throws Exception {
-				System.err.println("Printing Page " + pageNum);
+//				System.err.println("Printing Page " + pageNum);
 				if (pageNum != -1) {
 					final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
 					// canvasRenderer.makeCurrentContext();

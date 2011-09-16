@@ -13,14 +13,7 @@
 
 	<description kind="short">A tool for designing and building energy efficient houses in 3D.</description>
 
-	<icon href="energy3d.gif"/>
-	<icon kind="splash" href="splash.jpg"/> 
-	<offline-allowed/>
-	<shortcut/>
 </information>
-<security>
-	<all-permissions/>
-</security>
 
 
 <resources>
@@ -30,10 +23,20 @@
 
 	<jar href="energy3d.jar" main="true"/>
 
-	<extension name="jogl" href="jnlp/jogl.jnlp"/>
+	<extension name="jogl" href="jogl.jnlp"/>
 
 </resources>
 
 
-<application-desc main-class="org.concord.energy3d.gui.MainApplication"/>
+<applet-desc
+	name="Energy3D"
+
+	main-class="org.concord.energy3d.gui.MainApplet"
+	width="800"
+	height="600">
+
+<param name="heliodon" value="true" />
+<param name="file" value="Energy3D Projects/Default.ser" />
+</applet-desc>
+
 </jnlp>

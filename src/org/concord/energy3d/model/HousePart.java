@@ -422,7 +422,7 @@ public abstract class HousePart implements Serializable {
 //			return;
 //		drawFlag = globalDrawFlag;
 
-		System.out.println("Drawing..." + this);
+//		System.out.println("Drawing..." + this);
 		
 		if (root == null)
 			init();

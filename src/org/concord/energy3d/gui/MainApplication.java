@@ -1,5 +1,7 @@
 package org.concord.energy3d.gui;
 
+import java.security.AllPermission;
+
 import javax.swing.UIManager;
 
 import org.concord.energy3d.scene.SceneManager;
@@ -7,7 +9,14 @@ import org.concord.energy3d.scene.SceneManager;
 public class MainApplication {
 
 	public static void main(String[] args) {
-		setupLibraryPath();
+		if (System.getProperty("javawebstart.version", null) != null)
+			System.out.println("Application is lauched by webstart, therefore skiping library path setup.");
+		else
+			try {
+				setupLibraryPath();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

@@ -760,8 +760,9 @@ Version 0.4 - Auguest 24, 2011
 - turn off anti aliasing on lines to improve performance (quality stays the same)
 - redraw annotations as soon as their text size is updated
 - update annotation size only after new house part is drawn at same time as updating heliodon size
- 
- 
+- redraw upon resizing the window
+- redraw upon clicking on operation tools 
+- release v. 0.4.1 
  
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
