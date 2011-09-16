@@ -767,6 +767,7 @@ Version 0.4 - Auguest 24, 2011
 - remove poly2tri library because it's not part of the source code
 - update google-collection-1.0 to guava-r09
 - remove roof call to wall.setGablePoints
+- remove jnlp and applet stuff from exe folder
  
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
