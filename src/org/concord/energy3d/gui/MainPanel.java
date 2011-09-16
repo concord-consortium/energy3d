@@ -7,13 +7,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -22,7 +23,6 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 
 import org.concord.energy3d.model.HousePart;
@@ -33,12 +33,6 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Config;
-
-import sun.awt.AppContext;
-
-import javax.swing.JButton;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class MainPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -120,7 +114,7 @@ public class MainPanel extends JPanel {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
 			final boolean showEditTools = !Config.isHeliodonMode();
-//			if (showEditTools) {
+			if (showEditTools) {
 				appToolbar.add(getSelectButton());
 				appToolbar.add(getResizeButton());
 				appToolbar.add(getZoomButton());
@@ -135,26 +129,26 @@ public class MainPanel extends JPanel {
 				appToolbar.add(getRoofGableButton());
 				appToolbar.add(getFloorButton());
 				appToolbar.addSeparator();
-//			}
+			}
 			appToolbar.add(getLightButton());
 			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimButton());
 			appToolbar.add(getCalendarPanel());
-//			if (showEditTools) {
+			if (showEditTools) {
 				appToolbar.addSeparator();
 				appToolbar.add(getRotAnimButton());
 				appToolbar.add(getTopViewButton());
 				appToolbar.add(getGridButton());
 				appToolbar.add(getSnapButton());
 				appToolbar.addSeparator();
-//			} else
-//				appToolbar.add(getRotAnimButton());
+			} else
+				appToolbar.add(getRotAnimButton());
 
 			appToolbar.add(getAnnotationToggleButton());
-//			if (showEditTools)
+			if (showEditTools)
 				appToolbar.add(getPreviewButton());
 
-//			if (showEditTools) {
+			if (showEditTools) {
 				final ButtonGroup bg = new ButtonGroup();
 				bg.add(selectButton);
 				bg.add(resizeButton);
@@ -168,7 +162,7 @@ public class MainPanel extends JPanel {
 				bg.add(roofCustomButton);
 				bg.add(floorButton);
 				bg.add(roofGableButton);
-//			}
+			}
 		}
 		return appToolbar;
 	}

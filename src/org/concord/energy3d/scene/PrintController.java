@@ -2,22 +2,15 @@ package org.concord.energy3d.scene;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.awt.print.PageFormat;
 import java.awt.print.Pageable;
 import java.awt.print.Paper;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import org.concord.energy3d.gui.MainFrame;
@@ -33,17 +26,12 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.framework.CanvasRenderer;
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Updater;
-import com.ardor3d.framework.lwjgl.LwjglHeadlessCanvas;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.ContextManager;
-import com.ardor3d.renderer.state.OffsetState;
-import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -194,7 +182,7 @@ public class PrintController implements Updater {
 		if (flattenTime > 1)
 			flattenTime = 1;
 
-		int printSequence = 0;
+//		int printSequence = 0;
 		for (final HousePart part : printParts) {
 			if (part.isPrintable()) {
 				part.flatten(flattenTime);

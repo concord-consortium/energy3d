@@ -39,8 +39,6 @@ import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonSet;
 import org.poly2tri.triangulation.sets.ConstrainedPointSet;
 import org.poly2tri.triangulation.sets.PointSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -50,7 +48,6 @@ import org.slf4j.LoggerFactory;
  */
 public class TriangulationProcess implements Runnable
 {
-    private final static Logger logger = LoggerFactory.getLogger( TriangulationProcess.class );
 
     private final TriangulationAlgorithm _algorithm;
     
@@ -236,7 +233,6 @@ public class TriangulationProcess implements Runnable
                 Poly2Tri.triangulate( _tcx );
             }
             _triangulationTime = ( System.nanoTime() - time ) / 1e6;
-            logger.info( "Triangulation of {} points [{}ms]", _pointCount, _triangulationTime );
             sendEvent( TriangulationProcessEvent.Done );
         }
         catch( RuntimeException e )
@@ -244,7 +240,6 @@ public class TriangulationProcess implements Runnable
             if( _awaitingTermination )
             {
                 _awaitingTermination = false;
-                logger.info( "Thread[{}] : {}", _thread.getName(), e.getMessage() );
                 sendEvent( TriangulationProcessEvent.Aborted );
             }
             else
@@ -256,7 +251,6 @@ public class TriangulationProcess implements Runnable
         catch( Exception e )
         {
             e.printStackTrace();
-            logger.info( "Triangulation exception {}", e.getMessage() );
             sendEvent( TriangulationProcessEvent.Failed );
         }
         finally

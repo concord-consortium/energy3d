@@ -9,8 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-effects"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-jogl"/>
 	<classpathentry kind="src" path="/ardor3d-awt"/>
-	<classpathentry kind="lib" path="exe/lib/slf4j-api-1.5.10.jar"/>
-	<classpathentry kind="lib" path="exe/lib/slf4j-nop-1.5.10.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-lwjgl"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

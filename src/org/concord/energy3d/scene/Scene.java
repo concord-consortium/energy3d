@@ -20,14 +20,11 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Snap;
-import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.util.Config;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.bounding.BoundingVolume;
-import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.ui.text.BMText;

@@ -33,7 +33,6 @@ import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 import org.lwjgl.LWJGLException;
 
-import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.ColladaMaterialUtils;
@@ -86,8 +85,6 @@ import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.BlendState.DestinationFunction;
-import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -711,8 +708,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// dy = 4;
 		// zoom(canvas, tpf, dy / 5.0);
 		// }
-		// }));
-
+		// }));		
+		
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LSHIFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				SelectUtil.setPickLayer(0);

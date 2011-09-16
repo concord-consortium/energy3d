@@ -35,13 +35,10 @@ import java.util.ArrayList;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.delaunay.sweep.DTSweepConstraint;
 import org.poly2tri.triangulation.point.TPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class DelaunayTriangle
 {
-    private final static Logger logger    = LoggerFactory.getLogger( DelaunayTriangle.class );
 
     /** Neighbor pointers */
     public final DelaunayTriangle[]   neighbors = new DelaunayTriangle[3];
@@ -134,7 +131,6 @@ public class DelaunayTriangle
         }
         else
         {
-            logger.error( "Neighbor error, please report!" );
             // throw new Exception("Neighbor error, please report!");
         }
     }
@@ -159,7 +155,6 @@ public class DelaunayTriangle
         }
         else
         {
-            logger.error( "markNeighbor failed" );
         }
     }
 
@@ -302,7 +297,6 @@ public class DelaunayTriangle
         {
             return points[0];
         }
-        logger.error( "point location error" );
         throw new RuntimeException("[FIXME] point location error");
     }
 
@@ -321,7 +315,6 @@ public class DelaunayTriangle
         {
             return points[1];
         }
-        logger.error( "point location error" );
         throw new RuntimeException("[FIXME] point location error");
     }
 
@@ -348,7 +341,6 @@ public class DelaunayTriangle
         }
         else
         {
-            logger.error( "legalization error" );
             throw new RuntimeException("legalization bug");
         }
     }

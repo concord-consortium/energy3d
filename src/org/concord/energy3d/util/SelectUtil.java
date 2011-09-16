@@ -8,7 +8,6 @@ import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.scene.SceneManager.ViewMode;
 
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;

@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,7 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -42,11 +42,6 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.util.GameTaskQueue;
-
-import javax.swing.Action;
-import javax.swing.AbstractAction;
-import java.awt.event.WindowEvent;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -85,9 +80,7 @@ public class MainFrame extends JFrame {
 	private JDialog aboutDialog = null; // @jve:decl-index=0:visual-constraint="602,644"
 	private JCheckBoxMenuItem wallThicknessMenuItem = null;
 	private MainPanel mainPanel = null;
-	private Action action;
 	private JCheckBoxMenuItem drawAnnotationsInward;
-	private Action action_1;
 
 	public static MainFrame getInstance() {
 		return instance;

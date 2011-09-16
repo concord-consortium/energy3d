@@ -1,7 +1,5 @@
 package org.concord.energy3d.gui;
 
-import java.security.AllPermission;
-
 import javax.swing.UIManager;
 
 import org.concord.energy3d.scene.SceneManager;

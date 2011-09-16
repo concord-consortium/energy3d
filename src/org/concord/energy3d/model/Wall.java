@@ -31,18 +31,14 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
-import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
@@ -64,7 +60,7 @@ public class Wall extends HousePart {
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
-	transient private ArrayList<Vector3> wallGablePoints; // TODO remove this
+//	transient private ArrayList<Vector3> wallGablePoints; // TODO remove this
 	transient private Roof roof;
 	transient private ArrayList<Vector3> wallPolygonPoints;
 
@@ -1189,9 +1185,9 @@ public class Wall extends HousePart {
 		// System.out.println(this);
 	}
 
-	public void setGablePoints(final ArrayList<Vector3> wallGablePoints) {
-		this.wallGablePoints = wallGablePoints;
-	}
+//	public void setGablePoints(final ArrayList<Vector3> wallGablePoints) {
+//		this.wallGablePoints = wallGablePoints;
+//	}
 
 	public void setRoof(final Roof roof) {
 		this.roof = roof;

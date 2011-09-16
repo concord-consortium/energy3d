@@ -10,8 +10,6 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.renderer.state.OffsetState;
-import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.TextureManager;

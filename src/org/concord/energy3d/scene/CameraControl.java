@@ -18,7 +18,6 @@ import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyHeldCondition;
-import com.ardor3d.input.logical.KeyReleasedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseMovedCondition;
 import com.ardor3d.input.logical.MouseWheelMovedCondition;

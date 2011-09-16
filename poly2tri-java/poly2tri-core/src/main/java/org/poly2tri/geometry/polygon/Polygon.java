@@ -9,13 +9,9 @@ import org.poly2tri.triangulation.TriangulationContext;
 import org.poly2tri.triangulation.TriangulationMode;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.delaunay.DelaunayTriangle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Polygon implements Triangulatable
 {
-    private final static Logger logger = LoggerFactory.getLogger( Polygon.class );
-
     protected ArrayList<TriangulationPoint> _points = new ArrayList<TriangulationPoint>();
     protected ArrayList<TriangulationPoint> _steinerPoints;
     protected ArrayList<Polygon> _holes;
@@ -52,7 +48,6 @@ public class Polygon implements Triangulatable
         // Its something that often happen when importing polygon data from other formats
         if( points.get(0).equals( points.get(points.size()-1) ) )
         {
-            logger.warn( "Removed duplicate point");
             points.remove( points.size()-1 );
         }
         _points.addAll( points );

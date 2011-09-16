@@ -2,15 +2,12 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.SizeAnnotation;
-import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
@@ -30,12 +27,9 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
@@ -44,11 +38,9 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
-import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -608,7 +600,7 @@ public abstract class Roof extends HousePart {
 				final Vector3[] meshBase = findBasePoints((Mesh) ((Node) roofPartNode).getChild(0), meshUpperPoints);
 				if (meshBase != null && isSameBasePoints(base, meshBase)) {
 					final Vector3 n = meshBase[1].subtract(meshBase[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
-					final ArrayList<Vector3> gableRoofMeshEditPoints = new ArrayList<Vector3>();
+//					final ArrayList<Vector3> gableRoofMeshEditPoints = new ArrayList<Vector3>();
 					for (final Vector3 meshPoint : meshUpperPoints) {
 						double smallestDistanceToEditPoint = Double.MAX_VALUE;
 						Vector3 nearestEditPoint = null;
@@ -631,10 +623,10 @@ public abstract class Roof extends HousePart {
 						// distance += -Math.signum(distance) * 0.1; // in order to avoid crazy roof that stretches to floor
 						nearestEditPoint.addLocal(n.multiply(distance, null));
 						nearestEditPointRel.set(toRelative(nearestEditPoint, container.getContainer()));
-						gableRoofMeshEditPoints.add(nearestEditPoint);
+//						gableRoofMeshEditPoints.add(nearestEditPoint);
 						gableEditPointToWallMap.put(nearestIndex, wall);
 					}
-					computeGableWallPoints(base, gableRoofMeshEditPoints);
+//					computeGableWallPoints(base, gableRoofMeshEditPoints);
 					break;
 				}
 			}
@@ -701,26 +693,26 @@ public abstract class Roof extends HousePart {
 		return (p1a.distance(p2a) < maxOverhangDistance && p1b.distance(p2b) < maxOverhangDistance) || (p1a.distance(p2b) < maxOverhangDistance && p1b.distance(p2a) < maxOverhangDistance);
 	}
 
-	private void computeGableWallPoints(final Vector3[] targetBase, final ArrayList<Vector3> gableRoofMeshEditPoints) {
-		Wall targetWall = findGableWall(targetBase);
+//	private void computeGableWallPoints(final Vector3[] targetBase, final ArrayList<Vector3> gableRoofMeshEditPoints) {
+//		Wall targetWall = findGableWall(targetBase);
 
-		final Wall wall = targetWall;
+//		final Wall wall = targetWall;
 
-		if (targetWall != null) {
-			Collections.sort(gableRoofMeshEditPoints, new Comparator<Vector3>() {
-				@Override
-				public int compare(Vector3 o1, Vector3 o2) {
-					final Vector3 wallFirstPoint = wall.getAbsPoint(0);
-					if (o1.distance(wallFirstPoint) > o2.distance(wallFirstPoint))
-						return -1;
-					else
-						return 1;
-				}
-			});
-			wall.setGablePoints(gableRoofMeshEditPoints);
-		}
+//		if (targetWall != null) {
+//			Collections.sort(gableRoofMeshEditPoints, new Comparator<Vector3>() {
+//				@Override
+//				public int compare(Vector3 o1, Vector3 o2) {
+//					final Vector3 wallFirstPoint = wall.getAbsPoint(0);
+//					if (o1.distance(wallFirstPoint) > o2.distance(wallFirstPoint))
+//						return -1;
+//					else
+//						return 1;
+//				}
+//			});
+//			wall.setGablePoints(gableRoofMeshEditPoints);
+//		}
 
-	}
+//	}
 
 	// private Wall findGableWall(final Vector3[] targetBase) {
 	// Wall targetWall = null;
