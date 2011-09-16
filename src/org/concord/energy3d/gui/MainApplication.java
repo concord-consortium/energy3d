@@ -9,9 +9,9 @@ import org.concord.energy3d.scene.SceneManager;
 public class MainApplication {
 
 	public static void main(String[] args) {
-		if (System.getProperty("javawebstart.version", null) != null)
-			System.out.println("Application is lauched by webstart, therefore skiping library path setup.");
-		else
+		if (System.getProperty("javawebstart.version", null) != null) {
+			System.out.println("Application is lauched by webstart.");
+		} else
 			try {
 				setupLibraryPath();
 			} catch (Exception e) {
