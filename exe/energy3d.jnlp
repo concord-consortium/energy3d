@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp>
+<jnlp codebase="http://energy.concord.org/energy3d">
 <information>
 	<title>Energy3D</title>
-	<vendor>Concord Consortium</vendor>
-	<homepage href="http://www.concord.org/"/>
+	<vendor>The Concord Consortium</vendor>
+	<homepage href="http://energy.concord.org/energy3d"/>
 	<description>Energy3D</description>
-	<description kind="short">A tool for designing and building energy efficient houses in 3D.</description>
-	<icon href="jnlp-resources/energy3d.gif"/>
+	<description kind="short">An educational CAD tool for green building design.</description>
+	<icon href="jnlp-resources/icon.gif"/>
 	<icon kind="splash" href="jnlp-resources/splash.jpg"/> 
 	<offline-allowed/>
     <shortcut online="false">
