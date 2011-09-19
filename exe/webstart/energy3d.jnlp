@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp>
+<information>
+	<title>Energy3D</title>
+	<vendor>The Concord Consortium</vendor>
+	<homepage href="http://energy.concord.org/energy3d"/>
+	<description>Energy3D</description>
+	<description kind="short">An educational CAD tool for green building design.</description>
+	<icon href="jnlp-resources/icon.gif"/>
+	<icon kind="splash" href="jnlp-resources/splash.jpg"/> 
+	<offline-allowed/>
+    <shortcut online="false">
+      <desktop/>
+      <menu submenu="Energy3D"/>
+    </shortcut>
+</information>
+
+<update check="background"/>
+<resources>
+	<j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+"/>
+	<property name="sun.java2d.noddraw" value="true"/>
+	<jar href="energy3d.jar" main="true"/>
+	<jar href="jnlp-resources/guava-r09.jar"/>
+	<jar href="jnlp-resources/jdom.jar"/>
+	<extension name="jogl" href="jnlp-resources/jogl.jnlp"/>
+</resources>
+<application-desc main-class="org.concord.energy3d.gui.MainApplication"/>
+</jnlp>
