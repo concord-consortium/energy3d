@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp codebase="http://energy.concord.org/energy3d">
+<jnlp>
 <information>
 	<title>Energy3D</title>
 	<vendor>The Concord Consortium</vendor>
@@ -14,13 +14,14 @@
       <menu submenu="Energy3D"/>
     </shortcut>
 </information>
-<security>
-	<all-permissions/>
-</security>
+
+<update check="background"/>
 <resources>
 	<j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+"/>
 	<property name="sun.java2d.noddraw" value="true"/>
 	<jar href="energy3d.jar" main="true"/>
+	<jar href="jnlp-resources/guava-r09.jar"/>
+	<jar href="jnlp-resources/jdom.jar"/>
 	<extension name="jogl" href="jnlp-resources/jogl.jnlp"/>
 </resources>
 <application-desc main-class="org.concord.energy3d.gui.MainApplication"/>
