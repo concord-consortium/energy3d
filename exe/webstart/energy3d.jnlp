@@ -6,8 +6,8 @@
 	<homepage href="http://energy.concord.org/energy3d"/>
 	<description>Energy3D</description>
 	<description kind="short">An educational CAD tool for green building design.</description>
-	<icon href="jnlp-resources/icon.gif"/>
-	<icon kind="splash" href="jnlp-resources/splash.jpg"/> 
+	<icon href="resources/icon.gif"/>
+	<icon kind="splash" href="resources/splash.jpg"/> 
 	<offline-allowed/>
     <shortcut online="false">
       <desktop/>
