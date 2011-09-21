@@ -13,7 +13,12 @@ Instructions:
 - To start the Energy3D simply double-click on energy3d.jar file.
 
 If you require assistance or have suggestions on how to improve Energy3D please 
-contact us by email at:
+contact us by email:
 
+Dr. Saeid Nourian
 snourian@concord.org
+
+Dr. Charles Xie
+qxie@concord.org
+
 http://www.concord.org/
