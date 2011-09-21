@@ -62,9 +62,11 @@ public class Scene implements Serializable {
 		if (instance == null) {
 			instance = new Scene();
 			try {
-				if (!Config.isApplet())
+				if (!Config.isApplet() && !Config.isWebStart())
 					instance.open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
-				else if (Config.getApplet().getParameter("file") != null) {
+				else if (Config.isWebStart()) {
+					// do nothing
+				} else if (Config.getApplet().getParameter("file") != null) {
 					final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
 					instance.open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
 				} else {

@@ -4,6 +4,7 @@ import org.concord.energy3d.gui.MainApplet;
 
 public class Config {
 	private static MainApplet applet;
+	private static boolean isWebstart;
 
 	public static MainApplet getApplet() {
 		return applet;
@@ -22,5 +23,13 @@ public class Config {
 			return false;
 		else
 			return "true".equalsIgnoreCase(Config.getApplet().getParameter("heliodon"));
+	}
+
+	public static void setWebStart(final boolean webstart) {
+		isWebstart = webstart;
+	}
+
+	public static boolean isWebStart() {
+		return isWebstart;
 	}
 }

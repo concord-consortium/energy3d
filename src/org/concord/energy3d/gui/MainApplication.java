@@ -3,11 +3,13 @@ package org.concord.energy3d.gui;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.util.Config;
 
 public class MainApplication {
 
 	public static void main(String[] args) {
-		if (System.getProperty("javawebstart.version", null) != null) {
+		Config.setWebStart(System.getProperty("javawebstart.version", null) != null);
+		if (Config.isWebStart()) {
 			System.out.println("Application is lauched by webstart.");
 		} else
 			try {

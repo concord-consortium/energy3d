@@ -39,6 +39,7 @@ import org.concord.energy3d.scene.Scene.Unit;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
+import org.concord.energy3d.util.Config;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -120,14 +121,16 @@ public class MainFrame extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/org/concord/energy3d/resources/icons/energy3d_2.gif")));
 		System.out.print("Initiating GUI...");
 		try {
-			final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
-			if (!dir.exists()) {
-				System.out.print("Making save directory...");
-				final boolean success = dir.mkdir();
-				System.out.println(success ? "done" : "failed");
+			if (!Config.isWebStart()) {
+				fileChooser = new JFileChooser();
+				final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
+				if (!dir.exists()) {
+					System.out.print("Making save directory..." + dir + "...");
+					final boolean success = dir.mkdir();
+					System.out.println(success ? "done" : "failed");
+				}
+				fileChooser.setCurrentDirectory(dir);
 			}
-			fileChooser = new JFileChooser();
-			fileChooser.setCurrentDirectory(dir);
 			fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
 		} catch (Exception e) {
 			fileChooser = null;
@@ -151,7 +154,7 @@ public class MainFrame extends JFrame {
 	private void initialize() {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		this.setSize(1092, 600);
-//		this.setSize(600, 600);
+		// this.setSize(600, 600);
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int) (screenSize.getWidth() - this.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -306,7 +309,7 @@ public class MainFrame extends JFrame {
 							public Object call() throws Exception {
 								if (printController.isFinished())
 									PrintController.getInstance().print();
-								else 
+								else
 									SceneManager.taskManager.update(this);
 								return null;
 							}
