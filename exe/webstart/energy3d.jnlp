@@ -9,14 +9,13 @@
 	<icon href="resources/icon.gif"/>
 	<icon kind="splash" href="resources/splash.jpg"/> 
 	<offline-allowed/>
-    <shortcut online="false">
+    <shortcut>
 		<desktop/>
     </shortcut>
 </information>
 <security>
 	<all-permissions/>
 </security>
-<update check="background"/>
 <resources>
 	<j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+"/>
 	<property name="sun.java2d.noddraw" value="true"/>
