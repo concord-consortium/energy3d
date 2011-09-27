@@ -772,6 +772,7 @@ Version 0.4 - Auguest 24, 2011
 - avoid making projects folder when running from webstart
 - avoid making start menu shortcut
 - release v. 0.4.1
+- scale dialog added to allow scale from current length to a new length
  
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

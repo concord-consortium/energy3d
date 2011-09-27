@@ -725,26 +725,28 @@ public class MainFrame extends JFrame {
 				private String previousScaleInput = "200%";
 
 				public void actionPerformed(ActionEvent e) {
-					boolean done = false;
-					while (!done) {
-						// previousScaleInput = "200%";
-						String result = JOptionPane.showInputDialog(MainFrame.this, "Please enter the scale factor in percentage:", previousScaleInput);
-						if (result == null)
-							break;
-						else
-							result = result.trim();
-						if (result.endsWith("%") && result.length() >= 1)
-							result = result.substring(0, result.length() - 1);
-						try {
-							final Scene scene = Scene.getInstance();
-							scene.setAnnotationScale(scene.getAnnotationScale() * Double.parseDouble(result) / 100.0);
-							previousScaleInput = result + "%";
-							done = true;
-						} catch (Exception err) {
-							err.printStackTrace();
-							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
-						}
-					}
+//					boolean done = false;
+//					while (!done) {
+//						// previousScaleInput = "200%";
+//						String result = JOptionPane.showInputDialog(MainFrame.this, "Please enter the scale factor in percentage:", previousScaleInput);
+//						if (result == null)
+//							break;
+//						else
+//							result = result.trim();
+//						if (result.endsWith("%") && result.length() >= 1)
+//							result = result.substring(0, result.length() - 1);
+//						try {
+//							final Scene scene = Scene.getInstance();
+//							scene.setAnnotationScale(scene.getAnnotationScale() * Double.parseDouble(result) / 100.0);
+//							previousScaleInput = result + "%";
+//							done = true;
+//						} catch (Exception err) {
+//							err.printStackTrace();
+//							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+//						}
+//					}
+					final ScaleDialog scaleDialog = new ScaleDialog();
+					scaleDialog.setVisible(true);
 				}
 			});
 		}
