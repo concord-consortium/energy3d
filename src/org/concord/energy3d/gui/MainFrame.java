@@ -82,6 +82,9 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem wallThicknessMenuItem = null;
 	private MainPanel mainPanel = null;
 	private JCheckBoxMenuItem drawAnnotationsInward;
+	private JMenu editMenu;
+	private JMenuItem undoMenuItem;
+	private JMenuItem redoMenuItem;
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -183,6 +186,7 @@ public class MainFrame extends JFrame {
 		if (appMenuBar == null) {
 			appMenuBar = new JMenuBar();
 			appMenuBar.add(getFileMenu());
+			appMenuBar.add(getEditMenu());
 			appMenuBar.add(getViewMenu());
 			appMenuBar.add(getScaleMenu());
 			appMenuBar.add(getCameraMenu());
@@ -778,6 +782,48 @@ public class MainFrame extends JFrame {
 		}
 		return drawAnnotationsInward;
 	}
+	private JMenu getEditMenu() {
+		if (editMenu == null) {
+			editMenu = new JMenu("Edit");
+			editMenu.add(getUndoMenuItem());
+			editMenu.add(getRedoMenuItem());
+		}
+		return editMenu;
+	}
+	public void refreshUndoRedo() {
+		getUndoMenuItem().setText(SceneManager.getInstance().getUndoManager().getUndoPresentationName());
+		getUndoMenuItem().setEnabled(SceneManager.getInstance().getUndoManager().canUndo());
+		getRedoMenuItem().setText(SceneManager.getInstance().getUndoManager().getRedoPresentationName());
+		getRedoMenuItem().setEnabled(SceneManager.getInstance().getUndoManager().canRedo());
+	}	
+	private JMenuItem getUndoMenuItem() {
+		if (undoMenuItem == null) {
+			undoMenuItem = new JMenuItem("Undo");
+			undoMenuItem.setEnabled(false);
+			undoMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().getUndoManager().undo();
+					SceneManager.getInstance().update();
+					refreshUndoRedo();
+				}
+			});
+		}
+		return undoMenuItem;
+	}
+	private JMenuItem getRedoMenuItem() {
+		if (redoMenuItem == null) {
+			redoMenuItem = new JMenuItem("Redo");
+			redoMenuItem.setEnabled(false);
+			redoMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().getUndoManager().redo();
+					SceneManager.getInstance().update();
+					refreshUndoRedo();
+				}
+			});
+		}
+		return redoMenuItem;
+	}
 } // @jve:decl-index=0:visual-constraint="10,-112"
 
 class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
@@ -823,4 +869,5 @@ class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		}
 		return false;
 	}
+	
 }

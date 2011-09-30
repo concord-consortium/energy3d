@@ -91,12 +91,28 @@ public class Scene implements Serializable {
 
 	public void add(HousePart housePart) {
 		System.out.print("Adding new house part...");
-		originalHouseRoot.attachChild(housePart.getRoot());
-		parts.add(housePart);
+//		originalHouseRoot.attachChild(housePart.getRoot());
+//		parts.add(housePart);
+		final HousePart container = housePart.getContainer();
+		if (container != null)
+			container.getChildren().add(housePart);		
+		addTree(housePart);
+		if (container != null)
+			container.draw();		
 		System.out.println("done");
 	}
+	
+	private void addTree(final HousePart housePart) {
+		System.out.println("Adding: " + housePart);
+		originalHouseRoot.attachChild(housePart.getRoot());
+		parts.add(housePart);
+//		housePart.delete();
+		for (final HousePart child : housePart.getChildren())
+			addTree(child);
+//		housePart.getChildren().clear();
+	}	
 
-	public void remove(HousePart housePart) {
+	public void remove(final HousePart housePart) {
 		if (housePart == null)
 			return;
 		final HousePart container = housePart.getContainer();
@@ -114,7 +130,7 @@ public class Scene implements Serializable {
 		housePart.delete();
 		for (final HousePart child : housePart.getChildren())
 			removeTree(child);
-		housePart.getChildren().clear();
+//		housePart.getChildren().clear();
 	}
 
 	public ArrayList<HousePart> getParts() {

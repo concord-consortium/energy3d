@@ -12,6 +12,12 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
@@ -26,6 +32,8 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.undo.AddHousePartCommand;
+import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FontManager;
@@ -159,6 +167,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean drawBounds = false;
 	private long lastRenderTime;
 	private boolean mouseControlEnabled = true;
+	private final UndoManager undoManager = new UndoManager();
 
 	private UserData pick;
 
@@ -633,8 +642,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										((Roof) drawn).setGable(pick.getIndex());
 									}
 								}
-							} else
+							} else {
 								drawn.addPoint(mouseState.getX(), mouseState.getY());
+								if (drawn.isDrawCompleted()) {
+									undoManager.addEdit(new AddHousePartCommand(drawn));
+									MainFrame.getInstance().refreshUndoRedo();
+								}
+							}
 
 							enableDisableRotationControl();
 
@@ -665,6 +679,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								}
 
 								if (drawn.isDrawCompleted()) {
+									undoManager.addEdit(new AddHousePartCommand(drawn));
+									MainFrame.getInstance().refreshUndoRedo();
 									drawn.hidePoints();
 									drawn = null;
 									if (operationStick)
@@ -724,6 +740,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				taskManager.update(new Callable<Object>() {
 					public Object call() throws Exception {
+						undoManager.addEdit(new RemoveHousePartCommand(drawn));
+						MainFrame.getInstance().refreshUndoRedo();
 						Scene.getInstance().remove(drawn);
 						drawn = null;
 						return null;
@@ -735,6 +753,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				taskManager.update(new Callable<Object>() {
 					public Object call() throws Exception {
+						undoManager.addEdit(new RemoveHousePartCommand(drawn));
+						MainFrame.getInstance().refreshUndoRedo();
 						Scene.getInstance().remove(drawn);
 						drawn = null;
 						return null;
@@ -1301,6 +1321,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void update(final double updateTime) {
 		this.updateTime  = frameHandler.getTimer().getTimeInSeconds() + updateTime;
+	}
+
+	public UndoManager getUndoManager() {
+		return undoManager;
 	}
 
 }
