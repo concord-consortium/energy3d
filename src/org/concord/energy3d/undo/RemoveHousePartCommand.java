@@ -7,6 +7,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 
+@SuppressWarnings("serial")
 public class RemoveHousePartCommand extends AbstractUndoableEdit {
 	private final HousePart housePart;
 	

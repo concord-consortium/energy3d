@@ -785,12 +785,26 @@ public class MainFrame extends JFrame {
 	private JMenu getEditMenu() {
 		if (editMenu == null) {
 			editMenu = new JMenu("Edit");
+			editMenu.addMenuListener(new MenuListener() {
+				public void menuCanceled(MenuEvent e) {
+				}
+
+				public void menuDeselected(MenuEvent e) {
+					SceneManager.getInstance().update();
+				}
+
+				public void menuSelected(MenuEvent e) {
+					mainPanel.getSelectButton().setSelected(true);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
+				}
+			});			
 			editMenu.add(getUndoMenuItem());
 			editMenu.add(getRedoMenuItem());
 		}
 		return editMenu;
 	}
 	public void refreshUndoRedo() {
+		SceneManager.getInstance().hideAllEditPoints();
 		getUndoMenuItem().setText(SceneManager.getInstance().getUndoManager().getUndoPresentationName());
 		getUndoMenuItem().setEnabled(SceneManager.getInstance().getUndoManager().canUndo());
 		getRedoMenuItem().setText(SceneManager.getInstance().getUndoManager().getRedoPresentationName());

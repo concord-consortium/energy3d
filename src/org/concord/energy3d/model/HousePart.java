@@ -220,7 +220,7 @@ public abstract class HousePart implements Serializable {
 		if (root == null)
 			init();
 		return points;
-	}
+	}	
 
 	public void complete() {
 		drawCompleted = true;
@@ -683,4 +683,11 @@ public abstract class HousePart implements Serializable {
 			child.draw();
 	}
 
+	public double getHeight() {
+		return height;
+	}
+
+	public void setHeight(final double height) {
+		this.height = height;
+	}
 }

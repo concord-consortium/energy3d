@@ -33,6 +33,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddHousePartCommand;
+import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
@@ -633,8 +634,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									System.out.print("Clicked on: " + pick);
 									if (previousDrawn != null && previousDrawn != drawn)
 										previousDrawn.hidePoints();
-									if (drawn != null && drawn != previousDrawn && !PrintController.getInstance().isPrintPreview())
+									if (drawn != null && drawn != previousDrawn && !PrintController.getInstance().isPrintPreview()) {
 										drawn.showPoints();
+										undoManager.addEdit(new EditHousePartCommand(drawn));
+										MainFrame.getInstance().refreshUndoRedo();										
+									}
 									SelectUtil.nextPickLayer();
 									if (operation == Operation.DRAW_ROOF_GABLE && drawn instanceof Roof) {
 										System.out.println(drawn);
@@ -912,7 +916,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		control.setKeyRotateSpeed(1);
 	}
 
-	private void hideAllEditPoints() {
+	public void hideAllEditPoints() {
 		for (HousePart part : Scene.getInstance().getParts())
 			part.hidePoints();
 	}

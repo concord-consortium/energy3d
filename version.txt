@@ -774,6 +774,8 @@ Version 0.4 - Auguest 24, 2011
 - release v. 0.4.1
 - scale dialog added to allow scale from current length to a new length
 - undo and redo menu for adding and removing house parts
+- undo and redo editing of edit points in house parts 
+- undo and redo editing of height in house parts
  
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
@@ -784,6 +786,7 @@ Version 0.4 - Auguest 24, 2011
 - fix problem with foundation bottom size annotation and label not showing in printout
 - reduce size of annotatoin font in printout 
 - undo the effect of HousePart.delete after undoing the remove
+
  
 
 TODO:
