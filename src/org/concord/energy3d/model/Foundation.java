@@ -43,8 +43,8 @@ public class Foundation extends HousePart {
 	protected void init() {
 		super.init();
 		resizeHouseMode = false;
-		if (boundingHeight == 0)
-			boundingHeight = 2;
+//		if (boundingHeight == 0)
+//			boundingHeight = 2;
 
 		mesh = new Box("Foundation", new Vector3(), new Vector3());
 		final MaterialState ms = new MaterialState();
@@ -73,7 +73,7 @@ public class Foundation extends HousePart {
 		mesh.setUserData(userData);
 		boundingMesh.setUserData(userData);
 
-		scanChildrenHeight(); // to fix bug with resizing height instead of width when moving edit point of platform right after loading the model
+//		scanChildrenHeight(); // to fix bug with resizing height instead of width when moving edit point of platform right after loading the model
 		
 		setLabelOffset(-0.11);
 	}
@@ -108,6 +108,7 @@ public class Foundation extends HousePart {
 	@Override
 	public void complete() {
 		super.complete();
+		newBoundingHeight = points.get(4).getZ() - height; // problem?
 		applyNewHeight(boundingHeight, newBoundingHeight, true);
 		if (!resizeHouseMode) {
 			final double dx = Math.abs(points.get(2).getX() - points.get(0).getX());
@@ -116,18 +117,31 @@ public class Foundation extends HousePart {
 			final double dy = Math.abs(points.get(1).getY() - points.get(0).getY());
 			final double dyOrg = Math.abs(orgPoints.get(1).getY() - orgPoints.get(0).getY());
 			final double ratioY = dy / dyOrg;
-			for (final HousePart child : children)
-				for (final Vector3 childPoint : child.getPoints()) {
-					double x = childPoint.getX() / ratioX;
-					if (editPointIndex == 0 || editPointIndex == 1)
-						x += (dx - dxOrg) / dx;
-					childPoint.setX(x);
-					double y = childPoint.getY() / ratioY;
-					if (editPointIndex == 0 || editPointIndex == 2)
-						y += (dy - dyOrg) / dy;
-					childPoint.setY(y);
+			final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
+			for (final HousePart child : children) {
+				reverseFoundationResizeEffect(child, dx, dxOrg, ratioX, dy, dyOrg, ratioY);
+				if (child instanceof Wall) {
+					final HousePart roof = ((Wall)child).getRoof();
+					if (roof != null && !roofs.contains(roof)) {
+						reverseFoundationResizeEffect(roof, dx, dxOrg, ratioX, dy, dyOrg, ratioY);
+						roofs.add(roof);
+					}
 				}
+			}
 			orgPoints = null;
+		}
+	}
+
+	private void reverseFoundationResizeEffect(final HousePart child, final double dx, final double dxOrg, final double ratioX, final double dy, final double dyOrg, final double ratioY) {
+		for (final Vector3 childPoint : child.getPoints()) {
+			double x = childPoint.getX() / ratioX;
+			if (editPointIndex == 0 || editPointIndex == 1)
+				x += (dx - dxOrg) / dx;
+			childPoint.setX(x);
+			double y = childPoint.getY() / ratioY;
+			if (editPointIndex == 0 || editPointIndex == 2)
+				y += (dy - dyOrg) / dy;
+			childPoint.setY(y);
 		}
 	}
 
@@ -179,15 +193,21 @@ public class Foundation extends HousePart {
 		showPoints();
 //		Scene.getInstance().updateTextSizes();
 	}
+	
+//	public void applyNewHeight() {
+//		newBoundingHeight = points.get(4).getZ() - height;
+//		applyNewHeight(boundingHeight, newBoundingHeight, true);
+//		this.complete();
+//	}
 
-	private void applyNewHeight(double oldHeight, double newHeight, boolean finalize) {
-		if (newHeight == 0 || newHeight == oldHeight)
+	private void applyNewHeight(double orgHeight, double newHeight, boolean finalize) {
+		if (newHeight == 0 || newHeight == orgHeight)
 			return;
-		double scale = newHeight / oldHeight;
+		double scale = newHeight / orgHeight;
 
 		applyNewHeight(children, scale, finalize);
 		if (finalize)
-			boundingHeight = newHeight;
+			this.boundingHeight = newHeight;
 	}
 
 	private void applyNewHeight(ArrayList<HousePart> children, double scale, boolean finalize) {
@@ -201,6 +221,8 @@ public class Foundation extends HousePart {
 
 	@Override
 	protected void drawMesh() {
+		if (boundingHeight == 0)
+			scanChildrenHeight();
 		final boolean drawable = points.size() == 8;
 		if (drawable) {
 			((Box) mesh).setData(points.get(0), points.get(3).add(0, 0, height, null));
@@ -227,11 +249,11 @@ public class Foundation extends HousePart {
 		Vector3 p;
 		p = getAbsPoint(i);
 		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		p = getAbsPoint(i);
+//		p = getAbsPoint(i);
 		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float)height);
 		p = getAbsPoint(j);
 		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float)height);
-		p = getAbsPoint(j);
+//		p = getAbsPoint(j);
 		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 	}
 
@@ -317,10 +339,14 @@ public class Foundation extends HousePart {
 			editPoint -= 4;
 		super.setEditPoint(editPoint);
 		if (!resizeHouseMode) {
-			orgPoints = new ArrayList<Vector3>(4);
-			for (int i = 0; i < 4; i++)
-				orgPoints.add(points.get(i).clone());
+			prepareForNotResizing();
 		}
+	}
+
+	public void prepareForNotResizing() {
+		orgPoints = new ArrayList<Vector3>(4);
+		for (int i = 0; i < 4; i++)
+			orgPoints.add(points.get(i).clone());
 	}
 
 	@Override

@@ -634,7 +634,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									System.out.print("Clicked on: " + pick);
 									if (previousDrawn != null && previousDrawn != drawn)
 										previousDrawn.hidePoints();
-									if (drawn != null && drawn != previousDrawn && !PrintController.getInstance().isPrintPreview()) {
+//									if (drawn != null && drawn != previousDrawn && !PrintController.getInstance().isPrintPreview()) {
+									if (drawn != null && !PrintController.getInstance().isPrintPreview()) {										
 										drawn.showPoints();
 										if (pick.getIndex() != -1) {
 											editHousePartCommand = new EditHousePartCommand(drawn);

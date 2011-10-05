@@ -777,7 +777,9 @@ Version 0.4 - Auguest 24, 2011
 - undo and redo editing of edit points in house parts 
 - undo and redo editing of height in house parts
 - only register undo command if there is change in points of HousePart
-- implement undo for converting roof to gable
+- undo and redo converting roof to gable
+- undo and redo resizing
+- undo and redo foundation resize 
  
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
