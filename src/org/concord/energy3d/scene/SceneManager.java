@@ -34,6 +34,7 @@ import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddHousePartCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
+import org.concord.energy3d.undo.MakeGableCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
@@ -169,12 +170,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private long lastRenderTime;
 	private boolean mouseControlEnabled = true;
 	private final UndoManager undoManager = new UndoManager();
-
 	private UserData pick;
-
 	private boolean update = true;
-
 	private double updateTime = -1;
+	private AddHousePartCommand addHousePartCommand;
+	private EditHousePartCommand editHousePartCommand;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -620,7 +620,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {				
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 					update = true;
-					taskManager.update(new Callable<Object>() {
+					taskManager.update(new Callable<Object>() {						
 						public Object call() throws Exception {
 							MouseState mouseState = inputStates.getCurrent().getMouseState();
 							if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.DRAW_ROOF_GABLE) {
@@ -636,22 +636,23 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										previousDrawn.hidePoints();
 									if (drawn != null && drawn != previousDrawn && !PrintController.getInstance().isPrintPreview()) {
 										drawn.showPoints();
-										undoManager.addEdit(new EditHousePartCommand(drawn));
-										MainFrame.getInstance().refreshUndoRedo();										
+										if (pick.getIndex() != -1) {
+											editHousePartCommand = new EditHousePartCommand(drawn);
+										}
 									}
 									SelectUtil.nextPickLayer();
 									if (operation == Operation.DRAW_ROOF_GABLE && drawn instanceof Roof) {
 										System.out.println(drawn);
 										System.out.println("deleting roof #" + pick.getIndex());
-										((Roof) drawn).setGable(pick.getIndex());
+										final int roofPartIndex = pick.getIndex();
+										final Roof roof = (Roof) drawn;
+										undoManager.addEdit(new MakeGableCommand(roof, roofPartIndex));
+										roof.setGable(roofPartIndex, true);
+										MainFrame.getInstance().refreshUndoRedo();
 									}
 								}
 							} else {
 								drawn.addPoint(mouseState.getX(), mouseState.getY());
-								if (drawn.isDrawCompleted()) {
-									undoManager.addEdit(new AddHousePartCommand(drawn));
-									MainFrame.getInstance().refreshUndoRedo();
-								}
 							}
 
 							enableDisableRotationControl();
@@ -667,7 +668,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 					update = true;
-					taskManager.update(new Callable<Object>() {
+					taskManager.update(new Callable<Object>() {						
 						public Object call() throws Exception {
 							MouseState mouseState = inputStates.getCurrent().getMouseState();
 							boolean sceneChanged = false;
@@ -675,6 +676,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (drawn != null && !drawn.isDrawCompleted()) {
 									drawn.complete();
 									sceneChanged = true;
+									if (editHousePartCommand != null) {
+										if (editHousePartCommand.isReallyEdited()) {
+											undoManager.addEdit(editHousePartCommand);
+											MainFrame.getInstance().refreshUndoRedo();
+										}
+										editHousePartCommand = null;
+									}									
 								}
 							} else {
 								if (!drawn.isDrawCompleted()) {
@@ -683,8 +691,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								}
 
 								if (drawn.isDrawCompleted()) {
-									undoManager.addEdit(new AddHousePartCommand(drawn));
-									MainFrame.getInstance().refreshUndoRedo();
+									if (addHousePartCommand != null) {
+										undoManager.addEdit(addHousePartCommand);
+										MainFrame.getInstance().refreshUndoRedo();
+										addHousePartCommand = null;
+									}
 									drawn.hidePoints();
 									drawn = null;
 									if (operationStick)
@@ -1085,8 +1096,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else if (operation == Operation.DRAW_FOUNDATION)
 			drawn = new Foundation();
 
-		if (drawn != null)
+		if (drawn != null) {
 			Scene.getInstance().add(drawn);
+			addHousePartCommand = new AddHousePartCommand(drawn);
+		}
 		return drawn;
 	}
 

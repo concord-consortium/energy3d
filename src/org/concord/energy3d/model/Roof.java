@@ -569,7 +569,7 @@ public abstract class Roof extends HousePart {
 		// points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 	}
 
-	public void setGable(int index) {
+	public void setGable(final int index, final boolean isGable) {
 		// if (gableBases == null)
 		// gableBases = new ArrayList<Vector3[]>();
 		// final Vector3[] base = findBasePoints((Mesh) getFlattenedMeshesRoot().getChild(index), null);
@@ -582,7 +582,10 @@ public abstract class Roof extends HousePart {
 		final Vector3[] base = findBasePoints((Mesh) ((Node) getFlattenedMeshesRoot().getChild(index)).getChild(0), null);
 		final Wall wall = findGableWall(base);
 		if (base != null) {
-			gableWalls.add(wall);
+			if (isGable)
+				gableWalls.add(wall);
+			else
+				gableWalls.remove(wall);
 			draw();
 			drawWalls();
 		}
