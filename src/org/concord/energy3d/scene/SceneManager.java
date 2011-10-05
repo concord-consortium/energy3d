@@ -33,6 +33,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddHousePartCommand;
+import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.MakeGableCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
@@ -638,7 +639,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									if (drawn != null && !PrintController.getInstance().isPrintPreview()) {										
 										drawn.showPoints();
 										if (pick.getIndex() != -1) {
-											editHousePartCommand = new EditHousePartCommand(drawn);
+											if (drawn instanceof Foundation)
+												editHousePartCommand = new EditFoundationCommand((Foundation)drawn);
+											else
+												editHousePartCommand = new EditHousePartCommand(drawn);
 										}
 									}
 									SelectUtil.nextPickLayer();

@@ -29,6 +29,6 @@ public class RemoveHousePartCommand extends AbstractUndoableEdit {
 	
 	@Override
 	public String getPresentationName() {
-		return "remove " + housePart.getClass().getSimpleName();
+		return "Remove " + housePart.getClass().getSimpleName();
 	}
 }

@@ -21,12 +21,11 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	private final double orgHeight;
 	private ArrayList<Vector3> newPoints;
 	private double newHeight;
-	private final boolean isResizeMode;
+	
 	
 	public EditHousePartCommand(final HousePart housePart) {
 		this.housePart = housePart;
-		this.orgHeight = housePart.getHeight();
-		this.isResizeMode = SceneManager.getInstance().getOperation() == Operation.RESIZE;
+		this.orgHeight = housePart.getHeight();		
 		this.orgPoints = new ArrayList<Vector3>(housePart.getPoints().size());		
 		for (final Vector3 p : housePart.getPoints())
 			this.orgPoints.add(p.clone());
@@ -35,21 +34,21 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		Foundation foundation = null;
-		if (housePart instanceof Foundation) {			
-			foundation = (Foundation)housePart;
-			foundation.setResizeHouseMode(isResizeMode);
-			if (!isResizeMode) 
-				foundation.prepareForNotResizing();
-		}
+//		Foundation foundation = null;
+//		if (housePart instanceof Foundation) {			
+//			foundation = (Foundation)housePart;
+//			foundation.setResizeHouseMode(isResizeMode);
+//			if (!isResizeMode) 
+//				foundation.prepareForNotResizing();
+//		}
 		housePart.setHeight(orgHeight);
 		housePart.getPoints().clear();
 		housePart.getPoints().addAll(orgPoints);
-		if (foundation != null) {
-			foundation.complete();
-			foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
-		}
-		Scene.getInstance().redrawAll();
+//		if (foundation != null) {
+//			foundation.complete();
+//			foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
+//		}
+//		Scene.getInstance().redrawAll();
 	}
 	
 	@Override
@@ -64,26 +63,26 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 ////			((Foundation)housePart).applyNewHeight(isResizeMode);
 //			housePart.complete();
 //		Scene.getInstance().redrawAll();
-		Foundation foundation = null;
-		if (housePart instanceof Foundation) {			
-			foundation = (Foundation)housePart;
-			foundation.setResizeHouseMode(isResizeMode);
-			if (!isResizeMode) 
-				foundation.prepareForNotResizing();
-		}
+//		Foundation foundation = null;
+//		if (housePart instanceof Foundation) {			
+//			foundation = (Foundation)housePart;
+//			foundation.setResizeHouseMode(isResizeMode);
+//			if (!isResizeMode) 
+//				foundation.prepareForNotResizing();
+//		}
 		housePart.setHeight(newHeight);
 		housePart.getPoints().clear();
 		housePart.getPoints().addAll(newPoints);
-		if (foundation != null) {
-			foundation.complete();
-			foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
-		}
+//		if (foundation != null) {
+//			foundation.complete();
+//			foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
+//		}
 		Scene.getInstance().redrawAll();		
 	}
 	
 	@Override
 	public String getPresentationName() {
-		return "edit " + housePart.getClass().getSimpleName();
+		return "Edit " + housePart.getClass().getSimpleName();
 	}
 	
 	public boolean isReallyEdited() {
