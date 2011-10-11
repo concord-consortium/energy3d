@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
 
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
@@ -170,6 +171,9 @@ public class Scene implements Serializable {
 				Thread.yield();
 		}
 
+		parts.clear();
+		url = null;
+
 		SceneManager.taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
 				originalHouseRoot.detachAllChildren();
@@ -178,11 +182,11 @@ public class Scene implements Serializable {
 						root.detachChild(child);
 				root.updateWorldBound(true);
 				SceneManager.getInstance().updateHeliodonAndAnnotationSize();
+				SceneManager.getInstance().getUndoManager().die();
+				MainFrame.getInstance().refreshUndoRedo();
 				return null;
 			}
 		});
-		parts.clear();
-		url = null;
 	}
 
 	public void open(final URL file) {

@@ -779,7 +779,8 @@ Version 0.4 - Auguest 24, 2011
 - only register undo command if there is change in points of HousePart
 - undo and redo converting roof to gable
 - undo and redo resizing
-- undo and redo foundation resize 
+- undo and redo foundation resize
+- reset the undoManager after new file or opening file 
  
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
