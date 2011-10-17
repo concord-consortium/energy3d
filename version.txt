@@ -783,6 +783,7 @@ Version 0.4 - Auguest 24, 2011
 - reset the undoManager after new file or opening file
 - determine the gable edit points at the time of conversion to gable roof to avoid jumping to other edit points when the original one is out of range
 - use the gable edit point and gable wall information to always maintain the edit point on the wall line
+- fix problem with house becoming shorter by foundation height after undo
  
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

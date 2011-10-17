@@ -48,7 +48,7 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 //			foundation.complete();
 //			foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
 //		}
-//		Scene.getInstance().redrawAll();
+		Scene.getInstance().redrawAll();
 	}
 	
 	@Override

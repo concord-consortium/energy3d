@@ -33,7 +33,7 @@ public class Foundation extends HousePart {
 	transient private double newBoundingHeight;
 	transient private ArrayList<Vector3> orgPoints;
 	transient private Mesh wireframeMesh;
-	private double boundingHeight;
+	transient private double boundingHeight;
 
 	public Foundation() {
 		super(2, 8, 0.1);
@@ -182,7 +182,7 @@ public class Foundation extends HousePart {
 				applyNewHeight(boundingHeight, newBoundingHeight, false);
 			}
 			for (int i = 0; i < 4; i++)
-				points.get(i + 4).set(points.get(i)).setZ(newBoundingHeight);
+				points.get(i + 4).set(points.get(i)).setZ(newBoundingHeight + height);
 		}
 
 //		draw();
@@ -260,9 +260,9 @@ public class Foundation extends HousePart {
 	private void scanChildrenHeight() {
 		if (!isFirstPointInserted())
 			return;
-		boundingHeight = scanChildrenHeight(this);
+		boundingHeight = scanChildrenHeight(this) - height;
 		for (int i = 4; i < 8; i++) {
-			points.get(i).setZ(boundingHeight);
+			points.get(i).setZ(boundingHeight + height);
 		}
 		newBoundingHeight = boundingHeight;
 		updateEditShapes();
