@@ -784,6 +784,11 @@ Version 0.4 - Auguest 24, 2011
 - determine the gable edit points at the time of conversion to gable roof to avoid jumping to other edit points when the original one is out of range
 - use the gable edit point and gable wall information to always maintain the edit point on the wall line
 - fix problem with house becoming shorter by foundation height after undo
+- fix problem with part of roof disappearing when joggling edit points that shouldn't move due to two attached gable walls
+
+
+- *after edition the edit point disppear and doesn't reappear after mouse hover because it thinks it is still visible
+- *save new gable roof data
  
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

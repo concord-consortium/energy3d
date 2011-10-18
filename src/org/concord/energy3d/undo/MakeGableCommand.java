@@ -18,8 +18,9 @@ public class MakeGableCommand extends EditHousePartCommand {
 	
 	@Override
 	public void undo() throws CannotUndoException {
+//		isReallyEdited(); // to force update of new vertices
+		saveNewPoints(); // to force update of new vertices
 		super.undo();
-		isReallyEdited(); // to force update of new vertices
 		roof.setGable(roofPartIndex, false);
 	}
 	

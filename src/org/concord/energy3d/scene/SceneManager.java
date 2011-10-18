@@ -389,7 +389,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (drawBounds && drawn != null) {
 			if (drawn instanceof Roof) {
-				final Node flattenedMeshesRoot = ((Roof) drawn).getFlattenedMeshesRoot();
+				final Node flattenedMeshesRoot = ((Roof) drawn).getRoofPartsRoot();
 				if (flattenedMeshesRoot != null && pick != null) {
 					com.ardor3d.util.geom.Debugger.drawBounds(flattenedMeshesRoot.getChild(pick.getIndex()), renderer, true);
 //					com.ardor3d.util.geom.Debugger.drawBounds(((Node) flattenedMeshesRoot.getChild(pick.getIndex())).getChild(0), renderer, true);
@@ -789,12 +789,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Q), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				moveUpDown(source, tpf, true);
+//				moveUpDown(source, tpf, true);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				moveUpDown(source, tpf, false);
+//				if (!inputStates.getCurrent().getKeyboardState().isAtLeastOneDown(Key.LCONTROL, Key.RCONTROL))
+//					moveUpDown(source, tpf, false);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {

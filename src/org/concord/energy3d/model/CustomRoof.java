@@ -37,15 +37,15 @@ public class CustomRoof extends Roof {
 			final double z = container.getPoints().get(1).getZ() + height;
 			for (final Vector3 v : points)
 				v.setZ(z);
-		} else if (gableEditPointToWallMap.containsKey(editPointIndex)) {
-			final Wall wall = gableEditPointToWallMap.get(editPointIndex);
-			final Vector3 base = wall.getAbsPoint(0);
-			final Vector3 dir = wall.getAbsPoint(2).subtract(base, null).normalizeLocal();
-			base.setZ(container.getPoints().get(1).getZ() + height);
-			Vector3 p = closestPoint(base, dir, x, y);
-			p = grid(p, GRID_SIZE);
-			p = closestPoint(base, dir, p, Vector3.NEG_UNIT_Z);
-			points.get(editPointIndex).set(toRelative(p, container.getContainer()));
+//		} else if (gableEditPointToWallMap.containsKey(editPointIndex)) {
+//			final Wall wall = gableEditPointToWallMap.get(editPointIndex);
+//			final Vector3 base = wall.getAbsPoint(0);
+//			final Vector3 dir = wall.getAbsPoint(2).subtract(base, null).normalizeLocal();
+//			base.setZ(container.getPoints().get(1).getZ() + height);
+//			Vector3 p = closestPoint(base, dir, x, y);
+//			p = grid(p, GRID_SIZE);
+//			p = closestPoint(base, dir, p, Vector3.NEG_UNIT_Z);
+//			points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 		} else {
 			final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
 			Vector3 p = new Vector3();

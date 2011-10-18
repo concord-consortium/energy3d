@@ -164,7 +164,7 @@ public class SelectUtil {
 				if (data.getHousePart().getOriginal() == null)
 					Blinker.getInstance().setTarget(null);
 				else if (data.getHousePart() instanceof Roof)
-					Blinker.getInstance().setTarget(((Roof)data.getHousePart().getOriginal()).getFlattenedMeshesRoot().getChild(data.getIndex()-0));
+					Blinker.getInstance().setTarget(((Roof)data.getHousePart().getOriginal()).getRoofPartsRoot().getChild(data.getIndex()-0));
 				else
 					Blinker.getInstance().setTarget(data.getHousePart().getOriginal().getRoot());
 //			}

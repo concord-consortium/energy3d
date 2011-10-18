@@ -50,14 +50,15 @@ public abstract class Roof extends HousePart {
 	static protected final double GRID_SIZE = 0.5;
 	static public final double OVERHANG_LENGHT = 0.2;
 	// transient protected Mesh bottomMesh;
-	transient protected Node flattenedMeshesRoot;
+	transient protected Node roofPartsRoot;
 	transient private ArrayList<PolygonPoint> wallUpperPoints;
 	transient private ArrayList<ReadOnlyVector3> wallNormals;
 	transient private Map<Node, ReadOnlyVector3> orgCenters;
 	transient private Line wireframeMesh;
 	private ArrayList<Wall> gableWalls;
 	transient private ArrayList<Wall> walls;
-	transient protected Map<Integer, Wall> gableEditPointToWallMap;
+	transient protected Map<Integer, ArrayList<Wall>> gableEditPointToWallMap;
+	transient protected Map<Integer, ArrayList<Integer>> gableRoofPartToEditPointMap;
 
 	// transient private boolean isTextureApplied;
 
@@ -71,16 +72,18 @@ public abstract class Roof extends HousePart {
 		wallUpperPoints = new ArrayList<PolygonPoint>();
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
-		gableEditPointToWallMap = new Hashtable<Integer, Wall>();
+		gableWalls = new ArrayList<Wall>();
+		gableEditPointToWallMap = new Hashtable<Integer, ArrayList<Wall>>();
+		gableRoofPartToEditPointMap = new Hashtable<Integer, ArrayList<Integer>>();
 		// isTextureApplied = false;
 
-		flattenedMeshesRoot = new Node("Roof Meshes Root");
+		roofPartsRoot = new Node("Roof Meshes Root");
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
 		offsetState.setFactor(1);
 		offsetState.setUnits(1);
 		// flattenedMeshesRoot.setRenderState(offsetState);
-		root.attachChild(flattenedMeshesRoot);
+		root.attachChild(roofPartsRoot);
 
 		mesh = new Mesh("Roof");
 		mesh.setModelBound(new BoundingBox());
@@ -128,13 +131,13 @@ public abstract class Roof extends HousePart {
 
 		try {
 			if (container == null) {
-				flattenedMeshesRoot.getSceneHints().setCullHint(CullHint.Always);
+				roofPartsRoot.getSceneHints().setCullHint(CullHint.Always);
 				wireframeMesh.getSceneHints().setCullHint(CullHint.Always);
 				// bottomMesh.getSceneHints().setCullHint(CullHint.Always);
 				hidePoints();
 				return;
 			}
-			flattenedMeshesRoot.getSceneHints().setCullHint(CullHint.Inherit);
+			roofPartsRoot.getSceneHints().setCullHint(CullHint.Inherit);
 			wireframeMesh.getSceneHints().setCullHint(CullHint.Inherit);
 			// final boolean bottomMeshVisible = height > 0;
 			// bottomMesh.getSceneHints().setCullHint(bottomMeshVisible ? CullHint.Inherit : CullHint.Always);
@@ -145,8 +148,8 @@ public abstract class Roof extends HousePart {
 			// moveEditPointsToInsideOfRoof(wallUpperPoints);
 			computeGableEditPoints();
 			final Vector3 p = getAbsPoint(0);
-//			if (p.getY() < -3)
-				System.out.println(p);
+			// if (p.getY() < -3)
+			System.out.println(p);
 			// updateEditShapes();
 
 			// fillMeshWithPolygon(bottomMesh, new Polygon(wallUpperPoints));
@@ -159,13 +162,13 @@ public abstract class Roof extends HousePart {
 
 			// create roof parts
 			int meshIndex = 0;
-			MeshLib.groupByPlanner(mesh, flattenedMeshesRoot);
+			MeshLib.groupByPlanner(mesh, roofPartsRoot);
 			setAnnotationsVisible(drawAnnotations);
 			hideGableMeshes();
 			// final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
 			// wireframeVertexBuffer.rewind();
 			// wireframeVertexBuffer.limit(wireframeVertexBuffer.capacity());
-			for (final Spatial child : flattenedMeshesRoot.getChildren()) {
+			for (final Spatial child : roofPartsRoot.getChildren()) {
 				if (child.getSceneHints().getCullHint() != CullHint.Always) {
 					final Mesh mesh = (Mesh) ((Node) child).getChild(0);
 					mesh.setUserData(new UserData(this, meshIndex, false));
@@ -314,7 +317,7 @@ public abstract class Roof extends HousePart {
 		else
 			orgCenters.clear();
 		flatten(1.0);
-		for (final Spatial mesh : flattenedMeshesRoot.getChildren()) {
+		for (final Spatial mesh : roofPartsRoot.getChildren()) {
 			mesh.setTranslation(0, 0, 0);
 
 			// The following code is needed because the center of bounding box is not accurate. If oriented bounding box is usde then this code is no longer required.
@@ -330,7 +333,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	public void flatten(final double flattenTime) {
-		for (Spatial child : getFlattenedMeshesRoot().getChildren()) {
+		for (Spatial child : getRoofPartsRoot().getChildren()) {
 			if (child.getSceneHints().getCullHint() != CullHint.Always)
 				flattenQuadTriangle((Node) child, flattenTime);
 			// break;
@@ -410,7 +413,7 @@ public abstract class Roof extends HousePart {
 		if (container == null)
 			return;
 
-		for (Spatial roofPart : flattenedMeshesRoot.getChildren()) {
+		for (Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				int annotCounter = 0, angleAnnotCounter = 0;
 				final Node roofPartNode = (Node) roofPart;
@@ -450,7 +453,7 @@ public abstract class Roof extends HousePart {
 		final ArrayList<ArrayList<ReadOnlyVector3>> convexHulls = new ArrayList<ArrayList<ReadOnlyVector3>>();
 		int totalVertices = 0;
 
-		for (Spatial roofPart : flattenedMeshesRoot.getChildren()) {
+		for (Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Node roofPartNode = (Node) roofPart;
 
@@ -484,7 +487,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	public int drawLabels(int printSequence) {
-		for (Spatial roofPartNode : flattenedMeshesRoot.getChildren()) {
+		for (Spatial roofPartNode : roofPartsRoot.getChildren()) {
 			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
 				final String text = "(" + (printSequence++ + 1) + ")";
 				final BMText label = (BMText) ((Node) roofPartNode).getChild(3);
@@ -496,7 +499,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	public void hideLabels() {
-		for (Spatial roofPartNode : flattenedMeshesRoot.getChildren())
+		for (Spatial roofPartNode : roofPartsRoot.getChildren())
 			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
 				((Node) roofPartNode).getChild(3).getSceneHints().setCullHint(CullHint.Always);
 	}
@@ -537,8 +540,8 @@ public abstract class Roof extends HousePart {
 	// }
 
 	public void updateTextureAndColor(final boolean textureEnabled) {
-		if (flattenedMeshesRoot != null) {
-			for (final Spatial roofPartNode : flattenedMeshesRoot.getChildren()) {
+		if (roofPartsRoot != null) {
+			for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
 				if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
 					final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
 					if (textureEnabled) {
@@ -556,8 +559,8 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-	public Node getFlattenedMeshesRoot() {
-		return flattenedMeshesRoot;
+	public Node getRoofPartsRoot() {
+		return roofPartsRoot;
 	}
 
 	protected String getDefaultTextureFileName() {
@@ -575,45 +578,56 @@ public abstract class Roof extends HousePart {
 		// points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 	}
 
-	public void setGable(final int index, final boolean isGable) {
-		if (gableWalls == null)
-			gableWalls = new ArrayList<Wall>();
-		final ArrayList<Vector3> meshUpperPoints = new ArrayList<Vector3>();
-		final Vector3[] meshBase = findBasePoints((Mesh) ((Node) getFlattenedMeshesRoot().getChild(index)).getChild(0), meshUpperPoints);
-		final Wall wall = findGableWall(meshBase);
-		for (final Vector3 meshPoint : meshUpperPoints) {
-			double smallestDistanceToEditPoint = Double.MAX_VALUE;
-			// Vector3 nearestEditPoint = null;
-			// Vector3 nearestEditPointRel = null;
-			int nearestIndex = -1;
-			// select the nearest point so that one edit point per upper mesh point is selected
-			for (int i = 0; i < points.size(); i++) {
-				final Vector3 editPoint = getAbsPoint(i);
-				final double distanceToEditPoint = meshPoint.distance(editPoint);
-				if (distanceToEditPoint < smallestDistanceToEditPoint) {
-					smallestDistanceToEditPoint = distanceToEditPoint;
-					// nearestEditPoint = editPoint;
-					// nearestEditPointRel = points.get(i);
-					nearestIndex = i;
+	public void setGable(final int roofPartIndex, final boolean isGable) {
+		// if (gableWalls == null)
+		// gableWalls = new ArrayList<Wall>();
+		final ArrayList<Vector3> roofPartMeshUpperPoints = new ArrayList<Vector3>();
+		final Vector3[] roofMeshBase = findBasePoints((Mesh) ((Node) getRoofPartsRoot().getChild(roofPartIndex)).getChild(0), roofPartMeshUpperPoints);
+		final Wall wall = findGableWall(roofMeshBase);
+		if (isGable) {
+			final ArrayList<Integer> editPoints = new ArrayList<Integer>();
+			for (final Vector3 roofPartMeshUpperPoint : roofPartMeshUpperPoints) {
+				double smallestDistanceToEditPoint = Double.MAX_VALUE;
+				int nearestEditPointIndex = -1;
+				// select the nearest point so that one edit point per upper mesh point is selected
+				for (int i = 0; i < points.size(); i++) {
+					final Vector3 editPoint = getAbsPoint(i);
+					final double distanceToEditPoint = roofPartMeshUpperPoint.distance(editPoint);
+					if (distanceToEditPoint < smallestDistanceToEditPoint) {
+						smallestDistanceToEditPoint = distanceToEditPoint;
+						nearestEditPointIndex = i;
+					}
 				}
+				if (gableEditPointToWallMap.containsKey(nearestEditPointIndex))
+					gableEditPointToWallMap.get(nearestEditPointIndex).add(wall);
+				else {
+					final ArrayList<Wall> walls = new ArrayList<Wall>(2);
+					walls.add(wall);
+					gableEditPointToWallMap.put(nearestEditPointIndex, walls);
+				}
+				editPoints.add(nearestEditPointIndex);
 			}
-			gableEditPointToWallMap.put(nearestIndex, wall);
-
-			// final Vector3 n = meshBase[1].subtract(meshBase[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
-			// double distance = -nearestEditPoint.subtract(meshBase[0], null).dot(n);
-			// distance += -Math.signum(distance) * 0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
-			// nearestEditPoint.addLocal(n.multiply(distance, null));
-			// nearestEditPointRel.set(toRelative(nearestEditPoint, container.getContainer()));
+			gableRoofPartToEditPointMap.put(roofPartIndex, editPoints);
+			gableWalls.add(wall);
+		} else {
+			for (final int editPointIndex : gableRoofPartToEditPointMap.get(roofPartIndex))
+				gableEditPointToWallMap.remove(editPointIndex);
+			gableRoofPartToEditPointMap.remove(roofPartIndex);
+			gableWalls.add(wall);
 		}
 
-		if (meshBase != null) {
-			if (isGable)
-				gableWalls.add(wall);
-			else
-				gableWalls.remove(wall);
-			draw();
-			drawWalls();
-		}
+		// if (meshBase != null) {
+		// if (isGable)
+		// gableWalls.add(wall);
+		// else
+		// gableWalls.remove(wall);
+		// draw();
+		// drawWalls();
+		// }
+
+		draw();
+		drawWalls();
+
 	}
 
 	// private void computeGableEditPoints() {
@@ -662,48 +676,51 @@ public abstract class Roof extends HousePart {
 	// }
 
 	private void computeGableEditPoints() {
-		if (gableWalls == null)
-			return;
+		// if (gableWalls == null)
+		// return;
 		// gableEditPointToWallMap.clear();
 		// final ArrayList<Vector3> meshUpperPoints = new ArrayList<Vector3>();
 		// for (final Wall wall : gableWalls) {
 		for (final int nearestIndex : gableEditPointToWallMap.keySet()) {
-			final Wall wall = gableEditPointToWallMap.get(nearestIndex);
-//			final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
-//			for (final Spatial roofPartNode : getFlattenedMeshesRoot().getChildren()) {
-				// meshUpperPoints.clear();
-//				final Vector3[] meshBase = findBasePoints((Mesh) ((Node) roofPartNode).getChild(0), null);
-//				if (meshBase != null && isSameBasePoints(base, meshBase)) {
-					// for (final Vector3 meshPoint : meshUpperPoints) {
-					// double smallestDistanceToEditPoint = Double.MAX_VALUE;
-					// Vector3 nearestEditPoint = null;
-					// Vector3 nearestEditPointRel = null;
-					// int nearestIndex = -1;
-					// select the nearest point so that one edit point per upper mesh point is selected
-					// for (int i = 0; i < points.size(); i++) {
-					// final Vector3 editPoint = getAbsPoint(i);
-					// final double distanceToEditPoint = meshPoint.distance(editPoint);
-					// if (distanceToEditPoint < smallestDistanceToEditPoint) {
-					// smallestDistanceToEditPoint = distanceToEditPoint;
-					// nearestEditPoint = editPoint;
-					// nearestEditPointRel = points.get(i);
-					// nearestIndex = i;
-					// }
-					// }
-					final Vector3 nearestEditPoint = getAbsPoint(nearestIndex);
-//					final Vector3 n = meshBase[1].subtract(meshBase[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
-					final ReadOnlyVector3 n = wall.getFaceDirection();
-//					double distance = -nearestEditPoint.subtract(meshBase[0], null).dot(n);
-					double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(OVERHANG_LENGHT, null)), null).dot(n);
-					// distance += -Math.signum(distance) * 0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
-					// distance += -Math.signum(distance) * 0.001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
-					nearestEditPoint.addLocal(n.multiply(distance, null));
-					points.get(nearestIndex).set(toRelative(nearestEditPoint, container.getContainer()));
-					// gableEditPointToWallMap.put(nearestIndex, wall);
-					// }
-					// break;
-//				}
-//			}
+			final Vector3 nearestEditPoint = getAbsPoint(nearestIndex);
+			for (final Wall wall : gableEditPointToWallMap.get(nearestIndex)) {
+			// final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
+			// for (final Spatial roofPartNode : getFlattenedMeshesRoot().getChildren()) {
+			// meshUpperPoints.clear();
+			// final Vector3[] meshBase = findBasePoints((Mesh) ((Node) roofPartNode).getChild(0), null);
+			// if (meshBase != null && isSameBasePoints(base, meshBase)) {
+			// for (final Vector3 meshPoint : meshUpperPoints) {
+			// double smallestDistanceToEditPoint = Double.MAX_VALUE;
+			// Vector3 nearestEditPoint = null;
+			// Vector3 nearestEditPointRel = null;
+			// int nearestIndex = -1;
+			// select the nearest point so that one edit point per upper mesh point is selected
+			// for (int i = 0; i < points.size(); i++) {
+			// final Vector3 editPoint = getAbsPoint(i);
+			// final double distanceToEditPoint = meshPoint.distance(editPoint);
+			// if (distanceToEditPoint < smallestDistanceToEditPoint) {
+			// smallestDistanceToEditPoint = distanceToEditPoint;
+			// nearestEditPoint = editPoint;
+			// nearestEditPointRel = points.get(i);
+			// nearestIndex = i;
+			// }
+			// }
+			// final Vector3 n = meshBase[1].subtract(meshBase[0], null).crossLocal(Vector3.UNIT_Z).normalizeLocal();
+			final ReadOnlyVector3 n = wall.getFaceDirection();
+			// double distance = -nearestEditPoint.subtract(meshBase[0], null).dot(n);
+			double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(OVERHANG_LENGHT, null)), null).dot(n);
+//			distance += -0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
+			distance -= 0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
+//			distance += -Math.signum(distance) * 0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
+			// distance += -Math.signum(distance) * 0.001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
+			nearestEditPoint.addLocal(n.multiply(distance, null));
+			// gableEditPointToWallMap.put(nearestIndex, wall);
+			// }
+			// break;
+			// }
+			// }
+			}
+			points.get(nearestIndex).set(toRelative(nearestEditPoint, container.getContainer()));
 		}
 	}
 
@@ -743,19 +760,24 @@ public abstract class Roof extends HousePart {
 	// }
 
 	private void hideGableMeshes() {
-		if (gableWalls == null)
-			return;
+		// if (gableWalls == null)
+		// return;
 		for (final Wall wall : gableWalls) {
 			final Vector3[] base_i = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
-			for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
-				final Vector3[] base = findBasePoints((Mesh) ((Node) mesh).getChild(0), null);
+			for (final Spatial roofPart : getRoofPartsRoot().getChildren()) {
+				final Vector3[] base = findBasePoints((Mesh) ((Node) roofPart).getChild(0), null);
 				if (base != null && isSameBasePoints(base_i, base)) {
-					mesh.getSceneHints().setCullHint(CullHint.Always);
-					mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+					roofPart.getSceneHints().setCullHint(CullHint.Always);
+					roofPart.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 					break;
 				}
 			}
 		}
+		// for (final int roofPartIndex : gableRoofPartToEditPointMap.keySet()) {
+		// final Spatial mesh = roofPartsRoot.getChild(roofPartIndex);
+		// mesh.getSceneHints().setCullHint(CullHint.Always);
+		// mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		// }
 	}
 
 	public boolean isSameBasePoints(final Vector3[] base_1, final Vector3[] base_2) {
@@ -865,7 +887,7 @@ public abstract class Roof extends HousePart {
 
 	public ArrayList<Spatial> findMeshesContainingEditPoints(final ArrayList<Vector3> editpoints) {
 		final ArrayList<Spatial> meshes = new ArrayList<Spatial>();
-		for (final Spatial mesh : getFlattenedMeshesRoot().getChildren()) {
+		for (final Spatial mesh : getRoofPartsRoot().getChildren()) {
 			boolean foundAll = true;
 			for (final Vector3 p : editpoints) {
 				final FloatBuffer buf = ((Mesh) mesh).getMeshData().getVertexBuffer();
@@ -919,17 +941,17 @@ public abstract class Roof extends HousePart {
 		// root.attachChild(flattenedMeshesRoot);
 		// drawAnnotations();
 
-		this.root.detachChild(flattenedMeshesRoot);
+		this.root.detachChild(roofPartsRoot);
 		// this.center = original.center;
-		this.flattenedMeshesRoot = ((Roof) original).flattenedMeshesRoot.makeCopy(true);
-		for (int i = 0; i < flattenedMeshesRoot.getNumberOfChildren(); i++) {
-			if (flattenedMeshesRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
-				final UserData orgUserData = (UserData) ((Node) ((Roof) original).flattenedMeshesRoot.getChild(i)).getChild(0).getUserData();
-				((Node) flattenedMeshesRoot.getChild(i)).getChild(0).setUserData(new UserData(this, orgUserData.getIndex(), false));
-				flattenedMeshesRoot.getChild(i).setUserData(((Roof) original).flattenedMeshesRoot.getChild(i).getUserData());
+		this.roofPartsRoot = ((Roof) original).roofPartsRoot.makeCopy(true);
+		for (int i = 0; i < roofPartsRoot.getNumberOfChildren(); i++) {
+			if (roofPartsRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
+				final UserData orgUserData = (UserData) ((Node) ((Roof) original).roofPartsRoot.getChild(i)).getChild(0).getUserData();
+				((Node) roofPartsRoot.getChild(i)).getChild(0).setUserData(new UserData(this, orgUserData.getIndex(), false));
+				roofPartsRoot.getChild(i).setUserData(((Roof) original).roofPartsRoot.getChild(i).getUserData());
 			}
 		}
-		root.attachChild(flattenedMeshesRoot);
+		root.attachChild(roofPartsRoot);
 		drawAnnotations();
 		root.updateWorldBound(true);
 	}
@@ -979,8 +1001,8 @@ public abstract class Roof extends HousePart {
 	public void setAnnotationsVisible(boolean visible) {
 		super.setAnnotationsVisible(visible);
 		final CullHint cull = visible ? CullHint.Inherit : CullHint.Always;
-		if (flattenedMeshesRoot != null)
-			for (final Spatial roofPart : flattenedMeshesRoot.getChildren()) {
+		if (roofPartsRoot != null)
+			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 				((Node) roofPart).getChild(1).getSceneHints().setCullHint(cull);
 				((Node) roofPart).getChild(2).getSceneHints().setCullHint(cull);
 			}

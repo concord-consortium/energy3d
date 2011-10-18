@@ -43,6 +43,9 @@ import org.concord.energy3d.util.Config;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -278,6 +281,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getSaveMenuItem() {
 		if (saveMenuItem == null) {
 			saveMenuItem = new JMenuItem("Save");
+			saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
 			saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					try {
@@ -813,6 +817,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getUndoMenuItem() {
 		if (undoMenuItem == null) {
 			undoMenuItem = new JMenuItem("Undo");
+			undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
 			undoMenuItem.setEnabled(false);
 			undoMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
@@ -827,6 +832,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRedoMenuItem() {
 		if (redoMenuItem == null) {
 			redoMenuItem = new JMenuItem("Redo");
+			redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
 			redoMenuItem.setEnabled(false);
 			redoMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {

@@ -507,7 +507,7 @@ public class PrintController implements Updater {
 		for (final HousePart printPart : printParts) {
 			if (printPart.isPrintable()) {
 				if (printPart instanceof Roof) {
-					for (final Spatial mesh : ((Roof) printPart).getFlattenedMeshesRoot().getChildren()) {
+					for (final Spatial mesh : ((Roof) printPart).getRoofPartsRoot().getChildren()) {
 						maxWidth = Math.max(maxWidth, ((BoundingBox) mesh.getWorldBound()).getXExtent() * 2);
 						maxHeight = Math.max(maxHeight, ((BoundingBox) mesh.getWorldBound()).getZExtent() * 2);
 					}
@@ -569,7 +569,7 @@ public class PrintController implements Updater {
 				printPart.getRoot().updateWorldBound(true);
 
 				if (printPart instanceof Roof) {
-					for (final Spatial roofPart : ((Roof) printPart).getFlattenedMeshesRoot().getChildren())
+					for (final Spatial roofPart : ((Roof) printPart).getRoofPartsRoot().getChildren())
 						if (roofPart.getSceneHints().getCullHint() != CullHint.Always)
 							computePrintCenterOf((Mesh) ((Node) roofPart).getChild(0), pages);
 				} else

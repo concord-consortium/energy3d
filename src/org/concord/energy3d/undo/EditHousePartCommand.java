@@ -86,12 +86,16 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	}
 	
 	public boolean isReallyEdited() {
+		saveNewPoints();
+		return !orgPoints.equals(newPoints);
+	}
+
+	public void saveNewPoints() {
 		if (newPoints == null) {
 			this.newHeight = housePart.getHeight();
 			this.newPoints = new ArrayList<Vector3>(housePart.getPoints().size());
 			for (final Vector3 p : housePart.getPoints())
 				this.newPoints.add(p.clone());
 		}
-		return !orgPoints.equals(newPoints);
 	}
 }
