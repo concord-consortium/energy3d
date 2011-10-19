@@ -14,7 +14,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class CustomRoof extends Roof {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.5;
+//	private static final double GRID_SIZE = 0.5;
 	transient private boolean recalculateEditPoints;
 
 	public CustomRoof() {

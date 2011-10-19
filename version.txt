@@ -786,9 +786,8 @@ Version 0.4 - Auguest 24, 2011
 - fix problem with house becoming shorter by foundation height after undo
 - fix problem with part of roof disappearing when joggling edit points that shouldn't move due to two attached gable walls
 - after edition the edit point disppear and doesn't reappear after mouse hover because it thinks it is still visible
-
-
-- *save new gable roof data
+- save new gable roof data
+- automatically convert pre version 0.4.1 roof data to new format whenever new data is null
  
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
