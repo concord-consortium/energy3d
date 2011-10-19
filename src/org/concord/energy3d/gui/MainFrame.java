@@ -127,8 +127,8 @@ public class MainFrame extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/org/concord/energy3d/resources/icons/energy3d_2.gif")));
 		System.out.print("Initiating GUI...");
 		try {
+			fileChooser = new JFileChooser();
 			if (!Config.isWebStart()) {
-				fileChooser = new JFileChooser();
 				final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
 				if (!dir.exists()) {
 					System.out.print("Making save directory..." + dir + "...");
