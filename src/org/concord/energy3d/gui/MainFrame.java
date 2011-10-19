@@ -124,7 +124,7 @@ public class MainFrame extends JFrame {
 	 */
 	private MainFrame() {
 		super();
-		setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/org/concord/energy3d/resources/icons/energy3d_2.gif")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/org/concord/energy3d/resources/icons/icon.gif")));
 		System.out.print("Initiating GUI...");
 		try {
 			fileChooser = new JFileChooser();
