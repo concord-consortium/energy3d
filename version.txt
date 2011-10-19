@@ -785,9 +785,9 @@ Version 0.4 - Auguest 24, 2011
 - use the gable edit point and gable wall information to always maintain the edit point on the wall line
 - fix problem with house becoming shorter by foundation height after undo
 - fix problem with part of roof disappearing when joggling edit points that shouldn't move due to two attached gable walls
+- after edition the edit point disppear and doesn't reappear after mouse hover because it thinks it is still visible
 
 
-- *after edition the edit point disppear and doesn't reappear after mouse hover because it thinks it is still visible
 - *save new gable roof data
  
 - *auto redraw gable wall when inserting gable or editing gable

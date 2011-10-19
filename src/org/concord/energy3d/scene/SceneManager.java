@@ -154,7 +154,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final LightState lightState = new LightState();
 	private boolean exit = false;
 	private boolean rotAnim = false;
-	private HousePart drawn = null;
+	private HousePart selectedHousePart = null;
 	private HousePart hoveredHousePart = null;
 	private Operation operation = Operation.SELECT;
 	private Heliodon heliodon;
@@ -387,21 +387,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //		if (operationFlag)
 //			executeOperation();
 
-		if (drawBounds && drawn != null) {
-			if (drawn instanceof Roof) {
-				final Node flattenedMeshesRoot = ((Roof) drawn).getRoofPartsRoot();
+		if (drawBounds && selectedHousePart != null) {
+			if (selectedHousePart instanceof Roof) {
+				final Node flattenedMeshesRoot = ((Roof) selectedHousePart).getRoofPartsRoot();
 				if (flattenedMeshesRoot != null && pick != null) {
 					com.ardor3d.util.geom.Debugger.drawBounds(flattenedMeshesRoot.getChild(pick.getIndex()), renderer, true);
 //					com.ardor3d.util.geom.Debugger.drawBounds(((Node) flattenedMeshesRoot.getChild(pick.getIndex())).getChild(0), renderer, true);
 					System.out.println(flattenedMeshesRoot.getChild(pick.getIndex()).getWorldBound());
 				}
 			} else {
-				if (drawn instanceof Wall)
-					com.ardor3d.util.geom.Debugger.drawBounds(((Wall) drawn).getRoot().getChild(3), renderer, true);
+				if (selectedHousePart instanceof Wall)
+					com.ardor3d.util.geom.Debugger.drawBounds(((Wall) selectedHousePart).getRoot().getChild(3), renderer, true);
 				else
-					com.ardor3d.util.geom.Debugger.drawBounds(drawn.getRoot(), renderer, true);
-				if (drawn.getMesh() != null)
-					System.out.println(drawn.getMesh().getWorldBound());
+					com.ardor3d.util.geom.Debugger.drawBounds(selectedHousePart.getRoot(), renderer, true);
+				if (selectedHousePart.getMesh() != null)
+					System.out.println(selectedHousePart.getMesh().getWorldBound());
 			}
 		}
 
@@ -625,39 +625,39 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						public Object call() throws Exception {
 							MouseState mouseState = inputStates.getCurrent().getMouseState();
 							if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.DRAW_ROOF_GABLE) {
-								if (drawn == null || drawn.isDrawCompleted()) {
-									final HousePart previousDrawn = drawn;
+								if (selectedHousePart == null || selectedHousePart.isDrawCompleted()) {
+									final HousePart previousDrawn = selectedHousePart;
 									final UserData pick = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
 									if (pick == null)
-										drawn = null;
+										selectedHousePart = null;
 									else
-										drawn = pick.getHousePart();
+										selectedHousePart = pick.getHousePart();
 									System.out.print("Clicked on: " + pick);
-									if (previousDrawn != null && previousDrawn != drawn)
+									if (previousDrawn != null && previousDrawn != selectedHousePart)
 										previousDrawn.hidePoints();
 //									if (drawn != null && drawn != previousDrawn && !PrintController.getInstance().isPrintPreview()) {
-									if (drawn != null && !PrintController.getInstance().isPrintPreview()) {										
-										drawn.showPoints();
+									if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {										
+										selectedHousePart.showPoints();
 										if (pick.getIndex() != -1) {
-											if (drawn instanceof Foundation)
-												editHousePartCommand = new EditFoundationCommand((Foundation)drawn);
+											if (selectedHousePart instanceof Foundation)
+												editHousePartCommand = new EditFoundationCommand((Foundation)selectedHousePart);
 											else
-												editHousePartCommand = new EditHousePartCommand(drawn);
+												editHousePartCommand = new EditHousePartCommand(selectedHousePart);
 										}
 									}
 									SelectUtil.nextPickLayer();
-									if (operation == Operation.DRAW_ROOF_GABLE && drawn instanceof Roof) {
-										System.out.println(drawn);
+									if (operation == Operation.DRAW_ROOF_GABLE && selectedHousePart instanceof Roof) {
+										System.out.println(selectedHousePart);
 										System.out.println("deleting roof #" + pick.getIndex());
 										final int roofPartIndex = pick.getIndex();
-										final Roof roof = (Roof) drawn;
+										final Roof roof = (Roof) selectedHousePart;
 										undoManager.addEdit(new MakeGableCommand(roof, roofPartIndex));
 										roof.setGable(roofPartIndex, true);
 										MainFrame.getInstance().refreshUndoRedo();
 									}
 								}
 							} else {
-								drawn.addPoint(mouseState.getX(), mouseState.getY());
+								selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
 							}
 
 							enableDisableRotationControl();
@@ -678,8 +678,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							MouseState mouseState = inputStates.getCurrent().getMouseState();
 							boolean sceneChanged = false;
 							if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-								if (drawn != null && !drawn.isDrawCompleted()) {
-									drawn.complete();
+								if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
+									selectedHousePart.complete();
 									sceneChanged = true;
 									if (editHousePartCommand != null) {
 										if (editHousePartCommand.isReallyEdited()) {
@@ -690,19 +690,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									}									
 								}
 							} else {
-								if (!drawn.isDrawCompleted()) {
-									drawn.addPoint(mouseState.getX(), mouseState.getY());
+								if (!selectedHousePart.isDrawCompleted()) {
+									selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
 									sceneChanged = true;
 								}
 
-								if (drawn.isDrawCompleted()) {
+								if (selectedHousePart.isDrawCompleted()) {
 									if (addHousePartCommand != null) {
 										undoManager.addEdit(addHousePartCommand);
 										MainFrame.getInstance().refreshUndoRedo();
 										addHousePartCommand = null;
 									}
-									drawn.hidePoints();
-									drawn = null;
+									selectedHousePart.hidePoints();
+									selectedHousePart = null;
 									if (operationStick)
 										operationFlag = true;
 									else {
@@ -760,10 +760,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				taskManager.update(new Callable<Object>() {
 					public Object call() throws Exception {
-						undoManager.addEdit(new RemoveHousePartCommand(drawn));
+						undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
 						MainFrame.getInstance().refreshUndoRedo();
-						Scene.getInstance().remove(drawn);
-						drawn = null;
+						Scene.getInstance().remove(selectedHousePart);
+						selectedHousePart = null;
 						return null;
 					}
 				});
@@ -773,10 +773,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				taskManager.update(new Callable<Object>() {
 					public Object call() throws Exception {
-						undoManager.addEdit(new RemoveHousePartCommand(drawn));
+						undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
 						MainFrame.getInstance().refreshUndoRedo();
-						Scene.getInstance().remove(drawn);
-						drawn = null;
+						Scene.getInstance().remove(selectedHousePart);
+						selectedHousePart = null;
 						return null;
 					}
 				});
@@ -1070,15 +1070,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void executeOperation() {
 //		System.out.println("executeOperation()");
 		this.operationFlag = false;
-		if (drawn != null && !drawn.isDrawCompleted())
-			Scene.getInstance().remove(drawn);
+		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted())
+			Scene.getInstance().remove(selectedHousePart);
 		for (HousePart part : Scene.getInstance().getParts())
 			if (part instanceof Foundation) {
 				((Foundation) part).setResizeHouseMode(operation == Operation.RESIZE);
 			}
 		if (viewMode != ViewMode.PRINT_PREVIEW)
 			Scene.getInstance().drawResizeBounds();
-		drawn = newHousePart();
+		selectedHousePart = newHousePart();
 		enableDisableRotationControl();
 	}
 
@@ -1137,7 +1137,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (!mouseControlEnabled)
 			return;
 
-		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (drawn == null || drawn.isDrawCompleted()))
+		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (selectedHousePart == null || selectedHousePart.isDrawCompleted()))
 			control.setMouseEnabled(true);
 		else
 			control.setMouseEnabled(false);
@@ -1149,7 +1149,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public HousePart getSelectedPart() {
-		return drawn;
+		return selectedHousePart;
 	}
 
 	public boolean isTopView() {
@@ -1279,20 +1279,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		int x = mouseState.getX();
 		int y = mouseState.getY();
 
-		if (drawn != null && !drawn.isDrawCompleted()) {
-			drawn.setPreviewPoint(x, y);
+		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
+			selectedHousePart.setPreviewPoint(x, y);
 		} else if (operation == Operation.SELECT && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
 			pick = SelectUtil.selectHousePart(x, y, false);
 			if (pick != null) {
 				// drawn = pick.getHousePart();
-				if (hoveredHousePart != null && hoveredHousePart != drawn)
+				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && hoveredHousePart != pick.getHousePart())
 					hoveredHousePart.hidePoints();
 				hoveredHousePart = pick.getHousePart();
-				if (hoveredHousePart != null && hoveredHousePart != drawn && !PrintController.getInstance().isPrintPreview())
+				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && !PrintController.getInstance().isPrintPreview())
 					hoveredHousePart.showPoints();
 			} else {
 				// drawn = null;
-				if (hoveredHousePart != null && hoveredHousePart != drawn)
+				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart)
 					hoveredHousePart.hidePoints();
 				hoveredHousePart = null;
 			}

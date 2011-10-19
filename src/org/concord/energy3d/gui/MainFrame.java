@@ -807,8 +807,7 @@ public class MainFrame extends JFrame {
 		}
 		return editMenu;
 	}
-	public void refreshUndoRedo() {
-		SceneManager.getInstance().hideAllEditPoints();
+	public void refreshUndoRedo() {		
 		getUndoMenuItem().setText(SceneManager.getInstance().getUndoManager().getUndoPresentationName());
 		getUndoMenuItem().setEnabled(SceneManager.getInstance().getUndoManager().canUndo());
 		getRedoMenuItem().setText(SceneManager.getInstance().getUndoManager().getRedoPresentationName());
@@ -821,6 +820,7 @@ public class MainFrame extends JFrame {
 			undoMenuItem.setEnabled(false);
 			undoMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().undo();
 					SceneManager.getInstance().update();
 					refreshUndoRedo();
@@ -836,6 +836,7 @@ public class MainFrame extends JFrame {
 			redoMenuItem.setEnabled(false);
 			redoMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().redo();
 					SceneManager.getInstance().update();
 					refreshUndoRedo();
