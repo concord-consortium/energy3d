@@ -28,12 +28,12 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.5;
-	transient private boolean resizeHouseMode = false;
-	transient private Box boundingMesh;
-	transient private double newBoundingHeight;
-	transient private ArrayList<Vector3> orgPoints;
-	transient private Mesh wireframeMesh;
-	transient private double boundingHeight;
+	private transient Box boundingMesh;
+	private transient Mesh wireframeMesh;
+	private transient ArrayList<Vector3> orgPoints;
+	private transient double newBoundingHeight;
+	private transient double boundingHeight;
+	private transient boolean resizeHouseMode = false;
 
 	public Foundation() {
 		super(2, 8, 0.1);
@@ -43,8 +43,6 @@ public class Foundation extends HousePart {
 	protected void init() {
 		super.init();
 		resizeHouseMode = false;
-//		if (boundingHeight == 0)
-//			boundingHeight = 2;
 
 		mesh = new Box("Foundation", new Vector3(), new Vector3());
 		final MaterialState ms = new MaterialState();
@@ -57,7 +55,7 @@ public class Foundation extends HousePart {
 		boundingMesh = new Box("Foundation (Bounding)", new Vector3(), new Vector3());
 		boundingMesh.setRenderState(new WireframeState());
 		boundingMesh.setModelBound(new BoundingBox());
-		
+
 		wireframeMesh = new Mesh("Foundation (wireframe)");
 		wireframeMesh.getMeshData().setIndexMode(IndexMode.Quads);
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(16));
@@ -73,8 +71,8 @@ public class Foundation extends HousePart {
 		mesh.setUserData(userData);
 		boundingMesh.setUserData(userData);
 
-//		scanChildrenHeight(); // to fix bug with resizing height instead of width when moving edit point of platform right after loading the model
-		
+		// scanChildrenHeight(); // to fix bug with resizing height instead of width when moving edit point of platform right after loading the model
+
 		setLabelOffset(-0.11);
 	}
 
@@ -121,7 +119,7 @@ public class Foundation extends HousePart {
 			for (final HousePart child : children) {
 				reverseFoundationResizeEffect(child, dx, dxOrg, ratioX, dy, dyOrg, ratioY);
 				if (child instanceof Wall) {
-					final HousePart roof = ((Wall)child).getRoof();
+					final HousePart roof = ((Wall) child).getRoof();
 					if (roof != null && !roofs.contains(roof)) {
 						reverseFoundationResizeEffect(roof, dx, dxOrg, ratioX, dy, dyOrg, ratioY);
 						roofs.add(roof);
@@ -173,7 +171,6 @@ public class Foundation extends HousePart {
 				points.get(0).set(points.get(1).getX(), points.get(2).getY(), 0);
 				points.get(3).set(points.get(2).getX(), points.get(1).getY(), 0);
 			} else {
-//				final int lower = (editPointIndex == 1) ? 0 : 2;
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
 				Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
@@ -185,20 +182,12 @@ public class Foundation extends HousePart {
 				points.get(i + 4).set(points.get(i)).setZ(newBoundingHeight + height);
 		}
 
-//		draw();
 		if (resizeHouseMode)
 			Scene.getInstance().redrawAll();
 		else
 			draw();
 		showPoints();
-//		Scene.getInstance().updateTextSizes();
 	}
-	
-//	public void applyNewHeight() {
-//		newBoundingHeight = points.get(4).getZ() - height;
-//		applyNewHeight(boundingHeight, newBoundingHeight, true);
-//		this.complete();
-//	}
 
 	private void applyNewHeight(double orgHeight, double newHeight, boolean finalize) {
 		if (newHeight == 0 || newHeight == orgHeight)
@@ -229,7 +218,7 @@ public class Foundation extends HousePart {
 			mesh.updateModelBound();
 			boundingMesh.setData(points.get(0), points.get(7));
 			boundingMesh.updateModelBound();
-			
+
 			// draw wireframe
 			final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
 			wireframeVertexBuffer.rewind();
@@ -238,10 +227,6 @@ public class Foundation extends HousePart {
 			drawSideWireframe(wireframeVertexBuffer, 3, 2);
 			drawSideWireframe(wireframeVertexBuffer, 2, 0);
 			wireframeMesh.updateModelBound();
-
-//			if (original == null && resizeHouseMode)
-//				for (HousePart child : children)
-//					child.draw();
 		}
 	}
 
@@ -249,11 +234,9 @@ public class Foundation extends HousePart {
 		Vector3 p;
 		p = getAbsPoint(i);
 		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-//		p = getAbsPoint(i);
-		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float)height);
+		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float) height);
 		p = getAbsPoint(j);
-		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float)height);
-//		p = getAbsPoint(j);
+		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float) height);
 		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 	}
 
@@ -271,9 +254,8 @@ public class Foundation extends HousePart {
 	private double scanChildrenHeight(final HousePart part) {
 		double maxHeight = 0;
 		if (part instanceof Wall || part instanceof Roof) {
-//			for (final Vector3 p : part.getAbsPoints())
 			for (int i = 0; i < part.points.size(); i++) {
-				final ReadOnlyVector3 p = part.getAbsPoint(i);			
+				final ReadOnlyVector3 p = part.getAbsPoint(i);
 				maxHeight = Math.max(maxHeight, p.getZ());
 			}
 		}
@@ -287,25 +269,12 @@ public class Foundation extends HousePart {
 		super.flattenInit();
 		flattenCenter.setY(0);
 	}
-	
+
 	@Override
 	public void flatten(double flattenTime) {
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 		super.flatten(flattenTime);
 	}
-
-//	@Override
-//	protected void computeCenter() {
-//		center.set(0, 0, 0);
-//		for (int i = 0; i < points.size() / 2; i++) {
-//			Vector3 p = points.get(i);
-//			p = toAbsolute(p);
-//			pointsRoot.getChild(i).setTranslation(p);
-//			getAbsPoint(i).set(p);
-//			center.addLocal(p);
-//		}
-//		center.multiplyLocal(1.0 / points.size() * 2);
-//	}
 
 	@Override
 	protected void drawAnnotations() {
@@ -319,7 +288,6 @@ public class Foundation extends HousePart {
 				annot = new SizeAnnotation();
 				sizeAnnotRoot.attachChild(annot);
 			}
-//			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), center, getFaceDirection(), false, original == null ? Align.South : Align.Center, true);
 			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), getCenter(), getFaceDirection(), false, Align.Center, true, true, false);
 		}
 
@@ -353,9 +321,4 @@ public class Foundation extends HousePart {
 	protected String getDefaultTextureFileName() {
 		return "foundation.jpg";
 	}
-	
-//	public boolean isPrintable() {
-//		return false;
-//	}	
-
 }

@@ -35,18 +35,17 @@ import com.google.common.base.Predicates;
 public abstract class CameraControl {
 	public enum ButtonAction {MOVE, ROTATE, ZOOM, NONE};
     protected final Vector3 _upAxis = new Vector3();
-    protected double _mouseRotateSpeed = .005;
-    protected double _moveSpeed = 50;
-    protected double _keyRotateSpeed = 2.25;
     protected final Matrix3 _workerMatrix = new Matrix3();    
     protected final Vector3 _workerVector = new Vector3();
     protected InputTrigger _mouseTrigger;
     protected InputTrigger _keyTrigger;
+    protected ButtonAction leftButtonAction = ButtonAction.ROTATE;
+    protected ButtonAction rightButtonAction = ButtonAction.MOVE;
+    protected double _mouseRotateSpeed = .005;
+    protected double _moveSpeed = 50;
+    protected double _keyRotateSpeed = 2.25;
     protected boolean enabled = true;
-	protected ButtonAction leftButtonAction = ButtonAction.ROTATE;
-	protected ButtonAction rightButtonAction = ButtonAction.MOVE;
 	private boolean mouseEnabled = true;
-//	private boolean zoomScale = true;
 
     public CameraControl(final ReadOnlyVector3 upAxis) {
         _upAxis.set(upAxis);
@@ -127,7 +126,6 @@ public abstract class CameraControl {
         final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(), Predicates
                 .or(TriggerConditions.rightButtonDown(), TriggerConditions.middleButtonDown()));
         final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), Predicates.and(someMouseDown, Predicates.not(new KeyHeldCondition(Key.LCONTROL))));
-//        final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), someMouseDown);
         final TriggerAction dragAction = new TriggerAction() {
 
             // Test boolean to allow us to ignore first mouse event. First event can wildly vary based on platform.

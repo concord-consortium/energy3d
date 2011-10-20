@@ -57,7 +57,6 @@ public class Scene implements Serializable {
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private Unit unit = Unit.Meter;
 	private double annotationScale = 1;
-//	private transient BoundingVolume sceneBound;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -92,26 +91,22 @@ public class Scene implements Serializable {
 
 	public void add(HousePart housePart) {
 		System.out.print("Adding new house part...");
-//		originalHouseRoot.attachChild(housePart.getRoot());
-//		parts.add(housePart);
 		final HousePart container = housePart.getContainer();
 		if (container != null)
-			container.getChildren().add(housePart);		
+			container.getChildren().add(housePart);
 		addTree(housePart);
 		if (container != null)
-			container.draw();		
+			container.draw();
 		System.out.println("done");
 	}
-	
+
 	private void addTree(final HousePart housePart) {
 		System.out.println("Adding: " + housePart);
 		originalHouseRoot.attachChild(housePart.getRoot());
 		parts.add(housePart);
-//		housePart.delete();
 		for (final HousePart child : housePart.getChildren())
 			addTree(child);
-//		housePart.getChildren().clear();
-	}	
+	}
 
 	public void remove(final HousePart housePart) {
 		if (housePart == null)
@@ -131,7 +126,6 @@ public class Scene implements Serializable {
 		housePart.delete();
 		for (final HousePart child : housePart.getChildren())
 			removeTree(child);
-//		housePart.getChildren().clear();
 	}
 
 	public ArrayList<HousePart> getParts() {
@@ -164,8 +158,6 @@ public class Scene implements Serializable {
 	public void newFile() {
 		final PrintController printController = PrintController.getInstance();
 		if (printController.isPrintPreview()) {
-			// printController.setPrintPreview(false);
-			// MainFrame.getInstance().getPreviewMenuItem().setSelected(false);
 			MainPanel.getInstance().getPreviewButton().setSelected(false);
 			while (!printController.isFinished())
 				Thread.yield();
@@ -200,8 +192,6 @@ public class Scene implements Serializable {
 				in.close();
 				for (HousePart housePart : instance.getParts())
 					originalHouseRoot.attachChild(housePart.getRoot());
-				// for (HousePart housePart : instance.getParts())
-				// housePart.draw();
 				redrawAll = true;
 				System.out.println("done");
 				SceneManager.getInstance().updateHeliodonAndAnnotationSize();
@@ -231,9 +221,6 @@ public class Scene implements Serializable {
 		if (PrintController.getInstance().isPrintPreview())
 			for (HousePart part : PrintController.getInstance().getPrintParts())
 				part.setAnnotationsVisible(visible);
-
-		// if (visible)
-		// redrawAnnotations = true;
 		SceneManager.getInstance().update();
 	}
 
@@ -274,15 +261,9 @@ public class Scene implements Serializable {
 	public void update() {
 		if (redrawAll) {
 			Snap.clearAnnotationDrawn();
-//			final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
 			for (final HousePart part : parts)
 				if (part instanceof Roof)
-//					if (part.getContainer() == null || part.getContainer().getChildren().contains(part) != part)
-//						toBeRemoved.add(part);
-//					else
-						part.draw();
-//			for (final HousePart part : toBeRemoved)
-//				remove(part);
+					part.draw();
 			for (final HousePart part : parts)
 				if (!(part instanceof Roof))
 					part.draw();
@@ -292,15 +273,6 @@ public class Scene implements Serializable {
 			updateTextSizes();
 			redrawAll = false;
 		}
-		// if (redrawAnnotations) {
-		// Snap.clearAnnotationDrawn();
-		// for (HousePart part : parts)
-		// part.drawAnnotations();
-		// if (PrintController.getInstance().getPrintParts() != null)
-		// for (HousePart part : PrintController.getInstance().getPrintParts())
-		// part.drawAnnotations();
-		// redrawAnnotations = false;
-		// }
 	}
 
 	public void setUnit(Unit unit) {
@@ -328,17 +300,16 @@ public class Scene implements Serializable {
 	public boolean isTextureEnabled() {
 		return isTextureEnabled;
 	}
-	
+
 	public void updateTextSizes() {
 		getOriginalHouseRoot().updateWorldBound(true);
 		final BoundingBox bounds = (BoundingBox) getOriginalHouseRoot().getWorldBound();
 		if (bounds != null) {
 			final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
-//			final double fontSize = Math.min(size, 10) / 20.0;
 			final double fontSize = size / 20.0;
 			Annotation.setFontSize(fontSize);
 			updateTextSizes(root, fontSize);
-		}		
+		}
 	}
 
 	private void updateTextSizes(final Spatial spatial, double size) {
@@ -353,7 +324,7 @@ public class Scene implements Serializable {
 				updateTextSizes(child, size);
 			// now that text font is updated redraw the annotation
 			if (spatial instanceof Annotation)
-				((Annotation)spatial).draw();
+				((Annotation) spatial).draw();
 		}
 	}
 
@@ -362,7 +333,7 @@ public class Scene implements Serializable {
 		for (final HousePart part : parts)
 			if (part instanceof Roof)
 				roofs.add(part);
-		
+
 		for (final HousePart part : roofs)
 			remove(part);
 	}
@@ -370,9 +341,4 @@ public class Scene implements Serializable {
 	public static boolean isRedrawAll() {
 		return redrawAll;
 	}
-
-//	public void setSceneBounds(final BoundingVolume sceneBound) {
-//		this.sceneBound = sceneBound;
-//	}
-		
 }

@@ -34,8 +34,6 @@ public abstract class Annotation extends Node {
 	public Annotation(final Mesh mesh) {
 		super();
 		this.mesh = mesh;
-//		this.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-//		mesh.getSceneHints().setCastsShadows(false);
 		mesh.setModelBound(new BoundingBox());
 		mesh.setDefaultColor(ColorRGBA.BLACK);
 		Util.disablePickShadowLight(mesh);
@@ -47,15 +45,6 @@ public abstract class Annotation extends Node {
 		mesh.setDefaultColor(color);
 		label.setTextColor(color);
 	}
-
-	
-//	protected void updateTextSize() {
-//		final BoundingBox bounds = (BoundingBox) Scene.getInstance().getOriginalHouseRoot().getWorldBound();
-//		if (bounds != null) {
-//			final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
-//			label.setFontScale(size / 20.0);
-//		}
-//	}
 	
 	public abstract void draw();
 }

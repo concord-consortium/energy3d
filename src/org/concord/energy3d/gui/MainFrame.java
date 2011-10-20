@@ -7,6 +7,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.MalformedURLException;
@@ -28,6 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -43,9 +46,6 @@ import org.concord.energy3d.util.Config;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import javax.swing.KeyStroke;
-import java.awt.event.KeyEvent;
-import java.awt.event.InputEvent;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -75,8 +75,6 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem textureCheckBoxMenuItem;
 	protected Object lastSelection; // @jve:decl-index=0:
 	private JMenuItem colorMenuItem = null;
-	private JMenu debugMenu = null;
-	private JMenuItem infoMenuItem = null;
 	private JCheckBoxMenuItem lightingMenu = null;
 	private JMenuItem exitMenuItem = null;
 	private JMenu helpMenu = null;
@@ -88,6 +86,45 @@ public class MainFrame extends JFrame {
 	private JMenu editMenu;
 	private JMenuItem undoMenuItem;
 	private JMenuItem redoMenuItem;
+	
+	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
+		String description;
+		String extensions[];
+
+		public ExtensionFileFilter(String description, String extension) {
+			this(description, new String[] { extension });
+		}
+
+		public ExtensionFileFilter(String description, String extensions[]) {
+			if (description == null) {
+				this.description = extensions[0] + "{ " + extensions.length + "} ";
+			} else {
+				this.description = description;
+			}
+			this.extensions = (String[]) extensions.clone();
+		}
+
+		@Override
+		public String getDescription() {
+			return description;
+		}
+
+		@Override
+		public boolean accept(File file) {
+			if (file.isDirectory()) {
+				return true;
+			} else {
+				String path = file.getAbsolutePath().toLowerCase();
+				for (int i = 0, n = extensions.length; i < n; i++) {
+					String extension = extensions[i];
+					if ((path.endsWith(extension) && (path.charAt(path.length() - extension.length() - 1)) == '.')) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+	}	
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -140,14 +177,11 @@ public class MainFrame extends JFrame {
 			fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
 		} catch (Exception e) {
 			fileChooser = null;
-			// System.err.println("MainFrame()");
 			e.printStackTrace();
 		}
-
 		colorChooser = new JColorChooser();
 		final ReadOnlyColorRGBA defaultColor = HousePart.getDefaultColor();
 		colorChooser.setColor(new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue()));
-
 		initialize();
 		System.out.println("done");
 	}
@@ -193,7 +227,6 @@ public class MainFrame extends JFrame {
 			appMenuBar.add(getViewMenu());
 			appMenuBar.add(getScaleMenu());
 			appMenuBar.add(getCameraMenu());
-			appMenuBar.add(getDebugMenu());
 			appMenuBar.add(getHelpMenu());
 		}
 		return appMenuBar;
@@ -340,8 +373,6 @@ public class MainFrame extends JFrame {
 			previewMenuItem = new JCheckBoxMenuItem("Print Preview");
 			previewMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					// deselect();
-					// PrintController.getInstance().setPrintPreview(previewMenuItem.isSelected());
 					mainPanel.getPreviewButton().setSelected(previewMenuItem.isSelected());
 				}
 			});
@@ -446,41 +477,6 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes debugMenu
-	 * 
-	 * @return javax.swing.JMenu
-	 */
-	private JMenu getDebugMenu() {
-		if (debugMenu == null) {
-			debugMenu = new JMenu();
-			debugMenu.setText("Debug");
-			debugMenu.add(getInfoMenuItem());
-		}
-		return debugMenu;
-	}
-
-	/**
-	 * This method initializes infoMenuItem
-	 * 
-	 * @return javax.swing.JMenuItem
-	 */
-	private JMenuItem getInfoMenuItem() {
-		if (infoMenuItem == null) {
-			infoMenuItem = new JMenuItem();
-			infoMenuItem.setText("Print Info");
-			infoMenuItem.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					System.out.println("******** Scene Info *********");
-					for (final HousePart part : Scene.getInstance().getParts())
-						System.out.println(part + "\t" + part.getRoot().getWorldBound());
-					System.out.println("*****************************");
-				}
-			});
-		}
-		return infoMenuItem;
-	}
-
-	/**
 	 * This method initializes lightingMenu
 	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
@@ -564,7 +560,7 @@ public class MainFrame extends JFrame {
 			aboutDialog.setTitle("About");
 			JPanel p = new JPanel(new BorderLayout());
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			final String version = "0.4.1";
+			final String version = "0.5";
 			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + version + "<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grant #0918449 to the Concord Consortium. </html>"), BorderLayout.CENTER);
 			aboutDialog.setContentPane(p);
 			aboutDialog.pack();
@@ -730,29 +726,7 @@ public class MainFrame extends JFrame {
 		if (scaleMenuItem == null) {
 			scaleMenuItem = new JMenuItem("Scale...");
 			scaleMenuItem.addActionListener(new ActionListener() {
-				private String previousScaleInput = "200%";
-
 				public void actionPerformed(ActionEvent e) {
-//					boolean done = false;
-//					while (!done) {
-//						// previousScaleInput = "200%";
-//						String result = JOptionPane.showInputDialog(MainFrame.this, "Please enter the scale factor in percentage:", previousScaleInput);
-//						if (result == null)
-//							break;
-//						else
-//							result = result.trim();
-//						if (result.endsWith("%") && result.length() >= 1)
-//							result = result.substring(0, result.length() - 1);
-//						try {
-//							final Scene scene = Scene.getInstance();
-//							scene.setAnnotationScale(scene.getAnnotationScale() * Double.parseDouble(result) / 100.0);
-//							previousScaleInput = result + "%";
-//							done = true;
-//						} catch (Exception err) {
-//							err.printStackTrace();
-//							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
-//						}
-//					}
 					final ScaleDialog scaleDialog = new ScaleDialog();
 					scaleDialog.setVisible(true);
 				}
@@ -766,7 +740,6 @@ public class MainFrame extends JFrame {
 			textureCheckBoxMenuItem = new JCheckBoxMenuItem("Texture", true);
 			textureCheckBoxMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					// HousePart.setTextureEnabled(textureCheckBoxMenuItem.isSelected());
 					Scene.getInstance().setTextureEnabled(textureCheckBoxMenuItem.isSelected());
 				}
 			});
@@ -845,50 +818,4 @@ public class MainFrame extends JFrame {
 		}
 		return redoMenuItem;
 	}
-} // @jve:decl-index=0:visual-constraint="10,-112"
-
-class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
-	String description;
-
-	String extensions[];
-
-	public ExtensionFileFilter(String description, String extension) {
-		this(description, new String[] { extension });
-	}
-
-	public ExtensionFileFilter(String description, String extensions[]) {
-		if (description == null) {
-			this.description = extensions[0] + "{ " + extensions.length + "} ";
-		} else {
-			this.description = description;
-		}
-		this.extensions = (String[]) extensions.clone();
-		toLower(this.extensions);
-	}
-
-	private void toLower(String array[]) {
-		for (int i = 0, n = array.length; i < n; i++) {
-			array[i] = array[i].toLowerCase();
-		}
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public boolean accept(File file) {
-		if (file.isDirectory()) {
-			return true;
-		} else {
-			String path = file.getAbsolutePath().toLowerCase();
-			for (int i = 0, n = extensions.length; i < n; i++) {
-				String extension = extensions[i];
-				if ((path.endsWith(extension) && (path.charAt(path.length() - extension.length() - 1)) == '.')) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
 }

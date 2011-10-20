@@ -24,29 +24,29 @@ import com.ardor3d.scenegraph.Spatial;
 public class SelectUtil {
 	private static final PickResults pickResults = new PrimitivePickResults();
 	private static Mesh floor;
-	private static Node housePartsNode;	
+	private static Node housePartsNode;
 	private static int pickLayer = -1;
 	private static ColorRGBA currentEditPointOriginalColor = new ColorRGBA();
 	private static Mesh currentEditPointMesh;
-	
+
 	static {
-		pickResults.setCheckDistance(true);		
+		pickResults.setCheckDistance(true);
 	}
-	
+
 	public static PickedHousePart pickPart(int x, int y, Spatial target) {
 		if (target == null)
 			target = floor;
 		pickResults.clear();
-		
+
 		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
-		PickingUtil.findPick(target, pickRay, pickResults);;		
+		PickingUtil.findPick(target, pickRay, pickResults, false);
 		return getPickResult(pickRay);
 	}
 
 	public static PickedHousePart pickPart(int x, int y, Class<?> typeOfHousePart) {
 		pickResults.clear();
-		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);		
-		
+		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
+
 		if (typeOfHousePart == null)
 			PickingUtil.findPick(floor, pickRay, pickResults);
 		else
@@ -68,8 +68,7 @@ public class SelectUtil {
 			final PickData pick = pickResults.getPickData(i);
 			if (pick.getIntersectionRecord().getNumberOfIntersections() == 0)
 				continue;
-			Object obj = ((Mesh)pick.getTarget()).getUserData();
-//			System.out.println(pick.getTarget());
+			Object obj = ((Mesh) pick.getTarget()).getUserData();
 			UserData userData = null;
 			if (obj instanceof UserData) {
 				userData = (UserData) obj;
@@ -80,35 +79,26 @@ public class SelectUtil {
 			} else if (pickLayer != -1) {
 				continue;
 			}
-			if (pickLayer != -1 && objCounter-1 != pickLayer)
+			if (pickLayer != -1 && objCounter - 1 != pickLayer)
 				continue;
 			Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
 			PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
 			double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {
-				for (int j = 0; j < userData.getHousePart().getPoints().size(); j ++) {
+				for (int j = 0; j < userData.getHousePart().getPoints().size(); j++) {
 					Vector3 p = userData.getHousePart().getAbsPoint(j);
 					pointDist_i = p.distance(intersectionPoint);
 					double adjust = 0;
-//					if (userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) > 0.8)					
-//						adjust -= 0.1;	// give more priority because the wall is facing the camera
 					adjust -= Math.abs(userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) / 10.0);
-					if (userData.getHousePart() == SceneManager.getInstance().getSelectedPart())					
-						adjust -= 0.1;	// give more priority because the object is selected					
-//					if (pickedHousePart != null && pickedHousePart.getUserData() != null && pickedHousePart.getUserData().isEditPoint() && !userData.isEditPoint())
-//						adjust += 1;	// give less priority because this is not a edit point and an edit point is already found
+					if (userData.getHousePart() == SceneManager.getInstance().getSelectedPart())
+						adjust -= 0.1; // give more priority because the object is selected
 					if (userData.isEditPoint())
-						adjust -= 0.1;	// give more priority because this is an edit point
+						adjust -= 0.1; // give more priority because this is an edit point
 					if (userData.isEditPoint() && userData.getHousePart() instanceof Foundation && ((Foundation) userData.getHousePart()).isResizeHouseMode())
 						adjust -= 0.1;
 					pointDist_i += adjust;
-//					if (pointDist_i + adjust < pointDist && 
-//							(userData.getIndex() != -1 || pickedHousePart == null || 
-//									pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getIndex() == -1)) {
-					if (pointDist_i < pointDist && 
-							(userData.getIndex() != -1 || pickedHousePart == null || 
-									pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getIndex() == -1)) {					
+					if (pointDist_i < pointDist && (userData.getIndex() != -1 || pickedHousePart == null || pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getIndex() == -1)) {
 						pickedHousePart = picked_i;
 						polyDist = polyDist_i;
 						pointDist = pointDist_i;
@@ -125,8 +115,7 @@ public class SelectUtil {
 	}
 
 	public static UserData selectHousePart(int x, int y, boolean edit) {
-//		final HousePart lastHoveredObject = SceneManager.getInstance().getSelectedPart();
-		final PickedHousePart pickedHousePart  = pickPart(x, y, housePartsNode);
+		final PickedHousePart pickedHousePart = pickPart(x, y, housePartsNode);
 		UserData data = null;
 		if (pickedHousePart != null)
 			data = pickedHousePart.getUserData();
@@ -143,34 +132,21 @@ public class SelectUtil {
 			currentEditPointOriginalColor.set(currentEditPointMesh.getDefaultColor());
 			currentEditPointMesh.setDefaultColor(ColorRGBA.YELLOW);
 		}
-		
+
 		if (data == null) {
-//			if (lastHoveredObject != null) {
-//				lastHoveredObject.hidePoints();
-				Blinker.getInstance().setTarget(null);
-//			}
+			Blinker.getInstance().setTarget(null);
 		} else if (edit && data.isEditPoint()) {
 			int pointIndex = data.getIndex();
 			if (SceneManager.getInstance().isTopView() && data.getHousePart() instanceof Wall)
 				pointIndex -= 1;
 			data.getHousePart().setEditPoint(pointIndex);
 		} else {
-//			if (lastHoveredObject != null && lastHoveredObject != data.getHousePart()) {
-//				lastHoveredObject.hidePoints();
-//			}
-
-//			if (lastHoveredObject != data.getHousePart()) {
-//				Blinker.getInstance().setTarget(null);
-				if (data.getHousePart().getOriginal() == null)
-					Blinker.getInstance().setTarget(null);
-				else if (data.getHousePart() instanceof Roof)
-					Blinker.getInstance().setTarget(((Roof)data.getHousePart().getOriginal()).getRoofPartsRoot().getChild(data.getIndex()-0));
-				else
-					Blinker.getInstance().setTarget(data.getHousePart().getOriginal().getRoot());
-//			}
-//			final ViewMode viewMode = SceneManager.getInstance().getViewMode();
-//			if (viewMode == ViewMode.NORMAL || viewMode == ViewMode.TOP_VIEW)
-//				data.getHousePart().showPoints();
+			if (data.getHousePart().getOriginal() == null)
+				Blinker.getInstance().setTarget(null);
+			else if (data.getHousePart() instanceof Roof)
+				Blinker.getInstance().setTarget(((Roof) data.getHousePart().getOriginal()).getRoofPartsRoot().getChild(data.getIndex() - 0));
+			else
+				Blinker.getInstance().setTarget(data.getHousePart().getOriginal().getRoot());
 		}
 		return data;
 	}

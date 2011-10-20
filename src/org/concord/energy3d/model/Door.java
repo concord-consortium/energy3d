@@ -17,9 +17,8 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.2; // 0.25;
+	private static final double GRID_SIZE = 0.2;
 	private static double defaultDoorHeight = 0.8f;
-//	private transient Mesh mesh;
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer normalBuffer;
 	private transient FloatBuffer textureBuffer;
@@ -48,12 +47,6 @@ public class Door extends HousePart {
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("door.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		mesh.setRenderState(ts);
-
-//		OffsetState offsetState = new OffsetState();
-//		offsetState.setTypeEnabled(OffsetType.Fill, true);
-////		offsetState.setFactor(-0.1f);
-//		offsetState.setUnits(-1f);
-//		mesh.setRenderState(offsetState);
 
 		mesh.setModelBound(new BoundingBox());	
 		mesh.setUserData(new UserData(this));
@@ -103,7 +96,6 @@ public class Door extends HousePart {
 			return;		
 
 		vertexBuffer.rewind();
-//		for (Vector3 p : abspoints) {
 		for (int i = 0; i < points.size(); i++) {
 			final ReadOnlyVector3 p = getAbsPoint(i);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
@@ -126,10 +118,6 @@ public class Door extends HousePart {
 		mesh.updateModelBound();
 	}
 
-//	public ArrayList<Vector3> getAbsPoints() {
-//		return abspoints;
-//	}
-
 	public boolean isPrintable() {
 		return false;
 	}
@@ -141,5 +129,4 @@ public class Door extends HousePart {
 	protected String getDefaultTextureFileName() {
 		return "door.jpg";
 	}
-	
 }

@@ -27,11 +27,8 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.15;
-//	private transient Mesh mesh;
-//	private transient FloatBuffer vertexBuffer;
-//	private transient FloatBuffer normalBuffer;
-	transient private BMText label1;
-	transient private Line bars;
+	private transient BMText label1;
+	private transient Line bars;
 
 	public Window() {
 		super(2, 4, 0.30);
@@ -40,8 +37,6 @@ public class Window extends HousePart {
 	protected void init() {
 		label1 = Annotation.makeNewLabel();
 		super.init();
-////		for (int i = 0; i < points.size(); i++)
-////			getAbsPoint(i).set(toAbsolute(getAbsPoint(i)));
 		mesh = new Mesh("Window");
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
@@ -62,22 +57,15 @@ public class Window extends HousePart {
 		ms.setColorMaterial(ColorMaterial.AmbientAndDiffuse);
 		mesh.setRenderState(ms);
 		mesh.setUserData(new UserData(this));
-		
+
 		root.attachChild(mesh);
-		
+
 		label1.setAlign(Align.SouthWest);
 		root.attachChild(label1);
-		
+
 		bars = new Line("Window (bars)");
-//		bars.setAntialiased(true);
-//        final BlendState blend = new BlendState();
-//        blend.setBlendEnabled(true);
-//        bars.setRenderState(blend);		
 		bars.setLineWidth(3);
 		bars.setModelBound(new BoundingBox());
-//		bars.getSceneHints().setCastsShadows(false);
-//		bars.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-//		bars.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		Util.disablePickShadowLight(bars);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		root.attachChild(bars);
@@ -116,9 +104,6 @@ public class Window extends HousePart {
 			}
 		}
 
-//		draw();
-//		showPoints();
-
 		if (container != null) {
 			draw();
 			showPoints();
@@ -129,7 +114,7 @@ public class Window extends HousePart {
 	protected void drawMesh() {
 		if (points.size() < 4)
 			return;
-		
+
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		for (int i = 0; i < points.size(); i++) {
@@ -146,26 +131,22 @@ public class Window extends HousePart {
 			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
 
 		mesh.updateModelBound();
-		
+
 		final double divisionLength = 0.3;
-		final Vector3 halfThickness = ((Wall)container).getThicknessNormal().multiply(0.5, null);
+		final Vector3 halfThickness = ((Wall) container).getThicknessNormal().multiply(0.5, null);
 		FloatBuffer barsVertices = bars.getMeshData().getVertexBuffer();
-//		FloatBuffer barsNormals = bars.getMeshData().getNormalBuffer();
-		final int cols = (int)Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / divisionLength);
-		final int rows = (int)Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / divisionLength);
+		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / divisionLength);
+		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / divisionLength);
 		if (barsVertices.capacity() < (4 + rows + cols) * 6) {
 			barsVertices = BufferUtils.createVector3Buffer((4 + rows + cols) * 2);
-//			barsNormals = BufferUtils.createVector3Buffer((4 + rows + cols) * 2);
 			bars.getMeshData().setVertexBuffer(barsVertices);
 			bars.getMeshData().setNormalBuffer(barsVertices);
 		} else {
 			barsVertices.rewind();
 			barsVertices.limit(barsVertices.capacity());
-//			barsNormals.rewind();
-//			barsNormals.limit(barsVertices.capacity());			
 		}
-			
-		barsVertices.rewind();		
+
+		barsVertices.rewind();
 		final Vector3 p = new Vector3();
 		getAbsPoint(0).add(halfThickness, p);
 		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
@@ -182,30 +163,25 @@ public class Window extends HousePart {
 		getAbsPoint(2).add(halfThickness, p);
 		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		getAbsPoint(0).add(halfThickness, p);
-		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());		
-		
+		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+
 		final ReadOnlyVector3 o = getAbsPoint(0).add(halfThickness, null);
 		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
 		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
 		for (int col = 1; col < cols; col++) {
-			u.multiply((double)col/cols, p).addLocal(o);
+			u.multiply((double) col / cols, p).addLocal(o);
 			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			p.addLocal(v);
 			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 		for (int row = 1; row < rows; row++) {
-			v.multiply((double)row/rows, p).addLocal(o);
+			v.multiply((double) row / rows, p).addLocal(o);
 			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			p.addLocal(u);
 			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 		p.set(halfThickness).negateLocal().normalizeLocal();
-//		for (int i = 0; i < barsVertices.position() / 3; i++) {
-//			barsNormals.put(p.getXf()).put(p.getYf()).put(p.getZf());
-//			barsNormals.put(1).put(1).put(1);
-//		}
 		barsVertices.limit(barsVertices.position());
-//		barsNormals.limit(barsNormals.position());
 		bars.getMeshData().updateVertexCount();
 		bars.updateModelBound();
 	}
@@ -217,12 +193,7 @@ public class Window extends HousePart {
 		int annotCounter = 0;
 
 		final ReadOnlyVector3 v02 = container.getAbsPoint(2).subtract(container.getAbsPoint(0), null);
-//		if (label1 == null) {
-//			label1 = Annotation.makeNewLabel();
-//			label1.setAlign(Align.SouthWest);
-//			root.attachChild(label1);
-//		}
-		
+
 		final boolean reversedFace = v02.normalize(null).crossLocal(container.getFaceDirection()).dot(Vector3.NEG_UNIT_Z) < 0.0;
 		final boolean reversedH;
 		if (points.get(0).getX() > points.get(2).getX())
@@ -230,7 +201,7 @@ public class Window extends HousePart {
 		else
 			reversedH = reversedFace;
 		final boolean reversedV = getAbsPoint(0).getZ() > getAbsPoint(1).getZ();
-		
+
 		final int i0, i1, i2;
 		if (reversedH && reversedV) {
 			i0 = 3;
@@ -249,28 +220,24 @@ public class Window extends HousePart {
 			i1 = 1;
 			i2 = 2;
 		}
-		
-		
+
 		final Vector3 cornerXY = getAbsPoint(i0).subtract(container.getAbsPoint(0), null);
-		cornerXY.setZ(0);		
-		double xy = cornerXY.length(); //Math.sqrt(getAbsPoint(i1).getX() * getAbsPoint(i1).getX() + getAbsPoint(i1).getY() * getAbsPoint(i1).getY());
+		cornerXY.setZ(0);
+		double xy = cornerXY.length();
 		if (reversedFace)
-			xy = v02.length() - xy; 
+			xy = v02.length() - xy;
 		label1.setText("(" + Math.round(10 * xy) / 10.0 + ", " + Math.round(10 * getAbsPoint(i0).getZf()) / 10.0 + ")");
-		
+
 		final ReadOnlyTransform trans = container.getRoot().getTransform();
 		final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getFaceDirection(), null);
-//		final ReadOnlyVector3 moveToFront = faceDirection.multiply(0.04, null);
 		label1.setTranslation(getAbsPoint(i0));
 		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 		final Vector3 center = trans.applyForward(getCenter(), null);
 		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, true, false);
-//		annot.setTranslation(moveToFront);
 
 		annot = fetchSizeAnnot(annotCounter++);
 		annot.setRange(getAbsPoint(i0), getAbsPoint(i2), center, faceDirection, false, Align.Center, true, false, false);
-//		annot.setTranslation(moveToFront);
 	}
 
 	public boolean isPrintable() {
@@ -282,16 +249,7 @@ public class Window extends HousePart {
 		if (label1 != null)
 			label1.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 	}
-	
-//	protected void computeAbsPoints() {
-//		for (int i = 0; i < points.size(); i++) {
-//			final Vector3 p = toAbsolute(enforceContraints(points.get(i)));
-//			getAbsPoint(i).set(p);
-//			toAbsolute(enforceContraints(points.get(i)));
-//			pointsRoot.getChild(i).setTranslation(p);
-//		}
-//	}
-	
+
 	private Vector3 enforceContraints(Vector3 p) {
 		if (container == null)
 			return new Vector3(p);
@@ -301,27 +259,19 @@ public class Window extends HousePart {
 		x = Math.min(x, 1 - margin);
 		return new Vector3(x, p.getY(), p.getZ());
 	}
-	
+
 	public void updateTextureAndColor(final boolean textureEnabled) {
 	}
-	
+
 	public void hideBars() {
 		if (bars != null)
 			bars.getSceneHints().setCullHint(CullHint.Always);
 	}
-	
+
 	public Vector3 getAbsPoint(final int index) {
 		final Vector3 absolute = toAbsolute(enforceContraints(points.get(index)));
 		if (container != null)
 			container.getRoot().getTransform().applyForward(absolute);
 		return absolute;
 	}
-	
-	@Override
-	public void setOriginal(final HousePart original) {
-		super.setOriginal(original);
-//		root.detachChild(sizeAnnotRoot);
-//		container.getRoot().attachChild(sizeAnnotRoot);
-	}
-	
 }

@@ -64,19 +64,4 @@ public class MainApplication {
 			e.printStackTrace();
 		}
 	}
-
-	// /* returns 4 for 32bit and 8 for 64bit */
-	// private static int detectBits() {
-	// try {
-	// Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-	// unsafeField.setAccessible(true);
-	// Unsafe unsafe = (Unsafe) unsafeField.get(null);
-	// System.out.println("Detecting..." + unsafe.addressSize() + " bits");
-	// return unsafe.addressSize();
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// return 0;
-	// }
-	// }
-
 }

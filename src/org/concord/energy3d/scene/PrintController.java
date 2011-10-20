@@ -45,33 +45,26 @@ public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
 	private static final int MARGIN = 5;
 	private static final double PRINT_MARGIN = 0.5;
+	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
+	private final Timer timer = new Timer();
 	private double pageWidth, pageHeight;
+	private double angle;
+	private int cols;
+	private int rows;
 	private boolean isPrintPreview = false;
 	private boolean init = false;
 	private boolean finish = false;
 	private boolean finished = true;
-	private ArrayList<HousePart> printParts;
-	private double angle;
-	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
 	private boolean shadingSelected;
 	private boolean shadowSelected;
+	private ArrayList<HousePart> printParts;
 	private Node pagesRoot = new Node();
-	private int cols;
-	private int rows;
-	private final Timer timer = new Timer();
-
-	// private int currentPrintPage;
 
 	public static PrintController getInstance() {
 		return instance;
 	}
 
 	public void init() {
-		// final OffsetState offsetState = new OffsetState();
-		// offsetState.setTypeEnabled(OffsetType.Fill, true);
-		// offsetState.setFactor(10);
-		// offsetState.setUnits(10);
-		// pagesRoot.setRenderState(offsetState);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -96,7 +89,6 @@ public class PrintController implements Updater {
 					printParts.get(i).setOriginal(Scene.getInstance().getParts().get(i));
 				}
 
-				// drawPrintParts(1);
 				int printSequence = 0;
 				for (final HousePart part : printParts)
 					if (part.isPrintable()) {
@@ -167,9 +159,6 @@ public class PrintController implements Updater {
 						part.hideLabels();
 				}
 				finished = true;
-				// timer.reset();
-				// SceneManager.getInstance().update(1.0);
-				// SceneManager.getInstance().update();
 			}
 		}
 	}
@@ -182,134 +171,43 @@ public class PrintController implements Updater {
 		if (flattenTime > 1)
 			flattenTime = 1;
 
-//		int printSequence = 0;
 		for (final HousePart part : printParts) {
 			if (part.isPrintable()) {
 				part.flatten(flattenTime);
-				// printSequence = part.drawLabels(printSequence);
 			} else if (part instanceof Window) {
 				((Window) part).hideBars();
 			}
 		}
-		// SceneManager.getInstance().update();
 	}
-
-	// public void print() {
-	// // MainFrame.getInstance().setSize(10000, 10000);
-	// Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
-	// final PrintExporter printExporter = new PrintExporter();
-	// final Camera camera = Camera.getCurrentCamera();
-	// SceneManager.getInstance().resetCamera(ViewMode.PRINT);
-	// for (final Vector3 pos : printCenters) {
-	// camera.setLocation(pos.getX(), pos.getY() - pageWidth * 2, pos.getZ());
-	// camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
-	// SceneManager.getInstance().getCameraNode().updateFromCamera();
-	// // SceneManager.getInstance().update(1);
-	// try {
-	// Thread.sleep(500);
-	// } catch (InterruptedException e) {
-	// e.printStackTrace();
-	// }
-	// final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-	// canvasRenderer.makeCurrentContext();
-	// ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printExporter);
-	// canvasRenderer.releaseCurrentContext();
-	// }
-	// final PrinterJob job = PrinterJob.getPrinterJob();
-	// final PageFormat pageFormat = new PageFormat();
-	// final Paper paper = new Paper();
-	// paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-	// pageFormat.setPaper(paper);
-	//
-	// job.setPageable(new Pageable() {
-	// @Override
-	// public Printable getPrintable(int arg0) throws IndexOutOfBoundsException {
-	// return printExporter;
-	// }
-	//
-	// @Override
-	// public PageFormat getPageFormat(int arg0) throws IndexOutOfBoundsException {
-	// return pageFormat;
-	// }
-	//
-	// @Override
-	// public int getNumberOfPages() {
-	// return printCenters.size();
-	// }
-	// });
-	//
-	// if (job.printDialog()) {
-	// try {
-	// job.print();
-	// } catch (PrinterException exc) {
-	// exc.printStackTrace();
-	// }
-	// }
-	// Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-	// SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
-	// }
 
 	public void print() {
 		SceneManager.taskManager.update(new Callable<Object>() {
 			public Object call() throws Exception {
-				// MainFrame.getInstance().setSize(10000, 10000);
 				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 				final PrintExporter printExporter = new PrintExporter();
-				// final Camera camera = Camera.getCurrentCamera();
-//				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
-				// camera.resize(1000, 1000);
-				// final Dimension orgSize = ((java.awt.Component)SceneManager.getInstance().getCanvas()).getSize();
 				final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
-//				final Dimension orgSize = canvas.getSize();
 				final Paper paper = new Paper();
 				final int resolutionHeight = 1000;
-				final Dimension newSize = new Dimension((int)(resolutionHeight * paper.getWidth() / paper.getHeight()), resolutionHeight);
+				final Dimension newSize = new Dimension((int) (resolutionHeight * paper.getWidth() / paper.getHeight()), resolutionHeight);
 				canvas.setSize(newSize);
-//				canvas.setLocation((int) (orgSize.getWidth() - newSize.getWidth()) / 2, (int) (orgSize.getHeight() - newSize.getHeight()) / 2);
-//				canvas.setLocation(-100, -100);
-//				canvas.repaint();
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
-				
-				
-
-				// // currentPrintPage = 0;
-				// final Vector3 pos = printCenters.get(0);
-				// // camera.setLocation(pos.getX(), pos.getY() - pageWidth * 2, pos.getZ());
-				// camera.setLocation(pos.getX(), -1.0, pos.getZ());
-				// camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
-
-//				System.err.println("init ");
 				print(-1, printExporter);
 				return null;
 			}
 		});
-
 	}
 
 	private void print(final int pageNum, final PrintExporter printExporter) {
 		SceneManager.taskManager.render(new Callable<Object>() {
 			public Object call() throws Exception {
-//				System.err.println("Printing Page " + pageNum);
 				if (pageNum != -1) {
 					final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-					// canvasRenderer.makeCurrentContext();
 					ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printExporter);
-					// canvasRenderer.releaseCurrentContext();
 				}
-
-				// try {
-				// Thread.sleep(1000);
-				// } catch (InterruptedException e) {
-				// // TODO Auto-generated catch block
-				// e.printStackTrace();
-				// }
-
 				final int nextPage = pageNum + 1;
 				if (nextPage < printCenters.size()) {
 					final Vector3 pos = printCenters.get(nextPage);
 					final Camera camera = Camera.getCurrentCamera();
-					// camera.setLocation(pos.getX(), pos.getY() - pageWidth * 2, pos.getZ());
-					// camera.setLocation(pos.getX(), pos.getY() - camera.getWidth() * , pos.getZ());
 					camera.setLocation(pos.getX(), -1.0, pos.getZ());
 					camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 					SceneManager.getInstance().getCameraNode().updateFromCamera();
@@ -337,8 +235,6 @@ public class PrintController implements Updater {
 							return printCenters.size();
 						}
 					});
-
-					// SceneManager.getInstance().update(10);
 
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
@@ -372,109 +268,15 @@ public class PrintController implements Updater {
 		});
 	}
 
-	// public void print() {
-	// // Setup our headless canvas for rendering.
-	// final DisplaySettings settings = new DisplaySettings(800, 600, 0, 0, false);
-	// final LwjglHeadlessCanvas canvas = new LwjglHeadlessCanvas(settings, SceneManager.getInstance());
-	// // canvas.getRenderer().setBackgroundColor(ColorRGBA.BLACK_NO_ALPHA);
-	//
-	// // Set up an image to show our 3d content in.
-	// final BufferedImage labelImage = new BufferedImage(settings.getWidth(), settings.getHeight(), BufferedImage.TYPE_INT_ARGB);
-	// final int[] tmpData = ((DataBufferInt) labelImage.getRaster().getDataBuffer()).getData();
-	//
-	// // Set up a frame and label with icon to show our image in.
-	// JFrame frame = new JFrame("Headless Example - close window to exit");
-	// frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	// JLabel label = new JLabel("View of Headless Content:");
-	// label.setVerticalTextPosition(SwingConstants.TOP);
-	// label.setHorizontalTextPosition(SwingConstants.CENTER);
-	// label.setIcon(new ImageIcon(labelImage));
-	// frame.getContentPane().add(label);
-	// frame.pack();
-	// frame.setLocationRelativeTo(null);
-	// frame.setVisible(true);
-	//
-	// // Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
-	// final PrintExporter printExporter = new PrintExporter();
-	// // final Camera camera = Camera.getCurrentCamera();
-	// // final Camera camera = canvas.getCamera();
-	// // SceneManager.getInstance().resetCamera(ViewMode.PRINT);
-	// final Camera camera = canvas.getCamera();
-	// camera.setLocation(0, -15, 15);
-	// camera.lookAt(new Vector3(0, 0, 0), Vector3.UNIT_Z);
-	//
-	// canvas.draw();
-	// final IntBuffer data = canvas.getDataBuffer();
-	//
-	// final int width = settings.getWidth();
-	//
-	// for (int x = settings.getHeight(); --x >= 0;) {
-	// data.get(tmpData, x * width, width);
-	// }
-	//
-	// label.setIcon(new ImageIcon(labelImage));
-	//
-	// for (final Vector3 pos : printCenters) {
-	// camera.setLocation(pos.getX(), pos.getY() - pageWidth * 2, pos.getZ());
-	// camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
-	// // SceneManager.getInstance().getCameraNode().updateFromCamera();
-	// // SceneManager.getInstance().update();
-	// canvas.draw();
-	// try {
-	// Thread.sleep(500);
-	// } catch (InterruptedException e) {
-	// e.printStackTrace();
-	// }
-	// final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-	// // canvasRenderer.makeCurrentContext();
-	// // ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printExporter);
-	// // canvasRenderer.releaseCurrentContext();
-	// // printExporter.export(data, settings.getWidth(), settings.getHeight());
-	// }
-	// final PrinterJob job = PrinterJob.getPrinterJob();
-	// final PageFormat pageFormat = new PageFormat();
-	// final Paper paper = new Paper();
-	// paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-	// pageFormat.setPaper(paper);
-	//
-	// job.setPageable(new Pageable() {
-	// @Override
-	// public Printable getPrintable(int arg0) throws IndexOutOfBoundsException {
-	// return printExporter;
-	// }
-	//
-	// @Override
-	// public PageFormat getPageFormat(int arg0) throws IndexOutOfBoundsException {
-	// return pageFormat;
-	// }
-	//
-	// @Override
-	// public int getNumberOfPages() {
-	// return printCenters.size();
-	// }
-	// });
-	//
-	// if (job.printDialog()) {
-	// try {
-	// job.print();
-	// } catch (PrinterException exc) {
-	// exc.printStackTrace();
-	// }
-	// }
-	// Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-	// SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
-	// }
 	public void setPrintPreview(final boolean printPreview) {
 		if (printPreview == isPrintPreview)
 			return;
 		init = true;
 		finished = false;
 		isPrintPreview = printPreview;
-
 		if (printPreview) {
 			shadingSelected = SceneManager.getInstance().isShadingEnabled();
 			shadowSelected = SceneManager.getInstance().isShadowEnaled();
-
 			if (shadingSelected)
 				SceneManager.getInstance().setShading(false);
 			if (shadowSelected)
@@ -554,12 +356,9 @@ public class PrintController implements Updater {
 				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(currentCorner);
 
 			final Box box = new Box("Page Boundary");
-			// box.setDefaultColor(ColorRGBA.GRAY);
 			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
-			// box.setData(currentCorner, currentCorner.add(pageWidth, 0.1, -pageHeight, null));
 			pagesRoot.attachChild(box);
 		}
-
 	}
 
 	private void computePrintCenters(final ArrayList<ArrayList<Spatial>> pages) {
@@ -567,7 +366,6 @@ public class PrintController implements Updater {
 			if (printPart.isPrintable()) {
 				printPart.getRoot().updateWorldTransform(true);
 				printPart.getRoot().updateWorldBound(true);
-
 				if (printPart instanceof Roof) {
 					for (final Spatial roofPart : ((Roof) printPart).getRoofPartsRoot().getChildren())
 						if (roofPart.getSceneHints().getCullHint() != CullHint.Always)
@@ -592,15 +390,10 @@ public class PrintController implements Updater {
 	}
 
 	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
-		// if (printPart.getName().startsWith("Roof"))
-		// System.out.println();
-		// printPart.updateWorldTransform(true);
-		// printPart.updateWorldBound(true);
 		for (Spatial neighborPart : page) {
 			final Vector3 neighborPartCenter = ((UserData) neighborPart.getUserData()).getPrintCenter();
 			final BoundingBox neighborBound = (BoundingBox) neighborPart.getWorldBound().clone(null);
 			final BoundingBox printPartBound = (BoundingBox) printPart.getWorldBound().clone(null);
-			;
 			final double PADDING = 0.5;
 			final double xExtend = neighborBound.getXExtent() + printPartBound.getXExtent() + PADDING;
 			final double zExtend = neighborBound.getZExtent() + printPartBound.getZExtent() + PADDING;
@@ -624,7 +417,6 @@ public class PrintController implements Updater {
 					collision = true;
 				else
 					for (final Spatial otherPart : page) {
-						// if (otherPart != neighborPart) {
 						printPartBound.setCenter(tryCenter);
 						final BoundingVolume otherPartBound = otherPart.getWorldBound().clone(null);
 						otherPartBound.setCenter(((UserData) otherPart.getUserData()).getPrintCenter());
@@ -632,7 +424,6 @@ public class PrintController implements Updater {
 							collision = true;
 							break;
 						}
-						// }
 					}
 				if (!collision) {
 					((UserData) printPart.getUserData()).setPrintCenter(tryCenter);

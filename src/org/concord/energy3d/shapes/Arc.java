@@ -10,18 +10,9 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Arc extends Line {
-
-	public Arc() {
-		
-	}
 	
 	public Arc(final String name, final int vertices) {
 		super(name);
-//		setAntialiased(true);
-//        final BlendState blend = new BlendState();
-//        blend.setBlendEnabled(true);
-//        setRenderState(blend);
-//		getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		getMeshData().setIndexMode(IndexMode.LineStrip);
 		getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(vertices));
 		Util.disablePickShadowLight(this);
@@ -42,21 +33,5 @@ public class Arc extends Line {
 		}
 		getMeshData().updateVertexCount();
 	}
-
-//	private FloatBuffer createColor(int samples) {
-//		FloatBuffer buf = BufferUtils.createColorBuffer(samples);
-//		for (int i = 0; i < samples; i++) {
-//			buf.put(1).put(1).put(1).put(1);
-//		}
-//		return buf;
-//	}
-//
-//	private FloatBuffer createNormal(int samples) {
-//		FloatBuffer buf = BufferUtils.createVector3Buffer(samples);
-//		for (int i = 0; i < samples; i++) {
-//			buf.put(0).put(0).put(1);
-//		}
-//		return buf;
-//	}
 
 }

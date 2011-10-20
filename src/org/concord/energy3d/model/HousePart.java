@@ -34,44 +34,34 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.TextureManager;
 
 public abstract class HousePart implements Serializable {
-	static final private long serialVersionUID = 1L;
-	static final protected double SNAP_DISTANCE = 0.5;
-	static protected int printSequence;
-	static protected ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
-	static private boolean snapToObjects = true;
-	static private boolean snapToGrids = false;
-	static protected boolean drawAnnotations = false;
-//	static private int globalDrawFlag = 1;
-	transient protected Node root;
-	transient protected Node pointsRoot;
-	// transient protected ArrayList<Vector3> abspoints;
-	transient protected double orgHeight;
-	transient protected HousePart original = null;
-//	transient protected Vector3 center;
-	transient protected Node labelsRoot;
-	transient protected Node sizeAnnotRoot;
-	transient protected Node angleAnnotRoot;
-	transient protected Mesh mesh;
-//	transient private int drawFlag;
-	transient protected String textureFileName;
-	transient protected boolean relativeToHorizontal;
+	private static final long serialVersionUID = 1L;
+	protected static final double SNAP_DISTANCE = 0.5;
+	protected static int printSequence;
+	protected static ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
+	private static boolean snapToObjects = true;
+	private static boolean snapToGrids = false;
+	protected static boolean drawAnnotations = false;
+	protected transient Node root;
+	protected transient Node pointsRoot;
+	protected transient double orgHeight;
+	protected transient HousePart original = null;
+	protected transient Node labelsRoot;
+	protected transient Node sizeAnnotRoot;
+	protected transient Node angleAnnotRoot;
+	protected transient Mesh mesh;
+	protected transient String textureFileName;
+	protected transient boolean relativeToHorizontal;
 	protected final int numOfDrawPoints;
 	protected final int numOfEditPoints;
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
 	protected HousePart container = null;
-	protected boolean drawCompleted = false;
-	protected int editPointIndex = -1;
 	protected double height;
-	private boolean firstPointInserted = false;
+	protected int editPointIndex = -1;
+	protected boolean drawCompleted = false;
 	protected Vector3 flattenCenter;
 	private double labelOffset = -0.01;
-
-//	public static void clearDrawFlags() {
-//		globalDrawFlag++;
-//		if (globalDrawFlag >= Integer.MAX_VALUE)
-//			globalDrawFlag = 1;
-//	}
+	private boolean firstPointInserted = false;
 
 	public static boolean isSnapToObjects() {
 		return snapToObjects;
@@ -97,16 +87,10 @@ public abstract class HousePart implements Serializable {
 		HousePart.defaultColor = defaultColor;
 	}
 
-	// public HousePart(int numOfDrawPoints, int numOfEditPoints, double height) {
-	// this(numOfDrawPoints, numOfEditPoints, height, false);
-	// }
-
-	// public HousePart(int numOfDrawPoints, int numOfEditPoints, double height, boolean relativeToHorizontal) {
 	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height) {
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
 		this.height = this.orgHeight = height;
-		// this.relativeToHorizontal = relativeToHorizontal;
 		points = new ArrayList<Vector3>(numOfEditPoints);
 		init();
 		allocateNewPoint();
@@ -115,10 +99,6 @@ public abstract class HousePart implements Serializable {
 	protected void init() {
 		relativeToHorizontal = false;
 		orgHeight = height;
-//		center = new Vector3();
-		// abspoints = new ArrayList<Vector3>(numOfEditPoints);
-		// for (int i = 0; i < points.size(); i++)
-		// abspoints.add(new Vector3());
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");
 		sizeAnnotRoot = new Node("Size Annotations");
@@ -127,13 +107,9 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		labelsRoot = new Node("Labels");
 
-		// sizeAnnotRoot.getSceneHints().setCullHint(CullHint.Always);
-		// angleAnnotRoot.getSceneHints().setCullHint(CullHint.Always);
-
 		setAnnotationsVisible(drawAnnotations);
 
 		// Set up a reusable pick results
-		// final Vector3 origin = new Vector3();
 		for (int i = 0; i < numOfEditPoints; i++)
 			addNewEditPointShape(i);
 
@@ -141,14 +117,6 @@ public abstract class HousePart implements Serializable {
 		root.attachChild(sizeAnnotRoot);
 		root.attachChild(angleAnnotRoot);
 		root.attachChild(labelsRoot);
-
-		// final OffsetState offsetState = new OffsetState();
-		// offsetState.setTypeEnabled(OffsetType.Line, true);
-		// offsetState.setFactor(1);
-		// offsetState.setUnits(10);
-		// root.setRenderState(offsetState);
-
-		// computeAbsPoints();
 
 		if (textureFileName == null)
 			textureFileName = getDefaultTextureFileName();
@@ -161,7 +129,6 @@ public abstract class HousePart implements Serializable {
 		pointShape.getSceneHints().setCullHint(CullHint.Always);
 		pointShape.setModelBound(new BoundingBox());
 		pointsRoot.attachChild(pointShape);
-		// System.out.println(i);
 	}
 
 	public Mesh getEditPointShape(final int i) {
@@ -177,26 +144,13 @@ public abstract class HousePart implements Serializable {
 	public void setOriginal(HousePart original) {
 		this.original = original;
 		root.detachChild(pointsRoot);
-//		this.center = original.center;
 		if (original.mesh != null) {
 			root.detachChild(mesh);
 			mesh = original.mesh.makeCopy(true);
 			mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getIndex(), false));
 			root.attachChild(mesh);
-			
-//			root.detachChild(sizeAnnotRoot);
-//			sizeAnnotRoot = original.sizeAnnotRoot.makeCopy(true);
-//			root.attachChild(sizeAnnotRoot);
-//			
-//			root.detachChild(angleAnnotRoot);
-//			angleAnnotRoot = original.sizeAnnotRoot.makeCopy(true);
-//			root.attachChild(angleAnnotRoot);
-			
-			// this.sizeAnnotRoot = original.sizeAnnotRoot.makeCopy(false);
-			// root.attachChild(sizeAnnotRoot);
 		}
-		 drawAnnotations();
-		// setAnnotationsVisible(drawAnnotations);
+		drawAnnotations();
 		root.updateWorldBound(true);
 	}
 
@@ -210,17 +164,11 @@ public abstract class HousePart implements Serializable {
 		return root;
 	}
 
-	// public ArrayList<Vector3> getAbsPoints() {
-	// if (root == null)
-	// init();
-	// return abspoints;
-	// }
-
 	public ArrayList<Vector3> getPoints() {
 		if (root == null)
 			init();
 		return points;
-	}	
+	}
 
 	public void complete() {
 		drawCompleted = true;
@@ -246,7 +194,6 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void showPoints() {
-		// for (int i = 0; i < points.size(); i++) {
 		for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
 			computeEditPointScale(i);
 			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
@@ -259,8 +206,6 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void hidePoints() {
-		// for (int i = 0; i < points.size(); i++)
-		// pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 		for (final Spatial child : pointsRoot.getChildren())
 			child.getSceneHints().setCullHint(CullHint.Always);
 	}
@@ -349,12 +294,8 @@ public abstract class HousePart implements Serializable {
 	protected Vector3 toRelative(final ReadOnlyVector3 org, final HousePart container) {
 		if (container == null)
 			return new Vector3(org);
-		// ArrayList<Vector3> wallPoints = container.getAbsPoints();
-		// Vector3 origin = wallPoints.get(0);
 		Vector3 origin = container.getAbsPoint(0);
 		Vector3 p = org.subtract(origin, null);
-		// Vector3 wallx = wallPoints.get(2).subtract(origin, null);
-		// Vector3 wally = wallPoints.get(1).subtract(origin, null);
 		Vector3 wallx = container.getAbsPoint(2).subtract(origin, null);
 		Vector3 wally = container.getAbsPoint(1).subtract(origin, null);
 		Vector3 pointOnWall = new Vector3(wallx.getX() == 0 ? p.getY() / wallx.getY() : p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY() : org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
@@ -368,10 +309,6 @@ public abstract class HousePart implements Serializable {
 	protected Vector3 toAbsolute(final ReadOnlyVector3 p, final HousePart container) {
 		if (container == null)
 			return new Vector3(p);
-		// ArrayList<Vector3> containerPoints = container.getAbsPoints();
-		// Vector3 origin = containerPoints.get(0);
-		// Vector3 wallx = containerPoints.get(2).subtract(origin, null);
-		// Vector3 wally = containerPoints.get(1).subtract(origin, null);
 		Vector3 origin = container.getAbsPoint(0);
 		Vector3 wallx = container.getAbsPoint(2).subtract(origin, null);
 		Vector3 wally = container.getAbsPoint(1).subtract(origin, null);
@@ -408,107 +345,21 @@ public abstract class HousePart implements Serializable {
 	private void allocateNewPoint() {
 		for (int i = 0; i < numOfEditPoints / numOfDrawPoints; i++) {
 			points.add(new Vector3());
-			// if (points != abspoints)
-			// abspoints.add(new Vector3());
 		}
 	}
 
-	// protected void clearDrawFlag() {
-	// drawFlag = 0;
-	// }
-
 	public void draw() {
-//		if (drawFlag == globalDrawFlag)
-//			return;
-//		drawFlag = globalDrawFlag;
-
-//		System.out.println("Drawing..." + this);
-		
 		if (root == null)
 			init();
-
-		// computeAbsPoints();
-
 		drawMesh();
-		
 		updateEditShapes();
-
-//		computeCenter();
-
 		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
-
-		// if (isFlatten && original != null && isPrintable() && isDrawCompleted()) // && flattenTime >= 0) // TODO If draw not completed then it shouldn't even exist at this point!
-		// flatten();
-
-		// if (original != null && isPrintable())
-		// if (isPrintable())
-		// drawLabels();
-
-		// if (drawAnnotations)
 		drawAnnotations();
 	}
 
-	// protected void computeAbsPoints() {
-	// for (int i = 0; i < points.size(); i++) {
-	// final Vector3 p = toAbsolute(points.get(i));
-	// abspoints.get(i).set(p);
-	// pointsRoot.getChild(i).setTranslation(p);
-	// }
-	// }
-
-	// protected void computeCenter() {
-	// center.set(0, 0, 0);
-	// for (int i = 0; i < abspoints.size(); i++)
-	// center.addLocal(abspoints.get(i));
-	// center.multiplyLocal(1.0 / abspoints.size());
-	// }
-
-//	protected void computeCenter() {
-////		center.set(0, 0, 0);
-//		// for (int i = 0; i < abspoints.size(); i++)
-//		// center.addLocal(abspoints.get(i));
-//		// center.multiplyLocal(1.0 / abspoints.size());
-//
-//		if (mesh == null)
-//			return;
-//		double minX, minY, minZ;
-//		double maxX, maxY, maxZ;
-//		minX = minY = minZ = Double.MAX_VALUE;
-//		maxX = maxY = maxZ = -Double.MAX_VALUE;
-//
-//		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-//		buf.rewind();
-//		while (buf.hasRemaining()) {
-//			final double x = buf.get();
-//			final double y = buf.get();
-//			final double z = buf.get();
-//			if (x < minX)
-//				minX = x;
-//			if (y < minY)
-//				minY = y;
-//			if (z < minZ)
-//				minZ = z;
-//			if (x > maxX)
-//				maxX = x;
-//			if (y > maxY)
-//				maxY = y;
-//			if (z > maxZ)
-//				maxZ = z;
-//		}
-//		center.set(minX + (maxX - minX) / 2.0, minY + (maxY - minY) / 2.0, minZ + (maxZ - minZ) / 2.0);
-//	}
-
 	protected void updateEditShapes() {
-		// int i = 0;
-		// for (final Spatial editShape : pointsRoot.getChildren()) {
-		// editShape.setTranslation(abspoints.get(i++));
-		// }
-
 		for (int i = 0; i < points.size(); i++)
 			getEditPointShape(i).setTranslation(getAbsPoint(i));
-		
-			
-//		pointsRoot.updateWorldBound(true);	
 	}
 
 	public void flattenInit() {
@@ -520,13 +371,10 @@ public abstract class HousePart implements Serializable {
 	protected ReadOnlyVector3 getCenter() {
 		return mesh.getModelBound().getCenter();
 	}
-	
+
 	public void flatten(double flattenTime) {
 		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
 		root.setTranslation(targetCenter.subtractLocal(flattenCenter).multiplyLocal(flattenTime));
-//		drawAnnotations();
-//		root.updateWorldTransform(true);
-//		root.updateWorldBound(true);
 		root.updateGeometricState(0);
 	}
 
@@ -551,7 +399,6 @@ public abstract class HousePart implements Serializable {
 		label.setTranslation(offset);
 		return printSequence;
 	}
-
 
 	public void hideLabels() {
 		for (final Spatial label : labelsRoot.getChildren())
@@ -578,14 +425,14 @@ public abstract class HousePart implements Serializable {
 	protected SizeAnnotation fetchSizeAnnot(final int annotCounter) {
 		return fetchSizeAnnot(annotCounter, sizeAnnotRoot);
 	}
-	
+
 	protected SizeAnnotation fetchSizeAnnot(final int annotCounter, final Node sizeAnnotRoot) {
 		final SizeAnnotation annot;
 		if (annotCounter < sizeAnnotRoot.getChildren().size()) {
 			annot = (SizeAnnotation) sizeAnnotRoot.getChild(annotCounter);
 			annot.getSceneHints().setCullHint(CullHint.Inherit);
 			for (int i = annotCounter + 1; i < sizeAnnotRoot.getChildren().size(); i++)
-				sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);			
+				sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 		} else {
 			annot = new SizeAnnotation();
 			sizeAnnotRoot.attachChild(annot);
@@ -596,14 +443,14 @@ public abstract class HousePart implements Serializable {
 	protected AngleAnnotation fetchAngleAnnot(final int annotCounter) {
 		return fetchAngleAnnot(annotCounter, angleAnnotRoot);
 	}
-	
+
 	protected AngleAnnotation fetchAngleAnnot(final int annotCounter, final Node angleAnnotRoot) {
 		final AngleAnnotation annot;
 		if (annotCounter < angleAnnotRoot.getChildren().size()) {
 			annot = (AngleAnnotation) angleAnnotRoot.getChild(annotCounter);
 			annot.getSceneHints().setCullHint(CullHint.Inherit);
 			for (int i = annotCounter + 1; i < angleAnnotRoot.getChildren().size(); i++)
-				angleAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);			
+				angleAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 		} else {
 			annot = new AngleAnnotation();
 			angleAnnotRoot.attachChild(annot);
@@ -614,15 +461,6 @@ public abstract class HousePart implements Serializable {
 	public abstract void setPreviewPoint(int x, int y);
 
 	public void delete() {
-		// System.out.println("Removing: " + this);
-		// Scene.getInstance().getOriginalHouseRoot().detachChild(root);
-		// Scene.getInstance().getParts().remove(this);
-		//
-		// for (HousePart child : children)
-		// child.delete();
-		// // Scene.getInstance().remove(child);
-		// children.clear();
-		//
 	}
 
 	protected void drawAnnotations() {
@@ -659,14 +497,9 @@ public abstract class HousePart implements Serializable {
 
 	@Override
 	public String toString() {
-		// return this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + "), editPoint = " + editPointIndex;
 		String s = this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + ")";
 		for (int i = 0; i < points.size(); i += 2)
-			// if (root == null)
-			// s += "\t" + Util.toString(abspoints.get(i));
 			s += "\t" + Util.toString(getAbsPoint(i));
-		// else
-		// s += "\t" + Util.toString(root.getTransform().applyForward(points.get(i), null));
 		s += ("\teditPoint = " + editPointIndex);
 		return s;
 	}
@@ -678,7 +511,7 @@ public abstract class HousePart implements Serializable {
 	public Vector3 getAbsPoint(final int index) {
 		return toAbsolute(points.get(index));
 	}
-	
+
 	protected void drawChildren() {
 		for (final HousePart child : children)
 			child.draw();

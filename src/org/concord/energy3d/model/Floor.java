@@ -24,7 +24,6 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Floor extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.2;
-//	protected double labelTop;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 
 	public Floor() {
@@ -64,32 +63,27 @@ public class Floor extends HousePart {
 	}
 
 	private Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
-//		center.set(0, 0, 0);
 		double maxY = wallUpperPoints.get(0).getY();
 		for (PolygonPoint p : wallUpperPoints) {
-//			center.addLocal(p.getX(), p.getY(), height);
 			p.set(p.getX(), p.getY(), height);
 			if (p.getY() > maxY)
 				maxY = p.getY();
 		}
-//		center.multiplyLocal(1.0 / wallUpperPoints.size());
-//		labelTop = (maxY - center.getY());
 		points.get(0).set(toRelative(getCenter(), container.getContainer()));
 		return new Polygon(wallUpperPoints);
 	}
 
 	private void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
-			Poly2Tri.triangulate(polygon);
-			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
-			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
-			ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, new TPoint(0,0,0), new TPoint(1,0,0), new TPoint(0,1,0));
-			mesh.getMeshData().updateVertexCount();
-			mesh.updateModelBound();
-			root.updateWorldBound(true);
-//			center = new Vector3(root.getWorldBound().getCenter());
+		Poly2Tri.triangulate(polygon);
+		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
+		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
+		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
+		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, new TPoint(0, 0, 0), new TPoint(1, 0, 0), new TPoint(0, 1, 0));
+		mesh.getMeshData().updateVertexCount();
+		mesh.updateModelBound();
+		root.updateWorldBound(true);
 	}
-	
+
 	protected void computeAbsPoints() {
 	}
 
@@ -103,14 +97,11 @@ public class Floor extends HousePart {
 				hidePoints();
 				return;
 			}
-			
 			mesh.getSceneHints().setCullHint(CullHint.Inherit);
 			wallUpperPoints = exploreWallNeighbors((Wall) container);
 			fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
-
 			for (int i = 0; i < points.size(); i++)
 				pointsRoot.getChild(i).setTranslation(points.get(i));
-
 			mesh.updateModelBound();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -118,9 +109,6 @@ public class Floor extends HousePart {
 	}
 
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
-//		center.set(0, 0, 0);
-//		final Vector3 min = new Vector3();
-//		final Vector3 max = new Vector3();		
 		final ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
 		startWall.visitNeighbors(new WallVisitor() {
 			public void visit(Wall currentWall, Snap prev, Snap next) {
@@ -132,18 +120,9 @@ public class Floor extends HousePart {
 				final Vector3 p2 = currentWall.getAbsPoint(pointIndex);
 				addPointToPolygon(poly, p1);
 				addPointToPolygon(poly, p2);
-//				min.set(Math.min(min.getX(), p1.getX()), Math.min(min.getY(), p1.getY()), Math.min(min.getZ(), p1.getZ()));
-//				min.set(Math.min(min.getX(), p2.getX()), Math.min(min.getY(), p2.getY()), Math.min(min.getZ(), p2.getZ()));
-//				max.set(Math.max(max.getX(), p1.getX()), Math.max(max.getY(), p1.getY()), Math.max(max.getZ(), p1.getZ()));
-//				max.set(Math.max(max.getX(), p2.getX()), Math.max(max.getY(), p2.getY()), Math.max(max.getZ(), p2.getZ()));
 			}
 
 		});
-
-//		center.multiplyLocal(1.0 / poly.size());
-//		center.set(max).addLocal(min).multiplyLocal(0.5); //.setZ(max.getZ());
-		
-//		points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
 
 		return poly;
 	}
@@ -167,17 +146,17 @@ public class Floor extends HousePart {
 			fetchSizeAnnot(annotCounter++).setRange(a, b, getCenter(), getFaceDirection(), original == null, Align.Center, true, false, Scene.isDrawAnnotationsInside());
 		}
 	}
-	
+
 	protected String getDefaultTextureFileName() {
 		return "floor.jpg";
 	}
-		
+
 	public void flatten(double flattenTime) {
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 		root.updateWorldTransform(true);
 		super.flatten(flattenTime);
 	}
-	
+
 	public Vector3 getAbsPoint(final int index) {
 		return toAbsolute(points.get(index), container == null ? null : container.getContainer());
 	}
@@ -187,5 +166,4 @@ public class Floor extends HousePart {
 		wallUpperPoints = ((Floor) original).wallUpperPoints;
 		super.setOriginal(original);
 	}
-	
 }

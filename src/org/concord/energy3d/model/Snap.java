@@ -3,11 +3,9 @@ package org.concord.energy3d.model;
 import java.io.Serializable;
 
 public class Snap implements Serializable {
-	static private final long serialVersionUID = 1L;
-	static private int currentAnnotationDrawnStamp = 1;
-	transient private int annotationDrawn;
-//	static private int currentVisitStamp = 1;
-//	transient private int visitStamp;
+	private static final long serialVersionUID = 1L;
+	private static int currentAnnotationDrawnStamp = 1;
+	private transient int annotationDrawn;
 	private Wall neighbor1;
 	private Wall neighbor2;
 	private int pointIndex1;
@@ -16,10 +14,6 @@ public class Snap implements Serializable {
 	public static void clearAnnotationDrawn() {
 		currentAnnotationDrawnStamp = ++currentAnnotationDrawnStamp % 1000;
 	}
-	
-//	public static void clearVisits() {
-//		currentVisitStamp = ++currentVisitStamp % 1000;
-//	}	
 	
 	public Snap(Wall neighbor1, Wall neighbor2, int pointIndex1, int pointIndex2) {
 		this.neighbor1 = neighbor1;
@@ -57,15 +51,6 @@ public class Snap implements Serializable {
 		return annotationDrawn == currentAnnotationDrawnStamp;
 	}
 
-//	public boolean isVisited() {
-//		return visitStamp == currentVisitStamp;
-//	}
-//
-//	public void visit() {
-//		visitStamp = currentVisitStamp;
-//	}	
-	
-
 	@Override
 	public boolean equals(Object obj) {
 		if (obj != null && obj instanceof Snap) {
@@ -74,5 +59,4 @@ public class Snap implements Serializable {
 		} else
 			return false;
 	}
-	
 }

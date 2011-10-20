@@ -92,15 +92,10 @@ public class PrintExporter implements ScreenExportable, Printable {
 		if (pageIndex >= images.size()) {
 			return NO_SUCH_PAGE;
 		}
-
-//		Graphics2D g2d = (Graphics2D) graphics;
-//		g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-
 		final BufferedImage img = images.get(pageIndex);
 		
 		final int w = img.getWidth();
 		final int h = img.getHeight();
-//		final double pageRatio = pageFormat.getWidth() / pageFormat.getHeight();
 		final double pageRatio = pageFormat.getImageableWidth() / pageFormat.getImageableHeight();
 		final BufferedImage croppedImg;
 		if (w / h > pageRatio)
@@ -108,11 +103,7 @@ public class PrintExporter implements ScreenExportable, Printable {
 		else
 			croppedImg = img.getSubimage(0, (int)(h-w / pageRatio)/2, w, (int)(w / pageRatio));
 		
-//		graphics.drawImage(img, 0, 0, 600, 600 * h / w , null);
-//		graphics.drawImage(croppedImg, 0, 0, 600, 600 * h / w , null);
 		graphics.drawImage(croppedImg, 0, 0, (int)pageFormat.getWidth(), (int)pageFormat.getHeight() , null);
-
 		return PAGE_EXISTS;
 	}
-
 }

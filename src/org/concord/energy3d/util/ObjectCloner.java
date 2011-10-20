@@ -3,12 +3,8 @@ package org.concord.energy3d.util;
 import java.io.*;
 
 public class ObjectCloner {
-	// so that nobody can accidentally create an ObjectCloner object
-	private ObjectCloner() {
-	}
 
-	// returns a deep copy of an object
-	static public Object deepCopy(Object oldObj) {
+	public static Object deepCopy(Object oldObj) {
 		ObjectOutputStream oos = null;
 		ObjectInputStream ois = null;
 		try {
@@ -34,5 +30,4 @@ public class ObjectCloner {
 			}
 		}
 	}
-
 }

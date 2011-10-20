@@ -789,7 +789,14 @@ Version 0.4 - Auguest 24, 2011
 - save new gable roof data
 - automatically convert pre version 0.4.1 roof data to new format whenever new data is null
 - fix problem with open dialog box not showing in webstart version
+- remove debug menu
+- remove commented codes
+- cleanup the code
+- release version 0.5
  
+**********************************************************************************************
+Version 0.5 - October 20, 2011
+
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
 - *fix problem with resizing custome roof

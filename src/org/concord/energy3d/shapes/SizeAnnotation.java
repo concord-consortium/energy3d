@@ -23,26 +23,17 @@ public class SizeAnnotation extends Annotation {
 	private ReadOnlyVector3 to;
 	private ReadOnlyVector3 center;
 	private ReadOnlyVector3 faceDirection;
-	private boolean front;
 	private Align align;
+	private boolean front;
 	private boolean autoFlipOffset;
 	private boolean upsideDownText;
 	private boolean drawInside;
 
 	public SizeAnnotation() {
 		super(new Line("Size annotation lines", BufferUtils.createVector3Buffer(8), null, null, null));
-//		((Line)mesh).setAntialiased(true);
-//        final BlendState blend = new BlendState();
-//        blend.setBlendEnabled(true);
-//        mesh.setRenderState(blend);	
-				
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		arrows.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(arrows);
-//		arrows.getSceneHints().setCastsShadows(false);
-		
-//		Util.disablePickShadowLight(mesh);
-//		Util.disablePickShadowLight(arrows);
 		setColor(ColorRGBA.BLACK);
 		this.attachChild(arrows);
 		this.attachChild(label);
@@ -147,22 +138,11 @@ public class SizeAnnotation extends Annotation {
 
 		arrows.updateModelBound();
 
-//		label.setTranslation(middle);
-//		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 100) / 100.0 + Scene.getInstance().getUnit().getNotation());
-//		label.setAlign(align);
-//		label.updateWorldBound(false);
 		this.updateWorldTransform(true);
 		this.updateWorldBound(true);
 	}
 
-//	protected void updateTextSize() {
-//		final BoundingBox bounds = (BoundingBox) Scene.getInstance().getOriginalHouseRoot().getWorldBound();
-//		if (bounds != null) {
-//			final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
-//			label.setFontScale(size / 20.0);
-//		}
-//	}
-	
+	@Override
 	public void setColor(final ReadOnlyColorRGBA color) {
 		super.setColor(color);
 		arrows.setDefaultColor(color);
@@ -177,5 +157,4 @@ public class SizeAnnotation extends Annotation {
         node.detachChildAt(2);
         return node;
     }
-
 }

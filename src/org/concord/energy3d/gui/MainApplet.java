@@ -44,7 +44,6 @@ public class MainApplet extends JApplet {
         		frame.setLocation((int) (screenSize.getWidth() - frame.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - frame.getSize().getHeight()) / 2);                
             }
         }		
-//		this.setSize(300, 200);
 		this.setContentPane(getMainPanel());
 		SceneManager.getInstance();
 		
@@ -72,5 +71,4 @@ public class MainApplet extends JApplet {
 	public void stop() {
 		SceneManager.getInstance().exit();		
 	}
-	
 }

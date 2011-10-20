@@ -21,9 +21,9 @@ import com.ardor3d.renderer.Camera;
 public class OrbitControl extends CameraControl {
 	private static final double FRONT_DISTANCE_DEFAULT = 8;
 	private static double frontDistance = FRONT_DISTANCE_DEFAULT;
-	private Vector3 _center = new Vector3(1, 0, 1);
 	private final Matrix3 _workerMatrix_2 = new Matrix3();
 	private final Vector4 _workerVector4 = new Vector4();
+	private Vector3 _center = new Vector3(1, 0, 1);
 
 	public OrbitControl(final ReadOnlyVector3 upAxis) {
 		super(upAxis);
@@ -59,7 +59,6 @@ public class OrbitControl extends CameraControl {
 			}
 			loc.normalizeLocal().multiplyLocal(_moveSpeed * tpf).addLocal(camera.getLocation());
 			camera.setLocation(loc);
-//			_center.set(camera.getDirection()).multiplyLocal(FRONT_DISTANCE_DEFAULT).addLocal(camera.getLocation());
 			clearOrbitCenter();
 		}
 
@@ -105,21 +104,19 @@ public class OrbitControl extends CameraControl {
 		_workerVector.set(_workerVector4.getX(), _workerVector4.getY(), _workerVector4.getZ());
 		_workerVector.addLocal(camera.getLocation());
 		camera.setLocation(_workerVector);
-//		_center.set(camera.getDirection()).multiplyLocal(FRONT_DISTANCE).addLocal(camera.getLocation());
 		clearOrbitCenter();
 	}
-	
+
 	private void clearOrbitCenter() {
 		_center.set(0, 0, 0);
 	}
-	
+
 	public void reset() {
 		clearOrbitCenter();
 		computeNewFrontDistance();
 	}
-	
+
 	public void computeNewFrontDistance() {
-//		final Camera currentCamera = Camera.getCurrentCamera();
 		final Camera currentCamera = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera();
 		if (currentCamera != null) {
 			frontDistance = _center.subtractLocal(currentCamera.getLocation()).length();

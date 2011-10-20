@@ -19,7 +19,6 @@ public class Blinker implements Updater {
 	}
 
 	public void init() {
-
 	}
 
 	public void update(ReadOnlyTimer timer) {
@@ -29,7 +28,6 @@ public class Blinker implements Updater {
 			final SceneHints sceneHints = target.getSceneHints();
 			sceneHints.setCullHint(sceneHints.getCullHint() == CullHint.Always ? CullHint.Inherit : CullHint.Always);
 		}
-
 	}
 
 	public Spatial getTarget() {

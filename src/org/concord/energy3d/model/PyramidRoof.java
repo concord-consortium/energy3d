@@ -10,7 +10,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class PyramidRoof extends Roof {
 	private static final long serialVersionUID = 1L;
-	transient private boolean recalculateEditPoints;
+	private transient boolean recalculateEditPoints;
 
 	public PyramidRoof() {
 		super(1, 1, 0.5);
@@ -30,7 +30,6 @@ public class PyramidRoof extends Roof {
 		drawWalls();
 		if (container != null)
 			showPoints();
-//		Scene.getInstance().updateTextSizes();
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
@@ -53,5 +52,4 @@ public class PyramidRoof extends Roof {
 		} else
 			points.get(0).setZ(center.getZ() + height);
 	}	
-	
 }

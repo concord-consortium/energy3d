@@ -66,18 +66,8 @@ public class AngleAnnotation extends Annotation {
 			this.detachChild(label);
 		} else {
 			((Arc)mesh).set(radius, start, end);
-//			if (start < 0)
-//				start = Math.PI * 2 + start;
-//			angle = Math.round((start) * 180.0 / Math.PI);
-			
 			mesh.setRotation(toFlat.invertLocal());
 			label.setText("" + angleDegrees + "\u00B0");
-//			label.updateModelBound();
-//			label.setTranslation(a.add(b, null).normalizeLocal().multiplyLocal(radius / 2.0));
-//			final ReadOnlyVector3 ab = a.add(b, null).normalizeLocal();
-//			label.setRotation(new Matrix3().fromAxes(n.cross(ab, null).normalizeLocal().negateLocal(), n, ab));
-//			label.setRotation(new Matrix3().fromAxes(n.negate(null).cross(Vector3.UNIT_Z, null).normalizeLocal(), n.negate(null), n.negate(null).cross(Vector3.UNIT_X, null).negateLocal().normalizeLocal()));
-//			label.setRotation(toFlat.multiplyLocal(new Matrix3().fromAngles(-Math.PI / 2.0, 0, 0))); //new Matrix3().fromAxes(n.negate(null).cross(Vector3.UNIT_Z, null).normalizeLocal(), n.negate(null), ab));
 			final double start360 = start < 0 ? MathUtils.TWO_PI + start : start;
 			final double angle360 = angle < 0 ? MathUtils.TWO_PI + angle : angle;
 			final double end360 = start360 + angle360;
@@ -88,8 +78,6 @@ public class AngleAnnotation extends Annotation {
 			this.attachChild(label);
 		}
 		mesh.updateModelBound();
-		
 		this.setTranslation(mainPoint.add(n.multiply(0.001, null), null));
 	}	
-	
 }

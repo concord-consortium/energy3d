@@ -44,5 +44,4 @@ public class UserData {
 	public String toString() {
 		return housePart + " index = " + index + " PrintCenter = " + Util.toString(printCenter);
 	}
-
 }

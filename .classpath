@@ -9,6 +9,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-effects"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-jogl"/>
 	<classpathentry kind="src" path="/ardor3d-awt"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-lwjgl"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

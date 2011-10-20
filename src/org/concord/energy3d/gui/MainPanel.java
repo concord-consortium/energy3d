@@ -914,4 +914,4 @@ public class MainPanel extends JPanel {
 		}
 		return roofGableButton;
 	}
-} // @jve:decl-index=0:visual-constraint="10,10"
+}

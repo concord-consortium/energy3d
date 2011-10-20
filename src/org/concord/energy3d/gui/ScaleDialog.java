@@ -22,8 +22,8 @@ import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.scene.Scene;
 
-@SuppressWarnings("serial")
 public class ScaleDialog extends JDialog {
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField currentTextField;
 	private JTextField newTextField;

@@ -108,14 +108,9 @@ public class Heliodon {
 
 		// Sun Path
 		sunPath = new Line("Sun Path", BufferUtils.createVector3Buffer(SUN_PATH_VERTICES), null, null, null);
-//		sunPath.setAntialiased(true);
-//        final BlendState blend = new BlendState();
-//        blend.setBlendEnabled(true);
-//        sunPath.setRenderState(blend);		
 		sunPath.setLineWidth(3);
 		sunPath.setDefaultColor(ColorRGBA.YELLOW);
 		sunPath.getMeshData().setIndexMode(IndexMode.LineStrip);
-//		sunPath.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		Util.disablePickShadowLight(sunPath);
 		root.attachChild(sunPath);
 
@@ -147,8 +142,6 @@ public class Heliodon {
 		base.getMeshData().setIndexMode(IndexMode.QuadStrip);
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
-//		offsetState.setFactor(0.2f);
-//		offsetState.setUnits(3f);
 		offsetState.setFactor(0.1f);
 		offsetState.setUnits(0.1f);		
 		base.setRenderState(offsetState);
@@ -170,7 +163,6 @@ public class Heliodon {
 		final BMText northLabel = new BMText("North", "N", FontManager.getInstance().getAnnotationFont(), Align.Center);
 		northLabel.setAutoRotate(false);
 		northLabel.setAutoScale(AutoScale.Off);
-//		northLabel.setAutoFade(AutoFade.Off);
 		northLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, 0));
 		northLabel.setTranslation(0, 6, 0);
 		root.attachChild(northLabel);
@@ -280,9 +272,6 @@ public class Heliodon {
 						p.set(buf.get(), buf.get(), buf.get());
 						rootTansform.applyForward(p, p_abs);
 						final double d;
-//						if (intersectionPoint != null)
-//							d = intersectionPoint.distanceSquared(p_abs);
-//						else
 							d = pickRay.distanceSquared(p_abs, null);
 						if (d < smallestDistance) {
 							smallestDistance = d;
@@ -293,9 +282,6 @@ public class Heliodon {
 					totalHourVertices = buf.limit() / 3;
 				}
 				
-//				final Vector3 screenCoordinates = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getScreenCoordinates(newSunLocation);
-//				screenCoordinates.setZ(0);
-//				if (screenCoordinates.distanceSquared(mouse.getX(), mouse.getY(), 0) > 100000)
 				if (smallestDistance > 5.0 * root.getTransform().getScale().getX() * root.getTransform().getScale().getX())
 					selectDifferentDeclinationWithMouse = true;
 				
@@ -346,19 +332,15 @@ public class Heliodon {
 						double newDeclinationAngle = -TILT_ANGLE + (2.0 * TILT_ANGLE * resultRow / DECLINATION_DIVISIONS);
 						declinationChanged = Math.abs(newDeclinationAngle - declinationAngle) > MathUtils.EPSILON;
 						if (declinationChanged) {							
-//							System.out.println("resultRow = " + resultRow + " / " + DECLINATION_DIVISIONS);
 							setDeclinationAngle(newDeclinationAngle, false, true);			
-//							drawSunPath();
 							dirtySunPath = true;
 						}
 					}					
 				}				
 				final double newHourAngle = ((double)hourVertex - Math.floor(totalHourVertices / 2.0)) * Math.PI / 48.0;
 				final boolean hourAngleChanged = Math.abs(newHourAngle - hourAngle) > MathUtils.EPSILON;
-				if (hourAngleChanged) {
-//					System.out.println("hourVertex = " + hourVertex + " / " + totalHourVertices);
+				if (hourAngleChanged)
 					setHourAngle(newHourAngle, false, true);					
-				}
 				if (declinationChanged || hourAngleChanged)
 					setSunLocation(newSunLocation);
 			}
@@ -527,7 +509,6 @@ public class Heliodon {
 			}
 			counter++;
 		}
-//		System.out.println("\nbase limit = " + buf.position() + " / " + buf.capacity());
 		base.updateModelBound();
 		baseTicks.updateModelBound();
 	}	
@@ -561,7 +542,6 @@ public class Heliodon {
 		sunRegion.getMeshData().updateVertexCount();
 		sunRegion.updateModelBound();
 		sunRegion.updateGeometricState(0);
-//		System.out.println("limit = " + limit + " / " + buf.capacity());
 		dirtySunRegion = false;
 	}
 
@@ -581,7 +561,6 @@ public class Heliodon {
 		buf.limit(limit);
 		sunPath.updateModelBound();
 		sunPath.getSceneHints().setCullHint(limit == 0 ? CullHint.Always : CullHint.Inherit);
-//		System.out.println("sunpath limit = " + limit + " / " + buf.capacity());
 		dirtySunPath = false;
 	}
 
@@ -653,5 +632,4 @@ public class Heliodon {
 		else
 			sunRegion.getSceneHints().setCullHint(CullHint.Always);
 	}
-	
 }
