@@ -134,41 +134,41 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private static final double MOVE_SPEED = 5;
 
-	static public final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
-	static private final SceneManager instance = new SceneManager(MainPanel.getInstance());
-	static private final boolean JOGL = true;
+	public static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
+	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());
+	private static final boolean JOGL = true;
 	private final Canvas canvas;
-	public final FrameHandler frameHandler;
+	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
 	private final Node root = new Node("Root");
 	private final Node backgroundRoot = new Node("Scenary Root");
 	private final BasicPassManager passManager = new BasicPassManager();
 	private final Mesh floor = new Quad("Floor", 200, 200);
 	private final LightState lightState = new LightState();
-	private boolean exit = false;
-	private boolean rotAnim = false;
+	private final UndoManager undoManager = new UndoManager();
 	private HousePart selectedHousePart = null;
 	private HousePart hoveredHousePart = null;
 	private Operation operation = Operation.SELECT;
 	private Heliodon heliodon;
 	private CameraControl control;
 	private ParallelSplitShadowMapPass shadowPass;
-	private boolean sunControl;
-	private boolean sunAnim;
 	private ViewMode viewMode = ViewMode.NORMAL;
-	private boolean operationFlag = false;
 	private CameraNode cameraNode;
-	private boolean operationStick = false;
 	private TwoInputStates moveState;
-	private boolean drawBounds = false;
-	private long lastRenderTime;
-	private boolean mouseControlEnabled = true;
-	private final UndoManager undoManager = new UndoManager();
-	private UserData pick;
-	private boolean update = true;
-	private double updateTime = -1;
 	private AddHousePartCommand addHousePartCommand;
 	private EditHousePartCommand editHousePartCommand;
+	private UserData pick;
+	private double updateTime = -1;
+	private long lastRenderTime;
+	private boolean mouseControlEnabled = true;
+	private boolean drawBounds = false;
+	private boolean exit = false;
+	private boolean rotAnim = false;
+	private boolean sunControl;
+	private boolean sunAnim;
+	private boolean operationStick = false;
+	private boolean operationFlag = false;
+	private boolean update = true;
 
 	public static SceneManager getInstance() {
 		return instance;
