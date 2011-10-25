@@ -5,8 +5,7 @@ import javax.swing.UIManager;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
 
-public class MainApplication {
-
+public class MainApplication {	
 	public static void main(String[] args) {
 		Config.setWebStart(System.getProperty("javawebstart.version", null) != null);
 		if (Config.isWebStart()) {

@@ -797,6 +797,9 @@ Version 0.4 - Auguest 24, 2011
 **********************************************************************************************
 Version 0.5 - October 20, 2011
 
+- fix problem with print and preview due to missing default constructor in class Arc
+- release version 0.5.1
+
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
 - *fix problem with resizing custome roof

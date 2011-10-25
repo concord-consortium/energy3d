@@ -11,6 +11,10 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Arc extends Line {
 	
+	public Arc() {
+		// this default constructor is needed when makeCopy is called to clone this shape
+	}
+	
 	public Arc(final String name, final int vertices) {
 		super(name);
 		getMeshData().setIndexMode(IndexMode.LineStrip);

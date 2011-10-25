@@ -199,7 +199,7 @@ public class MainFrame extends JFrame {
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int) (screenSize.getWidth() - this.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setTitle("Energy3D");
+		this.setTitle("Energy3D v" + Config.VERSION);
 		this.setJMenuBar(getAppMenuBar());
 		this.setContentPane(getMainPanel());
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -563,8 +563,7 @@ public class MainFrame extends JFrame {
 			aboutDialog.setTitle("About");
 			JPanel p = new JPanel(new BorderLayout());
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			final String version = "0.5";
-			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + version + "<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grant #0918449 to the Concord Consortium. </html>"), BorderLayout.CENTER);
+			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + Config.VERSION + "<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grant #0918449 to the Concord Consortium. </html>"), BorderLayout.CENTER);
 			aboutDialog.setContentPane(p);
 			aboutDialog.pack();
 		}
