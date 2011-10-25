@@ -48,6 +48,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class MainFrame extends JFrame {
+	private final static boolean IS_MAC = System.getProperty("os.name").startsWith("Mac");
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
 	private JFileChooser fileChooser;
@@ -86,7 +87,7 @@ public class MainFrame extends JFrame {
 	private JMenu editMenu;
 	private JMenuItem undoMenuItem;
 	private JMenuItem redoMenuItem;
-	
+
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
 		String extensions[];
@@ -124,7 +125,7 @@ public class MainFrame extends JFrame {
 			}
 			return false;
 		}
-	}	
+	}
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -290,6 +291,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getOpenMenuItem() {
 		if (openMenuItem == null) {
 			openMenuItem = new JMenuItem("Open...");
+			openMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().update(1);
@@ -314,7 +316,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getSaveMenuItem() {
 		if (saveMenuItem == null) {
 			saveMenuItem = new JMenuItem("Save");
-			saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+			saveMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK));
 			saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					try {
@@ -341,6 +343,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getPrintMenuItem() {
 		if (printMenuItem == null) {
 			printMenuItem = new JMenuItem("Print");
+			printMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_MASK));
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					final PrintController printController = PrintController.getInstance();
@@ -759,6 +762,7 @@ public class MainFrame extends JFrame {
 		}
 		return drawAnnotationsInward;
 	}
+
 	private JMenu getEditMenu() {
 		if (editMenu == null) {
 			editMenu = new JMenu("Edit");
@@ -774,22 +778,24 @@ public class MainFrame extends JFrame {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
-			});			
+			});
 			editMenu.add(getUndoMenuItem());
 			editMenu.add(getRedoMenuItem());
 		}
 		return editMenu;
 	}
-	public void refreshUndoRedo() {		
+
+	public void refreshUndoRedo() {
 		getUndoMenuItem().setText(SceneManager.getInstance().getUndoManager().getUndoPresentationName());
 		getUndoMenuItem().setEnabled(SceneManager.getInstance().getUndoManager().canUndo());
 		getRedoMenuItem().setText(SceneManager.getInstance().getUndoManager().getRedoPresentationName());
 		getRedoMenuItem().setEnabled(SceneManager.getInstance().getUndoManager().canRedo());
-	}	
+	}
+
 	private JMenuItem getUndoMenuItem() {
 		if (undoMenuItem == null) {
 			undoMenuItem = new JMenuItem("Undo");
-			undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
+			undoMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
 			undoMenuItem.setEnabled(false);
 			undoMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
@@ -802,10 +808,11 @@ public class MainFrame extends JFrame {
 		}
 		return undoMenuItem;
 	}
+
 	private JMenuItem getRedoMenuItem() {
 		if (redoMenuItem == null) {
 			redoMenuItem = new JMenuItem("Redo");
-			redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
+			redoMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
 			redoMenuItem.setEnabled(false);
 			redoMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
