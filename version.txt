@@ -804,7 +804,8 @@ Version 0.5 - October 20, 2011
 - fix problem with foundation wireframe causing shadow to crash by using Line instead of Quad with wireframe
 - remove the diagonal lines from resize box
 - release version 0.5.2
-
+- hide edit points after selecting new house part to insert
+- fix problem with webstart illegal url exception in Mac OS
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
@@ -819,7 +820,6 @@ Version 0.5 - October 20, 2011
 - draw grids
 - automatically draw gris based on where the mouse is pointing
 
- 
 
 TODO:
 - automatically determine if the user is going with the drag approach or click approach when drawing house parts

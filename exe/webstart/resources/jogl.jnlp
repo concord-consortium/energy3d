@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp>
+<jnlp codebase="http://energy.concord.org/energy3d">
   <information>
     <title>Java Binding to the OpenGL API</title>
     <vendor>Sun Microsystems, Inc.</vendor>
