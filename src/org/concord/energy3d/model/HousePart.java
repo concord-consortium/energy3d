@@ -38,9 +38,11 @@ public abstract class HousePart implements Serializable {
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
 	protected static ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
+	protected static boolean drawAnnotations = false;
 	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = false;
-	protected static boolean drawAnnotations = false;
+	protected transient final int numOfDrawPoints;
+	protected transient final int numOfEditPoints;
 	protected transient Node root;
 	protected transient Node pointsRoot;
 	protected transient double orgHeight;
@@ -51,8 +53,6 @@ public abstract class HousePart implements Serializable {
 	protected transient Mesh mesh;
 	protected transient String textureFileName;
 	protected transient boolean relativeToHorizontal;
-	protected final int numOfDrawPoints;
-	protected final int numOfEditPoints;
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
 	protected HousePart container = null;
@@ -87,7 +87,8 @@ public abstract class HousePart implements Serializable {
 		HousePart.defaultColor = defaultColor;
 	}
 
-	public HousePart(int numOfDrawPoints, int numOfEditPoints, double height) {
+	/* if an attribute is serializable or is not needed after deserialization then they are passed as parameters to constructor */
+	public HousePart(final int numOfDrawPoints, final int numOfEditPoints, final double height) {
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
 		this.height = this.orgHeight = height;
@@ -96,6 +97,7 @@ public abstract class HousePart implements Serializable {
 		allocateNewPoint();
 	}
 
+	/* if an attribute is transient but is always needed then it should be set to default here */
 	protected void init() {
 		relativeToHorizontal = false;
 		orgHeight = height;
@@ -110,7 +112,7 @@ public abstract class HousePart implements Serializable {
 		setAnnotationsVisible(drawAnnotations);
 
 		// Set up a reusable pick results
-		for (int i = 0; i < numOfEditPoints; i++)
+		for (int i = 0; i < points.size(); i++)
 			addNewEditPointShape(i);
 
 		root.attachChild(pointsRoot);
@@ -330,16 +332,22 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void addPoint(int x, int y) {
-		firstPointInserted = true;
-		if (drawCompleted)
-			throw new RuntimeException("Drawing of this object is already completed");
+		if (container != null || !mustHaveContainer()) {
+			firstPointInserted = true;
+			if (drawCompleted)
+				throw new RuntimeException("Drawing of this object is already completed");
 
-		if (points.size() >= numOfEditPoints)
-			drawCompleted = true;
-		else {
-			allocateNewPoint();
-			setPreviewPoint(x, y);
+			if (points.size() >= numOfEditPoints)
+				drawCompleted = true;
+			else {
+				allocateNewPoint();
+				setPreviewPoint(x, y);
+			}
 		}
+	}
+
+	protected boolean mustHaveContainer() {
+		return true;
 	}
 
 	private void allocateNewPoint() {

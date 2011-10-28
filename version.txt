@@ -799,6 +799,12 @@ Version 0.5 - October 20, 2011
 
 - fix problem with print and preview due to missing default constructor in class Arc
 - release version 0.5.1
+- fix problem with unable to insert new roof due to change in picking API that avoids hidden mesh picking unless false passed
+- disallow inserting roof when no container is present using mustHaveContainer super method
+- fix problem with foundation wireframe causing shadow to crash by using Line instead of Quad with wireframe
+- remove the diagonal lines from resize box
+- release version 0.5.2
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
@@ -809,6 +815,9 @@ Version 0.5 - October 20, 2011
 - fix problem with foundation bottom size annotation and label not showing in printout
 - reduce size of annotatoin font in printout 
 - undo the effect of HousePart.delete after undoing the remove
+- automatically zoom in and out after a double click on house parts
+- draw grids
+- automatically draw gris based on where the mouse is pointing
 
  
 

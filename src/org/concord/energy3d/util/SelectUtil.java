@@ -48,11 +48,11 @@ public class SelectUtil {
 		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
 
 		if (typeOfHousePart == null)
-			PickingUtil.findPick(floor, pickRay, pickResults);
+			PickingUtil.findPick(floor, pickRay, pickResults, false);
 		else
 			for (HousePart housePart : Scene.getInstance().getParts())
 				if (typeOfHousePart.isInstance(housePart))
-					PickingUtil.findPick(housePart.getRoot(), pickRay, pickResults);
+					PickingUtil.findPick(housePart.getRoot(), pickRay, pickResults, false);
 
 		return getPickResult(pickRay);
 	}

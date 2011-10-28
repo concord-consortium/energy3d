@@ -22,6 +22,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HipRoof;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.PyramidRoof;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.UserData;
@@ -68,6 +69,7 @@ import com.ardor3d.input.logical.KeyHeldCondition;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.KeyReleasedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.MouseButtonClickedCondition;
 import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.MouseMovedCondition;
@@ -510,7 +512,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							return null;
 						}
 					});
-
 				}
 			}));
 
@@ -569,6 +570,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					moveState = inputStates;
 				}
 			}));
+		
+		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.LEFT), new TriggerAction() {				
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (inputStates.getCurrent().getMouseState().getClickCount(MouseButton.LEFT) == 2) {
+					final PickedHousePart pickedHousePart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), Scene.getRoot());
+					if (pickedHousePart.getUserData() == null) {
+						
+//						pickedHousePart.getPoint()
+					} else {
+						
+					}
+				}
+			}
+		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LSHIFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {

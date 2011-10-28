@@ -71,11 +71,6 @@ public class Window extends HousePart {
 		root.attachChild(bars);
 	}
 
-	public void addPoint(int x, int y) {
-		if (container != null)
-			super.addPoint(x, y);
-	}
-
 	public void setPreviewPoint(int x, int y) {
 		int index = editPointIndex;
 		if (index == -1) {

@@ -16,10 +16,10 @@ public class PyramidRoof extends Roof {
 		super(1, 1, 0.5);
 	}
 	
-	public void setPreviewPoint(int x, int y) {		
+	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1) {
 			pickContainer(x, y, Wall.class);
-			recalculateEditPoints = true;
+			recalculateEditPoints = true;;
 		} else {
 			final ReadOnlyVector3 base = new Vector3(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getCenter().getZ());
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);

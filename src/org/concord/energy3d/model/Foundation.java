@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.SelectUtil;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
@@ -16,6 +17,7 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.WireframeState;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -28,7 +30,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.5;
-	private transient Box boundingMesh;
+	private transient Mesh boundingMesh;
 	private transient Mesh wireframeMesh;
 	private transient ArrayList<Vector3> orgPoints;
 	private transient double newBoundingHeight;
@@ -37,6 +39,11 @@ public class Foundation extends HousePart {
 
 	public Foundation() {
 		super(2, 8, 0.1);
+	}
+	
+	@Override
+	protected boolean mustHaveContainer() {
+		return false;
 	}
 
 	@Override
@@ -52,22 +59,21 @@ public class Foundation extends HousePart {
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 		root.attachChild(mesh);
 
-		boundingMesh = new Box("Foundation (Bounding)", new Vector3(), new Vector3());
-		boundingMesh.setRenderState(new WireframeState());
+		boundingMesh = new Line("Foundation (Bounding)");
+		boundingMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(24));
 		boundingMesh.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(boundingMesh);
+		boundingMesh.getSceneHints().setCullHint(CullHint.Always);
+		root.attachChild(boundingMesh);
 
-		wireframeMesh = new Mesh("Foundation (wireframe)");
-		wireframeMesh.getMeshData().setIndexMode(IndexMode.Quads);
-		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(16));
-		wireframeMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		wireframeMesh.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-		wireframeMesh.getSceneHints().setCastsShadows(false);
-		wireframeMesh.setRenderState(new WireframeState());
+		wireframeMesh = new Line("Foundation (wireframe)");
+		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(24));
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
 
-		UserData userData = new UserData(this);
+		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
 		boundingMesh.setUserData(userData);
 
@@ -80,10 +86,11 @@ public class Foundation extends HousePart {
 		this.resizeHouseMode = resizeHouseMode;
 		if (resizeHouseMode) {
 			scanChildrenHeight();
-			root.attachChild(boundingMesh);
+			boundingMesh.getSceneHints().setCullHint(CullHint.Inherit);
 			showPoints();
 		} else {
 			root.detachChild(boundingMesh);
+			boundingMesh.getSceneHints().setCullHint(CullHint.Always);
 			hidePoints();
 		}
 	}
@@ -216,29 +223,60 @@ public class Foundation extends HousePart {
 		if (drawable) {
 			((Box) mesh).setData(points.get(0), points.get(3).add(0, 0, height, null));
 			mesh.updateModelBound();
-			boundingMesh.setData(points.get(0), points.get(7));
-			boundingMesh.updateModelBound();
+//			boundingMesh.setData(points.get(0), points.get(7));
+//			boundingMesh.updateModelBound();
+			drawWireframe(boundingMesh, points.get(7).getZf());
 
-			// draw wireframe
-			final FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
-			wireframeVertexBuffer.rewind();
-			drawSideWireframe(wireframeVertexBuffer, 0, 1);
-			drawSideWireframe(wireframeVertexBuffer, 1, 3);
-			drawSideWireframe(wireframeVertexBuffer, 3, 2);
-			drawSideWireframe(wireframeVertexBuffer, 2, 0);
-			wireframeMesh.updateModelBound();
+			drawWireframe(wireframeMesh, (float) height);
 		}
 	}
 
-	public void drawSideWireframe(final FloatBuffer wireframeVertexBuffer, final int i, final int j) {
-		Vector3 p;
-		p = getAbsPoint(i);
-		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float) height);
-		p = getAbsPoint(j);
-		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf() + (float) height);
-		wireframeVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+	private void drawWireframe(final Mesh mesh, final float height) {
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		buf.rewind();
+		final Vector3 p0 = getAbsPoint(0);
+		final Vector3 p1 = getAbsPoint(1);
+		final Vector3 p2 = getAbsPoint(2);
+		final Vector3 p3 = getAbsPoint(3);
+		
+		putWireframePoint(buf, p0);
+		putWireframePoint(buf, p2);
+		putWireframePoint(buf, p2);
+		putWireframePoint(buf, p3);
+		putWireframePoint(buf, p3);
+		putWireframePoint(buf, p1);
+		putWireframePoint(buf, p1);
+		putWireframePoint(buf, p0);
+
+		putWireframePoint(buf, p0, height);
+		putWireframePoint(buf, p2, height);
+		putWireframePoint(buf, p2, height);
+		putWireframePoint(buf, p3, height);
+		putWireframePoint(buf, p3, height);
+		putWireframePoint(buf, p1, height);
+		putWireframePoint(buf, p1, height);
+		putWireframePoint(buf, p0, height);
+		
+		putWireframePoint(buf, p0);
+		putWireframePoint(buf, p0, height);
+		putWireframePoint(buf, p2);
+		putWireframePoint(buf, p2, height);
+		putWireframePoint(buf, p3);
+		putWireframePoint(buf, p3, height);
+		putWireframePoint(buf, p1);
+		putWireframePoint(buf, p1, height);
+		
+		mesh.updateModelBound();		
 	}
+
+	private void putWireframePoint(final FloatBuffer buf, final Vector3 p) {
+		putWireframePoint(buf, p, 0);
+	}
+
+	private void putWireframePoint(final FloatBuffer buf, final Vector3 p, final float height) {
+		buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + height);
+	}
+	
 
 	private void scanChildrenHeight() {
 		if (!isFirstPointInserted())

@@ -53,11 +53,6 @@ public class Door extends HousePart {
 		root.attachChild(mesh);
 	}
 
-	public void addPoint(int x, int y) {
-		if (container != null)
-			super.addPoint(x, y);
-	}
-
 	public void setPreviewPoint(int x, int y) {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			PickedHousePart picked = pickContainer(x, y, Wall.class);

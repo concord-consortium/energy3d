@@ -69,6 +69,11 @@ public class Wall extends HousePart {
 	public Wall() {
 		super(2, 4, defaultWallHeight);
 	}
+	
+	@Override
+	protected boolean mustHaveContainer() {
+		return false;
+	}
 
 	protected void init() {
 		super.init();
@@ -125,9 +130,9 @@ public class Wall extends HousePart {
 		root.attachChild(windowsSurroundMesh);
 
 		wireframeMesh = new Line("Wall (Wireframe)");
+		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setModelBound(new BoundingBox());
-		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
 
@@ -495,7 +500,6 @@ public class Wall extends HousePart {
 		if (roof == null)
 			return v.getZ();
 		final PickResults pickResults = new PrimitivePickResults();
-		;
 		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v.getX(), v.getY(), 0), Vector3.UNIT_Z), pickResults);
 		if (pickResults.getNumber() > 0) {
 			final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
