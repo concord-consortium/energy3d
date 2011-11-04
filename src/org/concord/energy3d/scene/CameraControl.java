@@ -46,6 +46,11 @@ public abstract class CameraControl {
     protected double _keyRotateSpeed = 2.25;
     protected boolean enabled = true;
 	private boolean mouseEnabled = true;
+	private ReadOnlyVector3 orgCameraDirection;
+	private ReadOnlyVector3 newCameraDirection;
+	private double animationTime = -1;
+	private Vector3 orgCameraLocation;
+	private Vector3 newCameraLocation;
 
     public CameraControl(final ReadOnlyVector3 upAxis) {
         _upAxis.set(upAxis);
@@ -280,5 +285,38 @@ public abstract class CameraControl {
 		}
 		SceneManager.getInstance().getCameraNode().updateFromCamera();
 		SceneManager.getInstance().update();
+	}
+
+	public void zoomAtPoint(final ReadOnlyVector3 clickedPoint) {
+		final double zoomDistance;
+		if (Camera.getCurrentCamera().getLocation().distance(clickedPoint) < 3)
+			zoomDistance = 10.0;
+		else
+			zoomDistance = 2.0;
+		
+		orgCameraDirection = new Vector3(Camera.getCurrentCamera().getDirection());
+		newCameraDirection = clickedPoint.subtract(Camera.getCurrentCamera().getLocation(), null).normalizeLocal();
+		orgCameraLocation = new Vector3(Camera.getCurrentCamera().getLocation());
+		newCameraLocation = clickedPoint.subtract(newCameraDirection.multiply(zoomDistance, null), null);
+		animationTime  = SceneManager.getInstance().getTimer().getTimeInSeconds();
+	}
+	
+	public boolean isAnimating() {
+		return animationTime != -1;
+	}
+	
+	public void animate() {
+		System.out.println("animating...");
+		final double currentTime  = SceneManager.getInstance().getTimer().getTimeInSeconds();
+		final double t = currentTime - animationTime;
+		System.out.println(t);
+		final double animationDuration = 1.0;
+		final ReadOnlyVector3 currentDirection = orgCameraDirection.multiply(animationDuration - t, null).addLocal(newCameraDirection.multiply(t, null)).normalizeLocal();
+		final ReadOnlyVector3 currentLocation = orgCameraLocation.multiply(animationDuration - t, null).addLocal(newCameraLocation.multiply(t, null));
+		Camera.getCurrentCamera().setLocation(currentLocation);
+		Camera.getCurrentCamera().lookAt(currentLocation.add(currentDirection, null), Vector3.UNIT_Z);
+		SceneManager.getInstance().getCameraNode().updateFromCamera();
+		if (t > animationDuration)
+			animationTime = -1;
 	}
 }

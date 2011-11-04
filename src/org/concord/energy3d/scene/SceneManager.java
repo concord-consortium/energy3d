@@ -152,7 +152,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private HousePart hoveredHousePart = null;
 	private Operation operation = Operation.SELECT;
 	private Heliodon heliodon;
-	private CameraControl control;
+	private CameraControl cameraControl;
 	private ParallelSplitShadowMapPass shadowPass;
 	private ViewMode viewMode = ViewMode.NORMAL;
 	private CameraNode cameraNode;
@@ -286,7 +286,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isUpdateTime = updateTime != -1 && now <= updateTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
-			if (update || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim) {
+			if (update || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || cameraControl.isAnimating()) {
 				if (now > updateTime)
 					updateTime = -1;
 				update = false;
@@ -329,9 +329,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		if (sunAnim)
-			heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true);
+			heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true);		
 
 		heliodon.update();
+		
+		if (cameraControl.isAnimating())
+			cameraControl.animate();
 
 		root.updateGeometricState(tpf);
 	}
@@ -573,13 +576,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (inputStates.getCurrent().getMouseState().getClickCount(MouseButton.LEFT) == 2) {
-					final PickedHousePart pickedHousePart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), Scene.getRoot());
-					if (pickedHousePart.getUserData() == null) {
-
-						// pickedHousePart.getPoint()
-					} else {
-
-					}
+					final PickedHousePart pickedHousePart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), root);
+					final Vector3 clickedPoint = pickedHousePart.getPoint();
+					cameraControl.zoomAtPoint(clickedPoint);
 				}
 			}
 		}));
@@ -726,17 +725,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setCameraControl(final CameraMode type) {
-		if (control != null)
-			control.removeTriggers(logicalLayer);
+		if (cameraControl != null)
+			cameraControl.removeTriggers(logicalLayer);
 
 		if (type == CameraMode.ORBIT)
-			control = new OrbitControl(Vector3.UNIT_Z);
+			cameraControl = new OrbitControl(Vector3.UNIT_Z);
 		else if (type == CameraMode.FIRST_PERSON)
-			control = new FirstPersonControl(Vector3.UNIT_Z);
-		control.setupKeyboardTriggers(logicalLayer);
-		control.setupMouseTriggers(logicalLayer, true);
-		control.setMoveSpeed(MOVE_SPEED);
-		control.setKeyRotateSpeed(1);
+			cameraControl = new FirstPersonControl(Vector3.UNIT_Z);
+		cameraControl.setupKeyboardTriggers(logicalLayer);
+		cameraControl.setupMouseTriggers(logicalLayer, true);
+		cameraControl.setMoveSpeed(MOVE_SPEED);
+		cameraControl.setKeyRotateSpeed(1);
 	}
 
 	public void hideAllEditPoints() {
@@ -748,8 +747,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.viewMode = viewMode;
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
 
-		control.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
-		control.setMoveSpeed(MOVE_SPEED);
+		cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
+		cameraControl.setMoveSpeed(MOVE_SPEED);
 		Vector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
 		Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
@@ -762,14 +761,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			resizeCamera();
 		} else if (viewMode == ViewMode.TOP_VIEW) {
 			camera.setProjectionMode(ProjectionMode.Parallel);
-			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
-			control.setMoveSpeed(5 * MOVE_SPEED);
+			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
+			cameraControl.setMoveSpeed(5 * MOVE_SPEED);
 			loc = new Vector3(0, 0, 10);
 			up = new Vector3(0.0f, -1.0f, 0.0f);
 			lookAt = new Vector3(0.0f, 0.0f, -1.0f);
 			resizeCamera(2);
 		} else if (viewMode == ViewMode.PRINT) {
-			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
+			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Parallel);
 			loc = new Vector3(0, -1, 0);
 			final double pageWidth = PrintController.getInstance().getPageWidth();
@@ -782,7 +781,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			else
 				resizeCamera(pageWidth);
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
-			control.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
+			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			final int rows = PrintController.getInstance().getRows();
 			final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin();
@@ -796,7 +795,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		camera.setFrame(loc, left, up, lookAt);
 		camera.lookAt(lookAt, Vector3.UNIT_Z);
 
-		control.reset();
+		cameraControl.reset();
 		cameraNode.updateFromCamera();
 	}
 
@@ -919,14 +918,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return;
 
 		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (selectedHousePart == null || selectedHousePart.isDrawCompleted()))
-			control.setMouseEnabled(true);
+			cameraControl.setMouseEnabled(true);
 		else
-			control.setMouseEnabled(false);
+			cameraControl.setMouseEnabled(false);
 
 		if (sunControl)
-			control.setKeyRotateSpeed(0);
+			cameraControl.setKeyRotateSpeed(0);
 		else
-			control.setKeyRotateSpeed(1);
+			cameraControl.setKeyRotateSpeed(1);
 	}
 
 	public HousePart getSelectedPart() {
@@ -1084,7 +1083,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setMouseControlEnabled(final boolean enabled) {
 		this.mouseControlEnabled = enabled;
-		control.setMouseEnabled(enabled);
+		cameraControl.setMouseEnabled(enabled);
 	}
 
 	public Heliodon getHeliodon() {
@@ -1109,7 +1108,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setZoomLock(boolean zoomLock) {
-		control.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);
+		cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);
 	}
 
 	public void update() {
@@ -1122,5 +1121,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public UndoManager getUndoManager() {
 		return undoManager;
+	}
+
+	public Timer getTimer() {
+		return frameHandler.getTimer();
 	}
 }

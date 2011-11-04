@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp codebase="http://energy.concord.org/energy3d">
+<jnlp codebase="http://energy.concord.org/energy3d/resources/" >
   <information>
     <title>Java Binding to the OpenGL API</title>
     <vendor>Sun Microsystems, Inc.</vendor>
-    <homepage href="http://jogl.dev.java.net/"/>
+    <homepage href="http://jogl.dev.java.net/" />
     <description>Java Binding to the OpenGL API - JSR-231 Current Build</description>
     <description kind="short">Java programming language binding to the OpenGL 3D graphics API. (Current build of JSR-231 APIs)</description>
     <offline-allowed/>
@@ -60,5 +60,5 @@
     <resources os="Mac OS X" arch="x86_64">
       <nativelib href = "jogl-natives-macosx-universal.jar" />
     </resources>
-  <component-desc />
+  <component-desc/>
 </jnlp>

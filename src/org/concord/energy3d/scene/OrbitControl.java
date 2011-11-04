@@ -123,4 +123,10 @@ public class OrbitControl extends CameraControl {
 			clearOrbitCenter();
 		}
 	}
+	
+	@Override
+	public void zoomAtPoint(ReadOnlyVector3 clickedPoint) {
+		super.zoomAtPoint(clickedPoint);
+		this._center.set(clickedPoint);
+	}
 }
