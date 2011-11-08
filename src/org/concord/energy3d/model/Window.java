@@ -26,12 +26,17 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.15;
+//	private static final double GRID_SIZE = 0.15;
 	private transient BMText label1;
 	private transient Line bars;
 
 	public Window() {
 		super(2, 4, 0.30);
+	}
+	
+	@Override
+	public double getGridSize() {
+		return 0.15;
 	}
 
 	protected void init() {
@@ -83,7 +88,7 @@ public class Window extends HousePart {
 		Vector3 p = points.get(index);
 		if (pick != null) {
 			p = pick.getPoint();
-			p = grid(p, GRID_SIZE);
+			p = grid(p, getGridSize());
 			p = toRelative(p);
 		}
 		points.get(index).set(p);
@@ -269,4 +274,16 @@ public class Window extends HousePart {
 			container.getRoot().getTransform().applyForward(absolute);
 		return absolute;
 	}
+	
+//	@Override
+//	protected Vector3 grid(final Vector3 p, final double gridSize, final boolean snapToZ) {
+//		if (isSnapToGrids()) {
+//			if (container.getContainer() != null)
+//				p.subtractLocal(0, 0, container.getContainer().getHeight());
+//			p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+//			if (container.getContainer() != null)
+//				p.addLocal(0, 0, container.getContainer().getHeight());
+//		}
+//		return p;
+//	}	
 }

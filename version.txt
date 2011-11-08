@@ -806,9 +806,12 @@ Version 0.5 - October 20, 2011
 - release version 0.5.2
 - hide edit points after selecting new house part to insert
 - fix problem with webstart illegal url exception in Mac OS
-- zoom in and out after a double click on house parts
+- zoom in and out after a doubleclick on house parts
 - animate the double click zoom
 - automatically decide between doubleclick zoom out or in based on how close the camera is to target
+- draw grids for walls
+- snap correctly to wall grids
+- draw grids for foundation
 
 
 - *auto redraw gable wall when inserting gable or editing gable
@@ -821,7 +824,9 @@ Version 0.5 - October 20, 2011
 - reduce size of annotatoin font in printout 
 - undo the effect of HousePart.delete after undoing the remove
 - draw grids
-- automatically draw gris based on where the mouse is pointing
+- automatically draw grids based on where the mouse is pointing
+- double click should zoom differently in print preview
+- fix bug with door has different height after resizing house and then moving base edit points
 
 
 TODO:

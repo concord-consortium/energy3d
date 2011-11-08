@@ -54,6 +54,7 @@ public class Wall extends HousePart {
 	private transient Mesh invisibleMesh;
 	private transient Mesh windowsSurroundMesh;
 	private transient Line wireframeMesh;
+	private transient Line gridsMesh;
 	private transient Roof roof;
 	private transient ArrayList<Vector3> wallPolygonPoints;
 	private transient int visitStamp;
@@ -69,7 +70,7 @@ public class Wall extends HousePart {
 	public Wall() {
 		super(2, 4, defaultWallHeight);
 	}
-	
+
 	@Override
 	protected boolean mustHaveContainer() {
 		return false;
@@ -135,6 +136,13 @@ public class Wall extends HousePart {
 		wireframeMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
+
+		gridsMesh = new Line("Wall (Grids)");
+		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
+		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+		gridsMesh.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(gridsMesh);
+		root.attachChild(gridsMesh);
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 
@@ -353,8 +361,8 @@ public class Wall extends HousePart {
 			surroundMesh.updateModelBound();
 			windowsSurroundMesh.updateModelBound();
 			wireframeMesh.updateModelBound();
-			invisibleMesh.updateModelBound();
-
+			invisibleMesh.updateModelBound();	
+			
 			root.updateWorldBound(true);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -495,17 +503,22 @@ public class Wall extends HousePart {
 					gablePoints.add(new Vector3(hole.getPoints().get(i).getX(), hole.getPoints().get(i).getY(), hole.getPoints().get(i).getZ()));
 		return gablePoints;
 	}
-
 	public double findRoofIntersection(final ReadOnlyVector3 v, final boolean backMesh) {
+		return findRoofIntersection(v, backMesh, Vector3.UNIT_Z).getZ();
+	}
+
+	public ReadOnlyVector3 findRoofIntersection(final ReadOnlyVector3 v, final boolean backMesh, final ReadOnlyVector3 direction) {
 		if (roof == null)
-			return v.getZ();
+			return v;
 		final PickResults pickResults = new PrimitivePickResults();
-		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v.getX(), v.getY(), 0), Vector3.UNIT_Z), pickResults);
+//		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v.getX(), v.getY(), 0), direction), pickResults);
+		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v), direction), pickResults);
 		if (pickResults.getNumber() > 0) {
-			final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
-			return intersectionPoint.getZ() - 0.02; // (backMesh ? 0.1 : 0.0);
-		}
-		return v.getZ();
+//			final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
+//			return intersectionPoint.getZ() - 0.02; // (backMesh ? 0.1 : 0.0);
+			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
+		} else 
+			return v;
 	}
 
 	public boolean isPerpendicularToNeighbor(final int neighbor) {
@@ -545,11 +558,12 @@ public class Wall extends HousePart {
 		backMesh.getMeshData().updateVertexCount();
 	}
 
+	// TODO what does this method do??
 	private Polygon enforceRangeAndRemoveDuplicatedGablePoints(final Polygon polygon) {
 		final List<TriangulationPoint> polygonPoints = polygon.getPoints();
+		final Vector2 min = new Vector2(Math.min(polygonPoints.get(1).getX(), polygonPoints.get(2).getX()), Math.min(polygonPoints.get(1).getY(), polygonPoints.get(2).getY()));
+		final Vector2 max = new Vector2(Math.max(polygonPoints.get(1).getX(), polygonPoints.get(2).getX()), Math.max(polygonPoints.get(1).getY(), polygonPoints.get(2).getY()));
 		for (int i = 4; i < polygon.pointCount(); i++) {
-			final Vector2 min = new Vector2(Math.min(polygonPoints.get(1).getX(), polygonPoints.get(2).getX()), Math.min(polygonPoints.get(1).getY(), polygonPoints.get(2).getY()));
-			final Vector2 max = new Vector2(Math.max(polygonPoints.get(1).getX(), polygonPoints.get(2).getX()), Math.max(polygonPoints.get(1).getY(), polygonPoints.get(2).getY()));
 			final TriangulationPoint tp = polygonPoints.get(i);
 			tp.set(Math.max(tp.getX(), min.getX()), Math.max(tp.getY(), min.getY()), tp.getZ());
 			tp.set(Math.min(tp.getX(), max.getX()), Math.min(tp.getY(), max.getY()), tp.getZ());
@@ -973,4 +987,80 @@ public class Wall extends HousePart {
 	public HousePart getRoof() {
 		return roof;
 	}
+	
+	@Override
+	public void hideGrids() {
+		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
+	}
+
+	@Override
+	public void drawGrids(final double gridSize) {
+		final ReadOnlyVector3 p0 = getAbsPoint(0);
+//		final ReadOnlyVector3 p0 = wallPolygonPoints.get(1);
+		final ReadOnlyVector3 p2 = getAbsPoint(2);
+//		final ReadOnlyVector3 p2 = wallPolygonPoints.get(2);
+		final ReadOnlyVector3 width = p2.subtract(p0, null);
+		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
+
+		final int cols = (int) (width.length() / gridSize);
+
+		double gableHeight = this.height;
+		ReadOnlyVector3 gablePeakBase = p0;
+		for (int col = 1; col < cols; col++) {
+			final ReadOnlyVector3 lineP1 = width.normalize(null).multiplyLocal(col * gridSize).addLocal(p0);
+			points.add(lineP1);
+			final ReadOnlyVector3 lineP2 = findRoofIntersection(new Vector3(lineP1.getX(), lineP1.getY(), this.height), false, Vector3.UNIT_Z);			
+			points.add(lineP2);
+			if (lineP2.getZ() > gableHeight) {
+				gableHeight = lineP2.getZ();
+				gablePeakBase = lineP1;
+			}
+		}
+		
+		final ReadOnlyVector3 height = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(gableHeight);
+//		final ReadOnlyVector3 height = wallPolygonPoints.get(1).subtractLocal(p0).normalizeLocal().multiplyLocal(gableHeight);
+		final int rows = (int) (gableHeight / gridSize);
+		
+		for (int row = 1; row < rows; row++) {
+			final ReadOnlyVector3 pMiddle = height.normalize(null).multiplyLocal(row * gridSize).addLocal(gablePeakBase);
+			ReadOnlyVector3 lineP1 = new Vector3(p0.getX(), p0.getY(), pMiddle.getZ());
+			ReadOnlyVector3 lineP2 = new Vector3(p2.getX(), p2.getY(), pMiddle.getZ());
+			if (pMiddle.getZ() > this.height) {
+				ReadOnlyVector3 tmp;
+//				tmp = findRoofIntersection(pMiddle, false, Vector3.UNIT_Z);
+				tmp = findRoofIntersection(pMiddle, false, width.normalize(null));
+				if (tmp != pMiddle)
+					lineP1 = tmp;
+				tmp = findRoofIntersection(pMiddle, false, width.normalize(null).negateLocal());
+				if (tmp != pMiddle)
+					lineP2 = tmp;				
+			}
+			points.add(lineP1);
+			points.add(lineP2);
+		}
+		if (points.size() < 2)
+			return;
+		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
+		for (final ReadOnlyVector3 p : points)
+			buf.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		gridsMesh.getMeshData().setVertexBuffer(buf);
+		
+		
+//		gridsMesh.getMeshData().updateVertexCount();
+		gridsMesh.updateModelBound();
+		
+		gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
+	}
+	
+//	@Override
+//	protected Vector3 grid(final Vector3 p, final double gridSize, final boolean snapToZ) {
+//		if (isSnapToGrids()) {
+//			if (container != null)
+//				p.subtractLocal(0, 0, container.getHeight());
+//			p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+//			if (container != null)
+//				p.addLocal(0, 0, container.getHeight());
+//		}
+//		return p;
+//	}
 }

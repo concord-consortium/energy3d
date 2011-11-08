@@ -556,6 +556,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										MainPanel.getInstance().deselect();
 								}
 							}
+							if (HousePart.getGridsHighlightedHousePart() != null) {
+								HousePart.getGridsHighlightedHousePart().hideGrids();
+								HousePart.setGridsHighlightedHousePart(null);
+							}
 							enableDisableRotationControl();
 							if (sceneChanged)
 								updateHeliodonAndAnnotationSize();

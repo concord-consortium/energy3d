@@ -36,11 +36,12 @@ public class Foundation extends HousePart {
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient boolean resizeHouseMode = false;
+	private transient Mesh gridsMesh;
 
 	public Foundation() {
 		super(2, 8, 0.1);
 	}
-	
+
 	@Override
 	protected boolean mustHaveContainer() {
 		return false;
@@ -72,6 +73,13 @@ public class Foundation extends HousePart {
 		wireframeMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
+
+		gridsMesh = new Line("Wall (Grids)");
+		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
+		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+		gridsMesh.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(gridsMesh);
+		root.attachChild(gridsMesh);
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -223,8 +231,8 @@ public class Foundation extends HousePart {
 		if (drawable) {
 			((Box) mesh).setData(points.get(0), points.get(3).add(0, 0, height, null));
 			mesh.updateModelBound();
-//			boundingMesh.setData(points.get(0), points.get(7));
-//			boundingMesh.updateModelBound();
+			// boundingMesh.setData(points.get(0), points.get(7));
+			// boundingMesh.updateModelBound();
 			drawWireframe(boundingMesh, points.get(7).getZf());
 
 			drawWireframe(wireframeMesh, (float) height);
@@ -238,7 +246,7 @@ public class Foundation extends HousePart {
 		final Vector3 p1 = getAbsPoint(1);
 		final Vector3 p2 = getAbsPoint(2);
 		final Vector3 p3 = getAbsPoint(3);
-		
+
 		putWireframePoint(buf, p0);
 		putWireframePoint(buf, p2);
 		putWireframePoint(buf, p2);
@@ -256,7 +264,7 @@ public class Foundation extends HousePart {
 		putWireframePoint(buf, p1, height);
 		putWireframePoint(buf, p1, height);
 		putWireframePoint(buf, p0, height);
-		
+
 		putWireframePoint(buf, p0);
 		putWireframePoint(buf, p0, height);
 		putWireframePoint(buf, p2);
@@ -265,8 +273,63 @@ public class Foundation extends HousePart {
 		putWireframePoint(buf, p3, height);
 		putWireframePoint(buf, p1);
 		putWireframePoint(buf, p1, height);
-		
-		mesh.updateModelBound();		
+
+		mesh.updateModelBound();
+	}
+
+	@Override
+	public void drawGrids(final double gridSize) {
+		final ReadOnlyVector3 p0 = getAbsPoint(0);
+		final ReadOnlyVector3 p1 = getAbsPoint(1);
+		final ReadOnlyVector3 p2 = getAbsPoint(2);
+		final ReadOnlyVector3 width = p2.subtract(p0, null);
+		final ReadOnlyVector3 height = p1.subtract(p0, null);
+		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
+		final ReadOnlyVector3 pMiddle = width.add(height, null).multiplyLocal(0.5).addLocal(p0);
+
+		final int cols = (int) (width.length() / gridSize);
+
+		// double gableHeight = this.height;
+		ReadOnlyVector3 gablePeakBase = p0;
+		for (int col = 0; col < cols / 2 + 1; col++) {
+			for (int neg = -1; neg <= 1; neg += 2) {
+				final ReadOnlyVector3 lineP1 = width.normalize(null).multiplyLocal(neg * col * gridSize).addLocal(pMiddle).subtractLocal(height.multiply(0.5, null));
+				points.add(lineP1);
+				final ReadOnlyVector3 lineP2 = lineP1.add(height, null);
+				points.add(lineP2);
+				if (col == 0)
+					break;
+			}
+		}
+
+		final int rows = (int) (height.length() / gridSize);
+
+		for (int row = 0; row < rows / 2 + 1; row++) {
+			for (int neg = -1; neg <= 1; neg += 2) {
+				final ReadOnlyVector3 lineP1 = height.normalize(null).multiplyLocal(neg * row * gridSize).addLocal(pMiddle).subtractLocal(width.multiply(0.5, null));
+				points.add(lineP1);
+				final ReadOnlyVector3 lineP2 = lineP1.add(width, null);
+				points.add(lineP2);
+				if (row == 0)
+					break;
+			}
+		}
+		if (points.size() < 2)
+			return;
+		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
+		for (final ReadOnlyVector3 p : points)
+			buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.01f);
+		gridsMesh.getMeshData().setVertexBuffer(buf);
+
+		// gridsMesh.getMeshData().updateVertexCount();
+		gridsMesh.updateModelBound();
+
+		gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
+	}
+
+	@Override
+	public void hideGrids() {
+		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
 	}
 
 	private void putWireframePoint(final FloatBuffer buf, final Vector3 p) {
@@ -276,7 +339,6 @@ public class Foundation extends HousePart {
 	private void putWireframePoint(final FloatBuffer buf, final Vector3 p, final float height) {
 		buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + height);
 	}
-	
 
 	private void scanChildrenHeight() {
 		if (!isFirstPointInserted())

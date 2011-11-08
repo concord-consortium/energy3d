@@ -17,7 +17,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.2;
+//	private static final double GRID_SIZE = 0.2;
 	private static double defaultDoorHeight = 0.8f;
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer normalBuffer;
@@ -26,6 +26,11 @@ public class Door extends HousePart {
 	public Door() {
 		super(2, 4, defaultDoorHeight);
 	}
+	
+	@Override
+	public double getGridSize() {
+		return 0.2;
+	}	
 
 	protected void init() {
 		super.init();
@@ -61,7 +66,7 @@ public class Door extends HousePart {
 				Vector3 wallFirstPoint = container.getAbsPoint(0);
 				Vector3 wallx = container.getAbsPoint(2).subtract(wallFirstPoint, null);
 				p = closestPoint(wallFirstPoint, wallx, x, y);
-				p = grid(p, GRID_SIZE, false);
+				p = grid(p, getGridSize(), false);
 
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				points.set(index, toRelative(p));
@@ -73,7 +78,7 @@ public class Door extends HousePart {
 			Vector3 base = points.get(lower);
 			Vector3 absoluteBase = toAbsolute(base);
 			Vector3 p = closestPoint(absoluteBase, Vector3.UNIT_Z, x, y);
-			p = grid(p, GRID_SIZE);
+			p = grid(p, getGridSize());
 			height = Math.max(0, p.getZ() - absoluteBase.getZ());
 			
 			final double rel_z = toRelative(absoluteBase.addLocal(0, 0, height)).getZ();

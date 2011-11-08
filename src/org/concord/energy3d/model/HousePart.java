@@ -39,6 +39,7 @@ public abstract class HousePart implements Serializable {
 	protected static int printSequence;
 	protected static ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
 	protected static boolean drawAnnotations = false;
+	private static HousePart gridsHighlightedHousePart;
 	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = false;
 	protected transient final int numOfDrawPoints;
@@ -87,6 +88,14 @@ public abstract class HousePart implements Serializable {
 		HousePart.defaultColor = defaultColor;
 	}
 
+	public static HousePart getGridsHighlightedHousePart() {
+		return gridsHighlightedHousePart;
+	}
+
+	public static void setGridsHighlightedHousePart(HousePart gridsHighlightedHousePart) {
+		HousePart.gridsHighlightedHousePart = gridsHighlightedHousePart;
+	}
+
 	/* if an attribute is serializable or is not needed after deserialization then they are passed as parameters to constructor */
 	public HousePart(final int numOfDrawPoints, final int numOfEditPoints, final double height) {
 		this.numOfDrawPoints = numOfDrawPoints;
@@ -95,6 +104,10 @@ public abstract class HousePart implements Serializable {
 		points = new ArrayList<Vector3>(numOfEditPoints);
 		init();
 		allocateNewPoint();
+	}
+
+	public double getGridSize() {
+		return 0.5;
 	}
 
 	/* if an attribute is transient but is always needed then it should be set to default here */
@@ -286,6 +299,13 @@ public abstract class HousePart implements Serializable {
 					container = null;
 			}
 		}
+		if (gridsHighlightedHousePart != container) {
+			if (gridsHighlightedHousePart != null)
+				gridsHighlightedHousePart.hideGrids();
+			if (container != null)
+				container.drawGrids(getGridSize());
+			gridsHighlightedHousePart = container;
+		}
 		return picked;
 	}
 
@@ -324,11 +344,41 @@ public abstract class HousePart implements Serializable {
 		return grid(p, gridSize, true);
 	}
 
-	protected Vector3 grid(Vector3 p, double gridSize, boolean snapToZ) {
-		if (snapToGrids) {
-			p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+	protected Vector3 grid(final Vector3 p, final double gridSize, final boolean snapToZ) {
+		// if (snapToGrids) {
+		// p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+		// }
+//		if (snapToGrids) {
+//			p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+//		}
+//		return p;
+		
+//		if (isSnapToGrids()) {
+//			if (container.getContainer() != null)
+//				p.subtractLocal(0, 0, container.getContainer().getHeight());
+//			p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+//			if (container.getContainer() != null)
+//				p.addLocal(0, 0, container.getContainer().getHeight());
+//		}
+//		return p;
+		
+		if (isSnapToGrids()) {
+			if (container != null) {
+				final ReadOnlyVector3 p0 = container.getAbsPoint(0);
+				
+				final ReadOnlyVector3 p0p = p.subtract(p0, null);
+				final ReadOnlyVector3 h = new Vector3(p0p.getX(), p0p.getY(), 0);
+				final double snapedHorizontalLength = Math.round(h.length() / gridSize) * gridSize;
+				final Vector3 newp0p = h.normalize(null).multiplyLocal(snapedHorizontalLength);
+							
+				final double snapedVerticalLength = Math.round(p0p.getZ() / gridSize) * gridSize;
+				newp0p.setZ(snapedVerticalLength);
+				return newp0p.addLocal(p0);
+			} else
+				p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
 		}
-		return p;
+		return p;		
+		
 	}
 
 	public void addPoint(int x, int y) {
@@ -363,6 +413,14 @@ public abstract class HousePart implements Serializable {
 		updateEditShapes();
 		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
 		drawAnnotations();
+	}
+
+	public void drawGrids(final double gridSize) {
+
+	}
+
+	public void hideGrids() {
+
 	}
 
 	protected void updateEditShapes() {
