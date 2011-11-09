@@ -331,10 +331,10 @@ public abstract class HousePart implements Serializable {
 	protected Vector3 toAbsolute(final ReadOnlyVector3 p, final HousePart container) {
 		if (container == null)
 			return new Vector3(p);
-		Vector3 origin = container.getAbsPoint(0);
-		Vector3 wallx = container.getAbsPoint(2).subtract(origin, null);
-		Vector3 wally = container.getAbsPoint(1).subtract(origin, null);
-		Vector3 pointOnSpace = origin.add(wallx.multiply(p.getX(), null), null).add(wally.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
+		final ReadOnlyVector3 origin = container.getAbsPoint(0);
+		final ReadOnlyVector3 width = container.getAbsPoint(2).subtract(origin, null);
+		final ReadOnlyVector3 height = container.getAbsPoint(1).subtract(origin, null);
+		Vector3 pointOnSpace = origin.add(width.multiply(p.getX(), null), null).add(height.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
 		if (relativeToHorizontal)
 			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
 		return pointOnSpace;
@@ -366,14 +366,30 @@ public abstract class HousePart implements Serializable {
 			if (container != null) {
 				final ReadOnlyVector3 p0 = container.getAbsPoint(0);
 				
-				final ReadOnlyVector3 p0p = p.subtract(p0, null);
-				final ReadOnlyVector3 h = new Vector3(p0p.getX(), p0p.getY(), 0);
-				final double snapedHorizontalLength = Math.round(h.length() / gridSize) * gridSize;
-				final Vector3 newp0p = h.normalize(null).multiplyLocal(snapedHorizontalLength);
+				final ReadOnlyVector3 origin;
+				if (relativeToHorizontal)
+					origin = container.getAbsPoint(2).subtractLocal(p0).addLocal(container.getAbsPoint(1).subtractLocal(p0)).multiplyLocal(0.5).addLocal(p0);
+				else
+					origin = p0;
+				
+				final ReadOnlyVector3 originToP = p.subtract(origin, null);
+				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), relativeToHorizontal ? 0 : originToP.getY(), 0);
+				final double snapedHorizontalLength = Math.round(horizontalDir.length() / gridSize) * gridSize;
+				final Vector3 newP = horizontalDir.normalize(null).multiplyLocal(snapedHorizontalLength);
 							
-				final double snapedVerticalLength = Math.round(p0p.getZ() / gridSize) * gridSize;
-				newp0p.setZ(snapedVerticalLength);
-				return newp0p.addLocal(p0);
+				final double snapedVerticalLength = Math.round((relativeToHorizontal ? originToP.getY() : originToP.getZ()) / gridSize) * gridSize;
+				newP.set(newP.getX(), relativeToHorizontal ? snapedVerticalLength : newP.getY(), relativeToHorizontal ? p.getZ() : snapedVerticalLength);
+				return newP.addLocal(origin);
+				
+				
+//				final ReadOnlyVector3 p0p = p.subtract(p0, null);
+//				final ReadOnlyVector3 h = new Vector3(p0p.getX(), p0p.getY(), 0);
+//				final double snapedHorizontalLength = Math.round(h.length() / gridSize) * gridSize;
+//				final Vector3 newp0p = h.normalize(null).multiplyLocal(snapedHorizontalLength);
+//							
+//				final double snapedVerticalLength = Math.round(p0p.getZ() / gridSize) * gridSize;
+//				newp0p.setZ(snapedVerticalLength);
+//				return newp0p.addLocal(p0);
 			} else
 				p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
 		}

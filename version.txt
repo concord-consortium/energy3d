@@ -812,6 +812,7 @@ Version 0.5 - October 20, 2011
 - draw grids for walls
 - snap correctly to wall grids
 - draw grids for foundation
+- snap to correct grids on foundation
 
 
 - *auto redraw gable wall when inserting gable or editing gable
