@@ -368,17 +368,23 @@ public abstract class HousePart implements Serializable {
 				
 				final ReadOnlyVector3 origin;
 				if (relativeToHorizontal)
-					origin = container.getAbsPoint(2).subtractLocal(p0).addLocal(container.getAbsPoint(1).subtractLocal(p0)).multiplyLocal(0.5).addLocal(p0);
+//					origin = container.getAbsPoint(2).subtractLocal(p0).addLocal(container.getAbsPoint(1).subtractLocal(p0)).multiplyLocal(0.5).addLocal(p0);
+//					origin = root.getWorldBound().getCenter();
+					origin = getCenter();
 				else
 					origin = p0;
 				
 				final ReadOnlyVector3 originToP = p.subtract(origin, null);
-				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), relativeToHorizontal ? 0 : originToP.getY(), 0);
+				final Vector3 newP = new Vector3();
+//				if (!snapToZ) {
+				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), !snapToZ ? 0 : originToP.getY(), 0);
 				final double snapedHorizontalLength = Math.round(horizontalDir.length() / gridSize) * gridSize;
-				final Vector3 newP = horizontalDir.normalize(null).multiplyLocal(snapedHorizontalLength);
+				newP.set(horizontalDir).normalizeLocal().multiplyLocal(snapedHorizontalLength);
+//				}
 							
-				final double snapedVerticalLength = Math.round((relativeToHorizontal ? originToP.getY() : originToP.getZ()) / gridSize) * gridSize;
-				newP.set(newP.getX(), relativeToHorizontal ? snapedVerticalLength : newP.getY(), relativeToHorizontal ? p.getZ() : snapedVerticalLength);
+				final double snapedVerticalLength = Math.round((!snapToZ ? originToP.getY() : originToP.getZ()) / gridSize) * gridSize;
+//				newP.set(newP.getX(), !snapToZ ? snapedVerticalLength : newP.getY(), !snapToZ ? p.getZ() : snapedVerticalLength);
+				newP.set(newP.getX(), !snapToZ ? snapedVerticalLength : 0, !snapToZ ? 0 : snapedVerticalLength);
 				return newP.addLocal(origin);
 				
 				

@@ -13,16 +13,12 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
@@ -289,8 +285,6 @@ public class Foundation extends HousePart {
 
 		final int cols = (int) (width.length() / gridSize);
 
-		// double gableHeight = this.height;
-		ReadOnlyVector3 gablePeakBase = p0;
 		for (int col = 0; col < cols / 2 + 1; col++) {
 			for (int neg = -1; neg <= 1; neg += 2) {
 				final ReadOnlyVector3 lineP1 = width.normalize(null).multiplyLocal(neg * col * gridSize).addLocal(pMiddle).subtractLocal(height.multiply(0.5, null));
@@ -319,11 +313,9 @@ public class Foundation extends HousePart {
 		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
 		for (final ReadOnlyVector3 p : points)
 			buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.01f);
+
 		gridsMesh.getMeshData().setVertexBuffer(buf);
-
-		// gridsMesh.getMeshData().updateVertexCount();
 		gridsMesh.updateModelBound();
-
 		gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 	}
 

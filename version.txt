@@ -813,7 +813,7 @@ Version 0.5 - October 20, 2011
 - snap correctly to wall grids
 - draw grids for foundation
 - snap to correct grids on foundation
-
+- snap to correct grids on roof
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

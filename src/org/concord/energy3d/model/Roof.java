@@ -43,15 +43,16 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class Roof extends HousePart {
-	static private final long serialVersionUID = 1L;
-	static protected final double GRID_SIZE = 0.5;
-	static private final double OVERHANG_LENGHT = 0.2;
-	transient protected Node roofPartsRoot;
-	transient private ArrayList<PolygonPoint> wallUpperPoints;
-	transient private ArrayList<ReadOnlyVector3> wallNormals;
-	transient private Map<Node, ReadOnlyVector3> orgCenters;
-	transient private Line wireframeMesh;
-	transient private ArrayList<Wall> walls;
+	private static final long serialVersionUID = 1L;
+	protected static final double GRID_SIZE = 0.5;
+	private static final double OVERHANG_LENGHT = 0.2;
+	protected transient Node roofPartsRoot;
+	private transient ArrayList<PolygonPoint> wallUpperPoints;
+	private transient ArrayList<ReadOnlyVector3> wallNormals;
+	private transient Map<Node, ReadOnlyVector3> orgCenters;
+	private transient Line wireframeMesh;
+	private transient ArrayList<Wall> walls;
+	private transient Mesh gridsMesh;
 	private ArrayList<Wall> gableWalls = null;
 	private Map<Integer, ArrayList<Wall>> gableEditPointToWallMap = null;
 	private Map<Integer, ArrayList<Integer>> gableRoofPartToEditPointMap = null;
@@ -79,6 +80,13 @@ public abstract class Roof extends HousePart {
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
 		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
+		
+		gridsMesh = new Line("Wall (Grids)");
+		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
+		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+		gridsMesh.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(gridsMesh);
+		root.attachChild(gridsMesh);
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
 	}
@@ -119,6 +127,7 @@ public abstract class Roof extends HousePart {
 			drawWireframe();
 			updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 			root.updateGeometricState(0);
+			drawGrids(getGridSize());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -581,4 +590,53 @@ public abstract class Roof extends HousePart {
 				((Node) roofPart).getChild(2).getSceneHints().setCullHint(cull);
 			}
 	}
+	
+	@Override
+	public void drawGrids(final double gridSize) {
+//		final ReadOnlyVector3 p0 = getAbsPoint(0);
+//		final ReadOnlyVector3 p1 = getAbsPoint(1);
+//		final ReadOnlyVector3 p2 = getAbsPoint(2);
+		final BoundingBox bounds = (BoundingBox) root.getWorldBound();
+		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(bounds.getXExtent() * 2, null); 
+		final ReadOnlyVector3 height = Vector3.UNIT_Y.multiply(bounds.getYExtent() * 2, null);
+		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
+		final ReadOnlyVector3 pMiddle = getAbsPoint(0);
+//		final ReadOnlyVector3 pMiddle = width.add(height, null).multiplyLocal(0.5).addLocal(p0);
+
+		final int cols = (int) (width.length() / gridSize);
+
+		for (int col = 0; col < cols / 2 + 1; col++) {
+			for (int neg = -1; neg <= 1; neg += 2) {
+				final ReadOnlyVector3 lineP1 = width.normalize(null).multiplyLocal(neg * col * gridSize).addLocal(pMiddle).subtractLocal(height.multiply(0.5, null));
+				points.add(lineP1);
+				final ReadOnlyVector3 lineP2 = lineP1.add(height, null);
+				points.add(lineP2);
+				if (col == 0)
+					break;
+			}
+		}
+
+		final int rows = (int) (height.length() / gridSize);
+
+		for (int row = 0; row < rows / 2 + 1; row++) {
+			for (int neg = -1; neg <= 1; neg += 2) {
+				final ReadOnlyVector3 lineP1 = height.normalize(null).multiplyLocal(neg * row * gridSize).addLocal(pMiddle).subtractLocal(width.multiply(0.5, null));
+				points.add(lineP1);
+				final ReadOnlyVector3 lineP2 = lineP1.add(width, null);
+				points.add(lineP2);
+				if (row == 0)
+					break;
+			}
+		}
+		if (points.size() < 2)
+			return;
+		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
+		for (final ReadOnlyVector3 p : points)
+//			buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.01f);
+			buf.put(p.getXf()).put(p.getYf()).put(pMiddle.getZf());
+
+		gridsMesh.getMeshData().setVertexBuffer(buf);
+		gridsMesh.updateModelBound();
+		gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
+	}	
 }
