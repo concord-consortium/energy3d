@@ -298,6 +298,7 @@ public class MainFrame extends JFrame {
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						try {
 							Scene.getInstance().open(fileChooser.getSelectedFile().toURI().toURL());
+							setTitle("Energy3D v" + Config.VERSION + ": " + fileChooser.getSelectedFile());
 						} catch (MalformedURLException e1) {
 							e1.printStackTrace();
 						}
@@ -605,6 +606,7 @@ public class MainFrame extends JFrame {
 							if (!file.getName().toLowerCase().endsWith(".ser"))
 								file = new File(file.toString() + ".ser");
 							Scene.getInstance().save(file.toURI().toURL());
+							setTitle("Energy3D v" + Config.VERSION + ": " + file);
 						} catch (Throwable err) {
 							err.printStackTrace();
 							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
