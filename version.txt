@@ -816,6 +816,7 @@ Version 0.5 - October 20, 2011
 - snap to correct grids on roof
 - snap to correct grids on roof vertically
 - fix snap on foundation
+- update the window title bar with the file name
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

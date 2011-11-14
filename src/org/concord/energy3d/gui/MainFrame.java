@@ -184,6 +184,7 @@ public class MainFrame extends JFrame {
 		final ReadOnlyColorRGBA defaultColor = HousePart.getDefaultColor();
 		colorChooser.setColor(new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue()));
 		initialize();
+		updateTitleBar();
 		System.out.println("done");
 	}
 
@@ -298,7 +299,7 @@ public class MainFrame extends JFrame {
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						try {
 							Scene.getInstance().open(fileChooser.getSelectedFile().toURI().toURL());
-							setTitle("Energy3D v" + Config.VERSION + ": " + fileChooser.getSelectedFile());
+							updateTitleBar();
 						} catch (MalformedURLException e1) {
 							e1.printStackTrace();
 						}
@@ -307,6 +308,10 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return openMenuItem;
+	}
+
+	protected void updateTitleBar() {
+		this.setTitle("Energy3D v" + Config.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " "));
 	}
 
 	/**
@@ -606,7 +611,7 @@ public class MainFrame extends JFrame {
 							if (!file.getName().toLowerCase().endsWith(".ser"))
 								file = new File(file.toString() + ".ser");
 							Scene.getInstance().save(file.toURI().toURL());
-							setTitle("Energy3D v" + Config.VERSION + ": " + file);
+							updateTitleBar();
 						} catch (Throwable err) {
 							err.printStackTrace();
 							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
