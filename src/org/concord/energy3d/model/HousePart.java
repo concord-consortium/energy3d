@@ -367,14 +367,23 @@ public abstract class HousePart implements Serializable {
 				final ReadOnlyVector3 p0 = container.getAbsPoint(0);
 				
 				final ReadOnlyVector3 origin;
-				if (relativeToHorizontal)
+				if (relativeToHorizontal) {
 //					origin = container.getAbsPoint(2).subtractLocal(p0).addLocal(container.getAbsPoint(1).subtractLocal(p0)).multiplyLocal(0.5).addLocal(p0);
 //					origin = root.getWorldBound().getCenter();
-					origin = getCenter();
-				else
+					final ReadOnlyVector3 center;
+					if (this instanceof Roof)
+						center = getCenter();
+					else
+						center = container.getCenter();
+						
+					if (snapToZ)
+						origin = center;
+					else
+						origin = center.add(0, 0, p.getZ(), null);
+				} else
 					origin = p0;
 				
-				final ReadOnlyVector3 originToP = p.subtract(origin, null);
+				final ReadOnlyVector3 originToP = p.subtract(origin, null);;
 				final Vector3 newP = new Vector3();
 //				if (!snapToZ) {
 				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), !snapToZ ? 0 : originToP.getY(), 0);

@@ -814,6 +814,8 @@ Version 0.5 - October 20, 2011
 - draw grids for foundation
 - snap to correct grids on foundation
 - snap to correct grids on roof
+- snap to correct grids on roof vertically
+- fix snap on foundation
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
