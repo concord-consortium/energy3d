@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Callable;
@@ -41,6 +42,7 @@ import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.ColladaMaterialUtils;
@@ -82,6 +84,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.Renderer;
@@ -146,6 +149,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Node backgroundRoot = new Node("Scenary Root");
 	private final BasicPassManager passManager = new BasicPassManager();
 	private final Mesh floor = new Quad("Floor", 200, 200);
+	private final Mesh gridsMesh = new Line("Floor Grids");
 	private final LightState lightState = new LightState();
 	private final UndoManager undoManager = new UndoManager();
 	private HousePart selectedHousePart = null;
@@ -170,7 +174,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean sunAnim;
 	private boolean operationStick = false;
 	private boolean operationFlag = false;
-	private boolean update = true;
+	private boolean update = true;	
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -243,6 +247,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		backgroundRoot.attachChild(createSky());
 		backgroundRoot.attachChild(createFloor());
+		backgroundRoot.attachChild(createGrids(0.5));
 		backgroundRoot.attachChild(createAxis());
 		root.attachChild(backgroundRoot);
 		root.attachChild(Scene.getRoot());
@@ -420,7 +425,58 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		floor.updateModelBound();
 		return floor;
 	}
+	
+	public Mesh createGrids(final double gridSize) {
+		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+		gridsMesh.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(gridsMesh);
+		
+		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(200, null);
+		final ReadOnlyVector3 height = Vector3.UNIT_Y.multiply(200, null);
+		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
+		final ReadOnlyVector3 pMiddle = Vector3.ZERO;
 
+		final int cols = (int) (width.length() / gridSize);
+
+		for (int col = 0; col < cols / 2 + 1; col++) {
+			for (int neg = -1; neg <= 1; neg += 2) {
+				final ReadOnlyVector3 lineP1 = width.normalize(null).multiplyLocal(neg * col * gridSize).addLocal(pMiddle).subtractLocal(height.multiply(0.5, null));
+				points.add(lineP1);
+				final ReadOnlyVector3 lineP2 = lineP1.add(height, null);
+				points.add(lineP2);
+				if (col == 0)
+					break;
+			}
+		}
+
+		final int rows = (int) (height.length() / gridSize);
+
+		for (int row = 0; row < rows / 2 + 1; row++) {
+			for (int neg = -1; neg <= 1; neg += 2) {
+				final ReadOnlyVector3 lineP1 = height.normalize(null).multiplyLocal(neg * row * gridSize).addLocal(pMiddle).subtractLocal(width.multiply(0.5, null));
+				points.add(lineP1);
+				final ReadOnlyVector3 lineP2 = lineP1.add(width, null);
+				points.add(lineP2);
+				if (row == 0)
+					break;
+			}
+		}
+//		if (points.size() < 2)
+//			return;
+		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
+		for (final ReadOnlyVector3 p : points)
+			buf.put(p.getXf()).put(p.getYf()).put(0.01f);
+
+		gridsMesh.getMeshData().setVertexBuffer(buf);
+		gridsMesh.updateModelBound();
+		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
+		return gridsMesh;
+	}
+	
+	public void setGridsVisible(final boolean visible) {
+		gridsMesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+	}
+	
 	private Mesh createSky() {
 		final Dome sky = new Dome("Sky", 100, 100, 100);
 		sky.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
@@ -478,17 +534,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							MouseState mouseState = inputStates.getCurrent().getMouseState();
 							if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.DRAW_ROOF_GABLE) {
 								if (selectedHousePart == null || selectedHousePart.isDrawCompleted()) {
-									final HousePart previousDrawn = selectedHousePart;
+									final HousePart previousSelectedHousePart = selectedHousePart;
 									final UserData pick = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
 									if (pick == null)
 										selectedHousePart = null;
 									else
 										selectedHousePart = pick.getHousePart();
 									System.out.print("Clicked on: " + pick);
-									if (previousDrawn != null && previousDrawn != selectedHousePart)
-										previousDrawn.hidePoints();
+									if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
+										previousSelectedHousePart.hidePoints();
+										previousSelectedHousePart.setGridsVisible(false);
+									}
 									if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
 										selectedHousePart.showPoints();
+										selectedHousePart.setGridsVisible(true);
 										if (pick.getIndex() != -1) {
 											if (selectedHousePart instanceof Foundation)
 												editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart);
@@ -505,7 +564,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										undoManager.addEdit(new MakeGableCommand(roof, roofPartIndex));
 										roof.setGable(roofPartIndex, true);
 										MainFrame.getInstance().refreshUndoRedo();
-									}
+									}																		
 								}
 							} else {
 								selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
@@ -556,10 +615,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										MainPanel.getInstance().deselect();
 								}
 							}
-							if (HousePart.getGridsHighlightedHousePart() != null) {
-								HousePart.getGridsHighlightedHousePart().hideGrids();
-								HousePart.setGridsHighlightedHousePart(null);
-							}
+//							if (HousePart.getGridsHighlightedHousePart() != null) {
+//								HousePart.getGridsHighlightedHousePart().setGridsVisible(false);
+//								HousePart.setGridsHighlightedHousePart(null);
+//							}
+							if (selectedHousePart != null)
+								selectedHousePart.setGridsVisible(false);
 							enableDisableRotationControl();
 							if (sceneChanged)
 								updateHeliodonAndAnnotationSize();
@@ -857,21 +918,25 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			else
 				Scene.getInstance().remove(selectedHousePart);
 		}
+		
 		for (HousePart part : Scene.getInstance().getParts())
-			if (part instanceof Foundation) {
+			if (part instanceof Foundation)
 				((Foundation) part).setResizeHouseMode(operation == Operation.RESIZE);
-			}
+		
 		if (viewMode != ViewMode.PRINT_PREVIEW)
 			Scene.getInstance().drawResizeBounds();
+				
 		selectedHousePart = newHousePart();
 		enableDisableRotationControl();
 	}
 
 	private HousePart newHousePart() {
 		final HousePart drawn;
-		if (operation == Operation.DRAW_WALL)
+		setGridsVisible(false);
+		if (operation == Operation.DRAW_WALL) {
 			drawn = new Wall();
-		else if (operation == Operation.DRAW_DOOR)
+			setGridsVisible(true);
+		} else if (operation == Operation.DRAW_DOOR)
 			drawn = new Door();
 		else if (operation == Operation.DRAW_WINDOW)
 			drawn = new Window();
@@ -883,9 +948,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new CustomRoof();
 		else if (operation == Operation.DRAW_FLOOR)
 			drawn = new Floor();
-		else if (operation == Operation.DRAW_FOUNDATION)
+		else if (operation == Operation.DRAW_FOUNDATION) {
 			drawn = new Foundation();
-		else
+			setGridsVisible(true);
+		} else
 			return null;
 
 		Scene.getInstance().add(drawn);
@@ -1112,7 +1178,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setZoomLock(boolean zoomLock) {
-		cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);
+		cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);		
 	}
 
 	public void update() {

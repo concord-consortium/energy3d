@@ -54,7 +54,7 @@ public class Wall extends HousePart {
 	private transient Mesh invisibleMesh;
 	private transient Mesh windowsSurroundMesh;
 	private transient Line wireframeMesh;
-	private transient Line gridsMesh;
+//	private transient Line gridsMesh;
 	private transient Roof roof;
 	private transient ArrayList<Vector3> wallPolygonPoints;
 	private transient int visitStamp;
@@ -137,12 +137,13 @@ public class Wall extends HousePart {
 		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
 
-		gridsMesh = new Line("Wall (Grids)");
-		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
-		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
-		gridsMesh.setModelBound(new BoundingBox());
-		Util.disablePickShadowLight(gridsMesh);
-		root.attachChild(gridsMesh);
+//		gridsMesh = new Line("Wall (Grids)");
+//		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
+//		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+//		gridsMesh.setModelBound(new BoundingBox());
+//		Util.disablePickShadowLight(gridsMesh);		
+//		root.attachChild(gridsMesh);
+//		setGridsVisible(false);
 
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 
@@ -989,11 +990,6 @@ public class Wall extends HousePart {
 	}
 	
 	@Override
-	public void hideGrids() {
-		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
-	}
-
-	@Override
 	public void drawGrids(final double gridSize) {
 		final ReadOnlyVector3 p0 = getAbsPoint(0);
 //		final ReadOnlyVector3 p0 = wallPolygonPoints.get(1);
@@ -1049,7 +1045,7 @@ public class Wall extends HousePart {
 //		gridsMesh.getMeshData().updateVertexCount();
 		gridsMesh.updateModelBound();
 		
-		gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
+//		gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 	}
 	
 //	@Override

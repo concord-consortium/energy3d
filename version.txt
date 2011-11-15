@@ -817,6 +817,8 @@ Version 0.5 - October 20, 2011
 - snap to correct grids on roof vertically
 - fix snap on foundation
 - update the window title bar with the file name
+- fix exception when snapping new wall to one of the walls of a roof
+- turn the grids on and off with code in init, pickContainer, mouseReleased, newHousePart
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

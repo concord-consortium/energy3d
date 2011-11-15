@@ -52,7 +52,7 @@ public abstract class Roof extends HousePart {
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
 	private transient Line wireframeMesh;
 	private transient ArrayList<Wall> walls;
-	private transient Mesh gridsMesh;
+	// private transient Mesh gridsMesh;
 	private ArrayList<Wall> gableWalls = null;
 	private Map<Integer, ArrayList<Wall>> gableEditPointToWallMap = null;
 	private Map<Integer, ArrayList<Integer>> gableRoofPartToEditPointMap = null;
@@ -80,13 +80,14 @@ public abstract class Roof extends HousePart {
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
 		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
-		
-		gridsMesh = new Line("Wall (Grids)");
-		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
-		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
-		gridsMesh.setModelBound(new BoundingBox());
-		Util.disablePickShadowLight(gridsMesh);
-		root.attachChild(gridsMesh);
+
+		// gridsMesh = new Line("Grids");
+		// gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
+		// gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+		// gridsMesh.setModelBound(new BoundingBox());
+		// Util.disablePickShadowLight(gridsMesh);
+		// root.attachChild(gridsMesh);
+		// setGridsVisible(false);
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
 	}
@@ -127,7 +128,7 @@ public abstract class Roof extends HousePart {
 			drawWireframe();
 			updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 			root.updateGeometricState(0);
-			drawGrids(getGridSize());
+			// drawGrids(getGridSize());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -145,7 +146,7 @@ public abstract class Roof extends HousePart {
 	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
 		try {
 			Poly2Tri.triangulate(polygon);
-		} catch (RuntimeException e) {
+		} catch (final RuntimeException e) {
 			e.printStackTrace();
 			System.out.println("Triangulate exception received with the following polygon:");
 			for (TriangulationPoint p : polygon.getPoints())
@@ -166,19 +167,21 @@ public abstract class Roof extends HousePart {
 		wallNormals.clear();
 		startWall.visitNeighbors(new WallVisitor() {
 			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
-				walls.add(currentWall);
-				currentWall.setRoof(Roof.this);
-				final int pointIndex2;
-				if (nextSnap != null)
-					pointIndex2 = nextSnap.getSnapPointIndexOf(currentWall) + 1;
-				else
-					pointIndex2 = 0 + 1;
-				final int pointIndex1 = pointIndex2 == 1 ? 3 : 1;
-				final Vector3 p1 = currentWall.getAbsPoint(pointIndex1);
-				final Vector3 p2 = currentWall.getAbsPoint(pointIndex2);
-				final ReadOnlyVector3 normal = currentWall.getFaceDirection();
-				addPointToPolygon(p1, normal);
-				addPointToPolygon(p2, normal);
+				if (currentWall.isDrawCompleted()) {
+					walls.add(currentWall);
+					currentWall.setRoof(Roof.this);
+					final int pointIndex2;
+					if (nextSnap != null)
+						pointIndex2 = nextSnap.getSnapPointIndexOf(currentWall) + 1;
+					else
+						pointIndex2 = 0 + 1;
+					final int pointIndex1 = pointIndex2 == 1 ? 3 : 1;
+					final Vector3 p1 = currentWall.getAbsPoint(pointIndex1);
+					final Vector3 p2 = currentWall.getAbsPoint(pointIndex2);
+					final ReadOnlyVector3 normal = currentWall.getFaceDirection();
+					addPointToPolygon(p1, normal);
+					addPointToPolygon(p2, normal);
+				}
 			}
 		});
 	}
@@ -590,18 +593,18 @@ public abstract class Roof extends HousePart {
 				((Node) roofPart).getChild(2).getSceneHints().setCullHint(cull);
 			}
 	}
-	
+
 	@Override
 	public void drawGrids(final double gridSize) {
-//		final ReadOnlyVector3 p0 = getAbsPoint(0);
-//		final ReadOnlyVector3 p1 = getAbsPoint(1);
-//		final ReadOnlyVector3 p2 = getAbsPoint(2);
+		// final ReadOnlyVector3 p0 = getAbsPoint(0);
+		// final ReadOnlyVector3 p1 = getAbsPoint(1);
+		// final ReadOnlyVector3 p2 = getAbsPoint(2);
 		final BoundingBox bounds = (BoundingBox) root.getWorldBound();
-		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(bounds.getXExtent() * 2, null); 
+		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(bounds.getXExtent() * 2, null);
 		final ReadOnlyVector3 height = Vector3.UNIT_Y.multiply(bounds.getYExtent() * 2, null);
 		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
 		final ReadOnlyVector3 pMiddle = getAbsPoint(0);
-//		final ReadOnlyVector3 pMiddle = width.add(height, null).multiplyLocal(0.5).addLocal(p0);
+		// final ReadOnlyVector3 pMiddle = width.add(height, null).multiplyLocal(0.5).addLocal(p0);
 
 		final int cols = (int) (width.length() / gridSize);
 
@@ -632,11 +635,11 @@ public abstract class Roof extends HousePart {
 			return;
 		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
 		for (final ReadOnlyVector3 p : points)
-//			buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.01f);
+			// buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.01f);
 			buf.put(p.getXf()).put(p.getYf()).put(pMiddle.getZf());
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
 		gridsMesh.updateModelBound();
-		gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
-	}	
+		// gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
+	}
 }

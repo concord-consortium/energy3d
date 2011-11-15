@@ -32,7 +32,7 @@ public class Foundation extends HousePart {
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient boolean resizeHouseMode = false;
-	private transient Mesh gridsMesh;
+//	private transient Mesh gridsMesh;
 
 	public Foundation() {
 		super(2, 8, 0.1);
@@ -70,12 +70,13 @@ public class Foundation extends HousePart {
 		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
 
-		gridsMesh = new Line("Wall (Grids)");
-		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
-		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
-		gridsMesh.setModelBound(new BoundingBox());
-		Util.disablePickShadowLight(gridsMesh);
-		root.attachChild(gridsMesh);
+//		gridsMesh = new Line("Grids");
+//		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
+//		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+//		gridsMesh.setModelBound(new BoundingBox());
+//		Util.disablePickShadowLight(gridsMesh);
+//		root.attachChild(gridsMesh);
+//		setGridsVisible(false);
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -316,12 +317,7 @@ public class Foundation extends HousePart {
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
 		gridsMesh.updateModelBound();
-		gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
-	}
-
-	@Override
-	public void hideGrids() {
-		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
+//		gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 	}
 
 	private void putWireframePoint(final FloatBuffer buf, final Vector3 p) {

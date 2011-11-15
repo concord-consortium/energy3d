@@ -879,6 +879,7 @@ public class MainPanel extends JPanel {
 			zoomButton.setToolTipText("Zoom");
 			zoomButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 					SceneManager.getInstance().setZoomLock(zoomButton.isSelected());
 				}
 			});
