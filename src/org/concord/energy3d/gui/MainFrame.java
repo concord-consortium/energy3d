@@ -195,7 +195,7 @@ public class MainFrame extends JFrame {
 	 */
 	private void initialize() {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-		this.setSize(1092, 600);
+		this.setSize(900, 600); // XIE: reduce the length, as some older computers have only 1024x800 screen resolution.
 		// this.setSize(600, 600);
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int) (screenSize.getWidth() - this.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2);
