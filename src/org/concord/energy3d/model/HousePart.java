@@ -339,7 +339,7 @@ public abstract class HousePart implements Serializable {
 			else
 				previousContainer.gridsMesh.getSceneHints().setCullHint(CullHint.Always);
 		}
-		if (container != null) {
+		if (container != null && !(this instanceof Roof)) {
 			container.drawGrids(getGridSize());
 			container.gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 		} else if (this instanceof Foundation || this instanceof Wall) {

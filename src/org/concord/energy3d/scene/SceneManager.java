@@ -582,6 +582,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					update = true;
 					taskManager.update(new Callable<Object>() {
 						public Object call() throws Exception {
+							if (selectedHousePart != null)
+								selectedHousePart.setGridsVisible(false);							
 							MouseState mouseState = inputStates.getCurrent().getMouseState();
 							boolean sceneChanged = false;
 							if (operation == Operation.SELECT || operation == Operation.RESIZE) {
@@ -619,8 +621,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //								HousePart.getGridsHighlightedHousePart().setGridsVisible(false);
 //								HousePart.setGridsHighlightedHousePart(null);
 //							}
-							if (selectedHousePart != null)
-								selectedHousePart.setGridsVisible(false);
 							enableDisableRotationControl();
 							if (sceneChanged)
 								updateHeliodonAndAnnotationSize();
@@ -804,8 +804,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void hideAllEditPoints() {
-		for (HousePart part : Scene.getInstance().getParts())
+		for (HousePart part : Scene.getInstance().getParts()) {
 			part.hidePoints();
+			part.setGridsVisible(false);
+		}
+		update = true;
 	}
 
 	public void resetCamera(final ViewMode viewMode) {

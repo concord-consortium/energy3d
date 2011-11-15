@@ -819,6 +819,8 @@ Version 0.5 - October 20, 2011
 - update the window title bar with the file name
 - fix exception when snapping new wall to one of the walls of a roof
 - turn the grids on and off with code in init, pickContainer, mouseReleased, newHousePart
+- prevent grids of roof container from showing when roof is selected
+- do not show roof grids when initially inserted, only show when editing
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
