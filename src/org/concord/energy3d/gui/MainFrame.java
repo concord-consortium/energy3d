@@ -278,6 +278,7 @@ public class MainFrame extends JFrame {
 			newMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					Scene.getInstance().newFile();
+					setTitle("Energy3D v" + Config.VERSION);
 				}
 			});
 		}
