@@ -44,7 +44,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton doorButton = null;
 	private JToggleButton roofButton = null;
 	private JToggleButton windowButton = null;
-	private JToggleButton foundationButton = null;
+	private JToggleButton platformButton = null;
 	private JToggleButton lightButton = null;
 	private JToggleButton topViewButton = null;
 	private JToggleButton rotAnimButton = null;
@@ -119,7 +119,7 @@ public class MainPanel extends JPanel {
 				appToolbar.add(getResizeButton());
 				appToolbar.add(getZoomButton());
 				appToolbar.addSeparator();
-				appToolbar.add(getFoundationButton());
+				appToolbar.add(getPlatformButton());
 				appToolbar.add(getWallButton());
 				appToolbar.add(getDoorButton());
 				appToolbar.add(getWindowButton());
@@ -153,7 +153,7 @@ public class MainPanel extends JPanel {
 				bg.add(selectButton);
 				bg.add(resizeButton);
 				bg.add(zoomButton);
-				bg.add(foundationButton);
+				bg.add(platformButton);
 				bg.add(wallButton);
 				bg.add(doorButton);
 				bg.add(windowButton);
@@ -311,21 +311,21 @@ public class MainPanel extends JPanel {
 	}
 
 	/**
-	 * This method initializes foundationButton
+	 * This method initializes platformButton
 	 * 
 	 * @return javax.swing.JToggleButton
 	 */
-	private JToggleButton getFoundationButton() {
-		if (foundationButton == null) {
-			foundationButton = new JToggleButton();
-			foundationButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/foundation.png")));
-			foundationButton.setToolTipText("Draw foundation");
-			foundationButton.addActionListener(new java.awt.event.ActionListener() {
+	private JToggleButton getPlatformButton() {
+		if (platformButton == null) {
+			platformButton = new JToggleButton();
+			platformButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/foundation.png")));
+			platformButton.setToolTipText("Draw platform");
+			platformButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
 				}
 			});
-			foundationButton.addMouseListener(new java.awt.event.MouseAdapter() {
+			platformButton.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
@@ -336,7 +336,7 @@ public class MainPanel extends JPanel {
 				}
 			});
 		}
-		return foundationButton;
+		return platformButton;
 	}
 
 	/**
