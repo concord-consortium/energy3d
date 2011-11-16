@@ -821,6 +821,10 @@ Version 0.5 - October 20, 2011
 - turn the grids on and off with code in init, pickContainer, mouseReleased, newHousePart
 - prevent grids of roof container from showing when roof is selected
 - do not show roof grids when initially inserted, only show when editing
+- prevent chance of inserting invisible walls by decreasing MIN_WALL_LENGTH to 0.01 to make walls visible from the start
+- do not draw window bars if width and height of window is less than bar devision length
+- remove wall if it's invisible due to being too narrow
+- hide wall meshes if wall is too narrow
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

@@ -15,11 +15,16 @@ import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.BlendState.BlendEquation;
+import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
@@ -142,9 +147,15 @@ public abstract class HousePart implements Serializable {
 		gridsMesh = new Line("Grids");
 		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
 		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
-		gridsMesh.setModelBound(new BoundingBox());
+//		gridsMesh.setDefaultColor(new ColorRGBA(0, 1, 1, 0.5f));
+//		gridsMesh.setDefaultColor(new ColorRGBA(0, 0, 1, 0.9f));
+//		final BlendState blend = new BlendState();
+//		blend.setBlendEnabled(true);
+//		gridsMesh.setRenderState(blend);
+//		gridsMesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		gridsMesh.setModelBound(new BoundingBox());		
 		Util.disablePickShadowLight(gridsMesh);
-		root.attachChild(gridsMesh);
+		root.attachChild(gridsMesh);		
 		setGridsVisible(false);
 	}
 
@@ -371,11 +382,17 @@ public abstract class HousePart implements Serializable {
 		if (container == null)
 			return new Vector3(p);
 		final ReadOnlyVector3 origin = container.getAbsPoint(0);
-		final ReadOnlyVector3 width = container.getAbsPoint(2).subtract(origin, null);
-		final ReadOnlyVector3 height = container.getAbsPoint(1).subtract(origin, null);
+		ReadOnlyVector3 width = container.getAbsPoint(2).subtract(origin, null);
+		if (width.length() < MathUtils.ZERO_TOLERANCE)
+		    width = new Vector3(MathUtils.ZERO_TOLERANCE, 0, 0);		
+		ReadOnlyVector3 height = container.getAbsPoint(1).subtract(origin, null);
+        if (height.length() < MathUtils.ZERO_TOLERANCE)
+            height = new Vector3(0, relativeToHorizontal ? MathUtils.ZERO_TOLERANCE : 0, relativeToHorizontal ? 0 : MathUtils.ZERO_TOLERANCE);        		
 		Vector3 pointOnSpace = origin.add(width.multiply(p.getX(), null), null).add(height.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
 		if (relativeToHorizontal)
 			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
+		if (!Vector3.isValid(pointOnSpace))
+		    System.out.println("xxx");
 		return pointOnSpace;
 	}
 
@@ -458,7 +475,8 @@ public abstract class HousePart implements Serializable {
 				throw new RuntimeException("Drawing of this object is already completed");
 
 			if (points.size() >= numOfEditPoints)
-				drawCompleted = true;
+//				drawCompleted = true;
+			    complete();
 			else {
 				allocateNewPoint();
 				setPreviewPoint(x, y);

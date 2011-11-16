@@ -8,6 +8,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
@@ -26,14 +27,14 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
-//	private static final double GRID_SIZE = 0.15;
+	// private static final double GRID_SIZE = 0.15;
 	private transient BMText label1;
 	private transient Line bars;
 
 	public Window() {
 		super(2, 4, 0.30);
 	}
-	
+
 	@Override
 	public double getGridSize() {
 		return 0.15;
@@ -133,57 +134,62 @@ public class Window extends HousePart {
 		mesh.updateModelBound();
 
 		final double divisionLength = 0.3;
-		final Vector3 halfThickness = ((Wall) container).getThicknessNormal().multiply(0.5, null);
-		FloatBuffer barsVertices = bars.getMeshData().getVertexBuffer();
-		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / divisionLength);
-		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / divisionLength);
-		if (barsVertices.capacity() < (4 + rows + cols) * 6) {
-			barsVertices = BufferUtils.createVector3Buffer((4 + rows + cols) * 2);
-			bars.getMeshData().setVertexBuffer(barsVertices);
-			bars.getMeshData().setNormalBuffer(barsVertices);
-		} else {
+		if (getAbsPoint(2).subtractLocal(getAbsPoint(0)).length() < 2 * divisionLength || getAbsPoint(1).subtractLocal(getAbsPoint(0)).length() < 2 * divisionLength)
+			bars.getSceneHints().setCullHint(CullHint.Always);
+		else {
+			bars.getSceneHints().setCullHint(CullHint.Inherit);
+			final Vector3 halfThickness = ((Wall) container).getThicknessNormal().multiply(0.5, null);
+			FloatBuffer barsVertices = bars.getMeshData().getVertexBuffer();
+			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / divisionLength);
+			final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / divisionLength);
+			if (barsVertices.capacity() < (4 + rows + cols) * 6) {
+				barsVertices = BufferUtils.createVector3Buffer((4 + rows + cols) * 2);
+				bars.getMeshData().setVertexBuffer(barsVertices);
+				bars.getMeshData().setNormalBuffer(barsVertices);
+			} else {
+				barsVertices.rewind();
+				barsVertices.limit(barsVertices.capacity());
+			}
+
 			barsVertices.rewind();
-			barsVertices.limit(barsVertices.capacity());
-		}
+			final Vector3 p = new Vector3();
+			getAbsPoint(0).add(halfThickness, p);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			getAbsPoint(1).add(halfThickness, p);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			getAbsPoint(1).add(halfThickness, p);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			getAbsPoint(3).add(halfThickness, p);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			getAbsPoint(3).add(halfThickness, p);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			getAbsPoint(2).add(halfThickness, p);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			getAbsPoint(2).add(halfThickness, p);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			getAbsPoint(0).add(halfThickness, p);
+			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 
-		barsVertices.rewind();
-		final Vector3 p = new Vector3();
-		getAbsPoint(0).add(halfThickness, p);
-		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		getAbsPoint(1).add(halfThickness, p);
-		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		getAbsPoint(1).add(halfThickness, p);
-		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		getAbsPoint(3).add(halfThickness, p);
-		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		getAbsPoint(3).add(halfThickness, p);
-		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		getAbsPoint(2).add(halfThickness, p);
-		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		getAbsPoint(2).add(halfThickness, p);
-		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		getAbsPoint(0).add(halfThickness, p);
-		barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-
-		final ReadOnlyVector3 o = getAbsPoint(0).add(halfThickness, null);
-		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
-		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
-		for (int col = 1; col < cols; col++) {
-			u.multiply((double) col / cols, p).addLocal(o);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p.addLocal(v);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			final ReadOnlyVector3 o = getAbsPoint(0).add(halfThickness, null);
+			final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
+			final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
+			for (int col = 1; col < cols; col++) {
+				u.multiply((double) col / cols, p).addLocal(o);
+				barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+				p.addLocal(v);
+				barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			}
+			for (int row = 1; row < rows; row++) {
+				v.multiply((double) row / rows, p).addLocal(o);
+				barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+				p.addLocal(u);
+				barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			}
+			p.set(halfThickness).negateLocal().normalizeLocal();
+			barsVertices.limit(barsVertices.position());
+			bars.getMeshData().updateVertexCount();
+			bars.updateModelBound();
 		}
-		for (int row = 1; row < rows; row++) {
-			v.multiply((double) row / rows, p).addLocal(o);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p.addLocal(u);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		}
-		p.set(halfThickness).negateLocal().normalizeLocal();
-		barsVertices.limit(barsVertices.position());
-		bars.getMeshData().updateVertexCount();
-		bars.updateModelBound();
 	}
 
 	@Override
@@ -250,10 +256,12 @@ public class Window extends HousePart {
 			label1.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 	}
 
-	private Vector3 enforceContraints(Vector3 p) {
+	private Vector3 enforceContraints(final ReadOnlyVector3 p) {
 		if (container == null)
 			return new Vector3(p);
-		final double wallx = container.getAbsPoint(2).subtract(container.getAbsPoint(0), null).length();
+		double wallx = container.getAbsPoint(2).subtract(container.getAbsPoint(0), null).length();
+		if (wallx < MathUtils.ZERO_TOLERANCE)
+			wallx = MathUtils.ZERO_TOLERANCE;
 		final double margin = 0.2 / wallx;
 		double x = Math.max(p.getX(), margin);
 		x = Math.min(x, 1 - margin);
@@ -274,16 +282,16 @@ public class Window extends HousePart {
 			container.getRoot().getTransform().applyForward(absolute);
 		return absolute;
 	}
-	
-//	@Override
-//	protected Vector3 grid(final Vector3 p, final double gridSize, final boolean snapToZ) {
-//		if (isSnapToGrids()) {
-//			if (container.getContainer() != null)
-//				p.subtractLocal(0, 0, container.getContainer().getHeight());
-//			p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
-//			if (container.getContainer() != null)
-//				p.addLocal(0, 0, container.getContainer().getHeight());
-//		}
-//		return p;
-//	}	
+
+	// @Override
+	// protected Vector3 grid(final Vector3 p, final double gridSize, final boolean snapToZ) {
+	// if (isSnapToGrids()) {
+	// if (container.getContainer() != null)
+	// p.subtractLocal(0, 0, container.getContainer().getHeight());
+	// p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+	// if (container.getContainer() != null)
+	// p.addLocal(0, 0, container.getContainer().getHeight());
+	// }
+	// return p;
+	// }
 }

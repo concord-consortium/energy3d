@@ -426,8 +426,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return floor;
 	}
 	
-	public Mesh createGrids(final double gridSize) {
-		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+	private Mesh createGrids(final double gridSize) {
+//		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+//		gridsMesh.setDefaultColor(new ColorRGBA(0, 0, 1, 1f));
+//		final BlendState blend = new BlendState();
+//		blend.setBlendEnabled(true);
+//		gridsMesh.setRenderState(blend);
+		
 		gridsMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(gridsMesh);
 		

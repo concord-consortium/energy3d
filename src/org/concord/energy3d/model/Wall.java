@@ -46,7 +46,8 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double GRID_SIZE = 0.5;
-	private static final double MIN_WALL_LENGTH = 0.1;
+//	private static final double MIN_WALL_LENGTH = 0.1;
+	private static final double MIN_WALL_LENGTH = 0.01;
 	private static double defaultWallHeight = 1f;
 	private static int currentVisitStamp = 1;
 	private transient Mesh backMesh;
@@ -300,6 +301,13 @@ public class Wall extends HousePart {
 	}
 
 	protected void drawMesh() {
+		final CullHint cull = isDrawable() ? CullHint.Inherit : CullHint.Always;
+		mesh.getSceneHints().setCullHint(cull);
+		backMesh.getSceneHints().setCullHint(cull);
+		surroundMesh.getSceneHints().setCullHint(cull);
+		windowsSurroundMesh.getSceneHints().setCullHint(cull);
+		wireframeMesh.getSceneHints().setCullHint(cull);		
+		
 		if (!isDrawable())
 			return;
 
@@ -1059,4 +1067,11 @@ public class Wall extends HousePart {
 //		}
 //		return p;
 //	}
+	
+	@Override
+	public void complete() {
+		super.complete();
+		if (!isDrawable())
+			Scene.getInstance().remove(this);
+	}
 }
