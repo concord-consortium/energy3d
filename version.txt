@@ -825,6 +825,9 @@ Version 0.5 - October 20, 2011
 - do not draw window bars if width and height of window is less than bar devision length
 - remove wall if it's invisible due to being too narrow
 - hide wall meshes if wall is too narrow
+- switch left and right mouse function
+- allow rotation while inserting new house part
+- fix problem with wall wireframe visible from below the roof
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

@@ -427,7 +427,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 	
 	private Mesh createGrids(final double gridSize) {
-//		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
 //		gridsMesh.setDefaultColor(new ColorRGBA(0, 0, 1, 1f));
 //		final BlendState blend = new BlendState();
 //		blend.setBlendEnabled(true);
@@ -626,6 +626,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //								HousePart.getGridsHighlightedHousePart().setGridsVisible(false);
 //								HousePart.setGridsHighlightedHousePart(null);
 //							}
+							cameraControl.setMouseLeftButtonAction(ButtonAction.MOVE);
 							enableDisableRotationControl();
 							if (sceneChanged)
 								updateHeliodonAndAnnotationSize();
@@ -820,7 +821,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.viewMode = viewMode;
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
 
-		cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
+//		cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
+		cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.ROTATE);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		Vector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
 		Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
@@ -935,7 +937,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			Scene.getInstance().drawResizeBounds();
 				
 		selectedHousePart = newHousePart();
-		enableDisableRotationControl();
+		cameraControl.setMouseLeftButtonAction(ButtonAction.NONE);
+//		enableDisableRotationControl();
 	}
 
 	private HousePart newHousePart() {

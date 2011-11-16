@@ -464,7 +464,7 @@ public class Wall extends HousePart {
 
 		for (final int i : upper) {
 			final TriangulationPoint tp = polygon.getPoints().get(i);
-			tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), tp.getZ()), false));
+			tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), tp.getZ())));
 		}
 
 		TriangulationPoint tp = polygon.getPoints().get(0);
@@ -481,7 +481,7 @@ public class Wall extends HousePart {
 		final double step = 0.01;
 		for (double d = length - step; d > step; d -= step) {
 			final Vector3 p = dir.multiply(d, null).addLocal(o);
-			final double findRoofIntersection = findRoofIntersection(p, false);
+			final double findRoofIntersection = findRoofIntersection(p);
 
 			final ReadOnlyVector3 currentStretchPoint = new Vector3(p.getX(), p.getY(), findRoofIntersection);
 			final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();
@@ -512,11 +512,11 @@ public class Wall extends HousePart {
 					gablePoints.add(new Vector3(hole.getPoints().get(i).getX(), hole.getPoints().get(i).getY(), hole.getPoints().get(i).getZ()));
 		return gablePoints;
 	}
-	public double findRoofIntersection(final ReadOnlyVector3 v, final boolean backMesh) {
-		return findRoofIntersection(v, backMesh, Vector3.UNIT_Z).getZ();
+	public double findRoofIntersection(final ReadOnlyVector3 v) {
+		return findRoofIntersection(v, Vector3.UNIT_Z, -0.02).getZ();
 	}
 
-	public ReadOnlyVector3 findRoofIntersection(final ReadOnlyVector3 v, final boolean backMesh, final ReadOnlyVector3 direction) {
+	public ReadOnlyVector3 findRoofIntersection(final ReadOnlyVector3 v, final ReadOnlyVector3 direction, final double offset) {
 		if (roof == null)
 			return v;
 		final PickResults pickResults = new PrimitivePickResults();
@@ -525,7 +525,7 @@ public class Wall extends HousePart {
 		if (pickResults.getNumber() > 0) {
 //			final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
 //			return intersectionPoint.getZ() - 0.02; // (backMesh ? 0.1 : 0.0);
-			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
+			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(offset, null), null);
 		} else 
 			return v;
 	}
@@ -557,7 +557,7 @@ public class Wall extends HousePart {
 
 		// reduce the height of the back mesh a little
 		for (final TriangulationPoint tp : polygon.getPoints())
-			tp.set(tp.getX(), tp.getY(), tp.getZ() - 0.01);
+			tp.set(tp.getX(), tp.getY(), tp.getZ() - 0.02);
 
 		toXY(polygon);
 
@@ -1013,7 +1013,7 @@ public class Wall extends HousePart {
 		for (int col = 1; col < cols; col++) {
 			final ReadOnlyVector3 lineP1 = width.normalize(null).multiplyLocal(col * gridSize).addLocal(p0);
 			points.add(lineP1);
-			final ReadOnlyVector3 lineP2 = findRoofIntersection(new Vector3(lineP1.getX(), lineP1.getY(), this.height), false, Vector3.UNIT_Z);			
+			final ReadOnlyVector3 lineP2 = findRoofIntersection(new Vector3(lineP1.getX(), lineP1.getY(), this.height), Vector3.UNIT_Z, 0);			
 			points.add(lineP2);
 			if (lineP2.getZ() > gableHeight) {
 				gableHeight = lineP2.getZ();
@@ -1032,10 +1032,10 @@ public class Wall extends HousePart {
 			if (pMiddle.getZ() > this.height) {
 				ReadOnlyVector3 tmp;
 //				tmp = findRoofIntersection(pMiddle, false, Vector3.UNIT_Z);
-				tmp = findRoofIntersection(pMiddle, false, width.normalize(null));
+				tmp = findRoofIntersection(pMiddle, width.normalize(null), 0);
 				if (tmp != pMiddle)
 					lineP1 = tmp;
-				tmp = findRoofIntersection(pMiddle, false, width.normalize(null).negateLocal());
+				tmp = findRoofIntersection(pMiddle, width.normalize(null).negateLocal(), 0);
 				if (tmp != pMiddle)
 					lineP2 = tmp;				
 			}

@@ -253,6 +253,14 @@ public abstract class CameraControl {
 		this.rightButtonAction = rightButtonAction;
 	}
 
+	public void setMouseLeftButtonAction(final ButtonAction leftButtonAction) {
+		this.leftButtonAction = leftButtonAction;
+	}
+
+	public void setMouseRightButtonAction(final ButtonAction rightButtonAction) {
+		this.rightButtonAction = rightButtonAction;
+	}
+	
 	public void setMouseEnabled(boolean enabled) {		
 		this.mouseEnabled  = enabled;
 	}
