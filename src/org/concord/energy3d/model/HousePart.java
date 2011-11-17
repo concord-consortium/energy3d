@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.concord.energy3d.exception.InvisibleException;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -207,7 +208,7 @@ public abstract class HousePart implements Serializable {
 		return points;
 	}
 
-	public void complete() throws Exception {
+	public void complete() throws InvisibleException {
 		drawCompleted = true;
 		orgHeight = height;
 	}
@@ -468,7 +469,7 @@ public abstract class HousePart implements Serializable {
 
 	}
 
-	public void addPoint(int x, int y) throws Exception {
+	public void addPoint(int x, int y) throws InvisibleException {
 		if (container != null || !mustHaveContainer()) {
 			firstPointInserted = true;
 			if (drawCompleted)
@@ -513,7 +514,8 @@ public abstract class HousePart implements Serializable {
 
 	public void setGridsVisible(final boolean visible) {
 		if (this instanceof Foundation) {
-			SceneManager.getInstance().setGridsVisible(visible);
+//			if (SceneManager.getInstance() != null)
+				SceneManager.getInstance().setGridsVisible(visible);
 		} else if (this instanceof Roof) {
 			if (visible)
 				drawGrids(getGridSize());

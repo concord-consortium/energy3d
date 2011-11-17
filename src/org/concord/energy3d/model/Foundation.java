@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import org.concord.energy3d.exception.InvisibleException;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.SelectUtil;
@@ -116,11 +117,11 @@ public class Foundation extends HousePart {
 	}
 
 	@Override
-	public void complete() throws Exception {
+	public void complete() throws InvisibleException {
 		super.complete();
 		newBoundingHeight = points.get(4).getZ() - height; // problem?
 		applyNewHeight(boundingHeight, newBoundingHeight, true);
-		if (!resizeHouseMode) {
+		if (!resizeHouseMode && orgPoints != null) {
 			final double dx = Math.abs(points.get(2).getX() - points.get(0).getX());
 			final double dxOrg = Math.abs(orgPoints.get(2).getX() - orgPoints.get(0).getX());
 			final double ratioX = dx / dxOrg;

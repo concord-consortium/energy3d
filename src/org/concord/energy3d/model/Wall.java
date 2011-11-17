@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.concord.energy3d.exception.InvisibleException;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.SelectUtil;
@@ -1069,10 +1070,10 @@ public class Wall extends HousePart {
 //	}
 	
 	@Override
-	public void complete() throws Exception {
+	public void complete() throws InvisibleException {
 		super.complete();
 		if (!isDrawable())
-			throw new Exception("Invalid. Must remove.");
+			throw new InvisibleException();
 //			Scene.getInstance().remove(this);
 	}
 	

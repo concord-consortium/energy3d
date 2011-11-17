@@ -11,7 +11,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
@@ -277,8 +276,8 @@ public class MainFrame extends JFrame {
 			newMenuItem = new JMenuItem("New");
 			newMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					Scene.getInstance().newFile();
-					setTitle("Energy3D v" + Config.VERSION);
+					Scene.newFile();
+					updateTitleBar();					
 				}
 			});
 		}
@@ -299,10 +298,11 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().update(1);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						try {
-							Scene.getInstance().open(fileChooser.getSelectedFile().toURI().toURL());
+							Scene.open(fileChooser.getSelectedFile().toURI().toURL());
 							updateTitleBar();
-						} catch (MalformedURLException e1) {
-							e1.printStackTrace();
+						} catch (Throwable err) {
+							err.printStackTrace();
+							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}
@@ -312,7 +312,10 @@ public class MainFrame extends JFrame {
 	}
 
 	protected void updateTitleBar() {
-		this.setTitle("Energy3D v" + Config.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " "));
+		if (Scene.getURL() == null)
+			this.setTitle("Energy3D v" + Config.VERSION);
+		else
+			this.setTitle("Energy3D v" + Config.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " "));
 	}
 
 	/**
@@ -329,9 +332,9 @@ public class MainFrame extends JFrame {
 					try {
 						final URL url = Scene.getURL();
 						if (url != null)
-							Scene.getInstance().save(url);
+							Scene.save(url);
 						else if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
-							Scene.getInstance().save(fileChooser.getSelectedFile().toURI().toURL());
+							Scene.save(fileChooser.getSelectedFile().toURI().toURL());
 					} catch (Throwable err) {
 						err.printStackTrace();
 						JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -611,7 +614,7 @@ public class MainFrame extends JFrame {
 							File file = fileChooser.getSelectedFile();
 							if (!file.getName().toLowerCase().endsWith(".ser"))
 								file = new File(file.toString() + ".ser");
-							Scene.getInstance().save(file.toURI().toURL());
+							Scene.save(file.toURI().toURL());
 							updateTitleBar();
 						} catch (Throwable err) {
 							err.printStackTrace();
@@ -695,6 +698,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 			buttonGroup.add(centimetersRadioButtonMenuItem);
+			centimetersRadioButtonMenuItem.setSelected(true);
 		}
 		return centimetersRadioButtonMenuItem;
 	}

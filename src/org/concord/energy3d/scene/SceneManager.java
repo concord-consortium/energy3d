@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import javax.swing.undo.UndoManager;
 
+import org.concord.energy3d.exception.InvisibleException;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.CustomRoof;
@@ -274,9 +275,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		});
 
-		Scene.getInstance();
+//		Scene.getInstance();
 
-		SelectUtil.init(floor, Scene.getRoot());
+//		SelectUtil.init(floor, Scene.getRoot());
 		initMouse();
 
 		root.updateGeometricState(0, true);
@@ -599,7 +600,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 									try {
 										selectedHousePart.complete();
-									} catch (Exception e) {
+									} catch (InvisibleException e) {
 										editHousePartCommand.undo();
 										selectedHousePart.reset();
 										selectedHousePart.draw();
@@ -624,7 +625,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (!selectedHousePart.isDrawCompleted()) {
 									try {
 										selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
-									} catch (Exception e) {
+									} catch (InvisibleException e) {
 										addHousePartCommand = null;
 										Scene.getInstance().remove(selectedHousePart);
 										selectedHousePart = null;
@@ -1235,5 +1236,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public Timer getTimer() {
 		return frameHandler.getTimer();
+	}
+
+	public Spatial getFloor() {
+		return floor;
 	}
 }

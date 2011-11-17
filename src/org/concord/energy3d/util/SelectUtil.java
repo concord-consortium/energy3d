@@ -23,8 +23,8 @@ import com.ardor3d.scenegraph.Spatial;
 
 public class SelectUtil {
 	private static final PickResults pickResults = new PrimitivePickResults();
-	private static Mesh floor;
-	private static Node housePartsNode;
+//	private static Mesh floor;
+//	private static Node housePartsNode;
 	private static int pickLayer = -1;
 	private static ColorRGBA currentEditPointOriginalColor = new ColorRGBA();
 	private static Mesh currentEditPointMesh;
@@ -35,7 +35,8 @@ public class SelectUtil {
 
 	public static PickedHousePart pickPart(int x, int y, Spatial target) {
 		if (target == null)
-			target = floor;
+//			target = floor;
+			target = SceneManager.getInstance().getFloor();
 		pickResults.clear();
 
 		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
@@ -48,7 +49,7 @@ public class SelectUtil {
 		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
 
 		if (typeOfHousePart == null)
-			PickingUtil.findPick(floor, pickRay, pickResults, false);
+			PickingUtil.findPick(SceneManager.getInstance().getFloor(), pickRay, pickResults, false);
 		else
 			for (HousePart housePart : Scene.getInstance().getParts())
 				if (typeOfHousePart.isInstance(housePart))
@@ -115,7 +116,7 @@ public class SelectUtil {
 	}
 
 	public static UserData selectHousePart(int x, int y, boolean edit) {
-		final PickedHousePart pickedHousePart = pickPart(x, y, housePartsNode);
+		final PickedHousePart pickedHousePart = pickPart(x, y, Scene.getRoot());
 		UserData data = null;
 		if (pickedHousePart != null)
 			data = pickedHousePart.getUserData();
@@ -151,10 +152,10 @@ public class SelectUtil {
 		return data;
 	}
 
-	public static void init(Mesh floor, Node housePartsNode) {
-		SelectUtil.floor = floor;
-		SelectUtil.housePartsNode = housePartsNode;
-	}
+//	public static void init(Mesh floor, Node housePartsNode) {
+//		SelectUtil.floor = floor;
+//		SelectUtil.housePartsNode = housePartsNode;
+//	}
 
 	public static void nextPickLayer() {
 		if (pickLayer != -1)

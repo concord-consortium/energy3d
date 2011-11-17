@@ -54,33 +54,118 @@ public class Scene implements Serializable {
 	private static boolean isTextureEnabled = true;
 	private static boolean drawThickness = false;
 	private static boolean drawAnnotationsInside = false;
+	private static Unit unit = Unit.Centimeter;
+	private static double annotationScale = 10;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
-	private Unit unit = Unit.Meter;
-	private double annotationScale = 1;
+
+	// public static Scene getInstance() {
+	// if (instance == null) {
+	// instance = new Scene();
+	// try {
+	// if (!Config.isApplet() && !Config.isWebStart())
+	// instance.open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
+	// else if (Config.isWebStart()) {
+	// // do nothing
+	// } else if (Config.getApplet().getParameter("file") != null) {
+	// final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
+	// instance.open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
+	// } else {
+	// final URL url = new URL(Config.getApplet().getCodeBase(), "Energy3D Projects/Default.ser");
+	// instance.open((new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL()));
+	// }
+	// } catch (Throwable e) {
+	// e.printStackTrace();
+	// instance = new Scene();
+	// }
+	// root.attachChild(originalHouseRoot);
+	// }
+	// return instance;
+	// }
 
 	public static Scene getInstance() {
 		if (instance == null) {
-			instance = new Scene();
+			// instance = new Scene();
 			try {
 				if (!Config.isApplet() && !Config.isWebStart())
-					instance.open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
+					open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
 				else if (Config.isWebStart()) {
-					// do nothing
+					open(null);
 				} else if (Config.getApplet().getParameter("file") != null) {
 					final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
-					instance.open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
+					open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
 				} else {
 					final URL url = new URL(Config.getApplet().getCodeBase(), "Energy3D Projects/Default.ser");
-					instance.open((new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL()));
+					open((new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL()));
 				}
 			} catch (Throwable e) {
 				e.printStackTrace();
-				instance = new Scene();
+				newFile();
 			}
-			root.attachChild(originalHouseRoot);
+//			root.attachChild(originalHouseRoot);
 		}
 		return instance;
 	}
+	
+	public static void newFile() {
+		try {
+			open(null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void open(final URL file) throws Exception {
+		Scene.url = file;
+
+		if (PrintController.getInstance().isPrintPreview()) {
+			MainPanel.getInstance().getPreviewButton().setSelected(false);
+			while (!PrintController.getInstance().isFinished())
+				Thread.yield();
+		}
+
+		System.out.print("New file...");
+		originalHouseRoot.detachAllChildren();
+		root.detachAllChildren();
+		root.attachChild(originalHouseRoot);
+
+		if (url == null) {
+			instance = new Scene();
+			System.out.println("done");
+		} else {
+			System.out.print("Opening..." + file + "...");
+			ObjectInputStream in = new ObjectInputStream(file.openStream());
+			instance = (Scene) in.readObject();
+			in.close();
+			for (HousePart housePart : instance.getParts())
+				originalHouseRoot.attachChild(housePart.getRoot());
+			redrawAll = true;
+			System.out.println("done");
+		}
+
+		root.updateWorldBound(true);
+		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
+		SceneManager.getInstance().getUndoManager().die();
+		MainFrame.getInstance().refreshUndoRedo();
+	}
+	
+	public static void save(final URL url) throws Exception {
+		// remove dead objects
+		final Iterator<HousePart> itr = instance.parts.iterator();
+		while (itr.hasNext()) {
+			HousePart part = itr.next();
+			if (part instanceof Roof || part instanceof Window || part instanceof Door)
+				if (part.getContainer() == null)
+					itr.remove();
+		}
+
+		Scene.url = url;
+		System.out.print("Saving " + Scene.url + "...");
+		ObjectOutputStream out;
+		out = new ObjectOutputStream(new FileOutputStream(Scene.url.toURI().getPath()));
+		out.writeObject(instance);
+		out.close();
+		System.out.println("done");
+	}	
 
 	public static Node getRoot() {
 		return root;
@@ -132,73 +217,73 @@ public class Scene implements Serializable {
 		return parts;
 	}
 
-	public void save(final URL url) throws FileNotFoundException, IOException {
-		// remove dead objects
-		final Iterator<HousePart> itr = parts.iterator();
-		while (itr.hasNext()) {
-			HousePart part = itr.next();
-			if (part instanceof Roof || part instanceof Window || part instanceof Door)
-				if (part.getContainer() == null)
-					itr.remove();
-		}
-
-		Scene.url = url;
-		System.out.print("Saving " + Scene.url + "...");
-		ObjectOutputStream out;
-		try {
-			out = new ObjectOutputStream(new FileOutputStream(Scene.url.toURI().getPath()));
-			out.writeObject(this);
-			out.close();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		System.out.println("done");
-	}
-
-	public void newFile() {
-		final PrintController printController = PrintController.getInstance();
-		if (printController.isPrintPreview()) {
-			MainPanel.getInstance().getPreviewButton().setSelected(false);
-			while (!printController.isFinished())
-				Thread.yield();
-		}
-
-		parts.clear();
-		url = null;
-
-		SceneManager.taskManager.update(new Callable<Object>() {
-			public Object call() throws Exception {
-				originalHouseRoot.detachAllChildren();
-				for (Spatial child : root.getChildren())
-					if (child != originalHouseRoot)
-						root.detachChild(child);
-				root.updateWorldBound(true);
-				SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-				SceneManager.getInstance().getUndoManager().die();
-				MainFrame.getInstance().refreshUndoRedo();
-				return null;
-			}
-		});
-	}
-
-	public void open(final URL file) {
-		instance.newFile();
-		Scene.url = file;
-		SceneManager.taskManager.update(new Callable<Object>() {
-			public Object call() throws Exception {
-				System.out.print("Opening..." + file + "...");
-				ObjectInputStream in = new ObjectInputStream(file.openStream());
-				instance = (Scene) in.readObject();
-				in.close();
-				for (HousePart housePart : instance.getParts())
-					originalHouseRoot.attachChild(housePart.getRoot());
-				redrawAll = true;
-				System.out.println("done");
-				SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-				return null;
-			}
-		});
-	}
+	// public void save(final URL url) throws FileNotFoundException, IOException {
+	// // remove dead objects
+	// final Iterator<HousePart> itr = parts.iterator();
+	// while (itr.hasNext()) {
+	// HousePart part = itr.next();
+	// if (part instanceof Roof || part instanceof Window || part instanceof Door)
+	// if (part.getContainer() == null)
+	// itr.remove();
+	// }
+	//
+	// Scene.url = url;
+	// System.out.print("Saving " + Scene.url + "...");
+	// ObjectOutputStream out;
+	// try {
+	// out = new ObjectOutputStream(new FileOutputStream(Scene.url.toURI().getPath()));
+	// out.writeObject(this);
+	// out.close();
+	// } catch (URISyntaxException e) {
+	// e.printStackTrace();
+	// }
+	// System.out.println("done");
+	// }
+	//
+	// public void newFile() {
+	// final PrintController printController = PrintController.getInstance();
+	// if (printController.isPrintPreview()) {
+	// MainPanel.getInstance().getPreviewButton().setSelected(false);
+	// while (!printController.isFinished())
+	// Thread.yield();
+	// }
+	//
+	// parts.clear();
+	// url = null;
+	//
+	// SceneManager.taskManager.update(new Callable<Object>() {
+	// public Object call() throws Exception {
+	// originalHouseRoot.detachAllChildren();
+	// for (Spatial child : root.getChildren())
+	// if (child != originalHouseRoot)
+	// root.detachChild(child);
+	// root.updateWorldBound(true);
+	// SceneManager.getInstance().updateHeliodonAndAnnotationSize();
+	// SceneManager.getInstance().getUndoManager().die();
+	// MainFrame.getInstance().refreshUndoRedo();
+	// return null;
+	// }
+	// });
+	// }
+	//
+	// public void open(final URL file) {
+	// instance.newFile();
+	// Scene.url = file;
+	// SceneManager.taskManager.update(new Callable<Object>() {
+	// public Object call() throws Exception {
+	// System.out.print("Opening..." + file + "...");
+	// ObjectInputStream in = new ObjectInputStream(file.openStream());
+	// instance = (Scene) in.readObject();
+	// in.close();
+	// for (HousePart housePart : instance.getParts())
+	// originalHouseRoot.attachChild(housePart.getRoot());
+	// redrawAll = true;
+	// System.out.println("done");
+	// SceneManager.getInstance().updateHeliodonAndAnnotationSize();
+	// return null;
+	// }
+	// });
+	// }
 
 	public void drawResizeBounds() {
 		for (HousePart part : parts) {
