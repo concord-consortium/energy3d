@@ -255,6 +255,9 @@ public abstract class CameraControl {
 
 	public void setMouseLeftButtonAction(final ButtonAction leftButtonAction) {
 		this.leftButtonAction = leftButtonAction;
+		System.out.println(this.leftButtonAction);
+		if (leftButtonAction == ButtonAction.NONE)
+			System.out.println();
 	}
 
 	public void setMouseRightButtonAction(final ButtonAction rightButtonAction) {

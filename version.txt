@@ -829,6 +829,11 @@ Version 0.5 - October 20, 2011
 - allow rotation while inserting new house part
 - fix problem with wall wireframe visible from below the roof
 
+- remove parts if they are shrinked enough to be invisible
+- add remove command to undo manager after removing above
+- force redrawing the full wall using HousePart.reset method before adding it to undo list
+- fix problem with mouse not moving the scene in its first attempt after inserting a new part
+
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
 - *fix problem with resizing custome roof

@@ -555,9 +555,9 @@ public class Wall extends HousePart {
 		enforceRangeAndRemoveDuplicatedGablePoints(polygon);
 		stretchToRoof(polygon);
 
-		// reduce the height of the back mesh a little
-		for (final TriangulationPoint tp : polygon.getPoints())
-			tp.set(tp.getX(), tp.getY(), tp.getZ() - 0.02);
+//		// reduce the height of the back mesh a little
+//		for (final TriangulationPoint tp : polygon.getPoints())
+//			tp.set(tp.getX(), tp.getY(), tp.getZ() - 0.02);
 
 		toXY(polygon);
 
@@ -1069,9 +1069,16 @@ public class Wall extends HousePart {
 //	}
 	
 	@Override
-	public void complete() {
+	public void complete() throws Exception {
 		super.complete();
 		if (!isDrawable())
-			Scene.getInstance().remove(this);
+			throw new Exception("Invalid. Must remove.");
+//			Scene.getInstance().remove(this);
+	}
+	
+	@Override
+	public void reset() {
+		super.reset();
+		thicknessNormal = null;
 	}
 }

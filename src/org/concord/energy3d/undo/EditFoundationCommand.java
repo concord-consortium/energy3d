@@ -25,7 +25,11 @@ public class EditFoundationCommand extends EditHousePartCommand {
 		if (!isResizeMode)
 			foundation.prepareForNotResizing();
 		super.undo();
-		foundation.complete();
+		try {
+			foundation.complete();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
 		Scene.getInstance().redrawAll();
 	}
@@ -36,7 +40,11 @@ public class EditFoundationCommand extends EditHousePartCommand {
 		if (!isResizeMode)
 			foundation.prepareForNotResizing();
 		super.redo();
-		foundation.complete();
+		try {
+			foundation.complete();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
 		Scene.getInstance().redrawAll();
 	}

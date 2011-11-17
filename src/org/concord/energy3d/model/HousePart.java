@@ -207,7 +207,7 @@ public abstract class HousePart implements Serializable {
 		return points;
 	}
 
-	public void complete() {
+	public void complete() throws Exception {
 		drawCompleted = true;
 		orgHeight = height;
 	}
@@ -468,7 +468,7 @@ public abstract class HousePart implements Serializable {
 
 	}
 
-	public void addPoint(int x, int y) {
+	public void addPoint(int x, int y) throws Exception {
 		if (container != null || !mustHaveContainer()) {
 			firstPointInserted = true;
 			if (drawCompleted)
@@ -691,5 +691,9 @@ public abstract class HousePart implements Serializable {
 
 	public void setHeight(final double height) {
 		this.height = height;
+	}
+	
+	public void reset() {
+		
 	}
 }
