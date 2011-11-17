@@ -131,11 +131,11 @@ public class MeshLib {
 			} else {
 				newMesh = new Mesh("Roof Mesh #" + meshIndex);
 				newMesh.setModelBound(new BoundingBox());
-				final OffsetState offsetState = new OffsetState();
-				offsetState.setTypeEnabled(OffsetType.Fill, true);
-				offsetState.setFactor(1);
-				offsetState.setUnits(1);
-				newMesh.setRenderState(offsetState);
+//				final OffsetState offsetState = new OffsetState();
+//				offsetState.setTypeEnabled(OffsetType.Fill, true);
+//				offsetState.setFactor(1);
+//				offsetState.setUnits(1);
+//				newMesh.setRenderState(offsetState);
 				node = new Node("Roof Part #" + meshIndex);
 				node.attachChild(newMesh);
 				node.attachChild(new Node("Roof Size Annot"));

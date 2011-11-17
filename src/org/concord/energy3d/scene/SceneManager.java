@@ -552,8 +552,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									}
 									if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
 										selectedHousePart.showPoints();
-										selectedHousePart.setGridsVisible(true);
-										if (pick.getIndex() != -1) {
+										if (pick.isEditPoint() && pick.getIndex() != -1) {
+											selectedHousePart.setGridsVisible(true);
 											if (selectedHousePart instanceof Foundation)
 												editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart);
 											else
