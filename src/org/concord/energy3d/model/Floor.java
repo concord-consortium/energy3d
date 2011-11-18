@@ -59,7 +59,7 @@ public class Floor extends HousePart {
 			height = Math.max(0, p.getZ() - base.getZ()) + base.getZ();
 		}
 		draw();
-		showPoints();
+		setEditPointsVisible(true);
 	}
 
 	private Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
@@ -94,7 +94,7 @@ public class Floor extends HousePart {
 		try {
 			if (container == null) {
 				mesh.getSceneHints().setCullHint(CullHint.Always);
-				hidePoints();
+				setEditPointsVisible(false);
 				return;
 			}
 			mesh.getSceneHints().setCullHint(CullHint.Inherit);

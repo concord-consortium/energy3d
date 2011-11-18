@@ -33,7 +33,7 @@ public class HipRoof extends Roof {
 		draw();
 		drawWalls();
 		if (container != null)
-			showPoints();
+			setEditPointsVisible(true);
 
 	}
 

@@ -33,7 +33,8 @@ public class Foundation extends HousePart {
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient boolean resizeHouseMode = false;
-//	private transient Mesh gridsMesh;
+
+	// private transient Mesh gridsMesh;
 
 	public Foundation() {
 		super(2, 8, 0.1);
@@ -71,13 +72,13 @@ public class Foundation extends HousePart {
 		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
 
-//		gridsMesh = new Line("Grids");
-//		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
-//		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
-//		gridsMesh.setModelBound(new BoundingBox());
-//		Util.disablePickShadowLight(gridsMesh);
-//		root.attachChild(gridsMesh);
-//		setGridsVisible(false);
+		// gridsMesh = new Line("Grids");
+		// gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
+		// gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+		// gridsMesh.setModelBound(new BoundingBox());
+		// Util.disablePickShadowLight(gridsMesh);
+		// root.attachChild(gridsMesh);
+		// setGridsVisible(false);
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -88,17 +89,12 @@ public class Foundation extends HousePart {
 		setLabelOffset(-0.11);
 	}
 
-	public void setResizeHouseMode(boolean resizeHouseMode) {
+	public void setResizeHouseMode(final boolean resizeHouseMode) {
 		this.resizeHouseMode = resizeHouseMode;
-		if (resizeHouseMode) {
+		if (resizeHouseMode)
 			scanChildrenHeight();
-			boundingMesh.getSceneHints().setCullHint(CullHint.Inherit);
-			showPoints();
-		} else {
-			root.detachChild(boundingMesh);
-			boundingMesh.getSceneHints().setCullHint(CullHint.Always);
-			hidePoints();
-		}
+		setEditPointsVisible(resizeHouseMode);
+		boundingMesh.getSceneHints().setCullHint(resizeHouseMode ? CullHint.Inherit : CullHint.Always);
 	}
 
 	public boolean isResizeHouseMode() {
@@ -106,13 +102,21 @@ public class Foundation extends HousePart {
 	}
 
 	@Override
-	public void showPoints() {
-		for (int i = 0; i < points.size(); i++) {
-			computeEditPointScale(i);
-			if (!resizeHouseMode && i >= 4)
-				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
-			else
-				pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
+	public void setEditPointsVisible(final boolean visible) {
+		if (!visible && resizeHouseMode)
+			return;
+		else {
+			for (int i = 0; i < points.size(); i++) {
+				if (!visible)
+					pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
+				else {
+					computeEditPointScale(i);
+					if (!resizeHouseMode && i >= 4)
+						pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
+					else
+						pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
+				}
+			}
 		}
 	}
 
@@ -199,7 +203,7 @@ public class Foundation extends HousePart {
 			Scene.getInstance().redrawAll();
 		else
 			draw();
-		showPoints();
+		setEditPointsVisible(true);
 	}
 
 	private void applyNewHeight(double orgHeight, double newHeight, boolean finalize) {
@@ -318,7 +322,7 @@ public class Foundation extends HousePart {
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
 		gridsMesh.updateModelBound();
-//		gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
+		// gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 	}
 
 	private void putWireframePoint(final FloatBuffer buf, final Vector3 p) {
@@ -384,11 +388,11 @@ public class Foundation extends HousePart {
 			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 	}
 
-	@Override
-	public void hidePoints() {
-		if (!resizeHouseMode)
-			super.hidePoints();
-	}
+//	@Override
+//	public void setEditPointsVisible(final boolean visible) {
+//		if (visible || !resizeHouseMode)
+//			super.setEditPointsVisible(visible);
+//	}
 
 	@Override
 	public void setEditPoint(int editPoint) {
@@ -409,5 +413,10 @@ public class Foundation extends HousePart {
 	@Override
 	protected String getDefaultTextureFileName() {
 		return "foundation.jpg";
+	}
+	
+	@Override
+	protected ReadOnlyVector3 getCenter() {
+		return super.getCenter().multiply(new Vector3(1, 1, 0), null);
 	}
 }

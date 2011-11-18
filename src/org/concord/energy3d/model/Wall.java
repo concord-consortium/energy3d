@@ -237,7 +237,7 @@ public class Wall extends HousePart {
 		isShortWall = true;
 		draw();
 		drawChildren();
-		showPoints();
+		setEditPointsVisible(true);
 
 		if (isDrawable())
 			drawNeighborWalls();

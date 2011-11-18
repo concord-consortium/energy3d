@@ -29,7 +29,7 @@ public class PyramidRoof extends Roof {
 		draw();
 		drawWalls();
 		if (container != null)
-			showPoints();
+			setEditPointsVisible(true);
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {

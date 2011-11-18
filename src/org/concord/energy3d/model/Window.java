@@ -107,7 +107,7 @@ public class Window extends HousePart {
 
 		if (container != null) {
 			draw();
-			showPoints();
+			setEditPointsVisible(true);
 			container.draw();
 		}
 	}

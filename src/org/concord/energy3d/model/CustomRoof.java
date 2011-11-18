@@ -46,7 +46,7 @@ public class CustomRoof extends Roof {
 		draw();
 		drawWalls();
 		if (container != null)
-			showPoints();
+			setEditPointsVisible(true);
 	}
 
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {

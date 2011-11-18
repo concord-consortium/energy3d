@@ -97,7 +97,7 @@ public abstract class Roof extends HousePart {
 			if (container == null) {
 				roofPartsRoot.getSceneHints().setCullHint(CullHint.Always);
 				wireframeMesh.getSceneHints().setCullHint(CullHint.Always);
-				hidePoints();
+				setEditPointsVisible(false);
 				return;
 			}
 			roofPartsRoot.getSceneHints().setCullHint(CullHint.Inherit);

@@ -548,11 +548,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										selectedHousePart = pick.getHousePart();
 									System.out.print("Clicked on: " + pick);
 									if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
-										previousSelectedHousePart.hidePoints();
+										previousSelectedHousePart.setEditPointsVisible(false);
 										previousSelectedHousePart.setGridsVisible(false);
 									}
 									if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
-										selectedHousePart.showPoints();
+										selectedHousePart.setEditPointsVisible(true);
 										if (pick.isEditPoint() && pick.getIndex() != -1) {
 											selectedHousePart.setGridsVisible(true);
 											if (selectedHousePart instanceof Foundation)
@@ -636,7 +636,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										MainFrame.getInstance().refreshUndoRedo();
 										addHousePartCommand = null;
 									}
-									selectedHousePart.hidePoints();
+									selectedHousePart.setEditPointsVisible(false);
 									selectedHousePart = null;
 									if (operationStick)
 										operationFlag = true;
@@ -833,7 +833,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void hideAllEditPoints() {
 		for (HousePart part : Scene.getInstance().getParts()) {
-			part.hidePoints();
+			part.setEditPointsVisible(false);
 			part.setGridsVisible(false);
 		}
 		update = true;
@@ -946,7 +946,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.operationFlag = false;
 		if (selectedHousePart != null) {
 			if (selectedHousePart.isDrawCompleted())
-				selectedHousePart.hidePoints();
+				selectedHousePart.setEditPointsVisible(false);
 			else
 				Scene.getInstance().remove(selectedHousePart);
 		}
@@ -1165,13 +1165,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			pick = SelectUtil.selectHousePart(x, y, false);
 			if (pick != null) {
 				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && hoveredHousePart != pick.getHousePart())
-					hoveredHousePart.hidePoints();
+					hoveredHousePart.setEditPointsVisible(false);
 				hoveredHousePart = pick.getHousePart();
 				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && !PrintController.getInstance().isPrintPreview())
-					hoveredHousePart.showPoints();
+					hoveredHousePart.setEditPointsVisible(true);
 			} else {
 				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart)
-					hoveredHousePart.hidePoints();
+					hoveredHousePart.setEditPointsVisible(false);
 				hoveredHousePart = null;
 			}
 		}

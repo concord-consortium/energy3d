@@ -87,7 +87,7 @@ public class Door extends HousePart {
 		}
 		if (container != null) {
 			draw();
-			showPoints();
+			setEditPointsVisible(true);
 		}
 	}
 

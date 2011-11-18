@@ -231,10 +231,11 @@ public abstract class HousePart implements Serializable {
 			this.orgHeight = newHeight;
 	}
 
-	public void showPoints() {
+	public void setEditPointsVisible(final boolean visible) {
 		for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
-			computeEditPointScale(i);
-			pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
+			if (visible)
+				computeEditPointScale(i);
+			pointsRoot.getChild(i).getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 		}
 	}
 
@@ -243,13 +244,13 @@ public abstract class HousePart implements Serializable {
 		pointsRoot.getChild(i).updateGeometricState(0);
 	}
 
-	public void hidePoints() {
-		for (final Spatial child : pointsRoot.getChildren())
-			child.getSceneHints().setCullHint(CullHint.Always);
-		// hideGrids();
-		// if (container != null)
-		// container.setGridsVisible(false);
-	}
+//	public void hidePoints() {
+//		for (final Spatial child : pointsRoot.getChildren())
+//			child.getSceneHints().setCullHint(CullHint.Always);
+//		// hideGrids();
+//		// if (container != null)
+//		// container.setGridsVisible(false);
+//	}
 
 	public void setEditPoint(int i) {
 		editPointIndex = i;

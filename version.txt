@@ -838,7 +838,11 @@ Version 0.5 - October 20, 2011
 - set the default scale to 10 so that 30cm X 30cm is the default foundation size 
 
 - after deleting a wall, automatically search for other walls that could snap to neighbor walls of the deleted wall
-- redraw the neighboring walls after a wall delete to use proper wall thickness normal 
+- redraw the neighboring walls after a wall delete to use proper wall thickness normal
+
+- fix problem with resize box not showing upon 2nd use
+- rename show and hide points to setEditPointVisible
+- fix problem with wall drawn above the foundation when grids are enforced
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
