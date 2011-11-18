@@ -547,6 +547,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									else
 										selectedHousePart = pick.getHousePart();
 									System.out.print("Clicked on: " + pick);
+									if (pick.isEditPoint())
+										cameraControl.setMouseLeftButtonAction(ButtonAction.NONE);
+
 									if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
 										previousSelectedHousePart.setEditPointsVisible(false);
 										previousSelectedHousePart.setGridsVisible(false);
@@ -574,9 +577,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								}
 							} else {
 								selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
-								
+
 							}
-							enableDisableRotationControl();
+							// enableDisableRotationControl();
 							return null;
 						}
 					});
@@ -615,6 +618,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										editHousePartCommand = null;
 									}
 								}
+								cameraControl.setMouseLeftButtonAction(ButtonAction.MOVE);
 							} else {
 								if (!selectedHousePart.isDrawCompleted()) {
 									selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
@@ -625,8 +629,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										selectedHousePart = null;
 										if (operationStick)
 											operationFlag = true;
-										else
-											MainPanel.getInstance().deselect();
+										// else
+										// MainPanel.getInstance().deselect();
 									}
 									sceneChanged = true;
 								}
@@ -640,16 +644,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									selectedHousePart = null;
 									if (operationStick)
 										operationFlag = true;
-									else
-										MainPanel.getInstance().deselect();
+									// else
+									// MainPanel.getInstance().deselect();
+								}
+								if (!operationFlag) {
+									MainPanel.getInstance().deselect();
+									cameraControl.setMouseLeftButtonAction(ButtonAction.MOVE);
 								}
 							}
 							// if (HousePart.getGridsHighlightedHousePart() != null) {
 							// HousePart.getGridsHighlightedHousePart().setGridsVisible(false);
 							// HousePart.setGridsHighlightedHousePart(null);
 							// }
-							cameraControl.setMouseLeftButtonAction(ButtonAction.MOVE);
-							enableDisableRotationControl();
+							// if (!operationFlag)
+							// cameraControl.setMouseLeftButtonAction(ButtonAction.MOVE);
+							// enableDisableRotationControl();
 							if (sceneChanged)
 								updateHeliodonAndAnnotationSize();
 							return null;
