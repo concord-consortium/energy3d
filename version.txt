@@ -828,18 +828,17 @@ Version 0.5 - October 20, 2011
 - switch left and right mouse function
 - allow rotation while inserting new house part
 - fix problem with wall wireframe visible from below the roof
-
 - remove parts if they are shrinked enough to be invisible
 - add remove command to undo manager after removing above
 - force redrawing the full wall using HousePart.reset method before adding it to undo list
 - fix problem with mouse not moving the scene in its first attempt after inserting a new part
-
 - avoid showing grids when part selected but edit point not selected
-
 - convert new, open, save methods to static methods
 - set the default unit to cm
 - set the default scale to 10 so that 30cm X 30cm is the default foundation size 
 
+- after deleting a wall, automatically search for other walls that could snap to neighbor walls of the deleted wall
+- redraw the neighboring walls after a wall delete to use proper wall thickness normal 
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

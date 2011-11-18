@@ -160,7 +160,7 @@ public class Wall extends HousePart {
 		Snap.clearAnnotationDrawn();
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			final HousePart previousContainer = container;
-			final PickedHousePart picked = pick(x, y, new Class<?>[] { Foundation.class, null });
+			final PickedHousePart picked = pick(x, y, new Class<?>[] {Foundation.class, null});
 			if (container != previousContainer && previousContainer != null)
 				return;
 			if (container != previousContainer)
@@ -297,7 +297,8 @@ public class Wall extends HousePart {
 			return false;
 	}
 
-	private boolean isDrawable() {
+	@Override
+	public boolean isDrawable() {
 		return points.size() >= 4 && points.get(0).subtract(points.get(2), null).length() > MIN_WALL_LENGTH;
 	}
 
@@ -770,22 +771,26 @@ public class Wall extends HousePart {
 		return null;
 	}
 
-	private void setNeighbor(final int pointIndex, Snap newSnap, final boolean updateNeighbors) {
+	private void setNeighbor(final int pointIndex, Snap newSnap, final boolean updateNeighbors) {	
 		final int i = pointIndex < 2 ? 0 : 1;
 		final Snap oldSnap = neighbors[i];
+//		if (newSnap != null && !newSnap.equals(oldSnap))
+//			System.out.println(this + "\t.setNeighbor: " + pointIndex + "\t" + newSnap);
 
 		if (newSnap == null && !updateNeighbors) // see if it is attached to another wall
 			for (HousePart part : Scene.getInstance().getParts())
 				if (part instanceof Wall && part != this) {
-					final Vector3 point = points.get(pointIndex);
+					final Vector3 point = getAbsPoint(pointIndex);
 					final Wall wall = (Wall) part;
-					if (point.distance(part.getAbsPoint(0)) < 0.001) {
+					if (point.distance(part.getAbsPoint(0)) < MathUtils.ZERO_TOLERANCE) {
 						newSnap = new Snap(this, wall, pointIndex, 0);
 						wall.setNeighbor(0, newSnap, false);
+						wall.drawNeighborWalls();
 						break;
-					} else if (part.getPoints().size() > 2 && point.distance(part.getAbsPoint(2)) < 0.001) {
+					} else if (part.getPoints().size() > 2 && point.distance(part.getAbsPoint(2)) < MathUtils.ZERO_TOLERANCE) {
 						newSnap = new Snap(this, wall, pointIndex, 2);
 						wall.setNeighbor(2, newSnap, false);
+						wall.drawNeighborWalls();
 						break;
 					}
 				}
@@ -806,10 +811,39 @@ public class Wall extends HousePart {
 	}
 
 	public void delete() {
-		for (int i = 0; i < neighbors.length; i++)
-			if (neighbors[i] != null)
-				neighbors[i].getNeighborOf(this).setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false);
+		for (int i = 0; i < neighbors.length; i++) {
+			if (neighbors[i] != null) {
+				final Wall neighbor = neighbors[i].getNeighborOf(this);
+				neighbor.setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false);
+				neighbor.draw();	// TODO This is the 2nd time we would draw neighbor (once in setNeighbor) but we need it because otherwise the back wall sticks out
+			}
+		}
 	}
+
+//	public void delete() {
+//		for (int i = 0; i < neighbors.length; i++)
+//			if (neighbors[i] != null) {
+//				final Wall neighbor = neighbors[i].getNeighborOf(this);
+//				final int pointIndex = neighbors[i].getSnapPointIndexOfNeighborOf(this);
+//				final Vector3 targetP = neighbor.getAbsPoint(pointIndex);
+//				
+//				// search for other walls that snap to this neighbor
+//				boolean found = false;
+//				for (final HousePart part : Scene.getInstance().getParts()) {
+//					if (part instanceof Wall && part != this) {
+//						final boolean p0 = part.getAbsPoint(0).distance(targetP) < MathUtils.ZERO_TOLERANCE;
+//						final boolean p2 = part.getAbsPoint(2).distance(targetP) < MathUtils.ZERO_TOLERANCE;
+//						if (p0 || p2) {
+//							neighbor.setNeighbor(pointIndex, new Snap(neighbor, (Wall) part, pointIndex, p0 ? 0 : 2), false);
+//							found = true;
+//							break;
+//						}
+//					}
+//				}
+//				if (!found)
+//					neighbor.setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false);
+//			}
+//	}	
 
 	protected void setHeight(final double newHeight, final boolean finalize) {
 		super.setHeight(newHeight, finalize);
@@ -905,7 +939,7 @@ public class Wall extends HousePart {
 				boolean nextIsShort = false;
 
 				public void visit(Wall wall, Snap prev, Snap next) {
-					visitWall(wall, prev);
+					visitWallAndReverseThickness(wall, prev);
 					walls.add(wall);
 					wall.isShortWall = nextIsShort;
 					nextIsShort = !nextIsShort;
@@ -917,7 +951,7 @@ public class Wall extends HousePart {
 				boolean nextIsShort = false;
 
 				public void visit(Wall wall, Snap prev, Snap next) {
-					visitWall(wall, prev);
+					visitWallAndReverseThickness(wall, prev);
 					walls.add(wall);
 					wall.isShortWall = nextIsShort;
 					nextIsShort = !nextIsShort;
@@ -928,14 +962,16 @@ public class Wall extends HousePart {
 			wall.draw();
 	}
 
-	private void visitWall(final Wall wall, final Snap prev) {
-		if (wall == Wall.this)
+	private void visitWallAndReverseThickness(final Wall wall, final Snap prev) {
+		if (wall == Wall.this || !wall.isFirstPointInserted())
 			return;
 		final int pointIndex = prev.getSnapPointIndexOf(wall);
 		final Vector3 wallDir = wall.getAbsPoint(pointIndex == 0 ? 2 : 0).subtract(wall.getAbsPoint(pointIndex), null).normalizeLocal();
 
 		final int otherPointIndex = prev.getSnapPointIndexOfNeighborOf(wall);
 		final Wall other = prev.getNeighborOf(wall);
+		if (!other.isFirstPointInserted())
+			return;
 		final Vector3 otherWallDir = other.getAbsPoint(otherPointIndex == 0 ? 2 : 0).subtract(other.getAbsPoint(otherPointIndex), null).normalizeLocal();
 
 		final Vector3 n1 = new Vector3(wall.getThicknessNormal()).normalizeLocal();
@@ -1068,14 +1104,6 @@ public class Wall extends HousePart {
 //		}
 //		return p;
 //	}
-	
-	@Override
-	public void complete() throws InvisibleException {
-		super.complete();
-		if (!isDrawable())
-			throw new InvisibleException();
-//			Scene.getInstance().remove(this);
-	}
 	
 	@Override
 	public void reset() {

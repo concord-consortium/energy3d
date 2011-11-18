@@ -175,7 +175,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean sunAnim;
 	private boolean operationStick = false;
 	private boolean operationFlag = false;
-	private boolean update = true;	
+	private boolean update = true;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -275,9 +275,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		});
 
-//		Scene.getInstance();
+		// Scene.getInstance();
 
-//		SelectUtil.init(floor, Scene.getRoot());
+		// SelectUtil.init(floor, Scene.getRoot());
 		initMouse();
 
 		root.updateGeometricState(0, true);
@@ -335,10 +335,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		if (sunAnim)
-			heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true);		
+			heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true);
 
 		heliodon.update();
-		
+
 		if (cameraControl.isAnimating())
 			cameraControl.animate();
 
@@ -426,17 +426,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		floor.updateModelBound();
 		return floor;
 	}
-	
+
 	private Mesh createGrids(final double gridSize) {
 		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
-//		gridsMesh.setDefaultColor(new ColorRGBA(0, 0, 1, 1f));
-//		final BlendState blend = new BlendState();
-//		blend.setBlendEnabled(true);
-//		gridsMesh.setRenderState(blend);
-		
+		// gridsMesh.setDefaultColor(new ColorRGBA(0, 0, 1, 1f));
+		// final BlendState blend = new BlendState();
+		// blend.setBlendEnabled(true);
+		// gridsMesh.setRenderState(blend);
+
 		gridsMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(gridsMesh);
-		
+
 		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(200, null);
 		final ReadOnlyVector3 height = Vector3.UNIT_Y.multiply(200, null);
 		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
@@ -467,8 +467,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					break;
 			}
 		}
-//		if (points.size() < 2)
-//			return;
+		// if (points.size() < 2)
+		// return;
 		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
 		for (final ReadOnlyVector3 p : points)
 			buf.put(p.getXf()).put(p.getYf()).put(0.01f);
@@ -478,11 +478,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
 		return gridsMesh;
 	}
-	
+
 	public void setGridsVisible(final boolean visible) {
 		gridsMesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 	}
-	
+
 	private Mesh createSky() {
 		final Dome sky = new Dome("Sky", 100, 100, 100);
 		sky.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
@@ -570,14 +570,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										undoManager.addEdit(new MakeGableCommand(roof, roofPartIndex));
 										roof.setGable(roofPartIndex, true);
 										MainFrame.getInstance().refreshUndoRedo();
-									}																		
+									}
 								}
 							} else {
-								try {
-									selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
-								} catch (Exception e) {
-									Scene.getInstance().remove(selectedHousePart);									
-								}
+								selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
+								
 							}
 							enableDisableRotationControl();
 							return null;
@@ -593,20 +590,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					taskManager.update(new Callable<Object>() {
 						public Object call() {
 							if (selectedHousePart != null)
-								selectedHousePart.setGridsVisible(false);							
+								selectedHousePart.setGridsVisible(false);
 							MouseState mouseState = inputStates.getCurrent().getMouseState();
 							boolean sceneChanged = false;
 							if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 								if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
-									try {
+									if (selectedHousePart.isDrawable())
 										selectedHousePart.complete();
-									} catch (InvisibleException e) {
+									else {
 										editHousePartCommand.undo();
 										selectedHousePart.reset();
 										selectedHousePart.draw();
-//										editHousePartCommand = null;
-//										undoManager.addEdit(editHousePartCommand);
-//										MainFrame.getInstance().refreshUndoRedo();
 										undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
 										MainFrame.getInstance().refreshUndoRedo();
 										Scene.getInstance().remove(selectedHousePart);
@@ -623,9 +617,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								}
 							} else {
 								if (!selectedHousePart.isDrawCompleted()) {
-									try {
-										selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
-									} catch (InvisibleException e) {
+									selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
+									if (selectedHousePart.isDrawCompleted() && !selectedHousePart.isDrawable()) {
 										addHousePartCommand = null;
 										Scene.getInstance().remove(selectedHousePart);
 										selectedHousePart = null;
@@ -633,7 +626,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										if (operationStick)
 											operationFlag = true;
 										else
-											MainPanel.getInstance().deselect();										
+											MainPanel.getInstance().deselect();
 									}
 									sceneChanged = true;
 								}
@@ -651,10 +644,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										MainPanel.getInstance().deselect();
 								}
 							}
-//							if (HousePart.getGridsHighlightedHousePart() != null) {
-//								HousePart.getGridsHighlightedHousePart().setGridsVisible(false);
-//								HousePart.setGridsHighlightedHousePart(null);
-//							}
+							// if (HousePart.getGridsHighlightedHousePart() != null) {
+							// HousePart.getGridsHighlightedHousePart().setGridsVisible(false);
+							// HousePart.setGridsHighlightedHousePart(null);
+							// }
 							cameraControl.setMouseLeftButtonAction(ButtonAction.MOVE);
 							enableDisableRotationControl();
 							if (sceneChanged)
@@ -850,7 +843,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.viewMode = viewMode;
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
 
-//		cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
+		// cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 		cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.ROTATE);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		Vector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
@@ -957,18 +950,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			else
 				Scene.getInstance().remove(selectedHousePart);
 		}
-		
+
 		for (HousePart part : Scene.getInstance().getParts())
 			if (part instanceof Foundation)
 				((Foundation) part).setResizeHouseMode(operation == Operation.RESIZE);
-		
+
 		if (viewMode != ViewMode.PRINT_PREVIEW)
 			Scene.getInstance().drawResizeBounds();
-				
+
 		selectedHousePart = newHousePart();
 		if (selectedHousePart != null)
 			cameraControl.setMouseLeftButtonAction(ButtonAction.NONE);
-//		enableDisableRotationControl();
+		// enableDisableRotationControl();
 	}
 
 	private HousePart newHousePart() {
@@ -1219,7 +1212,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setZoomLock(boolean zoomLock) {
-		cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);		
+		cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);
 	}
 
 	public void update() {

@@ -208,7 +208,7 @@ public abstract class HousePart implements Serializable {
 		return points;
 	}
 
-	public void complete() throws InvisibleException {
+	public void complete() {
 		drawCompleted = true;
 		orgHeight = height;
 	}
@@ -469,7 +469,7 @@ public abstract class HousePart implements Serializable {
 
 	}
 
-	public void addPoint(int x, int y) throws InvisibleException {
+	public void addPoint(int x, int y) {
 		if (container != null || !mustHaveContainer()) {
 			firstPointInserted = true;
 			if (drawCompleted)
@@ -505,7 +505,8 @@ public abstract class HousePart implements Serializable {
 			container.drawGrids(getGridSize());
 		updateEditShapes();
 		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
-		drawAnnotations();
+		if (isDrawable())
+			drawAnnotations();
 	}
 
 	public void drawGrids(final double gridSize) {
@@ -697,5 +698,9 @@ public abstract class HousePart implements Serializable {
 	
 	public void reset() {
 		
+	}
+	
+	public boolean isDrawable() {
+		return true;
 	}
 }

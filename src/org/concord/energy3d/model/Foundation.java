@@ -117,7 +117,7 @@ public class Foundation extends HousePart {
 	}
 
 	@Override
-	public void complete() throws InvisibleException {
+	public void complete() {
 		super.complete();
 		newBoundingHeight = points.get(4).getZ() - height; // problem?
 		applyNewHeight(boundingHeight, newBoundingHeight, true);

@@ -59,4 +59,9 @@ public class Snap implements Serializable {
 		} else
 			return false;
 	}
+	
+	@Override
+	public String toString() {
+		return "(" + neighbor1 + ", " + pointIndex1 + ") - ("+ neighbor2 + ", " + pointIndex2 + ")";
+	}
 }
