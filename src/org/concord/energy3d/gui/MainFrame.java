@@ -359,12 +359,12 @@ public class MainFrame extends JFrame {
 					final PrintController printController = PrintController.getInstance();
 					if (!printController.isPrintPreview()) {
 						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
-						SceneManager.taskManager.update(new Callable<Object>() {
+						SceneManager.getTaskManager().update(new Callable<Object>() {
 							public Object call() throws Exception {
 								if (printController.isFinished())
 									PrintController.getInstance().print();
 								else
-									SceneManager.taskManager.update(this);
+									SceneManager.getTaskManager().update(this);
 								return null;
 							}
 						});

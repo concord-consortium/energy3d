@@ -126,6 +126,7 @@ import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
+
 	public enum Operation {
 		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE
 	}
@@ -140,7 +141,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private static final double MOVE_SPEED = 5;
 
-	public static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
+	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());
 	private static final boolean JOGL = true;
 	private final Canvas canvas;
@@ -181,6 +182,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return instance;
 	}
 
+	public static GameTaskQueueManager getTaskManager() {
+		return taskManager;
+	}
+	
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
 		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);

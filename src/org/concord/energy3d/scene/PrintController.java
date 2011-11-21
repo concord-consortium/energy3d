@@ -181,7 +181,7 @@ public class PrintController implements Updater {
 	}
 
 	public void print() {
-		SceneManager.taskManager.update(new Callable<Object>() {
+		SceneManager.getTaskManager().update(new Callable<Object>() {
 			public Object call() throws Exception {
 				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 				final PrintExporter printExporter = new PrintExporter();
@@ -198,7 +198,7 @@ public class PrintController implements Updater {
 	}
 
 	private void print(final int pageNum, final PrintExporter printExporter) {
-		SceneManager.taskManager.render(new Callable<Object>() {
+		SceneManager.getTaskManager().render(new Callable<Object>() {
 			public Object call() throws Exception {
 				if (pageNum != -1) {
 					final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
@@ -242,9 +242,9 @@ public class PrintController implements Updater {
 							Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
 							MainFrame.getInstance().getMainPanel().validate();
 							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
-							SceneManager.taskManager.render(new Callable<Object>() {
+							SceneManager.getTaskManager().render(new Callable<Object>() {
 								public Object call() throws Exception {
-									SceneManager.taskManager.render(new Callable<Object>() {
+									SceneManager.getTaskManager().render(new Callable<Object>() {
 										public Object call() throws Exception {
 											if (job.printDialog())
 												try {

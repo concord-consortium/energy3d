@@ -1,9 +1,12 @@
 package org.concord.energy3d.undo;
 
+import java.util.concurrent.Callable;
+
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.scene.SceneManager;
 
 @SuppressWarnings("serial")
 public class MakeGableCommand extends EditHousePartCommand {
@@ -20,13 +23,23 @@ public class MakeGableCommand extends EditHousePartCommand {
 	public void undo() throws CannotUndoException {
 		saveNewPoints();
 		super.undo();
-		roof.setGable(roofPartIndex, false);
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			public Object call() {		
+				roof.setGable(roofPartIndex, false);
+				return null;
+			}
+		});
 	}
 	
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		roof.setGable(roofPartIndex, true);
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			public Object call() {		
+				roof.setGable(roofPartIndex, true);
+				return null;
+			}
+		});
 	}
 	
 	@Override
