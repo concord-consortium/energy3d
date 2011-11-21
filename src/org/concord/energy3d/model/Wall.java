@@ -462,17 +462,17 @@ public class Wall extends HousePart {
 	}
 
 	private Polygon stretchToRoof(final Polygon polygon) {
-		final double baseZ = getAbsPoint(0).getZ() + 0.01;
+//		final double baseZ = getAbsPoint(0).getZ() + 0.01;
 		final int[] upper = { 0, 3 };
 
 		for (final int i : upper) {
 			final TriangulationPoint tp = polygon.getPoints().get(i);
-			tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), baseZ)));
+			tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), tp.getZ())));
 		}
 
 		TriangulationPoint tp = polygon.getPoints().get(0);
+		final Vector3 o = new Vector3(tp.getX(), tp.getY(), tp.getZ());
 //		final Vector3 o = new Vector3(tp.getX(), tp.getY(), tp.getZ());
-		final Vector3 o = new Vector3(tp.getX(), tp.getY(), baseZ);
 		tp = polygon.getPoints().get(3);
 		final Vector3 dir = new Vector3(tp.getX(), tp.getY(), tp.getZ()).subtract(o, null);
 		dir.setZ(0);
@@ -524,8 +524,8 @@ public class Wall extends HousePart {
 		if (roof == null)
 			return v;
 		final PickResults pickResults = new PrimitivePickResults();
-//		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v.getX(), v.getY(), 0), direction), pickResults);
-		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v), direction), pickResults);
+		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v.getX(), v.getY(), 0), direction), pickResults);
+//		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v), direction), pickResults);
 		if (pickResults.getNumber() > 0) {
 //			final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
 //			return intersectionPoint.getZ() - 0.02; // (backMesh ? 0.1 : 0.0);
