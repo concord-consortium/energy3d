@@ -881,7 +881,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (viewMode == ViewMode.PRINT) {
 			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Parallel);
-			loc = new Vector3(0, -1, 0);
+			/* location will be set in PrintController.print() */
+			//loc = new Vector3(0, -10, 0);
 			final double pageWidth = PrintController.getInstance().getPageWidth();
 			final double pageHeight = PrintController.getInstance().getPageHeight();
 			final Dimension canvasSize = ((Component) canvas).getSize();

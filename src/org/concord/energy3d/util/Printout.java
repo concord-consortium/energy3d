@@ -3,23 +3,31 @@ package org.concord.energy3d.util;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
+import java.awt.print.Pageable;
+import java.awt.print.Paper;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.util.screen.ScreenExportable;
 
-public class PrintExporter implements ScreenExportable, Printable {
+public class Printout implements ScreenExportable, Printable, Pageable {
 	protected boolean _useAlpha;
 	private ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
+	
+	final PageFormat pageFormat = new PageFormat();
+	final Paper paper = new Paper();
 
-	public PrintExporter() {
+	public Printout() {
 		this(false);
+		paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+		pageFormat.setPaper(paper);
 	}
 
-	public PrintExporter(boolean useAlpha) {
+	public Printout(boolean useAlpha) {
 		_useAlpha = useAlpha;
 	}
 
@@ -106,4 +114,21 @@ public class PrintExporter implements ScreenExportable, Printable {
 		graphics.drawImage(croppedImg, 0, 0, (int)pageFormat.getWidth(), (int)pageFormat.getHeight() , null);
 		return PAGE_EXISTS;
 	}
+	
+
+		@Override
+		public Printable getPrintable(int arg0) throws IndexOutOfBoundsException {
+			return this;
+		}
+
+		@Override
+		public PageFormat getPageFormat(int arg0) throws IndexOutOfBoundsException {
+			return pageFormat;
+		}
+
+		@Override
+		public int getNumberOfPages() {
+			return images.size();
+		}
+	
 }

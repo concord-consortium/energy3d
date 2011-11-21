@@ -569,9 +569,11 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	public void delete() {
-		super.delete();
-		for (final Wall wall : walls)
+		super.delete();		
+		for (final Wall wall : walls) {
 			wall.setRoof(null);
+			wall.draw();
+		}
 	}
 
 	@Override

@@ -442,7 +442,6 @@ public abstract class HousePart implements Serializable {
 					origin = p0;
 
 				final ReadOnlyVector3 originToP = p.subtract(origin, null);
-				;
 				final Vector3 newP = new Vector3();
 				// if (!snapToZ) {
 				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), !snapToZ ? 0 : originToP.getY(), 0);

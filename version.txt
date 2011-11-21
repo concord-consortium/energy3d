@@ -842,14 +842,13 @@ Version 0.5 - October 20, 2011
 - rename show and hide points to setEditPointVisible
 - fix problem with wall drawn above the foundation when grids are enforced
 - fix problem with mouse move disabled after inserting new house part until clicked a 2nd time
-
 - fix problem with wall sticking out of roof when neighboring wall has higher height because higher height is used instead instead of actual wall height
 - improve stretch wall so that even if the wall height must become shorter due to shape of roof then wall height is shortened
-
 - fix problem with unable to make roof gable when the roof base points are not exactly at same z as the wall upper points under it
 - fix problem with undo make gable roof leaving the gable roof invisible
 - fix problem with undo gable throwing exception sometimes due to not wrapped around TaskManager
-  
+- automatically redraw the attached walls after deleting a roof
+- fix problem with some parts not printing completely due to camera being too close to them   
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

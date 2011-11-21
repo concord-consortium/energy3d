@@ -20,7 +20,7 @@ import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.ObjectCloner;
-import org.concord.energy3d.util.PrintExporter;
+import org.concord.energy3d.util.Printout;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -184,64 +184,34 @@ public class PrintController implements Updater {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			public Object call() throws Exception {
 				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
-				final PrintExporter printExporter = new PrintExporter();
+				final Printout printExporter = new Printout();
 				final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
 				final Paper paper = new Paper();
 				final int resolutionHeight = 1000;
 				final Dimension newSize = new Dimension((int) (resolutionHeight * paper.getWidth() / paper.getHeight()), resolutionHeight);
 				canvas.setSize(newSize);
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
-				print(-1, printExporter);
+				print(0, printExporter);
 				return null;
 			}
 		});
 	}
 
-	private void print(final int pageNum, final PrintExporter printExporter) {
+	private void print(final int pageNum, final Printout printout) {
 		SceneManager.getTaskManager().render(new Callable<Object>() {
 			public Object call() throws Exception {
-				if (pageNum != -1) {
-					final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-					ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printExporter);
-				}
-				final int nextPage = pageNum + 1;
-				if (nextPage < printCenters.size()) {
-					final Vector3 pos = printCenters.get(nextPage);
-					final Camera camera = Camera.getCurrentCamera();
-					camera.setLocation(pos.getX(), -1.0, pos.getZ());
-					camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
-					SceneManager.getInstance().getCameraNode().updateFromCamera();
-					print(nextPage, printExporter);
-				} else {
+//				final int nextPage = pageNum + 1;
+				if (pageNum == printCenters.size() + 1) {
 					final PrinterJob job = PrinterJob.getPrinterJob();
-					final PageFormat pageFormat = new PageFormat();
-					final Paper paper = new Paper();
-					paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-					pageFormat.setPaper(paper);
-
-					job.setPageable(new Pageable() {
-						@Override
-						public Printable getPrintable(int arg0) throws IndexOutOfBoundsException {
-							return printExporter;
-						}
-
-						@Override
-						public PageFormat getPageFormat(int arg0) throws IndexOutOfBoundsException {
-							return pageFormat;
-						}
-
-						@Override
-						public int getNumberOfPages() {
-							return printCenters.size();
-						}
-					});
-
+					job.setPageable(printout);
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
 							Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
 							MainFrame.getInstance().getMainPanel().validate();
+							
 							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
+							
 							SceneManager.getTaskManager().render(new Callable<Object>() {
 								public Object call() throws Exception {
 									SceneManager.getTaskManager().render(new Callable<Object>() {
@@ -258,11 +228,87 @@ public class PrintController implements Updater {
 									return null;
 								}
 							});
-
 						}
-					});
-
+					});					
+				} else {
+					if (pageNum != 0) {
+						final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
+						Thread.sleep(1000);
+						ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printout);
+					}
+					if (pageNum < printCenters.size()) {					
+						final Vector3 pos = printCenters.get(pageNum);
+						final Camera camera = Camera.getCurrentCamera();
+						camera.setLocation(pos.getX(), -10.0, pos.getZ());
+						camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
+						SceneManager.getInstance().getCameraNode().updateFromCamera();
+					}
+					print(pageNum + 1, printout);					
+					
 				}
+//				if (pageNum != 0) {
+//					final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
+//					Thread.sleep(1000);
+//					ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printout);
+//				}
+//				if (nextPage < printCenters.size()) {					
+//					final Vector3 pos = printCenters.get(nextPage);
+//					final Camera camera = Camera.getCurrentCamera();
+//					camera.setLocation(pos.getX(), -1.0, pos.getZ());
+//					camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
+//					SceneManager.getInstance().getCameraNode().updateFromCamera();
+//					print(nextPage, printout);
+//				} else {
+//					final PrinterJob job = PrinterJob.getPrinterJob();
+//					job.setPageable(printout);
+//					final PrinterJob job = PrinterJob.getPrinterJob();
+//					final PageFormat pageFormat = new PageFormat();
+//					final Paper paper = new Paper();
+//					paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+//					pageFormat.setPaper(paper);
+//
+//					job.setPageable(new Pageable() {
+//						@Override
+//						public Printable getPrintable(int arg0) throws IndexOutOfBoundsException {
+//							return printout;
+//						}
+//
+//						@Override
+//						public PageFormat getPageFormat(int arg0) throws IndexOutOfBoundsException {
+//							return pageFormat;
+//						}
+//
+//						@Override
+//						public int getNumberOfPages() {
+//							return printCenters.size();
+//						}
+//					});
+
+//					SwingUtilities.invokeLater(new Runnable() {
+//						@Override
+//						public void run() {
+//							Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
+//							MainFrame.getInstance().getMainPanel().validate();
+//							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
+//							SceneManager.getTaskManager().render(new Callable<Object>() {
+//								public Object call() throws Exception {
+//									SceneManager.getTaskManager().render(new Callable<Object>() {
+//										public Object call() throws Exception {
+//											if (job.printDialog())
+//												try {
+//													job.print();
+//												} catch (PrinterException exc) {
+//													exc.printStackTrace();
+//												}
+//											return null;
+//										}
+//									});
+//									return null;
+//								}
+//							});
+//						}
+//					});
+//				}
 				return null;
 			}
 		});
