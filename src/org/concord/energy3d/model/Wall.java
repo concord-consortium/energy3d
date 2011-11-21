@@ -462,15 +462,17 @@ public class Wall extends HousePart {
 	}
 
 	private Polygon stretchToRoof(final Polygon polygon) {
+		final double baseZ = getAbsPoint(0).getZ() + 0.01;
 		final int[] upper = { 0, 3 };
 
 		for (final int i : upper) {
 			final TriangulationPoint tp = polygon.getPoints().get(i);
-			tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), tp.getZ())));
+			tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), baseZ)));
 		}
 
 		TriangulationPoint tp = polygon.getPoints().get(0);
-		final Vector3 o = new Vector3(tp.getX(), tp.getY(), tp.getZ());
+//		final Vector3 o = new Vector3(tp.getX(), tp.getY(), tp.getZ());
+		final Vector3 o = new Vector3(tp.getX(), tp.getY(), baseZ);
 		tp = polygon.getPoints().get(3);
 		final Vector3 dir = new Vector3(tp.getX(), tp.getY(), tp.getZ()).subtract(o, null);
 		dir.setZ(0);
@@ -486,13 +488,13 @@ public class Wall extends HousePart {
 			final double findRoofIntersection = findRoofIntersection(p);
 
 			final ReadOnlyVector3 currentStretchPoint = new Vector3(p.getX(), p.getY(), findRoofIntersection);
-			final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();
+			final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();;
 
 			if (direction == null) {
 				direction = currentDirection;
 			} else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE) {
 				direction = null;
-				polygon.getPoints().add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection));
+				polygon.getPoints().add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection));;
 			}
 			previousStretchPoint = currentStretchPoint;
 		}

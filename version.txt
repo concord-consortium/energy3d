@@ -843,6 +843,10 @@ Version 0.5 - October 20, 2011
 - fix problem with wall drawn above the foundation when grids are enforced
 - fix problem with mouse move disabled after inserting new house part until clicked a 2nd time
 
+- fix problem with wall sticking out of roof when neighboring wall has higher height because higher height is used instead instead of actual wall height
+- improve stretch wall so that even if the wall height must become shorter due to shape of roof then wall height is shortened
+  
+
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
 - *fix problem with resizing custome roof

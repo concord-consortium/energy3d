@@ -547,7 +547,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									else
 										selectedHousePart = pick.getHousePart();
 									System.out.print("Clicked on: " + pick);
-									if (pick.isEditPoint())
+									if (pick != null && pick.isEditPoint())
 										cameraControl.setMouseLeftButtonAction(ButtonAction.NONE);
 
 									if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
