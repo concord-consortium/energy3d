@@ -193,7 +193,7 @@ public class Window extends HousePart {
 	}
 
 	@Override
-	protected void drawAnnotations() {
+	public void drawAnnotations() {
 		if (points.size() < 4)
 			return;
 		int annotCounter = 0;

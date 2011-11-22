@@ -13,8 +13,8 @@ import com.ardor3d.ui.text.BMText.AutoScale;
 
 public abstract class Annotation extends Node {
 	private static double fontSize = 0.1; 
-	protected transient final Mesh mesh;
-	protected final transient BMText label = makeNewLabel();
+	protected final Mesh mesh;
+	protected final BMText label = makeNewLabel();
 	
 	public static void setFontSize(double fontSize) {
 		Annotation.fontSize = fontSize;

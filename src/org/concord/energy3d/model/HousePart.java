@@ -634,7 +634,7 @@ public abstract class HousePart implements Serializable {
 	public void delete() {
 	}
 
-	protected void drawAnnotations() {
+	public void drawAnnotations() {
 	}
 
 	protected abstract void drawMesh();

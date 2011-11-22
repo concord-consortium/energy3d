@@ -133,7 +133,7 @@ public class Floor extends HousePart {
 			poly.add(polygonPoint);
 	}
 
-	protected void drawAnnotations() {
+	public void drawAnnotations() {
 		if (container == null)
 			return;
 		int annotCounter = 0;

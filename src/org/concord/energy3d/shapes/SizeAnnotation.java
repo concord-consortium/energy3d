@@ -140,6 +140,7 @@ public class SizeAnnotation extends Annotation {
 
 		this.updateWorldTransform(true);
 		this.updateWorldBound(true);
+		this.setTranslation(faceDirection.multiply(0.005, null));
 	}
 
 	@Override
@@ -152,9 +153,10 @@ public class SizeAnnotation extends Annotation {
     public Node makeCopy(final boolean shareGeometricData) {
         // get copy of basic spatial info
         final Node node = (Node) super.makeCopy(shareGeometricData);
-        node.detachChildAt(0);
-        node.detachChildAt(1);
-        node.detachChildAt(2);
+        // because the above code calls the constructor of this object (which adds 3 children) and then clones the node.children (which then adds extra 3 children) we need to undo the effect of last step
+        node.detachChildAt(5);
+        node.detachChildAt(4);
+        node.detachChildAt(3);;
         return node;
     }
 }

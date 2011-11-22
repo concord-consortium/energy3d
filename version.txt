@@ -848,7 +848,12 @@ Version 0.5 - October 20, 2011
 - fix problem with undo make gable roof leaving the gable roof invisible
 - fix problem with undo gable throwing exception sometimes due to not wrapped around TaskManager
 - automatically redraw the attached walls after deleting a roof
-- fix problem with some parts not printing completely due to camera being too close to them   
+- fix problem with some parts not printing completely due to camera being too close to them 
+- allow switching between annotations inward/outward when in print preview without redrawing scene
+- fix problem with roof annotations not switching inward when in print preview due to wrong duplication being removed in SizeAnnotation.makeCopy
+- make the annotation font size small in print preview
+- make the annotation font size small
+- avoid drawing annotations that are too small or too close to eachother 
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

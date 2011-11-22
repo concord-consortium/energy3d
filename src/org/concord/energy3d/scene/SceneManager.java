@@ -1159,7 +1159,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (sunControl)
 			taskManager.update(new Callable<Object>() {
 				public Object call() throws Exception {
-					Scene.getInstance().updateTextSizes();
+//					Scene.getInstance().updateTextSizes();
 					heliodon.updateSize();
 					return null;
 				}

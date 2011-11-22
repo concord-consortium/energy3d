@@ -145,6 +145,7 @@ public class PrintController implements Updater {
 				SceneManager.getInstance().setShading(shadingSelected);
 				SceneManager.getInstance().setShadow(shadowSelected);
 				SceneManager.getInstance().updatePrintPreviewScene(false);
+//				Scene.getInstance().updateTextSizes();
 				if (!doTheEndAnimation) // to avoid concurrency exception
 					finished = true;
 			}
@@ -232,9 +233,7 @@ public class PrintController implements Updater {
 					});					
 				} else {
 					if (pageNum != 0) {
-						final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-						Thread.sleep(1000);
-						ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printout);
+						ScreenExporter.exportCurrentScreen(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(), printout);
 					}
 					if (pageNum < printCenters.size()) {					
 						final Vector3 pos = printCenters.get(pageNum);
@@ -327,6 +326,7 @@ public class PrintController implements Updater {
 				SceneManager.getInstance().setShading(false);
 			if (shadowSelected)
 				SceneManager.getInstance().setShadow(false);
+//			Scene.getInstance().updateTextSizes(0.1);
 		}
 	}
 

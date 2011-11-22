@@ -493,6 +493,7 @@ public class Wall extends HousePart {
 			if (direction == null) {
 				direction = currentDirection;
 			} else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE) {
+//			} else if (direction.smallestAngleBetween(currentDirection) >= 10.0 / 180.0 * Math.PI) {
 				direction = null;
 				polygon.getPoints().add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection));;
 			}
@@ -879,7 +880,7 @@ public class Wall extends HousePart {
 		return thicknessNormal.negate(null).normalizeLocal();
 	}
 
-	protected void drawAnnotations() {
+	public void drawAnnotations() {
 		if (points.size() < 4)
 			return;
 		final ReadOnlyVector3 faceDirection = getFaceDirection();
@@ -890,10 +891,20 @@ public class Wall extends HousePart {
 			final Vector3 actualNormal = wallPolygonPoints.get(0).subtract(wallPolygonPoints.get(1), null).normalizeLocal().crossLocal(wallPolygonPoints.get(2).subtract(wallPolygonPoints.get(1), null).normalizeLocal()).negateLocal();
 			final boolean reverse = actualNormal.dot(getFaceDirection()) < 0;
 
+//			ReadOnlyVector3 p1 = null;
+//			ReadOnlyVector3 to = null;
 			for (int i = 0; i < wallPolygonPoints.size(); i++) {
 				final boolean front = i == 1 && original == null;
-				fetchSizeAnnot(annotCounter++).setRange(wallPolygonPoints.get(i), wallPolygonPoints.get((i + 1) % wallPolygonPoints.size()), getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, reverse, Scene.isDrawAnnotationsInside());
-				fetchAngleAnnot(angleAnnotCounter++).setRange(wallPolygonPoints.get((i + 1) % wallPolygonPoints.size()), wallPolygonPoints.get(i), wallPolygonPoints.get((i + 2) % wallPolygonPoints.size()), getFaceDirection());
+//				if (p1 == null)
+				final ReadOnlyVector3 p1 = wallPolygonPoints.get(i);
+				final ReadOnlyVector3 p2 = wallPolygonPoints.get((i + 1) % wallPolygonPoints.size());
+				final ReadOnlyVector3 p3 = wallPolygonPoints.get((i + 2) % wallPolygonPoints.size());
+				final double minLength = 0.4;
+				if (p1.distance(p2) > minLength)
+					fetchSizeAnnot(annotCounter++).setRange(p1, p2, getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, reverse, Scene.isDrawAnnotationsInside());
+//				if (to.distance(from) > 0.1 && to.distance(afterTo) > 0.1)
+				if (p1.distance(p2) > minLength && p2.distance(p3) > minLength)
+					fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p1, p3, getFaceDirection());
 			}
 		}
 	}

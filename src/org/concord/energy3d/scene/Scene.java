@@ -101,11 +101,11 @@ public class Scene implements Serializable {
 				e.printStackTrace();
 				newFile();
 			}
-//			root.attachChild(originalHouseRoot);
+			// root.attachChild(originalHouseRoot);
 		}
 		return instance;
 	}
-	
+
 	public static void newFile() {
 		try {
 			open(null);
@@ -147,7 +147,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().getUndoManager().die();
 		MainFrame.getInstance().refreshUndoRedo();
 	}
-	
+
 	public static void save(final URL url) throws Exception {
 		// remove dead objects
 		final Iterator<HousePart> itr = instance.parts.iterator();
@@ -165,7 +165,7 @@ public class Scene implements Serializable {
 		out.writeObject(instance);
 		out.close();
 		System.out.println("done");
-	}	
+	}
 
 	public static Node getRoot() {
 		return root;
@@ -336,7 +336,13 @@ public class Scene implements Serializable {
 
 	public static void setDrawAnnotationsInside(boolean drawAnnotationsInside) {
 		Scene.drawAnnotationsInside = drawAnnotationsInside;
-		redrawAll = true;
+		for (final HousePart part : getInstance().getParts())
+			part.drawAnnotations();
+		if (PrintController.getInstance().getPrintParts() != null)
+			for (final HousePart part : PrintController.getInstance().getPrintParts())
+				part.drawAnnotations();
+
+		// redrawAll = true;
 	}
 
 	public void redrawAll() {
@@ -355,7 +361,7 @@ public class Scene implements Serializable {
 			if (PrintController.getInstance().getPrintParts() != null)
 				for (HousePart part : PrintController.getInstance().getPrintParts())
 					part.draw();
-			updateTextSizes();
+//			updateTextSizes();
 			redrawAll = false;
 		}
 	}
@@ -391,22 +397,26 @@ public class Scene implements Serializable {
 		final BoundingBox bounds = (BoundingBox) getOriginalHouseRoot().getWorldBound();
 		if (bounds != null) {
 			final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
-			final double fontSize = size / 20.0;
-			Annotation.setFontSize(fontSize);
-			updateTextSizes(root, fontSize);
+			final double fontSize = size / 20.0;			
+			updateTextSizes(fontSize);
 		}
 	}
+	
+	public void updateTextSizes(final double fontSize) {
+		Annotation.setFontSize(fontSize);
+		updateTextSizes(root, fontSize);
+	}
 
-	private void updateTextSizes(final Spatial spatial, double size) {
+	private void updateTextSizes(final Spatial spatial, final double fontSize) {		
 		if (spatial instanceof BMText) {
 			final BMText label = (BMText) spatial;
 			if (label.getAutoScale() == AutoScale.Off) {
-				label.setFontScale(size);
+				label.setFontScale(fontSize);
 				label.updateGeometricState(0);
 			}
 		} else if (spatial instanceof Node) {
 			for (final Spatial child : ((Node) spatial).getChildren())
-				updateTextSizes(child, size);
+				updateTextSizes(child, fontSize);
 			// now that text font is updated redraw the annotation
 			if (spatial instanceof Annotation)
 				((Annotation) spatial).draw();

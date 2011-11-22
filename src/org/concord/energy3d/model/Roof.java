@@ -249,7 +249,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	@Override
-	protected void drawAnnotations() {
+	public void drawAnnotations() {
 		if (container == null)
 			return;
 
@@ -582,9 +582,10 @@ public abstract class Roof extends HousePart {
 		this.root.detachChild(pointsRoot);
 		this.root.detachChild(wireframeMesh);
 		this.root.detachChild(roofPartsRoot);
-		this.roofPartsRoot = ((Roof) original).roofPartsRoot.makeCopy(true);
+		this.roofPartsRoot = ((Roof) original).roofPartsRoot.makeCopy(false);
 		for (int i = 0; i < roofPartsRoot.getNumberOfChildren(); i++) {
 			if (roofPartsRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
+//				((Node) roofPartsRoot.getChild(i)).getChild(1).getSceneHints().setCullHint(CullHint.Always);
 				final UserData orgUserData = (UserData) ((Node) ((Roof) original).roofPartsRoot.getChild(i)).getChild(0).getUserData();
 				((Node) roofPartsRoot.getChild(i)).getChild(0).setUserData(new UserData(this, orgUserData.getIndex(), false));
 				roofPartsRoot.getChild(i).setUserData(((Roof) original).roofPartsRoot.getChild(i).getUserData());

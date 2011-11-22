@@ -78,6 +78,7 @@ public class AngleAnnotation extends Annotation {
 			this.attachChild(label);
 		}
 		mesh.updateModelBound();
-		this.setTranslation(mainPoint.add(n.multiply(0.001, null), null));
+//		this.setTranslation(mainPoint.add(n.multiply(0.001, null), null));
+		this.setTranslation(mainPoint.add(n.multiply(0.02, null), null));
 	}	
 }

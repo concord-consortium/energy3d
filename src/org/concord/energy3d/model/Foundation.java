@@ -370,7 +370,7 @@ public class Foundation extends HousePart {
 	}
 
 	@Override
-	protected void drawAnnotations() {
+	public void drawAnnotations() {
 		int[] order = { 0, 1, 3, 2, 0 };
 		int annotCounter = 0;
 		for (int i = 0; i < order.length - 1; i++, annotCounter++) {
