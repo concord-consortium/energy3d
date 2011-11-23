@@ -871,6 +871,9 @@ Version 0.5 - October 20, 2011
 - fix problem with snapping to left corner when drawing window/door on a wall that is parallel to x-axis
 - scale the window annotation properly 
 
+- fix problem with large paper size in print preview with small parts due to boundingbox of invisible roof parts
+
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

@@ -357,8 +357,10 @@ public class PrintController implements Updater {
 			if (printPart.isPrintable()) {
 				if (printPart instanceof Roof) {
 					for (final Spatial mesh : ((Roof) printPart).getRoofPartsRoot().getChildren()) {
-						maxWidth = Math.max(maxWidth, ((BoundingBox) mesh.getWorldBound()).getXExtent() * 2);
-						maxHeight = Math.max(maxHeight, ((BoundingBox) mesh.getWorldBound()).getZExtent() * 2);
+						if (mesh.getSceneHints().getCullHint() != CullHint.Always) {
+							maxWidth = Math.max(maxWidth, ((BoundingBox) mesh.getWorldBound()).getXExtent() * 2);
+							maxHeight = Math.max(maxHeight, ((BoundingBox) mesh.getWorldBound()).getZExtent() * 2);
+						}
 					}
 				} else {
 					maxWidth = Math.max(maxWidth, ((BoundingBox) printPart.getMesh().getWorldBound()).getXExtent() * 2);
