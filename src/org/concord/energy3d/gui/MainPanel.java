@@ -432,6 +432,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getGridButton() {
 		if (gridButton == null) {
 			gridButton = new JToggleButton();
+			gridButton.setSelected(true);
 			gridButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
@@ -844,6 +845,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getAnnotationToggleButton() {
 		if (annotationToggleButton == null) {
 			annotationToggleButton = new JToggleButton();
+			annotationToggleButton.setSelected(true);
 			annotationToggleButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {

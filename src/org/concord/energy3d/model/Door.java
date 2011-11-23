@@ -66,7 +66,7 @@ public class Door extends HousePart {
 				Vector3 wallFirstPoint = container.getAbsPoint(0);
 				Vector3 wallx = container.getAbsPoint(2).subtract(wallFirstPoint, null);
 				p = closestPoint(wallFirstPoint, wallx, x, y);
-				p = grid(p, getGridSize(), false);
+				p = grid(p, getGridSize());
 
 				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				points.set(index, toRelative(p));

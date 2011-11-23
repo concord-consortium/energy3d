@@ -46,10 +46,10 @@ public abstract class HousePart implements Serializable {
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
 	protected static ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
-	protected static boolean drawAnnotations = false;
+	protected static boolean drawAnnotations = true;
 	private static HousePart gridsHighlightedHousePart;
 	private static boolean snapToObjects = true;
-	private static boolean snapToGrids = false;
+	private static boolean snapToGrids = true;
 	protected transient final int numOfDrawPoints;
 	protected transient final int numOfEditPoints;
 	protected transient Node root;
@@ -442,17 +442,23 @@ public abstract class HousePart implements Serializable {
 					origin = p0;
 
 				final ReadOnlyVector3 originToP = p.subtract(origin, null);
-				final Vector3 newP = new Vector3();
+//				final Vector3 newP = new Vector3();
 				// if (!snapToZ) {
-				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), !snapToZ ? 0 : originToP.getY(), 0);
+//				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), !snapToZ ? 0 : originToP.getY(), 0);
+				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), snapToZ ? originToP.getY() : 0, 0);
 				final double snapedHorizontalLength = Math.round(horizontalDir.length() / gridSize) * gridSize;
-				newP.set(horizontalDir).normalizeLocal().multiplyLocal(snapedHorizontalLength);
+				final ReadOnlyVector3 u = horizontalDir.normalize(null).multiplyLocal(snapedHorizontalLength);
+//				newP.set(horizontalDir).normalizeLocal().multiplyLocal(snapedHorizontalLength);
 				// }
 
-				final double snapedVerticalLength = Math.round((!snapToZ ? originToP.getY() : originToP.getZ()) / gridSize) * gridSize;
+				final ReadOnlyVector3 verticalDir = new Vector3(0, snapToZ ? 0 : originToP.getY(), snapToZ ? originToP.getZ() : 0);
+				final double snapedVerticalLength = Math.round(verticalDir.length() / gridSize) * gridSize;; //Math.round((!snapToZ ? originToP.getY() : originToP.getZ()) / gridSize) * gridSize;
+				final ReadOnlyVector3 v = verticalDir.normalize(null).multiplyLocal(snapedVerticalLength);
 				// newP.set(newP.getX(), !snapToZ ? snapedVerticalLength : newP.getY(), !snapToZ ? p.getZ() : snapedVerticalLength);
-				newP.set(newP.getX(), !snapToZ ? snapedVerticalLength : 0, !snapToZ ? 0 : snapedVerticalLength);
-				return newP.addLocal(origin);
+//				newP.set(newP.getX(), !snapToZ ? snapedVerticalLength : 0, !snapToZ ? 0 : snapedVerticalLength);
+//				newP.addLocal(Vector)
+//				return newP.addLocal(origin);
+				return origin.add(u, null).addLocal(v);
 
 				// final ReadOnlyVector3 p0p = p.subtract(p0, null);
 				// final ReadOnlyVector3 h = new Vector3(p0p.getX(), p0p.getY(), 0);
@@ -470,6 +476,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void addPoint(int x, int y) {
+		setPreviewPoint(x, y);
 		if (container != null || !mustHaveContainer()) {
 			firstPointInserted = true;
 			if (drawCompleted)

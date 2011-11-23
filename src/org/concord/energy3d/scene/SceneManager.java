@@ -177,6 +177,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean operationStick = false;
 	private boolean operationFlag = false;
 	private boolean update = true;
+	private boolean zoomLock = false;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -581,6 +582,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									}
 								}
 							} else {
+//								selectedHousePart.setPreviewPoint(mouseState.getX(), mouseState.getY());
 								selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
 
 							}
@@ -623,7 +625,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										editHousePartCommand = null;
 									}
 								}
-								cameraControl.setMouseLeftButtonAction(ButtonAction.MOVE);
+								if (!zoomLock)
+									cameraControl.setMouseLeftButtonAction(ButtonAction.ROTATE);
 							} else {
 								if (!selectedHousePart.isDrawCompleted()) {
 									selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
@@ -654,7 +657,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								}
 								if (!operationFlag) {
 									MainPanel.getInstance().deselect();
-									cameraControl.setMouseLeftButtonAction(ButtonAction.MOVE);
+									cameraControl.setMouseLeftButtonAction(ButtonAction.ROTATE);
 								}
 							}
 							// if (HousePart.getGridsHighlightedHousePart() != null) {
@@ -858,7 +861,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
 
 		// cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
-		cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.ROTATE);
+		cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		ReadOnlyVector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
 		ReadOnlyVector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
@@ -1229,7 +1232,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setZoomLock(boolean zoomLock) {
-		cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);
+		this.zoomLock  = zoomLock;
+		cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.MOVE, ButtonAction.ROTATE);
 	}
 
 	public void update() {
