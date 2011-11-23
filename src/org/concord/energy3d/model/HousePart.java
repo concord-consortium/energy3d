@@ -531,6 +531,9 @@ public abstract class HousePart implements Serializable {
 	protected void updateEditShapes() {
 		for (int i = 0; i < points.size(); i++)
 			getEditPointShape(i).setTranslation(getAbsPoint(i));
+		/* remove remaining edit shapes */
+		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++)
+			pointsRoot.detachChildAt(points.size());
 	}
 
 	public void flattenInit() {

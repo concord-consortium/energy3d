@@ -31,6 +31,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -489,15 +490,22 @@ public class PrintController implements Updater {
 		return pageHeight;
 	}
 
-	public int getCols() {
-		return cols;
-	}
+//	public int getCols() {
+//		return cols;
+//	}
+//
+//	public int getRows() {
+//		return rows;
+//	}
+//
+//	public static int getMargin() {
+//		return MARGIN;
+//	}
 
-	public int getRows() {
-		return rows;
-	}
-
-	public static int getMargin() {
-		return MARGIN;
+	public ReadOnlyVector3 getZoomAllCameraLocation() {
+		final double pageHeight = getPageHeight() + MARGIN;
+		final double w = cols * (getPageWidth() + MARGIN);
+		final double h = rows * pageHeight;		
+		return new Vector3(0, -Math.max(w, h), rows % 2 != 0 ? 0 : pageHeight / 2);
 	}
 }

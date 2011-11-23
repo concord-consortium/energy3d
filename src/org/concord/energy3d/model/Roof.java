@@ -52,6 +52,7 @@ public abstract class Roof extends HousePart {
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
 	private transient Line wireframeMesh;
 	private transient ArrayList<Wall> walls;
+	private transient HousePart previousContainer;
 	// private transient Mesh gridsMesh;
 	private ArrayList<Wall> gableWalls = null;
 	private Map<Integer, ArrayList<Wall>> gableEditPointToWallMap = null;
@@ -94,6 +95,15 @@ public abstract class Roof extends HousePart {
 
 	protected void drawMesh() {
 		try {
+			/* undo the effect of wall stretch on all walls if roof is moved to new walls */
+			if (previousContainer != container) {
+				previousContainer = container;
+				for (final Wall wall : walls) {
+					wall.setRoof(null);
+					wall.draw();
+				}
+			}
+			
 			if (container == null) {
 				roofPartsRoot.getSceneHints().setCullHint(CullHint.Always);
 				wireframeMesh.getSceneHints().setCullHint(CullHint.Always);

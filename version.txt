@@ -854,6 +854,10 @@ Version 0.5 - October 20, 2011
 - make the annotation font size small in print preview
 - make the annotation font size small
 - avoid drawing annotations that are too small or too close to eachother 
+ 
+- allow zoom animation in print preview by double clicking on a page 
+- fix problem with hovering custome roof on one house then moving it to 2nd house draws the roof on the 1st house by mistake
+- revert stretched walls when there is no longer a roof above them
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

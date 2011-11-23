@@ -49,8 +49,8 @@ public abstract class CameraControl {
 	private ReadOnlyVector3 orgCameraDirection;
 	private ReadOnlyVector3 newCameraDirection;
 	private double animationTime = -1;
-	private Vector3 orgCameraLocation;
-	private Vector3 newCameraLocation;
+	private ReadOnlyVector3 orgCameraLocation;
+	private ReadOnlyVector3 newCameraLocation;
 
     public CameraControl(final ReadOnlyVector3 upAxis) {
         _upAxis.set(upAxis);
@@ -294,18 +294,31 @@ public abstract class CameraControl {
 		SceneManager.getInstance().getCameraNode().updateFromCamera();
 		SceneManager.getInstance().update();
 	}
-
+	
 	public void zoomAtPoint(final ReadOnlyVector3 clickedPoint) {
-		final double zoomDistance;
-		if (Camera.getCurrentCamera().getLocation().distance(clickedPoint) < 3)
+		final boolean isPrintPreview = PrintController.getInstance().isPrintPreview();
+		final double zoomInDistance = isPrintPreview ? 5 : 2;
+		final double zoomDistance;		
+		final boolean zoomOut = Camera.getCurrentCamera().getLocation().distance(clickedPoint) < zoomInDistance + 1;
+		if (zoomOut)
 			zoomDistance = 10.0;
 		else
-			zoomDistance = 2.0;
+			zoomDistance = zoomInDistance;
 		
 		orgCameraDirection = new Vector3(Camera.getCurrentCamera().getDirection());
-		newCameraDirection = clickedPoint.subtract(Camera.getCurrentCamera().getLocation(), null).normalizeLocal();
 		orgCameraLocation = new Vector3(Camera.getCurrentCamera().getLocation());
-		newCameraLocation = clickedPoint.subtract(newCameraDirection.multiply(zoomDistance, null), null);
+		if (isPrintPreview) {
+			newCameraDirection = Vector3.UNIT_Y;
+//			newCameraDirection = clickedPoint.subtract(Camera.getCurrentCamera().getLocation(), null).normalizeLocal();
+//			newCameraLocation = clickedPoint.add(0, -10, 0, null);
+		} else {
+			newCameraDirection = clickedPoint.subtract(Camera.getCurrentCamera().getLocation(), null).normalizeLocal();
+		}
+		if (isPrintPreview && zoomOut)
+//			newCameraLocation = new Vector3(0, -40, 0);
+			newCameraLocation = PrintController.getInstance().getZoomAllCameraLocation();
+		else
+			newCameraLocation = clickedPoint.subtract(newCameraDirection.multiply(zoomDistance, null), null);
 		animationTime  = SceneManager.getInstance().getTimer().getTimeInSeconds();
 	}
 	
@@ -314,10 +327,10 @@ public abstract class CameraControl {
 	}
 	
 	public void animate() {
-		System.out.println("animating...");
+//		System.out.println("animating...");
 		final double currentTime  = SceneManager.getInstance().getTimer().getTimeInSeconds();
 		final double t = currentTime - animationTime;
-		System.out.println(t);
+//		System.out.println(t);
 		final double animationDuration = 1.0;
 		final ReadOnlyVector3 currentDirection = orgCameraDirection.multiply(animationDuration - t, null).addLocal(newCameraDirection.multiply(t, null)).normalizeLocal();
 		final ReadOnlyVector3 currentLocation = orgCameraLocation.multiply(animationDuration - t, null).addLocal(newCameraLocation.multiply(t, null));

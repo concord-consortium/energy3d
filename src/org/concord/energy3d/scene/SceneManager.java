@@ -860,10 +860,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 		cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.ROTATE);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
-		Vector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
-		Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
-		Vector3 up = new Vector3(0.0f, 0.0f, 1.0f);
-		Vector3 lookAt = new Vector3(0.0f, 0.0f, 0.0f);
+		ReadOnlyVector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
+		ReadOnlyVector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
+		ReadOnlyVector3 up = new Vector3(0.0f, 0.0f, 1.0f);
+		ReadOnlyVector3 lookAt = new Vector3(0.0f, 0.0f, 0.0f);
 
 		setCompassVisible(viewMode == ViewMode.NORMAL);
 
@@ -895,12 +895,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
 			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
-			final int rows = PrintController.getInstance().getRows();
-			final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin();
-			final double w = PrintController.getInstance().getCols() * (PrintController.getInstance().getPageWidth() + PrintController.getMargin());
-			final double h = rows * pageHeight;
-			loc = new Vector3(0, -Math.max(w, h), rows % 2 != 0 ? 0 : pageHeight / 2);
-			lookAt = loc.clone().addLocal(0, 1, 0);
+//			final int rows = PrintController.getInstance().getRows();
+//			final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin();
+//			final double w = PrintController.getInstance().getCols() * (PrintController.getInstance().getPageWidth() + PrintController.getMargin());
+//			final double h = rows * pageHeight;
+//			loc = new Vector3(0, -Math.max(w, h), rows % 2 != 0 ? 0 : pageHeight / 2);
+			loc = PrintController.getInstance().getZoomAllCameraLocation();
+			lookAt = loc.add(0, 1, 0, null);
 			resizeCamera(PrintController.getInstance().getPageWidth());
 		}
 
@@ -1067,6 +1068,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void updatePrintPreviewScene(boolean printPreview) {
 		resetCamera(printPreview ? ViewMode.PRINT_PREVIEW : ViewMode.NORMAL);
 		backgroundRoot.getSceneHints().setCullHint(printPreview ? CullHint.Always : CullHint.Inherit);
+		backgroundRoot.getSceneHints().setAllPickingHints(false);
 	}
 
 	public void setShadow(final boolean shadow) {

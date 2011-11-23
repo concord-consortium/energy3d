@@ -67,11 +67,12 @@ public class CustomRoof extends Roof {
 
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
+			points.clear();
 			// add or update edit points
 			final double z = container.getPoints().get(1).getZ() + height;
 			if (wallUpperPoints.size() > points.size()) {
 				final Vector3 v = new Vector3();
-				for (int i = 0; i < wallUpperPoints.size() - 1; i = i + 1) {
+				for (int i = 0; i < wallUpperPoints.size() - 1; i++) {
 					final PolygonPoint p1 = wallUpperPoints.get(i);
 					final PolygonPoint p2 = wallUpperPoints.get(i + 1);
 					// middle of wall = (p1 + p2) / 2
@@ -80,9 +81,9 @@ public class CustomRoof extends Roof {
 					// add -normal*0.2 to middle point of wall
 					v.addLocal(wallNormals.get(i).multiply(0.2, null).negateLocal());
 					v.set(toRelative(v, container.getContainer()));
-					if (i + 1 < points.size())
-						points.get(i + 1).set(v);
-					else
+//					if (i + 1 < points.size())
+//						points.get(i + 1).set(v);
+//					else
 						points.add(v.clone());
 				}
 			}
