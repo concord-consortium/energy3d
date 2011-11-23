@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.Util;
@@ -232,7 +233,7 @@ public class Window extends HousePart {
 		double xy = cornerXY.length();
 		if (reversedFace)
 			xy = v02.length() - xy;
-		label1.setText("(" + Math.round(10 * xy) / 10.0 + ", " + Math.round(10 * getAbsPoint(i0).getZf()) / 10.0 + ")");
+		label1.setText("(" + Math.round(Scene.getInstance().getAnnotationScale() * 10 * xy) / 10.0 + ", " + Math.round(Scene.getInstance().getAnnotationScale() * 10 * getAbsPoint(i0).getZf()) / 10.0 + ")");
 
 		final ReadOnlyTransform trans = container.getRoot().getTransform();
 		final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getFaceDirection(), null);

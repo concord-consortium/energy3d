@@ -869,6 +869,7 @@ Version 0.5 - October 20, 2011
 - turn on grids by default
 - turn on annotations by default
 - fix problem with snapping to left corner when drawing window/door on a wall that is parallel to x-axis
+- scale the window annotation properly 
 
 
 - *auto redraw gable wall when inserting gable or editing gable
