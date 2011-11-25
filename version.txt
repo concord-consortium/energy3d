@@ -854,15 +854,12 @@ Version 0.5 - October 20, 2011
 - make the annotation font size small in print preview
 - make the annotation font size small
 - avoid drawing annotations that are too small or too close to eachother 
- 
 - allow zoom animation in print preview by double clicking on a page 
 - fix problem with hovering custom roof on one house then moving it to 2nd house draws the roof on the 1st house by mistake
 - revert stretched walls when there is no longer a roof above them
-
 - fix problem with stickoperation and inserting 2nd object by clicking without moving the mouse first resulting in wrong (0,0,0) origin
 - fix problem with zoom tool usable only once and reset to move mode after mouse button is released
 - add feature for zooming while holding middle mouse button 
-
 - release verion 0.5.3
 - revert the behavior of mouse back to left button for rotate and right button for move
 - fix grid problem with door
@@ -870,10 +867,9 @@ Version 0.5 - October 20, 2011
 - turn on annotations by default
 - fix problem with snapping to left corner when drawing window/door on a wall that is parallel to x-axis
 - scale the window annotation properly 
+- fix problem with large paper size in print preview with small parts due to bounding box of invisible roof parts
 
-- fix problem with large paper size in print preview with small parts due to boundingbox of invisible roof parts
-
-
+- fix problem with roof not exploring walls compeletly due to wrong snap.equals() method which didn't consider reversed neighbors 
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

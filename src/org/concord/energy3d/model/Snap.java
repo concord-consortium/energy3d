@@ -55,13 +55,14 @@ public class Snap implements Serializable {
 	public boolean equals(Object obj) {
 		if (obj != null && obj instanceof Snap) {
 			Snap s = (Snap)obj;
-			return neighbor1 == s.neighbor1 && neighbor2 == s.neighbor2 && pointIndex1 == s.pointIndex1 && pointIndex2 == s.pointIndex2;
+			return neighbor1 == s.neighbor1 && neighbor2 == s.neighbor2 && pointIndex1 == s.pointIndex1 && pointIndex2 == s.pointIndex2 || neighbor1 == s.neighbor2 && neighbor2 == s.neighbor1 && pointIndex1 == s.pointIndex2 && pointIndex2 == s.pointIndex1;
 		} else
 			return false;
 	}
 	
 	@Override
 	public String toString() {
-		return "(" + neighbor1 + ", " + pointIndex1 + ") - ("+ neighbor2 + ", " + pointIndex2 + ")";
+//		return "(" + neighbor1 + ", " + pointIndex1 + ") - ("+ neighbor2 + ", " + pointIndex2 + ")";
+		return Integer.toHexString(neighbor1.hashCode()) + "-" + Integer.toHexString(neighbor2.hashCode()) ;
 	}
 }
