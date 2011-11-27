@@ -46,10 +46,10 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.5;
+//	private static final double getGridSize() = 0.5;
 	// private static final double MIN_WALL_LENGTH = 0.1;
 	private static final double MIN_WALL_LENGTH = 0.01;
-	private static double defaultWallHeight = 1f;
+	private static double defaultWallHeight = 1.0;
 	private static int currentVisitStamp = 1;
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
@@ -190,7 +190,7 @@ public class Wall extends HousePart {
 							secondClosesPoint = container.points.get(i);
 					final Vector3 dir = closesPoint.subtract(secondClosesPoint, null).normalizeLocal();
 					p = closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
-					p = grid(p, GRID_SIZE);
+					p = grid(p, getGridSize());
 					p = closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
 					p.setX(MathUtils.clamp(p.getX(), Math.min(container.points.get(0).getX(), container.points.get(2).getX()), Math.max(container.points.get(0).getX(), container.points.get(2).getX())));
 					p.setY(MathUtils.clamp(p.getY(), Math.min(container.points.get(0).getY(), container.points.get(1).getY()), Math.max(container.points.get(0).getY(), container.points.get(1).getY())));
@@ -212,7 +212,7 @@ public class Wall extends HousePart {
 			if (snap == null) {
 				boolean foundationSnap = snapFoundation(p);
 				if (!foundationSnap)
-					p = grid(p, GRID_SIZE, false);
+					p = grid(p, getGridSize(), false);
 			}
 			setNeighbor(index, snap, true);
 			if (index == 2) // make sure z of 2nd base point is same as 2st (needed for platform picking side)
@@ -226,7 +226,7 @@ public class Wall extends HousePart {
 			Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
 			Snap snap = snap(closestPoint, -1);
 			if (snap == null)
-				closestPoint = grid(closestPoint, GRID_SIZE);
+				closestPoint = grid(closestPoint, getGridSize());
 			defaultWallHeight = height = Math.max(0.1, closestPoint.getZ() - base.getZ());
 			final double z = height + base.getZ();
 			points.get(1).setZ(z);
@@ -528,7 +528,7 @@ public class Wall extends HousePart {
 		if (roof == null)
 			return v;
 		final PickResults pickResults = new PrimitivePickResults();
-		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v.getX(), v.getY(), 0), direction), pickResults);
+		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v.getX(), v.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : v.getZ()), direction), pickResults);
 		// PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v), direction), pickResults);
 		if (pickResults.getNumber() > 0) {
 			// final Vector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
@@ -1143,8 +1143,8 @@ public class Wall extends HousePart {
 		thicknessNormal = null;
 	}
 
-	@Override
-	public String toString() {
-		return super.toString() + "\t" + (neighbors[0]) + "\t" + (neighbors[1] == null);
-	}
+//	@Override
+//	public String toString() {
+//		return super.toString() + "\t" + (neighbors[0]) + "\t" + (neighbors[1] == null);
+//	}
 }

@@ -28,7 +28,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
-	// private static final double GRID_SIZE = 0.15;
+	// private static final double getGridSize() = 0.15;
 	private transient BMText label1;
 	private transient Line bars;
 
@@ -38,7 +38,7 @@ public class Window extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return 0.15;
+		return 0.1;
 	}
 
 	protected void init() {

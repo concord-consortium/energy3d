@@ -26,7 +26,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.5;
+//	private static final double getGridSize() = 0.5;
 	private transient Mesh boundingMesh;
 	private transient Mesh wireframeMesh;
 	private transient ArrayList<Vector3> orgPoints;
@@ -40,6 +40,15 @@ public class Foundation extends HousePart {
 		super(2, 8, 0.1);
 	}
 
+	public Foundation(final double xLength, final double yLength) {
+		super(2, 8, 0.1, true);
+		points.get(0).set(-xLength / 2.0, -yLength / 2.0, 0);
+		points.get(2).set(xLength / 2.0, -yLength / 2.0, 0);
+		points.get(1).set(-xLength / 2.0, yLength / 2.0, 0);
+		points.get(3).set(xLength / 2.0, yLength / 2.0, 0);
+	}
+
+	
 	@Override
 	protected boolean mustHaveContainer() {
 		return false;
@@ -173,7 +182,7 @@ public class Foundation extends HousePart {
 		Vector3 p = points.get(index);
 		if (pick != null) {
 			p = pick.getPoint();
-			p = grid(p, GRID_SIZE);
+			p = grid(p, getGridSize());
 		}
 		points.get(index).set(p);
 		if (!isFirstPointInserted()) {
@@ -191,7 +200,7 @@ public class Foundation extends HousePart {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
 				Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
-				closestPoint = grid(closestPoint, GRID_SIZE);
+				closestPoint = grid(closestPoint, getGridSize());
 				newBoundingHeight = Math.max(0, closestPoint.getZ() - base.getZ());
 				applyNewHeight(boundingHeight, newBoundingHeight, false);
 			}
@@ -418,5 +427,10 @@ public class Foundation extends HousePart {
 	@Override
 	protected ReadOnlyVector3 getCenter() {
 		return super.getCenter().multiply(new Vector3(1, 1, 0), null);
+	}
+	
+	@Override
+	public boolean isPrintable() {
+		return false;
 	}
 }

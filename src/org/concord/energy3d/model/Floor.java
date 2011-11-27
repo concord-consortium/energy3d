@@ -23,7 +23,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Floor extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double GRID_SIZE = 0.2;
+//	private static final double getGridSize() = 0.2;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 
 	public Floor() {
@@ -55,7 +55,7 @@ public class Floor extends HousePart {
 		if (container != null) {
 			Vector3 base = container.getAbsPoint(0);
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
-			p = grid(p, GRID_SIZE);
+			p = grid(p, getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ()) + base.getZ();
 		}
 		draw();

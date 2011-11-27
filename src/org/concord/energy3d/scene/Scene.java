@@ -99,19 +99,26 @@ public class Scene implements Serializable {
 				}
 			} catch (Throwable e) {
 				e.printStackTrace();
-				newFile();
+				newFile(40, 30);
 			}
 			// root.attachChild(originalHouseRoot);
 		}
 		return instance;
 	}
 
-	public static void newFile() {
+//	public static void newFile() {
+//	}
+	
+	public static void newFile(final double xLength, final double yLength) {
+//		newFile();
 		try {
-			open(null);
+			open(null);				
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}		
+		final Foundation foundation = new Foundation(xLength / annotationScale, yLength / annotationScale);
+		instance.add(foundation);
+		redrawAll = true;
 	}
 
 	public static void open(final URL file) throws Exception {

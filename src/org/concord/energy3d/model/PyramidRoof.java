@@ -23,7 +23,7 @@ public class PyramidRoof extends Roof {
 		} else {
 			final ReadOnlyVector3 base = new Vector3(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getCenter().getZ());
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
-			p = grid(p, GRID_SIZE);
+			p = grid(p, getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ());
 		}
 		draw();

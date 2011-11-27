@@ -276,7 +276,7 @@ public class MainFrame extends JFrame {
 			newMenuItem = new JMenuItem("New");
 			newMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					Scene.newFile();
+					Scene.newFile(40, 30);
 					updateTitleBar();					
 				}
 			});

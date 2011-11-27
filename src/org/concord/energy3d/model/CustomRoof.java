@@ -30,7 +30,7 @@ public class CustomRoof extends Roof {
 		} else if (editPointIndex == 0) {
 			final ReadOnlyVector3 base = getCenter();
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
-			p = grid(p, GRID_SIZE);
+			p = grid(p, getGridSize());
 			height = Math.max(0, p.getZ() - container.getPoints().get(1).getZ());
 			final double z = container.getPoints().get(1).getZ() + height;
 			for (final Vector3 v : points)
@@ -39,7 +39,7 @@ public class CustomRoof extends Roof {
 			final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
 			Vector3 p = new Vector3();
 			if (pickRay.intersectsPlane(new Plane(Vector3.UNIT_Z, points.get(0).getZ()), p)) {
-				p = grid(p, GRID_SIZE, false);
+				p = grid(p, getGridSize(), false);
 				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 			}
 		}

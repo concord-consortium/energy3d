@@ -254,7 +254,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		backgroundRoot.attachChild(createSky());
 		backgroundRoot.attachChild(createFloor());
-		backgroundRoot.attachChild(createGrids(0.5));
+		backgroundRoot.attachChild(createGrids(1.0));
 		backgroundRoot.attachChild(createAxis());
 		root.attachChild(backgroundRoot);
 		root.attachChild(Scene.getRoot());
@@ -760,6 +760,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				resetCamera(viewMode);
+				update = true;
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.X), new TriggerAction() {
@@ -863,7 +864,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 		cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
-		ReadOnlyVector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
+//		ReadOnlyVector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
+		ReadOnlyVector3 loc = new Vector3(1.0f, -5.0f, 3.0f);
 		ReadOnlyVector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		ReadOnlyVector3 up = new Vector3(0.0f, 0.0f, 1.0f);
 		ReadOnlyVector3 lookAt = new Vector3(0.0f, 0.0f, 0.0f);

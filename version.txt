@@ -868,8 +868,15 @@ Version 0.5 - October 20, 2011
 - fix problem with snapping to left corner when drawing window/door on a wall that is parallel to x-axis
 - scale the window annotation properly 
 - fix problem with large paper size in print preview with small parts due to bounding box of invisible roof parts
-
-- fix problem with roof not exploring walls compeletly due to wrong snap.equals() method which didn't consider reversed neighbors 
+- fix problem with roof not exploring walls compeletly due to wrong snap.equals() method which didn't consider reversed neighbors
+- fix problem with grids staying visible after inserting house part 
+- insert platform by default whenever making new file
+- change the default scale to make it reasonable for a 40 X 30 cm house
+- change the default wall and door height to make it reasonable for a 40 X 30 cm house
+- change the default grid size to make it reasonable and round for a 40 X 30 cm house
+- change the default camera position to zoom all the default platform
+- remove platform from the printout
+- fix problem with horizontal gable grids sticking out 
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

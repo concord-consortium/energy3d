@@ -44,7 +44,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
-	protected static final double GRID_SIZE = 0.5;
+//	protected static final double getGridSize() = 0.5;
 	private static final double OVERHANG_LENGHT = 0.2;
 	protected transient Node roofPartsRoot;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
