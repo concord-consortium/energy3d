@@ -877,6 +877,8 @@ Version 0.5 - October 20, 2011
 - change the default camera position to zoom all the default platform
 - remove platform from the printout
 - fix problem with horizontal gable grids sticking out 
+- release verion 0.5.4
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
