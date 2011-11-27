@@ -14,6 +14,7 @@ import java.util.concurrent.Callable;
 import javax.swing.SwingUtilities;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.UserData;
@@ -154,7 +155,13 @@ public class PrintController implements Updater {
 			if (isPrintPreview || doTheEndAnimation) {
 				int printSequence = 0;
 				originalHouseRoot.getSceneHints().setCullHint(CullHint.Inherit);
-				for (final HousePart part : Scene.getInstance().getParts()) {
+
+				if (printParts != null)
+					for (final HousePart part : printParts)
+						if (part instanceof Foundation)
+							part.getRoot().getSceneHints().setCullHint(isPrintPreview ? CullHint.Always : CullHint.Inherit);
+
+				for (final HousePart part : Scene.getInstance().getParts()) {						
 					if (isPrintPreview)
 						printSequence = part.drawLabels(printSequence);
 					else

@@ -333,8 +333,9 @@ public class MainFrame extends JFrame {
 						final URL url = Scene.getURL();
 						if (url != null)
 							Scene.save(url);
-						else if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
-							Scene.save(fileChooser.getSelectedFile().toURI().toURL());
+						else //if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
+//							Scene.save(fileChooser.getSelectedFile().toURI().toURL());
+							saveFile();
 					} catch (Throwable err) {
 						err.printStackTrace();
 						JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -609,17 +610,7 @@ public class MainFrame extends JFrame {
 			saveasMenuItem = new JMenuItem("Save As...");
 			saveasMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
-						try {
-							File file = fileChooser.getSelectedFile();
-							if (!file.getName().toLowerCase().endsWith(".ser"))
-								file = new File(file.toString() + ".ser");
-							Scene.save(file.toURI().toURL());
-							updateTitleBar();
-						} catch (Throwable err) {
-							err.printStackTrace();
-							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-						}
+					saveFile();
 				}
 			});
 		}
@@ -835,5 +826,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return redoMenuItem;
+	}
+
+	private void saveFile() {
+		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
+			try {
+				File file = fileChooser.getSelectedFile();
+				if (!file.getName().toLowerCase().endsWith(".ser"))
+					file = new File(file.toString() + ".ser");
+				Scene.save(file.toURI().toURL());
+				updateTitleBar();
+			} catch (Throwable err) {
+				err.printStackTrace();
+				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
 	}
 }
