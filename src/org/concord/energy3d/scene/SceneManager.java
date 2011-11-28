@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 
 import javax.swing.undo.UndoManager;
 
-import org.concord.energy3d.exception.InvisibleException;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.CustomRoof;
@@ -179,6 +178,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean update = true;
 	private boolean zoomLock = false;
 
+	public final static byte DEFAULT_THEME = 0;
+	public final static byte SKETCHUP_THEME = 1;
+	private byte theme = DEFAULT_THEME;
+
 	public static SceneManager getInstance() {
 		return instance;
 	}
@@ -186,7 +189,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public static GameTaskQueueManager getTaskManager() {
 		return taskManager;
 	}
-	
+
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
 		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
@@ -413,7 +416,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createFloor() {
-		floor.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
+		switch (theme) {
+		case DEFAULT_THEME:
+			floor.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
+			break;
+		case SKETCHUP_THEME:
+			floor.setDefaultColor(new ColorRGBA(1, 1, 1, 0.9f));
+			break;
+		}
 
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
@@ -493,7 +503,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Dome sky = new Dome("Sky", 100, 100, 100);
 		sky.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("sky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		if (theme == DEFAULT_THEME) {
+			ts.setTexture(TextureManager.load("sky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		}
 		sky.setRenderState(ts);
 		sky.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		return sky;
@@ -582,7 +594,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									}
 								}
 							} else {
-//								selectedHousePart.setPreviewPoint(mouseState.getX(), mouseState.getY());
+								// selectedHousePart.setPreviewPoint(mouseState.getX(), mouseState.getY());
 								selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
 
 							}
@@ -864,7 +876,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 		cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
-//		ReadOnlyVector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
+		// ReadOnlyVector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
 		ReadOnlyVector3 loc = new Vector3(1.0f, -5.0f, 3.0f);
 		ReadOnlyVector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		ReadOnlyVector3 up = new Vector3(0.0f, 0.0f, 1.0f);
@@ -887,7 +899,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Parallel);
 			/* location will be set in PrintController.print() */
-			//loc = new Vector3(0, -10, 0);
+			// loc = new Vector3(0, -10, 0);
 			final double pageWidth = PrintController.getInstance().getPageWidth();
 			final double pageHeight = PrintController.getInstance().getPageHeight();
 			final Dimension canvasSize = ((Component) canvas).getSize();
@@ -900,11 +912,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
 			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
-//			final int rows = PrintController.getInstance().getRows();
-//			final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin();
-//			final double w = PrintController.getInstance().getCols() * (PrintController.getInstance().getPageWidth() + PrintController.getMargin());
-//			final double h = rows * pageHeight;
-//			loc = new Vector3(0, -Math.max(w, h), rows % 2 != 0 ? 0 : pageHeight / 2);
+			// final int rows = PrintController.getInstance().getRows();
+			// final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin();
+			// final double w = PrintController.getInstance().getCols() * (PrintController.getInstance().getPageWidth() + PrintController.getMargin());
+			// final double h = rows * pageHeight;
+			// loc = new Vector3(0, -Math.max(w, h), rows % 2 != 0 ? 0 : pageHeight / 2);
 			loc = PrintController.getInstance().getZoomAllCameraLocation();
 			lookAt = loc.add(0, 1, 0, null);
 			resizeCamera(PrintController.getInstance().getPageWidth());
@@ -1166,7 +1178,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (sunControl)
 			taskManager.update(new Callable<Object>() {
 				public Object call() throws Exception {
-//					Scene.getInstance().updateTextSizes();
+					// Scene.getInstance().updateTextSizes();
 					heliodon.updateSize();
 					return null;
 				}
@@ -1234,7 +1246,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setZoomLock(boolean zoomLock) {
-		this.zoomLock  = zoomLock;
+		this.zoomLock = zoomLock;
 		cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.MOVE, ButtonAction.ROTATE);
 	}
 
