@@ -49,7 +49,7 @@ public class Wall extends HousePart {
 //	private static final double getGridSize() = 0.5;
 	// private static final double MIN_WALL_LENGTH = 0.1;
 	private static final double MIN_WALL_LENGTH = 0.01;
-	private static double defaultWallHeight = 1.0;
+	private static double defaultWallHeight = 2.0; // the recommended default wall height is 20cm
 	private static int currentVisitStamp = 1;
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
