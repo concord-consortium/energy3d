@@ -126,7 +126,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public double getGridSize() {
-		return 0.5;
+		return 0.1;
 	}
 
 	/* if an attribute is transient but is always needed then it should be set to default here */
