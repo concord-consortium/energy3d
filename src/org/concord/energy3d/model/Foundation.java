@@ -433,4 +433,9 @@ public class Foundation extends HousePart {
 	public boolean isPrintable() {
 		return false;
 	}
+	
+	@Override
+	public double getGridSize() {
+		return 0.2;
+	}
 }

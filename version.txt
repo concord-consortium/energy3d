@@ -885,6 +885,8 @@ Version 0.5 - October 20, 2011
 - prevent floor from going higher than walls
 - use the center point of floor for adjusting its position even when inserting it for first time
 
+- make all grids 1cm except platform which is 2cm
+- allow dynamic SceneManager.floor grids via drawGrids(gridSize)
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

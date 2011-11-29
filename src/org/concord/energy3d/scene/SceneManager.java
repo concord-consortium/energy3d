@@ -257,7 +257,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		backgroundRoot.attachChild(createSky());
 		backgroundRoot.attachChild(createFloor());
-		backgroundRoot.attachChild(createGrids(1.0));
+		backgroundRoot.attachChild(gridsMesh);
 		backgroundRoot.attachChild(createAxis());
 		root.attachChild(backgroundRoot);
 		root.attachChild(Scene.getRoot());
@@ -443,7 +443,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return floor;
 	}
 
-	private Mesh createGrids(final double gridSize) {
+	public void drawGrids(final double gridSize) {
 		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
 		// gridsMesh.setDefaultColor(new ColorRGBA(0, 0, 1, 1f));
 		// final BlendState blend = new BlendState();
@@ -490,9 +490,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			buf.put(p.getXf()).put(p.getYf()).put(0.01f);
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
+		gridsMesh.getMeshData().updateVertexCount();
 		gridsMesh.updateModelBound();
-		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
-		return gridsMesh;
+//		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
 	}
 
 	public void setGridsVisible(final boolean visible) {

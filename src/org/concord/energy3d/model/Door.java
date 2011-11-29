@@ -27,10 +27,10 @@ public class Door extends HousePart {
 		super(2, 4, defaultDoorHeight);
 	}
 	
-	@Override
-	public double getGridSize() {
-		return 0.2;
-	}	
+//	@Override
+//	public double getGridSize() {
+//		return 0.2;
+//	}	
 
 	protected void init() {
 		super.init();

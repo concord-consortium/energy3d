@@ -36,10 +36,10 @@ public class Window extends HousePart {
 		super(2, 4, 0.30);
 	}
 
-	@Override
-	public double getGridSize() {
-		return 0.1;
-	}
+//	@Override
+//	public double getGridSize() {
+//		return 0.1;
+//	}
 
 	protected void init() {
 		label1 = Annotation.makeNewLabel();
