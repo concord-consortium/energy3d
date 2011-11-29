@@ -888,6 +888,8 @@ Version 0.5 - October 20, 2011
 - make all grids 1cm except platform which is 2cm
 - allow dynamic SceneManager.floor grids via drawGrids(gridSize)
 
+- *fix problem with disconnected walls after deleter followed by undo
+
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
 - *fix problem with resizing custome roof

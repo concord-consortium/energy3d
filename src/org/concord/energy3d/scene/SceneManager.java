@@ -257,6 +257,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		backgroundRoot.attachChild(createSky());
 		backgroundRoot.attachChild(createFloor());
+		drawGrids(0.1);
 		backgroundRoot.attachChild(gridsMesh);
 		backgroundRoot.attachChild(createAxis());
 		root.attachChild(backgroundRoot);
