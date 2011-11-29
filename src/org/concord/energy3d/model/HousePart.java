@@ -517,12 +517,13 @@ public abstract class HousePart implements Serializable {
 		if (root == null)
 			init();
 		drawMesh();
-		if (this instanceof Roof)
-			drawGrids(getGridSize());
-		else if (container != null)
-			container.drawGrids(getGridSize());
+		// if (this instanceof Roof)
+		// drawGrids(getGridSize());
+		// else if (container != null)
+		// container.drawGrids(getGridSize());
 		updateEditShapes();
-		CollisionTreeManager.INSTANCE.removeCollisionTree(root);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
+		hideAnnotations();
 		if (isDrawable())
 			drawAnnotations();
 	}
@@ -623,13 +624,18 @@ public abstract class HousePart implements Serializable {
 		if (annotCounter < sizeAnnotRoot.getChildren().size()) {
 			annot = (SizeAnnotation) sizeAnnotRoot.getChild(annotCounter);
 			annot.getSceneHints().setCullHint(CullHint.Inherit);
-			for (int i = annotCounter + 1; i < sizeAnnotRoot.getChildren().size(); i++)
-				sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 		} else {
 			annot = new SizeAnnotation();
 			sizeAnnotRoot.attachChild(annot);
 		}
 		return annot;
+	}
+
+	private void hideAnnotations() {
+		for (final Spatial annot : sizeAnnotRoot.getChildren())
+			annot.getSceneHints().setCullHint(CullHint.Always);
+		for (final Spatial annot : angleAnnotRoot.getChildren())
+			annot.getSceneHints().setCullHint(CullHint.Always);
 	}
 
 	protected AngleAnnotation fetchAngleAnnot(final int annotCounter) {
@@ -641,8 +647,6 @@ public abstract class HousePart implements Serializable {
 		if (annotCounter < angleAnnotRoot.getChildren().size()) {
 			annot = (AngleAnnotation) angleAnnotRoot.getChild(annotCounter);
 			annot.getSceneHints().setCullHint(CullHint.Inherit);
-			for (int i = annotCounter + 1; i < angleAnnotRoot.getChildren().size(); i++)
-				angleAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 		} else {
 			annot = new AngleAnnotation();
 			angleAnnotRoot.attachChild(annot);

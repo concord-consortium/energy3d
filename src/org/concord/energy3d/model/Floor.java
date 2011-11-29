@@ -13,6 +13,7 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -53,13 +54,18 @@ public class Floor extends HousePart {
 	public void setPreviewPoint(int x, int y) {
 		pickContainer(x, y, Wall.class);
 		if (container != null) {
-			Vector3 base = container.getAbsPoint(0);
+//			Vector3 base = container.getAbsPoint(0);
+			final ReadOnlyVector3 base = getCenter();
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, getGridSize());
-			height = Math.max(0, p.getZ() - base.getZ()) + base.getZ();
+//			height = Math.max(0, p.getZ() - base.getZ()) + base.getZ();
+			final double zMin = container.getAbsPoint(0).getZ() + 0.01;
+			final double zmax = container.getAbsPoint(1).getZ();
+//			height = Math.max(0, p.getZ() - base.getZ()) + base.getZ();
+			height = Math.min(zmax, Math.max(zMin, p.getZ()));
 		}
 		draw();
-		setEditPointsVisible(true);
+		setEditPointsVisible(container != null);
 	}
 
 	private Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
@@ -84,31 +90,26 @@ public class Floor extends HousePart {
 		root.updateWorldBound(true);
 	}
 
-	protected void computeAbsPoints() {
-	}
-
-	protected void computeCenter() {
-	}
-
 	protected void drawMesh() {
+		if (container == null) {
+			mesh.getSceneHints().setCullHint(CullHint.Always);
+//			setEditPointsVisible(false);
+			return;
+		}
 		try {
-			if (container == null) {
-				mesh.getSceneHints().setCullHint(CullHint.Always);
-				setEditPointsVisible(false);
-				return;
-			}
 			mesh.getSceneHints().setCullHint(CullHint.Inherit);
 			wallUpperPoints = exploreWallNeighbors((Wall) container);
 			fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
-			for (int i = 0; i < points.size(); i++)
-				pointsRoot.getChild(i).setTranslation(points.get(i));
-			mesh.updateModelBound();
+//			mesh.updateModelBound();
+			updateEditShapes();
+//			for (int i = 0; i < points.size(); i++)
+//				pointsRoot.getChild(i).setTranslation(points.get(i));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	protected ArrayList<PolygonPoint> exploreWallNeighbors(Wall startWall) {
+	protected ArrayList<PolygonPoint> exploreWallNeighbors(final Wall startWall) {
 		final ArrayList<PolygonPoint> poly = new ArrayList<PolygonPoint>();
 		startWall.visitNeighbors(new WallVisitor() {
 			public void visit(Wall currentWall, Snap prev, Snap next) {
@@ -116,18 +117,17 @@ public class Floor extends HousePart {
 				if (next != null)
 					pointIndex = next.getSnapPointIndexOf(currentWall);
 				pointIndex = pointIndex + 1;
-				final Vector3 p1 = currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1);
-				final Vector3 p2 = currentWall.getAbsPoint(pointIndex);
+				final ReadOnlyVector3 p1 = currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1);
+				final ReadOnlyVector3 p2 = currentWall.getAbsPoint(pointIndex);
 				addPointToPolygon(poly, p1);
 				addPointToPolygon(poly, p2);
 			}
-
 		});
 
 		return poly;
 	}
 
-	private void addPointToPolygon(ArrayList<PolygonPoint> poly, Vector3 p) {
+	private void addPointToPolygon(final ArrayList<PolygonPoint> poly, final ReadOnlyVector3 p) {
 		PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 		if (!poly.contains(polygonPoint))
 			poly.add(polygonPoint);
@@ -147,16 +147,19 @@ public class Floor extends HousePart {
 		}
 	}
 
+	@Override
 	protected String getDefaultTextureFileName() {
 		return "floor.jpg";
 	}
 
-	public void flatten(double flattenTime) {
+	@Override
+	public void flatten(final double flattenTime) {
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 		root.updateWorldTransform(true);
 		super.flatten(flattenTime);
 	}
 
+	@Override
 	public Vector3 getAbsPoint(final int index) {
 		return toAbsolute(points.get(index), container == null ? null : container.getContainer());
 	}
@@ -165,5 +168,10 @@ public class Floor extends HousePart {
 	public void setOriginal(final HousePart original) {
 		wallUpperPoints = ((Floor) original).wallUpperPoints;
 		super.setOriginal(original);
+	}
+	
+	@Override
+	public boolean isDrawable() {
+		return container != null;
 	}
 }

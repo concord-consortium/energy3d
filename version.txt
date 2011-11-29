@@ -879,7 +879,12 @@ Version 0.5 - October 20, 2011
 - fix problem with horizontal gable grids sticking out 
 - release verion 0.5.4
 - hide platform at the end of print preview animation
-- add .ser to filenames
+- fix problem with missing .ser in filenames when clicking on "save" ("save as" works fine)
+
+- prevent floor from going under the platform
+- prevent floor from going higher than walls
+- use the center point of floor for adjusting its position even when inserting it for first time
+
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool
