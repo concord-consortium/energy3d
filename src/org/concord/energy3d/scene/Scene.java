@@ -116,9 +116,16 @@ public class Scene implements Serializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
+
 		final Foundation foundation = new Foundation(xLength / annotationScale, yLength / annotationScale);
-		instance.add(foundation);
-		redrawAll = true;
+		
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			public Object call() throws Exception {				
+				instance.add(foundation);
+				redrawAll = true;
+				return null;
+			}
+		});
 	}
 
 	public static void open(final URL file) throws Exception {
@@ -130,29 +137,34 @@ public class Scene implements Serializable {
 				Thread.yield();
 		}
 
-		System.out.print("New file...");
-		originalHouseRoot.detachAllChildren();
-		root.detachAllChildren();
-		root.attachChild(originalHouseRoot);
-
-		if (url == null) {
-			instance = new Scene();
-			System.out.println("done");
-		} else {
-			System.out.print("Opening..." + file + "...");
-			ObjectInputStream in = new ObjectInputStream(file.openStream());
-			instance = (Scene) in.readObject();
-			in.close();
-			for (HousePart housePart : instance.getParts())
-				originalHouseRoot.attachChild(housePart.getRoot());
-			redrawAll = true;
-			System.out.println("done");
-		}
-
-		root.updateWorldBound(true);
-		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-		SceneManager.getInstance().getUndoManager().die();
-		MainFrame.getInstance().refreshUndoRedo();
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			public Object call() throws Exception {				
+				System.out.print("Open file...");
+				originalHouseRoot.detachAllChildren();
+				root.detachAllChildren();
+				root.attachChild(originalHouseRoot);
+				
+				if (url == null) {
+					instance = new Scene();
+					System.out.println("done");
+				} else {
+					System.out.print("Opening..." + file + "...");
+					ObjectInputStream in = new ObjectInputStream(file.openStream());
+					instance = (Scene) in.readObject();
+					in.close();
+					for (HousePart housePart : instance.getParts())
+						originalHouseRoot.attachChild(housePart.getRoot());
+							redrawAll = true;
+							System.out.println("done");
+				}
+				
+				root.updateWorldBound(true);
+				SceneManager.getInstance().updateHeliodonAndAnnotationSize();
+				SceneManager.getInstance().getUndoManager().die();
+				MainFrame.getInstance().refreshUndoRedo();
+				return null;
+			}
+		});
 	}
 
 	public static void save(final URL url) throws Exception {

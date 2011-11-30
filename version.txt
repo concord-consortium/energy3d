@@ -880,16 +880,15 @@ Version 0.5 - October 20, 2011
 - release verion 0.5.4
 - hide platform at the end of print preview animation
 - fix problem with missing .ser in filenames when clicking on "save" ("save as" works fine)
-
 - prevent floor from going under the platform
 - prevent floor from going higher than walls
 - use the center point of floor for adjusting its position even when inserting it for first time
-
 - make all grids 1cm except platform which is 2cm
 - allow dynamic SceneManager.floor grids via drawGrids(gridSize)
-
 - reduce wall thickness from 1cm to 0.5cm
 - increase default height of door from 8cm to 15cm
+
+- queue the code of newFile and open in order to avoid exceptions
 
 - *fix problem with disconnected walls after deleter followed by undo
 

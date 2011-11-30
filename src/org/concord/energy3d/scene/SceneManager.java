@@ -257,6 +257,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		backgroundRoot.attachChild(createSky());
 		backgroundRoot.attachChild(createFloor());
+		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
 		drawGrids(0.1);
 		backgroundRoot.attachChild(gridsMesh);
 		backgroundRoot.attachChild(createAxis());
@@ -333,7 +334,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (moveState != null)
 			executeMouseMove();
 
-		Scene.getInstance().update();
+		if (Scene.getInstance() != null)
+			Scene.getInstance().update();
 
 		if (rotAnim && viewMode == ViewMode.NORMAL) {
 			final Matrix3 rotate = new Matrix3();
@@ -881,7 +883,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		ReadOnlyVector3 loc = new Vector3(1.0f, -5.0f, 3.0f);
 		ReadOnlyVector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		ReadOnlyVector3 up = new Vector3(0.0f, 0.0f, 1.0f);
-		ReadOnlyVector3 lookAt = new Vector3(0.0f, 0.0f, 0.0f);
+		ReadOnlyVector3 lookAt = new Vector3(0.0f, 0.0f, 1.0f);
 
 		setCompassVisible(viewMode == ViewMode.NORMAL);
 
