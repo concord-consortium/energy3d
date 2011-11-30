@@ -888,6 +888,9 @@ Version 0.5 - October 20, 2011
 - make all grids 1cm except platform which is 2cm
 - allow dynamic SceneManager.floor grids via drawGrids(gridSize)
 
+- reduce wall thickness from 1cm to 0.5cm
+- increase default height of door from 8cm to 15cm
+
 - *fix problem with disconnected walls after deleter followed by undo
 
 - *auto redraw gable wall when inserting gable or editing gable

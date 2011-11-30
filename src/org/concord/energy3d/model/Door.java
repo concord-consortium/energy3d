@@ -18,7 +18,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
 //	private static final double getGridSize() = 0.2;
-	private static double defaultDoorHeight = 0.8f;
+	private static double defaultDoorHeight = 1.5; //0.8f;
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer normalBuffer;
 	private transient FloatBuffer textureBuffer;

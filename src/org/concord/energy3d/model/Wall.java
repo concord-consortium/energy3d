@@ -60,7 +60,7 @@ public class Wall extends HousePart {
 	private transient Roof roof;
 	private transient ArrayList<Vector3> wallPolygonPoints;
 	private transient int visitStamp;
-	private final double wallThickness = 0.1;
+	private final double wallThickness = 0.05;
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
