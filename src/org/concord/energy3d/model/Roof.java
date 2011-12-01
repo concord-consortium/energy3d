@@ -679,7 +679,8 @@ public abstract class Roof extends HousePart {
 			buf.put(p.getXf()).put(p.getYf()).put(pMiddle.getZf());
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
-		gridsMesh.updateModelBound();
+//		gridsMesh.updateModelBound();
+//		gridsMesh.updateWorldBound(false);
 		// gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 	}
 }

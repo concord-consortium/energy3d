@@ -107,7 +107,10 @@ public class PrintController implements Updater {
 				SceneManager.getInstance().updatePrintPreviewScene(true);
 
 				originalHouseRoot.setScale(2);
-				originalHouseRoot.setTranslation(0, 0, -Util.findExactHeight(printParts));
+//				originalHouseRoot.setTranslation(0, 0, -Util.findExactHeight(printParts));
+//				originalHouseRoot.updateWorldTransform(false);
+//				originalHouseRoot.updateWorldBound(false);
+				originalHouseRoot.setTranslation(originalHouseRoot.getWorldBound().getCenter().multiply(-2.0, null));
 
 				drawPrintParts(0);
 			}

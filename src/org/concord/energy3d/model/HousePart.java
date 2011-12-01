@@ -164,7 +164,7 @@ public abstract class HousePart implements Serializable {
 		// blend.setBlendEnabled(true);
 		// gridsMesh.setRenderState(blend);
 		// gridsMesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-		gridsMesh.setModelBound(new BoundingBox());
+		gridsMesh.setModelBound(null);
 		Util.disablePickShadowLight(gridsMesh);
 		root.attachChild(gridsMesh);
 		setGridsVisible(false);
@@ -243,16 +243,19 @@ public abstract class HousePart implements Serializable {
 
 	public void setEditPointsVisible(final boolean visible) {
 		for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
-			if (visible)
-				computeEditPointScale(i);
+//			if (visible)
+//				computeEditPointScale(i);
 			pointsRoot.getChild(i).getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 		}
 	}
 
-	protected void computeEditPointScale(int i) {
-		pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
-		pointsRoot.getChild(i).updateGeometricState(0);
-	}
+//	protected void computeEditPointScale(final int i) {
+////		pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
+////		pointsRoot.getChild(i).updateGeometricState(0);
+//		
+//		pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
+//		pointsRoot.getChild(i).updateGeometricState(0);		
+//	}
 
 	// public void hidePoints() {
 	// for (final Spatial child : pointsRoot.getChildren())

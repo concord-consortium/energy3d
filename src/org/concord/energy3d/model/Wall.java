@@ -129,7 +129,9 @@ public class Wall extends HousePart {
 		windowsSurroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(1000));
 		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		windowsSurroundMesh.setModelBound(new BoundingBox());
+//		windowsSurroundMesh.setModelBound(new BoundingBox());
+		/* lets not use bounds for this mesh because when there are no windows its bounds is set to center 0,0,0 which shifts the overall bounds toward zero */
+		windowsSurroundMesh.setModelBound(null);
 		root.attachChild(windowsSurroundMesh);
 
 		wireframeMesh = new Line("Wall (Wireframe)");
@@ -766,6 +768,10 @@ public class Wall extends HousePart {
 		}
 		final int pos = vertexBuffer.position();
 		vertexBuffer.limit(pos != 0 ? pos : 1);
+		
+		windowsSurroundMesh.getMeshData().updateVertexCount();
+//		windowsSurroundMesh.updateModelBound();
+//		windowsSurroundMesh.updateWorldBound(false);
 	}
 
 	public Snap getOtherSnap(final Snap snap) {
@@ -1120,8 +1126,8 @@ public class Wall extends HousePart {
 		gridsMesh.getMeshData().setVertexBuffer(buf);
 
 		// gridsMesh.getMeshData().updateVertexCount();
-		gridsMesh.updateModelBound();
-
+//		gridsMesh.updateModelBound();
+//		gridsMesh.updateWorldBound(false);
 		// gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 	}
 

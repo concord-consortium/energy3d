@@ -276,6 +276,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.add(Scene.getRoot());
 		shadowPass.addOccluder(Scene.getRoot());
 
+		Scene.getInstance();
+
 		final Date today = Calendar.getInstance().getTime();
 		heliodon = new Heliodon(root, light, passManager, logicalLayer, today);
 		taskManager.update(new Callable<Object>() {
@@ -286,7 +288,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		});
 
-		// Scene.getInstance();
 
 		// SelectUtil.init(floor, Scene.getRoot());
 		initMouse();
@@ -334,7 +335,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (moveState != null)
 			executeMouseMove();
 
-		if (Scene.getInstance() != null)
+//		if (Scene.getInstance() != null)
 			Scene.getInstance().update();
 
 		if (rotAnim && viewMode == ViewMode.NORMAL) {
@@ -379,7 +380,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}
 
-		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getRoot(), renderer, true);
+//		 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
 
 		passManager.renderPasses(renderer);
 		try {

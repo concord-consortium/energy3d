@@ -30,6 +30,8 @@ public class CustomRoof extends Roof {
 		} else if (editPointIndex == 0) {
 			final ReadOnlyVector3 base = getCenter();
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
+			if (p == null)
+				return;
 			p = grid(p, getGridSize());
 			height = Math.max(0, p.getZ() - container.getPoints().get(1).getZ());
 			final double z = container.getPoints().get(1).getZ() + height;

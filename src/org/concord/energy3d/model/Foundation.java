@@ -119,7 +119,7 @@ public class Foundation extends HousePart {
 				if (!visible)
 					pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 				else {
-					computeEditPointScale(i);
+//					computeEditPointScale(i);
 					if (!resizeHouseMode && i >= 4)
 						pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 					else
@@ -330,7 +330,8 @@ public class Foundation extends HousePart {
 			buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.01f);
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
-		gridsMesh.updateModelBound();
+//		gridsMesh.updateModelBound();
+//		gridsMesh.updateWorldBound(false);
 		// gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 	}
 

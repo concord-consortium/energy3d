@@ -887,18 +887,21 @@ Version 0.5 - October 20, 2011
 - allow dynamic SceneManager.floor grids via drawGrids(gridSize)
 - reduce wall thickness from 1cm to 0.5cm
 - increase default height of door from 8cm to 15cm
-
 - queue the code of newFile and open in order to avoid exceptions
-
 - increase print resolution to 2X as much as the paper point size
 - improve resolution algorithm to allocate enough memory
 - improve resolution algorithm to fix problem with shifted printout in certain resolution
-
 - fix problem with upside-down top view
 - zoom all in top view mode
 - disable double-click in top view
 - fix problem with mouse disabled in top view
 - add left and right mousebuttonEnabled to CameraController
+
+- fix exception when moving center point of roofs in top view
+- fix problem with opening the initial file twice
+- bring print preview model to center based on bounds center
+
+
 
 -*add feature for planting trees
 
