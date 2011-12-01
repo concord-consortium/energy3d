@@ -193,14 +193,15 @@ public class PrintController implements Updater {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			public Object call() throws Exception {
 				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
-				final Printout printExporter = new Printout();
+				final Printout printout = new Printout();
 				final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
 				final Paper paper = new Paper();
-				final int resolutionHeight = 1000;
-				final Dimension newSize = new Dimension((int) (resolutionHeight * paper.getWidth() / paper.getHeight()), resolutionHeight);
+				final int resolutionHeight = 2;
+//				final Dimension newSize = new Dimension((int) (resolutionHeight * paper.getWidth() / paper.getHeight()), resolutionHeight);
+				final Dimension newSize = new Dimension((int) (resolutionHeight * paper.getWidth()), (int) (resolutionHeight * paper.getHeight()));
 				canvas.setSize(newSize);
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
-				print(0, printExporter);
+				print(0, printout);
 				return null;
 			}
 		});

@@ -890,7 +890,21 @@ Version 0.5 - October 20, 2011
 
 - queue the code of newFile and open in order to avoid exceptions
 
+- increase print resolution to 2X as much as the paper point size
+- improve resolution algorithm to allocate enough memory
+- improve resolution algorithm to fix problem with shifted printout in certain resolution
+
+- fix problem with upside-down top view
+- zoom all in top view mode
+- disable double-click in top view
+- fix problem with mouse disabled in top view
+- add left and right mousebuttonEnabled to CameraController
+
+-*add feature for planting trees
+
+
 - *fix problem with disconnected walls after deleter followed by undo
+- *fix problem of window drawn in front of wall due to not redrawing after wall thickness direction changes
 
 - *auto redraw gable wall when inserting gable or editing gable
 - *fix problem with resize tool

@@ -569,7 +569,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										selectedHousePart = pick.getHousePart();
 									System.out.print("Clicked on: " + pick);
 									if (pick != null && pick.isEditPoint())
-										cameraControl.setMouseLeftButtonAction(ButtonAction.NONE);
+//										cameraControl.setMouseLeftButtonAction(ButtonAction.NONE);
+										cameraControl.setLeftMouseButtonEnabled(false);
 
 									if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
 										previousSelectedHousePart.setEditPointsVisible(false);
@@ -640,8 +641,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										editHousePartCommand = null;
 									}
 								}
-								if (!zoomLock)
-									cameraControl.setMouseLeftButtonAction(ButtonAction.ROTATE);
+								if (!zoomLock) // && viewMode == ViewMode.NORMAL)
+//									cameraControl.setMouseLeftButtonAction(ButtonAction.ROTATE);
+									cameraControl.setLeftMouseButtonEnabled(true);
 							} else {
 								if (!selectedHousePart.isDrawCompleted()) {
 									selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
@@ -672,7 +674,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								}
 								if (!operationFlag) {
 									MainPanel.getInstance().deselect();
-									cameraControl.setMouseLeftButtonAction(ButtonAction.ROTATE);
+//									cameraControl.setMouseLeftButtonAction(ButtonAction.ROTATE);
+									cameraControl.setLeftMouseButtonEnabled(true);
 								}
 							}
 							// if (HousePart.getGridsHighlightedHousePart() != null) {
@@ -700,7 +703,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (inputStates.getCurrent().getMouseState().getClickCount(MouseButton.LEFT) == 2) {
+				if (!isTopView() && inputStates.getCurrent().getMouseState().getClickCount(MouseButton.LEFT) == 2) {
 					final PickedHousePart pickedHousePart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), root);
 					final Vector3 clickedPoint = pickedHousePart.getPoint();
 					cameraControl.zoomAtPoint(clickedPoint);
@@ -895,9 +898,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
 			cameraControl.setMoveSpeed(5 * MOVE_SPEED);
 			loc = new Vector3(0, 0, 10);
-			up = new Vector3(0.0f, -1.0f, 0.0f);
+//			up = new Vector3(0.0f, -1.0f, 0.0f);
+			up = new Vector3(0.0f, 1.0f, 0.0f);
 			lookAt = new Vector3(0.0f, 0.0f, -1.0f);
-			resizeCamera(2);
+			resizeCamera(Util.findBoundLength(Scene.getRoot().getWorldBound()));
 		} else if (viewMode == ViewMode.PRINT) {
 			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Parallel);
@@ -996,7 +1000,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		selectedHousePart = newHousePart();
 		if (selectedHousePart != null)
-			cameraControl.setMouseLeftButtonAction(ButtonAction.NONE);
+//			cameraControl.setMouseLeftButtonAction(ButtonAction.NONE);
+			cameraControl.setLeftMouseButtonEnabled(false);
 		// enableDisableRotationControl();
 	}
 

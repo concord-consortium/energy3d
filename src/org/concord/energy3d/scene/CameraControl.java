@@ -51,6 +51,8 @@ public abstract class CameraControl {
 	private double animationTime = -1;
 	private ReadOnlyVector3 orgCameraLocation;
 	private ReadOnlyVector3 newCameraLocation;
+	private boolean leftMouseButtonEnabled = true;
+	private boolean rightMouseButtonEnabled = true;
 
     public CameraControl(final ReadOnlyVector3 upAxis) {
         _upAxis.set(upAxis);
@@ -141,8 +143,8 @@ public abstract class CameraControl {
                 final MouseState mouse = inputStates.getCurrent().getMouseState();
                 if (mouse.getDx() != 0 || mouse.getDy() != 0) {
                     if (!firstPing) {
-                    	final boolean left = mouse.getButtonState(MouseButton.LEFT) == ButtonState.DOWN;
-                    	final boolean right = mouse.getButtonState(MouseButton.RIGHT) == ButtonState.DOWN;
+                    	final boolean left =  leftMouseButtonEnabled && mouse.getButtonState(MouseButton.LEFT) == ButtonState.DOWN;
+                    	final boolean right = rightMouseButtonEnabled && mouse.getButtonState(MouseButton.RIGHT) == ButtonState.DOWN;
                     	final boolean middle = mouse.getButtonState(MouseButton.MIDDLE) == ButtonState.DOWN;
 						if (left && leftButtonAction == ButtonAction.MOVE || right && rightButtonAction == ButtonAction.MOVE) {
 							final double fac = Camera.getCurrentCamera().getLocation().length() * 150;
@@ -254,13 +256,14 @@ public abstract class CameraControl {
 		this.rightButtonAction = rightButtonAction;
 	}
 
-	public void setMouseLeftButtonAction(final ButtonAction leftButtonAction) {
-		this.leftButtonAction = leftButtonAction;
-	}
-
-	public void setMouseRightButtonAction(final ButtonAction rightButtonAction) {
-		this.rightButtonAction = rightButtonAction;
-	}
+//	public void setMouseLeftButtonAction(final ButtonAction leftButtonAction) {
+//		this.leftButtonAction = leftButtonAction;
+//	}
+//
+//	public void setMouseRightButtonAction(final ButtonAction rightButtonAction) {
+//		this.rightButtonAction = rightButtonAction;
+//	}
+		
 	
 	public void setMouseEnabled(boolean enabled) {		
 		this.mouseEnabled  = enabled;
@@ -340,5 +343,29 @@ public abstract class CameraControl {
 		SceneManager.getInstance().getCameraNode().updateFromCamera();
 		if (t > animationDuration)
 			animationTime = -1;
+	}
+
+	public ButtonAction getRightButtonAction() {
+		return rightButtonAction;
+	}
+
+	public void setRightButtonAction(ButtonAction rightButtonAction) {
+		this.rightButtonAction = rightButtonAction;
+	}
+
+	public boolean isLeftMouseButtonEnabled() {
+		return leftMouseButtonEnabled;
+	}
+
+	public void setLeftMouseButtonEnabled(boolean leftMouseButtonEnabled) {
+		this.leftMouseButtonEnabled = leftMouseButtonEnabled;
+	}
+
+	public boolean isRightMouseButtonEnabled() {
+		return rightMouseButtonEnabled;
+	}
+
+	public void setRightMouseButtonEnabled(boolean rightMouseButtonEnabled) {
+		this.rightMouseButtonEnabled = rightMouseButtonEnabled;
 	}
 }
