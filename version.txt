@@ -898,6 +898,7 @@ Version 0.5 - October 20, 2011
 - add left and right mousebuttonEnabled to CameraController
 
 - fix exception when moving center point of roofs in top view
+- disable dynamic edit point size change based on camera size to fix issues with top view
 - fix problem with opening the initial file twice
 - bring print preview model to center based on bounds center
 
