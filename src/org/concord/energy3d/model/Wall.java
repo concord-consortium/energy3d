@@ -279,7 +279,7 @@ public class Wall extends HousePart {
 	}
 
 	private boolean snapFoundation(final Vector3 current) {
-		if (container == null)
+		if (!isSnapToObjects() || container == null)
 			return false;
 		ReadOnlyVector3 snapPoint = null;
 		double snapDistance = Double.MAX_VALUE;

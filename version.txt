@@ -907,7 +907,10 @@ Version 0.5 - October 20, 2011
 - version 0.5.5
 - fix problem with window location annotation adding the height of platform
 - fix problem with clicking on print preview while print preview is animating off. This would cause extra house parts to remain on the scene
- 
+
+- allow turning platform snap off
+- unfocus toolbar buttons after a click
+- *platform annotation disappears when changing paltform dimension 
 
 
 

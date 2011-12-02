@@ -972,7 +972,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		SceneManager.getInstance().update();
 	}
 
-	public void setOperation(Operation operation) {
+	public void setOperation(final Operation operation) {
 		this.operationStick = false;
 		this.operation = operation;
 		this.operationFlag = true;

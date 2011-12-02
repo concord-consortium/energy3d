@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.ButtonGroup;
+import javax.swing.FocusManager;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -114,7 +115,7 @@ public class MainPanel extends JPanel {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
 			final boolean showEditTools = !Config.isHeliodonMode();
-			if (showEditTools) {
+//			if (showEditTools) {
 				appToolbar.add(getSelectButton());
 				appToolbar.add(getResizeButton());
 				appToolbar.add(getZoomButton());
@@ -129,26 +130,26 @@ public class MainPanel extends JPanel {
 				appToolbar.add(getRoofGableButton());
 				appToolbar.add(getFloorButton());
 				appToolbar.addSeparator();
-			}
+//			}
 			appToolbar.add(getLightButton());
 			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimButton());
 			appToolbar.add(getCalendarPanel());
-			if (showEditTools) {
+//			if (showEditTools) {
 				appToolbar.addSeparator();
 				appToolbar.add(getRotAnimButton());
 				appToolbar.add(getTopViewButton());
 				appToolbar.add(getGridButton());
 				appToolbar.add(getSnapButton());
 				appToolbar.addSeparator();
-			} else
-				appToolbar.add(getRotAnimButton());
+//			} else
+//				appToolbar.add(getRotAnimButton());
 
 			appToolbar.add(getAnnotationToggleButton());
-			if (showEditTools)
+//			if (showEditTools)
 				appToolbar.add(getPreviewButton());
 
-			if (showEditTools) {
+//			if (showEditTools) {
 				final ButtonGroup bg = new ButtonGroup();
 				bg.add(selectButton);
 				bg.add(resizeButton);
@@ -162,7 +163,7 @@ public class MainPanel extends JPanel {
 				bg.add(roofCustomButton);
 				bg.add(floorButton);
 				bg.add(roofGableButton);
-			}
+//			}
 		}
 		return appToolbar;
 	}
@@ -187,6 +188,7 @@ public class MainPanel extends JPanel {
 			selectButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -206,6 +208,7 @@ public class MainPanel extends JPanel {
 			wallButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			wallButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -236,6 +239,7 @@ public class MainPanel extends JPanel {
 			doorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			doorButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -265,6 +269,7 @@ public class MainPanel extends JPanel {
 			roofButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			roofButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -294,6 +299,7 @@ public class MainPanel extends JPanel {
 			windowButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			windowButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -323,6 +329,7 @@ public class MainPanel extends JPanel {
 			platformButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			platformButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -367,6 +374,7 @@ public class MainPanel extends JPanel {
 					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
 					calendarPanel.setVisible(showSunTools);
 					sunAnimButton.setEnabled(showSunTools);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -393,6 +401,7 @@ public class MainPanel extends JPanel {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().resetCamera(topViewButton.isSelected() ? ViewMode.TOP_VIEW : ViewMode.NORMAL);
 					SceneManager.getInstance().update();
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -418,6 +427,7 @@ public class MainPanel extends JPanel {
 			rotAnimButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().toggleRotation();
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -444,6 +454,7 @@ public class MainPanel extends JPanel {
 			gridButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					HousePart.setSnapToGrids(gridButton.isSelected());
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -470,6 +481,7 @@ public class MainPanel extends JPanel {
 			snapButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					HousePart.setSnapToObjects(snapButton.isSelected());
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -489,6 +501,7 @@ public class MainPanel extends JPanel {
 			floorButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			floorButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -518,6 +531,7 @@ public class MainPanel extends JPanel {
 			roofHipButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			roofHipButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -553,6 +567,7 @@ public class MainPanel extends JPanel {
 			resizeButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(Operation.RESIZE);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -581,6 +596,7 @@ public class MainPanel extends JPanel {
 					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
 					calendarPanel.setVisible(showSunTools);
 					sunAnimButton.setEnabled(showSunTools);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -607,6 +623,7 @@ public class MainPanel extends JPanel {
 			sunAnimButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setSunAnim(sunAnimButton.isSelected());
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -636,6 +653,7 @@ public class MainPanel extends JPanel {
 						mainFrame.getPreviewMenuItem().setSelected(previewButton.isSelected());
 					deselect();
 					PrintController.getInstance().setPrintPreview(previewButton.isSelected());
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -820,6 +838,7 @@ public class MainPanel extends JPanel {
 			roofCustomButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_CUSTOM);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			roofCustomButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -857,6 +876,7 @@ public class MainPanel extends JPanel {
 			annotationToggleButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -883,6 +903,7 @@ public class MainPanel extends JPanel {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 					SceneManager.getInstance().setZoomLock(zoomButton.isSelected());
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 		}
@@ -902,6 +923,7 @@ public class MainPanel extends JPanel {
 			roofGableButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(Operation.DRAW_ROOF_GABLE);
+					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			roofGableButton.addMouseListener(new java.awt.event.MouseAdapter() {
