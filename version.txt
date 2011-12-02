@@ -902,6 +902,13 @@ Version 0.5 - October 20, 2011
 - fix problem with opening the initial file twice
 - bring print preview model to center based on bounds center
 
+- draw rectangular annoations when there is a maximum of 0.5cm difference in wall top variation
+- draw the size annoations for sharp corner edges on the correct size by using the x,y center of the angle vectors plus the z of the wall center
+- version 0.5.5
+- fix problem with window location annotation adding the height of platform
+- fix problem with clicking on print preview while print preview is animating off. This would cause extra house parts to remain on the scene
+ 
+
 
 
 -*add feature for planting trees

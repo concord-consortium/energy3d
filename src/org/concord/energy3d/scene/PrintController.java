@@ -14,6 +14,7 @@ import java.util.concurrent.Callable;
 import javax.swing.SwingUtilities;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
@@ -152,7 +153,7 @@ public class PrintController implements Updater {
 				SceneManager.getInstance().updatePrintPreviewScene(false);
 //				Scene.getInstance().updateTextSizes();
 				if (!doTheEndAnimation) // to avoid concurrency exception
-					finished = true;
+					setFinished(true);				
 			}
 
 			if (isPrintPreview || doTheEndAnimation) {
@@ -170,7 +171,7 @@ public class PrintController implements Updater {
 					else
 						part.hideLabels();
 				}
-				finished = true;
+				setFinished(true);
 			}
 		}
 	}
@@ -328,8 +329,10 @@ public class PrintController implements Updater {
 	public void setPrintPreview(final boolean printPreview) {
 		if (printPreview == isPrintPreview)
 			return;
+//		while(!isFinished())
+//			Thread.yield();
 		init = true;
-		finished = false;
+		setFinished(false);
 		isPrintPreview = printPreview;
 		if (printPreview) {
 			shadingSelected = SceneManager.getInstance().isShadingEnabled();
@@ -355,6 +358,12 @@ public class PrintController implements Updater {
 
 	public ArrayList<HousePart> getPrintParts() {
 		return printParts;
+	}
+
+	private void setFinished(final boolean finished) {
+		this.finished = finished;
+		MainPanel.getInstance().getPreviewButton().setEnabled(finished);
+		MainFrame.getInstance().getPreviewMenuItem().setEnabled(finished);		
 	}
 
 	public boolean isFinished() {
