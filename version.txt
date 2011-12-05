@@ -913,6 +913,7 @@ Version 0.5 - October 20, 2011
 
 - platform annotation disappears when changing paltform dimension 
 
+- if the moving edit point of a wall is snapped to a new wall then use the angle with the new wall to determine the thickness direction of this wall
 
 
 -*add feature for planting trees

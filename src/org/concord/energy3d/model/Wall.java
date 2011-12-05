@@ -630,7 +630,25 @@ public class Wall extends HousePart {
 		cull(true);
 		final Vector3 n = computeNormal();
 		final Snap neighbor;
-		neighbor = neighbors[editPointIndex == 0 || editPointIndex == 1 ? 1 : 0];
+		
+		final int whichNeighbor;		
+		if (editPointIndex == 0 || editPointIndex == 1) {
+			/* if edit point has snapped to a new wall then use the angle with new wall to determine inside direction of this wall otherwise use the angle with the other wall attached to none moving corner of the this wall */
+			if (neighbors[0] == null)
+				whichNeighbor = 1;
+			else
+				whichNeighbor = 0;
+		} else {
+			if (neighbors[1] == null)
+				whichNeighbor = 0;
+			else
+				whichNeighbor = 1;			
+		}
+		neighbor = neighbors[whichNeighbor];
+		
+//		neighbor = neighbors[editPointIndex == 0 || editPointIndex == 1 ? 1 : 0];
+		
+		
 		// if (neighbor != null && neighbor.getNeighborOf(this).getAbsPoints().size() >= 4) {
 		if (neighbor != null && neighbor.getNeighborOf(this).getPoints().size() >= 4) {
 			final Wall other = neighbor.getNeighborOf(this);
