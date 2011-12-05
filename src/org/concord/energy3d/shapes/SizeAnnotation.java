@@ -11,6 +11,10 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.CullState;
+import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -88,7 +92,9 @@ public class SizeAnnotation extends Annotation {
 		label.setTranslation(middle);
 		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 100) / 100.0 + Scene.getInstance().getUnit().getNotation());
 		label.setAlign(align);
-		label.updateWorldBound(false);			
+		label.updateWorldTransform(true);
+		label.updateWorldBound(true);
+//		label.getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);
 		
 		
 		vertexBuffer.put(newFrom.getXf()).put(newFrom.getYf()).put(newFrom.getZf());

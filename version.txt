@@ -910,9 +910,8 @@ Version 0.5 - October 20, 2011
 
 - shift angle text toward outside to make it appear more in center
 - make annotation lines thicker (2 pixels) in print preview mode
- 
 
-- *platform annotation disappears when changing paltform dimension 
+- platform annotation disappears when changing paltform dimension 
 
 
 

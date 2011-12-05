@@ -384,19 +384,20 @@ public class Foundation extends HousePart {
 		int[] order = { 0, 1, 3, 2, 0 };
 		int annotCounter = 0;
 		for (int i = 0; i < order.length - 1; i++, annotCounter++) {
-			final SizeAnnotation annot;
-			if (annotCounter < sizeAnnotRoot.getChildren().size())
-				annot = (SizeAnnotation) sizeAnnotRoot.getChild(annotCounter);
-			else {
-				annot = new SizeAnnotation();
-				sizeAnnotRoot.attachChild(annot);
-			}
+//			final SizeAnnotation annot;
+//			if (annotCounter < sizeAnnotRoot.getChildren().size())
+//				annot = (SizeAnnotation) sizeAnnotRoot.getChild(annotCounter);
+//			else {
+//				annot = new SizeAnnotation();
+//				sizeAnnotRoot.attachChild(annot);
+//			}
+			final SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), getCenter(), getFaceDirection(), false, Align.Center, true, true, false);
 			annot.setLineWidth(original == null ? 1f : 2f);
 		}
 
-		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
-			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
+//		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
+//			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 	}
 
 //	@Override
