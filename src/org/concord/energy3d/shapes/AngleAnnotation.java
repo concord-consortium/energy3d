@@ -29,6 +29,7 @@ public class AngleAnnotation extends Annotation {
 		draw();
 	}
 	
+	@Override
 	public void draw() {
 		final ReadOnlyVector3 a = new Vector3().set(p2).subtractLocal(mainPoint).normalizeLocal();
 		final ReadOnlyVector3 b = new Vector3().set(p3).subtractLocal(mainPoint).normalizeLocal();		
@@ -73,7 +74,7 @@ public class AngleAnnotation extends Annotation {
 			final double end360 = start360 + angle360;
 			final Matrix3 rotMatrix = toFlat.multiplyLocal(new Matrix3().fromAngles(-Math.PI / 2.0, 0, -Math.PI / 2.0 + (start360 + end360) / 2.0));
 			label.setRotation(rotMatrix);
-			final Vector3 trans = new Vector3(0, 0, radius / 2.0);
+			final Vector3 trans = new Vector3(0, 0, radius / 1.7);
 			label.setTranslation(rotMatrix.applyPost(trans, trans));
 			this.attachChild(label);
 		}

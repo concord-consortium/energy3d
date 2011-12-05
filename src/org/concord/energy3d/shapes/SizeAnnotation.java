@@ -52,6 +52,7 @@ public class SizeAnnotation extends Annotation {
 		draw();
 	}
 	
+	@Override
 	public void draw() {
 		final double C = 0.1;
 		final Vector3 v = new Vector3();

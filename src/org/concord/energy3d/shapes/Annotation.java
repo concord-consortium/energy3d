@@ -6,14 +6,14 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.AutoScale;
 
 public abstract class Annotation extends Node {
 	private static double fontSize = 0.1; 
-	protected final Mesh mesh;
+	protected final Line mesh;
 	protected final BMText label = makeNewLabel();
 	
 	public static void setFontSize(double fontSize) {
@@ -31,11 +31,11 @@ public abstract class Annotation extends Node {
 		return label;
 	}
 	
-	public Annotation(final Mesh mesh) {
+	public Annotation(final Line mesh) {
 		super();
-		this.mesh = mesh;
+		mesh.setDefaultColor(ColorRGBA.BLACK);		
 		mesh.setModelBound(new BoundingBox());
-		mesh.setDefaultColor(ColorRGBA.BLACK);
+		this.mesh = mesh;
 		Util.disablePickShadowLight(mesh);
 		Util.disablePickShadowLight(label);
 		this.attachChild(mesh);
@@ -44,6 +44,10 @@ public abstract class Annotation extends Node {
 	public void setColor(final ReadOnlyColorRGBA color) {
 		mesh.setDefaultColor(color);
 		label.setTextColor(color);
+	}
+	
+	public void setLineWidth(final float lineWidth) {
+		mesh.setLineWidth(lineWidth);
 	}
 	
 	public abstract void draw();

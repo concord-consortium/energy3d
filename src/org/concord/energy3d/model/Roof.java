@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.Util;
@@ -282,13 +283,15 @@ public abstract class Roof extends HousePart {
 					final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
 					final SizeAnnotation sizeAnnot = fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1));
 					sizeAnnot.setRange(p2, p3, center, normal, false, Align.Center, true, true, Scene.isDrawAnnotationsInside());
+					sizeAnnot.setLineWidth(original == null ? 1f : 2f);
 					if (Scene.isDrawAnnotationsInside())
 						sizeAnnot.setColor(ColorRGBA.WHITE);
 					else
 						sizeAnnot.setColor(ColorRGBA.BLACK);
 
 					// Angle annotations
-					fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2)).setRange(p2, p1, p3, normal);
+					final AngleAnnotation angleAnnot = fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2));
+					angleAnnot.setRange(p2, p1, p3, normal);
 				}
 			}
 		}

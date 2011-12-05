@@ -7,6 +7,8 @@ import java.util.List;
 import org.concord.energy3d.exception.InvisibleException;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.shapes.AngleAnnotation;
+import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
@@ -911,10 +913,11 @@ public class Wall extends HousePart {
 					hi = wallPolygonPoints.get(i).getZ();
 			}
 	
+			final float lineWidth = original == null ? 1f : 2f;;
 			final boolean isRectangular = hi - low < 0.5;
 
-			if (isRectangular) {
-				final ReadOnlyVector3 p1 = wallPolygonPoints.get(0).multiply(new Vector3(1, 1, 0), null).addLocal(0, 0, lowestWallZ);				final ReadOnlyVector3 p2 = wallPolygonPoints.get(1);
+			if (isRectangular) {				final ReadOnlyVector3 p1 = wallPolygonPoints.get(0).multiply(new Vector3(1, 1, 0), null).addLocal(0, 0, lowestWallZ);
+				final ReadOnlyVector3 p2 = wallPolygonPoints.get(1);
 				final ReadOnlyVector3 p3 = wallPolygonPoints.get(2);
 //				final ReadOnlyVector3 p4 = wallPolygonPoints.get(3);
 				final ReadOnlyVector3 p4 = wallPolygonPoints.get(3).multiply(new Vector3(1, 1, 0), null).addLocal(0, 0, lowestWallZ);
@@ -926,10 +929,16 @@ public class Wall extends HousePart {
 				fetchSizeAnnot(annotCounter++).setRange(p3, p4, getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, reverse, Scene.isDrawAnnotationsInside());
 				fetchSizeAnnot(annotCounter++).setRange(p4, p1, getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, reverse, Scene.isDrawAnnotationsInside());
 				
+				for (int i = 0; i < annotCounter ; i++)
+					fetchSizeAnnot(i).setLineWidth(lineWidth);
+				
 				fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p1, p3, getFaceDirection());
 				fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p2, p4, getFaceDirection());
 				fetchAngleAnnot(angleAnnotCounter++).setRange(p4, p3, p1, getFaceDirection());
 				fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p4, p2, getFaceDirection());
+				
+				for (int i = 0; i < annotCounter ; i++)
+					fetchAngleAnnot(i).setLineWidth(lineWidth);				
 				
 			} else
 				for (int i = 0; i < wallPolygonPoints.size(); i++) {
@@ -945,11 +954,16 @@ public class Wall extends HousePart {
 						final ReadOnlyVector3 min = new Vector3(Math.min(p1.getX(), Math.min(p2.getX(), p3.getX())), Math.min(p1.getY(), Math.min(p2.getY(), p3.getY())), 0);
 						final ReadOnlyVector3 max = new Vector3(Math.max(p1.getX(), Math.max(p2.getX(), p3.getX())), Math.max(p1.getY(), Math.max(p2.getY(), p3.getY())), 0);
 						final ReadOnlyVector3 center = min.add(max, null).divideLocal(2.0).addLocal(0, 0, getCenter().getZ());
-						fetchSizeAnnot(annotCounter++).setRange(p1, p2, center, faceDirection, front, front ? Align.South : Align.Center, true, reverse, Scene.isDrawAnnotationsInside());
+						final SizeAnnotation sizeAnnot = fetchSizeAnnot(annotCounter++);
+						sizeAnnot.setRange(p1, p2, center, faceDirection, front, front ? Align.South : Align.Center, true, reverse, Scene.isDrawAnnotationsInside());
+						sizeAnnot.setLineWidth(lineWidth);
 					}
 					// if (to.distance(from) > 0.1 && to.distance(afterTo) > 0.1)
-					if (p1.distance(p2) > minLength && p2.distance(p3) > minLength)
-						fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p1, p3, getFaceDirection());
+					if (p1.distance(p2) > minLength && p2.distance(p3) > minLength) {
+						final AngleAnnotation angleAnnot = fetchAngleAnnot(angleAnnotCounter++);
+						angleAnnot.setRange(p2, p1, p3, getFaceDirection());
+						angleAnnot.setLineWidth(lineWidth);
+					}
 				}
 		}
 	}

@@ -239,12 +239,17 @@ public class Window extends HousePart {
 		final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getFaceDirection(), null);
 		label1.setTranslation(getAbsPoint(i0));
 		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
-		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
+		
 		final Vector3 center = trans.applyForward(getCenter(), null);
+		final float lineWidth = original == null ? 1f : 2f;;
+		
+		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);		
 		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, true, false);
+		annot.setLineWidth(lineWidth);
 
 		annot = fetchSizeAnnot(annotCounter++);
 		annot.setRange(getAbsPoint(i0), getAbsPoint(i2), center, faceDirection, false, Align.Center, true, false, false);
+		annot.setLineWidth(lineWidth);
 	}
 
 	public boolean isPrintable() {

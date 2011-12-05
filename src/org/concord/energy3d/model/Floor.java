@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
@@ -143,7 +144,9 @@ public class Floor extends HousePart {
 			Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
 			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
 			Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
-			fetchSizeAnnot(annotCounter++).setRange(a, b, getCenter(), getFaceDirection(), original == null, Align.Center, true, false, Scene.isDrawAnnotationsInside());
+			final SizeAnnotation sizeAnnot = fetchSizeAnnot(annotCounter++);
+			sizeAnnot.setRange(a, b, getCenter(), getFaceDirection(), original == null, Align.Center, true, false, Scene.isDrawAnnotationsInside());
+			sizeAnnot.setLineWidth(original == null ? 1f : 2f);
 		}
 	}
 
