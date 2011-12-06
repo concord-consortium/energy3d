@@ -612,6 +612,10 @@ public class Wall extends HousePart {
 
 		final boolean reverse = angle360 >= Math.PI;
 		final double length = wallThickness * Math.tan((Math.PI - angle) / 2) * (reverse ? -1 : 1);
+		
+		System.out.println(length);
+		System.out.println(Math.tan((Math.PI - angle) / 2));
+		System.out.println(wallThickness);
 
 		final Vector3 v = wallDir.normalize(null).multiplyLocal(length);
 

@@ -907,13 +907,20 @@ Version 0.5 - October 20, 2011
 - fix problem with clicking on print preview while print preview is animating off. This would cause extra house parts to remain on the scene
 - allow turning platform snap off
 - unfocus toolbar buttons after a click
-
 - shift angle text toward outside to make it appear more in center
 - make annotation lines thicker (2 pixels) in print preview mode
-
 - platform annotation disappears when changing paltform dimension 
-
 - if the moving edit point of a wall is snapped to a new wall then use the angle with the new wall to determine the thickness direction of this wall
+
+- allow rotation around an exact point by determining the distance from first clicked point to camera when starting to Orbit object
+
+
+
+
+- *fix problem with inside of wall not extended all the way sometimes when angle is more than 180 degrees - no need to fix, it's due to different values in thicknessNormal and wallThickness
+
+
+- *close interior of walls when in -90 degrees
 
 
 -*add feature for planting trees

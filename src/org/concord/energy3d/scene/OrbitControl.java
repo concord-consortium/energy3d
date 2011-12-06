@@ -10,13 +10,30 @@
 
 package org.concord.energy3d.scene;
 
+import org.concord.energy3d.model.PickedHousePart;
+import org.concord.energy3d.model.UserData;
+import org.concord.energy3d.util.SelectUtil;
+
+import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyboardState;
+import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.logical.InputTrigger;
+import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.MouseButtonPressedCondition;
+import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Ray3;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.scenegraph.Spatial;
 
 public class OrbitControl extends CameraControl {
 	private static final double FRONT_DISTANCE_DEFAULT = 8;
@@ -24,9 +41,11 @@ public class OrbitControl extends CameraControl {
 	private final Matrix3 _workerMatrix_2 = new Matrix3();
 	private final Vector4 _workerVector4 = new Vector4();
 	private Vector3 _center = new Vector3(1, 0, 1);
+	private final Spatial root;
 
-	public OrbitControl(final ReadOnlyVector3 upAxis) {
+	public OrbitControl(final ReadOnlyVector3 upAxis, final Spatial root) {
 		super(upAxis);
+		this.root = root;
 	}
 
 	protected void move(final Camera camera, final KeyboardState kb, final double tpf) {
@@ -128,5 +147,36 @@ public class OrbitControl extends CameraControl {
 	public void zoomAtPoint(ReadOnlyVector3 clickedPoint) {
 		super.zoomAtPoint(clickedPoint);
 		this._center.set(clickedPoint);
+	}
+	
+	@Override
+	public void setupMouseTriggers(final LogicalLayer logicalLayer, final boolean dragOnly) {
+		super.setupMouseTriggers(logicalLayer, dragOnly);
+
+		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY()), false, null);
+				final PickResults pickResults = new PrimitivePickResults();
+				PickingUtil.findPick(Scene.getRoot(), pickRay, pickResults, false);
+				
+				for (int i = 0; i < pickResults.getNumber(); i++) {
+					final int closestIntersection = pickResults.getPickData(i).getIntersectionRecord().getClosestIntersection();
+					if (closestIntersection != -1) {
+						final Vector3 point = pickResults.getPickData(i).getIntersectionRecord().getIntersectionPoint(closestIntersection);
+						frontDistance = point.subtractLocal(source.getCanvasRenderer().getCamera().getLocation()).length();
+						clearOrbitCenter();
+						return;
+					}
+				}
+				
+				
+//				final PickedHousePart pickPart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), Scene.getRoot());
+//				if (pickPart != null) {
+//					final Vector3 point = pickPart.getPoint();
+//					frontDistance = point.subtractLocal(source.getCanvasRenderer().getCamera().getLocation()).length();
+//					clearOrbitCenter();
+//				}
+			}
+		}));
 	}
 }

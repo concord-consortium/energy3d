@@ -128,7 +128,7 @@ public abstract class CameraControl {
     }
 
     public void setupMouseTriggers(final LogicalLayer layer, final boolean dragOnly) {
-        final CameraControl control = this;
+//        final CameraControl control = this;
         // Mouse look
         final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(), Predicates
                 .or(TriggerConditions.rightButtonDown(), TriggerConditions.middleButtonDown()));
@@ -150,10 +150,10 @@ public abstract class CameraControl {
 							final double fac = Camera.getCurrentCamera().getLocation().length() * 150;
                     		final double dx = -mouse.getDx() * fac / Camera.getCurrentCamera().getWidth();
 							final double dy = -mouse.getDy() * fac / Camera.getCurrentCamera().getHeight() / 4.0;
-							control.move(source.getCanvasRenderer().getCamera(), dx, dy);
+							move(source.getCanvasRenderer().getCamera(), dx, dy);
                     		SceneManager.getInstance().getCameraNode().updateFromCamera();
 						} else if (left && leftButtonAction == ButtonAction.ROTATE || right && rightButtonAction == ButtonAction.ROTATE) {
-                    		control.rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
+                    		rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
                     		SceneManager.getInstance().getCameraNode().updateFromCamera();
 						} else if (middle || left && leftButtonAction == ButtonAction.ZOOM || right && rightButtonAction == ButtonAction.ZOOM) {
 							int dy = inputStates.getCurrent().getMouseState().getDy();

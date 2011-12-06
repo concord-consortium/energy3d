@@ -859,7 +859,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			cameraControl.removeTriggers(logicalLayer);
 
 		if (type == CameraMode.ORBIT)
-			cameraControl = new OrbitControl(Vector3.UNIT_Z);
+			cameraControl = new OrbitControl(Vector3.UNIT_Z, root);
 		else if (type == CameraMode.FIRST_PERSON)
 			cameraControl = new FirstPersonControl(Vector3.UNIT_Z);
 		cameraControl.setupKeyboardTriggers(logicalLayer);
