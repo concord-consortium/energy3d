@@ -914,8 +914,10 @@ Version 0.5 - October 20, 2011
 
 - allow rotation around an exact point by determining the distance from first clicked point to camera when starting to Orbit object
 
+- remove Ctrl+click functionality assigned to zooming due to its reserved meaning in Mac OS X
+- fix problem with roof exception due to null gable wall by ignoring null walls  
 
-
+- *fix problem with right mouse drag not working in mouse os X using Ctrl+click by removing Ctrl+click functionality assigned to zooming
 
 - *fix problem with inside of wall not extended all the way sometimes when angle is more than 180 degrees - no need to fix, it's due to different values in thicknessNormal and wallThickness
 

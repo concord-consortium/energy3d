@@ -188,19 +188,19 @@ public abstract class CameraControl {
 			}
 		}));
 		
-		final KeyHeldCondition cond1 = new KeyHeldCondition(Key.LCONTROL);
-		final MouseMovedCondition cond2 = new MouseMovedCondition();
-		final Predicate<TwoInputStates> condition = Predicates.and(cond1, Predicates.and(cond2, someMouseDown));
-		layer.registerTrigger(new InputTrigger(condition, new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				int dy = inputStates.getCurrent().getMouseState().getDy();
-				if (dy < -4)
-					dy = -4;
-				if (dy > 4)
-					dy = 4;
-				zoom(source, tpf, -dy / 1.0);
-			}
-		}));	        
+//		final KeyHeldCondition cond1 = new KeyHeldCondition(Key.LCONTROL);
+//		final MouseMovedCondition cond2 = new MouseMovedCondition();
+//		final Predicate<TwoInputStates> condition = Predicates.and(cond1, Predicates.and(cond2, someMouseDown));
+//		layer.registerTrigger(new InputTrigger(condition, new TriggerAction() {
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				int dy = inputStates.getCurrent().getMouseState().getDy();
+//				if (dy < -4)
+//					dy = -4;
+//				if (dy > 4)
+//					dy = 4;
+//				zoom(source, tpf, -dy / 1.0);
+//			}
+//		}));	        
     }
 
     public Predicate<TwoInputStates> setupKeyboardTriggers(final LogicalLayer layer) {

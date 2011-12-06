@@ -528,6 +528,8 @@ public abstract class Roof extends HousePart {
 //		}
 		
 		for (final Wall wall : gableWalls) {
+			if (wall == null)
+				continue;
 			final Vector3[] base_i = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
 			for (final Spatial roofPart : getRoofPartsRoot().getChildren()) {
 				final ReadOnlyVector3[] base = findBasePoints((Mesh) ((Node) roofPart).getChild(0), null);
