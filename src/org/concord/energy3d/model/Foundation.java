@@ -46,6 +46,9 @@ public class Foundation extends HousePart {
 		points.get(2).set(xLength / 2.0, -yLength / 2.0, 0);
 		points.get(1).set(-xLength / 2.0, yLength / 2.0, 0);
 		points.get(3).set(xLength / 2.0, yLength / 2.0, 0);
+		
+		for (int i = 0; i < 4; i++)
+			points.get(4 + i).set(points.get(i)).setZ(newBoundingHeight + height);		
 	}
 
 	

@@ -114,7 +114,7 @@ public class Wall extends HousePart {
 		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(12));
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(12));
 		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
-		surroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+//		surroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		surroundMesh.setModelBound(new BoundingBox());
 		root.attachChild(surroundMesh);
 
@@ -718,6 +718,7 @@ public class Wall extends HousePart {
 
 		vertexBuffer.limit(vertexBuffer.position());
 		normalBuffer.limit(normalBuffer.position());
+		surroundMesh.getMeshData().updateVertexCount();
 	}
 
 	protected void addSurroundQuad(int i1, int i2, ReadOnlyVector3 n, final ReadOnlyVector3 thickness, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {
@@ -931,7 +932,7 @@ public class Wall extends HousePart {
 					hi = wallPolygonPoints.get(i).getZ();
 			}
 	
-			final float lineWidth = original == null ? 1f : 2f;;
+			final float lineWidth = original == null ? 1f : 2f;
 			final boolean isRectangular = hi - low < 0.5;
 
 			if (isRectangular) {				final ReadOnlyVector3 p1 = wallPolygonPoints.get(0).multiply(new Vector3(1, 1, 0), null).addLocal(0, 0, lowestWallZ);

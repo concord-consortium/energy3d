@@ -911,11 +911,13 @@ Version 0.5 - October 20, 2011
 - make annotation lines thicker (2 pixels) in print preview mode
 - platform annotation disappears when changing paltform dimension 
 - if the moving edit point of a wall is snapped to a new wall then use the angle with the new wall to determine the thickness direction of this wall
-
 - allow rotation around an exact point by determining the distance from first clicked point to camera when starting to Orbit object
-
 - remove Ctrl+click functionality assigned to zooming due to its reserved meaning in Mac OS X
-- fix problem with roof exception due to null gable wall by ignoring null walls  
+- fix problem with roof exception due to null gable wall by ignoring null walls
+
+- allow selecting walls by clicking on their surround meshes
+- fix problem with wall snaping to (0,0,0) as if there is a neighboring wall there when there isn't
+
 
 - *fix problem with right mouse drag not working in mouse os X using Ctrl+click by removing Ctrl+click functionality assigned to zooming
 
