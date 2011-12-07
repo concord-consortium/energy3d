@@ -637,7 +637,7 @@ public abstract class HousePart implements Serializable {
 		return annot;
 	}
 
-	private void hideAnnotations() {
+	protected void hideAnnotations() {
 		for (final Spatial annot : sizeAnnotRoot.getChildren())
 			annot.getSceneHints().setCullHint(CullHint.Always);
 		for (final Spatial annot : angleAnnotRoot.getChildren())

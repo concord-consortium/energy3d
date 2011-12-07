@@ -918,6 +918,11 @@ Version 0.5 - October 20, 2011
 - allow selecting walls by clicking on their surround meshes
 - fix problem with wall snaping to (0,0,0) as if there is a neighboring wall there when there isn't
 
+- fix problem with exception when converting hip roof into pyramid roof by removing duplicated steiner points
+- fix problem with roof annotations not hiding when not needed
+
+
+- *fix problem with shed roof becoming none gable on one side when adjusting height
 
 - *fix problem with right mouse drag not working in mouse os X using Ctrl+click by removing Ctrl+click functionality assigned to zooming
 

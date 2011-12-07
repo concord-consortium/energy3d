@@ -44,7 +44,8 @@ public class HipRoof extends Roof {
 		final Vector3 p2 = getAbsPoint(2);
 		PolygonPoint roofUpperPoint2 = new PolygonPoint(p2.getX(), p2.getY(), p2.getZ());
 		polygon.addSteinerPoint(roofUpperPoint1);
-		polygon.addSteinerPoint(roofUpperPoint2);
+		if (!roofUpperPoint2.equals(roofUpperPoint1))
+			polygon.addSteinerPoint(roofUpperPoint2);
 		return polygon;
 	}
 

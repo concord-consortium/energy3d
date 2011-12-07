@@ -45,7 +45,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
-//	protected static final double getGridSize() = 0.5;
+	// protected static final double getGridSize() = 0.5;
 	private static final double OVERHANG_LENGHT = 0.2;
 	protected transient Node roofPartsRoot;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
@@ -104,7 +104,7 @@ public abstract class Roof extends HousePart {
 					wall.draw();
 				}
 			}
-			
+
 			if (container == null) {
 				roofPartsRoot.getSceneHints().setCullHint(CullHint.Always);
 				wireframeMesh.getSceneHints().setCullHint(CullHint.Always);
@@ -260,10 +260,21 @@ public abstract class Roof extends HousePart {
 	}
 
 	@Override
+	protected void hideAnnotations() {
+		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+			for (final Spatial sizeAnnot : ((Node) ((Node) roofPart).getChild(1)).getChildren())
+				sizeAnnot.getSceneHints().setCullHint(CullHint.Always);
+			for (final Spatial sizeAnnot : ((Node) ((Node) roofPart).getChild(2)).getChildren())
+				sizeAnnot.getSceneHints().setCullHint(CullHint.Always);
+		}
+	}
+
+	@Override
 	public void drawAnnotations() {
 		if (container == null)
 			return;
 
+		System.out.println("+_)+)+_)+_)+_)+_)+_)+)+)");
 		for (Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				int annotCounter = 0, angleAnnotCounter = 0;
@@ -291,8 +302,10 @@ public abstract class Roof extends HousePart {
 
 					// Angle annotations
 					final AngleAnnotation angleAnnot = fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2));
+					angleAnnot.setLineWidth(original == null ? 1f : 2f);
 					angleAnnot.setRange(p2, p1, p3, normal);
 				}
+				System.out.println(angleAnnotCounter);
 			}
 		}
 	}
@@ -478,25 +491,25 @@ public abstract class Roof extends HousePart {
 	public ReadOnlyVector3[] findBasePoints(final Mesh mesh, final ArrayList<ReadOnlyVector3> storeUpperPoints) {
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		buf.rewind();
-		
-		final ReadOnlyVector3[] base = {new Vector3(buf.get(), buf.get(), buf.get()), new Vector3(buf.get(), buf.get(), buf.get())};
+
+		final ReadOnlyVector3[] base = { new Vector3(buf.get(), buf.get(), buf.get()), new Vector3(buf.get(), buf.get(), buf.get()) };
 		if (storeUpperPoints != null) {
 			storeUpperPoints.add(base[0]);
 			storeUpperPoints.add(base[1]);
 		}
-		
+
 		while (buf.hasRemaining()) {
 			ReadOnlyVector3 meshPoint = new Vector3(buf.get(), buf.get(), buf.get());
 			if (storeUpperPoints != null)
 				storeUpperPoints.add(meshPoint);
-//			if (meshPoint.getZ() - container.getAbsPoint(1).getZ() < MathUtils.ZERO_TOLERANCE) {
-//				if (base[0] == null)
-//					base[0] = meshPoint;
-//				else if (!meshPoint.equals(base[0])) {
-//					base[1] = meshPoint;
-//				}
-//			} else if (storeUpperPoints != null)
-//				storeUpperPoints.add(meshPoint);
+			// if (meshPoint.getZ() - container.getAbsPoint(1).getZ() < MathUtils.ZERO_TOLERANCE) {
+			// if (base[0] == null)
+			// base[0] = meshPoint;
+			// else if (!meshPoint.equals(base[0])) {
+			// base[1] = meshPoint;
+			// }
+			// } else if (storeUpperPoints != null)
+			// storeUpperPoints.add(meshPoint);
 			if (base[0].getZ() > meshPoint.getZ()) {
 				final ReadOnlyVector3 tmp = base[0];
 				base[0] = meshPoint;
@@ -504,29 +517,29 @@ public abstract class Roof extends HousePart {
 			}
 			if (base[1].getZ() > meshPoint.getZ()) {
 				base[1] = meshPoint;
-			}			
+			}
 		}
-//		if (base[1] == null)
-//			return null;
-//		else
-//			return base;
-		
+		// if (base[1] == null)
+		// return null;
+		// else
+		// return base;
+
 		if (storeUpperPoints != null) {
 			storeUpperPoints.remove(base[0]);
 			storeUpperPoints.remove(base[1]);
 		}
-//			storeUpperPoints.add(meshPoint);
+		// storeUpperPoints.add(meshPoint);
 		return base;
 	}
 
 	private void hideGableRoofParts() {
 		if (gableWalls == null)
 			return;
-//		for (final Spatial roofPart : getRoofPartsRoot().getChildren()) {
-//				roofPart.getSceneHints().setCullHint(CullHint.Inherit);
-//				roofPart.getSceneHints().setPickingHint(PickingHint.Pickable, true);
-//		}
-		
+		// for (final Spatial roofPart : getRoofPartsRoot().getChildren()) {
+		// roofPart.getSceneHints().setCullHint(CullHint.Inherit);
+		// roofPart.getSceneHints().setPickingHint(PickingHint.Pickable, true);
+		// }
+
 		for (final Wall wall : gableWalls) {
 			if (wall == null)
 				continue;
@@ -584,7 +597,7 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	public void delete() {
-		super.delete();		
+		super.delete();
 		for (final Wall wall : walls) {
 			wall.setRoof(null);
 			wall.draw();
@@ -600,7 +613,7 @@ public abstract class Roof extends HousePart {
 		this.roofPartsRoot = ((Roof) original).roofPartsRoot.makeCopy(false);
 		for (int i = 0; i < roofPartsRoot.getNumberOfChildren(); i++) {
 			if (roofPartsRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
-//				((Node) roofPartsRoot.getChild(i)).getChild(1).getSceneHints().setCullHint(CullHint.Always);
+				// ((Node) roofPartsRoot.getChild(i)).getChild(1).getSceneHints().setCullHint(CullHint.Always);
 				final UserData orgUserData = (UserData) ((Node) ((Roof) original).roofPartsRoot.getChild(i)).getChild(0).getUserData();
 				((Node) roofPartsRoot.getChild(i)).getChild(0).setUserData(new UserData(this, orgUserData.getIndex(), false));
 				roofPartsRoot.getChild(i).setUserData(((Roof) original).roofPartsRoot.getChild(i).getUserData());
@@ -684,8 +697,8 @@ public abstract class Roof extends HousePart {
 			buf.put(p.getXf()).put(p.getYf()).put(pMiddle.getZf());
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
-//		gridsMesh.updateModelBound();
-//		gridsMesh.updateWorldBound(false);
+		// gridsMesh.updateModelBound();
+		// gridsMesh.updateWorldBound(false);
 		// gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 	}
 }

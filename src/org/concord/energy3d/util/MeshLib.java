@@ -150,6 +150,13 @@ public class MeshLib {
 			normal.normalizeLocal();
 			node.setUserData(normal);
 
+//			final Vector3 normal = new Vector3();
+//			for (final Vector3 v : group.normals)
+//				normal.addLocal(v);
+//			normal.normalizeLocal();
+//			if (!Vector3.isValid(normal))
+//				continue;
+			
 			FloatBuffer buf = newMesh.getMeshData().getVertexBuffer();
 			int n = group.vertices.size();
 			if (buf == null || buf.capacity() / 3 < n) {
