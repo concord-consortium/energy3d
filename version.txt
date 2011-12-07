@@ -921,6 +921,13 @@ Version 0.5 - October 20, 2011
 - fix problem with exception when converting hip roof into pyramid roof by removing duplicated steiner points
 - fix problem with roof annotations not hiding when not needed
 
+- fix problem with finding basepoints of same value when creating shed roof
+- fix probelm with shed roof throwing exception when it's height is zero
+- fix problem with undo and redo gable points not working well due to orginal points not being cloned properly 
+
+- *fix problem with grid lines in custome roof not drawn in correct position initially
+
+
 
 - *fix problem with shed roof becoming none gable on one side when adjusting height
 

@@ -136,7 +136,7 @@ public abstract class Roof extends HousePart {
 				}
 				roofPartIndex++;
 			}
-			drawWireframe();
+			drawWireframe();;
 			updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 			root.updateGeometricState(0);
 			// drawGrids(getGridSize());
@@ -274,7 +274,6 @@ public abstract class Roof extends HousePart {
 		if (container == null)
 			return;
 
-		System.out.println("+_)+)+_)+_)+_)+_)+_)+)+)");
 		for (Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				int annotCounter = 0, angleAnnotCounter = 0;
@@ -305,7 +304,6 @@ public abstract class Roof extends HousePart {
 					angleAnnot.setLineWidth(original == null ? 1f : 2f);
 					angleAnnot.setRange(p2, p1, p3, normal);
 				}
-				System.out.println(angleAnnotCounter);
 			}
 		}
 	}
@@ -346,7 +344,7 @@ public abstract class Roof extends HousePart {
 				buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 			}
 		}
-		buf.limit(buf.position());
+		buf.limit(buf.position());;
 		wireframeMesh.getMeshData().updateVertexCount();
 	}
 
@@ -446,13 +444,16 @@ public abstract class Roof extends HousePart {
 						nearestEditPointIndex = i;
 					}
 				}
-				if (gableEditPointToWallMap.containsKey(nearestEditPointIndex))
-					gableEditPointToWallMap.get(nearestEditPointIndex).add(wall);
-				else {
-					final ArrayList<Wall> walls = new ArrayList<Wall>(2);
-					walls.add(wall);
-					gableEditPointToWallMap.put(nearestEditPointIndex, walls);
-				}
+				// if (gableEditPointToWallMap.containsKey(nearestEditPointIndex))
+				// gableEditPointToWallMap.get(nearestEditPointIndex).add(wall);
+				// else {
+				// final ArrayList<Wall> walls = new ArrayList<Wall>(2);
+				// walls.add(wall);
+				// gableEditPointToWallMap.put(nearestEditPointIndex, walls);
+				// }
+				if (gableEditPointToWallMap.get(nearestEditPointIndex) == null)
+					gableEditPointToWallMap.put(nearestEditPointIndex, new ArrayList<Wall>(2));
+				gableEditPointToWallMap.get(nearestEditPointIndex).add(wall);
 				editPoints.add(nearestEditPointIndex);
 			}
 			gableRoofPartToEditPointMap.put(roofPartIndex, editPoints);
@@ -492,24 +493,24 @@ public abstract class Roof extends HousePart {
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		buf.rewind();
 
-		final ReadOnlyVector3[] base = { new Vector3(buf.get(), buf.get(), buf.get()), new Vector3(buf.get(), buf.get(), buf.get()) };
+		final ReadOnlyVector3[] base = {new Vector3(buf.get(), buf.get(), buf.get()), new Vector3(buf.get(), buf.get(), buf.get())};
 		if (storeUpperPoints != null) {
 			storeUpperPoints.add(base[0]);
 			storeUpperPoints.add(base[1]);
 		}
 
+		double highestZ = Math.max(base[0].getZ(), base[1].getZ());
 		while (buf.hasRemaining()) {
 			ReadOnlyVector3 meshPoint = new Vector3(buf.get(), buf.get(), buf.get());
+			if (meshPoint.equals(base[0]) || meshPoint.equals(base[1]))
+				continue;
+			
+			if (meshPoint.getZ() > highestZ)
+				highestZ = meshPoint.getZ();
+
 			if (storeUpperPoints != null)
 				storeUpperPoints.add(meshPoint);
-			// if (meshPoint.getZ() - container.getAbsPoint(1).getZ() < MathUtils.ZERO_TOLERANCE) {
-			// if (base[0] == null)
-			// base[0] = meshPoint;
-			// else if (!meshPoint.equals(base[0])) {
-			// base[1] = meshPoint;
-			// }
-			// } else if (storeUpperPoints != null)
-			// storeUpperPoints.add(meshPoint);
+
 			if (base[0].getZ() > meshPoint.getZ()) {
 				final ReadOnlyVector3 tmp = base[0];
 				base[0] = meshPoint;
@@ -519,16 +520,14 @@ public abstract class Roof extends HousePart {
 				base[1] = meshPoint;
 			}
 		}
-		// if (base[1] == null)
-		// return null;
-		// else
-		// return base;
-
+		
+		if (highestZ <= base[0].getZ() && highestZ <= base[0].getZ())
+			return null;
+		
 		if (storeUpperPoints != null) {
 			storeUpperPoints.remove(base[0]);
-			storeUpperPoints.remove(base[1]);
-		}
-		// storeUpperPoints.add(meshPoint);
+			storeUpperPoints.remove(base[1]);			
+		}		
 		return base;
 	}
 

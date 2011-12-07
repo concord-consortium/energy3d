@@ -14,7 +14,7 @@ import com.ardor3d.math.Vector3;
 @SuppressWarnings("serial")
 public class EditHousePartCommand extends AbstractUndoableEdit {
 	private final HousePart housePart;
-	private final ArrayList<Vector3> orgPoints;
+	protected final ArrayList<Vector3> orgPoints;
 	private final double orgHeight;
 	private ArrayList<Vector3> newPoints;
 	private double newHeight;
@@ -32,8 +32,10 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		housePart.setHeight(orgHeight);
-		housePart.getPoints().clear();
-		housePart.getPoints().addAll(orgPoints);
+//		housePart.getPoints().clear();
+//		housePart.getPoints().addAll(orgPoints);
+		for (int i = 0; i < orgPoints.size(); i++)
+			housePart.getPoints().set(i, orgPoints.get(i).clone());
 		Scene.getInstance().redrawAll();
 	}
 	
@@ -41,8 +43,10 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		housePart.setHeight(newHeight);
-		housePart.getPoints().clear();
-		housePart.getPoints().addAll(newPoints);
+//		housePart.getPoints().clear();
+//		housePart.getPoints().addAll(newPoints);
+		for (int i = 0; i < orgPoints.size(); i++)
+			housePart.getPoints().set(i, orgPoints.get(i).clone());		
 		Scene.getInstance().redrawAll();		
 	}
 	
