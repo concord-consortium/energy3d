@@ -45,6 +45,7 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
+import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
@@ -206,19 +207,28 @@ public class Wall extends HousePart {
 			if (container != null)
 				p.setZ(container.height);
 			int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
-			final Vector3 p_snap = new Vector3(p);
-			Snap snap = snap(p_snap, index);
-			if (snap != null && (!isFirstPointInserted() || p_snap.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > MIN_WALL_LENGTH))
-				p.set(p_snap);
-			else
-				snap = null;
+//			final Vector3 p_snap = new Vector3(p);
+//			Snap snap = snapWall(p_snap, index);
+//			if (snap != null && (!isFirstPointInserted() || p_snap.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > MIN_WALL_LENGTH))
+//			final boolean snapWall = snapWall(p_snap, index);
+			boolean snapWall = snapWall(p, index);
+//			if (!snapWall && (!isFirstPointInserted() || p_snap.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > MIN_WALL_LENGTH))			
+//				p.set(p_snap);
+//			else
+//				snap = null;
 
-			if (snap == null) {
-				boolean foundationSnap = snapFoundation(p);
-				if (!foundationSnap)
-					p = grid(p, getGridSize(), false);
+//			if (snap == null) {
+			if (!snapWall) {
+			p = grid(p, getGridSize(), false);
+			snapWall = snapWall(p, index);		// see if it can be snapped after grid move
 			}
-			setNeighbor(index, snap, true);
+			
+			if (!snapWall) {
+				final boolean foundationSnap = snapFoundation(p);
+				if (!foundationSnap) {
+				}
+			}
+//			setNeighbor(index, snap, true);
 			if (index == 2) // make sure z of 2nd base point is same as 2st (needed for platform picking side)
 				p.setZ(points.get(0).getZ());
 			final Vector3 p_rel = toRelative(p);
@@ -228,8 +238,9 @@ public class Wall extends HousePart {
 			int lower = (editPointIndex == 1) ? 0 : 2;
 			Vector3 base = getAbsPoint(lower);
 			Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
-			Snap snap = snap(closestPoint, -1);
-			if (snap == null)
+//			Snap snap = snapWall(closestPoint, -1);
+			final boolean snapWall = snapWall(closestPoint, lower);
+			if (!snapWall)
 				closestPoint = grid(closestPoint, getGridSize());
 			defaultWallHeight = height = Math.max(0.1, closestPoint.getZ() - base.getZ());
 			final double z = height + base.getZ();
@@ -247,9 +258,9 @@ public class Wall extends HousePart {
 			drawNeighborWalls();
 	}
 
-	protected Snap snap(Vector3 p, int index) {
-		if (!isSnapToObjects())
-			return null;
+	protected boolean snapWall(final Vector3 p, final int index) {
+//		if (!isSnapToObjects())
+//			return null;
 		ReadOnlyVector3 closestPoint = null;
 		double closestDistance = Double.MAX_VALUE;
 		Wall closestWall = null;
@@ -272,29 +283,35 @@ public class Wall extends HousePart {
 				}
 			}
 		}
-		if (closestDistance < SNAP_DISTANCE) {
+		if (closestDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize()) && (!isFirstPointInserted() || p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > MIN_WALL_LENGTH)) {
 			p.set(closestPoint);
-			return new Snap(this, closestWall, index, closestPointIndex);
+			setNeighbor(index, new Snap(this, closestWall, index, closestPointIndex), true);
+			return true;
 		} else {
-			return null;
+			setNeighbor(index, null, true);
+			return false;
 		}
 	}
 
 	private boolean snapFoundation(final Vector3 current) {
-		if (!isSnapToObjects() || container == null)
+//		if (!isSnapToObjects() || container == null)
+		if (container == null)
 			return false;
 		ReadOnlyVector3 snapPoint = null;
 		double snapDistance = Double.MAX_VALUE;
-		for (int i = 0; i < container.points.size(); i++) {
-			final ReadOnlyVector3 p = container.getAbsPoint(i);
-
+//		for (int i = 0; i < container.points.size(); i++) {
+		final int[] indices = new int[] {0, 2, 3, 1, 0};
+		for (int i = 0; i < indices.length - 1; i++) {
+//			final ReadOnlyVector3 p = container.getAbsPoint(i);
+			final Vector3 p = Util.getClosetPoint(container.getAbsPoint(indices[i]).addLocal(0, 0, current.getZ()), container.getAbsPoint(indices[i+1]).addLocal(0, 0, current.getZ()), current, true);
 			final double d = p.distance(current);
 			if (d < snapDistance) {
 				snapDistance = d;
 				snapPoint = p;
 			}
 		}
-		if (snapDistance < SNAP_DISTANCE) {
+		
+		if (snapDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize())) {
 			current.set(snapPoint.getX(), snapPoint.getY(), current.getZ());
 			return true;
 		} else

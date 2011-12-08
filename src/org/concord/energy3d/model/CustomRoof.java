@@ -21,8 +21,8 @@ public class CustomRoof extends Roof {
 	}
 
 	public void setPreviewPoint(int x, int y) {
-		if (container != null)
-			points.get(0).set(toRelative(getCenter(), container.getContainer())).addLocal(0, 0, height);
+//		if (container != null)
+//			points.get(0).set(toRelative(getCenter(), container.getContainer())).addLocal(0, 0, height);
 
 		if (editPointIndex == -1) {
 			recalculateEditPoints = true;
@@ -70,6 +70,9 @@ public class CustomRoof extends Roof {
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
 			points.clear();
+			
+			points.add(new Vector3(toRelative(getCenter(), container.getContainer())).addLocal(0, 0, height));
+			
 			// add or update edit points
 			final double z = container.getPoints().get(1).getZ() + height;
 			if (wallUpperPoints.size() > points.size()) {

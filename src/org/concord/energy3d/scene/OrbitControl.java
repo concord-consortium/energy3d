@@ -163,7 +163,7 @@ public class OrbitControl extends CameraControl {
 					final int closestIntersection = pickResults.getPickData(i).getIntersectionRecord().getClosestIntersection();
 					if (closestIntersection != -1) {
 						final Vector3 point = pickResults.getPickData(i).getIntersectionRecord().getIntersectionPoint(closestIntersection);
-						frontDistance = point.subtractLocal(source.getCanvasRenderer().getCamera().getLocation()).length();
+						frontDistance = point.subtractLocal(source.getCanvasRenderer().getCamera().getLocation()).length() + 1;
 						clearOrbitCenter();
 						return;
 					}

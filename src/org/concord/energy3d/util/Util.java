@@ -81,4 +81,22 @@ public class Util {
 		spatial.getSceneHints().setCastsShadows(false);
 		spatial.getSceneHints().setLightCombineMode(LightCombineMode.Off);		
 	}
+	
+	public static Vector3 getClosetPoint(Vector3 A, Vector3 B, Vector3 P, boolean segmentClamp)
+	{
+	    Vector3 AP = P.subtract(A, null);
+	    Vector3 AB = B.subtract(A, null);
+//	    double ab2 = AB.getX()*AB.getX() + AB.getY()*AB.getY() + AB.getZ()*AB.getZ();
+	    double ab2 = AB.dot(AB);
+//	    double ap_ab = AP.dot(vec).getX()*AB.x + AP.y*AB.y;
+	    double ap_ab = AP.dot(AB);
+	    double t = ap_ab / ab2;
+	    if (segmentClamp)
+	    {
+	         if (t < 0.0f) t = 0.0f;
+	         else if (t > 1.0f) t = 1.0f;
+	    }
+	    Vector3 Closest = AB.scaleAdd(t, A, null);
+	    return Closest;
+	}	
 }

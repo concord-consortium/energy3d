@@ -914,29 +914,29 @@ Version 0.5 - October 20, 2011
 - allow rotation around an exact point by determining the distance from first clicked point to camera when starting to Orbit object
 - remove Ctrl+click functionality assigned to zooming due to its reserved meaning in Mac OS X
 - fix problem with roof exception due to null gable wall by ignoring null walls
-
 - allow selecting walls by clicking on their surround meshes
 - fix problem with wall snaping to (0,0,0) as if there is a neighboring wall there when there isn't
-
 - fix problem with exception when converting hip roof into pyramid roof by removing duplicated steiner points
 - fix problem with roof annotations not hiding when not needed
-
 - fix problem with finding basepoints of same value when creating shed roof
-- fix probelm with shed roof throwing exception when it's height is zero
-- fix problem with undo and redo gable points not working well due to orginal points not being cloned properly 
+- fix problem with shed roof throwing exception when it's height is zero
+- fix problem with undo and redo gable points not working well due to orginal points not being cloned properly
+- fix problem with shed roof becoming none gable on one side when adjusting height
 
-- *fix problem with grid lines in custome roof not drawn in correct position initially
+- fix problem with grid lines in custome roof not drawn in correct position initially
+- adjust rotate around clicked point so that the camera looks through the object with larger radius
 
+- fix problem with walls not snapping when snap mode is off even when in exactly same grid position
+- allow short snapping between walls within gridsize even when snapping is off
+- allow short snapping between walls and foundation within gridsize even when snapping is off 
+- snap walls along foundation edges 
 
+ 
 
-- *fix problem with shed roof becoming none gable on one side when adjusting height
 
 - *fix problem with right mouse drag not working in mouse os X using Ctrl+click by removing Ctrl+click functionality assigned to zooming
 
-- *fix problem with inside of wall not extended all the way sometimes when angle is more than 180 degrees - no need to fix, it's due to different values in thicknessNormal and wallThickness
 
-
-- *close interior of walls when in -90 degrees
 
 
 -*add feature for planting trees
