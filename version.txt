@@ -923,7 +923,7 @@ Version 0.5 - October 20, 2011
 - fix problem with undo and redo gable points not working well due to orginal points not being cloned properly
 - fix problem with shed roof becoming none gable on one side when adjusting height
 
-- fix problem with grid lines in custome roof not drawn in correct position initially
+- fix problem with grid lines in custom roof not drawn in correct position initially
 - adjust rotate around clicked point so that the camera looks through the object with larger radius
 
 - fix problem with walls not snapping when snap mode is off even when in exactly same grid position
@@ -931,18 +931,14 @@ Version 0.5 - October 20, 2011
 - allow short snapping between walls and foundation within gridsize even when snapping is off 
 - snap walls along foundation edges 
 
+- fix invisible annotatoin labels problem when semi transparent floor is the background
  
-
-
-- *fix problem with right mouse drag not working in mouse os X using Ctrl+click by removing Ctrl+click functionality assigned to zooming
-
-
 
 
 -*add feature for planting trees
 
 
-- *fix problem with disconnected walls after deleter followed by undo
+- *fix problem with disconnected walls after delete followed by undo
 - *fix problem of window drawn in front of wall due to not redrawing after wall thickness direction changes
 
 - *auto redraw gable wall when inserting gable or editing gable

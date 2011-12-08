@@ -94,7 +94,6 @@ public class SizeAnnotation extends Annotation {
 		label.setAlign(align);
 		label.updateWorldTransform(true);
 		label.updateWorldBound(true);
-//		label.getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);
 		
 		
 		vertexBuffer.put(newFrom.getXf()).put(newFrom.getYf()).put(newFrom.getZf());
