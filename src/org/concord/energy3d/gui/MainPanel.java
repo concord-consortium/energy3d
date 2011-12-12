@@ -87,6 +87,7 @@ public class MainPanel extends JPanel {
 	 */
 	private MainPanel() {
 		super();
+		System.out.println("Version: " + Config.VERSION);
 		System.out.print("Initiating GUI Panel...");
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
@@ -115,10 +116,11 @@ public class MainPanel extends JPanel {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
 			final boolean showEditTools = !Config.isHeliodonMode();
-//			if (showEditTools) {
-				appToolbar.add(getSelectButton());
+			appToolbar.add(getSelectButton());
+			if (showEditTools)
 				appToolbar.add(getResizeButton());
-				appToolbar.add(getZoomButton());
+			appToolbar.add(getZoomButton());
+			if (showEditTools) {
 				appToolbar.addSeparator();
 				appToolbar.add(getPlatformButton());
 				appToolbar.add(getWallButton());
@@ -129,31 +131,31 @@ public class MainPanel extends JPanel {
 				appToolbar.add(getRoofCustomButton());
 				appToolbar.add(getRoofGableButton());
 				appToolbar.add(getFloorButton());
-				appToolbar.addSeparator();
-//			}
+			}
+			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
 			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimButton());
 			appToolbar.add(getCalendarPanel());
-//			if (showEditTools) {
+			if (showEditTools) {
 				appToolbar.addSeparator();
 				appToolbar.add(getRotAnimButton());
 				appToolbar.add(getTopViewButton());
 				appToolbar.add(getGridButton());
 				appToolbar.add(getSnapButton());
 				appToolbar.addSeparator();
-//			} else
-//				appToolbar.add(getRotAnimButton());
+			} else
+				appToolbar.add(getRotAnimButton());
 
 			appToolbar.add(getAnnotationToggleButton());
-//			if (showEditTools)
+			if (showEditTools)
 				appToolbar.add(getPreviewButton());
 
-//			if (showEditTools) {
-				final ButtonGroup bg = new ButtonGroup();
-				bg.add(selectButton);
+			final ButtonGroup bg = new ButtonGroup();
+			bg.add(selectButton);
+			bg.add(zoomButton);
+			if (showEditTools) {
 				bg.add(resizeButton);
-				bg.add(zoomButton);
 				bg.add(platformButton);
 				bg.add(wallButton);
 				bg.add(doorButton);
@@ -163,7 +165,7 @@ public class MainPanel extends JPanel {
 				bg.add(roofCustomButton);
 				bg.add(floorButton);
 				bg.add(roofGableButton);
-//			}
+			}
 		}
 		return appToolbar;
 	}
@@ -469,15 +471,15 @@ public class MainPanel extends JPanel {
 	private JToggleButton getSnapButton() {
 		if (snapButton == null) {
 			snapButton = new JToggleButton();
+			snapButton.setSelected(false);
+			snapButton.setToolTipText("Snap");
+			snapButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/snap.png")));
 			snapButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
 					SceneManager.getInstance().update();
 				}
 			});
-			snapButton.setSelected(true);
-			snapButton.setToolTipText("Snap");
-			snapButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/snap.png")));
 			snapButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					HousePart.setSnapToObjects(snapButton.isSelected());
@@ -864,7 +866,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getAnnotationToggleButton() {
 		if (annotationToggleButton == null) {
 			annotationToggleButton = new JToggleButton();
-			annotationToggleButton.setSelected(true);
+			annotationToggleButton.setSelected(Config.isApplet() ? false : true);
 			annotationToggleButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {

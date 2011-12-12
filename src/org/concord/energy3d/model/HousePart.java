@@ -7,6 +7,7 @@ import org.concord.energy3d.exception.InvisibleException;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
@@ -46,9 +47,9 @@ public abstract class HousePart implements Serializable {
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
 	protected static ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
-	protected static boolean drawAnnotations = true;
+	protected static boolean drawAnnotations = Config.isApplet() ? false : true;
 	private static HousePart gridsHighlightedHousePart;
-	private static boolean snapToObjects = true;
+	private static boolean snapToObjects = false;
 	private static boolean snapToGrids = true;
 	protected transient final int numOfDrawPoints;
 	protected transient final int numOfEditPoints;
@@ -549,7 +550,8 @@ public abstract class HousePart implements Serializable {
 		} else if (container != null) {
 			if (visible)
 				container.drawGrids(getGridSize());
-			container.gridsMesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+			if (container.gridsMesh != null)
+				container.gridsMesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 		}
 	}
 
@@ -678,6 +680,8 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void updateTextureAndColor(final boolean textureEnabled) {
+		if (mesh == null)
+			return;
 		if (textureEnabled) {
 			final TextureState ts = new TextureState();
 			ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));

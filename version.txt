@@ -922,17 +922,22 @@ Version 0.5 - October 20, 2011
 - fix problem with shed roof throwing exception when it's height is zero
 - fix problem with undo and redo gable points not working well due to orginal points not being cloned properly
 - fix problem with shed roof becoming none gable on one side when adjusting height
-
 - fix problem with grid lines in custom roof not drawn in correct position initially
 - adjust rotate around clicked point so that the camera looks through the object with larger radius
-
 - fix problem with walls not snapping when snap mode is off even when in exactly same grid position
 - allow short snapping between walls within gridsize even when snapping is off
 - allow short snapping between walls and foundation within gridsize even when snapping is off 
 - snap walls along foundation edges 
-
 - fix invisible annotatoin labels problem when semi transparent floor is the background
- 
+- switch off snap to objects by default
+- fix exceptions with applet version
+- fix rendering issues with applet version
+
+- fix issue with z buffer in applet in tablet laptops
+- fix issue with weird bloom effect and wrong shadows in tablet laptops by updating their drivers
+- fix problem with left/right mouse action switching after using zoom tool
+- release version 0.5.6
+
 
 
 -*add feature for planting trees

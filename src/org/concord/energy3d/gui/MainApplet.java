@@ -32,23 +32,25 @@ public class MainApplet extends JApplet {
 			err.printStackTrace();
 		}
 		
-		Component parent = this;
-        while (parent.getParent() != null)
-            parent = parent.getParent();
-        if (parent instanceof Frame) {
-            final Frame frame = (Frame) parent;
-			if (!frame.isResizable()) {
-                frame.setResizable(true);
-                frame.setLayout(new GridLayout());
-        		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        		frame.setLocation((int) (screenSize.getWidth() - frame.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - frame.getSize().getHeight()) / 2);                
-            }
-        }		
+//		Component parent = this;
+//        while (parent.getParent() != null)
+//            parent = parent.getParent();
+//        if (parent instanceof Frame) {
+//            final Frame frame = (Frame) parent;
+//			if (!frame.isResizable()) {
+//                frame.setResizable(true);
+//                frame.setLayout(new GridLayout());
+//        		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+//        		frame.setLocation((int) (screenSize.getWidth() - frame.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - frame.getSize().getHeight()) / 2);                
+//            }
+//        }		
 		this.setContentPane(getMainPanel());
 		SceneManager.getInstance();
 		
 		try {
-			HousePart.setDefaultColor(ColorRGBA.parseColor(this.getParameter("color"), null));
+			final String color = this.getParameter("color");
+			if (color != null)
+				HousePart.setDefaultColor(ColorRGBA.parseColor(color, null));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		

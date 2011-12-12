@@ -98,11 +98,11 @@ public class Heliodon {
 		this.passManager = passManager;
 		this.pickResults = new PrimitivePickResults();
 		this.pickResults.setCheckDistance(true);
-		
+
 		// Sun
 		final MaterialState material = new MaterialState();
 		material.setEmissive(ColorRGBA.WHITE);
-		sun.setRenderState(material);		
+		sun.setRenderState(material);
 		sun.setTranslation(0, 0, 5);
 		root.attachChild(sun);
 
@@ -116,7 +116,7 @@ public class Heliodon {
 
 		// Sun Region
 		sunRegion = new Mesh("Sun Region");
-		sunRegion.setTranslation(0, 0, 0.001);		// to avoid flickering
+		sunRegion.setTranslation(0, 0, 0.001); // to avoid flickering
 		sunRegion.getSceneHints().setCullHint(CullHint.Always);
 		sunRegion.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(SUN_REGION_VERTICES));
 		sunRegion.getMeshData().setIndexMode(IndexMode.Quads);
@@ -136,21 +136,21 @@ public class Heliodon {
 		passManager.add(wireframePass);
 
 		// Base
-        base = new Mesh("Base");
+		base = new Mesh("Base");
 		base.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(BASE_VERTICES + 2));
 		base.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(BASE_VERTICES + 2));
 		base.getMeshData().setIndexMode(IndexMode.QuadStrip);
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
 		offsetState.setFactor(0.1f);
-		offsetState.setUnits(0.1f);		
+		offsetState.setUnits(0.1f);
 		base.setRenderState(offsetState);
 		final ShadingState shadingState = new ShadingState();
 		shadingState.setShadingMode(ShadingMode.Flat);
 		base.setRenderState(shadingState);
 		base.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		root.attachChild(base);
-		
+
 		// Base Ticks
 		baseTicks = new Mesh("Base Ticks");
 		baseTicks.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(BASE_VERTICES));
@@ -158,7 +158,7 @@ public class Heliodon {
 		baseTicks.setDefaultColor(ColorRGBA.BLACK);
 		baseTicks.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		root.attachChild(baseTicks);
-		
+
 		// Compass Labels N S E W
 		final BMText northLabel = new BMText("North", "N", FontManager.getInstance().getAnnotationFont(), Align.Center);
 		northLabel.setAutoRotate(false);
@@ -184,34 +184,34 @@ public class Heliodon {
 		westLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, MathUtils.HALF_PI));
 		westLabel.setTranslation(-6, 0, 0);
 		root.attachChild(westLabel);
-		
+
 		// Clip
 		final ClipState cs = new ClipState();
 		cs.setEnableClipPlane(0, true);
 		cs.setClipPlaneEquation(0, 0, 0, 1, 0);
 		sunPath.setRenderState(cs);
-		sunRegion.setRenderState(cs);		
-		
+		sunRegion.setRenderState(cs);
+
 		initMouse(logicalLayer);
-		
+
 		root.getSceneHints().setCullHint(CullHint.Always);
 		scene.attachChild(root);
 
 		setDate(timeAndDate);
 		setTime(timeAndDate);
-		
+
 		if (Config.isHeliodonMode())
 			setSunRegionAlwaysVisible(true);
-		
+
 		draw();
 	}
 
 	private void initMouse(final LogicalLayer logicalLayer) {
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.F), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {				
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				setSunRegionAlwaysVisible(!forceSunRegionOn);
 			}
-		}));		
+		}));
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				lock = true;
@@ -227,13 +227,13 @@ public class Heliodon {
 				if (forceSunRegionOn)
 					selectDifferentDeclinationWithMouse = true;
 				else
-				selectDifferentDeclinationWithMouse = false;
+					selectDifferentDeclinationWithMouse = false;
 				SceneManager.getInstance().setMouseControlEnabled(!sunGrabbed);
 			}
 		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {				
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				sunGrabbed = false;
 				if (!forceSunRegionOn)
 					sunRegion.getSceneHints().setCullHint(CullHint.Always);
@@ -267,12 +267,12 @@ public class Heliodon {
 				final ReadOnlyTransform rootTansform = root.getTransform();
 				if (!selectDifferentDeclinationWithMouse) {
 					final FloatBuffer buf = sunPath.getMeshData().getVertexBuffer();
-					buf.rewind();					
+					buf.rewind();
 					while (buf.hasRemaining()) {
 						p.set(buf.get(), buf.get(), buf.get());
 						rootTansform.applyForward(p, p_abs);
 						final double d;
-							d = pickRay.distanceSquared(p_abs, null);
+						d = pickRay.distanceSquared(p_abs, null);
 						if (d < smallestDistance) {
 							smallestDistance = d;
 							hourVertex = buf.position() / 3 - 1;
@@ -281,10 +281,10 @@ public class Heliodon {
 					}
 					totalHourVertices = buf.limit() / 3;
 				}
-				
+
 				if (smallestDistance > 5.0 * root.getTransform().getScale().getX() * root.getTransform().getScale().getX())
 					selectDifferentDeclinationWithMouse = true;
-				
+
 				boolean declinationChanged = false;
 
 				if (selectDifferentDeclinationWithMouse) {
@@ -307,7 +307,7 @@ public class Heliodon {
 							d = intersectionPoint.distanceSquared(p_abs);
 						else
 							d = pickRay.distanceSquared(p_abs, null);
-						if (d < smallestDistance && p.getZ() >= -MathUtils.ZERO_TOLERANCE) { 
+						if (d < smallestDistance && p.getZ() >= -MathUtils.ZERO_TOLERANCE) {
 							smallestDistance = d;
 							newSunLocation.set(p);
 							resultRow = rowCounter + (quadVertexCounter >= 2 ? 1 : 0);
@@ -322,7 +322,7 @@ public class Heliodon {
 							rowVertexCounter = 0;
 						}
 						prev.set(p);
-						quadVertexCounter = (quadVertexCounter + 1) % 4;						
+						quadVertexCounter = (quadVertexCounter + 1) % 4;
 						rowVertexCounter++;
 					}
 					rowCounter++;
@@ -331,16 +331,16 @@ public class Heliodon {
 							resultRow += DECLINATION_DIVISIONS - rowCounter;
 						double newDeclinationAngle = -TILT_ANGLE + (2.0 * TILT_ANGLE * resultRow / DECLINATION_DIVISIONS);
 						declinationChanged = Math.abs(newDeclinationAngle - declinationAngle) > MathUtils.EPSILON;
-						if (declinationChanged) {							
-							setDeclinationAngle(newDeclinationAngle, false, true);			
+						if (declinationChanged) {
+							setDeclinationAngle(newDeclinationAngle, false, true);
 							dirtySunPath = true;
 						}
-					}					
-				}				
-				final double newHourAngle = ((double)hourVertex - Math.floor(totalHourVertices / 2.0)) * Math.PI / 48.0;
+					}
+				}
+				final double newHourAngle = ((double) hourVertex - Math.floor(totalHourVertices / 2.0)) * Math.PI / 48.0;
 				final boolean hourAngleChanged = Math.abs(newHourAngle - hourAngle) > MathUtils.EPSILON;
 				if (hourAngleChanged)
-					setHourAngle(newHourAngle, false, true);					
+					setHourAngle(newHourAngle, false, true);
 				if (declinationChanged || hourAngleChanged)
 					setSunLocation(newSunLocation);
 			}
@@ -367,17 +367,17 @@ public class Heliodon {
 
 	public void setHourAngle(final double hourAngle, final boolean redrawHeliodon, final boolean updateGUI) {
 		this.hourAngle = toPlusMinusPIRange(hourAngle, -Math.PI, Math.PI);
-		
-		final int minutes = (int)Math.round(this.hourAngle / Math.PI * 12 * 60 + 12 * 60);
+
+		final int minutes = (int) Math.round(this.hourAngle / Math.PI * 12 * 60 + 12 * 60);
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		calendar.set(Calendar.MINUTE, minutes);		
-		
+		calendar.set(Calendar.MINUTE, minutes);
+
 		if (updateGUI)
 			MainPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
-		
+
 		if (redrawHeliodon)
-			drawSun();	
-		
+			drawSun();
+
 		if (SceneManager.getInstance() != null)
 			SceneManager.getInstance().update();
 	}
@@ -388,16 +388,16 @@ public class Heliodon {
 
 	public void setDeclinationAngle(final double declinationAngle, final boolean redrawHeliodon, final boolean updateGUI) {
 		this.declinationAngle = toPlusMinusPIRange(declinationAngle, -TILT_ANGLE, TILT_ANGLE);
-		
+
 		final double days = MathUtils.asin(this.declinationAngle / TILT_ANGLE) / MathUtils.TWO_PI * 365.25 - 284.0;
-		calendar.set(calendar.get(Calendar.YEAR), 0, (int)Math.round(days));
-		
+		calendar.set(calendar.get(Calendar.YEAR), 0, (int) Math.round(days));
+
 		if (updateGUI)
 			MainPanel.getInstance().getDateSpinner().setValue(calendar.getTime());
-		
+
 		if (redrawHeliodon)
 			dirtySunPath = true;
-		
+
 		if (SceneManager.getInstance() != null)
 			SceneManager.getInstance().update();
 	}
@@ -411,23 +411,25 @@ public class Heliodon {
 
 		dirtySunRegion = true;
 		dirtySunPath = true;
-		
+
 		if (SceneManager.getInstance() != null)
-			SceneManager.getInstance().update();		
+			SceneManager.getInstance().update();
 	}
 
 	public void setVisible(final boolean visible) {
-		if (bloomRenderPass == null) {
-			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
-			passManager.add(bloomRenderPass);
-			bloomRenderPass.add(sun);			
-		}
+//		if (!Config.isApplet()) {
+			if (bloomRenderPass == null) {
+				bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
+				passManager.add(bloomRenderPass);
+				bloomRenderPass.add(sun);
+			}
+			bloomRenderPass.setEnabled(visible);
+//		}
 		root.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
-		bloomRenderPass.setEnabled(visible);
-		
+
 		if (visible)
 			updateSize();
-		
+
 		if (SceneManager.getInstance() != null)
 			SceneManager.getInstance().update();
 	}
@@ -456,7 +458,7 @@ public class Heliodon {
 		final double r = 5;
 		final Vector3 coords = new Vector3(r, azimuthAngle, altitudeAngle);
 		MathUtils.sphericalToCartesianZ(coords, coords);
-		coords.setX(-coords.getX());	// reverse the x so that sun moves from east to west
+		coords.setX(-coords.getX()); // reverse the x so that sun moves from east to west
 		return coords;
 	}
 
@@ -470,7 +472,7 @@ public class Heliodon {
 			result = max;
 		return result;
 	}
-	
+
 	private void drawBase() {
 		final FloatBuffer buf = base.getMeshData().getVertexBuffer();
 		buf.rewind();
@@ -482,7 +484,7 @@ public class Heliodon {
 		final double r = 5.0;
 		final double step = MathUtils.TWO_PI / BASE_DIVISIONS;
 		int counter = 0;
-		for (double angle = 0 ; angle < MathUtils.TWO_PI + step / 2.0; angle += step) {
+		for (double angle = 0; angle < MathUtils.TWO_PI + step / 2.0; angle += step) {
 			final double trimedAngle;
 			if (angle > MathUtils.TWO_PI)
 				trimedAngle = MathUtils.TWO_PI;
@@ -492,14 +494,14 @@ public class Heliodon {
 			float zoffset = 0f;
 
 			MathUtils.sphericalToCartesianZ(p.set(r, trimedAngle, 0), p);
-			buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + zoffset);			
+			buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + zoffset);
 			MathUtils.sphericalToCartesianZ(p.set(r + width, trimedAngle, 0), p);
 			buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + zoffset);
-			
+
 			final float c = ((counter - 1) / 3) % 2 == 0 ? 0.5f : 1.0f;
 			cbuf.put(c).put(c).put(c).put(c);
 			cbuf.put(c).put(c).put(c).put(c);
-			
+
 			if (MathUtils.TWO_PI - trimedAngle > MathUtils.ZERO_TOLERANCE) {
 				width = counter % 3 == 0 ? 0.5f : 0.3f;
 				MathUtils.sphericalToCartesianZ(p.set(r, trimedAngle, 0), p);
@@ -511,7 +513,7 @@ public class Heliodon {
 		}
 		base.updateModelBound();
 		baseTicks.updateModelBound();
-	}	
+	}
 
 	private void drawSunRegion() {
 		final FloatBuffer buf = sunRegion.getMeshData().getVertexBuffer();
@@ -557,7 +559,7 @@ public class Heliodon {
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 				limit += 3;
 			}
-		}		
+		}
 		buf.limit(limit);
 		sunPath.updateModelBound();
 		sunPath.getSceneHints().setCullHint(limit == 0 ? CullHint.Always : CullHint.Inherit);
@@ -584,17 +586,17 @@ public class Heliodon {
 
 	public void updateBloom() {
 		if (bloomRenderPass != null)
-		bloomRenderPass.markNeedsRefresh();
+			bloomRenderPass.markNeedsRefresh();
 	}
 
 	public void setTime(final Date time) {
-		if (lock )
-			return;		
+		if (lock)
+			return;
 		final Calendar timeCalendar = Calendar.getInstance();
 		timeCalendar.setTime(time);
 		calendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
 		calendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
-		
+
 		final int minutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE) - 12 * 60;
 		setHourAngle(minutes / (12.0 * 60.0) * Math.PI, true, false);
 	}
@@ -604,13 +606,13 @@ public class Heliodon {
 			return;
 		final Calendar dateCalendar = Calendar.getInstance();
 		dateCalendar.setTime(date);
-		calendar.set(dateCalendar.get(Calendar.YEAR), dateCalendar.get(Calendar.MONTH), dateCalendar.get(Calendar.DAY_OF_MONTH));		
-		
+		calendar.set(dateCalendar.get(Calendar.YEAR), dateCalendar.get(Calendar.MONTH), dateCalendar.get(Calendar.DAY_OF_MONTH));
+
 		final int days = calendar.get(Calendar.DAY_OF_YEAR);
-		setDeclinationAngle(TILT_ANGLE * MathUtils.sin(MathUtils.TWO_PI*(284+days)/365.25), true, false);
-		
+		setDeclinationAngle(TILT_ANGLE * MathUtils.sin(MathUtils.TWO_PI * (284 + days) / 365.25), true, false);
+
 		dirtySunPath = true;
-		
+
 		if (SceneManager.getInstance() != null)
 			SceneManager.getInstance().update();
 	}
@@ -622,7 +624,7 @@ public class Heliodon {
 			drawSunPath();
 			drawSun();
 		}
-		
+
 	}
 
 	public void setSunRegionAlwaysVisible(final boolean forceSunRegionOn) {

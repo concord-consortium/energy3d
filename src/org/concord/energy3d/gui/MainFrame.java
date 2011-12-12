@@ -358,7 +358,7 @@ public class MainFrame extends JFrame {
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					final PrintController printController = PrintController.getInstance();
-					if (!printController.isPrintPreview()) {
+					if (!printController.isPrintPreview()) {					    
 						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
 						SceneManager.getTaskManager().update(new Callable<Object>() {
 							public Object call() throws Exception {

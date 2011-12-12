@@ -106,21 +106,21 @@ public class Scene implements Serializable {
 		return instance;
 	}
 
-//	public static void newFile() {
-//	}
-	
+	// public static void newFile() {
+	// }
+
 	public static void newFile(final double xLength, final double yLength) {
-//		newFile();
+		// newFile();
 		try {
-			open(null);				
+			open(null);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}		
+		}
 
 		final Foundation foundation = new Foundation(xLength / annotationScale, yLength / annotationScale);
-		
+
 		SceneManager.getTaskManager().update(new Callable<Object>() {
-			public Object call() throws Exception {				
+			public Object call() throws Exception {
 				instance.add(foundation);
 				redrawAll = true;
 				return null;
@@ -137,31 +137,35 @@ public class Scene implements Serializable {
 				Thread.yield();
 		}
 
+		if (url == null) {
+			instance = new Scene();
+			System.out.println("done");
+		} else {
+			System.out.print("Opening..." + file + "...");
+			ObjectInputStream in = new ObjectInputStream(file.openStream());
+			instance = (Scene) in.readObject();
+			in.close();
+		}
+
 		SceneManager.getTaskManager().update(new Callable<Object>() {
-			public Object call() throws Exception {				
+			public Object call() throws Exception {
 				System.out.print("Open file...");
 				originalHouseRoot.detachAllChildren();
 				root.detachAllChildren();
 				root.attachChild(originalHouseRoot);
-				
-				if (url == null) {
-					instance = new Scene();
-					System.out.println("done");
-				} else {
-					System.out.print("Opening..." + file + "...");
-					ObjectInputStream in = new ObjectInputStream(file.openStream());
-					instance = (Scene) in.readObject();
-					in.close();
+
+				if (url != null) {
 					for (HousePart housePart : instance.getParts())
 						originalHouseRoot.attachChild(housePart.getRoot());
-							redrawAll = true;
-							System.out.println("done");
+					redrawAll = true;
+					System.out.println("done");
 				}
-				
+
 				root.updateWorldBound(true);
 				SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 				SceneManager.getInstance().getUndoManager().die();
-				MainFrame.getInstance().refreshUndoRedo();
+				if (!Config.isApplet())
+					MainFrame.getInstance().refreshUndoRedo();
 				return null;
 			}
 		});
@@ -380,7 +384,7 @@ public class Scene implements Serializable {
 			if (PrintController.getInstance().getPrintParts() != null)
 				for (HousePart part : PrintController.getInstance().getPrintParts())
 					part.draw();
-//			updateTextSizes();
+			// updateTextSizes();
 			redrawAll = false;
 		}
 	}
@@ -416,17 +420,17 @@ public class Scene implements Serializable {
 		final BoundingBox bounds = (BoundingBox) getOriginalHouseRoot().getWorldBound();
 		if (bounds != null) {
 			final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
-			final double fontSize = size / 20.0;			
+			final double fontSize = size / 20.0;
 			updateTextSizes(fontSize);
 		}
 	}
-	
+
 	public void updateTextSizes(final double fontSize) {
 		Annotation.setFontSize(fontSize);
 		updateTextSizes(root, fontSize);
 	}
 
-	private void updateTextSizes(final Spatial spatial, final double fontSize) {		
+	private void updateTextSizes(final Spatial spatial, final double fontSize) {
 		if (spatial instanceof BMText) {
 			final BMText label = (BMText) spatial;
 			if (label.getAutoScale() == AutoScale.Off) {

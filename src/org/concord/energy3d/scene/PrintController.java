@@ -222,7 +222,8 @@ public class PrintController implements Updater {
 						@Override
 						public void run() {
 							Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-							MainFrame.getInstance().getMainPanel().validate();
+//							MainFrame.getInstance().getMainPanel().validate();
+							MainPanel.getInstance().validate();
 							
 							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
 							

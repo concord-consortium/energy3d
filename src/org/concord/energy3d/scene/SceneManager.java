@@ -276,7 +276,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.add(Scene.getRoot());
 		shadowPass.addOccluder(Scene.getRoot());
 
-		Scene.getInstance();
+//		Scene.getInstance();
 
 		final Date today = Calendar.getInstance().getTime();
 		heliodon = new Heliodon(root, light, passManager, logicalLayer, today);
@@ -595,7 +595,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										final Roof roof = (Roof) selectedHousePart;
 										undoManager.addEdit(new MakeGableCommand(roof, roofPartIndex));
 										roof.setGable(roofPartIndex, true);
-										MainFrame.getInstance().refreshUndoRedo();
+										if (!Config.isApplet())
+											MainFrame.getInstance().refreshUndoRedo();
 									}
 								}
 							} else {
@@ -629,7 +630,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										selectedHousePart.reset();
 										selectedHousePart.draw();
 										undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-										MainFrame.getInstance().refreshUndoRedo();
+										if (!Config.isApplet())
+											MainFrame.getInstance().refreshUndoRedo();
 										Scene.getInstance().remove(selectedHousePart);
 										selectedHousePart = null;
 									}
@@ -637,7 +639,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									if (editHousePartCommand != null) {
 										if (editHousePartCommand.isReallyEdited()) {
 											undoManager.addEdit(editHousePartCommand);
-											MainFrame.getInstance().refreshUndoRedo();
+											if (!Config.isApplet())
+												MainFrame.getInstance().refreshUndoRedo();
 										}
 										editHousePartCommand = null;
 									}
@@ -663,7 +666,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (selectedHousePart != null && selectedHousePart.isDrawCompleted()) {
 									if (addHousePartCommand != null) {
 										undoManager.addEdit(addHousePartCommand);
-										MainFrame.getInstance().refreshUndoRedo();
+										if (!Config.isApplet())
+											MainFrame.getInstance().refreshUndoRedo();
 										addHousePartCommand = null;
 									}
 									selectedHousePart.setEditPointsVisible(false);
@@ -694,11 +698,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}));
 
-		if (!Config.isHeliodonMode())
+		
 			logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 					update = true;
-					moveState = inputStates;
+					if (!Config.isHeliodonMode())
+						moveState = inputStates;
 				}
 			}));
 
@@ -727,7 +732,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				taskManager.update(new Callable<Object>() {
 					public Object call() throws Exception {
 						undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-						MainFrame.getInstance().refreshUndoRedo();
+						if (!Config.isApplet())
+							MainFrame.getInstance().refreshUndoRedo();
 						Scene.getInstance().remove(selectedHousePart);
 						selectedHousePart = null;
 						return null;
@@ -740,7 +746,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				taskManager.update(new Callable<Object>() {
 					public Object call() throws Exception {
 						undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-						MainFrame.getInstance().refreshUndoRedo();
+						if (!Config.isApplet())
+							MainFrame.getInstance().refreshUndoRedo();
 						Scene.getInstance().remove(selectedHousePart);
 						selectedHousePart = null;
 						return null;
@@ -892,6 +899,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		setCompassVisible(viewMode == ViewMode.NORMAL);
 
 		if (viewMode == ViewMode.NORMAL) {
+			if (Config.isApplet()) {
+				loc = new Vector3(2.0f, -8.0f, 5.0f);
+				lookAt = new Vector3(0.0f, 0.0f, 0.0f);
+			}
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			resizeCamera();
 		} else if (viewMode == ViewMode.TOP_VIEW) {
@@ -1256,7 +1267,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setZoomLock(boolean zoomLock) {
 		this.zoomLock = zoomLock;
-		cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.MOVE, ButtonAction.ROTATE);
+		cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);
 	}
 
 	public void update() {
