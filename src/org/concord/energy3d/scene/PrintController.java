@@ -364,7 +364,7 @@ public class PrintController implements Updater {
 	private void setFinished(final boolean finished) {
 		this.finished = finished;
 		MainPanel.getInstance().getPreviewButton().setEnabled(finished);
-		MainFrame.getInstance().getPreviewMenuItem().setEnabled(finished);		
+		MainFrame.getInstance().getPreviewMenuItem().setEnabled(finished);
 	}
 
 	public boolean isFinished() {

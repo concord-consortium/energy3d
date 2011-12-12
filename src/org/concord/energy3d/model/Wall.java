@@ -311,7 +311,8 @@ public class Wall extends HousePart {
 			}
 		}
 		
-		if (snapDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize())) {
+//		if (snapDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize())) {
+		if (snapDistance < getGridSize() / 2) {
 			current.set(snapPoint.getX(), snapPoint.getY(), current.getZ());
 			return true;
 		} else
