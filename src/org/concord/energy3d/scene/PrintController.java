@@ -62,6 +62,7 @@ public class PrintController implements Updater {
 	private boolean shadowSelected;
 	private ArrayList<HousePart> printParts;
 	private Node pagesRoot = new Node();
+	private boolean heliodonSelected;
 
 	public static PrintController getInstance() {
 		return instance;
@@ -150,6 +151,8 @@ public class PrintController implements Updater {
 
 				SceneManager.getInstance().setShading(shadingSelected);
 				SceneManager.getInstance().setShadow(shadowSelected);
+				SceneManager.getInstance().getHeliodon().setVisible(heliodonSelected);
+
 				SceneManager.getInstance().updatePrintPreviewScene(false);
 //				Scene.getInstance().updateTextSizes();
 				if (!doTheEndAnimation) // to avoid concurrency exception
@@ -332,16 +335,19 @@ public class PrintController implements Updater {
 			return;
 //		while(!isFinished())
 //			Thread.yield();
+		isPrintPreview = printPreview;
 		init = true;
 		setFinished(false);
-		isPrintPreview = printPreview;
 		if (printPreview) {
 			shadingSelected = SceneManager.getInstance().isShadingEnabled();
-			shadowSelected = SceneManager.getInstance().isShadowEnaled();
+			shadowSelected = SceneManager.getInstance().isShadowEnabled();
+			heliodonSelected = SceneManager.getInstance().isHeliodonControlEnabled();
 			if (shadingSelected)
 				SceneManager.getInstance().setShading(false);
 			if (shadowSelected)
 				SceneManager.getInstance().setShadow(false);
+			if (heliodonSelected)
+				SceneManager.getInstance().getHeliodon().setVisible(false);
 //			Scene.getInstance().updateTextSizes(0.1);
 		}
 	}
@@ -365,6 +371,8 @@ public class PrintController implements Updater {
 		this.finished = finished;
 		MainPanel.getInstance().getPreviewButton().setEnabled(finished);
 		MainFrame.getInstance().getPreviewMenuItem().setEnabled(finished);
+		if (isPrintPreview() || finished)
+			MainPanel.getInstance().setToolbarEnabled(!isPrintPreview());
 	}
 
 	public boolean isFinished() {

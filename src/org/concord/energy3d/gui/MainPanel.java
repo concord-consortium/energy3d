@@ -1,6 +1,7 @@
 package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -594,7 +595,7 @@ public class MainPanel extends JPanel {
 			heliodonButton.setToolTipText("Show sun heliodon");
 			heliodonButton.addItemListener(new java.awt.event.ItemListener() {
 				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					SceneManager.getInstance().setSunControl(heliodonButton.isSelected());
+					SceneManager.getInstance().setHeliodonControl(heliodonButton.isSelected());
 					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
 					calendarPanel.setVisible(showSunTools);
 					sunAnimButton.setEnabled(showSunTools);
@@ -940,5 +941,16 @@ public class MainPanel extends JPanel {
 			});			
 		}
 		return roofGableButton;
+	}
+	
+	public void setToolbarEnabled(final boolean enabled) {
+		for (final Component c : getAppToolbar().getComponents()) {
+			if (c != getPreviewButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getRotAnimButton()) {
+				if (!enabled || c != getSunAnimButton() || getLightButton().isSelected() || getHeliodonButton().isSelected())
+					c.setEnabled(enabled);
+			}
+		}
+		
+		getCalendarPanel().setVisible(enabled && (getLightButton().isSelected() || getHeliodonButton().isSelected()));
 	}
 }

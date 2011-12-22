@@ -171,7 +171,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean drawBounds = false;
 	private boolean exit = false;
 	private boolean rotAnim = false;
-	private boolean sunControl;
+	private boolean heliodonControl;
 	private boolean sunAnim;
 	private boolean operationStick = false;
 	private boolean operationFlag = false;
@@ -801,28 +801,28 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.UP), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (!sunControl)
+				if (!heliodonControl)
 					return;
 				heliodon.setObserverLatitude(heliodon.getObserverLatitude() + 0.01);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DOWN), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (!sunControl)
+				if (!heliodonControl)
 					return;
 				heliodon.setObserverLatitude(heliodon.getObserverLatitude() - 0.01);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.RIGHT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (!sunControl)
+				if (!heliodonControl)
 					return;
 				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() + 0.01, true, true);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (!sunControl)
+				if (!heliodonControl)
 					return;
 				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() - 0.01, true, true);
 			}
@@ -888,7 +888,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
 
 		// cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
-		cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
+//		cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
+		cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		// ReadOnlyVector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
 		ReadOnlyVector3 loc = new Vector3(1.0f, -5.0f, 3.0f);
@@ -899,6 +900,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		setCompassVisible(viewMode == ViewMode.NORMAL);
 
 		if (viewMode == ViewMode.NORMAL) {
+			cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 			if (Config.isApplet()) {
 				loc = new Vector3(2.0f, -8.0f, 5.0f);
 				lookAt = new Vector3(0.0f, 0.0f, 0.0f);
@@ -907,7 +909,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			resizeCamera();
 		} else if (viewMode == ViewMode.TOP_VIEW) {
 			camera.setProjectionMode(ProjectionMode.Parallel);
-			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.NONE);
+//			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			cameraControl.setMoveSpeed(5 * MOVE_SPEED);
 			loc = new Vector3(0, 0, 10);
 //			up = new Vector3(0.0f, -1.0f, 0.0f);
@@ -915,7 +917,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			lookAt = new Vector3(0.0f, 0.0f, -1.0f);
 			resizeCamera(Util.findBoundLength(Scene.getRoot().getWorldBound()));
 		} else if (viewMode == ViewMode.PRINT) {
-			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
+//			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Parallel);
 			/* location will be set in PrintController.print() */
 			// loc = new Vector3(0, -10, 0);
@@ -929,7 +931,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			else
 				resizeCamera(pageWidth);
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
-			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
+//			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			// final int rows = PrintController.getInstance().getRows();
 			// final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin();
@@ -1060,8 +1062,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 	}
 
-	public void setSunControl(boolean selected) {
-		this.sunControl = selected;
+	public void setHeliodonControl(boolean selected) {
+		this.heliodonControl = selected;
 		heliodon.setVisible(selected);
 		enableDisableRotationControl();
 	}
@@ -1079,7 +1081,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else
 			cameraControl.setMouseEnabled(false);
 
-		if (sunControl)
+		if (heliodonControl)
 			cameraControl.setKeyRotateSpeed(0);
 		else
 			cameraControl.setKeyRotateSpeed(1);
@@ -1195,7 +1197,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void updateHeliodonAndAnnotationSize() {
-		if (sunControl)
+		if (heliodonControl)
 			taskManager.update(new Callable<Object>() {
 				public Object call() throws Exception {
 					// Scene.getInstance().updateTextSizes();
@@ -1261,13 +1263,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return lightState.isEnabled();
 	}
 
-	public boolean isShadowEnaled() {
+	public boolean isShadowEnabled() {
 		return shadowPass.isEnabled();
 	}
 
-	public void setZoomLock(boolean zoomLock) {
+	public void setZoomLock(final boolean zoomLock) {
 		this.zoomLock = zoomLock;
-		cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);
+		cameraControl.setLeftButtonAction(zoomLock ? ButtonAction.ZOOM : viewMode == ViewMode.NORMAL ? ButtonAction.ROTATE : ButtonAction.MOVE);
+//			cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);
+			
 	}
 
 	public void update() {
@@ -1288,5 +1292,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public Spatial getFloor() {
 		return floor;
+	}
+
+	public boolean isHeliodonControlEnabled() {
+		return heliodonControl;
 	}
 }

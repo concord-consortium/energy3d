@@ -1,6 +1,7 @@
 package org.concord.energy3d.shapes;
 
 import java.nio.FloatBuffer;
+import java.text.DecimalFormat;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
@@ -90,7 +91,9 @@ public class SizeAnnotation extends Annotation {
 		final Vector3 body = new Vector3(to).subtractLocal(from).multiplyLocal(0.5);
 		
 		label.setTranslation(middle);
-		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 100) / 100.0 + Scene.getInstance().getUnit().getNotation());
+//		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 10.0) / 10.0 + Scene.getInstance().getUnit().getNotation());
+		final DecimalFormat df = new DecimalFormat("#.#");
+		label.setText("" + df.format(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale()) + Scene.getInstance().getUnit().getNotation());
 		label.setAlign(align);
 		label.updateWorldTransform(true);
 		label.updateWorldBound(true);

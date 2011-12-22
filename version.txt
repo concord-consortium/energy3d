@@ -932,15 +932,17 @@ Version 0.5 - October 20, 2011
 - switch off snap to objects by default
 - fix exceptions with applet version
 - fix rendering issues with applet version
-
 - fix issue with z buffer in applet in tablet laptops
 - fix issue with weird bloom effect and wrong shadows in tablet laptops by updating their drivers
 - fix problem with left/right mouse action switching after using zoom tool
 - release version 0.5.6
-
 - open newFile in webstart version by default
-
-- *disable all tools when in print preview
+- disable all tools when in print preview
+- fix problem with left mouse button causing to rotate after swtiching back from zoom tool in print preview mode
+- release version 0.5.7
+- do not disable rotate animation in print preview mode
+- turn off heliodon before switching to print preview
+- round size annotations from 2 fraction digits to 1 fraction digits
 
 -*add feature for planting trees
 
