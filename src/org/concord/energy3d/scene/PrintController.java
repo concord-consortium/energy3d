@@ -8,6 +8,7 @@ import java.awt.print.Paper;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
@@ -27,6 +28,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.math.ColorRGBA;
@@ -42,14 +44,17 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
+import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.screen.ScreenExporter;
 
 public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
-	private static final int MARGIN = 5;
-	private static final double PRINT_MARGIN = 0.5;
+	private static final int SPACE_BETWEEN_PAGES = 5;
+	private static final double PAGE_MARGIN = 0.2;
+	private static final double SPACE_BETWEEN_PARTS = 0.3; //0.5;
 	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
 	private final Timer timer = new Timer();
+	private final Paper paper = new Paper();
 	private double pageWidth, pageHeight;
 	private double angle;
 	private int cols;
@@ -71,7 +76,6 @@ public class PrintController implements Updater {
 	public void init() {
 	}
 
-	@SuppressWarnings("unchecked")
 	public void update(final ReadOnlyTimer globalTimer) {
 		if (isPrintPreview)
 			rotate();
@@ -200,9 +204,9 @@ public class PrintController implements Updater {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			public Object call() throws Exception {
 				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
-				final Printout printout = new Printout();
+				final Printout printout = new Printout(paper);
 				final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
-				final Paper paper = new Paper();
+//				final Paper paper = new Paper();
 				final int resolutionHeight = 2;
 //				final Dimension newSize = new Dimension((int) (resolutionHeight * paper.getWidth() / paper.getHeight()), resolutionHeight);
 				final Dimension newSize = new Dimension((int) (resolutionHeight * paper.getWidth()), (int) (resolutionHeight * paper.getHeight()));
@@ -385,27 +389,34 @@ public class PrintController implements Updater {
 		for (final HousePart printPart : printParts) {
 			if (printPart.isPrintable()) {
 				if (printPart instanceof Roof) {
-					for (final Spatial mesh : ((Roof) printPart).getRoofPartsRoot().getChildren()) {
-						if (mesh.getSceneHints().getCullHint() != CullHint.Always) {
-							maxWidth = Math.max(maxWidth, ((BoundingBox) mesh.getWorldBound()).getXExtent() * 2);
-							maxHeight = Math.max(maxHeight, ((BoundingBox) mesh.getWorldBound()).getZExtent() * 2);
+					for (final Spatial roofPartNode : ((Roof) printPart).getRoofPartsRoot().getChildren()) {
+						if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
+//							maxWidth = Math.max(maxWidth, ((BoundingBox) mesh.getWorldBound()).getXExtent() * 2);
+//							maxHeight = Math.max(maxHeight, ((BoundingBox) mesh.getWorldBound()).getZExtent() * 2);
+							maxWidth = Math.max(maxWidth, ((OrientedBoundingBox) ((Node) roofPartNode).getChild(0).getWorldBound()).getExtent().getX() * 2);
+							maxHeight = Math.max(maxHeight, ((OrientedBoundingBox) ((Node) roofPartNode).getChild(0).getWorldBound()).getExtent().getZ() * 2);							
 						}
 					}
 				} else {
-					maxWidth = Math.max(maxWidth, ((BoundingBox) printPart.getMesh().getWorldBound()).getXExtent() * 2);
-					maxHeight = Math.max(maxHeight, ((BoundingBox) printPart.getMesh().getWorldBound()).getZExtent() * 2);
+//					maxWidth = Math.max(maxWidth, ((BoundingBox) printPart.getMesh().getWorldBound()).getXExtent() * 2);
+//					maxHeight = Math.max(maxHeight, ((BoundingBox) printPart.getMesh().getWorldBound()).getZExtent() * 2);
+					maxWidth = Math.max(maxWidth, ((OrientedBoundingBox) printPart.getMesh().getWorldBound()).getExtent().getX() * 2);
+					maxHeight = Math.max(maxHeight, ((OrientedBoundingBox) printPart.getMesh().getWorldBound()).getExtent().getZ() * 2);					
 				}
 			}
-		}
-		final Paper paper = new Paper();
-		final double ratio = paper.getWidth() / paper.getHeight();
-		if (maxWidth / maxHeight > ratio) {
-			pageWidth = maxWidth + PRINT_MARGIN * 2;
-			pageHeight = pageWidth / ratio;
-		} else {
-			pageHeight = maxHeight + PRINT_MARGIN * 2;
-			pageWidth = pageHeight * ratio;
-		}
+		}		
+		paper.setSize(13.0 * 72.0, 19.0 * 72.0);
+//		final double ratio = paper.getWidth() / paper.getHeight();
+//		if (maxWidth / maxHeight > ratio) {
+//			pageWidth = maxWidth + PRINT_MARGIN * 2;
+//			pageHeight = pageWidth / ratio;
+//		} else {
+//			pageHeight = maxHeight + PRINT_MARGIN * 2;
+//			pageWidth = pageHeight * ratio;
+//		}
+		final double exactCentimeterOnPaperScale = 1.0 / 72.0 / 4.0 / 10.6 * 10.8;
+		pageWidth = paper.getWidth() * exactCentimeterOnPaperScale;
+		pageHeight = paper.getHeight() * exactCentimeterOnPaperScale;
 	}
 
 	private void arrangePrintPages(final ArrayList<ArrayList<Spatial>> pages) {
@@ -421,8 +432,8 @@ public class PrintController implements Updater {
 			final Vector3 currentCorner = new Vector3();
 			double x, y;
 			do {
-				x = (pageNum % cols - cols / 2) * (pageWidth + MARGIN);
-				y = (pageNum / cols - (rows - 1) / 2) * (pageHeight + MARGIN);
+				x = (pageNum % cols - cols / 2) * (pageWidth + SPACE_BETWEEN_PAGES);
+				y = (pageNum / cols - (rows - 1) / 2) * (pageHeight + SPACE_BETWEEN_PAGES);
 				currentCorner.setX(x - pageWidth / 2);
 				currentCorner.setZ(y + pageHeight / 2);
 				pageNum++;
@@ -435,6 +446,7 @@ public class PrintController implements Updater {
 
 			final Box box = new Box("Page Boundary");
 			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageWidth, 0.2, -pageHeight, null));
+			box.setDefaultColor(ColorRGBA.GRAY);
 			pagesRoot.attachChild(box);
 		}
 	}
@@ -459,8 +471,10 @@ public class PrintController implements Updater {
 		for (int pageNum = 0; pageNum < pages.size() && !isFitted; pageNum++)
 			isFitted = fitInPage(printPart, pages.get(pageNum));
 		if (!isFitted) {
-			final BoundingBox bounds = (BoundingBox) printPart.getWorldBound();
-			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getXExtent() + PRINT_MARGIN, 0, -bounds.getZExtent() - PRINT_MARGIN));
+//			final BoundingBox bounds = (BoundingBox) printPart.getWorldBound();
+			final OrientedBoundingBox bounds = (OrientedBoundingBox) printPart.getWorldBound();
+//			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getXExtent() + PAGE_AND_PART_MARGIN, 0, -bounds.getZExtent() - PAGE_AND_PART_MARGIN));
+			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getExtent().getX() + PAGE_MARGIN, 0, -bounds.getExtent().getZ() - PAGE_MARGIN));
 			final ArrayList<Spatial> page = new ArrayList<Spatial>();
 			page.add(printPart);
 			pages.add(page);
@@ -470,28 +484,40 @@ public class PrintController implements Updater {
 	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
 		for (Spatial neighborPart : page) {
 			final Vector3 neighborPartCenter = ((UserData) neighborPart.getUserData()).getPrintCenter();
-			final BoundingBox neighborBound = (BoundingBox) neighborPart.getWorldBound().clone(null);
-			final BoundingBox printPartBound = (BoundingBox) printPart.getWorldBound().clone(null);
-			final double PADDING = 0.5;
-			final double xExtend = neighborBound.getXExtent() + printPartBound.getXExtent() + PADDING;
-			final double zExtend = neighborBound.getZExtent() + printPartBound.getZExtent() + PADDING;
+//			final BoundingBox neighborBound = (BoundingBox) neighborPart.getWorldBound().clone(null);
+			final OrientedBoundingBox neighborBound = (OrientedBoundingBox) neighborPart.getWorldBound().clone(null);
+//			final boolean isRoof = ((UserData) printPart.getUserData()).getHousePart() instanceof Roof;
+			final OrientedBoundingBox printPartBound;
+//			if (isRoof)
+//				printPartBound = computeBoundingBox((Mesh)printPart);
+//			else
+//				printPartBound = (BoundingBox) printPart.getWorldBound().clone(null);
+			printPartBound = (OrientedBoundingBox) printPart.getWorldBound().clone(null);
+//			final double SPACE_BETWEEN_PARTS = 0.3; //0.5;
+//			final double xExtend = neighborBound.getXExtent() + printPartBound.getXExtent() + PADDING;
+//			final double zExtend = neighborBound.getZExtent() + printPartBound.getZExtent() + PADDING;
+			final double xExtend = neighborBound.getExtent().getX() + printPartBound.getExtent().getX() + SPACE_BETWEEN_PARTS;
+			final double zExtend = neighborBound.getExtent().getZ() + printPartBound.getExtent().getZ() + SPACE_BETWEEN_PARTS;
 
 			for (double angleQuarter = 0; angleQuarter < 4; angleQuarter++) {
 				final boolean isHorizontal = angleQuarter % 2 == 0;
 				final Vector3 tryCenter = new Matrix3().fromAngles(0, angleQuarter * Math.PI / 2.0, 0).applyPost(new Vector3(isHorizontal ? xExtend : zExtend, 0, 0), null);
 				tryCenter.addLocal(neighborPartCenter);
 				if (!isHorizontal)
-					tryCenter.setX(PRINT_MARGIN + printPartBound.getXExtent());
+//					tryCenter.setX(PAGE_AND_PART_MARGIN + printPartBound.getXExtent());
+					tryCenter.setX(PAGE_MARGIN + printPartBound.getExtent().getX());
 
 				if (!isHorizontal)
-					tryCenter.setX(MathUtils.clamp(tryCenter.getX(), PRINT_MARGIN + printPartBound.getXExtent(), pageWidth - PRINT_MARGIN - printPartBound.getXExtent()));
+//					tryCenter.setX(MathUtils.clamp(tryCenter.getX(), PAGE_AND_PART_MARGIN + printPartBound.getXExtent(), pageWidth - PAGE_AND_PART_MARGIN - printPartBound.getXExtent()));
+					tryCenter.setX(MathUtils.clamp(tryCenter.getX(), PAGE_MARGIN + printPartBound.getExtent().getX(), pageWidth - PAGE_MARGIN - printPartBound.getExtent().getX()));
 				else
-					tryCenter.setZ(MathUtils.clamp(tryCenter.getZ(), -pageHeight + PRINT_MARGIN + printPartBound.getZExtent(), -PRINT_MARGIN - printPartBound.getZExtent()));
+					tryCenter.setZ(MathUtils.clamp(tryCenter.getZ(), -pageHeight + PAGE_MARGIN + printPartBound.getExtent().getZ(), -PAGE_MARGIN - printPartBound.getExtent().getZ()));
 
 				tryCenter.setY(0);
 
 				boolean collision = false;
-				if (tryCenter.getX() - printPartBound.getXExtent() < PRINT_MARGIN || tryCenter.getX() + printPartBound.getXExtent() > pageWidth - PRINT_MARGIN || tryCenter.getZ() + printPartBound.getZExtent() > PRINT_MARGIN || tryCenter.getZ() - printPartBound.getZExtent() < -pageHeight + PRINT_MARGIN)
+//				if (tryCenter.getX() - printPartBound.getXExtent() < PAGE_AND_PART_MARGIN || tryCenter.getX() + printPartBound.getXExtent() > pageWidth - PAGE_AND_PART_MARGIN || tryCenter.getZ() + printPartBound.getZExtent() > PAGE_AND_PART_MARGIN || tryCenter.getZ() - printPartBound.getZExtent() < -pageHeight + PAGE_AND_PART_MARGIN)				
+				if (tryCenter.getX() - printPartBound.getExtent().getX() < PAGE_MARGIN - MathUtils.ZERO_TOLERANCE || tryCenter.getX() + printPartBound.getExtent().getX() > pageWidth - PAGE_MARGIN + MathUtils.ZERO_TOLERANCE || tryCenter.getZ() + printPartBound.getExtent().getZ() > PAGE_MARGIN + MathUtils.ZERO_TOLERANCE|| tryCenter.getZ() - printPartBound.getExtent().getZ() < -pageHeight + PAGE_MARGIN - MathUtils.ZERO_TOLERANCE)
 					collision = true;
 				else
 					for (final Spatial otherPart : page) {
@@ -512,6 +538,22 @@ public class PrintController implements Updater {
 		}
 		return false;
 	}
+
+//	private BoundingBox computeBoundingBox(final Mesh printPart) {
+//		final FloatBuffer buf = printPart.getMeshData().getVertexBuffer();
+//		buf.rewind();
+//		final FloatBuffer newbuf = BufferUtils.createFloatBuffer(buf.limit());
+//		while (buf.hasRemaining()) {
+//			final Vector3 v = new Vector3(buf.get(), buf.get(), buf.get());
+//			printPart.getWorldTransform().applyForward(v);
+//			newbuf.put(v.getXf()).put(v.getYf()).put(v.getZf());
+//		}
+//		final BoundingVolume boundingBox = printPart.getWorldBound();
+//		System.out.println(boundingBox);
+//		boundingBox.computeFromPoints(newbuf);
+//		System.out.println(boundingBox);
+//		return (BoundingBox) boundingBox;
+//	}
 
 	public double getPageWidth() {
 		return pageWidth;
@@ -534,8 +576,8 @@ public class PrintController implements Updater {
 //	}
 
 	public ReadOnlyVector3 getZoomAllCameraLocation() {
-		final double pageHeight = getPageHeight() + MARGIN;
-		final double w = cols * (getPageWidth() + MARGIN);
+		final double pageHeight = getPageHeight() + SPACE_BETWEEN_PAGES;
+		final double w = cols * (getPageWidth() + SPACE_BETWEEN_PAGES);
 		final double h = rows * pageHeight;		
 		return new Vector3(0, -Math.max(w, h), rows % 2 != 0 ? 0 : pageHeight / 2);
 	}

@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -130,7 +131,7 @@ public class MeshLib {
 				node.getSceneHints().setPickingHint(PickingHint.Pickable, true);
 			} else {
 				newMesh = new Mesh("Roof Mesh #" + meshIndex);
-				newMesh.setModelBound(new BoundingBox());
+				newMesh.setModelBound(new OrientedBoundingBox());
 //				final OffsetState offsetState = new OffsetState();
 //				offsetState.setTypeEnabled(OffsetType.Fill, true);
 //				offsetState.setFactor(1);
@@ -142,6 +143,8 @@ public class MeshLib {
 				node.attachChild(new Node("Roof Angle Annot"));
 				node.attachChild(new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center));
 				node.getChild(3).getSceneHints().setCullHint(CullHint.Always);
+//				if (root.getNumberOfChildren() != 0)
+//					newMesh.getSceneHints().setCullHint(CullHint.Always);
 				root.attachChild(node);
 			}
 			final Vector3 normal = new Vector3();
@@ -199,6 +202,7 @@ public class MeshLib {
 			node.getChild(3).setTranslation(center.add(normal.multiply(0.1, null), null));
 
 			meshIndex++;
+//			break;
 		}
 		while (meshIndex < root.getNumberOfChildren()) {
 			root.getChild(meshIndex).getSceneHints().setCullHint(CullHint.Always);

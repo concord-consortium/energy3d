@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.io.Serializable;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.exception.InvisibleException;
@@ -13,12 +14,15 @@ import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
+import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -70,7 +74,7 @@ public abstract class HousePart implements Serializable {
 	protected double height;
 	protected int editPointIndex = -1;
 	protected boolean drawCompleted = false;
-	protected Vector3 flattenCenter;
+	protected transient Vector3 flattenCenter;
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 
@@ -134,13 +138,15 @@ public abstract class HousePart implements Serializable {
 	protected void init() {
 		relativeToHorizontal = false;
 		orgHeight = height;
+		flattenCenter = new Vector3();
+		
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");
 		sizeAnnotRoot = new Node("Size Annotations");
 		sizeAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		angleAnnotRoot = new Node("Angle Annotations");
 		angleAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		labelsRoot = new Node("Labels");
+		labelsRoot = new Node("Labels");		
 
 		setAnnotationsVisible(drawAnnotations);
 
@@ -197,9 +203,13 @@ public abstract class HousePart implements Serializable {
 			root.detachChild(mesh);
 			mesh = original.mesh.makeCopy(true);
 			mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getIndex(), false));
+//			final BoundingVolume modelBound = original.mesh.getModelBound();
+//			mesh.setModelBound(modelBound);
+//			modelBound.transform(new Transform(), mesh.getModelBound());
 			root.attachChild(mesh);
 		}
 		drawAnnotations();
+		computeOrientedBoundingBox();
 		root.updateWorldBound(true);
 	}
 
@@ -522,6 +532,7 @@ public abstract class HousePart implements Serializable {
 		if (root == null)
 			init();
 		drawMesh();
+		computeOrientedBoundingBox();
 		// if (this instanceof Roof)
 		// drawGrids(getGridSize());
 		// else if (container != null)
@@ -562,6 +573,29 @@ public abstract class HousePart implements Serializable {
 		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++)
 			pointsRoot.detachChildAt(points.size());
 	}
+	
+	protected void computeOrientedBoundingBox() {
+		flatten(1.0);
+		computeOrientedBoundingBox(mesh);		
+		flattenCenter.set(mesh.getWorldBound().getCenter());
+		flatten(0.0);
+	}
+	
+	protected void computeOrientedBoundingBox(final Mesh mesh) {
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		buf.rewind();
+		final FloatBuffer newbuf = BufferUtils.createFloatBuffer(buf.limit());
+		while (buf.hasRemaining()) {
+			final Vector3 v = new Vector3(buf.get(), buf.get(), buf.get());
+			mesh.getWorldTransform().applyForward(v);
+			newbuf.put(v.getXf()).put(v.getYf()).put(v.getZf());
+		}
+		final OrientedBoundingBox boundingBox = new OrientedBoundingBox();
+		boundingBox.computeFromPoints(newbuf);
+		boundingBox.transform(mesh.getWorldTransform().invert(null), mesh.getModelBound());
+		mesh.updateWorldBound(true);
+	}	
+	
 
 	public void flattenInit() {
 		flattenCenter = new Vector3();

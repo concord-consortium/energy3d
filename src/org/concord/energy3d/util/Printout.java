@@ -19,17 +19,18 @@ public class Printout implements ScreenExportable, Printable, Pageable {
 	private ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 	
 	final PageFormat pageFormat = new PageFormat();
-	final Paper paper = new Paper();
+//	final Paper paper; // = new Paper();
 
-	public Printout() {
-		this(false);
+	public Printout(final Paper paper) {
+//		this(false);
+//		this.pa
 		paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
 		pageFormat.setPaper(paper);
 	}
 
-	public Printout(boolean useAlpha) {
-		_useAlpha = useAlpha;
-	}
+//	public Printout(boolean useAlpha) {
+//		_useAlpha = useAlpha;
+//	}
 
 	public void export(final ByteBuffer data, final int width, final int height) {
 		final BufferedImage img = new BufferedImage(width, height, _useAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);

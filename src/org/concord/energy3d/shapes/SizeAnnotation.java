@@ -92,7 +92,7 @@ public class SizeAnnotation extends Annotation {
 		
 		label.setTranslation(middle);
 //		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 10.0) / 10.0 + Scene.getInstance().getUnit().getNotation());
-		final DecimalFormat df = new DecimalFormat("#.#");
+		final DecimalFormat df = new DecimalFormat("#.##");
 		label.setText("" + df.format(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale()) + Scene.getInstance().getUnit().getNotation());
 		label.setAlign(align);
 		label.updateWorldTransform(true);

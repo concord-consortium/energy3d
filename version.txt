@@ -944,6 +944,14 @@ Version 0.5 - October 20, 2011
 - turn off heliodon before switching to print preview
 - round size annotations from 2 fraction digits to 1 fraction digits
 
+- allow printing exact size
+- allow printing on 13"x19" paper
+- fix problem with never drawing gable wall top annotations
+- use OBB (Oriented Bounding Box) for all shapes
+- compute OBB by flattening shapes first and computing their bounding box and reverse rotating the bounding box
+- eliminiate the need for initFlatten method
+ 
+
 -*add feature for planting trees
 
 

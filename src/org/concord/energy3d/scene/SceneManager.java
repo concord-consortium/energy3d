@@ -366,19 +366,38 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (selectedHousePart instanceof Roof) {
 				final Node flattenedMeshesRoot = ((Roof) selectedHousePart).getRoofPartsRoot();
 				if (flattenedMeshesRoot != null && pick != null) {
-					com.ardor3d.util.geom.Debugger.drawBounds(flattenedMeshesRoot.getChild(pick.getIndex()), renderer, true);
-					// com.ardor3d.util.geom.Debugger.drawBounds(((Node) flattenedMeshesRoot.getChild(pick.getIndex())).getChild(0), renderer, true);
-					System.out.println(flattenedMeshesRoot.getChild(pick.getIndex()).getWorldBound());
+//					com.ardor3d.util.geom.Debugger.drawBounds(flattenedMeshesRoot.getChild(pick.getIndex()), renderer, true);
+					 final Spatial node = ((Node) flattenedMeshesRoot.getChild(pick.getIndex())).getChild(0);
+					com.ardor3d.util.geom.Debugger.drawBounds(node, renderer, true);
+					System.out.println(node.getWorldBound());
 				}
 			} else {
-				if (selectedHousePart instanceof Wall)
-					com.ardor3d.util.geom.Debugger.drawBounds(((Wall) selectedHousePart).getRoot().getChild(3), renderer, true);
-				else
-					com.ardor3d.util.geom.Debugger.drawBounds(selectedHousePart.getRoot(), renderer, true);
+//				if (selectedHousePart instanceof Wall)
+//					com.ardor3d.util.geom.Debugger.drawBounds(((Wall) selectedHousePart).getRoot().getChild(3), renderer, true);
+//				else
+					com.ardor3d.util.geom.Debugger.drawBounds(selectedHousePart.getMesh(), renderer, true);
 				if (selectedHousePart.getMesh() != null)
 					System.out.println(selectedHousePart.getMesh().getWorldBound());
 			}
 		}
+		
+		if (drawBounds) {
+//			for (final HousePart selectedHousePart : PrintController.getInstance().getPrintParts())
+			for (final HousePart selectedHousePart : Scene.getInstance().getParts())
+			if (selectedHousePart instanceof Roof) {
+				final Node flattenedMeshesRoot = ((Roof) selectedHousePart).getRoofPartsRoot();
+				if (flattenedMeshesRoot != null) {
+					for (int i = 0; i < flattenedMeshesRoot.getNumberOfChildren(); i++) {
+//					com.ardor3d.util.geom.Debugger.drawBounds(flattenedMeshesRoot.getChild(pick.getIndex()), renderer, true);
+					 final Spatial node = ((Node) flattenedMeshesRoot.getChild(i)).getChild(0);
+					 node.getWorldBound();
+					com.ardor3d.util.geom.Debugger.drawBounds(node, renderer, true);
+					System.out.println(node.getWorldBound());
+					}
+				}
+			}
+		}
+		
 
 //		 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
 
@@ -931,7 +950,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			else
 				resizeCamera(pageWidth);
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
-//			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
+			cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			// final int rows = PrintController.getInstance().getRows();
 			// final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin();

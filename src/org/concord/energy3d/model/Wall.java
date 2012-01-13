@@ -23,6 +23,7 @@ import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -98,7 +99,7 @@ public class Wall extends HousePart {
 		offsetState.setFactor(1f);
 		offsetState.setUnits(1f);
 		mesh.setRenderState(offsetState);
-		mesh.setModelBound(new BoundingBox());
+		mesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(mesh);
 
 		backMesh = new Mesh("Wall (Back)");
@@ -951,7 +952,7 @@ public class Wall extends HousePart {
 			}
 	
 			final float lineWidth = original == null ? 1f : 2f;
-			final boolean isRectangular = hi - low < 0.5;
+			final boolean isRectangular = hi - low < 0.1;;
 
 			if (isRectangular) {				final ReadOnlyVector3 p1 = wallPolygonPoints.get(0).multiply(new Vector3(1, 1, 0), null).addLocal(0, 0, lowestWallZ);
 				final ReadOnlyVector3 p2 = wallPolygonPoints.get(1);

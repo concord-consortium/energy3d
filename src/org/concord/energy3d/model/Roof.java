@@ -20,13 +20,17 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -46,7 +50,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
 	// protected static final double getGridSize() = 0.5;
-	private static final double OVERHANG_LENGHT = 0.2;
+	private static final double OVERHANG_LENGHT = 0.2; //0.01; //0.2;
 	protected transient Node roofPartsRoot;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient ArrayList<ReadOnlyVector3> wallNormals;
@@ -66,6 +70,7 @@ public abstract class Roof extends HousePart {
 	protected void init() {
 		super.init();
 		relativeToHorizontal = true; // TODO move all parameters of HousePart constructor to init
+		orgCenters = new HashMap<Node, ReadOnlyVector3>();		
 		wallUpperPoints = new ArrayList<PolygonPoint>();
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
@@ -140,9 +145,17 @@ public abstract class Roof extends HousePart {
 			updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 			root.updateGeometricState(0);
 			// drawGrids(getGridSize());
+			
+//			flattenInit();
+			
+//			flatten(0);
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+//		computeOrientedBoundingBox();
 	}
 
 	protected void drawWalls() {
@@ -215,25 +228,40 @@ public abstract class Roof extends HousePart {
 	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
 		return new Polygon(wallUpperPoints);
 	}
-
-	public void flattenInit() {
-		if (orgCenters == null)
-			orgCenters = new HashMap<Node, ReadOnlyVector3>();
-		else
-			orgCenters.clear();
+	
+	@Override
+	protected void computeOrientedBoundingBox() {
 		flatten(1.0);
-		for (final Spatial mesh : roofPartsRoot.getChildren()) {
-			mesh.setTranslation(0, 0, 0);
+		orgCenters.clear();
+		
+		for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
+			final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
+			computeOrientedBoundingBox(roofPartMesh);
+			orgCenters.put((Node) roofPartNode, roofPartMesh.getWorldBound().getCenter());
+		}
+		flatten(0.0);
+	}
+	
+	public void flattenInit() {
+//		if (orgCenters == null)
+//			orgCenters = new HashMap<Node, ReadOnlyVector3>();
+//		else
+//			orgCenters.clear();
+		flatten(1.0);
+		for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
+			roofPartNode.setTranslation(0, 0, 0);
 
+			final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
+//			computeOrientedBoundingBox(mesh);
 			// The following code is needed because the center of bounding box is not accurate. If oriented bounding box is usde then this code is no longer required.
-			final FloatBuffer buf = ((Mesh) ((Node) mesh).getChild(0)).getMeshData().getVertexBuffer();
+			final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 			buf.rewind();
 			final Vector3 p = new Vector3(buf.get(), buf.get(), buf.get());
-			mesh.getTransform().applyForward(p);
+			roofPartNode.getTransform().applyForward(p);
 
-			final Vector3 orgCenter = new Vector3(mesh.getWorldBound().getCenter());
+			final Vector3 orgCenter = new Vector3(roofPartNode.getWorldBound().getCenter());
 			orgCenter.setY(p.getY());
-			orgCenters.put((Node) mesh, orgCenter);
+			orgCenters.put((Node) roofPartNode, orgCenter);
 		}
 	}
 
@@ -247,9 +275,25 @@ public abstract class Roof extends HousePart {
 
 	private void flattenQuadTriangle(final Node roofPartNode, final double flattenTime) {
 		final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPartNode.getUserData();
-		final double angle = normal.smallestAngleBetween(Vector3.NEG_UNIT_Y);
-		final Vector3 rotAxis = normal.cross(Vector3.NEG_UNIT_Y, null);
-		roofPartNode.setRotation(new Matrix3().fromAngleAxis(flattenTime * angle, rotAxis));
+
+		final double angleZ = Util.angleBetween(new Vector3(normal.getX(), normal.getY(), 0).normalizeLocal(), Vector3.NEG_UNIT_Y, Vector3.UNIT_Z);
+		final Matrix3 m1 = new Matrix3().fromAngles(0, 0, flattenTime * angleZ);
+		
+//		final double angle = normal.smallestAngleBetween(Vector3.NEG_UNIT_Y);
+//		final Vector3 rotAxis = normal.cross(Vector3.NEG_UNIT_Y, null);
+//		final Matrix3 matrix = new Matrix3().fromAngleAxis(flattenTime * angle, rotAxis);
+		
+		final ReadOnlyVector3 normal2 = m1.applyPost(normal, null);
+//		final double angleX = Util.angleBetween(new Vector3(0, normal.getY(), normal.getZ()).normalizeLocal(), Vector3.NEG_UNIT_Y, Vector3.UNIT_X);
+		final double angleX = Util.angleBetween(normal2, Vector3.NEG_UNIT_Y, Vector3.UNIT_X);
+		final Matrix3 m2 = new Matrix3().fromAngles(flattenTime * angleX, 0, 0);
+		
+		final Matrix3 matrix = m2.multiply(m1, null);
+		
+		System.out.println(matrix);
+		roofPartNode.setRotation(matrix);
+		System.out.println(matrix.invertLocal());
+//		System.out.println(new Matrix3().fromAngleAxis(-flattenTime * angle, rotAxis));
 
 		ReadOnlyVector3 orgCenter = orgCenters.get(roofPartNode);
 		if (orgCenter == null)
@@ -614,12 +658,19 @@ public abstract class Roof extends HousePart {
 			if (roofPartsRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
 				// ((Node) roofPartsRoot.getChild(i)).getChild(1).getSceneHints().setCullHint(CullHint.Always);
 				final UserData orgUserData = (UserData) ((Node) ((Roof) original).roofPartsRoot.getChild(i)).getChild(0).getUserData();
-				((Node) roofPartsRoot.getChild(i)).getChild(0).setUserData(new UserData(this, orgUserData.getIndex(), false));
+				final Mesh mesh = (Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(0);
+				mesh.setUserData(new UserData(this, orgUserData.getIndex(), false));
 				roofPartsRoot.getChild(i).setUserData(((Roof) original).roofPartsRoot.getChild(i).getUserData());
+				
+				
+//				final BoundingVolume modelBound = ((Mesh) ((Node) ((Roof) original).roofPartsRoot.getChild(i)).getChild(0)).getModelBound();
+//				mesh.setModelBound(modelBound);
+//				modelBound.transform(new Transform(), modelBound);				
 			}
 		}
 		root.attachChild(roofPartsRoot);
 		drawAnnotations();
+		computeOrientedBoundingBox();
 		root.updateWorldBound(true);
 	}
 
