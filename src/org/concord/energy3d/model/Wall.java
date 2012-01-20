@@ -912,6 +912,9 @@ public class Wall extends HousePart {
 			angle = Math.PI - angle;
 
 		root.setRotation((new Matrix3().fromAngles(0, 0, -flattenTime * angle)));
+//		System.out.println(new Matrix3().fromAngles(0, -Math.PI / 2.0 * flattenTime, 0).multiply(root.getRotation(), null));
+//		root.setRotation(new Matrix3().fromAngles(0, -Math.PI / 2.0 * flattenTime, 0).multiply(root.getRotation(), null));
+		
 		super.flatten(flattenTime);
 
 		for (HousePart part : children)

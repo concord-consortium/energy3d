@@ -129,4 +129,11 @@ public class Door extends HousePart {
 	protected String getDefaultTextureFileName() {
 		return "door.jpg";
 	}
+	
+	public Vector3 getAbsPoint(final int index) {
+		if (container != null)
+			return container.getRoot().getTransform().applyForward(super.getAbsPoint(index));
+		else
+			return super.getAbsPoint(index);
+	}	
 }

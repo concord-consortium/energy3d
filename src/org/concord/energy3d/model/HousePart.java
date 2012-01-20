@@ -21,6 +21,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
@@ -77,6 +78,7 @@ public abstract class HousePart implements Serializable {
 	protected transient Vector3 flattenCenter;
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
+	private transient boolean isPrintVertical;
 
 	public static boolean isSnapToObjects() {
 		return snapToObjects;
@@ -139,14 +141,15 @@ public abstract class HousePart implements Serializable {
 		relativeToHorizontal = false;
 		orgHeight = height;
 		flattenCenter = new Vector3();
-		
+		isPrintVertical = false;
+
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");
 		sizeAnnotRoot = new Node("Size Annotations");
 		sizeAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		angleAnnotRoot = new Node("Angle Annotations");
 		angleAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		labelsRoot = new Node("Labels");		
+		labelsRoot = new Node("Labels");
 
 		setAnnotationsVisible(drawAnnotations);
 
@@ -203,9 +206,9 @@ public abstract class HousePart implements Serializable {
 			root.detachChild(mesh);
 			mesh = original.mesh.makeCopy(true);
 			mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getIndex(), false));
-//			final BoundingVolume modelBound = original.mesh.getModelBound();
-//			mesh.setModelBound(modelBound);
-//			modelBound.transform(new Transform(), mesh.getModelBound());
+			// final BoundingVolume modelBound = original.mesh.getModelBound();
+			// mesh.setModelBound(modelBound);
+			// modelBound.transform(new Transform(), mesh.getModelBound());
 			root.attachChild(mesh);
 		}
 		drawAnnotations();
@@ -254,19 +257,19 @@ public abstract class HousePart implements Serializable {
 
 	public void setEditPointsVisible(final boolean visible) {
 		for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
-//			if (visible)
-//				computeEditPointScale(i);
+			// if (visible)
+			// computeEditPointScale(i);
 			pointsRoot.getChild(i).getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 		}
 	}
 
-//	protected void computeEditPointScale(final int i) {
-////		pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
-////		pointsRoot.getChild(i).updateGeometricState(0);
-//		
-//		pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
-//		pointsRoot.getChild(i).updateGeometricState(0);		
-//	}
+	// protected void computeEditPointScale(final int i) {
+	// // pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
+	// // pointsRoot.getChild(i).updateGeometricState(0);
+	//
+	// pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
+	// pointsRoot.getChild(i).updateGeometricState(0);
+	// }
 
 	// public void hidePoints() {
 	// for (final Spatial child : pointsRoot.getChildren())
@@ -532,7 +535,8 @@ public abstract class HousePart implements Serializable {
 		if (root == null)
 			init();
 		drawMesh();
-		computeOrientedBoundingBox();
+		if (firstPointInserted)
+			computeOrientedBoundingBox();
 		// if (this instanceof Roof)
 		// drawGrids(getGridSize());
 		// else if (container != null)
@@ -549,7 +553,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void setGridsVisible(final boolean visible) {
-//		if (this instanceof Foundation) {
+		// if (this instanceof Foundation) {
 		if (container == null) {
 			if (visible)
 				SceneManager.getInstance().drawGrids(getGridSize());
@@ -573,14 +577,17 @@ public abstract class HousePart implements Serializable {
 		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++)
 			pointsRoot.detachChildAt(points.size());
 	}
-	
+
 	protected void computeOrientedBoundingBox() {
+		flattenCenter.set(0, 0, 0);
 		flatten(1.0);
-		computeOrientedBoundingBox(mesh);		
+		computeOrientedBoundingBox(mesh);
 		flattenCenter.set(mesh.getWorldBound().getCenter());
+//		System.out.println(flattenCenter);
+//		System.out.println();
 		flatten(0.0);
 	}
-	
+
 	protected void computeOrientedBoundingBox(final Mesh mesh) {
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		buf.rewind();
@@ -594,8 +601,10 @@ public abstract class HousePart implements Serializable {
 		boundingBox.computeFromPoints(newbuf);
 		boundingBox.transform(mesh.getWorldTransform().invert(null), mesh.getModelBound());
 		mesh.updateWorldBound(true);
-	}	
-	
+		
+//		if (this instanceof Roof)
+//			System.out.println(mesh.getWorldBound().getCenter());
+	}
 
 	public void flattenInit() {
 		flattenCenter = new Vector3();
@@ -608,9 +617,20 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void flatten(double flattenTime) {
-		final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
-		root.setTranslation(targetCenter.subtractLocal(flattenCenter).multiplyLocal(flattenTime));
-		root.updateGeometricState(0);
+		if (isPrintable()) {
+			if (isPrintVertical) {
+				root.setRotation(new Matrix3().fromAngles(0, -Math.PI / 2.0 * flattenTime, 0).multiply(root.getRotation(), null));
+//				isPrintVertical = false;
+			}
+			final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
+//			final Vector3 targetCenter = new Vector3();
+			root.setTranslation(targetCenter.subtractLocal(flattenCenter).multiplyLocal(flattenTime));
+			root.updateGeometricState(0);
+//			System.out.println(mesh.getWorldBound().getCenter());
+//			System.out.println(((OrientedBoundingBox) mesh.getWorldBound()).getExtent());
+//			System.out.println();
+			int a = 5;			
+		}
 	}
 
 	public boolean isPrintable() {
@@ -772,4 +792,10 @@ public abstract class HousePart implements Serializable {
 	public boolean isDrawable() {
 		return true;
 	}
+	
+	public void setPrintVertical(final boolean isVertical) {
+		isPrintVertical = isVertical;
+		computeOrientedBoundingBox();
+	}
+	
 }
