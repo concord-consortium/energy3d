@@ -71,6 +71,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton roofCustomButton = null;
 	private JToggleButton zoomButton = null;
 	private JToggleButton roofGableButton = null;
+	
 	public static MainPanel getInstance() {
 		return instance;
 	}

@@ -212,7 +212,7 @@ public abstract class HousePart implements Serializable {
 			root.attachChild(mesh);
 		}
 		drawAnnotations();
-		computeOrientedBoundingBox();
+//		computeOrientedBoundingBox(true);
 		root.updateWorldBound(true);
 	}
 
@@ -535,8 +535,8 @@ public abstract class HousePart implements Serializable {
 		if (root == null)
 			init();
 		drawMesh();
-		if (firstPointInserted)
-			computeOrientedBoundingBox();
+//		if (firstPointInserted)
+//			computeOrientedBoundingBox(true);
 		// if (this instanceof Roof)
 		// drawGrids(getGridSize());
 		// else if (container != null)
@@ -578,14 +578,16 @@ public abstract class HousePart implements Serializable {
 			pointsRoot.detachChildAt(points.size());
 	}
 
-	protected void computeOrientedBoundingBox() {
+	public void computeOrientedBoundingBox() {
 		flattenCenter.set(0, 0, 0);
-		flatten(1.0);
+//		if (flatten)
+//			flatten(1.0);
 		computeOrientedBoundingBox(mesh);
 		flattenCenter.set(mesh.getWorldBound().getCenter());
 //		System.out.println(flattenCenter);
 //		System.out.println();
-		flatten(0.0);
+//		if (flatten)
+//			flatten(0.0);
 	}
 
 	protected void computeOrientedBoundingBox(final Mesh mesh) {
@@ -610,6 +612,7 @@ public abstract class HousePart implements Serializable {
 		flattenCenter = new Vector3();
 		flatten(1.0);
 		flattenCenter = new Vector3(mesh.getWorldBound().getCenter());
+//		flatten(1.0);
 	}
 
 	protected ReadOnlyVector3 getCenter() {
@@ -795,6 +798,8 @@ public abstract class HousePart implements Serializable {
 	
 	public void setPrintVertical(final boolean isVertical) {
 		isPrintVertical = isVertical;
+		flattenCenter.set(0, 0, 0);
+		flatten(1.0);
 		computeOrientedBoundingBox();
 	}
 	

@@ -10,6 +10,8 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.Callable;
 
 import javax.swing.SwingUtilities;
@@ -25,6 +27,8 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.Printout;
 import org.concord.energy3d.util.Util;
+
+import sun.misc.Sort;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingVolume;
@@ -101,16 +105,20 @@ public class PrintController implements Updater {
 				for (final HousePart part : printParts)
 					if (part.isPrintable()) {
 //						part.flattenInit();
+						part.flatten(1.0);
+						part.computeOrientedBoundingBox();
 						part.drawLabels(printSequence);
 						printSequence = part.getOriginal().drawLabels(printSequence);
 					}
-
+				
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
 				computePageDimension();
 				computePrintCenters(pages);
+				
 //				finished = true;
 //				if (true)
 //					return;
+				
 				arrangePrintPages(pages);
 
 				SceneManager.getInstance().updatePrintPreviewScene(true);
@@ -121,7 +129,7 @@ public class PrintController implements Updater {
 				// originalHouseRoot.updateWorldBound(false);
 				originalHouseRoot.setTranslation(originalHouseRoot.getWorldBound().getCenter().multiply(-2.0, null));
 
-//				drawPrintParts(0);
+				drawPrintParts(0);
 			}
 			originalHouseRoot.getSceneHints().setCullHint(CullHint.Always);
 			timer.reset();
@@ -511,6 +519,9 @@ public class PrintController implements Updater {
 	}
 
 	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
+		int a;
+		if (((UserData)printPart.getUserData()).getHousePart() instanceof Roof)
+			a = 5;
 		for (Spatial neighborPart : page) {
 			final Vector3 neighborPartCenter = ((UserData) neighborPart.getUserData()).getPrintCenter();
 			// final BoundingBox neighborBound = (BoundingBox) neighborPart.getWorldBound().clone(null);

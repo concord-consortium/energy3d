@@ -232,32 +232,34 @@ public abstract class Roof extends HousePart {
 	}
 
 	@Override
-	protected void computeOrientedBoundingBox() {
+	public void computeOrientedBoundingBox() {
 		orgCenters.clear();
-//		flatten(1.0);
+//		if (flatten)
+//			flatten(1.0);
 
 		for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
 			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
 				final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
 				computeOrientedBoundingBox(roofPartMesh);
-//				orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
-//				System.out.print(roofPartMesh.getWorldBound().getCenter());
-//				System.out.println();
+				orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
+				System.out.print(roofPartMesh.getWorldBound().getCenter());
+				System.out.println();
 			}
 		}
-//		 flatten(0.0);
+//		if (flatten)
+//			flatten(0.0);
 	}
-	
-	@Override
-	protected void computeOrientedBoundingBox(Mesh mesh) {
-		orgCenters.put((Node) mesh.getParent(), null);
-		flattenQuadTriangle((Node) mesh.getParent(), 1.0);
-		super.computeOrientedBoundingBox(mesh);
-		orgCenters.put((Node) mesh.getParent(), new Vector3(mesh.getWorldBound().getCenter()));
-		System.out.print(mesh.getWorldBound().getCenter());;
-		System.out.println();		
-		flattenQuadTriangle((Node) mesh.getParent(), 0.0);
-	}
+
+	// @Override
+	// protected void computeOrientedBoundingBox(final Mesh mesh) {
+	// orgCenters.put((Node) mesh.getParent(), null);
+	// flattenQuadTriangle((Node) mesh.getParent(), 1.0);
+	// super.computeOrientedBoundingBox(mesh);
+	// orgCenters.put((Node) mesh.getParent(), new Vector3(mesh.getWorldBound().getCenter()));
+	// System.out.print(mesh.getWorldBound().getCenter());;
+	// System.out.println();
+	// // flattenQuadTriangle((Node) mesh.getParent(), 0.0);
+	// }
 
 	public void flattenInit() {
 		// if (orgCenters == null)
@@ -309,11 +311,13 @@ public abstract class Roof extends HousePart {
 
 		ReadOnlyVector3 orgCenter = orgCenters.get(roofPartNode);
 		System.out.println(orgCenter);
+
 		if (orgCenter == null)
 			orgCenter = Vector3.ZERO;
 		final Vector3 targetPrintCenter = ((UserData) ((Node) roofPartNode).getChild(0).getUserData()).getPrintCenter();
 		if (!targetPrintCenter.equals(Vector3.ZERO))
 			roofPartNode.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
+//		System.out.println(roofPartNode.getTranslation());
 	}
 
 	@Override
@@ -683,7 +687,7 @@ public abstract class Roof extends HousePart {
 		}
 		root.attachChild(roofPartsRoot);
 		drawAnnotations();
-		computeOrientedBoundingBox();
+//		computeOrientedBoundingBox(true);
 		root.updateWorldBound(true);
 	}
 
@@ -766,11 +770,22 @@ public abstract class Roof extends HousePart {
 	}
 
 	public void setPrintVertical(final Spatial roofPartNode, final boolean isVertical) {
+//		Boolean currentValue = roofPartPrintVerticalMap.get(roofPartNode);
+//		if (currentValue == null)
+//			currentValue = true;
+//		if (currentValue == isVertical)
+//		if (!isVertical)
+//			return;
 		roofPartPrintVerticalMap.put(roofPartNode, isVertical);
+//		flatten(1.0); // to trigger rotate 90 degrees
 //		computeOrientedBoundingBox();
-//		flattenQuadTriangle((Node) roofPartNode, 1.0);
-		final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
-		computeOrientedBoundingBox(roofPartMesh);
-//		flattenQuadTriangle((Node) roofPartNode, 0.0);
+//		flatten(1.0);
+		 flattenQuadTriangle((Node) roofPartNode, 1.0);
+		 roofPartNode.updateGeometricState(0);
+		orgCenters.put((Node) roofPartNode, null);
+		 final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
+		 computeOrientedBoundingBox(roofPartMesh);
+		 orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
+		// flattenQuadTriangle((Node) roofPartNode, 0.0);
 	}
 }
