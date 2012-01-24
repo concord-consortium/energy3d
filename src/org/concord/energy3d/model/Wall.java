@@ -358,7 +358,7 @@ public class Wall extends HousePart {
 		toXY.transform(u);
 		toXY.transform(v);
 
-		try {
+//		try {
 			if (Scene.getInstance().isDrawThickness() && isShortWall) {
 				final Vector3 dir = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
 
@@ -398,9 +398,9 @@ public class Wall extends HousePart {
 			invisibleMesh.updateModelBound();
 
 			root.updateWorldBound(true);
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
+//		} catch (Throwable e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	private void drawWireframe(final ArrayList<? extends ReadOnlyVector3> wallPolygonPoints, final ArrayList<ReadOnlyVector3> wallPolygonHoles) {

@@ -98,7 +98,7 @@ public class Floor extends HousePart {
 //			setEditPointsVisible(false);
 			return;
 		}
-		try {
+//		try {
 			mesh.getSceneHints().setCullHint(CullHint.Inherit);
 			wallUpperPoints = exploreWallNeighbors((Wall) container);
 			fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
@@ -106,9 +106,9 @@ public class Floor extends HousePart {
 			updateEditShapes();
 //			for (int i = 0; i < points.size(); i++)
 //				pointsRoot.getChild(i).setTranslation(points.get(i));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(final Wall startWall) {

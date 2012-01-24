@@ -949,10 +949,9 @@ Version 0.5 - October 20, 2011
 - use OBB (Oriented Bounding Box) for all shapes
 - compute OBB by flattening shapes first and computing their bounding box and reverse rotating the bounding box
 - eliminate the need for initFlatten method
-
 - allow rotating the flatten house parts using setPrintVertical and recalculating the new Oriented Bounding Box
  
- 
+- fix problem with program crashing when HousePart.draw exception happens by catching all exceptions thrown in this method 
 
 -*add feature for planting trees
 

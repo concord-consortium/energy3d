@@ -102,7 +102,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void drawMesh() {
-		try {
+//		try {
 			/* undo the effect of wall stretch on all walls if roof is moved to new walls */
 			if (previousContainer != container) {
 				previousContainer = container;
@@ -144,7 +144,6 @@ public abstract class Roof extends HousePart {
 				roofPartIndex++;
 			}
 			drawWireframe();
-			;
 			updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 			root.updateGeometricState(0);
 			// drawGrids(getGridSize());
@@ -153,9 +152,9 @@ public abstract class Roof extends HousePart {
 
 			// flatten(0);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
 		// computeOrientedBoundingBox();
 	}
