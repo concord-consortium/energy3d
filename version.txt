@@ -951,8 +951,9 @@ Version 0.5 - October 20, 2011
 - eliminate the need for initFlatten method
 - allow rotating the flatten house parts using setPrintVertical and recalculating the new Oriented Bounding Box
 - fix problem with program crashing when HousePart.draw exception happens by catching all exceptions thrown in this method
+- fix problem with unable to draw window on some walls that are parallel to y axis by checking abs value of wallDir.x with zero_tollerance
 
-- fix problem with unable to draw window on some walls that are parallel to y axis by checking abs value of wallDir.x with zero_tollerance 
+- fix problem with not rotating around clicked point sometimes by sorting pick points and using the closest distance
 
 -*add feature for planting trees
 

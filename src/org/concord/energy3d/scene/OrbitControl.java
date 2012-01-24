@@ -157,13 +157,15 @@ public class OrbitControl extends CameraControl {
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY()), false, null);
 				final PickResults pickResults = new PrimitivePickResults();
+				pickResults.setCheckDistance(true);
 				PickingUtil.findPick(Scene.getRoot(), pickRay, pickResults, false);
 				
 				for (int i = 0; i < pickResults.getNumber(); i++) {
 					final int closestIntersection = pickResults.getPickData(i).getIntersectionRecord().getClosestIntersection();
 					if (closestIntersection != -1) {
-						final Vector3 point = pickResults.getPickData(i).getIntersectionRecord().getIntersectionPoint(closestIntersection);
-						frontDistance = point.subtractLocal(source.getCanvasRenderer().getCamera().getLocation()).length() + 1;
+//						final Vector3 point = pickResults.getPickData(i).getIntersectionRecord().getIntersectionPoint(closestIntersection);
+//						frontDistance = point.subtractLocal(source.getCanvasRenderer().getCamera().getLocation()).length() + 1;
+						frontDistance = pickResults.getPickData(i).getIntersectionRecord().getClosestDistance() + 1;
 						clearOrbitCenter();
 						return;
 					}
