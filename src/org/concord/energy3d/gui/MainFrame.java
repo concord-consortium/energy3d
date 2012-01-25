@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.net.URL;
 import java.util.concurrent.Callable;
@@ -45,6 +47,7 @@ import org.concord.energy3d.util.Config;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import javax.swing.JSeparator;
 
 public class MainFrame extends JFrame {
 	private final static boolean IS_MAC = System.getProperty("os.name").startsWith("Mac");
@@ -86,6 +89,9 @@ public class MainFrame extends JFrame {
 	private JMenu editMenu;
 	private JMenuItem undoMenuItem;
 	private JMenuItem redoMenuItem;
+	private JMenuItem pageSetupMenuItem;
+	private JSeparator separator;
+	private JSeparator separator_1;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -259,8 +265,11 @@ public class MainFrame extends JFrame {
 			fileMenu.add(getOpenMenuItem());
 			fileMenu.add(getSaveMenuItem());
 			fileMenu.add(getSaveasMenuItem());
+			fileMenu.add(getSeparator());
+			fileMenu.add(getPageSetupMenuItem());
 			fileMenu.add(getPreviewMenuItem());
 			fileMenu.add(getPrintMenuItem());
+			fileMenu.add(getSeparator_1());
 			fileMenu.add(getExitMenuItem());
 		}
 		return fileMenu;
@@ -353,7 +362,7 @@ public class MainFrame extends JFrame {
 	 */
 	private JMenuItem getPrintMenuItem() {
 		if (printMenuItem == null) {
-			printMenuItem = new JMenuItem("Print");
+			printMenuItem = new JMenuItem("Print...");
 			printMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_MASK));
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -840,5 +849,28 @@ public class MainFrame extends JFrame {
 				err.printStackTrace();
 				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
+	}
+	private JMenuItem getPageSetupMenuItem() {
+		if (pageSetupMenuItem == null) {
+			pageSetupMenuItem = new JMenuItem("Page Setup...");
+			pageSetupMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					PrintController.getInstance().pageSetup();
+				}
+			});
+		}
+		return pageSetupMenuItem;
+	}
+	private JSeparator getSeparator() {
+		if (separator == null) {
+			separator = new JSeparator();
+		}
+		return separator;
+	}
+	private JSeparator getSeparator_1() {
+		if (separator_1 == null) {
+			separator_1 = new JSeparator();
+		}
+		return separator_1;
 	}
 }

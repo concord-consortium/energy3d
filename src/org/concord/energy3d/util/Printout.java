@@ -18,14 +18,15 @@ public class Printout implements ScreenExportable, Printable, Pageable {
 	protected boolean _useAlpha;
 	private ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 	
-	final PageFormat pageFormat = new PageFormat();
+	final PageFormat pageFormat; // = new PageFormat();
 //	final Paper paper; // = new Paper();
 
-	public Printout(final Paper paper) {
+	public Printout(final PageFormat pageFormat) {
 //		this(false);
 //		this.pa
-		paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-		pageFormat.setPaper(paper);
+//		paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+//		pageFormat.setPaper(paper);
+		this.pageFormat = pageFormat;
 	}
 
 //	public Printout(boolean useAlpha) {
@@ -103,16 +104,18 @@ public class Printout implements ScreenExportable, Printable, Pageable {
 		}
 		final BufferedImage img = images.get(pageIndex);
 		
-		final int w = img.getWidth();
-		final int h = img.getHeight();
-		final double pageRatio = pageFormat.getImageableWidth() / pageFormat.getImageableHeight();
-		final BufferedImage croppedImg;
-		if (w / h > pageRatio)
-			croppedImg = img.getSubimage((int)(w-h * pageRatio)/2, 0, (int)(h * pageRatio), h);
-		else
-			croppedImg = img.getSubimage(0, (int)(h-w / pageRatio)/2, w, (int)(w / pageRatio));
+//		final int w = img.getWidth();
+//		final int h = img.getHeight();
+//		final double pageRatio = pageFormat.getImageableWidth() / pageFormat.getImageableHeight();
+//		final BufferedImage croppedImg;
+//		if (w / h > pageRatio)
+//			croppedImg = img.getSubimage((int)(w-h * pageRatio)/2, 0, (int)(h * pageRatio), h);
+//		else
+//			croppedImg = img.getSubimage(0, (int)(h-w / pageRatio)/2, w, (int)(w / pageRatio));
 		
-		graphics.drawImage(croppedImg, 0, 0, (int)pageFormat.getWidth(), (int)pageFormat.getHeight() , null);
+//		graphics.drawImage(croppedImg, 0, 0, (int)pageFormat.getWidth(), (int)pageFormat.getHeight() , null);
+		graphics.drawImage(img, (int) pageFormat.getImageableX(), (int) pageFormat.getImageableY(), (int) pageFormat.getWidth(), (int) pageFormat.getHeight() , null);
+//		graphics.drawImage(img, 0, 0, (int)pageFormat.getWidth(), (int)pageFormat.getHeight() , null);
 		return PAGE_EXISTS;
 	}
 	
