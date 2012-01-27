@@ -453,27 +453,34 @@ public class PrintController implements Updater {
 		int pageNum = 0;
 		printCenters.clear();
 		for (final ArrayList<Spatial> page : pages) {
-			final Vector3 currentCorner = new Vector3();
+			final Vector3 upperLeftCorner = new Vector3();
 			double x, z;
 			final BoundingBox boundingBox = (BoundingBox) Scene.getInstance().getOriginalHouseRoot().getWorldBound();
+			final double minXDistance = boundingBox.getXExtent() + pageFormat.getWidth() / 2.0 * fromPageToWorldCoord;
+			final double minYDistance = boundingBox.getZExtent();
 			do {
-				x = (pageNum % cols - cols / 2) * (pageFormat.getWidth() * fromPageToWorldCoord + SPACE_BETWEEN_PAGES);
+				x = (pageNum % cols - cols / 2) * (pageFormat.getWidth() * fromPageToWorldCoord + SPACE_BETWEEN_PAGES) + boundingBox.getCenter().getX();
 //				z = (pageNum / cols - (rows - 1) / 2) * (pageFormat.getHeight() * fromPageToWorldCoord + SPACE_BETWEEN_PAGES);
 				z = (pageNum / cols) * (pageFormat.getHeight() * fromPageToWorldCoord + SPACE_BETWEEN_PAGES);
-				currentCorner.setX(x - pageFormat.getWidth() / 2.0 * fromPageToWorldCoord + boundingBox.getCenter().getX());
-				currentCorner.setZ(z + pageFormat.getHeight() * fromPageToWorldCoord);
-				currentCorner.setY(boundingBox.getCenter().getY());
+				upperLeftCorner.setX(x - pageFormat.getWidth() / 2.0 * fromPageToWorldCoord);
+				upperLeftCorner.setZ(z + pageFormat.getHeight() * fromPageToWorldCoord);
+				upperLeftCorner.setY(boundingBox.getCenter().getY());
 				pageNum++;
+//				new Vector3(x, boundingBox.getCenter().getY(), z).distance(boundingBox.getCenter()) < boun
 //			} while (currentCorner.length() < pageFormat.getWidth() * fromPageToWorldCoord);
-			} while (Math.abs(x) - pageFormat.getWidth() / 2.0 * fromPageToWorldCoord < boundingBox.getXExtent() && Math.abs(z) - pageFormat.getHeight() * fromPageToWorldCoord < boundingBox.getCenter().getZ() + boundingBox.getZExtent());
+//			} while (Math.abs(x) - pageFormat.getWidth() / 2.0 * fromPageToWorldCoord < Math.abs(boundingBox.getCenter().getX()) + boundingBox.getXExtent() 
+//					&& Math.abs(z) - pageFormat.getHeight() / 2.0 * fromPageToWorldCoord < Math.abs(boundingBox.getCenter().getZ()) + boundingBox.getZExtent());
+				} while (Math.abs(x - boundingBox.getCenter().getX()) < minXDistance 
+				&& Math.abs(z - boundingBox.getCenter().getZ()) < minYDistance);
 
-			printCenters.add(new Vector3(x, 0, z));
+
+			printCenters.add(new Vector3(x, 0, z + pageFormat.getHeight() / 2.0 * fromPageToWorldCoord));
 
 			for (final Spatial printSpatial : page)
-				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(currentCorner);
+				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(upperLeftCorner);
 
 			final Box box = new Box("Page Boundary");
-			box.setData(currentCorner.add(0, 0.1, 0, null), currentCorner.add(pageFormat.getWidth() * fromPageToWorldCoord, 0.2, -pageFormat.getHeight() * fromPageToWorldCoord, null));
+			box.setData(upperLeftCorner.add(0, 0.1, 0, null), upperLeftCorner.add(pageFormat.getWidth() * fromPageToWorldCoord, 0.2, -pageFormat.getHeight() * fromPageToWorldCoord, null));
 //			box.setDefaultColor(ColorRGBA.GRAY);
 			pagesRoot.attachChild(box);
 		}

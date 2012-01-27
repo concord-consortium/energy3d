@@ -958,6 +958,9 @@ Version 0.5 - October 20, 2011
 - ensure there is no overlap between print pages and the original model
 - instead of moving original model, move the camera and print pages around the original model
 
+- fix problem with incorrect proximity estimation of pages to center model in print preview
+- fix adjustment with camera position for print snapshots 
+
 -*add feature for planting trees
 
 
