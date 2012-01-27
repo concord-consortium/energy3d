@@ -717,6 +717,13 @@ public class Wall extends HousePart {
 
 		final boolean visible = roof == null || noNeighbor0 || noNeighbor1;
 		surroundMesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+		if (!visible) {
+			if (surroundMesh.getModelBound() != null)
+				surroundMesh.setModelBound(null);
+		} else {
+			if (surroundMesh.getModelBound() == null)
+				surroundMesh.setModelBound(new BoundingBox());
+		}
 		if (!visible)
 			return;
 
@@ -738,6 +745,7 @@ public class Wall extends HousePart {
 		vertexBuffer.limit(vertexBuffer.position());
 		normalBuffer.limit(normalBuffer.position());
 		surroundMesh.getMeshData().updateVertexCount();
+		surroundMesh.updateModelBound();
 	}
 
 	protected void addSurroundQuad(int i1, int i2, ReadOnlyVector3 n, final ReadOnlyVector3 thickness, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {

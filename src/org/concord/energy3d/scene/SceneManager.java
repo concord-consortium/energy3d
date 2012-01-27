@@ -398,6 +398,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}
 		
+//		com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
+		
 
 //		 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
 
@@ -730,6 +732,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!isTopView() && inputStates.getCurrent().getMouseState().getClickCount(MouseButton.LEFT) == 2) {
 					final PickedHousePart pickedHousePart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), root);
+					if (pickedHousePart == null)
+						return;
 					final Vector3 clickedPoint = pickedHousePart.getPoint();
 					cameraControl.zoomAtPoint(clickedPoint);
 				}

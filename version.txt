@@ -955,7 +955,8 @@ Version 0.5 - October 20, 2011
 - fix problem with not rotating around clicked point sometimes by sorting pick points and using the closest distance
 
 - use pageSetup dialog to allow user to select paper size, orientation and margin
-
+- ensure there is no overlap between print pages and the original model
+- instead of moving original model, move the camera and print pages around the original model
 
 -*add feature for planting trees
 

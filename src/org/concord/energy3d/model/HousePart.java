@@ -547,6 +547,7 @@ public abstract class HousePart implements Serializable {
 			hideAnnotations();
 			if (isDrawable())
 				drawAnnotations();
+			root.updateGeometricState(0);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

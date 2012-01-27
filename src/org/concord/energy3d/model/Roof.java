@@ -145,7 +145,7 @@ public abstract class Roof extends HousePart {
 			}
 			drawWireframe();
 			updateTextureAndColor(Scene.getInstance().isTextureEnabled());
-			root.updateGeometricState(0);
+//			root.updateGeometricState(0);
 			// drawGrids(getGridSize());
 
 			// flattenInit();
@@ -405,8 +405,8 @@ public abstract class Roof extends HousePart {
 			}
 		}
 		buf.limit(buf.position());
-		;
 		wireframeMesh.getMeshData().updateVertexCount();
+		wireframeMesh.updateModelBound();
 	}
 
 	public int drawLabels(int printSequence) {

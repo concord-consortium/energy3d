@@ -114,8 +114,8 @@ public class Printout implements ScreenExportable, Printable, Pageable {
 //			croppedImg = img.getSubimage(0, (int)(h-w / pageRatio)/2, w, (int)(w / pageRatio));
 		
 //		graphics.drawImage(croppedImg, 0, 0, (int)pageFormat.getWidth(), (int)pageFormat.getHeight() , null);
-		graphics.drawImage(img, (int) pageFormat.getImageableX(), (int) pageFormat.getImageableY(), (int) pageFormat.getWidth(), (int) pageFormat.getHeight() , null);
-//		graphics.drawImage(img, 0, 0, (int)pageFormat.getWidth(), (int)pageFormat.getHeight() , null);
+//		graphics.drawImage(img, (int) pageFormat.getImageableX(), (int) pageFormat.getImageableY(), (int) pageFormat.getWidth(), (int) pageFormat.getHeight() , null);
+		graphics.drawImage(img, 0, 0, (int)pageFormat.getWidth(), (int)pageFormat.getHeight() , null);
 		return PAGE_EXISTS;
 	}
 	
