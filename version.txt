@@ -953,13 +953,16 @@ Version 0.5 - October 20, 2011
 - fix problem with program crashing when HousePart.draw exception happens by catching all exceptions thrown in this method
 - fix problem with unable to draw window on some walls that are parallel to y axis by checking abs value of wallDir.x with zero_tollerance
 - fix problem with not rotating around clicked point sometimes by sorting pick points and using the closest distance
-
 - use pageSetup dialog to allow user to select paper size, orientation and margin
 - ensure there is no overlap between print pages and the original model
 - instead of moving original model, move the camera and print pages around the original model
-
 - fix problem with incorrect proximity estimation of pages to center model in print preview
-- fix adjustment with camera position for print snapshots 
+- fix adjustment with camera position for print snapshots
+
+- set default apper size to 13 x 19 inches
+- set default margin to zero  
+- add half of SPACE_BETWEEN_PARTS to margins to ensure that the annotations are not outside of margins
+
 
 -*add feature for planting trees
 

@@ -104,14 +104,15 @@ public class Printout implements ScreenExportable, Printable, Pageable {
 		}
 		final BufferedImage img = images.get(pageIndex);
 		
-//		final int w = img.getWidth();
-//		final int h = img.getHeight();
-//		final double pageRatio = pageFormat.getImageableWidth() / pageFormat.getImageableHeight();
-//		final BufferedImage croppedImg;
-//		if (w / h > pageRatio)
-//			croppedImg = img.getSubimage((int)(w-h * pageRatio)/2, 0, (int)(h * pageRatio), h);
-//		else
-//			croppedImg = img.getSubimage(0, (int)(h-w / pageRatio)/2, w, (int)(w / pageRatio));
+		final double w = img.getWidth();
+		final double h = img.getHeight();
+		final double pageRatio = pageFormat.getImageableWidth() / pageFormat.getImageableHeight();
+//		(double) img.getWidth() / img.getHeight()
+		final BufferedImage croppedImg;
+		if (w / h > pageRatio)
+			croppedImg = img.getSubimage((int)(w-h * pageRatio)/2, 0, (int)(h * pageRatio), (int)h);
+		else
+			croppedImg = img.getSubimage(0, (int)(h-w / pageRatio)/2, (int)w, (int)(w / pageRatio));
 		
 //		graphics.drawImage(croppedImg, 0, 0, (int)pageFormat.getWidth(), (int)pageFormat.getHeight() , null);
 //		graphics.drawImage(img, (int) pageFormat.getImageableX(), (int) pageFormat.getImageableY(), (int) pageFormat.getWidth(), (int) pageFormat.getHeight() , null);

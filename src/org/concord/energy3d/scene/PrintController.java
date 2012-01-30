@@ -60,7 +60,7 @@ public class PrintController implements Updater {
 	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
 	private final Timer timer = new Timer();
 //	private final Paper paper = new Paper();
-//	private double pageWidth, pageHeight;
+	private double pageWidth, pageHeight;
 	private double angle;
 	private int cols;
 	private int rows;
@@ -80,6 +80,10 @@ public class PrintController implements Updater {
 	}
 
 	public void init() {
+//		final Paper paper = new Paper();
+//		paper.setSize(13 * 72, 19 * 72);
+//		paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
+//		pageFormat.setPaper(paper);
 	}
 
 	public void update(final ReadOnlyTimer globalTimer) {
@@ -227,7 +231,8 @@ public class PrintController implements Updater {
 				// final Paper paper = new Paper();
 				final int resolutionHeight = 2;
 				// final Dimension newSize = new Dimension((int) (resolutionHeight * paper.getWidth() / paper.getHeight()), resolutionHeight);
-				final Dimension newSize = new Dimension((int) (resolutionHeight * pageFormat.getPaper().getWidth()), (int) (resolutionHeight * pageFormat.getPaper().getHeight()));
+//				final Dimension newSize = new Dimension((int) (resolutionHeight * pageFormat.getPaper().getWidth()), (int) (resolutionHeight * pageFormat.getPaper().getHeight()));
+				final Dimension newSize = new Dimension((int) (resolutionHeight * pageFormat.getWidth()), (int) (resolutionHeight * pageFormat.getHeight()));
 				canvas.setSize(newSize);
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
 				print(0, printout);
@@ -434,7 +439,11 @@ public class PrintController implements Updater {
 		// }
 //		final double exactCentimeterOnPaperScale = 1.0 / 72.0 / 4.0 / 10.6 * 10.8;
 //		pageWidth = pageFormat.getPaper().getWidth() * exactCentimeterOnPaperScale;
-//		pageHeight = pageFormat.getPaper().getHeight() * exactCentimeterOnPaperScale;		
+//		pageHeight = pageFormat.getPaper().getHeight() * exactCentimeterOnPaperScale;
+		
+		pageWidth = pageFormat.getWidth() * fromPageToWorldCoord;
+		pageHeight = pageFormat.getHeight() * fromPageToWorldCoord;		
+		
 //		
 //		if (pageFormat.getOrientation() == PageFormat.LANDSCAPE) {
 //			final double tmp = pageWidth;
@@ -459,11 +468,11 @@ public class PrintController implements Updater {
 			final double minXDistance = boundingBox.getXExtent() + pageFormat.getWidth() / 2.0 * fromPageToWorldCoord;
 			final double minYDistance = boundingBox.getZExtent();
 			do {
-				x = (pageNum % cols - cols / 2) * (pageFormat.getWidth() * fromPageToWorldCoord + SPACE_BETWEEN_PAGES) + boundingBox.getCenter().getX();
+				x = (pageNum % cols - cols / 2) * (pageWidth + SPACE_BETWEEN_PAGES) + boundingBox.getCenter().getX();
 //				z = (pageNum / cols - (rows - 1) / 2) * (pageFormat.getHeight() * fromPageToWorldCoord + SPACE_BETWEEN_PAGES);
-				z = (pageNum / cols) * (pageFormat.getHeight() * fromPageToWorldCoord + SPACE_BETWEEN_PAGES);
-				upperLeftCorner.setX(x - pageFormat.getWidth() / 2.0 * fromPageToWorldCoord);
-				upperLeftCorner.setZ(z + pageFormat.getHeight() * fromPageToWorldCoord);
+				z = (pageNum / cols) * (pageHeight + SPACE_BETWEEN_PAGES);
+				upperLeftCorner.setX(x - pageWidth / 2.0); //pageFormat.getWidth() / 2.0 * fromPageToWorldCoord);
+				upperLeftCorner.setZ(z + pageHeight);
 				upperLeftCorner.setY(boundingBox.getCenter().getY());
 				pageNum++;
 //				new Vector3(x, boundingBox.getCenter().getY(), z).distance(boundingBox.getCenter()) < boun
@@ -480,7 +489,7 @@ public class PrintController implements Updater {
 				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(upperLeftCorner);
 
 			final Box box = new Box("Page Boundary");
-			box.setData(upperLeftCorner.add(0, 0.1, 0, null), upperLeftCorner.add(pageFormat.getWidth() * fromPageToWorldCoord, 0.2, -pageFormat.getHeight() * fromPageToWorldCoord, null));
+			box.setData(upperLeftCorner.add(0, 0.1, 0, null), upperLeftCorner.add(pageWidth, 0.2, -pageHeight, null));
 //			box.setDefaultColor(ColorRGBA.GRAY);
 			pagesRoot.attachChild(box);
 		}
@@ -535,7 +544,7 @@ public class PrintController implements Updater {
 			final OrientedBoundingBox bounds = (OrientedBoundingBox) printPart.getWorldBound();
 			// ((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getXExtent() + PAGE_AND_PART_MARGIN, 0, -bounds.getZExtent() - PAGE_AND_PART_MARGIN));
 //			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getExtent().getX() + PAGE_MARGIN, 0, -bounds.getExtent().getZ() - PAGE_MARGIN));
-			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getExtent().getX() + pageFormat.getImageableX() * fromPageToWorldCoord, 0, -bounds.getExtent().getZ() - pageFormat.getImageableY() * fromPageToWorldCoord));
+			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getExtent().getX() + pageFormat.getImageableX() * fromPageToWorldCoord + SPACE_BETWEEN_PARTS / 2.0, 0, -bounds.getExtent().getZ() - pageFormat.getImageableY() * fromPageToWorldCoord - SPACE_BETWEEN_PARTS / 2.0));
 			final ArrayList<Spatial> page = new ArrayList<Spatial>();
 			page.add(printPart);
 			pages.add(page);
@@ -558,15 +567,15 @@ public class PrintController implements Updater {
 				if (!isHorizontal)
 					// tryCenter.setX(PAGE_AND_PART_MARGIN + printPartBound.getXExtent());
 //					tryCenter.setX(PAGE_MARGIN + printPartBound.getExtent().getX());
-					tryCenter.setX(pageFormat.getImageableX() * fromPageToWorldCoord + printPartBound.getExtent().getX());
+					tryCenter.setX(pageFormat.getImageableX() * fromPageToWorldCoord + SPACE_BETWEEN_PARTS / 2.0 + printPartBound.getExtent().getX());
 
 				if (!isHorizontal)
 					// tryCenter.setX(MathUtils.clamp(tryCenter.getX(), PAGE_AND_PART_MARGIN + printPartBound.getXExtent(), pageWidth - PAGE_AND_PART_MARGIN - printPartBound.getXExtent()));
 //					tryCenter.setX(MathUtils.clamp(tryCenter.getX(), PAGE_MARGIN + printPartBound.getExtent().getX(), pageWidth - PAGE_MARGIN - printPartBound.getExtent().getX()));
-					tryCenter.setX(MathUtils.clamp(tryCenter.getX(), pageFormat.getImageableX() * fromPageToWorldCoord + printPartBound.getExtent().getX(), (pageFormat.getImageableX() + pageFormat.getImageableWidth()) * fromPageToWorldCoord - printPartBound.getExtent().getX()));
+					tryCenter.setX(MathUtils.clamp(tryCenter.getX(), pageFormat.getImageableX() * fromPageToWorldCoord + SPACE_BETWEEN_PARTS / 2.0 + printPartBound.getExtent().getX(), (pageFormat.getImageableX() + pageFormat.getImageableWidth()) * fromPageToWorldCoord - SPACE_BETWEEN_PARTS / 2.0 - printPartBound.getExtent().getX()));
 				else
 //					tryCenter.setZ(MathUtils.clamp(tryCenter.getZ(), -pageHeight + PAGE_MARGIN + printPartBound.getExtent().getZ(), -PAGE_MARGIN - printPartBound.getExtent().getZ()));
-					tryCenter.setZ(MathUtils.clamp(tryCenter.getZ(), -pageFormat.getImageableY() * fromPageToWorldCoord - pageFormat.getImageableHeight() + printPartBound.getExtent().getZ(), -pageFormat.getImageableY() * fromPageToWorldCoord - printPartBound.getExtent().getZ()));
+					tryCenter.setZ(MathUtils.clamp(tryCenter.getZ(), -(pageFormat.getImageableY() + pageFormat.getImageableHeight())* fromPageToWorldCoord - SPACE_BETWEEN_PARTS / 2.0 + printPartBound.getExtent().getZ(), -pageFormat.getImageableY() * fromPageToWorldCoord - SPACE_BETWEEN_PARTS / 2.0 - printPartBound.getExtent().getZ()));
 
 				tryCenter.setY(0);
 
@@ -615,11 +624,11 @@ public class PrintController implements Updater {
 	// }
 
 	public double getPageWidth() {
-		return pageFormat.getWidth() * fromPageToWorldCoord;
+		return pageWidth;
 	}
 
 	public double getPageHeight() {
-		return pageFormat.getHeight() * fromPageToWorldCoord;
+		return pageHeight;
 	}
 
 	// public int getCols() {
