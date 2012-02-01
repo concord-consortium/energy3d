@@ -55,7 +55,7 @@ public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
 	private static final double SPACE_BETWEEN_PAGES = 0.5;
 //	private static final double PAGE_MARGIN = 0.2;
-	private static final double SPACE_BETWEEN_PARTS = 0.3; // 0.5;
+	private static final double SPACE_BETWEEN_PARTS = 0; //0.3; // 0.5;
 	private static final double exactFromPageToWorldCoord = 1.0 / 72.0 / 4.0 / 10.6 * 10.8;
 	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
 	private final Timer timer = new Timer();
@@ -74,17 +74,19 @@ public class PrintController implements Updater {
 	private Node pagesRoot = new Node();
 	private boolean heliodonSelected;
 	private PageFormat pageFormat = new PageFormat();
+	private boolean isScaleToFit;
+	private boolean restartFlag = false;
 
 	public static PrintController getInstance() {
 		return instance;
 	}
 	
 	public PrintController() {
-//		final Paper paper = new Paper();
-////		paper.setSize(13 * 72, 19 * 72);
-//		final int m = 0; //(int) (0.25 * 72);
-//		paper.setImageableArea(m, m, paper.getWidth() - m*2, paper.getHeight() - m*2);
-//		pageFormat.setPaper(paper);
+		final Paper paper = new Paper();
+//		paper.setSize(13 * 72, 19 * 72);
+		final int m = 0; //(int) (0.25 * 72);
+		paper.setImageableArea(m, m, paper.getWidth() - m*2, paper.getHeight() - m*2);
+		pageFormat.setPaper(paper);
 	}
 
 	public void init() {
@@ -160,6 +162,11 @@ public class PrintController implements Updater {
 		}
 
 		if (finish) {
+//			if (!isPrintPreview && restartFlag) {
+//				restartFlag = false;
+//				setPrintPreview(true);
+//				return;
+//			}
 			if (isPrintPreview)
 				Scene.getRoot().attachChild(pagesRoot);
 			final boolean doTheEndAnimation = timer.getTimeInSeconds() > viewSwitchDelay; // (time - startTime) > 1.0;
@@ -169,6 +176,11 @@ public class PrintController implements Updater {
 				for (final HousePart housePart : printParts)
 					Scene.getRoot().detachChild(housePart.getRoot());
 				printParts = null;
+						if (!isPrintPreview && restartFlag) {
+							restartFlag = false;
+							setPrintPreview(true);
+							return;
+						}						
 				originalHouseRoot.setScale(1);
 				originalHouseRoot.setTranslation(0, 0, 0);
 				originalHouseRoot.updateGeometricState(timer.getTimePerFrame(), true);
@@ -184,18 +196,24 @@ public class PrintController implements Updater {
 
 				SceneManager.getInstance().updatePrintPreviewScene(false);
 				// Scene.getInstance().updateTextSizes();
-				if (!doTheEndAnimation) // to avoid concurrency exception
+				if (!doTheEndAnimation) { // to avoid concurrency exception
 					setFinished(true);
+				}
 			}
+			
+			if (printParts != null)
+				for (final HousePart part : printParts)
+					if (part instanceof Foundation)
+						part.getRoot().getSceneHints().setCullHint(isPrintPreview ? CullHint.Always : CullHint.Inherit);			
 
 			if (isPrintPreview || doTheEndAnimation) {
 				int printSequence = 0;
 				originalHouseRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
-				if (printParts != null)
-					for (final HousePart part : printParts)
-						if (part instanceof Foundation)
-							part.getRoot().getSceneHints().setCullHint(isPrintPreview ? CullHint.Always : CullHint.Inherit);
+//				if (printParts != null)
+//					for (final HousePart part : printParts)
+//						if (part instanceof Foundation)
+//							part.getRoot().getSceneHints().setCullHint(isPrintPreview ? CullHint.Always : CullHint.Inherit);
 
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (isPrintPreview)
@@ -412,8 +430,7 @@ public class PrintController implements Updater {
 
 	private void computePageDimension() {
 		final double fromPageToWorldCoord;
-		final boolean isFillPage = true;
-		if (!isFillPage) {
+		if (!this.isScaleToFit) {
 			fromPageToWorldCoord = exactFromPageToWorldCoord;
 		} else {
 		double maxWidth = 0;
@@ -712,11 +729,27 @@ public class PrintController implements Updater {
 			
 			@Override
 			public void run() {
-				pageFormat = PrinterJob.getPrinterJob().pageDialog(pageFormat);
+				final PageFormat pf = PrinterJob.getPrinterJob().pageDialog(pageFormat);
+				if (pf != pageFormat) {
+					pageFormat = pf;
+					if (isPrintPreview())
+						restartAnimation();
+				}
 			}
 		});
 //				return null;
 //			}
 //		});		
+	}
+
+	public void setScaleToFit(final boolean scaleToFit) {
+		this.isScaleToFit = scaleToFit;
+		if (isPrintPreview())
+			restartAnimation();
+	}
+
+	private void restartAnimation() {
+		restartFlag  = true;
+		setPrintPreview(false);
 	}
 }

@@ -48,6 +48,7 @@ import org.concord.energy3d.util.Config;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import javax.swing.JSeparator;
+import javax.swing.JRadioButton;
 
 public class MainFrame extends JFrame {
 	private final static boolean IS_MAC = System.getProperty("os.name").startsWith("Mac");
@@ -92,6 +93,10 @@ public class MainFrame extends JFrame {
 	private JMenuItem pageSetupMenuItem;
 	private JSeparator separator;
 	private JSeparator separator_1;
+	private JRadioButtonMenuItem scaleToFitRadioButtonMenuItem;
+	private JRadioButtonMenuItem exactSizeRadioButtonMenuItem;
+	private JSeparator separator_2;
+	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -266,6 +271,9 @@ public class MainFrame extends JFrame {
 			fileMenu.add(getSaveMenuItem());
 			fileMenu.add(getSaveasMenuItem());
 			fileMenu.add(getSeparator());
+			fileMenu.add(getScaleToFitRadioButtonMenuItem());
+			fileMenu.add(getExactSizeRadioButtonMenuItem());
+			fileMenu.add(getSeparator_2());
 			fileMenu.add(getPageSetupMenuItem());
 			fileMenu.add(getPreviewMenuItem());
 			fileMenu.add(getPrintMenuItem());
@@ -872,5 +880,39 @@ public class MainFrame extends JFrame {
 			separator_1 = new JSeparator();
 		}
 		return separator_1;
+	}
+	
+	private JRadioButtonMenuItem getScaleToFitRadioButtonMenuItem() {
+		if (scaleToFitRadioButtonMenuItem == null) {
+			scaleToFitRadioButtonMenuItem = new JRadioButtonMenuItem("Scale To Fit Paper");
+			scaleToFitRadioButtonMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					PrintController.getInstance().setScaleToFit(true);
+				}
+			});
+			buttonGroup_1.add(scaleToFitRadioButtonMenuItem);
+		}
+		return scaleToFitRadioButtonMenuItem;
+	}
+	
+	private JRadioButtonMenuItem getExactSizeRadioButtonMenuItem() {
+		if (exactSizeRadioButtonMenuItem == null) {
+			exactSizeRadioButtonMenuItem = new JRadioButtonMenuItem("Exact Size on Paper");
+			exactSizeRadioButtonMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					PrintController.getInstance().setScaleToFit(false);
+				}
+			});
+			buttonGroup_1.add(exactSizeRadioButtonMenuItem);
+			exactSizeRadioButtonMenuItem.setSelected(true);
+		}
+		return exactSizeRadioButtonMenuItem;
+	}
+	
+	private JSeparator getSeparator_2() {
+		if (separator_2 == null) {
+			separator_2 = new JSeparator();
+		}
+		return separator_2;
 	}
 }
