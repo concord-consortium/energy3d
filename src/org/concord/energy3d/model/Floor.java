@@ -41,7 +41,7 @@ public class Floor extends HousePart {
 
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		mesh.setModelBound(new OrientedBoundingBox());
+		mesh.setModelBound(new OrientedBoundingBox());		
 
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);

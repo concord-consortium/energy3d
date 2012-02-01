@@ -962,6 +962,10 @@ Version 0.5 - October 20, 2011
 - set default apper size to 13 x 19 inches
 - set default margin to zero  
 - add half of SPACE_BETWEEN_PARTS to margins to ensure that the annotations are not outside of margins
+- fix problem floor root being OrientedBoundingBox instead of BoundingBox
+- fix problem with printout stretched and shifted and greyed out by converting width/height to int before multiplying by resolution 2
+- consider the annotation size when deciding if a print part fits within boundaries of a page
+- allow options for both exact size printing and scale to fit printing
 
 
 -*add feature for planting trees
