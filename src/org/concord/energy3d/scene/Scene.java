@@ -57,6 +57,7 @@ public class Scene implements Serializable {
 	private static Unit unit = Unit.Centimeter;
 	private static double annotationScale = 10;
 	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
+	private static boolean isAnnotationsVisible = true;
 
 	// public static Scene getInstance() {
 	// if (instance == null) {
@@ -324,12 +325,17 @@ public class Scene implements Serializable {
 	}
 
 	public void setAnnotationsVisible(boolean visible) {
+		this.isAnnotationsVisible = visible;
 		for (HousePart part : parts)
 			part.setAnnotationsVisible(visible);
 		if (PrintController.getInstance().isPrintPreview())
 			for (HousePart part : PrintController.getInstance().getPrintParts())
 				part.setAnnotationsVisible(visible);
-		SceneManager.getInstance().update();
+		if (PrintController.getInstance().isPrintPreview()) {
+			PrintController.getInstance().restartAnimation();
+		} else
+			SceneManager.getInstance().update();
+			
 	}
 
 	public void setTextureEnabled(final boolean enabled) {
@@ -458,5 +464,9 @@ public class Scene implements Serializable {
 
 	public static boolean isRedrawAll() {
 		return redrawAll;
+	}
+
+	public static boolean isAnnotationsVisible() {
+		return isAnnotationsVisible;
 	}
 }

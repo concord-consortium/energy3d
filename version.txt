@@ -965,9 +965,13 @@ Version 0.5 - October 20, 2011
 - fix problem with printout stretched and shifted and greyed out by converting width/height to int before multiplying by resolution 2
 - consider the annotation size when deciding if a print part fits within boundaries of a page
 - allow options for both exact size printing and scale to fit printing
-
 - add menu for switching between Scale To Fit and Exact Size
-- restart animation when Scale To Fit or Page Setup change happens
+- restart animation when Scale To Fit or Page Setup change happens or hide Annotation
+
+- allow zero space between print parts by manually detecting collision between bounding box with Zero Tolerance
+- draw back and surround wall meshes in print preview mode
+- draw wireframe in print preview
+- change space between parts in print preview depending on whether annotation is on or off
  
 
 -*add feature for planting trees

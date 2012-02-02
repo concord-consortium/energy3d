@@ -59,7 +59,7 @@ public class Wall extends HousePart {
 	private transient Mesh surroundMesh;
 	private transient Mesh invisibleMesh;
 	private transient Mesh windowsSurroundMesh;
-	private transient Line wireframeMesh;
+	private transient Mesh wireframeMesh;
 	// private transient Line gridsMesh;
 	private transient Roof roof;
 	private transient ArrayList<Vector3> wallPolygonPoints;
@@ -1141,16 +1141,26 @@ public class Wall extends HousePart {
 
 	@Override
 	public void setOriginal(final HousePart original) {
+		final Wall originalWall = (Wall) original;
 		root.detachChild(invisibleMesh);
 		root.detachChild(backMesh);
 		root.detachChild(surroundMesh);
 		root.detachChild(windowsSurroundMesh);
 		root.detachChild(wireframeMesh);
-		final Mesh orgInvisibleMesh = ((Wall) original).invisibleMesh;
+		backMesh = originalWall.backMesh.makeCopy(true);
+		surroundMesh = originalWall.surroundMesh.makeCopy(true);
+		windowsSurroundMesh = originalWall.windowsSurroundMesh.makeCopy(true);
+		wireframeMesh = originalWall.wireframeMesh.makeCopy(true);
+		root.attachChild(backMesh);
+		root.attachChild(surroundMesh);
+		root.attachChild(windowsSurroundMesh);
+		root.attachChild(wireframeMesh);
+		
+		final Mesh orgInvisibleMesh = originalWall.invisibleMesh;
 		this.invisibleMesh = orgInvisibleMesh.makeCopy(true);
 		this.invisibleMesh.setUserData(new UserData(this, ((UserData) orgInvisibleMesh.getUserData()).getIndex(), false));
 		root.attachChild(invisibleMesh);
-		wallPolygonPoints = ((Wall) original).wallPolygonPoints;
+		wallPolygonPoints = originalWall.wallPolygonPoints;
 
 		super.setOriginal(original);
 	}

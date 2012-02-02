@@ -5,12 +5,14 @@ import java.util.ArrayList;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -143,6 +145,14 @@ public class MeshLib {
 				node.attachChild(new Node("Roof Angle Annot"));
 				node.attachChild(new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center));
 				node.getChild(3).getSceneHints().setCullHint(CullHint.Always);
+				
+				final Mesh wireframeMesh = new Line("Roof (wireframe)");
+				wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
+				wireframeMesh.setModelBound(new BoundingBox());
+				wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10));
+				Util.disablePickShadowLight(wireframeMesh);
+				node.attachChild(wireframeMesh);				
+				
 //				if (root.getNumberOfChildren() != 0)
 //					newMesh.getSceneHints().setCullHint(CullHint.Always);
 				root.attachChild(node);

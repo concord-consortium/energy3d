@@ -55,7 +55,7 @@ public abstract class Roof extends HousePart {
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient ArrayList<ReadOnlyVector3> wallNormals;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
-	private transient Line wireframeMesh;
+//	private transient Mesh wireframeMesh;
 	private transient ArrayList<Wall> walls;
 	private transient HousePart previousContainer;
 	// private transient Mesh gridsMesh;
@@ -83,12 +83,12 @@ public abstract class Roof extends HousePart {
 		mesh = new Mesh("Roof");
 		mesh.setModelBound(new BoundingBox());
 
-		wireframeMesh = new Line("Roof (wireframe)");
-		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-		wireframeMesh.setModelBound(new BoundingBox());
-		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
-		Util.disablePickShadowLight(wireframeMesh);
-		root.attachChild(wireframeMesh);
+//		wireframeMesh = new Line("Roof (wireframe)");
+//		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
+//		wireframeMesh.setModelBound(new BoundingBox());
+//		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10));
+//		Util.disablePickShadowLight(wireframeMesh);
+//		root.attachChild(wireframeMesh);
 
 		// gridsMesh = new Line("Grids");
 		// gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
@@ -114,12 +114,12 @@ public abstract class Roof extends HousePart {
 
 			if (container == null) {
 				roofPartsRoot.getSceneHints().setCullHint(CullHint.Always);
-				wireframeMesh.getSceneHints().setCullHint(CullHint.Always);
+//				wireframeMesh.getSceneHints().setCullHint(CullHint.Always);
 				setEditPointsVisible(false);
 				return;
 			}
 			roofPartsRoot.getSceneHints().setCullHint(CullHint.Inherit);
-			wireframeMesh.getSceneHints().setCullHint(CullHint.Inherit);
+//			wireframeMesh.getSceneHints().setCullHint(CullHint.Inherit);
 
 			exploreWallNeighbors((Wall) container);
 			processRoofPoints(wallUpperPoints, wallNormals);
@@ -368,46 +368,86 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
+//	protected void drawWireframe() {
+//		if (container == null)
+//			return;
+//
+//		final ArrayList<ArrayList<ReadOnlyVector3>> convexHulls = new ArrayList<ArrayList<ReadOnlyVector3>>();
+//		int totalVertices = 0;
+//
+//		for (Spatial roofPart : roofPartsRoot.getChildren()) {
+//			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+//				final Node roofPartNode = (Node) roofPart;
+//
+//				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
+//				convexHulls.add(convexHull);
+//				totalVertices += convexHull.size();
+//			}
+//		}
+//
+//		final FloatBuffer buf;
+//		if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
+//			buf = wireframeMesh.getMeshData().getVertexBuffer();
+//			buf.limit(buf.capacity());
+//			buf.rewind();
+//		} else {
+//			buf = BufferUtils.createVector3Buffer(totalVertices * 2);
+//			wireframeMesh.getMeshData().setVertexBuffer(buf);
+//		}
+//
+//		for (final ArrayList<ReadOnlyVector3> convexHull : convexHulls) {
+//			for (int i = 0; i < convexHull.size(); i++) {
+//				final ReadOnlyVector3 p1 = convexHull.get(i);
+//				final ReadOnlyVector3 p2 = convexHull.get((i + 1) % convexHull.size());
+//
+//				buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+//				buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+//			}
+//		}
+//		buf.limit(buf.position());
+//		wireframeMesh.getMeshData().updateVertexCount();
+//		wireframeMesh.updateModelBound();
+//	}
+	
 	protected void drawWireframe() {
 		if (container == null)
 			return;
 
-		final ArrayList<ArrayList<ReadOnlyVector3>> convexHulls = new ArrayList<ArrayList<ReadOnlyVector3>>();
-		int totalVertices = 0;
+//		final ArrayList<ArrayList<ReadOnlyVector3>> convexHulls = new ArrayList<ArrayList<ReadOnlyVector3>>();
+//		int totalVertices = 0;
 
 		for (Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Node roofPartNode = (Node) roofPart;
-
+				final Mesh wireframeMesh = (Mesh) roofPartNode.getChild(4);
+				
 				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
-				convexHulls.add(convexHull);
-				totalVertices += convexHull.size();
+//				convexHulls.add(convexHull);
+				final int totalVertices = convexHull.size();
+				
+				final FloatBuffer buf;
+				if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
+					buf = wireframeMesh.getMeshData().getVertexBuffer();
+					buf.limit(buf.capacity());
+					buf.rewind();
+				} else {
+					buf = BufferUtils.createVector3Buffer(totalVertices * 2);
+					wireframeMesh.getMeshData().setVertexBuffer(buf);
+				}
+
+					for (int i = 0; i < convexHull.size(); i++) {
+						final ReadOnlyVector3 p1 = convexHull.get(i);
+						final ReadOnlyVector3 p2 = convexHull.get((i + 1) % convexHull.size());
+
+						buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+						buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+					}
+				buf.limit(buf.position());
+				wireframeMesh.getMeshData().updateVertexCount();
+				wireframeMesh.updateModelBound();				
 			}
 		}
-
-		final FloatBuffer buf;
-		if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
-			buf = wireframeMesh.getMeshData().getVertexBuffer();
-			buf.limit(buf.capacity());
-			buf.rewind();
-		} else {
-			buf = BufferUtils.createVector3Buffer(totalVertices * 2);
-			wireframeMesh.getMeshData().setVertexBuffer(buf);
-		}
-
-		for (final ArrayList<ReadOnlyVector3> convexHull : convexHulls) {
-			for (int i = 0; i < convexHull.size(); i++) {
-				final ReadOnlyVector3 p1 = convexHull.get(i);
-				final ReadOnlyVector3 p2 = convexHull.get((i + 1) % convexHull.size());
-
-				buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-				buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-			}
-		}
-		buf.limit(buf.position());
-		wireframeMesh.getMeshData().updateVertexCount();
-		wireframeMesh.updateModelBound();
-	}
+	}	
 
 	public int drawLabels(int printSequence) {
 		for (Spatial roofPartNode : roofPartsRoot.getChildren()) {
@@ -666,25 +706,29 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	public void setOriginal(final HousePart original) {
+		final Roof originalRoof = (Roof) original;
 		this.original = original;
 		this.root.detachChild(pointsRoot);
-		this.root.detachChild(wireframeMesh);
+//		this.root.detachChild(wireframeMesh);
 		this.root.detachChild(roofPartsRoot);
-		this.roofPartsRoot = ((Roof) original).roofPartsRoot.makeCopy(false);
+//		wireframeMesh = originalRoof.wireframeMesh.makeCopy(true);
+		roofPartsRoot = originalRoof.roofPartsRoot.makeCopy(true);
+//		root.attachChild(wireframeMesh);
+		root.attachChild(roofPartsRoot);
+		
 		for (int i = 0; i < roofPartsRoot.getNumberOfChildren(); i++) {
 			if (roofPartsRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
 				// ((Node) roofPartsRoot.getChild(i)).getChild(1).getSceneHints().setCullHint(CullHint.Always);
-				final UserData orgUserData = (UserData) ((Node) ((Roof) original).roofPartsRoot.getChild(i)).getChild(0).getUserData();
+				final UserData orgUserData = (UserData) ((Node) originalRoof.roofPartsRoot.getChild(i)).getChild(0).getUserData();
 				final Mesh mesh = (Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(0);
 				mesh.setUserData(new UserData(this, orgUserData.getIndex(), false));
-				roofPartsRoot.getChild(i).setUserData(((Roof) original).roofPartsRoot.getChild(i).getUserData());
+				roofPartsRoot.getChild(i).setUserData(originalRoof.roofPartsRoot.getChild(i).getUserData());
 
 				// final BoundingVolume modelBound = ((Mesh) ((Node) ((Roof) original).roofPartsRoot.getChild(i)).getChild(0)).getModelBound();
 				// mesh.setModelBound(modelBound);
 				// modelBound.transform(new Transform(), modelBound);
 			}
 		}
-		root.attachChild(roofPartsRoot);
 		drawAnnotations();
 //		computeOrientedBoundingBox(true);
 		root.updateWorldBound(true);

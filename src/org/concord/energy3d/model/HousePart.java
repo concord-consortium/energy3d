@@ -208,8 +208,10 @@ public abstract class HousePart implements Serializable {
 			mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getIndex(), false));
 			// final BoundingVolume modelBound = original.mesh.getModelBound();
 			// mesh.setModelBound(modelBound);
-			// modelBound.transform(new Transform(), mesh.getModelBound());
+			// modelBound.transform(new Transform(), mesh.getModelBound());			
 			root.attachChild(mesh);
+			
+			
 		}
 		drawAnnotations();
 		// computeOrientedBoundingBox(true);

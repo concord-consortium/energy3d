@@ -55,8 +55,8 @@ public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
 	private static final double SPACE_BETWEEN_PAGES = 0.5;
 //	private static final double PAGE_MARGIN = 0.2;
-	private static final double SPACE_BETWEEN_PARTS = 0; //0.3; // 0.5;
 	private static final double exactFromPageToWorldCoord = 1.0 / 72.0 / 4.0 / 10.6 * 10.8;
+	private static double spaceBetweenParts = 0; //0.3; // 0.5;
 	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
 	private final Timer timer = new Timer();
 //	private final Paper paper = new Paper();
@@ -429,6 +429,7 @@ public class PrintController implements Updater {
 	}
 
 	private void computePageDimension() {
+		spaceBetweenParts = Scene.getInstance().isAnnotationsVisible() ? 0.3 : 0;
 		final double fromPageToWorldCoord;
 		if (!this.isScaleToFit) {
 			fromPageToWorldCoord = exactFromPageToWorldCoord;
@@ -473,8 +474,8 @@ public class PrintController implements Updater {
 		maxWidth *= 2;
 		maxHeight *= 2;
 		
-		maxWidth += SPACE_BETWEEN_PARTS; //+ (pageFormat.getWidth() - pageFormat.getImageableWidth()) * fromPageToWorldCoord;
-		maxHeight += SPACE_BETWEEN_PARTS; //+ (pageFormat.getHeight() - pageFormat.getImageableHeight()) * fromPageToWorldCoord;
+		maxWidth += spaceBetweenParts; //+ (pageFormat.getWidth() - pageFormat.getImageableWidth()) * fromPageToWorldCoord;
+		maxHeight += spaceBetweenParts; //+ (pageFormat.getHeight() - pageFormat.getImageableHeight()) * fromPageToWorldCoord;
 //		paper.setSize(13.0 * 72.0, 19.0 * 72.0);
 //		 final double ratio = pageFormat.getWidth() / pageFormat.getHeight();
 		 final double ratio = pageFormat.getImageableWidth() / pageFormat.getImageableHeight();		 
@@ -492,11 +493,11 @@ public class PrintController implements Updater {
 		}
 
 		 
-		pageLeft = pageFormat.getImageableX() * fromPageToWorldCoord + SPACE_BETWEEN_PARTS / 2.0;
+		pageLeft = pageFormat.getImageableX() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
 //		pageMarginRight = (pageFormat.getWidth() - pageFormat.getImageableWidth() - pageFormat.getImageableX()) * fromPageToWorldCoord;
-		pageRight = (pageFormat.getImageableX() + pageFormat.getImageableWidth()) * fromPageToWorldCoord - SPACE_BETWEEN_PARTS / 2.0;
-		pageTop = pageFormat.getImageableY() * fromPageToWorldCoord + SPACE_BETWEEN_PARTS / 2.0;
-		pageBottom = (pageFormat.getImageableY() + pageFormat.getImageableHeight()) * fromPageToWorldCoord - SPACE_BETWEEN_PARTS / 2.0;
+		pageRight = (pageFormat.getImageableX() + pageFormat.getImageableWidth()) * fromPageToWorldCoord - spaceBetweenParts / 2.0;
+		pageTop = pageFormat.getImageableY() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
+		pageBottom = (pageFormat.getImageableY() + pageFormat.getImageableHeight()) * fromPageToWorldCoord - spaceBetweenParts / 2.0;
 		
 		pageWidth = pageFormat.getWidth() * fromPageToWorldCoord;
 		pageHeight = pageFormat.getHeight() * fromPageToWorldCoord;
@@ -625,8 +626,8 @@ public class PrintController implements Updater {
 			final OrientedBoundingBox neighborBound = (OrientedBoundingBox) neighborPart.getWorldBound().clone(null);
 			final OrientedBoundingBox printPartBound;
 			printPartBound = (OrientedBoundingBox) printPart.getWorldBound().clone(null);
-			final double xExtend = neighborBound.getExtent().getX() + printPartBound.getExtent().getX() + SPACE_BETWEEN_PARTS;
-			final double zExtend = neighborBound.getExtent().getZ() + printPartBound.getExtent().getZ() + SPACE_BETWEEN_PARTS;
+			final double xExtend = neighborBound.getExtent().getX() + printPartBound.getExtent().getX() + spaceBetweenParts;
+			final double zExtend = neighborBound.getExtent().getZ() + printPartBound.getExtent().getZ() + spaceBetweenParts;
 
 			for (double angleQuarter = 0; angleQuarter < 4; angleQuarter++) {
 				final boolean isHorizontal = angleQuarter % 2 == 0;
@@ -661,9 +662,26 @@ public class PrintController implements Updater {
 				else
 					for (final Spatial otherPart : page) {
 						printPartBound.setCenter(tryCenter);
-						final BoundingVolume otherPartBound = otherPart.getWorldBound().clone(null);
+//						final BoundingVolume otherPartBound = otherPart.getWorldBound().clone(null);
+						final OrientedBoundingBox otherPartBound = (OrientedBoundingBox) otherPart.getWorldBound().clone(null);
 						otherPartBound.setCenter(((UserData) otherPart.getUserData()).getPrintCenter());
-						if (otherPartBound.intersects(printPartBound)) {
+//						final BoundingBox printPartBoundingBox = (BoundingBox) new BoundingBox(printPartBound.getCenter(), 0, 0, 0).mergeLocal(printPartBound);
+//						final BoundingBox otherPartBoundingBox = (BoundingBox) new BoundingBox(otherPartBound.getCenter(), 0, 0, 0).mergeLocal(otherPartBound);
+//						if (printPartBoundingBox.getXExtent() + otherPartBoundingBox.getXExtent() > Math.abs(printPartBoundingBox.getCenter().getX() - otherPartBoundingBox.getCenter().getX()) + MathUtils.ZERO_TOLERANCE
+//								&& printPartBoundingBox.getZExtent() + otherPartBoundingBox.getZExtent() > Math.abs(printPartBoundingBox.getCenter().getZ() - otherPartBoundingBox.getCenter().getZ()) + MathUtils.ZERO_TOLERANCE) {
+
+//						int printPartX = (printPartBound.getXAxis().dot(Vector3.UNIT_X) >= 1.0 -MathUtils.ZERO_TOLERANCE) ? 0 : (printPartBound.getXAxis().dot(Vector3.UNIT_Y) >= 1.0 - MathUtils.ZERO_TOLERANCE) ? 1 : 2;						
+//						int printPartZ = (printPartBound.getZAxis().dot(Vector3.UNIT_X) >= 1.0 -MathUtils.ZERO_TOLERANCE) ? 0 : (printPartBound.getZAxis().dot(Vector3.UNIT_Y) >= 1.0 - MathUtils.ZERO_TOLERANCE) ? 1 : 2;
+//						int otherPartX = (otherPartBound.getXAxis().dot(Vector3.UNIT_X) >= 1.0 -MathUtils.ZERO_TOLERANCE) ? 0 : (otherPartBound.getXAxis().dot(Vector3.UNIT_Y) >= 1.0 - MathUtils.ZERO_TOLERANCE) ? 1 : 2;
+//						int otherPartZ = (otherPartBound.getZAxis().dot(Vector3.UNIT_X) >= 1.0 -MathUtils.ZERO_TOLERANCE) ? 0 : (otherPartBound.getZAxis().dot(Vector3.UNIT_Y) >= 1.0 - MathUtils.ZERO_TOLERANCE) ? 1 : 2;
+						
+//						if (printPartBound.getExtent().getValue(printPartX) + otherPartBound.getExtent().getValue(otherPartX) > Math.abs(printPartBound.getCenter().getValue(printPartX) - otherPartBound.getCenter().getValue(otherPartX)) + MathUtils.ZERO_TOLERANCE
+//						&& printPartBound.getExtent().getValue(printPartZ) + otherPartBound.getExtent().getValue(otherPartZ) > Math.abs(printPartBound.getCenter().getValue(printPartZ) - otherPartBound.getCenter().getValue(otherPartZ)) + MathUtils.ZERO_TOLERANCE) {
+
+						if (printPartBound.getExtent().getX() + otherPartBound.getExtent().getX() > Math.abs(printPartBound.getCenter().getX() - otherPartBound.getCenter().getX()) + MathUtils.ZERO_TOLERANCE
+						&& printPartBound.getExtent().getZ() + otherPartBound.getExtent().getZ() > Math.abs(printPartBound.getCenter().getZ() - otherPartBound.getCenter().getZ()) + MathUtils.ZERO_TOLERANCE) {
+						
+//						if (otherPartBound.intersects(printPartBound)) {
 							collision = true;
 							break;
 						}
@@ -748,7 +766,7 @@ public class PrintController implements Updater {
 			restartAnimation();
 	}
 
-	private void restartAnimation() {
+	public void restartAnimation() {
 		restartFlag  = true;
 		setPrintPreview(false);
 	}
