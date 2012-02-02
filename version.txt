@@ -967,11 +967,15 @@ Version 0.5 - October 20, 2011
 - allow options for both exact size printing and scale to fit printing
 - add menu for switching between Scale To Fit and Exact Size
 - restart animation when Scale To Fit or Page Setup change happens or hide Annotation
-
 - allow zero space between print parts by manually detecting collision between bounding box with Zero Tolerance
 - draw back and surround wall meshes in print preview mode
 - draw wireframe in print preview
 - change space between parts in print preview depending on whether annotation is on or off
+
+- hide back wall meshes after print preview animation is finished to avoid back mesh sticking out of paper
+- hide part lables while animating
+- release v0.5.9
+
  
 
 -*add feature for planting trees

@@ -954,7 +954,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			else
 				resizeCamera(pageWidth);
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
-			cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
+			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			// final int rows = PrintController.getInstance().getRows();
 			// final double pageHeight = PrintController.getInstance().getPageHeight() + PrintController.getMargin();

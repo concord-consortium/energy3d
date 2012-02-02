@@ -1258,6 +1258,12 @@ public class Wall extends HousePart {
 		thicknessNormal = null;
 	}
 
+	public void setBackMeshesVisible(final boolean visible) {
+		backMesh.setVisible(visible);
+		surroundMesh.setVisible(visible);
+		windowsSurroundMesh.setVisible(visible);
+	}
+
 	// @Override
 	// public String toString() {
 	// return super.toString() + "\t" + (neighbors[0]) + "\t" + (neighbors[1] == null);
