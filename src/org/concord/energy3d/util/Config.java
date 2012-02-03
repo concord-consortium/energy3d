@@ -1,6 +1,6 @@
 package org.concord.energy3d.util;
 
-import org.concord.energy3d.gui.MainApplet;
+import org.concord.energy3d.MainApplet;
 
 public class Config {
 	public static final String VERSION = "0.5.9";

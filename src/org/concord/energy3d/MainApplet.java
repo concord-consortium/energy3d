@@ -1,4 +1,4 @@
-package org.concord.energy3d.gui;
+package org.concord.energy3d;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import javax.swing.JApplet;
 import javax.swing.UIManager;
 
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
