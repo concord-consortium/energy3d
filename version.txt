@@ -975,6 +975,8 @@ Version 0.5 - October 20, 2011
 - hide back wall meshes after print preview animation is finished to avoid back mesh sticking out of paper
 - hide part lables while animating
 - release v0.5.9
+- save previous open and save folder location in registry and use it as default next time the program starts
+- release v0.6
 
  
 

@@ -87,17 +87,22 @@ public class Scene implements Serializable {
 		if (instance == null) {
 			// instance = new Scene();
 			try {
-				if (!Config.isApplet() && !Config.isWebStart())
-					open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
-				else if (Config.isWebStart()) {
-					newFile(40, 30);
-				} else if (Config.getApplet().getParameter("file") != null) {
+//				if (!Config.isApplet() && !Config.isWebStart())
+//					open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
+//				else if (Config.isWebStart()) {
+//					newFile(40, 30);
+//				} else if (Config.getApplet().getParameter("file") != null) {
+//					final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
+//					open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
+//				} else {
+//					final URL url = new URL(Config.getApplet().getCodeBase(), "Energy3D Projects/Default.ser");
+//					open((new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL()));
+//				}
+				if (Config.isApplet() && Config.getApplet().getParameter("file") != null) {
 					final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
 					open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
-				} else {
-					final URL url = new URL(Config.getApplet().getCodeBase(), "Energy3D Projects/Default.ser");
-					open((new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL()));
-				}
+				} else
+					newFile(40, 30);
 			} catch (Throwable e) {
 				e.printStackTrace();
 				newFile(40, 30);

@@ -3,6 +3,7 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -37,6 +38,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -47,9 +49,13 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.util.Config;
 
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import javax.swing.JSeparator;
 import javax.swing.JRadioButton;
+import java.awt.event.WindowStateListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class MainFrame extends JFrame {
 	private final static boolean IS_MAC = System.getProperty("os.name").startsWith("Mac");
@@ -173,19 +179,20 @@ public class MainFrame extends JFrame {
 	 */
 	private MainFrame() {
 		super();
-		setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/org/concord/energy3d/resources/icons/icon.gif")));
 		System.out.print("Initiating GUI...");
+		setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/org/concord/energy3d/resources/icons/icon.gif")));
 		try {
-			fileChooser = new JFileChooser(Preferences.userNodeForPackage(getClass()).get("dir", null));
-//			if (!Config.isWebStart()) {
-//				final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
+			final String directoryPath = Preferences.userNodeForPackage(MainApplication.class).get("dir", null);
+			fileChooser = new JFileChooser(directoryPath);
+			if (!Config.isWebStart() && directoryPath == null) {
+				final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
 //				if (!dir.exists()) {
 //					System.out.print("Making save directory..." + dir + "...");
 //					final boolean success = dir.mkdir();
 //					System.out.println(success ? "done" : "failed");
 //				}
-//				fileChooser.setCurrentDirectory(dir);
-//			}
+				fileChooser.setCurrentDirectory(dir);
+			}
 			fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
 		} catch (Exception e) {
 			fileChooser = null;
@@ -206,14 +213,49 @@ public class MainFrame extends JFrame {
 	 */
 	private void initialize() {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-		this.setSize(900, 600); // XIE: reduce the length, as some older computers have only 1024x800 screen resolution.
 		// this.setSize(600, 600);
-		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setLocation((int) (screenSize.getWidth() - this.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setTitle("Energy3D v" + Config.VERSION);
+		
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+//		GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		this.setSize(
+				Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_width", 900), screenSize.width),
+				Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_height", 600), screenSize.height));
+		
+		this.setLocation((int) (screenSize.getWidth() - this.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2);
+//		this.setLocation(
+//				Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_x", (int) (screenSize.getWidth() - this.getSize().getWidth()) / 2),
+//				Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_y", (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2));
+//		this.setLocation(
+//				MathUtils.clamp(this.getLocation().x, this.getSize().width / 2, screenSize.width - this.getSize().width / 2), 
+//				MathUtils.clamp(this.getLocation().y, this.getSize().height / 2, screenSize.height - this.getSize().width / 2));
+//		this.setSize(900, 600); // XIE: reduce the length, as some older computers have only 1024x800 screen resolution.				
+		final int windowState = Preferences.userNodeForPackage(MainApplication.class).getInt("window_state", JFrame.NORMAL);
+		if ((windowState & JFrame.ICONIFIED) == 0)
+			this.setExtendedState(windowState);
+		
 		this.setJMenuBar(getAppMenuBar());
 		this.setContentPane(getMainPanel());
+		
+		addComponentListener(new ComponentAdapter() {
+//			@Override
+//			public void componentMoved(final ComponentEvent e) {
+//				Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_x", e.getComponent().getLocation().x);
+//				Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_y", e.getComponent().getLocation().y);				
+//			}
+			@Override
+			public void componentResized(final ComponentEvent e) {
+				Preferences.userNodeForPackage(MainApplication.class).putInt("window_size_width", e.getComponent().getSize().width);
+				Preferences.userNodeForPackage(MainApplication.class).putInt("window_size_height", e.getComponent().getSize().height);
+			}
+		});
+		addWindowStateListener(new WindowStateListener() {
+			public void windowStateChanged(final WindowEvent e) {
+				Preferences.userNodeForPackage(MainApplication.class).putInt("window_state", e.getNewState());
+			}
+		});		
+		
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 			@Override
 			public void windowClosing(java.awt.event.WindowEvent e) {
@@ -315,7 +357,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().update(1);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
-						Preferences.userNodeForPackage(getClass()).put("dir", fileChooser.getSelectedFile().getParent());
+						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						try {
 							Scene.open(fileChooser.getSelectedFile().toURI().toURL());
 							updateTitleBar();
@@ -849,6 +891,7 @@ public class MainFrame extends JFrame {
 
 	private void saveFile() {
 		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
+			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 			try {
 				File file = fileChooser.getSelectedFile();
 				if (!file.getName().toLowerCase().endsWith(".ser"))
