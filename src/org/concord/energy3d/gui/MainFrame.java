@@ -15,6 +15,7 @@ import java.awt.print.PrinterJob;
 import java.io.File;
 import java.net.URL;
 import java.util.concurrent.Callable;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -175,16 +176,16 @@ public class MainFrame extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/org/concord/energy3d/resources/icons/icon.gif")));
 		System.out.print("Initiating GUI...");
 		try {
-			fileChooser = new JFileChooser();
-			if (!Config.isWebStart()) {
-				final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
-				if (!dir.exists()) {
-					System.out.print("Making save directory..." + dir + "...");
-					final boolean success = dir.mkdir();
-					System.out.println(success ? "done" : "failed");
-				}
-				fileChooser.setCurrentDirectory(dir);
-			}
+			fileChooser = new JFileChooser(Preferences.userNodeForPackage(getClass()).get("dir", null));
+//			if (!Config.isWebStart()) {
+//				final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
+//				if (!dir.exists()) {
+//					System.out.print("Making save directory..." + dir + "...");
+//					final boolean success = dir.mkdir();
+//					System.out.println(success ? "done" : "failed");
+//				}
+//				fileChooser.setCurrentDirectory(dir);
+//			}
 			fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
 		} catch (Exception e) {
 			fileChooser = null;
@@ -314,6 +315,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().update(1);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+						Preferences.userNodeForPackage(getClass()).put("dir", fileChooser.getSelectedFile().getParent());
 						try {
 							Scene.open(fileChooser.getSelectedFile().toURI().toURL());
 							updateTitleBar();

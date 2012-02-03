@@ -33,4 +33,5 @@ public class Config {
 	public static boolean isWebStart() {
 		return isWebstart;
 	}
+	 
 }

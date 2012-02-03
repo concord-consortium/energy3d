@@ -1,7 +1,8 @@
-package org.concord.energy3d.gui;
+package org.concord.energy3d;
 
 import javax.swing.UIManager;
 
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
 
