@@ -87,17 +87,17 @@ public class Scene implements Serializable {
 		if (instance == null) {
 			// instance = new Scene();
 			try {
-//				if (!Config.isApplet() && !Config.isWebStart())
-//					open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
-//				else if (Config.isWebStart()) {
-//					newFile(40, 30);
-//				} else if (Config.getApplet().getParameter("file") != null) {
-//					final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
-//					open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
-//				} else {
-//					final URL url = new URL(Config.getApplet().getCodeBase(), "Energy3D Projects/Default.ser");
-//					open((new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL()));
-//				}
+				// if (!Config.isApplet() && !Config.isWebStart())
+				// open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
+				// else if (Config.isWebStart()) {
+				// newFile(40, 30);
+				// } else if (Config.getApplet().getParameter("file") != null) {
+				// final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
+				// open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
+				// } else {
+				// final URL url = new URL(Config.getApplet().getCodeBase(), "Energy3D Projects/Default.ser");
+				// open((new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL()));
+				// }
 				if (Config.isApplet() && Config.getApplet().getParameter("file") != null) {
 					final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
 					open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
@@ -151,6 +151,8 @@ public class Scene implements Serializable {
 			ObjectInputStream in = new ObjectInputStream(file.openStream());
 			instance = (Scene) in.readObject();
 			in.close();
+
+			instance.cleanup();
 		}
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -162,6 +164,7 @@ public class Scene implements Serializable {
 
 				if (url != null) {
 					for (HousePart housePart : instance.getParts())
+						// if (housePart.isValid())
 						originalHouseRoot.attachChild(housePart.getRoot());
 					redrawAll = true;
 					System.out.println("done");
@@ -177,15 +180,29 @@ public class Scene implements Serializable {
 		});
 	}
 
-	public static void save(final URL url) throws Exception {
-		// remove dead objects
-		final Iterator<HousePart> itr = instance.parts.iterator();
-		while (itr.hasNext()) {
-			HousePart part = itr.next();
-			if (part instanceof Roof || part instanceof Window || part instanceof Door)
-				if (part.getContainer() == null)
-					itr.remove();
+	private void cleanup() {
+		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
+		for (final HousePart housePart : getParts()) {
+			if (!housePart.isValid()
+					|| ((housePart instanceof Roof || housePart instanceof Window || housePart instanceof Door) && housePart.getContainer() == null))
+				toBeRemoved.add(housePart);
 		}
+
+//		// remove dead objects that don't have container
+//		final Iterator<HousePart> itr = instance.parts.iterator();
+//		while (itr.hasNext()) {
+//			HousePart part = itr.next();
+//			if (part instanceof Roof || part instanceof Window || part instanceof Door)
+//				if (part.getContainer() == null)
+//					itr.remove();
+//		}
+
+		for (final HousePart housePart : toBeRemoved)
+			remove(housePart);
+	}
+
+	public static void save(final URL url) throws Exception {
+		instance.cleanup();
 
 		Scene.url = url;
 		System.out.print("Saving " + Scene.url + "...");
@@ -340,7 +357,7 @@ public class Scene implements Serializable {
 			PrintController.getInstance().restartAnimation();
 		} else
 			SceneManager.getInstance().update();
-			
+
 	}
 
 	public void setTextureEnabled(final boolean enabled) {

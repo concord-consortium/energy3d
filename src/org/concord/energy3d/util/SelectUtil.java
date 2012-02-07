@@ -9,6 +9,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -39,7 +40,8 @@ public class SelectUtil {
 			target = SceneManager.getInstance().getFloor();
 		pickResults.clear();
 
-		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
+		final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
+		final Ray3 pickRay = canvasRenderer.getCamera().getPickRay(new Vector2(x, y), false, null);
 		PickingUtil.findPick(target, pickRay, pickResults, false);
 		return getPickResult(pickRay);
 	}

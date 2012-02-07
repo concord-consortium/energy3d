@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
 import javax.swing.undo.UndoManager;
 
 import org.concord.energy3d.gui.MainFrame;
@@ -41,6 +42,7 @@ import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
+import org.lwjgl.LWJGLException;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
@@ -54,6 +56,8 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
+import com.ardor3d.framework.lwjgl.LwjglAwtCanvas;
+import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -90,6 +94,7 @@ import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
+import com.ardor3d.renderer.lwjgl.LwjglTextureRendererProvider;
 import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -113,6 +118,7 @@ import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -141,8 +147,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private static final double MOVE_SPEED = 5;
 
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
-	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());
-	private static final boolean JOGL = true;
+	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());	
 	private final Canvas canvas;
 	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
@@ -193,17 +198,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
 		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
-		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 4, false, false);
-		if (JOGL) {
+//		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 4, false, false);
+//		final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
+		if (Config.JOGL) {
+			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 4, false, false);
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
 			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
 		} else {
-			// try {
-			// canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
-			// TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
-			// } catch (LWJGLException e) {
-			// throw new RuntimeException(e);
-			// }
+			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
+			 try {
+			 canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
+			 TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
+			 } catch (LWJGLException e) {
+			 throw new RuntimeException(e);
+			 }
 		}
 
 		frameHandler = new FrameHandler(new Timer());
@@ -304,11 +312,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isUpdateTime = updateTime != -1 && now <= updateTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
-			if (update || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || cameraControl.isAnimating()) {
+			if (update || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
 				if (now > updateTime)
 					updateTime = -1;
 				update = false;
-				frameHandler.updateFrame();
+				try {
+					frameHandler.updateFrame();
+				} catch (Throwable e) {
+					e.printStackTrace();
+					if (shadowPass.isEnabled()) {
+						JOptionPane.showMessageDialog(MainPanel.getInstance(), "Your video card driver does not support shadows! Updating your video card drivers may fix this issue. Shadow rendering will be disabled now.", "Warning", JOptionPane.WARNING_MESSAGE);
+						shadowPass.setEnabled(false);
+					}
+				}
 			} else
 				frameHandler.getTimer().update();
 			final double syncNS = 1000000000.0 / 60.0;
@@ -338,7 +354,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //		if (Scene.getInstance() != null)
 			Scene.getInstance().update();
 
-		if (rotAnim && viewMode == ViewMode.NORMAL) {
+		if (rotAnim && viewMode == ViewMode.NORMAL && canvas.getCanvasRenderer() != null) { 
 			final Matrix3 rotate = new Matrix3();
 			rotate.fromAngleNormalAxis(45 * tpf * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
@@ -352,7 +368,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		heliodon.update();
 
-		if (cameraControl.isAnimating())
+		if (cameraControl != null && cameraControl.isAnimating())
 			cameraControl.animate();
 
 		root.updateGeometricState(tpf);
@@ -361,6 +377,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public boolean renderUnto(final Renderer renderer) {
 		if (cameraNode == null)
 			initCamera();
+		
 
 		if (drawBounds && selectedHousePart != null) {
 			if (selectedHousePart instanceof Roof) {
@@ -406,9 +423,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		passManager.renderPasses(renderer);
 		try {
 			shadowPass.renderPass(renderer);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
-			shadowPass.setEnabled(false);
+			if (shadowPass.isEnabled()) {
+				JOptionPane.showMessageDialog(MainPanel.getInstance(), "Your video card driver does not support shadows! Updating your video card drivers may fix this issue. Shadow rendering will be disabled now.", "Warning", JOptionPane.WARNING_MESSAGE);
+				shadowPass.setEnabled(false);
+			}
 		}
 		taskManager.getQueue(GameTaskQueue.RENDER).execute(renderer);
 		return true;
@@ -1119,11 +1139,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void exit() {
-		System.out.print("exiting...");
+		System.out.print("exit cleaning up...");
 		this.exit = true;
-		canvas.getCanvasRenderer().makeCurrentContext();
-		ContextGarbageCollector.doFinalCleanup(canvas.getCanvasRenderer().getRenderer());
+		try {
+			canvas.getCanvasRenderer().makeCurrentContext();
+			ContextGarbageCollector.doFinalCleanup(canvas.getCanvasRenderer().getRenderer());
+		} catch (final Throwable e) {
+			e.printStackTrace();
+		}
 		System.out.println("done");
+		System.out.println ("exit.");
 		System.exit(0);
 	}
 
@@ -1275,7 +1300,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public void init() {
-		if (JOGL)
+		if (Config.JOGL)
 			initCamera();
 		if (Config.isHeliodonMode())
 			MainPanel.getInstance().getHeliodonButton().setSelected(true);

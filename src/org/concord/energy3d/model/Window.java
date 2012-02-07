@@ -92,6 +92,7 @@ public class Window extends HousePart {
 			p = pick.getPoint();
 			p = grid(p, getGridSize());
 			p = toRelative(p);
+			p = enforceContraints(p);
 		}
 		points.get(index).set(p);
 		if (!isFirstPointInserted()) {

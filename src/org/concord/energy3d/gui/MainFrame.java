@@ -3,6 +3,7 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -219,17 +220,17 @@ public class MainFrame extends JFrame {
 		
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 //		GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		
 		this.setSize(
 				Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_width", 900), screenSize.width),
 				Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_height", 600), screenSize.height));
-		
 		this.setLocation((int) (screenSize.getWidth() - this.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2);
-//		this.setLocation(
-//				Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_x", (int) (screenSize.getWidth() - this.getSize().getWidth()) / 2),
-//				Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_y", (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2));
-//		this.setLocation(
-//				MathUtils.clamp(this.getLocation().x, this.getSize().width / 2, screenSize.width - this.getSize().width / 2), 
-//				MathUtils.clamp(this.getLocation().y, this.getSize().height / 2, screenSize.height - this.getSize().width / 2));
+		this.setLocation(
+				Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_x", (int) (screenSize.getWidth() - this.getSize().getWidth()) / 2),
+				Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_y", (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2));
+		this.setLocation(
+				MathUtils.clamp(this.getLocation().x, 0, screenSize.width - this.getSize().width), 
+				MathUtils.clamp(this.getLocation().y, 0, screenSize.height - this.getSize().width));
 //		this.setSize(900, 600); // XIE: reduce the length, as some older computers have only 1024x800 screen resolution.				
 		final int windowState = Preferences.userNodeForPackage(MainApplication.class).getInt("window_state", JFrame.NORMAL);
 		if ((windowState & JFrame.ICONIFIED) == 0)
@@ -239,20 +240,25 @@ public class MainFrame extends JFrame {
 		this.setContentPane(getMainPanel());
 		
 		addComponentListener(new ComponentAdapter() {
-//			@Override
-//			public void componentMoved(final ComponentEvent e) {
-//				Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_x", e.getComponent().getLocation().x);
-//				Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_y", e.getComponent().getLocation().y);				
-//			}
+			@Override
+			public void componentMoved(final ComponentEvent e) {
+				if (MainFrame.this.getExtendedState() == 0 ) {
+				Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_x", e.getComponent().getLocation().x);
+				Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_y", e.getComponent().getLocation().y);
+				}
+			}
 			@Override
 			public void componentResized(final ComponentEvent e) {
-				Preferences.userNodeForPackage(MainApplication.class).putInt("window_size_width", e.getComponent().getSize().width);
-				Preferences.userNodeForPackage(MainApplication.class).putInt("window_size_height", e.getComponent().getSize().height);
+				if (MainFrame.this.getExtendedState() == 0 ) {
+					Preferences.userNodeForPackage(MainApplication.class).putInt("window_size_width", e.getComponent().getSize().width);
+					Preferences.userNodeForPackage(MainApplication.class).putInt("window_size_height", e.getComponent().getSize().height);
+				}
 			}
 		});
 		addWindowStateListener(new WindowStateListener() {
-			public void windowStateChanged(final WindowEvent e) {
+			public void windowStateChanged(final WindowEvent e) {				
 				Preferences.userNodeForPackage(MainApplication.class).putInt("window_state", e.getNewState());
+				SceneManager.getInstance().update();
 			}
 		});		
 		
@@ -580,7 +586,8 @@ public class MainFrame extends JFrame {
 			exitMenuItem.setText("Exit");
 			exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					System.exit(0);
+//					System.exit(0);
+					SceneManager.getInstance().exit();
 				}
 			});
 		}
