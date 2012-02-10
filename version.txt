@@ -984,7 +984,10 @@ Version 0.5 - October 20, 2011
 - save window location in registry
 - remove house parts with invalid points from scene before saving and after opening
 - re-enable the window constrain check code to prevent windows from being dragging too close to wall
+- fix problem with initial window location.y
+- experiment with texture renderer then revert back
 
+- *fix problem with printing in mac os x by ensuring that canvas height does not exceed visible jframe if running under mac os x (will result in lower resolution printout)
 
  
 

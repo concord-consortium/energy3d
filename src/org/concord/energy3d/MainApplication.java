@@ -15,7 +15,7 @@ public class MainApplication {
 //		} catch (IOException e1) {
 //			e1.printStackTrace();
 //		}
-		final long s = System.nanoTime();
+//		final long s = System.nanoTime();
 		Config.setWebStart(System.getProperty("javawebstart.version", null) != null);
 		if (Config.isWebStart()) {
 			System.out.println("Application is lauched by webstart.");
@@ -34,7 +34,7 @@ public class MainApplication {
 		final SceneManager scene = SceneManager.getInstance();
 		MainFrame.getInstance().setVisible(true);
 		new Thread(scene, "Energy 3D Application").start();
-		System.out.println(System.nanoTime() - s);
+//		System.out.println(System.nanoTime() - s);
 	}
 
 	private static void setupLibraryPath() {

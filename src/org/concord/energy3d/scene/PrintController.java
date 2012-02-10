@@ -25,6 +25,7 @@ import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
+import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.Printout;
 import org.concord.energy3d.util.Util;
@@ -35,13 +36,26 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.framework.CanvasRenderer;
+import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Updater;
+import com.ardor3d.image.Texture;
+import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.TextureCubeMap;
+import com.ardor3d.image.Texture.ApplyMode;
+import com.ardor3d.image.Texture.CombinerFunctionRGB;
+import com.ardor3d.image.Texture.CombinerOperandRGB;
+import com.ardor3d.image.Texture.CombinerSource;
+import com.ardor3d.image.Texture.EnvironmentalMapMode;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.TextureRenderer;
+import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -77,6 +91,8 @@ public class PrintController implements Updater {
 	private PageFormat pageFormat = new PageFormat();
 	private boolean isScaleToFit;
 	private boolean restartFlag = false;
+	private TextureRenderer textureRenderer;
+	private Texture texture;
 
 	public static PrintController getInstance() {
 		return instance;
@@ -88,6 +104,7 @@ public class PrintController implements Updater {
 		final int m = (int) (0.25 * 72);
 		paper.setImageableArea(m, m, paper.getWidth() - m * 2, paper.getHeight() - m * 2);
 		pageFormat.setPaper(paper);
+		
 	}
 
 	public void init() {
@@ -158,7 +175,7 @@ public class PrintController implements Updater {
 			}
 			originalHouseRoot.getSceneHints().setCullHint(CullHint.Always);
 			timer.reset();
-			System.out.println("Print Preview init done.");
+//			System.out.println("Print Preview init done.");
 		}
 
 		final double viewSwitchDelay = 0.5;
@@ -280,9 +297,17 @@ public class PrintController implements Updater {
 				final int resolutionHeight = 2;
 				// final Dimension newSize = new Dimension((int) (resolutionHeight * paper.getWidth() / paper.getHeight()), resolutionHeight);
 				// final Dimension newSize = new Dimension((int) (resolutionHeight * pageFormat.getPaper().getWidth()), (int) (resolutionHeight * pageFormat.getPaper().getHeight()));
-				final Dimension newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
+//				final Dimension newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
+				final Dimension newSize;
+				if (Config.isMac())
+					newSize = new Dimension((int)(canvas.getHeight() * pageWidth / pageHeight), canvas.getHeight());
+				else
+					newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
 				canvas.setSize(newSize);
+				
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
+				
+		        
 				print(0, printout);
 				return null;
 			}
@@ -326,13 +351,50 @@ public class PrintController implements Updater {
 				} else {
 					if (pageNum != 0) {
 						ScreenExporter.exportCurrentScreen(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(), printout);
+//						ScreenExporter.exportCurrentScreen(textureRenderer.getCamera().get, printout);
+//						textureRenderer.render(Scene.getRoot(), texture, Renderer.BUFFER_COLOR_AND_DEPTH);
+//						if (texture.getImage() != null)
+//							printout.export(texture.getImage());
 					}
 					if (pageNum < printCenters.size()) {
+						
+//						final DisplaySettings settings = new DisplaySettings(1256, 1256, 24, 0, 0, 24, 0, 0, false, false);
+//				        textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, false, SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(),
+//				                ContextManager.getCurrentContext().getCapabilities());
+
+//				        textureRenderer.getCamera().setFrustum(.1, 10, -.1, .1, .1, -.1);
+//				        
+//				        texture = new Texture2D();
+//				        texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
+//				        texture.setApply(ApplyMode.Combine);
+//				        texture.setCombineFuncRGB(CombinerFunctionRGB.Interpolate);
+//				        // color 1
+//				        texture.setCombineSrc0RGB(CombinerSource.CurrentTexture);
+//				        texture.setCombineOp0RGB(CombinerOperandRGB.SourceColor);
+//				        // color 2
+//				        texture.setCombineSrc1RGB(CombinerSource.Previous);
+//				        texture.setCombineOp1RGB(CombinerOperandRGB.SourceColor);
+//				        // interpolate param will come from alpha of constant color
+//				        texture.setCombineSrc2RGB(CombinerSource.Constant);
+//				        texture.setCombineOp2RGB(CombinerOperandRGB.SourceAlpha);
+//				        texture.setConstantColor(0, 0, 0, .07f);
+
+//			            textureRenderer.getCamera().setLocation(new Vector3(-10, 0, 15));
+//			            textureRenderer.setBackgroundColor(new ColorRGBA(0f, 0f, 0f, 1));
+//				        textureRenderer.setupTexture(texture);        
+
+				        
+				        
+				        
+						
+						
 						final Vector3 pos = printCenters.get(pageNum);
 						final Camera camera = Camera.getCurrentCamera();
+//						final Camera camera = textureRenderer.getCamera();
 						camera.setLocation(pos.getX(), -10.0, pos.getZ());
 						camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 						SceneManager.getInstance().getCameraNode().updateFromCamera();
+//						textureRenderer.render(Scene.getRoot(), texture, Renderer.BUFFER_COLOR_AND_DEPTH);
 					}
 					print(pageNum + 1, printout);
 
@@ -570,7 +632,8 @@ public class PrintController implements Updater {
 				// && Math.abs(z) - pageFormat.getHeight() / 2.0 * fromPageToWorldCoord < Math.abs(boundingBox.getCenter().getZ()) + boundingBox.getZExtent());
 			} while (Math.abs(x - boundingBox.getCenter().getX()) < minXDistance && Math.abs(z - boundingBox.getCenter().getZ()) < minYDistance);
 
-			printCenters.add(new Vector3(x, 0, z + pageHeight / 2.0));
+//			printCenters.add(new Vector3(x, 0, z + pageHeight / 2.0));
+			printCenters.add(new Vector3(x, 0, z + pageHeight / (Config.isMac() ? 1.0 : 2.0)));
 
 			for (final Spatial printSpatial : page)
 				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(upperLeftCorner);

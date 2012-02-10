@@ -230,7 +230,7 @@ public class MainFrame extends JFrame {
 				Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_y", (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2));
 		this.setLocation(
 				MathUtils.clamp(this.getLocation().x, 0, screenSize.width - this.getSize().width), 
-				MathUtils.clamp(this.getLocation().y, 0, screenSize.height - this.getSize().width));
+				MathUtils.clamp(this.getLocation().y, 0, screenSize.height - this.getSize().height));
 //		this.setSize(900, 600); // XIE: reduce the length, as some older computers have only 1024x800 screen resolution.				
 		final int windowState = Preferences.userNodeForPackage(MainApplication.class).getInt("window_state", JFrame.NORMAL);
 		if ((windowState & JFrame.ICONIFIED) == 0)

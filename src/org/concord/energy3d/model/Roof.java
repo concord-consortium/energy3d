@@ -241,8 +241,8 @@ public abstract class Roof extends HousePart {
 				final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
 				computeOrientedBoundingBox(roofPartMesh);
 				orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
-				System.out.print(roofPartMesh.getWorldBound().getCenter());
-				System.out.println();
+//				System.out.print(roofPartMesh.getWorldBound().getCenter());
+//				System.out.println();
 			}
 		}
 //		if (flatten)
@@ -309,7 +309,7 @@ public abstract class Roof extends HousePart {
 		roofPartNode.setRotation(matrix);
 
 		ReadOnlyVector3 orgCenter = orgCenters.get(roofPartNode);
-		System.out.println(orgCenter);
+//		System.out.println(orgCenter);
 
 		if (orgCenter == null)
 			orgCenter = Vector3.ZERO;

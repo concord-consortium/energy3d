@@ -1139,15 +1139,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void exit() {
-		System.out.print("exit cleaning up...");
-		this.exit = true;
-		try {
-			canvas.getCanvasRenderer().makeCurrentContext();
-			ContextGarbageCollector.doFinalCleanup(canvas.getCanvasRenderer().getRenderer());
-		} catch (final Throwable e) {
-			e.printStackTrace();
-		}
-		System.out.println("done");
+//		System.out.print("exit cleaning up...");
+//		this.exit = true;
+//		try {
+//			canvas.getCanvasRenderer().makeCurrentContext();
+//			ContextGarbageCollector.doFinalCleanup(canvas.getCanvasRenderer().getRenderer());
+//		} catch (final Throwable e) {
+//			e.printStackTrace();
+//		}
+//		System.out.println("done");
 		System.out.println ("exit.");
 		System.exit(0);
 	}

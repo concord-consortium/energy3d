@@ -7,6 +7,7 @@ public class Config {
 	public static final boolean JOGL = true;
 	private static MainApplet applet;
 	private static boolean isWebstart;
+	private static final boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac");
 
 	public static MainApplet getApplet() {
 		return applet;
@@ -33,6 +34,10 @@ public class Config {
 
 	public static boolean isWebStart() {
 		return isWebstart;
+	}
+
+	public static boolean isMac() {
+		return isMac;
 	}
 	 
 }

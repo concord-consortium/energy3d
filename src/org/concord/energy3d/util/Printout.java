@@ -11,6 +11,7 @@ import java.awt.print.PrinterJob;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
+import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.util.screen.ScreenExportable;
 
@@ -56,6 +57,10 @@ public class Printout implements ScreenExportable, Printable, Pageable {
 			}
 		}
 	}
+	
+	public void export(final Image img) {
+		export(img.getData(0), img.getWidth(), img.getHeight());
+	}	
 	
 	public void export(final int[] data, final int width, final int height) {
 		final BufferedImage img = new BufferedImage(width, height, _useAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
