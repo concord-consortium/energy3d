@@ -995,6 +995,8 @@ Version 0.5 - October 20, 2011
 - *reset orbit center after new or open
 - *save camera position in file
 
+- *disallow picking walls when in resize mode
+
 
 - *fix problem with printing in mac os x by ensuring that canvas height does not exceed visible jframe if running under mac os x (will result in lower resolution printout)
 
