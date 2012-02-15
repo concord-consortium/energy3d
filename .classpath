@@ -10,5 +10,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-jogl"/>
 	<classpathentry kind="src" path="/ardor3d-awt"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-lwjgl"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.6.0_27/jre/lib/deploy.jar" sourcepath="C:/Program Files/Java/jdk1.6.0_27/src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

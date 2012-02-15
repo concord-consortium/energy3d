@@ -986,6 +986,13 @@ Version 0.5 - October 20, 2011
 - re-enable the window constrain check code to prevent windows from being dragging too close to wall
 - fix problem with initial window location.y
 - experiment with texture renderer then revert back
+- avoid all kinds of crash due to Throwables, Errors and Exceptions by catching throwable in draw() method
+
+- *add rotate camera option
+- *be smarter about orbit rotation when not clicking on any house part
+- *reset orbit center after new or open
+- *save camera position in file
+
 
 - *fix problem with printing in mac os x by ensuring that canvas height does not exceed visible jframe if running under mac os x (will result in lower resolution printout)
 
