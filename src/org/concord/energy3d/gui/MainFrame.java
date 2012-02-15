@@ -3,17 +3,16 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-import java.awt.print.PageFormat;
-import java.awt.print.PrinterJob;
+import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.net.URL;
 import java.util.concurrent.Callable;
@@ -34,6 +33,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
@@ -52,11 +52,6 @@ import org.concord.energy3d.util.Config;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import javax.swing.JSeparator;
-import javax.swing.JRadioButton;
-import java.awt.event.WindowStateListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 
 public class MainFrame extends JFrame {
 	private final static boolean IS_MAC = System.getProperty("os.name").startsWith("Mac");
@@ -105,22 +100,24 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem exactSizeRadioButtonMenuItem;
 	private JSeparator separator_2;
 	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
+	private JMenuItem importMenuItem;
+	private JSeparator separator_3;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
 		String extensions[];
 
-		public ExtensionFileFilter(String description, String extension) {
+		public ExtensionFileFilter(final String description, final String extension) {
 			this(description, new String[] { extension });
 		}
 
-		public ExtensionFileFilter(String description, String extensions[]) {
+		public ExtensionFileFilter(final String description, final String extensions[]) {
 			if (description == null) {
 				this.description = extensions[0] + "{ " + extensions.length + "} ";
 			} else {
 				this.description = description;
 			}
-			this.extensions = (String[]) extensions.clone();
+			this.extensions = extensions.clone();
 		}
 
 		@Override
@@ -129,13 +126,13 @@ public class MainFrame extends JFrame {
 		}
 
 		@Override
-		public boolean accept(File file) {
+		public boolean accept(final File file) {
 			if (file.isDirectory()) {
 				return true;
 			} else {
-				String path = file.getAbsolutePath().toLowerCase();
+				final String path = file.getAbsolutePath().toLowerCase();
 				for (int i = 0, n = extensions.length; i < n; i++) {
-					String extension = extensions[i];
+					final String extension = extensions[i];
 					if ((path.endsWith(extension) && (path.charAt(path.length() - extension.length() - 1)) == '.')) {
 						return true;
 					}
@@ -151,7 +148,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes mainPanel
-	 * 
+	 *
 	 * @return org.concord.energy3d.gui.MainPanel
 	 */
 	public MainPanel getMainPanel() {
@@ -165,10 +162,11 @@ public class MainFrame extends JFrame {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
-				MainFrame thisClass = new MainFrame();
+				final MainFrame thisClass = new MainFrame();
 				thisClass.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				thisClass.setVisible(true);
 			}
@@ -195,7 +193,7 @@ public class MainFrame extends JFrame {
 				fileChooser.setCurrentDirectory(dir);
 			}
 			fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			fileChooser = null;
 			e.printStackTrace();
 		}
@@ -209,18 +207,18 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes this
-	 * 
+	 *
 	 * @return void
 	 */
 	private void initialize() {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		// this.setSize(600, 600);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setTitle("Energy3D v" + Config.VERSION);
-		
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Energy3D v" + Config.VERSION);
+
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 //		GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-		
+
 		this.setSize(
 				Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_width", 900), screenSize.width),
 				Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_height", 600), screenSize.height));
@@ -229,16 +227,16 @@ public class MainFrame extends JFrame {
 				Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_x", (int) (screenSize.getWidth() - this.getSize().getWidth()) / 2),
 				Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_y", (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2));
 		this.setLocation(
-				MathUtils.clamp(this.getLocation().x, 0, screenSize.width - this.getSize().width), 
+				MathUtils.clamp(this.getLocation().x, 0, screenSize.width - this.getSize().width),
 				MathUtils.clamp(this.getLocation().y, 0, screenSize.height - this.getSize().height));
-//		this.setSize(900, 600); // XIE: reduce the length, as some older computers have only 1024x800 screen resolution.				
+//		this.setSize(900, 600); // XIE: reduce the length, as some older computers have only 1024x800 screen resolution.
 		final int windowState = Preferences.userNodeForPackage(MainApplication.class).getInt("window_state", JFrame.NORMAL);
 		if ((windowState & JFrame.ICONIFIED) == 0)
-			this.setExtendedState(windowState);
-		
-		this.setJMenuBar(getAppMenuBar());
-		this.setContentPane(getMainPanel());
-		
+			setExtendedState(windowState);
+
+		setJMenuBar(getAppMenuBar());
+		setContentPane(getMainPanel());
+
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentMoved(final ComponentEvent e) {
@@ -256,15 +254,16 @@ public class MainFrame extends JFrame {
 			}
 		});
 		addWindowStateListener(new WindowStateListener() {
-			public void windowStateChanged(final WindowEvent e) {				
+			@Override
+			public void windowStateChanged(final WindowEvent e) {
 				Preferences.userNodeForPackage(MainApplication.class).putInt("window_state", e.getNewState());
 				SceneManager.getInstance().update();
 			}
-		});		
-		
-		this.addWindowListener(new java.awt.event.WindowAdapter() {
+		});
+
+		addWindowListener(new java.awt.event.WindowAdapter() {
 			@Override
-			public void windowClosing(java.awt.event.WindowEvent e) {
+			public void windowClosing(final java.awt.event.WindowEvent e) {
 				SceneManager.getInstance().exit();
 			}
 
@@ -277,7 +276,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes appMenuBar
-	 * 
+	 *
 	 * @return javax.swing.JMenuBar
 	 */
 	private JMenuBar getAppMenuBar() {
@@ -295,21 +294,24 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes fileMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getFileMenu() {
 		if (fileMenu == null) {
 			fileMenu = new JMenu();
 			fileMenu.addMenuListener(new MenuListener() {
-				public void menuCanceled(MenuEvent e) {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
 				}
 
-				public void menuDeselected(MenuEvent e) {
+				@Override
+				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().update();
 				}
 
-				public void menuSelected(MenuEvent e) {
+				@Override
+				public void menuSelected(final MenuEvent e) {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
@@ -320,6 +322,8 @@ public class MainFrame extends JFrame {
 			fileMenu.add(getSaveMenuItem());
 			fileMenu.add(getSaveasMenuItem());
 			fileMenu.add(getSeparator());
+			fileMenu.add(getImportMenuItem());
+			fileMenu.add(getSeparator_3());
 			fileMenu.add(getScaleToFitRadioButtonMenuItem());
 			fileMenu.add(getExactSizeRadioButtonMenuItem());
 			fileMenu.add(getSeparator_2());
@@ -334,16 +338,17 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes newMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getNewMenuItem() {
 		if (newMenuItem == null) {
 			newMenuItem = new JMenuItem("New");
 			newMenuItem.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					Scene.newFile(40, 30);
-					updateTitleBar();					
+					updateTitleBar();
 				}
 			});
 		}
@@ -352,7 +357,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes openMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getOpenMenuItem() {
@@ -360,14 +365,15 @@ public class MainFrame extends JFrame {
 			openMenuItem = new JMenuItem("Open...");
 			openMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().update(1);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						try {
 							Scene.open(fileChooser.getSelectedFile().toURI().toURL());
 							updateTitleBar();
-						} catch (Throwable err) {
+						} catch (final Throwable err) {
 							err.printStackTrace();
 							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 						}
@@ -380,14 +386,14 @@ public class MainFrame extends JFrame {
 
 	protected void updateTitleBar() {
 		if (Scene.getURL() == null)
-			this.setTitle("Energy3D v" + Config.VERSION);
+			setTitle("Energy3D v" + Config.VERSION);
 		else
-			this.setTitle("Energy3D v" + Config.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " "));
+			setTitle("Energy3D v" + Config.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " "));
 	}
 
 	/**
 	 * This method initializes saveMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getSaveMenuItem() {
@@ -395,7 +401,8 @@ public class MainFrame extends JFrame {
 			saveMenuItem = new JMenuItem("Save");
 			saveMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK));
 			saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					try {
 						final URL url = Scene.getURL();
 						if (url != null)
@@ -403,7 +410,7 @@ public class MainFrame extends JFrame {
 						else //if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
 //							Scene.save(fileChooser.getSelectedFile().toURI().toURL());
 							saveFile();
-					} catch (Throwable err) {
+					} catch (final Throwable err) {
 						err.printStackTrace();
 						JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 					}
@@ -415,7 +422,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes printMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getPrintMenuItem() {
@@ -423,11 +430,13 @@ public class MainFrame extends JFrame {
 			printMenuItem = new JMenuItem("Print...");
 			printMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_MASK));
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					final PrintController printController = PrintController.getInstance();
-					if (!printController.isPrintPreview()) {					    
+					if (!printController.isPrintPreview()) {
 						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
 						SceneManager.getTaskManager().update(new Callable<Object>() {
+							@Override
 							public Object call() throws Exception {
 								if (printController.isFinished())
 									PrintController.getInstance().print();
@@ -446,14 +455,15 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes previewMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getPreviewMenuItem() {
 		if (previewMenuItem == null) {
 			previewMenuItem = new JCheckBoxMenuItem("Print Preview");
 			previewMenuItem.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
+				@Override
+				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					mainPanel.getPreviewButton().setSelected(previewMenuItem.isSelected());
 				}
 			});
@@ -463,21 +473,24 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes cameraMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getCameraMenu() {
 		if (cameraMenu == null) {
 			cameraMenu = new JMenu();
 			cameraMenu.addMenuListener(new MenuListener() {
-				public void menuCanceled(MenuEvent e) {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
 				}
 
-				public void menuDeselected(MenuEvent e) {
+				@Override
+				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().update();
 				}
 
-				public void menuSelected(MenuEvent e) {
+				@Override
+				public void menuSelected(final MenuEvent e) {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
@@ -485,7 +498,7 @@ public class MainFrame extends JFrame {
 			cameraMenu.setText("Camera");
 			cameraMenu.add(getOrbitMenuItem());
 			cameraMenu.add(getFirstPersonMenuItem());
-			ButtonGroup bg = new ButtonGroup();
+			final ButtonGroup bg = new ButtonGroup();
 			bg.add(orbitMenuItem);
 			bg.add(firstPersonMenuItem);
 		}
@@ -494,7 +507,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes orbitMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getOrbitMenuItem() {
@@ -503,7 +516,8 @@ public class MainFrame extends JFrame {
 			orbitMenuItem.setText("Orbit");
 			orbitMenuItem.setSelected(true);
 			orbitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setCameraControl(CameraMode.ORBIT);
 				}
 			});
@@ -513,7 +527,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes firstPersonMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getFirstPersonMenuItem() {
@@ -521,7 +535,8 @@ public class MainFrame extends JFrame {
 			firstPersonMenuItem = new JRadioButtonMenuItem();
 			firstPersonMenuItem.setText("First Person");
 			firstPersonMenuItem.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setCameraControl(CameraMode.FIRST_PERSON);
 				}
 			});
@@ -531,7 +546,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes colorMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getColorMenuItem() {
@@ -539,9 +554,11 @@ public class MainFrame extends JFrame {
 			colorMenuItem = new JMenuItem();
 			colorMenuItem.setText("House Color...");
 			colorMenuItem.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					final ActionListener actionListener = new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
 							final Color c = colorChooser.getColor();
 							final float[] newColor = c.getComponents(null);
 							HousePart.setDefaultColor(new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]));
@@ -559,7 +576,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes lightingMenu
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getLightingMenu() {
@@ -567,7 +584,8 @@ public class MainFrame extends JFrame {
 			lightingMenu = new JCheckBoxMenuItem();
 			lightingMenu.setText("Shading");
 			lightingMenu.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
+				@Override
+				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setShading(lightingMenu.isSelected());
 				}
 			});
@@ -577,7 +595,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes exitMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getExitMenuItem() {
@@ -585,7 +603,8 @@ public class MainFrame extends JFrame {
 			exitMenuItem = new JMenuItem();
 			exitMenuItem.setText("Exit");
 			exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 //					System.exit(0);
 					SceneManager.getInstance().exit();
 				}
@@ -596,7 +615,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes helpMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getHelpMenu() {
@@ -610,7 +629,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getAboutMenuItem() {
@@ -618,7 +637,8 @@ public class MainFrame extends JFrame {
 			aboutMenuItem = new JMenuItem();
 			aboutMenuItem.setText("About");
 			aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					final JDialog aboutDialog = getAboutDialog();
 					final Dimension frameSize = MainFrame.this.getSize();
 					final Dimension dialogSize = aboutDialog.getSize();
@@ -633,14 +653,14 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutDialog
-	 * 
+	 *
 	 * @return javax.swing.JDialog
 	 */
 	private JDialog getAboutDialog() {
 		if (aboutDialog == null) {
 			aboutDialog = new JDialog(this);
 			aboutDialog.setTitle("About");
-			JPanel p = new JPanel(new BorderLayout());
+			final JPanel p = new JPanel(new BorderLayout());
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
 			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + Config.VERSION + "<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grant #0918449 to the Concord Consortium. </html>"), BorderLayout.CENTER);
 			aboutDialog.setContentPane(p);
@@ -651,7 +671,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes wallThicknessMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	private JCheckBoxMenuItem getWallThicknessMenuItem() {
@@ -659,7 +679,8 @@ public class MainFrame extends JFrame {
 			wallThicknessMenuItem = new JCheckBoxMenuItem();
 			wallThicknessMenuItem.setText("Draw Wall Thickness");
 			wallThicknessMenuItem.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
+				@Override
+				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					Scene.getInstance().setDrawThickness(wallThicknessMenuItem.isSelected());
 				}
 			});
@@ -677,7 +698,8 @@ public class MainFrame extends JFrame {
 		if (saveasMenuItem == null) {
 			saveasMenuItem = new JMenuItem("Save As...");
 			saveasMenuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
 					saveFile();
 				}
 			});
@@ -689,14 +711,17 @@ public class MainFrame extends JFrame {
 		if (viewMenu == null) {
 			viewMenu = new JMenu("View");
 			viewMenu.addMenuListener(new MenuListener() {
-				public void menuCanceled(MenuEvent e) {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
 				}
 
-				public void menuDeselected(MenuEvent e) {
+				@Override
+				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().update();
 				}
 
-				public void menuSelected(MenuEvent e) {
+				@Override
+				public void menuSelected(final MenuEvent e) {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
@@ -726,7 +751,8 @@ public class MainFrame extends JFrame {
 		if (shadowMenu == null) {
 			shadowMenu = new JCheckBoxMenuItem("Shadows", false);
 			shadowMenu.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
+				@Override
+				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setShadow(shadowMenu.isSelected());
 				}
 			});
@@ -738,7 +764,8 @@ public class MainFrame extends JFrame {
 		if (metersRadioButtonMenuItem == null) {
 			metersRadioButtonMenuItem = new JRadioButtonMenuItem("Meters (m)");
 			metersRadioButtonMenuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setUnit(Unit.Meter);
 				}
 			});
@@ -752,7 +779,8 @@ public class MainFrame extends JFrame {
 		if (centimetersRadioButtonMenuItem == null) {
 			centimetersRadioButtonMenuItem = new JRadioButtonMenuItem("Centimeters (cm)");
 			centimetersRadioButtonMenuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setUnit(Unit.Centimeter);
 				}
 			});
@@ -766,7 +794,8 @@ public class MainFrame extends JFrame {
 		if (inchesRadioButtonMenuItem == null) {
 			inchesRadioButtonMenuItem = new JRadioButtonMenuItem("Inches (\")");
 			inchesRadioButtonMenuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setUnit(Unit.Inches);
 				}
 			});
@@ -779,13 +808,16 @@ public class MainFrame extends JFrame {
 		if (scaleMenu == null) {
 			scaleMenu = new JMenu("Scale");
 			scaleMenu.addMenuListener(new MenuListener() {
-				public void menuCanceled(MenuEvent e) {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
 				}
 
-				public void menuDeselected(MenuEvent e) {
+				@Override
+				public void menuDeselected(final MenuEvent e) {
 				}
 
-				public void menuSelected(MenuEvent e) {
+				@Override
+				public void menuSelected(final MenuEvent e) {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
@@ -799,7 +831,8 @@ public class MainFrame extends JFrame {
 		if (scaleMenuItem == null) {
 			scaleMenuItem = new JMenuItem("Scale...");
 			scaleMenuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
 					final ScaleDialog scaleDialog = new ScaleDialog();
 					scaleDialog.setVisible(true);
 				}
@@ -812,7 +845,8 @@ public class MainFrame extends JFrame {
 		if (textureCheckBoxMenuItem == null) {
 			textureCheckBoxMenuItem = new JCheckBoxMenuItem("Texture", true);
 			textureCheckBoxMenuItem.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
+				@Override
+				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					Scene.getInstance().setTextureEnabled(textureCheckBoxMenuItem.isSelected());
 				}
 			});
@@ -824,7 +858,8 @@ public class MainFrame extends JFrame {
 		if (drawAnnotationsInward == null) {
 			drawAnnotationsInward = new JCheckBoxMenuItem("Draw Annotations Inward");
 			drawAnnotationsInward.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
+				@Override
+				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					Scene.setDrawAnnotationsInside(drawAnnotationsInward.isSelected());
 				}
 			});
@@ -837,14 +872,17 @@ public class MainFrame extends JFrame {
 		if (editMenu == null) {
 			editMenu = new JMenu("Edit");
 			editMenu.addMenuListener(new MenuListener() {
-				public void menuCanceled(MenuEvent e) {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
 				}
 
-				public void menuDeselected(MenuEvent e) {
+				@Override
+				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().update();
 				}
 
-				public void menuSelected(MenuEvent e) {
+				@Override
+				public void menuSelected(final MenuEvent e) {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
@@ -868,6 +906,7 @@ public class MainFrame extends JFrame {
 			undoMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
 			undoMenuItem.setEnabled(false);
 			undoMenuItem.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().undo();
@@ -885,6 +924,7 @@ public class MainFrame extends JFrame {
 			redoMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
 			redoMenuItem.setEnabled(false);
 			redoMenuItem.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().redo();
@@ -905,15 +945,28 @@ public class MainFrame extends JFrame {
 					file = new File(file.toString() + ".ser");
 				Scene.save(file.toURI().toURL());
 				updateTitleBar();
-			} catch (Throwable err) {
+			} catch (final Throwable err) {
 				err.printStackTrace();
 				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 	}
+
+	private void importFile() {
+		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
+			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
+			try {
+				Scene.importFile(fileChooser.getSelectedFile().toURI().toURL());
+			} catch (final Throwable err) {
+				err.printStackTrace();
+				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+	}
+
 	private JMenuItem getPageSetupMenuItem() {
 		if (pageSetupMenuItem == null) {
 			pageSetupMenuItem = new JMenuItem("Page Setup...");
 			pageSetupMenuItem.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(final ActionEvent e) {
 					PrintController.getInstance().pageSetup();
 				}
@@ -933,11 +986,12 @@ public class MainFrame extends JFrame {
 		}
 		return separator_1;
 	}
-	
+
 	private JRadioButtonMenuItem getScaleToFitRadioButtonMenuItem() {
 		if (scaleToFitRadioButtonMenuItem == null) {
 			scaleToFitRadioButtonMenuItem = new JRadioButtonMenuItem("Scale To Fit Paper");
 			scaleToFitRadioButtonMenuItem.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(final ActionEvent e) {
 					PrintController.getInstance().setScaleToFit(true);
 				}
@@ -946,11 +1000,12 @@ public class MainFrame extends JFrame {
 		}
 		return scaleToFitRadioButtonMenuItem;
 	}
-	
+
 	private JRadioButtonMenuItem getExactSizeRadioButtonMenuItem() {
 		if (exactSizeRadioButtonMenuItem == null) {
 			exactSizeRadioButtonMenuItem = new JRadioButtonMenuItem("Exact Size on Paper");
 			exactSizeRadioButtonMenuItem.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(final ActionEvent e) {
 					PrintController.getInstance().setScaleToFit(false);
 				}
@@ -960,11 +1015,29 @@ public class MainFrame extends JFrame {
 		}
 		return exactSizeRadioButtonMenuItem;
 	}
-	
+
 	private JSeparator getSeparator_2() {
 		if (separator_2 == null) {
 			separator_2 = new JSeparator();
 		}
 		return separator_2;
+	}
+	private JMenuItem getImportMenuItem() {
+		if (importMenuItem == null) {
+			importMenuItem = new JMenuItem("Import...");
+			importMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					importFile();
+				}
+			});
+		}
+		return importMenuItem;
+	}
+	private JSeparator getSeparator_3() {
+		if (separator_3 == null) {
+			separator_3 = new JSeparator();
+		}
+		return separator_3;
 	}
 }

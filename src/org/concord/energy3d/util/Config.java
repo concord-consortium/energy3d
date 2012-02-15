@@ -4,7 +4,7 @@ import org.concord.energy3d.MainApplet;
 
 public class Config {
 	public static final String VERSION = "0.6";
-	public static final boolean JOGL = true;
+	public static final boolean JOGL = false;
 	private static MainApplet applet;
 	private static boolean isWebstart;
 	private static final boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac");
@@ -13,7 +13,7 @@ public class Config {
 		return applet;
 	}
 
-	public static void setApplet(MainApplet applet) {
+	public static void setApplet(final MainApplet applet) {
 		Config.applet = applet;
 	}
 
@@ -39,5 +39,5 @@ public class Config {
 	public static boolean isMac() {
 		return isMac;
 	}
-	 
+
 }

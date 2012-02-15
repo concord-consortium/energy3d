@@ -1,17 +1,12 @@
 package org.concord.energy3d.scene;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.MainFrame;
@@ -36,7 +31,7 @@ public class Scene implements Serializable {
 		Meter("m"), Centimeter("cm"), Inches("\"");
 		private final String notation;
 
-		private Unit(String notation) {
+		private Unit(final String notation) {
 			this.notation = notation;
 		}
 
@@ -56,7 +51,7 @@ public class Scene implements Serializable {
 	private static boolean drawAnnotationsInside = false;
 	private static Unit unit = Unit.Centimeter;
 	private static double annotationScale = 10;
-	private ArrayList<HousePart> parts = new ArrayList<HousePart>();
+	private final ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private static boolean isAnnotationsVisible = true;
 
 	// public static Scene getInstance() {
@@ -103,7 +98,7 @@ public class Scene implements Serializable {
 					open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
 				} else
 					newFile(40, 30);
-			} catch (Throwable e) {
+			} catch (final Throwable e) {
 				e.printStackTrace();
 				newFile(40, 30);
 			}
@@ -119,13 +114,14 @@ public class Scene implements Serializable {
 		// newFile();
 		try {
 			open(null);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 
 		final Foundation foundation = new Foundation(xLength / annotationScale, yLength / annotationScale);
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
 			public Object call() throws Exception {
 				instance.add(foundation);
 				redrawAll = true;
@@ -148,7 +144,7 @@ public class Scene implements Serializable {
 			System.out.println("done");
 		} else {
 			System.out.print("Opening..." + file + "...");
-			ObjectInputStream in = new ObjectInputStream(file.openStream());
+			final ObjectInputStream in = new ObjectInputStream(file.openStream());
 			instance = (Scene) in.readObject();
 			in.close();
 
@@ -156,6 +152,7 @@ public class Scene implements Serializable {
 		}
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
 			public Object call() throws Exception {
 				System.out.print("Open file...");
 				originalHouseRoot.detachAllChildren();
@@ -163,7 +160,7 @@ public class Scene implements Serializable {
 				root.attachChild(originalHouseRoot);
 
 				if (url != null) {
-					for (HousePart housePart : instance.getParts())
+					for (final HousePart housePart : instance.getParts())
 						// if (housePart.isValid())
 						originalHouseRoot.attachChild(housePart.getRoot());
 					redrawAll = true;
@@ -178,6 +175,39 @@ public class Scene implements Serializable {
 				return null;
 			}
 		});
+	}
+
+	public static void importFile(final URL url) throws Exception {
+		if (PrintController.getInstance().isPrintPreview()) {
+			MainPanel.getInstance().getPreviewButton().setSelected(false);
+			while (!PrintController.getInstance().isFinished())
+				Thread.yield();
+		}
+
+		if (url != null) {
+			System.out.print("Opening..." + url + "...");
+			final ObjectInputStream in = new ObjectInputStream(url.openStream());
+			final Scene instance = (Scene) in.readObject();
+			in.close();
+
+			instance.cleanup();
+
+			if (url != null) {
+				for (final HousePart housePart : instance.getParts()) {
+					Scene.getInstance().parts.add(housePart);
+					// if (housePart.isValid())
+					originalHouseRoot.attachChild(housePart.getRoot());
+				}
+				redrawAll = true;
+				System.out.println("done");
+			}
+
+			root.updateWorldBound(true);
+			SceneManager.getInstance().updateHeliodonAndAnnotationSize();
+			SceneManager.getInstance().getUndoManager().die();
+			if (!Config.isApplet())
+				MainFrame.getInstance().refreshUndoRedo();
+		}
 	}
 
 	private void cleanup() {
@@ -220,7 +250,7 @@ public class Scene implements Serializable {
 	private Scene() {
 	}
 
-	public void add(HousePart housePart) {
+	public void add(final HousePart housePart) {
 		System.out.print("Adding new house part...");
 		final HousePart container = housePart.getContainer();
 		if (container != null)
@@ -250,7 +280,7 @@ public class Scene implements Serializable {
 			container.draw();
 	}
 
-	private void removeTree(HousePart housePart) {
+	private void removeTree(final HousePart housePart) {
 		System.out.println("Removing: " + housePart);
 		originalHouseRoot.detachChild(housePart.getRoot());
 		parts.remove(housePart);
@@ -332,7 +362,7 @@ public class Scene implements Serializable {
 	// }
 
 	public void drawResizeBounds() {
-		for (HousePart part : parts) {
+		for (final HousePart part : parts) {
 			if (part instanceof Foundation)
 				part.draw();
 		}
@@ -346,12 +376,12 @@ public class Scene implements Serializable {
 		return url;
 	}
 
-	public void setAnnotationsVisible(boolean visible) {
-		this.isAnnotationsVisible = visible;
-		for (HousePart part : parts)
+	public void setAnnotationsVisible(final boolean visible) {
+		isAnnotationsVisible = visible;
+		for (final HousePart part : parts)
 			part.setAnnotationsVisible(visible);
 		if (PrintController.getInstance().isPrintPreview())
-			for (HousePart part : PrintController.getInstance().getPrintParts())
+			for (final HousePart part : PrintController.getInstance().getPrintParts())
 				part.setAnnotationsVisible(visible);
 		if (PrintController.getInstance().isPrintPreview()) {
 			PrintController.getInstance().restartAnimation();
@@ -362,10 +392,10 @@ public class Scene implements Serializable {
 
 	public void setTextureEnabled(final boolean enabled) {
 		isTextureEnabled = enabled;
-		for (HousePart part : parts)
+		for (final HousePart part : parts)
 			part.updateTextureAndColor(enabled);
 		if (PrintController.getInstance().getPrintParts() != null)
-			for (HousePart part : PrintController.getInstance().getPrintParts())
+			for (final HousePart part : PrintController.getInstance().getPrintParts())
 				part.updateTextureAndColor(enabled);
 
 		if (enabled)
@@ -385,7 +415,7 @@ public class Scene implements Serializable {
 		return drawAnnotationsInside;
 	}
 
-	public static void setDrawAnnotationsInside(boolean drawAnnotationsInside) {
+	public static void setDrawAnnotationsInside(final boolean drawAnnotationsInside) {
 		Scene.drawAnnotationsInside = drawAnnotationsInside;
 		for (final HousePart part : getInstance().getParts())
 			part.drawAnnotations();
@@ -410,14 +440,14 @@ public class Scene implements Serializable {
 				if (!(part instanceof Roof))
 					part.draw();
 			if (PrintController.getInstance().getPrintParts() != null)
-				for (HousePart part : PrintController.getInstance().getPrintParts())
+				for (final HousePart part : PrintController.getInstance().getPrintParts())
 					part.draw();
 			// updateTextSizes();
 			redrawAll = false;
 		}
 	}
 
-	public void setUnit(Unit unit) {
+	public void setUnit(final Unit unit) {
 		this.unit = unit;
 		redrawAll = true;
 	}
@@ -428,8 +458,8 @@ public class Scene implements Serializable {
 		return unit;
 	}
 
-	public void setAnnotationScale(double scale) {
-		this.annotationScale = scale;
+	public void setAnnotationScale(final double scale) {
+		annotationScale = scale;
 		redrawAll = true;
 	}
 

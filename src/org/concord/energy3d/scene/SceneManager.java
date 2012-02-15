@@ -118,8 +118,6 @@ import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
-import com.ardor3d.util.Ardor3dException;
-import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -147,7 +145,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private static final double MOVE_SPEED = 5;
 
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
-	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());	
+	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());
 	private final Canvas canvas;
 	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
@@ -174,7 +172,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private long lastRenderTime;
 	private boolean mouseControlEnabled = true;
 	private boolean drawBounds = false;
-	private boolean exit = false;
+	private final boolean exit = false;
 	private boolean rotAnim = false;
 	private boolean heliodonControl;
 	private boolean sunAnim;
@@ -185,7 +183,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public final static byte DEFAULT_THEME = 0;
 	public final static byte SKETCHUP_THEME = 1;
-	private byte theme = DEFAULT_THEME;
+	private final byte theme = DEFAULT_THEME;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -205,11 +203,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
 			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
 		} else {
-			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
+//			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
+			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 4, false, false);
 			 try {
 			 canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
 			 TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
-			 } catch (LWJGLException e) {
+			 } catch (final LWJGLException e) {
 			 throw new RuntimeException(e);
 			 }
 		}
@@ -229,7 +228,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.addUpdater(Blinker.getInstance());
 
 		panel.addComponentListener(new java.awt.event.ComponentAdapter() {
-			public void componentResized(java.awt.event.ComponentEvent e) {
+			@Override
+			public void componentResized(final java.awt.event.ComponentEvent e) {
 				resizeCamera();
 				update();
 				if (heliodon != null)
@@ -289,6 +289,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Date today = Calendar.getInstance().getTime();
 		heliodon = new Heliodon(root, light, passManager, logicalLayer, today);
 		taskManager.update(new Callable<Object>() {
+			@Override
 			public Object call() throws Exception {
 				MainPanel.getInstance().getDateSpinner().setValue(today);
 				MainPanel.getInstance().getTimeSpinner().setValue(today);
@@ -304,6 +305,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.out.println("Finished initialization.");
 	}
 
+	@Override
 	public synchronized void run() {
 		frameHandler.init();
 		while (!exit) {
@@ -318,7 +320,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				update = false;
 				try {
 					frameHandler.updateFrame();
-				} catch (Throwable e) {
+				} catch (final Throwable e) {
 					e.printStackTrace();
 					if (shadowPass.isEnabled()) {
 						JOptionPane.showMessageDialog(MainPanel.getInstance(), "Your video card driver does not support shadows! Updating your video card drivers may fix this issue. Shadow rendering will be disabled now.", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -328,11 +330,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			} else
 				frameHandler.getTimer().update();
 			final double syncNS = 1000000000.0 / 60.0;
-			long sinceLast = System.nanoTime() - lastRenderTime;
+			final long sinceLast = System.nanoTime() - lastRenderTime;
 			if (sinceLast < syncNS) {
 				try {
 					Thread.sleep(Math.round((syncNS - sinceLast) / 1000000L));
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -340,6 +342,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 	}
 
+	@Override
 	public void update(final ReadOnlyTimer timer) {
 		final double tpf = timer.getTimePerFrame();
 		passManager.updatePasses(tpf);
@@ -354,7 +357,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //		if (Scene.getInstance() != null)
 			Scene.getInstance().update();
 
-		if (rotAnim && viewMode == ViewMode.NORMAL && canvas.getCanvasRenderer() != null) { 
+		if (rotAnim && viewMode == ViewMode.NORMAL && canvas.getCanvasRenderer() != null) {
 			final Matrix3 rotate = new Matrix3();
 			rotate.fromAngleNormalAxis(45 * tpf * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
@@ -374,10 +377,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		root.updateGeometricState(tpf);
 	}
 
+	@Override
 	public boolean renderUnto(final Renderer renderer) {
 		if (cameraNode == null)
 			initCamera();
-		
+
 
 		if (drawBounds && selectedHousePart != null) {
 			if (selectedHousePart instanceof Roof) {
@@ -397,7 +401,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					System.out.println(selectedHousePart.getMesh().getWorldBound());
 			}
 		}
-		
+
 		if (drawBounds) {
 //			for (final HousePart selectedHousePart : PrintController.getInstance().getPrintParts())
 			for (final HousePart selectedHousePart : Scene.getInstance().getParts())
@@ -414,16 +418,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}
 		}
-		
+
 //		com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, false);
-		
+
 
 //		 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
 
 		passManager.renderPasses(renderer);
 		try {
 			shadowPass.renderPass(renderer);
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			e.printStackTrace();
 			if (shadowPass.isEnabled()) {
 				JOptionPane.showMessageDialog(MainPanel.getInstance(), "Your video card driver does not support shadows! Updating your video card drivers may fix this issue. Shadow rendering will be disabled now.", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -442,6 +446,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		resetCamera(ViewMode.NORMAL);
 
 		taskManager.update(new Callable<Object>() {
+			@Override
 			public Object call() throws Exception {
 				final Spatial compass = createCompass();
 				compass.setScale(0.1);
@@ -452,7 +457,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 	}
 
-	public PickResults doPick(Ray3 pickRay) {
+	@Override
+	public PickResults doPick(final Ray3 pickRay) {
 		return null;
 	}
 
@@ -596,11 +602,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (!Config.isHeliodonMode())
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
+				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 					update = true;
 					taskManager.update(new Callable<Object>() {
+						@Override
 						public Object call() {
-							MouseState mouseState = inputStates.getCurrent().getMouseState();
+							final MouseState mouseState = inputStates.getCurrent().getMouseState();
 							if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.DRAW_ROOF_GABLE) {
 								if (selectedHousePart == null || selectedHousePart.isDrawCompleted()) {
 									final HousePart previousSelectedHousePart = selectedHousePart;
@@ -654,13 +662,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (!Config.isHeliodonMode())
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
+				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 					update = true;
 					taskManager.update(new Callable<Object>() {
+						@Override
 						public Object call() {
 							if (selectedHousePart != null)
 								selectedHousePart.setGridsVisible(false);
-							MouseState mouseState = inputStates.getCurrent().getMouseState();
+							final MouseState mouseState = inputStates.getCurrent().getMouseState();
 							boolean sceneChanged = false;
 							if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 								if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
@@ -739,8 +749,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}));
 
-		
+
 			logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
+				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 					update = true;
 					if (!Config.isHeliodonMode())
@@ -749,6 +760,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.LEFT), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!isTopView() && inputStates.getCurrent().getMouseState().getClickCount(MouseButton.LEFT) == 2) {
 					final PickedHousePart pickedHousePart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), root);
@@ -761,18 +773,22 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LSHIFT), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				SelectUtil.setPickLayer(0);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.LSHIFT), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				SelectUtil.setPickLayer(-1);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.DELETE), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				taskManager.update(new Callable<Object>() {
+					@Override
 					public Object call() throws Exception {
 						undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
 						if (!Config.isApplet())
@@ -785,8 +801,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.BACK), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				taskManager.update(new Callable<Object>() {
+					@Override
 					public Object call() throws Exception {
 						undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
 						if (!Config.isApplet())
@@ -799,50 +817,59 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.ESCAPE), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				hideAllEditPoints();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Q), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				// moveUpDown(source, tpf, true);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				// if (!inputStates.getCurrent().getKeyboardState().isAtLeastOneDown(Key.LCONTROL, Key.RCONTROL))
 				// moveUpDown(source, tpf, false);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (viewMode == ViewMode.TOP_VIEW)
 					moveUpDown(source, tpf, true);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.S), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (viewMode == ViewMode.TOP_VIEW)
 					moveUpDown(source, tpf, false);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				resetCamera(viewMode);
 				update = true;
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.X), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				heliodon.setHourAngle(heliodon.getHourAngle() + 0.03, true, true);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				heliodon.setHourAngle(heliodon.getHourAngle() - 0.03, true, true);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.UP), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!heliodonControl)
 					return;
@@ -850,6 +877,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DOWN), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!heliodonControl)
 					return;
@@ -857,6 +885,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.RIGHT), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!heliodonControl)
 					return;
@@ -864,6 +893,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!heliodonControl)
 					return;
@@ -871,6 +901,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.B), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				drawBounds = !drawBounds;
 				if (drawBounds)
@@ -880,6 +911,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.I), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				System.out.println("---- Parts: ------------------------");
 				System.out.println("size = " + Scene.getInstance().getParts().size());
@@ -893,11 +925,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				Scene.getInstance().redrawAll();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.X), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				Scene.getInstance().removeAllRoofs();
 			}
@@ -919,7 +953,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void hideAllEditPoints() {
-		for (HousePart part : Scene.getInstance().getParts()) {
+		for (final HousePart part : Scene.getInstance().getParts()) {
 			part.setEditPointsVisible(false);
 			part.setGridsVisible(false);
 		}
@@ -936,7 +970,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		// ReadOnlyVector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
 		ReadOnlyVector3 loc = new Vector3(1.0f, -5.0f, 3.0f);
-		ReadOnlyVector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
+		final ReadOnlyVector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		ReadOnlyVector3 up = new Vector3(0.0f, 0.0f, 1.0f);
 		ReadOnlyVector3 lookAt = new Vector3(0.0f, 0.0f, 1.0f);
 
@@ -1029,18 +1063,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setOperation(final Operation operation) {
-		this.operationStick = false;
+		operationStick = false;
 		this.operation = operation;
-		this.operationFlag = true;
+		operationFlag = true;
 		update();
 	}
 
-	public void setOperationStick(boolean stick) {
-		this.operationStick = stick;
+	public void setOperationStick(final boolean stick) {
+		operationStick = stick;
 	}
 
 	public void executeOperation() {
-		this.operationFlag = false;
+		operationFlag = false;
 		if (selectedHousePart != null) {
 			if (selectedHousePart.isDrawCompleted())
 				selectedHousePart.setEditPointsVisible(false);
@@ -1048,7 +1082,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				Scene.getInstance().remove(selectedHousePart);
 		}
 
-		for (HousePart part : Scene.getInstance().getParts())
+		for (final HousePart part : Scene.getInstance().getParts())
 			if (part instanceof Foundation)
 				((Foundation) part).setResizeHouseMode(operation == Operation.RESIZE);
 
@@ -1097,6 +1131,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setShading(final boolean enable) {
 		taskManager.update(new Callable<Object>() {
+			@Override
 			public Object call() throws Exception {
 				lightState.setEnabled(enable);
 				root.updateWorldRenderStates(true);
@@ -1105,14 +1140,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 	}
 
-	public void setHeliodonControl(boolean selected) {
-		this.heliodonControl = selected;
+	public void setHeliodonControl(final boolean selected) {
+		heliodonControl = selected;
 		heliodon.setVisible(selected);
 		enableDisableRotationControl();
 	}
 
-	public void setSunAnim(boolean selected) {
-		this.sunAnim = selected;
+	public void setSunAnim(final boolean selected) {
+		sunAnim = selected;
 	}
 
 	public void enableDisableRotationControl() {
@@ -1152,7 +1187,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.exit(0);
 	}
 
-	public void updatePrintPreviewScene(boolean printPreview) {
+	public void updatePrintPreviewScene(final boolean printPreview) {
 		resetCamera(printPreview ? ViewMode.PRINT_PREVIEW : ViewMode.NORMAL);
 		backgroundRoot.getSceneHints().setCullHint(printPreview ? CullHint.Always : CullHint.Inherit);
 		backgroundRoot.getSceneHints().setAllPickingHints(false);
@@ -1160,6 +1195,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setShadow(final boolean shadow) {
 		taskManager.update(new Callable<Object>() {
+			@Override
 			public Object call() throws Exception {
 				shadowPass.setEnabled(shadow);
 				return null;
@@ -1225,7 +1261,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.out.println("done");
 
 		compass.addController(new SpatialController<Spatial>() {
-			public void update(double time, Spatial caller) {
+			@Override
+			public void update(final double time, final Spatial caller) {
 				final Vector3 direction = canvas.getCanvasRenderer().getCamera().getDirection().normalize(null);
 				direction.setZ(0);
 				direction.normalizeLocal();
@@ -1240,13 +1277,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return compassNode;
 	}
 
-	public void setCompassVisible(boolean visible) {
+	public void setCompassVisible(final boolean visible) {
 		cameraNode.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 	}
 
 	public void updateHeliodonAndAnnotationSize() {
 		if (heliodonControl)
 			taskManager.update(new Callable<Object>() {
+				@Override
 				public Object call() throws Exception {
 					// Scene.getInstance().updateTextSizes();
 					heliodon.updateSize();
@@ -1260,8 +1298,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return;
 		final MouseState mouseState = moveState.getCurrent().getMouseState();
 		moveState = null;
-		int x = mouseState.getX();
-		int y = mouseState.getY();
+		final int x = mouseState.getX();
+		final int y = mouseState.getY();
 
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
@@ -1290,7 +1328,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setMouseControlEnabled(final boolean enabled) {
-		this.mouseControlEnabled = enabled;
+		mouseControlEnabled = enabled;
 		cameraControl.setMouseEnabled(enabled);
 	}
 
@@ -1319,7 +1357,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.zoomLock = zoomLock;
 		cameraControl.setLeftButtonAction(zoomLock ? ButtonAction.ZOOM : viewMode == ViewMode.NORMAL ? ButtonAction.ROTATE : ButtonAction.MOVE);
 //			cameraControl.setMouseButtonActions(zoomLock ? ButtonAction.ZOOM : ButtonAction.ROTATE, ButtonAction.MOVE);
-			
+
 	}
 
 	public void update() {
