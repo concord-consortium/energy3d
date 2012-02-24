@@ -47,6 +47,7 @@ import org.concord.energy3d.scene.Scene.Unit;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
+import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.Config;
 
 import com.ardor3d.math.ColorRGBA;
@@ -70,26 +71,25 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem orbitMenuItem = null;
 	private JRadioButtonMenuItem firstPersonMenuItem = null;
 	private JMenuItem saveasMenuItem;
-	private JMenu viewMenu;
+	private JMenu sceneMenu;
 	private JMenu unitsMenu;
 	private JRadioButtonMenuItem metersRadioButtonMenuItem;
 	private JRadioButtonMenuItem centimetersRadioButtonMenuItem;
 	private JRadioButtonMenuItem inchesRadioButtonMenuItem;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
-	private JMenu scaleMenu;
 	private JMenuItem scaleMenuItem;
 	private JCheckBoxMenuItem shadowMenu;
 	private JCheckBoxMenuItem textureCheckBoxMenuItem;
 	protected Object lastSelection; // @jve:decl-index=0:
 	private JMenuItem colorMenuItem = null;
-	private JCheckBoxMenuItem lightingMenu = null;
+	private JCheckBoxMenuItem shadeMenu = null;
 	private JMenuItem exitMenuItem = null;
 	private JMenu helpMenu = null;
 	private JMenuItem aboutMenuItem = null;
 	private JDialog aboutDialog = null; // @jve:decl-index=0:visual-constraint="602,644"
 	private JCheckBoxMenuItem wallThicknessMenuItem = null;
 	private MainPanel mainPanel = null;
-	private JCheckBoxMenuItem drawAnnotationsInward;
+	private JCheckBoxMenuItem annotationsInward;
 	private JMenu editMenu;
 	private JMenuItem undoMenuItem;
 	private JMenuItem redoMenuItem;
@@ -102,6 +102,14 @@ public class MainFrame extends JFrame {
 	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
 	private JMenuItem importMenuItem;
 	private JSeparator separator_3;
+	private JCheckBoxMenuItem snapCheckBoxMenuItem;
+	private JCheckBoxMenuItem gridsCheckBoxMenuItem;
+	private JSeparator separator_4;
+	private JSeparator separator_5;
+	private JSeparator separator_6;
+	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
+	private JSeparator separator_7;
+	private JSeparator separator_8;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -284,8 +292,7 @@ public class MainFrame extends JFrame {
 			appMenuBar = new JMenuBar();
 			appMenuBar.add(getFileMenu());
 			appMenuBar.add(getEditMenu());
-			appMenuBar.add(getViewMenu());
-			appMenuBar.add(getScaleMenu());
+			appMenuBar.add(getSceneMenu());
 			appMenuBar.add(getCameraMenu());
 			appMenuBar.add(getHelpMenu());
 		}
@@ -501,6 +508,8 @@ public class MainFrame extends JFrame {
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(orbitMenuItem);
 			bg.add(firstPersonMenuItem);
+			cameraMenu.add(getSeparator_7());
+			cameraMenu.add(getTopViewCheckBoxMenuItem());
 		}
 		return cameraMenu;
 	}
@@ -579,18 +588,18 @@ public class MainFrame extends JFrame {
 	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
-	public JCheckBoxMenuItem getLightingMenu() {
-		if (lightingMenu == null) {
-			lightingMenu = new JCheckBoxMenuItem();
-			lightingMenu.setText("Shading");
-			lightingMenu.addItemListener(new java.awt.event.ItemListener() {
+	public JCheckBoxMenuItem getShadeMenu() {
+		if (shadeMenu == null) {
+			shadeMenu = new JCheckBoxMenuItem();
+			shadeMenu.setText("Shade");
+			shadeMenu.addItemListener(new java.awt.event.ItemListener() {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
-					SceneManager.getInstance().setShading(lightingMenu.isSelected());
+					SceneManager.getInstance().setShading(shadeMenu.isSelected());
 				}
 			});
 		}
-		return lightingMenu;
+		return shadeMenu;
 	}
 
 	/**
@@ -707,10 +716,10 @@ public class MainFrame extends JFrame {
 		return saveasMenuItem;
 	}
 
-	private JMenu getViewMenu() {
-		if (viewMenu == null) {
-			viewMenu = new JMenu("View");
-			viewMenu.addMenuListener(new MenuListener() {
+	private JMenu getSceneMenu() {
+		if (sceneMenu == null) {
+			sceneMenu = new JMenu("Scene");
+			sceneMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 				}
@@ -726,15 +735,22 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
-			viewMenu.add(getUnitsMenu());
-			viewMenu.add(getLightingMenu());
-			viewMenu.add(getShadowMenu());
-			viewMenu.add(getTextureCheckBoxMenuItem());
-			viewMenu.add(getColorMenuItem());
-			viewMenu.add(getWallThicknessMenuItem());
-			viewMenu.add(getDrawAnnotationsInward());
+			sceneMenu.add(getUnitsMenu());
+			sceneMenu.add(getScaleMenuItem());
+			sceneMenu.add(getSeparator_8());
+			sceneMenu.add(getGridsCheckBoxMenuItem());
+			sceneMenu.add(getSnapCheckBoxMenuItem());
+			sceneMenu.add(getSeparator_4());
+			sceneMenu.add(getShadeMenu());
+			sceneMenu.add(getShadowMenu());
+			sceneMenu.add(getSeparator_5());
+			sceneMenu.add(getTextureCheckBoxMenuItem());
+			sceneMenu.add(getColorMenuItem());
+			sceneMenu.add(getSeparator_6());
+			sceneMenu.add(getWallThicknessMenuItem());
+			sceneMenu.add(getAnnotationsInward());
 		}
-		return viewMenu;
+		return sceneMenu;
 	}
 
 	private JMenu getUnitsMenu() {
@@ -804,29 +820,6 @@ public class MainFrame extends JFrame {
 		return inchesRadioButtonMenuItem;
 	}
 
-	private JMenu getScaleMenu() {
-		if (scaleMenu == null) {
-			scaleMenu = new JMenu("Scale");
-			scaleMenu.addMenuListener(new MenuListener() {
-				@Override
-				public void menuCanceled(final MenuEvent e) {
-				}
-
-				@Override
-				public void menuDeselected(final MenuEvent e) {
-				}
-
-				@Override
-				public void menuSelected(final MenuEvent e) {
-					mainPanel.getSelectButton().setSelected(true);
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-				}
-			});
-			scaleMenu.add(getScaleMenuItem());
-		}
-		return scaleMenu;
-	}
-
 	private JMenuItem getScaleMenuItem() {
 		if (scaleMenuItem == null) {
 			scaleMenuItem = new JMenuItem("Scale...");
@@ -854,18 +847,18 @@ public class MainFrame extends JFrame {
 		return textureCheckBoxMenuItem;
 	}
 
-	private JCheckBoxMenuItem getDrawAnnotationsInward() {
-		if (drawAnnotationsInward == null) {
-			drawAnnotationsInward = new JCheckBoxMenuItem("Draw Annotations Inward");
-			drawAnnotationsInward.addItemListener(new java.awt.event.ItemListener() {
+	private JCheckBoxMenuItem getAnnotationsInward() {
+		if (annotationsInward == null) {
+			annotationsInward = new JCheckBoxMenuItem("Annotations Inward");
+			annotationsInward.addItemListener(new java.awt.event.ItemListener() {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
-					Scene.setDrawAnnotationsInside(drawAnnotationsInward.isSelected());
+					Scene.setDrawAnnotationsInside(annotationsInward.isSelected());
 				}
 			});
 
 		}
-		return drawAnnotationsInward;
+		return annotationsInward;
 	}
 
 	private JMenu getEditMenu() {
@@ -1039,5 +1032,73 @@ public class MainFrame extends JFrame {
 			separator_3 = new JSeparator();
 		}
 		return separator_3;
+	}
+	private JCheckBoxMenuItem getSnapCheckBoxMenuItem() {
+		if (snapCheckBoxMenuItem == null) {
+			snapCheckBoxMenuItem = new JCheckBoxMenuItem("Snap Walls");
+			snapCheckBoxMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart.setSnapToObjects(snapCheckBoxMenuItem.isSelected());
+				}
+			});
+		}
+		return snapCheckBoxMenuItem;
+	}
+	private JCheckBoxMenuItem getGridsCheckBoxMenuItem() {
+		if (gridsCheckBoxMenuItem == null) {
+			gridsCheckBoxMenuItem = new JCheckBoxMenuItem("Snap To Grids");
+			gridsCheckBoxMenuItem.setSelected(true);
+			gridsCheckBoxMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart.setSnapToGrids(gridsCheckBoxMenuItem.isSelected());
+				}
+			});
+		}
+		return gridsCheckBoxMenuItem;
+	}
+	private JSeparator getSeparator_4() {
+		if (separator_4 == null) {
+			separator_4 = new JSeparator();
+		}
+		return separator_4;
+	}
+	private JSeparator getSeparator_5() {
+		if (separator_5 == null) {
+			separator_5 = new JSeparator();
+		}
+		return separator_5;
+	}
+	private JSeparator getSeparator_6() {
+		if (separator_6 == null) {
+			separator_6 = new JSeparator();
+		}
+		return separator_6;
+	}
+	private JCheckBoxMenuItem getTopViewCheckBoxMenuItem() {
+		if (topViewCheckBoxMenuItem == null) {
+			topViewCheckBoxMenuItem = new JCheckBoxMenuItem("Top View");
+			topViewCheckBoxMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().resetCamera(topViewCheckBoxMenuItem.isSelected() ? ViewMode.TOP_VIEW : ViewMode.NORMAL);
+					SceneManager.getInstance().update();
+				}
+			});
+		}
+		return topViewCheckBoxMenuItem;
+	}
+	private JSeparator getSeparator_7() {
+		if (separator_7 == null) {
+			separator_7 = new JSeparator();
+		}
+		return separator_7;
+	}
+	private JSeparator getSeparator_8() {
+		if (separator_8 == null) {
+			separator_8 = new JSeparator();
+		}
+		return separator_8;
 	}
 }

@@ -27,12 +27,10 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.ToolTipManager;
 
-import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
-import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Config;
 
@@ -48,10 +46,10 @@ public class MainPanel extends JPanel {
 	private JToggleButton windowButton = null;
 	private JToggleButton platformButton = null;
 	private JToggleButton lightButton = null;
-	private JToggleButton topViewButton = null;
+	private final JToggleButton topViewButton = null;
 	private JToggleButton rotAnimButton = null;
-	private JToggleButton gridButton = null;
-	private JToggleButton snapButton = null;
+	private final JToggleButton gridButton = null;
+	private final JToggleButton snapButton = null;
 	private JToggleButton floorButton = null;
 	private JToggleButton roofHipButton = null;
 	private JToggleButton resizeButton = null;
@@ -142,9 +140,6 @@ public class MainPanel extends JPanel {
 			if (showEditTools) {
 				appToolbar.addSeparator();
 				appToolbar.add(getRotAnimButton());
-				appToolbar.add(getTopViewButton());
-				appToolbar.add(getGridButton());
-				appToolbar.add(getSnapButton());
 				appToolbar.addSeparator();
 			} else
 				appToolbar.add(getRotAnimButton());
@@ -381,7 +376,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					if (mainFrame != null) {
-						mainFrame.getLightingMenu().setSelected(lightButton.isSelected());
+						mainFrame.getShadeMenu().setSelected(lightButton.isSelected());
 						mainFrame.getShadowMenu().setSelected(lightButton.isSelected());
 					} else {
 						SceneManager.getInstance().setShading(lightButton.isSelected());
@@ -395,34 +390,6 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return lightButton;
-	}
-
-	/**
-	 * This method initializes topViewButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
-	private JToggleButton getTopViewButton() {
-		if (topViewButton == null) {
-			topViewButton = new JToggleButton();
-			topViewButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
-				}
-			});
-			topViewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/top.png")));
-			topViewButton.setToolTipText("Top view");
-			topViewButton.addItemListener(new java.awt.event.ItemListener() {
-				@Override
-				public void itemStateChanged(final java.awt.event.ItemEvent e) {
-					SceneManager.getInstance().resetCamera(topViewButton.isSelected() ? ViewMode.TOP_VIEW : ViewMode.NORMAL);
-					SceneManager.getInstance().update();
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
-				}
-			});
-		}
-		return topViewButton;
 	}
 
 	/**
@@ -450,62 +417,6 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return rotAnimButton;
-	}
-
-	/**
-	 * This method initializes gridButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
-	private JToggleButton getGridButton() {
-		if (gridButton == null) {
-			gridButton = new JToggleButton();
-			gridButton.setSelected(true);
-			gridButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
-				}
-			});
-			gridButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/grid.png")));
-			gridButton.setToolTipText("Grids");
-			gridButton.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					HousePart.setSnapToGrids(gridButton.isSelected());
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
-				}
-			});
-		}
-		return gridButton;
-	}
-
-	/**
-	 * This method initializes snapButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
-	private JToggleButton getSnapButton() {
-		if (snapButton == null) {
-			snapButton = new JToggleButton();
-			snapButton.setSelected(false);
-			snapButton.setToolTipText("Snap");
-			snapButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/snap.png")));
-			snapButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
-				}
-			});
-			snapButton.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					HousePart.setSnapToObjects(snapButton.isSelected());
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
-				}
-			});
-		}
-		return snapButton;
 	}
 
 	/**

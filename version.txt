@@ -987,8 +987,8 @@ Version 0.5 - October 20, 2011
 - fix problem with initial window location.y
 - experiment with texture renderer then revert back
 - avoid all kinds of crash due to Throwables, Errors and Exceptions by catching throwable in draw() method
-
 - add import feature
+- move snap, grid and top view buttons from toolbar to menu
 
 - *add rotate camera option
 - *be smarter about orbit rotation when not clicking on any house part
