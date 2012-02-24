@@ -21,6 +21,9 @@ import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.util.Config;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.ui.text.BMText;
@@ -51,8 +54,10 @@ public class Scene implements Serializable {
 	private static boolean drawAnnotationsInside = false;
 	private static Unit unit = Unit.Centimeter;
 	private static double annotationScale = 10;
-	private final ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private static boolean isAnnotationsVisible = true;
+	private final ArrayList<HousePart> parts = new ArrayList<HousePart>();
+	private ReadOnlyVector3 cameraLocation;
+	private ReadOnlyVector3 cameraDirection;
 
 	// public static Scene getInstance() {
 	// if (instance == null) {
@@ -149,7 +154,17 @@ public class Scene implements Serializable {
 			in.close();
 
 			instance.cleanup();
+
+			// update camera from file
+			final Camera camera = SceneManager.getInstance().getCameraNode().getCamera();
+			if (instance.getCameraLocation() != null && instance.getCameraDirection() != null) {
+				camera.setLocation(instance.getCameraLocation());
+				camera.lookAt(instance.getCameraLocation().add(instance.getCameraDirection(), null), Vector3.UNIT_Z);
+			}
+			SceneManager.getInstance().getCameraNode().updateFromCamera();
 		}
+
+		SceneManager.getInstance().getCameraControl().reset();
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
@@ -233,6 +248,10 @@ public class Scene implements Serializable {
 
 	public static void save(final URL url) throws Exception {
 		instance.cleanup();
+		// save camera to file
+		final Camera camera = SceneManager.getInstance().getCameraNode().getCamera();
+		instance.setCameraLocation(camera.getLocation());
+		instance.setCameraDirection(SceneManager.getInstance().getCameraNode().getCamera().getDirection());
 
 		Scene.url = url;
 		System.out.print("Saving " + Scene.url + "...");
@@ -520,5 +539,21 @@ public class Scene implements Serializable {
 
 	public static boolean isAnnotationsVisible() {
 		return isAnnotationsVisible;
+	}
+
+	public ReadOnlyVector3 getCameraLocation() {
+		return cameraLocation;
+	}
+
+	public void setCameraLocation(final ReadOnlyVector3 cameraLocation) {
+		this.cameraLocation = cameraLocation;
+	}
+
+	public ReadOnlyVector3 getCameraDirection() {
+		return cameraDirection;
+	}
+
+	public void setCameraDirection(final ReadOnlyVector3 cameraDirection) {
+		this.cameraDirection = cameraDirection;
 	}
 }

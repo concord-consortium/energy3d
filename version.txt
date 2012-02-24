@@ -994,6 +994,7 @@ Version 0.5 - October 20, 2011
 - prevent wall under roof from being lowered when overhang length is less than 0.5cm
 - in helidion mode show the sun region by default
 - add more cities to heliodon dropdown box
+- save the camera location and direction in model files
 
 - *add rotate camera option
 - *be smarter about orbit rotation when not clicking on any house part

@@ -380,7 +380,8 @@ public class MainFrame extends JFrame {
 							updateTitleBar();
 						} catch (final Throwable err) {
 							err.printStackTrace();
-							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+							final String message = err.getMessage();
+							JOptionPane.showMessageDialog(MainFrame.this, message != null ? message : "Unexpected error occured!", "Error", JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}
