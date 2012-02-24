@@ -89,15 +89,15 @@ public class Heliodon {
 	private boolean lock = false;
 	private boolean dirtySunRegion = false;
 	private boolean dirtySunPath = false;
-	private boolean forceSunRegionOn = false;
+	private boolean forceSunRegionOn = true;
 	private BloomRenderPass bloomRenderPass;
-	private BasicPassManager passManager;
+	private final BasicPassManager passManager;
 
 	public Heliodon(final Node scene, final DirectionalLight light, final BasicPassManager passManager, final LogicalLayer logicalLayer, final Date timeAndDate) {
 		this.light = light;
 		this.passManager = passManager;
-		this.pickResults = new PrimitivePickResults();
-		this.pickResults.setCheckDistance(true);
+		pickResults = new PrimitivePickResults();
+		pickResults.setCheckDistance(true);
 
 		// Sun
 		final MaterialState material = new MaterialState();
@@ -117,7 +117,8 @@ public class Heliodon {
 		// Sun Region
 		sunRegion = new Mesh("Sun Region");
 		sunRegion.setTranslation(0, 0, 0.001); // to avoid flickering
-		sunRegion.getSceneHints().setCullHint(CullHint.Always);
+		if (!forceSunRegionOn)
+			sunRegion.getSceneHints().setCullHint(CullHint.Always);
 		sunRegion.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(SUN_REGION_VERTICES));
 		sunRegion.getMeshData().setIndexMode(IndexMode.Quads);
 		sunRegion.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 0.5f));
@@ -208,11 +209,13 @@ public class Heliodon {
 
 	private void initMouse(final LogicalLayer logicalLayer) {
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.F), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				setSunRegionAlwaysVisible(!forceSunRegionOn);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				lock = true;
 				final int x = inputStates.getCurrent().getMouseState().getX();
@@ -233,6 +236,7 @@ public class Heliodon {
 		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				sunGrabbed = false;
 				if (!forceSunRegionOn)
@@ -243,6 +247,7 @@ public class Heliodon {
 		}));
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!sunGrabbed)
 					return;
@@ -329,7 +334,7 @@ public class Heliodon {
 					if (resultRow != -1) {
 						if (rowCounter < DECLINATION_DIVISIONS && observerLatitude > 0)
 							resultRow += DECLINATION_DIVISIONS - rowCounter;
-						double newDeclinationAngle = -TILT_ANGLE + (2.0 * TILT_ANGLE * resultRow / DECLINATION_DIVISIONS);
+						final double newDeclinationAngle = -TILT_ANGLE + (2.0 * TILT_ANGLE * resultRow / DECLINATION_DIVISIONS);
 						declinationChanged = Math.abs(newDeclinationAngle - declinationAngle) > MathUtils.EPSILON;
 						if (declinationChanged) {
 							setDeclinationAngle(newDeclinationAngle, false, true);
@@ -337,7 +342,7 @@ public class Heliodon {
 						}
 					}
 				}
-				final double newHourAngle = ((double) hourVertex - Math.floor(totalHourVertices / 2.0)) * Math.PI / 48.0;
+				final double newHourAngle = (hourVertex - Math.floor(totalHourVertices / 2.0)) * Math.PI / 48.0;
 				final boolean hourAngleChanged = Math.abs(newHourAngle - hourAngle) > MathUtils.EPSILON;
 				if (hourAngleChanged)
 					setHourAngle(newHourAngle, false, true);
@@ -406,7 +411,7 @@ public class Heliodon {
 		return observerLatitude;
 	}
 
-	public void setObserverLatitude(double observerLatitude) {
+	public void setObserverLatitude(final double observerLatitude) {
 		this.observerLatitude = toPlusMinusPIRange(observerLatitude, -MathUtils.HALF_PI, MathUtils.HALF_PI);
 
 		dirtySunRegion = true;
@@ -462,7 +467,7 @@ public class Heliodon {
 		return coords;
 	}
 
-	private double toPlusMinusPIRange(final double radian, double min, double max) {
+	private double toPlusMinusPIRange(final double radian, final double min, final double max) {
 		double result = radian - (int) (radian / MathUtils.TWO_PI) * MathUtils.TWO_PI;
 		if (Math.abs(result) > Math.PI)
 			result = -Math.signum(result) * (MathUtils.TWO_PI - Math.abs(result));
@@ -491,7 +496,7 @@ public class Heliodon {
 			else
 				trimedAngle = angle;
 			float width = 0.3f;
-			float zoffset = 0f;
+			final float zoffset = 0f;
 
 			MathUtils.sphericalToCartesianZ(p.set(r, trimedAngle, 0), p);
 			buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + zoffset);
