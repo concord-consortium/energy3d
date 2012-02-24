@@ -712,34 +712,61 @@ public class MainPanel extends JPanel {
 	private JComboBox getCityComboBox() {
 		if (cityComboBox == null) {
 			cityComboBox = new JComboBox();
+			cityComboBox.setMaximumRowCount(15);
 			cityComboBox.addItem("");
+			cityComboBox.addItem("Moscow");
+			cityComboBox.addItem("Ottawa");
 			cityComboBox.addItem("Boston");
+			cityComboBox.addItem("Beijing");
 			cityComboBox.addItem("Washington DC");
-			cityComboBox.addItem("Los Angeles");
-			cityComboBox.addItem("San Francisco");
 			cityComboBox.addItem("Tehran");
+			cityComboBox.addItem("Los Angeles");
+			cityComboBox.addItem("Miami");
+			cityComboBox.addItem("Mexico City");
+			cityComboBox.addItem("Singapore");
+			cityComboBox.addItem("Sydney");
+			cityComboBox.addItem("Buenos Aires");
+
 			cityComboBox.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					int latitude = 0;
 					switch (cityComboBox.getSelectedIndex()) {
 					case 1:
-						latitude = 42;
+						latitude = 55;
 						break;
 					case 2:
-						latitude = 38;
+						latitude = 45;
 						break;
 					case 3:
-						latitude = 34;
+						latitude = 42;
 						break;
 					case 4:
-						latitude = 37;
+						latitude = 39;
 						break;
 					case 5:
-						latitude = 35;
+						latitude = 38;
 						break;
 					case 6:
-						latitude = 39;
+						latitude = 35;
+						break;
+					case 7:
+						latitude = 34;
+						break;
+					case 8:
+						latitude = 25;
+						break;
+					case 9:
+						latitude = 19;
+						break;
+					case 10:
+						latitude = 1;
+						break;
+					case 11:
+						latitude = -33;
+						break;
+					case 12:
+						latitude = -34;
 						break;
 					}
 					latitudeSpinner.setValue(latitude);
