@@ -41,6 +41,7 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.Unit;
@@ -110,6 +111,8 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
 	private JSeparator separator_7;
 	private JSeparator separator_8;
+	private JMenuItem roofOverhangLengthMenuItem;
+	private JSeparator separator_9;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -193,11 +196,11 @@ public class MainFrame extends JFrame {
 			fileChooser = new JFileChooser(directoryPath);
 			if (!Config.isWebStart() && directoryPath == null) {
 				final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
-//				if (!dir.exists()) {
-//					System.out.print("Making save directory..." + dir + "...");
-//					final boolean success = dir.mkdir();
-//					System.out.println(success ? "done" : "failed");
-//				}
+				// if (!dir.exists()) {
+				// System.out.print("Making save directory..." + dir + "...");
+				// final boolean success = dir.mkdir();
+				// System.out.println(success ? "done" : "failed");
+				// }
 				fileChooser.setCurrentDirectory(dir);
 			}
 			fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
@@ -225,19 +228,13 @@ public class MainFrame extends JFrame {
 		setTitle("Energy3D v" + Config.VERSION);
 
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//		GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		// GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 
-		this.setSize(
-				Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_width", 900), screenSize.width),
-				Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_height", 600), screenSize.height));
+		this.setSize(Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_width", 900), screenSize.width), Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_height", 600), screenSize.height));
 		this.setLocation((int) (screenSize.getWidth() - this.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2);
-		this.setLocation(
-				Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_x", (int) (screenSize.getWidth() - this.getSize().getWidth()) / 2),
-				Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_y", (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2));
-		this.setLocation(
-				MathUtils.clamp(this.getLocation().x, 0, screenSize.width - this.getSize().width),
-				MathUtils.clamp(this.getLocation().y, 0, screenSize.height - this.getSize().height));
-//		this.setSize(900, 600); // XIE: reduce the length, as some older computers have only 1024x800 screen resolution.
+		this.setLocation(Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_x", (int) (screenSize.getWidth() - this.getSize().getWidth()) / 2), Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_y", (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2));
+		this.setLocation(MathUtils.clamp(this.getLocation().x, 0, screenSize.width - this.getSize().width), MathUtils.clamp(this.getLocation().y, 0, screenSize.height - this.getSize().height));
+		// this.setSize(900, 600); // XIE: reduce the length, as some older computers have only 1024x800 screen resolution.
 		final int windowState = Preferences.userNodeForPackage(MainApplication.class).getInt("window_state", JFrame.NORMAL);
 		if ((windowState & JFrame.ICONIFIED) == 0)
 			setExtendedState(windowState);
@@ -248,14 +245,15 @@ public class MainFrame extends JFrame {
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentMoved(final ComponentEvent e) {
-				if (MainFrame.this.getExtendedState() == 0 ) {
-				Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_x", e.getComponent().getLocation().x);
-				Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_y", e.getComponent().getLocation().y);
+				if (MainFrame.this.getExtendedState() == 0) {
+					Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_x", e.getComponent().getLocation().x);
+					Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_y", e.getComponent().getLocation().y);
 				}
 			}
+
 			@Override
 			public void componentResized(final ComponentEvent e) {
-				if (MainFrame.this.getExtendedState() == 0 ) {
+				if (MainFrame.this.getExtendedState() == 0) {
 					Preferences.userNodeForPackage(MainApplication.class).putInt("window_size_width", e.getComponent().getSize().width);
 					Preferences.userNodeForPackage(MainApplication.class).putInt("window_size_height", e.getComponent().getSize().height);
 				}
@@ -414,8 +412,9 @@ public class MainFrame extends JFrame {
 						final URL url = Scene.getURL();
 						if (url != null)
 							Scene.save(url);
-						else //if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
-//							Scene.save(fileChooser.getSelectedFile().toURI().toURL());
+						else
+							// if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
+							// Scene.save(fileChooser.getSelectedFile().toURI().toURL());
 							saveFile();
 					} catch (final Throwable err) {
 						err.printStackTrace();
@@ -614,7 +613,7 @@ public class MainFrame extends JFrame {
 			exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
-//					System.exit(0);
+					// System.exit(0);
 					SceneManager.getInstance().exit();
 				}
 			});
@@ -738,6 +737,8 @@ public class MainFrame extends JFrame {
 			sceneMenu.add(getUnitsMenu());
 			sceneMenu.add(getScaleMenuItem());
 			sceneMenu.add(getSeparator_8());
+			sceneMenu.add(getRoofOverhangLengthMenuItem());
+			sceneMenu.add(getSeparator_9());
 			sceneMenu.add(getGridsCheckBoxMenuItem());
 			sceneMenu.add(getSnapCheckBoxMenuItem());
 			sceneMenu.add(getSeparator_4());
@@ -932,27 +933,27 @@ public class MainFrame extends JFrame {
 	private void saveFile() {
 		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-			try {
-				File file = fileChooser.getSelectedFile();
-				if (!file.getName().toLowerCase().endsWith(".ser"))
-					file = new File(file.toString() + ".ser");
-				Scene.save(file.toURI().toURL());
-				updateTitleBar();
-			} catch (final Throwable err) {
-				err.printStackTrace();
-				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			}
+		try {
+			File file = fileChooser.getSelectedFile();
+			if (!file.getName().toLowerCase().endsWith(".ser"))
+				file = new File(file.toString() + ".ser");
+			Scene.save(file.toURI().toURL());
+			updateTitleBar();
+		} catch (final Throwable err) {
+			err.printStackTrace();
+			JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private void importFile() {
 		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-			try {
-				Scene.importFile(fileChooser.getSelectedFile().toURI().toURL());
-			} catch (final Throwable err) {
-				err.printStackTrace();
-				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			}
+		try {
+			Scene.importFile(fileChooser.getSelectedFile().toURI().toURL());
+		} catch (final Throwable err) {
+			err.printStackTrace();
+			JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private JMenuItem getPageSetupMenuItem() {
@@ -967,12 +968,14 @@ public class MainFrame extends JFrame {
 		}
 		return pageSetupMenuItem;
 	}
+
 	private JSeparator getSeparator() {
 		if (separator == null) {
 			separator = new JSeparator();
 		}
 		return separator;
 	}
+
 	private JSeparator getSeparator_1() {
 		if (separator_1 == null) {
 			separator_1 = new JSeparator();
@@ -1015,6 +1018,7 @@ public class MainFrame extends JFrame {
 		}
 		return separator_2;
 	}
+
 	private JMenuItem getImportMenuItem() {
 		if (importMenuItem == null) {
 			importMenuItem = new JMenuItem("Import...");
@@ -1027,12 +1031,14 @@ public class MainFrame extends JFrame {
 		}
 		return importMenuItem;
 	}
+
 	private JSeparator getSeparator_3() {
 		if (separator_3 == null) {
 			separator_3 = new JSeparator();
 		}
 		return separator_3;
 	}
+
 	private JCheckBoxMenuItem getSnapCheckBoxMenuItem() {
 		if (snapCheckBoxMenuItem == null) {
 			snapCheckBoxMenuItem = new JCheckBoxMenuItem("Snap Walls");
@@ -1045,6 +1051,7 @@ public class MainFrame extends JFrame {
 		}
 		return snapCheckBoxMenuItem;
 	}
+
 	private JCheckBoxMenuItem getGridsCheckBoxMenuItem() {
 		if (gridsCheckBoxMenuItem == null) {
 			gridsCheckBoxMenuItem = new JCheckBoxMenuItem("Snap To Grids");
@@ -1058,24 +1065,28 @@ public class MainFrame extends JFrame {
 		}
 		return gridsCheckBoxMenuItem;
 	}
+
 	private JSeparator getSeparator_4() {
 		if (separator_4 == null) {
 			separator_4 = new JSeparator();
 		}
 		return separator_4;
 	}
+
 	private JSeparator getSeparator_5() {
 		if (separator_5 == null) {
 			separator_5 = new JSeparator();
 		}
 		return separator_5;
 	}
+
 	private JSeparator getSeparator_6() {
 		if (separator_6 == null) {
 			separator_6 = new JSeparator();
 		}
 		return separator_6;
 	}
+
 	private JCheckBoxMenuItem getTopViewCheckBoxMenuItem() {
 		if (topViewCheckBoxMenuItem == null) {
 			topViewCheckBoxMenuItem = new JCheckBoxMenuItem("Top View");
@@ -1089,16 +1100,56 @@ public class MainFrame extends JFrame {
 		}
 		return topViewCheckBoxMenuItem;
 	}
+
 	private JSeparator getSeparator_7() {
 		if (separator_7 == null) {
 			separator_7 = new JSeparator();
 		}
 		return separator_7;
 	}
+
 	private JSeparator getSeparator_8() {
 		if (separator_8 == null) {
 			separator_8 = new JSeparator();
 		}
 		return separator_8;
+	}
+
+	private JMenuItem getRoofOverhangLengthMenuItem() {
+		if (roofOverhangLengthMenuItem == null) {
+			roofOverhangLengthMenuItem = new JMenuItem("Roof Overhang Length...");
+			roofOverhangLengthMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					while (true) {
+						SceneManager.getInstance().update(1);
+						final String newValue = JOptionPane.showInputDialog(MainFrame.this, "What is the length of roof overhang?", Roof.getOverhangLength() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < 0 || val > 5)
+									JOptionPane.showMessageDialog(MainFrame.this, "Overhang value must be between 0 and 5.", "Error", JOptionPane.ERROR_MESSAGE);
+								Roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
+								Scene.getInstance().redrawAll();
+								break;
+							} catch (final NumberFormatException e1) {
+								e1.printStackTrace();
+								JOptionPane.showMessageDialog(MainFrame.this, "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+		}
+		return roofOverhangLengthMenuItem;
+	}
+
+	private JSeparator getSeparator_9() {
+		if (separator_9 == null) {
+			separator_9 = new JSeparator();
+		}
+		return separator_9;
 	}
 }

@@ -20,23 +20,18 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.bounding.BoundingVolume;
-import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -50,7 +45,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
 	// protected static final double getGridSize() = 0.5;
-	private static final double OVERHANG_LENGHT = 0.2; // 0.01; //0.2;
+	private static double overhangLength = 0.2; // 0.01; //0.2;
 	protected transient Node roofPartsRoot;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient ArrayList<ReadOnlyVector3> wallNormals;
@@ -64,10 +59,19 @@ public abstract class Roof extends HousePart {
 	private Map<Integer, ArrayList<Integer>> gableRoofPartToEditPointMap = null;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 
-	public Roof(int numOfDrawPoints, int numOfEditPoints, double height) {
+	public static double getOverhangLength() {
+		return overhangLength;
+	}
+
+	public static void setOverhangLength(final double overhangLength) {
+		Roof.overhangLength = overhangLength;
+	}
+
+	public Roof(final int numOfDrawPoints, final int numOfEditPoints, final double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
 	}
 
+	@Override
 	protected void init() {
 		super.init();
 		relativeToHorizontal = true; // TODO move all parameters of HousePart constructor to init
@@ -101,6 +105,7 @@ public abstract class Roof extends HousePart {
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
 	}
 
+	@Override
 	protected void drawMesh() {
 //		try {
 			/* undo the effect of wall stretch on all walls if roof is moved to new walls */
@@ -162,19 +167,20 @@ public abstract class Roof extends HousePart {
 	protected void drawWalls() {
 		if (container != null)
 			((Wall) container).visitNeighbors(new WallVisitor() {
+				@Override
 				public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
 					currentWall.draw();
 				}
 			});
 	}
 
-	protected void fillMeshWithPolygon(Mesh mesh, Polygon polygon) {
+	protected void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon) {
 		try {
 			Poly2Tri.triangulate(polygon);
 		} catch (final RuntimeException e) {
 			e.printStackTrace();
 			System.out.println("Triangulate exception received with the following polygon:");
-			for (TriangulationPoint p : polygon.getPoints())
+			for (final TriangulationPoint p : polygon.getPoints())
 				System.out.println("new PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + ")");
 			throw e;
 		}
@@ -191,6 +197,7 @@ public abstract class Roof extends HousePart {
 		wallUpperPoints.clear();
 		wallNormals.clear();
 		startWall.visitNeighbors(new WallVisitor() {
+			@Override
 			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
 				if (currentWall.isDrawCompleted()) {
 					walls.add(currentWall);
@@ -226,7 +233,7 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
+	protected Polygon makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {
 		return new Polygon(wallUpperPoints);
 	}
 
@@ -260,6 +267,7 @@ public abstract class Roof extends HousePart {
 	// // flattenQuadTriangle((Node) mesh.getParent(), 0.0);
 	// }
 
+	@Override
 	public void flattenInit() {
 		// if (orgCenters == null)
 		// orgCenters = new HashMap<Node, ReadOnlyVector3>();
@@ -283,8 +291,9 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
+	@Override
 	public void flatten(final double flattenTime) {
-		for (Spatial child : getRoofPartsRoot().getChildren()) {
+		for (final Spatial child : getRoofPartsRoot().getChildren()) {
 			if (child.getSceneHints().getCullHint() != CullHint.Always)
 				flattenQuadTriangle((Node) child, flattenTime);
 		}
@@ -313,7 +322,7 @@ public abstract class Roof extends HousePart {
 
 		if (orgCenter == null)
 			orgCenter = Vector3.ZERO;
-		final Vector3 targetPrintCenter = ((UserData) ((Node) roofPartNode).getChild(0).getUserData()).getPrintCenter();
+		final Vector3 targetPrintCenter = ((UserData) roofPartNode.getChild(0).getUserData()).getPrintCenter();
 		if (!targetPrintCenter.equals(Vector3.ZERO))
 			roofPartNode.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
 //		System.out.println(roofPartNode.getTranslation());
@@ -334,7 +343,7 @@ public abstract class Roof extends HousePart {
 		if (container == null)
 			return;
 
-		for (Spatial roofPart : roofPartsRoot.getChildren()) {
+		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				int annotCounter = 0, angleAnnotCounter = 0;
 				final Node roofPartNode = (Node) roofPart;
@@ -408,7 +417,7 @@ public abstract class Roof extends HousePart {
 //		wireframeMesh.getMeshData().updateVertexCount();
 //		wireframeMesh.updateModelBound();
 //	}
-	
+
 	protected void drawWireframe() {
 		if (container == null)
 			return;
@@ -416,15 +425,15 @@ public abstract class Roof extends HousePart {
 //		final ArrayList<ArrayList<ReadOnlyVector3>> convexHulls = new ArrayList<ArrayList<ReadOnlyVector3>>();
 //		int totalVertices = 0;
 
-		for (Spatial roofPart : roofPartsRoot.getChildren()) {
+		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Node roofPartNode = (Node) roofPart;
 				final Mesh wireframeMesh = (Mesh) roofPartNode.getChild(4);
-				
+
 				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
 //				convexHulls.add(convexHull);
 				final int totalVertices = convexHull.size();
-				
+
 				final FloatBuffer buf;
 				if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
 					buf = wireframeMesh.getMeshData().getVertexBuffer();
@@ -444,13 +453,14 @@ public abstract class Roof extends HousePart {
 					}
 				buf.limit(buf.position());
 				wireframeMesh.getMeshData().updateVertexCount();
-				wireframeMesh.updateModelBound();				
+				wireframeMesh.updateModelBound();
 			}
 		}
-	}	
+	}
 
+	@Override
 	public int drawLabels(int printSequence) {
-		for (Spatial roofPartNode : roofPartsRoot.getChildren()) {
+		for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
 			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
 				final String text = "(" + (printSequence++ + 1) + ")";
 				final BMText label = (BMText) ((Node) roofPartNode).getChild(3);
@@ -461,12 +471,14 @@ public abstract class Roof extends HousePart {
 		return printSequence;
 	}
 
+	@Override
 	public void hideLabels() {
-		for (Spatial roofPartNode : roofPartsRoot.getChildren())
+		for (final Spatial roofPartNode : roofPartsRoot.getChildren())
 			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
 				((Node) roofPartNode).getChild(3).getSceneHints().setCullHint(CullHint.Always);
 	}
 
+	@Override
 	public void updateTextureAndColor(final boolean textureEnabled) {
 		if (roofPartsRoot != null) {
 			for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
@@ -491,15 +503,16 @@ public abstract class Roof extends HousePart {
 		return roofPartsRoot;
 	}
 
+	@Override
 	protected String getDefaultTextureFileName() {
 		return "roof.jpg";
 	}
 
-	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
+	protected void processRoofPoints(final ArrayList<PolygonPoint> wallUpperPoints, final ArrayList<ReadOnlyVector3> wallNormals) {
 		final Vector3 op = new Vector3();
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			final PolygonPoint p = wallUpperPoints.get(i);
-			op.set(wallNormals.get(i)).multiplyLocal(OVERHANG_LENGHT);
+			op.set(wallNormals.get(i)).multiplyLocal(getOverhangLength());
 			op.addLocal(p.getX(), p.getY(), p.getZ());
 			p.set(op.getX(), op.getY(), op.getZ());
 		}
@@ -582,7 +595,7 @@ public abstract class Roof extends HousePart {
 			final Vector3 nearestEditPoint = getAbsPoint(nearestIndex);
 			for (final Wall wall : gableEditPointToWallMap.get(nearestIndex)) {
 				final ReadOnlyVector3 n = wall.getFaceDirection();
-				double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(OVERHANG_LENGHT, null)), null).dot(n);
+				double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(getOverhangLength(), null)), null).dot(n);
 				distance -= 0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
 				nearestEditPoint.addLocal(n.multiply(distance, null));
 			}
@@ -656,7 +669,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	public boolean isSameBasePoints(final ReadOnlyVector3[] base_1, final ReadOnlyVector3[] base_2) {
-		final double maxOverhangDistance = MathUtils.sqrt(2 * OVERHANG_LENGHT * OVERHANG_LENGHT) * 2;
+		final double maxOverhangDistance = MathUtils.sqrt(2 * getOverhangLength() * getOverhangLength()) * 2;
 		final Vector2 p1a = new Vector2(base_1[0].getX(), base_1[0].getY());
 		final Vector2 p1b = new Vector2(base_1[1].getX(), base_1[1].getY());
 		final Vector2 p2a = new Vector2(base_2[0].getX(), base_2[0].getY());
@@ -708,14 +721,14 @@ public abstract class Roof extends HousePart {
 	public void setOriginal(final HousePart original) {
 		final Roof originalRoof = (Roof) original;
 		this.original = original;
-		this.root.detachChild(pointsRoot);
+		root.detachChild(pointsRoot);
 //		this.root.detachChild(wireframeMesh);
-		this.root.detachChild(roofPartsRoot);
+		root.detachChild(roofPartsRoot);
 //		wireframeMesh = originalRoof.wireframeMesh.makeCopy(true);
 		roofPartsRoot = originalRoof.roofPartsRoot.makeCopy(true);
 //		root.attachChild(wireframeMesh);
 		root.attachChild(roofPartsRoot);
-		
+
 		for (int i = 0; i < roofPartsRoot.getNumberOfChildren(); i++) {
 			if (roofPartsRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
 				// ((Node) roofPartsRoot.getChild(i)).getChild(1).getSceneHints().setCullHint(CullHint.Always);
@@ -734,6 +747,7 @@ public abstract class Roof extends HousePart {
 		root.updateWorldBound(true);
 	}
 
+	@Override
 	public Vector3 getAbsPoint(final int index) {
 		return toAbsolute(points.get(index), container == null ? null : container.getContainer());
 	}
@@ -752,7 +766,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	@Override
-	public void setAnnotationsVisible(boolean visible) {
+	public void setAnnotationsVisible(final boolean visible) {
 		super.setAnnotationsVisible(visible);
 		final CullHint cull = visible ? CullHint.Inherit : CullHint.Always;
 		if (roofPartsRoot != null)

@@ -990,6 +990,8 @@ Version 0.5 - October 20, 2011
 - add import feature
 - move snap, grid and top view buttons from toolbar to menu
 - revert orbit rotation back to way it was when center of rotation is not affected by the click location
+- add menu for adjusting overhang length
+- prevent wall under roof from being lowered when overhang length is less than 0.5cm
 
 - *add rotate camera option
 - *be smarter about orbit rotation when not clicking on any house part
