@@ -71,12 +71,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton roofCustomButton = null;
 	private JToggleButton zoomButton = null;
 	private JToggleButton roofGableButton = null;
-	
+
 	public static MainPanel getInstance() {
 		return instance;
 	}
 
-	public void setMainFrame(MainFrame mainFrame) {
+	public void setMainFrame(final MainFrame mainFrame) {
 		this.mainFrame = mainFrame;
 	}
 
@@ -99,19 +99,19 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes this
-	 * 
+	 *
 	 * @return void
 	 */
 	private void initialize() {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		this.setSize(1000, 300);
-		this.setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 		this.add(getAppToolbar(), BorderLayout.NORTH);
 	}
 
 	/**
 	 * This method initializes appToolbar
-	 * 
+	 *
 	 * @return javax.swing.JToolBar
 	 */
 	private JToolBar getAppToolbar() {
@@ -174,7 +174,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes selectButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	public JToggleButton getSelectButton() {
@@ -190,7 +190,8 @@ public class MainPanel extends JPanel {
 			selectButton.setToolTipText("Select");
 			selectButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/select.png")));
 			selectButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
@@ -201,7 +202,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes wallButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getWallButton() {
@@ -210,13 +211,15 @@ public class MainPanel extends JPanel {
 			wallButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/wall.png")));
 			wallButton.setToolTipText("Draw wall");
 			wallButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			wallButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				public void mouseClicked(java.awt.event.MouseEvent e) {
+				@Override
+				public void mouseClicked(final java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
@@ -231,7 +234,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes doorButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getDoorButton() {
@@ -241,13 +244,15 @@ public class MainPanel extends JPanel {
 			doorButton.setToolTipText("Draw door");
 			doorButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/door.png")));
 			doorButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			doorButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				public void mouseClicked(java.awt.event.MouseEvent e) {
+				@Override
+				public void mouseClicked(final java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
@@ -262,7 +267,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes roofButton
-	 * 
+	 *
 	 * @return javax.swing.JButton
 	 */
 	private JToggleButton getRoofButton() {
@@ -271,13 +276,15 @@ public class MainPanel extends JPanel {
 			roofButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_pyramid.png")));
 			roofButton.setToolTipText("Draw pyramid roof");
 			roofButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			roofButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				public void mouseClicked(java.awt.event.MouseEvent e) {
+				@Override
+				public void mouseClicked(final java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
@@ -292,7 +299,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes windowButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getWindowButton() {
@@ -301,13 +308,15 @@ public class MainPanel extends JPanel {
 			windowButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/window.png")));
 			windowButton.setToolTipText("Draw window");
 			windowButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			windowButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				public void mouseClicked(java.awt.event.MouseEvent e) {
+				@Override
+				public void mouseClicked(final java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
@@ -322,7 +331,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes platformButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getPlatformButton() {
@@ -331,13 +340,15 @@ public class MainPanel extends JPanel {
 			platformButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/foundation.png")));
 			platformButton.setToolTipText("Draw platform");
 			platformButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			platformButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				public void mouseClicked(java.awt.event.MouseEvent e) {
+				@Override
+				public void mouseClicked(final java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
@@ -352,7 +363,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes lightButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getLightButton() {
@@ -367,7 +378,8 @@ public class MainPanel extends JPanel {
 			lightButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/shadow.png")));
 			lightButton.setToolTipText("Show shadows");
 			lightButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					if (mainFrame != null) {
 						mainFrame.getLightingMenu().setSelected(lightButton.isSelected());
 						mainFrame.getShadowMenu().setSelected(lightButton.isSelected());
@@ -387,7 +399,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes topViewButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getTopViewButton() {
@@ -402,7 +414,8 @@ public class MainPanel extends JPanel {
 			topViewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/top.png")));
 			topViewButton.setToolTipText("Top view");
 			topViewButton.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
+				@Override
+				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().resetCamera(topViewButton.isSelected() ? ViewMode.TOP_VIEW : ViewMode.NORMAL);
 					SceneManager.getInstance().update();
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
@@ -414,7 +427,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes rotAnimButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getRotAnimButton() {
@@ -429,7 +442,8 @@ public class MainPanel extends JPanel {
 			rotAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/rotate.png")));
 			rotAnimButton.setToolTipText("Animate scene roatation");
 			rotAnimButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().toggleRotation();
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
@@ -440,7 +454,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes gridButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getGridButton() {
@@ -456,7 +470,8 @@ public class MainPanel extends JPanel {
 			gridButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/grid.png")));
 			gridButton.setToolTipText("Grids");
 			gridButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					HousePart.setSnapToGrids(gridButton.isSelected());
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
@@ -467,7 +482,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes snapButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getSnapButton() {
@@ -483,7 +498,8 @@ public class MainPanel extends JPanel {
 				}
 			});
 			snapButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					HousePart.setSnapToObjects(snapButton.isSelected());
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
@@ -494,7 +510,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes floorButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getFloorButton() {
@@ -503,13 +519,15 @@ public class MainPanel extends JPanel {
 			floorButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/floor.png")));
 			floorButton.setToolTipText("Draw floor");
 			floorButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			floorButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				public void mouseClicked(java.awt.event.MouseEvent e) {
+				@Override
+				public void mouseClicked(final java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
@@ -524,7 +542,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes roofHipButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getRoofHipButton() {
@@ -533,13 +551,15 @@ public class MainPanel extends JPanel {
 			roofHipButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_hip.png")));
 			roofHipButton.setToolTipText("Draw hip roof");
 			roofHipButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			roofHipButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				public void mouseClicked(java.awt.event.MouseEvent e) {
+				@Override
+				public void mouseClicked(final java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
@@ -554,7 +574,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes resizeButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getResizeButton() {
@@ -569,7 +589,8 @@ public class MainPanel extends JPanel {
 			resizeButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/resize.png")));
 			resizeButton.setToolTipText("Resize house");
 			resizeButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(Operation.RESIZE);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
@@ -580,7 +601,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes heliodonButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	public JToggleButton getHeliodonButton() {
@@ -595,7 +616,8 @@ public class MainPanel extends JPanel {
 			heliodonButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/sun_heliodon.png")));
 			heliodonButton.setToolTipText("Show sun heliodon");
 			heliodonButton.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
+				@Override
+				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setHeliodonControl(heliodonButton.isSelected());
 					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
 					calendarPanel.setVisible(showSunTools);
@@ -609,7 +631,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes sunAnimButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getSunAnimButton() {
@@ -625,7 +647,8 @@ public class MainPanel extends JPanel {
 			sunAnimButton.setEnabled(false);
 			sunAnimButton.setToolTipText("Animate sun");
 			sunAnimButton.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
+				@Override
+				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setSunAnim(sunAnimButton.isSelected());
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
@@ -636,7 +659,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes previewButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	public JToggleButton getPreviewButton() {
@@ -652,7 +675,8 @@ public class MainPanel extends JPanel {
 			previewButton.setToolTipText("Preview printable parts");
 			// must be ItemListner to be triggered when selection is changed by code
 			previewButton.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
+				@Override
+				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					if (mainFrame != null)
 						mainFrame.getPreviewMenuItem().setSelected(previewButton.isSelected());
 					deselect();
@@ -666,42 +690,42 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes calendarPanel
-	 * 
+	 *
 	 * @return javax.swing.JPanel
 	 */
 	private JPanel getCalendarPanel() {
 		if (calendarPanel == null) {
-			GridBagConstraints gridBagConstraints4 = new GridBagConstraints();
+			final GridBagConstraints gridBagConstraints4 = new GridBagConstraints();
 			gridBagConstraints4.gridx = 3;
 			gridBagConstraints4.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints4.insets = new Insets(0, 0, 0, 1);
 			gridBagConstraints4.gridy = 1;
-			GridBagConstraints gridBagConstraints31 = new GridBagConstraints();
+			final GridBagConstraints gridBagConstraints31 = new GridBagConstraints();
 			gridBagConstraints31.fill = GridBagConstraints.BOTH;
 			gridBagConstraints31.gridy = 0;
 			gridBagConstraints31.insets = new Insets(0, 1, 0, 1);
 			gridBagConstraints31.gridwidth = 2;
 			gridBagConstraints31.gridx = 2;
-			GridBagConstraints gridBagConstraints21 = new GridBagConstraints();
+			final GridBagConstraints gridBagConstraints21 = new GridBagConstraints();
 			gridBagConstraints21.gridx = 2;
 			gridBagConstraints21.gridy = 1;
 			latitudeLabel = new JLabel();
 			latitudeLabel.setText(" Latitude:");
-			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
+			final GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
 			gridBagConstraints3.gridx = 1;
 			gridBagConstraints3.gridy = 1;
 			gridBagConstraints3.fill = GridBagConstraints.HORIZONTAL;
-			GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
+			final GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
 			gridBagConstraints2.gridx = 0;
 			gridBagConstraints2.gridy = 1;
 			timeLabel = new JLabel();
 			timeLabel.setText(" Time: ");
-			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
+			final GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
 			gridBagConstraints1.gridx = 1;
 			gridBagConstraints1.gridy = 0;
 			gridBagConstraints1.weightx = 1.0;
 			gridBagConstraints1.fill = GridBagConstraints.HORIZONTAL;
-			GridBagConstraints gridBagConstraints = new GridBagConstraints();
+			final GridBagConstraints gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = 0;
 			dateLabel = new JLabel();
@@ -724,7 +748,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes dateSpinner
-	 * 
+	 *
 	 * @return javax.swing.JSpinner
 	 */
 	public JSpinner getDateSpinner() {
@@ -737,7 +761,8 @@ public class MainPanel extends JPanel {
 			dateSpinner = new JSpinner(model);
 			dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
 			dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-				public void stateChanged(javax.swing.event.ChangeEvent e) {
+				@Override
+				public void stateChanged(final javax.swing.event.ChangeEvent e) {
 					final Heliodon heliodon = SceneManager.getInstance().getHeliodon();
 					if (heliodon != null)
 						heliodon.setDate((Date) dateSpinner.getValue());
@@ -749,7 +774,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes timeSpinner
-	 * 
+	 *
 	 * @return javax.swing.JSpinner
 	 */
 	public JSpinner getTimeSpinner() {
@@ -757,7 +782,8 @@ public class MainPanel extends JPanel {
 			timeSpinner = new JSpinner(new SpinnerDateModel());
 			timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
 			timeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-				public void stateChanged(javax.swing.event.ChangeEvent e) {
+				@Override
+				public void stateChanged(final javax.swing.event.ChangeEvent e) {
 					final Heliodon heliodon = SceneManager.getInstance().getHeliodon();
 					if (heliodon != null)
 						heliodon.setTime((Date) timeSpinner.getValue());
@@ -769,7 +795,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes cityComboBox
-	 * 
+	 *
 	 * @return javax.swing.JComboBox
 	 */
 	private JComboBox getCityComboBox() {
@@ -782,7 +808,8 @@ public class MainPanel extends JPanel {
 			cityComboBox.addItem("San Francisco");
 			cityComboBox.addItem("Tehran");
 			cityComboBox.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					int latitude = 0;
 					switch (cityComboBox.getSelectedIndex()) {
 					case 1:
@@ -813,7 +840,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes latitudeSpinner
-	 * 
+	 *
 	 * @return javax.swing.JSpinner
 	 */
 	private JSpinner getLatitudeSpinner() {
@@ -821,7 +848,8 @@ public class MainPanel extends JPanel {
 			latitudeSpinner = new JSpinner();
 			latitudeSpinner.setModel(new SpinnerNumberModel(0, -90, 90, 1));
 			latitudeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-				public void stateChanged(javax.swing.event.ChangeEvent e) {
+				@Override
+				public void stateChanged(final javax.swing.event.ChangeEvent e) {
 					SceneManager.getInstance().getHeliodon().setObserverLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				}
 			});
@@ -831,7 +859,7 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * This method initializes roofCustomButton
-	 * 
+	 *
 	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getRoofCustomButton() {
@@ -840,13 +868,15 @@ public class MainPanel extends JPanel {
 			roofCustomButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_custom.png")));
 			roofCustomButton.setToolTipText("Draw custom roof");
 			roofCustomButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_CUSTOM);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			roofCustomButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				public void mouseClicked(java.awt.event.MouseEvent e) {
+				@Override
+				public void mouseClicked(final java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
@@ -878,7 +908,8 @@ public class MainPanel extends JPanel {
 			annotationToggleButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/annotation.png")));
 			annotationToggleButton.setToolTipText("Show annotations");
 			annotationToggleButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
@@ -888,9 +919,9 @@ public class MainPanel extends JPanel {
 	}
 
 	/**
-	 * This method initializes zoomButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes zoomButton
+	 *
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getZoomButton() {
 		if (zoomButton == null) {
@@ -904,7 +935,8 @@ public class MainPanel extends JPanel {
 			zoomButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/zoom.png")));
 			zoomButton.setToolTipText("Zoom");
 			zoomButton.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
+				@Override
+				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 					SceneManager.getInstance().setZoomLock(zoomButton.isSelected());
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
@@ -915,9 +947,9 @@ public class MainPanel extends JPanel {
 	}
 
 	/**
-	 * This method initializes roofGableButton	
-	 * 	
-	 * @return javax.swing.JToggleButton	
+	 * This method initializes roofGableButton
+	 *
+	 * @return javax.swing.JToggleButton
 	 */
 	private JToggleButton getRoofGableButton() {
 		if (roofGableButton == null) {
@@ -925,13 +957,15 @@ public class MainPanel extends JPanel {
 			roofGableButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_gable.png")));
 			roofGableButton.setToolTipText("Convert to gable roof");
 			roofGableButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(Operation.DRAW_ROOF_GABLE);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
 			});
 			roofGableButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				public void mouseClicked(java.awt.event.MouseEvent e) {
+				@Override
+				public void mouseClicked(final java.awt.event.MouseEvent e) {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
@@ -939,11 +973,11 @@ public class MainPanel extends JPanel {
 				public void mouseExited(final MouseEvent e) {
 					SceneManager.getInstance().update();
 				}
-			});			
+			});
 		}
 		return roofGableButton;
 	}
-	
+
 	public void setToolbarEnabled(final boolean enabled) {
 		for (final Component c : getAppToolbar().getComponents()) {
 			if (c != getPreviewButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getRotAnimButton()) {
@@ -951,7 +985,7 @@ public class MainPanel extends JPanel {
 					c.setEnabled(enabled);
 			}
 		}
-		
+
 		getCalendarPanel().setVisible(enabled && (getLightButton().isSelected() || getHeliodonButton().isSelected()));
 	}
 }

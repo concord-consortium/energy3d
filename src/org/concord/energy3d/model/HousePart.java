@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
-import org.concord.energy3d.exception.InvisibleException;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -14,7 +13,6 @@ import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.image.Texture;
@@ -23,15 +21,10 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
-import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.BlendState.BlendEquation;
-import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
@@ -84,7 +77,7 @@ public abstract class HousePart implements Serializable {
 		return snapToObjects;
 	}
 
-	public static void setSnapToObjects(boolean snapToObjects) {
+	public static void setSnapToObjects(final boolean snapToObjects) {
 		HousePart.snapToObjects = snapToObjects;
 	}
 
@@ -92,7 +85,7 @@ public abstract class HousePart implements Serializable {
 		return snapToGrids;
 	}
 
-	public static void setSnapToGrids(boolean snapToGrid) {
+	public static void setSnapToGrids(final boolean snapToGrid) {
 		HousePart.snapToGrids = snapToGrid;
 	}
 
@@ -100,7 +93,7 @@ public abstract class HousePart implements Serializable {
 		return defaultColor;
 	}
 
-	public static void setDefaultColor(ReadOnlyColorRGBA defaultColor) {
+	public static void setDefaultColor(final ReadOnlyColorRGBA defaultColor) {
 		HousePart.defaultColor = defaultColor;
 	}
 
@@ -108,7 +101,7 @@ public abstract class HousePart implements Serializable {
 		return gridsHighlightedHousePart;
 	}
 
-	public static void setGridsHighlightedHousePart(HousePart gridsHighlightedHousePart) {
+	public static void setGridsHighlightedHousePart(final HousePart gridsHighlightedHousePart) {
 		HousePart.gridsHighlightedHousePart = gridsHighlightedHousePart;
 	}
 
@@ -116,7 +109,7 @@ public abstract class HousePart implements Serializable {
 	public HousePart(final int numOfDrawPoints, final int numOfEditPoints, final double height, final boolean complete) {
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
-		this.height = this.orgHeight = height;
+		this.height = orgHeight = height;
 		points = new ArrayList<Vector3>(numOfEditPoints);
 		init();
 		allocateNewPoint();
@@ -180,7 +173,7 @@ public abstract class HousePart implements Serializable {
 		setGridsVisible(false);
 	}
 
-	private void addNewEditPointShape(int i) {
+	private void addNewEditPointShape(final int i) {
 		final Sphere pointShape = new Sphere("Point", Vector3.ZERO, 8, 8, 0.05);
 		pointShape.setUserData(new UserData(this, i, true));
 		pointShape.updateModelBound(); // important
@@ -199,7 +192,7 @@ public abstract class HousePart implements Serializable {
 		return null;
 	}
 
-	public void setOriginal(HousePart original) {
+	public void setOriginal(final HousePart original) {
 		this.original = original;
 		root.detachChild(pointsRoot);
 		if (original.mesh != null) {
@@ -208,10 +201,10 @@ public abstract class HousePart implements Serializable {
 			mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getIndex(), false));
 			// final BoundingVolume modelBound = original.mesh.getModelBound();
 			// mesh.setModelBound(modelBound);
-			// modelBound.transform(new Transform(), mesh.getModelBound());			
+			// modelBound.transform(new Transform(), mesh.getModelBound());
 			root.attachChild(mesh);
-			
-			
+
+
 		}
 		drawAnnotations();
 		// computeOrientedBoundingBox(true);
@@ -251,10 +244,10 @@ public abstract class HousePart implements Serializable {
 		return children;
 	}
 
-	protected void setHeight(double newHeight, boolean finalize) {
-		this.height = newHeight;
+	protected void setHeight(final double newHeight, final boolean finalize) {
+		height = newHeight;
 		if (finalize)
-			this.orgHeight = newHeight;
+			orgHeight = newHeight;
 	}
 
 	public void setEditPointsVisible(final boolean visible) {
@@ -281,7 +274,7 @@ public abstract class HousePart implements Serializable {
 	// // container.setGridsVisible(false);
 	// }
 
-	public void setEditPoint(int i) {
+	public void setEditPoint(final int i) {
 		editPointIndex = i;
 		drawCompleted = false;
 		// if (this instanceof Roof)
@@ -300,7 +293,7 @@ public abstract class HousePart implements Serializable {
 		return closest;
 	}
 
-	protected Vector3 closestPoint(ReadOnlyVector3 p1, ReadOnlyVector3 p21, ReadOnlyVector3 p3, ReadOnlyVector3 p43) {
+	protected Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 p21, final ReadOnlyVector3 p3, final ReadOnlyVector3 p43) {
 		final double EPS = 0.0001;
 		Vector3 p13;
 		double d1343, d4321, d1321, d4343, d2121;
@@ -323,22 +316,22 @@ public abstract class HousePart implements Serializable {
 			return null;
 		numer = d1343 * d4321 - d1321 * d4343;
 
-		double mua = numer / denom;
-		Vector3 pa = new Vector3(p1.getX() + mua * p21.getX(), p1.getY() + mua * p21.getY(), p1.getZ() + mua * p21.getZ());
+		final double mua = numer / denom;
+		final Vector3 pa = new Vector3(p1.getX() + mua * p21.getX(), p1.getY() + mua * p21.getY(), p1.getZ() + mua * p21.getZ());
 
 		return pa;
 	}
 
-	protected PickedHousePart pick(int x, int y, Class<?>[] typesOfHousePart) {
-		for (Class<?> c : typesOfHousePart) {
-			PickedHousePart picked = pickContainer(x, y, c);
+	protected PickedHousePart pick(final int x, final int y, final Class<?>[] typesOfHousePart) {
+		for (final Class<?> c : typesOfHousePart) {
+			final PickedHousePart picked = pickContainer(x, y, c);
 			if (picked != null)
 				return picked;
 		}
 		return null;
 	}
 
-	protected PickedHousePart pickContainer(int x, int y, Class<?> typeOfHousePart) {
+	protected PickedHousePart pickContainer(final int x, final int y, final Class<?> typeOfHousePart) {
 		final HousePart previousContainer = container;
 		final PickedHousePart picked;
 		if (!firstPointInserted || container == null)
@@ -391,18 +384,18 @@ public abstract class HousePart implements Serializable {
 		return picked;
 	}
 
-	protected Vector3 toRelative(Vector3 org) {
+	protected Vector3 toRelative(final Vector3 org) {
 		return toRelative(org, container);
 	}
 
 	protected Vector3 toRelative(final ReadOnlyVector3 org, final HousePart container) {
 		if (container == null)
 			return new Vector3(org);
-		Vector3 origin = container.getAbsPoint(0);
-		Vector3 p = org.subtract(origin, null);
-		Vector3 wallx = container.getAbsPoint(2).subtract(origin, null);
-		Vector3 wally = container.getAbsPoint(1).subtract(origin, null);
-		Vector3 pointOnWall = new Vector3(Math.abs(wallx.getX()) < MathUtils.ZERO_TOLERANCE ? p.getY() / wallx.getY() : p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY() : org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
+		final Vector3 origin = container.getAbsPoint(0);
+		final Vector3 p = org.subtract(origin, null);
+		final Vector3 wallx = container.getAbsPoint(2).subtract(origin, null);
+		final Vector3 wally = container.getAbsPoint(1).subtract(origin, null);
+		final Vector3 pointOnWall = new Vector3(Math.abs(wallx.getX()) < MathUtils.ZERO_TOLERANCE ? p.getY() / wallx.getY() : p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY() : org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
 		return pointOnWall;
 	}
 
@@ -420,7 +413,7 @@ public abstract class HousePart implements Serializable {
 		ReadOnlyVector3 height = container.getAbsPoint(1).subtract(origin, null);
 		if (height.length() < MathUtils.ZERO_TOLERANCE)
 			height = new Vector3(0, relativeToHorizontal ? MathUtils.ZERO_TOLERANCE : 0, relativeToHorizontal ? 0 : MathUtils.ZERO_TOLERANCE);
-		Vector3 pointOnSpace = origin.add(width.multiply(p.getX(), null), null).add(height.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
+		final Vector3 pointOnSpace = origin.add(width.multiply(p.getX(), null), null).add(height.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
 		if (relativeToHorizontal)
 			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
 		if (!Vector3.isValid(pointOnSpace))
@@ -428,7 +421,7 @@ public abstract class HousePart implements Serializable {
 		return pointOnSpace;
 	}
 
-	protected Vector3 grid(Vector3 p, double gridSize) {
+	protected Vector3 grid(final Vector3 p, final double gridSize) {
 		return grid(p, gridSize, true);
 	}
 
@@ -506,7 +499,7 @@ public abstract class HousePart implements Serializable {
 
 	}
 
-	public void addPoint(int x, int y) {
+	public void addPoint(final int x, final int y) {
 		setPreviewPoint(x, y);
 		if (container != null || !mustHaveContainer()) {
 			firstPointInserted = true;
@@ -626,7 +619,7 @@ public abstract class HousePart implements Serializable {
 		return mesh.getModelBound().getCenter();
 	}
 
-	public void flatten(double flattenTime) {
+	public void flatten(final double flattenTime) {
 		if (isPrintable()) {
 			if (isPrintVertical) {
 				root.setRotation(new Matrix3().fromAngles(0, -Math.PI / 2.0 * flattenTime, 0).multiply(root.getRotation(), null));
@@ -639,7 +632,7 @@ public abstract class HousePart implements Serializable {
 			// System.out.println(mesh.getWorldBound().getCenter());
 			// System.out.println(((OrientedBoundingBox) mesh.getWorldBound()).getExtent());
 			// System.out.println();
-			int a = 5;
+			final int a = 5;
 		}
 	}
 
@@ -736,7 +729,7 @@ public abstract class HousePart implements Serializable {
 
 	protected abstract void drawMesh();
 
-	public void setAnnotationsVisible(boolean visible) {
+	public void setAnnotationsVisible(final boolean visible) {
 		drawAnnotations = visible;
 		final CullHint cull = visible ? CullHint.Inherit : CullHint.Always;
 		sizeAnnotRoot.getSceneHints().setCullHint(cull);
@@ -767,14 +760,14 @@ public abstract class HousePart implements Serializable {
 
 	@Override
 	public String toString() {
-		String s = this.getClass().getSimpleName() + "(" + Integer.toHexString(this.hashCode()) + ")";
+		String s = this.getClass().getSimpleName() + "(" + Integer.toHexString(hashCode()) + ")";
 		for (int i = 0; i < points.size(); i += 2)
 			s += "\t" + Util.toString(getAbsPoint(i));
 		s += ("\teditPoint = " + editPointIndex);
 		return s;
 	}
 
-	public void setLabelOffset(double labelOffset) {
+	public void setLabelOffset(final double labelOffset) {
 		this.labelOffset = labelOffset;
 	}
 
