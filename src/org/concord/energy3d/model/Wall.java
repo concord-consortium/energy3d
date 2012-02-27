@@ -503,6 +503,7 @@ public class Wall extends HousePart {
 		final double length = dir.length();
 		dir.normalizeLocal();
 
+		if (roof != null) {
 		Vector3 direction = null;
 		ReadOnlyVector3 previousStretchPoint = new Vector3(polygon.getPoints().get(3).getX(), polygon.getPoints().get(3).getY(), polygon.getPoints().get(3).getZ());
 
@@ -523,6 +524,8 @@ public class Wall extends HousePart {
 			}
 			previousStretchPoint = currentStretchPoint;
 		}
+		}
+
 		return polygon;
 	}
 

@@ -594,10 +594,12 @@ public abstract class Roof extends HousePart {
 		for (final int nearestIndex : gableEditPointToWallMap.keySet()) {
 			final Vector3 nearestEditPoint = getAbsPoint(nearestIndex);
 			for (final Wall wall : gableEditPointToWallMap.get(nearestIndex)) {
+				if (wall != null) { // TODO do this check before adding
 				final ReadOnlyVector3 n = wall.getFaceDirection();
 				double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(getOverhangLength(), null)), null).dot(n);
 				distance -= 0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
 				nearestEditPoint.addLocal(n.multiply(distance, null));
+				}
 			}
 			points.get(nearestIndex).set(toRelative(nearestEditPoint, container.getContainer()));
 		}

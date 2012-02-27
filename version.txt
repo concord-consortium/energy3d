@@ -995,6 +995,8 @@ Version 0.5 - October 20, 2011
 - in helidion mode show the sun region by default
 - add more cities to heliodon dropdown box
 - save the camera location and direction in model files
+- fix problem with disjoined walls due to invalid snap indices by checking and fixing snap indices whenever getIndex is called on any snap
+- fix problem with mistaken one side 0,0,0 wall being invisible by preventing stretchToRoof when there is no roof
 
 - *add rotate camera option
 - *be smarter about orbit rotation when not clicking on any house part

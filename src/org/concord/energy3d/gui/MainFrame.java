@@ -1132,9 +1132,11 @@ public class MainFrame extends JFrame {
 								final double val = Double.parseDouble(newValue);
 								if (val < 0 || val > 5)
 									JOptionPane.showMessageDialog(MainFrame.this, "Overhang value must be between 0 and 5.", "Error", JOptionPane.ERROR_MESSAGE);
-								Roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
-								Scene.getInstance().redrawAll();
-								break;
+								else {
+									Roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
+									Scene.getInstance().redrawAll();
+									break;
+								}
 							} catch (final NumberFormatException e1) {
 								e1.printStackTrace();
 								JOptionPane.showMessageDialog(MainFrame.this, "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
