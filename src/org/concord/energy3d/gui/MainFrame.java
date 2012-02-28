@@ -203,7 +203,7 @@ public class MainFrame extends JFrame {
 				// }
 				fileChooser.setCurrentDirectory(dir);
 			}
-			fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
+			fileChooser.setFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
 		} catch (final Exception e) {
 			fileChooser = null;
 			e.printStackTrace();

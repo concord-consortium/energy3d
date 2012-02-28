@@ -8,6 +8,7 @@ import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SceneManager.Operation;
 
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.intersection.PickData;
@@ -19,7 +20,6 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 
 public class SelectUtil {
@@ -34,7 +34,7 @@ public class SelectUtil {
 		pickResults.setCheckDistance(true);
 	}
 
-	public static PickedHousePart pickPart(int x, int y, Spatial target) {
+	public static PickedHousePart pickPart(final int x, final int y, Spatial target) {
 		if (target == null)
 //			target = floor;
 			target = SceneManager.getInstance().getFloor();
@@ -46,14 +46,14 @@ public class SelectUtil {
 		return getPickResult(pickRay);
 	}
 
-	public static PickedHousePart pickPart(int x, int y, Class<?> typeOfHousePart) {
+	public static PickedHousePart pickPart(final int x, final int y, final Class<?> typeOfHousePart) {
 		pickResults.clear();
 		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
 
 		if (typeOfHousePart == null)
 			PickingUtil.findPick(SceneManager.getInstance().getFloor(), pickRay, pickResults, false);
 		else
-			for (HousePart housePart : Scene.getInstance().getParts())
+			for (final HousePart housePart : Scene.getInstance().getParts())
 				if (typeOfHousePart.isInstance(housePart))
 					PickingUtil.findPick(housePart.getRoot(), pickRay, pickResults, false);
 
@@ -71,7 +71,7 @@ public class SelectUtil {
 			final PickData pick = pickResults.getPickData(i);
 			if (pick.getIntersectionRecord().getNumberOfIntersections() == 0)
 				continue;
-			Object obj = ((Mesh) pick.getTarget()).getUserData();
+			final Object obj = ((Mesh) pick.getTarget()).getUserData();
 			UserData userData = null;
 			if (obj instanceof UserData) {
 				userData = (UserData) obj;
@@ -84,13 +84,13 @@ public class SelectUtil {
 			}
 			if (pickLayer != -1 && objCounter - 1 != pickLayer)
 				continue;
-			Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
-			PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
-			double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
+			final Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
+			final PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
+			final double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {
 				for (int j = 0; j < userData.getHousePart().getPoints().size(); j++) {
-					Vector3 p = userData.getHousePart().getAbsPoint(j);
+					final Vector3 p = userData.getHousePart().getAbsPoint(j);
 					pointDist_i = p.distance(intersectionPoint);
 					double adjust = 0;
 					adjust -= Math.abs(userData.getHousePart().getFaceDirection().negate(null).dot(pickRay.getDirection()) / 10.0);
@@ -117,8 +117,13 @@ public class SelectUtil {
 		return pickedHousePart;
 	}
 
-	public static UserData selectHousePart(int x, int y, boolean edit) {
-		final PickedHousePart pickedHousePart = pickPart(x, y, Scene.getRoot());
+	public static UserData selectHousePart(final int x, final int y, final boolean edit) {
+//		final PickedHousePart pickedHousePart = pickPart(x, y, Scene.getRoot());
+		final PickedHousePart pickedHousePart;
+		if (SceneManager.getInstance().getOperation() == Operation.RESIZE)
+			pickedHousePart = pickPart(x, y, Foundation.class);
+		else
+			pickedHousePart = pickPart(x, y, Scene.getRoot());
 		UserData data = null;
 		if (pickedHousePart != null)
 			data = pickedHousePart.getUserData();
@@ -165,7 +170,7 @@ public class SelectUtil {
 		System.out.println("\tpickLayer = " + pickLayer);
 	}
 
-	public static void setPickLayer(int i) {
+	public static void setPickLayer(final int i) {
 		pickLayer = i;
 	}
 }
