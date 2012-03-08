@@ -276,7 +276,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		rootPass.add(root);
 		passManager.add(rootPass);
 
-		// shadowPass = new ParallelSplitShadowMapPass(light, 512, 3);
+//		 shadowPass = new ParallelSplitShadowMapPass(light, 512, 3);
+//		shadowPass = new ParallelSplitShadowMapPass(light, 2048, 3);
 		shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
 		shadowPass.setEnabled(false);
 		shadowPass.setUseObjectCullFace(true);
@@ -971,7 +972,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		// ReadOnlyVector3 loc = new Vector3(1.0f, -10.0f, 6.0f);
 		ReadOnlyVector3 loc = new Vector3(1.0f, -5.0f, 3.0f);
-		final ReadOnlyVector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
+		ReadOnlyVector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
 		ReadOnlyVector3 up = new Vector3(0.0f, 0.0f, 1.0f);
 		ReadOnlyVector3 lookAt = new Vector3(0.0f, 0.0f, 1.0f);
 
@@ -998,7 +999,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Parallel);
 			/* location will be set in PrintController.print() */
-			// loc = new Vector3(0, -10, 0);
+			 loc = new Vector3(0, -10, 0);
+			up = new Vector3(0.0f, 0.0f, -1.0f);
+			left = new Vector3(1.0f, 0.0f, 0.0f);
 			final double pageWidth = PrintController.getInstance().getPageWidth();
 			final double pageHeight = PrintController.getInstance().getPageHeight();
 			final Dimension canvasSize = ((Component) canvas).getSize();
@@ -1043,7 +1046,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final double near = 1;
 		final double far = 1000;
 		if (camera.getProjectionMode() == ProjectionMode.Parallel)
-			camera.setFrustum(near, far, -orthoWidth / 2, orthoWidth / 2, -orthoWidth / ratio / 2, orthoWidth / ratio / 2);
+			camera.setFrustum(near, far, -orthoWidth / 2, orthoWidth / 2, orthoWidth / ratio / 2, -orthoWidth / ratio / 2);
 		else
 			camera.setFrustumPerspective(45.0, ratio, near, far);
 	}

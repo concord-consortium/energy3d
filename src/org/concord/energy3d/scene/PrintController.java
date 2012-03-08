@@ -3,15 +3,10 @@ package org.concord.energy3d.scene;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.print.PageFormat;
-import java.awt.print.Pageable;
 import java.awt.print.Paper;
-import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.concurrent.Callable;
 
 import javax.swing.SwingUtilities;
@@ -28,34 +23,19 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.Printout;
-import org.concord.energy3d.util.Util;
-
-import sun.misc.Sort;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.framework.CanvasRenderer;
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture2D;
-import com.ardor3d.image.TextureCubeMap;
-import com.ardor3d.image.Texture.ApplyMode;
-import com.ardor3d.image.Texture.CombinerFunctionRGB;
-import com.ardor3d.image.Texture.CombinerOperandRGB;
-import com.ardor3d.image.Texture.CombinerSource;
-import com.ardor3d.image.Texture.EnvironmentalMapMode;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.ContextManager;
-import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRenderer;
-import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -63,7 +43,6 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.screen.ScreenExporter;
 
 public class PrintController implements Updater {
@@ -86,7 +65,7 @@ public class PrintController implements Updater {
 	private boolean shadingSelected;
 	private boolean shadowSelected;
 	private ArrayList<HousePart> printParts;
-	private Node pagesRoot = new Node();
+	private final Node pagesRoot = new Node();
 	private boolean heliodonSelected;
 	private PageFormat pageFormat = new PageFormat();
 	private boolean isScaleToFit;
@@ -104,12 +83,14 @@ public class PrintController implements Updater {
 		final int m = (int) (0.25 * 72);
 		paper.setImageableArea(m, m, paper.getWidth() - m * 2, paper.getHeight() - m * 2);
 		pageFormat.setPaper(paper);
-		
+
 	}
 
+	@Override
 	public void init() {
 	}
 
+	@Override
 	public void update(final ReadOnlyTimer globalTimer) {
 		if (isPrintPreview)
 			rotate();
@@ -127,7 +108,7 @@ public class PrintController implements Updater {
 				for (final HousePart part : printParts)
 					if (part instanceof Wall)
 						((Wall) part).setBackMeshesVisible(true);
-						
+
 				for (final HousePart part : printParts) {
 						part.hideLabels();
 						part.getOriginal().hideLabels();
@@ -140,7 +121,7 @@ public class PrintController implements Updater {
 					printParts.get(i).setOriginal(Scene.getInstance().getParts().get(i));
 				}
 
-				int printSequence = 0;
+				final int printSequence = 0;
 				for (final HousePart part : printParts)
 					if (part.isPrintable()) {
 						// part.flattenInit();
@@ -288,6 +269,7 @@ public class PrintController implements Updater {
 
 	public void print() {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
 			public Object call() throws Exception {
 				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 				// final Printout printout = new Printout(paper);
@@ -304,10 +286,10 @@ public class PrintController implements Updater {
 				else
 					newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
 				canvas.setSize(newSize);
-				
+
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
-				
-		        
+
+
 				print(0, printout);
 				return null;
 			}
@@ -316,8 +298,8 @@ public class PrintController implements Updater {
 
 	private void print(final int pageNum, final Printout printout) {
 		SceneManager.getTaskManager().render(new Callable<Object>() {
+			@Override
 			public Object call() throws Exception {
-				// final int nextPage = pageNum + 1;
 				if (pageNum == printCenters.size() + 1) {
 					final PrinterJob job = PrinterJob.getPrinterJob();
 					job.setPageable(printout);
@@ -325,19 +307,20 @@ public class PrintController implements Updater {
 						@Override
 						public void run() {
 							Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-							// MainFrame.getInstance().getMainPanel().validate();
 							MainPanel.getInstance().validate();
 
 							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
 
 							SceneManager.getTaskManager().render(new Callable<Object>() {
+								@Override
 								public Object call() throws Exception {
 									SceneManager.getTaskManager().render(new Callable<Object>() {
+										@Override
 										public Object call() throws Exception {
 											if (job.printDialog())
 												try {
 													job.print();
-												} catch (PrinterException exc) {
+												} catch (final PrinterException exc) {
 													exc.printStackTrace();
 												}
 											return null;
@@ -351,117 +334,17 @@ public class PrintController implements Updater {
 				} else {
 					if (pageNum != 0) {
 						ScreenExporter.exportCurrentScreen(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(), printout);
-//						ScreenExporter.exportCurrentScreen(textureRenderer.getCamera().get, printout);
-//						textureRenderer.render(Scene.getRoot(), texture, Renderer.BUFFER_COLOR_AND_DEPTH);
-//						if (texture.getImage() != null)
-//							printout.export(texture.getImage());
 					}
 					if (pageNum < printCenters.size()) {
-						
-//						final DisplaySettings settings = new DisplaySettings(1256, 1256, 24, 0, 0, 24, 0, 0, false, false);
-//				        textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, false, SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(),
-//				                ContextManager.getCurrentContext().getCapabilities());
-
-//				        textureRenderer.getCamera().setFrustum(.1, 10, -.1, .1, .1, -.1);
-//				        
-//				        texture = new Texture2D();
-//				        texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
-//				        texture.setApply(ApplyMode.Combine);
-//				        texture.setCombineFuncRGB(CombinerFunctionRGB.Interpolate);
-//				        // color 1
-//				        texture.setCombineSrc0RGB(CombinerSource.CurrentTexture);
-//				        texture.setCombineOp0RGB(CombinerOperandRGB.SourceColor);
-//				        // color 2
-//				        texture.setCombineSrc1RGB(CombinerSource.Previous);
-//				        texture.setCombineOp1RGB(CombinerOperandRGB.SourceColor);
-//				        // interpolate param will come from alpha of constant color
-//				        texture.setCombineSrc2RGB(CombinerSource.Constant);
-//				        texture.setCombineOp2RGB(CombinerOperandRGB.SourceAlpha);
-//				        texture.setConstantColor(0, 0, 0, .07f);
-
-//			            textureRenderer.getCamera().setLocation(new Vector3(-10, 0, 15));
-//			            textureRenderer.setBackgroundColor(new ColorRGBA(0f, 0f, 0f, 1));
-//				        textureRenderer.setupTexture(texture);        
-
-				        
-				        
-				        
-						
-						
 						final Vector3 pos = printCenters.get(pageNum);
 						final Camera camera = Camera.getCurrentCamera();
-//						final Camera camera = textureRenderer.getCamera();
 						camera.setLocation(pos.getX(), -10.0, pos.getZ());
 						camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 						SceneManager.getInstance().getCameraNode().updateFromCamera();
-//						textureRenderer.render(Scene.getRoot(), texture, Renderer.BUFFER_COLOR_AND_DEPTH);
 					}
 					print(pageNum + 1, printout);
 
 				}
-				// if (pageNum != 0) {
-				// final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-				// Thread.sleep(1000);
-				// ScreenExporter.exportCurrentScreen(canvasRenderer.getRenderer(), printout);
-				// }
-				// if (nextPage < printCenters.size()) {
-				// final Vector3 pos = printCenters.get(nextPage);
-				// final Camera camera = Camera.getCurrentCamera();
-				// camera.setLocation(pos.getX(), -1.0, pos.getZ());
-				// camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
-				// SceneManager.getInstance().getCameraNode().updateFromCamera();
-				// print(nextPage, printout);
-				// } else {
-				// final PrinterJob job = PrinterJob.getPrinterJob();
-				// job.setPageable(printout);
-				// final PrinterJob job = PrinterJob.getPrinterJob();
-				// final PageFormat pageFormat = new PageFormat();
-				// final Paper paper = new Paper();
-				// paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight());
-				// pageFormat.setPaper(paper);
-				//
-				// job.setPageable(new Pageable() {
-				// @Override
-				// public Printable getPrintable(int arg0) throws IndexOutOfBoundsException {
-				// return printout;
-				// }
-				//
-				// @Override
-				// public PageFormat getPageFormat(int arg0) throws IndexOutOfBoundsException {
-				// return pageFormat;
-				// }
-				//
-				// @Override
-				// public int getNumberOfPages() {
-				// return printCenters.size();
-				// }
-				// });
-
-				// SwingUtilities.invokeLater(new Runnable() {
-				// @Override
-				// public void run() {
-				// Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-				// MainFrame.getInstance().getMainPanel().validate();
-				// SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
-				// SceneManager.getTaskManager().render(new Callable<Object>() {
-				// public Object call() throws Exception {
-				// SceneManager.getTaskManager().render(new Callable<Object>() {
-				// public Object call() throws Exception {
-				// if (job.printDialog())
-				// try {
-				// job.print();
-				// } catch (PrinterException exc) {
-				// exc.printStackTrace();
-				// }
-				// return null;
-				// }
-				// });
-				// return null;
-				// }
-				// });
-				// }
-				// });
-				// }
 				return null;
 			}
 		});
@@ -519,7 +402,7 @@ public class PrintController implements Updater {
 	private void computePageDimension() {
 		spaceBetweenParts = Scene.getInstance().isAnnotationsVisible() ? 0.3 : 0;
 		final double fromPageToWorldCoord;
-		if (!this.isScaleToFit) {
+		if (!isScaleToFit) {
 			fromPageToWorldCoord = exactFromPageToWorldCoord;
 		} else {
 			double maxWidth = 0;
@@ -708,7 +591,7 @@ public class PrintController implements Updater {
 	}
 
 	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
-		for (Spatial neighborPart : page) {
+		for (final Spatial neighborPart : page) {
 			final Vector3 neighborPartCenter = ((UserData) neighborPart.getUserData()).getPrintCenter();
 			final OrientedBoundingBox neighborBound = (OrientedBoundingBox) neighborPart.getWorldBound().clone(null);
 			final OrientedBoundingBox printPartBound;
@@ -844,7 +727,7 @@ public class PrintController implements Updater {
 	}
 
 	public void setScaleToFit(final boolean scaleToFit) {
-		this.isScaleToFit = scaleToFit;
+		isScaleToFit = scaleToFit;
 		if (isPrintPreview())
 			restartAnimation();
 	}
