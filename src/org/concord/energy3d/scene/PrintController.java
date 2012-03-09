@@ -219,10 +219,10 @@ public class PrintController implements Updater {
 					if (part instanceof Wall)
 						((Wall) part).setBackMeshesVisible(false);
 
-				int printSequence = 0;
+				int printSequence = 0;;
 				for (final HousePart part : printParts) {
-					part.drawLabels(printSequence);
-					printSequence = part.getOriginal().drawLabels(printSequence);
+					part.getOriginal().drawLabels(printSequence);
+					printSequence = part.drawLabels(printSequence);
 				}
 				SceneManager.getInstance().update();
 			}

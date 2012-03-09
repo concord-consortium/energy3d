@@ -1001,6 +1001,9 @@ Version 0.5 - October 20, 2011
 - fix problem with picking edit points when in resize mode
 - make *.ser the default filter
 - release version 0.6.1
+- release version 0.6.2
+- fix problem with wrong print part numbering with two parts having same part number
+- release version 0.6.3
 
 - *add rotate camera option
 - *be smarter about orbit rotation when not clicking on any house part
