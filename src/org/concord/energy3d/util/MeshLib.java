@@ -10,8 +10,6 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.state.OffsetState;
-import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -85,7 +83,7 @@ public class MeshLib {
 		return groups;
 	}
 
-	private static void computeHorizontalTextureCoords(ArrayList<GroupData> groups) {
+	private static void computeHorizontalTextureCoords(final ArrayList<GroupData> groups) {
 		for (final GroupData group : groups) {
 			final Vector3 normal = group.normals.get(0);
 
@@ -145,20 +143,21 @@ public class MeshLib {
 				node.attachChild(new Node("Roof Angle Annot"));
 				node.attachChild(new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center));
 				node.getChild(3).getSceneHints().setCullHint(CullHint.Always);
-				
+
 				final Mesh wireframeMesh = new Line("Roof (wireframe)");
+//				((Line)wireframeMesh).setLineWidth(5);
 				wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 				wireframeMesh.setModelBound(new BoundingBox());
 				wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10));
 				Util.disablePickShadowLight(wireframeMesh);
-				node.attachChild(wireframeMesh);				
-				
+				node.attachChild(wireframeMesh);
+
 //				if (root.getNumberOfChildren() != 0)
 //					newMesh.getSceneHints().setCullHint(CullHint.Always);
 				root.attachChild(node);
 			}
 			final Vector3 normal = new Vector3();
-			for (Vector3 v : group.normals)
+			for (final Vector3 v : group.normals)
 				normal.addLocal(v);
 			normal.normalizeLocal();
 			node.setUserData(normal);
@@ -169,7 +168,7 @@ public class MeshLib {
 //			normal.normalizeLocal();
 //			if (!Vector3.isValid(normal))
 //				continue;
-			
+
 			FloatBuffer buf = newMesh.getMeshData().getVertexBuffer();
 			int n = group.vertices.size();
 			if (buf == null || buf.capacity() / 3 < n) {
@@ -193,7 +192,7 @@ public class MeshLib {
 			}
 			buf.rewind();
 			buf.limit(n * 3);
-			for (Vector3 v : group.normals)
+			for (final Vector3 v : group.normals)
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 
 			buf = newMesh.getMeshData().getTextureBuffer(0);
@@ -204,7 +203,7 @@ public class MeshLib {
 			}
 			buf.rewind();
 			buf.limit(n * 2);
-			for (Vector2 v : group.textures)
+			for (final Vector2 v : group.textures)
 				buf.put(v.getXf()).put(v.getYf());
 
 			newMesh.getMeshData().updateVertexCount();

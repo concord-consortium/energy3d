@@ -570,8 +570,13 @@ public class MainFrame extends JFrame {
 						public void actionPerformed(final ActionEvent e) {
 							final Color c = colorChooser.getColor();
 							final float[] newColor = c.getComponents(null);
+							final boolean restartPrintPreview = HousePart.getDefaultColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 							HousePart.setDefaultColor(new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]));
 							Scene.getInstance().setTextureEnabled(getTextureCheckBoxMenuItem().isSelected());
+
+							if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
+								PrintController.getInstance().restartAnimation();
+
 						}
 					};
 					textureCheckBoxMenuItem.setSelected(false);

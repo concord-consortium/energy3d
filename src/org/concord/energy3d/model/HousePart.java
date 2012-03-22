@@ -46,6 +46,7 @@ public abstract class HousePart implements Serializable {
 	protected static int printSequence;
 	protected static ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
 	protected static boolean drawAnnotations = Config.isApplet() ? false : true;
+	protected static float WIREFRAME_THICKNESS = 2f;
 	private static HousePart gridsHighlightedHousePart;
 	private static boolean snapToObjects = false;
 	private static boolean snapToGrids = true;
@@ -199,6 +200,8 @@ public abstract class HousePart implements Serializable {
 			root.detachChild(mesh);
 			mesh = original.mesh.makeCopy(true);
 			mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getIndex(), false));
+//			mesh.getSceneHints().setCullHint((!org.concord.energy3d.scene.Scene.getInstance().isTextureEnabled() && defaultColor.equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
+//			mesh.getSceneHints().setCullHint(CullHint.Always);
 			// final BoundingVolume modelBound = original.mesh.getModelBound();
 			// mesh.setModelBound(modelBound);
 			// modelBound.transform(new Transform(), mesh.getModelBound());

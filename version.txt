@@ -1004,6 +1004,10 @@ Version 0.5 - October 20, 2011
 - release version 0.6.2
 - fix problem with wrong print part numbering with two parts having same part number
 - release version 0.6.3
+- avoid drawing mesh of print parts when color is white
+- make the wireframe of print parts thicker
+- print outlines of house parts to save ink 
+- release version 0.6.4
 
 - *add rotate camera option
 - *be smarter about orbit rotation when not clicking on any house part

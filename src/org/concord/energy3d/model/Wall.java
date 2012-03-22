@@ -138,6 +138,7 @@ public class Wall extends HousePart {
 		root.attachChild(windowsSurroundMesh);
 
 		wireframeMesh = new Line("Wall (Wireframe)");
+//		((Line)wireframeMesh).setLineWidth(5);
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setModelBound(new BoundingBox());
@@ -1163,6 +1164,7 @@ public class Wall extends HousePart {
 		surroundMesh = originalWall.surroundMesh.makeCopy(true);
 		windowsSurroundMesh = originalWall.windowsSurroundMesh.makeCopy(true);
 		wireframeMesh = originalWall.wireframeMesh.makeCopy(true);
+		((Line)wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
 		root.attachChild(backMesh);
 		root.attachChild(surroundMesh);
 		root.attachChild(windowsSurroundMesh);
