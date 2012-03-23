@@ -84,6 +84,7 @@ public class PrintController implements Updater {
 	public void init() {
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void update(final ReadOnlyTimer globalTimer) {
 		if (isPrintPreview)
@@ -107,7 +108,6 @@ public class PrintController implements Updater {
 						part.hideLabels();
 						part.getOriginal().hideLabels();
 				}
-
 			} else {
 				printParts = (ArrayList<HousePart>) ObjectCloner.deepCopy(Scene.getInstance().getParts());
 				for (int i = 0; i < printParts.size(); i++) {
@@ -126,9 +126,7 @@ public class PrintController implements Updater {
 				computePrintCenters(pages);
 
 				arrangePrintPages(pages);
-
 				SceneManager.getInstance().updatePrintPreviewScene(true);
-
 				drawPrintParts(0);
 			}
 			originalHouseRoot.getSceneHints().setCullHint(CullHint.Always);

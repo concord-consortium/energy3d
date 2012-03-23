@@ -31,7 +31,6 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Floor extends HousePart {
 	private static final long serialVersionUID = 1L;
-	// private static final double getGridSize() = 0.2;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient Mesh wireframeMesh;
 
@@ -51,7 +50,6 @@ public class Floor extends HousePart {
 		mesh.setModelBound(new OrientedBoundingBox());
 
 		wireframeMesh = new Line("Floor (Wireframe)");
-//		((Line)wireframeMesh).setLineWidth(5);
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setModelBound(new BoundingBox());
@@ -72,14 +70,11 @@ public class Floor extends HousePart {
 	public void setPreviewPoint(final int x, final int y) {
 		pickContainer(x, y, Wall.class);
 		if (container != null) {
-			// Vector3 base = container.getAbsPoint(0);
 			final ReadOnlyVector3 base = getCenter();
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, getGridSize());
-			// height = Math.max(0, p.getZ() - base.getZ()) + base.getZ();
 			final double zMin = container.getAbsPoint(0).getZ() + 0.01;
 			final double zmax = container.getAbsPoint(1).getZ();
-			// height = Math.max(0, p.getZ() - base.getZ()) + base.getZ();
 			height = Math.min(zmax, Math.max(zMin, p.getZ()));
 		}
 		draw();
@@ -112,21 +107,13 @@ public class Floor extends HousePart {
 	protected void drawMesh() {
 		if (container == null) {
 			mesh.getSceneHints().setCullHint(CullHint.Always);
-			// setEditPointsVisible(false);
 			return;
 		}
-		// try {
 		mesh.getSceneHints().setCullHint(CullHint.Inherit);
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
 		fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
-		// mesh.updateModelBound();
 		drawWireframe();
 		updateEditShapes();
-		// for (int i = 0; i < points.size(); i++)
-		// pointsRoot.getChild(i).setTranslation(points.get(i));
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
 	}
 
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(final Wall startWall) {
@@ -221,8 +208,8 @@ public class Floor extends HousePart {
 	public void setOriginal(final HousePart original) {
 		wallUpperPoints = ((Floor) original).wallUpperPoints;
 		root.detachChild(wireframeMesh);
-		wireframeMesh = ((Floor)original).wireframeMesh.makeCopy(true);
-		((Line)wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
+		wireframeMesh = ((Floor) original).wireframeMesh.makeCopy(true);
+		((Line) wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
 		root.attachChild(wireframeMesh);
 
 		super.setOriginal(original);

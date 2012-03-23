@@ -81,13 +81,13 @@ public class MainFrame extends JFrame {
 	private JMenuItem scaleMenuItem;
 	private JCheckBoxMenuItem shadowMenu;
 	private JCheckBoxMenuItem textureCheckBoxMenuItem;
-	protected Object lastSelection; // @jve:decl-index=0:
+	protected Object lastSelection;
 	private JMenuItem colorMenuItem = null;
 	private JCheckBoxMenuItem shadeMenu = null;
 	private JMenuItem exitMenuItem = null;
 	private JMenu helpMenu = null;
 	private JMenuItem aboutMenuItem = null;
-	private JDialog aboutDialog = null; // @jve:decl-index=0:visual-constraint="602,644"
+	private JDialog aboutDialog = null;
 	private JCheckBoxMenuItem wallThicknessMenuItem = null;
 	private MainPanel mainPanel = null;
 	private JCheckBoxMenuItem annotationsInward;
@@ -196,11 +196,6 @@ public class MainFrame extends JFrame {
 			fileChooser = new JFileChooser(directoryPath);
 			if (!Config.isWebStart() && directoryPath == null) {
 				final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
-				// if (!dir.exists()) {
-				// System.out.print("Making save directory..." + dir + "...");
-				// final boolean success = dir.mkdir();
-				// System.out.println(success ? "done" : "failed");
-				// }
 				fileChooser.setCurrentDirectory(dir);
 			}
 			fileChooser.setFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
@@ -223,18 +218,15 @@ public class MainFrame extends JFrame {
 	 */
 	private void initialize() {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-		// this.setSize(600, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Energy3D v" + Config.VERSION);
 
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		// GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 
 		this.setSize(Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_width", 900), screenSize.width), Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_height", 600), screenSize.height));
 		this.setLocation((int) (screenSize.getWidth() - this.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2);
 		this.setLocation(Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_x", (int) (screenSize.getWidth() - this.getSize().getWidth()) / 2), Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_y", (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2));
 		this.setLocation(MathUtils.clamp(this.getLocation().x, 0, screenSize.width - this.getSize().width), MathUtils.clamp(this.getLocation().y, 0, screenSize.height - this.getSize().height));
-		// this.setSize(900, 600); // XIE: reduce the length, as some older computers have only 1024x800 screen resolution.
 		final int windowState = Preferences.userNodeForPackage(MainApplication.class).getInt("window_state", JFrame.NORMAL);
 		if ((windowState & JFrame.ICONIFIED) == 0)
 			setExtendedState(windowState);
@@ -414,8 +406,6 @@ public class MainFrame extends JFrame {
 						if (url != null)
 							Scene.save(url);
 						else
-							// if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
-							// Scene.save(fileChooser.getSelectedFile().toURI().toURL());
 							saveFile();
 					} catch (final Throwable err) {
 						err.printStackTrace();
@@ -619,7 +609,6 @@ public class MainFrame extends JFrame {
 			exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					// System.exit(0);
 					SceneManager.getInstance().exit();
 				}
 			});

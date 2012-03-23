@@ -1008,6 +1008,8 @@ Version 0.5 - October 20, 2011
 - make the wireframe of print parts thicker
 - print outlines of house parts to save ink 
 - release version 0.6.4
+- cleanup code
+- fix problem with drawing the outline of non-convex print parts
 
 - *add rotate camera option
 - *be smarter about orbit rotation when not clicking on any house part

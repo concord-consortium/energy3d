@@ -17,7 +17,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.scenegraph.Spatial;
 
 public class OrbitControl extends CameraControl {
 	private static final double FRONT_DISTANCE_DEFAULT = 8;
@@ -25,11 +24,12 @@ public class OrbitControl extends CameraControl {
 	private final Matrix3 _workerMatrix_2 = new Matrix3();
 	private final Vector4 _workerVector4 = new Vector4();
 	private final Vector3 _center = new Vector3(1, 0, 1);
-	private final Spatial root;
+//	private final Spatial root;
 
-	public OrbitControl(final ReadOnlyVector3 upAxis, final Spatial root) {
+//	public OrbitControl(final ReadOnlyVector3 upAxis, final Spatial root) {
+	public OrbitControl(final ReadOnlyVector3 upAxis) {
 		super(upAxis);
-		this.root = root;
+//		this.root = root;
 	}
 
 	@Override

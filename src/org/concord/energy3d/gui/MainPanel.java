@@ -46,17 +46,13 @@ public class MainPanel extends JPanel {
 	private JToggleButton windowButton = null;
 	private JToggleButton platformButton = null;
 	private JToggleButton lightButton = null;
-	private final JToggleButton topViewButton = null;
 	private JToggleButton rotAnimButton = null;
-	private final JToggleButton gridButton = null;
-	private final JToggleButton snapButton = null;
 	private JToggleButton floorButton = null;
 	private JToggleButton roofHipButton = null;
 	private JToggleButton resizeButton = null;
 	private JToggleButton heliodonButton = null;
 	private JToggleButton sunAnimButton = null;
 	private JToggleButton annotationToggleButton;
-	protected Object lastSelection; // @jve:decl-index=0:
 	private JToggleButton previewButton = null;
 	private JPanel calendarPanel = null;
 	private JLabel dateLabel = null;
@@ -828,7 +824,6 @@ public class MainPanel extends JPanel {
 	}
 
 	public void deselect() {
-		lastSelection = null;
 		getSelectButton().setSelected(true);
 		SceneManager.getInstance().setOperation(Operation.SELECT);
 	}
@@ -923,7 +918,6 @@ public class MainPanel extends JPanel {
 					c.setEnabled(enabled);
 			}
 		}
-
 		getCalendarPanel().setVisible(enabled && (getLightButton().isSelected() || getHeliodonButton().isSelected()));
 	}
 }

@@ -16,7 +16,8 @@ public class HipRoof extends Roof {
 		super(1, 3, 0.5);
 	}
 
-	public void setPreviewPoint(int x, int y) {
+	@Override
+	public void setPreviewPoint(final int x, final int y) {
 		if (editPointIndex == -1) {
 			pickContainer(x, y, Wall.class);
 			recalculateEditPoints = true;
@@ -37,12 +38,13 @@ public class HipRoof extends Roof {
 
 	}
 
-	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
+	@Override
+	protected Polygon makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {
 		final Polygon polygon = new Polygon(wallUpperPoints);
 		final Vector3 p1 = getAbsPoint(1);
-		PolygonPoint roofUpperPoint1 = new PolygonPoint(p1.getX(), p1.getY(), p1.getZ());
+		final PolygonPoint roofUpperPoint1 = new PolygonPoint(p1.getX(), p1.getY(), p1.getZ());
 		final Vector3 p2 = getAbsPoint(2);
-		PolygonPoint roofUpperPoint2 = new PolygonPoint(p2.getX(), p2.getY(), p2.getZ());
+		final PolygonPoint roofUpperPoint2 = new PolygonPoint(p2.getX(), p2.getY(), p2.getZ());
 		polygon.addSteinerPoint(roofUpperPoint1);
 		if (!roofUpperPoint2.equals(roofUpperPoint1))
 			polygon.addSteinerPoint(roofUpperPoint2);
@@ -50,7 +52,7 @@ public class HipRoof extends Roof {
 	}
 
 	@Override
-	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
+	protected void processRoofPoints(final ArrayList<PolygonPoint> wallUpperPoints, final ArrayList<ReadOnlyVector3> wallNormals) {
 		super.processRoofPoints(wallUpperPoints, wallNormals);
 		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {

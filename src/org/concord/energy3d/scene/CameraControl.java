@@ -3,7 +3,7 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
+ * Ardor3D is free software: you can redistribute it and/or modify it
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
@@ -19,7 +19,6 @@ import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyHeldCondition;
 import com.ardor3d.input.logical.LogicalLayer;
-import com.ardor3d.input.logical.MouseMovedCondition;
 import com.ardor3d.input.logical.MouseWheelMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
@@ -35,7 +34,7 @@ import com.google.common.base.Predicates;
 public abstract class CameraControl {
 	public enum ButtonAction {MOVE, ROTATE, ZOOM, NONE};
     protected final Vector3 _upAxis = new Vector3();
-    protected final Matrix3 _workerMatrix = new Matrix3();    
+    protected final Matrix3 _workerMatrix = new Matrix3();
     protected final Vector3 _workerVector = new Vector3();
     protected InputTrigger _mouseTrigger;
     protected InputTrigger _keyTrigger;
@@ -89,16 +88,16 @@ public abstract class CameraControl {
     public void setKeyRotateSpeed(final double speed) {
         _keyRotateSpeed = speed;
     }
-    
+
 //	private void zoom(final Canvas canvas, final double tpf, int val) {
 //		final Camera camera = canvas.getCanvasRenderer().getCamera();
 //		final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * _moveSpeed * 10 * tpf).addLocal(camera.getLocation());
 //		// final Vector3 loc = new Vector3(camera.getLocation()).addLocal(dir);
 //		camera.setLocation(loc);
-//	}    
+//	}
 
     protected abstract void move(final Camera camera, final KeyboardState kb, final double tpf);
-    
+
     protected abstract void move(final Camera camera, final double dx, final double dy);
 
     protected abstract void rotate(final Camera camera, final double dx, final double dy);
@@ -114,8 +113,8 @@ public abstract class CameraControl {
      * @return a new FirstPersonControl object
      */
     public void setupTriggers(final LogicalLayer layer, final ReadOnlyVector3 upAxis, final boolean dragOnly) {
-        this.setupKeyboardTriggers(layer);
-        this.setupMouseTriggers(layer, dragOnly);
+        setupKeyboardTriggers(layer);
+        setupMouseTriggers(layer, dragOnly);
     }
 
     public void removeTriggers(final LogicalLayer layer) {
@@ -138,7 +137,8 @@ public abstract class CameraControl {
             // Test boolean to allow us to ignore first mouse event. First event can wildly vary based on platform.
             private boolean firstPing = true;
 
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+            @Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
             	if (!enabled || !mouseEnabled) return;
                 final MouseState mouse = inputStates.getCurrent().getMouseState();
                 if (mouse.getDx() != 0 || mouse.getDy() != 0) {
@@ -169,25 +169,26 @@ public abstract class CameraControl {
                 }
             }
         };
-        
+
 
         _mouseTrigger = new InputTrigger(dragOnly ? dragged : TriggerConditions.mouseMoved(), dragAction);
         layer.registerTrigger(_mouseTrigger);
 
-        
+
 //        layer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
 //        	public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 //        		zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
 //        	}
-//        })); 
+//        }));
 
-        
+
 		layer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
 			}
 		}));
-		
+
 //		final KeyHeldCondition cond1 = new KeyHeldCondition(Key.LCONTROL);
 //		final MouseMovedCondition cond2 = new MouseMovedCondition();
 //		final Predicate<TwoInputStates> condition = Predicates.and(cond1, Predicates.and(cond2, someMouseDown));
@@ -200,7 +201,7 @@ public abstract class CameraControl {
 //					dy = 4;
 //				zoom(source, tpf, -dy / 1.0);
 //			}
-//		}));	        
+//		}));
     }
 
     public Predicate<TwoInputStates> setupKeyboardTriggers(final LogicalLayer layer) {
@@ -211,7 +212,8 @@ public abstract class CameraControl {
         final Predicate<TwoInputStates> keysHeld = new Predicate<TwoInputStates>() {
             Key[] keys = new Key[] { Key.W, Key.A, Key.S, Key.D, Key.LEFT, Key.RIGHT, Key.UP, Key.DOWN };
 
-            public boolean apply(final TwoInputStates states) {
+            @Override
+			public boolean apply(final TwoInputStates states) {
                 for (final Key k : keys) {
                     if (states.getCurrent() != null && states.getCurrent().getKeyboardState().isDown(k)) {
                         return true;
@@ -222,7 +224,8 @@ public abstract class CameraControl {
         };
 
         final TriggerAction moveAction = new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+            @Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
             	if (!enabled) return;
                 control.move(source.getCanvasRenderer().getCamera(), inputStates.getCurrent().getKeyboardState(), tpf);
                 SceneManager.getInstance().getCameraNode().updateFromCamera();
@@ -230,8 +233,8 @@ public abstract class CameraControl {
             }
         };
         _keyTrigger = new InputTrigger(keysHeld, moveAction);
-        layer.registerTrigger(_keyTrigger);	
-        
+        layer.registerTrigger(_keyTrigger);
+
         return keysHeld;
     }
 
@@ -246,12 +249,12 @@ public abstract class CameraControl {
     public boolean isEnabled() {
     	return enabled;
     }
-    
-    public void setEnabled(boolean enabled) {
+
+    public void setEnabled(final boolean enabled) {
     	this.enabled = enabled;
     }
-	
-	public void setMouseButtonActions(ButtonAction leftButtonAction, ButtonAction rightButtonAction) {
+
+	public void setMouseButtonActions(final ButtonAction leftButtonAction, final ButtonAction rightButtonAction) {
 		this.leftButtonAction = leftButtonAction;
 		this.rightButtonAction = rightButtonAction;
 	}
@@ -263,21 +266,21 @@ public abstract class CameraControl {
 //	public void setMouseRightButtonAction(final ButtonAction rightButtonAction) {
 //		this.rightButtonAction = rightButtonAction;
 //	}
-		
-	
-	public void setMouseEnabled(boolean enabled) {		
-		this.mouseEnabled  = enabled;
+
+
+	public void setMouseEnabled(final boolean enabled) {
+		mouseEnabled  = enabled;
 	}
 
 	public boolean isMouseEnabled() {
 		return mouseEnabled;
 	}
-	
+
 	public void reset() {
-		
+
 	}
-	
-	private void zoom(final Canvas canvas, final double tpf, double val) {
+
+	private void zoom(final Canvas canvas, final double tpf, final double val) {
 		if (Camera.getCurrentCamera().getProjectionMode() == ProjectionMode.Parallel) {
 			final double fac = val > 0 ? 1.1 : 0.9;
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
@@ -298,17 +301,17 @@ public abstract class CameraControl {
 		SceneManager.getInstance().getCameraNode().updateFromCamera();
 		SceneManager.getInstance().update();
 	}
-	
+
 	public void zoomAtPoint(final ReadOnlyVector3 clickedPoint) {
 		final boolean isPrintPreview = PrintController.getInstance().isPrintPreview();
 		final double zoomInDistance = isPrintPreview ? 5 : 2;
-		final double zoomDistance;		
+		final double zoomDistance;
 		final boolean zoomOut = Camera.getCurrentCamera().getLocation().distance(clickedPoint) < zoomInDistance + 1;
 		if (zoomOut)
 			zoomDistance = 10.0;
 		else
 			zoomDistance = zoomInDistance;
-		
+
 		orgCameraDirection = new Vector3(Camera.getCurrentCamera().getDirection());
 		orgCameraLocation = new Vector3(Camera.getCurrentCamera().getLocation());
 		if (isPrintPreview) {
@@ -325,11 +328,11 @@ public abstract class CameraControl {
 			newCameraLocation = clickedPoint.subtract(newCameraDirection.multiply(zoomDistance, null), null);
 		animationTime  = SceneManager.getInstance().getTimer().getTimeInSeconds();
 	}
-	
+
 	public boolean isAnimating() {
 		return animationTime != -1;
 	}
-	
+
 	public void animate() {
 //		System.out.println("animating...");
 		final double currentTime  = SceneManager.getInstance().getTimer().getTimeInSeconds();
@@ -349,7 +352,7 @@ public abstract class CameraControl {
 		return rightButtonAction;
 	}
 
-	public void setRightButtonAction(ButtonAction rightButtonAction) {
+	public void setRightButtonAction(final ButtonAction rightButtonAction) {
 		this.rightButtonAction = rightButtonAction;
 	}
 
@@ -357,7 +360,7 @@ public abstract class CameraControl {
 		return leftMouseButtonEnabled;
 	}
 
-	public void setLeftMouseButtonEnabled(boolean leftMouseButtonEnabled) {
+	public void setLeftMouseButtonEnabled(final boolean leftMouseButtonEnabled) {
 		this.leftMouseButtonEnabled = leftMouseButtonEnabled;
 	}
 
@@ -365,7 +368,7 @@ public abstract class CameraControl {
 		return rightMouseButtonEnabled;
 	}
 
-	public void setRightMouseButtonEnabled(boolean rightMouseButtonEnabled) {
+	public void setRightMouseButtonEnabled(final boolean rightMouseButtonEnabled) {
 		this.rightMouseButtonEnabled = rightMouseButtonEnabled;
 	}
 
@@ -373,7 +376,7 @@ public abstract class CameraControl {
 		return leftButtonAction;
 	}
 
-	public void setLeftButtonAction(ButtonAction leftButtonAction) {
+	public void setLeftButtonAction(final ButtonAction leftButtonAction) {
 		this.leftButtonAction = leftButtonAction;
 	}
 }

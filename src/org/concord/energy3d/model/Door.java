@@ -17,7 +17,6 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
-//	private static final double getGridSize() = 0.2;
 	private static double defaultDoorHeight = 1.5; //0.8f;
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer normalBuffer;
@@ -26,12 +25,8 @@ public class Door extends HousePart {
 	public Door() {
 		super(2, 4, defaultDoorHeight);
 	}
-	
-//	@Override
-//	public double getGridSize() {
-//		return 0.2;
-//	}	
 
+	@Override
 	protected void init() {
 		super.init();
 		mesh = new Mesh("Door");
@@ -53,34 +48,35 @@ public class Door extends HousePart {
 		ts.setTexture(TextureManager.load("door.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		mesh.setRenderState(ts);
 
-		mesh.setModelBound(new BoundingBox());	
+		mesh.setModelBound(new BoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 	}
 
-	public void setPreviewPoint(int x, int y) {
+	@Override
+	public void setPreviewPoint(final int x, final int y) {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
-			PickedHousePart picked = pickContainer(x, y, Wall.class);
+			final PickedHousePart picked = pickContainer(x, y, Wall.class);
 			if (picked != null) {
 				Vector3 p = picked.getPoint();
-				Vector3 wallFirstPoint = container.getAbsPoint(0);
-				Vector3 wallx = container.getAbsPoint(2).subtract(wallFirstPoint, null);
+				final Vector3 wallFirstPoint = container.getAbsPoint(0);
+				final Vector3 wallx = container.getAbsPoint(2).subtract(wallFirstPoint, null);
 				p = closestPoint(wallFirstPoint, wallx, x, y);
 				p = grid(p, getGridSize());
 
-				int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
+				final int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				points.set(index, toRelative(p));
 				p.setZ(p.getZ() + height);
 				points.set(index + 1, toRelative(p));
 			}
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
-			int lower = (editPointIndex == 1) ? 0 : 2;
-			Vector3 base = points.get(lower);
-			Vector3 absoluteBase = toAbsolute(base);
+			final int lower = (editPointIndex == 1) ? 0 : 2;
+			final Vector3 base = points.get(lower);
+			final Vector3 absoluteBase = toAbsolute(base);
 			Vector3 p = closestPoint(absoluteBase, Vector3.UNIT_Z, x, y);
 			p = grid(p, getGridSize());
 			height = Math.max(0, p.getZ() - absoluteBase.getZ());
-			
+
 			final double rel_z = toRelative(absoluteBase.addLocal(0, 0, height)).getZ();
 			points.get(1).setZ(rel_z);
 			points.get(3).setZ(rel_z);
@@ -91,9 +87,10 @@ public class Door extends HousePart {
 		}
 	}
 
+	@Override
 	protected void drawMesh() {
 		if (points.size() < 4)
-			return;		
+			return;
 
 		vertexBuffer.rewind();
 		for (int i = 0; i < points.size(); i++) {
@@ -102,7 +99,7 @@ public class Door extends HousePart {
 		}
 
 		// Compute normals
-		Vector3 normal = getAbsPoint(2).subtract(getAbsPoint(0), null).crossLocal(getAbsPoint(1).subtract(getAbsPoint(0), null)).normalizeLocal();
+		final Vector3 normal = getAbsPoint(2).subtract(getAbsPoint(0), null).crossLocal(getAbsPoint(1).subtract(getAbsPoint(0), null)).normalizeLocal();
 		normal.negateLocal();
 		normalBuffer.rewind();
 		for (int i = 0; i < points.size(); i++)
@@ -118,22 +115,26 @@ public class Door extends HousePart {
 		mesh.updateModelBound();
 	}
 
+	@Override
 	public boolean isPrintable() {
 		return false;
 	}
-	
+
+	@Override
 	public void updateTextureAndColor(final boolean textureEnabled) {
-		
+
 	}
 
+	@Override
 	protected String getDefaultTextureFileName() {
 		return "door.jpg";
 	}
-	
+
+	@Override
 	public Vector3 getAbsPoint(final int index) {
 		if (container != null)
 			return container.getRoot().getTransform().applyForward(super.getAbsPoint(index));
 		else
 			return super.getAbsPoint(index);
-	}	
+	}
 }

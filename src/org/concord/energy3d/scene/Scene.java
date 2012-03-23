@@ -59,45 +59,9 @@ public class Scene implements Serializable {
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
 
-	// public static Scene getInstance() {
-	// if (instance == null) {
-	// instance = new Scene();
-	// try {
-	// if (!Config.isApplet() && !Config.isWebStart())
-	// instance.open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
-	// else if (Config.isWebStart()) {
-	// // do nothing
-	// } else if (Config.getApplet().getParameter("file") != null) {
-	// final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
-	// instance.open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
-	// } else {
-	// final URL url = new URL(Config.getApplet().getCodeBase(), "Energy3D Projects/Default.ser");
-	// instance.open((new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL()));
-	// }
-	// } catch (Throwable e) {
-	// e.printStackTrace();
-	// instance = new Scene();
-	// }
-	// root.attachChild(originalHouseRoot);
-	// }
-	// return instance;
-	// }
-
 	public static Scene getInstance() {
 		if (instance == null) {
-			// instance = new Scene();
 			try {
-				// if (!Config.isApplet() && !Config.isWebStart())
-				// open(new File("Energy3D Projects" + File.separator + "Default.ser").toURI().toURL());
-				// else if (Config.isWebStart()) {
-				// newFile(40, 30);
-				// } else if (Config.getApplet().getParameter("file") != null) {
-				// final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
-				// open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
-				// } else {
-				// final URL url = new URL(Config.getApplet().getCodeBase(), "Energy3D Projects/Default.ser");
-				// open((new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL()));
-				// }
 				if (Config.isApplet() && Config.getApplet().getParameter("file") != null) {
 					final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
 					open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
@@ -107,16 +71,11 @@ public class Scene implements Serializable {
 				e.printStackTrace();
 				newFile(40, 30);
 			}
-			// root.attachChild(originalHouseRoot);
 		}
 		return instance;
 	}
 
-	// public static void newFile() {
-	// }
-
 	public static void newFile(final double xLength, final double yLength) {
-		// newFile();
 		try {
 			open(null);
 		} catch (final Exception e) {
@@ -176,7 +135,6 @@ public class Scene implements Serializable {
 
 				if (url != null) {
 					for (final HousePart housePart : instance.getParts())
-						// if (housePart.isValid())
 						originalHouseRoot.attachChild(housePart.getRoot());
 					redrawAll = true;
 					System.out.println("done");
@@ -210,7 +168,6 @@ public class Scene implements Serializable {
 			if (url != null) {
 				for (final HousePart housePart : instance.getParts()) {
 					Scene.getInstance().parts.add(housePart);
-					// if (housePart.isValid())
 					originalHouseRoot.attachChild(housePart.getRoot());
 				}
 				redrawAll = true;
@@ -228,19 +185,9 @@ public class Scene implements Serializable {
 	private void cleanup() {
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
 		for (final HousePart housePart : getParts()) {
-			if (!housePart.isValid()
-					|| ((housePart instanceof Roof || housePart instanceof Window || housePart instanceof Door) && housePart.getContainer() == null))
+			if (!housePart.isValid() || ((housePart instanceof Roof || housePart instanceof Window || housePart instanceof Door) && housePart.getContainer() == null))
 				toBeRemoved.add(housePart);
 		}
-
-//		// remove dead objects that don't have container
-//		final Iterator<HousePart> itr = instance.parts.iterator();
-//		while (itr.hasNext()) {
-//			HousePart part = itr.next();
-//			if (part instanceof Roof || part instanceof Window || part instanceof Door)
-//				if (part.getContainer() == null)
-//					itr.remove();
-//		}
 
 		for (final HousePart housePart : toBeRemoved)
 			remove(housePart);
@@ -312,74 +259,6 @@ public class Scene implements Serializable {
 		return parts;
 	}
 
-	// public void save(final URL url) throws FileNotFoundException, IOException {
-	// // remove dead objects
-	// final Iterator<HousePart> itr = parts.iterator();
-	// while (itr.hasNext()) {
-	// HousePart part = itr.next();
-	// if (part instanceof Roof || part instanceof Window || part instanceof Door)
-	// if (part.getContainer() == null)
-	// itr.remove();
-	// }
-	//
-	// Scene.url = url;
-	// System.out.print("Saving " + Scene.url + "...");
-	// ObjectOutputStream out;
-	// try {
-	// out = new ObjectOutputStream(new FileOutputStream(Scene.url.toURI().getPath()));
-	// out.writeObject(this);
-	// out.close();
-	// } catch (URISyntaxException e) {
-	// e.printStackTrace();
-	// }
-	// System.out.println("done");
-	// }
-	//
-	// public void newFile() {
-	// final PrintController printController = PrintController.getInstance();
-	// if (printController.isPrintPreview()) {
-	// MainPanel.getInstance().getPreviewButton().setSelected(false);
-	// while (!printController.isFinished())
-	// Thread.yield();
-	// }
-	//
-	// parts.clear();
-	// url = null;
-	//
-	// SceneManager.taskManager.update(new Callable<Object>() {
-	// public Object call() throws Exception {
-	// originalHouseRoot.detachAllChildren();
-	// for (Spatial child : root.getChildren())
-	// if (child != originalHouseRoot)
-	// root.detachChild(child);
-	// root.updateWorldBound(true);
-	// SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-	// SceneManager.getInstance().getUndoManager().die();
-	// MainFrame.getInstance().refreshUndoRedo();
-	// return null;
-	// }
-	// });
-	// }
-	//
-	// public void open(final URL file) {
-	// instance.newFile();
-	// Scene.url = file;
-	// SceneManager.taskManager.update(new Callable<Object>() {
-	// public Object call() throws Exception {
-	// System.out.print("Opening..." + file + "...");
-	// ObjectInputStream in = new ObjectInputStream(file.openStream());
-	// instance = (Scene) in.readObject();
-	// in.close();
-	// for (HousePart housePart : instance.getParts())
-	// originalHouseRoot.attachChild(housePart.getRoot());
-	// redrawAll = true;
-	// System.out.println("done");
-	// SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-	// return null;
-	// }
-	// });
-	// }
-
 	public void drawResizeBounds() {
 		for (final HousePart part : parts) {
 			if (part instanceof Foundation)
@@ -441,8 +320,6 @@ public class Scene implements Serializable {
 		if (PrintController.getInstance().getPrintParts() != null)
 			for (final HousePart part : PrintController.getInstance().getPrintParts())
 				part.drawAnnotations();
-
-		// redrawAll = true;
 	}
 
 	public void redrawAll() {
@@ -461,13 +338,12 @@ public class Scene implements Serializable {
 			if (PrintController.getInstance().getPrintParts() != null)
 				for (final HousePart part : PrintController.getInstance().getPrintParts())
 					part.draw();
-			// updateTextSizes();
 			redrawAll = false;
 		}
 	}
 
 	public void setUnit(final Unit unit) {
-		this.unit = unit;
+		Scene.unit = unit;
 		redrawAll = true;
 	}
 

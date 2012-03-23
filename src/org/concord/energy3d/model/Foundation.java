@@ -3,7 +3,6 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
-import org.concord.energy3d.exception.InvisibleException;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.SelectUtil;
@@ -26,15 +25,12 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
-//	private static final double getGridSize() = 0.5;
 	private transient Mesh boundingMesh;
 	private transient Mesh wireframeMesh;
 	private transient ArrayList<Vector3> orgPoints;
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient boolean resizeHouseMode = false;
-
-	// private transient Mesh gridsMesh;
 
 	public Foundation() {
 		super(2, 8, 0.1);
@@ -46,12 +42,12 @@ public class Foundation extends HousePart {
 		points.get(2).set(xLength / 2.0, -yLength / 2.0, 0);
 		points.get(1).set(-xLength / 2.0, yLength / 2.0, 0);
 		points.get(3).set(xLength / 2.0, yLength / 2.0, 0);
-		
+
 		for (int i = 0; i < 4; i++)
-			points.get(4 + i).set(points.get(i)).setZ(newBoundingHeight + height);		
+			points.get(4 + i).set(points.get(i)).setZ(newBoundingHeight + height);
 	}
 
-	
+
 	@Override
 	protected boolean mustHaveContainer() {
 		return false;
@@ -84,14 +80,6 @@ public class Foundation extends HousePart {
 		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
 
-		// gridsMesh = new Line("Grids");
-		// gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
-		// gridsMesh.setDefaultColor(ColorRGBA.BLUE);
-		// gridsMesh.setModelBound(new BoundingBox());
-		// Util.disablePickShadowLight(gridsMesh);
-		// root.attachChild(gridsMesh);
-		// setGridsVisible(false);
-
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
 		boundingMesh.setUserData(userData);
@@ -122,7 +110,6 @@ public class Foundation extends HousePart {
 				if (!visible)
 					pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 				else {
-//					computeEditPointScale(i);
 					if (!resizeHouseMode && i >= 4)
 						pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 					else
@@ -173,7 +160,7 @@ public class Foundation extends HousePart {
 	}
 
 	@Override
-	public void setPreviewPoint(int x, int y) {
+	public void setPreviewPoint(final int x, final int y) {
 		int index = editPointIndex;
 		if (index == -1) {
 			if (isFirstPointInserted())
@@ -181,7 +168,7 @@ public class Foundation extends HousePart {
 			else
 				index = 0;
 		}
-		PickedHousePart pick = SelectUtil.pickPart(x, y, (Spatial) null);
+		final PickedHousePart pick = SelectUtil.pickPart(x, y, (Spatial) null);
 		Vector3 p = points.get(index);
 		if (pick != null) {
 			p = pick.getPoint();
@@ -218,18 +205,18 @@ public class Foundation extends HousePart {
 		setEditPointsVisible(true);
 	}
 
-	private void applyNewHeight(double orgHeight, double newHeight, boolean finalize) {
+	private void applyNewHeight(final double orgHeight, final double newHeight, final boolean finalize) {
 		if (newHeight == 0 || newHeight == orgHeight)
 			return;
-		double scale = newHeight / orgHeight;
+		final double scale = newHeight / orgHeight;
 
 		applyNewHeight(children, scale, finalize);
 		if (finalize)
-			this.boundingHeight = newHeight;
+			boundingHeight = newHeight;
 	}
 
-	private void applyNewHeight(ArrayList<HousePart> children, double scale, boolean finalize) {
-		for (HousePart child : children) {
+	private void applyNewHeight(final ArrayList<HousePart> children, final double scale, final boolean finalize) {
+		for (final HousePart child : children) {
 			if (child instanceof Wall || child instanceof Floor || child instanceof Roof) {
 				child.setHeight(child.orgHeight * scale, finalize);
 				applyNewHeight(child.getChildren(), scale, finalize);
@@ -245,10 +232,7 @@ public class Foundation extends HousePart {
 		if (drawable) {
 			((Box) mesh).setData(points.get(0), points.get(3).add(0, 0, height, null));
 			mesh.updateModelBound();
-			// boundingMesh.setData(points.get(0), points.get(7));
-			// boundingMesh.updateModelBound();
 			drawWireframe(boundingMesh, points.get(7).getZf());
-
 			drawWireframe(wireframeMesh, (float) height);
 		}
 	}
@@ -333,9 +317,6 @@ public class Foundation extends HousePart {
 			buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.01f);
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
-//		gridsMesh.updateModelBound();
-//		gridsMesh.updateWorldBound(false);
-		// gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 	}
 
 	private void putWireframePoint(final FloatBuffer buf, final Vector3 p) {
@@ -377,37 +358,21 @@ public class Foundation extends HousePart {
 	}
 
 	@Override
-	public void flatten(double flattenTime) {
+	public void flatten(final double flattenTime) {
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 		super.flatten(flattenTime);
 	}
 
 	@Override
 	public void drawAnnotations() {
-		int[] order = { 0, 1, 3, 2, 0 };
+		final int[] order = { 0, 1, 3, 2, 0 };
 		int annotCounter = 0;
 		for (int i = 0; i < order.length - 1; i++, annotCounter++) {
-//			final SizeAnnotation annot;
-//			if (annotCounter < sizeAnnotRoot.getChildren().size())
-//				annot = (SizeAnnotation) sizeAnnotRoot.getChild(annotCounter);
-//			else {
-//				annot = new SizeAnnotation();
-//				sizeAnnotRoot.attachChild(annot);
-//			}
 			final SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), getCenter(), getFaceDirection(), false, Align.Center, true, true, false);
 			annot.setLineWidth(original == null ? 1f : 2f);
 		}
-
-//		for (int i = annotCounter; i < sizeAnnotRoot.getChildren().size(); i++)
-//			sizeAnnotRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
 	}
-
-//	@Override
-//	public void setEditPointsVisible(final boolean visible) {
-//		if (visible || !resizeHouseMode)
-//			super.setEditPointsVisible(visible);
-//	}
 
 	@Override
 	public void setEditPoint(int editPoint) {
@@ -429,17 +394,17 @@ public class Foundation extends HousePart {
 	protected String getDefaultTextureFileName() {
 		return "foundation.jpg";
 	}
-	
+
 	@Override
 	protected ReadOnlyVector3 getCenter() {
 		return super.getCenter().multiply(new Vector3(1, 1, 0), null);
 	}
-	
+
 	@Override
 	public boolean isPrintable() {
 		return false;
 	}
-	
+
 	@Override
 	public double getGridSize() {
 		return 0.2;

@@ -24,8 +24,6 @@ import com.ardor3d.scenegraph.Spatial;
 
 public class SelectUtil {
 	private static final PickResults pickResults = new PrimitivePickResults();
-//	private static Mesh floor;
-//	private static Node housePartsNode;
 	private static int pickLayer = -1;
 	private static ColorRGBA currentEditPointOriginalColor = new ColorRGBA();
 	private static Mesh currentEditPointMesh;
@@ -36,7 +34,6 @@ public class SelectUtil {
 
 	public static PickedHousePart pickPart(final int x, final int y, Spatial target) {
 		if (target == null)
-//			target = floor;
 			target = SceneManager.getInstance().getFloor();
 		pickResults.clear();
 
@@ -118,7 +115,6 @@ public class SelectUtil {
 	}
 
 	public static UserData selectHousePart(final int x, final int y, final boolean edit) {
-//		final PickedHousePart pickedHousePart = pickPart(x, y, Scene.getRoot());
 		final PickedHousePart pickedHousePart;
 		if (SceneManager.getInstance().getOperation() == Operation.RESIZE)
 			pickedHousePart = pickPart(x, y, Foundation.class);
@@ -158,11 +154,6 @@ public class SelectUtil {
 		}
 		return data;
 	}
-
-//	public static void init(Mesh floor, Node housePartsNode) {
-//		SelectUtil.floor = floor;
-//		SelectUtil.housePartsNode = housePartsNode;
-//	}
 
 	public static void nextPickLayer() {
 		if (pickLayer != -1)

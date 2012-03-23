@@ -45,16 +45,13 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
-	// protected static final double getGridSize() = 0.5;
-	private static double overhangLength = 0.2; // 0.01; //0.2;
+	private static double overhangLength = 0.2;
 	protected transient Node roofPartsRoot;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient ArrayList<ReadOnlyVector3> wallNormals;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
-//	private transient Mesh wireframeMesh;
 	private transient ArrayList<Wall> walls;
 	private transient HousePart previousContainer;
-	// private transient Mesh gridsMesh;
 	private ArrayList<Wall> gableWalls = null;
 	private Map<Integer, ArrayList<Wall>> gableEditPointToWallMap = null;
 	private Map<Integer, ArrayList<Integer>> gableRoofPartToEditPointMap = null;
@@ -88,81 +85,51 @@ public abstract class Roof extends HousePart {
 		mesh = new Mesh("Roof");
 		mesh.setModelBound(new BoundingBox());
 
-//		wireframeMesh = new Line("Roof (wireframe)");
-//		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-//		wireframeMesh.setModelBound(new BoundingBox());
-//		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10));
-//		Util.disablePickShadowLight(wireframeMesh);
-//		root.attachChild(wireframeMesh);
-
-		// gridsMesh = new Line("Grids");
-		// gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
-		// gridsMesh.setDefaultColor(ColorRGBA.BLUE);
-		// gridsMesh.setModelBound(new BoundingBox());
-		// Util.disablePickShadowLight(gridsMesh);
-		// root.attachChild(gridsMesh);
-		// setGridsVisible(false);
-
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
 	}
 
 	@Override
 	protected void drawMesh() {
-//		try {
-			/* undo the effect of wall stretch on all walls if roof is moved to new walls */
-			if (previousContainer != container) {
-				previousContainer = container;
-				for (final Wall wall : walls) {
-					wall.setRoof(null);
-					wall.draw();
-				}
+		/* undo the effect of wall stretch on all walls if roof is moved to new walls */
+		if (previousContainer != container) {
+			previousContainer = container;
+			for (final Wall wall : walls) {
+				wall.setRoof(null);
+				wall.draw();
 			}
+		}
 
-			if (container == null) {
-				roofPartsRoot.getSceneHints().setCullHint(CullHint.Always);
-//				wireframeMesh.getSceneHints().setCullHint(CullHint.Always);
-				setEditPointsVisible(false);
-				return;
+		if (container == null) {
+			roofPartsRoot.getSceneHints().setCullHint(CullHint.Always);
+			setEditPointsVisible(false);
+			return;
+		}
+		roofPartsRoot.getSceneHints().setCullHint(CullHint.Inherit);
+
+		exploreWallNeighbors((Wall) container);
+		processRoofPoints(wallUpperPoints, wallNormals);
+		computeGableEditPoints();
+		final Polygon polygon = makePolygon(wallUpperPoints);
+		fillMeshWithPolygon(mesh, polygon);
+		// create roof parts
+		MeshLib.groupByPlanner(mesh, roofPartsRoot);
+		setAnnotationsVisible(drawAnnotations);
+		hideGableRoofParts();
+		int roofPartIndex = 0;
+		for (final Spatial child : roofPartsRoot.getChildren()) {
+			if (child.getSceneHints().getCullHint() != CullHint.Always) {
+				final Mesh mesh = (Mesh) ((Node) child).getChild(0);
+				mesh.setUserData(new UserData(this, roofPartIndex, false));
+				if (!Scene.getInstance().isTextureEnabled())
+					mesh.setDefaultColor(defaultColor);
+				final MaterialState ms = new MaterialState();
+				ms.setColorMaterial(ColorMaterial.Diffuse);
+				mesh.setRenderState(ms);
 			}
-			roofPartsRoot.getSceneHints().setCullHint(CullHint.Inherit);
-//			wireframeMesh.getSceneHints().setCullHint(CullHint.Inherit);
-
-			exploreWallNeighbors((Wall) container);
-			processRoofPoints(wallUpperPoints, wallNormals);
-			computeGableEditPoints();
-			final Polygon polygon = makePolygon(wallUpperPoints);
-			fillMeshWithPolygon(mesh, polygon);
-			// create roof parts
-			MeshLib.groupByPlanner(mesh, roofPartsRoot);
-			setAnnotationsVisible(drawAnnotations);
-			hideGableRoofParts();
-			int roofPartIndex = 0;
-			for (final Spatial child : roofPartsRoot.getChildren()) {
-				if (child.getSceneHints().getCullHint() != CullHint.Always) {
-					final Mesh mesh = (Mesh) ((Node) child).getChild(0);
-					mesh.setUserData(new UserData(this, roofPartIndex, false));
-					if (!Scene.getInstance().isTextureEnabled())
-						mesh.setDefaultColor(defaultColor);
-					final MaterialState ms = new MaterialState();
-					ms.setColorMaterial(ColorMaterial.Diffuse);
-					mesh.setRenderState(ms);
-				}
-				roofPartIndex++;
-			}
-			drawWireframe();
-			updateTextureAndColor(Scene.getInstance().isTextureEnabled());
-//			root.updateGeometricState(0);
-			// drawGrids(getGridSize());
-
-			// flattenInit();
-
-			// flatten(0);
-
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-
-		// computeOrientedBoundingBox();
+			roofPartIndex++;
+		}
+		drawWireframe();
+		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 	}
 
 	protected void drawWalls() {
@@ -241,45 +208,23 @@ public abstract class Roof extends HousePart {
 	@Override
 	public void computeOrientedBoundingBox() {
 		orgCenters.clear();
-//		if (flatten)
-//			flatten(1.0);
 
 		for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
 			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
 				final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
 				computeOrientedBoundingBox(roofPartMesh);
 				orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
-//				System.out.print(roofPartMesh.getWorldBound().getCenter());
-//				System.out.println();
 			}
 		}
-//		if (flatten)
-//			flatten(0.0);
 	}
-
-	// @Override
-	// protected void computeOrientedBoundingBox(final Mesh mesh) {
-	// orgCenters.put((Node) mesh.getParent(), null);
-	// flattenQuadTriangle((Node) mesh.getParent(), 1.0);
-	// super.computeOrientedBoundingBox(mesh);
-	// orgCenters.put((Node) mesh.getParent(), new Vector3(mesh.getWorldBound().getCenter()));
-	// System.out.print(mesh.getWorldBound().getCenter());;
-	// System.out.println();
-	// // flattenQuadTriangle((Node) mesh.getParent(), 0.0);
-	// }
 
 	@Override
 	public void flattenInit() {
-		// if (orgCenters == null)
-		// orgCenters = new HashMap<Node, ReadOnlyVector3>();
-		// else
-		// orgCenters.clear();
 		flatten(1.0);
 		for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
 			roofPartNode.setTranslation(0, 0, 0);
 
 			final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
-			// computeOrientedBoundingBox(mesh);
 			// The following code is needed because the center of bounding box is not accurate. If oriented bounding box is usde then this code is no longer required.
 			final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 			buf.rewind();
@@ -319,14 +264,12 @@ public abstract class Roof extends HousePart {
 		roofPartNode.setRotation(matrix);
 
 		ReadOnlyVector3 orgCenter = orgCenters.get(roofPartNode);
-//		System.out.println(orgCenter);
 
 		if (orgCenter == null)
 			orgCenter = Vector3.ZERO;
 		final Vector3 targetPrintCenter = ((UserData) roofPartNode.getChild(0).getUserData()).getPrintCenter();
 		if (!targetPrintCenter.equals(Vector3.ZERO))
 			roofPartNode.setTranslation(targetPrintCenter.subtract(orgCenter, null).multiplyLocal(flattenTime));
-//		System.out.println(roofPartNode.getTranslation());
 	}
 
 	@Override
@@ -378,53 +321,9 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-//	protected void drawWireframe() {
-//		if (container == null)
-//			return;
-//
-//		final ArrayList<ArrayList<ReadOnlyVector3>> convexHulls = new ArrayList<ArrayList<ReadOnlyVector3>>();
-//		int totalVertices = 0;
-//
-//		for (Spatial roofPart : roofPartsRoot.getChildren()) {
-//			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
-//				final Node roofPartNode = (Node) roofPart;
-//
-//				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
-//				convexHulls.add(convexHull);
-//				totalVertices += convexHull.size();
-//			}
-//		}
-//
-//		final FloatBuffer buf;
-//		if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
-//			buf = wireframeMesh.getMeshData().getVertexBuffer();
-//			buf.limit(buf.capacity());
-//			buf.rewind();
-//		} else {
-//			buf = BufferUtils.createVector3Buffer(totalVertices * 2);
-//			wireframeMesh.getMeshData().setVertexBuffer(buf);
-//		}
-//
-//		for (final ArrayList<ReadOnlyVector3> convexHull : convexHulls) {
-//			for (int i = 0; i < convexHull.size(); i++) {
-//				final ReadOnlyVector3 p1 = convexHull.get(i);
-//				final ReadOnlyVector3 p2 = convexHull.get((i + 1) % convexHull.size());
-//
-//				buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-//				buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-//			}
-//		}
-//		buf.limit(buf.position());
-//		wireframeMesh.getMeshData().updateVertexCount();
-//		wireframeMesh.updateModelBound();
-//	}
-
 	protected void drawWireframe() {
 		if (container == null)
 			return;
-
-//		final ArrayList<ArrayList<ReadOnlyVector3>> convexHulls = new ArrayList<ArrayList<ReadOnlyVector3>>();
-//		int totalVertices = 0;
 
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
@@ -432,7 +331,6 @@ public abstract class Roof extends HousePart {
 				final Mesh wireframeMesh = (Mesh) roofPartNode.getChild(4);
 
 				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
-//				convexHulls.add(convexHull);
 				final int totalVertices = convexHull.size();
 
 				final FloatBuffer buf;
@@ -445,13 +343,13 @@ public abstract class Roof extends HousePart {
 					wireframeMesh.getMeshData().setVertexBuffer(buf);
 				}
 
-					for (int i = 0; i < convexHull.size(); i++) {
-						final ReadOnlyVector3 p1 = convexHull.get(i);
-						final ReadOnlyVector3 p2 = convexHull.get((i + 1) % convexHull.size());
+				for (int i = 0; i < convexHull.size(); i++) {
+					final ReadOnlyVector3 p1 = convexHull.get(i);
+					final ReadOnlyVector3 p2 = convexHull.get((i + 1) % convexHull.size());
 
-						buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-						buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-					}
+					buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+					buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+				}
 				buf.limit(buf.position());
 				wireframeMesh.getMeshData().updateVertexCount();
 				wireframeMesh.updateModelBound();
@@ -559,13 +457,6 @@ public abstract class Roof extends HousePart {
 						nearestEditPointIndex = i;
 					}
 				}
-				// if (gableEditPointToWallMap.containsKey(nearestEditPointIndex))
-				// gableEditPointToWallMap.get(nearestEditPointIndex).add(wall);
-				// else {
-				// final ArrayList<Wall> walls = new ArrayList<Wall>(2);
-				// walls.add(wall);
-				// gableEditPointToWallMap.put(nearestEditPointIndex, walls);
-				// }
 				if (gableEditPointToWallMap.get(nearestEditPointIndex) == null)
 					gableEditPointToWallMap.put(nearestEditPointIndex, new ArrayList<Wall>(2));
 				gableEditPointToWallMap.get(nearestEditPointIndex).add(wall);
@@ -596,10 +487,10 @@ public abstract class Roof extends HousePart {
 			final Vector3 nearestEditPoint = getAbsPoint(nearestIndex);
 			for (final Wall wall : gableEditPointToWallMap.get(nearestIndex)) {
 				if (wall != null) { // TODO do this check before adding
-				final ReadOnlyVector3 n = wall.getFaceDirection();
-				double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(getOverhangLength(), null)), null).dot(n);
-				distance -= 0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
-				nearestEditPoint.addLocal(n.multiply(distance, null));
+					final ReadOnlyVector3 n = wall.getFaceDirection();
+					double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(getOverhangLength(), null)), null).dot(n);
+					distance -= 0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
+					nearestEditPoint.addLocal(n.multiply(distance, null));
 				}
 			}
 			points.get(nearestIndex).set(toRelative(nearestEditPoint, container.getContainer()));
@@ -651,10 +542,6 @@ public abstract class Roof extends HousePart {
 	private void hideGableRoofParts() {
 		if (gableWalls == null)
 			return;
-		// for (final Spatial roofPart : getRoofPartsRoot().getChildren()) {
-		// roofPart.getSceneHints().setCullHint(CullHint.Inherit);
-		// roofPart.getSceneHints().setPickingHint(PickingHint.Pickable, true);
-		// }
 
 		for (final Wall wall : gableWalls) {
 			if (wall == null)
@@ -725,31 +612,22 @@ public abstract class Roof extends HousePart {
 		final Roof originalRoof = (Roof) original;
 		this.original = original;
 		root.detachChild(pointsRoot);
-//		this.root.detachChild(wireframeMesh);
 		root.detachChild(roofPartsRoot);
-//		wireframeMesh = originalRoof.wireframeMesh.makeCopy(true);
 		roofPartsRoot = originalRoof.roofPartsRoot.makeCopy(true);
-//		root.attachChild(wireframeMesh);
 		root.attachChild(roofPartsRoot);
 
 		for (int i = 0; i < roofPartsRoot.getNumberOfChildren(); i++) {
 			if (roofPartsRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
-				// ((Node) roofPartsRoot.getChild(i)).getChild(1).getSceneHints().setCullHint(CullHint.Always);
 				final UserData orgUserData = (UserData) ((Node) originalRoof.roofPartsRoot.getChild(i)).getChild(0).getUserData();
 				final Mesh mesh = (Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(0);
 				mesh.setUserData(new UserData(this, orgUserData.getIndex(), false));
 				roofPartsRoot.getChild(i).setUserData(originalRoof.roofPartsRoot.getChild(i).getUserData());
 				final Mesh wireframeMesh = (Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(4);
-				((Line)wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
+				((Line) wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
 				mesh.getSceneHints().setCullHint((!Scene.getInstance().isTextureEnabled() && defaultColor.equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
-
-				// final BoundingVolume modelBound = ((Mesh) ((Node) ((Roof) original).roofPartsRoot.getChild(i)).getChild(0)).getModelBound();
-				// mesh.setModelBound(modelBound);
-				// modelBound.transform(new Transform(), modelBound);
 			}
 		}
 		drawAnnotations();
-//		computeOrientedBoundingBox(true);
 		root.updateWorldBound(true);
 	}
 
@@ -784,15 +662,11 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	public void drawGrids(final double gridSize) {
-		// final ReadOnlyVector3 p0 = getAbsPoint(0);
-		// final ReadOnlyVector3 p1 = getAbsPoint(1);
-		// final ReadOnlyVector3 p2 = getAbsPoint(2);
 		final BoundingBox bounds = (BoundingBox) root.getWorldBound();
 		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(bounds.getXExtent() * 2, null);
 		final ReadOnlyVector3 height = Vector3.UNIT_Y.multiply(bounds.getYExtent() * 2, null);
 		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
 		final ReadOnlyVector3 pMiddle = getAbsPoint(0);
-		// final ReadOnlyVector3 pMiddle = width.add(height, null).multiplyLocal(0.5).addLocal(p0);
 
 		final int cols = (int) (width.length() / gridSize);
 
@@ -823,32 +697,18 @@ public abstract class Roof extends HousePart {
 			return;
 		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
 		for (final ReadOnlyVector3 p : points)
-			// buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.01f);
 			buf.put(p.getXf()).put(p.getYf()).put(pMiddle.getZf());
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
-		// gridsMesh.updateModelBound();
-		// gridsMesh.updateWorldBound(false);
-		// gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 	}
 
 	public void setPrintVertical(final Spatial roofPartNode, final boolean isVertical) {
-//		Boolean currentValue = roofPartPrintVerticalMap.get(roofPartNode);
-//		if (currentValue == null)
-//			currentValue = true;
-//		if (currentValue == isVertical)
-//		if (!isVertical)
-//			return;
 		roofPartPrintVerticalMap.put(roofPartNode, isVertical);
-//		flatten(1.0); // to trigger rotate 90 degrees
-//		computeOrientedBoundingBox();
-//		flatten(1.0);
-		 flattenQuadTriangle((Node) roofPartNode, 1.0);
-		 roofPartNode.updateGeometricState(0);
+		flattenQuadTriangle((Node) roofPartNode, 1.0);
+		roofPartNode.updateGeometricState(0);
 		orgCenters.put((Node) roofPartNode, null);
-		 final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
-		 computeOrientedBoundingBox(roofPartMesh);
-		 orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
-		// flattenQuadTriangle((Node) roofPartNode, 0.0);
+		final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
+		computeOrientedBoundingBox(roofPartMesh);
+		orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
 	}
 }

@@ -1,11 +1,5 @@
 package org.concord.energy3d;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
-
 import javax.swing.JApplet;
 import javax.swing.UIManager;
 
@@ -26,37 +20,26 @@ public class MainApplet extends JApplet {
 		Config.setApplet(this);
 	}
 
+	@Override
 	public void init() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception err) {
+		} catch (final Exception err) {
 			err.printStackTrace();
 		}
-		
-//		Component parent = this;
-//        while (parent.getParent() != null)
-//            parent = parent.getParent();
-//        if (parent instanceof Frame) {
-//            final Frame frame = (Frame) parent;
-//			if (!frame.isResizable()) {
-//                frame.setResizable(true);
-//                frame.setLayout(new GridLayout());
-//        		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//        		frame.setLocation((int) (screenSize.getWidth() - frame.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - frame.getSize().getHeight()) / 2);                
-//            }
-//        }		
-		this.setContentPane(getMainPanel());
+
+		setContentPane(getMainPanel());
 		SceneManager.getInstance();
-		
+
 		try {
-			final String color = this.getParameter("color");
+			final String color = getParameter("color");
 			if (color != null)
 				HousePart.setDefaultColor(ColorRGBA.parseColor(color, null));
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
-		}		
-		Scene.getInstance().setTextureEnabled(!"false".equalsIgnoreCase(this.getParameter("texture")));
-	}	
+		}
+		Scene.getInstance().setTextureEnabled(!"false".equalsIgnoreCase(getParameter("texture")));
+	}
 
 	private MainPanel getMainPanel() {
 		if (mainPanel == null) {
@@ -72,6 +55,6 @@ public class MainApplet extends JApplet {
 
 	@Override
 	public void stop() {
-		SceneManager.getInstance().exit();		
+		SceneManager.getInstance().exit();
 	}
 }

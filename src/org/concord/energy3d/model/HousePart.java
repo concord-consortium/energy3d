@@ -162,12 +162,6 @@ public abstract class HousePart implements Serializable {
 		gridsMesh = new Line("Grids");
 		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
 		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
-		// gridsMesh.setDefaultColor(new ColorRGBA(0, 1, 1, 0.5f));
-		// gridsMesh.setDefaultColor(new ColorRGBA(0, 0, 1, 0.9f));
-		// final BlendState blend = new BlendState();
-		// blend.setBlendEnabled(true);
-		// gridsMesh.setRenderState(blend);
-		// gridsMesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		gridsMesh.setModelBound(null);
 		Util.disablePickShadowLight(gridsMesh);
 		root.attachChild(gridsMesh);
@@ -200,17 +194,11 @@ public abstract class HousePart implements Serializable {
 			root.detachChild(mesh);
 			mesh = original.mesh.makeCopy(true);
 			mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getIndex(), false));
-//			mesh.getSceneHints().setCullHint((!org.concord.energy3d.scene.Scene.getInstance().isTextureEnabled() && defaultColor.equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
-//			mesh.getSceneHints().setCullHint(CullHint.Always);
-			// final BoundingVolume modelBound = original.mesh.getModelBound();
-			// mesh.setModelBound(modelBound);
-			// modelBound.transform(new Transform(), mesh.getModelBound());
 			root.attachChild(mesh);
 
 
 		}
 		drawAnnotations();
-		// computeOrientedBoundingBox(true);
 		root.updateWorldBound(true);
 	}
 
@@ -254,36 +242,13 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void setEditPointsVisible(final boolean visible) {
-		for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
-			// if (visible)
-			// computeEditPointScale(i);
+		for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++)
 			pointsRoot.getChild(i).getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
-		}
 	}
-
-	// protected void computeEditPointScale(final int i) {
-	// // pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
-	// // pointsRoot.getChild(i).updateGeometricState(0);
-	//
-	// pointsRoot.getChild(i).setScale(0.15 * SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getLocation().subtract(pointsRoot.getChild(i).getTranslation(), null).length());
-	// pointsRoot.getChild(i).updateGeometricState(0);
-	// }
-
-	// public void hidePoints() {
-	// for (final Spatial child : pointsRoot.getChildren())
-	// child.getSceneHints().setCullHint(CullHint.Always);
-	// // hideGrids();
-	// // if (container != null)
-	// // container.setGridsVisible(false);
-	// }
 
 	public void setEditPoint(final int i) {
 		editPointIndex = i;
 		drawCompleted = false;
-		// if (this instanceof Roof)
-		// setGridsVisible(true);
-		// else if (container != null)
-		// container.setGridsVisible(true);
 	}
 
 	public int getEditPoint() {
@@ -356,21 +321,6 @@ public abstract class HousePart implements Serializable {
 					container = null;
 			}
 		}
-		// if (gridsHighlightedHousePart != container) {
-		// if (gridsHighlightedHousePart != null)
-		// // gridsHighlightedHousePart.setGridsVisible(false);
-		// gridsHighlightedHousePart.gridsMesh.getSceneHints().setCullHint(CullHint.Always);
-		// else
-		// SceneManager.getInstance().setGridsVisible(false);
-		// if (container != null)
-		// container.drawGrids(getGridSize());
-		// else if (this instanceof Foundation || this instanceof Wall)
-		// SceneManager.getInstance().setGridsVisible(true);
-		// if (this instanceof Roof)
-		// gridsHighlightedHousePart = this;
-		// else
-		// gridsHighlightedHousePart = container;
-		// }
 		if (previousContainer != container) {
 			if (previousContainer == null)
 				SceneManager.getInstance().setGridsVisible(false);
@@ -429,31 +379,11 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected Vector3 grid(final Vector3 p, final double gridSize, final boolean snapToZ) {
-		// if (snapToGrids) {
-		// p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
-		// }
-		// if (snapToGrids) {
-		// p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
-		// }
-		// return p;
-
-		// if (isSnapToGrids()) {
-		// if (container.getContainer() != null)
-		// p.subtractLocal(0, 0, container.getContainer().getHeight());
-		// p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
-		// if (container.getContainer() != null)
-		// p.addLocal(0, 0, container.getContainer().getHeight());
-		// }
-		// return p;
-
 		if (isSnapToGrids()) {
 			if (container != null) {
 				final ReadOnlyVector3 p0 = container.getAbsPoint(0);
-
 				final ReadOnlyVector3 origin;
 				if (relativeToHorizontal) {
-					// origin = container.getAbsPoint(2).subtractLocal(p0).addLocal(container.getAbsPoint(1).subtractLocal(p0)).multiplyLocal(0.5).addLocal(p0);
-					// origin = root.getWorldBound().getCenter();
 					final ReadOnlyVector3 center;
 					if (this instanceof Roof)
 						center = getCenter();
@@ -468,33 +398,14 @@ public abstract class HousePart implements Serializable {
 					origin = p0;
 
 				final ReadOnlyVector3 originToP = p.subtract(origin, null);
-				// final Vector3 newP = new Vector3();
-				// if (!snapToZ) {
-				// final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), !snapToZ ? 0 : originToP.getY(), 0);
 				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), snapToZ ? originToP.getY() : 0, 0);
 				final double snapedHorizontalLength = Math.round(horizontalDir.length() / gridSize) * gridSize;
 				final ReadOnlyVector3 u = horizontalDir.normalize(null).multiplyLocal(snapedHorizontalLength);
-				// newP.set(horizontalDir).normalizeLocal().multiplyLocal(snapedHorizontalLength);
-				// }
 
 				final ReadOnlyVector3 verticalDir = new Vector3(0, snapToZ ? 0 : originToP.getY(), snapToZ ? originToP.getZ() : 0);
 				final double snapedVerticalLength = Math.round(verticalDir.length() / gridSize) * gridSize;
-				; // Math.round((!snapToZ ? originToP.getY() : originToP.getZ()) / gridSize) * gridSize;
 				final ReadOnlyVector3 v = verticalDir.normalize(null).multiplyLocal(snapedVerticalLength);
-				// newP.set(newP.getX(), !snapToZ ? snapedVerticalLength : newP.getY(), !snapToZ ? p.getZ() : snapedVerticalLength);
-				// newP.set(newP.getX(), !snapToZ ? snapedVerticalLength : 0, !snapToZ ? 0 : snapedVerticalLength);
-				// newP.addLocal(Vector)
-				// return newP.addLocal(origin);
 				return origin.add(u, null).addLocal(v);
-
-				// final ReadOnlyVector3 p0p = p.subtract(p0, null);
-				// final ReadOnlyVector3 h = new Vector3(p0p.getX(), p0p.getY(), 0);
-				// final double snapedHorizontalLength = Math.round(h.length() / gridSize) * gridSize;
-				// final Vector3 newp0p = h.normalize(null).multiplyLocal(snapedHorizontalLength);
-				//
-				// final double snapedVerticalLength = Math.round(p0p.getZ() / gridSize) * gridSize;
-				// newp0p.setZ(snapedVerticalLength);
-				// return newp0p.addLocal(p0);
 			} else
 				p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
 		}
@@ -510,7 +421,6 @@ public abstract class HousePart implements Serializable {
 				throw new RuntimeException("Drawing of this object is already completed");
 
 			if (points.size() >= numOfEditPoints)
-				// drawCompleted = true;
 				complete();
 			else {
 				allocateNewPoint();
@@ -534,12 +444,6 @@ public abstract class HousePart implements Serializable {
 			if (root == null)
 				init();
 			drawMesh();
-			// if (firstPointInserted)
-			// computeOrientedBoundingBox(true);
-			// if (this instanceof Roof)
-			// drawGrids(getGridSize());
-			// else if (container != null)
-			// container.drawGrids(getGridSize());
 			updateEditShapes();
 			CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
 			hideAnnotations();
@@ -556,7 +460,6 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void setGridsVisible(final boolean visible) {
-		// if (this instanceof Foundation) {
 		if (container == null) {
 			if (visible)
 				SceneManager.getInstance().drawGrids(getGridSize());
@@ -583,14 +486,8 @@ public abstract class HousePart implements Serializable {
 
 	public void computeOrientedBoundingBox() {
 		flattenCenter.set(0, 0, 0);
-		// if (flatten)
-		// flatten(1.0);
 		computeOrientedBoundingBox(mesh);
 		flattenCenter.set(mesh.getWorldBound().getCenter());
-		// System.out.println(flattenCenter);
-		// System.out.println();
-		// if (flatten)
-		// flatten(0.0);
 	}
 
 	protected void computeOrientedBoundingBox(final Mesh mesh) {
@@ -606,16 +503,12 @@ public abstract class HousePart implements Serializable {
 		boundingBox.computeFromPoints(newbuf);
 		boundingBox.transform(mesh.getWorldTransform().invert(null), mesh.getModelBound());
 		mesh.updateWorldBound(true);
-
-		// if (this instanceof Roof)
-		// System.out.println(mesh.getWorldBound().getCenter());
 	}
 
 	public void flattenInit() {
 		flattenCenter = new Vector3();
 		flatten(1.0);
 		flattenCenter = new Vector3(mesh.getWorldBound().getCenter());
-		// flatten(1.0);
 	}
 
 	protected ReadOnlyVector3 getCenter() {
@@ -624,18 +517,11 @@ public abstract class HousePart implements Serializable {
 
 	public void flatten(final double flattenTime) {
 		if (isPrintable()) {
-			if (isPrintVertical) {
+			if (isPrintVertical)
 				root.setRotation(new Matrix3().fromAngles(0, -Math.PI / 2.0 * flattenTime, 0).multiply(root.getRotation(), null));
-				// isPrintVertical = false;
-			}
 			final Vector3 targetCenter = new Vector3(((UserData) mesh.getUserData()).getPrintCenter());
-			// final Vector3 targetCenter = new Vector3();
 			root.setTranslation(targetCenter.subtractLocal(flattenCenter).multiplyLocal(flattenTime));
 			root.updateGeometricState(0);
-			// System.out.println(mesh.getWorldBound().getCenter());
-			// System.out.println(((OrientedBoundingBox) mesh.getWorldBound()).getExtent());
-			// System.out.println();
-			final int a = 5;
 		}
 	}
 

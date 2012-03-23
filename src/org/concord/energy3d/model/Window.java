@@ -28,7 +28,6 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
-	// private static final double getGridSize() = 0.15;
 	private transient BMText label1;
 	private transient Line bars;
 
@@ -36,11 +35,7 @@ public class Window extends HousePart {
 		super(2, 4, 0.30);
 	}
 
-//	@Override
-//	public double getGridSize() {
-//		return 0.1;
-//	}
-
+	@Override
 	protected void init() {
 		label1 = Annotation.makeNewLabel();
 		super.init();
@@ -53,7 +48,7 @@ public class Window extends HousePart {
 
 		// Transparency
 		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.4f, 0.5f, 0.7f));
-		BlendState blendState = new BlendState();
+		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
 		blendState.setTestEnabled(true);
 		mesh.setRenderState(blendState);
@@ -78,7 +73,8 @@ public class Window extends HousePart {
 		root.attachChild(bars);
 	}
 
-	public void setPreviewPoint(int x, int y) {
+	@Override
+	public void setPreviewPoint(final int x, final int y) {
 		int index = editPointIndex;
 		if (index == -1) {
 			if (isFirstPointInserted())
@@ -86,7 +82,7 @@ public class Window extends HousePart {
 			else
 				index = 0;
 		}
-		PickedHousePart pick = pickContainer(x, y, Wall.class);
+		final PickedHousePart pick = pickContainer(x, y, Wall.class);
 		Vector3 p = points.get(index);
 		if (pick != null) {
 			p = pick.getPoint();
@@ -114,6 +110,7 @@ public class Window extends HousePart {
 		}
 	}
 
+	@Override
 	protected void drawMesh() {
 		if (points.size() < 4)
 			return;
@@ -240,11 +237,11 @@ public class Window extends HousePart {
 		final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getFaceDirection(), null);
 		label1.setTranslation(getAbsPoint(i0));
 		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
-		
+
 		final Vector3 center = trans.applyForward(getCenter(), null);
 		final float lineWidth = original == null ? 1f : 2f;;
-		
-		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);		
+
+		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, true, false);
 		annot.setLineWidth(lineWidth);
 
@@ -253,11 +250,13 @@ public class Window extends HousePart {
 		annot.setLineWidth(lineWidth);
 	}
 
+	@Override
 	public boolean isPrintable() {
 		return false;
 	}
 
-	public void setAnnotationsVisible(boolean visible) {
+	@Override
+	public void setAnnotationsVisible(final boolean visible) {
 		super.setAnnotationsVisible(visible);
 		if (label1 != null)
 			label1.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
@@ -275,6 +274,7 @@ public class Window extends HousePart {
 		return new Vector3(x, p.getY(), p.getZ());
 	}
 
+	@Override
 	public void updateTextureAndColor(final boolean textureEnabled) {
 	}
 
@@ -283,22 +283,11 @@ public class Window extends HousePart {
 			bars.getSceneHints().setCullHint(CullHint.Always);
 	}
 
+	@Override
 	public Vector3 getAbsPoint(final int index) {
 		if (container != null)
 			return container.getRoot().getTransform().applyForward(super.getAbsPoint(index));
 		else
 			return super.getAbsPoint(index);
 	}
-
-	// @Override
-	// protected Vector3 grid(final Vector3 p, final double gridSize, final boolean snapToZ) {
-	// if (isSnapToGrids()) {
-	// if (container.getContainer() != null)
-	// p.subtractLocal(0, 0, container.getContainer().getHeight());
-	// p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
-	// if (container.getContainer() != null)
-	// p.addLocal(0, 0, container.getContainer().getHeight());
-	// }
-	// return p;
-	// }
 }

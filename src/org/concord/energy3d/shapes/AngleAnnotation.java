@@ -18,7 +18,7 @@ public class AngleAnnotation extends Annotation {
 
 	public AngleAnnotation() {
 		super(new Arc("Angle annotation arc", 10));
-		setColor(ColorRGBA.WHITE);		
+		setColor(ColorRGBA.WHITE);
 	}
 
 	public void setRange(final ReadOnlyVector3 mainPoint, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3, final ReadOnlyVector3 n) {
@@ -28,17 +28,17 @@ public class AngleAnnotation extends Annotation {
 		this.n = n;
 		draw();
 	}
-	
+
 	@Override
 	public void draw() {
 		final ReadOnlyVector3 a = new Vector3().set(p2).subtractLocal(mainPoint).normalizeLocal();
-		final ReadOnlyVector3 b = new Vector3().set(p3).subtractLocal(mainPoint).normalizeLocal();		
-		
+		final ReadOnlyVector3 b = new Vector3().set(p3).subtractLocal(mainPoint).normalizeLocal();
+
 		final ReadOnlyVector3 axis = n.cross(Vector3.UNIT_Z, null).normalizeLocal();
 		final Matrix3 toFlat = new Matrix3().fromAngleAxis(Util.angleBetween(n, Vector3.UNIT_Z, n.cross(Vector3.UNIT_Z, null).normalizeLocal()), axis);
 		final ReadOnlyVector3 aFlat = toFlat.applyPost(a, null);
 		final ReadOnlyVector3 bFlat = toFlat.applyPost(b, null);
-		
+
 		final double start, angle;
 		if (Util.angleBetween(aFlat, bFlat, Vector3.UNIT_Z) >= 0) {
 			start = Util.angleBetween(Vector3.UNIT_X, aFlat, Vector3.UNIT_Z);
@@ -64,7 +64,7 @@ public class AngleAnnotation extends Annotation {
 			for (final ReadOnlyVector3 v : p)
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 			mesh.setRotation(new Matrix3());
-			this.detachChild(label);
+			detachChild(label);
 		} else {
 			((Arc)mesh).set(radius, start, end);
 			mesh.setRotation(toFlat.invertLocal());
@@ -76,10 +76,9 @@ public class AngleAnnotation extends Annotation {
 			label.setRotation(rotMatrix);
 			final Vector3 trans = new Vector3(0, 0, radius / 1.7);
 			label.setTranslation(rotMatrix.applyPost(trans, trans));
-			this.attachChild(label);
+			attachChild(label);
 		}
 		mesh.updateModelBound();
-//		this.setTranslation(mainPoint.add(n.multiply(0.001, null), null));
 		this.setTranslation(mainPoint.add(n.multiply(0.02, null), null));
-	}	
+	}
 }

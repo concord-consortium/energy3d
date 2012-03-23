@@ -12,10 +12,6 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.RenderState;
-import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -40,11 +36,11 @@ public class SizeAnnotation extends Annotation {
 		arrows.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(arrows);
 		setColor(ColorRGBA.BLACK);
-		this.attachChild(arrows);
-		this.attachChild(label);
+		attachChild(arrows);
+		attachChild(label);
 	}
 
-	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, boolean autoFlipOffset, final boolean upsideDownText, final boolean drawInside) {
+	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, final boolean autoFlipOffset, final boolean upsideDownText, final boolean drawInside) {
 		this.from = from;
 		this.to = to;
 		this.center = center;
@@ -53,10 +49,10 @@ public class SizeAnnotation extends Annotation {
 		this.align = align;
 		this.autoFlipOffset = autoFlipOffset;
 		this.upsideDownText = upsideDownText;
-		this.drawInside = drawInside;		
+		this.drawInside = drawInside;
 		draw();
 	}
-	
+
 	@Override
 	public void draw() {
 		final double C = 0.1;
@@ -72,14 +68,14 @@ public class SizeAnnotation extends Annotation {
 					offset.negateLocal();
 			}
 		}
-		
+
 		if (drawInside)
 			offset.negateLocal();
 
 		final ReadOnlyVector3 dir = to.subtract(from, null).normalizeLocal();
 		final int scale = upsideDownText ? -1 : 1;
 		label.setRotation(new Matrix3().fromAxes(dir.multiply(scale, null), faceDirection, faceDirection.cross(dir, null).multiplyLocal(scale)));
-		
+
 
 		FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
@@ -89,7 +85,7 @@ public class SizeAnnotation extends Annotation {
 		final Vector3 newTo = new Vector3(to).addLocal(offset);
 		final Vector3 middle = new Vector3(newFrom).addLocal(newTo).multiplyLocal(0.5);
 		final Vector3 body = new Vector3(to).subtractLocal(from).multiplyLocal(0.5);
-		
+
 		label.setTranslation(middle);
 //		label.setText("" + Math.round(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale() * 10.0) / 10.0 + Scene.getInstance().getUnit().getNotation());
 		final DecimalFormat df = new DecimalFormat("#.##");
@@ -97,11 +93,11 @@ public class SizeAnnotation extends Annotation {
 		label.setAlign(align);
 		label.updateWorldTransform(true);
 		label.updateWorldBound(true);
-		
-		
+
+
 		vertexBuffer.put(newFrom.getXf()).put(newFrom.getYf()).put(newFrom.getZf());
 		final double bankSpace = label.getWidth() * 0.70;
-		double blankSpaceFactor = Math.max(0, body.length() - bankSpace) / body.length();
+		final double blankSpaceFactor = Math.max(0, body.length() - bankSpace) / body.length();
 		v.set(body).multiplyLocal(blankSpaceFactor).addLocal(newFrom);
 		vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
 		v.set(body).multiplyLocal(-blankSpaceFactor).addLocal(newTo);
@@ -147,8 +143,8 @@ public class SizeAnnotation extends Annotation {
 
 		arrows.updateModelBound();
 
-		this.updateWorldTransform(true);
-		this.updateWorldBound(true);
+		updateWorldTransform(true);
+		updateWorldBound(true);
 		this.setTranslation(faceDirection.multiply(0.005, null));
 	}
 
@@ -156,12 +152,12 @@ public class SizeAnnotation extends Annotation {
 	public void setColor(final ReadOnlyColorRGBA color) {
 		super.setColor(color);
 		arrows.setDefaultColor(color);
-	}	
+	}
 
     @Override
     public Node makeCopy(final boolean shareGeometricData) {
         // get copy of basic spatial info
-        final Node node = (Node) super.makeCopy(shareGeometricData);
+        final Node node = super.makeCopy(shareGeometricData);
         // because the above code calls the constructor of this object (which adds 3 children) and then clones the node.children (which then adds extra 3 children) we need to undo the effect of last step
         node.detachChildAt(5);
         node.detachChildAt(4);

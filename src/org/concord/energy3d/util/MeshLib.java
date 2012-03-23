@@ -132,11 +132,11 @@ public class MeshLib {
 			} else {
 				newMesh = new Mesh("Roof Mesh #" + meshIndex);
 				newMesh.setModelBound(new OrientedBoundingBox());
-//				final OffsetState offsetState = new OffsetState();
-//				offsetState.setTypeEnabled(OffsetType.Fill, true);
-//				offsetState.setFactor(1);
-//				offsetState.setUnits(1);
-//				newMesh.setRenderState(offsetState);
+				// final OffsetState offsetState = new OffsetState();
+				// offsetState.setTypeEnabled(OffsetType.Fill, true);
+				// offsetState.setFactor(1);
+				// offsetState.setUnits(1);
+				// newMesh.setRenderState(offsetState);
 				node = new Node("Roof Part #" + meshIndex);
 				node.attachChild(newMesh);
 				node.attachChild(new Node("Roof Size Annot"));
@@ -145,15 +145,15 @@ public class MeshLib {
 				node.getChild(3).getSceneHints().setCullHint(CullHint.Always);
 
 				final Mesh wireframeMesh = new Line("Roof (wireframe)");
-//				((Line)wireframeMesh).setLineWidth(5);
+				// ((Line)wireframeMesh).setLineWidth(5);
 				wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 				wireframeMesh.setModelBound(new BoundingBox());
 				wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10));
 				Util.disablePickShadowLight(wireframeMesh);
 				node.attachChild(wireframeMesh);
 
-//				if (root.getNumberOfChildren() != 0)
-//					newMesh.getSceneHints().setCullHint(CullHint.Always);
+				// if (root.getNumberOfChildren() != 0)
+				// newMesh.getSceneHints().setCullHint(CullHint.Always);
 				root.attachChild(node);
 			}
 			final Vector3 normal = new Vector3();
@@ -162,12 +162,12 @@ public class MeshLib {
 			normal.normalizeLocal();
 			node.setUserData(normal);
 
-//			final Vector3 normal = new Vector3();
-//			for (final Vector3 v : group.normals)
-//				normal.addLocal(v);
-//			normal.normalizeLocal();
-//			if (!Vector3.isValid(normal))
-//				continue;
+			// final Vector3 normal = new Vector3();
+			// for (final Vector3 v : group.normals)
+			// normal.addLocal(v);
+			// normal.normalizeLocal();
+			// if (!Vector3.isValid(normal))
+			// continue;
 
 			FloatBuffer buf = newMesh.getMeshData().getVertexBuffer();
 			int n = group.vertices.size();
@@ -211,7 +211,7 @@ public class MeshLib {
 			node.getChild(3).setTranslation(center.add(normal.multiply(0.1, null), null));
 
 			meshIndex++;
-//			break;
+			// break;
 		}
 		while (meshIndex < root.getNumberOfChildren()) {
 			root.getChild(meshIndex).getSceneHints().setCullHint(CullHint.Always);
@@ -271,15 +271,36 @@ public class MeshLib {
 		final ArrayList<ReadOnlyVector3> convexHull = new ArrayList<ReadOnlyVector3>();
 		convexHull.add(new Vector3(pointOnHull));
 		do {
-			endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
-			for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
+			// endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
+			endpoint.setX(Double.MAX_VALUE);
+
+			// for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
+			for (int j = 0; j <= vertexBuffer.limit() / 3 - 1; j++) {
 				sj.set(vertexBuffer.get(j * 3), vertexBuffer.get(j * 3 + 1), vertexBuffer.get(j * 3 + 2));
-				// if (S[j] is on left of line from P[i] to endpoint)
-				final double dot = normal.cross(endpoint.subtract(pointOnHull, null).normalizeLocal(), null).dot(sj.subtract(pointOnHull, null).normalizeLocal());
-				if (!sj.equals(pointOnHull) && dot > 0) {
-					endpoint.set(sj); // found greater left turn, update endpoint
-				} else if (!sj.equals(pointOnHull) && dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
-					endpoint.set(sj); // found greater left turn, update endpoint
+				// check to see if sj is connected to pointOnHull
+				boolean isConnected = false;
+				int k = 0;
+				while (k < vertexBuffer.limit()) {
+					final ReadOnlyVector3 p1 = new Vector3(vertexBuffer.get(k++), vertexBuffer.get(k++), vertexBuffer.get(k++));
+					final ReadOnlyVector3 p2 = new Vector3(vertexBuffer.get(k++), vertexBuffer.get(k++), vertexBuffer.get(k++));
+					final ReadOnlyVector3 p3 = new Vector3(vertexBuffer.get(k++), vertexBuffer.get(k++), vertexBuffer.get(k++));
+					if ((pointOnHull.equals(p1) || pointOnHull.equals(p2) || pointOnHull.equals(p3)) && (sj.equals(p1) || sj.equals(p2) || sj.equals(p3))) {
+						isConnected = true;
+						break;
+					}
+				}
+				if (!isConnected)
+					continue;
+				if (endpoint.getX() == Double.MAX_VALUE)
+					endpoint.set(sj);
+				else {
+					// if (S[j] is on left of line from P[i] to endpoint)
+					final double dot = normal.cross(endpoint.subtract(pointOnHull, null).normalizeLocal(), null).dot(sj.subtract(pointOnHull, null).normalizeLocal());
+					if (!sj.equals(pointOnHull) && dot > 0) {
+						endpoint.set(sj); // found greater left turn, update endpoint
+					} else if (!sj.equals(pointOnHull) && dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
+						endpoint.set(sj); // found greater left turn, update endpoint
+				}
 			}
 			pointOnHull.set(endpoint);
 			convexHull.add(new Vector3(pointOnHull));

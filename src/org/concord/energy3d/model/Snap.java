@@ -77,6 +77,5 @@ public class Snap implements Serializable {
 	@Override
 	public String toString() {
 		return "(" + neighbor1 + ", " + pointIndex1 + ") - ("+ neighbor2 + ", " + pointIndex2 + ")";
-//		return Integer.toHexString(neighbor1.hashCode()) + "-" + Integer.toHexString(neighbor2.hashCode()) ;
 	}
 }

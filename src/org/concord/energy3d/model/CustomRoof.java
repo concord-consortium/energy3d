@@ -20,10 +20,8 @@ public class CustomRoof extends Roof {
 		super(1, 1, 0.5);
 	}
 
-	public void setPreviewPoint(int x, int y) {
-//		if (container != null)
-//			points.get(0).set(toRelative(getCenter(), container.getContainer())).addLocal(0, 0, height);
-
+	@Override
+	public void setPreviewPoint(final int x, final int y) {
 		if (editPointIndex == -1) {
 			recalculateEditPoints = true;
 			pickContainer(x, y, Wall.class);
@@ -51,7 +49,8 @@ public class CustomRoof extends Roof {
 			setEditPointsVisible(true);
 	}
 
-	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
+	@Override
+	protected Polygon makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {
 		final Polygon polygon = new Polygon(wallUpperPoints);
 		final ArrayList<ReadOnlyVector3> steinerPoints = new ArrayList<ReadOnlyVector3>();
 		for (int i = 1; i < points.size(); i++) {
@@ -64,15 +63,16 @@ public class CustomRoof extends Roof {
 		return polygon;
 	}
 
-	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
+	@Override
+	protected void processRoofPoints(final ArrayList<PolygonPoint> wallUpperPoints, final ArrayList<ReadOnlyVector3> wallNormals) {
 		super.processRoofPoints(wallUpperPoints, wallNormals);
 
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
 			points.clear();
-			
+
 			points.add(new Vector3(toRelative(getCenter(), container.getContainer())).addLocal(0, 0, height));
-			
+
 			// add or update edit points
 			final double z = container.getPoints().get(1).getZ() + height;
 			if (wallUpperPoints.size() > points.size()) {
@@ -86,10 +86,7 @@ public class CustomRoof extends Roof {
 					// add -normal*0.2 to middle point of wall
 					v.addLocal(wallNormals.get(i).multiply(0.2, null).negateLocal());
 					v.set(toRelative(v, container.getContainer()));
-//					if (i + 1 < points.size())
-//						points.get(i + 1).set(v);
-//					else
-						points.add(v.clone());
+					points.add(v.clone());
 				}
 			}
 		} else {
@@ -99,7 +96,7 @@ public class CustomRoof extends Roof {
 	}
 
 	@Override
-	protected void setHeight(double newHeight, boolean finalize) {
+	protected void setHeight(final double newHeight, final boolean finalize) {
 		super.setHeight(newHeight, finalize);
 		for (final Vector3 p : points)
 			p.setZ(container.getPoints().get(1).getZ() + newHeight);
