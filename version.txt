@@ -1010,6 +1010,9 @@ Version 0.5 - October 20, 2011
 - release version 0.6.4
 - cleanup code
 - fix problem with drawing the outline of non-convex print parts
+- add page # footnote to all print preview pages
+- allow double click on pages
+- release version 0.6.5
 
 - *add rotate camera option
 - *be smarter about orbit rotation when not clicking on any house part

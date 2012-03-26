@@ -20,6 +20,7 @@ import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
+import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.Printout;
@@ -39,6 +40,8 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.screen.ScreenExporter;
@@ -396,7 +399,7 @@ public class PrintController implements Updater {
 		pageLeft = pageFormat.getImageableX() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
 		pageRight = (pageFormat.getImageableX() + pageFormat.getImageableWidth()) * fromPageToWorldCoord - spaceBetweenParts / 2.0;
 		pageTop = pageFormat.getImageableY() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
-		pageBottom = (pageFormat.getImageableY() + pageFormat.getImageableHeight()) * fromPageToWorldCoord - spaceBetweenParts / 2.0;
+		pageBottom = (pageFormat.getImageableY() + pageFormat.getImageableHeight()) * fromPageToWorldCoord - spaceBetweenParts / 2.0 - Annotation.makeNewLabel().getHeight();
 
 		pageWidth = pageFormat.getWidth() * fromPageToWorldCoord;
 		pageHeight = pageFormat.getHeight() * fromPageToWorldCoord;
@@ -434,6 +437,13 @@ public class PrintController implements Updater {
 			final Box box = new Box("Page Boundary");
 			box.setData(upperLeftCorner.add(0, 0.1, 0, null), upperLeftCorner.add(pageWidth, 0.2, -pageHeight, null));
 			pagesRoot.attachChild(box);
+
+			final BMText footNote = Annotation.makeNewLabel();
+			final String url = Scene.getURL() != null ? Scene.getURL().getFile().substring( Scene.getURL().getFile().lastIndexOf('/')+1, Scene.getURL().getFile().length()) + " -" : "";
+			footNote.setText(url.replaceAll("%20", " ") + " Page " + printCenters.size() + " / " + pages.size() + " - http://energy.concord.org/");
+			footNote.setAlign(Align.North);
+			footNote.setTranslation(upperLeftCorner.add(pageWidth / 2.0, 0.0, -pageBottom - spaceBetweenParts / 2.0, null));
+			pagesRoot.attachChild(footNote);
 		}
 	}
 
