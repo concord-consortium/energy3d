@@ -1012,7 +1012,11 @@ Version 0.5 - October 20, 2011
 - fix problem with drawing the outline of non-convex print parts
 - add page # footnote to all print preview pages
 - allow double click on pages
+- fix problem with infinite loop when searching for polygon outline
+- remove door and window if the width or the height is zero
 - release version 0.6.5
+
+- *fix problem with invisible walls
 
 - *add rotate camera option
 - *be smarter about orbit rotation when not clicking on any house part

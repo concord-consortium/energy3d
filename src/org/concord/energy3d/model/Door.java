@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
@@ -85,6 +86,11 @@ public class Door extends HousePart {
 			draw();
 			setEditPointsVisible(true);
 		}
+	}
+
+	@Override
+	public boolean isDrawable() {
+		return points.size() >= 4 && getAbsPoint(2).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE && getAbsPoint(1).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE;
 	}
 
 	@Override

@@ -69,6 +69,7 @@ public class PrintController implements Updater {
 	private PageFormat pageFormat = new PageFormat();
 	private boolean isScaleToFit;
 	private boolean restartFlag = false;
+	private double labelHeight = 0.0;
 
 	public static PrintController getInstance() {
 		return instance;
@@ -399,7 +400,12 @@ public class PrintController implements Updater {
 		pageLeft = pageFormat.getImageableX() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
 		pageRight = (pageFormat.getImageableX() + pageFormat.getImageableWidth()) * fromPageToWorldCoord - spaceBetweenParts / 2.0;
 		pageTop = pageFormat.getImageableY() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
-		pageBottom = (pageFormat.getImageableY() + pageFormat.getImageableHeight()) * fromPageToWorldCoord - spaceBetweenParts / 2.0 - Annotation.makeNewLabel().getHeight();
+		if (labelHeight == 0.0) {
+			final BMText label = Annotation.makeNewLabel();
+			label.setFontScale(0.05);
+			labelHeight = label.getHeight();
+		}
+		pageBottom = (pageFormat.getImageableY() + pageFormat.getImageableHeight()) * fromPageToWorldCoord - spaceBetweenParts / 2.0 - labelHeight;
 
 		pageWidth = pageFormat.getWidth() * fromPageToWorldCoord;
 		pageHeight = pageFormat.getHeight() * fromPageToWorldCoord;
@@ -441,6 +447,7 @@ public class PrintController implements Updater {
 			final BMText footNote = Annotation.makeNewLabel();
 			final String url = Scene.getURL() != null ? Scene.getURL().getFile().substring( Scene.getURL().getFile().lastIndexOf('/')+1, Scene.getURL().getFile().length()) + " -" : "";
 			footNote.setText(url.replaceAll("%20", " ") + " Page " + printCenters.size() + " / " + pages.size() + " - http://energy.concord.org/");
+			footNote.setFontScale(0.05);
 			footNote.setAlign(Align.North);
 			footNote.setTranslation(upperLeftCorner.add(pageWidth / 2.0, 0.0, -pageBottom - spaceBetweenParts / 2.0, null));
 			pagesRoot.attachChild(footNote);

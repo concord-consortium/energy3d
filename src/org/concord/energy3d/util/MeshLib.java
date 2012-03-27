@@ -303,7 +303,10 @@ public class MeshLib {
 				}
 			}
 			pointOnHull.set(endpoint);
-			convexHull.add(new Vector3(pointOnHull));
+			if (convexHull.contains(pointOnHull))
+				break;
+			else
+				convexHull.add(new Vector3(pointOnHull));
 		} while (!endpoint.equals(leftVertex));
 		convexHull.contains(endpoint);
 		return convexHull;

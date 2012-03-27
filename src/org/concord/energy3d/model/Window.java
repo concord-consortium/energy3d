@@ -111,6 +111,11 @@ public class Window extends HousePart {
 	}
 
 	@Override
+	public boolean isDrawable() {
+		return points.size() >= 4 && getAbsPoint(2).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE && getAbsPoint(1).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE;
+	}
+
+	@Override
 	protected void drawMesh() {
 		if (points.size() < 4)
 			return;
