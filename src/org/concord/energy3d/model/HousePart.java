@@ -13,7 +13,6 @@ import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
@@ -445,7 +444,7 @@ public abstract class HousePart implements Serializable {
 				init();
 			drawMesh();
 			updateEditShapes();
-			CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
+//			CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
 			hideAnnotations();
 			if (isDrawable())
 				drawAnnotations();

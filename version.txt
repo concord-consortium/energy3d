@@ -1015,10 +1015,9 @@ Version 0.5 - October 20, 2011
 - fix problem with infinite loop when searching for polygon outline
 - remove door and window if the width or the height is zero
 - release version 0.6.5
-
 - draw dashed lines on each roof part based on intersection of each roof part with all underlying walls
 - adjust roof draw annotation to account for convex polygon that doesn't end with 1st vertex
-
+- remove call to CollisionTreeManager.INSTANCE.removeCollisionTree(root) in HousePart.draw() and use update method instead when needed
 
 - *fix problem with invisible walls
 
