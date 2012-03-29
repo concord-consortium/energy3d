@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -95,6 +96,7 @@ public abstract class HousePart implements Serializable {
 
 	public static void setDefaultColor(final ReadOnlyColorRGBA defaultColor) {
 		HousePart.defaultColor = defaultColor;
+		Scene.getInstance().updateRoofDashLinesColor();
 	}
 
 	public static HousePart getGridsHighlightedHousePart() {

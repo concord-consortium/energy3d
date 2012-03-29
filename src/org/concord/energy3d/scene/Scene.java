@@ -296,6 +296,8 @@ public class Scene implements Serializable {
 			for (final HousePart part : PrintController.getInstance().getPrintParts())
 				part.updateTextureAndColor(enabled);
 
+		Scene.getInstance().updateRoofDashLinesColor();
+
 		if (enabled)
 			redrawAll = true;
 	}
@@ -397,6 +399,16 @@ public class Scene implements Serializable {
 			if (spatial instanceof Annotation)
 				((Annotation) spatial).draw();
 		}
+	}
+
+	public void updateRoofDashLinesColor() {
+		for (final HousePart part : parts)
+			if (part instanceof Roof)
+				((Roof) part).updateDashLinesColor();
+		if (PrintController.getInstance().getPrintParts() != null)
+			for (final HousePart part : PrintController.getInstance().getPrintParts())
+				if (part instanceof Roof)
+					((Roof) part).updateDashLinesColor();
 	}
 
 	public void removeAllRoofs() {

@@ -1018,6 +1018,12 @@ Version 0.5 - October 20, 2011
 - draw dashed lines on each roof part based on intersection of each roof part with all underlying walls
 - adjust roof draw annotation to account for convex polygon that doesn't end with 1st vertex
 - remove call to CollisionTreeManager.INSTANCE.removeCollisionTree(root) in HousePart.draw() and use update method instead when needed
+- set the roof dash lines color to black if texture is off and house part color is white
+- fix problem with selecting the wrong convex poly by not allowing same point twice in the poly
+- remove convex poly points that lay on a same line
+
+- *cache convex polygon points to aviod generating it a second time for dash line in Roof class
+
 
 - *fix problem with invisible walls
 

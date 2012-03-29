@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.MeshLib;
@@ -131,15 +133,15 @@ public abstract class Roof extends HousePart {
 				ms.setColorMaterial(ColorMaterial.Diffuse);
 				mesh.setRenderState(ms);
 				mesh.getMeshData().updateVertexCount();
-//				mesh.updateModelBound();
-//				mesh.updateGeometricState(0);
+				// mesh.updateModelBound();
+				// mesh.updateGeometricState(0);
 				CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 			}
 			roofPartIndex++;
 		}
 		drawWireframe();
-//		root.updateGeometricState(0);
-//		CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
+		// root.updateGeometricState(0);
+		// CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
 		drawDashLines();
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 	}
@@ -155,39 +157,57 @@ public abstract class Roof extends HousePart {
 	}
 
 	private void drawDashLines() {
-		if (container != null)
-			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-				if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
-					final Node roofPartNode = (Node) roofPart;
-					final Mesh dashLineMesh = (Mesh) roofPartNode.getChild(5);
-					final ArrayList<ReadOnlyVector3> result = new ArrayList<ReadOnlyVector3>();
-					((Wall) container).visitNeighbors(new WallVisitor() {
-						@Override
-						public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
-							stretchToRoof(result, (Mesh) roofPartNode.getChild(0), currentWall.getAbsPoint(0), currentWall.getAbsPoint(2));
+		if (container == null)
+			return;
+
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+						final Node roofPartNode = (Node) roofPart;
+						final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
+						final ArrayList<ReadOnlyVector3> result = new ArrayList<ReadOnlyVector3>();
+						((Wall) container).visitNeighbors(new WallVisitor() {
+							@Override
+							public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
+								stretchToRoof(result, (Mesh) roofPartNode.getChild(0), currentWall.getAbsPoint(0), currentWall.getAbsPoint(2));
+							}
+						});
+						if (result.isEmpty()) {
+							dashLinesMesh.setVisible(false);
+							return null;
+						} else
+							dashLinesMesh.setVisible(true);
+						FloatBuffer vertexBuffer = dashLinesMesh.getMeshData().getVertexBuffer();
+						if (vertexBuffer == null || vertexBuffer.capacity() < result.size() * 3) {
+							vertexBuffer = BufferUtils.createVector3Buffer(result.size());
+							dashLinesMesh.getMeshData().setVertexBuffer(vertexBuffer);
 						}
-					});
-					if (result.isEmpty()) {
-						dashLineMesh.setVisible(false);
-						return;
-					} else
-						dashLineMesh.setVisible(true);
-					FloatBuffer vertexBuffer = dashLineMesh.getMeshData().getVertexBuffer();
-					if (vertexBuffer == null || vertexBuffer.capacity() < result.size() * 3) {
-						vertexBuffer = BufferUtils.createVector3Buffer(result.size());
-						dashLineMesh.getMeshData().setVertexBuffer(vertexBuffer);
+						vertexBuffer.limit(result.size() * 3);
+						vertexBuffer.rewind();
+
+						for (final ReadOnlyVector3 p : result)
+							vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+
+						dashLinesMesh.getMeshData().updateVertexCount();
+						dashLinesMesh.updateModelBound();
 					}
-					vertexBuffer.limit(result.size() * 3);
-					vertexBuffer.rewind();
-
-					for (final ReadOnlyVector3 p : result)
-						vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-
-					dashLineMesh.getMeshData().updateVertexCount();
-					dashLineMesh.updateModelBound();
-//					dashLineMesh.updateGeometricState(0);
 				}
+				updateDashLinesColor();
+				return null;
 			}
+		});
+	}
+
+	public void updateDashLinesColor() {
+		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				final Node roofPartNode = (Node) roofPart;
+				final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
+				dashLinesMesh.setDefaultColor(!Scene.getInstance().isTextureEnabled() && HousePart.getDefaultColor().equals(ColorRGBA.WHITE) ? ColorRGBA.BLACK : ColorRGBA.WHITE);
+			}
+		}
 	}
 
 	private void stretchToRoof(final ArrayList<ReadOnlyVector3> result, final Mesh roof, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2) {

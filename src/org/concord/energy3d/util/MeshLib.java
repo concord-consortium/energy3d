@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -288,6 +289,9 @@ public class MeshLib {
 			// for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
 			for (int j = 0; j <= vertexBuffer.limit() / 3 - 1; j++) {
 				sj.set(vertexBuffer.get(j * 3), vertexBuffer.get(j * 3 + 1), vertexBuffer.get(j * 3 + 2));
+//				if (sj.equals(pointOnHull))
+				if (convexHull.contains(sj))
+					continue;
 				// check to see if sj is connected to pointOnHull
 				boolean isConnected = false;
 				int k = 0;
@@ -302,24 +306,38 @@ public class MeshLib {
 				}
 				if (!isConnected)
 					continue;
-				if (endpoint.getX() == Double.MAX_VALUE)
-					endpoint.set(sj);
-				else {
+				if (endpoint.getX() == Double.MAX_VALUE) {
+					if (convexHull.contains(sj))
+						continue;
+					else
+						endpoint.set(sj);
+				} else {
 					// if (S[j] is on left of line from P[i] to endpoint)
 					final double dot = normal.cross(endpoint.subtract(pointOnHull, null).normalizeLocal(), null).dot(sj.subtract(pointOnHull, null).normalizeLocal());
-					if (!sj.equals(pointOnHull) && dot > 0) {
+					if (dot > 0) {
 						endpoint.set(sj); // found greater left turn, update endpoint
-					} else if (!sj.equals(pointOnHull) && dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
+					} else if (dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
 						endpoint.set(sj); // found greater left turn, update endpoint
 				}
 			}
 			pointOnHull.set(endpoint);
-			if (convexHull.contains(pointOnHull))
+//			if (convexHull.contains(pointOnHull))
+			if (endpoint.getX() == Double.MAX_VALUE)
 				break;
 			else
 				convexHull.add(new Vector3(pointOnHull));
 		} while (!endpoint.equals(leftVertex));
-		convexHull.contains(endpoint);
+
+		final ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
+		for (int i = 1; i < convexHull.size() - 1; i++) {
+			final ReadOnlyVector3 p1 = convexHull.get(i - 1);
+			final ReadOnlyVector3 p2 = convexHull.get(i);
+			final ReadOnlyVector3 p3 = convexHull.get(i + 1);
+			if (p2.subtract(p1, null).normalizeLocal().dot(p3.subtract(p1, null).normalizeLocal()) > 1 - MathUtils.ZERO_TOLERANCE)
+				toBeRemoved.add(i);
+		}
+		for (final int i : toBeRemoved)
+			convexHull.remove(i);
 		return convexHull;
 	}
 }
