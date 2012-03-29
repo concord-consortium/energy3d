@@ -152,6 +152,17 @@ public class MeshLib {
 				Util.disablePickShadowLight(wireframeMesh);
 				node.attachChild(wireframeMesh);
 
+				final Line dashLineMesh = new Line("Roof (dash line)");
+				dashLineMesh.setStipplePattern((short)0xFF00);
+				dashLineMesh.setVisible(false);
+				// ((Line)wireframeMesh).setLineWidth(5);
+//				dashLineMesh.set
+//				dashLineMesh.setDefaultColor(ColorRGBA.WHITE);
+				dashLineMesh.setModelBound(new BoundingBox());
+//				dashLineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+				Util.disablePickShadowLight(dashLineMesh);
+				node.attachChild(dashLineMesh);
+
 				// if (root.getNumberOfChildren() != 0)
 				// newMesh.getSceneHints().setCullHint(CullHint.Always);
 				root.attachChild(node);

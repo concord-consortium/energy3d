@@ -20,11 +20,16 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -125,10 +130,17 @@ public abstract class Roof extends HousePart {
 				final MaterialState ms = new MaterialState();
 				ms.setColorMaterial(ColorMaterial.Diffuse);
 				mesh.setRenderState(ms);
+				mesh.getMeshData().updateVertexCount();
+//				mesh.updateModelBound();
+//				mesh.updateGeometricState(0);
+				CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 			}
 			roofPartIndex++;
 		}
 		drawWireframe();
+//		root.updateGeometricState(0);
+//		CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
+		drawDashLines();
 		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
 	}
 
@@ -140,6 +152,90 @@ public abstract class Roof extends HousePart {
 					currentWall.draw();
 				}
 			});
+	}
+
+	private void drawDashLines() {
+		if (container != null)
+			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+				if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+					final Node roofPartNode = (Node) roofPart;
+					final Mesh dashLineMesh = (Mesh) roofPartNode.getChild(5);
+					final ArrayList<ReadOnlyVector3> result = new ArrayList<ReadOnlyVector3>();
+					((Wall) container).visitNeighbors(new WallVisitor() {
+						@Override
+						public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
+							stretchToRoof(result, (Mesh) roofPartNode.getChild(0), currentWall.getAbsPoint(0), currentWall.getAbsPoint(2));
+						}
+					});
+					if (result.isEmpty()) {
+						dashLineMesh.setVisible(false);
+						return;
+					} else
+						dashLineMesh.setVisible(true);
+					FloatBuffer vertexBuffer = dashLineMesh.getMeshData().getVertexBuffer();
+					if (vertexBuffer == null || vertexBuffer.capacity() < result.size() * 3) {
+						vertexBuffer = BufferUtils.createVector3Buffer(result.size());
+						dashLineMesh.getMeshData().setVertexBuffer(vertexBuffer);
+					}
+					vertexBuffer.limit(result.size() * 3);
+					vertexBuffer.rewind();
+
+					for (final ReadOnlyVector3 p : result)
+						vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+
+					dashLineMesh.getMeshData().updateVertexCount();
+					dashLineMesh.updateModelBound();
+//					dashLineMesh.updateGeometricState(0);
+				}
+			}
+	}
+
+	private void stretchToRoof(final ArrayList<ReadOnlyVector3> result, final Mesh roof, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2) {
+		final Vector3 dir = p2.subtract(p1, null).multiplyLocal(1, 1, 0);
+		final double length = dir.length();
+		dir.normalizeLocal();
+
+		Vector3 direction = null;
+		ReadOnlyVector3 previousStretchPoint = null;
+		boolean firstInsert = false;
+
+		final double step = 0.01;
+		for (double d = length; d > step; d -= step) {
+			final Vector3 p = dir.multiply(d, null).addLocal(p1);
+			final ReadOnlyVector3 currentStretchPoint = findRoofIntersection(roof, p);
+
+			if (currentStretchPoint != null && !firstInsert) {
+				result.add(currentStretchPoint);
+				firstInsert = true;
+			} else if (currentStretchPoint == null) {
+				if (previousStretchPoint != null)
+					result.add(previousStretchPoint);
+				direction = null;
+				firstInsert = false;
+			} else {
+				final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();
+				if (direction == null) {
+					direction = currentDirection;
+				} else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE) {
+					direction = null;
+					result.add(currentStretchPoint);
+				}
+			}
+			previousStretchPoint = currentStretchPoint;
+		}
+
+		if (previousStretchPoint != null)
+			result.add(previousStretchPoint);
+	}
+
+	public ReadOnlyVector3 findRoofIntersection(final Mesh roofPart, final ReadOnlyVector3 p) {
+		final double offset = 0.001;
+		final PickResults pickResults = new PrimitivePickResults();
+		PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults);
+		if (pickResults.getNumber() > 0) {
+			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(0, 0, offset, null);
+		} else
+			return null;
 	}
 
 	protected void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon) {
@@ -296,10 +392,10 @@ public abstract class Roof extends HousePart {
 				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(buf);
 
 				final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
-				final int n = convexHull.size() - 1;
+				final int n = convexHull.size();
 				for (int i = 0; i < n; i++) {
 					final ReadOnlyVector3 p1 = convexHull.get(i);
-					final ReadOnlyVector3 p2 = convexHull.get(i + 1);
+					final ReadOnlyVector3 p2 = convexHull.get((i + 1) % n);
 					final ReadOnlyVector3 p3 = convexHull.get((i + 2) % n);
 
 					// Size annotation
@@ -622,8 +718,8 @@ public abstract class Roof extends HousePart {
 				final Mesh mesh = (Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(0);
 				mesh.setUserData(new UserData(this, orgUserData.getIndex(), false));
 				roofPartsRoot.getChild(i).setUserData(originalRoof.roofPartsRoot.getChild(i).getUserData());
-				final Mesh wireframeMesh = (Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(4);
-				((Line) wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
+				final Line wireframeMesh = (Line) ((Node) roofPartsRoot.getChild(i)).getChild(4);
+				wireframeMesh.setLineWidth(WIREFRAME_THICKNESS);
 				mesh.getSceneHints().setCullHint((!Scene.getInstance().isTextureEnabled() && defaultColor.equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
 			}
 		}

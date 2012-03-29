@@ -507,19 +507,19 @@ public class Wall extends HousePart {
 		return gablePoints;
 	}
 
-	public double findRoofIntersection(final ReadOnlyVector3 v) {
-		return findRoofIntersection(v, Vector3.UNIT_Z, -0.02).getZ();
+	public double findRoofIntersection(final ReadOnlyVector3 p) {
+		return findRoofIntersection(p, Vector3.UNIT_Z, -0.02).getZ();
 	}
 
-	public ReadOnlyVector3 findRoofIntersection(final ReadOnlyVector3 v, final ReadOnlyVector3 direction, final double offset) {
+	public ReadOnlyVector3 findRoofIntersection(final ReadOnlyVector3 p, final ReadOnlyVector3 direction, final double offset) {
 		if (roof == null)
-			return v;
+			return p;
 		final PickResults pickResults = new PrimitivePickResults();
-		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(v.getX(), v.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : v.getZ()), direction), pickResults);
+		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ()), direction), pickResults);
 		if (pickResults.getNumber() > 0) {
 			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(Roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
 		} else
-			return v;
+			return p;
 	}
 
 	public boolean isPerpendicularToNeighbor(final int neighbor) {

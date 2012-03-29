@@ -418,7 +418,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, false);
 
-		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
+//		 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
 
 		passManager.renderPasses(renderer);
 		try {

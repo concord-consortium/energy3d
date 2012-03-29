@@ -1016,6 +1016,10 @@ Version 0.5 - October 20, 2011
 - remove door and window if the width or the height is zero
 - release version 0.6.5
 
+- draw dashed lines on each roof part based on intersection of each roof part with all underlying walls
+- adjust roof draw annotation to account for convex polygon that doesn't end with 1st vertex
+
+
 - *fix problem with invisible walls
 
 - *add rotate camera option
