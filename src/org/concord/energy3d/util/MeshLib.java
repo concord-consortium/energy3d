@@ -58,11 +58,27 @@ public class MeshLib {
 			GroupData group = null;
 			for (final GroupData g : groups) {
 				if (g.key.dot(norm) > 0.99) { // if there is less than 8 degrees difference between the two vectors
-					for (final Vector3 groupPoint : g.vertices)
-						if (groupPoint.equals(p1) || groupPoint.equals(p2) || groupPoint.equals(p3)) {
-							group = g;
-							break;
+//					for (final Vector3 groupPoint : g.vertices)
+//						if (groupPoint.equals(p1) || groupPoint.equals(p2) || groupPoint.equals(p3)) {
+//							group = g;
+//							break;
+//						}
+					// if there is an edge in common with the existing triangles
+					boolean foundEdgeInCommon = false;
+					for (int j = 0; j < g.vertices.size() && !foundEdgeInCommon; j += 3) {
+						int numOfShared = 0;
+						for (int k = 0; k < 3; k++) {
+							final Vector3 p = g.vertices.get(j+k);
+							if (p.equals(p1) || p.equals(p2) || p.equals(p3))
+								numOfShared++;
 						}
+						if (numOfShared > 1)
+							foundEdgeInCommon = true;
+					}
+					if (foundEdgeInCommon) {
+						group = g;
+						break;
+					}
 				}
 			}
 

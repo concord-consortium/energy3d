@@ -1021,6 +1021,7 @@ Version 0.5 - October 20, 2011
 - set the roof dash lines color to black if texture is off and house part color is white
 - fix problem with selecting the wrong convex poly by not allowing same point twice in the poly
 - remove convex poly points that lay on a same line
+- disallow roof parts that are connected only at one point because the convex polygon algorithm doesn't allow repeating vertices
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class
 
