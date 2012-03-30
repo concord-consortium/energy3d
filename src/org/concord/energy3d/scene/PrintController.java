@@ -109,8 +109,8 @@ public class PrintController implements Updater {
 						((Wall) part).setBackMeshesVisible(true);
 
 				for (final HousePart part : printParts) {
-						part.hideLabels();
-						part.getOriginal().hideLabels();
+					part.hideLabels();
+					part.getOriginal().hideLabels();
 				}
 			} else {
 				printParts = (ArrayList<HousePart>) ObjectCloner.deepCopy(Scene.getInstance().getParts());
@@ -190,17 +190,18 @@ public class PrintController implements Updater {
 				for (final HousePart part : printParts)
 					if (part instanceof Wall)
 						((Wall) part).setBackMeshesVisible(false);
-
-				int printSequence = 0;;
-				for (final HousePart part : printParts) {
-					part.getOriginal().drawLabels(printSequence);
-					printSequence = part.drawLabels(printSequence);
-				}
-				SceneManager.getInstance().update();
 			}
 
 			if (isPrintPreview || doTheEndAnimation) {
 				originalHouseRoot.getSceneHints().setCullHint(CullHint.Inherit);
+				if (isPrintPreview) {
+					int printSequence = 0;
+					for (final HousePart part : printParts) {
+						part.getOriginal().drawLabels(printSequence);
+						printSequence = part.drawLabels(printSequence);
+					}
+					SceneManager.getInstance().update();
+				}
 				setFinished(true);
 			}
 		}
@@ -233,7 +234,7 @@ public class PrintController implements Updater {
 				final int resolutionHeight = 2;
 				final Dimension newSize;
 				if (Config.isMac())
-					newSize = new Dimension((int)(canvas.getHeight() * pageWidth / pageHeight), canvas.getHeight());
+					newSize = new Dimension((int) (canvas.getHeight() * pageWidth / pageHeight), canvas.getHeight());
 				else
 					newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
 				canvas.setSize(newSize);
@@ -445,7 +446,7 @@ public class PrintController implements Updater {
 			pagesRoot.attachChild(box);
 
 			final BMText footNote = Annotation.makeNewLabel();
-			final String url = Scene.getURL() != null ? Scene.getURL().getFile().substring( Scene.getURL().getFile().lastIndexOf('/')+1, Scene.getURL().getFile().length()) + " -" : "";
+			final String url = Scene.getURL() != null ? Scene.getURL().getFile().substring(Scene.getURL().getFile().lastIndexOf('/') + 1, Scene.getURL().getFile().length()) + " -" : "";
 			footNote.setText(url.replaceAll("%20", " ") + " Page " + printCenters.size() + " / " + pages.size() + " - http://energy.concord.org/");
 			footNote.setFontScale(0.05);
 			footNote.setAlign(Align.North);
