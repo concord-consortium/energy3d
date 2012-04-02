@@ -346,7 +346,10 @@ public class Wall extends HousePart {
 		Poly2Tri.triangulate(polygon);
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
-		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, o, u, v);
+		final double scale = 0.2;
+		final double scale2 = 0.6;
+		u.set(u.getX() * scale2, u.getY() * scale2, u.getZ() * scale2);
+		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale, o, u, v);
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
 
@@ -1011,7 +1014,7 @@ public class Wall extends HousePart {
 
 	@Override
 	protected String getDefaultTextureFileName() {
-		return "wall.jpg";
+		return "wall.png";
 	}
 
 	public boolean isVisited() {

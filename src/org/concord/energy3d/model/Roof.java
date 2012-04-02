@@ -205,7 +205,8 @@ public abstract class Roof extends HousePart {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Node roofPartNode = (Node) roofPart;
 				final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
-				dashLinesMesh.setDefaultColor(!Scene.getInstance().isTextureEnabled() && HousePart.getDefaultColor().equals(ColorRGBA.WHITE) ? ColorRGBA.BLACK : ColorRGBA.WHITE);
+//				dashLinesMesh.setDefaultColor(!Scene.getInstance().isTextureEnabled() && HousePart.getDefaultColor().equals(ColorRGBA.WHITE) ? ColorRGBA.BLACK : ColorRGBA.WHITE);
+				dashLinesMesh.setDefaultColor(ColorRGBA.RED);
 			}
 		}
 	}
@@ -520,7 +521,7 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	protected String getDefaultTextureFileName() {
-		return "roof.jpg";
+		return "roof.png";
 	}
 
 	protected void processRoofPoints(final ArrayList<PolygonPoint> wallUpperPoints, final ArrayList<ReadOnlyVector3> wallNormals) {

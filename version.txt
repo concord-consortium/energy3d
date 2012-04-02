@@ -1023,6 +1023,7 @@ Version 0.5 - October 20, 2011
 - remove convex poly points that lay on a same line
 - disallow roof parts that are connected only at one point because the convex polygon algorithm doesn't allow repeating vertices
 - fix problem with invisible roof labels due to ardor3d cull changes
+- create and apply new textures with black lines only
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class
 

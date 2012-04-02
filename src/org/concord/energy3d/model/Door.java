@@ -46,7 +46,7 @@ public class Door extends HousePart {
 
 		// Add a texture to the box.
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("door.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		ts.setTexture(TextureManager.load(getDefaultTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		mesh.setRenderState(ts);
 
 		mesh.setModelBound(new BoundingBox());
@@ -133,7 +133,7 @@ public class Door extends HousePart {
 
 	@Override
 	protected String getDefaultTextureFileName() {
-		return "door.jpg";
+		return "door.png";
 	}
 
 	@Override

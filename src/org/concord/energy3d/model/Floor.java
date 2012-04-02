@@ -97,7 +97,8 @@ public class Floor extends HousePart {
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1, new TPoint(0, 0, 0), new TPoint(1, 0, 0), new TPoint(0, 1, 0));
+		final double scale = 0.1;
+		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale , new TPoint(0, 0, 0), new TPoint(1, 0, 0), new TPoint(0, 1, 0));
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
 		root.updateWorldBound(true);
@@ -189,7 +190,7 @@ public class Floor extends HousePart {
 
 	@Override
 	protected String getDefaultTextureFileName() {
-		return "floor.jpg";
+		return "floor.png";
 	}
 
 	@Override

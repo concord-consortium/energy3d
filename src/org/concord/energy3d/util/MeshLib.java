@@ -119,13 +119,14 @@ public class MeshLib {
 
 			final Matrix3 matrix = new Matrix3().fromAngles(angleX, 0, 0).multiplyLocal(matrixZ);
 
+			final double scale = 5;
 			double minV = Double.MAX_VALUE;
 
 			for (int i = 0; i < group.vertices.size(); i++) {
 				final Vector3 p = group.vertices.get(i).clone();
 				matrix.applyPost(p, p);
-				final double v = p.getZ();
-				final double u = p.getX();
+				final double v = p.getZ() * scale;
+				final double u = p.getX() * scale;
 				group.textures.get(i).set(u, v);
 				if (minV > v)
 					minV = v;
