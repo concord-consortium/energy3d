@@ -3,6 +3,9 @@ package org.concord.energy3d.util;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
+
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
@@ -119,7 +122,7 @@ public class MeshLib {
 
 			final Matrix3 matrix = new Matrix3().fromAngles(angleX, 0, 0).multiplyLocal(matrixZ);
 
-			final double scale = 5;
+			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 5.0 : 1.0;
 			double minV = Double.MAX_VALUE;
 
 			for (int i = 0; i < group.vertices.size(); i++) {

@@ -43,13 +43,15 @@ public class Scene implements Serializable {
 		}
 	};
 
+	public static enum TextureMode {None, Simple, Full};
+
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
 	private static final Node originalHouseRoot = new Node("Original House Root");
 	private static Scene instance;
 	private static URL url = null;
 	private static boolean redrawAll = false;
-	private static boolean isTextureEnabled = true;
+	private static TextureMode textureMode = TextureMode.Full;
 	private static boolean drawThickness = false;
 	private static boolean drawAnnotationsInside = false;
 	private static Unit unit = Unit.Centimeter;
@@ -288,17 +290,17 @@ public class Scene implements Serializable {
 
 	}
 
-	public void setTextureEnabled(final boolean enabled) {
-		isTextureEnabled = enabled;
+	public void setTextureMode(final TextureMode textureMode) {
+		Scene.textureMode = textureMode;
 		for (final HousePart part : parts)
-			part.updateTextureAndColor(enabled);
+			part.updateTextureAndColor();
 		if (PrintController.getInstance().getPrintParts() != null)
 			for (final HousePart part : PrintController.getInstance().getPrintParts())
-				part.updateTextureAndColor(enabled);
+				part.updateTextureAndColor();
 
 		Scene.getInstance().updateRoofDashLinesColor();
 
-		if (enabled)
+		if (textureMode != TextureMode.None)
 			redrawAll = true;
 	}
 
@@ -366,8 +368,8 @@ public class Scene implements Serializable {
 		return annotationScale;
 	}
 
-	public boolean isTextureEnabled() {
-		return isTextureEnabled;
+	public TextureMode getTextureMode() {
+		return textureMode;
 	}
 
 	public void updateTextSizes() {

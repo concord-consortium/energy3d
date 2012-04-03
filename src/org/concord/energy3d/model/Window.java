@@ -280,7 +280,7 @@ public class Window extends HousePart {
 	}
 
 	@Override
-	public void updateTextureAndColor(final boolean textureEnabled) {
+	public void updateTextureAndColor() {
 	}
 
 	public void hideBars() {

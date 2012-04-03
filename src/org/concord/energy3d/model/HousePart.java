@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -61,7 +62,6 @@ public abstract class HousePart implements Serializable {
 	protected transient Node angleAnnotRoot;
 	protected transient Mesh mesh;
 	protected transient Mesh gridsMesh;
-	protected transient String textureFileName;
 	protected transient boolean relativeToHorizontal;
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
@@ -157,9 +157,6 @@ public abstract class HousePart implements Serializable {
 		root.attachChild(angleAnnotRoot);
 		root.attachChild(labelsRoot);
 
-		if (textureFileName == null)
-			textureFileName = getDefaultTextureFileName();
-
 		gridsMesh = new Line("Grids");
 		gridsMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
 		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
@@ -184,7 +181,7 @@ public abstract class HousePart implements Serializable {
 		return (Mesh) pointsRoot.getChild(i);
 	}
 
-	protected String getDefaultTextureFileName() {
+	protected String getTextureFileName() {
 		return null;
 	}
 
@@ -626,17 +623,17 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot.getSceneHints().setCullHint(cull);
 	}
 
-	public void updateTextureAndColor(final boolean textureEnabled) {
+	public void updateTextureAndColor() {
 		if (mesh == null)
 			return;
-		if (textureEnabled) {
-			final TextureState ts = new TextureState();
-			ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-			mesh.setRenderState(ts);
-			mesh.setDefaultColor(ColorRGBA.WHITE);
-		} else {
+		if (Scene.getInstance().getTextureMode() == TextureMode.None) {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(defaultColor);
+		} else {
+			final TextureState ts = new TextureState();
+			ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+			mesh.setRenderState(ts);
+			mesh.setDefaultColor(ColorRGBA.WHITE);
 		}
 	}
 

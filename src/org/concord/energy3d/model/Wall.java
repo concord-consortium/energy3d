@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -96,6 +97,12 @@ public class Wall extends HousePart {
 		offsetState.setUnits(1f);
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new OrientedBoundingBox());
+
+//		final BlendState blend = new BlendState();
+//		blend.setBlendEnabled(true);
+//		blend.setTestEnabled(true);
+//		mesh.setRenderState(blend);
+//		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		root.attachChild(mesh);
 
 		backMesh = new Mesh("Wall (Back)");
@@ -139,7 +146,7 @@ public class Wall extends HousePart {
 		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
 
-		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
+		updateTextureAndColor();
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -326,7 +333,6 @@ public class Wall extends HousePart {
 
 		toXY.transform(o);
 		toXY.transform(u);
-		toXY.transform(v);
 
 		if (Scene.getInstance().isDrawThickness() && isShortWall) {
 			final Vector3 dir = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
@@ -346,9 +352,9 @@ public class Wall extends HousePart {
 		Poly2Tri.triangulate(polygon);
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
-		final double scale = 0.2;
-		final double scale2 = 0.6;
-		u.set(u.getX() * scale2, u.getY() * scale2, u.getZ() * scale2);
+		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.1 : 1.0;
+//		final double scale2 = 1;
+//		u.set(u.getX() * scale2, u.getY() * scale2, u.getZ() * scale2);
 		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale, o, u, v);
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
@@ -1013,8 +1019,8 @@ public class Wall extends HousePart {
 	}
 
 	@Override
-	protected String getDefaultTextureFileName() {
-		return "wall.png";
+	protected String getTextureFileName() {
+		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "wall3.png" : "wall.jpg";
 	}
 
 	public boolean isVisited() {

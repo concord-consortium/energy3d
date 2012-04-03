@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -127,7 +128,7 @@ public abstract class Roof extends HousePart {
 			if (child.getSceneHints().getCullHint() != CullHint.Always) {
 				final Mesh mesh = (Mesh) ((Node) child).getChild(0);
 				mesh.setUserData(new UserData(this, roofPartIndex, false));
-				if (!Scene.getInstance().isTextureEnabled())
+				if (Scene.getInstance().getTextureMode() == TextureMode.None)
 					mesh.setDefaultColor(defaultColor);
 				final MaterialState ms = new MaterialState();
 				ms.setColorMaterial(ColorMaterial.Diffuse);
@@ -143,7 +144,7 @@ public abstract class Roof extends HousePart {
 		// root.updateGeometricState(0);
 		// CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
 		drawDashLines();
-		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
+		updateTextureAndColor();
 	}
 
 	protected void drawWalls() {
@@ -495,20 +496,19 @@ public abstract class Roof extends HousePart {
 	}
 
 	@Override
-	public void updateTextureAndColor(final boolean textureEnabled) {
+	public void updateTextureAndColor() {
 		if (roofPartsRoot != null) {
 			for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
 				if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
 					final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
-					if (textureEnabled) {
-						final TextureState ts = new TextureState();
-						ts.setTexture(TextureManager.load(textureFileName, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-						mesh.setRenderState(ts);
-						mesh.setDefaultColor(ColorRGBA.WHITE);
-
-					} else {
+					if (Scene.getInstance().getTextureMode() == TextureMode.None) {
 						mesh.clearRenderState(StateType.Texture);
 						mesh.setDefaultColor(defaultColor);
+					} else {
+						final TextureState ts = new TextureState();
+						ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+						mesh.setRenderState(ts);
+						mesh.setDefaultColor(ColorRGBA.WHITE);
 					}
 				}
 			}
@@ -520,8 +520,8 @@ public abstract class Roof extends HousePart {
 	}
 
 	@Override
-	protected String getDefaultTextureFileName() {
-		return "roof.png";
+	protected String getTextureFileName() {
+		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "roof.png" : "roof.jpg";
 	}
 
 	protected void processRoofPoints(final ArrayList<PolygonPoint> wallUpperPoints, final ArrayList<ReadOnlyVector3> wallNormals) {
@@ -741,7 +741,7 @@ public abstract class Roof extends HousePart {
 				roofPartsRoot.getChild(i).setUserData(originalRoof.roofPartsRoot.getChild(i).getUserData());
 				final Line wireframeMesh = (Line) ((Node) roofPartsRoot.getChild(i)).getChild(4);
 				wireframeMesh.setLineWidth(WIREFRAME_THICKNESS);
-				mesh.getSceneHints().setCullHint((!Scene.getInstance().isTextureEnabled() && defaultColor.equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
+				mesh.getSceneHints().setCullHint((Scene.getInstance().getTextureMode() == TextureMode.None && defaultColor.equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
 			}
 		}
 		drawAnnotations();

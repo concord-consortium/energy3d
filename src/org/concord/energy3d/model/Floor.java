@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.Util;
@@ -60,7 +61,7 @@ public class Floor extends HousePart {
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
 
-		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
+		updateTextureAndColor();
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -97,7 +98,7 @@ public class Floor extends HousePart {
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-		final double scale = 0.1;
+		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.1 : 1.0;
 		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale , new TPoint(0, 0, 0), new TPoint(1, 0, 0), new TPoint(0, 1, 0));
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
@@ -189,8 +190,8 @@ public class Floor extends HousePart {
 	}
 
 	@Override
-	protected String getDefaultTextureFileName() {
-		return "floor.png";
+	protected String getTextureFileName() {
+		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "floor.png" : "floor.jpg";
 	}
 
 	@Override

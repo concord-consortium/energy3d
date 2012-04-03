@@ -6,6 +6,7 @@ import javax.swing.UIManager;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
 
@@ -38,7 +39,12 @@ public class MainApplet extends JApplet {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		Scene.getInstance().setTextureEnabled(!"false".equalsIgnoreCase(getParameter("texture")));
+		if ("none".equalsIgnoreCase(getParameter("texture")))
+			Scene.getInstance().setTextureMode(TextureMode.None);
+		else if ("simple".equalsIgnoreCase(getParameter("texture")))
+			Scene.getInstance().setTextureMode(TextureMode.Simple);
+		else
+			Scene.getInstance().setTextureMode(TextureMode.Full);
 	}
 
 	private MainPanel getMainPanel() {

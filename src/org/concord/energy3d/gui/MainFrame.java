@@ -44,6 +44,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.Scene.Unit;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
@@ -80,7 +81,6 @@ public class MainFrame extends JFrame {
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JMenuItem scaleMenuItem;
 	private JCheckBoxMenuItem shadowMenu;
-	private JCheckBoxMenuItem textureCheckBoxMenuItem;
 	protected Object lastSelection;
 	private JMenuItem colorMenuItem = null;
 	private JCheckBoxMenuItem shadeMenu = null;
@@ -113,6 +113,10 @@ public class MainFrame extends JFrame {
 	private JSeparator separator_8;
 	private JMenuItem roofOverhangLengthMenuItem;
 	private JSeparator separator_9;
+	private JRadioButtonMenuItem noTextureRadioButtonMenuItem;
+	private JRadioButtonMenuItem simpleTextureRadioButtonMenuItem;
+	private JRadioButtonMenuItem fullTextureRadioButtonMenuItem;
+	private final ButtonGroup buttonGroup_2 = new ButtonGroup();
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -562,14 +566,17 @@ public class MainFrame extends JFrame {
 							final float[] newColor = c.getComponents(null);
 							final boolean restartPrintPreview = HousePart.getDefaultColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 							HousePart.setDefaultColor(new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]));
-							Scene.getInstance().setTextureEnabled(getTextureCheckBoxMenuItem().isSelected());
+							Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 
 							if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
 								PrintController.getInstance().restartAnimation();
 
 						}
 					};
-					textureCheckBoxMenuItem.setSelected(false);
+					if (fullTextureRadioButtonMenuItem.isSelected()) {
+						noTextureRadioButtonMenuItem.setSelected(true);
+						Scene.getInstance().setTextureMode(TextureMode.None);
+					}
 					final JDialog colorDialog = JColorChooser.createDialog(MainFrame.this, "Select House Color", true, colorChooser, actionListener, null);
 					colorDialog.setVisible(true);
 				}
@@ -740,7 +747,9 @@ public class MainFrame extends JFrame {
 			sceneMenu.add(getShadeMenu());
 			sceneMenu.add(getShadowMenu());
 			sceneMenu.add(getSeparator_5());
-			sceneMenu.add(getTextureCheckBoxMenuItem());
+			sceneMenu.add(getNoTextureRadioButtonMenuItem());
+			sceneMenu.add(getSimpleTextureRadioButtonMenuItem());
+			sceneMenu.add(getFullTextureRadioButtonMenuItem());
 			sceneMenu.add(getColorMenuItem());
 			sceneMenu.add(getSeparator_6());
 			sceneMenu.add(getWallThicknessMenuItem());
@@ -828,19 +837,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return scaleMenuItem;
-	}
-
-	private JCheckBoxMenuItem getTextureCheckBoxMenuItem() {
-		if (textureCheckBoxMenuItem == null) {
-			textureCheckBoxMenuItem = new JCheckBoxMenuItem("Texture", true);
-			textureCheckBoxMenuItem.addItemListener(new java.awt.event.ItemListener() {
-				@Override
-				public void itemStateChanged(final java.awt.event.ItemEvent e) {
-					Scene.getInstance().setTextureEnabled(textureCheckBoxMenuItem.isSelected());
-				}
-			});
-		}
-		return textureCheckBoxMenuItem;
 	}
 
 	private JCheckBoxMenuItem getAnnotationsInward() {
@@ -1148,5 +1144,45 @@ public class MainFrame extends JFrame {
 			separator_9 = new JSeparator();
 		}
 		return separator_9;
+	}
+	private JRadioButtonMenuItem getNoTextureRadioButtonMenuItem() {
+		if (noTextureRadioButtonMenuItem == null) {
+			noTextureRadioButtonMenuItem = new JRadioButtonMenuItem("No Texture");
+			noTextureRadioButtonMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().setTextureMode(TextureMode.None);
+				}
+			});
+			buttonGroup_2.add(noTextureRadioButtonMenuItem);
+		}
+		return noTextureRadioButtonMenuItem;
+	}
+	private JRadioButtonMenuItem getSimpleTextureRadioButtonMenuItem() {
+		if (simpleTextureRadioButtonMenuItem == null) {
+			simpleTextureRadioButtonMenuItem = new JRadioButtonMenuItem("Simple Texture");
+			simpleTextureRadioButtonMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().setTextureMode(TextureMode.Simple);
+				}
+			});
+			buttonGroup_2.add(simpleTextureRadioButtonMenuItem);
+		}
+		return simpleTextureRadioButtonMenuItem;
+	}
+	private JRadioButtonMenuItem getFullTextureRadioButtonMenuItem() {
+		if (fullTextureRadioButtonMenuItem == null) {
+			fullTextureRadioButtonMenuItem = new JRadioButtonMenuItem("Full Texture");
+			fullTextureRadioButtonMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().setTextureMode(TextureMode.Full);
+				}
+			});
+			fullTextureRadioButtonMenuItem.setSelected(true);
+			buttonGroup_2.add(fullTextureRadioButtonMenuItem);
+		}
+		return fullTextureRadioButtonMenuItem;
 	}
 }

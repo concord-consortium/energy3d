@@ -63,7 +63,7 @@ public class Foundation extends HousePart {
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
 		mesh.setModelBound(new BoundingBox());
-		updateTextureAndColor(Scene.getInstance().isTextureEnabled());
+		updateTextureAndColor();
 		root.attachChild(mesh);
 
 		boundingMesh = new Line("Foundation (Bounding)");
@@ -391,7 +391,7 @@ public class Foundation extends HousePart {
 	}
 
 	@Override
-	protected String getDefaultTextureFileName() {
+	protected String getTextureFileName() {
 		return "foundation.jpg";
 	}
 
