@@ -33,6 +33,7 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
@@ -49,6 +50,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private static final double MIN_WALL_LENGTH = 0.01;
 	private static double defaultWallHeight = 2.0; // the recommended default wall height is 20cm
 	private static int currentVisitStamp = 1;
@@ -64,6 +66,14 @@ public class Wall extends HousePart {
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
+
+	public static ReadOnlyColorRGBA getDefaultColor() {
+		return defaultColor;
+	}
+
+	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
+		defaultColor = color;
+	}
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -1139,5 +1149,10 @@ public class Wall extends HousePart {
 		backMesh.setVisible(visible);
 		surroundMesh.setVisible(visible);
 		windowsSurroundMesh.setVisible(visible);
+	}
+
+	@Override
+	public void updateTextureAndColor() {
+		updateTextureAndColor(mesh, getDefaultColor());
 	}
 }

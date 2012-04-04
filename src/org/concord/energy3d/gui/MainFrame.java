@@ -40,8 +40,12 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -82,7 +86,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem scaleMenuItem;
 	private JCheckBoxMenuItem shadowMenu;
 	protected Object lastSelection;
-	private JMenuItem colorMenuItem = null;
 	private JCheckBoxMenuItem shadeMenu = null;
 	private JMenuItem exitMenuItem = null;
 	private JMenu helpMenu = null;
@@ -117,6 +120,12 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem simpleTextureRadioButtonMenuItem;
 	private JRadioButtonMenuItem fullTextureRadioButtonMenuItem;
 	private final ButtonGroup buttonGroup_2 = new ButtonGroup();
+	private JMenu colorMenu;
+	private JMenuItem platformColorMenuItem;
+	private JMenuItem wallColorMenuItem;
+	private JMenuItem doorColorMenuItem;
+	private JMenuItem floorColorMenuItem;
+	private JMenuItem roofColorMenuItem;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -208,8 +217,8 @@ public class MainFrame extends JFrame {
 			e.printStackTrace();
 		}
 		colorChooser = new JColorChooser();
-		final ReadOnlyColorRGBA defaultColor = HousePart.getDefaultColor();
-		colorChooser.setColor(new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue()));
+//		final ReadOnlyColorRGBA defaultColor = HousePart.getDefaultColor();
+//		colorChooser.setColor(new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue()));
 		initialize();
 		updateTitleBar();
 		System.out.println("done");
@@ -548,44 +557,6 @@ public class MainFrame extends JFrame {
 	}
 
 	/**
-	 * This method initializes colorMenuItem
-	 *
-	 * @return javax.swing.JMenuItem
-	 */
-	private JMenuItem getColorMenuItem() {
-		if (colorMenuItem == null) {
-			colorMenuItem = new JMenuItem();
-			colorMenuItem.setText("House Color...");
-			colorMenuItem.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					final ActionListener actionListener = new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent e) {
-							final Color c = colorChooser.getColor();
-							final float[] newColor = c.getComponents(null);
-							final boolean restartPrintPreview = HousePart.getDefaultColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
-							HousePart.setDefaultColor(new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]));
-							Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
-
-							if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
-								PrintController.getInstance().restartAnimation();
-
-						}
-					};
-					if (fullTextureRadioButtonMenuItem.isSelected()) {
-						noTextureRadioButtonMenuItem.setSelected(true);
-						Scene.getInstance().setTextureMode(TextureMode.None);
-					}
-					final JDialog colorDialog = JColorChooser.createDialog(MainFrame.this, "Select House Color", true, colorChooser, actionListener, null);
-					colorDialog.setVisible(true);
-				}
-			});
-		}
-		return colorMenuItem;
-	}
-
-	/**
 	 * This method initializes lightingMenu
 	 *
 	 * @return javax.swing.JCheckBoxMenuItem
@@ -750,7 +721,7 @@ public class MainFrame extends JFrame {
 			sceneMenu.add(getNoTextureRadioButtonMenuItem());
 			sceneMenu.add(getSimpleTextureRadioButtonMenuItem());
 			sceneMenu.add(getFullTextureRadioButtonMenuItem());
-			sceneMenu.add(getColorMenuItem());
+			sceneMenu.add(getColorMenu());
 			sceneMenu.add(getSeparator_6());
 			sceneMenu.add(getWallThicknessMenuItem());
 			sceneMenu.add(getAnnotationsInward());
@@ -1184,5 +1155,139 @@ public class MainFrame extends JFrame {
 			buttonGroup_2.add(fullTextureRadioButtonMenuItem);
 		}
 		return fullTextureRadioButtonMenuItem;
+	}
+	private JMenu getColorMenu() {
+		if (colorMenu == null) {
+			colorMenu = new JMenu("Color");
+			colorMenu.add(getRoofColorMenuItem());
+			colorMenu.add(getFloorColorMenuItem());
+			colorMenu.add(getDoorColorMenuItem());
+			colorMenu.add(getWallColorMenuItem());
+			colorMenu.add(getPlatformColorMenuItem());
+		}
+		return colorMenu;
+	}
+	private JMenuItem getPlatformColorMenuItem() {
+		if (platformColorMenuItem == null) {
+			platformColorMenuItem = new JMenuItem("Platform Color...");
+			platformColorMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					showColorDialogForHousePart(Operation.DRAW_FOUNDATION);
+				}
+			});
+		}
+		return platformColorMenuItem;
+	}
+	private JMenuItem getWallColorMenuItem() {
+		if (wallColorMenuItem == null) {
+			wallColorMenuItem = new JMenuItem("Wall Color...");
+			wallColorMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					showColorDialogForHousePart(Operation.DRAW_WALL);
+				}
+			});
+		}
+		return wallColorMenuItem;
+	}
+	private JMenuItem getDoorColorMenuItem() {
+		if (doorColorMenuItem == null) {
+			doorColorMenuItem = new JMenuItem("Door Color...");
+			doorColorMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					showColorDialogForHousePart(Operation.DRAW_DOOR);
+				}
+			});
+		}
+		return doorColorMenuItem;
+	}
+	private JMenuItem getFloorColorMenuItem() {
+		if (floorColorMenuItem == null) {
+			floorColorMenuItem = new JMenuItem("Floor Color...");
+			floorColorMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					showColorDialogForHousePart(Operation.DRAW_FLOOR);
+				}
+			});
+		}
+		return floorColorMenuItem;
+	}
+	private JMenuItem getRoofColorMenuItem() {
+		if (roofColorMenuItem == null) {
+			roofColorMenuItem = new JMenuItem("Roof Color...");
+			roofColorMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					showColorDialogForHousePart(Operation.DRAW_ROOF);
+				}
+			});
+		}
+		return roofColorMenuItem;
+	}
+
+	private void showColorDialogForHousePart(final Operation operation) {
+		final ActionListener actionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final Color c = colorChooser.getColor();
+				final float[] newColor = c.getComponents(null);
+				final boolean restartPrintPreview = Roof.getDefaultColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
+				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
+				switch (operation) {
+				case DRAW_FOUNDATION:
+					Foundation.setDefaultColor(color);
+					break;
+				case DRAW_WALL:
+					Wall.setDefaultColor(color);
+					break;
+				case DRAW_DOOR:
+					Door.setDefaultColor(color);
+					break;
+				case DRAW_FLOOR:
+					Floor.setDefaultColor(color);
+					break;
+				case DRAW_ROOF:
+					Roof.setDefaultColor(color);
+					break;
+				}
+//				HousePart.setDefaultColor(color);
+				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
+
+				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
+					PrintController.getInstance().restartAnimation();
+
+			}
+		};
+		if (fullTextureRadioButtonMenuItem.isSelected()) {
+			noTextureRadioButtonMenuItem.setSelected(true);
+			Scene.getInstance().setTextureMode(TextureMode.None);
+		}
+
+		final ReadOnlyColorRGBA color;
+		switch (operation) {
+		case DRAW_FOUNDATION:
+			color = Foundation.getDefaultColor();
+			break;
+		case DRAW_WALL:
+			color = Wall.getDefaultColor();
+			break;
+		case DRAW_DOOR:
+			color = Door.getDefaultColor();
+			break;
+		case DRAW_FLOOR:
+			color = Floor.getDefaultColor();
+			break;
+		case DRAW_ROOF:
+			color = Roof.getDefaultColor();
+			break;
+		default:
+			color = ColorRGBA.WHITE;
+		}
+		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+		final JDialog colorDialog = JColorChooser.createDialog(MainFrame.this, "Select House Color", true, colorChooser, actionListener, null);
+		colorDialog.setVisible(true);
 	}
 }

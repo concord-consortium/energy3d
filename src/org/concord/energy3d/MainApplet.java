@@ -4,7 +4,11 @@ import javax.swing.JApplet;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.gui.MainPanel;
-import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
+import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
@@ -33,12 +37,41 @@ public class MainApplet extends JApplet {
 		SceneManager.getInstance();
 
 		try {
-			final String color = getParameter("color");
+			final String color = getParameter("foundation-color");
 			if (color != null)
-				HousePart.setDefaultColor(ColorRGBA.parseColor(color, null));
+				Foundation.setDefaultColor(ColorRGBA.parseColor(color, null));
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
+		try {
+			final String color = getParameter("wall-color");
+			if (color != null)
+				Wall.setDefaultColor(ColorRGBA.parseColor(color, null));
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			final String color = getParameter("door-color");
+			if (color != null)
+				Door.setDefaultColor(ColorRGBA.parseColor(color, null));
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			final String color = getParameter("floor-color");
+			if (color != null)
+				Floor.setDefaultColor(ColorRGBA.parseColor(color, null));
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			final String color = getParameter("roof-color");
+			if (color != null)
+				Roof.setDefaultColor(ColorRGBA.parseColor(color, null));
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+
 		if ("none".equalsIgnoreCase(getParameter("texture")))
 			Scene.getInstance().setTextureMode(TextureMode.None);
 		else if ("simple".equalsIgnoreCase(getParameter("texture")))

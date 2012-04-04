@@ -46,7 +46,7 @@ public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
-	protected static ReadOnlyColorRGBA defaultColor = null; //ColorRGBA.GRAY;
+//	protected static ReadOnlyColorRGBA defaultColor = null; //ColorRGBA.GRAY;
 	protected static boolean drawAnnotations = Config.isApplet() ? false : true;
 //	protected static float WIREFRAME_THICKNESS = 2f;
 	protected static final float printWireframeThickness = 2f;
@@ -92,19 +92,19 @@ public abstract class HousePart implements Serializable {
 		HousePart.snapToGrids = snapToGrid;
 	}
 
-	public static ReadOnlyColorRGBA getDefaultColor() {
-		if (defaultColor != null)
-			return defaultColor;
-		else if (Scene.getInstance().getTextureMode() == TextureMode.None)
-			return ColorRGBA.GRAY;
-		else
-			return ColorRGBA.WHITE;
-	}
-
-	public static void setDefaultColor(final ReadOnlyColorRGBA defaultColor) {
-		HousePart.defaultColor = defaultColor;
-		Scene.getInstance().updateRoofDashLinesColor();
-	}
+//	public static ReadOnlyColorRGBA getDefaultColor() {
+//		if (defaultColor != null)
+//			return defaultColor;
+//		else if (Scene.getInstance().getTextureMode() == TextureMode.None)
+//			return ColorRGBA.GRAY;
+//		else
+//			return ColorRGBA.WHITE;
+//	}
+//
+//	public static void setDefaultColor(final ReadOnlyColorRGBA defaultColor) {
+//		HousePart.defaultColor = defaultColor;
+//		Scene.getInstance().updateRoofDashLinesColor();
+//	}
 
 	public static HousePart getGridsHighlightedHousePart() {
 		return gridsHighlightedHousePart;
@@ -628,7 +628,7 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot.getSceneHints().setCullHint(cull);
 	}
 
-	public void updateTextureAndColor() {
+	public abstract void updateTextureAndColor();
 //		if (mesh == null)
 //			return;
 //		if (Scene.getInstance().getTextureMode() == TextureMode.None) {
@@ -645,13 +645,13 @@ public abstract class HousePart implements Serializable {
 //			else
 //				mesh.setDefaultColor(defaultColor);
 //		}
-		updateTextureAndColor(mesh);
-	}
+//		updateTextureAndColor(mesh, defaultColor);
+//	}
 
-	protected void updateTextureAndColor(final Mesh mesh) {
-		if (Scene.getInstance().getTextureMode() == TextureMode.None) {
+	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor) {
+		if (Scene.getInstance().getTextureMode() == TextureMode.None || getTextureFileName() == null) {
 			mesh.clearRenderState(StateType.Texture);
-			mesh.setDefaultColor(getDefaultColor());
+			mesh.setDefaultColor(defaultColor);
 		} else {
 			final TextureState ts = new TextureState();
 			final Texture texture = TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
@@ -661,7 +661,7 @@ public abstract class HousePart implements Serializable {
 			if (Scene.getInstance().getTextureMode() == TextureMode.Full)
 				mesh.setDefaultColor(ColorRGBA.WHITE);
 			else
-				mesh.setDefaultColor(getDefaultColor());
+				mesh.setDefaultColor(defaultColor);
 		}
 	}
 

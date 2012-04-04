@@ -33,6 +33,7 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -48,6 +49,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private static double overhangLength = 0.2;
 	protected transient Node roofPartsRoot;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
@@ -59,6 +61,15 @@ public abstract class Roof extends HousePart {
 	private Map<Integer, ArrayList<Wall>> gableEditPointToWallMap = null;
 	private Map<Integer, ArrayList<Integer>> gableRoofPartToEditPointMap = null;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
+
+	public static ReadOnlyColorRGBA getDefaultColor() {
+		return defaultColor;
+	}
+
+	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
+		defaultColor = color;
+		Scene.getInstance().updateRoofDashLinesColor();
+	}
 
 	public static double getOverhangLength() {
 		return overhangLength;
@@ -201,7 +212,7 @@ public abstract class Roof extends HousePart {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Node roofPartNode = (Node) roofPart;
 				final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
-//				dashLinesMesh.setDefaultColor(!Scene.getInstance().isTextureEnabled() && HousePart.getDefaultColor().equals(ColorRGBA.WHITE) ? ColorRGBA.BLACK : ColorRGBA.WHITE);
+				// dashLinesMesh.setDefaultColor(!Scene.getInstance().isTextureEnabled() && HousePart.getDefaultColor().equals(ColorRGBA.WHITE) ? ColorRGBA.BLACK : ColorRGBA.WHITE);
 				dashLinesMesh.setDefaultColor(ColorRGBA.RED);
 			}
 		}
@@ -495,19 +506,19 @@ public abstract class Roof extends HousePart {
 		if (roofPartsRoot != null) {
 			for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
 				if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
-					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(0));
-//				{
-//					final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
-//					if (Scene.getInstance().getTextureMode() == TextureMode.None) {
-//						mesh.clearRenderState(StateType.Texture);
-//						mesh.setDefaultColor(defaultColor);
-//					} else {
-//						final TextureState ts = new TextureState();
-//						ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-//						mesh.setRenderState(ts);
-//						mesh.setDefaultColor(ColorRGBA.WHITE);
-//					}
-//				}
+					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(0), getDefaultColor());
+				// {
+				// final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
+				// if (Scene.getInstance().getTextureMode() == TextureMode.None) {
+				// mesh.clearRenderState(StateType.Texture);
+				// mesh.setDefaultColor(defaultColor);
+				// } else {
+				// final TextureState ts = new TextureState();
+				// ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+				// mesh.setRenderState(ts);
+				// mesh.setDefaultColor(ColorRGBA.WHITE);
+				// }
+				// }
 			}
 		}
 	}
@@ -737,7 +748,7 @@ public abstract class Roof extends HousePart {
 				mesh.setUserData(new UserData(this, orgUserData.getIndex(), false));
 				roofPartsRoot.getChild(i).setUserData(originalRoof.roofPartsRoot.getChild(i).getUserData());
 				final Line wireframeMesh = (Line) ((Node) roofPartsRoot.getChild(i)).getChild(4);
-//				wireframeMesh.setLineWidth(WIREFRAME_THICKNESS);
+				// wireframeMesh.setLineWidth(WIREFRAME_THICKNESS);
 				wireframeMesh.setLineWidth(printWireframeThickness);
 				mesh.getSceneHints().setCullHint((Scene.getInstance().getTextureMode() == TextureMode.None && getDefaultColor().equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
 			}

@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
@@ -12,6 +13,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -25,12 +27,21 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private transient Mesh boundingMesh;
 	private transient Mesh wireframeMesh;
 	private transient ArrayList<Vector3> orgPoints;
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient boolean resizeHouseMode = false;
+
+	public static ReadOnlyColorRGBA getDefaultColor() {
+		return defaultColor;
+	}
+
+	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
+		defaultColor = color;
+	}
 
 	public Foundation() {
 		super(2, 8, 0.1);
@@ -392,7 +403,7 @@ public class Foundation extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		return "foundation.jpg";
+		return Scene.getInstance().getTextureMode() == TextureMode.Full ? "foundation.jpg" : null;
 	}
 
 	@Override
@@ -408,5 +419,10 @@ public class Foundation extends HousePart {
 	@Override
 	public double getGridSize() {
 		return 0.2;
+	}
+
+	@Override
+	public void updateTextureAndColor() {
+		updateTextureAndColor(mesh, getDefaultColor());
 	}
 }
