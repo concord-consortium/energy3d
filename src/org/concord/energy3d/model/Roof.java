@@ -24,8 +24,6 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
-import com.ardor3d.image.Texture;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -38,8 +36,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -48,7 +44,6 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
-import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class Roof extends HousePart {
@@ -129,7 +124,7 @@ public abstract class Roof extends HousePart {
 				final Mesh mesh = (Mesh) ((Node) child).getChild(0);
 				mesh.setUserData(new UserData(this, roofPartIndex, false));
 				if (Scene.getInstance().getTextureMode() == TextureMode.None)
-					mesh.setDefaultColor(defaultColor);
+					mesh.setDefaultColor(getDefaultColor());
 				final MaterialState ms = new MaterialState();
 				ms.setColorMaterial(ColorMaterial.Diffuse);
 				mesh.setRenderState(ms);
@@ -499,18 +494,20 @@ public abstract class Roof extends HousePart {
 	public void updateTextureAndColor() {
 		if (roofPartsRoot != null) {
 			for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
-				if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
-					final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
-					if (Scene.getInstance().getTextureMode() == TextureMode.None) {
-						mesh.clearRenderState(StateType.Texture);
-						mesh.setDefaultColor(defaultColor);
-					} else {
-						final TextureState ts = new TextureState();
-						ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-						mesh.setRenderState(ts);
-						mesh.setDefaultColor(ColorRGBA.WHITE);
-					}
-				}
+				if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
+					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(0));
+//				{
+//					final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
+//					if (Scene.getInstance().getTextureMode() == TextureMode.None) {
+//						mesh.clearRenderState(StateType.Texture);
+//						mesh.setDefaultColor(defaultColor);
+//					} else {
+//						final TextureState ts = new TextureState();
+//						ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+//						mesh.setRenderState(ts);
+//						mesh.setDefaultColor(ColorRGBA.WHITE);
+//					}
+//				}
 			}
 		}
 	}
@@ -521,7 +518,7 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "roof.png" : "roof.jpg";
+		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "roof2.png" : "roof.jpg";
 	}
 
 	protected void processRoofPoints(final ArrayList<PolygonPoint> wallUpperPoints, final ArrayList<ReadOnlyVector3> wallNormals) {
@@ -740,8 +737,9 @@ public abstract class Roof extends HousePart {
 				mesh.setUserData(new UserData(this, orgUserData.getIndex(), false));
 				roofPartsRoot.getChild(i).setUserData(originalRoof.roofPartsRoot.getChild(i).getUserData());
 				final Line wireframeMesh = (Line) ((Node) roofPartsRoot.getChild(i)).getChild(4);
-				wireframeMesh.setLineWidth(WIREFRAME_THICKNESS);
-				mesh.getSceneHints().setCullHint((Scene.getInstance().getTextureMode() == TextureMode.None && defaultColor.equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
+//				wireframeMesh.setLineWidth(WIREFRAME_THICKNESS);
+				wireframeMesh.setLineWidth(printWireframeThickness);
+				mesh.getSceneHints().setCullHint((Scene.getInstance().getTextureMode() == TextureMode.None && getDefaultColor().equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
 			}
 		}
 		drawAnnotations();

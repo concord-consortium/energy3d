@@ -17,6 +17,7 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Texture.ApplyMode;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -45,9 +46,10 @@ public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
-	protected static ReadOnlyColorRGBA defaultColor = ColorRGBA.GRAY;
+	protected static ReadOnlyColorRGBA defaultColor = null; //ColorRGBA.GRAY;
 	protected static boolean drawAnnotations = Config.isApplet() ? false : true;
-	protected static float WIREFRAME_THICKNESS = 2f;
+//	protected static float WIREFRAME_THICKNESS = 2f;
+	protected static final float printWireframeThickness = 2f;
 	private static HousePart gridsHighlightedHousePart;
 	private static boolean snapToObjects = false;
 	private static boolean snapToGrids = true;
@@ -91,7 +93,12 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public static ReadOnlyColorRGBA getDefaultColor() {
-		return defaultColor;
+		if (defaultColor != null)
+			return defaultColor;
+		else if (Scene.getInstance().getTextureMode() == TextureMode.None)
+			return ColorRGBA.GRAY;
+		else
+			return ColorRGBA.WHITE;
 	}
 
 	public static void setDefaultColor(final ReadOnlyColorRGBA defaultColor) {
@@ -193,8 +200,6 @@ public abstract class HousePart implements Serializable {
 			mesh = original.mesh.makeCopy(true);
 			mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getIndex(), false));
 			root.attachChild(mesh);
-
-
 		}
 		drawAnnotations();
 		root.updateWorldBound(true);
@@ -624,16 +629,39 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void updateTextureAndColor() {
-		if (mesh == null)
-			return;
+//		if (mesh == null)
+//			return;
+//		if (Scene.getInstance().getTextureMode() == TextureMode.None) {
+//			mesh.clearRenderState(StateType.Texture);
+//			mesh.setDefaultColor(defaultColor);
+//		} else {
+//			final TextureState ts = new TextureState();
+//			final Texture texture = TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
+//			texture.setApply(ApplyMode.Decal);
+//			ts.setTexture(texture);
+//			mesh.setRenderState(ts);
+//			if (Scene.getInstance().getTextureMode() == TextureMode.Full)
+//				mesh.setDefaultColor(ColorRGBA.WHITE);
+//			else
+//				mesh.setDefaultColor(defaultColor);
+//		}
+		updateTextureAndColor(mesh);
+	}
+
+	protected void updateTextureAndColor(final Mesh mesh) {
 		if (Scene.getInstance().getTextureMode() == TextureMode.None) {
 			mesh.clearRenderState(StateType.Texture);
-			mesh.setDefaultColor(defaultColor);
+			mesh.setDefaultColor(getDefaultColor());
 		} else {
 			final TextureState ts = new TextureState();
-			ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+			final Texture texture = TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
+			texture.setApply(ApplyMode.Decal);
+			ts.setTexture(texture);
 			mesh.setRenderState(ts);
-			mesh.setDefaultColor(ColorRGBA.WHITE);
+			if (Scene.getInstance().getTextureMode() == TextureMode.Full)
+				mesh.setDefaultColor(ColorRGBA.WHITE);
+			else
+				mesh.setDefaultColor(getDefaultColor());
 		}
 	}
 

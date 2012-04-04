@@ -1020,7 +1020,7 @@ public class Wall extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "wall3.png" : "wall.jpg";
+		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "wall5.png" : "wall.jpg";
 	}
 
 	public boolean isVisited() {
@@ -1047,7 +1047,8 @@ public class Wall extends HousePart {
 		surroundMesh = originalWall.surroundMesh.makeCopy(true);
 		windowsSurroundMesh = originalWall.windowsSurroundMesh.makeCopy(true);
 		wireframeMesh = originalWall.wireframeMesh.makeCopy(true);
-		((Line) wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
+//		((Line) wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
+		((Line) wireframeMesh).setLineWidth(printWireframeThickness);
 		root.attachChild(backMesh);
 		root.attachChild(surroundMesh);
 		root.attachChild(windowsSurroundMesh);

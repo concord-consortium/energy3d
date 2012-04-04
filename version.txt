@@ -1026,6 +1026,7 @@ Version 0.5 - October 20, 2011
 - create and apply new textures with black lines only
 - create horizontal lines texture for walls
 - allow switching between none, simple and full textures through menus
+- use transparent wall, roof and floor textures to allow changing the color of the house when the simple texture is on
 
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class

@@ -34,7 +34,6 @@ public class Floor extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient Mesh wireframeMesh;
-
 	public Floor() {
 		super(1, 1, 0.5);
 	}
@@ -98,7 +97,7 @@ public class Floor extends HousePart {
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.1 : 1.0;
+		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.2 : 1.0;
 		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale , new TPoint(0, 0, 0), new TPoint(1, 0, 0), new TPoint(0, 1, 0));
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
@@ -191,7 +190,7 @@ public class Floor extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "floor.png" : "floor.jpg";
+		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "floor2.png" : "floor.jpg";
 	}
 
 	@Override
@@ -211,9 +210,9 @@ public class Floor extends HousePart {
 		wallUpperPoints = ((Floor) original).wallUpperPoints;
 		root.detachChild(wireframeMesh);
 		wireframeMesh = ((Floor) original).wireframeMesh.makeCopy(true);
-		((Line) wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
+//		((Line) wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
+		((Line) wireframeMesh).setLineWidth(printWireframeThickness);
 		root.attachChild(wireframeMesh);
-
 		super.setOriginal(original);
 	}
 
