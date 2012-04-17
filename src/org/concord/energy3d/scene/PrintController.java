@@ -233,11 +233,13 @@ public class PrintController implements Updater {
 				final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
 				final int resolutionHeight = 2;
 				final Dimension newSize;
-				if (Config.isMac())
-					newSize = new Dimension((int) (canvas.getHeight() * pageWidth / pageHeight), canvas.getHeight());
-				else
+//				if (Config.isMac())
+//					newSize = new Dimension((int) (canvas.getHeight() * pageWidth / pageHeight), canvas.getHeight());
+//				else
 					newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
 				canvas.setSize(newSize);
+				canvas.setPreferredSize(newSize);
+				canvas.invalidate();
 
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
 
@@ -258,9 +260,9 @@ public class PrintController implements Updater {
 						@Override
 						public void run() {
 							Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-							MainPanel.getInstance().validate();
+//							MainPanel.getInstance().validate();
 
-							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
+//							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
 
 							SceneManager.getTaskManager().render(new Callable<Object>() {
 								@Override

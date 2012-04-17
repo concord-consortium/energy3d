@@ -125,7 +125,9 @@ public class Scene implements Serializable {
 			SceneManager.getInstance().getCameraNode().updateFromCamera();
 		}
 
-		SceneManager.getInstance().getCameraControl().reset();
+		final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
+		if (cameraControl != null)
+			cameraControl.reset();
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
