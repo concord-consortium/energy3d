@@ -21,7 +21,6 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Annotation;
-import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.Printout;
 
@@ -229,7 +228,6 @@ public class PrintController implements Updater {
 			@Override
 			public Object call() throws Exception {
 				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
-				final Printout printout = new Printout(pageFormat);
 				final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
 				final int resolutionHeight = 2;
 				final Dimension newSize;
@@ -237,19 +235,52 @@ public class PrintController implements Updater {
 //					newSize = new Dimension((int) (canvas.getHeight() * pageWidth / pageHeight), canvas.getHeight());
 //				else
 					newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
-				canvas.setSize(newSize);
-				canvas.setPreferredSize(newSize);
-				canvas.invalidate();
+
+
+//				canvas.setSize(newSize);
+//				canvas.setPreferredSize(newSize);
+//				canvas.invalidate();
+
+//				if (!Config.isMac())
+//					canvas.setSize(new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight()));
+
+
 
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
 
-				print(0, printout);
+				final Dimension canvasSize = canvas.getSize();
+				System.out.println(canvasSize);
+				if (canvasSize.width % 32 != 0) {
+					canvasSize.width -= canvasSize.width % 32;
+					canvas.setSize(canvasSize);
+					canvas.validate();
+				}
+				final double ratio = (double) canvasSize.width / canvasSize.height;
+				final double cols = newSize.getWidth() / canvasSize.getWidth();
+				final double rows = newSize.getHeight() / canvasSize.getHeight();
+				final double pageWidth = PrintController.getInstance().getPageWidth() / cols;
+				final double pageHeight = PrintController.getInstance().getPageHeight() / rows;
+
+				System.out.println("CANVAS SIZE ========== ");
+				System.out.println(canvasSize);
+				System.out.println(rows + "\t" + cols);
+				System.out.println("PageWidth segment: " + pageWidth);
+				System.out.println("PageHeight segment: " + pageHeight);
+
+				if (ratio > pageWidth / pageHeight)
+					SceneManager.getInstance().resizeCamera(pageHeight * ratio);
+				else
+					SceneManager.getInstance().resizeCamera(pageWidth);
+
+
+				final Printout printout = new Printout(pageFormat, newSize);
+				print(0, printout, 0, 0, pageWidth, pageHeight);
 				return null;
 			}
 		});
 	}
 
-	private void print(final int pageNum, final Printout printout) {
+	private void print(final int pageNum, final Printout printout, final double x, final double y, final double w, final double h) {
 		SceneManager.getTaskManager().render(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
@@ -260,9 +291,9 @@ public class PrintController implements Updater {
 						@Override
 						public void run() {
 							Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-//							MainPanel.getInstance().validate();
+							MainPanel.getInstance().validate();
 
-//							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
+							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
 
 							SceneManager.getTaskManager().render(new Callable<Object>() {
 								@Override
@@ -285,17 +316,28 @@ public class PrintController implements Updater {
 						}
 					});
 				} else {
-					if (pageNum != 0) {
+					if (pageNum != 0 || x != 0 || y != 0) {
+						Thread.sleep(1000);
 						ScreenExporter.exportCurrentScreen(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(), printout);
 					}
+
 					if (pageNum < printCenters.size()) {
-						final Vector3 pos = printCenters.get(pageNum);
+						final Vector3 pos = new Vector3(printCenters.get(pageNum));
+						pos.set(pos.getX() + x + w / 2.0, -10.0, pos.getZ() - y - h / 2.0);
 						final Camera camera = Camera.getCurrentCamera();
-						camera.setLocation(pos.getX(), -10.0, pos.getZ());
+						camera.setLocation(pos);
 						camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
 						SceneManager.getInstance().getCameraNode().updateFromCamera();
-					}
-					print(pageNum + 1, printout);
+						if (x + w < getPageWidth())
+							print(pageNum, printout, x + w, y, w, h);
+						else if (y + h < getPageHeight())
+							print(pageNum, printout, 0, y + h, w, h);
+						else
+							print(pageNum + 1, printout, 0, 0, w, h);
+//						print(pageNum + 1, printout, x, y);
+//						print(pageNum, printout, x, y, w, h);
+					} else
+						print(pageNum + 1, printout, 0, 0, w, h);
 
 				}
 				return null;
@@ -438,7 +480,8 @@ public class PrintController implements Updater {
 				pageNum++;
 			} while (Math.abs(x - boundingBox.getCenter().getX()) < minXDistance && Math.abs(z - boundingBox.getCenter().getZ()) < minYDistance);
 
-			printCenters.add(new Vector3(x, 0, z + pageHeight / (Config.isMac() ? 1.0 : 2.0)));
+//			printCenters.add(new Vector3(x, 0, z + pageHeight / (Config.isMac() ? 1.0 : 2.0)));
+			printCenters.add(upperLeftCorner);
 
 			for (final Spatial printSpatial : page)
 				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(upperLeftCorner);

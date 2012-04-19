@@ -1,14 +1,11 @@
 package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Panel;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -68,9 +65,9 @@ public class MainPanel extends JPanel {
 	private JToggleButton roofCustomButton = null;
 	private JToggleButton zoomButton = null;
 	private JToggleButton roofGableButton = null;
-	private Panel panel;
-	private ScrollPane scrollPane;
-	private Button button;
+//	private Panel panel;
+//	private ScrollPane scrollPane;
+//	private Button button;
 
 	public static MainPanel getInstance() {
 		return instance;
@@ -107,7 +104,7 @@ public class MainPanel extends JPanel {
 		this.setSize(1000, 300);
 		setLayout(new BorderLayout());
 		this.add(getAppToolbar(), BorderLayout.NORTH);
-		add(getScrollPane(), BorderLayout.CENTER);
+//		add(getScrollPane(), BorderLayout.CENTER);
 	}
 
 	/**
@@ -927,29 +924,29 @@ public class MainPanel extends JPanel {
 		}
 		getCalendarPanel().setVisible(enabled && (getLightButton().isSelected() || getHeliodonButton().isSelected()));
 	}
-	public Panel getPanel() {
-		if (panel == null) {
-			panel = new Panel();
-			panel.setLayout(new BorderLayout());
-			panel.add(getButton(), BorderLayout.NORTH);
-		}
-		return panel;
-	}
-
-	private ScrollPane getScrollPane() {
-		if (scrollPane == null) {
-			scrollPane = new ScrollPane();
-			scrollPane.add(getPanel());
-		}
-		return scrollPane;
-	}
-
-	private Button getButton() {
-		if (button == null) {
-			button = new Button("New button");
-//			button.setSize(100, 1000);
-//			button.setPreferredSize(new Dimension(10, 10));
-		}
-		return button;
-	}
+//	public Panel getPanel() {
+//		if (panel == null) {
+//			panel = new Panel();
+//			panel.setLayout(new BorderLayout());
+//			panel.add(getButton(), BorderLayout.NORTH);
+//		}
+//		return panel;
+//	}
+//
+//	private ScrollPane getScrollPane() {
+//		if (scrollPane == null) {
+//			scrollPane = new ScrollPane();
+//			scrollPane.add(getPanel());
+//		}
+//		return scrollPane;
+//	}
+//
+//	private Button getButton() {
+//		if (button == null) {
+//			button = new Button("New button");
+////			button.setSize(100, 1000);
+////			button.setPreferredSize(new Dimension(10, 10));
+//		}
+//		return button;
+//	}
 }

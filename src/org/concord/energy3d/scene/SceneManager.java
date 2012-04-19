@@ -145,7 +145,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private static final double MOVE_SPEED = 5;
 
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
-	private static final SceneManager instance = new SceneManager(MainPanel.getInstance().getPanel());
+	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());
 	private final Canvas canvas;
 	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
@@ -185,7 +185,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public final static byte SKETCHUP_THEME = 1;
 	private final byte theme = DEFAULT_THEME;
 
-	private boolean updateWindow = false;
+//	private boolean updateWindow = false;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -317,18 +317,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isUpdateTime = updateTime != -1 && now <= updateTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
-			if (update || updateWindow || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
+			if (update || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
+//			if (update || updateWindow || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
 				if (now > updateTime)
 					updateTime = -1;
 				update = false;
-				if (updateWindow) {
-					final Dimension size = MainFrame.getInstance().getSize();
-					size.width++;
-					MainFrame.getInstance().setSize(size);
-					size.width--;
-					MainFrame.getInstance().setSize(size);
-					updateWindow = false;
-				}
+//				if (updateWindow) {
+//					final Dimension size = MainFrame.getInstance().getSize();
+//					size.width++;
+//					MainFrame.getInstance().setSize(size);
+//					size.width--;
+//					MainFrame.getInstance().setSize(size);
+//					updateWindow = false;
+//				}
 
 				try {
 					frameHandler.updateFrame();
@@ -982,10 +983,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final Dimension canvasSize = ((Component) canvas).getSize();
 			final double ratio = (double) canvasSize.width / canvasSize.height;
 
-			if (ratio > pageWidth / pageHeight)
-				resizeCamera(pageHeight * ratio);
-			else
-				resizeCamera(pageWidth);
+//			if (ratio > pageWidth / pageHeight)
+//				resizeCamera(pageHeight * ratio);
+//			else
+//				resizeCamera(pageWidth);
+
+//			resizeCamera(PrintController.getInstance().getPageWidth());
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
 			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
@@ -1005,7 +1008,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		resizeCamera(2);
 	}
 
-	private void resizeCamera(final double orthoWidth) {
+	public void resizeCamera(final double orthoWidth) {
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
 		if (camera == null)
 			return;
@@ -1359,7 +1362,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return cameraControl;
 	}
 
-	public void updateWindow() {
-		updateWindow  = true;
-	}
+//	public void updateWindow() {
+//		updateWindow  = true;
+//	}
 }

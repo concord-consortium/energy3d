@@ -1030,6 +1030,10 @@ Version 0.5 - October 20, 2011
 - allow different colors for different house parts
 - create menus to change the color of house parts
 
+- write algorithm to take several snapshots of a page and then combine them into one image per page
+- use the above as work around for mac os x printing problem
+- avoid snapshot crash by ensuring that the canvas size is factor of 32
+- fix exception when cancelling save dialog box
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class
 

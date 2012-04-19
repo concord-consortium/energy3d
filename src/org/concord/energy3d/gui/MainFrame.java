@@ -897,6 +897,8 @@ public class MainFrame extends JFrame {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 		try {
 			File file = fileChooser.getSelectedFile();
+			if (file == null)
+				return;
 			if (!file.getName().toLowerCase().endsWith(".ser"))
 				file = new File(file.toString() + ".ser");
 			Scene.save(file.toURI().toURL());
