@@ -136,6 +136,7 @@ public class Printout implements ScreenExportable, Printable, Pageable {
 			return NO_SUCH_PAGE;
 		}
 		final BufferedImage img = images.get(pageIndex);
+		/* The img is twice as big as the page so need to draw it based on paper size not img size */
 		graphics.drawImage(img, 0, 0, (int) pageFormat.getWidth(), (int) pageFormat.getHeight(), null);
 //		graphics.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
 		return PAGE_EXISTS;

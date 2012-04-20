@@ -158,6 +158,9 @@ public class PrintController implements Updater {
 				printParts = null;
 				if (!isPrintPreview && restartFlag) {
 					restartFlag = false;
+//					/* to force redraw when animated back to normal scene */
+//					Scene.getInstance().redrawAll();
+//					Scene.getInstance().update();
 					setPrintPreview(true);
 					return;
 				}
@@ -249,7 +252,7 @@ public class PrintController implements Updater {
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
 
 				final Dimension canvasSize = canvas.getSize();
-				System.out.println(canvasSize);
+//				System.out.println(canvasSize);
 				if (canvasSize.width % 32 != 0) {
 					canvasSize.width -= canvasSize.width % 32;
 					canvas.setSize(canvasSize);
@@ -261,11 +264,11 @@ public class PrintController implements Updater {
 				final double pageWidth = PrintController.getInstance().getPageWidth() / cols;
 				final double pageHeight = PrintController.getInstance().getPageHeight() / rows;
 
-				System.out.println("CANVAS SIZE ========== ");
-				System.out.println(canvasSize);
-				System.out.println(rows + "\t" + cols);
-				System.out.println("PageWidth segment: " + pageWidth);
-				System.out.println("PageHeight segment: " + pageHeight);
+//				System.out.println("CANVAS SIZE ========== ");
+//				System.out.println(canvasSize);
+//				System.out.println(rows + "\t" + cols);
+//				System.out.println("PageWidth segment: " + pageWidth);
+//				System.out.println("PageHeight segment: " + pageHeight);
 
 				if (ratio > pageWidth / pageHeight)
 					SceneManager.getInstance().resizeCamera(pageHeight * ratio);
@@ -317,7 +320,7 @@ public class PrintController implements Updater {
 					});
 				} else {
 					if (pageNum != 0 || x != 0 || y != 0) {
-						Thread.sleep(1000);
+//						Thread.sleep(1000);
 						ScreenExporter.exportCurrentScreen(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(), printout);
 					}
 

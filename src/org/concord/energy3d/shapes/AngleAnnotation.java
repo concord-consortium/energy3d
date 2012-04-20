@@ -4,7 +4,6 @@ import java.nio.FloatBuffer;
 
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -18,7 +17,7 @@ public class AngleAnnotation extends Annotation {
 
 	public AngleAnnotation() {
 		super(new Arc("Angle annotation arc", 10));
-		setColor(ColorRGBA.WHITE);
+//		setColor(ColorRGBA.WHITE);
 	}
 
 	public void setRange(final ReadOnlyVector3 mainPoint, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3, final ReadOnlyVector3 n) {

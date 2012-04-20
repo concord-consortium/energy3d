@@ -43,7 +43,9 @@ public class Scene implements Serializable {
 		}
 	};
 
-	public static enum TextureMode {None, Simple, Full};
+	public static enum TextureMode {
+		None, Simple, Full
+	};
 
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
@@ -302,8 +304,12 @@ public class Scene implements Serializable {
 
 		Scene.getInstance().updateRoofDashLinesColor();
 
-		if (textureMode != TextureMode.None)
-			redrawAll = true;
+		// if (textureMode != TextureMode.None)
+//		 redrawAll = true;
+
+//		if (PrintController.getInstance().isPrintPreview())
+//			PrintController.getInstance().restartAnimation();
+
 	}
 
 	public void setDrawThickness(final boolean draw) {
