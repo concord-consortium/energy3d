@@ -33,7 +33,6 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
@@ -50,7 +49,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
+//	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private static final double MIN_WALL_LENGTH = 0.01;
 	private static double defaultWallHeight = 2.0; // the recommended default wall height is 20cm
 	private static int currentVisitStamp = 1;
@@ -67,13 +66,13 @@ public class Wall extends HousePart {
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
 
-	public static ReadOnlyColorRGBA getDefaultColor() {
-		return defaultColor;
-	}
-
-	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
-		defaultColor = color;
-	}
+//	public static ReadOnlyColorRGBA getDefaultColor() {
+//		return defaultColor;
+//	}
+//
+//	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
+//		defaultColor = color;
+//	}
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -536,7 +535,7 @@ public class Wall extends HousePart {
 		final PickResults pickResults = new PrimitivePickResults();
 		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ()), direction), pickResults);
 		if (pickResults.getNumber() > 0) {
-			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(Roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
+			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(Scene.getInstance().getOverhangLength() > 0.05 ? offset : 0, null), null);
 		} else
 			return p;
 	}
@@ -1153,6 +1152,6 @@ public class Wall extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, getDefaultColor());
+		updateTextureAndColor(mesh, Scene.getInstance().getWallColor());
 	}
 }

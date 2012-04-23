@@ -20,7 +20,6 @@ import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
@@ -33,17 +32,17 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Floor extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
+//	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient Mesh wireframeMesh;
 
-	public static ReadOnlyColorRGBA getDefaultColor() {
-		return defaultColor;
-	}
-
-	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
-		defaultColor = color;
-	}
+//	public static ReadOnlyColorRGBA getDefaultColor() {
+//		return defaultColor;
+//	}
+//
+//	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
+//		defaultColor = color;
+//	}
 
 	public Floor() {
 		super(1, 1, 0.5);
@@ -234,6 +233,7 @@ public class Floor extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, getDefaultColor());
+//		updateTextureAndColor(mesh, getDefaultColor());
+		updateTextureAndColor(mesh, Scene.getInstance().getFloorColor());
 	}
 }

@@ -40,12 +40,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.MainApplication;
-import org.concord.energy3d.model.Door;
-import org.concord.energy3d.model.Floor;
-import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Roof;
-import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -1087,7 +1082,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					while (true) {
 						SceneManager.getInstance().update(1);
-						final String newValue = JOptionPane.showInputDialog(MainFrame.this, "What is the length of roof overhang?", Roof.getOverhangLength() * Scene.getInstance().getAnnotationScale());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.this, "What is the length of roof overhang?", Scene.getInstance().getOverhangLength() * Scene.getInstance().getAnnotationScale());
 						if (newValue == null)
 							break;
 						else {
@@ -1096,7 +1091,7 @@ public class MainFrame extends JFrame {
 								if (val < 0 || val > 5)
 									JOptionPane.showMessageDialog(MainFrame.this, "Overhang value must be between 0 and 5.", "Error", JOptionPane.ERROR_MESSAGE);
 								else {
-									Roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
+									Scene.getInstance().setOverhangLength(val / Scene.getInstance().getAnnotationScale());
 									Scene.getInstance().redrawAll();
 									break;
 								}
@@ -1236,23 +1231,40 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(final ActionEvent e) {
 				final Color c = colorChooser.getColor();
 				final float[] newColor = c.getComponents(null);
-				final boolean restartPrintPreview = Roof.getDefaultColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
+				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
+//				switch (operation) {
+//				case DRAW_FOUNDATION:
+//					Foundation.setDefaultColor(color);
+//					break;
+//				case DRAW_WALL:
+//					Wall.setDefaultColor(color);
+//					break;
+//				case DRAW_DOOR:
+//					Door.setDefaultColor(color);
+//					break;
+//				case DRAW_FLOOR:
+//					Floor.setDefaultColor(color);
+//					break;
+//				case DRAW_ROOF:
+//					Roof.setDefaultColor(color);
+//					break;
+//				}
 				switch (operation) {
 				case DRAW_FOUNDATION:
-					Foundation.setDefaultColor(color);
+					Scene.getInstance().setFoundationColor(color);
 					break;
 				case DRAW_WALL:
-					Wall.setDefaultColor(color);
+					Scene.getInstance().setWallColor(color);
 					break;
 				case DRAW_DOOR:
-					Door.setDefaultColor(color);
+					Scene.getInstance().setDoorColor(color);
 					break;
 				case DRAW_FLOOR:
-					Floor.setDefaultColor(color);
+					Scene.getInstance().setFloorColor(color);
 					break;
 				case DRAW_ROOF:
-					Roof.setDefaultColor(color);
+					Scene.getInstance().setRoofColor(color);
 					break;
 				}
 //				HousePart.setDefaultColor(color);
@@ -1271,19 +1283,19 @@ public class MainFrame extends JFrame {
 		final ReadOnlyColorRGBA color;
 		switch (operation) {
 		case DRAW_FOUNDATION:
-			color = Foundation.getDefaultColor();
+			color = Scene.getInstance().getFoundationColor();
 			break;
 		case DRAW_WALL:
-			color = Wall.getDefaultColor();
+			color = Scene.getInstance().getWallColor();
 			break;
 		case DRAW_DOOR:
-			color = Door.getDefaultColor();
+			color = Scene.getInstance().getDoorColor();
 			break;
 		case DRAW_FLOOR:
-			color = Floor.getDefaultColor();
+			color = Scene.getInstance().getFloorColor();
 			break;
 		case DRAW_ROOF:
-			color = Roof.getDefaultColor();
+			color = Scene.getInstance().getRoofColor();
 			break;
 		default:
 			color = ColorRGBA.WHITE;

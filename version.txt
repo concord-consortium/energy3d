@@ -1042,6 +1042,12 @@ Version 0.5 - October 20, 2011
 - add shortkey G for removing all gables from roofs
 - fix problem with hiding wrong gable roof part due by ensuring that roof parts with only one lower base points are never considered for hiding
 
+- save overhang in model files
+- save texture type in model files 
+- save house part colors in model files
+
+- *rescale textures when texture type changes
+- *consider scale factor in print preview
 
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class

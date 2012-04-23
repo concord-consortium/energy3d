@@ -13,7 +13,6 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -27,21 +26,12 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private transient Mesh boundingMesh;
 	private transient Mesh wireframeMesh;
 	private transient ArrayList<Vector3> orgPoints;
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient boolean resizeHouseMode = false;
-
-	public static ReadOnlyColorRGBA getDefaultColor() {
-		return defaultColor;
-	}
-
-	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
-		defaultColor = color;
-	}
 
 	public Foundation() {
 		super(2, 8, 0.1);
@@ -423,6 +413,6 @@ public class Foundation extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, getDefaultColor());
+		updateTextureAndColor(mesh, Scene.getInstance().getFoundationColor());
 	}
 }

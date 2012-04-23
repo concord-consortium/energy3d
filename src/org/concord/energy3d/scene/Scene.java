@@ -21,7 +21,9 @@ import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.util.Config;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Node;
@@ -53,7 +55,6 @@ public class Scene implements Serializable {
 	private static Scene instance;
 	private static URL url = null;
 	private static boolean redrawAll = false;
-	private static TextureMode textureMode = TextureMode.Full;
 	private static boolean drawThickness = false;
 	private static boolean drawAnnotationsInside = false;
 	private static Unit unit = Unit.Centimeter;
@@ -62,6 +63,13 @@ public class Scene implements Serializable {
 	private final ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
+	private double overhangLength = 0.2;
+	private TextureMode textureMode = TextureMode.Full;
+	private ReadOnlyColorRGBA foundationColor = ColorRGBA.WHITE;
+	private ReadOnlyColorRGBA wallColor = ColorRGBA.WHITE;
+	private ReadOnlyColorRGBA doorColor = ColorRGBA.WHITE;
+	private ReadOnlyColorRGBA floorColor = ColorRGBA.WHITE;
+	private ReadOnlyColorRGBA roofColor = ColorRGBA.WHITE;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -189,6 +197,12 @@ public class Scene implements Serializable {
 	}
 
 	private void cleanup() {
+		if (textureMode == null) {
+			textureMode = TextureMode.Full;
+			overhangLength = 0.2;
+			foundationColor = wallColor = doorColor = floorColor = roofColor = ColorRGBA.WHITE;
+		}
+
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
 		for (final HousePart housePart : getParts()) {
 			if (!housePart.isValid() || ((housePart instanceof Roof || housePart instanceof Window || housePart instanceof Door) && housePart.getContainer() == null))
@@ -197,6 +211,7 @@ public class Scene implements Serializable {
 
 		for (final HousePart housePart : toBeRemoved)
 			remove(housePart);
+
 	}
 
 	public static void save(final URL url) throws Exception {
@@ -295,7 +310,7 @@ public class Scene implements Serializable {
 	}
 
 	public void setTextureMode(final TextureMode textureMode) {
-		Scene.textureMode = textureMode;
+		this.textureMode = textureMode;
 		for (final HousePart part : parts)
 			part.updateTextureAndColor();
 		if (PrintController.getInstance().getPrintParts() != null)
@@ -459,5 +474,53 @@ public class Scene implements Serializable {
 		for (final HousePart part : parts)
 			if (part instanceof Roof)
 				((Roof) part).removeAllGables();
+	}
+
+	public double getOverhangLength() {
+		return overhangLength;
+	}
+
+	public void setOverhangLength(final double overhangLength) {
+		this.overhangLength = overhangLength;
+	}
+
+	public ReadOnlyColorRGBA getFoundationColor() {
+		return foundationColor;
+	}
+
+	public void setFoundationColor(final ReadOnlyColorRGBA foundationColor) {
+		this.foundationColor = foundationColor;
+	}
+
+	public ReadOnlyColorRGBA getWallColor() {
+		return wallColor;
+	}
+
+	public void setWallColor(final ReadOnlyColorRGBA wallColor) {
+		this.wallColor = wallColor;
+	}
+
+	public ReadOnlyColorRGBA getDoorColor() {
+		return doorColor;
+	}
+
+	public void setDoorColor(final ReadOnlyColorRGBA doorColor) {
+		this.doorColor = doorColor;
+	}
+
+	public ReadOnlyColorRGBA getFloorColor() {
+		return floorColor;
+	}
+
+	public void setFloorColor(final ReadOnlyColorRGBA floorColor) {
+		this.floorColor = floorColor;
+	}
+
+	public ReadOnlyColorRGBA getRoofColor() {
+		return roofColor;
+	}
+
+	public void setRoofColor(final ReadOnlyColorRGBA roofColor) {
+		this.roofColor = roofColor;
 	}
 }

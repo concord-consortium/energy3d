@@ -33,7 +33,6 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -49,8 +48,8 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
-	private static double overhangLength = 0.2;
+//	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
+//	private static double overhangLength = 0.2;
 	protected transient Node roofPartsRoot;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient ArrayList<ReadOnlyVector3> wallNormals;
@@ -62,22 +61,22 @@ public abstract class Roof extends HousePart {
 	private Map<Integer, ArrayList<Integer>> gableRoofPartToEditPointMap = null;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 
-	public static ReadOnlyColorRGBA getDefaultColor() {
-		return defaultColor;
-	}
+//	public static ReadOnlyColorRGBA getDefaultColor() {
+//		return defaultColor;
+//	}
+//
+//	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
+//		defaultColor = color;
+//		Scene.getInstance().updateRoofDashLinesColor();
+//	}
 
-	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
-		defaultColor = color;
-		Scene.getInstance().updateRoofDashLinesColor();
-	}
-
-	public static double getOverhangLength() {
-		return overhangLength;
-	}
-
-	public static void setOverhangLength(final double overhangLength) {
-		Roof.overhangLength = overhangLength;
-	}
+//	public static double getOverhangLength() {
+//		return overhangLength;
+//	}
+//
+//	public static void setOverhangLength(final double overhangLength) {
+//		Roof.overhangLength = overhangLength;
+//	}
 
 	public Roof(final int numOfDrawPoints, final int numOfEditPoints, final double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
@@ -135,7 +134,7 @@ public abstract class Roof extends HousePart {
 				final Mesh mesh = (Mesh) ((Node) child).getChild(0);
 				mesh.setUserData(new UserData(this, roofPartIndex, false));
 				if (Scene.getInstance().getTextureMode() == TextureMode.None)
-					mesh.setDefaultColor(getDefaultColor());
+					mesh.setDefaultColor(Scene.getInstance().getRoofColor());
 				final MaterialState ms = new MaterialState();
 				ms.setColorMaterial(ColorMaterial.Diffuse);
 				mesh.setRenderState(ms);
@@ -506,7 +505,8 @@ public abstract class Roof extends HousePart {
 		if (roofPartsRoot != null) {
 			for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
 				if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
-					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(0), getDefaultColor());
+//					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(0), getDefaultColor());
+					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(0), Scene.getInstance().getRoofColor());
 				// {
 				// final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
 				// if (Scene.getInstance().getTextureMode() == TextureMode.None) {
@@ -536,7 +536,7 @@ public abstract class Roof extends HousePart {
 		final Vector3 op = new Vector3();
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			final PolygonPoint p = wallUpperPoints.get(i);
-			op.set(wallNormals.get(i)).multiplyLocal(getOverhangLength());
+			op.set(wallNormals.get(i)).multiplyLocal(Scene.getInstance().getOverhangLength());
 			op.addLocal(p.getX(), p.getY(), p.getZ());
 			p.set(op.getX(), op.getY(), op.getZ());
 		}
@@ -628,7 +628,7 @@ public abstract class Roof extends HousePart {
 			for (final Wall wall : gableEditPointToWallMap.get(nearestIndex)) {
 				if (wall != null) { // TODO do this check before adding
 					final ReadOnlyVector3 n = wall.getFaceDirection();
-					double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(getOverhangLength(), null)), null).dot(n);
+					double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(Scene.getInstance().getOverhangLength(), null)), null).dot(n);
 					distance -= 0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
 					nearestEditPoint.addLocal(n.multiply(distance, null));
 				}
@@ -703,7 +703,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	public boolean isSameBasePoints(final ReadOnlyVector3[] base_1, final ReadOnlyVector3[] base_2) {
-		final double maxOverhangDistance = MathUtils.sqrt(2 * getOverhangLength() * getOverhangLength()) * 2;
+		final double maxOverhangDistance = MathUtils.sqrt(2 * Scene.getInstance().getOverhangLength() * Scene.getInstance().getOverhangLength()) * 2;
 		final Vector2 p1a = new Vector2(base_1[0].getX(), base_1[0].getY());
 		final Vector2 p1b = new Vector2(base_1[1].getX(), base_1[1].getY());
 		final Vector2 p2a = new Vector2(base_2[0].getX(), base_2[0].getY());
@@ -769,7 +769,7 @@ public abstract class Roof extends HousePart {
 				final Line wireframeMesh = (Line) ((Node) roofPartsRoot.getChild(i)).getChild(4);
 				// wireframeMesh.setLineWidth(WIREFRAME_THICKNESS);
 				wireframeMesh.setLineWidth(printWireframeThickness);
-				mesh.getSceneHints().setCullHint((Scene.getInstance().getTextureMode() == TextureMode.None && getDefaultColor().equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
+				mesh.getSceneHints().setCullHint((Scene.getInstance().getTextureMode() == TextureMode.None && Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
 			}
 		}
 		drawAnnotations();
