@@ -1039,6 +1039,8 @@ Version 0.5 - October 20, 2011
 - improve memory consumption by sending current page image to the printer right away
 - fix problem capturing snap shot of previous camera position
 - successful completion of printing with new algorithm
+- add shortkey G for removing all gables from roofs
+- fix problem with hiding wrong gable roof part due by ensuring that roof parts with only one lower base points are never considered for hiding
 
 
 

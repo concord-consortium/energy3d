@@ -921,6 +921,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				Scene.getInstance().removeAllRoofs();
 			}
 		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.G), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				taskManager.update(new Callable<Object>() {
+//					@Override
+//					public Object call() throws Exception {
+//						Scene.getInstance().removeAllGables();
+//						return null;
+//					}
+//				});
+				Scene.getInstance().removeAllGables();
+			}
+		}));
 	}
 
 	public void setCameraControl(final CameraMode type) {

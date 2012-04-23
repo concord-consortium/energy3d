@@ -454,4 +454,10 @@ public class Scene implements Serializable {
 	public void setCameraDirection(final ReadOnlyVector3 cameraDirection) {
 		this.cameraDirection = cameraDirection;
 	}
+
+	public void removeAllGables() {
+		for (final HousePart part : parts)
+			if (part instanceof Roof)
+				((Roof) part).removeAllGables();
+	}
 }

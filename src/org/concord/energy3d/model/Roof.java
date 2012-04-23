@@ -557,6 +557,10 @@ public abstract class Roof extends HousePart {
 	}
 
 	public void setGable(final int roofPartIndex, final boolean isGable) {
+		setGable(roofPartIndex, isGable, true);
+	}
+
+	private void setGable(final int roofPartIndex, final boolean isGable, final boolean redraw) {
 		System.out.println("setGable(" + roofPartIndex + ", " + isGable + ")");
 		if (gableWalls == null)
 			gableWalls = new ArrayList<Wall>();
@@ -596,9 +600,20 @@ public abstract class Roof extends HousePart {
 			gableWalls.remove(wall);
 		}
 
+		if (redraw) {
+			draw();
+			drawWalls();
+		}
+	}
+
+	public void removeAllGables() {
+		final ArrayList<Integer> indices = new ArrayList<Integer>();
+		for (final int index : gableRoofPartToEditPointMap.keySet())
+			indices.add(index);
+		for (final int index : indices)
+			setGable(index, false, false);
 		draw();
 		drawWalls();
-
 	}
 
 	private void computeGableEditPoints() {
@@ -654,7 +669,10 @@ public abstract class Roof extends HousePart {
 			}
 		}
 
-		if (highestZ <= base[0].getZ() && highestZ <= base[0].getZ())
+//		if (highestZ <= base[0].getZ() && highestZ <= base[0].getZ())
+//			return null;
+
+		if (highestZ == base[0].getZ() || highestZ == base[1].getZ())
 			return null;
 
 		if (storeUpperPoints != null) {
@@ -668,6 +686,7 @@ public abstract class Roof extends HousePart {
 		if (gableWalls == null)
 			return;
 
+		/* Two Options: hide using estimating direction with wall. Or, hide using roof part number (it be wrong)) */
 		for (final Wall wall : gableWalls) {
 			if (wall == null)
 				continue;
