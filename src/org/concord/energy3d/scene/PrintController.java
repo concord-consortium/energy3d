@@ -7,7 +7,6 @@ import java.awt.print.Paper;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
 
 import javax.swing.SwingUtilities;
 
@@ -43,14 +42,13 @@ import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
-import com.ardor3d.util.screen.ScreenExporter;
 
 public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
 	private static final double SPACE_BETWEEN_PAGES = 0.5;
 	private static final double exactFromPageToWorldCoord = 1.0 / 72.0 / 4.0 / 10.6 * 10.8;
 	private static double spaceBetweenParts = 0; // 0.3; // 0.5;
-	private final ArrayList<Vector3> printCenters = new ArrayList<Vector3>();
+	private final ArrayList<ReadOnlyVector3> printCenters = new ArrayList<ReadOnlyVector3>();
 	private final Timer timer = new Timer();
 	private double pageWidth, pageHeight, pageLeft, pageRight, pageTop, pageBottom;
 	private double angle;
@@ -227,9 +225,9 @@ public class PrintController implements Updater {
 	}
 
 	public void print() {
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
+//		SceneManager.getTaskManager().update(new Callable<Object>() {
+//			@Override
+//			public Object call() throws Exception {
 				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 				final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
 				final int resolutionHeight = 2;
@@ -251,7 +249,8 @@ public class PrintController implements Updater {
 
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
 
-				final Dimension canvasSize = canvas.getSize();
+				final Dimension orgCanvasSize = canvas.getSize();
+				final Dimension canvasSize = (Dimension) orgCanvasSize.clone();
 //				System.out.println(canvasSize);
 				if (canvasSize.width % 32 != 0) {
 					canvasSize.width -= canvasSize.width % 32;
@@ -276,76 +275,97 @@ public class PrintController implements Updater {
 					SceneManager.getInstance().resizeCamera(pageWidth);
 
 
-				final Printout printout = new Printout(pageFormat, newSize);
-				print(0, printout, 0, 0, pageWidth, pageHeight);
-				return null;
-			}
-		});
+				SceneManager.getInstance().update();
+				final Printout printout = new Printout(pageFormat, newSize, pageWidth, pageHeight, printCenters);
+				print(0, printout, 0, 0, pageWidth, pageHeight);;
+
+				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
+//				MainPanel.getInstance().validate();
+
+				canvas.setSize(orgCanvasSize);
+				canvas.validate();
+
+				SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
+				SceneManager.getInstance().update();
+//				return null;
+//			}
+//		});
 	}
 
+//	private void print(final int pageNum, final Printout printout, final double x, final double y, final double w, final double h) {
+//		SceneManager.getTaskManager().render(new Callable<Object>() {
+//			@Override
+//			public Object call() throws Exception {
+//				if (pageNum == printCenters.size() + 1) {
+//					final PrinterJob job = PrinterJob.getPrinterJob();
+//					job.setPageable(printout);
+//					SwingUtilities.invokeLater(new Runnable() {
+//						@Override
+//						public void run() {
+//							Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
+//							MainPanel.getInstance().validate();
+//
+//							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
+//
+//							SceneManager.getTaskManager().render(new Callable<Object>() {
+//								@Override
+//								public Object call() throws Exception {
+//									SceneManager.getTaskManager().render(new Callable<Object>() {
+//										@Override
+//										public Object call() throws Exception {
+//											if (job.printDialog())
+//												try {
+//													job.print();
+//												} catch (final PrinterException exc) {
+//													exc.printStackTrace();
+//												}
+//											return null;
+//										}
+//									});
+//									return null;
+//								}
+//							});
+//						}
+//					});
+//				} else {
+//					if (pageNum != 0 || x != 0 || y != 0) {
+////						Thread.sleep(1000);
+//						ScreenExporter.exportCurrentScreen(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(), printout);
+//					}
+//
+//					if (pageNum < printCenters.size()) {
+//						final Vector3 pos = new Vector3(printCenters.get(pageNum));
+//						pos.set(pos.getX() + x + w / 2.0, -10.0, pos.getZ() - y - h / 2.0);
+//						final Camera camera = Camera.getCurrentCamera();
+//						camera.setLocation(pos);
+//						camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
+//						SceneManager.getInstance().getCameraNode().updateFromCamera();
+//						if (x + w < getPageWidth())
+//							print(pageNum, printout, x + w, y, w, h);
+//						else if (y + h < getPageHeight())
+//							print(pageNum, printout, 0, y + h, w, h);
+//						else
+//							print(pageNum + 1, printout, 0, 0, w, h);
+////						print(pageNum + 1, printout, x, y);
+////						print(pageNum, printout, x, y, w, h);
+//					} else
+//						print(pageNum + 1, printout, 0, 0, w, h);
+//
+//				}
+//				return null;
+//			}
+//		});
+//	}
+
 	private void print(final int pageNum, final Printout printout, final double x, final double y, final double w, final double h) {
-		SceneManager.getTaskManager().render(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				if (pageNum == printCenters.size() + 1) {
 					final PrinterJob job = PrinterJob.getPrinterJob();
 					job.setPageable(printout);
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-							MainPanel.getInstance().validate();
-
-							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
-
-							SceneManager.getTaskManager().render(new Callable<Object>() {
-								@Override
-								public Object call() throws Exception {
-									SceneManager.getTaskManager().render(new Callable<Object>() {
-										@Override
-										public Object call() throws Exception {
 											if (job.printDialog())
 												try {
 													job.print();
 												} catch (final PrinterException exc) {
 													exc.printStackTrace();
 												}
-											return null;
-										}
-									});
-									return null;
-								}
-							});
-						}
-					});
-				} else {
-					if (pageNum != 0 || x != 0 || y != 0) {
-//						Thread.sleep(1000);
-						ScreenExporter.exportCurrentScreen(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(), printout);
-					}
-
-					if (pageNum < printCenters.size()) {
-						final Vector3 pos = new Vector3(printCenters.get(pageNum));
-						pos.set(pos.getX() + x + w / 2.0, -10.0, pos.getZ() - y - h / 2.0);
-						final Camera camera = Camera.getCurrentCamera();
-						camera.setLocation(pos);
-						camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
-						SceneManager.getInstance().getCameraNode().updateFromCamera();
-						if (x + w < getPageWidth())
-							print(pageNum, printout, x + w, y, w, h);
-						else if (y + h < getPageHeight())
-							print(pageNum, printout, 0, y + h, w, h);
-						else
-							print(pageNum + 1, printout, 0, 0, w, h);
-//						print(pageNum + 1, printout, x, y);
-//						print(pageNum, printout, x, y, w, h);
-					} else
-						print(pageNum + 1, printout, 0, 0, w, h);
-
-				}
-				return null;
-			}
-		});
 	}
 
 	public void setPrintPreview(final boolean printPreview) {

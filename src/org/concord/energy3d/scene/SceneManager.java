@@ -147,7 +147,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());
 	private final Canvas canvas;
-	private final FrameHandler frameHandler;
+	public final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
 	private final Node root = new Node("Root");
 	private final Node backgroundRoot = new Node("Scenary Root");

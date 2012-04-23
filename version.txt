@@ -1035,6 +1035,11 @@ Version 0.5 - October 20, 2011
 - fix exception when canceling save dialog box
 - printing works in mac os x now
 - door texture is simple in no texture mode 
+- algorithm to capture full resolution screenshots of only the pages that need to be printed
+- improve memory consumption by sending current page image to the printer right away
+- fix problem capturing snap shot of previous camera position
+- successful completion of printing with new algorithm
+
 
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class
