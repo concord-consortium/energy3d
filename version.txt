@@ -1041,10 +1041,10 @@ Version 0.5 - October 20, 2011
 - successful completion of printing with new algorithm
 - add shortkey G for removing all gables from roofs
 - fix problem with hiding wrong gable roof part due by ensuring that roof parts with only one lower base points are never considered for hiding
-
 - save overhang in model files
 - save texture type in model files 
 - save house part colors in model files
+- release 0.6.6
 
 - *rescale textures when texture type changes
 - *consider scale factor in print preview
