@@ -1045,9 +1045,10 @@ Version 0.5 - October 20, 2011
 - save texture type in model files 
 - save house part colors in model files
 - release 0.6.6
+- consider scale factor in print preview
+
 
 - *rescale textures when texture type changes
-- *consider scale factor in print preview
 
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class

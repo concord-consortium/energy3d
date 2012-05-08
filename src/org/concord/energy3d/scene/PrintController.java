@@ -416,10 +416,10 @@ public class PrintController implements Updater {
 
 	private void computePageDimension() {
 		spaceBetweenParts = Scene.isAnnotationsVisible() ? 0.3 : 0;
-		final double fromPageToWorldCoord;
-		if (!isScaleToFit) {
-			fromPageToWorldCoord = exactFromPageToWorldCoord;
-		} else {
+		double fromPageToWorldCoord;
+		if (!isScaleToFit)
+			fromPageToWorldCoord = exactFromPageToWorldCoord / (Scene.getInstance().getAnnotationScale() / 10.0);
+		else {
 			double maxWidth = 0;
 			double maxHeight = 0;
 			for (final HousePart printPart : printParts) {
