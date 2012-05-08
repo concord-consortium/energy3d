@@ -367,7 +367,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (moveState != null)
 			executeMouseMove();
 
-		Scene.getInstance().update();
+		if (Scene.isRedrawAll())
+			Scene.getInstance().update();
 
 		if (rotAnim && viewMode == ViewMode.NORMAL && canvas.getCanvasRenderer() != null) {
 			final Matrix3 rotate = new Matrix3();

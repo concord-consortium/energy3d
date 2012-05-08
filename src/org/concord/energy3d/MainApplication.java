@@ -3,6 +3,7 @@ package org.concord.energy3d;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
 
@@ -33,6 +34,7 @@ public class MainApplication {
 		final SceneManager scene = SceneManager.getInstance();
 		MainFrame.getInstance().setVisible(true);
 		new Thread(scene, "Energy 3D Application").start();
+		Scene.getInstance();
 		// System.out.println(System.nanoTime() - s);
 	}
 

@@ -1046,9 +1046,9 @@ Version 0.5 - October 20, 2011
 - save house part colors in model files
 - release 0.6.6
 - consider scale factor in print preview
-
-
-- *rescale textures when texture type changes
+- save the annotationScale of the scene with the model 
+- re-animate print preview after changing scene scale
+- re-animate print preview when texture type changes
 
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class

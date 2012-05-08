@@ -158,7 +158,7 @@ public class PrintController implements Updater {
 					restartFlag = false;
 //					/* to force redraw when animated back to normal scene */
 //					Scene.getInstance().redrawAll();
-//					Scene.getInstance().update();
+					Scene.getInstance().update();
 					setPrintPreview(true);
 					return;
 				}

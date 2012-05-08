@@ -447,6 +447,7 @@ public abstract class HousePart implements Serializable {
 			if (root == null)
 				init();
 			drawMesh();
+			updateTextureAndColor();
 			updateEditShapes();
 //			CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
 			hideAnnotations();

@@ -58,7 +58,7 @@ public class Scene implements Serializable {
 	private static boolean drawThickness = false;
 	private static boolean drawAnnotationsInside = false;
 	private static Unit unit = Unit.Centimeter;
-	private static double annotationScale = 10;
+	private double annotationScale = 10;
 	private static boolean isAnnotationsVisible = true;
 	private final ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private ReadOnlyVector3 cameraLocation;
@@ -94,7 +94,7 @@ public class Scene implements Serializable {
 			e.printStackTrace();
 		}
 
-		final Foundation foundation = new Foundation(xLength / annotationScale, yLength / annotationScale);
+		final Foundation foundation = new Foundation(xLength / 10, yLength / 10);
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
@@ -311,6 +311,7 @@ public class Scene implements Serializable {
 
 	public void setTextureMode(final TextureMode textureMode) {
 		this.textureMode = textureMode;
+		redrawAll();
 		for (final HousePart part : parts)
 			part.updateTextureAndColor();
 		if (PrintController.getInstance().getPrintParts() != null)
@@ -318,13 +319,6 @@ public class Scene implements Serializable {
 				part.updateTextureAndColor();
 
 		Scene.getInstance().updateRoofDashLinesColor();
-
-		// if (textureMode != TextureMode.None)
-//		 redrawAll = true;
-
-//		if (PrintController.getInstance().isPrintPreview())
-//			PrintController.getInstance().restartAnimation();
-
 	}
 
 	public void setDrawThickness(final boolean draw) {
@@ -350,11 +344,15 @@ public class Scene implements Serializable {
 	}
 
 	public void redrawAll() {
+		if (PrintController.getInstance().isPrintPreview())
+			PrintController.getInstance().restartAnimation();
+		else
 		redrawAll = true;
+//			Scene.getInstance().redrawAll();
 	}
 
 	public void update() {
-		if (redrawAll) {
+//		if (redrawAll) {
 			Snap.clearAnnotationDrawn();
 			for (final HousePart part : parts)
 				if (part instanceof Roof)
@@ -366,7 +364,7 @@ public class Scene implements Serializable {
 				for (final HousePart part : PrintController.getInstance().getPrintParts())
 					part.draw();
 			redrawAll = false;
-		}
+//		}
 	}
 
 	public void setUnit(final Unit unit) {
@@ -382,12 +380,12 @@ public class Scene implements Serializable {
 
 	public void setAnnotationScale(final double scale) {
 		annotationScale = scale;
-		redrawAll = true;
+//		redrawAll = true;
 	}
 
 	public double getAnnotationScale() {
 		if (annotationScale == 0)
-			annotationScale = 1;
+			annotationScale = 10;
 		return annotationScale;
 	}
 
