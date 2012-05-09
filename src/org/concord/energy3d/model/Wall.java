@@ -169,7 +169,7 @@ public class Wall extends HousePart {
 		Snap.clearAnnotationDrawn();
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			final HousePart previousContainer = container;
-			final PickedHousePart picked = pick(x, y, new Class<?>[] { Foundation.class, null });
+			final PickedHousePart picked = pick(x, y, new Class<?>[] {Foundation.class});
 			if (container != previousContainer && previousContainer != null)
 				return;
 			if (container != previousContainer)

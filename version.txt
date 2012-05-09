@@ -1050,9 +1050,11 @@ Version 0.5 - October 20, 2011
 - re-animate print preview after changing scene scale
 - re-animate print preview when texture type changes
 - allow single click to starting wall and a single click to finish it
+- only allow inserting walls on a platform
 
-- *only allow inserting walls on a platform
 - *disallow shrinking the size of platform so that the walls are no longer on the platform
+- *make the house completely dark after sunset
+- *fix disconnected walls upon cleanup
 
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class

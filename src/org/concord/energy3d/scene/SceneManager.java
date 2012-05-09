@@ -999,7 +999,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		setGridsVisible(false);
 		if (operation == Operation.DRAW_WALL) {
 			drawn = new Wall();
-			setGridsVisible(true);
+//			setGridsVisible(true);
 		} else if (operation == Operation.DRAW_DOOR)
 			drawn = new Door();
 		else if (operation == Operation.DRAW_WINDOW)
