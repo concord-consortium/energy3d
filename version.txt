@@ -1054,9 +1054,9 @@ Version 0.5 - October 20, 2011
 - make the house completely dark after sunset
 - make the house slightly lit up with ambient light at night time
 - if startup time is night time then reset the time to noon to avoid presenting dark house to user when the shading is turned on
+- fix disconnected walls upon cleanup
 
 - *disallow shrinking the size of platform so that the walls are no longer on the platform
-- *fix disconnected walls upon cleanup
 - *use passManager to render wireframes of all house parts (use Heliodon as guide)
 - *fix problem with transparent texture and shading not working together
 

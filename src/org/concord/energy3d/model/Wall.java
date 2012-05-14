@@ -49,7 +49,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
-//	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
+	// private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private static final double MIN_WALL_LENGTH = 0.01;
 	private static double defaultWallHeight = 2.0; // the recommended default wall height is 20cm
 	private static int currentVisitStamp = 1;
@@ -66,13 +66,13 @@ public class Wall extends HousePart {
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
 
-//	public static ReadOnlyColorRGBA getDefaultColor() {
-//		return defaultColor;
-//	}
-//
-//	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
-//		defaultColor = color;
-//	}
+	// public static ReadOnlyColorRGBA getDefaultColor() {
+	// return defaultColor;
+	// }
+	//
+	// public static void setDefaultColor(final ReadOnlyColorRGBA color) {
+	// defaultColor = color;
+	// }
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -107,11 +107,11 @@ public class Wall extends HousePart {
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new OrientedBoundingBox());
 
-//		final BlendState blend = new BlendState();
-//		blend.setBlendEnabled(true);
-//		blend.setTestEnabled(true);
-//		mesh.setRenderState(blend);
-//		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		// final BlendState blend = new BlendState();
+		// blend.setBlendEnabled(true);
+		// blend.setTestEnabled(true);
+		// mesh.setRenderState(blend);
+		// mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		root.attachChild(mesh);
 
 		backMesh = new Mesh("Wall (Back)");
@@ -169,7 +169,7 @@ public class Wall extends HousePart {
 		Snap.clearAnnotationDrawn();
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			final HousePart previousContainer = container;
-			final PickedHousePart picked = pick(x, y, new Class<?>[] {Foundation.class});
+			final PickedHousePart picked = pick(x, y, new Class<?>[] { Foundation.class });
 			if (container != previousContainer && previousContainer != null)
 				return;
 			if (container != previousContainer)
@@ -362,8 +362,8 @@ public class Wall extends HousePart {
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.1 : 1.0;
-//		final double scale2 = 1;
-//		u.set(u.getX() * scale2, u.getY() * scale2, u.getZ() * scale2);
+		// final double scale2 = 1;
+		// u.set(u.getX() * scale2, u.getY() * scale2, u.getZ() * scale2);
 		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale, o, u, v);
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
@@ -1056,7 +1056,7 @@ public class Wall extends HousePart {
 		surroundMesh = originalWall.surroundMesh.makeCopy(true);
 		windowsSurroundMesh = originalWall.windowsSurroundMesh.makeCopy(true);
 		wireframeMesh = originalWall.wireframeMesh.makeCopy(true);
-//		((Line) wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
+		// ((Line) wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
 		((Line) wireframeMesh).setLineWidth(printWireframeThickness);
 		root.attachChild(backMesh);
 		root.attachChild(surroundMesh);
@@ -1153,5 +1153,25 @@ public class Wall extends HousePart {
 	@Override
 	public void updateTextureAndColor() {
 		updateTextureAndColor(mesh, Scene.getInstance().getWallColor());
+	}
+
+	public void fixDisconnectedWalls() {
+		if (neighbors[0] != null && neighbors[1] != null)
+			return;
+
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Wall && part != this) {
+				final Wall otherWall = (Wall) part;
+				for (int index = 0; index < 2; index++) {
+					if (neighbors[index] == null)
+						for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
+							if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && otherWall.getAbsPoint(otherIndex * 2).distance(getAbsPoint(index * 2)) < MathUtils.ZERO_TOLERANCE) {
+								System.out.println("Fixing neighbor...");
+								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
+							}
+						}
+				}
+			}
+		}
 	}
 }

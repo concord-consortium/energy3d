@@ -16,6 +16,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Snap;
+import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.util.Config;
@@ -212,6 +213,17 @@ public class Scene implements Serializable {
 		for (final HousePart housePart : toBeRemoved)
 			remove(housePart);
 
+		fixDisconnectedWalls();
+
+	}
+
+	private void fixDisconnectedWalls() {
+		for (final HousePart part : parts) {
+			if (part instanceof Wall) {
+				final Wall wall = (Wall) part;
+				wall.fixDisconnectedWalls();
+			}
+		}
 	}
 
 	public static void save(final URL url) throws Exception {
