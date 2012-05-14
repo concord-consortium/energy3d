@@ -201,6 +201,12 @@ public class Heliodon {
 		setDate(timeAndDate);
 		setTime(timeAndDate);
 
+		if (isNightTime()) {
+			final Calendar calendar = Calendar.getInstance();
+			calendar.set(2000, 1, 1, 12, 0, 0);
+			setTime(calendar.getTime());
+		}
+
 		if (Config.isHeliodonMode())
 			setSunRegionAlwaysVisible(true);
 
@@ -422,14 +428,12 @@ public class Heliodon {
 	}
 
 	public void setVisible(final boolean visible) {
-//		if (!Config.isApplet()) {
-			if (bloomRenderPass == null) {
-				bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
-				passManager.add(bloomRenderPass);
-				bloomRenderPass.add(sun);
-			}
-			bloomRenderPass.setEnabled(visible);
-//		}
+		if (bloomRenderPass == null) {
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
+			passManager.add(bloomRenderPass);
+			bloomRenderPass.add(sun);
+		}
+		bloomRenderPass.setEnabled(visible);
 		root.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 
 		if (visible)
@@ -578,8 +582,17 @@ public class Heliodon {
 
 	private void setSunLocation(final ReadOnlyVector3 sunLocation) {
 		sun.setTranslation(sunLocation);
-		light.setDirection(sunLocation.negate(null));
-		light.setEnabled(sunLocation.getZ() >= 0);
+		final boolean enabled = !isNightTime();
+		if (enabled)
+			light.setDirection(sunLocation.negate(null));
+		else
+			light.setDirection(Vector3.ZERO);
+		if (bloomRenderPass != null)
+			bloomRenderPass.setEnabled(enabled);
+	}
+
+	public boolean isNightTime() {
+		return sun.getTranslation().getZ() < 0;
 	}
 
 	private void draw() {

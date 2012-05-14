@@ -1051,11 +1051,14 @@ Version 0.5 - October 20, 2011
 - re-animate print preview when texture type changes
 - allow single click to starting wall and a single click to finish it
 - only allow inserting walls on a platform
+- make the house completely dark after sunset
+- make the house slightly lit up with ambient light at night time
+- if startup time is night time then reset the time to noon to avoid presenting dark house to user when the shading is turned on
 
 - *disallow shrinking the size of platform so that the walls are no longer on the platform
-- *make the house completely dark after sunset
 - *fix disconnected walls upon cleanup
-
+- *use passManager to render wireframes of all house parts (use Heliodon as guide)
+- *fix problem with transparent texture and shading not working together
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class
 

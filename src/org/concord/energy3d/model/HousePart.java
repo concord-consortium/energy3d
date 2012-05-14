@@ -17,7 +17,6 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture.ApplyMode;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -656,7 +655,7 @@ public abstract class HousePart implements Serializable {
 		} else {
 			final TextureState ts = new TextureState();
 			final Texture texture = TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
-			texture.setApply(ApplyMode.Decal);
+//			texture.setApply(ApplyMode.Decal);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
 			if (Scene.getInstance().getTextureMode() == TextureMode.Full)

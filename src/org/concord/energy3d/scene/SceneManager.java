@@ -267,6 +267,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		light.setAmbient(new ColorRGBA(1, 1, 1, 1));
 		light.setEnabled(true);
 
+
+
 		lightState.setEnabled(false);
 		lightState.attach(light);
 		root.setRenderState(lightState);
@@ -441,7 +443,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		passManager.renderPasses(renderer);
 		try {
-			shadowPass.renderPass(renderer);
+			if (!heliodon.isNightTime())
+				shadowPass.renderPass(renderer);
 		} catch (final Throwable e) {
 			e.printStackTrace();
 			if (shadowPass.isEnabled()) {
@@ -1092,13 +1095,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setShadow(final boolean shadow) {
-		taskManager.update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				shadowPass.setEnabled(shadow);
-				return null;
-			}
-		});
+		shadowPass.setEnabled(shadow);
+//		taskManager.update(new Callable<Object>() {
+//			@Override
+//			public Object call() throws Exception {
+//				shadowPass.setEnabled(shadow);
+//				return null;
+//			}
+//		});
 	}
 
 	public CameraNode getCameraNode() {

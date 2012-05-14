@@ -672,8 +672,13 @@ public class MainPanel extends JPanel {
 			dateSpinner = new JSpinner(model);
 			dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
 			dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+			    boolean firstCall = true;
 				@Override
 				public void stateChanged(final javax.swing.event.ChangeEvent e) {
+				    if (firstCall)
+				        return;
+				    else
+				        firstCall = false;
 					final Heliodon heliodon = SceneManager.getInstance().getHeliodon();
 					if (heliodon != null)
 						heliodon.setDate((Date) dateSpinner.getValue());
@@ -693,8 +698,15 @@ public class MainPanel extends JPanel {
 			timeSpinner = new JSpinner(new SpinnerDateModel());
 			timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
 			timeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-				@Override
-				public void stateChanged(final javax.swing.event.ChangeEvent e) {
+                private boolean firstCall = true;
+
+                @Override
+                public void stateChanged(final javax.swing.event.ChangeEvent e) {
+                    // ignore the first event
+                    if (firstCall)
+                        return;
+                    else
+                        firstCall = false;
 					final Heliodon heliodon = SceneManager.getInstance().getHeliodon();
 					if (heliodon != null)
 						heliodon.setTime((Date) timeSpinner.getValue());
