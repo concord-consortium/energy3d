@@ -170,6 +170,8 @@ public class MeshLib {
 				wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 				wireframeMesh.setModelBound(new BoundingBox());
 				wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10));
+				// offset to avoid x-fighting
+				wireframeMesh.setTranslation(group.key.multiply(0.001, null));
 				Util.disablePickShadowLight(wireframeMesh);
 				node.attachChild(wireframeMesh);
 

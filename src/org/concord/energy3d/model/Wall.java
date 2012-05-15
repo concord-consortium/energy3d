@@ -417,6 +417,7 @@ public class Wall extends HousePart {
 		}
 		wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
 		wireframeMesh.getMeshData().updateVertexCount();
+		wireframeMesh.setTranslation(getFaceDirection().multiply(0.001, null));
 	}
 
 	public Polygon computeWallAndWindowPolygon(final boolean backMesh) {

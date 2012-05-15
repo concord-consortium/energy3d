@@ -769,7 +769,7 @@ public abstract class Roof extends HousePart {
 				final Line wireframeMesh = (Line) ((Node) roofPartsRoot.getChild(i)).getChild(4);
 				// wireframeMesh.setLineWidth(WIREFRAME_THICKNESS);
 				wireframeMesh.setLineWidth(printWireframeThickness);
-				mesh.getSceneHints().setCullHint((Scene.getInstance().getTextureMode() == TextureMode.None && Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
+//				mesh.getSceneHints().setCullHint((Scene.getInstance().getTextureMode() == TextureMode.None && Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
 			}
 		}
 		drawAnnotations();

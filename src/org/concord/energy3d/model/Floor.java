@@ -195,7 +195,8 @@ public class Floor extends HousePart {
 		}
 		buf.limit(buf.position());
 		wireframeMesh.getMeshData().updateVertexCount();
-		wireframeMesh.updateModelBound();
+//		wireframeMesh.updateModelBound();
+		wireframeMesh.setTranslation(getFaceDirection().multiply(0.001, null));
 	}
 
 	@Override
