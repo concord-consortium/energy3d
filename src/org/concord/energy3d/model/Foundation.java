@@ -32,6 +32,10 @@ public class Foundation extends HousePart {
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient boolean resizeHouseMode = false;
+	private transient double minX;
+	private transient double minY;
+	private transient double maxX;
+	private transient double maxY;
 
 	public Foundation() {
 		super(2, 8, 0.1);
@@ -47,7 +51,6 @@ public class Foundation extends HousePart {
 		for (int i = 0; i < 4; i++)
 			points.get(4 + i).set(points.get(i)).setZ(newBoundingHeight + height);
 	}
-
 
 	@Override
 	protected boolean mustHaveContainer() {
@@ -174,6 +177,8 @@ public class Foundation extends HousePart {
 		if (pick != null) {
 			p = pick.getPoint();
 			p = grid(p, getGridSize());
+			if (!resizeHouseMode)
+				p = ensureIncludesChildren(p, index);
 		}
 		points.get(index).set(p);
 		if (!isFirstPointInserted()) {
@@ -204,6 +209,29 @@ public class Foundation extends HousePart {
 		else
 			draw();
 		setEditPointsVisible(true);
+	}
+
+	private Vector3 ensureIncludesChildren(final ReadOnlyVector3 p, final int index) {
+		System.out.println(minX);
+		System.out.println(p);
+		final Vector3 newP = new Vector3(p);
+		if ((index == 0 && points.get(0).getX() < points.get(2).getX()) || (index == 1 && points.get(1).getX() < points.get(3).getX())) {
+			if (newP.getX() > minX)
+				newP.setX(minX);
+		} else {
+			if (newP.getX() < maxX)
+				newP.setX(maxX);
+		}
+
+		if ((index == 0 && points.get(0).getY() < points.get(1).getY()) || (index == 2 && points.get(2).getY() < points.get(3).getY())) {
+			if (newP.getY() > minY)
+				newP.setY(minY);
+		} else {
+			if (newP.getY() < maxY)
+				newP.setY(maxY);
+		}
+
+		return newP;
 	}
 
 	private void applyNewHeight(final double orgHeight, final double newHeight, final boolean finalize) {
@@ -382,6 +410,22 @@ public class Foundation extends HousePart {
 		super.setEditPoint(editPoint);
 		if (!resizeHouseMode) {
 			prepareForNotResizing();
+			minX = Double.MAX_VALUE;
+			minY = Double.MAX_VALUE;
+			maxX = Double.MIN_VALUE;
+			maxY = Double.MIN_VALUE;
+			for (final HousePart part : children) {
+				final Vector3 p1 = part.getAbsPoint(0);
+				final Vector3 p2 = part.getAbsPoint(2);
+				minX = Math.min(p1.getX(), minX);
+				minX = Math.min(p2.getX(), minX);
+				minY = Math.min(p1.getY(), minY);
+				minY = Math.min(p2.getY(), minY);
+				maxX = Math.max(p1.getX(), maxX);
+				maxX = Math.max(p2.getX(), maxX);
+				maxY = Math.max(p1.getY(), maxY);
+				maxY = Math.max(p2.getY(), maxY);
+			}
 		}
 	}
 

@@ -45,9 +45,7 @@ public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
-//	protected static ReadOnlyColorRGBA defaultColor = null; //ColorRGBA.GRAY;
 	protected static boolean drawAnnotations = Config.isApplet() ? false : true;
-//	protected static float WIREFRAME_THICKNESS = 2f;
 	protected static final float printWireframeThickness = 2f;
 	private static HousePart gridsHighlightedHousePart;
 	private static boolean snapToObjects = false;
@@ -90,20 +88,6 @@ public abstract class HousePart implements Serializable {
 	public static void setSnapToGrids(final boolean snapToGrid) {
 		HousePart.snapToGrids = snapToGrid;
 	}
-
-//	public static ReadOnlyColorRGBA getDefaultColor() {
-//		if (defaultColor != null)
-//			return defaultColor;
-//		else if (Scene.getInstance().getTextureMode() == TextureMode.None)
-//			return ColorRGBA.GRAY;
-//		else
-//			return ColorRGBA.WHITE;
-//	}
-//
-//	public static void setDefaultColor(final ReadOnlyColorRGBA defaultColor) {
-//		HousePart.defaultColor = defaultColor;
-//		Scene.getInstance().updateRoofDashLinesColor();
-//	}
 
 	public static HousePart getGridsHighlightedHousePart() {
 		return gridsHighlightedHousePart;
