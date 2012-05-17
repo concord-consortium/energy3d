@@ -169,9 +169,14 @@ public class Wall extends HousePart {
 		Snap.clearAnnotationDrawn();
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			final HousePart previousContainer = container;
-			final PickedHousePart picked = pick(x, y, new Class<?>[] { Foundation.class });
-			if (container != previousContainer && previousContainer != null)
-				return;
+			PickedHousePart picked = pick(x, y, new Class<?>[] { Foundation.class });
+			System.out.println(container);
+			if (container != previousContainer && previousContainer != null && isFirstPointInserted()) {
+				container = previousContainer;
+				picked = null;
+			}
+//			if (container != previousContainer && previousContainer != null)
+//				return;
 			if (container != previousContainer)
 				for (int i = 0; i < points.size(); i++) {
 					final Vector3 p = points.get(i);
@@ -182,6 +187,11 @@ public class Wall extends HousePart {
 					else
 						p.setZ(container.height + height);
 				}
+
+			if (container == null)
+				return;
+
+
 			Vector3 p = null;
 			if (picked != null) {
 				p = picked.getPoint();

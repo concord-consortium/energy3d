@@ -218,25 +218,27 @@ public class Foundation extends HousePart {
 			points.get(i + 4).set(points.get(i)).setZ(Math.max(height, newBoundingHeight + height));
 	}
 
-	private Vector3 ensureIncludesChildren(final ReadOnlyVector3 p, final int index) {
-		final Vector3 newP = new Vector3(p);
+	private Vector3 ensureIncludesChildren(final Vector3 p, final int index) {
+		if (children.isEmpty())
+			return p;
+
 		if ((index == 0 && points.get(0).getX() < points.get(2).getX()) || (index == 1 && points.get(1).getX() < points.get(3).getX())) {
-			if (newP.getX() > minX)
-				newP.setX(minX);
+			if (p.getX() > minX)
+				p.setX(minX);
 		} else {
-			if (newP.getX() < maxX)
-				newP.setX(maxX);
+			if (p.getX() < maxX)
+				p.setX(maxX);
 		}
 
 		if ((index == 0 && points.get(0).getY() < points.get(1).getY()) || (index == 2 && points.get(2).getY() < points.get(3).getY())) {
-			if (newP.getY() > minY)
-				newP.setY(minY);
+			if (p.getY() > minY)
+				p.setY(minY);
 		} else {
-			if (newP.getY() < maxY)
-				newP.setY(maxY);
+			if (p.getY() < maxY)
+				p.setY(maxY);
 		}
 
-		return newP;
+		return p;
 	}
 
 	private void applyNewHeight(final double orgHeight, final double newHeight, final boolean finalize) {

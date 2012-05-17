@@ -1062,7 +1062,12 @@ Version 0.5 - October 20, 2011
 - update texture menu radio button upon loading a new model
 - save annotation on/off state with model file
 - fix bug with door has different height after resizing house and then moving base edit points
-- fix problem with upper edit points of resize box not showing 
+- fix problem with upper edit points of resize box not showing
+- make drawing walls on the edge of platform easier by following mouse outside of platform
+- do not show floor grids when inserting wall
+- fix problem with being unable to draw platform on the negative x
+
+- *fix exception for connected walls picking
 
 
 - *fix problem with transparent texture and shading not working together
