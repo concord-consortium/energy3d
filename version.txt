@@ -1068,6 +1068,8 @@ Version 0.5 - October 20, 2011
 - fix problem with being unable to draw platform on the negative x
 - fix exception for connected walls picking by using CollisionTree.updateMesh
 - fix problem with windows sticking out because neighboring walls' children not redrawn
+- ensure mesh.getMeshData().updateVertexCount() is called after all mesh updates
+- ensure CollisionTreeManager.INSTANCE.updateCollisionTree(mesh) is called after all pickable mesh updates
 
 - *fix problem with transparent texture and shading not working together
 - *avoid inserting multiple roofs at same place

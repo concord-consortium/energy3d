@@ -7,6 +7,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -241,6 +242,7 @@ public class MeshLib {
 				buf.put(v.getXf()).put(v.getYf());
 
 			newMesh.getMeshData().updateVertexCount();
+			CollisionTreeManager.INSTANCE.updateCollisionTree(newMesh);
 			newMesh.updateModelBound();
 			node.getChild(3).setTranslation(center.add(normal.multiply(0.1, null), null));
 

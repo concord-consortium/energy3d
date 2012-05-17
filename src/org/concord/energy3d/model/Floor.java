@@ -16,6 +16,7 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
@@ -110,8 +111,9 @@ public class Floor extends HousePart {
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.2 : 1.0;
 		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale , new TPoint(0, 0, 0), new TPoint(1, 0, 0), new TPoint(0, 1, 0));
 		mesh.getMeshData().updateVertexCount();
+		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 		mesh.updateModelBound();
-		root.updateWorldBound(true);
+//		root.updateWorldBound(true);
 	}
 
 	@Override
@@ -195,7 +197,7 @@ public class Floor extends HousePart {
 		}
 		buf.limit(buf.position());
 		wireframeMesh.getMeshData().updateVertexCount();
-//		wireframeMesh.updateModelBound();
+		wireframeMesh.updateModelBound();
 		wireframeMesh.setTranslation(getFaceDirection().multiply(0.001, null));
 	}
 

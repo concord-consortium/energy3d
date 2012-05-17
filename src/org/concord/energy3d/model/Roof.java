@@ -23,7 +23,6 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -96,7 +95,8 @@ public abstract class Roof extends HousePart {
 		root.attachChild(roofPartsRoot);
 
 		mesh = new Mesh("Roof");
-		mesh.setModelBound(new BoundingBox());
+		mesh.setModelBound(null);
+//		mesh.setModelBound(new BoundingBox());
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
 	}
@@ -139,10 +139,10 @@ public abstract class Roof extends HousePart {
 				final MaterialState ms = new MaterialState();
 				ms.setColorMaterial(ColorMaterial.Diffuse);
 				mesh.setRenderState(ms);
-				mesh.getMeshData().updateVertexCount();
-				mesh.updateModelBound();
+//				mesh.getMeshData().updateVertexCount();
+//				mesh.updateModelBound();
 				// mesh.updateGeometricState(0);
-				CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
+//				CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 			}
 			roofPartIndex++;
 		}
@@ -747,7 +747,9 @@ public abstract class Roof extends HousePart {
 	public void delete() {
 		super.delete();
 		for (final Wall wall : walls) {
-			wall.setRoof(null);
+			// if the wall doesn't already have another roof on top of it (it's possible when the user replaces an old roof with a new roof)
+			if (wall.getRoof() == this)
+				wall.setRoof(null);
 			wall.draw();
 		}
 	}

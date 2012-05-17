@@ -189,7 +189,6 @@ public class Wall extends HousePart {
 //						p.setZ(container.height + height);
 //				}
 
-			System.out.println(container);
 			if (container == null)
 				return;
 
@@ -380,21 +379,23 @@ public class Wall extends HousePart {
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
 
+		/* draw invisibleMesh */
 		final Polygon invisiblePolygon = new Polygon(ArdorVector3PolygonPoint.toPoints(extractPolygonPoints(polygon)));
 		Poly2Tri.triangulate(invisiblePolygon);
 		ArdorMeshMapper.updateTriangleMesh(invisibleMesh, invisiblePolygon, fromXY);
 		invisibleMesh.getMeshData().updateVertexCount();
+		CollisionTreeManager.INSTANCE.updateCollisionTree(invisibleMesh);
 		invisibleMesh.updateModelBound();
 
 		drawBackMesh(computeWallAndWindowPolygon(true), fromXY);
 		drawSurroundMesh(thicknessNormal);
 		drawWindowsSurroundMesh(thicknessNormal);
 
-		backMesh.updateModelBound();
-		surroundMesh.updateModelBound();
-		windowsSurroundMesh.updateModelBound();
-		wireframeMesh.updateModelBound();
-		invisibleMesh.updateModelBound();
+//		backMesh.updateModelBound();
+//		surroundMesh.updateModelBound();
+//		windowsSurroundMesh.updateModelBound();
+//		wireframeMesh.updateModelBound();
+//		invisibleMesh.updateModelBound();
 
 		root.updateWorldBound(true);
 	}
@@ -429,6 +430,7 @@ public class Wall extends HousePart {
 		}
 		wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
 		wireframeMesh.getMeshData().updateVertexCount();
+		wireframeMesh.updateModelBound();
 		wireframeMesh.setTranslation(getFaceDirection().multiply(0.001, null));
 	}
 
@@ -584,6 +586,8 @@ public class Wall extends HousePart {
 		ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
 		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
 		backMesh.getMeshData().updateVertexCount();
+		CollisionTreeManager.INSTANCE.updateCollisionTree(backMesh);
+		backMesh.updateModelBound();
 	}
 
 	// TODO what does this method do??
@@ -712,9 +716,8 @@ public class Wall extends HousePart {
 		vertexBuffer.limit(vertexBuffer.position());
 		normalBuffer.limit(normalBuffer.position());
 		surroundMesh.getMeshData().updateVertexCount();
-		surroundMesh.updateModelBound();
-		// to avoid invalid primitive exception
 		CollisionTreeManager.INSTANCE.updateCollisionTree(surroundMesh);
+		surroundMesh.updateModelBound();
 	}
 
 	protected void addSurroundQuad(final int i1, final int i2, final ReadOnlyVector3 n, final ReadOnlyVector3 thickness, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {
@@ -785,7 +788,7 @@ public class Wall extends HousePart {
 		vertexBuffer.limit(pos != 0 ? pos : 1);
 
 		windowsSurroundMesh.getMeshData().updateVertexCount();
-		// windowsSurroundMesh.updateModelBound();
+		windowsSurroundMesh.updateModelBound();
 		// windowsSurroundMesh.updateWorldBound(false);
 	}
 

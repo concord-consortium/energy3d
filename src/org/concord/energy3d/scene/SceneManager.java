@@ -1390,6 +1390,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 					if (selectedHousePart != null && selectedHousePart.isDrawCompleted()) {
 						if (addHousePartCommand != null) {
+							removeExistingRoof();
 							undoManager.addEdit(addHousePartCommand);
 							if (!Config.isApplet())
 								MainFrame.getInstance().refreshUndoRedo();
@@ -1410,6 +1411,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				return null;
 			}
 		});
+	}
+
+	protected void removeExistingRoof() {
+//		if (selectedHousePart instanceof Roof) {
+//			final Wall wall = (Wall) ((Roof) selectedHousePart).getContainer();
+//			for (final HousePart part : Scene.getInstance().getParts())
+//				if (part instanceof Roof && part != selectedHousePart && ((Roof) part).getContainer() == wall) {
+//					undoManager.addEdit(new RemoveHousePartCommand(part));
+//					Scene.getInstance().remove(part);
+//					return;
+//				}
+//		}
 	}
 
 //	public void updateWindow() {
