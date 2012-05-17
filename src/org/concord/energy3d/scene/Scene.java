@@ -59,18 +59,18 @@ public class Scene implements Serializable {
 	private static boolean drawThickness = false;
 	private static boolean drawAnnotationsInside = false;
 	private static Unit unit = Unit.Centimeter;
-	private double annotationScale = 10;
-	private static boolean isAnnotationsVisible = true;
 	private final ArrayList<HousePart> parts = new ArrayList<HousePart>();
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
-	private double overhangLength = 0.2;
 	private TextureMode textureMode = TextureMode.Full;
 	private ReadOnlyColorRGBA foundationColor = ColorRGBA.WHITE;
 	private ReadOnlyColorRGBA wallColor = ColorRGBA.WHITE;
 	private ReadOnlyColorRGBA doorColor = ColorRGBA.WHITE;
 	private ReadOnlyColorRGBA floorColor = ColorRGBA.WHITE;
 	private ReadOnlyColorRGBA roofColor = ColorRGBA.WHITE;
+	private double overhangLength = 0.2;
+	private double annotationScale = 10;
+	private boolean isAnnotationsVisible = true;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -134,7 +134,18 @@ public class Scene implements Serializable {
 				camera.lookAt(instance.getCameraLocation().add(instance.getCameraDirection(), null), Vector3.UNIT_Z);
 			}
 			SceneManager.getInstance().getCameraNode().updateFromCamera();
+
 		}
+
+		if (!Config.isApplet()) {
+			if (instance.textureMode == TextureMode.None)
+				MainFrame.getInstance().getNoTextureRadioButtonMenuItem().setSelected(true);
+			else if (instance.textureMode == TextureMode.Simple)
+				MainFrame.getInstance().getSimpleTextureRadioButtonMenuItem().setSelected(true);
+			else
+				MainFrame.getInstance().getFullTextureRadioButtonMenuItem().setSelected(true);
+		}
+		MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
 
 		final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
 		if (cameraControl != null)
@@ -460,7 +471,7 @@ public class Scene implements Serializable {
 		return redrawAll;
 	}
 
-	public static boolean isAnnotationsVisible() {
+	public boolean isAnnotationsVisible() {
 		return isAnnotationsVisible;
 	}
 

@@ -1113,7 +1113,7 @@ public class MainFrame extends JFrame {
 		}
 		return separator_9;
 	}
-	private JRadioButtonMenuItem getNoTextureRadioButtonMenuItem() {
+	public JRadioButtonMenuItem getNoTextureRadioButtonMenuItem() {
 		if (noTextureRadioButtonMenuItem == null) {
 			noTextureRadioButtonMenuItem = new JRadioButtonMenuItem("No Texture");
 			noTextureRadioButtonMenuItem.addActionListener(new ActionListener() {
@@ -1126,7 +1126,7 @@ public class MainFrame extends JFrame {
 		}
 		return noTextureRadioButtonMenuItem;
 	}
-	private JRadioButtonMenuItem getSimpleTextureRadioButtonMenuItem() {
+	public JRadioButtonMenuItem getSimpleTextureRadioButtonMenuItem() {
 		if (simpleTextureRadioButtonMenuItem == null) {
 			simpleTextureRadioButtonMenuItem = new JRadioButtonMenuItem("Simple Texture");
 			simpleTextureRadioButtonMenuItem.addActionListener(new ActionListener() {
@@ -1139,7 +1139,7 @@ public class MainFrame extends JFrame {
 		}
 		return simpleTextureRadioButtonMenuItem;
 	}
-	private JRadioButtonMenuItem getFullTextureRadioButtonMenuItem() {
+	public JRadioButtonMenuItem getFullTextureRadioButtonMenuItem() {
 		if (fullTextureRadioButtonMenuItem == null) {
 			fullTextureRadioButtonMenuItem = new JRadioButtonMenuItem("Full Texture");
 			fullTextureRadioButtonMenuItem.addActionListener(new ActionListener() {

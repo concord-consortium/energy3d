@@ -212,8 +212,6 @@ public class Foundation extends HousePart {
 	}
 
 	private Vector3 ensureIncludesChildren(final ReadOnlyVector3 p, final int index) {
-		System.out.println(minX);
-		System.out.println(p);
 		final Vector3 newP = new Vector3(p);
 		if ((index == 0 && points.get(0).getX() < points.get(2).getX()) || (index == 1 && points.get(1).getX() < points.get(3).getX())) {
 			if (newP.getX() > minX)

@@ -9,7 +9,6 @@ import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
-import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
@@ -45,7 +44,7 @@ public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
-	protected static boolean drawAnnotations = Config.isApplet() ? false : true;
+//	protected static boolean drawAnnotations = Config.isApplet() ? false : true;
 	protected static final float printWireframeThickness = 2f;
 	private static HousePart gridsHighlightedHousePart;
 	private static boolean snapToObjects = false;
@@ -136,7 +135,8 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		labelsRoot = new Node("Labels");
 
-		setAnnotationsVisible(drawAnnotations);
+//		setAnnotationsVisible(drawAnnotations);
+		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
 
 		// Set up a reusable pick results
 		for (int i = 0; i < points.size(); i++)
@@ -433,7 +433,7 @@ public abstract class HousePart implements Serializable {
 			updateTextureAndColor();
 			updateEditShapes();
 //			CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
-			hideAnnotations();
+			clearAnnotations();
 			if (isDrawable())
 				drawAnnotations();
 			root.updateGeometricState(0);
@@ -572,7 +572,7 @@ public abstract class HousePart implements Serializable {
 		return annot;
 	}
 
-	protected void hideAnnotations() {
+	protected void clearAnnotations() {
 		for (final Spatial annot : sizeAnnotRoot.getChildren())
 			annot.getSceneHints().setCullHint(CullHint.Always);
 		for (final Spatial annot : angleAnnotRoot.getChildren())
@@ -606,7 +606,7 @@ public abstract class HousePart implements Serializable {
 	protected abstract void drawMesh();
 
 	public void setAnnotationsVisible(final boolean visible) {
-		drawAnnotations = visible;
+//		drawAnnotations = visible;
 		final CullHint cull = visible ? CullHint.Inherit : CullHint.Always;
 		sizeAnnotRoot.getSceneHints().setCullHint(cull);
 		angleAnnotRoot.getSceneHints().setCullHint(cull);

@@ -844,7 +844,7 @@ public class MainPanel extends JPanel {
 		SceneManager.getInstance().setOperation(Operation.SELECT);
 	}
 
-	private JToggleButton getAnnotationToggleButton() {
+	public JToggleButton getAnnotationToggleButton() {
 		if (annotationToggleButton == null) {
 			annotationToggleButton = new JToggleButton();
 			annotationToggleButton.setSelected(Config.isApplet() ? false : true);

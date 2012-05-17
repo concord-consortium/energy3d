@@ -415,7 +415,7 @@ public class PrintController implements Updater {
 	}
 
 	private void computePageDimension() {
-		spaceBetweenParts = Scene.isAnnotationsVisible() ? 0.3 : 0;
+		spaceBetweenParts = Scene.getInstance().isAnnotationsVisible() ? 0.3 : 0;
 		double fromPageToWorldCoord;
 		if (!isScaleToFit)
 			fromPageToWorldCoord = exactFromPageToWorldCoord / (Scene.getInstance().getAnnotationScale() / 10.0);

@@ -126,7 +126,8 @@ public abstract class Roof extends HousePart {
 		fillMeshWithPolygon(mesh, polygon);
 		// create roof parts
 		MeshLib.groupByPlanner(mesh, roofPartsRoot);
-		setAnnotationsVisible(drawAnnotations);
+//		setAnnotationsVisible(drawAnnotations);
+		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
 		hideGableRoofParts();
 		int roofPartIndex = 0;
 		for (final Spatial child : roofPartsRoot.getChildren()) {
@@ -396,7 +397,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	@Override
-	protected void hideAnnotations() {
+	protected void clearAnnotations() {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 			for (final Spatial sizeAnnot : ((Node) ((Node) roofPart).getChild(1)).getChildren())
 				sizeAnnot.getSceneHints().setCullHint(CullHint.Always);

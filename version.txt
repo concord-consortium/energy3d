@@ -1059,10 +1059,13 @@ Version 0.5 - October 20, 2011
 - translate roof and wall wireframe meshes forward to prevent z-fighting and avoid missing lines in printout
 - disallow shrinking the size of platform so that the walls are no longer on the platform
 - highlight the resize box edit points when hovering mouse over them
+- update texture menu radio button upon loading a new model
+- save annotation on/off state with model file
+
+
 
 - *fix problem with transparent texture and shading not working together
 - *avoid inserting multiple roofs at same place
-- *save annotation on/off state
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class
 
