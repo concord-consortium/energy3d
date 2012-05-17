@@ -1066,9 +1066,8 @@ Version 0.5 - October 20, 2011
 - make drawing walls on the edge of platform easier by following mouse outside of platform
 - do not show floor grids when inserting wall
 - fix problem with being unable to draw platform on the negative x
-
-- *fix exception for connected walls picking
-
+- fix exception for connected walls picking by using CollisionTree.updateMesh
+- fix problem with windows sticking out because neighboring walls' children not redrawn
 
 - *fix problem with transparent texture and shading not working together
 - *avoid inserting multiple roofs at same place

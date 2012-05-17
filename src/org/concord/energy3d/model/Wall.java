@@ -23,6 +23,7 @@ import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -170,24 +171,25 @@ public class Wall extends HousePart {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			final HousePart previousContainer = container;
 			PickedHousePart picked = pick(x, y, new Class<?>[] { Foundation.class });
-			System.out.println(container);
-			if (container != previousContainer && previousContainer != null && isFirstPointInserted()) {
+			if (container != previousContainer && previousContainer != null && (isFirstPointInserted() || container == null)) {
 				container = previousContainer;
 				picked = null;
 			}
 //			if (container != previousContainer && previousContainer != null)
 //				return;
-			if (container != previousContainer)
-				for (int i = 0; i < points.size(); i++) {
-					final Vector3 p = points.get(i);
-					p.setX(MathUtils.clamp(p.getX(), 0, 1));
-					p.setY(MathUtils.clamp(p.getY(), 0, 1));
-					if (i == 0 || i == 2)
-						p.setZ(container.height);
-					else
-						p.setZ(container.height + height);
-				}
 
+//			if (container != previousContainer)
+//				for (int i = 0; i < points.size(); i++) {
+//					final Vector3 p = points.get(i);
+//					p.setX(MathUtils.clamp(p.getX(), 0, 1));
+//					p.setY(MathUtils.clamp(p.getY(), 0, 1));
+//					if (i == 0 || i == 2)
+//						p.setZ(container.height);
+//					else
+//						p.setZ(container.height + height);
+//				}
+
+			System.out.println(container);
 			if (container == null)
 				return;
 
@@ -711,6 +713,8 @@ public class Wall extends HousePart {
 		normalBuffer.limit(normalBuffer.position());
 		surroundMesh.getMeshData().updateVertexCount();
 		surroundMesh.updateModelBound();
+		// to avoid invalid primitive exception
+		CollisionTreeManager.INSTANCE.updateCollisionTree(surroundMesh);
 	}
 
 	protected void addSurroundQuad(final int i1, final int i2, final ReadOnlyVector3 n, final ReadOnlyVector3 thickness, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {
@@ -992,7 +996,8 @@ public class Wall extends HousePart {
 				@Override
 				public void visit(final Wall wall, final Snap prev, final Snap next) {
 					visitWallAndReverseThickness(wall, prev);
-					walls.add(wall);
+					if (wall != Wall.this)
+						walls.add(wall);
 					wall.isShortWall = nextIsShort;
 					nextIsShort = !nextIsShort;
 				}
@@ -1005,14 +1010,17 @@ public class Wall extends HousePart {
 				@Override
 				public void visit(final Wall wall, final Snap prev, final Snap next) {
 					visitWallAndReverseThickness(wall, prev);
-					walls.add(wall);
+					if (wall != Wall.this)
+						walls.add(wall);
 					wall.isShortWall = nextIsShort;
 					nextIsShort = !nextIsShort;
 				}
 			});
 
-		for (final Wall wall : walls)
+		for (final Wall wall : walls) {
 			wall.draw();
+			wall.drawChildren();
+		}
 	}
 
 	private void visitWallAndReverseThickness(final Wall wall, final Snap prev) {

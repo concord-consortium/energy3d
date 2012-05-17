@@ -140,7 +140,7 @@ public abstract class Roof extends HousePart {
 				ms.setColorMaterial(ColorMaterial.Diffuse);
 				mesh.setRenderState(ms);
 				mesh.getMeshData().updateVertexCount();
-				// mesh.updateModelBound();
+				mesh.updateModelBound();
 				// mesh.updateGeometricState(0);
 				CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 			}
