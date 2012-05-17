@@ -1061,7 +1061,8 @@ Version 0.5 - October 20, 2011
 - highlight the resize box edit points when hovering mouse over them
 - update texture menu radio button upon loading a new model
 - save annotation on/off state with model file
-
+- fix bug with door has different height after resizing house and then moving base edit points
+- fix problem with upper edit points of resize box not showing 
 
 
 - *fix problem with transparent texture and shading not working together
@@ -1069,40 +1070,11 @@ Version 0.5 - October 20, 2011
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class
 
-
-- *fix problem with invisible walls
-
-- *add rotate camera option
-- *be smarter about orbit rotation when not clicking on any house part
-- *reset orbit center after new or open
-- *save camera position in file
-
-- *disallow picking walls when in resize mode
-
-
-- *fix problem with printing in mac os x by ensuring that canvas height does not exceed visible jframe if running under mac os x (will result in lower resolution printout)
-
- 
-
--*add feature for planting trees
-
-
+- *add feature for planting trees
 - *fix problem with disconnected walls after delete followed by undo
-- *fix problem of window drawn in front of wall due to not redrawing after wall thickness direction changes
-
-- *auto redraw gable wall when inserting gable or editing gable
-- *fix problem with resize tool
-- *fix problem with resizing custome roof
-- *put the main model in the exact middle of print preview view using its bounding box
-- *move all parameters of HousePart constructor to init
 - *too slow
-- fix problem with foundation bottom size annotation and label not showing in printout
-- reduce size of annotatoin font in printout 
-- undo the effect of HousePart.delete after undoing the remove
-- draw grids
-- automatically draw grids based on where the mouse is pointing
-- double click should zoom differently in print preview
-- fix bug with door has different height after resizing house and then moving base edit points
+- *undo the effect of HousePart.delete after undoing the remove
+- *automatically draw grids based on where the mouse is pointing
 
 
 TODO:

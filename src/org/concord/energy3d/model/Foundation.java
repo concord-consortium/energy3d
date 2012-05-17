@@ -48,8 +48,11 @@ public class Foundation extends HousePart {
 		points.get(1).set(-xLength / 2.0, yLength / 2.0, 0);
 		points.get(3).set(xLength / 2.0, yLength / 2.0, 0);
 
-		for (int i = 0; i < 4; i++)
-			points.get(4 + i).set(points.get(i)).setZ(newBoundingHeight + height);
+//		for (int i = 0; i < 4; i++)
+//			points.get(4 + i).set(points.get(i)).setZ(newBoundingHeight + height);
+
+//		for (int i = 0; i < 4; i++)
+//			points.get(i + 4).set(points.get(i)).setZ(newBoundingHeight + height);
 	}
 
 	@Override
@@ -200,8 +203,7 @@ public class Foundation extends HousePart {
 				newBoundingHeight = Math.max(0, closestPoint.getZ() - base.getZ());
 				applyNewHeight(boundingHeight, newBoundingHeight, false);
 			}
-			for (int i = 0; i < 4; i++)
-				points.get(i + 4).set(points.get(i)).setZ(newBoundingHeight + height);
+			syncUpperPoints();
 		}
 
 		if (resizeHouseMode)
@@ -209,6 +211,11 @@ public class Foundation extends HousePart {
 		else
 			draw();
 		setEditPointsVisible(true);
+	}
+
+	private void syncUpperPoints() {
+		for (int i = 0; i < 4; i++)
+			points.get(i + 4).set(points.get(i)).setZ(Math.max(height, newBoundingHeight + height));
 	}
 
 	private Vector3 ensureIncludesChildren(final ReadOnlyVector3 p, final int index) {
@@ -362,6 +369,7 @@ public class Foundation extends HousePart {
 			points.get(i).setZ(boundingHeight + height);
 		}
 		newBoundingHeight = boundingHeight;
+		syncUpperPoints();
 		updateEditShapes();
 	}
 

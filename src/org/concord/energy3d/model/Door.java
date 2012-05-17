@@ -79,6 +79,8 @@ public class Door extends HousePart {
 
 				final int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				points.set(index, toRelative(p));
+				if (editPointIndex != -1)
+					defaultDoorHeight = height = getAbsPoint(editPointIndex == 0 ? 2 : 0).subtract(getAbsPoint(editPointIndex == 0 ? 3 : 1), null).length();
 				p.setZ(p.getZ() + height);
 				points.set(index + 1, toRelative(p));
 			}
@@ -88,7 +90,7 @@ public class Door extends HousePart {
 			final Vector3 absoluteBase = toAbsolute(base);
 			Vector3 p = closestPoint(absoluteBase, Vector3.UNIT_Z, x, y);
 			p = grid(p, getGridSize());
-			height = Math.max(0, p.getZ() - absoluteBase.getZ());
+			defaultDoorHeight = height = Math.max(0, p.getZ() - absoluteBase.getZ());
 
 			final double rel_z = toRelative(absoluteBase.addLocal(0, 0, height)).getZ();
 			points.get(1).setZ(rel_z);
