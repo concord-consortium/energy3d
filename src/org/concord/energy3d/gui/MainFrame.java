@@ -263,7 +263,7 @@ public class MainFrame extends JFrame {
 			@Override
 			public void windowStateChanged(final WindowEvent e) {
 				Preferences.userNodeForPackage(MainApplication.class).putInt("window_state", e.getNewState());
-				SceneManager.getInstance().update();
+				SceneManager.getInstance().refresh();
 			}
 		});
 
@@ -275,7 +275,7 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void windowDeiconified(final WindowEvent e) {
-				SceneManager.getInstance().update();
+				SceneManager.getInstance().refresh();
 			}
 		});
 	}
@@ -312,7 +312,7 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 
 				@Override
@@ -372,7 +372,7 @@ public class MainFrame extends JFrame {
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().update(1);
+					SceneManager.getInstance().refresh(1);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						try {
@@ -491,7 +491,7 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 
 				@Override
@@ -693,7 +693,7 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 
 				@Override
@@ -829,7 +829,7 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 
 				@Override
@@ -861,7 +861,8 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().undo();
-					SceneManager.getInstance().update();
+					Scene.getInstance().redrawAll();
+//					SceneManager.getInstance().refresh();
 					refreshUndoRedo();
 				}
 			});
@@ -879,7 +880,8 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().redo();
-					SceneManager.getInstance().update();
+					Scene.getInstance().redrawAll();
+//					SceneManager.getInstance().refresh();
 					refreshUndoRedo();
 				}
 			});
@@ -1053,7 +1055,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().resetCamera(topViewCheckBoxMenuItem.isSelected() ? ViewMode.TOP_VIEW : ViewMode.NORMAL);
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}
@@ -1081,7 +1083,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					while (true) {
-						SceneManager.getInstance().update(1);
+						SceneManager.getInstance().refresh(1);
 						final String newValue = JOptionPane.showInputDialog(MainFrame.this, "What is the length of roof overhang?", Scene.getInstance().getOverhangLength() * Scene.getInstance().getAnnotationScale());
 						if (newValue == null)
 							break;

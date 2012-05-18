@@ -158,7 +158,7 @@ public class PrintController implements Updater {
 					restartFlag = false;
 //					/* to force redraw when animated back to normal scene */
 //					Scene.getInstance().redrawAll();
-					Scene.getInstance().update();
+					Scene.getInstance().redrawAllNow();
 					setPrintPreview(true);
 					return;
 				}
@@ -200,7 +200,7 @@ public class PrintController implements Updater {
 						part.getOriginal().drawLabels(printSequence);
 						printSequence = part.drawLabels(printSequence);
 					}
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 				setFinished(true);
 			}
@@ -275,7 +275,7 @@ public class PrintController implements Updater {
 					SceneManager.getInstance().resizeCamera(pageWidth);
 
 
-				SceneManager.getInstance().update();
+				SceneManager.getInstance().refresh();
 				final Printout printout = new Printout(pageFormat, newSize, pageWidth, pageHeight, printCenters);
 				print(0, printout, 0, 0, pageWidth, pageHeight);;
 
@@ -286,7 +286,7 @@ public class PrintController implements Updater {
 				canvas.validate();
 
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
-				SceneManager.getInstance().update();
+				SceneManager.getInstance().refresh();
 //				return null;
 //			}
 //		});

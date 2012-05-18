@@ -170,7 +170,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private AddHousePartCommand addHousePartCommand;
 	private EditHousePartCommand editHousePartCommand;
 	private UserData pick;
-	private double updateTime = -1;
+	private double refreshTime = -1;
 	private long lastRenderTime;
 	private boolean mouseControlEnabled = true;
 	private boolean drawBounds = false;
@@ -180,7 +180,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean sunAnim;
 	private boolean operationStick = false;
 	private boolean operationFlag = false;
-	private boolean update = true;
+	private boolean refresh = true;
 	private boolean zoomLock = false;
 	private TwoInputStates firstClickState;
 
@@ -237,7 +237,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			@Override
 			public void componentResized(final java.awt.event.ComponentEvent e) {
 				resizeCamera();
-				update();
+				refresh();
 				if (heliodon != null)
 					heliodon.updateBloom();
 			}
@@ -320,14 +320,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		while (!exit) {
 			logicalLayer.checkTriggers(frameHandler.getTimer().getTimePerFrame());
 			final double now = frameHandler.getTimer().getTimeInSeconds();
-			final boolean isUpdateTime = updateTime != -1 && now <= updateTime;
+			final boolean isUpdateTime = refreshTime != -1 && now <= refreshTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
-			if (update || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
+			if (refresh || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
 //			if (update || updateWindow || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
-				if (now > updateTime)
-					updateTime = -1;
-				update = false;
+				if (now > refreshTime)
+					refreshTime = -1;
+				refresh = false;
 //				if (updateWindow) {
 //					final Dimension size = MainFrame.getInstance().getSize();
 //					size.width++;
@@ -374,7 +374,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			executeMouseMove();
 
 		if (Scene.isRedrawAll())
-			Scene.getInstance().update();
+			Scene.getInstance().redrawAllNow();
 
 		if (rotAnim && viewMode == ViewMode.NORMAL && canvas.getCanvasRenderer() != null) {
 			final Matrix3 rotate = new Matrix3();
@@ -638,7 +638,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final MouseState prevMouseState = firstClickState.getCurrent().getMouseState();
 						final ReadOnlyVector2 p1 = new Vector2(prevMouseState.getX(), prevMouseState.getY());
 						final ReadOnlyVector2 p2 = new Vector2(mouseState.getX(), mouseState.getY());
-						if (p1.distance(p2) > 10) {
+						if (selectedHousePart instanceof Roof || selectedHousePart instanceof Floor || p1.distance(p2) > 10) {
 							firstClickState = null;
 							mouseReleased(inputStates);
 						}
@@ -649,7 +649,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				update = true;
+				refresh = true;
 				if (!Config.isHeliodonMode())
 					moveState = inputStates;
 			}
@@ -750,7 +750,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				resetCamera(viewMode);
-				update = true;
+				refresh = true;
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.X), new TriggerAction() {
@@ -867,7 +867,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			part.setEditPointsVisible(false);
 			part.setGridsVisible(false);
 		}
-		update = true;
+		refresh = true;
 	}
 
 	public void resetCamera(final ViewMode viewMode) {
@@ -962,14 +962,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		loc.multiplyLocal((up ? 1 : -1) * MOVE_SPEED * tpf).addLocal(camera.getLocation());
 		camera.setLocation(loc);
 		cameraNode.updateFromCamera();
-		SceneManager.getInstance().update();
+		SceneManager.getInstance().refresh();
 	}
 
 	public void setOperation(final Operation operation) {
 		operationStick = false;
 		this.operation = operation;
 		operationFlag = true;
-		update();
+		refresh();
 	}
 
 	public void setOperationStick(final boolean stick) {
@@ -1260,12 +1260,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	}
 
-	public void update() {
-		update = true;
+	public void refresh() {
+		refresh = true;
 	}
 
-	public void update(final double updateTime) {
-		this.updateTime = frameHandler.getTimer().getTimeInSeconds() + updateTime;
+	public void refresh(final double updateTime) {
+		this.refreshTime = frameHandler.getTimer().getTimeInSeconds() + updateTime;
 	}
 
 	public UndoManager getUndoManager() {
@@ -1289,7 +1289,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void mousePressed(final TwoInputStates inputStates) {
-		update = true;
+		refresh = true;
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {
@@ -1341,7 +1341,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void mouseReleased(final TwoInputStates inputStates) {
-		update = true;
+		refresh = true;
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {
@@ -1390,8 +1390,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 					if (selectedHousePart != null && selectedHousePart.isDrawCompleted()) {
 						if (addHousePartCommand != null) {
-							removeExistingRoof();
 							undoManager.addEdit(addHousePartCommand);
+							removeExistingRoof();
 							if (!Config.isApplet())
 								MainFrame.getInstance().refreshUndoRedo();
 							addHousePartCommand = null;
@@ -1414,15 +1414,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	protected void removeExistingRoof() {
-//		if (selectedHousePart instanceof Roof) {
-//			final Wall wall = (Wall) ((Roof) selectedHousePart).getContainer();
-//			for (final HousePart part : Scene.getInstance().getParts())
-//				if (part instanceof Roof && part != selectedHousePart && ((Roof) part).getContainer() == wall) {
-//					undoManager.addEdit(new RemoveHousePartCommand(part));
-//					Scene.getInstance().remove(part);
-//					return;
-//				}
-//		}
+		if (selectedHousePart instanceof Roof) {
+			final Wall wall = (Wall) ((Roof) selectedHousePart).getContainer();
+			for (final HousePart part : Scene.getInstance().getParts())
+				if (part instanceof Roof && part != selectedHousePart && ((Roof) part).getContainer() == wall) {
+					undoManager.addEdit(new RemoveHousePartCommand(part, false));
+					Scene.getInstance().remove(part);
+					return;
+				}
+		}
 	}
 
 //	public void updateWindow() {

@@ -189,6 +189,8 @@ public class Scene implements Serializable {
 			final Scene instance = (Scene) in.readObject();
 			in.close();
 
+			instance.fixUnintializedVariables();
+
 			instance.cleanup();
 
 			if (url != null) {
@@ -205,6 +207,14 @@ public class Scene implements Serializable {
 			SceneManager.getInstance().getUndoManager().die();
 			if (!Config.isApplet())
 				MainFrame.getInstance().refreshUndoRedo();
+		}
+	}
+
+	private void fixUnintializedVariables() {
+		if (textureMode == null) {
+			textureMode = TextureMode.Full;
+			overhangLength = 0.2;
+			foundationColor = wallColor = doorColor = floorColor = roofColor = ColorRGBA.WHITE;
 		}
 	}
 
@@ -286,17 +296,17 @@ public class Scene implements Serializable {
 		if (container != null)
 			container.getChildren().remove(housePart);
 		removeTree(housePart);
-		if (container != null)
-			container.draw();
+//		if (container != null)
+//			container.draw();
 	}
 
 	private void removeTree(final HousePart housePart) {
 		System.out.println("Removing: " + housePart);
-		originalHouseRoot.detachChild(housePart.getRoot());
-		parts.remove(housePart);
-		housePart.delete();
+		parts.remove(housePart);	// this must happen before call to wall.delete()
 		for (final HousePart child : housePart.getChildren())
 			removeTree(child);
+		originalHouseRoot.detachChild(housePart.getRoot());
+		housePart.delete();
 	}
 
 	public ArrayList<HousePart> getParts() {
@@ -328,7 +338,7 @@ public class Scene implements Serializable {
 		if (PrintController.getInstance().isPrintPreview()) {
 			PrintController.getInstance().restartAnimation();
 		} else
-			SceneManager.getInstance().update();
+			SceneManager.getInstance().refresh();
 
 	}
 
@@ -370,13 +380,14 @@ public class Scene implements Serializable {
 		if (PrintController.getInstance().isPrintPreview())
 			PrintController.getInstance().restartAnimation();
 		else
-		redrawAll = true;
+			redrawAll = true;
 //			Scene.getInstance().redrawAll();
 	}
 
-	public void update() {
+	public void redrawAllNow() {
 //		if (redrawAll) {
 			Snap.clearAnnotationDrawn();
+			cleanup();
 			for (final HousePart part : parts)
 				if (part instanceof Roof)
 					part.draw();

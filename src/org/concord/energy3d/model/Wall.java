@@ -267,7 +267,7 @@ public class Wall extends HousePart {
 		Wall closestWall = null;
 		int closestPointIndex = -1;
 		for (final HousePart housePart : Scene.getInstance().getParts()) {
-			if (housePart instanceof Wall && housePart != this) {
+			if (housePart instanceof Wall && housePart != this && ((neighbors[0] == null || neighbors[0].getNeighborOf(this) != housePart) && (neighbors[1] == null || neighbors[1].getNeighborOf(this) != housePart))) {
 				final Wall wall = (Wall) housePart;
 				int i = 0;
 				for (int j = 0; j < wall.points.size(); j++) {
@@ -284,7 +284,8 @@ public class Wall extends HousePart {
 				}
 			}
 		}
-		if (closestDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize()) && (!isFirstPointInserted() || p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > MIN_WALL_LENGTH)) {
+//		if (closestDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize()) && (!isFirstPointInserted() || p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > MIN_WALL_LENGTH)) {
+		if (closestDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize()) && (!isFirstPointInserted() || p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > getGridSize() * 2)) {
 			p.set(closestPoint);
 			setNeighbor(index, new Snap(this, closestWall, index, closestPointIndex), true);
 			return true;
@@ -801,30 +802,48 @@ public class Wall extends HousePart {
 		return null;
 	}
 
-	private void setNeighbor(final int pointIndex, Snap newSnap, final boolean updateNeighbors) {
+	/**
+	 * @param pointIndex
+	 * @param newSnap
+	 * @param updateNeighbors
+	 */
+	private void setNeighbor(final int pointIndex, final Snap newSnap, final boolean updateNeighbors) {
 		final int i = pointIndex < 2 ? 0 : 1;
+//		if (neighbors[i] != null && neighbors[i].equals(neighbors[i == 0 ? 1 : 0]))
+//			return;
 		final Snap oldSnap = neighbors[i];
 		// if (newSnap != null && !newSnap.equals(oldSnap))
 		// System.out.println(this + "\t.setNeighbor: " + pointIndex + "\t" + newSnap);
 
-		if (newSnap == null && !updateNeighbors) // see if it is attached to another wall
-			for (final HousePart part : Scene.getInstance().getParts())
-				if (part instanceof Wall && part != this) {
-					final Vector3 point = getAbsPoint(pointIndex);
-					final Wall wall = (Wall) part;
-					if (point.distance(part.getAbsPoint(0)) < MathUtils.ZERO_TOLERANCE) {
-						newSnap = new Snap(this, wall, pointIndex, 0);
-						wall.setNeighbor(0, newSnap, false);
-						wall.drawNeighborWalls();
-						break;
-					} else if (part.getPoints().size() > 2 && point.distance(part.getAbsPoint(2)) < MathUtils.ZERO_TOLERANCE) {
-						newSnap = new Snap(this, wall, pointIndex, 2);
-						wall.setNeighbor(2, newSnap, false);
-						wall.drawNeighborWalls();
-						break;
-					}
-				}
-		neighbors[i] = newSnap;
+//		if (newSnap == null && !updateNeighbors) // see if it is attached to another wall
+//
+////		if (newSnap == null && oldSnap != null && updateNeighbors && (neighbors[0] != null || neighbors[1] != null)) // see if it is attached to another wall
+//
+//			for (final HousePart part : Scene.getInstance().getParts())
+//				if (part instanceof Wall && part != this) {
+//					final Vector3 point = getAbsPoint(pointIndex);
+//					final Wall wall = (Wall) part;
+//					if (point.distance(part.getAbsPoint(0)) < MathUtils.ZERO_TOLERANCE) {
+//						newSnap = new Snap(this, wall, pointIndex, 0);
+//						wall.setNeighbor(0, newSnap, false);
+//						wall.drawNeighborWalls();
+//						break;
+//					} else if (part.getPoints().size() > 2 && point.distance(part.getAbsPoint(2)) < MathUtils.ZERO_TOLERANCE) {
+//						newSnap = new Snap(this, wall, pointIndex, 2);
+//						wall.setNeighbor(2, newSnap, false);
+//						wall.drawNeighborWalls();
+//						break;
+//					}
+//				}
+//		if (neighbors[i] != newSnap && (newSnap == null || !newSnap.equals(neighbors[i])))
+				neighbors[i] = newSnap;
+
+		if (newSnap == null && !updateNeighbors) { // see if it is attached to another wall
+			fixDisconnectedWalls();
+			return;
+		}
+
+
 		if (!updateNeighbors || oldSnap == newSnap || (oldSnap != null && oldSnap.equals(newSnap)))
 			return;
 
@@ -842,13 +861,15 @@ public class Wall extends HousePart {
 
 	@Override
 	public void delete() {
-		for (int i = 0; i < neighbors.length; i++) {
-			if (neighbors[i] != null) {
-				final Wall neighbor = neighbors[i].getNeighborOf(this);
-				neighbor.setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false);
-				neighbor.draw(); // TODO This is the 2nd time we would draw neighbor (once in setNeighbor) but we need it because otherwise the back wall sticks out
-			}
-		}
+		setNeighbor(0, null, true);
+		setNeighbor(2, null, true);
+//		for (int i = 0; i < neighbors.length; i++) {
+//			if (neighbors[i] != null) {
+//				final Wall neighbor = neighbors[i].getNeighborOf(this);
+//				neighbor.setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false);
+////				neighbor.draw(); // TODO This is the 2nd time we would draw neighbor (once in setNeighbor) but we need it because otherwise the back wall sticks out
+//			}
+//		}
 	}
 
 	@Override
@@ -1182,7 +1203,7 @@ public class Wall extends HousePart {
 			return;
 
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Wall && part != this) {
+			if (part instanceof Wall && part != this && part.isDrawCompleted()) {
 				final Wall otherWall = (Wall) part;
 				for (int index = 0; index < 2; index++) {
 					if (neighbors[index] == null)

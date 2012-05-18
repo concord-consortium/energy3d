@@ -178,7 +178,7 @@ public class MainPanel extends JPanel {
 			selectButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 			selectButton.setSelected(true);
@@ -220,7 +220,7 @@ public class MainPanel extends JPanel {
 				}
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}
@@ -253,7 +253,7 @@ public class MainPanel extends JPanel {
 				}
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}
@@ -285,7 +285,7 @@ public class MainPanel extends JPanel {
 				}
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}
@@ -317,7 +317,7 @@ public class MainPanel extends JPanel {
 				}
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}
@@ -349,7 +349,7 @@ public class MainPanel extends JPanel {
 				}
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}
@@ -367,7 +367,7 @@ public class MainPanel extends JPanel {
 			lightButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 			lightButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/shadow.png")));
@@ -403,7 +403,7 @@ public class MainPanel extends JPanel {
 			rotAnimButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 			rotAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/rotate.png")));
@@ -444,7 +444,7 @@ public class MainPanel extends JPanel {
 				}
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}
@@ -476,7 +476,7 @@ public class MainPanel extends JPanel {
 				}
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}
@@ -494,7 +494,7 @@ public class MainPanel extends JPanel {
 			resizeButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 			resizeButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/resize.png")));
@@ -521,7 +521,7 @@ public class MainPanel extends JPanel {
 			heliodonButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 			heliodonButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/sun_heliodon.png")));
@@ -551,7 +551,7 @@ public class MainPanel extends JPanel {
 			sunAnimButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/sun_anim.png")));
@@ -579,7 +579,7 @@ public class MainPanel extends JPanel {
 			previewButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 			previewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/print_preview.png")));
@@ -832,7 +832,7 @@ public class MainPanel extends JPanel {
 				}
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}
@@ -851,7 +851,7 @@ public class MainPanel extends JPanel {
 			annotationToggleButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 			annotationToggleButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/annotation.png")));
@@ -878,7 +878,7 @@ public class MainPanel extends JPanel {
 			zoomButton.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 			zoomButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/zoom.png")));
@@ -920,7 +920,7 @@ public class MainPanel extends JPanel {
 				}
 				@Override
 				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().update();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}

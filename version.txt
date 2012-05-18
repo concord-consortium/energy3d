@@ -1070,9 +1070,15 @@ Version 0.5 - October 20, 2011
 - fix problem with windows sticking out because neighboring walls' children not redrawn
 - ensure mesh.getMeshData().updateVertexCount() is called after all mesh updates
 - ensure CollisionTreeManager.INSTANCE.updateCollisionTree(mesh) is called after all pickable mesh updates
+- avoid inserting multiple roofs at same place
+- delete previous roof and allow undo using "insignificant" undo command
+- redrawAll after undo or redo
+- avoid any draw commands in HousePart.delete(), instead make one redrawAll call at the end
+
+
+
 
 - *fix problem with transparent texture and shading not working together
-- *avoid inserting multiple roofs at same place
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class
 

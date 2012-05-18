@@ -750,7 +750,7 @@ public abstract class Roof extends HousePart {
 			// if the wall doesn't already have another roof on top of it (it's possible when the user replaces an old roof with a new roof)
 			if (wall.getRoof() == this)
 				wall.setRoof(null);
-			wall.draw();
+//			wall.draw();
 		}
 	}
 

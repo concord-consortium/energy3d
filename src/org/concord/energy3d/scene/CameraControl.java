@@ -229,7 +229,7 @@ public abstract class CameraControl {
             	if (!enabled) return;
                 control.move(source.getCanvasRenderer().getCamera(), inputStates.getCurrent().getKeyboardState(), tpf);
                 SceneManager.getInstance().getCameraNode().updateFromCamera();
-        		SceneManager.getInstance().update();
+        		SceneManager.getInstance().refresh();
             }
         };
         _keyTrigger = new InputTrigger(keysHeld, moveAction);
@@ -299,7 +299,7 @@ public abstract class CameraControl {
 				((OrbitControl) this).computeNewFrontDistance();
 		}
 		SceneManager.getInstance().getCameraNode().updateFromCamera();
-		SceneManager.getInstance().update();
+		SceneManager.getInstance().refresh();
 	}
 
 	public void zoomAtPoint(final ReadOnlyVector3 clickedPoint) {

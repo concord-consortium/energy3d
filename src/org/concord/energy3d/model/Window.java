@@ -295,4 +295,10 @@ public class Window extends HousePart {
 		else
 			return super.getAbsPoint(index);
 	}
+
+//	@Override
+//	public void delete() {
+//		super.delete();
+//		container.draw();
+//	}
 }
