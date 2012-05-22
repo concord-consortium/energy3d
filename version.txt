@@ -1075,11 +1075,13 @@ Version 0.5 - October 20, 2011
 - redrawAll after undo or redo
 - avoid any draw commands in HousePart.delete(), instead make one redrawAll call at the end
 - fix problem with transparent texture and shading not working together by replacing all alpha colors with default color at runtime
+- fix problem with floor grids turning on when drawing wall on the edge of platform
+- fix problem with platform grids turning off when drawing wall on the edge of platform
 
+- *fix problem with disconnected walls after delete followed by undo
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class
 
 - *add feature for planting trees
-- *fix problem with disconnected walls after delete followed by undo
 - *too slow
 - *undo the effect of HousePart.delete after undoing the remove
 - *automatically draw grids based on where the mouse is pointing
