@@ -1074,11 +1074,7 @@ Version 0.5 - October 20, 2011
 - delete previous roof and allow undo using "insignificant" undo command
 - redrawAll after undo or redo
 - avoid any draw commands in HousePart.delete(), instead make one redrawAll call at the end
-
-
-
-
-- *fix problem with transparent texture and shading not working together
+- fix problem with transparent texture and shading not working together by replacing all alpha colors with default color at runtime
 
 - *cache convex polygon points to aviod generating it a second time for dash line in Roof class
 

@@ -1,6 +1,8 @@
 package org.concord.energy3d.model;
 
+import java.awt.Color;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
@@ -15,6 +17,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
@@ -44,7 +47,7 @@ public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
-//	protected static boolean drawAnnotations = Config.isApplet() ? false : true;
+	// protected static boolean drawAnnotations = Config.isApplet() ? false : true;
 	protected static final float printWireframeThickness = 2f;
 	private static HousePart gridsHighlightedHousePart;
 	private static boolean snapToObjects = false;
@@ -135,7 +138,7 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		labelsRoot = new Node("Labels");
 
-//		setAnnotationsVisible(drawAnnotations);
+		// setAnnotationsVisible(drawAnnotations);
 		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
 
 		// Set up a reusable pick results
@@ -432,7 +435,7 @@ public abstract class HousePart implements Serializable {
 			drawMesh();
 			updateTextureAndColor();
 			updateEditShapes();
-//			CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
+			// CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
 			clearAnnotations();
 			if (isDrawable())
 				drawAnnotations();
@@ -606,31 +609,32 @@ public abstract class HousePart implements Serializable {
 	protected abstract void drawMesh();
 
 	public void setAnnotationsVisible(final boolean visible) {
-//		drawAnnotations = visible;
+		// drawAnnotations = visible;
 		final CullHint cull = visible ? CullHint.Inherit : CullHint.Always;
 		sizeAnnotRoot.getSceneHints().setCullHint(cull);
 		angleAnnotRoot.getSceneHints().setCullHint(cull);
 	}
 
 	public abstract void updateTextureAndColor();
-//		if (mesh == null)
-//			return;
-//		if (Scene.getInstance().getTextureMode() == TextureMode.None) {
-//			mesh.clearRenderState(StateType.Texture);
-//			mesh.setDefaultColor(defaultColor);
-//		} else {
-//			final TextureState ts = new TextureState();
-//			final Texture texture = TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
-//			texture.setApply(ApplyMode.Decal);
-//			ts.setTexture(texture);
-//			mesh.setRenderState(ts);
-//			if (Scene.getInstance().getTextureMode() == TextureMode.Full)
-//				mesh.setDefaultColor(ColorRGBA.WHITE);
-//			else
-//				mesh.setDefaultColor(defaultColor);
-//		}
-//		updateTextureAndColor(mesh, defaultColor);
-//	}
+
+	// if (mesh == null)
+	// return;
+	// if (Scene.getInstance().getTextureMode() == TextureMode.None) {
+	// mesh.clearRenderState(StateType.Texture);
+	// mesh.setDefaultColor(defaultColor);
+	// } else {
+	// final TextureState ts = new TextureState();
+	// final Texture texture = TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
+	// texture.setApply(ApplyMode.Decal);
+	// ts.setTexture(texture);
+	// mesh.setRenderState(ts);
+	// if (Scene.getInstance().getTextureMode() == TextureMode.Full)
+	// mesh.setDefaultColor(ColorRGBA.WHITE);
+	// else
+	// mesh.setDefaultColor(defaultColor);
+	// }
+	// updateTextureAndColor(mesh, defaultColor);
+	// }
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor) {
 		if (Scene.getInstance().getTextureMode() == TextureMode.None || getTextureFileName() == null) {
@@ -638,8 +642,9 @@ public abstract class HousePart implements Serializable {
 			mesh.setDefaultColor(defaultColor);
 		} else {
 			final TextureState ts = new TextureState();
-			final Texture texture = TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
-//			texture.setApply(ApplyMode.Decal);
+			// final Texture texture = TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
+			final Texture texture = getTexture(getTextureFileName(), defaultColor);
+			// texture.setApply(ApplyMode.Decal);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
 			if (Scene.getInstance().getTextureMode() == TextureMode.Full)
@@ -647,6 +652,28 @@ public abstract class HousePart implements Serializable {
 			else
 				mesh.setDefaultColor(defaultColor);
 		}
+	}
+
+	private Texture getTexture(final String filename, final ReadOnlyColorRGBA defaultColor) {
+		final Texture texture = TextureManager.load(filename, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
+		if (Scene.getInstance().getTextureMode() == TextureMode.Simple) {
+			final Color color = new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue());
+			final Image image = texture.getImage();
+			final ByteBuffer data = image.getData(0);
+			for (int y = 0; y < image.getHeight(); y++)
+				for (int x = 0; x < image.getWidth(); x++) {
+					final byte alpha = data.get((y * image.getWidth() + x) * 4 + 3);
+					if (alpha == 0) {
+						data.put((y * image.getWidth() + x) * 4, (byte) color.getRed());
+						data.put((y * image.getWidth() + x) * 4 + 1, (byte) color.getGreen());
+						data.put((y * image.getWidth() + x) * 4 + 2, (byte) color.getBlue());
+						data.put((y * image.getWidth() + x) * 4 + 3, (byte) -1);
+					}
+				}
+			image.setData(data);
+			texture.setImage(image);
+		}
+		return texture;
 	}
 
 	public HousePart getContainer() {
