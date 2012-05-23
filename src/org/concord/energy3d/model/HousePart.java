@@ -35,6 +35,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
@@ -164,6 +165,8 @@ public abstract class HousePart implements Serializable {
 		pointShape.setUserData(new UserData(this, i, true));
 		pointShape.updateModelBound(); // important
 		pointShape.getSceneHints().setCullHint(CullHint.Always);
+		pointShape.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+		pointShape.getSceneHints().setCastsShadows(false);
 		pointShape.setModelBound(new BoundingBox());
 		pointsRoot.attachChild(pointShape);
 	}

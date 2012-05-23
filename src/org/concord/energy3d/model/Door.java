@@ -6,17 +6,13 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.image.Texture;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
@@ -57,9 +53,11 @@ public class Door extends HousePart {
 		mesh.setRenderState(ms);
 
 		// Add a texture to the box.
-		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		mesh.setRenderState(ts);
+//		final TextureState ts = new TextureState();
+//		ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+//		mesh.setRenderState(ts);
+
+		updateTextureAndColor();
 
 		mesh.setModelBound(new BoundingBox());
 		mesh.setUserData(new UserData(this));
@@ -142,17 +140,18 @@ public class Door extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		if (mesh == null)
-			return;
-		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		mesh.setRenderState(ts);
-		mesh.setDefaultColor(Scene.getInstance().getDoorColor());
+//		if (mesh == null)
+//			return;
+//		final TextureState ts = new TextureState();
+//		ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+//		mesh.setRenderState(ts);
+//		mesh.setDefaultColor(Scene.getInstance().getDoorColor());
+		updateTextureAndColor(mesh, Scene.getInstance().getDoorColor());
 	}
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Full ? "door.jpg" : "door.png";
+		return Scene.getInstance().getTextureMode() == TextureMode.Full ? "door.jpg" : "door2.png";
 	}
 
 	@Override

@@ -1077,30 +1077,16 @@ Version 0.5 - October 20, 2011
 - fix problem with transparent texture and shading not working together by replacing all alpha colors with default color at runtime
 - fix problem with floor grids turning on when drawing wall on the edge of platform
 - fix problem with platform grids turning off when drawing wall on the edge of platform
-
-- *fix problem with disconnected walls after delete followed by undo
-- *cache convex polygon points to aviod generating it a second time for dash line in Roof class
-
-- *add feature for planting trees
-- *too slow
-- *undo the effect of HousePart.delete after undoing the remove
-- *automatically draw grids based on where the mouse is pointing
+- improve door texture quality
+- disable light effect on edit points
 
 
 TODO:
-- automatically determine if the user is going with the drag approach or click approach when drawing house parts
-- avoid inserting house parts of length zero or very small dimension
-- draw wire-frame lines around polygons of roofs
-- avoid drawing the triangle lines when displaying the resize box
 - add a list of textures for wall and roof and floor for users to choose from
-- rotate the sky so that the less busy texture is viewable by default
-- put minimum size restrictions on the resize tool
 - fix problem with sometimes cannot grab edit points
-- add menu item to print current scene information
-- load all textures at start up and only once
 - avoid drawing roof if only one attached wall is present 
-- new Orbit
-- combine the wall meshed into one
-- insert window in oriented wall attached to other walls
-- save position and state of window in registry
-- *allow rotation of scene with respect to north
+- allow rotation of scene with respect to north
+- add feature for planting trees
+- too slow
+- fix problem with disconnected walls after delete followed by undo
+- cache convex polygon points to aviod generating it a second time for dash line in Roof class
