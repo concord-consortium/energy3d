@@ -51,6 +51,9 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.Config;
 
+import com.apple.eawt.Application;
+import com.apple.eawt.ApplicationAdapter;
+import com.apple.eawt.ApplicationEvent;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -167,7 +170,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes mainPanel
-	 *
+	 * 
 	 * @return org.concord.energy3d.gui.MainPanel
 	 */
 	public MainPanel getMainPanel() {
@@ -212,8 +215,8 @@ public class MainFrame extends JFrame {
 			e.printStackTrace();
 		}
 		colorChooser = new JColorChooser();
-//		final ReadOnlyColorRGBA defaultColor = HousePart.getDefaultColor();
-//		colorChooser.setColor(new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue()));
+		// final ReadOnlyColorRGBA defaultColor = HousePart.getDefaultColor();
+		// colorChooser.setColor(new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue()));
 		initialize();
 		updateTitleBar();
 		System.out.println("done");
@@ -221,7 +224,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes this
-	 *
+	 * 
 	 * @return void
 	 */
 	private void initialize() {
@@ -241,6 +244,26 @@ public class MainFrame extends JFrame {
 
 		setJMenuBar(getAppMenuBar());
 		setContentPane(getMainPanel());
+
+		if (IS_MAC) {
+			Application anApp = new Application();
+			anApp.setEnabledPreferencesMenu(true);
+			anApp.addApplicationListener(new ApplicationAdapter() {
+				public void handleQuit(ApplicationEvent e) {
+					SceneManager.getInstance().exit();
+					e.setHandled(true);
+				}
+
+				public void handlePreferences(ApplicationEvent e) {
+					e.setHandled(true);
+				}
+
+				public void handleAbout(ApplicationEvent e) {
+					showAbout();
+					e.setHandled(true);
+				}
+			});
+		}
 
 		addComponentListener(new ComponentAdapter() {
 			@Override
@@ -282,7 +305,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes appMenuBar
-	 *
+	 * 
 	 * @return javax.swing.JMenuBar
 	 */
 	private JMenuBar getAppMenuBar() {
@@ -299,7 +322,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes fileMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getFileMenu() {
@@ -343,7 +366,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes newMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getNewMenuItem() {
@@ -362,7 +385,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes openMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getOpenMenuItem() {
@@ -399,7 +422,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes saveMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getSaveMenuItem() {
@@ -427,7 +450,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes printMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getPrintMenuItem() {
@@ -460,7 +483,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes previewMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getPreviewMenuItem() {
@@ -478,7 +501,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes cameraMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getCameraMenu() {
@@ -514,7 +537,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes orbitMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getOrbitMenuItem() {
@@ -534,7 +557,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes firstPersonMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getFirstPersonMenuItem() {
@@ -553,7 +576,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes lightingMenu
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getShadeMenu() {
@@ -572,7 +595,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes exitMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getExitMenuItem() {
@@ -591,7 +614,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes helpMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getHelpMenu() {
@@ -603,24 +626,28 @@ public class MainFrame extends JFrame {
 		return helpMenu;
 	}
 
+	private void showAbout() {
+		final JDialog aboutDialog = getAboutDialog();
+		final Dimension frameSize = MainFrame.this.getSize();
+		final Dimension dialogSize = aboutDialog.getSize();
+		final Point location = MainFrame.this.getLocation();
+		aboutDialog.setLocation((int) (location.getX() + frameSize.getWidth() / 2 - dialogSize.getWidth() / 2), (int) (location.getY() + frameSize.getHeight() / 2 - dialogSize.getHeight() / 2));
+		aboutDialog.setVisible(true);
+	}
+
 	/**
 	 * This method initializes aboutMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getAboutMenuItem() {
 		if (aboutMenuItem == null) {
 			aboutMenuItem = new JMenuItem();
 			aboutMenuItem.setText("About");
-			aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			aboutMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					final JDialog aboutDialog = getAboutDialog();
-					final Dimension frameSize = MainFrame.this.getSize();
-					final Dimension dialogSize = aboutDialog.getSize();
-					final Point location = MainFrame.this.getLocation();
-					aboutDialog.setLocation((int) (location.getX() + frameSize.getWidth() / 2 - dialogSize.getWidth() / 2), (int) (location.getY() + frameSize.getHeight() / 2 - dialogSize.getHeight() / 2));
-					aboutDialog.setVisible(true);
+				public void actionPerformed(final ActionEvent e) {
+					showAbout();
 				}
 			});
 		}
@@ -629,7 +656,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutDialog
-	 *
+	 * 
 	 * @return javax.swing.JDialog
 	 */
 	private JDialog getAboutDialog() {
@@ -647,7 +674,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes wallThicknessMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	private JCheckBoxMenuItem getWallThicknessMenuItem() {
@@ -862,7 +889,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().undo();
 					Scene.getInstance().redrawAll();
-//					SceneManager.getInstance().refresh();
+					// SceneManager.getInstance().refresh();
 					refreshUndoRedo();
 				}
 			});
@@ -881,7 +908,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().redo();
 					Scene.getInstance().redrawAll();
-//					SceneManager.getInstance().refresh();
+					// SceneManager.getInstance().refresh();
 					refreshUndoRedo();
 				}
 			});
@@ -1115,6 +1142,7 @@ public class MainFrame extends JFrame {
 		}
 		return separator_9;
 	}
+
 	public JRadioButtonMenuItem getNoTextureRadioButtonMenuItem() {
 		if (noTextureRadioButtonMenuItem == null) {
 			noTextureRadioButtonMenuItem = new JRadioButtonMenuItem("No Texture");
@@ -1128,6 +1156,7 @@ public class MainFrame extends JFrame {
 		}
 		return noTextureRadioButtonMenuItem;
 	}
+
 	public JRadioButtonMenuItem getSimpleTextureRadioButtonMenuItem() {
 		if (simpleTextureRadioButtonMenuItem == null) {
 			simpleTextureRadioButtonMenuItem = new JRadioButtonMenuItem("Simple Texture");
@@ -1141,6 +1170,7 @@ public class MainFrame extends JFrame {
 		}
 		return simpleTextureRadioButtonMenuItem;
 	}
+
 	public JRadioButtonMenuItem getFullTextureRadioButtonMenuItem() {
 		if (fullTextureRadioButtonMenuItem == null) {
 			fullTextureRadioButtonMenuItem = new JRadioButtonMenuItem("Full Texture");
@@ -1155,6 +1185,7 @@ public class MainFrame extends JFrame {
 		}
 		return fullTextureRadioButtonMenuItem;
 	}
+
 	private JMenu getColorMenu() {
 		if (colorMenu == null) {
 			colorMenu = new JMenu("Color");
@@ -1166,6 +1197,7 @@ public class MainFrame extends JFrame {
 		}
 		return colorMenu;
 	}
+
 	private JMenuItem getPlatformColorMenuItem() {
 		if (platformColorMenuItem == null) {
 			platformColorMenuItem = new JMenuItem("Platform Color...");
@@ -1178,6 +1210,7 @@ public class MainFrame extends JFrame {
 		}
 		return platformColorMenuItem;
 	}
+
 	private JMenuItem getWallColorMenuItem() {
 		if (wallColorMenuItem == null) {
 			wallColorMenuItem = new JMenuItem("Wall Color...");
@@ -1190,6 +1223,7 @@ public class MainFrame extends JFrame {
 		}
 		return wallColorMenuItem;
 	}
+
 	private JMenuItem getDoorColorMenuItem() {
 		if (doorColorMenuItem == null) {
 			doorColorMenuItem = new JMenuItem("Door Color...");
@@ -1202,6 +1236,7 @@ public class MainFrame extends JFrame {
 		}
 		return doorColorMenuItem;
 	}
+
 	private JMenuItem getFloorColorMenuItem() {
 		if (floorColorMenuItem == null) {
 			floorColorMenuItem = new JMenuItem("Floor Color...");
@@ -1214,6 +1249,7 @@ public class MainFrame extends JFrame {
 		}
 		return floorColorMenuItem;
 	}
+
 	private JMenuItem getRoofColorMenuItem() {
 		if (roofColorMenuItem == null) {
 			roofColorMenuItem = new JMenuItem("Roof Color...");
@@ -1235,23 +1271,23 @@ public class MainFrame extends JFrame {
 				final float[] newColor = c.getComponents(null);
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
-//				switch (operation) {
-//				case DRAW_FOUNDATION:
-//					Foundation.setDefaultColor(color);
-//					break;
-//				case DRAW_WALL:
-//					Wall.setDefaultColor(color);
-//					break;
-//				case DRAW_DOOR:
-//					Door.setDefaultColor(color);
-//					break;
-//				case DRAW_FLOOR:
-//					Floor.setDefaultColor(color);
-//					break;
-//				case DRAW_ROOF:
-//					Roof.setDefaultColor(color);
-//					break;
-//				}
+				// switch (operation) {
+				// case DRAW_FOUNDATION:
+				// Foundation.setDefaultColor(color);
+				// break;
+				// case DRAW_WALL:
+				// Wall.setDefaultColor(color);
+				// break;
+				// case DRAW_DOOR:
+				// Door.setDefaultColor(color);
+				// break;
+				// case DRAW_FLOOR:
+				// Floor.setDefaultColor(color);
+				// break;
+				// case DRAW_ROOF:
+				// Roof.setDefaultColor(color);
+				// break;
+				// }
 				switch (operation) {
 				case DRAW_FOUNDATION:
 					Scene.getInstance().setFoundationColor(color);
@@ -1269,7 +1305,7 @@ public class MainFrame extends JFrame {
 					Scene.getInstance().setRoofColor(color);
 					break;
 				}
-//				HousePart.setDefaultColor(color);
+				// HousePart.setDefaultColor(color);
 				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
