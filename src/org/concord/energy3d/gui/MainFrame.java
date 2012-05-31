@@ -621,7 +621,8 @@ public class MainFrame extends JFrame {
 		if (helpMenu == null) {
 			helpMenu = new JMenu();
 			helpMenu.setText("Help");
-			helpMenu.add(getAboutMenuItem());
+			if (!IS_MAC)
+				helpMenu.add(getAboutMenuItem());
 		}
 		return helpMenu;
 	}
