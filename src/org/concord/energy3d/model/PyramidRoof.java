@@ -15,15 +15,16 @@ public class PyramidRoof extends Roof {
 	public PyramidRoof() {
 		super(1, 1, 0.5);
 	}
-	
-	public void setPreviewPoint(int x, int y) {
+
+	@Override
+	public void setPreviewPoint(final int x, final int y) {
 		if (editPointIndex == -1) {
 			pickContainer(x, y, Wall.class);
 			recalculateEditPoints = true;;
 		} else {
 			final ReadOnlyVector3 base = new Vector3(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getCenter().getZ());
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
-			p = grid(p, getGridSize());
+			p = grid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ());
 		}
 		draw();
@@ -32,17 +33,18 @@ public class PyramidRoof extends Roof {
 			setEditPointsVisible(true);
 	}
 
-	protected Polygon makePolygon(ArrayList<PolygonPoint> wallUpperPoints) {
+	@Override
+	protected Polygon makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {
 		final Polygon polygon = new Polygon(wallUpperPoints);
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 abspoint = getAbsPoint(i);
 			polygon.addSteinerPoint(new PolygonPoint(abspoint.getX(), abspoint.getY(), abspoint.getZ()));
-		}		
+		}
 		return polygon;
 	}
 
 	@Override
-	protected void processRoofPoints(ArrayList<PolygonPoint> wallUpperPoints, ArrayList<ReadOnlyVector3> wallNormals) {
+	protected void processRoofPoints(final ArrayList<PolygonPoint> wallUpperPoints, final ArrayList<ReadOnlyVector3> wallNormals) {
 		super.processRoofPoints(wallUpperPoints, wallNormals);
 		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {
@@ -51,5 +53,5 @@ public class PyramidRoof extends Roof {
 			recalculateEditPoints = false;
 		} else
 			points.get(0).setZ(center.getZ() + height);
-	}	
+	}
 }

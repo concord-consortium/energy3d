@@ -210,7 +210,7 @@ public class Wall extends HousePart {
 							secondClosesPoint = container.points.get(i);
 					final Vector3 dir = closesPoint.subtract(secondClosesPoint, null).normalizeLocal();
 					p = closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
-					p = grid(p, getGridSize());
+					p = grid(p, getAbsPoint(editPointIndex == -1 ? points.size() - 2 : editPointIndex), getGridSize());
 					p = closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
 					p.setX(MathUtils.clamp(p.getX(), Math.min(container.points.get(0).getX(), container.points.get(2).getX()), Math.max(container.points.get(0).getX(), container.points.get(2).getX())));
 					p.setY(MathUtils.clamp(p.getY(), Math.min(container.points.get(0).getY(), container.points.get(1).getY()), Math.max(container.points.get(0).getY(), container.points.get(1).getY())));
@@ -224,7 +224,7 @@ public class Wall extends HousePart {
 			final int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 			boolean snapWall = snapWall(p, index);
 			if (!snapWall) {
-				p = grid(p, getGridSize(), false);
+				p = grid(p, getAbsPoint(index), getGridSize(), false);
 				snapWall = snapWall(p, index); // see if it can be snapped after grid move
 			}
 
@@ -244,7 +244,7 @@ public class Wall extends HousePart {
 			Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
 			final boolean snapWall = snapWall(closestPoint, lower);
 			if (!snapWall)
-				closestPoint = grid(closestPoint, getGridSize());
+				closestPoint = grid(closestPoint, getAbsPoint(editPointIndex), getGridSize());
 			defaultWallHeight = height = Math.max(0.1, closestPoint.getZ() - base.getZ());
 			final double z = height + base.getZ();
 			points.get(1).setZ(z);
@@ -284,6 +284,9 @@ public class Wall extends HousePart {
 				}
 			}
 		}
+
+
+
 //		if (closestDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize()) && (!isFirstPointInserted() || p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > MIN_WALL_LENGTH)) {
 		if (closestDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize()) && (!isFirstPointInserted() || p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > getGridSize() * 2)) {
 			p.set(closestPoint);

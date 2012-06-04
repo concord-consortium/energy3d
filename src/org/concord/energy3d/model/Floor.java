@@ -83,7 +83,7 @@ public class Floor extends HousePart {
 		if (container != null) {
 			final ReadOnlyVector3 base = getCenter();
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
-			p = grid(p, getGridSize());
+			p = grid(p, base, getGridSize());
 			final double zMin = container.getAbsPoint(0).getZ() + 0.01;
 			final double zmax = container.getAbsPoint(1).getZ();
 			height = Math.min(zmax, Math.max(zMin, p.getZ()));

@@ -2,6 +2,8 @@ package org.concord.energy3d.model;
 
 import java.io.Serializable;
 
+import com.ardor3d.math.type.ReadOnlyVector3;
+
 public class Snap implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static int currentAnnotationDrawnStamp = 1;
@@ -43,6 +45,10 @@ public class Snap implements Serializable {
 			return pointIndex2;
 		else
 			return pointIndex1;
+	}
+
+	public ReadOnlyVector3 getSnapPointOfNeighborOf(final HousePart housePart) {
+		return getNeighborOf(housePart).getAbsPoint(getSnapPointIndexOfNeighborOf(housePart));
 	}
 
 	private void fixPointIndices() {

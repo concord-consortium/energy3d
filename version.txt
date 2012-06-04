@@ -1080,6 +1080,13 @@ Version 0.5 - October 20, 2011
 - improve door texture quality
 - disable light effect on edit points
 - release version 0.6.7
+- convert swing menu to Mac OS X system menu when in Mac
+- fix problem with wall losing its parent attachment when mouse hovered outside of platform
+- prevent jitter effect when snapping
+- fix problem with platform bounds skipping 2X when dragged upward
+- release version 0.6.8
+
+
 
 
 TODO:

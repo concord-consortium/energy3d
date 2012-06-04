@@ -86,7 +86,7 @@ public class Window extends HousePart {
 		Vector3 p = points.get(index);
 		if (pick != null) {
 			p = pick.getPoint();
-			p = grid(p, getGridSize());
+			p = grid(p, getAbsPoint(index), getGridSize());
 			p = toRelative(p);
 			p = enforceContraints(p);
 		}

@@ -24,11 +24,11 @@ public class HipRoof extends Roof {
 		} else if (editPointIndex == 0) {
 			final ReadOnlyVector3 base = getCenter();
 			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
-			p = grid(p, getGridSize());
+			p = grid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ());
 		} else if (editPointIndex == 1 || editPointIndex == 2) {
 			Vector3 p = closestPoint(getAbsPoint(editPointIndex), Vector3.UNIT_Y, x, y);
-			p = grid(p, getGridSize(), false);
+			p = grid(p, getAbsPoint(editPointIndex), getGridSize(), false);
 			points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 		}
 		draw();

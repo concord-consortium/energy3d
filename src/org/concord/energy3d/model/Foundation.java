@@ -177,13 +177,13 @@ public class Foundation extends HousePart {
 		}
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, (Spatial) null);
 		Vector3 p = points.get(index);
-		if (pick != null) {
+		if (pick != null && index < 4) {
 			p = pick.getPoint();
-			p = grid(p, getGridSize());
+			p = grid(p, getAbsPoint(index), getGridSize());
 			if (!resizeHouseMode)
 				p = ensureIncludesChildren(p, index);
+			points.get(index).set(p);
 		}
-		points.get(index).set(p);
 		if (!isFirstPointInserted()) {
 			points.get(1).set(p);
 			points.get(2).set(p);
@@ -199,9 +199,12 @@ public class Foundation extends HousePart {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
 				Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
-				closestPoint = grid(closestPoint, getGridSize());
-				newBoundingHeight = Math.max(0, closestPoint.getZ() - base.getZ());
-				applyNewHeight(boundingHeight, newBoundingHeight, false);
+				final Vector3 currentPoint = getAbsPoint(index);
+				closestPoint = grid(closestPoint, currentPoint, getGridSize());
+				if (!closestPoint.equals(currentPoint)) {
+					newBoundingHeight = Math.max(0, closestPoint.getZ() - height);
+					applyNewHeight(boundingHeight, newBoundingHeight, false);
+				}
 			}
 			syncUpperPoints();
 		}

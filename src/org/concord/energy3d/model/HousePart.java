@@ -299,7 +299,8 @@ public abstract class HousePart implements Serializable {
 		else
 			picked = SelectUtil.pickPart(x, y, container == null ? null : container.getRoot());
 
-		if (!firstPointInserted || container == null) {
+//		if (!firstPointInserted || container == null) {
+		if (!firstPointInserted && picked != null) {
 			UserData userData = null;
 			if (picked != null)
 				userData = picked.getUserData();
@@ -366,13 +367,15 @@ public abstract class HousePart implements Serializable {
 		return pointOnSpace;
 	}
 
-	protected Vector3 grid(final Vector3 p, final double gridSize) {
-		return grid(p, gridSize, true);
+	protected Vector3 grid(final Vector3 p, final ReadOnlyVector3 current, final double gridSize) {
+		return grid(p, current, gridSize, true);
 	}
 
-	protected Vector3 grid(final Vector3 p, final double gridSize, final boolean snapToZ) {
+	protected Vector3 grid(final Vector3 p, final ReadOnlyVector3 current, final double gridSize, final boolean snapToZ) {
 		if (isSnapToGrids()) {
-			if (container != null) {
+			if (p.distance(current) < gridSize)
+				return new Vector3(current);
+			else if (container != null) {
 				final ReadOnlyVector3 p0 = container.getAbsPoint(0);
 				final ReadOnlyVector3 origin;
 				if (relativeToHorizontal) {
@@ -399,9 +402,9 @@ public abstract class HousePart implements Serializable {
 				final ReadOnlyVector3 v = verticalDir.normalize(null).multiplyLocal(snapedVerticalLength);
 				return origin.add(u, null).addLocal(v);
 			} else
-				p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
-		}
-		return p;
+				return p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+		} else
+			return p;
 
 	}
 
