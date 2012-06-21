@@ -118,6 +118,7 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
+import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.GameTaskQueue;
@@ -166,7 +167,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private ParallelSplitShadowMapPass shadowPass;
 	private ViewMode viewMode = ViewMode.NORMAL;
 	private CameraNode cameraNode;
-	private TwoInputStates moveState;
+	private MouseState mouseState;
 	private AddHousePartCommand addHousePartCommand;
 	private EditHousePartCommand editHousePartCommand;
 	private UserData pick;
@@ -187,6 +188,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public final static byte DEFAULT_THEME = 0;
 	public final static byte SKETCHUP_THEME = 1;
 	private final byte theme = DEFAULT_THEME;
+
+	private Sphere kinectPointer;
+
+	private HousePart lastSelectedEditPoint;
+
+	private MouseState lastSelectedEditPointMouseState;
+
+//	private int mouseX = -1;
+//	private int mouseY;
 
 
 //	private boolean updateWindow = false;
@@ -279,6 +289,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		drawGrids(0.1);
 		backgroundRoot.attachChild(gridsMesh);
 		backgroundRoot.attachChild(createAxis());
+		backgroundRoot.attachChild(createKinectPointer());
 		root.attachChild(backgroundRoot);
 		root.attachChild(Scene.getRoot());
 
@@ -370,7 +381,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (operationFlag)
 			executeOperation();
 
-		if (moveState != null)
+		if (mouseState != null)
+//		if (mouseX != -1)
 			executeMouseMove();
 
 		if (Scene.isRedrawAll())
@@ -608,6 +620,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return axisRoot;
 	}
 
+	private Mesh createKinectPointer() {
+		kinectPointer = new Sphere("Kinect Pointer", 10, 10, 0.01);
+		return kinectPointer;
+	}
+
 	private void initMouse() {
 
 		if (!Config.isHeliodonMode())
@@ -616,10 +633,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 					if (firstClickState == null) {
 						firstClickState = inputStates;
-						mousePressed(inputStates);
+						mousePressed(inputStates.getCurrent().getMouseState());
 					} else {
 						firstClickState = null;
-						mouseReleased(inputStates);
+						mouseReleased(inputStates.getCurrent().getMouseState());
 					}
 
 				}
@@ -632,7 +649,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					// if editing object using select or resize then only mouse drag is allowed
 					if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 						firstClickState = null;
-						mouseReleased(inputStates);
+						mouseReleased(inputStates.getCurrent().getMouseState());
 					} else if (firstClickState != null) {
 						final MouseState mouseState = inputStates.getCurrent().getMouseState();
 						final MouseState prevMouseState = firstClickState.getCurrent().getMouseState();
@@ -640,7 +657,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final ReadOnlyVector2 p2 = new Vector2(mouseState.getX(), mouseState.getY());
 						if (selectedHousePart instanceof Roof || selectedHousePart instanceof Floor || p1.distance(p2) > 10) {
 							firstClickState = null;
-							mouseReleased(inputStates);
+							mouseReleased(inputStates.getCurrent().getMouseState());
 						}
 					}
 				}
@@ -651,7 +668,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				refresh = true;
 				if (!Config.isHeliodonMode())
-					moveState = inputStates;
+					mouseState = inputStates.getCurrent().getMouseState();
 			}
 		}));
 
@@ -1197,10 +1214,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void executeMouseMove() {
 		if (!mouseControlEnabled)
 			return;
-		final MouseState mouseState = moveState.getCurrent().getMouseState();
-		moveState = null;
+//		final MouseState mouseState = null; //moveState.getCurrent().getMouseState();
+//		final MouseState mouseState = mouseState.getCurrent().getMouseState();
+
+//		mouseState = null;
 		final int x = mouseState.getX();
 		final int y = mouseState.getY();
+
+//		final int x = mouseX;
+//		final int y = mouseY;
+
+//		System.out.println(x + "\t" + y);
+
 
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
@@ -1212,12 +1237,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				hoveredHousePart = pick.getHousePart();
 				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && !PrintController.getInstance().isPrintPreview())
 					hoveredHousePart.setEditPointsVisible(true);
+				if (pick.getIndex() != -1)
+					lastSelectedEditPointMouseState = mouseState;
 			} else {
 				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart)
 					hoveredHousePart.setEditPointsVisible(false);
 				hoveredHousePart = null;
 			}
 		}
+//		mouseState = null;
 	}
 
 	public ViewMode getViewMode() {
@@ -1265,7 +1293,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void refresh(final double updateTime) {
-		this.refreshTime = frameHandler.getTimer().getTimeInSeconds() + updateTime;
+		refreshTime = frameHandler.getTimer().getTimeInSeconds() + updateTime;
 	}
 
 	public UndoManager getUndoManager() {
@@ -1288,12 +1316,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return cameraControl;
 	}
 
-	private void mousePressed(final TwoInputStates inputStates) {
+	private void mousePressed(final MouseState mouseState) {
 		refresh = true;
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {
-				final MouseState mouseState = inputStates.getCurrent().getMouseState();
+//				final MouseState mouseState = inputStates.getCurrent().getMouseState();
 				if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.DRAW_ROOF_GABLE) {
 					if (selectedHousePart == null || selectedHousePart.isDrawCompleted()) {
 						final HousePart previousSelectedHousePart = selectedHousePart;
@@ -1340,14 +1368,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 	}
 
-	private void mouseReleased(final TwoInputStates inputStates) {
+	private void mouseReleased(final MouseState mouseState) {
 		refresh = true;
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {
 				if (selectedHousePart != null)
 					selectedHousePart.setGridsVisible(false);
-				final MouseState mouseState = inputStates.getCurrent().getMouseState();
+//				final MouseState mouseState = inputStates.getCurrent().getMouseState();
 				boolean sceneChanged = false;
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 					if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
@@ -1423,6 +1451,31 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					return;
 				}
 		}
+	}
+
+	public void moveMouse(final float x, final float y) {
+//		System.out.println(x + "\t" + y);
+//		moveState = new TwoInputStates(null, new InputState(null, new MouseState((int)x, (int)y, 0, 0, 0, null, null), null));
+//		mouseX = (int)x + 100;
+//		mouseY = (int)y + 100;
+
+
+		final int pixelX = (int) ((-x + 500f) * canvas.getCanvasRenderer().getCamera().getWidth() / 1000f);
+		final int pixelY = (int) ((y + 200f) * canvas.getCanvasRenderer().getCamera().getHeight() / 400f);
+		mouseState = new MouseState(pixelX, pixelY, 0, 0, 0, null, null);
+
+		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(pixelX, pixelY), false, null);
+		final ReadOnlyVector3 origin = pickRay.getOrigin();
+		kinectPointer.setTranslation(origin.getX(), origin.getY(), origin.getZ());
+
+		refresh = true;
+	}
+
+	public void grabOrRelease() {
+		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted())
+			mouseReleased(lastSelectedEditPointMouseState);
+		else
+			mousePressed(lastSelectedEditPointMouseState);
 	}
 
 //	public void updateWindow() {

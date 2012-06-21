@@ -14,7 +14,7 @@ import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.image.ImageDataFormat;
-import com.ardor3d.image.ImageDataType;
+import com.ardor3d.image.PixelDataType;
 import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -43,7 +43,7 @@ public class Printout implements Printable, Pageable {
 		this.visibleSceneHeight = visibleSceneHeight;
 		this.printCorners = printCorners;
 		final Camera camera = Camera.getCurrentCamera();
-		_scratch = BufferUtils.createByteBuffer(camera.getWidth() * camera.getHeight() * ImageUtils.getPixelByteSize(getFormat(), ImageDataType.UnsignedByte));
+		_scratch = BufferUtils.createByteBuffer(camera.getWidth() * camera.getHeight() * ImageUtils.getPixelByteSize(getFormat(), PixelDataType.UnsignedByte));
 		image = new BufferedImage(targetSize.width, targetSize.height, BufferedImage.TYPE_INT_RGB);
 
 //		final Vector3 cameraLocation = new Vector3(printCorners.get(0)).addLocal(visibleSceneWidth / 2.0, -10.0, -visibleSceneHeight / 2.0);
@@ -231,7 +231,7 @@ public class Printout implements Printable, Pageable {
 //				e.printStackTrace();
 //			}
 			// Ask the renderer for the current scene to be stored in the buffer
-			_scratch = BufferUtils.createByteBuffer(camera.getWidth() * camera.getHeight() * ImageUtils.getPixelByteSize(getFormat(), ImageDataType.UnsignedByte));
+			_scratch = BufferUtils.createByteBuffer(camera.getWidth() * camera.getHeight() * ImageUtils.getPixelByteSize(getFormat(), PixelDataType.UnsignedByte));
 			SceneManager.getInstance().getCanvas().getCanvasRenderer().makeCurrentContext();
 			renderer.grabScreenContents(_scratch, getFormat(), 0, 0, width, height);
 			SceneManager.getInstance().getCanvas().getCanvasRenderer().releaseCurrentContext();

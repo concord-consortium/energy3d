@@ -675,10 +675,10 @@ public class MainPanel extends JPanel {
 			    boolean firstCall = true;
 				@Override
 				public void stateChanged(final javax.swing.event.ChangeEvent e) {
-				    if (firstCall)
+				    if (firstCall) {
+				    	firstCall = false;
 				        return;
-				    else
-				        firstCall = false;
+				    }
 					final Heliodon heliodon = SceneManager.getInstance().getHeliodon();
 					if (heliodon != null)
 						heliodon.setDate((Date) dateSpinner.getValue());
@@ -703,10 +703,10 @@ public class MainPanel extends JPanel {
                 @Override
                 public void stateChanged(final javax.swing.event.ChangeEvent e) {
                     // ignore the first event
-                    if (firstCall)
+                    if (firstCall) {
+                    	firstCall = false;
                         return;
-                    else
-                        firstCall = false;
+                    }
 					final Heliodon heliodon = SceneManager.getInstance().getHeliodon();
 					if (heliodon != null)
 						heliodon.setTime((Date) timeSpinner.getValue());

@@ -3,12 +3,13 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="poly2tri-java/poly2tri-core/src/main/java"/>
 	<classpathentry kind="src" path="poly2tri-java/poly2tri-ardor3d/src/main/java"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_27"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-collada"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-effects"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-jogl"/>
 	<classpathentry kind="src" path="/ardor3d-awt"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-lwjgl"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre6"/>
+	<classpathentry kind="lib" path="exe/lib/org.OpenNI.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

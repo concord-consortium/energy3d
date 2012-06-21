@@ -3,6 +3,7 @@ package org.concord.energy3d;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.kinect.HandTrackerApplication;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
@@ -38,8 +39,10 @@ public class MainApplication {
 		final SceneManager scene = SceneManager.getInstance();
 		MainFrame.getInstance().setVisible(true);
 		new Thread(scene, "Energy 3D Application").start();
-		Scene.getInstance();
+		Scene.getInstance();;
 		// System.out.println(System.nanoTime() - s);
+
+		HandTrackerApplication.main(null);
 	}
 
 	private static void setupLibraryPath() {
@@ -65,7 +68,8 @@ public class MainApplication {
 		} else
 			throw new RuntimeException("Unknown OS: " + os);
 
-		final String newLibraryPath = rendererNativePath + sep + OSPath + System.getProperty("path.separator") + orgLibraryPath;
+		final String pathSep = System.getProperty("path.separator");
+		final String newLibraryPath = "." + pathSep + rendererNativePath + sep + OSPath + pathSep + orgLibraryPath;
 		System.setProperty("java.library.path", newLibraryPath);
 		System.out.println("Path = " + System.getProperty("java.library.path"));
 		// The following code is to empty the library path cache in order to force JVM to use the new library path above
