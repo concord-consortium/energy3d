@@ -74,7 +74,7 @@ public class PrintController implements Updater {
 
 	public PrintController() {
 		final Paper paper = new Paper();
-		paper.setSize(13 * 72, 19 * 72);
+//		paper.setSize(13 * 72, 19 * 72);
 		final int m = (int) (0.25 * 72);
 		paper.setImageableArea(m, m, paper.getWidth() - m * 2, paper.getHeight() - m * 2);
 		pageFormat.setPaper(paper);

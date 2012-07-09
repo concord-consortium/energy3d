@@ -9,6 +9,7 @@ import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
@@ -373,15 +374,15 @@ public class Wall extends HousePart {
 			}
 		}
 
-		Poly2Tri.triangulate(polygon);
-		ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
-		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
+//		Poly2Tri.triangulate(polygon);
+//		ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
+//		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.1 : 1.0;
-		// final double scale2 = 1;
-		// u.set(u.getX() * scale2, u.getY() * scale2, u.getZ() * scale2);
-		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale, o, u, v);
-		mesh.getMeshData().updateVertexCount();
-		mesh.updateModelBound();
+//		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale, o, u, v);
+//		mesh.getMeshData().updateVertexCount();
+//		mesh.updateModelBound();
+
+		MeshLib.fillMeshWithPolygon(mesh, polygon, scale, o, u, v, fromXY);
 
 		/* draw invisibleMesh */
 		final Polygon invisiblePolygon = new Polygon(ArdorVector3PolygonPoint.toPoints(extractPolygonPoints(polygon)));

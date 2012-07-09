@@ -5,6 +5,12 @@ import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.poly2tri.Poly2Tri;
+import org.poly2tri.geometry.polygon.Polygon;
+import org.poly2tri.transform.coordinate.XYToAnyTransform;
+import org.poly2tri.triangulation.TriangulationPoint;
+import org.poly2tri.triangulation.point.TPoint;
+import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
@@ -62,17 +68,17 @@ public class MeshLib {
 			GroupData group = null;
 			for (final GroupData g : groups) {
 				if (g.key.dot(norm) > 0.99) { // if there is less than 8 degrees difference between the two vectors
-//					for (final Vector3 groupPoint : g.vertices)
-//						if (groupPoint.equals(p1) || groupPoint.equals(p2) || groupPoint.equals(p3)) {
-//							group = g;
-//							break;
-//						}
+				// for (final Vector3 groupPoint : g.vertices)
+				// if (groupPoint.equals(p1) || groupPoint.equals(p2) || groupPoint.equals(p3)) {
+				// group = g;
+				// break;
+				// }
 					// if there is an edge in common with the existing triangles
 					boolean foundEdgeInCommon = false;
 					for (int j = 0; j < g.vertices.size() && !foundEdgeInCommon; j += 3) {
 						int numOfShared = 0;
 						for (int k = 0; k < 3; k++) {
-							final Vector3 p = g.vertices.get(j+k);
+							final Vector3 p = g.vertices.get(j + k);
 							if (p.equals(p1) || p.equals(p2) || p.equals(p3))
 								numOfShared++;
 						}
@@ -177,13 +183,13 @@ public class MeshLib {
 				node.attachChild(wireframeMesh);
 
 				final Line dashLineMesh = new Line("Roof (dash line)");
-				dashLineMesh.setStipplePattern((short)0xFF00);
+				dashLineMesh.setStipplePattern((short) 0xFF00);
 				dashLineMesh.setVisible(false);
 				// ((Line)wireframeMesh).setLineWidth(5);
-//				dashLineMesh.set
-//				dashLineMesh.setDefaultColor(ColorRGBA.WHITE);
+				// dashLineMesh.set
+				// dashLineMesh.setDefaultColor(ColorRGBA.WHITE);
 				dashLineMesh.setModelBound(new BoundingBox());
-//				dashLineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+				// dashLineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 				Util.disablePickShadowLight(dashLineMesh);
 				node.attachChild(dashLineMesh);
 
@@ -313,7 +319,7 @@ public class MeshLib {
 			// for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
 			for (int j = 0; j <= vertexBuffer.limit() / 3 - 1; j++) {
 				sj.set(vertexBuffer.get(j * 3), vertexBuffer.get(j * 3 + 1), vertexBuffer.get(j * 3 + 2));
-//				if (sj.equals(pointOnHull))
+				// if (sj.equals(pointOnHull))
 				if (convexHull.contains(sj))
 					continue;
 				// check to see if sj is connected to pointOnHull
@@ -345,7 +351,7 @@ public class MeshLib {
 				}
 			}
 			pointOnHull.set(endpoint);
-//			if (convexHull.contains(pointOnHull))
+			// if (convexHull.contains(pointOnHull))
 			if (endpoint.getX() == Double.MAX_VALUE)
 				break;
 			else
@@ -363,5 +369,71 @@ public class MeshLib {
 		for (final int i : toBeRemoved)
 			convexHull.remove(i);
 		return convexHull;
+	}
+
+	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final double textureScale, final TPoint o, final TPoint u, final TPoint v, final XYToAnyTransform fromXY) {
+//		final Vector2 min = new Vector2(Double.MAX_VALUE, Double.MAX_VALUE);
+//		final Vector2 max = new Vector2(Double.MIN_VALUE, Double.MIN_VALUE);
+//		for (final TriangulationPoint p : polygon.getPoints()) {
+//			if (p.getX() > max.getX())
+//				max.setX(p.getX());
+//			else if (p.getX() < min.getX())
+//				min.setX(p.getX());
+//
+//			if (p.getY() > max.getY())
+//				max.setY(p.getY());
+//			else if (p.getY() < min.getY())
+//				min.setY(p.getY());
+//		}
+//
+//		final double c = 0.1;
+//		min.addLocal(c, c);
+//		max.subtractLocal(c, c);
+//
+//		if (polygon.getHoles() != null) {
+////			polygon.getHoles().remove(3);
+//			polygon.getHoles().remove(9);
+////			polygon.getHoles().remove(8);
+//			polygon.getHoles().remove(7);
+//			polygon.getHoles().remove(6);
+//			polygon.getHoles().remove(5);
+//			polygon.getHoles().remove(4);
+////			polygon.getHoles().remove(3);
+//			polygon.getHoles().remove(2);
+////			polygon.getHoles().remove(1);
+//			polygon.getHoles().remove(0);
+////			for (final Polygon hole : polygon.getHoles()) {
+////				for (final TriangulationPoint p : hole.getPoints())
+////					p.set(MathUtils.clamp(p.getX(), min.getX(), max.getX()), MathUtils.clamp(p.getY(), min.getY(), max.getY()), p.getZ());
+////			}
+//		}
+
+		try {
+			Poly2Tri.triangulate(polygon);
+		} catch (final RuntimeException e) {
+//			e.printStackTrace();
+			System.out.println("Triangulate exception received with the following polygon:");
+			System.out.println("final Polygon polygon = new Polygon(new PolygonPoint[] {");
+			for (final TriangulationPoint p : polygon.getPoints())
+				System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
+			System.out.println("});");
+
+			System.out.println("Polygon hole;");
+			for (final Polygon hole : polygon.getHoles()) {
+				System.out.println("hole = new Polygon(new PolygonPoint[] {");
+				for (final TriangulationPoint p : hole.getPoints())
+					System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
+				System.out.println("});");
+				System.out.println("polygon.addHole(hole);");
+			}
+
+			throw e;
+		}
+		ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
+		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
+		// ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
+		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), textureScale, o, u, v);
+		mesh.getMeshData().updateVertexCount();
+		mesh.updateModelBound();
 	}
 }

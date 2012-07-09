@@ -3,7 +3,6 @@ package org.concord.energy3d;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.kinect.HandTrackerApplication;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
@@ -42,7 +41,7 @@ public class MainApplication {
 		Scene.getInstance();;
 		// System.out.println(System.nanoTime() - s);
 
-		HandTrackerApplication.main(null);
+//		HandTrackerApplication.main(null);
 	}
 
 	private static void setupLibraryPath() {

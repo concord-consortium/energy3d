@@ -296,8 +296,8 @@ public class Scene implements Serializable {
 		if (container != null)
 			container.getChildren().remove(housePart);
 		removeTree(housePart);
-//		if (container != null)
-//			container.draw();
+		if (container != null)
+			container.draw();
 	}
 
 	private void removeTree(final HousePart housePart) {

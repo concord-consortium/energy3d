@@ -1086,6 +1086,8 @@ Version 0.5 - October 20, 2011
 - fix problem with platform bounds skipping 2X when dragged upward
 - release version 0.6.8
 - integrate with Kinect
+- fixed problem with removing window and not refreshing the wall
+- set the default paper size to Letter size
 
 
 

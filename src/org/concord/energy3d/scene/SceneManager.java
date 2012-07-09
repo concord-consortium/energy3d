@@ -460,7 +460,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} catch (final Throwable e) {
 			e.printStackTrace();
 			if (shadowPass.isEnabled()) {
-				JOptionPane.showMessageDialog(MainPanel.getInstance(), "Your video card driver does not support shadows! Updating your video card drivers may fix this issue. Shadow rendering will be disabled now.", "Warning", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(MainPanel.getInstance(), "Your video card driver does not support shadows!\nUpdating your video card drivers may fix this issue.\nShadow rendering will be disabled now.", "Warning", JOptionPane.WARNING_MESSAGE);
 				shadowPass.setEnabled(false);
 			}
 		}
