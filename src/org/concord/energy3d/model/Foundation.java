@@ -225,7 +225,7 @@ public class Foundation extends HousePart {
 		if (children.isEmpty())
 			return p;
 
-		if ((index == 0 && points.get(0).getX() < points.get(2).getX()) || (index == 1 && points.get(1).getX() < points.get(3).getX())) {
+		if (((index == 0 || index == 1) && points.get(0).getX() < points.get(2).getX()) || ((index == 2 || index == 3) && points.get(2).getX() < points.get(0).getX())) {
 			if (p.getX() > minX)
 				p.setX(minX);
 		} else {
@@ -233,7 +233,7 @@ public class Foundation extends HousePart {
 				p.setX(maxX);
 		}
 
-		if ((index == 0 && points.get(0).getY() < points.get(1).getY()) || (index == 2 && points.get(2).getY() < points.get(3).getY())) {
+		if (((index == 0 || index == 2) && points.get(0).getY() < points.get(1).getY()) || ((index == 1 || index == 3) && points.get(1).getY() < points.get(0).getY())) {
 			if (p.getY() > minY)
 				p.setY(minY);
 		} else {
@@ -423,8 +423,8 @@ public class Foundation extends HousePart {
 			prepareForNotResizing();
 			minX = Double.MAX_VALUE;
 			minY = Double.MAX_VALUE;
-			maxX = Double.MIN_VALUE;
-			maxY = Double.MIN_VALUE;
+			maxX = -Double.MAX_VALUE;
+			maxY = -Double.MAX_VALUE;
 			for (final HousePart part : children) {
 				final Vector3 p1 = part.getAbsPoint(0);
 				final Vector3 p2 = part.getAbsPoint(2);
