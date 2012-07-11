@@ -511,7 +511,7 @@ public class MainFrame extends JFrame {
 	 *
 	 * @return javax.swing.JMenu
 	 */
-	private JMenu getCameraMenu() {
+	public JMenu getCameraMenu() {
 		if (cameraMenu == null) {
 			cameraMenu = new JMenu();
 			cameraMenu.addMenuListener(new MenuListener() {
@@ -854,7 +854,7 @@ public class MainFrame extends JFrame {
 		return annotationsInward;
 	}
 
-	private JMenu getEditMenu() {
+	public JMenu getEditMenu() {
 		if (editMenu == null) {
 			editMenu = new JMenu("Edit");
 			editMenu.addMenuListener(new MenuListener() {

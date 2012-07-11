@@ -588,8 +588,11 @@ public class MainPanel extends JPanel {
 			previewButton.addItemListener(new java.awt.event.ItemListener() {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
-					if (mainFrame != null)
+					if (mainFrame != null) {
 						mainFrame.getPreviewMenuItem().setSelected(previewButton.isSelected());
+						mainFrame.getEditMenu().setEnabled(!previewButton.isSelected());
+						mainFrame.getCameraMenu().setEnabled(!previewButton.isSelected());
+					}
 					deselect();
 					PrintController.getInstance().setPrintPreview(previewButton.isSelected());
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
