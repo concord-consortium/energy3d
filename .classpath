@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="poly2tri-java/poly2tri-core/src/main/java"/>
-	<classpathentry kind="src" path="poly2tri-java/poly2tri-ardor3d/src/main/java"/>
+	<classpathentry kind="src" path="poly2tri.java/poly2tri-core/src/main/java"/>
+	<classpathentry kind="src" path="poly2tri.java/poly2tri-ardor3d/src/main/java"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-collada"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-effects"/>

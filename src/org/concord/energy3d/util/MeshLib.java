@@ -60,6 +60,8 @@ public class MeshLib {
 			final Vector3 p1 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 			final Vector3 p2 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 			final Vector3 p3 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+			if (p1.getZ() == 0 || p2.getZ() == 0 || p3.getZ() == 0)
+				continue;
 			p2.subtract(p1, v1);
 			p3.subtract(p1, v2);
 			v1.cross(v2, norm);

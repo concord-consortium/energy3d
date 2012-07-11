@@ -260,6 +260,9 @@ public class Wall extends HousePart {
 
 		if (isDrawable())
 			drawNeighborWalls();
+
+//		if (isDrawable() && roof != null)
+//			roof.draw();
 	}
 
 	protected boolean snapWall(final Vector3 p, final int index) {
