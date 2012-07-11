@@ -376,6 +376,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void update(final ReadOnlyTimer timer) {
 		final double tpf = timer.getTimePerFrame();
 		passManager.updatePasses(tpf);
+		taskManager.getQueue(GameTaskQueue.UPDATE).setExecuteMultiple(true);
+//		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
 		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
 
 		if (operationFlag)

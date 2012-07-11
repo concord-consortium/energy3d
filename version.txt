@@ -1089,6 +1089,7 @@ Version 0.5 - October 20, 2011
 - fixed problem with removing window and not refreshing the wall
 - set the default paper size to Letter size
 - fix problem with platform coming out from under the house and unable to put it back under the house.
+- fix problem with mouse released code executing after few seconds delay
 
 
 

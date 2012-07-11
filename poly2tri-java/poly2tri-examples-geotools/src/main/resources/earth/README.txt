@@ -1,1 +1,0 @@
-These data files can only be used for non commercial purposes

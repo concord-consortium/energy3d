@@ -386,26 +386,26 @@ public class MeshLib {
 //				min.setY(p.getY());
 //		}
 //
-//		final double c = 0.1;
+//		final double c = 0.5;
 //		min.addLocal(c, c);
 //		max.subtractLocal(c, c);
 //
 //		if (polygon.getHoles() != null) {
-////			polygon.getHoles().remove(3);
-//			polygon.getHoles().remove(9);
-////			polygon.getHoles().remove(8);
-//			polygon.getHoles().remove(7);
-//			polygon.getHoles().remove(6);
-//			polygon.getHoles().remove(5);
-//			polygon.getHoles().remove(4);
-////			polygon.getHoles().remove(3);
-//			polygon.getHoles().remove(2);
-////			polygon.getHoles().remove(1);
-//			polygon.getHoles().remove(0);
-////			for (final Polygon hole : polygon.getHoles()) {
-////				for (final TriangulationPoint p : hole.getPoints())
-////					p.set(MathUtils.clamp(p.getX(), min.getX(), max.getX()), MathUtils.clamp(p.getY(), min.getY(), max.getY()), p.getZ());
-////			}
+//////			polygon.getHoles().remove(3);
+////			polygon.getHoles().remove(9);
+//////			polygon.getHoles().remove(8);
+////			polygon.getHoles().remove(7);
+////			polygon.getHoles().remove(6);
+////			polygon.getHoles().remove(5);
+////			polygon.getHoles().remove(4);
+//////			polygon.getHoles().remove(3);
+////			polygon.getHoles().remove(2);
+//////			polygon.getHoles().remove(1);
+////			polygon.getHoles().remove(0);
+//			for (final Polygon hole : polygon.getHoles()) {
+//				for (final TriangulationPoint p : hole.getPoints())
+//					p.set(MathUtils.clamp(p.getX(), min.getX(), max.getX()), MathUtils.clamp(p.getY(), min.getY(), max.getY()), p.getZ());
+//			}
 //		}
 
 		try {
