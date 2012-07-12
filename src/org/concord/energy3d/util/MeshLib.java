@@ -25,7 +25,6 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -150,24 +149,21 @@ public class MeshLib {
 	}
 
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
+		final long t = System.nanoTime();
 		int meshIndex = 0;
+//		root.detachAllChildren();
 		for (final GroupData group : groups) {
 			final Node node;
 			final Mesh newMesh;
 			if (meshIndex < root.getNumberOfChildren()) {
 				node = (Node) root.getChild(meshIndex);
 				newMesh = (Mesh) node.getChild(0);
-				node.getSceneHints().setCullHint(CullHint.Inherit);
-				node.getSceneHints().setPickingHint(PickingHint.Pickable, true);
+//				node.getSceneHints().setCullHint(CullHint.Inherit);
+//				node.getSceneHints().setPickingHint(PickingHint.Pickable, true);
 			} else {
+				node = new Node("Roof Part #" + meshIndex);
 				newMesh = new Mesh("Roof Mesh #" + meshIndex);
 				newMesh.setModelBound(new OrientedBoundingBox());
-				// final OffsetState offsetState = new OffsetState();
-				// offsetState.setTypeEnabled(OffsetType.Fill, true);
-				// offsetState.setFactor(1);
-				// offsetState.setUnits(1);
-				// newMesh.setRenderState(offsetState);
-				node = new Node("Roof Part #" + meshIndex);
 				node.attachChild(newMesh);
 				node.attachChild(new Node("Roof Size Annot"));
 				node.attachChild(new Node("Roof Angle Annot"));
@@ -175,11 +171,10 @@ public class MeshLib {
 				node.getChild(3).getSceneHints().setCullHint(CullHint.Always);
 
 				final Mesh wireframeMesh = new Line("Roof (wireframe)");
-				// ((Line)wireframeMesh).setLineWidth(5);
 				wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 				wireframeMesh.setModelBound(new BoundingBox());
 				wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10));
-				// offset to avoid x-fighting
+				// offset to avoid z-fighting
 				wireframeMesh.setTranslation(group.key.multiply(0.001, null));
 				Util.disablePickShadowLight(wireframeMesh);
 				node.attachChild(wireframeMesh);
@@ -187,16 +182,9 @@ public class MeshLib {
 				final Line dashLineMesh = new Line("Roof (dash line)");
 				dashLineMesh.setStipplePattern((short) 0xFF00);
 				dashLineMesh.setVisible(false);
-				// ((Line)wireframeMesh).setLineWidth(5);
-				// dashLineMesh.set
-				// dashLineMesh.setDefaultColor(ColorRGBA.WHITE);
 				dashLineMesh.setModelBound(new BoundingBox());
-				// dashLineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 				Util.disablePickShadowLight(dashLineMesh);
 				node.attachChild(dashLineMesh);
-
-				// if (root.getNumberOfChildren() != 0)
-				// newMesh.getSceneHints().setCullHint(CullHint.Always);
 				root.attachChild(node);
 			}
 			final Vector3 normal = new Vector3();
@@ -205,21 +193,14 @@ public class MeshLib {
 			normal.normalizeLocal();
 			node.setUserData(normal);
 
-			// final Vector3 normal = new Vector3();
-			// for (final Vector3 v : group.normals)
-			// normal.addLocal(v);
-			// normal.normalizeLocal();
-			// if (!Vector3.isValid(normal))
-			// continue;
-
 			FloatBuffer buf = newMesh.getMeshData().getVertexBuffer();
 			int n = group.vertices.size();
-			if (buf == null || buf.capacity() / 3 < n) {
+//			if (buf == null || buf.capacity() / 3 == n) {
 				buf = BufferUtils.createVector3Buffer(n);
 				newMesh.getMeshData().setVertexBuffer(buf);
-			}
-			buf.rewind();
-			buf.limit(n * 3);
+//			}
+//			buf.rewind();
+//			buf.limit(n * 3);
 			final Vector3 center = new Vector3();
 			for (final Vector3 v : group.vertices) {
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
@@ -229,23 +210,23 @@ public class MeshLib {
 
 			buf = newMesh.getMeshData().getNormalBuffer();
 			n = group.normals.size();
-			if (buf == null || buf.capacity() / 3 < n) {
+//			if (buf == null || buf.capacity() / 3 == n) {
 				buf = BufferUtils.createVector3Buffer(n);
 				newMesh.getMeshData().setNormalBuffer(buf);
-			}
-			buf.rewind();
-			buf.limit(n * 3);
+//			}
+//			buf.rewind();
+//			buf.limit(n * 3);
 			for (final Vector3 v : group.normals)
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 
 			buf = newMesh.getMeshData().getTextureBuffer(0);
 			n = group.textures.size();
-			if (buf == null || buf.capacity() / 2 < n) {
+//			if (buf == null || buf.capacity() / 2 == n) {
 				buf = BufferUtils.createVector2Buffer(n);
 				newMesh.getMeshData().setTextureBuffer(buf, 0);
-			}
-			buf.rewind();
-			buf.limit(n * 2);
+//			}
+//			buf.rewind();
+//			buf.limit(n * 2);
 			for (final Vector2 v : group.textures)
 				buf.put(v.getXf()).put(v.getYf());
 
@@ -255,13 +236,16 @@ public class MeshLib {
 			node.getChild(3).setTranslation(center.add(normal.multiply(0.1, null), null));
 
 			meshIndex++;
-			// break;
 		}
 		while (meshIndex < root.getNumberOfChildren()) {
-			root.getChild(meshIndex).getSceneHints().setCullHint(CullHint.Always);
-			root.getChild(meshIndex).getSceneHints().setPickingHint(PickingHint.Pickable, false);
-			meshIndex++;
+			root.detachChildAt(root.getNumberOfChildren() - 1);
+//			root.getChild(meshIndex).getSceneHints().setCullHint(CullHint.Always);
+//			root.getChild(meshIndex).getSceneHints().setPickingHint(PickingHint.Pickable, false);
+//			meshIndex++;
 		}
+		System.out.print(System.nanoTime() - t);
+		System.out.print("\t");
+		System.out.println(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
 	}
 
 	public static void addConvexWireframe(final FloatBuffer wireframeVertexBuffer, final FloatBuffer vertexBuffer) {

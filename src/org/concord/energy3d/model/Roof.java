@@ -131,7 +131,7 @@ public abstract class Roof extends HousePart {
 		hideGableRoofParts();
 		int roofPartIndex = 0;
 		for (final Spatial child : roofPartsRoot.getChildren()) {
-			if (child.getSceneHints().getCullHint() != CullHint.Always) {
+//			if (child.getSceneHints().getCullHint() != CullHint.Always) {
 				final Mesh mesh = (Mesh) ((Node) child).getChild(0);
 				mesh.setUserData(new UserData(this, roofPartIndex, false));
 				if (Scene.getInstance().getTextureMode() == TextureMode.None)
@@ -143,7 +143,7 @@ public abstract class Roof extends HousePart {
 //				mesh.updateModelBound();
 				// mesh.updateGeometricState(0);
 //				CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
-			}
+//			}
 			roofPartIndex++;
 		}
 		drawWireframe();
@@ -171,7 +171,7 @@ public abstract class Roof extends HousePart {
 			@Override
 			public Object call() throws Exception {
 				for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+//					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 						final Node roofPartNode = (Node) roofPart;
 						final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
 						final ArrayList<ReadOnlyVector3> result = new ArrayList<ReadOnlyVector3>();
@@ -199,7 +199,7 @@ public abstract class Roof extends HousePart {
 
 						dashLinesMesh.getMeshData().updateVertexCount();
 						dashLinesMesh.updateModelBound();
-					}
+//					}
 				}
 				updateDashLinesColor();
 				return null;
@@ -209,12 +209,12 @@ public abstract class Roof extends HousePart {
 
 	public void updateDashLinesColor() {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+//			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Node roofPartNode = (Node) roofPart;
 				final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
 				// dashLinesMesh.setDefaultColor(!Scene.getInstance().isTextureEnabled() && HousePart.getDefaultColor().equals(ColorRGBA.WHITE) ? ColorRGBA.BLACK : ColorRGBA.WHITE);
 				dashLinesMesh.setDefaultColor(ColorRGBA.RED);
-			}
+//			}
 		}
 	}
 
@@ -334,11 +334,11 @@ public abstract class Roof extends HousePart {
 		orgCenters.clear();
 
 		for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
-			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
+//			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
 				final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
 				computeOrientedBoundingBox(roofPartMesh);
 				orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
-			}
+//			}
 		}
 	}
 
@@ -364,7 +364,7 @@ public abstract class Roof extends HousePart {
 	@Override
 	public void flatten(final double flattenTime) {
 		for (final Spatial child : getRoofPartsRoot().getChildren()) {
-			if (child.getSceneHints().getCullHint() != CullHint.Always)
+//			if (child.getSceneHints().getCullHint() != CullHint.Always)
 				flattenQuadTriangle((Node) child, flattenTime);
 		}
 		root.updateGeometricState(0);
@@ -412,7 +412,7 @@ public abstract class Roof extends HousePart {
 			return;
 
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+//			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				int annotCounter = 0, angleAnnotCounter = 0;
 				final Node roofPartNode = (Node) roofPart;
 				final FloatBuffer buf = ((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer();
@@ -441,7 +441,7 @@ public abstract class Roof extends HousePart {
 					angleAnnot.setLineWidth(original == null ? 1f : 2f);
 					angleAnnot.setRange(p2, p1, p3, normal);
 				}
-			}
+//			}
 		}
 	}
 
@@ -450,7 +450,7 @@ public abstract class Roof extends HousePart {
 			return;
 
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+//			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Node roofPartNode = (Node) roofPart;
 				final Mesh wireframeMesh = (Mesh) roofPartNode.getChild(4);
 
@@ -477,19 +477,19 @@ public abstract class Roof extends HousePart {
 				buf.limit(buf.position());
 				wireframeMesh.getMeshData().updateVertexCount();
 				wireframeMesh.updateModelBound();
-			}
+//			}
 		}
 	}
 
 	@Override
 	public int drawLabels(int printSequence) {
 		for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
-			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
+//			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
 				final String text = "(" + (printSequence++ + 1) + ")";
 				final BMText label = (BMText) ((Node) roofPartNode).getChild(3);
 				label.getSceneHints().setCullHint(CullHint.Inherit);
 				label.setText(text);
-			}
+//			}
 		}
 		return printSequence;
 	}
@@ -497,7 +497,7 @@ public abstract class Roof extends HousePart {
 	@Override
 	public void hideLabels() {
 		for (final Spatial roofPartNode : roofPartsRoot.getChildren())
-			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
+//			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
 				((Node) roofPartNode).getChild(3).getSceneHints().setCullHint(CullHint.Always);
 	}
 
@@ -505,7 +505,7 @@ public abstract class Roof extends HousePart {
 	public void updateTextureAndColor() {
 		if (roofPartsRoot != null) {
 			for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
-				if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
+//				if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
 //					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(0), getDefaultColor());
 					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(0), Scene.getInstance().getRoofColor());
 				// {
@@ -764,7 +764,7 @@ public abstract class Roof extends HousePart {
 		root.attachChild(roofPartsRoot);
 
 		for (int i = 0; i < roofPartsRoot.getNumberOfChildren(); i++) {
-			if (roofPartsRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
+//			if (roofPartsRoot.getChild(i).getSceneHints().getCullHint() != CullHint.Always) {
 				final UserData orgUserData = (UserData) ((Node) originalRoof.roofPartsRoot.getChild(i)).getChild(0).getUserData();
 				final Mesh mesh = (Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(0);
 				mesh.setUserData(new UserData(this, orgUserData.getIndex(), false));
@@ -773,7 +773,7 @@ public abstract class Roof extends HousePart {
 				// wireframeMesh.setLineWidth(WIREFRAME_THICKNESS);
 				wireframeMesh.setLineWidth(printWireframeThickness);
 //				mesh.getSceneHints().setCullHint((Scene.getInstance().getTextureMode() == TextureMode.None && Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE)) ? CullHint.Always : CullHint.Inherit);
-			}
+//			}
 		}
 		drawAnnotations();
 		root.updateWorldBound(true);

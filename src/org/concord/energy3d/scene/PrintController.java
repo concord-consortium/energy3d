@@ -425,7 +425,7 @@ public class PrintController implements Updater {
 				if (printPart.isPrintable()) {
 					if (printPart instanceof Roof) {
 						for (final Spatial roofPartNode : ((Roof) printPart).getRoofPartsRoot().getChildren()) {
-							if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
+//							if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
 								final OrientedBoundingBox boundingBox = (OrientedBoundingBox) ((Node) roofPartNode).getChild(0).getWorldBound();
 								final double width = Math.min(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
 								final double height = Math.max(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
@@ -433,7 +433,7 @@ public class PrintController implements Updater {
 									maxWidth = width;
 								if (height > maxHeight)
 									maxHeight = height;
-							}
+//							}
 						}
 					} else {
 						final OrientedBoundingBox boundingBox = (OrientedBoundingBox) printPart.getMesh().getWorldBound();
@@ -529,8 +529,8 @@ public class PrintController implements Updater {
 				printPart.getRoot().updateWorldBound(true);
 				if (printPart instanceof Roof) {
 					final Roof roof = (Roof) printPart;
-					for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren())
-						if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+					for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
+//						if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 							final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
 							roof.setPrintVertical(roofPart, decideVertical(mesh));
 							computePrintCenterOf(mesh, pages);
