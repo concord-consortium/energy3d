@@ -1247,7 +1247,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				hoveredHousePart = null;
 			}
 		}
-//		mouseState = null;
+		mouseState = null;
 	}
 
 	public ViewMode getViewMode() {

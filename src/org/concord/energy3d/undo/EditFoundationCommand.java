@@ -4,7 +4,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 
@@ -16,7 +15,7 @@ public class EditFoundationCommand extends EditHousePartCommand {
 	public EditFoundationCommand(final Foundation foundation) {
 		super(foundation);
 		this.foundation = foundation;
-		this.isResizeMode = SceneManager.getInstance().getOperation() == Operation.RESIZE;
+		isResizeMode = SceneManager.getInstance().getOperation() == Operation.RESIZE;
 	}
 
 	@Override
@@ -27,11 +26,11 @@ public class EditFoundationCommand extends EditHousePartCommand {
 		super.undo();
 		try {
 			foundation.complete();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
-		Scene.getInstance().redrawAll();
+//		Scene.getInstance().redrawAll();	will already be done in MainFrame
 	}
 
 	@Override
@@ -42,10 +41,10 @@ public class EditFoundationCommand extends EditHousePartCommand {
 		super.redo();
 		try {
 			foundation.complete();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
-		Scene.getInstance().redrawAll();
+//		Scene.getInstance().redrawAll();
 	}
 }

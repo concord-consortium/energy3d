@@ -347,9 +347,9 @@ public class Scene implements Serializable {
 		redrawAll();
 		for (final HousePart part : parts)
 			part.updateTextureAndColor();
-		if (PrintController.getInstance().getPrintParts() != null)
-			for (final HousePart part : PrintController.getInstance().getPrintParts())
-				part.updateTextureAndColor();
+//		if (PrintController.getInstance().getPrintParts() != null)
+//			for (final HousePart part : PrintController.getInstance().getPrintParts())
+//				part.updateTextureAndColor();
 
 		Scene.getInstance().updateRoofDashLinesColor();
 	}
@@ -394,9 +394,10 @@ public class Scene implements Serializable {
 			for (final HousePart part : parts)
 				if (!(part instanceof Roof))
 					part.draw();
-			if (PrintController.getInstance().getPrintParts() != null)
-				for (final HousePart part : PrintController.getInstance().getPrintParts())
-					part.draw();
+			// no need for redrawing printparts because they will be regenerated from original parts anyways
+//			if (PrintController.getInstance().getPrintParts() != null)
+//				for (final HousePart part : PrintController.getInstance().getPrintParts())
+//					part.draw();
 			redrawAll = false;
 //		}
 	}

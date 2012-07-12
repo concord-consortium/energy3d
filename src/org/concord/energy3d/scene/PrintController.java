@@ -157,8 +157,7 @@ public class PrintController implements Updater {
 				if (!isPrintPreview && restartFlag) {
 					restartFlag = false;
 //					/* to force redraw when animated back to normal scene */
-//					Scene.getInstance().redrawAll();
-					Scene.getInstance().redrawAllNow();
+					Scene.getInstance().redrawAllNow();		// redraw does not stretch the walls of print parts the roof. there is also no need for redraw since nothing has changed
 					setPrintPreview(true);
 					return;
 				}

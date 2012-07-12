@@ -342,7 +342,7 @@ public class Wall extends HousePart {
 			return;
 
 		final Vector3 normal = computeNormal();
-		final Polygon polygon = stretchToRoof(computeWallAndWindowPolygon(false));
+		final Polygon polygon = extendToRoof(computeWallAndWindowPolygon(false));
 
 		wallPolygonPoints = extractPolygonPoints(polygon);
 
@@ -491,7 +491,7 @@ public class Wall extends HousePart {
 		return polygon;
 	}
 
-	private Polygon stretchToRoof(final Polygon polygon) {
+	private Polygon extendToRoof(final Polygon polygon) {
 		final int[] upper = { 0, 3 };
 
 		for (final int i : upper) {
@@ -556,7 +556,7 @@ public class Wall extends HousePart {
 		if (roof == null)
 			return p;
 		final PickResults pickResults = new PrimitivePickResults();
-		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ()), direction), pickResults);
+		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ()), direction), pickResults, false);
 		if (pickResults.getNumber() > 0) {
 			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(Scene.getInstance().getOverhangLength() > 0.05 ? offset : 0, null), null);
 		} else
@@ -586,7 +586,7 @@ public class Wall extends HousePart {
 		}
 
 		enforceRangeAndRemoveDuplicatedGablePoints(polygon);
-		stretchToRoof(polygon);
+		extendToRoof(polygon);
 
 		toXY(polygon);
 

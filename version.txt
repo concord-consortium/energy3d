@@ -1092,6 +1092,7 @@ Version 0.5 - October 20, 2011
 - fix problem with mouse released code executing after few seconds delay
 - fix problem with roof stretching all the way to ground sometimes
 - disable edit and camera menus when in print preview mode
+- fix problem with walls not extending to roof after restarting print preview
 
 
 
