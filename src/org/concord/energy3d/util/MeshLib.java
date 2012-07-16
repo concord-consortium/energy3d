@@ -149,7 +149,7 @@ public class MeshLib {
 	}
 
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
-		final long t = System.nanoTime();
+//		final long t = System.nanoTime();
 		int meshIndex = 0;
 //		root.detachAllChildren();
 		for (final GroupData group : groups) {
@@ -243,9 +243,9 @@ public class MeshLib {
 //			root.getChild(meshIndex).getSceneHints().setPickingHint(PickingHint.Pickable, false);
 //			meshIndex++;
 		}
-		System.out.print(System.nanoTime() - t);
-		System.out.print("\t");
-		System.out.println(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+//		System.out.print(System.nanoTime() - t);
+//		System.out.print("\t");
+//		System.out.println(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
 	}
 
 	public static void addConvexWireframe(final FloatBuffer wireframeVertexBuffer, final FloatBuffer vertexBuffer) {

@@ -255,11 +255,22 @@ public class Wall extends HousePart {
 		thicknessNormal = null;
 		isShortWall = true;
 		draw();
-		drawChildren();
-		setEditPointsVisible(true);
-
 		if (isDrawable())
 			drawNeighborWalls();
+		drawChildren();
+		/* find and draw any roof or floor child of neighbors */
+		visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall wall, final Snap prev, final Snap next) {
+				for (final HousePart child : wall.getChildren())
+//					if (child instanceof Roof || child instanceof Floor)
+						child.draw();
+			}
+		});
+
+
+		setEditPointsVisible(true);
+
 
 //		if (isDrawable() && roof != null)
 //			roof.draw();
@@ -1005,16 +1016,30 @@ public class Wall extends HousePart {
 	}
 
 	public void visitNeighborsForward(Wall currentWall, Snap snap, final WallVisitor visitor) {
+		class VisitInfo {
+			Wall wall;
+			Snap prev, next;
+			VisitInfo(final Wall wall, final Snap prev, final Snap next) {
+				this.wall = wall;
+				this.prev = prev;
+				this.next = next;
+			}
+		}
+		final ArrayList<VisitInfo> visits = new ArrayList<VisitInfo>();
 		Wall.clearVisits();
 		while (currentWall != null && !currentWall.isVisited()) {
 			final Snap prevSnap = snap;
 			snap = currentWall.getOtherSnap(snap);
-			visitor.visit(currentWall, prevSnap, snap);
+//			visitor.visit(currentWall, prevSnap, snap);
+			if (currentWall != this)
+				visits.add(new VisitInfo(currentWall, prevSnap, snap));
 			currentWall.visit();
 			if (snap == null)
 				break;
 			currentWall = snap.getNeighborOf(currentWall);
 		}
+		for (final VisitInfo visit : visits)
+			visitor.visit(visit.wall, visit.prev, visit.next);
 	}
 
 	private void drawNeighborWalls() {
@@ -1027,7 +1052,7 @@ public class Wall extends HousePart {
 				@Override
 				public void visit(final Wall wall, final Snap prev, final Snap next) {
 					visitWallAndReverseThickness(wall, prev);
-					if (wall != Wall.this)
+//					if (wall != Wall.this)
 						walls.add(wall);
 					wall.isShortWall = nextIsShort;
 					nextIsShort = !nextIsShort;
@@ -1041,7 +1066,7 @@ public class Wall extends HousePart {
 				@Override
 				public void visit(final Wall wall, final Snap prev, final Snap next) {
 					visitWallAndReverseThickness(wall, prev);
-					if (wall != Wall.this)
+//					if (wall != Wall.this)
 						walls.add(wall);
 					wall.isShortWall = nextIsShort;
 					nextIsShort = !nextIsShort;
@@ -1050,7 +1075,7 @@ public class Wall extends HousePart {
 
 		for (final Wall wall : walls) {
 			wall.draw();
-			wall.drawChildren();
+//			wall.drawChildren();
 		}
 	}
 
@@ -1122,18 +1147,20 @@ public class Wall extends HousePart {
 		super.setOriginal(original);
 	}
 
-	@Override
-	protected void drawChildren() {
-		super.drawChildren();
-		visitNeighbors(new WallVisitor() {
-			@Override
-			public void visit(final Wall wall, final Snap prev, final Snap next) {
-				for (final HousePart child : wall.getChildren())
-					if (child instanceof Roof || child instanceof Floor)
-						child.draw();
-			}
-		});
-	}
+//	@Override
+//	protected void drawChildren() {
+//		/* draw windows and any roof or floor child of this wall */
+//		super.drawChildren();
+//		/* find and draw any roof or floor child of neighbors */
+//		visitNeighbors(new WallVisitor() {
+//			@Override
+//			public void visit(final Wall wall, final Snap prev, final Snap next) {
+//				for (final HousePart child : wall.getChildren())
+//					if (child instanceof Roof || child instanceof Floor)
+//						child.draw();
+//			}
+//		});
+//	}
 
 	public HousePart getRoof() {
 		return roof;

@@ -291,7 +291,8 @@ public abstract class Roof extends HousePart {
 		startWall.visitNeighbors(new WallVisitor() {
 			@Override
 			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
-				if (currentWall.isDrawCompleted()) {
+//				if (currentWall.isDrawCompleted()) {
+				if (currentWall.isFirstPointInserted()) {
 					walls.add(currentWall);
 					currentWall.setRoof(Roof.this);
 					final int pointIndex2;
