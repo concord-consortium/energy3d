@@ -349,9 +349,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 //				}
 
 				try {
-					final long t = System.nanoTime();
+//					final long t = System.nanoTime();
 					frameHandler.updateFrame();
-					System.out.println((System.nanoTime() - t)/1000000);
+//					System.out.println((System.nanoTime() - t)/1000000);
 				} catch (final Throwable e) {
 					e.printStackTrace();
 					if (shadowPass.isEnabled()) {

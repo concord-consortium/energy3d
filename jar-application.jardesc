@@ -13,13 +13,13 @@
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <file path="/ardor3d-collada/lib/jdom/jaxen.jar"/>
         <file path="/ardor3d-collada/lib/jdom/saxpath.jar"/>
-        <javaElement handleIdentifier="=Energy3D/poly2tri-java\/poly2tri-ardor3d\/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-lwjgl/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/resources&lt;com.ardor3d.extension.shadow.map"/>
-        <javaElement handleIdentifier="=Energy3D/poly2tri-java\/poly2tri-core\/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-core/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.shadow.map"/>
+        <javaElement handleIdentifier="=Energy3D/poly2tri.java\/poly2tri-ardor3d\/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-animation/src\/main\/java"/>
+        <javaElement handleIdentifier="=Energy3D/poly2tri.java\/poly2tri-core\/src\/main\/java"/>
         <file path="/ardor3d-collada/lib/jdom/jdom.jar"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/resources&lt;com.ardor3d.extension.effect.bloom"/>
         <javaElement handleIdentifier="=ardor3d-collada/src\/main\/java"/>

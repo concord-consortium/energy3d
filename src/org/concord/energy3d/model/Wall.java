@@ -55,6 +55,7 @@ public class Wall extends HousePart {
 	private static final double MIN_WALL_LENGTH = 0.01;
 	private static double defaultWallHeight = 2.0; // the recommended default wall height is 20cm
 	private static int currentVisitStamp = 1;
+	private static boolean extendToRoofEnabled = true;
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
 	private transient Mesh invisibleMesh;
@@ -252,21 +253,18 @@ public class Wall extends HousePart {
 			points.get(3).setZ(z);
 		}
 
-		thicknessNormal = null;
-		isShortWall = true;
-		draw();
-		if (isDrawable())
-			drawNeighborWalls();
-		drawChildren();
+//		thicknessNormal = null;
+//		isShortWall = true;
+		drawThisAndNeighbors(false);
 		/* find and draw any roof or floor child of neighbors */
-		visitNeighbors(new WallVisitor() {
-			@Override
-			public void visit(final Wall wall, final Snap prev, final Snap next) {
-				for (final HousePart child : wall.getChildren())
-//					if (child instanceof Roof || child instanceof Floor)
-						child.draw();
-			}
-		});
+//		visitNeighbors(new WallVisitor() {
+//			@Override
+//			public void visit(final Wall wall, final Snap prev, final Snap next) {
+//				for (final HousePart child : wall.getChildren())
+////					if (child instanceof Roof || child instanceof Floor)
+//						child.draw();
+//			}
+//		});
 
 
 		setEditPointsVisible(true);
@@ -274,6 +272,24 @@ public class Wall extends HousePart {
 
 //		if (isDrawable() && roof != null)
 //			roof.draw();
+	}
+
+	private void drawThisAndNeighbors(final boolean extendToRoofEnabled) {
+		thicknessNormal = null;
+		isShortWall = true;
+		Wall.extendToRoofEnabled = extendToRoofEnabled;
+		draw();
+		drawChildren();
+		if (isDrawable())
+			drawNeighborWalls();
+		Wall.extendToRoofEnabled = true;
+	}
+
+
+	@Override
+	public void complete() {
+		drawThisAndNeighbors(true);
+		super.complete();
 	}
 
 	protected boolean snapWall(final Vector3 p, final int index) {
@@ -503,6 +519,9 @@ public class Wall extends HousePart {
 	}
 
 	private Polygon extendToRoof(final Polygon polygon) {
+		if (!extendToRoofEnabled)
+			return polygon;
+
 		final int[] upper = { 0, 3 };
 
 		for (final int i : upper) {
@@ -1031,8 +1050,8 @@ public class Wall extends HousePart {
 			final Snap prevSnap = snap;
 			snap = currentWall.getOtherSnap(snap);
 //			visitor.visit(currentWall, prevSnap, snap);
-			if (currentWall != this)
-				visits.add(new VisitInfo(currentWall, prevSnap, snap));
+//			if (currentWall != this)
+			visits.add(new VisitInfo(currentWall, prevSnap, snap));
 			currentWall.visit();
 			if (snap == null)
 				break;
@@ -1053,6 +1072,7 @@ public class Wall extends HousePart {
 				public void visit(final Wall wall, final Snap prev, final Snap next) {
 					visitWallAndReverseThickness(wall, prev);
 //					if (wall != Wall.this)
+					if (wall != Wall.this && !walls.contains(wall))
 						walls.add(wall);
 					wall.isShortWall = nextIsShort;
 					nextIsShort = !nextIsShort;
@@ -1067,6 +1087,7 @@ public class Wall extends HousePart {
 				public void visit(final Wall wall, final Snap prev, final Snap next) {
 					visitWallAndReverseThickness(wall, prev);
 //					if (wall != Wall.this)
+					if (wall != Wall.this && !walls.contains(wall))
 						walls.add(wall);
 					wall.isShortWall = nextIsShort;
 					nextIsShort = !nextIsShort;
@@ -1075,7 +1096,7 @@ public class Wall extends HousePart {
 
 		for (final Wall wall : walls) {
 			wall.draw();
-//			wall.drawChildren();
+			wall.drawChildren();
 		}
 	}
 

@@ -1096,6 +1096,9 @@ Version 0.5 - October 20, 2011
 - fix problem with roof mesh texture not updated when switching to Simple Texture in print preview mode
 - removed unused roofPartRoot children to save memory and increase speed
 - reallocated mesh buffers unless the size is exactly the same as before to save memory and increase speed
+- fix problem with wrong visit flag due to recursive effect by saving parts in an array before visiting them
+- improve the speed 2X when adjusting position of wall by avoiding redundant drawings
+- improve the speed 5X when adjusting position of wall by avoiding extending walls to roof unless the mouse button is release
  
 
 
