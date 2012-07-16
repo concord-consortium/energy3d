@@ -182,6 +182,8 @@ public class Foundation extends HousePart {
 			p = grid(p, getAbsPoint(index), getGridSize());
 			if (!resizeHouseMode)
 				p = ensureIncludesChildren(p, index);
+			if (resizeHouseMode)
+				p = ensureNotTooSmall(p, index);
 			points.get(index).set(p);
 		}
 		if (!isFirstPointInserted()) {
@@ -214,6 +216,33 @@ public class Foundation extends HousePart {
 		else
 			draw();
 		setEditPointsVisible(true);
+	}
+
+	private Vector3 ensureNotTooSmall(final Vector3 p, final int index) {
+		final double width = 1;
+		final double x2 = getAbsPoint(index == 0 || index == 1 ? 2 : 0).getX();
+		if (getAbsPoint(index).getX() > x2) {
+			if (p.getX() - x2 < width)
+				p.setX(x2 + width);
+		} else  {
+			if (x2 - p.getX() < width)
+				p.setX(x2 - width);
+		}
+
+		final double y2 = getAbsPoint(index == 0 || index == 2 ? 1 : 0).getY();
+		if (getAbsPoint(index).getY() > y2) {
+			if (p.getY() - y2 < width)
+				p.setY(y2 + width);
+		} else {
+			if (y2 - p.getY() < width)
+				p.setY(y2 - width);
+		}
+
+////		final int other = index == 0 ? 2 : 0;
+//		final Vector3 other = getAbsPoint(index == 0 ? 2 : 0);
+//		if (Math.abs(other.getX() - p.getX()) < width)
+//			p.setX(other.getX() + width * other.getX() < p.getX())
+		return p;
 	}
 
 	private void syncUpperPoints() {

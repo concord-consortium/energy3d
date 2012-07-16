@@ -64,7 +64,7 @@ public class PrintController implements Updater {
 	private final Node pagesRoot = new Node();
 	private boolean heliodonSelected;
 	private PageFormat pageFormat = new PageFormat();
-	private boolean isScaleToFit;
+	private boolean isScaleToFit = true;
 	private boolean restartFlag = false;
 	private double labelHeight = 0.0;
 

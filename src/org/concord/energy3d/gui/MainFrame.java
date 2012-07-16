@@ -989,6 +989,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 			buttonGroup_1.add(scaleToFitRadioButtonMenuItem);
+			scaleToFitRadioButtonMenuItem.setSelected(true);
 		}
 		return scaleToFitRadioButtonMenuItem;
 	}
@@ -1003,7 +1004,6 @@ public class MainFrame extends JFrame {
 				}
 			});
 			buttonGroup_1.add(exactSizeRadioButtonMenuItem);
-			exactSizeRadioButtonMenuItem.setSelected(true);
 		}
 		return exactSizeRadioButtonMenuItem;
 	}

@@ -1099,7 +1099,8 @@ Version 0.5 - October 20, 2011
 - fix problem with wrong visit flag due to recursive effect by saving parts in an array before visiting them
 - improve the speed 2X when adjusting position of wall by avoiding redundant drawings
 - improve the speed 5X when adjusting position of wall by avoiding extending walls to roof unless the mouse button is release
- 
+- default scale-to-fit
+- prevent resize box from reversing or becoming too small  
 
 
 
