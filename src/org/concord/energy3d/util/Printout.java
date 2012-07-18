@@ -219,10 +219,11 @@ public class Printout implements Printable, Pageable {
 //			pos.set(pos.getX() + x + w / 2.0, -10.0, pos.getZ() - y - h / 2.0);
 			camera.setLocation(cameraLocation);
 			camera.lookAt(cameraLocation.add(0, 1, 0, null), Vector3.UNIT_Z);
+			camera.update();
 			SceneManager.getInstance().getCameraNode().updateFromCamera();
 
 
-			SceneManager.getInstance().frameHandler.updateFrame();
+//			SceneManager.getInstance().frameHandler.updateFrame();
 			SceneManager.getInstance().frameHandler.updateFrame();
 
 //			try {

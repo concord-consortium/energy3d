@@ -215,7 +215,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 4, false, false);
 		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
 		if (Config.JOGL) {
-			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 4, false, false);
+			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 2, 0, 4, false, false);
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
 			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
 		} else {
@@ -298,8 +298,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		passManager.add(rootPass);
 
 		// shadowPass = new ParallelSplitShadowMapPass(light, 512, 3);
-		// shadowPass = new ParallelSplitShadowMapPass(light, 2048, 3);
-		shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
+		shadowPass = new ParallelSplitShadowMapPass(light, 2048, 4);
+//		shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
+//		shadowPass = new ParallelSplitShadowMapPass(light, 1024, 3);
 		shadowPass.setEnabled(false);
 		shadowPass.setUseObjectCullFace(true);
 		shadowPass.add(floor);

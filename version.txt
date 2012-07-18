@@ -1100,7 +1100,11 @@ Version 0.5 - October 20, 2011
 - improve the speed 2X when adjusting position of wall by avoiding redundant drawings
 - improve the speed 5X when adjusting position of wall by avoiding extending walls to roof unless the mouse button is release
 - default scale-to-fit
-- prevent resize box from reversing or becoming too small  
+- prevent resize box from reversing or becoming too small
+- fix exception and canvas crash when enabling shadow in low-end integrated graphics cards by reducing the shadow texture depth in ParallelSplitShadowMapPass from Depth24 to Depth16
+- fix problem shadows disappearing at noon in low-end integrated graphics cards by reducing shadow resolution to 2048
+- increase number of shadow splits to improve shadow and compensate for lower shadow resolution
+ 
 
 
 
