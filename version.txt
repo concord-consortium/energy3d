@@ -1106,7 +1106,7 @@ Version 0.5 - October 20, 2011
 - increase number of shadow splits to improve shadow and compensate for lower shadow resolution
  
 <test  1>
-
+<test  2>
 
 
 TODO:
