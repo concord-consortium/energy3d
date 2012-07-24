@@ -224,33 +224,16 @@ public class PrintController implements Updater {
 	}
 
 	public void print() {
-//		SceneManager.getTaskManager().update(new Callable<Object>() {
-//			@Override
-//			public Object call() throws Exception {
 				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 				final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
 				final int resolutionHeight = 2;
 				final Dimension newSize;
-//				if (Config.isMac())
-//					newSize = new Dimension((int) (canvas.getHeight() * pageWidth / pageHeight), canvas.getHeight());
-//				else
 					newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
-
-
-//				canvas.setSize(newSize);
-//				canvas.setPreferredSize(newSize);
-//				canvas.invalidate();
-
-//				if (!Config.isMac())
-//					canvas.setSize(new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight()));
-
-
 
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
 
 				final Dimension orgCanvasSize = canvas.getSize();
 				final Dimension canvasSize = (Dimension) orgCanvasSize.clone();
-//				System.out.println(canvasSize);
 				if (canvasSize.width % 32 != 0) {
 					canvasSize.width -= canvasSize.width % 32;
 					canvas.setSize(canvasSize);
@@ -262,33 +245,22 @@ public class PrintController implements Updater {
 				final double pageWidth = PrintController.getInstance().getPageWidth() / cols;
 				final double pageHeight = PrintController.getInstance().getPageHeight() / rows;
 
-//				System.out.println("CANVAS SIZE ========== ");
-//				System.out.println(canvasSize);
-//				System.out.println(rows + "\t" + cols);
-//				System.out.println("PageWidth segment: " + pageWidth);
-//				System.out.println("PageHeight segment: " + pageHeight);
-
 				if (ratio > pageWidth / pageHeight)
 					SceneManager.getInstance().resizeCamera(pageHeight * ratio);
 				else
 					SceneManager.getInstance().resizeCamera(pageWidth);
-
 
 				SceneManager.getInstance().refresh();
 				final Printout printout = new Printout(pageFormat, newSize, pageWidth, pageHeight, printCenters);
 				print(0, printout, 0, 0, pageWidth, pageHeight);;
 
 				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-//				MainPanel.getInstance().validate();
 
 				canvas.setSize(orgCanvasSize);
 				canvas.validate();
 
 				SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
 				SceneManager.getInstance().refresh();
-//				return null;
-//			}
-//		});
 	}
 
 //	private void print(final int pageNum, final Printout printout, final double x, final double y, final double w, final double h) {

@@ -1106,7 +1106,8 @@ Version 0.5 - October 20, 2011
 - increase number of shadow splits to improve shadow and compensate for lower shadow resolution
 - move project from svn to git
 - no longer include the executable jar and dlls with the svn/git project repository
-  
+- fix problem with Ctrl+P causing the print preview to hang due to infinite loop caused by UpdateQueue.executeAll
+- release version 0.7.1  
 
 
 TODO:

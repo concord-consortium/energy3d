@@ -179,7 +179,9 @@ public class Printout implements Printable, Pageable {
 
 		/* The img is twice as big as the page so need to draw it based on paper size not img size */
 		if (lastImagePage != pageIndex) {
+//			final long t = System.nanoTime();
 			getScreenShot(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(), printCorners.get(pageIndex));
+//			System.out.println((System.nanoTime() - t) / 1000000.0);
 			lastImagePage  = pageIndex;
 		}
 		graphics.drawImage(image, 0, 0, (int) pageFormat.getWidth(), (int) pageFormat.getHeight(), null);
@@ -219,11 +221,13 @@ public class Printout implements Printable, Pageable {
 //			pos.set(pos.getX() + x + w / 2.0, -10.0, pos.getZ() - y - h / 2.0);
 			camera.setLocation(cameraLocation);
 			camera.lookAt(cameraLocation.add(0, 1, 0, null), Vector3.UNIT_Z);
-			camera.update();
-			SceneManager.getInstance().getCameraNode().updateFromCamera();
+//			SceneManager.getInstance().getCanvas().getCanvasRenderer().makeCurrentContext();
+//			camera.update();
+//			camera.apply(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer());
+//			SceneManager.getInstance().getCameraNode().updateFromCamera();
 
 
-//			SceneManager.getInstance().frameHandler.updateFrame();
+			SceneManager.getInstance().frameHandler.updateFrame();
 			SceneManager.getInstance().frameHandler.updateFrame();
 
 //			try {
@@ -290,7 +294,7 @@ public class Printout implements Printable, Pageable {
 				break;
 
 			i++;
-			System.out.println(i);
+//			System.out.println(i);
 //			if (i == 4)
 //				break;
 		}

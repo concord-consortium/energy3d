@@ -15,7 +15,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.net.URL;
-import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
@@ -470,16 +469,29 @@ public class MainFrame extends JFrame {
 					final PrintController printController = PrintController.getInstance();
 					if (!printController.isPrintPreview()) {
 						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
-						SceneManager.getTaskManager().update(new Callable<Object>() {
+//						SceneManager.getTaskManager().update(new Callable<Object>() {
+//							@Override
+//							public Object call() throws Exception {
+//								if (printController.isFinished())
+//									PrintController.getInstance().print();
+//								else
+//									SceneManager.getTaskManager().update(this);
+//								return null;
+//							}
+//						});
+						new Thread() {
 							@Override
-							public Object call() throws Exception {
-								if (printController.isFinished())
-									PrintController.getInstance().print();
-								else
-									SceneManager.getTaskManager().update(this);
-								return null;
+							public void run() {
+								while(!printController.isFinished()) {
+									try {
+										Thread.sleep(500);
+									} catch (final InterruptedException e) {
+										e.printStackTrace();
+									}
+								}
+								PrintController.getInstance().print();
 							}
-						});
+						}.start();
 					} else
 						PrintController.getInstance().print();
 				}
