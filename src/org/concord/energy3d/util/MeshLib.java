@@ -397,7 +397,7 @@ public class MeshLib {
 		try {
 			Poly2Tri.triangulate(polygon);
 		} catch (final RuntimeException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			System.out.println("Triangulate exception received with the following polygon:");
 			System.out.println("final Polygon polygon = new Polygon(new PolygonPoint[] {");
 			for (final TriangulationPoint p : polygon.getPoints())

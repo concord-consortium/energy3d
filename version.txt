@@ -1109,7 +1109,8 @@ Version 0.5 - October 20, 2011
 - fix problem with Ctrl+P causing the print preview to hang due to infinite loop caused by UpdateQueue.executeAll
 - release version 0.7.1
 - show door texture even if in no-texture mode
-- prevent gable window from being dragged outside of the gable roof boundaries 
+- prevent gable window from being dragged outside of the gable roof boundaries
+- release version 0.7.2
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from

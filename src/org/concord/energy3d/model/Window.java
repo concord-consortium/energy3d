@@ -90,9 +90,10 @@ public class Window extends HousePart {
 			p = grid(p, getAbsPoint(index), getGridSize());
 			p = toRelative(p);
 			p = enforceContraints(p);
-		}
-//		final Vector3 orgP = new Vector3(points.get(index));
-		final ArrayList<Vector3> orgPoints = new ArrayList<Vector3>(points.size()); //(ArrayList<Vector3>) ObjectCloner.deepCopy(points);
+		} else
+			return;
+
+		final ArrayList<Vector3> orgPoints = new ArrayList<Vector3>(points.size()); // (ArrayList<Vector3>) ObjectCloner.deepCopy(points);
 		for (final Vector3 v : points)
 			orgPoints.add(v.clone());
 
@@ -110,13 +111,12 @@ public class Window extends HousePart {
 			}
 		}
 
-		if (!((Wall)container).fits(this)) {
-//			points.get(index).set(orgP);
-//			points = orgPoints;
-			for (int i = 0; i < points.size(); i++)
-				points.get(i).set(orgPoints.get(i));
-			return;
-		}
+		if (isFirstPointInserted())
+			if (!((Wall) container).fits(this)) {
+				for (int i = 0; i < points.size(); i++)
+					points.get(i).set(orgPoints.get(i));
+				return;
+			}
 
 		if (container != null) {
 			draw();
@@ -259,7 +259,8 @@ public class Window extends HousePart {
 		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 
 		final Vector3 center = trans.applyForward(getCenter(), null);
-		final float lineWidth = original == null ? 1f : 2f;;
+		final float lineWidth = original == null ? 1f : 2f;
+		;
 
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, true, false);
