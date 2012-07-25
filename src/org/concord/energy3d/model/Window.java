@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Annotation;
@@ -90,7 +91,13 @@ public class Window extends HousePart {
 			p = toRelative(p);
 			p = enforceContraints(p);
 		}
+//		final Vector3 orgP = new Vector3(points.get(index));
+		final ArrayList<Vector3> orgPoints = new ArrayList<Vector3>(points.size()); //(ArrayList<Vector3>) ObjectCloner.deepCopy(points);
+		for (final Vector3 v : points)
+			orgPoints.add(v.clone());
+
 		points.get(index).set(p);
+
 		if (!isFirstPointInserted()) {
 			points.get(1).set(p);
 		} else {
@@ -101,6 +108,14 @@ public class Window extends HousePart {
 				points.get(0).set(points.get(1).getX(), 0, points.get(2).getZ());
 				points.get(3).set(points.get(2).getX(), 0, points.get(1).getZ());
 			}
+		}
+
+		if (!((Wall)container).fits(this)) {
+//			points.get(index).set(orgP);
+//			points = orgPoints;
+			for (int i = 0; i < points.size(); i++)
+				points.get(i).set(orgPoints.get(i));
+			return;
 		}
 
 		if (container != null) {

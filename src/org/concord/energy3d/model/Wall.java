@@ -67,6 +67,7 @@ public class Wall extends HousePart {
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
+	private Polygon polygon;
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -319,7 +320,7 @@ public class Wall extends HousePart {
 			return;
 
 		final Vector3 normal = computeNormal();
-		final Polygon polygon = extendToRoof(computeWallAndWindowPolygon(false));
+		polygon = extendToRoof(computeWallAndWindowPolygon(false));
 
 		wallPolygonPoints = extractPolygonPoints(polygon);
 
@@ -362,7 +363,7 @@ public class Wall extends HousePart {
 		// mesh.getMeshData().updateVertexCount();
 		// mesh.updateModelBound();
 
-		MeshLib.fillMeshWithPolygon(mesh, polygon, scale, o, u, v, fromXY);
+		MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, scale, o, u, v);
 
 		/* draw invisibleMesh */
 		final Polygon invisiblePolygon = new Polygon(ArdorVector3PolygonPoint.toPoints(extractPolygonPoints(polygon)));
@@ -422,7 +423,7 @@ public class Wall extends HousePart {
 	public Polygon computeWallAndWindowPolygon(final boolean backMesh) {
 		final ArrayList<PolygonPoint> polygonPoints = new ArrayList<PolygonPoint>();
 		final ReadOnlyVector3 trans = backMesh ? getThicknessNormal() : Vector3.ZERO;
-		Vector3 p = new Vector3();
+		final Vector3 p = new Vector3();
 		// Start the polygon with (1) then 0, 2, 3, [roof points] so that roof points are appended to the end of vertex list
 		p.set(getAbsPoint(1)).addLocal(trans);
 		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
@@ -438,19 +439,26 @@ public class Wall extends HousePart {
 		// Add window holes
 		for (final HousePart child : children) {
 			if (child instanceof Window && includeWindow(child)) {
-				final ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
-				p = child.getAbsPoint(1);
-				holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
-				p = child.getAbsPoint(0);
-				holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
-				p = child.getAbsPoint(2);
-				holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
-				p = child.getAbsPoint(3);
-				holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
-				polygon.addHole(new Polygon(holePoints));
+				final Polygon hole = computeWindowHole(child, trans);
+				polygon.addHole(hole);
 			}
 		}
 		return polygon;
+	}
+
+	private Polygon computeWindowHole(final HousePart window, final ReadOnlyVector3 trans) {
+		Vector3 p;
+		final ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
+		p = window.getAbsPoint(1);
+		holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
+		p = window.getAbsPoint(0);
+		holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
+		p = window.getAbsPoint(2);
+		holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
+		p = window.getAbsPoint(3);
+		holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
+		final Polygon hole = new Polygon(holePoints);
+		return hole;
 	}
 
 	private Polygon toXY(final Polygon polygon) {
@@ -570,12 +578,14 @@ public class Wall extends HousePart {
 
 		toXY(polygon);
 
-		Poly2Tri.triangulate(polygon);
-		ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
-		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
-		backMesh.getMeshData().updateVertexCount();
-		CollisionTreeManager.INSTANCE.updateCollisionTree(backMesh);
-		backMesh.updateModelBound();
+		MeshLib.fillMeshWithPolygon(backMesh, polygon, fromXY);
+
+//		Poly2Tri.triangulate(polygon);
+//		ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
+//		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
+//		backMesh.getMeshData().updateVertexCount();
+//		CollisionTreeManager.INSTANCE.updateCollisionTree(backMesh);
+//		backMesh.updateModelBound();
 	}
 
 	// TODO what does this method do??
@@ -1167,5 +1177,14 @@ public class Wall extends HousePart {
 				}
 			}
 		}
+	}
+
+	public boolean fits(final Window window) {
+		final Polygon hole = computeWindowHole(window, Vector3.ZERO);
+		toXY(hole);
+		for (final TriangulationPoint p : hole.getPoints())
+			if (!MeshLib.insidePolygon(polygon, p))
+				return false;
+		return true;
 	}
 }

@@ -2,6 +2,7 @@ package org.concord.energy3d.util;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -329,7 +330,11 @@ public class MeshLib {
 		return convexHull;
 	}
 
-	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final double textureScale, final TPoint o, final TPoint u, final TPoint v, final XYToAnyTransform fromXY) {
+	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final XYToAnyTransform fromXY) {
+		fillMeshWithPolygon(mesh, polygon, fromXY, 0, null, null, null);
+	}
+
+	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final XYToAnyTransform fromXY, final double textureScale, final TPoint o, final TPoint u, final TPoint v) {
 		// final Vector2 min = new Vector2(Double.MAX_VALUE, Double.MAX_VALUE);
 		// final Vector2 max = new Vector2(Double.MIN_VALUE, Double.MIN_VALUE);
 		// for (final TriangulationPoint p : polygon.getPoints()) {
@@ -366,6 +371,29 @@ public class MeshLib {
 		// }
 		// }
 
+//		if (polygon.getHoles() != null)
+//			for (final Polygon hole : polygon.getHoles()) {
+//				for (int i = 0; i < 4; i++) {
+////				for (final TriangulationPoint p : hole.getPoints()) {
+//					final TriangulationPoint p = hole.getPoints().get(i);
+//					if (!insidePolygon(polygon, p)) {
+//						p.set(p.getX() , p.getY() + 0.1, p.getZ());
+//						final int ii;
+//						if (i == 0)
+//							ii = 1;
+//						else if (i == 1)
+//							ii = 0;
+//						else if (i == 2)
+//							ii = 3;
+//						else
+//							ii = 2;
+//						final TriangulationPoint p2 = hole.getPoints().get(ii);
+//						p2.set(p2.getX(), p2.getY() + 0.1, p2.getZ());
+////						System.err.println("Hole outside wall!");
+//					}
+//				}
+//			}
+
 		try {
 			Poly2Tri.triangulate(polygon);
 		} catch (final RuntimeException e) {
@@ -390,8 +418,40 @@ public class MeshLib {
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
 		// ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
-		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), textureScale, o, u, v);
+		if (o != null)
+			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), textureScale, o, u, v);
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
+	}
+
+	public static boolean insidePolygon(final Polygon polygon, final TriangulationPoint p) {
+		int counter = 0;
+		int i;
+		double xinters;
+		TriangulationPoint p1, p2;
+
+		final int n = polygon.getPoints().size();
+		final List<TriangulationPoint> points = polygon.getPoints();
+		p1 = points.get(0);
+		for (i = 1; i <= n; i++) {
+			p2 = points.get(i % n);
+			if (p.getY() > Math.min(p1.getY(), p2.getY())) {
+				if (p.getY() <= Math.max(p1.getY(), p2.getY())) {
+					if (p.getX() <= Math.max(p1.getX(), p2.getX())) {
+						if (p1.getY() != p2.getY()) {
+							xinters = (p.getY() - p1.getY()) * (p2.getX() - p1.getX()) / (p2.getY() - p1.getY()) + p1.getX();
+							if (p1.getX() == p2.getX() || p.getX() <= xinters)
+								counter++;
+						}
+					}
+				}
+			}
+			p1 = p2;
+		}
+
+		if (counter % 2 == 0)
+			return false;
+		else
+			return true;
 	}
 }
