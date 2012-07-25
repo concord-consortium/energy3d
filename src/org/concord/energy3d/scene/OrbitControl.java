@@ -24,12 +24,9 @@ public class OrbitControl extends CameraControl {
 	private final Matrix3 _workerMatrix_2 = new Matrix3();
 	private final Vector4 _workerVector4 = new Vector4();
 	private final Vector3 _center = new Vector3(1, 0, 1);
-//	private final Spatial root;
 
-//	public OrbitControl(final ReadOnlyVector3 upAxis, final Spatial root) {
 	public OrbitControl(final ReadOnlyVector3 upAxis) {
 		super(upAxis);
-//		this.root = root;
 	}
 
 	@Override
@@ -137,36 +134,4 @@ public class OrbitControl extends CameraControl {
 		_center.set(clickedPoint);
 	}
 
-//	@Override
-//	public void setupMouseTriggers(final LogicalLayer logicalLayer, final boolean dragOnly) {
-//		super.setupMouseTriggers(logicalLayer, dragOnly);
-//
-//		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY()), false, null);
-//				final PickResults pickResults = new PrimitivePickResults();
-//				pickResults.setCheckDistance(true);
-//				PickingUtil.findPick(Scene.getRoot(), pickRay, pickResults, false);
-//
-//				for (int i = 0; i < pickResults.getNumber(); i++) {
-//					final int closestIntersection = pickResults.getPickData(i).getIntersectionRecord().getClosestIntersection();
-//					if (closestIntersection != -1) {
-////						final Vector3 point = pickResults.getPickData(i).getIntersectionRecord().getIntersectionPoint(closestIntersection);
-////						frontDistance = point.subtractLocal(source.getCanvasRenderer().getCamera().getLocation()).length() + 1;
-//						frontDistance = pickResults.getPickData(i).getIntersectionRecord().getClosestDistance() + 1;
-//						clearOrbitCenter();
-//						return;
-//					}
-//				}
-//
-//
-////				final PickedHousePart pickPart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), Scene.getRoot());
-////				if (pickPart != null) {
-////					final Vector3 point = pickPart.getPoint();
-////					frontDistance = point.subtractLocal(source.getCanvasRenderer().getCamera().getLocation()).length();
-////					clearOrbitCenter();
-////				}
-//			}
-//		}));
-//	}
 }

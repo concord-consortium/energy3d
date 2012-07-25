@@ -47,7 +47,7 @@ public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
 	private static final double SPACE_BETWEEN_PAGES = 0.5;
 	private static final double exactFromPageToWorldCoord = 1.0 / 72.0 / 4.0 / 10.6 * 10.8;
-	private static double spaceBetweenParts = 0; // 0.3; // 0.5;
+	private static double spaceBetweenParts = 0;
 	private final ArrayList<ReadOnlyVector3> printCenters = new ArrayList<ReadOnlyVector3>();
 	private final Timer timer = new Timer();
 	private double pageWidth, pageHeight, pageLeft, pageRight, pageTop, pageBottom;
@@ -74,7 +74,7 @@ public class PrintController implements Updater {
 
 	public PrintController() {
 		final Paper paper = new Paper();
-//		paper.setSize(13 * 72, 19 * 72);
+		// paper.setSize(13 * 72, 19 * 72);
 		final int m = (int) (0.25 * 72);
 		paper.setImageableArea(m, m, paper.getWidth() - m * 2, paper.getHeight() - m * 2);
 		pageFormat.setPaper(paper);
@@ -156,8 +156,8 @@ public class PrintController implements Updater {
 				printParts = null;
 				if (!isPrintPreview && restartFlag) {
 					restartFlag = false;
-//					/* to force redraw when animated back to normal scene */
-					Scene.getInstance().redrawAllNow();		// redraw does not stretch the walls of print parts the roof. there is also no need for redraw since nothing has changed
+					// /* to force redraw when animated back to normal scene */
+					Scene.getInstance().redrawAllNow(); // redraw does not stretch the walls of print parts the roof. there is also no need for redraw since nothing has changed
 					setPrintPreview(true);
 					return;
 				}
@@ -224,119 +224,55 @@ public class PrintController implements Updater {
 	}
 
 	public void print() {
-				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
-				final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
-				final int resolutionHeight = 2;
-				final Dimension newSize;
-					newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
+		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
+		final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
+		final int resolutionHeight = 2;
+		final Dimension newSize;
+		newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
 
-				SceneManager.getInstance().resetCamera(ViewMode.PRINT);
+		SceneManager.getInstance().resetCamera(ViewMode.PRINT);
 
-				final Dimension orgCanvasSize = canvas.getSize();
-				final Dimension canvasSize = (Dimension) orgCanvasSize.clone();
-				if (canvasSize.width % 32 != 0) {
-					canvasSize.width -= canvasSize.width % 32;
-					canvas.setSize(canvasSize);
-					canvas.validate();
-				}
-				final double ratio = (double) canvasSize.width / canvasSize.height;
-				final double cols = newSize.getWidth() / canvasSize.getWidth();
-				final double rows = newSize.getHeight() / canvasSize.getHeight();
-				final double pageWidth = PrintController.getInstance().getPageWidth() / cols;
-				final double pageHeight = PrintController.getInstance().getPageHeight() / rows;
+		final Dimension orgCanvasSize = canvas.getSize();
+		final Dimension canvasSize = (Dimension) orgCanvasSize.clone();
+		if (canvasSize.width % 32 != 0) {
+			canvasSize.width -= canvasSize.width % 32;
+			canvas.setSize(canvasSize);
+			canvas.validate();
+		}
+		final double ratio = (double) canvasSize.width / canvasSize.height;
+		final double cols = newSize.getWidth() / canvasSize.getWidth();
+		final double rows = newSize.getHeight() / canvasSize.getHeight();
+		final double pageWidth = PrintController.getInstance().getPageWidth() / cols;
+		final double pageHeight = PrintController.getInstance().getPageHeight() / rows;
 
-				if (ratio > pageWidth / pageHeight)
-					SceneManager.getInstance().resizeCamera(pageHeight * ratio);
-				else
-					SceneManager.getInstance().resizeCamera(pageWidth);
+		if (ratio > pageWidth / pageHeight)
+			SceneManager.getInstance().resizeCamera(pageHeight * ratio);
+		else
+			SceneManager.getInstance().resizeCamera(pageWidth);
 
-				SceneManager.getInstance().refresh();
-				final Printout printout = new Printout(pageFormat, newSize, pageWidth, pageHeight, printCenters);
-				print(0, printout, 0, 0, pageWidth, pageHeight);;
+		SceneManager.getInstance().refresh();
+		final Printout printout = new Printout(pageFormat, newSize, pageWidth, pageHeight, printCenters);
+		print(0, printout, 0, 0, pageWidth, pageHeight);
+		;
 
-				Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
+		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
 
-				canvas.setSize(orgCanvasSize);
-				canvas.validate();
+		canvas.setSize(orgCanvasSize);
+		canvas.validate();
 
-				SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
-				SceneManager.getInstance().refresh();
+		SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
+		SceneManager.getInstance().refresh();
 	}
 
-//	private void print(final int pageNum, final Printout printout, final double x, final double y, final double w, final double h) {
-//		SceneManager.getTaskManager().render(new Callable<Object>() {
-//			@Override
-//			public Object call() throws Exception {
-//				if (pageNum == printCenters.size() + 1) {
-//					final PrinterJob job = PrinterJob.getPrinterJob();
-//					job.setPageable(printout);
-//					SwingUtilities.invokeLater(new Runnable() {
-//						@Override
-//						public void run() {
-//							Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
-//							MainPanel.getInstance().validate();
-//
-//							SceneManager.getInstance().resetCamera(ViewMode.PRINT_PREVIEW);
-//
-//							SceneManager.getTaskManager().render(new Callable<Object>() {
-//								@Override
-//								public Object call() throws Exception {
-//									SceneManager.getTaskManager().render(new Callable<Object>() {
-//										@Override
-//										public Object call() throws Exception {
-//											if (job.printDialog())
-//												try {
-//													job.print();
-//												} catch (final PrinterException exc) {
-//													exc.printStackTrace();
-//												}
-//											return null;
-//										}
-//									});
-//									return null;
-//								}
-//							});
-//						}
-//					});
-//				} else {
-//					if (pageNum != 0 || x != 0 || y != 0) {
-////						Thread.sleep(1000);
-//						ScreenExporter.exportCurrentScreen(SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(), printout);
-//					}
-//
-//					if (pageNum < printCenters.size()) {
-//						final Vector3 pos = new Vector3(printCenters.get(pageNum));
-//						pos.set(pos.getX() + x + w / 2.0, -10.0, pos.getZ() - y - h / 2.0);
-//						final Camera camera = Camera.getCurrentCamera();
-//						camera.setLocation(pos);
-//						camera.lookAt(pos.add(0, 1, 0, null), Vector3.UNIT_Z);
-//						SceneManager.getInstance().getCameraNode().updateFromCamera();
-//						if (x + w < getPageWidth())
-//							print(pageNum, printout, x + w, y, w, h);
-//						else if (y + h < getPageHeight())
-//							print(pageNum, printout, 0, y + h, w, h);
-//						else
-//							print(pageNum + 1, printout, 0, 0, w, h);
-////						print(pageNum + 1, printout, x, y);
-////						print(pageNum, printout, x, y, w, h);
-//					} else
-//						print(pageNum + 1, printout, 0, 0, w, h);
-//
-//				}
-//				return null;
-//			}
-//		});
-//	}
-
 	private void print(final int pageNum, final Printout printout, final double x, final double y, final double w, final double h) {
-					final PrinterJob job = PrinterJob.getPrinterJob();
-					job.setPageable(printout);
-											if (job.printDialog())
-												try {
-													job.print();
-												} catch (final PrinterException exc) {
-													exc.printStackTrace();
-												}
+		final PrinterJob job = PrinterJob.getPrinterJob();
+		job.setPageable(printout);
+		if (job.printDialog())
+			try {
+				job.print();
+			} catch (final PrinterException exc) {
+				exc.printStackTrace();
+			}
 	}
 
 	public void setPrintPreview(final boolean printPreview) {
@@ -397,15 +333,13 @@ public class PrintController implements Updater {
 				if (printPart.isPrintable()) {
 					if (printPart instanceof Roof) {
 						for (final Spatial roofPartNode : ((Roof) printPart).getRoofPartsRoot().getChildren()) {
-//							if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
-								final OrientedBoundingBox boundingBox = (OrientedBoundingBox) ((Node) roofPartNode).getChild(0).getWorldBound();
-								final double width = Math.min(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
-								final double height = Math.max(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
-								if (width > maxWidth)
-									maxWidth = width;
-								if (height > maxHeight)
-									maxHeight = height;
-//							}
+							final OrientedBoundingBox boundingBox = (OrientedBoundingBox) ((Node) roofPartNode).getChild(0).getWorldBound();
+							final double width = Math.min(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
+							final double height = Math.max(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
+							if (width > maxWidth)
+								maxWidth = width;
+							if (height > maxHeight)
+								maxHeight = height;
 						}
 					} else {
 						final OrientedBoundingBox boundingBox = (OrientedBoundingBox) printPart.getMesh().getWorldBound();
@@ -474,7 +408,6 @@ public class PrintController implements Updater {
 				pageNum++;
 			} while (Math.abs(x - boundingBox.getCenter().getX()) < minXDistance && Math.abs(z - boundingBox.getCenter().getZ()) < minYDistance);
 
-//			printCenters.add(new Vector3(x, 0, z + pageHeight / (Config.isMac() ? 1.0 : 2.0)));
 			printCenters.add(upperLeftCorner);
 
 			for (final Spatial printSpatial : page)
@@ -502,11 +435,10 @@ public class PrintController implements Updater {
 				if (printPart instanceof Roof) {
 					final Roof roof = (Roof) printPart;
 					for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
-//						if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
-							final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-							roof.setPrintVertical(roofPart, decideVertical(mesh));
-							computePrintCenterOf(mesh, pages);
-						}
+						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+						roof.setPrintVertical(roofPart, decideVertical(mesh));
+						computePrintCenterOf(mesh, pages);
+					}
 				} else {
 					final Mesh mesh = printPart.getMesh();
 					printPart.setPrintVertical(decideVertical(mesh));

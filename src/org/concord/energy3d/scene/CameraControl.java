@@ -89,13 +89,6 @@ public abstract class CameraControl {
         _keyRotateSpeed = speed;
     }
 
-//	private void zoom(final Canvas canvas, final double tpf, int val) {
-//		final Camera camera = canvas.getCanvasRenderer().getCamera();
-//		final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * _moveSpeed * 10 * tpf).addLocal(camera.getLocation());
-//		// final Vector3 loc = new Vector3(camera.getLocation()).addLocal(dir);
-//		camera.setLocation(loc);
-//	}
-
     protected abstract void move(final Camera camera, final KeyboardState kb, final double tpf);
 
     protected abstract void move(final Camera camera, final double dx, final double dy);
@@ -127,7 +120,6 @@ public abstract class CameraControl {
     }
 
     public void setupMouseTriggers(final LogicalLayer layer, final boolean dragOnly) {
-//        final CameraControl control = this;
         // Mouse look
         final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(), Predicates
                 .or(TriggerConditions.rightButtonDown(), TriggerConditions.middleButtonDown()));
@@ -174,34 +166,12 @@ public abstract class CameraControl {
         _mouseTrigger = new InputTrigger(dragOnly ? dragged : TriggerConditions.mouseMoved(), dragAction);
         layer.registerTrigger(_mouseTrigger);
 
-
-//        layer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
-//        	public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//        		zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
-//        	}
-//        }));
-
-
 		layer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
 			}
 		}));
-
-//		final KeyHeldCondition cond1 = new KeyHeldCondition(Key.LCONTROL);
-//		final MouseMovedCondition cond2 = new MouseMovedCondition();
-//		final Predicate<TwoInputStates> condition = Predicates.and(cond1, Predicates.and(cond2, someMouseDown));
-//		layer.registerTrigger(new InputTrigger(condition, new TriggerAction() {
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				int dy = inputStates.getCurrent().getMouseState().getDy();
-//				if (dy < -4)
-//					dy = -4;
-//				if (dy > 4)
-//					dy = 4;
-//				zoom(source, tpf, -dy / 1.0);
-//			}
-//		}));
     }
 
     public Predicate<TwoInputStates> setupKeyboardTriggers(final LogicalLayer layer) {
@@ -259,15 +229,6 @@ public abstract class CameraControl {
 		this.rightButtonAction = rightButtonAction;
 	}
 
-//	public void setMouseLeftButtonAction(final ButtonAction leftButtonAction) {
-//		this.leftButtonAction = leftButtonAction;
-//	}
-//
-//	public void setMouseRightButtonAction(final ButtonAction rightButtonAction) {
-//		this.rightButtonAction = rightButtonAction;
-//	}
-
-
 	public void setMouseEnabled(final boolean enabled) {
 		mouseEnabled  = enabled;
 	}
@@ -316,13 +277,10 @@ public abstract class CameraControl {
 		orgCameraLocation = new Vector3(Camera.getCurrentCamera().getLocation());
 		if (isPrintPreview) {
 			newCameraDirection = Vector3.UNIT_Y;
-//			newCameraDirection = clickedPoint.subtract(Camera.getCurrentCamera().getLocation(), null).normalizeLocal();
-//			newCameraLocation = clickedPoint.add(0, -10, 0, null);
 		} else {
 			newCameraDirection = clickedPoint.subtract(Camera.getCurrentCamera().getLocation(), null).normalizeLocal();
 		}
 		if (isPrintPreview && zoomOut)
-//			newCameraLocation = new Vector3(0, -40, 0);
 			newCameraLocation = PrintController.getInstance().getZoomAllCameraLocation();
 		else
 			newCameraLocation = clickedPoint.subtract(newCameraDirection.multiply(zoomDistance, null), null);
@@ -334,10 +292,8 @@ public abstract class CameraControl {
 	}
 
 	public void animate() {
-//		System.out.println("animating...");
 		final double currentTime  = SceneManager.getInstance().getTimer().getTimeInSeconds();
 		final double t = currentTime - animationTime;
-//		System.out.println(t);
 		final double animationDuration = 1.0;
 		final ReadOnlyVector3 currentDirection = orgCameraDirection.multiply(animationDuration - t, null).addLocal(newCameraDirection.multiply(t, null)).normalizeLocal();
 		final ReadOnlyVector3 currentLocation = orgCameraLocation.multiply(animationDuration - t, null).addLocal(newCameraLocation.multiply(t, null));

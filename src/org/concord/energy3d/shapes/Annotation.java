@@ -40,7 +40,6 @@ public abstract class Annotation extends Node {
 		mesh.setModelBound(new BoundingBox());
 		this.mesh = mesh;
 		Util.disablePickShadowLight(mesh);
-//		Util.disablePickShadowLight(label);
 		attachChild(mesh);
 	}
 

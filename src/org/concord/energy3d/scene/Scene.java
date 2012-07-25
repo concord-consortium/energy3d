@@ -302,7 +302,7 @@ public class Scene implements Serializable {
 
 	private void removeTree(final HousePart housePart) {
 		System.out.println("Removing: " + housePart);
-		parts.remove(housePart);	// this must happen before call to wall.delete()
+		parts.remove(housePart); // this must happen before call to wall.delete()
 		for (final HousePart child : housePart.getChildren())
 			removeTree(child);
 		originalHouseRoot.detachChild(housePart.getRoot());
@@ -345,12 +345,6 @@ public class Scene implements Serializable {
 	public void setTextureMode(final TextureMode textureMode) {
 		this.textureMode = textureMode;
 		redrawAll();
-//		for (final HousePart part : parts)
-//			part.updateTextureAndColor();
-//		if (PrintController.getInstance().getPrintParts() != null)
-//			for (final HousePart part : PrintController.getInstance().getPrintParts())
-//				part.updateTextureAndColor();
-
 		Scene.getInstance().updateRoofDashLinesColor();
 	}
 
@@ -381,25 +375,19 @@ public class Scene implements Serializable {
 			PrintController.getInstance().restartAnimation();
 		else
 			redrawAll = true;
-//			Scene.getInstance().redrawAll();
 	}
 
 	public void redrawAllNow() {
-//		if (redrawAll) {
-			Snap.clearAnnotationDrawn();
-			cleanup();
-			for (final HousePart part : parts)
-				if (part instanceof Roof)
-					part.draw();
-			for (final HousePart part : parts)
-				if (!(part instanceof Roof))
-					part.draw();
-			// no need for redrawing printparts because they will be regenerated from original parts anyways
-//			if (PrintController.getInstance().getPrintParts() != null)
-//				for (final HousePart part : PrintController.getInstance().getPrintParts())
-//					part.draw();
-			redrawAll = false;
-//		}
+		Snap.clearAnnotationDrawn();
+		cleanup();
+		for (final HousePart part : parts)
+			if (part instanceof Roof)
+				part.draw();
+		for (final HousePart part : parts)
+			if (!(part instanceof Roof))
+				part.draw();
+		// no need for redrawing printparts because they will be regenerated from original parts anyways
+		redrawAll = false;
 	}
 
 	public void setUnit(final Unit unit) {
@@ -415,7 +403,6 @@ public class Scene implements Serializable {
 
 	public void setAnnotationScale(final double scale) {
 		annotationScale = scale;
-//		redrawAll = true;
 	}
 
 	public double getAnnotationScale() {

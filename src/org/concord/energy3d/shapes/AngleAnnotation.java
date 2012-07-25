@@ -17,7 +17,6 @@ public class AngleAnnotation extends Annotation {
 
 	public AngleAnnotation() {
 		super(new Arc("Angle annotation arc", 10));
-//		setColor(ColorRGBA.WHITE);
 	}
 
 	public void setRange(final ReadOnlyVector3 mainPoint, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3, final ReadOnlyVector3 n) {

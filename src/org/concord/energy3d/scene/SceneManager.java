@@ -190,16 +190,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final byte theme = DEFAULT_THEME;
 
 	private Sphere kinectPointer;
-
-	private HousePart lastSelectedEditPoint;
-
 	private MouseState lastSelectedEditPointMouseState;
 
-//	private int mouseX = -1;
-//	private int mouseY;
-
-
-//	private boolean updateWindow = false;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -211,9 +203,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
-		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
-		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 4, false, false);
-		// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
 		if (Config.JOGL) {
 			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 2, 0, 4, false, false);
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
@@ -253,8 +242,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		});
 		panel.add((Component) canvas, BorderLayout.CENTER);
-//		panel.add((Component) canvas);
-//		((ScrollPane) panel).setViewportView((Component) canvas);
 		System.out.println("done");
 		System.out.print("Initializing SceneManager...");
 		AWTImageLoader.registerLoader();
@@ -297,17 +284,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		rootPass.add(root);
 		passManager.add(rootPass);
 
-		// shadowPass = new ParallelSplitShadowMapPass(light, 512, 3);
 		shadowPass = new ParallelSplitShadowMapPass(light, 2048, 4);
 //		shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
-//		shadowPass = new ParallelSplitShadowMapPass(light, 1024, 3);
 		shadowPass.setEnabled(false);
 		shadowPass.setUseObjectCullFace(true);
 		shadowPass.add(floor);
 		shadowPass.add(Scene.getRoot());
 		shadowPass.addOccluder(Scene.getRoot());
-
-		// Scene.getInstance();
 
 		final Date today = Calendar.getInstance().getTime();
 		heliodon = new Heliodon(root, light, passManager, logicalLayer, today);
@@ -336,18 +319,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
 			if (refresh || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
-//			if (update || updateWindow || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
 				if (now > refreshTime)
 					refreshTime = -1;
 				refresh = false;
-//				if (updateWindow) {
-//					final Dimension size = MainFrame.getInstance().getSize();
-//					size.width++;
-//					MainFrame.getInstance().setSize(size);
-//					size.width--;
-//					MainFrame.getInstance().setSize(size);
-//					updateWindow = false;
-//				}
 
 				try {
 //					final long t = System.nanoTime();
@@ -380,14 +354,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final double tpf = timer.getTimePerFrame();
 		passManager.updatePasses(tpf);
 		taskManager.getQueue(GameTaskQueue.UPDATE).setExecuteMultiple(true);
-//		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
 		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
 
 		if (operationFlag)
 			executeOperation();
 
 		if (mouseState != null)
-//		if (mouseX != -1)
 			executeMouseMove();
 
 		if (Scene.isRedrawAll())
@@ -453,8 +425,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 				}
 		}
-
-		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, false);
 
 //		 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
 
@@ -682,7 +652,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!isTopView() && inputStates.getCurrent().getMouseState().getClickCount(MouseButton.LEFT) == 2) {
 					final PickedHousePart pickedHousePart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), root);
-//					if (pickedHousePart == null || pickedHousePart.getUserData() == null)
 					if (pickedHousePart == null)
 						return;
 					final Vector3 clickedPoint = pickedHousePart.getPoint();
@@ -858,13 +827,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.G), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				taskManager.update(new Callable<Object>() {
-//					@Override
-//					public Object call() throws Exception {
-//						Scene.getInstance().removeAllGables();
-//						return null;
-//					}
-//				});
 				Scene.getInstance().removeAllGables();
 			}
 		}));
@@ -925,17 +887,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			loc = new Vector3(0, -10, 0);
 			up = new Vector3(0.0f, 0.0f, -1.0f);
 			left = new Vector3(1.0f, 0.0f, 0.0f);
-			final double pageWidth = PrintController.getInstance().getPageWidth();
-			final double pageHeight = PrintController.getInstance().getPageHeight();
-			final Dimension canvasSize = ((Component) canvas).getSize();
-			final double ratio = (double) canvasSize.width / canvasSize.height;
-
-//			if (ratio > pageWidth / pageHeight)
-//				resizeCamera(pageHeight * ratio);
-//			else
-//				resizeCamera(pageWidth);
-
-//			resizeCamera(PrintController.getInstance().getPageWidth());
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
 			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
@@ -959,7 +910,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Camera camera = canvas.getCanvasRenderer().getCamera();
 		if (camera == null)
 			return;
-//		((Component) canvas).setSize(1000, 1000);
 		final Dimension size = ((Component) canvas).getSize();
 		camera.resize(size.width, size.height);
 		final double ratio = (double) size.width / size.height;
@@ -1026,7 +976,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		setGridsVisible(false);
 		if (operation == Operation.DRAW_WALL) {
 			drawn = new Wall();
-//			setGridsVisible(true);
 		} else if (operation == Operation.DRAW_DOOR)
 			drawn = new Door();
 		else if (operation == Operation.DRAW_WINDOW)
@@ -1120,13 +1069,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setShadow(final boolean shadow) {
 		shadowPass.setEnabled(shadow);
-//		taskManager.update(new Callable<Object>() {
-//			@Override
-//			public Object call() throws Exception {
-//				shadowPass.setEnabled(shadow);
-//				return null;
-//			}
-//		});
 	}
 
 	public CameraNode getCameraNode() {
@@ -1221,18 +1163,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void executeMouseMove() {
 		if (!mouseControlEnabled)
 			return;
-//		final MouseState mouseState = null; //moveState.getCurrent().getMouseState();
-//		final MouseState mouseState = mouseState.getCurrent().getMouseState();
-
-//		mouseState = null;
 		final int x = mouseState.getX();
 		final int y = mouseState.getY();
-
-//		final int x = mouseX;
-//		final int y = mouseY;
-
-//		System.out.println(x + "\t" + y);
-
 
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
@@ -1328,7 +1260,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {
-//				final MouseState mouseState = inputStates.getCurrent().getMouseState();
 				if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.DRAW_ROOF_GABLE) {
 					if (selectedHousePart == null || selectedHousePart.isDrawCompleted()) {
 						final HousePart previousSelectedHousePart = selectedHousePart;
@@ -1382,7 +1313,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() {
 				if (selectedHousePart != null)
 					selectedHousePart.setGridsVisible(false);
-//				final MouseState mouseState = inputStates.getCurrent().getMouseState();
 				boolean sceneChanged = false;
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 					if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
@@ -1461,12 +1391,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void moveMouse(final float x, final float y) {
-//		System.out.println(x + "\t" + y);
-//		moveState = new TwoInputStates(null, new InputState(null, new MouseState((int)x, (int)y, 0, 0, 0, null, null), null));
-//		mouseX = (int)x + 100;
-//		mouseY = (int)y + 100;
-
-
 		final int pixelX = (int) ((-x + 500f) * canvas.getCanvasRenderer().getCamera().getWidth() / 1000f);
 		final int pixelY = (int) ((y + 200f) * canvas.getCanvasRenderer().getCamera().getHeight() / 400f);
 		mouseState = new MouseState(pixelX, pixelY, 0, 0, 0, null, null);
@@ -1485,7 +1409,4 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			mousePressed(lastSelectedEditPointMouseState);
 	}
 
-//	public void updateWindow() {
-//		updateWindow  = true;
-//	}
 }
