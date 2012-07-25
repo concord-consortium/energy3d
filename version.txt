@@ -1107,7 +1107,8 @@ Version 0.5 - October 20, 2011
 - move project from svn to git
 - no longer include the executable jar and dlls with the svn/git project repository
 - fix problem with Ctrl+P causing the print preview to hang due to infinite loop caused by UpdateQueue.executeAll
-- release version 0.7.1  
+- release version 0.7.1
+- show door texture even if in no-texture mode
 
 
 TODO:

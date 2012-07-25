@@ -146,7 +146,7 @@ public class Door extends HousePart {
 //		ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 //		mesh.setRenderState(ts);
 //		mesh.setDefaultColor(Scene.getInstance().getDoorColor());
-		updateTextureAndColor(mesh, Scene.getInstance().getDoorColor());
+		updateTextureAndColor(mesh, Scene.getInstance().getDoorColor(), Scene.getInstance().getTextureMode() == TextureMode.None ? TextureMode.Simple : Scene.getInstance().getTextureMode());
 	}
 
 	@Override

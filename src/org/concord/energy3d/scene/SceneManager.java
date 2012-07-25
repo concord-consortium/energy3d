@@ -989,9 +989,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setOperation(final Operation operation) {
 		operationStick = false;
-		this.operation = operation;
-		operationFlag = true;
-		refresh();
+		if (this.operation != operation) {
+			this.operation = operation;
+			operationFlag = true;
+			refresh();
+		}
 	}
 
 	public void setOperationStick(final boolean stick) {

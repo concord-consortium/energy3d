@@ -345,8 +345,8 @@ public class Scene implements Serializable {
 	public void setTextureMode(final TextureMode textureMode) {
 		this.textureMode = textureMode;
 		redrawAll();
-		for (final HousePart part : parts)
-			part.updateTextureAndColor();
+//		for (final HousePart part : parts)
+//			part.updateTextureAndColor();
 //		if (PrintController.getInstance().getPrintParts() != null)
 //			for (final HousePart part : PrintController.getInstance().getPrintParts())
 //				part.updateTextureAndColor();
