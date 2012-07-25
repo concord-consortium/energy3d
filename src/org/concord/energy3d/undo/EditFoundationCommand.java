@@ -30,7 +30,6 @@ public class EditFoundationCommand extends EditHousePartCommand {
 			e.printStackTrace();
 		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
-//		Scene.getInstance().redrawAll();	will already be done in MainFrame
 	}
 
 	@Override
@@ -45,6 +44,5 @@ public class EditFoundationCommand extends EditHousePartCommand {
 			e.printStackTrace();
 		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
-//		Scene.getInstance().redrawAll();
 	}
 }

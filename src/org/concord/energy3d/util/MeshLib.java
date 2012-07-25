@@ -69,11 +69,6 @@ public class MeshLib {
 			GroupData group = null;
 			for (final GroupData g : groups) {
 				if (g.key.dot(norm) > 0.99) { // if there is less than 8 degrees difference between the two vectors
-				// for (final Vector3 groupPoint : g.vertices)
-				// if (groupPoint.equals(p1) || groupPoint.equals(p2) || groupPoint.equals(p3)) {
-				// group = g;
-				// break;
-				// }
 					// if there is an edge in common with the existing triangles
 					boolean foundEdgeInCommon = false;
 					for (int j = 0; j < g.vertices.size() && !foundEdgeInCommon; j += 3) {
@@ -149,17 +144,13 @@ public class MeshLib {
 	}
 
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
-//		final long t = System.nanoTime();
 		int meshIndex = 0;
-//		root.detachAllChildren();
 		for (final GroupData group : groups) {
 			final Node node;
 			final Mesh newMesh;
 			if (meshIndex < root.getNumberOfChildren()) {
 				node = (Node) root.getChild(meshIndex);
 				newMesh = (Mesh) node.getChild(0);
-//				node.getSceneHints().setCullHint(CullHint.Inherit);
-//				node.getSceneHints().setPickingHint(PickingHint.Pickable, true);
 			} else {
 				node = new Node("Roof Part #" + meshIndex);
 				newMesh = new Mesh("Roof Mesh #" + meshIndex);
@@ -195,12 +186,8 @@ public class MeshLib {
 
 			FloatBuffer buf = newMesh.getMeshData().getVertexBuffer();
 			int n = group.vertices.size();
-//			if (buf == null || buf.capacity() / 3 == n) {
-				buf = BufferUtils.createVector3Buffer(n);
-				newMesh.getMeshData().setVertexBuffer(buf);
-//			}
-//			buf.rewind();
-//			buf.limit(n * 3);
+			buf = BufferUtils.createVector3Buffer(n);
+			newMesh.getMeshData().setVertexBuffer(buf);
 			final Vector3 center = new Vector3();
 			for (final Vector3 v : group.vertices) {
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
@@ -210,23 +197,15 @@ public class MeshLib {
 
 			buf = newMesh.getMeshData().getNormalBuffer();
 			n = group.normals.size();
-//			if (buf == null || buf.capacity() / 3 == n) {
-				buf = BufferUtils.createVector3Buffer(n);
-				newMesh.getMeshData().setNormalBuffer(buf);
-//			}
-//			buf.rewind();
-//			buf.limit(n * 3);
+			buf = BufferUtils.createVector3Buffer(n);
+			newMesh.getMeshData().setNormalBuffer(buf);
 			for (final Vector3 v : group.normals)
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 
 			buf = newMesh.getMeshData().getTextureBuffer(0);
 			n = group.textures.size();
-//			if (buf == null || buf.capacity() / 2 == n) {
-				buf = BufferUtils.createVector2Buffer(n);
-				newMesh.getMeshData().setTextureBuffer(buf, 0);
-//			}
-//			buf.rewind();
-//			buf.limit(n * 2);
+			buf = BufferUtils.createVector2Buffer(n);
+			newMesh.getMeshData().setTextureBuffer(buf, 0);
 			for (final Vector2 v : group.textures)
 				buf.put(v.getXf()).put(v.getYf());
 
@@ -237,15 +216,10 @@ public class MeshLib {
 
 			meshIndex++;
 		}
+
 		while (meshIndex < root.getNumberOfChildren()) {
 			root.detachChildAt(root.getNumberOfChildren() - 1);
-//			root.getChild(meshIndex).getSceneHints().setCullHint(CullHint.Always);
-//			root.getChild(meshIndex).getSceneHints().setPickingHint(PickingHint.Pickable, false);
-//			meshIndex++;
 		}
-//		System.out.print(System.nanoTime() - t);
-//		System.out.print("\t");
-//		System.out.println(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
 	}
 
 	public static void addConvexWireframe(final FloatBuffer wireframeVertexBuffer, final FloatBuffer vertexBuffer) {
@@ -302,7 +276,6 @@ public class MeshLib {
 			// endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
 			endpoint.setX(Double.MAX_VALUE);
 
-			// for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
 			for (int j = 0; j <= vertexBuffer.limit() / 3 - 1; j++) {
 				sj.set(vertexBuffer.get(j * 3), vertexBuffer.get(j * 3 + 1), vertexBuffer.get(j * 3 + 2));
 				// if (sj.equals(pointOnHull))
@@ -337,7 +310,6 @@ public class MeshLib {
 				}
 			}
 			pointOnHull.set(endpoint);
-			// if (convexHull.contains(pointOnHull))
 			if (endpoint.getX() == Double.MAX_VALUE)
 				break;
 			else
@@ -358,46 +330,46 @@ public class MeshLib {
 	}
 
 	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final double textureScale, final TPoint o, final TPoint u, final TPoint v, final XYToAnyTransform fromXY) {
-//		final Vector2 min = new Vector2(Double.MAX_VALUE, Double.MAX_VALUE);
-//		final Vector2 max = new Vector2(Double.MIN_VALUE, Double.MIN_VALUE);
-//		for (final TriangulationPoint p : polygon.getPoints()) {
-//			if (p.getX() > max.getX())
-//				max.setX(p.getX());
-//			else if (p.getX() < min.getX())
-//				min.setX(p.getX());
-//
-//			if (p.getY() > max.getY())
-//				max.setY(p.getY());
-//			else if (p.getY() < min.getY())
-//				min.setY(p.getY());
-//		}
-//
-//		final double c = 0.5;
-//		min.addLocal(c, c);
-//		max.subtractLocal(c, c);
-//
-//		if (polygon.getHoles() != null) {
-//////			polygon.getHoles().remove(3);
-////			polygon.getHoles().remove(9);
-//////			polygon.getHoles().remove(8);
-////			polygon.getHoles().remove(7);
-////			polygon.getHoles().remove(6);
-////			polygon.getHoles().remove(5);
-////			polygon.getHoles().remove(4);
-//////			polygon.getHoles().remove(3);
-////			polygon.getHoles().remove(2);
-//////			polygon.getHoles().remove(1);
-////			polygon.getHoles().remove(0);
-//			for (final Polygon hole : polygon.getHoles()) {
-//				for (final TriangulationPoint p : hole.getPoints())
-//					p.set(MathUtils.clamp(p.getX(), min.getX(), max.getX()), MathUtils.clamp(p.getY(), min.getY(), max.getY()), p.getZ());
-//			}
-//		}
+		// final Vector2 min = new Vector2(Double.MAX_VALUE, Double.MAX_VALUE);
+		// final Vector2 max = new Vector2(Double.MIN_VALUE, Double.MIN_VALUE);
+		// for (final TriangulationPoint p : polygon.getPoints()) {
+		// if (p.getX() > max.getX())
+		// max.setX(p.getX());
+		// else if (p.getX() < min.getX())
+		// min.setX(p.getX());
+		//
+		// if (p.getY() > max.getY())
+		// max.setY(p.getY());
+		// else if (p.getY() < min.getY())
+		// min.setY(p.getY());
+		// }
+		//
+		// final double c = 0.5;
+		// min.addLocal(c, c);
+		// max.subtractLocal(c, c);
+		//
+		// if (polygon.getHoles() != null) {
+		// //// polygon.getHoles().remove(3);
+		// // polygon.getHoles().remove(9);
+		// //// polygon.getHoles().remove(8);
+		// // polygon.getHoles().remove(7);
+		// // polygon.getHoles().remove(6);
+		// // polygon.getHoles().remove(5);
+		// // polygon.getHoles().remove(4);
+		// //// polygon.getHoles().remove(3);
+		// // polygon.getHoles().remove(2);
+		// //// polygon.getHoles().remove(1);
+		// // polygon.getHoles().remove(0);
+		// for (final Polygon hole : polygon.getHoles()) {
+		// for (final TriangulationPoint p : hole.getPoints())
+		// p.set(MathUtils.clamp(p.getX(), min.getX(), max.getX()), MathUtils.clamp(p.getY(), min.getY(), max.getY()), p.getZ());
+		// }
+		// }
 
 		try {
 			Poly2Tri.triangulate(polygon);
 		} catch (final RuntimeException e) {
-//			e.printStackTrace();
+			// e.printStackTrace();
 			System.out.println("Triangulate exception received with the following polygon:");
 			System.out.println("final Polygon polygon = new Polygon(new PolygonPoint[] {");
 			for (final TriangulationPoint p : polygon.getPoints())
