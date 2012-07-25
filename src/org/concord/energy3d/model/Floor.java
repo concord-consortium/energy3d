@@ -33,17 +33,8 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Floor extends HousePart {
 	private static final long serialVersionUID = 1L;
-//	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient Mesh wireframeMesh;
-
-//	public static ReadOnlyColorRGBA getDefaultColor() {
-//		return defaultColor;
-//	}
-//
-//	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
-//		defaultColor = color;
-//	}
 
 	public Floor() {
 		super(1, 1, 0.5);
@@ -109,11 +100,10 @@ public class Floor extends HousePart {
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.2 : 1.0;
-		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale , new TPoint(0, 0, 0), new TPoint(1, 0, 0), new TPoint(0, 1, 0));
+		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale, new TPoint(0, 0, 0), new TPoint(1, 0, 0), new TPoint(0, 1, 0));
 		mesh.getMeshData().updateVertexCount();
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 		mesh.updateModelBound();
-//		root.updateWorldBound(true);
 	}
 
 	@Override
@@ -223,7 +213,6 @@ public class Floor extends HousePart {
 		wallUpperPoints = ((Floor) original).wallUpperPoints;
 		root.detachChild(wireframeMesh);
 		wireframeMesh = ((Floor) original).wireframeMesh.makeCopy(true);
-//		((Line) wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
 		((Line) wireframeMesh).setLineWidth(printWireframeThickness);
 		root.attachChild(wireframeMesh);
 		super.setOriginal(original);
@@ -236,7 +225,6 @@ public class Floor extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-//		updateTextureAndColor(mesh, getDefaultColor());
 		updateTextureAndColor(mesh, Scene.getInstance().getFloorColor());
 	}
 }

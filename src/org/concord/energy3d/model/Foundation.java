@@ -47,12 +47,6 @@ public class Foundation extends HousePart {
 		points.get(2).set(xLength / 2.0, -yLength / 2.0, 0);
 		points.get(1).set(-xLength / 2.0, yLength / 2.0, 0);
 		points.get(3).set(xLength / 2.0, yLength / 2.0, 0);
-
-//		for (int i = 0; i < 4; i++)
-//			points.get(4 + i).set(points.get(i)).setZ(newBoundingHeight + height);
-
-//		for (int i = 0; i < 4; i++)
-//			points.get(i + 4).set(points.get(i)).setZ(newBoundingHeight + height);
 	}
 
 	@Override
@@ -90,8 +84,6 @@ public class Foundation extends HousePart {
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
 		boundingMesh.setUserData(userData);
-
-		// scanChildrenHeight(); // to fix bug with resizing height instead of width when moving edit point of platform right after loading the model
 
 		setLabelOffset(-0.11);
 	}
@@ -224,7 +216,7 @@ public class Foundation extends HousePart {
 		if (getAbsPoint(index).getX() > x2) {
 			if (p.getX() - x2 < width)
 				p.setX(x2 + width);
-		} else  {
+		} else {
 			if (x2 - p.getX() < width)
 				p.setX(x2 - width);
 		}
@@ -238,10 +230,6 @@ public class Foundation extends HousePart {
 				p.setY(y2 - width);
 		}
 
-////		final int other = index == 0 ? 2 : 0;
-//		final Vector3 other = getAbsPoint(index == 0 ? 2 : 0);
-//		if (Math.abs(other.getX() - p.getX()) < width)
-//			p.setX(other.getX() + width * other.getX() < p.getX())
 		return p;
 	}
 

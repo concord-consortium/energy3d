@@ -65,9 +65,6 @@ public class MainPanel extends JPanel {
 	private JToggleButton roofCustomButton = null;
 	private JToggleButton zoomButton = null;
 	private JToggleButton roofGableButton = null;
-//	private Panel panel;
-//	private ScrollPane scrollPane;
-//	private Button button;
 
 	public static MainPanel getInstance() {
 		return instance;
@@ -104,7 +101,6 @@ public class MainPanel extends JPanel {
 		this.setSize(1000, 300);
 		setLayout(new BorderLayout());
 		this.add(getAppToolbar(), BorderLayout.NORTH);
-//		add(getScrollPane(), BorderLayout.CENTER);
 	}
 
 	/**
@@ -939,29 +935,4 @@ public class MainPanel extends JPanel {
 		}
 		getCalendarPanel().setVisible(enabled && (getLightButton().isSelected() || getHeliodonButton().isSelected()));
 	}
-//	public Panel getPanel() {
-//		if (panel == null) {
-//			panel = new Panel();
-//			panel.setLayout(new BorderLayout());
-//			panel.add(getButton(), BorderLayout.NORTH);
-//		}
-//		return panel;
-//	}
-//
-//	private ScrollPane getScrollPane() {
-//		if (scrollPane == null) {
-//			scrollPane = new ScrollPane();
-//			scrollPane.add(getPanel());
-//		}
-//		return scrollPane;
-//	}
-//
-//	private Button getButton() {
-//		if (button == null) {
-//			button = new Button("New button");
-////			button.setSize(100, 1000);
-////			button.setPreferredSize(new Dimension(10, 10));
-//		}
-//		return button;
-//	}
 }

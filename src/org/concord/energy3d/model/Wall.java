@@ -51,7 +51,6 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
-	// private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private static final double MIN_WALL_LENGTH = 0.01;
 	private static double defaultWallHeight = 2.0; // the recommended default wall height is 20cm
 	private static int currentVisitStamp = 1;
@@ -68,14 +67,6 @@ public class Wall extends HousePart {
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
-
-	// public static ReadOnlyColorRGBA getDefaultColor() {
-	// return defaultColor;
-	// }
-	//
-	// public static void setDefaultColor(final ReadOnlyColorRGBA color) {
-	// defaultColor = color;
-	// }
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -109,12 +100,6 @@ public class Wall extends HousePart {
 		offsetState.setUnits(1f);
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new OrientedBoundingBox());
-
-		// final BlendState blend = new BlendState();
-		// blend.setBlendEnabled(true);
-		// blend.setTestEnabled(true);
-		// mesh.setRenderState(blend);
-		// mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		root.attachChild(mesh);
 
 		backMesh = new Mesh("Wall (Back)");
@@ -177,23 +162,9 @@ public class Wall extends HousePart {
 				container = previousContainer;
 				picked = null;
 			}
-//			if (container != previousContainer && previousContainer != null)
-//				return;
-
-//			if (container != previousContainer)
-//				for (int i = 0; i < points.size(); i++) {
-//					final Vector3 p = points.get(i);
-//					p.setX(MathUtils.clamp(p.getX(), 0, 1));
-//					p.setY(MathUtils.clamp(p.getY(), 0, 1));
-//					if (i == 0 || i == 2)
-//						p.setZ(container.height);
-//					else
-//						p.setZ(container.height + height);
-//				}
 
 			if (container == null)
 				return;
-
 
 			Vector3 p = null;
 			if (picked != null) {
@@ -253,25 +224,8 @@ public class Wall extends HousePart {
 			points.get(3).setZ(z);
 		}
 
-//		thicknessNormal = null;
-//		isShortWall = true;
 		drawThisAndNeighbors(false);
-		/* find and draw any roof or floor child of neighbors */
-//		visitNeighbors(new WallVisitor() {
-//			@Override
-//			public void visit(final Wall wall, final Snap prev, final Snap next) {
-//				for (final HousePart child : wall.getChildren())
-////					if (child instanceof Roof || child instanceof Floor)
-//						child.draw();
-//			}
-//		});
-
-
 		setEditPointsVisible(true);
-
-
-//		if (isDrawable() && roof != null)
-//			roof.draw();
 	}
 
 	private void drawThisAndNeighbors(final boolean extendToRoofEnabled) {
@@ -284,7 +238,6 @@ public class Wall extends HousePart {
 			drawNeighborWalls();
 		Wall.extendToRoofEnabled = true;
 	}
-
 
 	@Override
 	public void complete() {
@@ -316,9 +269,6 @@ public class Wall extends HousePart {
 			}
 		}
 
-
-
-//		if (closestDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize()) && (!isFirstPointInserted() || p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > MIN_WALL_LENGTH)) {
 		if (closestDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize()) && (!isFirstPointInserted() || p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > getGridSize() * 2)) {
 			p.set(closestPoint);
 			setNeighbor(index, new Snap(this, closestWall, index, closestPointIndex), true);
@@ -404,13 +354,13 @@ public class Wall extends HousePart {
 			}
 		}
 
-//		Poly2Tri.triangulate(polygon);
-//		ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
-//		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
+		// Poly2Tri.triangulate(polygon);
+		// ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
+		// ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.1 : 1.0;
-//		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale, o, u, v);
-//		mesh.getMeshData().updateVertexCount();
-//		mesh.updateModelBound();
+		// ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale, o, u, v);
+		// mesh.getMeshData().updateVertexCount();
+		// mesh.updateModelBound();
 
 		MeshLib.fillMeshWithPolygon(mesh, polygon, scale, o, u, v, fromXY);
 
@@ -426,11 +376,11 @@ public class Wall extends HousePart {
 		drawSurroundMesh(thicknessNormal);
 		drawWindowsSurroundMesh(thicknessNormal);
 
-//		backMesh.updateModelBound();
-//		surroundMesh.updateModelBound();
-//		windowsSurroundMesh.updateModelBound();
-//		wireframeMesh.updateModelBound();
-//		invisibleMesh.updateModelBound();
+		// backMesh.updateModelBound();
+		// surroundMesh.updateModelBound();
+		// windowsSurroundMesh.updateModelBound();
+		// wireframeMesh.updateModelBound();
+		// invisibleMesh.updateModelBound();
 
 		root.updateWorldBound(true);
 	}
@@ -827,7 +777,6 @@ public class Wall extends HousePart {
 
 		windowsSurroundMesh.getMeshData().updateVertexCount();
 		windowsSurroundMesh.updateModelBound();
-		// windowsSurroundMesh.updateWorldBound(false);
 	}
 
 	public Snap getOtherSnap(final Snap snap) {
@@ -846,40 +795,13 @@ public class Wall extends HousePart {
 	 */
 	private void setNeighbor(final int pointIndex, final Snap newSnap, final boolean updateNeighbors) {
 		final int i = pointIndex < 2 ? 0 : 1;
-//		if (neighbors[i] != null && neighbors[i].equals(neighbors[i == 0 ? 1 : 0]))
-//			return;
 		final Snap oldSnap = neighbors[i];
-		// if (newSnap != null && !newSnap.equals(oldSnap))
-		// System.out.println(this + "\t.setNeighbor: " + pointIndex + "\t" + newSnap);
-
-//		if (newSnap == null && !updateNeighbors) // see if it is attached to another wall
-//
-////		if (newSnap == null && oldSnap != null && updateNeighbors && (neighbors[0] != null || neighbors[1] != null)) // see if it is attached to another wall
-//
-//			for (final HousePart part : Scene.getInstance().getParts())
-//				if (part instanceof Wall && part != this) {
-//					final Vector3 point = getAbsPoint(pointIndex);
-//					final Wall wall = (Wall) part;
-//					if (point.distance(part.getAbsPoint(0)) < MathUtils.ZERO_TOLERANCE) {
-//						newSnap = new Snap(this, wall, pointIndex, 0);
-//						wall.setNeighbor(0, newSnap, false);
-//						wall.drawNeighborWalls();
-//						break;
-//					} else if (part.getPoints().size() > 2 && point.distance(part.getAbsPoint(2)) < MathUtils.ZERO_TOLERANCE) {
-//						newSnap = new Snap(this, wall, pointIndex, 2);
-//						wall.setNeighbor(2, newSnap, false);
-//						wall.drawNeighborWalls();
-//						break;
-//					}
-//				}
-//		if (neighbors[i] != newSnap && (newSnap == null || !newSnap.equals(neighbors[i])))
-				neighbors[i] = newSnap;
+		neighbors[i] = newSnap;
 
 		if (newSnap == null && !updateNeighbors) { // see if it is attached to another wall
 			fixDisconnectedWalls();
 			return;
 		}
-
 
 		if (!updateNeighbors || oldSnap == newSnap || (oldSnap != null && oldSnap.equals(newSnap)))
 			return;
@@ -900,13 +822,6 @@ public class Wall extends HousePart {
 	public void delete() {
 		setNeighbor(0, null, true);
 		setNeighbor(2, null, true);
-//		for (int i = 0; i < neighbors.length; i++) {
-//			if (neighbors[i] != null) {
-//				final Wall neighbor = neighbors[i].getNeighborOf(this);
-//				neighbor.setNeighbor(neighbors[i].getSnapPointIndexOfNeighborOf(this), null, false);
-////				neighbor.draw(); // TODO This is the 2nd time we would draw neighbor (once in setNeighbor) but we need it because otherwise the back wall sticks out
-//			}
-//		}
 	}
 
 	@Override
@@ -1038,6 +953,7 @@ public class Wall extends HousePart {
 		class VisitInfo {
 			Wall wall;
 			Snap prev, next;
+
 			VisitInfo(final Wall wall, final Snap prev, final Snap next) {
 				this.wall = wall;
 				this.prev = prev;
@@ -1049,8 +965,6 @@ public class Wall extends HousePart {
 		while (currentWall != null && !currentWall.isVisited()) {
 			final Snap prevSnap = snap;
 			snap = currentWall.getOtherSnap(snap);
-//			visitor.visit(currentWall, prevSnap, snap);
-//			if (currentWall != this)
 			visits.add(new VisitInfo(currentWall, prevSnap, snap));
 			currentWall.visit();
 			if (snap == null)
@@ -1071,7 +985,6 @@ public class Wall extends HousePart {
 				@Override
 				public void visit(final Wall wall, final Snap prev, final Snap next) {
 					visitWallAndReverseThickness(wall, prev);
-//					if (wall != Wall.this)
 					if (wall != Wall.this && !walls.contains(wall))
 						walls.add(wall);
 					wall.isShortWall = nextIsShort;
@@ -1086,7 +999,6 @@ public class Wall extends HousePart {
 				@Override
 				public void visit(final Wall wall, final Snap prev, final Snap next) {
 					visitWallAndReverseThickness(wall, prev);
-//					if (wall != Wall.this)
 					if (wall != Wall.this && !walls.contains(wall))
 						walls.add(wall);
 					wall.isShortWall = nextIsShort;
@@ -1152,7 +1064,6 @@ public class Wall extends HousePart {
 		surroundMesh = originalWall.surroundMesh.makeCopy(true);
 		windowsSurroundMesh = originalWall.windowsSurroundMesh.makeCopy(true);
 		wireframeMesh = originalWall.wireframeMesh.makeCopy(true);
-		// ((Line) wireframeMesh).setLineWidth(WIREFRAME_THICKNESS);
 		((Line) wireframeMesh).setLineWidth(printWireframeThickness);
 		root.attachChild(backMesh);
 		root.attachChild(surroundMesh);
@@ -1167,21 +1078,6 @@ public class Wall extends HousePart {
 
 		super.setOriginal(original);
 	}
-
-//	@Override
-//	protected void drawChildren() {
-//		/* draw windows and any roof or floor child of this wall */
-//		super.drawChildren();
-//		/* find and draw any roof or floor child of neighbors */
-//		visitNeighbors(new WallVisitor() {
-//			@Override
-//			public void visit(final Wall wall, final Snap prev, final Snap next) {
-//				for (final HousePart child : wall.getChildren())
-//					if (child instanceof Roof || child instanceof Floor)
-//						child.draw();
-//			}
-//		});
-//	}
 
 	public HousePart getRoof() {
 		return roof;

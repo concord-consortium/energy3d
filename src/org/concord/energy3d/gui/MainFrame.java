@@ -214,8 +214,6 @@ public class MainFrame extends JFrame {
 			e.printStackTrace();
 		}
 		colorChooser = new JColorChooser();
-		// final ReadOnlyColorRGBA defaultColor = HousePart.getDefaultColor();
-		// colorChooser.setColor(new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue()));
 		initialize();
 		updateTitleBar();
 		System.out.println("done");
@@ -469,16 +467,6 @@ public class MainFrame extends JFrame {
 					final PrintController printController = PrintController.getInstance();
 					if (!printController.isPrintPreview()) {
 						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
-//						SceneManager.getTaskManager().update(new Callable<Object>() {
-//							@Override
-//							public Object call() throws Exception {
-//								if (printController.isFinished())
-//									PrintController.getInstance().print();
-//								else
-//									SceneManager.getTaskManager().update(this);
-//								return null;
-//							}
-//						});
 						new Thread() {
 							@Override
 							public void run() {
@@ -909,7 +897,6 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().undo();
 					Scene.getInstance().redrawAll();
-					// SceneManager.getInstance().refresh();
 					refreshUndoRedo();
 				}
 			});
@@ -928,7 +915,6 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().redo();
 					Scene.getInstance().redrawAll();
-					// SceneManager.getInstance().refresh();
 					refreshUndoRedo();
 				}
 			});
@@ -1291,23 +1277,6 @@ public class MainFrame extends JFrame {
 				final float[] newColor = c.getComponents(null);
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
-				// switch (operation) {
-				// case DRAW_FOUNDATION:
-				// Foundation.setDefaultColor(color);
-				// break;
-				// case DRAW_WALL:
-				// Wall.setDefaultColor(color);
-				// break;
-				// case DRAW_DOOR:
-				// Door.setDefaultColor(color);
-				// break;
-				// case DRAW_FLOOR:
-				// Floor.setDefaultColor(color);
-				// break;
-				// case DRAW_ROOF:
-				// Roof.setDefaultColor(color);
-				// break;
-				// }
 				switch (operation) {
 				case DRAW_FOUNDATION:
 					Scene.getInstance().setFoundationColor(color);
@@ -1324,8 +1293,9 @@ public class MainFrame extends JFrame {
 				case DRAW_ROOF:
 					Scene.getInstance().setRoofColor(color);
 					break;
+				default:
+					break;
 				}
-				// HousePart.setDefaultColor(color);
 				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())

@@ -18,18 +18,9 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static double defaultDoorHeight = 1.5; // 0.8f;
-//	private static ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private transient FloatBuffer vertexBuffer;
 	private transient FloatBuffer normalBuffer;
 	private transient FloatBuffer textureBuffer;
-
-//	public static ReadOnlyColorRGBA getDefaultColor() {
-//		return defaultColor;
-//	}
-//
-//	public static void setDefaultColor(final ReadOnlyColorRGBA color) {
-//		defaultColor = color;
-//	}
 
 	public Door() {
 		super(2, 4, defaultDoorHeight);
@@ -51,11 +42,6 @@ public class Door extends HousePart {
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
-
-		// Add a texture to the box.
-//		final TextureState ts = new TextureState();
-//		ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-//		mesh.setRenderState(ts);
 
 		updateTextureAndColor();
 
@@ -140,12 +126,6 @@ public class Door extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-//		if (mesh == null)
-//			return;
-//		final TextureState ts = new TextureState();
-//		ts.setTexture(TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-//		mesh.setRenderState(ts);
-//		mesh.setDefaultColor(Scene.getInstance().getDoorColor());
 		updateTextureAndColor(mesh, Scene.getInstance().getDoorColor(), Scene.getInstance().getTextureMode() == TextureMode.None ? TextureMode.Simple : Scene.getInstance().getTextureMode());
 	}
 

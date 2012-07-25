@@ -13,12 +13,6 @@ public class MainApplication {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Energy3D");
 		}
-		// try {
-		// System.in.read();
-		// } catch (IOException e1) {
-		// e1.printStackTrace();
-		// }
-		// final long s = System.nanoTime();
 		Config.setWebStart(System.getProperty("javawebstart.version", null) != null);
 		if (Config.isWebStart()) {
 			System.out.println("Application is lauched by webstart.");
@@ -39,7 +33,6 @@ public class MainApplication {
 		MainFrame.getInstance().setVisible(true);
 		new Thread(scene, "Energy 3D Application").start();
 		Scene.getInstance();;
-		// System.out.println(System.nanoTime() - s);
 
 //		HandTrackerApplication.main(null);
 	}

@@ -48,7 +48,6 @@ public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
-	// protected static boolean drawAnnotations = Config.isApplet() ? false : true;
 	protected static final float printWireframeThickness = 2f;
 	private static HousePart gridsHighlightedHousePart;
 	private static boolean snapToObjects = false;
@@ -139,7 +138,6 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		labelsRoot = new Node("Labels");
 
-		// setAnnotationsVisible(drawAnnotations);
 		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
 
 		// Set up a reusable pick results
@@ -299,7 +297,6 @@ public abstract class HousePart implements Serializable {
 		else
 			picked = SelectUtil.pickPart(x, y, container == null ? null : container.getRoot());
 
-//		if (!firstPointInserted || container == null) {
 		if (!firstPointInserted && picked != null) {
 			UserData userData = null;
 			if (picked != null)
@@ -322,7 +319,7 @@ public abstract class HousePart implements Serializable {
 			if (container != null && !(this instanceof Roof)) {
 				container.drawGrids(getGridSize());
 				container.gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
-			} else if (this instanceof Foundation) { // || this instanceof Wall) {
+			} else if (this instanceof Foundation) {
 				SceneManager.getInstance().drawGrids(getGridSize());
 				SceneManager.getInstance().setGridsVisible(true);
 			}
@@ -441,7 +438,6 @@ public abstract class HousePart implements Serializable {
 			drawMesh();
 			updateTextureAndColor();
 			updateEditShapes();
-			// CollisionTreeManager.INSTANCE.removeCollisionTree(root); // TODO try removing this
 			clearAnnotations();
 			if (isDrawable())
 				drawAnnotations();
@@ -615,32 +611,12 @@ public abstract class HousePart implements Serializable {
 	protected abstract void drawMesh();
 
 	public void setAnnotationsVisible(final boolean visible) {
-		// drawAnnotations = visible;
 		final CullHint cull = visible ? CullHint.Inherit : CullHint.Always;
 		sizeAnnotRoot.getSceneHints().setCullHint(cull);
 		angleAnnotRoot.getSceneHints().setCullHint(cull);
 	}
 
 	public abstract void updateTextureAndColor();
-
-	// if (mesh == null)
-	// return;
-	// if (Scene.getInstance().getTextureMode() == TextureMode.None) {
-	// mesh.clearRenderState(StateType.Texture);
-	// mesh.setDefaultColor(defaultColor);
-	// } else {
-	// final TextureState ts = new TextureState();
-	// final Texture texture = TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
-	// texture.setApply(ApplyMode.Decal);
-	// ts.setTexture(texture);
-	// mesh.setRenderState(ts);
-	// if (Scene.getInstance().getTextureMode() == TextureMode.Full)
-	// mesh.setDefaultColor(ColorRGBA.WHITE);
-	// else
-	// mesh.setDefaultColor(defaultColor);
-	// }
-	// updateTextureAndColor(mesh, defaultColor);
-	// }
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor) {
 		updateTextureAndColor(mesh, defaultColor, Scene.getInstance().getTextureMode());
@@ -652,12 +628,10 @@ public abstract class HousePart implements Serializable {
 			mesh.setDefaultColor(defaultColor);
 		} else {
 			final TextureState ts = new TextureState();
-			// final Texture texture = TextureManager.load(getTextureFileName(), Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
 			final Texture texture = getTexture(getTextureFileName(), defaultColor);
-			// texture.setApply(ApplyMode.Decal);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
-			if (Scene.getInstance().getTextureMode() == TextureMode.Full)
+			if (textureMode == TextureMode.Full)
 				mesh.setDefaultColor(ColorRGBA.WHITE);
 			else
 				mesh.setDefaultColor(defaultColor);
