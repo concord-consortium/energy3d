@@ -397,21 +397,21 @@ public class MeshLib {
 		try {
 			Poly2Tri.triangulate(polygon);
 		} catch (final RuntimeException e) {
-			e.printStackTrace();
-			System.out.println("Triangulate exception received with the following polygon:");
-			System.out.println("final Polygon polygon = new Polygon(new PolygonPoint[] {");
-			for (final TriangulationPoint p : polygon.getPoints())
-				System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
-			System.out.println("});");
-
-			System.out.println("Polygon hole;");
-			for (final Polygon hole : polygon.getHoles()) {
-				System.out.println("hole = new Polygon(new PolygonPoint[] {");
-				for (final TriangulationPoint p : hole.getPoints())
-					System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
-				System.out.println("});");
-				System.out.println("polygon.addHole(hole);");
-			}
+//			e.printStackTrace();
+//			System.out.println("Triangulate exception received with the following polygon:");
+//			System.out.println("final Polygon polygon = new Polygon(new PolygonPoint[] {");
+//			for (final TriangulationPoint p : polygon.getPoints())
+//				System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
+//			System.out.println("});");
+//
+//			System.out.println("Polygon hole;");
+//			for (final Polygon hole : polygon.getHoles()) {
+//				System.out.println("hole = new Polygon(new PolygonPoint[] {");
+//				for (final TriangulationPoint p : hole.getPoints())
+//					System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
+//				System.out.println("});");
+//				System.out.println("polygon.addHole(hole);");
+//			}
 
 			throw e;
 		}

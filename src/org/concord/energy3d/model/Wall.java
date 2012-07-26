@@ -63,11 +63,11 @@ public class Wall extends HousePart {
 	private transient Roof roof;
 	private transient ArrayList<Vector3> wallPolygonPoints;
 	private transient int visitStamp;
+	private transient Polygon polygon;
 	private final double wallThickness = 0.05;
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
-	private Polygon polygon;
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -242,7 +242,7 @@ public class Wall extends HousePart {
 
 	@Override
 	public void complete() {
-		drawThisAndNeighbors(true);
+		drawThisAndNeighbors(true);	//TODO is this necessary
 		super.complete();
 	}
 

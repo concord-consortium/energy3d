@@ -9,6 +9,7 @@
 		<icon href="resources/icon.gif" />
 		<icon kind="splash" href="resources/splash.jpg" /> 
 		<offline-allowed/>
+		<association extensions="ng3" mime-type="application/energy3d"/>
 	    <shortcut>
 			<desktop/>
 	    </shortcut>

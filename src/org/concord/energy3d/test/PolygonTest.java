@@ -15,35 +15,56 @@ public class PolygonTest {
 //		};
 //		final Polygon polygon = new Polygon(points);
 
+//			final Polygon polygon = new Polygon(new PolygonPoint[] {
+//				new PolygonPoint(6.699999999999999, 1.1, 1.7000000000000002),
+//				new PolygonPoint(0.1, 1.1, 1.7000000000000002),
+//				new PolygonPoint(0.1, -1.1, 1.7000000000000002),
+//				new PolygonPoint(6.699999999999999, -1.1, 1.7000000000000002),
+//			});
+//			Polygon hole;
+//			hole = new Polygon(new PolygonPoint[] {
+//				new PolygonPoint(5.6, -0.19999999999999907, 1.7000000000000002),
+//				new PolygonPoint(6.4, -0.19999999999999907, 1.7000000000000002),
+//				new PolygonPoint(6.4, -0.8999999999999999, 1.7000000000000002),
+//				new PolygonPoint(5.6, -0.8999999999999999, 1.7000000000000002),
+//			});
+//			polygon.addHole(hole);
+//			hole = new Polygon(new PolygonPoint[] {
+//				new PolygonPoint(4.6, -0.19999999999999907, 1.7000000000000002),
+//				new PolygonPoint(5.1, -0.19999999999999907, 1.7000000000000002),
+//				new PolygonPoint(5.1, -0.8999999999999995, 1.7000000000000002),
+//				new PolygonPoint(4.6, -0.8999999999999995, 1.7000000000000002),
+//			});
+//			polygon.addHole(hole);
+//			hole = new Polygon(new PolygonPoint[] {
+//				new PolygonPoint(1.5999999999999999, 0.8000000000000052, 1.7000000000000002),
+//				new PolygonPoint(2.3000000000000003, 0.8000000000000052, 1.7000000000000002),
+//				new PolygonPoint(2.3000000000000003, 0.3000000000000015, 1.7000000000000002),
+//				new PolygonPoint(1.5999999999999999, 0.3000000000000015, 1.7000000000000002),
+//			});
+//			polygon.addHole(hole);
+
 			final Polygon polygon = new Polygon(new PolygonPoint[] {
-				new PolygonPoint(6.699999999999999, 1.1, 1.7000000000000002),
-				new PolygonPoint(0.1, 1.1, 1.7000000000000002),
-				new PolygonPoint(0.1, -1.1, 1.7000000000000002),
-				new PolygonPoint(6.699999999999999, -1.1, 1.7000000000000002),
+				new PolygonPoint(6.7, 1.1, 0),
+				new PolygonPoint(0.1, 1.1, 0),
+				new PolygonPoint(0.1, -0.9, 0),
+				new PolygonPoint(6.7, -0.9, 0),
 			});
 			Polygon hole;
 			hole = new Polygon(new PolygonPoint[] {
-				new PolygonPoint(5.6, -0.19999999999999907, 1.7000000000000002),
-				new PolygonPoint(6.4, -0.19999999999999907, 1.7000000000000002),
-				new PolygonPoint(6.4, -0.8999999999999999, 1.7000000000000002),
-				new PolygonPoint(5.6, -0.8999999999999999, 1.7000000000000002),
+				new PolygonPoint(5.6, -0.0818181818181809, 0),
+				new PolygonPoint(6.4, -0.0818181818181809, 0),
+				new PolygonPoint(6.4, -0.718181818181818, 0),
+				new PolygonPoint(5.6, -0.718181818181818, 0),
 			});
 			polygon.addHole(hole);
 			hole = new Polygon(new PolygonPoint[] {
-				new PolygonPoint(4.6, -0.19999999999999907, 1.7000000000000002),
-				new PolygonPoint(5.1, -0.19999999999999907, 1.7000000000000002),
-				new PolygonPoint(5.1, -0.8999999999999995, 1.7000000000000002),
-				new PolygonPoint(4.6, -0.8999999999999995, 1.7000000000000002),
+				new PolygonPoint(4.6, -0.0818181818181809, 0),
+				new PolygonPoint(5.1, -0.0818181818181809, 0),
+				new PolygonPoint(5.1, -0.7181818181818176, 0),
+				new PolygonPoint(4.6, -0.7181818181818176, 0),
 			});
 			polygon.addHole(hole);
-			hole = new Polygon(new PolygonPoint[] {
-				new PolygonPoint(1.5999999999999999, 0.8000000000000052, 1.7000000000000002),
-				new PolygonPoint(2.3000000000000003, 0.8000000000000052, 1.7000000000000002),
-				new PolygonPoint(2.3000000000000003, 0.3000000000000015, 1.7000000000000002),
-				new PolygonPoint(1.5999999999999999, 0.3000000000000015, 1.7000000000000002),
-			});
-			polygon.addHole(hole);
-
 
 			Poly2Tri.triangulate(polygon);
 	}
