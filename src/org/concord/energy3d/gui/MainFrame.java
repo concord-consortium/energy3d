@@ -208,7 +208,8 @@ public class MainFrame extends JFrame {
 				final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
 				fileChooser.setCurrentDirectory(dir);
 			}
-			fileChooser.setFileFilter(new ExtensionFileFilter("Energy3D Project (*.ser)", "ser"));
+			fileChooser.setFileFilter(new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3"));
+			fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Old Energy3D Project (*.ser)", "ser"));
 		} catch (final Exception e) {
 			fileChooser = null;
 			e.printStackTrace();
@@ -929,8 +930,8 @@ public class MainFrame extends JFrame {
 			File file = fileChooser.getSelectedFile();
 			if (file == null)
 				return;
-			if (!file.getName().toLowerCase().endsWith(".ser"))
-				file = new File(file.toString() + ".ser");
+			if (!file.getName().toLowerCase().endsWith(".ng3"))
+				file = new File(file.toString() + ".ng3");
 			Scene.save(file.toURI().toURL());
 			updateTitleBar();
 		} catch (final Throwable err) {

@@ -1116,6 +1116,9 @@ Version 0.5 - October 20, 2011
 - modify the jnlp so that it can find the jnlp url so that it can update the jnlp file if modified
 - setup .ng3 files extension association in jnlp file
 - allow opening .ng3 files with energy3d by double-clicking on them
+- save files as .ng3 
+- add .ng3 filter to open and save dialog boxes and make them default extensions filters
+ 
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from
