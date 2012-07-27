@@ -1113,7 +1113,8 @@ Version 0.5 - October 20, 2011
 - release version 0.7.2
 - fix exception when drawing wall with windows that are almost at same z level but with a 0.000000000000001 difference
 - round all absolute points to 3 decimal places
-
+- modify the jnlp so that it can find the jnlp url so that it can update the jnlp file if modified
+- add .ng3 files extension setup tags to jnlp file
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from
