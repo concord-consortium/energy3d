@@ -428,13 +428,6 @@ public class Wall extends HousePart {
 		addPolygonPoint(polygonPoints, this, 0, trans);
 		addPolygonPoint(polygonPoints, this, 2, trans);
 		addPolygonPoint(polygonPoints, this, 3, trans);
-//		p.set(getAbsPoint(0)).addLocal(trans);
-//		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-//		p.set(getAbsPoint(2)).addLocal(trans);
-//		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-//		p.set(getAbsPoint(3)).addLocal(trans);
-//		polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-
 		final Polygon polygon = new Polygon(polygonPoints);
 
 		// Add window holes
@@ -448,20 +441,11 @@ public class Wall extends HousePart {
 	}
 
 	private Polygon computeWindowHole(final HousePart window, final ReadOnlyVector3 trans) {
-//		Vector3 p;
 		final ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
 		addPolygonPoint(holePoints, window, 1, trans);
 		addPolygonPoint(holePoints, window, 0, trans);
 		addPolygonPoint(holePoints, window, 2, trans);
 		addPolygonPoint(holePoints, window, 3, trans);
-//		p = window.getAbsPoint(1);
-//		holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
-//		p = window.getAbsPoint(0);
-//		holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
-//		p = window.getAbsPoint(2);
-//		holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
-//		p = window.getAbsPoint(3);
-//		holePoints.add(new PolygonPoint(p.getX() + trans.getX(), p.getY() + trans.getY(), p.getZ()));
 		final Polygon hole = new Polygon(holePoints);
 		return hole;
 	}
