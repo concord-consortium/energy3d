@@ -481,6 +481,7 @@ public abstract class Roof extends HousePart {
 			final PolygonPoint p = wallUpperPoints.get(i);
 			op.set(wallNormals.get(i)).multiplyLocal(Scene.getInstance().getOverhangLength());
 			op.addLocal(p.getX(), p.getY(), p.getZ());
+			roundPoint(op);
 			p.set(op.getX(), op.getY(), op.getZ());
 		}
 	}

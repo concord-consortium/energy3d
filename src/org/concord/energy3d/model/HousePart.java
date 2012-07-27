@@ -361,9 +361,13 @@ public abstract class HousePart implements Serializable {
 			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
 //		if (!Vector3.isValid(pointOnSpace))
 //			System.out.println("xxx");
-		final double C = 1000.0;
-		pointOnSpace.set(Math.round(pointOnSpace.getX() * C) / C, Math.round(pointOnSpace.getY() * C) / C, Math.round(pointOnSpace.getZ() * C) / C);
+		roundPoint(pointOnSpace);
 		return pointOnSpace;
+	}
+
+	protected Vector3 roundPoint(final Vector3 pointOnSpace) {
+		final double C = 1000.0;
+		return pointOnSpace.set(Math.round(pointOnSpace.getX() * C) / C, Math.round(pointOnSpace.getY() * C) / C, Math.round(pointOnSpace.getZ() * C) / C);
 	}
 
 	protected Vector3 grid(final Vector3 p, final ReadOnlyVector3 current, final double gridSize) {

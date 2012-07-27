@@ -1120,6 +1120,7 @@ Version 0.5 - October 20, 2011
 - add .ng3 filter to open and save dialog boxes and make them default extensions filters
 - rename all .ser files to .ng3 in samples folder
 - release version 0.7.3
+- round roof upperWallPoints and Steiner points
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from
