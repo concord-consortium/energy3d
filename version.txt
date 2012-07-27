@@ -1111,6 +1111,9 @@ Version 0.5 - October 20, 2011
 - show door texture even if in no-texture mode
 - prevent gable window from being dragged outside of the gable roof boundaries
 - release version 0.7.2
+- fix exception when drawing wall with windows that are almost at same z level but with a 0.000000000000001 difference
+- round all absolute points to 3 decimal places
+
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from
