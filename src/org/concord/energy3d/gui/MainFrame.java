@@ -208,8 +208,10 @@ public class MainFrame extends JFrame {
 				final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
 				fileChooser.setCurrentDirectory(dir);
 			}
-			fileChooser.setFileFilter(new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3"));
+			final ExtensionFileFilter filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
+			fileChooser.addChoosableFileFilter(filter);
 			fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Old Energy3D Project (*.ser)", "ser"));
+			fileChooser.setFileFilter(filter);
 		} catch (final Exception e) {
 			fileChooser = null;
 			e.printStackTrace();
