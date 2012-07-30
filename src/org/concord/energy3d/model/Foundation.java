@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
@@ -192,7 +193,7 @@ public class Foundation extends HousePart {
 			} else {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
-				Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
+				Vector3 closestPoint = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
 				final Vector3 currentPoint = getAbsPoint(index);
 				closestPoint = grid(closestPoint, currentPoint, getGridSize());
 				if (!closestPoint.equals(currentPoint)) {

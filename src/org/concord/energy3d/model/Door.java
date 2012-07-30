@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.concord.energy3d.util.MeshLib;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.MathUtils;
@@ -58,7 +59,7 @@ public class Door extends HousePart {
 				Vector3 p = picked.getPoint();
 				final Vector3 wallFirstPoint = container.getAbsPoint(0);
 				final Vector3 wallx = container.getAbsPoint(2).subtract(wallFirstPoint, null);
-				p = closestPoint(wallFirstPoint, wallx, x, y);
+				p = MeshLib.closestPoint(wallFirstPoint, wallx, x, y);
 				p = grid(p, getAbsPoint(editPointIndex == -1 ? points.size() - 2 : editPointIndex), getGridSize());
 
 				final int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
@@ -72,7 +73,7 @@ public class Door extends HousePart {
 			final int lower = (editPointIndex == 1) ? 0 : 2;
 			final Vector3 base = points.get(lower);
 			final Vector3 absoluteBase = toAbsolute(base);
-			Vector3 p = closestPoint(absoluteBase, Vector3.UNIT_Z, x, y);
+			Vector3 p = MeshLib.closestPoint(absoluteBase, Vector3.UNIT_Z, x, y);
 			p = grid(p, getAbsPoint(editPointIndex), getGridSize());
 			defaultDoorHeight = height = Math.max(0, p.getZ() - absoluteBase.getZ());
 

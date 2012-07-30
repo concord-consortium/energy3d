@@ -23,8 +23,6 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Ray3;
-import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -243,41 +241,6 @@ public abstract class HousePart implements Serializable {
 
 	public int getEditPoint() {
 		return editPointIndex;
-	}
-
-	protected Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 v1, final int x, final int y) {
-		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
-		final Vector3 closest = closestPoint(p1, v1, pickRay.getOrigin(), pickRay.getDirection());
-		return closest;
-	}
-
-	protected Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 p21, final ReadOnlyVector3 p3, final ReadOnlyVector3 p43) {
-		final double EPS = 0.0001;
-		Vector3 p13;
-		double d1343, d4321, d1321, d4343, d2121;
-		double numer, denom;
-
-		p13 = p1.subtract(p3, null);
-		if (Math.abs(p43.getX()) < EPS && Math.abs(p43.getY()) < EPS && Math.abs(p43.getZ()) < EPS)
-			return null;
-		if (Math.abs(p21.length()) < EPS)
-			return null;
-
-		d1343 = p13.getX() * p43.getX() + p13.getY() * p43.getY() + p13.getZ() * p43.getZ();
-		d4321 = p43.getX() * p21.getX() + p43.getY() * p21.getY() + p43.getZ() * p21.getZ();
-		d1321 = p13.getX() * p21.getX() + p13.getY() * p21.getY() + p13.getZ() * p21.getZ();
-		d4343 = p43.getX() * p43.getX() + p43.getY() * p43.getY() + p43.getZ() * p43.getZ();
-		d2121 = p21.getX() * p21.getX() + p21.getY() * p21.getY() + p21.getZ() * p21.getZ();
-
-		denom = d2121 * d4343 - d4321 * d4321;
-		if (Math.abs(denom) < EPS)
-			return null;
-		numer = d1343 * d4321 - d1321 * d4343;
-
-		final double mua = numer / denom;
-		final Vector3 pa = new Vector3(p1.getX() + mua * p21.getX(), p1.getY() + mua * p21.getY(), p1.getZ() + mua * p21.getZ());
-
-		return pa;
 	}
 
 	protected PickedHousePart pick(final int x, final int y, final Class<?>[] typesOfHousePart) {

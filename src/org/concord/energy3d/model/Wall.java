@@ -183,9 +183,9 @@ public class Wall extends HousePart {
 						if (secondClosesPoint.distance(p) > container.points.get(i).distance(p) && container.points.get(i) != closesPoint)
 							secondClosesPoint = container.points.get(i);
 					final Vector3 dir = closesPoint.subtract(secondClosesPoint, null).normalizeLocal();
-					p = closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
+					p = MeshLib.closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
 					p = grid(p, getAbsPoint(editPointIndex == -1 ? points.size() - 2 : editPointIndex), getGridSize());
-					p = closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
+					p = MeshLib.closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
 					p.setX(MathUtils.clamp(p.getX(), Math.min(container.points.get(0).getX(), container.points.get(2).getX()), Math.max(container.points.get(0).getX(), container.points.get(2).getX())));
 					p.setY(MathUtils.clamp(p.getY(), Math.min(container.points.get(0).getY(), container.points.get(1).getY()), Math.max(container.points.get(0).getY(), container.points.get(1).getY())));
 					p.getZ();
@@ -215,7 +215,7 @@ public class Wall extends HousePart {
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
 			final int lower = (editPointIndex == 1) ? 0 : 2;
 			final Vector3 base = getAbsPoint(lower);
-			Vector3 closestPoint = closestPoint(base, Vector3.UNIT_Z, x, y);
+			Vector3 closestPoint = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
 			final boolean snapWall = snapWall(closestPoint, lower);
 			if (!snapWall)
 				closestPoint = grid(closestPoint, getAbsPoint(editPointIndex), getGridSize());

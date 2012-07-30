@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.util.MeshLib;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 
@@ -10,6 +11,7 @@ import com.ardor3d.math.Plane;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class CustomRoof extends Roof {
@@ -27,7 +29,7 @@ public class CustomRoof extends Roof {
 			pickContainer(x, y, Wall.class);
 		} else if (editPointIndex == 0) {
 			final ReadOnlyVector3 base = getCenter();
-			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
+			Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
 			if (p == null)
 				return;
 			p = grid(p, getAbsPoint(editPointIndex), getGridSize());
@@ -40,13 +42,17 @@ public class CustomRoof extends Roof {
 			Vector3 p = new Vector3();
 			if (pickRay.intersectsPlane(new Plane(Vector3.UNIT_Z, points.get(0).getZ()), p)) {
 				p = grid(p, getAbsPoint(editPointIndex), getGridSize(), false);
+				final ReadOnlyVector2 p2D = MeshLib.snapToPolygon(p, wallUpperPoints);
+				p.set(p2D.getX(), p2D.getY(), p.getZ());
 				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 			}
 		}
-		draw();
-		drawWalls();
 		if (container != null)
 			setEditPointsVisible(true);
+		draw();
+		drawWalls();
+//		if (container != null)
+//			setEditPointsVisible(true);
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.util.ArrayList;
 
+import org.concord.energy3d.util.MeshLib;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 
@@ -23,7 +24,7 @@ public class PyramidRoof extends Roof {
 			recalculateEditPoints = true;;
 		} else {
 			final ReadOnlyVector3 base = new Vector3(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getCenter().getZ());
-			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
+			Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ());
 		}

@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.util.ArrayList;
 
+import org.concord.energy3d.util.MeshLib;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 
@@ -23,11 +24,11 @@ public class HipRoof extends Roof {
 			recalculateEditPoints = true;
 		} else if (editPointIndex == 0) {
 			final ReadOnlyVector3 base = getCenter();
-			Vector3 p = closestPoint(base, Vector3.UNIT_Z, x, y);
+			Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
 			p = grid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ());
 		} else if (editPointIndex == 1 || editPointIndex == 2) {
-			Vector3 p = closestPoint(getAbsPoint(editPointIndex), Vector3.UNIT_Y, x, y);
+			Vector3 p = MeshLib.closestPoint(getAbsPoint(editPointIndex), Vector3.UNIT_Y, x, y);
 			p = grid(p, getAbsPoint(editPointIndex), getGridSize(), false);
 			points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 		}

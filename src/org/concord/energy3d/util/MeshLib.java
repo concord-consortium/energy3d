@@ -6,8 +6,10 @@ import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
+import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.transform.coordinate.XYToAnyTransform;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
@@ -19,8 +21,10 @@ import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -371,47 +375,47 @@ public class MeshLib {
 		// }
 		// }
 
-//		if (polygon.getHoles() != null)
-//			for (final Polygon hole : polygon.getHoles()) {
-//				for (int i = 0; i < 4; i++) {
-////				for (final TriangulationPoint p : hole.getPoints()) {
-//					final TriangulationPoint p = hole.getPoints().get(i);
-//					if (!insidePolygon(polygon, p)) {
-//						p.set(p.getX() , p.getY() + 0.1, p.getZ());
-//						final int ii;
-//						if (i == 0)
-//							ii = 1;
-//						else if (i == 1)
-//							ii = 0;
-//						else if (i == 2)
-//							ii = 3;
-//						else
-//							ii = 2;
-//						final TriangulationPoint p2 = hole.getPoints().get(ii);
-//						p2.set(p2.getX(), p2.getY() + 0.1, p2.getZ());
-////						System.err.println("Hole outside wall!");
-//					}
-//				}
-//			}
+		// if (polygon.getHoles() != null)
+		// for (final Polygon hole : polygon.getHoles()) {
+		// for (int i = 0; i < 4; i++) {
+		// // for (final TriangulationPoint p : hole.getPoints()) {
+		// final TriangulationPoint p = hole.getPoints().get(i);
+		// if (!insidePolygon(polygon, p)) {
+		// p.set(p.getX() , p.getY() + 0.1, p.getZ());
+		// final int ii;
+		// if (i == 0)
+		// ii = 1;
+		// else if (i == 1)
+		// ii = 0;
+		// else if (i == 2)
+		// ii = 3;
+		// else
+		// ii = 2;
+		// final TriangulationPoint p2 = hole.getPoints().get(ii);
+		// p2.set(p2.getX(), p2.getY() + 0.1, p2.getZ());
+		// // System.err.println("Hole outside wall!");
+		// }
+		// }
+		// }
 
 		try {
 			Poly2Tri.triangulate(polygon);
 		} catch (final RuntimeException e) {
-//			e.printStackTrace();
-//			System.out.println("Triangulate exception received with the following polygon:");
-//			System.out.println("final Polygon polygon = new Polygon(new PolygonPoint[] {");
-//			for (final TriangulationPoint p : polygon.getPoints())
-//				System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
-//			System.out.println("});");
-//
-//			System.out.println("Polygon hole;");
-//			for (final Polygon hole : polygon.getHoles()) {
-//				System.out.println("hole = new Polygon(new PolygonPoint[] {");
-//				for (final TriangulationPoint p : hole.getPoints())
-//					System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
-//				System.out.println("});");
-//				System.out.println("polygon.addHole(hole);");
-//			}
+			// e.printStackTrace();
+			// System.out.println("Triangulate exception received with the following polygon:");
+			// System.out.println("final Polygon polygon = new Polygon(new PolygonPoint[] {");
+			// for (final TriangulationPoint p : polygon.getPoints())
+			// System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
+			// System.out.println("});");
+			//
+			// System.out.println("Polygon hole;");
+			// for (final Polygon hole : polygon.getHoles()) {
+			// System.out.println("hole = new Polygon(new PolygonPoint[] {");
+			// for (final TriangulationPoint p : hole.getPoints())
+			// System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
+			// System.out.println("});");
+			// System.out.println("polygon.addHole(hole);");
+			// }
 
 			throw e;
 		}
@@ -453,5 +457,77 @@ public class MeshLib {
 			return false;
 		else
 			return true;
+	}
+
+	public static Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 v1, final int x, final int y) {
+		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
+		final Vector3 closest = closestPoint(p1, v1, pickRay.getOrigin(), pickRay.getDirection());
+		return closest;
+	}
+
+	public static Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 p21, final ReadOnlyVector3 p3, final ReadOnlyVector3 p43) {
+		final double EPS = 0.0001;
+		Vector3 p13;
+		double d1343, d4321, d1321, d4343, d2121;
+		double numer, denom;
+
+		p13 = p1.subtract(p3, null);
+		if (Math.abs(p43.getX()) < EPS && Math.abs(p43.getY()) < EPS && Math.abs(p43.getZ()) < EPS)
+			return null;
+		if (Math.abs(p21.length()) < EPS)
+			return null;
+
+		d1343 = p13.getX() * p43.getX() + p13.getY() * p43.getY() + p13.getZ() * p43.getZ();
+		d4321 = p43.getX() * p21.getX() + p43.getY() * p21.getY() + p43.getZ() * p21.getZ();
+		d1321 = p13.getX() * p21.getX() + p13.getY() * p21.getY() + p13.getZ() * p21.getZ();
+		d4343 = p43.getX() * p43.getX() + p43.getY() * p43.getY() + p43.getZ() * p43.getZ();
+		d2121 = p21.getX() * p21.getX() + p21.getY() * p21.getY() + p21.getZ() * p21.getZ();
+
+		denom = d2121 * d4343 - d4321 * d4321;
+		if (Math.abs(denom) < EPS)
+			return null;
+		numer = d1343 * d4321 - d1321 * d4343;
+
+		final double mua = numer / denom;
+		final Vector3 pa = new Vector3(p1.getX() + mua * p21.getX(), p1.getY() + mua * p21.getY(), p1.getZ() + mua * p21.getZ());
+
+		return pa;
+	}
+
+	public static Vector2 closestPoint(final ReadOnlyVector2 v, final ReadOnlyVector2 w, final ReadOnlyVector2 p) {
+		final double l2 = v.distanceSquared(w);
+		if (l2 == 0.0)
+			return v.clone();
+		final double t = p.subtract(v, null).dot(w.subtract(v, null)) / l2; // dot(p - v, w - v) / l2;
+		if (t < 0.0)
+			return v.clone();
+		else if (t > 1.0)
+			return w.clone();
+		else
+			return w.subtract(v, null).multiplyLocal(t).addLocal(v); // v + t * (w - v);
+	}
+
+	public static Vector2 snapToPolygon(final ReadOnlyVector3 point, final List<PolygonPoint> polygon) {
+		final Vector2 p = new Vector2(point.getX(), point.getY());
+		final Vector2 l1 = new Vector2();
+		final Vector2 l2 = new Vector2();
+		double shortestDistance = Double.MAX_VALUE;
+		Vector2 closestPoint = null;
+		final int n = polygon.size();
+		for (int i = 0; i < n; i++) {
+			final PolygonPoint pp1 = polygon.get(i);
+			l1.set(pp1.getX(), pp1.getY());
+			final PolygonPoint pp2 = polygon.get((i + 1) % n);
+			l2.set(pp2.getX(), pp2.getY());
+			if (l1.distanceSquared(l2) > MathUtils.ZERO_TOLERANCE) {
+				final Vector2 pointOnLine = closestPoint(l1, l2, p);
+				final double distance = pointOnLine.distanceSquared(p);
+				if (distance < shortestDistance) {
+					shortestDistance = distance;
+					closestPoint = pointOnLine;
+				}
+			}
+		}
+		return closestPoint;
 	}
 }
