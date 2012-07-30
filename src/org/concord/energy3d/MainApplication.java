@@ -1,8 +1,5 @@
 package org.concord.energy3d;
 
-import java.io.File;
-import java.net.MalformedURLException;
-
 import javax.swing.UIManager;
 
 import org.concord.energy3d.gui.MainFrame;
@@ -33,18 +30,13 @@ public class MainApplication {
 			e.printStackTrace();
 		}
 		final SceneManager scene = SceneManager.getInstance();
-		MainFrame.getInstance().setVisible(true);
+		final MainFrame mainFrame = MainFrame.getInstance();
+		mainFrame.setVisible(true);
 		new Thread(scene, "Energy 3D Application").start();
 		Scene.getInstance();
 
-		if (args.length > 1)
-			try {
-				Scene.open(new File(args[1]).toURI().toURL());
-			} catch (final MalformedURLException e) {
-				e.printStackTrace();
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
+		if (!Config.isMac() && args.length > 1)
+			mainFrame.open(args[1]);
 
 //		HandTrackerApplication.main(null);
 	}

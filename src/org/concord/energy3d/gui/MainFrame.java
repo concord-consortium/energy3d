@@ -15,6 +15,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.net.URL;
+import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
@@ -58,7 +59,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class MainFrame extends JFrame {
-	private final static boolean IS_MAC = System.getProperty("os.name").startsWith("Mac");
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
 	private JFileChooser fileChooser;
@@ -245,7 +245,7 @@ public class MainFrame extends JFrame {
 		setJMenuBar(getAppMenuBar());
 		setContentPane(getMainPanel());
 
-		if (IS_MAC) {
+		if (Config.isMac()) {
 			final Application anApp = new Application();
 			anApp.setEnabledPreferencesMenu(true);
 			anApp.addApplicationListener(new ApplicationAdapter() {
@@ -264,6 +264,11 @@ public class MainFrame extends JFrame {
 				public void handleAbout(final ApplicationEvent e) {
 					showAbout();
 					e.setHandled(true);
+				}
+
+				@Override
+				public void handleOpenFile(final ApplicationEvent event) {
+					open(event.getFilename());
 				}
 			});
 		}
@@ -398,7 +403,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getOpenMenuItem() {
 		if (openMenuItem == null) {
 			openMenuItem = new JMenuItem("Open...");
-			openMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));
+			openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
@@ -409,9 +414,7 @@ public class MainFrame extends JFrame {
 							Scene.open(fileChooser.getSelectedFile().toURI().toURL());
 							updateTitleBar();
 						} catch (final Throwable err) {
-							err.printStackTrace();
-							final String message = err.getMessage();
-							JOptionPane.showMessageDialog(MainFrame.this, message != null ? message : "Unexpected error occured!", "Error", JOptionPane.ERROR_MESSAGE);
+							showUnexpectedErrorMessage(err);
 						}
 					}
 				}
@@ -420,7 +423,7 @@ public class MainFrame extends JFrame {
 		return openMenuItem;
 	}
 
-	protected void updateTitleBar() {
+	private void updateTitleBar() {
 		if (Scene.getURL() == null)
 			setTitle("Energy3D v" + Config.VERSION);
 		else
@@ -435,7 +438,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getSaveMenuItem() {
 		if (saveMenuItem == null) {
 			saveMenuItem = new JMenuItem("Save");
-			saveMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK));
+			saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
 			saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
@@ -463,7 +466,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getPrintMenuItem() {
 		if (printMenuItem == null) {
 			printMenuItem = new JMenuItem("Print...");
-			printMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_MASK));
+			printMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
 			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
@@ -631,7 +634,7 @@ public class MainFrame extends JFrame {
 		if (helpMenu == null) {
 			helpMenu = new JMenu();
 			helpMenu.setText("Help");
-			if (!IS_MAC)
+			if (!Config.isMac())
 				helpMenu.add(getAboutMenuItem());
 		}
 		return helpMenu;
@@ -892,7 +895,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getUndoMenuItem() {
 		if (undoMenuItem == null) {
 			undoMenuItem = new JMenuItem("Undo");
-			undoMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
+			undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
 			undoMenuItem.setEnabled(false);
 			undoMenuItem.addActionListener(new ActionListener() {
 				@Override
@@ -910,7 +913,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getRedoMenuItem() {
 		if (redoMenuItem == null) {
 			redoMenuItem = new JMenuItem("Redo");
-			redoMenuItem.setAccelerator(IS_MAC ? KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.META_MASK) : KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
+			redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
 			redoMenuItem.setEnabled(false);
 			redoMenuItem.addActionListener(new ActionListener() {
 				@Override
@@ -1334,5 +1337,26 @@ public class MainFrame extends JFrame {
 		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final JDialog colorDialog = JColorChooser.createDialog(MainFrame.this, "Select House Color", true, colorChooser, actionListener, null);
 		colorDialog.setVisible(true);
+	}
+
+	public void showUnexpectedErrorMessage(final Throwable err) {
+		err.printStackTrace();
+		final String message = err.getMessage();
+		JOptionPane.showMessageDialog(this, message != null ? message : "Unexpected error occured!", "Error", JOptionPane.ERROR_MESSAGE);
+	}
+
+	public void open(final String filename) {
+		try {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					Scene.open(new File(filename).toURI().toURL());
+					updateTitleBar();
+					return null;
+				}
+			});
+		} catch (final Throwable e) {
+			showUnexpectedErrorMessage(e);
+		}
 	}
 }
