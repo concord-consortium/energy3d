@@ -1124,6 +1124,7 @@ Version 0.5 - October 20, 2011
 - add feature in Mac OS X for opening models by double-clicking on files or dragging files to application icon
 - snap roof point to polygon that is constituted by attached walls 
 - snap roof point to polygon of walls only if the user dragged point is no longer inside the boundary polygon
+- instead of working with polygon and converting to Vector3 when needed, work with Vector3 and convert to polygon once at the end
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from

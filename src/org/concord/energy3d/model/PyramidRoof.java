@@ -1,10 +1,10 @@
 package org.concord.energy3d.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.util.MeshLib;
 import org.poly2tri.geometry.polygon.Polygon;
-import org.poly2tri.geometry.polygon.PolygonPoint;
+import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -35,18 +35,13 @@ public class PyramidRoof extends Roof {
 	}
 
 	@Override
-	protected Polygon makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {
-		final Polygon polygon = new Polygon(wallUpperPoints);
-		for (int i = 0; i < points.size(); i++) {
-			final Vector3 abspoint = getAbsPoint(i);
-			polygon.addSteinerPoint(new PolygonPoint(abspoint.getX(), abspoint.getY(), abspoint.getZ()));
-		}
+	protected Polygon applySteinerPoint(final Polygon polygon) {
+		polygon.addSteinerPoint(new ArdorVector3PolygonPoint(getAbsPoint(0)));
 		return polygon;
 	}
 
 	@Override
-	protected void processRoofPoints(final ArrayList<PolygonPoint> wallUpperPoints, final ArrayList<ReadOnlyVector3> wallNormals) {
-		super.processRoofPoints(wallUpperPoints, wallNormals);
+	protected void processRoofPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
 		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {
 			points.get(0).set(center.getX(), center.getY(), center.getZ() + height);

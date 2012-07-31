@@ -1,10 +1,11 @@
 package org.concord.energy3d.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.util.MeshLib;
 import org.poly2tri.geometry.polygon.Polygon;
-import org.poly2tri.geometry.polygon.PolygonPoint;
+import org.poly2tri.triangulation.TriangulationPoint;
+import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -40,12 +41,9 @@ public class HipRoof extends Roof {
 	}
 
 	@Override
-	protected Polygon makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {
-		final Polygon polygon = new Polygon(wallUpperPoints);
-		final Vector3 p1 = getAbsPoint(1);
-		final PolygonPoint roofUpperPoint1 = new PolygonPoint(p1.getX(), p1.getY(), p1.getZ());
-		final Vector3 p2 = getAbsPoint(2);
-		final PolygonPoint roofUpperPoint2 = new PolygonPoint(p2.getX(), p2.getY(), p2.getZ());
+	protected Polygon applySteinerPoint(final Polygon polygon) {
+		final TriangulationPoint roofUpperPoint1 = new ArdorVector3PolygonPoint(getAbsPoint(1));
+		final TriangulationPoint roofUpperPoint2 = new ArdorVector3PolygonPoint(getAbsPoint(2));
 		polygon.addSteinerPoint(roofUpperPoint1);
 		if (!roofUpperPoint2.equals(roofUpperPoint1))
 			polygon.addSteinerPoint(roofUpperPoint2);
@@ -53,8 +51,7 @@ public class HipRoof extends Roof {
 	}
 
 	@Override
-	protected void processRoofPoints(final ArrayList<PolygonPoint> wallUpperPoints, final ArrayList<ReadOnlyVector3> wallNormals) {
-		super.processRoofPoints(wallUpperPoints, wallNormals);
+	protected void processRoofPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
 		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {
 			// upper points

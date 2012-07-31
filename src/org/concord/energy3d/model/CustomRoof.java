@@ -1,12 +1,12 @@
 package org.concord.energy3d.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.MeshLib;
 import org.poly2tri.geometry.polygon.Polygon;
-import org.poly2tri.geometry.polygon.PolygonPoint;
-import org.poly2tri.triangulation.point.ardor3d.ArdorVector3Point;
+import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Ray3;
@@ -43,7 +43,7 @@ public class CustomRoof extends Roof {
 			Vector3 p = new Vector3();
 			if (pickRay.intersectsPlane(new Plane(Vector3.UNIT_Z, points.get(0).getZ()), p)) {
 				p = grid(p, getAbsPoint(editPointIndex), getGridSize(), false);
-				if (!MeshLib.insidePolygon(new ArdorVector3Point(p), wallUpperPoints)) {
+				if (!MeshLib.insidePolygon(p, wallUpperPoints)) {
 					final ReadOnlyVector2 p2D = MeshLib.snapToPolygon(p, wallUpperPoints, wallNormals);
 					p.set(p2D.getX(), p2D.getY(), p.getZ());
 				}
@@ -59,23 +59,20 @@ public class CustomRoof extends Roof {
 	}
 
 	@Override
-	protected Polygon makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {
-		final Polygon polygon = new Polygon(wallUpperPoints);
-		final ArrayList<ReadOnlyVector3> steinerPoints = new ArrayList<ReadOnlyVector3>(points.size());
+	protected Polygon applySteinerPoint(final Polygon polygon) {
+		final ArrayList<Vector3> steinerPoints = new ArrayList<Vector3>(points.size());
 		for (int i = 1; i < points.size(); i++) {
 			final Vector3 p = getAbsPoint(i);
-			if (!steinerPoints.contains(p))
+			if (!steinerPoints.contains(p)) {
 				steinerPoints.add(p);
+				polygon.addSteinerPoint(new ArdorVector3PolygonPoint(p));
+			}
 		}
-		for (final ReadOnlyVector3 p : steinerPoints)
-			polygon.addSteinerPoint(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		return polygon;
 	}
 
 	@Override
-	protected void processRoofPoints(final ArrayList<PolygonPoint> wallUpperPoints, final ArrayList<ReadOnlyVector3> wallNormals) {
-		super.processRoofPoints(wallUpperPoints, wallNormals);
-
+	protected void processRoofPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
 			points.clear();
@@ -86,8 +83,8 @@ public class CustomRoof extends Roof {
 			final double z = container.getPoints().get(1).getZ() + height;
 			if (wallUpperPoints.size() > points.size()) {
 				for (int i = 0; i < wallUpperPoints.size() - 1; i++) {
-					final PolygonPoint p1 = wallUpperPoints.get(i);
-					final PolygonPoint p2 = wallUpperPoints.get(i + 1);
+					final ReadOnlyVector3 p1 = wallUpperPoints.get(i);
+					final ReadOnlyVector3 p2 = wallUpperPoints.get(i + 1);
 					// middle of wall = (p1 + p2) / 2
 					final Vector3 v = new Vector3(p1.getX() + p2.getX(), p1.getY() + p2.getY(), 0).multiplyLocal(0.5);
 					v.setZ(z);

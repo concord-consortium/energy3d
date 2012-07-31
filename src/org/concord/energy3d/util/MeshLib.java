@@ -9,8 +9,6 @@ import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
-import org.poly2tri.geometry.polygon.PolygonPoint;
-import org.poly2tri.geometry.primitives.Point;
 import org.poly2tri.transform.coordinate.XYToAnyTransform;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
@@ -428,11 +426,11 @@ public class MeshLib {
 		mesh.updateModelBound();
 	}
 
-	public static boolean insidePolygon(final Point p, final List<? extends Point> polygon) {
+	public static boolean insidePolygon(final ReadOnlyVector3 p, final List<? extends ReadOnlyVector3> polygon) {
 		int counter = 0;
 		int i;
 		double xinters;
-		Point p1, p2;
+		ReadOnlyVector3 p1, p2;
 
 		final int n = polygon.size();
 		p1 = polygon.get(0);
@@ -506,7 +504,7 @@ public class MeshLib {
 			return w.subtract(v, null).multiplyLocal(t).addLocal(v); // v + t * (w - v);
 	}
 
-	public static Vector2 snapToPolygon(final ReadOnlyVector3 point, final List<PolygonPoint> polygon, final ArrayList<ReadOnlyVector3> wallNormals) {
+	public static Vector2 snapToPolygon(final ReadOnlyVector3 point, final List<? extends ReadOnlyVector3> polygon, final List<? extends ReadOnlyVector3> wallNormals) {
 		final Vector2 p = new Vector2(point.getX(), point.getY());
 		final Vector2 l1 = new Vector2();
 		final Vector2 l2 = new Vector2();
@@ -515,9 +513,9 @@ public class MeshLib {
 		ReadOnlyVector3 closestNormal = null;
 		final int n = polygon.size();
 		for (int i = 0; i < n; i++) {
-			final PolygonPoint pp1 = polygon.get(i);
+			final ReadOnlyVector3 pp1 = polygon.get(i);
 			l1.set(pp1.getX(), pp1.getY());
-			final PolygonPoint pp2 = polygon.get((i + 1) % n);
+			final ReadOnlyVector3 pp2 = polygon.get((i + 1) % n);
 			l2.set(pp2.getX(), pp2.getY());
 			if (l1.distanceSquared(l2) > MathUtils.ZERO_TOLERANCE) {
 				final Vector2 pointOnLine = closestPoint(l1, l2, p);

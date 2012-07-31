@@ -15,12 +15,12 @@ import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
-import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.geometry.primitives.Point;
 import org.poly2tri.transform.coordinate.AnyToXYTransform;
 import org.poly2tri.transform.coordinate.XYToAnyTransform;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
+import org.poly2tri.triangulation.point.ardor3d.ArdorVector3Point;
 import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
@@ -62,13 +62,15 @@ public class Wall extends HousePart {
 	private transient Mesh windowsSurroundMesh;
 	private transient Mesh wireframeMesh;
 	private transient Roof roof;
-	private transient ArrayList<Vector3> wallPolygonPoints;
 	private transient int visitStamp;
-	private transient Polygon polygon;
 	private final double wallThickness = 0.05;
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
+	private transient Vector3 normal;
+	private transient AnyToXYTransform toXY;
+	private transient XYToAnyTransform fromXY;
+	private transient List<ArrayList<Vector3>> wallAndWindowsPoints;
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -243,7 +245,7 @@ public class Wall extends HousePart {
 
 	@Override
 	public void complete() {
-		drawThisAndNeighbors(true);	//TODO is this necessary
+		drawThisAndNeighbors(true); // TODO is this necessary
 		super.complete();
 	}
 
@@ -320,61 +322,38 @@ public class Wall extends HousePart {
 		if (!isDrawable())
 			return;
 
-		final Vector3 normal = computeNormal();
-		polygon = extendToRoof(computeWallAndWindowPolygon(false));
+		computeNormalAndXYTransform();
 
-		wallPolygonPoints = extractPolygonPoints(polygon);
-
-		drawWireframe(wallPolygonPoints, extractPolygonHoles(polygon));
-
-		toXY(polygon);
-
-		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
-		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
-
-		final Vector3 p01 = getAbsPoint(1).subtract(getAbsPoint(0), null).normalizeLocal();
-		final Vector3 p02 = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
-		final TPoint o = new TPoint(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getAbsPoint(0).getZ());
-		final TPoint u = new TPoint(p01.getX(), p01.getY(), p01.getZ());
-		final TPoint v = new TPoint(p02.getX(), p02.getY(), p02.getZ());
-
-		toXY.transform(o);
-		toXY.transform(u);
+		wallAndWindowsPoints = computeWallAndWindowPolygon(false);
+		extendToRoof(wallAndWindowsPoints.get(0));
 
 		if (Scene.getInstance().isDrawThickness() && isShortWall) {
 			final Vector3 dir = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
 
 			if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted()) {
 				if (isPerpendicularToNeighbor(0))
-					reduceBackMeshWidth(polygon, dir, 0);
+					reduceBackMeshWidth(wallAndWindowsPoints.get(0), dir, 0);
 			}
 
 			if (neighbors[1] != null && neighbors[1].getNeighborOf(this).isFirstPointInserted()) {
 				dir.normalizeLocal().negateLocal();
 				if (isPerpendicularToNeighbor(1))
-					reduceBackMeshWidth(polygon, dir, 1);
+					reduceBackMeshWidth(wallAndWindowsPoints.get(0), dir, 1);
 			}
 		}
 
-		// Poly2Tri.triangulate(polygon);
-		// ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
-		// ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
-		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.1 : 1.0;
-		// ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale, o, u, v);
-		// mesh.getMeshData().updateVertexCount();
-		// mesh.updateModelBound();
-
-		MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, scale, o, u, v);
+		drawPolygon(wallAndWindowsPoints, mesh, true);
+		drawWireframe(wallAndWindowsPoints);
 
 		/* draw invisibleMesh */
-		final Polygon invisiblePolygon = new Polygon(ArdorVector3PolygonPoint.toPoints(extractPolygonPoints(polygon)));
+		final Polygon invisiblePolygon = new Polygon(ArdorVector3PolygonPoint.toPoints(wallAndWindowsPoints.get(0)));
 		Poly2Tri.triangulate(invisiblePolygon);
 		ArdorMeshMapper.updateTriangleMesh(invisibleMesh, invisiblePolygon, fromXY);
 		invisibleMesh.getMeshData().updateVertexCount();
 		CollisionTreeManager.INSTANCE.updateCollisionTree(invisibleMesh);
 		invisibleMesh.updateModelBound();
 
-		drawBackMesh(computeWallAndWindowPolygon(true), fromXY);
+		drawBackMesh(computeWallAndWindowPolygon(true));
 		drawSurroundMesh(thicknessNormal);
 		drawWindowsSurroundMesh(thicknessNormal);
 
@@ -387,9 +366,37 @@ public class Wall extends HousePart {
 		root.updateWorldBound(true);
 	}
 
-	private void drawWireframe(final ArrayList<? extends ReadOnlyVector3> wallPolygonPoints, final ArrayList<ReadOnlyVector3> wallPolygonHoles) {
+	private void drawPolygon(final List<ArrayList<Vector3>> wallAndWindowsPoints, final Mesh mesh, final boolean texture) {
+		final Polygon polygon = new Polygon(ArdorVector3PolygonPoint.toPoints(wallAndWindowsPoints.get(0)));
+		for (int i = 1; i < wallAndWindowsPoints.size(); i++)
+			polygon.addHole(new Polygon(ArdorVector3PolygonPoint.toPoints(wallAndWindowsPoints.get(i))));
+
+		// toXY(polygon);
+		for (final TriangulationPoint tp : polygon.getPoints())
+			toXY.transform(tp);
+		if (polygon.getHoles() != null)
+			for (final Polygon hole : polygon.getHoles())
+				for (final TriangulationPoint tp : hole.getPoints())
+					toXY.transform(tp);
+
+		if (texture) {
+			final Vector3 p01 = getAbsPoint(1).subtract(getAbsPoint(0), null).normalizeLocal();
+			final Vector3 p02 = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
+			final TPoint o = new TPoint(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getAbsPoint(0).getZ());
+			final TPoint u = new TPoint(p01.getX(), p01.getY(), p01.getZ());
+			final TPoint v = new TPoint(p02.getX(), p02.getY(), p02.getZ());
+			toXY.transform(o);
+			toXY.transform(u);
+			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.1 : 1.0;
+			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, scale, o, u, v);
+		} else
+			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY);
+	}
+
+	private void drawWireframe(final List<ArrayList<Vector3>> wallAndWindowsPoints) {
+		final ArrayList<Vector3> wallPolygonPoints = wallAndWindowsPoints.get(0);
 		FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
-		final int requiredSize = 2 * (wallPolygonPoints.size() + wallPolygonHoles.size());
+		final int requiredSize = 2 * (wallPolygonPoints.size() + (wallAndWindowsPoints.size() - 1) * 4);
 		if (wireframeVertexBuffer.capacity() / 3 < requiredSize) {
 			wireframeVertexBuffer = BufferUtils.createVector3Buffer(requiredSize);
 			wireframeMesh.getMeshData().setVertexBuffer(wireframeVertexBuffer);
@@ -406,10 +413,11 @@ public class Wall extends HousePart {
 			wireframeVertexBuffer.put(point.getXf()).put(point.getYf()).put(point.getZf());
 		}
 
-		for (int i = 0; i < wallPolygonHoles.size() / 4; i++) {
-			prev = wallPolygonHoles.get(i * 4 + 3);
+		for (int i = 1; i < wallAndWindowsPoints.size(); i++) {
+			final ArrayList<Vector3> windowHolePoints = wallAndWindowsPoints.get(i);
+			prev = windowHolePoints.get(3);
 			for (int j = 0; j < 4; j++) {
-				final ReadOnlyVector3 point = wallPolygonHoles.get(i * 4 + j);
+				final ReadOnlyVector3 point = windowHolePoints.get(j);
 				wireframeVertexBuffer.put(prev.getXf()).put(prev.getYf()).put(prev.getZf());
 				prev = point;
 				wireframeVertexBuffer.put(point.getXf()).put(point.getYf()).put(point.getZf());
@@ -421,78 +429,60 @@ public class Wall extends HousePart {
 		wireframeMesh.setTranslation(getFaceDirection().multiply(0.001, null));
 	}
 
-	public Polygon computeWallAndWindowPolygon(final boolean backMesh) {
-		final ArrayList<PolygonPoint> polygonPoints = new ArrayList<PolygonPoint>();
+	public List<ArrayList<Vector3>> computeWallAndWindowPolygon(final boolean backMesh) {
+		final List<ArrayList<Vector3>> polygonPoints = new ArrayList<ArrayList<Vector3>>();
 		final ReadOnlyVector3 trans = backMesh ? getThicknessNormal() : Vector3.ZERO;
 		// Start the polygon with (1) then 0, 2, 3, [roof points] so that roof points are appended to the end of vertex list
-		addPolygonPoint(polygonPoints, this, 1, trans);
-		addPolygonPoint(polygonPoints, this, 0, trans);
-		addPolygonPoint(polygonPoints, this, 2, trans);
-		addPolygonPoint(polygonPoints, this, 3, trans);
-		final Polygon polygon = new Polygon(polygonPoints);
+		final ArrayList<Vector3> wallPoints = new ArrayList<Vector3>(4);
+		addPolygonPoint(wallPoints, this, 1, trans);
+		addPolygonPoint(wallPoints, this, 0, trans);
+		addPolygonPoint(wallPoints, this, 2, trans);
+		addPolygonPoint(wallPoints, this, 3, trans);
+		polygonPoints.add(wallPoints);
 
 		// Add window holes
 		for (final HousePart child : children) {
-			if (child instanceof Window && includeWindow(child)) {
-				final Polygon hole = computeWindowHole(child, trans);
-				polygon.addHole(hole);
-			}
+			if (child instanceof Window && includeWindow(child))
+				polygonPoints.add(computeWindowHole(child, trans));
 		}
-		return polygon;
+		return polygonPoints;
 	}
 
-	private Polygon computeWindowHole(final HousePart window, final ReadOnlyVector3 trans) {
-		final ArrayList<PolygonPoint> holePoints = new ArrayList<PolygonPoint>();
-		addPolygonPoint(holePoints, window, 1, trans);
-		addPolygonPoint(holePoints, window, 0, trans);
-		addPolygonPoint(holePoints, window, 2, trans);
-		addPolygonPoint(holePoints, window, 3, trans);
-		final Polygon hole = new Polygon(holePoints);
-		return hole;
+	private ArrayList<Vector3> computeWindowHole(final HousePart window, final ReadOnlyVector3 trans) {
+		final ArrayList<Vector3> windowPoints = new ArrayList<Vector3>(4);
+		addPolygonPoint(windowPoints, window, 1, trans);
+		addPolygonPoint(windowPoints, window, 0, trans);
+		addPolygonPoint(windowPoints, window, 2, trans);
+		addPolygonPoint(windowPoints, window, 3, trans);
+		return windowPoints;
 	}
 
-	private void addPolygonPoint(final ArrayList<PolygonPoint> points, final HousePart housePart, final int index, final ReadOnlyVector3 trans) {
-		final ReadOnlyVector3 p = housePart.getAbsPoint(index).addLocal(trans);
-		points.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
+	private void addPolygonPoint(final List<Vector3> points, final HousePart housePart, final int index, final ReadOnlyVector3 trans) {
+		points.add(housePart.getAbsPoint(index).addLocal(trans));
 	}
 
-	private Polygon toXY(final Polygon polygon) {
-		final Vector3 normal = computeNormal();
-		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
-
-		for (final TriangulationPoint tp : polygon.getPoints())
-			toXY.transform(tp);
-
-		if (polygon.getHoles() != null)
-			for (final Polygon hole : polygon.getHoles()) {
-				for (final TriangulationPoint tp : hole.getPoints())
-					toXY.transform(tp);
-			}
-		return polygon;
-	}
-
-	private Polygon extendToRoof(final Polygon polygon) {
+	private void extendToRoof(final List<Vector3> polygon) {
 		if (!extendToRoofEnabled)
-			return polygon;
+			return;
 
 		final int[] upper = { 0, 3 };
 
 		for (final int i : upper) {
-			final TriangulationPoint tp = polygon.getPoints().get(i);
-			tp.set(tp.getX(), tp.getY(), findRoofIntersection(new Vector3(tp.getX(), tp.getY(), tp.getZ())));
+			final Vector3 tp = polygon.get(i);
+			tp.set(tp.getX(), tp.getY(), findRoofIntersection(tp));
 		}
 
-		TriangulationPoint tp = polygon.getPoints().get(0);
-		final Vector3 o = new Vector3(tp.getX(), tp.getY(), tp.getZ());
-		tp = polygon.getPoints().get(3);
-		final Vector3 dir = new Vector3(tp.getX(), tp.getY(), tp.getZ()).subtract(o, null);
+		Vector3 tp = polygon.get(0);
+		final ReadOnlyVector3 o = tp;
+		tp = polygon.get(3);
+		final Vector3 dir = tp.subtract(o, null);
 		dir.setZ(0);
 		final double length = dir.length();
 		dir.normalizeLocal();
 
 		if (roof != null) {
 			Vector3 direction = null;
-			ReadOnlyVector3 previousStretchPoint = new Vector3(polygon.getPoints().get(3).getX(), polygon.getPoints().get(3).getY(), polygon.getPoints().get(3).getZ());
+			ReadOnlyVector3 previousStretchPoint = polygon.get(3);
 
 			final double step = 0.01;
 			for (double d = length - step; d > step; d -= step) {
@@ -506,29 +496,12 @@ public class Wall extends HousePart {
 					direction = currentDirection;
 				} else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE) {
 					direction = null;
-					polygon.getPoints().add(new PolygonPoint(p.getX(), p.getY(), findRoofIntersection));
+					p.setZ(findRoofIntersection);
+					polygon.add(p);
 				}
 				previousStretchPoint = currentStretchPoint;
 			}
 		}
-
-		return polygon;
-	}
-
-	private ArrayList<Vector3> extractPolygonPoints(final Polygon polygon) {
-		final ArrayList<Vector3> gablePoints = new ArrayList<Vector3>();
-		for (int i = 0; i < polygon.getPoints().size(); i++)
-			gablePoints.add(new Vector3(polygon.getPoints().get(i).getX(), polygon.getPoints().get(i).getY(), polygon.getPoints().get(i).getZ()));
-		return gablePoints;
-	}
-
-	private ArrayList<ReadOnlyVector3> extractPolygonHoles(final Polygon polygon) {
-		final ArrayList<ReadOnlyVector3> gablePoints = new ArrayList<ReadOnlyVector3>();
-		if (polygon.getHoles() != null)
-			for (final Polygon hole : polygon.getHoles())
-				for (int i = 0; i < hole.getPoints().size(); i++)
-					gablePoints.add(new Vector3(hole.getPoints().get(i).getX(), hole.getPoints().get(i).getY(), hole.getPoints().get(i).getZ()));
-		return gablePoints;
 	}
 
 	public double findRoofIntersection(final ReadOnlyVector3 p) {
@@ -557,43 +530,32 @@ public class Wall extends HousePart {
 		return window.getPoints().size() >= 4 && window.getAbsPoint(2).subtract(window.getAbsPoint(0), null).length() >= 0.1;
 	}
 
-	private void drawBackMesh(final Polygon polygon, final XYToAnyTransform fromXY) {
+	private void drawBackMesh(final List<ArrayList<Vector3>> polygon) {
 		final Vector3 dir = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
 		if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted() && !(Scene.getInstance().isDrawThickness() && isShortWall && isPerpendicularToNeighbor(0))) {
-			reduceBackMeshWidth(polygon, dir, 0);
+			reduceBackMeshWidth(polygon.get(0), dir, 0);
 		}
 
 		if (neighbors[1] != null && neighbors[1].getNeighborOf(this).isFirstPointInserted() && !(Scene.getInstance().isDrawThickness() && isShortWall && isPerpendicularToNeighbor(1))) {
 			dir.normalizeLocal().negateLocal();
-			reduceBackMeshWidth(polygon, dir, 1);
+			reduceBackMeshWidth(polygon.get(0), dir, 1);
 		}
 
-		enforceRangeAndRemoveDuplicatedGablePoints(polygon);
-		extendToRoof(polygon);
+		enforceGablePointsRangeAndRemoveDuplicatedGablePoints(polygon.get(0));
+		extendToRoof(polygon.get(0));
 
-		toXY(polygon);
-
-		MeshLib.fillMeshWithPolygon(backMesh, polygon, fromXY);
-
-//		Poly2Tri.triangulate(polygon);
-//		ArdorMeshMapper.updateTriangleMesh(backMesh, polygon, fromXY);
-//		ArdorMeshMapper.updateVertexNormals(backMesh, polygon.getTriangles(), fromXY);
-//		backMesh.getMeshData().updateVertexCount();
-//		CollisionTreeManager.INSTANCE.updateCollisionTree(backMesh);
-//		backMesh.updateModelBound();
+		drawPolygon(polygon, backMesh, false);
 	}
 
-	// TODO what does this method do??
-	private Polygon enforceRangeAndRemoveDuplicatedGablePoints(final Polygon polygon) {
-		final List<TriangulationPoint> polygonPoints = polygon.getPoints();
+	private void enforceGablePointsRangeAndRemoveDuplicatedGablePoints(final ArrayList<Vector3> polygonPoints) {
 		final Vector2 min = new Vector2(Math.min(polygonPoints.get(1).getX(), polygonPoints.get(2).getX()), Math.min(polygonPoints.get(1).getY(), polygonPoints.get(2).getY()));
 		final Vector2 max = new Vector2(Math.max(polygonPoints.get(1).getX(), polygonPoints.get(2).getX()), Math.max(polygonPoints.get(1).getY(), polygonPoints.get(2).getY()));
-		for (int i = 4; i < polygon.pointCount(); i++) {
-			final TriangulationPoint tp = polygonPoints.get(i);
+		for (int i = 4; i < polygonPoints.size(); i++) {
+			final Vector3 tp = polygonPoints.get(i);
 			tp.set(Math.max(tp.getX(), min.getX()), Math.max(tp.getY(), min.getY()), tp.getZ());
 			tp.set(Math.min(tp.getX(), max.getX()), Math.min(tp.getY(), max.getY()), tp.getZ());
 			for (int j = 0; j < i; j++) {
-				final TriangulationPoint tpj = polygon.getPoints().get(j);
+				final Vector3 tpj = polygonPoints.get(j);
 				if (Math.abs(tpj.getX() - tp.getX()) < MathUtils.ZERO_TOLERANCE && Math.abs(tpj.getY() - tp.getY()) < MathUtils.ZERO_TOLERANCE) {
 					polygonPoints.remove(i);
 					i--;
@@ -601,10 +563,9 @@ public class Wall extends HousePart {
 				}
 			}
 		}
-		return polygon;
 	}
 
-	private void reduceBackMeshWidth(final Polygon polygon, final ReadOnlyVector3 wallDir, final int neighbor) {
+	private void reduceBackMeshWidth(final ArrayList<Vector3> polygon, final ReadOnlyVector3 wallDir, final int neighbor) {
 		final Snap snap = neighbors[neighbor];
 		final int neighborPointIndex = snap.getSnapPointIndexOfNeighborOf(this);
 		final Wall otherWall = snap.getNeighborOf(this);
@@ -621,8 +582,8 @@ public class Wall extends HousePart {
 
 		final Vector3 v = wallDir.normalize(null).multiplyLocal(length);
 
-		final TriangulationPoint p1 = polygon.getPoints().get(neighbor == 0 ? 1 : 2);
-		final TriangulationPoint p2 = polygon.getPoints().get(neighbor == 0 ? 0 : 3);
+		final Vector3 p1 = polygon.get(neighbor == 0 ? 1 : 2);
+		final Vector3 p2 = polygon.get(neighbor == 0 ? 0 : 3);
 
 		// now reduce the actual wall points
 		p1.set(p1.getX() + v.getX(), p1.getY() + v.getY(), p1.getZ());
@@ -633,7 +594,8 @@ public class Wall extends HousePart {
 	public Vector3 getThicknessNormal() {
 		if (thicknessNormal != null)
 			return thicknessNormal;
-		final Vector3 n = computeNormal();
+		computeNormalAndXYTransform();
+		final Vector3 n = normal.clone();
 		final Snap neighbor;
 
 		final int whichNeighbor;
@@ -667,11 +629,12 @@ public class Wall extends HousePart {
 		return thicknessNormal;
 	}
 
-	private Vector3 computeNormal() {
+	private void computeNormalAndXYTransform() {
 		final Vector3 p02 = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
 		final Vector3 p01 = getAbsPoint(1).subtract(getAbsPoint(0), null).normalizeLocal();
-		final Vector3 n = p02.crossLocal(p01).normalizeLocal();
-		return n;
+		normal = p02.crossLocal(p01).normalizeLocal();
+		toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
+		fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
 	}
 
 	private void drawSurroundMesh(final ReadOnlyVector3 thickness) {
@@ -873,7 +836,8 @@ public class Wall extends HousePart {
 		int annotCounter = 0;
 		int angleAnnotCounter = 0;
 
-		if (wallPolygonPoints != null) {
+		if (wallAndWindowsPoints != null) {
+			final ArrayList<Vector3> wallPolygonPoints = wallAndWindowsPoints.get(0);
 			final Vector3 actualNormal = wallPolygonPoints.get(0).subtract(wallPolygonPoints.get(1), null).normalizeLocal().crossLocal(wallPolygonPoints.get(2).subtract(wallPolygonPoints.get(1), null).normalizeLocal()).negateLocal();
 			final boolean reverse = actualNormal.dot(getFaceDirection()) < 0;
 
@@ -1079,7 +1043,7 @@ public class Wall extends HousePart {
 		invisibleMesh = orgInvisibleMesh.makeCopy(true);
 		invisibleMesh.setUserData(new UserData(this, ((UserData) orgInvisibleMesh.getUserData()).getIndex(), false));
 		root.attachChild(invisibleMesh);
-		wallPolygonPoints = originalWall.wallPolygonPoints;
+		wallAndWindowsPoints = originalWall.wallAndWindowsPoints;
 
 		super.setOriginal(original);
 	}
@@ -1161,25 +1125,36 @@ public class Wall extends HousePart {
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Wall && part != this && part.isDrawCompleted()) {
 				final Wall otherWall = (Wall) part;
-				for (int index = 0; index < 2; index++) {
+				for (int index = 0; index < 2; index++)
 					if (neighbors[index] == null)
 						for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
 							if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && otherWall.getAbsPoint(otherIndex * 2).distance(getAbsPoint(index * 2)) < MathUtils.ZERO_TOLERANCE) {
 								System.out.println("Fixing neighbor...");
 								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
 							}
-						}
 				}
 			}
 		}
 	}
 
 	public boolean fits(final Window window) {
-		final Polygon hole = computeWindowHole(window, Vector3.ZERO);
-		toXY(hole);
-		for (final Point p : hole.getPoints())
-			if (!MeshLib.insidePolygon(p, polygon.getPoints()))
+		final ArrayList<Vector3> hole = computeWindowHole(window, Vector3.ZERO);
+		applyXYTransform(hole);
+		final ArrayList<Vector3> polygon = new ArrayList<Vector3>(wallAndWindowsPoints.get(0).size());
+		for (final Vector3 p : wallAndWindowsPoints.get(0))
+			polygon.add(p.clone());
+		applyXYTransform(polygon);
+		for (final Vector3 p : hole)
+			if (!MeshLib.insidePolygon(p, polygon))
 				return false;
 		return true;
+	}
+
+	public void applyXYTransform(final ArrayList<Vector3> hole) {
+		for (final Vector3 p : hole) {
+			final Point point = new ArdorVector3Point(p);
+			toXY.transform(point);
+			p.set(point.getX(), point.getY(), point.getZ());
+		}
 	}
 }
