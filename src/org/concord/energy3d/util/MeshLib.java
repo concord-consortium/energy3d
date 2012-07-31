@@ -10,8 +10,8 @@ import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
+import org.poly2tri.geometry.primitives.Point;
 import org.poly2tri.transform.coordinate.XYToAnyTransform;
-import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
@@ -428,17 +428,16 @@ public class MeshLib {
 		mesh.updateModelBound();
 	}
 
-	public static boolean insidePolygon(final Polygon polygon, final TriangulationPoint p) {
+	public static boolean insidePolygon(final Point p, final List<? extends Point> polygon) {
 		int counter = 0;
 		int i;
 		double xinters;
-		TriangulationPoint p1, p2;
+		Point p1, p2;
 
-		final int n = polygon.getPoints().size();
-		final List<TriangulationPoint> points = polygon.getPoints();
-		p1 = points.get(0);
+		final int n = polygon.size();
+		p1 = polygon.get(0);
 		for (i = 1; i <= n; i++) {
-			p2 = points.get(i % n);
+			p2 = polygon.get(i % n);
 			if (p.getY() > Math.min(p1.getY(), p2.getY())) {
 				if (p.getY() <= Math.max(p1.getY(), p2.getY())) {
 					if (p.getX() <= Math.max(p1.getX(), p2.getX())) {
@@ -507,12 +506,13 @@ public class MeshLib {
 			return w.subtract(v, null).multiplyLocal(t).addLocal(v); // v + t * (w - v);
 	}
 
-	public static Vector2 snapToPolygon(final ReadOnlyVector3 point, final List<PolygonPoint> polygon) {
+	public static Vector2 snapToPolygon(final ReadOnlyVector3 point, final List<PolygonPoint> polygon, final ArrayList<ReadOnlyVector3> wallNormals) {
 		final Vector2 p = new Vector2(point.getX(), point.getY());
 		final Vector2 l1 = new Vector2();
 		final Vector2 l2 = new Vector2();
 		double shortestDistance = Double.MAX_VALUE;
 		Vector2 closestPoint = null;
+		ReadOnlyVector3 closestNormal = null;
 		final int n = polygon.size();
 		for (int i = 0; i < n; i++) {
 			final PolygonPoint pp1 = polygon.get(i);
@@ -525,9 +525,15 @@ public class MeshLib {
 				if (distance < shortestDistance) {
 					shortestDistance = distance;
 					closestPoint = pointOnLine;
+					if (l1.distanceSquared(closestPoint) <= l2.distanceSquared(pointOnLine))
+						closestNormal = wallNormals.get(i);
+					else
+						closestNormal = wallNormals.get((i + 1) % n);
 				}
 			}
 		}
+
+		closestPoint.addLocal(-closestNormal.getX() / 100.0, -closestNormal.getY() / 100.0);
 		return closestPoint;
 	}
 }

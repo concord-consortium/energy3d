@@ -16,6 +16,7 @@ import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
+import org.poly2tri.geometry.primitives.Point;
 import org.poly2tri.transform.coordinate.AnyToXYTransform;
 import org.poly2tri.transform.coordinate.XYToAnyTransform;
 import org.poly2tri.triangulation.TriangulationPoint;
@@ -1176,8 +1177,8 @@ public class Wall extends HousePart {
 	public boolean fits(final Window window) {
 		final Polygon hole = computeWindowHole(window, Vector3.ZERO);
 		toXY(hole);
-		for (final TriangulationPoint p : hole.getPoints())
-			if (!MeshLib.insidePolygon(polygon, p))
+		for (final Point p : hole.getPoints())
+			if (!MeshLib.insidePolygon(p, polygon.getPoints()))
 				return false;
 		return true;
 	}

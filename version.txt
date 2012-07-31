@@ -1123,7 +1123,7 @@ Version 0.5 - October 20, 2011
 - round roof upperWallPoints and Steiner points
 - add feature in Mac OS X for opening models by double-clicking on files or dragging files to application icon
 - snap roof point to polygon that is constituted by attached walls 
- 
+- snap roof point to polygon of walls only if the user dragged point is no longer inside the boundary polygon
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from

@@ -6,6 +6,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.MeshLib;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
+import org.poly2tri.triangulation.point.ardor3d.ArdorVector3Point;
 
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Ray3;
@@ -42,8 +43,10 @@ public class CustomRoof extends Roof {
 			Vector3 p = new Vector3();
 			if (pickRay.intersectsPlane(new Plane(Vector3.UNIT_Z, points.get(0).getZ()), p)) {
 				p = grid(p, getAbsPoint(editPointIndex), getGridSize(), false);
-				final ReadOnlyVector2 p2D = MeshLib.snapToPolygon(p, wallUpperPoints);
-				p.set(p2D.getX(), p2D.getY(), p.getZ());
+				if (!MeshLib.insidePolygon(new ArdorVector3Point(p), wallUpperPoints)) {
+					final ReadOnlyVector2 p2D = MeshLib.snapToPolygon(p, wallUpperPoints, wallNormals);
+					p.set(p2D.getX(), p2D.getY(), p.getZ());
+				}
 				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 			}
 		}

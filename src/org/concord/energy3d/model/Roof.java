@@ -49,7 +49,7 @@ public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
 	protected transient Node roofPartsRoot;
 	protected transient ArrayList<PolygonPoint> wallUpperPoints;
-	private transient ArrayList<ReadOnlyVector3> wallNormals;
+	protected transient ArrayList<ReadOnlyVector3> wallNormals;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
 	private transient ArrayList<Wall> walls;
 	private transient HousePart previousContainer;
