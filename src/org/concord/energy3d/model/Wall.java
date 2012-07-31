@@ -342,8 +342,8 @@ public class Wall extends HousePart {
 			}
 		}
 
-		drawPolygon(wallAndWindowsPoints, mesh, true);
 		drawWireframe(wallAndWindowsPoints);
+		drawPolygon(wallAndWindowsPoints, mesh, true);
 
 		/* draw invisibleMesh */
 		final Polygon invisiblePolygon = new Polygon(ArdorVector3PolygonPoint.toPoints(wallAndWindowsPoints.get(0)));
@@ -356,12 +356,6 @@ public class Wall extends HousePart {
 		drawBackMesh(computeWallAndWindowPolygon(true));
 		drawSurroundMesh(thicknessNormal);
 		drawWindowsSurroundMesh(thicknessNormal);
-
-		// backMesh.updateModelBound();
-		// surroundMesh.updateModelBound();
-		// windowsSurroundMesh.updateModelBound();
-		// wireframeMesh.updateModelBound();
-		// invisibleMesh.updateModelBound();
 
 		root.updateWorldBound(true);
 	}

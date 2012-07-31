@@ -1125,6 +1125,8 @@ Version 0.5 - October 20, 2011
 - snap roof point to polygon that is constituted by attached walls 
 - snap roof point to polygon of walls only if the user dragged point is no longer inside the boundary polygon
 - instead of working with polygon and converting to Vector3 when needed, work with Vector3 and convert to polygon once at the end
+- update Poly2Tri library so that it ArdorPolyPoint overrides the setter method otherwise setting has no effect 
+- update Poly2Tri library so that it ArdorPolyPoint works on a "copy" to input Vector3 so that it does not change the value of original vector
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from
