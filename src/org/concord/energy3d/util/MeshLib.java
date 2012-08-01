@@ -332,11 +332,7 @@ public class MeshLib {
 		return convexHull;
 	}
 
-	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final XYToAnyTransform fromXY) {
-		fillMeshWithPolygon(mesh, polygon, fromXY, 0, null, null, null);
-	}
-
-	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final XYToAnyTransform fromXY, final double textureScale, final TPoint o, final TPoint u, final TPoint v) {
+	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final XYToAnyTransform fromXY, final boolean generateNormals, final double textureScale, final TPoint o, final TPoint u, final TPoint v) {
 		// final Vector2 min = new Vector2(Double.MAX_VALUE, Double.MAX_VALUE);
 		// final Vector2 max = new Vector2(Double.MIN_VALUE, Double.MIN_VALUE);
 		// for (final TriangulationPoint p : polygon.getPoints()) {
@@ -418,7 +414,8 @@ public class MeshLib {
 			throw e;
 		}
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
-		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
+		if (generateNormals)
+			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
 		// ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
 		if (o != null)
 			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), textureScale, o, u, v);

@@ -13,7 +13,6 @@ import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
-import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.primitives.Point;
 import org.poly2tri.transform.coordinate.AnyToXYTransform;
@@ -22,7 +21,6 @@ import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.point.ardor3d.ArdorVector3Point;
 import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
-import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
@@ -343,15 +341,11 @@ public class Wall extends HousePart {
 		}
 
 		drawWireframe(wallAndWindowsPoints);
-		drawPolygon(wallAndWindowsPoints, mesh, true);
+		drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
 
 		/* draw invisibleMesh */
-		final Polygon invisiblePolygon = new Polygon(ArdorVector3PolygonPoint.toPoints(wallAndWindowsPoints.get(0)));
-		Poly2Tri.triangulate(invisiblePolygon);
-		ArdorMeshMapper.updateTriangleMesh(invisibleMesh, invisiblePolygon, fromXY);
-		invisibleMesh.getMeshData().updateVertexCount();
+		drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
 		CollisionTreeManager.INSTANCE.updateCollisionTree(invisibleMesh);
-		invisibleMesh.updateModelBound();
 
 		drawBackMesh(computeWallAndWindowPolygon(true));
 		drawSurroundMesh(thicknessNormal);
@@ -360,10 +354,11 @@ public class Wall extends HousePart {
 		root.updateWorldBound(true);
 	}
 
-	private void drawPolygon(final List<ArrayList<Vector3>> wallAndWindowsPoints, final Mesh mesh, final boolean texture) {
+	private void drawPolygon(final List<ArrayList<Vector3>> wallAndWindowsPoints, final Mesh mesh, final boolean drawHoles, final boolean normal, final boolean texture) {
 		final Polygon polygon = new Polygon(ArdorVector3PolygonPoint.toPoints(wallAndWindowsPoints.get(0)));
-		for (int i = 1; i < wallAndWindowsPoints.size(); i++)
-			polygon.addHole(new Polygon(ArdorVector3PolygonPoint.toPoints(wallAndWindowsPoints.get(i))));
+		if (drawHoles)
+			for (int i = 1; i < wallAndWindowsPoints.size(); i++)
+				polygon.addHole(new Polygon(ArdorVector3PolygonPoint.toPoints(wallAndWindowsPoints.get(i))));
 
 		// toXY(polygon);
 		for (final TriangulationPoint tp : polygon.getPoints())
@@ -382,9 +377,9 @@ public class Wall extends HousePart {
 			toXY.transform(o);
 			toXY.transform(u);
 			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.1 : 1.0;
-			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, scale, o, u, v);
+			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, scale, o, u, v);
 		} else
-			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY);
+			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, 0, null, null, null);
 	}
 
 	private void drawWireframe(final List<ArrayList<Vector3>> wallAndWindowsPoints) {
@@ -538,7 +533,7 @@ public class Wall extends HousePart {
 		enforceGablePointsRangeAndRemoveDuplicatedGablePoints(polygon.get(0));
 		extendToRoof(polygon.get(0));
 
-		drawPolygon(polygon, backMesh, false);
+		drawPolygon(polygon, backMesh, true, true, false);
 	}
 
 	private void enforceGablePointsRangeAndRemoveDuplicatedGablePoints(final ArrayList<Vector3> polygonPoints) {
