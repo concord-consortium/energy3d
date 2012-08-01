@@ -806,12 +806,12 @@ public abstract class Roof extends HousePart {
 
 	protected void snapToWallsPolygon(final Vector3 p) {
 		if (!insideWallsPolygon(p)) {
-			final ReadOnlyVector2 p2D = MeshLib.snapToPolygon(p, wallUpperPoints, wallNormals);
+			final ReadOnlyVector2 p2D = Util.snapToPolygon(p, wallUpperPoints, wallNormals);
 			p.set(p2D.getX(), p2D.getY(), p.getZ());
 		}
 	}
 
 	protected boolean insideWallsPolygon(final Vector3 p) {
-		return MeshLib.insidePolygon(p, wallUpperPoints);
+		return Util.insidePolygon(p, wallUpperPoints);
 	}
 }

@@ -169,45 +169,26 @@ public class Wall extends HousePart {
 				return;
 
 			Vector3 p = null;
-			if (picked != null) {
+			if (picked != null)
 				p = picked.getPoint();
-			} else {
-				final PickedHousePart floorPick = SelectUtil.pickPart(x, y, (Spatial) null);
-				if (floorPick != null) {
-					p = floorPick.getPoint();
-					ReadOnlyVector3 closesPoint = container.points.get(0);
-					for (int i = 1; i < 4; i++)
-						if (closesPoint.distance(p) > container.points.get(i).distance(p))
-							closesPoint = container.points.get(i);
-					ReadOnlyVector3 secondClosesPoint = closesPoint == container.points.get(0) ? container.points.get(1) : container.points.get(0);
-					for (int i = 0; i < 4; i++)
-						if (secondClosesPoint.distance(p) > container.points.get(i).distance(p) && container.points.get(i) != closesPoint)
-							secondClosesPoint = container.points.get(i);
-					final Vector3 dir = closesPoint.subtract(secondClosesPoint, null).normalizeLocal();
-					p = MeshLib.closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
-					snapToGrid(p, getAbsPoint(editPointIndex == -1 ? points.size() - 2 : editPointIndex), getGridSize());
-					p = MeshLib.closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
-					p.setX(MathUtils.clamp(p.getX(), Math.min(container.points.get(0).getX(), container.points.get(2).getX()), Math.max(container.points.get(0).getX(), container.points.get(2).getX())));
-					p.setY(MathUtils.clamp(p.getY(), Math.min(container.points.get(0).getY(), container.points.get(1).getY()), Math.max(container.points.get(0).getY(), container.points.get(1).getY())));
-					p.getZ();
-				}
-			}
+			else
+				p = findClosestPointOnFoundation(x, y);
+
 			if (p == null)
 				return;
+
 			if (container != null)
 				p.setZ(container.height);
 			final int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
-			boolean snapWall = snapToWall(p, index);
-			if (!snapWall) {
+			boolean snappedToWall = snapToWall(p, index);
+			if (!snappedToWall) {
 				snapToGrid(p, getAbsPoint(index), getGridSize(), false);
-				snapWall = snapToWall(p, index); // see if it can be snapped after grid move
+				snappedToWall = snapToWall(p, index); // see if it can be snapped after grid move
 			}
 
-			if (!snapWall) {
-				final boolean foundationSnap = snapFoundation(p);
-				if (!foundationSnap) {
-				}
-			}
+			if (!snappedToWall)
+				snapToFoundation(p);
+
 			if (index == 2) // make sure z of 2nd base point is same as 2st (needed for platform picking side)
 				p.setZ(points.get(0).getZ());
 			final Vector3 p_rel = toRelative(p);
@@ -216,7 +197,7 @@ public class Wall extends HousePart {
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
 			final int lower = (editPointIndex == 1) ? 0 : 2;
 			final Vector3 base = getAbsPoint(lower);
-			final Vector3 closestPoint = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
+			final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
 			final boolean snappedToWall = snapToWall(closestPoint, lower);
 			if (!snappedToWall)
 				snapToGrid(closestPoint, getAbsPoint(editPointIndex), getGridSize());
@@ -228,6 +209,31 @@ public class Wall extends HousePart {
 
 		drawThisAndNeighbors(false);
 		setEditPointsVisible(true);
+	}
+
+	public Vector3 findClosestPointOnFoundation(final int x, final int y) {
+		final PickedHousePart floorPick = SelectUtil.pickPart(x, y, (Spatial) null);
+		if (floorPick != null) {
+			Vector3 p = floorPick.getPoint();
+			ReadOnlyVector3 closesPoint = container.points.get(0);
+			for (int i = 1; i < 4; i++)
+				if (closesPoint.distance(p) > container.points.get(i).distance(p))
+					closesPoint = container.points.get(i);
+			ReadOnlyVector3 secondClosesPoint = closesPoint == container.points.get(0) ? container.points.get(1) : container.points.get(0);
+			for (int i = 0; i < 4; i++)
+				if (secondClosesPoint.distance(p) > container.points.get(i).distance(p) && container.points.get(i) != closesPoint)
+					secondClosesPoint = container.points.get(i);
+			final Vector3 dir = closesPoint.subtract(secondClosesPoint, null).normalizeLocal();
+			p = Util.closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
+			snapToGrid(p, getAbsPoint(editPointIndex == -1 ? points.size() - 2 : editPointIndex), getGridSize());
+			p = Util.closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
+			p.setX(MathUtils.clamp(p.getX(), Math.min(container.points.get(0).getX(), container.points.get(2).getX()), Math.max(container.points.get(0).getX(), container.points.get(2).getX())));
+			p.setY(MathUtils.clamp(p.getY(), Math.min(container.points.get(0).getY(), container.points.get(1).getY()), Math.max(container.points.get(0).getY(), container.points.get(1).getY())));
+			p.getZ();
+			return p;
+		} else
+			return null;
+
 	}
 
 	private void drawThisAndNeighbors(final boolean extendToRoofEnabled) {
@@ -281,14 +287,17 @@ public class Wall extends HousePart {
 		}
 	}
 
-	private boolean snapFoundation(final Vector3 current) {
+	private boolean snapToFoundation(final Vector3 current) {
 		if (container == null)
 			return false;
 		ReadOnlyVector3 snapPoint = null;
 		double snapDistance = Double.MAX_VALUE;
 		final int[] indices = new int[] { 0, 2, 3, 1, 0 };
 		for (int i = 0; i < indices.length - 1; i++) {
-			final Vector3 p = Util.getClosetPoint(container.getAbsPoint(indices[i]).addLocal(0, 0, current.getZ()), container.getAbsPoint(indices[i + 1]).addLocal(0, 0, current.getZ()), current, true);
+			final Vector3 p1 = container.getAbsPoint(indices[i]);
+			final Vector3 p2 = container.getAbsPoint(indices[i + 1]);
+			final Vector2 p2D = Util.closestPoint(new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()), new Vector2(current.getX(), current.getY()));
+			final Vector3 p = new Vector3(p2D.getX(), p2D.getY(), current.getZ());
 			final double d = p.distance(current);
 			if (d < snapDistance) {
 				snapDistance = d;
@@ -1134,7 +1143,7 @@ public class Wall extends HousePart {
 			polygon.add(p.clone());
 		applyXYTransform(polygon);
 		for (final Vector3 p : hole)
-			if (!MeshLib.insidePolygon(p, polygon))
+			if (!Util.insidePolygon(p, polygon))
 				return false;
 		return true;
 	}

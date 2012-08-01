@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.util.MeshLib;
+import org.concord.energy3d.util.Util;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 
@@ -29,7 +29,7 @@ public class CustomRoof extends Roof {
 			pickContainer(x, y, Wall.class);
 		} else if (editPointIndex == 0) {
 			final ReadOnlyVector3 base = getCenter();
-			final Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
+			final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
 			if (p == null)
 				return;
 			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());

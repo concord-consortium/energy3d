@@ -2,7 +2,7 @@ package org.concord.energy3d.model;
 
 import java.util.List;
 
-import org.concord.energy3d.util.MeshLib;
+import org.concord.energy3d.util.Util;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
@@ -25,11 +25,11 @@ public class HipRoof extends Roof {
 			recalculateEditPoints = true;
 		} else if (editPointIndex == 0) {
 			final ReadOnlyVector3 base = getCenter();
-			final Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
+			final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
 			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ());
 		} else if (editPointIndex == 1 || editPointIndex == 2) {
-			final Vector3 p = MeshLib.closestPoint(getAbsPoint(editPointIndex), Vector3.UNIT_Y, x, y);
+			final Vector3 p = Util.closestPoint(getAbsPoint(editPointIndex), Vector3.UNIT_Y, x, y);
 			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
 			if (insideWallsPolygon(p))
 				points.get(editPointIndex).set(toRelative(p, container.getContainer()));

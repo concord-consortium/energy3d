@@ -1131,6 +1131,8 @@ Version 0.5 - October 20, 2011
 - use wall.drawPolygon to generate the invisible mesh of walls
 - pull up snapToWallsPolygon to superclass Roof
 - ensure that edit points in HipRoof staying within boundaries
+- fix problem with inexact grid positioning
+- fix problem with snapping to corners of foundation from far distance after increasing size of foundation
 
 
 

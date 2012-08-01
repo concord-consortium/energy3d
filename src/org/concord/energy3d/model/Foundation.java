@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.SizeAnnotation;
-import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -173,10 +173,10 @@ public class Foundation extends HousePart {
 		if (pick != null && index < 4) {
 			p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
-			if (!resizeHouseMode)
-				p = ensureIncludesChildren(p, index);
 			if (resizeHouseMode)
 				p = ensureNotTooSmall(p, index);
+			else
+				p = ensureIncludesChildren(p, index);
 			points.get(index).set(p);
 		}
 		if (!isFirstPointInserted()) {
@@ -193,7 +193,7 @@ public class Foundation extends HousePart {
 			} else {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
-				final Vector3 closestPoint = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
+				final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
 				final Vector3 currentPoint = getAbsPoint(index);
 				snapToGrid(closestPoint, currentPoint, getGridSize());
 				if (!closestPoint.equals(currentPoint)) {
@@ -289,6 +289,7 @@ public class Foundation extends HousePart {
 		if (drawable) {
 			((Box) mesh).setData(points.get(0), points.get(3).add(0, 0, height, null));
 			mesh.updateModelBound();
+			CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 			drawWireframe(boundingMesh, points.get(7).getZf());
 			drawWireframe(wireframeMesh, (float) height);
 		}

@@ -366,7 +366,7 @@ public abstract class HousePart implements Serializable {
 				final ReadOnlyVector3 verticalDir = new Vector3(0, snapToZ ? 0 : originToP.getY(), snapToZ ? originToP.getZ() : 0);
 				final double snapedVerticalLength = Math.round(verticalDir.length() / gridSize) * gridSize;
 				final ReadOnlyVector3 v = verticalDir.normalize(null).multiplyLocal(snapedVerticalLength);
-				origin.add(u, null).addLocal(v);
+				p.set(origin).addLocal(u).addLocal(v);
 			} else
 				p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
 		}

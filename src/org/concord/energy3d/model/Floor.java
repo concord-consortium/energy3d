@@ -73,7 +73,7 @@ public class Floor extends HousePart {
 		pickContainer(x, y, Wall.class);
 		if (container != null) {
 			final ReadOnlyVector3 base = getCenter();
-			final Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
+			final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
 			snapToGrid(p, base, getGridSize());
 			final double zMin = container.getAbsPoint(0).getZ() + 0.01;
 			final double zmax = container.getAbsPoint(1).getZ();
