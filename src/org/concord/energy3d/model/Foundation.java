@@ -172,7 +172,7 @@ public class Foundation extends HousePart {
 		Vector3 p = points.get(index);
 		if (pick != null && index < 4) {
 			p = pick.getPoint();
-			p = grid(p, getAbsPoint(index), getGridSize());
+			snapToGrid(p, getAbsPoint(index), getGridSize());
 			if (!resizeHouseMode)
 				p = ensureIncludesChildren(p, index);
 			if (resizeHouseMode)
@@ -193,9 +193,9 @@ public class Foundation extends HousePart {
 			} else {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
-				Vector3 closestPoint = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
+				final Vector3 closestPoint = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
 				final Vector3 currentPoint = getAbsPoint(index);
-				closestPoint = grid(closestPoint, currentPoint, getGridSize());
+				snapToGrid(closestPoint, currentPoint, getGridSize());
 				if (!closestPoint.equals(currentPoint)) {
 					newBoundingHeight = Math.max(0, closestPoint.getZ() - height);
 					applyNewHeight(boundingHeight, newBoundingHeight, false);

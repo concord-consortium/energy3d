@@ -34,6 +34,7 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
@@ -50,8 +51,8 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
 	protected transient Node roofPartsRoot;
-	protected transient List<Vector3> wallUpperPoints;
-	protected transient List<Vector3> wallNormals;
+	private transient List<Vector3> wallUpperPoints;
+	private transient List<Vector3> wallNormals;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
 	private transient List<Wall> walls;
 	private transient HousePart previousContainer;
@@ -103,7 +104,7 @@ public abstract class Roof extends HousePart {
 
 		initWallUpperPoints((Wall) container, walls, wallUpperPoints, wallNormals);
 		applyOverhang(wallUpperPoints, wallNormals);
-		processRoofPoints(wallUpperPoints);
+		processRoofEditPoints(wallUpperPoints);
 		computeGableEditPoints();
 		final Polygon polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
@@ -482,7 +483,7 @@ public abstract class Roof extends HousePart {
 		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "roof3.png" : "roof.jpg";
 	}
 
-	protected abstract void processRoofPoints(final List<? extends ReadOnlyVector3> wallUpperPoints);
+	protected abstract void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints);
 
 	private void applyOverhang(final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
 		final Vector3 op = new Vector3();
@@ -801,5 +802,16 @@ public abstract class Roof extends HousePart {
 		final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
 		computeOrientedBoundingBox(roofPartMesh);
 		orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
+	}
+
+	protected void snapToWallsPolygon(final Vector3 p) {
+		if (!insideWallsPolygon(p)) {
+			final ReadOnlyVector2 p2D = MeshLib.snapToPolygon(p, wallUpperPoints, wallNormals);
+			p.set(p2D.getX(), p2D.getY(), p.getZ());
+		}
+	}
+
+	protected boolean insideWallsPolygon(final Vector3 p) {
+		return MeshLib.insidePolygon(p, wallUpperPoints);
 	}
 }

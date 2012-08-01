@@ -333,14 +333,14 @@ public abstract class HousePart implements Serializable {
 		return pointOnSpace.set(Math.round(pointOnSpace.getX() * C) / C, Math.round(pointOnSpace.getY() * C) / C, Math.round(pointOnSpace.getZ() * C) / C);
 	}
 
-	protected Vector3 grid(final Vector3 p, final ReadOnlyVector3 current, final double gridSize) {
-		return grid(p, current, gridSize, true);
+	protected void snapToGrid(final Vector3 p, final ReadOnlyVector3 current, final double gridSize) {
+		snapToGrid(p, current, gridSize, true);
 	}
 
-	protected Vector3 grid(final Vector3 p, final ReadOnlyVector3 current, final double gridSize, final boolean snapToZ) {
+	protected void snapToGrid(final Vector3 p, final ReadOnlyVector3 current, final double gridSize, final boolean snapToZ) {
 		if (isSnapToGrids()) {
 			if (p.distance(current) < gridSize)
-				return new Vector3(current);
+				p.set(current);
 			else if (container != null) {
 				final ReadOnlyVector3 p0 = container.getAbsPoint(0);
 				final ReadOnlyVector3 origin;
@@ -366,12 +366,10 @@ public abstract class HousePart implements Serializable {
 				final ReadOnlyVector3 verticalDir = new Vector3(0, snapToZ ? 0 : originToP.getY(), snapToZ ? originToP.getZ() : 0);
 				final double snapedVerticalLength = Math.round(verticalDir.length() / gridSize) * gridSize;
 				final ReadOnlyVector3 v = verticalDir.normalize(null).multiplyLocal(snapedVerticalLength);
-				return origin.add(u, null).addLocal(v);
+				origin.add(u, null).addLocal(v);
 			} else
-				return p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
-		} else
-			return p;
-
+				p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+		}
 	}
 
 	public void addPoint(final int x, final int y) {

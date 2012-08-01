@@ -12,7 +12,6 @@ import com.ardor3d.math.Plane;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class CustomRoof extends Roof {
@@ -30,23 +29,20 @@ public class CustomRoof extends Roof {
 			pickContainer(x, y, Wall.class);
 		} else if (editPointIndex == 0) {
 			final ReadOnlyVector3 base = getCenter();
-			Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
+			final Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
 			if (p == null)
 				return;
-			p = grid(p, getAbsPoint(editPointIndex), getGridSize());
+			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - container.getPoints().get(1).getZ());
 			final double z = container.getPoints().get(1).getZ() + height;
 			for (final Vector3 v : points)
 				v.setZ(z);
 		} else {
 			final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
-			Vector3 p = new Vector3();
+			final Vector3 p = new Vector3();
 			if (pickRay.intersectsPlane(new Plane(Vector3.UNIT_Z, points.get(0).getZ()), p)) {
-				p = grid(p, getAbsPoint(editPointIndex), getGridSize(), false);
-				if (!MeshLib.insidePolygon(p, wallUpperPoints)) {
-					final ReadOnlyVector2 p2D = MeshLib.snapToPolygon(p, wallUpperPoints, wallNormals);
-					p.set(p2D.getX(), p2D.getY(), p.getZ());
-				}
+				snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
+				snapToWallsPolygon(p);
 				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 			}
 		}
@@ -54,8 +50,6 @@ public class CustomRoof extends Roof {
 			setEditPointsVisible(true);
 		draw();
 		drawWalls();
-//		if (container != null)
-//			setEditPointsVisible(true);
 	}
 
 	@Override
@@ -72,7 +66,7 @@ public class CustomRoof extends Roof {
 	}
 
 	@Override
-	protected void processRoofPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
+	protected void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
 			points.clear();
@@ -89,7 +83,8 @@ public class CustomRoof extends Roof {
 					final Vector3 v = new Vector3(p1.getX() + p2.getX(), p1.getY() + p2.getY(), 0).multiplyLocal(0.5);
 					v.setZ(z);
 					// add -normal*0.2 to middle point of wall
-					v.addLocal(wallNormals.get(i).multiply(0.2, null).negateLocal());
+//					v.addLocal(wallNormals.get(i).multiply(0.2, null).negateLocal());
+					snapToWallsPolygon(v);
 					v.set(toRelative(v, container.getContainer()));
 					points.add(v);
 				}

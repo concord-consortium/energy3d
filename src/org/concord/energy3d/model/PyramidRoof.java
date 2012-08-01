@@ -24,8 +24,8 @@ public class PyramidRoof extends Roof {
 			recalculateEditPoints = true;;
 		} else {
 			final ReadOnlyVector3 base = new Vector3(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getCenter().getZ());
-			Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
-			p = grid(p, getAbsPoint(editPointIndex), getGridSize());
+			final Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
+			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ());
 		}
 		draw();
@@ -41,7 +41,7 @@ public class PyramidRoof extends Roof {
 	}
 
 	@Override
-	protected void processRoofPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
+	protected void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
 		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {
 			points.get(0).set(center.getX(), center.getY(), center.getZ() + height);

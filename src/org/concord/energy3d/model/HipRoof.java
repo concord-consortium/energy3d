@@ -25,13 +25,14 @@ public class HipRoof extends Roof {
 			recalculateEditPoints = true;
 		} else if (editPointIndex == 0) {
 			final ReadOnlyVector3 base = getCenter();
-			Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
-			p = grid(p, getAbsPoint(editPointIndex), getGridSize());
+			final Vector3 p = MeshLib.closestPoint(base, Vector3.UNIT_Z, x, y);
+			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ());
 		} else if (editPointIndex == 1 || editPointIndex == 2) {
-			Vector3 p = MeshLib.closestPoint(getAbsPoint(editPointIndex), Vector3.UNIT_Y, x, y);
-			p = grid(p, getAbsPoint(editPointIndex), getGridSize(), false);
-			points.get(editPointIndex).set(toRelative(p, container.getContainer()));
+			final Vector3 p = MeshLib.closestPoint(getAbsPoint(editPointIndex), Vector3.UNIT_Y, x, y);
+			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
+			if (insideWallsPolygon(p))
+				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 		}
 		draw();
 		drawWalls();
@@ -51,14 +52,21 @@ public class HipRoof extends Roof {
 	}
 
 	@Override
-	protected void processRoofPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
+	protected void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
 		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {
 			// upper points
 			points.get(0).set(toRelative(center, container.getContainer()).addLocal(0, 0, height));
 			if (editPointIndex == -1) {
-				points.get(1).set(toRelative(center, container.getContainer()).addLocal(0, -0.2, height));
-				points.get(2).set(toRelative(center, container.getContainer()).addLocal(0, 0.2, height));
+				final Vector3 p = new Vector3();
+				p.set(center).addLocal(0, -5, height);
+				snapToWallsPolygon(p);
+				p.setX(center.getX());
+				points.get(1).set(toRelative(p, container.getContainer()));
+				p.set(center).addLocal(0, 5, height);
+				snapToWallsPolygon(p);
+				p.setX(center.getX());
+				points.get(2).set(toRelative(p, container.getContainer()));
 			}
 			recalculateEditPoints = false;
 		} else {

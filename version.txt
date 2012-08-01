@@ -1129,6 +1129,9 @@ Version 0.5 - October 20, 2011
 - update Poly2Tri library so that it ArdorPolyPoint works on a "copy" to input Vector3 so that it does not change the value of original vector
 *
 - use wall.drawPolygon to generate the invisible mesh of walls
+- pull up snapToWallsPolygon to superclass Roof
+- ensure that edit points in HipRoof staying within boundaries
+
 
 
 TODO:
