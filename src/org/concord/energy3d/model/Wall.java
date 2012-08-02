@@ -61,14 +61,14 @@ public class Wall extends HousePart {
 	private transient Mesh wireframeMesh;
 	private transient Roof roof;
 	private transient int visitStamp;
-	private final double wallThickness = 0.05;
-	private final Snap[] neighbors = new Snap[2];
-	private Vector3 thicknessNormal;
-	private boolean isShortWall;
 	private transient Vector3 normal;
 	private transient AnyToXYTransform toXY;
 	private transient XYToAnyTransform fromXY;
 	private transient List<ArrayList<Vector3>> wallAndWindowsPoints;
+	private final double wallThickness = 0.05;
+	private final Snap[] neighbors = new Snap[2];
+	private Vector3 thicknessNormal;
+	private boolean isShortWall;
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -277,7 +277,7 @@ public class Wall extends HousePart {
 			}
 		}
 
-		if (closestDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize()) && (!isFirstPointInserted() || p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > getGridSize() * 2)) {
+		if (closestDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize() * 2) && (!isFirstPointInserted() || p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > getGridSize() * 2)) {
 			p.set(closestPoint);
 			setNeighbor(index, new Snap(this, closestWall, index, closestPointIndex), true);
 			return true;

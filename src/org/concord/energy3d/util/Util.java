@@ -196,4 +196,39 @@ public class Util {
 		closestPoint.addLocal(-closestNormal.getX() / 100.0, -closestNormal.getY() / 100.0);
 		return closestPoint;
 	}
+
+	public static Vector3 intersectLineSegments(final ReadOnlyVector3 a1, final ReadOnlyVector3 a2, final ReadOnlyVector3 b1, final ReadOnlyVector3 b2) {
+//		final Vector3 r = p2.subtract(p1, null);
+//		final Vector3 s = q2.subtract(q1, null);
+//		final Vector3 q_p = q1.subtract(p1, null);
+//		final Vector3 rs = r.cross(s, null);
+//		if (rs.length() == 0)
+//			return null;
+//		else {
+//			final double t = q_p.cross(s, null).length() / rs.length();
+////			final double u = q_p.cross(r, null).length() / rs.length();
+//			return r.multiply(t, null).addLocal(p1);
+//		}
+
+	    Vector3 result;
+
+	    final double ua_t = (b2.getX() - b1.getX()) * (a1.getY() - b1.getY()) - (b2.getY() - b1.getY()) * (a1.getX() - b1.getX());
+	    final double ub_t = (a2.getX() - a1.getX()) * (a1.getY() - b1.getY()) - (a2.getY() - a1.getY()) * (a1.getX() - b1.getX());
+	    final double u_b  = (b2.getY() - b1.getY()) * (a2.getX() - a1.getX()) - (b2.getX() - b1.getX()) * (a2.getY() - a1.getY());
+
+	    if ( u_b != 0 ) {
+	    	final double ua = ua_t / u_b;
+	    	final double ub = ub_t / u_b;
+
+	        if ( 0 <= ua && ua <= 1 && 0 <= ub && ub <= 1 ) {
+	            result = new Vector3(a1.getX() + ua * (a2.getX() - a1.getX()), a1.getY() + ua * (a2.getY() - a1.getY()), a1.getZ());
+	        } else {
+	            return null;
+	        }
+	    } else {
+	    	return null;
+	    }
+
+	    return result;
+	}
 }

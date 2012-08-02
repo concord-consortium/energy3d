@@ -55,18 +55,15 @@ public class HipRoof extends Roof {
 	protected void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
 		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {
-			// upper points
 			points.get(0).set(toRelative(center, container.getContainer()).addLocal(0, 0, height));
 			if (editPointIndex == -1) {
-				final Vector3 p = new Vector3();
-				p.set(center).addLocal(0, -5, height);
-				snapToWallsPolygon(p);
-				p.setX(center.getX());
-				points.get(1).set(toRelative(p, container.getContainer()));
-				p.set(center).addLocal(0, 5, height);
-				snapToWallsPolygon(p);
-				p.setX(center.getX());
-				points.get(2).set(toRelative(p, container.getContainer()));
+				final Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(0, -5, 0, null));
+				point1.addLocal(0, 0.2, height);
+				points.get(1).set(toRelative(point1, container.getContainer()));
+
+				final Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(0, 5, 0, null));
+				point2.addLocal(0, -0.2, height);
+				points.get(2).set(toRelative(point2, container.getContainer()));
 			}
 			recalculateEditPoints = false;
 		} else {
@@ -74,5 +71,22 @@ public class HipRoof extends Roof {
 			points.get(1).setZ(center.getZ() + height);
 			points.get(2).setZ(center.getZ() + height);
 		}
+	}
+
+	private Vector3 findFarthestIntersection(final List<? extends ReadOnlyVector3> wallUpperPoints, final ReadOnlyVector3 center, final Vector3 p) {
+		double farthestDistance = 0;
+		Vector3 farthestIntersection = null;
+		final int n = wallUpperPoints.size();
+		for (int i = 0; i < n; i++) {
+			final Vector3 intersect = Util.intersectLineSegments(center, p, wallUpperPoints.get(i), wallUpperPoints.get((i + 1) % n));
+			if (intersect != null) {
+				final double d = intersect.distanceSquared(center);
+				if (d > farthestDistance) {
+					farthestDistance = d;
+					farthestIntersection = intersect;
+				}
+			}
+		}
+		return farthestIntersection;
 	}
 }
