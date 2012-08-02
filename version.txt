@@ -1135,10 +1135,14 @@ Version 0.5 - October 20, 2011
 - fix problem with snapping to corners of foundation from far distance after increasing size of foundation
 - compute hip roof initial edit points by finding intersection from center to farthest wall
 - increase the default snap-to-wall distance when the snap to wall is off
-
+- fix problem with missing gable roof parts by increasing the factor that slightly movies gable points inward
+- when the user sets overhang value, set it to a small number (0.01) so that gable walls can find intersection to roof
+- release version 0.7.4
 
 - *redraw walls after deleting roof
 - *fix dash lines 
+
+- *instead of picking use line intersection algorithm to compute gable roof upper points for better performance
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from

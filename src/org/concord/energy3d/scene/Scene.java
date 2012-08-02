@@ -497,7 +497,10 @@ public class Scene implements Serializable {
 	}
 
 	public double getOverhangLength() {
-		return overhangLength;
+		if (overhangLength < 0.01)
+			return 0.01;
+		else
+			return overhangLength;
 	}
 
 	public void setOverhangLength(final double overhangLength) {

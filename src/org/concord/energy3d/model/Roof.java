@@ -43,7 +43,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
@@ -582,7 +581,7 @@ public abstract class Roof extends HousePart {
 				if (wall != null) { // TODO do this check before adding
 					final ReadOnlyVector3 n = wall.getFaceDirection();
 					double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(Scene.getInstance().getOverhangLength(), null)), null).dot(n);
-					distance -= 0.0001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
+					distance -= 0.001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
 					nearestEditPoint.addLocal(n.multiply(distance, null));
 				}
 			}
@@ -644,8 +643,9 @@ public abstract class Roof extends HousePart {
 			for (final Spatial roofPart : getRoofPartsRoot().getChildren()) {
 				final ReadOnlyVector3[] base = findBasePoints((Mesh) ((Node) roofPart).getChild(0), null);
 				if (base != null && isSameBasePoints(base_i, base)) {
-					roofPart.getSceneHints().setCullHint(CullHint.Always);
-					roofPart.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+					roofPart.removeFromParent();
+//					roofPart.getSceneHints().setCullHint(CullHint.Always);
+//					roofPart.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 					break;
 				}
 			}
