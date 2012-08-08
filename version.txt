@@ -1140,7 +1140,8 @@ Version 0.5 - October 20, 2011
 - release version 0.7.4
 - fix problem with roof making a triangle shape in L shaped house by ensuring that initial custom roof points are away from wall edge
 - somewhat fix problem with roof incorrect drawing when attached to walls of different height (siobhanB04 model)
-
+- avoid extra edit points in custom roof due to walls of different height not being recognized as same edge of a polygon
+- improve roofs on walls with different height
 
 - *redraw walls after deleting roof
 - *fix dash lines 

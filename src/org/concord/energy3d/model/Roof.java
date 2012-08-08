@@ -2,7 +2,6 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -279,17 +278,19 @@ public abstract class Roof extends HousePart {
 				}
 			}
 		});
-//		double maxZ = 0;
-//		for (final Vector3 p : wallUpperPoints)
-//			maxZ = Math.max(p.getZ(), maxZ);
-//		for (final Vector3 p : wallUpperPoints)
-//			p.setZ(maxZ);
-		Collections.reverse(wallUpperPoints);
-		Collections.reverse(wallNormals);
 	}
 
 	protected void addPointToPolygon(final Vector3 p, final ReadOnlyVector3 normal, final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
-		final int index = wallUpperPoints.indexOf(p);
+		int index = -1;
+		/* check to see if there is another point with same x,y coords */
+		for (int i = 0; i < wallUpperPoints.size(); i++) {
+			final Vector3 p_i = wallUpperPoints.get(i);
+			if (p.getX() == p_i.getX() && p.getY() == p_i.getY()) {
+				index = i;
+				break;
+			}
+		}
+
 		if (index == -1) {
 			wallUpperPoints.add(p);
 			wallNormals.add(normal.clone());
