@@ -44,10 +44,12 @@ public class PyramidRoof extends Roof {
 	protected void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
 		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {
-			points.get(0).set(center.getX(), center.getY(), center.getZ() + height);
-			points.get(0).set(toRelative(points.get(0), container.getContainer()));
 			recalculateEditPoints = false;
-		} else
-			points.get(0).setZ(center.getZ() + height);
+			points.get(0).set(toRelative(center, container.getContainer()));
+			computeHeight(wallUpperPoints);
+			applyHeight();
+		} else {
+			applyHeight();
+		}
 	}
 }

@@ -55,21 +55,21 @@ public class HipRoof extends Roof {
 	protected void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
 		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {
-			points.get(0).set(toRelative(center, container.getContainer()).addLocal(0, 0, height));
+			recalculateEditPoints = false;
+			points.get(0).set(toRelative(center, container.getContainer()));
 			if (editPointIndex == -1) {
 				final Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(0, -5, 0, null));
-				point1.addLocal(0, 0.2, height);
+				point1.addLocal(0, 0.2, 0);
 				points.get(1).set(toRelative(point1, container.getContainer()));
 
 				final Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(0, 5, 0, null));
-				point2.addLocal(0, -0.2, height);
+				point2.addLocal(0, -0.2, 0);
 				points.get(2).set(toRelative(point2, container.getContainer()));
 			}
-			recalculateEditPoints = false;
+			computeHeight(wallUpperPoints);
+			applyHeight();
 		} else {
-			points.get(0).setZ(center.getZ() + height);
-			points.get(1).setZ(center.getZ() + height);
-			points.get(2).setZ(center.getZ() + height);
+			applyHeight();
 		}
 	}
 

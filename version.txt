@@ -1142,6 +1142,7 @@ Version 0.5 - October 20, 2011
 - somewhat fix problem with roof incorrect drawing when attached to walls of different height (siobhanB04 model)
 - avoid extra edit points in custom roof due to walls of different height not being recognized as same edge of a polygon
 - improve roofs on walls with different height
+- calculate the height of custom roof based on highest wall 
 
 - *redraw walls after deleting roof
 - *fix dash lines 

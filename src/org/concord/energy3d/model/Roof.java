@@ -823,4 +823,17 @@ public abstract class Roof extends HousePart {
 	protected boolean insideWallsPolygon(final Vector3 p) {
 		return Util.insidePolygon(p, wallUpperPoints);
 	}
+
+	public void computeHeight(final List<? extends ReadOnlyVector3> wallUpperPoints) {
+		double maxZ = 0;
+		for (final ReadOnlyVector3 p : wallUpperPoints)
+			maxZ = Math.max(maxZ, p.getZ());
+		// to make height relative to container wall so that applyHeight() runs the same way
+		height = 0.5 + maxZ - container.getPoints().get(1).getZ();
+	}
+
+	public void applyHeight() {
+		for (final Vector3 p : points)
+			p.setZ(container.getPoints().get(1).getZ() + height);
+	}
 }
