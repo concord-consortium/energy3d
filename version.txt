@@ -1138,11 +1138,16 @@ Version 0.5 - October 20, 2011
 - fix problem with missing gable roof parts by increasing the factor that slightly movies gable points inward
 - when the user sets overhang value, set it to a small number (0.01) so that gable walls can find intersection to roof
 - release version 0.7.4
+- fix problem with roof making a triangle shape in L shaped house by ensuring that initial custom roof points are away from wall edge
+- somewhat fix problem with roof incorrect drawing when attached to walls of different height (siobhanB04 model)
+
 
 - *redraw walls after deleting roof
 - *fix dash lines 
-
+- *prompt for unsaved files
 - *instead of picking use line intersection algorithm to compute gable roof upper points for better performance
+- *fix problem with roof wireframe in Mainsion1 model
+
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from

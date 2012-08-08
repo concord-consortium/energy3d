@@ -75,16 +75,22 @@ public class CustomRoof extends Roof {
 
 			// add or update edit points
 			final double z = container.getPoints().get(1).getZ() + height;
-			if (wallUpperPoints.size() > points.size()) {
-				for (int i = 0; i < wallUpperPoints.size() - 1; i++) {
+			final int n = wallUpperPoints.size();
+			if (n > points.size()) {
+				for (int i = 0; i < n; i++) {
 					final ReadOnlyVector3 p1 = wallUpperPoints.get(i);
-					final ReadOnlyVector3 p2 = wallUpperPoints.get(i + 1);
+					final ReadOnlyVector3 p2 = wallUpperPoints.get((i + 1) % n);
 					// middle of wall = (p1 + p2) / 2
 					final Vector3 v = new Vector3(p1.getX() + p2.getX(), p1.getY() + p2.getY(), 0).multiplyLocal(0.5);
 					v.setZ(z);
 					// add -normal*0.2 to middle point of wall
 //					v.addLocal(wallNormals.get(i).multiply(0.2, null).negateLocal());
-					snapToWallsPolygon(v);
+					final Wall wall = findGableWall(p1, p2);
+					if (wall != null) {
+						final ReadOnlyVector3 normal = wall.getFaceDirection();
+						v.addLocal(normal.multiply(0.2, null).negateLocal());
+					}
+//					snapToWallsPolygon(v);
 					v.set(toRelative(v, container.getContainer()));
 					points.add(v);
 				}

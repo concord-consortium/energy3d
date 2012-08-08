@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -256,7 +257,7 @@ public abstract class Roof extends HousePart {
 
 	private void initWallUpperPoints(final Wall startWall, final List<Wall> walls, final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
 		walls.clear();
-		wallUpperPoints.clear();
+		wallUpperPoints.clear();;
 		wallNormals.clear();
 		startWall.visitNeighbors(new WallVisitor() {
 			@Override
@@ -278,6 +279,13 @@ public abstract class Roof extends HousePart {
 				}
 			}
 		});
+//		double maxZ = 0;
+//		for (final Vector3 p : wallUpperPoints)
+//			maxZ = Math.max(p.getZ(), maxZ);
+//		for (final Vector3 p : wallUpperPoints)
+//			p.setZ(maxZ);
+		Collections.reverse(wallUpperPoints);
+		Collections.reverse(wallNormals);
 	}
 
 	protected void addPointToPolygon(final Vector3 p, final ReadOnlyVector3 normal, final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
@@ -494,19 +502,19 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-	private void convertFromVersion_0_4_1() {
-		for (final Wall wall : gableWalls) {
-			final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
-			int roofPartIndex = 0;
-			for (final Spatial roofPartNode : getRoofPartsRoot().getChildren()) {
-				final ReadOnlyVector3[] meshBase = findBasePoints((Mesh) ((Node) roofPartNode).getChild(0), null);
-				if (meshBase != null && isSameBasePoints(base, meshBase)) {
-					setGable(roofPartIndex, true);
-				}
-				roofPartIndex++;
-			}
-		}
-	}
+//	private void convertFromVersion_0_4_1() {
+//		for (final Wall wall : gableWalls) {
+//			final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
+//			int roofPartIndex = 0;
+//			for (final Spatial roofPartNode : getRoofPartsRoot().getChildren()) {
+//				final ReadOnlyVector3[] meshBase = findBasePoints((Mesh) ((Node) roofPartNode).getChild(0), null);
+//				if (meshBase != null && isSameBasePoints(base, meshBase)) {
+//					setGable(roofPartIndex, true);
+//				}
+//				roofPartIndex++;
+//			}
+//		}
+//	}
 
 	public void setGable(final int roofPartIndex, final boolean isGable) {
 		setGable(roofPartIndex, isGable, true);
@@ -523,7 +531,7 @@ public abstract class Roof extends HousePart {
 
 		final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints = new ArrayList<ReadOnlyVector3>();
 		final ReadOnlyVector3[] roofMeshBase = findBasePoints((Mesh) ((Node) getRoofPartsRoot().getChild(roofPartIndex)).getChild(0), roofPartMeshUpperPoints);
-		final Wall wall = findGableWall(roofMeshBase);
+		final Wall wall = findGableWall(roofMeshBase[0], roofMeshBase[1]);
 		if (isGable) {
 			final ArrayList<Integer> editPoints = new ArrayList<Integer>();
 			for (final ReadOnlyVector3 roofPartMeshUpperPoint : roofPartMeshUpperPoints) {
@@ -572,7 +580,7 @@ public abstract class Roof extends HousePart {
 		if (gableWalls == null)
 			return;
 		else if (gableEditPointToWallMap == null) {
-			convertFromVersion_0_4_1();
+//			convertFromVersion_0_4_1();
 			return;
 		}
 		for (final int nearestIndex : gableEditPointToWallMap.keySet()) {
@@ -642,7 +650,7 @@ public abstract class Roof extends HousePart {
 			final Vector3[] base_i = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
 			for (final Spatial roofPart : getRoofPartsRoot().getChildren()) {
 				final ReadOnlyVector3[] base = findBasePoints((Mesh) ((Node) roofPart).getChild(0), null);
-				if (base != null && isSameBasePoints(base_i, base)) {
+				if (base != null && isSameBasePoints(base_i[0], base_i[1], base[0], base[1])) {
 					roofPart.removeFromParent();
 //					roofPart.getSceneHints().setCullHint(CullHint.Always);
 //					roofPart.getSceneHints().setPickingHint(PickingHint.Pickable, false);
@@ -652,18 +660,18 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-	public boolean isSameBasePoints(final ReadOnlyVector3[] base_1, final ReadOnlyVector3[] base_2) {
+	public boolean isSameBasePoints(final ReadOnlyVector3 a1, final ReadOnlyVector3 a2, final ReadOnlyVector3 b1, final ReadOnlyVector3 b2) {
 		final double maxOverhangDistance = MathUtils.sqrt(2 * Scene.getInstance().getOverhangLength() * Scene.getInstance().getOverhangLength()) * 2;
-		final Vector2 p1a = new Vector2(base_1[0].getX(), base_1[0].getY());
-		final Vector2 p1b = new Vector2(base_1[1].getX(), base_1[1].getY());
-		final Vector2 p2a = new Vector2(base_2[0].getX(), base_2[0].getY());
-		final Vector2 p2b = new Vector2(base_2[1].getX(), base_2[1].getY());
+		final Vector2 p1a = new Vector2(a1.getX(), a1.getY());
+		final Vector2 p1b = new Vector2(a2.getX(), a2.getY());
+		final Vector2 p2a = new Vector2(b1.getX(), b1.getY());
+		final Vector2 p2b = new Vector2(b2.getX(), b2.getY());
 		return (p1a.distance(p2a) <= maxOverhangDistance && p1b.distance(p2b) <= maxOverhangDistance) || (p1a.distance(p2b) <= maxOverhangDistance && p1b.distance(p2a) <= maxOverhangDistance);
 	}
 
-	private Wall findGableWall(final ReadOnlyVector3[] targetBase) {
+	protected Wall findGableWall(final ReadOnlyVector3 targetBase1, final ReadOnlyVector3 targetBase2) {
 		for (final Wall wall : walls) {
-			if (isSameBasePoints(targetBase, new Vector3[] { wall.getAbsPoint(0), wall.getAbsPoint(2) }))
+			if (isSameBasePoints(targetBase1, targetBase2, wall.getAbsPoint(0), wall.getAbsPoint(2)))
 				return wall;
 		}
 		return null;
