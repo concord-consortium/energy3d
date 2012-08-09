@@ -2,6 +2,8 @@ package org.concord.energy3d.util;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -15,6 +17,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.LineSegment3;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
@@ -326,6 +329,38 @@ public class MeshLib {
 		for (final int i : toBeRemoved)
 			convexHull.remove(i);
 		return convexHull;
+	}
+
+	public static ArrayList<ReadOnlyVector3> computeOutline(final FloatBuffer buf) {
+		final Map<LineSegment3, Boolean> visitMap = new HashMap<LineSegment3, Boolean>();
+		for (int i = 0; i < buf.limit(); i += 9) {
+			for (int trianglePointIndex = 0; trianglePointIndex < 9; trianglePointIndex += 3) {
+				buf.position(i + trianglePointIndex);
+				Vector3 p1 = new Vector3(buf.get(), buf.get(), buf.get());
+				buf.position(i + (trianglePointIndex + 3) % 9);
+				Vector3 p2 = new Vector3(buf.get(), buf.get(), buf.get());
+				if (p2.getX() < p1.getX() || (p2.getX() == p1.getX() && p2.getY() < p1.getY())) {
+					final Vector3 tmp = p1;
+					p1 = p2;
+					p2 = tmp;
+				}
+				final LineSegment3 line = new LineSegment3(p1, p2);
+				final Boolean pastVisit = visitMap.get(line);
+				if (pastVisit == null)
+					visitMap.put(line, true);
+				else
+					visitMap.put(line, false);
+			}
+		}
+
+		final ArrayList<ReadOnlyVector3> outlinePoints = new ArrayList<ReadOnlyVector3>();
+		for (final LineSegment3 line : visitMap.keySet()) {
+			if (visitMap.get(line)) {
+				outlinePoints.add(line.getNegativeEnd(null));
+				outlinePoints.add(line.getPositiveEnd(null));
+			}
+		}
+		return outlinePoints;
 	}
 
 	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final XYToAnyTransform fromXY, final boolean generateNormals, final double textureScale, final TPoint o, final TPoint u, final TPoint v) {

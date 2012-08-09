@@ -1142,13 +1142,14 @@ Version 0.5 - October 20, 2011
 - somewhat fix problem with roof incorrect drawing when attached to walls of different height (siobhanB04 model)
 - avoid extra edit points in custom roof due to walls of different height not being recognized as same edge of a polygon
 - improve roofs on walls with different height
-- calculate the height of custom roof based on highest wall 
+- calculate the height of custom roof based on highest wall
 - redraw walls after deleting roof
+- improve mesh outline algorithm to draw wireframe lines only for those edges that are not shared by more than one triangle
+- fix problem with roof wireframe in Mainsion1 model
 
 - *fix dash lines 
 - *prompt for unsaved files
 - *instead of picking use line intersection algorithm to compute gable roof upper points for better performance
-- *fix problem with roof wireframe in Mainsion1 model
 
 
 TODO:
