@@ -1143,8 +1143,8 @@ Version 0.5 - October 20, 2011
 - avoid extra edit points in custom roof due to walls of different height not being recognized as same edge of a polygon
 - improve roofs on walls with different height
 - calculate the height of custom roof based on highest wall 
+- redraw walls after deleting roof
 
-- *redraw walls after deleting roof
 - *fix dash lines 
 - *prompt for unsaved files
 - *instead of picking use line intersection algorithm to compute gable roof upper points for better performance
