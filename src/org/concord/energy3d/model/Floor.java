@@ -165,7 +165,7 @@ public class Floor extends HousePart {
 		if (container == null)
 			return;
 
-		final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(mesh.getMeshData().getVertexBuffer());
+		final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeOutline(mesh.getMeshData().getVertexBuffer());
 		final int totalVertices = convexHull.size();
 
 		final FloatBuffer buf;

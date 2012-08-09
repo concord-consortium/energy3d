@@ -395,7 +395,7 @@ public abstract class Roof extends HousePart {
 			final Node roofPartNode = (Node) roofPart;
 			final FloatBuffer buf = ((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer();
 
-			final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(buf);
+			final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeOutline(buf);
 
 			final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
 			final int n = convexHull.size();
@@ -433,25 +433,20 @@ public abstract class Roof extends HousePart {
 //			final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
 			final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeOutline(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
 			final int totalVertices = convexHull.size();
-			if (totalVertices == 0)
-				return;
 
 			final FloatBuffer buf;
-//			if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
-			if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 3) {
+			if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
 				buf = wireframeMesh.getMeshData().getVertexBuffer();
 				buf.limit(buf.capacity());
 				buf.rewind();
 			} else {
-				buf = BufferUtils.createVector3Buffer(totalVertices);
+				buf = BufferUtils.createVector3Buffer(totalVertices * 2);
 				wireframeMesh.getMeshData().setVertexBuffer(buf);
 			}
 
-//			for (int i = 0; i < convexHull.size(); i++) {
-			for (int i = 0; i < totalVertices - 1; i+=2) {
+			for (int i = 0; i < convexHull.size(); i++) {
 				final ReadOnlyVector3 p1 = convexHull.get(i);
-//				final ReadOnlyVector3 p2 = convexHull.get((i + 1) % convexHull.size());
-				final ReadOnlyVector3 p2 = convexHull.get(i + 1);
+				final ReadOnlyVector3 p2 = convexHull.get((i + 1) % convexHull.size());
 
 				buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
 				buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());

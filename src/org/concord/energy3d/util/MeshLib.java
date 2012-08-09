@@ -256,81 +256,6 @@ public class MeshLib {
 		} while (!endpoint.equals(leftVertex));
 	}
 
-	public static ArrayList<ReadOnlyVector3> computeConvexHull(final FloatBuffer vertexBuffer) {
-		vertexBuffer.rewind();
-		final Vector3 leftVertex = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
-		while (vertexBuffer.hasRemaining()) {
-			final double x = vertexBuffer.get();
-			final double y = vertexBuffer.get();
-			if (x < leftVertex.getX() || (x == leftVertex.getX() && y < leftVertex.getY()))
-				leftVertex.set(x, y, vertexBuffer.get());
-			else
-				vertexBuffer.position(vertexBuffer.position() + 1);
-		}
-
-		final ReadOnlyVector3 normal = Vector3.UNIT_Z;
-		final Vector3 pointOnHull = new Vector3(leftVertex);
-		final Vector3 endpoint = new Vector3();
-		final Vector3 sj = new Vector3();
-		final ArrayList<ReadOnlyVector3> convexHull = new ArrayList<ReadOnlyVector3>();
-		convexHull.add(new Vector3(pointOnHull));
-		do {
-			// endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
-			endpoint.setX(Double.MAX_VALUE);
-
-			for (int j = 0; j <= vertexBuffer.limit() / 3 - 1; j++) {
-				sj.set(vertexBuffer.get(j * 3), vertexBuffer.get(j * 3 + 1), vertexBuffer.get(j * 3 + 2));
-				// if (sj.equals(pointOnHull))
-				if (convexHull.contains(sj))
-					continue;
-				// check to see if sj is connected to pointOnHull
-				boolean isConnected = false;
-				int k = 0;
-				while (k < vertexBuffer.limit()) {
-					final ReadOnlyVector3 p1 = new Vector3(vertexBuffer.get(k++), vertexBuffer.get(k++), vertexBuffer.get(k++));
-					final ReadOnlyVector3 p2 = new Vector3(vertexBuffer.get(k++), vertexBuffer.get(k++), vertexBuffer.get(k++));
-					final ReadOnlyVector3 p3 = new Vector3(vertexBuffer.get(k++), vertexBuffer.get(k++), vertexBuffer.get(k++));
-					if ((pointOnHull.equals(p1) || pointOnHull.equals(p2) || pointOnHull.equals(p3)) && (sj.equals(p1) || sj.equals(p2) || sj.equals(p3))) {
-						isConnected = true;
-						break;
-					}
-				}
-				if (!isConnected)
-					continue;
-				if (endpoint.getX() == Double.MAX_VALUE) {
-					if (convexHull.contains(sj))
-						continue;
-					else
-						endpoint.set(sj);
-				} else {
-					// if (S[j] is on left of line from P[i] to endpoint)
-					final double dot = normal.cross(endpoint.subtract(pointOnHull, null).normalizeLocal(), null).dot(sj.subtract(pointOnHull, null).normalizeLocal());
-					if (dot > 0) {
-						endpoint.set(sj); // found greater left turn, update endpoint
-					} else if (dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
-						endpoint.set(sj); // found greater left turn, update endpoint
-				}
-			}
-			pointOnHull.set(endpoint);
-			if (endpoint.getX() == Double.MAX_VALUE)
-				break;
-			else
-				convexHull.add(new Vector3(pointOnHull));
-		} while (!endpoint.equals(leftVertex));
-
-		final ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
-		for (int i = 1; i < convexHull.size() - 1; i++) {
-			final ReadOnlyVector3 p1 = convexHull.get(i - 1);
-			final ReadOnlyVector3 p2 = convexHull.get(i);
-			final ReadOnlyVector3 p3 = convexHull.get(i + 1);
-			if (p2.subtract(p1, null).normalizeLocal().dot(p3.subtract(p1, null).normalizeLocal()) > 1 - MathUtils.ZERO_TOLERANCE)
-				toBeRemoved.add(i);
-		}
-		for (final int i : toBeRemoved)
-			convexHull.remove(i);
-		return convexHull;
-	}
-
 	public static ArrayList<ReadOnlyVector3> computeOutline(final FloatBuffer buf) {
 		final Map<LineSegment3, Boolean> visitMap = new HashMap<LineSegment3, Boolean>();
 		for (int i = 0; i < buf.limit(); i += 9) {
@@ -356,11 +281,30 @@ public class MeshLib {
 		final ArrayList<ReadOnlyVector3> outlinePoints = new ArrayList<ReadOnlyVector3>();
 		for (final LineSegment3 line : visitMap.keySet()) {
 			if (visitMap.get(line)) {
-				outlinePoints.add(line.getNegativeEnd(null));
+				final Vector3 negativeEnd = line.getNegativeEnd(null);
+				outlinePoints.add(negativeEnd);
 				outlinePoints.add(line.getPositiveEnd(null));
 			}
 		}
-		return outlinePoints;
+		final ArrayList<ReadOnlyVector3> sortedOutlinePoints = new ArrayList<ReadOnlyVector3>(outlinePoints.size() / 2);
+		sortedOutlinePoints.add(outlinePoints.get(0));
+		ReadOnlyVector3 lastPoint = outlinePoints.get(1);
+		sortedOutlinePoints.add(lastPoint);
+		outlinePoints.remove(1);
+		outlinePoints.remove(0);
+		while (!outlinePoints.isEmpty()) {
+			for (int i = 0; i < outlinePoints.size(); i++) {
+				if (outlinePoints.get(i).distanceSquared(lastPoint) < MathUtils.ZERO_TOLERANCE) {
+					final int otherEndIndex = i % 2 == 0 ? i + 1 : i - 1;
+					lastPoint = outlinePoints.get(otherEndIndex);
+					sortedOutlinePoints.add(lastPoint);
+					outlinePoints.remove(Math.max(i, otherEndIndex));
+					outlinePoints.remove(Math.min(i, otherEndIndex));
+				}
+			}
+		}
+
+		return sortedOutlinePoints;
 	}
 
 	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final XYToAnyTransform fromXY, final boolean generateNormals, final double textureScale, final TPoint o, final TPoint u, final TPoint v) {
