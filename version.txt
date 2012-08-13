@@ -1148,6 +1148,7 @@ Version 0.5 - October 20, 2011
 - fix problem with roof wireframe in Mainsion1 model
 - sort the wireframe outline points and removed duplications of edge end points
 - after returning from print preview set the camera to its previous location
+- release version 0.7.5
 
 
 - *fix dash lines 
