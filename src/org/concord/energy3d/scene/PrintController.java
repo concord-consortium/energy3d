@@ -253,7 +253,6 @@ public class PrintController implements Updater {
 		SceneManager.getInstance().refresh();
 		final Printout printout = new Printout(pageFormat, newSize, pageWidth, pageHeight, printCenters);
 		print(0, printout, 0, 0, pageWidth, pageHeight);
-		;
 
 		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
 

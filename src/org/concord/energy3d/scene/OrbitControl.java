@@ -110,7 +110,7 @@ public class OrbitControl extends CameraControl {
 		clearOrbitCenter();
 	}
 
-	private void clearOrbitCenter() {
+	public void clearOrbitCenter() {
 		_center.set(0, 0, 0);
 	}
 

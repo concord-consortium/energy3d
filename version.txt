@@ -1147,6 +1147,8 @@ Version 0.5 - October 20, 2011
 - improve mesh outline algorithm to draw wireframe lines only for those edges that are not shared by more than one triangle
 - fix problem with roof wireframe in Mainsion1 model
 - sort the wireframe outline points and removed duplications of edge end points
+- after returning from print preview set the camera to its previous location
+
 
 - *fix dash lines 
 - *prompt for unsaved files

@@ -128,12 +128,7 @@ public class Scene implements Serializable {
 			instance.cleanup();
 
 			// update camera from file
-			final Camera camera = SceneManager.getInstance().getCameraNode().getCamera();
-			if (instance.getCameraLocation() != null && instance.getCameraDirection() != null) {
-				camera.setLocation(instance.getCameraLocation());
-				camera.lookAt(instance.getCameraLocation().add(instance.getCameraDirection(), null), Vector3.UNIT_Z);
-			}
-			SceneManager.getInstance().getCameraNode().updateFromCamera();
+			loadCameraLocation();
 
 		}
 
@@ -174,6 +169,15 @@ public class Scene implements Serializable {
 				return null;
 			}
 		});
+	}
+
+	public static void loadCameraLocation() {
+		final Camera camera = SceneManager.getInstance().getCameraNode().getCamera();
+		if (instance.getCameraLocation() != null && instance.getCameraDirection() != null) {
+			camera.setLocation(instance.getCameraLocation());
+			camera.lookAt(instance.getCameraLocation().add(instance.getCameraDirection(), null), Vector3.UNIT_Z);
+		}
+		SceneManager.getInstance().getCameraNode().updateFromCamera();
 	}
 
 	public static void importFile(final URL url) throws Exception {
@@ -250,9 +254,7 @@ public class Scene implements Serializable {
 	public static void save(final URL url) throws Exception {
 		instance.cleanup();
 		// save camera to file
-		final Camera camera = SceneManager.getInstance().getCameraNode().getCamera();
-		instance.setCameraLocation(camera.getLocation());
-		instance.setCameraDirection(SceneManager.getInstance().getCameraNode().getCamera().getDirection());
+		saveCameraLocation();
 
 		Scene.url = url;
 		System.out.print("Saving " + Scene.url + "...");
@@ -261,6 +263,12 @@ public class Scene implements Serializable {
 		out.writeObject(instance);
 		out.close();
 		System.out.println("done");
+	}
+
+	public static void saveCameraLocation() {
+		final Camera camera = SceneManager.getInstance().getCameraNode().getCamera();
+		instance.setCameraLocation(camera.getLocation().clone());
+		instance.setCameraDirection(SceneManager.getInstance().getCameraNode().getCamera().getDirection().clone());
 	}
 
 	public static Node getRoot() {

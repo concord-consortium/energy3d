@@ -270,6 +270,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		lightState.attach(light);
 		root.setRenderState(lightState);
 
+		backgroundRoot.getSceneHints().setAllPickingHints(false);
 		backgroundRoot.attachChild(createSky());
 		backgroundRoot.attachChild(createFloor());
 		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
@@ -741,6 +742,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				resetCamera(viewMode);
+				cameraControl.reset();
 				refresh = true;
 			}
 		}));
@@ -898,7 +900,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		camera.setFrame(loc, left, up, lookAt);
 		camera.lookAt(lookAt, Vector3.UNIT_Z);
 
-		cameraControl.reset();
+//		cameraControl.reset();
 		cameraNode.updateFromCamera();
 	}
 
@@ -1062,9 +1064,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void updatePrintPreviewScene(final boolean printPreview) {
+		if (printPreview)
+			Scene.saveCameraLocation();
 		resetCamera(printPreview ? ViewMode.PRINT_PREVIEW : ViewMode.NORMAL);
+		if (!printPreview) {
+			Scene.loadCameraLocation();
+			if (cameraControl instanceof OrbitControl)
+				((OrbitControl) cameraControl).clearOrbitCenter();
+		}
 		backgroundRoot.getSceneHints().setCullHint(printPreview ? CullHint.Always : CullHint.Inherit);
-		backgroundRoot.getSceneHints().setAllPickingHints(false);
 	}
 
 	public void setShadow(final boolean shadow) {
