@@ -35,7 +35,6 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddHousePartCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
-import org.concord.energy3d.undo.MakeGableCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
@@ -1300,8 +1299,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							System.out.println("deleting roof #" + pick.getIndex());
 							final int roofPartIndex = pick.getIndex();
 							final Roof roof = (Roof) selectedHousePart;
-							undoManager.addEdit(new MakeGableCommand(roof, roofPartIndex));
-							roof.setGable(roofPartIndex, true);
+							roof.setGable(roofPartIndex, true, undoManager);
 							if (!Config.isApplet())
 								MainFrame.getInstance().refreshUndoRedo();
 						}

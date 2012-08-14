@@ -1151,6 +1151,9 @@ Version 0.5 - October 20, 2011
 - release version 0.7.5
 - ensure that the edit points stay within boundaries of the gable wall after the roof becomes gable
 - fix problem with gable roof edit point snapped outside of the wall if the the front wall is narrower than the back wall
+- use gable wall instead of root part index for undo and redo commands
+- fix problems with undo and redo gable when the gable results in removal of roof part 
+
 
 - *fix dash lines 
 - *prompt for unsaved files

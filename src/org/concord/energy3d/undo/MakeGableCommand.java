@@ -1,47 +1,39 @@
 package org.concord.energy3d.undo;
 
-import java.util.concurrent.Callable;
+import java.util.ArrayList;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Roof;
-import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.model.Wall;
+
+import com.ardor3d.math.type.ReadOnlyVector3;
 
 @SuppressWarnings("serial")
 public class MakeGableCommand extends EditHousePartCommand {
 	private final Roof roof;
-	private final int roofPartIndex;
+	private final Wall wall;
+	private final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints;
 
-	public MakeGableCommand(final Roof roof, final int roofPartIndex) {
+	public MakeGableCommand(final Roof roof, final Wall wall, final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints) {
 		super(roof);
 		this.roof = roof;
-		this.roofPartIndex = roofPartIndex;
+		this.wall = wall;
+		this.roofPartMeshUpperPoints = roofPartMeshUpperPoints;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		saveNewPoints();
+		roof.setGable(wall, false, false, roofPartMeshUpperPoints);
 		super.undo();
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() {
-				roof.setGable(roofPartIndex, false);
-				return null;
-			}
-		});
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
+		roof.setGable(wall, true, false, roofPartMeshUpperPoints);
 		super.redo();
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() {
-				roof.setGable(roofPartIndex, true);
-				return null;
-			}
-		});
 	}
 
 	@Override

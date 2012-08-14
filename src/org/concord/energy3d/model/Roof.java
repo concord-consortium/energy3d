@@ -6,13 +6,17 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
+
+import javax.swing.undo.UndoManager;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.undo.MakeGableCommand;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
@@ -57,7 +61,6 @@ public abstract class Roof extends HousePart {
 	private transient HousePart previousContainer;
 	private ArrayList<Wall> gableWalls = null;
 	private Map<Integer, ArrayList<Wall>> gableEditPointToWallMap = null;
-	private Map<Integer, ArrayList<Integer>> gableRoofPartToEditPointMap = null;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 
 	public Roof(final int numOfDrawPoints, final int numOfEditPoints, final double height) {
@@ -518,22 +521,25 @@ public abstract class Roof extends HousePart {
 //		}
 //	}
 
-	public void setGable(final int roofPartIndex, final boolean isGable) {
-		setGable(roofPartIndex, isGable, true);
+	public void setGable(final int roofPartIndex, final boolean isGable, final UndoManager undoManager) {
+		final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints = new ArrayList<ReadOnlyVector3>();
+		final Wall wall = findGableWall(roofPartIndex, roofPartMeshUpperPoints);
+		undoManager.addEdit(new MakeGableCommand(this, wall, roofPartMeshUpperPoints));
+		setGable(wall, isGable, true, roofPartMeshUpperPoints);
 	}
 
-	private void setGable(final int roofPartIndex, final boolean isGable, final boolean redraw) {
-		System.out.println("setGable(" + roofPartIndex + ", " + isGable + ")");
+	public Wall findGableWall(final int roofPartIndex, final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints) {
+		final ReadOnlyVector3[] roofMeshBase = findBasePoints((Mesh) ((Node) getRoofPartsRoot().getChild(roofPartIndex)).getChild(0), roofPartMeshUpperPoints);
+		return findGableWall(roofMeshBase[0], roofMeshBase[1]);
+	}
+
+	public void setGable(final Wall wall, final boolean isGable, final boolean redraw, final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints) {
+		System.out.println("setGable(" + wall + ", " + isGable + ")");
 		if (gableWalls == null)
 			gableWalls = new ArrayList<Wall>();
 		if (gableEditPointToWallMap == null)
 			gableEditPointToWallMap = new Hashtable<Integer, ArrayList<Wall>>();
-		if (gableRoofPartToEditPointMap == null)
-			gableRoofPartToEditPointMap = new Hashtable<Integer, ArrayList<Integer>>();
 
-		final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints = new ArrayList<ReadOnlyVector3>();
-		final ReadOnlyVector3[] roofMeshBase = findBasePoints((Mesh) ((Node) getRoofPartsRoot().getChild(roofPartIndex)).getChild(0), roofPartMeshUpperPoints);
-		final Wall wall = findGableWall(roofMeshBase[0], roofMeshBase[1]);
 		if (isGable) {
 			final ArrayList<Integer> editPoints = new ArrayList<Integer>();
 			for (final ReadOnlyVector3 roofPartMeshUpperPoint : roofPartMeshUpperPoints) {
@@ -553,12 +559,18 @@ public abstract class Roof extends HousePart {
 				gableEditPointToWallMap.get(nearestEditPointIndex).add(wall);
 				editPoints.add(nearestEditPointIndex);
 			}
-			gableRoofPartToEditPointMap.put(roofPartIndex, editPoints);
 			gableWalls.add(wall);
 		} else {
-			for (final int editPointIndex : gableRoofPartToEditPointMap.get(roofPartIndex))
-				gableEditPointToWallMap.remove(editPointIndex);
-			gableRoofPartToEditPointMap.remove(roofPartIndex);
+			final List<Integer> toBeRemoved = new ArrayList<Integer>();
+			for (final Entry<Integer, ArrayList<Wall>> entry : gableEditPointToWallMap.entrySet())
+				if (entry.getValue().contains(wall)) {
+					entry.getValue().remove(wall);
+					if (entry.getValue().isEmpty())
+						toBeRemoved.add(entry.getKey());
+				}
+			for (final int removedEditPoint : toBeRemoved)
+				gableEditPointToWallMap.remove(removedEditPoint);
+
 			gableWalls.remove(wall);
 		}
 
@@ -569,11 +581,8 @@ public abstract class Roof extends HousePart {
 	}
 
 	public void removeAllGables() {
-		final ArrayList<Integer> indices = new ArrayList<Integer>();
-		for (final int index : gableRoofPartToEditPointMap.keySet())
-			indices.add(index);
-		for (final int index : indices)
-			setGable(index, false, false);
+		for (final Wall wall : gableWalls)
+			setGable(wall, false, false, null);
 		draw();
 		drawWalls();
 	}
