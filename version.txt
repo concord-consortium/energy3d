@@ -1149,11 +1149,14 @@ Version 0.5 - October 20, 2011
 - sort the wireframe outline points and removed duplications of edge end points
 - after returning from print preview set the camera to its previous location
 - release version 0.7.5
-
+- ensure that the edit points stay within boundaries of the gable wall after the roof becomes gable
+- fix problem with gable roof edit point snapped outside of the wall if the the front wall is narrower than the back wall
 
 - *fix dash lines 
 - *prompt for unsaved files
 - *instead of picking use line intersection algorithm to compute gable roof upper points for better performance
+- *if color is changed to black, then to a dark color, the color stays black
+
 
 
 TODO:

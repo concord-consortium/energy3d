@@ -593,6 +593,7 @@ public abstract class Roof extends HousePart {
 					double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(Scene.getInstance().getOverhangLength(), null)), null).dot(n);
 					distance -= 0.001; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
 					nearestEditPoint.addLocal(n.multiply(distance, null));
+					snapToWallsPolygon(nearestEditPoint);
 				}
 			}
 			points.get(nearestIndex).set(toRelative(nearestEditPoint, container.getContainer()));
