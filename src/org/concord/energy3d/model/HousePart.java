@@ -610,7 +610,7 @@ public abstract class HousePart implements Serializable {
 		if (Scene.getInstance().getTextureMode() == TextureMode.Simple) {
 			final Color color = new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue());
 			final Image image = texture.getImage();
-			final ByteBuffer data = image.getData(0);
+			final ByteBuffer data = image.getData(0).duplicate();
 			for (int y = 0; y < image.getHeight(); y++)
 				for (int x = 0; x < image.getWidth(); x++) {
 					final byte alpha = data.get((y * image.getWidth() + x) * 4 + 3);
@@ -621,8 +621,8 @@ public abstract class HousePart implements Serializable {
 						data.put((y * image.getWidth() + x) * 4 + 3, (byte) -1);
 					}
 				}
-			image.setData(data);
-			texture.setImage(image);
+			final Image newImage = new Image(image.getDataFormat(), image.getDataType(), image.getWidth(), image.getHeight(), data, null);
+			texture.setImage(newImage);
 		}
 		return texture;
 	}
