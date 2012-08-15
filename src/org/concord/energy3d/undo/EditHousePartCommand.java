@@ -18,16 +18,16 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	private final double orgHeight;
 	private ArrayList<Vector3> newPoints;
 	private double newHeight;
-	
-	
+
+
 	public EditHousePartCommand(final HousePart housePart) {
 		this.housePart = housePart;
-		this.orgHeight = housePart.getHeight();		
-		this.orgPoints = new ArrayList<Vector3>(housePart.getPoints().size());		
+		orgHeight = housePart.getHeight();
+		orgPoints = new ArrayList<Vector3>(housePart.getPoints().size());
 		for (final Vector3 p : housePart.getPoints())
-			this.orgPoints.add(p.clone());
+			orgPoints.add(p.clone());
 	}
-	
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -38,23 +38,23 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 			housePart.getPoints().set(i, orgPoints.get(i).clone());
 		Scene.getInstance().redrawAll();
 	}
-	
+
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		housePart.setHeight(newHeight);
 //		housePart.getPoints().clear();
 //		housePart.getPoints().addAll(newPoints);
-		for (int i = 0; i < orgPoints.size(); i++)
-			housePart.getPoints().set(i, orgPoints.get(i).clone());		
-		Scene.getInstance().redrawAll();		
+		for (int i = 0; i < newPoints.size(); i++)
+			housePart.getPoints().set(i, newPoints.get(i).clone());
+		Scene.getInstance().redrawAll();
 	}
-	
+
 	@Override
 	public String getPresentationName() {
 		return "Edit " + housePart.getClass().getSimpleName();
 	}
-	
+
 	public boolean isReallyEdited() {
 		saveNewPoints();
 		return !orgPoints.equals(newPoints);
@@ -62,10 +62,10 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 
 	public void saveNewPoints() {
 		if (newPoints == null) {
-			this.newHeight = housePart.getHeight();
-			this.newPoints = new ArrayList<Vector3>(housePart.getPoints().size());
+			newHeight = housePart.getHeight();
+			newPoints = new ArrayList<Vector3>(housePart.getPoints().size());
 			for (final Vector3 p : housePart.getPoints())
-				this.newPoints.add(p.clone());
+				newPoints.add(p.clone());
 		}
 	}
 }

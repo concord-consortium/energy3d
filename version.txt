@@ -1153,11 +1153,16 @@ Version 0.5 - October 20, 2011
 - fix problem with gable roof edit point snapped outside of the wall if the the front wall is narrower than the back wall
 - use gable wall instead of root part index for undo and redo commands
 - fix problems with undo and redo gable when the gable results in removal of roof part 
-- fix problem with if color is changed to black, then to a dark color, the color stays black if in Simple Texture mode. 
+- fix problem with if color is changed to black, then to a dark color, the color stays black if in Simple Texture mode.
+- prompt for unsaved files
+- add SaveCommand with variable significant flag and override UndoManager to monitor it
+- set the edit flag whenever a new edit command is added
+- clear the edit flag whenever undo or redo to a save point
+- cancel closing of window if user select cancel to save file prompt
 
 - *fix dash lines 
-- *prompt for unsaved files
 - *instead of picking use line intersection algorithm to compute gable roof upper points for better performance
+- *allow undo and redo of color changes
 
 
 

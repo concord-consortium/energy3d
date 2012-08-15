@@ -218,7 +218,6 @@ public class MainFrame extends JFrame {
 		}
 		colorChooser = new JColorChooser();
 		initialize();
-		updateTitleBar();
 		System.out.println("done");
 	}
 
@@ -229,7 +228,7 @@ public class MainFrame extends JFrame {
 	 */
 	private void initialize() {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setTitle("Energy3D v" + Config.VERSION);
 
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -251,7 +250,7 @@ public class MainFrame extends JFrame {
 			anApp.addApplicationListener(new ApplicationAdapter() {
 				@Override
 				public void handleQuit(final ApplicationEvent e) {
-					SceneManager.getInstance().exit();
+					exit();
 					e.setHandled(true);
 				}
 
@@ -301,7 +300,7 @@ public class MainFrame extends JFrame {
 		addWindowListener(new java.awt.event.WindowAdapter() {
 			@Override
 			public void windowClosing(final java.awt.event.WindowEvent e) {
-				SceneManager.getInstance().exit();
+				exit();
 			}
 
 			@Override
@@ -423,11 +422,12 @@ public class MainFrame extends JFrame {
 		return openMenuItem;
 	}
 
-	private void updateTitleBar() {
+	public void updateTitleBar() {
+		final String star = Scene.getInstance().isEdited() ? "*" : "";
 		if (Scene.getURL() == null)
-			setTitle("Energy3D v" + Config.VERSION);
+			setTitle("Energy3D v" + Config.VERSION + star);
 		else
-			setTitle("Energy3D v" + Config.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " "));
+			setTitle("Energy3D v" + Config.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
 	}
 
 	/**
@@ -442,16 +442,7 @@ public class MainFrame extends JFrame {
 			saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					try {
-						final URL url = Scene.getURL();
-						if (url != null)
-							Scene.save(url);
-						else
-							saveFile();
-					} catch (final Throwable err) {
-						err.printStackTrace();
-						JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-					}
+					save();
 				}
 			});
 		}
@@ -618,7 +609,7 @@ public class MainFrame extends JFrame {
 			exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().exit();
+					exit();
 				}
 			});
 		}
@@ -1357,6 +1348,30 @@ public class MainFrame extends JFrame {
 			});
 		} catch (final Throwable e) {
 			showUnexpectedErrorMessage(e);
+		}
+	}
+
+	private void exit() {
+		if (Scene.getInstance().isEdited()) {
+			final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+			if (save == JOptionPane.YES_OPTION)
+				save();
+			else if (save == JOptionPane.CANCEL_OPTION)
+				return;
+		}
+		SceneManager.getInstance().exit();
+	}
+
+	private void save() {
+		try {
+			final URL url = Scene.getURL();
+			if (url != null)
+				Scene.save(url);
+			else
+				saveFile();
+		} catch (final Throwable err) {
+			err.printStackTrace();
+			JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

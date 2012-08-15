@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
-import javax.swing.undo.UndoManager;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
@@ -36,6 +35,7 @@ import org.concord.energy3d.undo.AddHousePartCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
+import org.concord.energy3d.undo.UndoManager;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FontManager;

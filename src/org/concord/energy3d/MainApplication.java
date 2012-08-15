@@ -38,6 +38,8 @@ public class MainApplication {
 		if (!Config.isMac() && args.length > 1)
 			mainFrame.open(args[1]);
 
+		mainFrame.updateTitleBar();
+
 //		HandTrackerApplication.main(null);
 	}
 

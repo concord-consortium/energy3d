@@ -19,6 +19,7 @@ import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.shapes.Annotation;
+import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -71,6 +72,7 @@ public class Scene implements Serializable {
 	private double overhangLength = 0.2;
 	private double annotationScale = 10;
 	private boolean isAnnotationsVisible = true;
+	private transient boolean edited = false;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -164,6 +166,8 @@ public class Scene implements Serializable {
 				root.updateWorldBound(true);
 				SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 				SceneManager.getInstance().getUndoManager().die();
+				SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
+				Scene.getInstance().setEdited(false);
 				if (!Config.isApplet())
 					MainFrame.getInstance().refreshUndoRedo();
 				return null;
@@ -262,6 +266,8 @@ public class Scene implements Serializable {
 		out = new ObjectOutputStream(new FileOutputStream(Scene.url.toURI().getPath()));
 		out.writeObject(instance);
 		out.close();
+		SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
+		Scene.getInstance().setEdited(false);
 		System.out.println("done");
 	}
 
@@ -553,5 +559,16 @@ public class Scene implements Serializable {
 
 	public void setRoofColor(final ReadOnlyColorRGBA roofColor) {
 		this.roofColor = roofColor;
+	}
+
+	public boolean isEdited() {
+		return edited;
+	}
+
+	public void setEdited(final boolean edited) {
+		System.out.println("setEdited(" + edited + ")");
+		this.edited  = edited;
+		if (!Config.isApplet())
+			MainFrame.getInstance().updateTitleBar();
 	}
 }
