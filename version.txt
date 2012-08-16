@@ -1161,11 +1161,11 @@ Version 0.5 - October 20, 2011
 - cancel closing of window if user select cancel to save file prompt
 - allow undo and redo of color changes
 - automatically refresh undo redo in gui inside undoManager
-
+- fix problem with if color is changed to black, then to a dark color, the color stays black if in Simple Texture mode.
 
 - *fix dash lines 
 - *instead of picking use line intersection algorithm to compute gable roof upper points for better performance
-
+- *fix file new camera initial position
 
 
 TODO:
