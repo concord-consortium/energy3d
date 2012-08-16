@@ -49,6 +49,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
+import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
 
 import com.apple.eawt.Application;
@@ -894,7 +895,6 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().undo();
 					Scene.getInstance().redrawAll();
-					refreshUndoRedo();
 				}
 			});
 		}
@@ -912,7 +912,6 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().redo();
 					Scene.getInstance().redrawAll();
-					refreshUndoRedo();
 				}
 			});
 		}
@@ -1152,6 +1151,7 @@ public class MainFrame extends JFrame {
 			noTextureRadioButtonMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.None);
 				}
 			});
@@ -1166,6 +1166,7 @@ public class MainFrame extends JFrame {
 			simpleTextureRadioButtonMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Simple);
 				}
 			});
@@ -1180,6 +1181,7 @@ public class MainFrame extends JFrame {
 			fullTextureRadioButtonMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Full);
 				}
 			});
@@ -1300,6 +1302,7 @@ public class MainFrame extends JFrame {
 
 			}
 		};
+		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 		if (fullTextureRadioButtonMenuItem.isSelected()) {
 			noTextureRadioButtonMenuItem.setSelected(true);
 			Scene.getInstance().setTextureMode(TextureMode.None);

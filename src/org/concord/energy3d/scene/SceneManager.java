@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
@@ -679,8 +678,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					@Override
 					public Object call() throws Exception {
 						undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-						if (!Config.isApplet())
-							MainFrame.getInstance().refreshUndoRedo();
 						Scene.getInstance().remove(selectedHousePart);
 						selectedHousePart = null;
 						return null;
@@ -695,8 +692,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					@Override
 					public Object call() throws Exception {
 						undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-						if (!Config.isApplet())
-							MainFrame.getInstance().refreshUndoRedo();
 						Scene.getInstance().remove(selectedHousePart);
 						selectedHousePart = null;
 						return null;
@@ -1300,8 +1295,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							final int roofPartIndex = pick.getIndex();
 							final Roof roof = (Roof) selectedHousePart;
 							roof.setGable(roofPartIndex, true, undoManager);
-							if (!Config.isApplet())
-								MainFrame.getInstance().refreshUndoRedo();
 						}
 					}
 				} else {
@@ -1329,18 +1322,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							selectedHousePart.reset();
 							selectedHousePart.draw();
 							undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-							if (!Config.isApplet())
-								MainFrame.getInstance().refreshUndoRedo();
 							Scene.getInstance().remove(selectedHousePart);
 							selectedHousePart = null;
 						}
 						sceneChanged = true;
 						if (editHousePartCommand != null) {
-							if (editHousePartCommand.isReallyEdited()) {
+							if (editHousePartCommand.isReallyEdited())
 								undoManager.addEdit(editHousePartCommand);
-								if (!Config.isApplet())
-									MainFrame.getInstance().refreshUndoRedo();
-							}
 							editHousePartCommand = null;
 						}
 					}
@@ -1363,8 +1351,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (addHousePartCommand != null) {
 							undoManager.addEdit(addHousePartCommand);
 							removeExistingRoof();
-							if (!Config.isApplet())
-								MainFrame.getInstance().refreshUndoRedo();
 							addHousePartCommand = null;
 						}
 						selectedHousePart.setEditPointsVisible(false);

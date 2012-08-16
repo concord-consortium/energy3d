@@ -1159,10 +1159,12 @@ Version 0.5 - October 20, 2011
 - set the edit flag whenever a new edit command is added
 - clear the edit flag whenever undo or redo to a save point
 - cancel closing of window if user select cancel to save file prompt
+- allow undo and redo of color changes
+- automatically refresh undo redo in gui inside undoManager
+
 
 - *fix dash lines 
 - *instead of picking use line intersection algorithm to compute gable roof upper points for better performance
-- *allow undo and redo of color changes
 
 
 

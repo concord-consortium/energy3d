@@ -168,8 +168,6 @@ public class Scene implements Serializable {
 				SceneManager.getInstance().getUndoManager().die();
 				SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
 				Scene.getInstance().setEdited(false);
-				if (!Config.isApplet())
-					MainFrame.getInstance().refreshUndoRedo();
 				return null;
 			}
 		});
