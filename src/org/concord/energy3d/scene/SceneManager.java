@@ -448,6 +448,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		cameraNode.updateFromCamera();
 		setCameraControl(CameraMode.ORBIT);
 		resetCamera(ViewMode.NORMAL);
+		SceneManager.getInstance().getCameraControl().reset();
 
 		taskManager.update(new Callable<Object>() {
 			@Override

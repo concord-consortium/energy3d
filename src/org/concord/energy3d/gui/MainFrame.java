@@ -388,6 +388,8 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					Scene.newFile(40, 30);
+					SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+					SceneManager.getInstance().getCameraControl().reset();
 					updateTitleBar();
 				}
 			});
