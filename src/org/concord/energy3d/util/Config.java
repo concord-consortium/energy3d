@@ -3,7 +3,7 @@ package org.concord.energy3d.util;
 import org.concord.energy3d.MainApplet;
 
 public class Config {
-	public static final String VERSION = "0.7.6";
+	public static final String VERSION = "0.7.7";
 	public static final boolean JOGL = true;
 	private static MainApplet applet;
 	private static boolean isWebstart;

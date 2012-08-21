@@ -1165,7 +1165,7 @@ Version 0.5 - October 20, 2011
 - fix orbit control camera initial direction
 - reset camera direction when creating new file
 - release version 0.7.6
- 
+- avoid infinit loop when computing roof outlines 
 
 - *fix dash lines 
 - *instead of picking use line intersection algorithm to compute gable roof upper points for better performance

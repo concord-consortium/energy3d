@@ -286,6 +286,7 @@ public class MeshLib {
 				outlinePoints.add(line.getPositiveEnd(null));
 			}
 		}
+
 		final ArrayList<ReadOnlyVector3> sortedOutlinePoints = new ArrayList<ReadOnlyVector3>(outlinePoints.size() / 2);
 		sortedOutlinePoints.add(outlinePoints.get(0));
 		ReadOnlyVector3 lastPoint = outlinePoints.get(1);
@@ -293,6 +294,7 @@ public class MeshLib {
 		outlinePoints.remove(1);
 		outlinePoints.remove(0);
 		while (!outlinePoints.isEmpty()) {
+			boolean foundSomething = false;
 			for (int i = 0; i < outlinePoints.size(); i++) {
 				if (outlinePoints.get(i).distanceSquared(lastPoint) < MathUtils.ZERO_TOLERANCE) {
 					final int otherEndIndex = i % 2 == 0 ? i + 1 : i - 1;
@@ -300,8 +302,12 @@ public class MeshLib {
 					sortedOutlinePoints.add(lastPoint);
 					outlinePoints.remove(Math.max(i, otherEndIndex));
 					outlinePoints.remove(Math.min(i, otherEndIndex));
+					foundSomething = true;
+					break;
 				}
 			}
+			if (!foundSomething)
+				break;
 		}
 
 		return sortedOutlinePoints;
