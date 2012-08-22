@@ -259,12 +259,10 @@ public class Wall extends HousePart {
 		Wall closestWall = null;
 		int closestPointIndex = -1;
 		for (final HousePart housePart : Scene.getInstance().getParts()) {
-			if (housePart instanceof Wall && housePart != this && ((neighbors[0] == null || neighbors[0].getNeighborOf(this) != housePart) && (neighbors[1] == null || neighbors[1].getNeighborOf(this) != housePart))) {
+			if (housePart instanceof Wall && housePart != this) {
 				final Wall wall = (Wall) housePart;
-				int i = 0;
-				for (int j = 0; j < wall.points.size(); j++) {
-					final ReadOnlyVector3 p2 = wall.getAbsPoint(j);
-
+				for (int i = 0; i < wall.points.size(); i += 2) {
+					final ReadOnlyVector3 p2 = wall.getAbsPoint(i);
 					final double distance = p.distance(p2);
 					if (distance < closestDistance) {
 						closestPoint = p2;
@@ -272,16 +270,29 @@ public class Wall extends HousePart {
 						closestWall = wall;
 						closestPointIndex = i;
 					}
-					i++;
 				}
 			}
 		}
 
-		if (closestDistance < (isSnapToObjects() ? SNAP_DISTANCE : getGridSize() * 2) && (!isFirstPointInserted() || p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() > getGridSize() * 2)) {
+		final double snapDistance = isSnapToObjects() ? SNAP_DISTANCE : getGridSize() * 2;
+
+		final boolean snap;
+		if (isFirstPointInserted() && p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() < getGridSize() * 2)
+			snap = false;
+		else if (closestDistance < snapDistance)
+			snap = true;
+		else if (neighbors[index / 2] != null && closestDistance < snapDistance + getGridSize())
+			snap = true;
+		else
+			snap = false;
+
+		if (snap) {
+			System.out.println("true");
 			p.set(closestPoint);
 			setNeighbor(index, new Snap(this, closestWall, index, closestPointIndex), true);
 			return true;
 		} else {
+			System.out.println("false");
 			setNeighbor(index, null, true);
 			return false;
 		}

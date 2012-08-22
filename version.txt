@@ -1165,10 +1165,11 @@ Version 0.5 - October 20, 2011
 - fix orbit control camera initial direction
 - reset camera direction when creating new file
 - release version 0.7.6
-- avoid infinit loop when computing roof outlines 
+- avoid infinit loop when computing roof outlines
+- fix jumpy and jittery walls connections when connecting or disconnecting walls by allowing a gridSize buffer for those walls already connected
 
+- *fix problem with wall hole falling outside of wall boundary due to chaging roof slope
 - *fix dash lines 
-- *instead of picking use line intersection algorithm to compute gable roof upper points for better performance
 
 
 TODO:
