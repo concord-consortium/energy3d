@@ -72,18 +72,7 @@ public class MeshLib {
 			for (final GroupData g : groups) {
 				if (g.key.dot(norm) > 0.99) { // if there is less than 8 degrees difference between the two vectors
 					// if there is an edge in common with the existing triangles
-					boolean foundEdgeInCommon = false;
-					for (int j = 0; j < g.vertices.size() && !foundEdgeInCommon; j += 3) {
-						int numOfShared = 0;
-						for (int k = 0; k < 3; k++) {
-							final Vector3 p = g.vertices.get(j + k);
-							if (p.equals(p1) || p.equals(p2) || p.equals(p3))
-								numOfShared++;
-						}
-						if (numOfShared > 1)
-							foundEdgeInCommon = true;
-					}
-					if (foundEdgeInCommon) {
+					if (hasCommonEdge(g, p1, p2, p3)) {
 						group = g;
 						break;
 					}
@@ -105,7 +94,64 @@ public class MeshLib {
 			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
 			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
 		}
+		combineGroups(groups);
 		return groups;
+	}
+
+	private static boolean hasCommonEdge(final GroupData group, final Vector3 p1, final Vector3 p2, final Vector3 p3) {
+		boolean foundEdgeInCommon = false;
+		for (int j = 0; j < group.vertices.size() && !foundEdgeInCommon; j += 3) {
+			int numOfShared = 0;
+			for (int k = 0; k < 3; k++) {
+				final Vector3 p = group.vertices.get(j + k);
+				if (p.equals(p1) || p.equals(p2) || p.equals(p3))
+					numOfShared++;
+			}
+			if (numOfShared > 1)
+				foundEdgeInCommon = true;
+		}
+		return foundEdgeInCommon;
+	}
+
+	private static void combineGroups(final ArrayList<GroupData> groups) {
+		for (int i = 0; i < groups.size(); i++) {
+			final GroupData group1 = groups.get(i);
+			for (int j = i + 1; j < groups.size(); j++) {
+				final GroupData group2 = groups.get(j);
+				boolean changed = false;
+				if (group1.key.equals(group2.key)) {
+					for (int w = 0; w < group2.vertices.size() / 3; w++) {
+						final Vector3 p1 = group2.vertices.get(w * 3);
+						final Vector3 p2 = group2.vertices.get(w * 3 + 1);
+						final Vector3 p3 = group2.vertices.get(w * 3 + 2);
+						if (hasCommonEdge(group1, p1, p2, p3)) {
+							group1.vertices.add(p1);
+							group1.vertices.add(p2);
+							group1.vertices.add(p3);
+							group1.normals.add(group2.normals.get(w * 3));
+							group1.normals.add(group2.normals.get(w * 3 + 1));
+							group1.normals.add(group2.normals.get(w * 3 + 2));
+							group1.textures.add(group2.textures.get(w * 3));
+							group1.textures.add(group2.textures.get(w * 3 + 1));
+							group1.textures.add(group2.textures.get(w * 3 + 2));
+							for (int count = 0; count < 3; count++) {
+								group2.vertices.remove(w);
+								group2.normals.remove(w);
+								group2.textures.remove(w);
+							}
+							changed = true;
+							if (group2.vertices.isEmpty()) {
+								groups.remove(group2);
+								break;
+							} else
+								w = 0;
+						}
+					}
+				}
+				if (changed)
+					j = i + 1;
+			}
+		}
 	}
 
 	private static void computeHorizontalTextureCoords(final ArrayList<GroupData> groups) {
