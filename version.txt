@@ -1168,9 +1168,10 @@ Version 0.5 - October 20, 2011
 - avoid infinit loop when computing roof outlines
 - fix jumpy and jittery walls connections when connecting or disconnecting walls by allowing a gridSize buffer for those walls already connected
 - improve group mesh algorithm looping through parts with common edges and combining them and redoing until no more combination is found  
-- fix problem with some roof parts being separate even though have common edge and a same normal 
+- fix problem with some roof parts being separate even though have common edge and a same normal
+- save the state of roof before editing and revert back if the new state results in a window falling outside of a wall 
+- fix problem with wall hole falling outside of wall boundary due to changing roof slope
 
-- *fix problem with wall hole falling outside of wall boundary due to chaging roof slope
 - *fix dash lines 
 
 

@@ -1146,6 +1146,14 @@ public class Wall extends HousePart {
 		}
 	}
 
+	public boolean windowsFit() {
+		for (final HousePart part : children)
+			if (part instanceof Window)
+				if (!fits((Window) part))
+					return false;
+		return true;
+	}
+
 	public boolean fits(final Window window) {
 		final ArrayList<Vector3> hole = computeWindowHole(window, Vector3.ZERO);
 		applyXYTransform(hole);

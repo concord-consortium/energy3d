@@ -63,6 +63,27 @@ public abstract class Roof extends HousePart {
 	private Map<Integer, ArrayList<Wall>> gableEditPointToWallMap = null;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 
+	protected class EditState {
+		final boolean fitTestRequired;
+		final ArrayList<Vector3> orgPoints;
+		final double orgHeight;
+
+		public EditState() {
+			if (editPointIndex == -1)
+				orgPoints = null;
+			else {
+				orgPoints = new ArrayList<Vector3>(points.size());
+				for (final Vector3 v : points)
+					orgPoints.add(v.clone());
+			}
+			if (editPointIndex == -1 || !windowsFit())
+				fitTestRequired = false;
+			else
+				fitTestRequired = true;
+			orgHeight = height;
+		}
+	}
+
 	public Roof(final int numOfDrawPoints, final int numOfEditPoints, final double height) {
 		super(numOfDrawPoints, numOfEditPoints, height);
 	}
@@ -139,6 +160,13 @@ public abstract class Roof extends HousePart {
 					currentWall.draw();
 				}
 			});
+	}
+
+	protected boolean windowsFit() {
+		for (final Wall wall : walls)
+			if (!wall.windowsFit())
+				return false;
+		return true;
 	}
 
 	private void drawDashLines() {
@@ -847,5 +875,21 @@ public abstract class Roof extends HousePart {
 	public void applyHeight() {
 		for (final Vector3 p : points)
 			p.setZ(container.getPoints().get(1).getZ() + height);
+	}
+
+	protected void postEdit(final EditState editState) {
+		draw();
+		drawWalls();
+
+		if (editState.fitTestRequired && !windowsFit()) {
+			for (int i = 0; i < points.size(); i++)
+				points.get(i).set(editState.orgPoints.get(i));
+			height = editState.orgHeight;
+			draw();
+			drawWalls();
+		}
+
+		if (container != null)
+			setEditPointsVisible(true);
 	}
 }

@@ -24,6 +24,7 @@ public class CustomRoof extends Roof {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		final EditState editState = new EditState();
 		if (editPointIndex == -1) {
 			recalculateEditPoints = true;
 			pickContainer(x, y, Wall.class);
@@ -46,10 +47,7 @@ public class CustomRoof extends Roof {
 				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 			}
 		}
-		if (container != null)
-			setEditPointsVisible(true);
-		draw();
-		drawWalls();
+		postEdit(editState);
 	}
 
 	@Override

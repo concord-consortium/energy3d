@@ -20,6 +20,8 @@ public class HipRoof extends Roof {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		final EditState editState = new EditState();
+
 		if (editPointIndex == -1) {
 			pickContainer(x, y, Wall.class);
 			recalculateEditPoints = true;
@@ -34,11 +36,7 @@ public class HipRoof extends Roof {
 			if (insideWallsPolygon(p))
 				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
 		}
-		draw();
-		drawWalls();
-		if (container != null)
-			setEditPointsVisible(true);
-
+		postEdit(editState);
 	}
 
 	@Override

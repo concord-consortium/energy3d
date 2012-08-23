@@ -19,6 +19,8 @@ public class PyramidRoof extends Roof {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		final EditState editState = new EditState();
+
 		if (editPointIndex == -1) {
 			pickContainer(x, y, Wall.class);
 			recalculateEditPoints = true;;
@@ -28,10 +30,7 @@ public class PyramidRoof extends Roof {
 			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ());
 		}
-		draw();
-		drawWalls();
-		if (container != null)
-			setEditPointsVisible(true);
+		postEdit(editState);
 	}
 
 	@Override
