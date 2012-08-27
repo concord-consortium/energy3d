@@ -598,10 +598,10 @@ public abstract class HousePart implements Serializable {
 			final Texture texture = getTexture(getTextureFileName(), defaultColor);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
-			if (textureMode == TextureMode.Full)
-				mesh.setDefaultColor(ColorRGBA.WHITE);
-			else
+			if (textureMode == TextureMode.None)
 				mesh.setDefaultColor(defaultColor);
+			else
+				mesh.setDefaultColor(ColorRGBA.WHITE);
 		}
 	}
 
@@ -613,11 +613,7 @@ public abstract class HousePart implements Serializable {
 			final ByteBuffer data = image.getData(0);
 			for (int y = 0; y < image.getHeight(); y++)
 				for (int x = 0; x < image.getWidth(); x++) {
-					final byte r = data.get((y * image.getWidth() + x) * 4 + 0);
-					final byte g = data.get((y * image.getWidth() + x) * 4 + 1);
-					final byte b = data.get((y * image.getWidth() + x) * 4 + 2);
 					final byte alpha = data.get((y * image.getWidth() + x) * 4 + 3);
-					System.out.println(r + " " + g + " " + b + " " + alpha);
 					if (alpha == 0) {
 						data.put((y * image.getWidth() + x) * 4, (byte) color.getRed());
 						data.put((y * image.getWidth() + x) * 4 + 1, (byte) color.getGreen());

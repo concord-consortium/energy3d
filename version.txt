@@ -1171,7 +1171,8 @@ Version 0.5 - October 20, 2011
 - fix problem with some roof parts being separate even though have common edge and a same normal
 - save the state of roof before editing and revert back if the new state results in a window falling outside of a wall 
 - fix problem with wall hole falling outside of wall boundary due to changing roof slope
-- fix problem with missing dash lines 
+- fix problem with missing dash lines
+- fix problem with darker color in simple texture mode by setting mesh default color to white
 
 
 TODO:
