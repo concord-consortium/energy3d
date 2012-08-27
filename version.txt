@@ -1173,7 +1173,9 @@ Version 0.5 - October 20, 2011
 - fix problem with wall hole falling outside of wall boundary due to changing roof slope
 - fix problem with missing dash lines
 - fix problem with darker color in simple texture mode by setting mesh default color to white
+- release version 0.7.8
 
+- *undo wall direction when undoing wall add or move or delete 
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from
