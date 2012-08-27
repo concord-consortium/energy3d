@@ -198,6 +198,7 @@ public class MeshLib {
 			final Mesh newMesh;
 			if (meshIndex < root.getNumberOfChildren()) {
 				node = (Node) root.getChild(meshIndex);
+				node.setName("Roof Part #" + meshIndex);
 				newMesh = (Mesh) node.getChild(0);
 			} else {
 				node = new Node("Roof Part #" + meshIndex);

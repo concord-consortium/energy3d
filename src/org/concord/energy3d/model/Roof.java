@@ -188,22 +188,22 @@ public abstract class Roof extends HousePart {
 					});
 					if (result.isEmpty()) {
 						dashLinesMesh.setVisible(false);
-						return null;
-					} else
+					} else {
 						dashLinesMesh.setVisible(true);
-					FloatBuffer vertexBuffer = dashLinesMesh.getMeshData().getVertexBuffer();
-					if (vertexBuffer == null || vertexBuffer.capacity() < result.size() * 3) {
-						vertexBuffer = BufferUtils.createVector3Buffer(result.size());
-						dashLinesMesh.getMeshData().setVertexBuffer(vertexBuffer);
+						FloatBuffer vertexBuffer = dashLinesMesh.getMeshData().getVertexBuffer();
+						if (vertexBuffer == null || vertexBuffer.capacity() < result.size() * 3) {
+							vertexBuffer = BufferUtils.createVector3Buffer(result.size());
+							dashLinesMesh.getMeshData().setVertexBuffer(vertexBuffer);
+						}
+						vertexBuffer.limit(result.size() * 3);
+						vertexBuffer.rewind();
+
+						for (final ReadOnlyVector3 p : result)
+							vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+
+						dashLinesMesh.getMeshData().updateVertexCount();
+						dashLinesMesh.updateModelBound();
 					}
-					vertexBuffer.limit(result.size() * 3);
-					vertexBuffer.rewind();
-
-					for (final ReadOnlyVector3 p : result)
-						vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-
-					dashLinesMesh.getMeshData().updateVertexCount();
-					dashLinesMesh.updateModelBound();
 				}
 				updateDashLinesColor();
 				return null;
@@ -287,7 +287,8 @@ public abstract class Roof extends HousePart {
 
 	private void initWallUpperPoints(final Wall startWall, final List<Wall> walls, final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
 		walls.clear();
-		wallUpperPoints.clear();;
+		wallUpperPoints.clear();
+		;
 		wallNormals.clear();
 		startWall.visitNeighbors(new WallVisitor() {
 			@Override
@@ -461,7 +462,7 @@ public abstract class Roof extends HousePart {
 			final Node roofPartNode = (Node) roofPart;
 			final Mesh wireframeMesh = (Mesh) roofPartNode.getChild(4);
 
-//			final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
+			// final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
 			final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeOutline(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
 			final int totalVertices = convexHull.size();
 
@@ -535,19 +536,19 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-//	private void convertFromVersion_0_4_1() {
-//		for (final Wall wall : gableWalls) {
-//			final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
-//			int roofPartIndex = 0;
-//			for (final Spatial roofPartNode : getRoofPartsRoot().getChildren()) {
-//				final ReadOnlyVector3[] meshBase = findBasePoints((Mesh) ((Node) roofPartNode).getChild(0), null);
-//				if (meshBase != null && isSameBasePoints(base, meshBase)) {
-//					setGable(roofPartIndex, true);
-//				}
-//				roofPartIndex++;
-//			}
-//		}
-//	}
+	// private void convertFromVersion_0_4_1() {
+	// for (final Wall wall : gableWalls) {
+	// final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
+	// int roofPartIndex = 0;
+	// for (final Spatial roofPartNode : getRoofPartsRoot().getChildren()) {
+	// final ReadOnlyVector3[] meshBase = findBasePoints((Mesh) ((Node) roofPartNode).getChild(0), null);
+	// if (meshBase != null && isSameBasePoints(base, meshBase)) {
+	// setGable(roofPartIndex, true);
+	// }
+	// roofPartIndex++;
+	// }
+	// }
+	// }
 
 	public void setGable(final int roofPartIndex, final boolean isGable, final UndoManager undoManager) {
 		final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints = new ArrayList<ReadOnlyVector3>();
@@ -619,7 +620,7 @@ public abstract class Roof extends HousePart {
 		if (gableWalls == null)
 			return;
 		else if (gableEditPointToWallMap == null) {
-//			convertFromVersion_0_4_1();
+			// convertFromVersion_0_4_1();
 			return;
 		}
 		for (final int nearestIndex : gableEditPointToWallMap.keySet()) {
@@ -692,8 +693,8 @@ public abstract class Roof extends HousePart {
 				final ReadOnlyVector3[] base = findBasePoints((Mesh) ((Node) roofPart).getChild(0), null);
 				if (base != null && isSameBasePoints(base_i[0], base_i[1], base[0], base[1])) {
 					roofPart.removeFromParent();
-//					roofPart.getSceneHints().setCullHint(CullHint.Always);
-//					roofPart.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+					// roofPart.getSceneHints().setCullHint(CullHint.Always);
+					// roofPart.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 					break;
 				}
 			}
