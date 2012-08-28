@@ -1174,6 +1174,8 @@ Version 0.5 - October 20, 2011
 - fix problem with missing dash lines
 - fix problem with darker color in simple texture mode by setting mesh default color to white
 - release version 0.7.8
+- fix exception when inserting hip roof on narrow walls that do not include the center such as U shape roofs 
+
 
 - *undo wall direction when undoing wall add or move or delete 
 
