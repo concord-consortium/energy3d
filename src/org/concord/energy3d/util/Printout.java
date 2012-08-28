@@ -23,13 +23,13 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Printout implements Printable, Pageable {
+	private final ArrayList<ReadOnlyVector3> printCorners;
+	private final BufferedImage image;
 	private final PageFormat pageFormat;
 	private final Dimension targetSize;
+	private final double visibleSceneWidth;
+	private final double visibleSceneHeight;
 	private ByteBuffer _scratch;
-	final private double visibleSceneWidth;
-	final private double visibleSceneHeight;
-	private final BufferedImage image;
-	private final ArrayList<ReadOnlyVector3> printCorners;
 	private int lastImagePage = -1;
 
 	public Printout(final PageFormat pageFormat, final Dimension targetSize, final double visibleSceneWidth, final double visibleSceneHeight, final ArrayList<ReadOnlyVector3> printCorners) {
@@ -92,8 +92,8 @@ public class Printout implements Printable, Pageable {
 			camera.setLocation(cameraLocation);
 			camera.lookAt(cameraLocation.add(0, 1, 0, null), Vector3.UNIT_Z);
 
-			SceneManager.getInstance().frameHandler.updateFrame();
-			SceneManager.getInstance().frameHandler.updateFrame();
+			SceneManager.getInstance().getFrameHandler().updateFrame();
+			SceneManager.getInstance().getFrameHandler().updateFrame();
 
 			// Ask the renderer for the current scene to be stored in the buffer
 			_scratch = BufferUtils.createByteBuffer(camera.getWidth() * camera.getHeight() * ImageUtils.getPixelByteSize(getFormat(), PixelDataType.UnsignedByte));

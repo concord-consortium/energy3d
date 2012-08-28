@@ -287,12 +287,10 @@ public class Wall extends HousePart {
 			snap = false;
 
 		if (snap) {
-			System.out.println("true");
 			p.set(closestPoint);
 			setNeighbor(index, new Snap(this, closestWall, index, closestPointIndex), true);
 			return true;
 		} else {
-			System.out.println("false");
 			setNeighbor(index, null, true);
 			return false;
 		}
@@ -380,7 +378,6 @@ public class Wall extends HousePart {
 			for (int i = 1; i < wallAndWindowsPoints.size(); i++)
 				polygon.addHole(new Polygon(ArdorVector3PolygonPoint.toPoints(wallAndWindowsPoints.get(i))));
 
-		// toXY(polygon);
 		for (final TriangulationPoint tp : polygon.getPoints())
 			toXY.transform(tp);
 		if (polygon.getHoles() != null)
@@ -765,11 +762,6 @@ public class Wall extends HousePart {
 		return null;
 	}
 
-	/**
-	 * @param pointIndex
-	 * @param newSnap
-	 * @param updateNeighbors
-	 */
 	private void setNeighbor(final int pointIndex, final Snap newSnap, final boolean updateNeighbors) {
 		final int i = pointIndex < 2 ? 0 : 1;
 		final Snap oldSnap = neighbors[i];

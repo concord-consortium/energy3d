@@ -143,12 +143,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		NORMAL, TOP_VIEW, PRINT_PREVIEW, PRINT
 	}
 
-	private static final double MOVE_SPEED = 5;
-
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());
+	private static final double MOVE_SPEED = 5;
 	private final Canvas canvas;
-	public final FrameHandler frameHandler;
+	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
 	private final Node root = new Node("Root");
 	private final Node backgroundRoot = new Node("Scenary Root");
@@ -169,11 +168,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private AddHousePartCommand addHousePartCommand;
 	private EditHousePartCommand editHousePartCommand;
 	private UserData pick;
+	private TwoInputStates firstClickState;
 	private double refreshTime = -1;
 	private long lastRenderTime;
 	private boolean mouseControlEnabled = true;
 	private boolean drawBounds = false;
-	private final boolean exit = false;
 	private boolean rotAnim = false;
 	private boolean heliodonControl;
 	private boolean sunAnim;
@@ -181,7 +180,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean operationFlag = false;
 	private boolean refresh = true;
 	private boolean zoomLock = false;
-	private TwoInputStates firstClickState;
 
 	public final static byte DEFAULT_THEME = 0;
 	public final static byte SKETCHUP_THEME = 1;
@@ -311,7 +309,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	@Override
 	public synchronized void run() {
 		frameHandler.init();
-		while (!exit) {
+		while (true) {
 			logicalLayer.checkTriggers(frameHandler.getTimer().getTimePerFrame());
 			final double now = frameHandler.getTimer().getTimeInSeconds();
 			final boolean isUpdateTime = refreshTime != -1 && now <= refreshTime;
@@ -399,9 +397,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					System.out.println(node.getWorldBound());
 				}
 			} else {
-				// if (selectedHousePart instanceof Wall)
-				// com.ardor3d.util.geom.Debugger.drawBounds(((Wall) selectedHousePart).getRoot().getChild(3), renderer, true);
-				// else
 				com.ardor3d.util.geom.Debugger.drawBounds(selectedHousePart.getMesh(), renderer, true);
 				if (selectedHousePart.getMesh() != null)
 					System.out.println(selectedHousePart.getMesh().getWorldBound());
@@ -465,6 +460,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	@Override
 	public PickResults doPick(final Ray3 pickRay) {
 		return null;
+	}
+
+	public FrameHandler getFrameHandler() {
+		return frameHandler;
 	}
 
 	public Canvas getCanvas() {
@@ -895,7 +894,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		camera.setFrame(loc, left, up, lookAt);
 		camera.lookAt(lookAt, Vector3.UNIT_Z);
 
-//		cameraControl.reset();
 		cameraNode.updateFromCamera();
 	}
 

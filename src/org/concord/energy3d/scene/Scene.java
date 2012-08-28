@@ -60,10 +60,11 @@ public class Scene implements Serializable {
 	private static boolean drawThickness = false;
 	private static boolean drawAnnotationsInside = false;
 	private static Unit unit = Unit.Centimeter;
+	private transient boolean edited = false;
 	private final ArrayList<HousePart> parts = new ArrayList<HousePart>();
+	private TextureMode textureMode = TextureMode.Full;
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
-	private TextureMode textureMode = TextureMode.Full;
 	private ReadOnlyColorRGBA foundationColor = ColorRGBA.WHITE;
 	private ReadOnlyColorRGBA wallColor = ColorRGBA.WHITE;
 	private ReadOnlyColorRGBA doorColor = ColorRGBA.WHITE;
@@ -72,7 +73,6 @@ public class Scene implements Serializable {
 	private double overhangLength = 0.2;
 	private double annotationScale = 10;
 	private boolean isAnnotationsVisible = true;
-	private transient boolean edited = false;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -128,10 +128,7 @@ public class Scene implements Serializable {
 			in.close();
 
 			instance.cleanup();
-
-			// update camera from file
 			loadCameraLocation();
-
 		}
 
 		if (!Config.isApplet()) {
@@ -241,7 +238,6 @@ public class Scene implements Serializable {
 			remove(housePart);
 
 		fixDisconnectedWalls();
-
 	}
 
 	private void fixDisconnectedWalls() {
@@ -283,14 +279,12 @@ public class Scene implements Serializable {
 	}
 
 	public void add(final HousePart housePart) {
-		System.out.print("Adding new house part...");
 		final HousePart container = housePart.getContainer();
 		if (container != null)
 			container.getChildren().add(housePart);
 		addTree(housePart);
 		if (container != null)
 			container.draw();
-		System.out.println("done");
 	}
 
 	private void addTree(final HousePart housePart) {
@@ -564,7 +558,6 @@ public class Scene implements Serializable {
 	}
 
 	public void setEdited(final boolean edited) {
-		System.out.println("setEdited(" + edited + ")");
 		this.edited  = edited;
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();

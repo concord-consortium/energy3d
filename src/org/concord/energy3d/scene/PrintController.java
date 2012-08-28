@@ -50,6 +50,10 @@ public class PrintController implements Updater {
 	private static double spaceBetweenParts = 0;
 	private final ArrayList<ReadOnlyVector3> printCenters = new ArrayList<ReadOnlyVector3>();
 	private final Timer timer = new Timer();
+	private final Node pagesRoot = new Node();
+	private ArrayList<HousePart> printParts;
+	private PageFormat pageFormat = new PageFormat();
+	private double labelHeight = 0.0;
 	private double pageWidth, pageHeight, pageLeft, pageRight, pageTop, pageBottom;
 	private double angle;
 	private int cols;
@@ -60,13 +64,9 @@ public class PrintController implements Updater {
 	private boolean finished = true;
 	private boolean shadingSelected;
 	private boolean shadowSelected;
-	private ArrayList<HousePart> printParts;
-	private final Node pagesRoot = new Node();
-	private boolean heliodonSelected;
-	private PageFormat pageFormat = new PageFormat();
 	private boolean isScaleToFit = true;
 	private boolean restartFlag = false;
-	private double labelHeight = 0.0;
+	private boolean heliodonSelected;
 
 	public static PrintController getInstance() {
 		return instance;

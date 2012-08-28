@@ -18,7 +18,6 @@ public class MainApplication {
 			System.out.println("Application is lauched by webstart.");
 		} else
 			try {
-				// setupFileAssociations();
 				setupLibraryPath();
 			} catch (final Exception e) {
 				e.printStackTrace();
@@ -81,87 +80,4 @@ public class MainApplication {
 		}
 	}
 
-	// private static void setupFileAssociations() {
-	// final AssociationService serv = new AssociationService();
-	// final Association logassoc = new Association();
-	//
-	// // Adds the .log type to the Association object.
-	//
-	// logassoc.addFileExtension("eg3");
-	//
-	// // Adds an Action to the Association object that will
-	// // open a .log file with Windows Notepad.
-	//
-	// logassoc.addAction(new Action("open", "C:\\WINDOWS\\system32\\NOTEPAD.EXE %1"));
-	//
-	// try {
-	//
-	// // Adds the .log Association to the file types' table
-	// // at the user level using an AssociationService object.
-	//
-	// serv.registerUserAssociation(logassoc);
-	//
-	// } catch (final java.lang.IllegalArgumentException e) {
-	//
-	// // This exception will be caught if the given Association is not valid
-	// // to be added to the table of file types.
-	//
-	// System.err.println(e);
-	//
-	// } catch (final AssociationAlreadyRegisteredException e) {
-	//
-	// // This exception will be caught if the Association already
-	// // exists in the table of file types.
-	//
-	// System.err.println(e);
-	//
-	// } catch (final RegisterFailedException e) {
-	//
-	// // This exception will be caught if the Association was
-	// // unable to be added to the table of file types.
-	//
-	// System.err.println(e);
-	//
-	// }
-	// }
-	//
-	// private static void removeFileAssociations() {
-	// final AssociationService serv = new AssociationService();
-	//
-	// // This uses an AssociationService to search the table of file
-	// // types for the .log extension. If the .log file is found,
-	// // an Association object representing the .log file type
-	// // will be returned. Otherwise, null is returned.
-	//
-	// final Association logassoc = serv.getFileExtensionAssociation("LOG");
-	//
-	// try {
-	//
-	// // The AssociationService will remove the .log file type from
-	// // the table of file types.
-	//
-	// serv.unregisterUserAssociation(logassoc);
-	//
-	// } catch (final java.lang.IllegalArgumentException e) {
-	//
-	// // This exception will be caught if the given Association is not valid
-	// // to be removed from the table of file types.
-	//
-	// System.err.println(e);
-	//
-	// } catch (final AssociationNotRegisteredException e) {
-	//
-	// // This exception will be caught if the Association does not already
-	// // exist in the table of file types.
-	//
-	// System.err.println(e);
-	//
-	// } catch (final RegisterFailedException e) {
-	//
-	// // This exception will be caughtif the association was unable to be
-	// // removed from the table of file types.
-	//
-	// System.err.println(e);
-	// }
-	// }
 }

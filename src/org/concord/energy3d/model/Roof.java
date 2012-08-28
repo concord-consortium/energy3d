@@ -54,14 +54,14 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class Roof extends HousePart {
 	private static final long serialVersionUID = 1L;
 	protected transient Node roofPartsRoot;
+	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
+	private transient Map<Node, ReadOnlyVector3> orgCenters;
 	private transient List<Vector3> wallUpperPoints;
 	private transient List<Vector3> wallNormals;
-	private transient Map<Node, ReadOnlyVector3> orgCenters;
 	private transient List<Wall> walls;
 	private transient HousePart previousContainer;
-	private ArrayList<Wall> gableWalls = null;
 	private Map<Integer, ArrayList<Wall>> gableEditPointToWallMap = null;
-	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
+	private ArrayList<Wall> gableWalls = null;
 
 	protected class EditState {
 		final boolean fitTestRequired;
@@ -91,7 +91,7 @@ public abstract class Roof extends HousePart {
 	@Override
 	protected void init() {
 		super.init();
-		relativeToHorizontal = true; // TODO move all parameters of HousePart constructor to init
+		relativeToHorizontal = true;
 		orgCenters = new HashMap<Node, ReadOnlyVector3>();
 		wallUpperPoints = new ArrayList<Vector3>();
 		wallNormals = new ArrayList<Vector3>();
@@ -536,20 +536,6 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-	// private void convertFromVersion_0_4_1() {
-	// for (final Wall wall : gableWalls) {
-	// final Vector3[] base = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
-	// int roofPartIndex = 0;
-	// for (final Spatial roofPartNode : getRoofPartsRoot().getChildren()) {
-	// final ReadOnlyVector3[] meshBase = findBasePoints((Mesh) ((Node) roofPartNode).getChild(0), null);
-	// if (meshBase != null && isSameBasePoints(base, meshBase)) {
-	// setGable(roofPartIndex, true);
-	// }
-	// roofPartIndex++;
-	// }
-	// }
-	// }
-
 	public void setGable(final int roofPartIndex, final boolean isGable, final UndoManager undoManager) {
 		final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints = new ArrayList<ReadOnlyVector3>();
 		final Wall wall = findGableWall(roofPartIndex, roofPartMeshUpperPoints);
@@ -617,12 +603,8 @@ public abstract class Roof extends HousePart {
 	}
 
 	private void computeGableEditPoints() {
-		if (gableWalls == null)
+		if (gableWalls == null || gableEditPointToWallMap == null)
 			return;
-		else if (gableEditPointToWallMap == null) {
-			// convertFromVersion_0_4_1();
-			return;
-		}
 		for (final int nearestIndex : gableEditPointToWallMap.keySet()) {
 			final Vector3 nearestEditPoint = getAbsPoint(nearestIndex);
 			for (final Wall wall : gableEditPointToWallMap.get(nearestIndex)) {
@@ -693,8 +675,6 @@ public abstract class Roof extends HousePart {
 				final ReadOnlyVector3[] base = findBasePoints((Mesh) ((Node) roofPart).getChild(0), null);
 				if (base != null && isSameBasePoints(base_i[0], base_i[1], base[0], base[1])) {
 					roofPart.removeFromParent();
-					// roofPart.getSceneHints().setCullHint(CullHint.Always);
-					// roofPart.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 					break;
 				}
 			}

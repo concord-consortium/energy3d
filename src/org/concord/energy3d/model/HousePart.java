@@ -52,15 +52,16 @@ public abstract class HousePart implements Serializable {
 	private static boolean snapToGrids = true;
 	protected transient final int numOfDrawPoints;
 	protected transient final int numOfEditPoints;
+	protected transient HousePart original = null;
 	protected transient Node root;
 	protected transient Node pointsRoot;
-	protected transient double orgHeight;
-	protected transient HousePart original = null;
 	protected transient Node labelsRoot;
 	protected transient Node sizeAnnotRoot;
 	protected transient Node angleAnnotRoot;
 	protected transient Mesh mesh;
 	protected transient Mesh gridsMesh;
+	protected transient Vector3 flattenCenter;
+	protected transient double orgHeight;
 	protected transient boolean relativeToHorizontal;
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
@@ -68,10 +69,9 @@ public abstract class HousePart implements Serializable {
 	protected double height;
 	protected int editPointIndex = -1;
 	protected boolean drawCompleted = false;
-	protected transient Vector3 flattenCenter;
+	private transient boolean isPrintVertical;
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
-	private transient boolean isPrintVertical;
 
 	public static boolean isSnapToObjects() {
 		return snapToObjects;
@@ -117,10 +117,6 @@ public abstract class HousePart implements Serializable {
 		this(numOfDrawPoints, numOfEditPoints, height, false);
 	}
 
-	public double getGridSize() {
-		return 0.1;
-	}
-
 	/* if an attribute is transient but is always needed then it should be set to default here */
 	protected void init() {
 		relativeToHorizontal = false;
@@ -154,6 +150,10 @@ public abstract class HousePart implements Serializable {
 		Util.disablePickShadowLight(gridsMesh);
 		root.attachChild(gridsMesh);
 		setGridsVisible(false);
+	}
+
+	public double getGridSize() {
+		return 0.1;
 	}
 
 	private void addNewEditPointShape(final int i) {

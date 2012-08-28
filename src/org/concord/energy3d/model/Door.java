@@ -18,10 +18,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static double defaultDoorHeight = 1.5; // 0.8f;
-	private transient FloatBuffer vertexBuffer;
-	private transient FloatBuffer normalBuffer;
-	private transient FloatBuffer textureBuffer;
+	private static double defaultDoorHeight = 1.5;
 
 	public Door() {
 		super(2, 4, defaultDoorHeight);
@@ -31,15 +28,11 @@ public class Door extends HousePart {
 	protected void init() {
 		super.init();
 		mesh = new Mesh("Door");
-		vertexBuffer = BufferUtils.createVector3Buffer(4);
-		normalBuffer = BufferUtils.createVector3Buffer(4);
-		textureBuffer = BufferUtils.createVector2Buffer(4);
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		mesh.getMeshData().setVertexBuffer(vertexBuffer);
-		mesh.getMeshData().setNormalBuffer(normalBuffer);
-		mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
+		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
+		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 
-		// Add a material to the box, to show both vertex color and lighting/shading.
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
@@ -97,20 +90,20 @@ public class Door extends HousePart {
 		if (points.size() < 4)
 			return;
 
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		for (int i = 0; i < points.size(); i++) {
 			final ReadOnlyVector3 p = getAbsPoint(i);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 
-		// Compute normals
-		final Vector3 normal = getAbsPoint(2).subtract(getAbsPoint(0), null).crossLocal(getAbsPoint(1).subtract(getAbsPoint(0), null)).normalizeLocal();
-		normal.negateLocal();
+		final ReadOnlyVector3 normal = getAbsPoint(2).subtract(getAbsPoint(0), null).crossLocal(getAbsPoint(1).subtract(getAbsPoint(0), null)).normalizeLocal().negateLocal();
+		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
 		normalBuffer.rewind();
 		for (int i = 0; i < points.size(); i++)
 			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
 
-		// Texture coords
+		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
 		textureBuffer.rewind();
 		textureBuffer.put(0).put(0);
 		textureBuffer.put(0).put(1);

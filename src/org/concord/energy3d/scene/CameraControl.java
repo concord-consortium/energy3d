@@ -44,12 +44,12 @@ public abstract class CameraControl {
     protected double _moveSpeed = 50;
     protected double _keyRotateSpeed = 2.25;
     protected boolean enabled = true;
-	private boolean mouseEnabled = true;
 	private ReadOnlyVector3 orgCameraDirection;
 	private ReadOnlyVector3 newCameraDirection;
-	private double animationTime = -1;
 	private ReadOnlyVector3 orgCameraLocation;
 	private ReadOnlyVector3 newCameraLocation;
+	private double animationTime = -1;
+	private boolean mouseEnabled = true;
 	private boolean leftMouseButtonEnabled = true;
 	private boolean rightMouseButtonEnabled = true;
 

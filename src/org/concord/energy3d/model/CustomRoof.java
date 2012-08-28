@@ -68,27 +68,23 @@ public class CustomRoof extends Roof {
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
 			points.clear();
-
 			points.add(toRelative(getCenter(), container.getContainer()));
-
 			// add or update edit points
 			final int n = wallUpperPoints.size();
-//			if (n > points.size()) {
-				for (int i = 0; i < n; i++) {
-					final ReadOnlyVector3 p1 = wallUpperPoints.get(i);
-					final ReadOnlyVector3 p2 = wallUpperPoints.get((i + 1) % n);
-					// middle of wall = (p1 + p2) / 2
-					final Vector3 v = new Vector3(p1.getX() + p2.getX(), p1.getY() + p2.getY(), 0).multiplyLocal(0.5);
-					// add -normal*0.2 to middle point of wall
-					final Wall wall = findGableWall(p1, p2);
-					if (wall != null) {
-						final ReadOnlyVector3 normal = wall.getFaceDirection();
-						v.addLocal(normal.multiply(0.2, null).negateLocal());
-					}
-					v.set(toRelative(v, container.getContainer()));
-					points.add(v);
+			for (int i = 0; i < n; i++) {
+				final ReadOnlyVector3 p1 = wallUpperPoints.get(i);
+				final ReadOnlyVector3 p2 = wallUpperPoints.get((i + 1) % n);
+				// middle of wall = (p1 + p2) / 2
+				final Vector3 v = new Vector3(p1.getX() + p2.getX(), p1.getY() + p2.getY(), 0).multiplyLocal(0.5);
+				// add -normal*0.2 to middle point of wall
+				final Wall wall = findGableWall(p1, p2);
+				if (wall != null) {
+					final ReadOnlyVector3 normal = wall.getFaceDirection();
+					v.addLocal(normal.multiply(0.2, null).negateLocal());
 				}
-//			}
+				v.set(toRelative(v, container.getContainer()));
+				points.add(v);
+			}
 
 			computeHeight(wallUpperPoints);
 			applyHeight();
