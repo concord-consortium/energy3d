@@ -251,8 +251,8 @@ public class MainFrame extends JFrame {
 			anApp.addApplicationListener(new ApplicationAdapter() {
 				@Override
 				public void handleQuit(final ApplicationEvent e) {
-					exit();
 					e.setHandled(true);
+					exit();
 				}
 
 				@Override
@@ -267,8 +267,9 @@ public class MainFrame extends JFrame {
 				}
 
 				@Override
-				public void handleOpenFile(final ApplicationEvent event) {
-					open(event.getFilename());
+				public void handleOpenFile(final ApplicationEvent e) {
+					open(e.getFilename());
+					e.setHandled(true);
 				}
 			});
 		}

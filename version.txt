@@ -1127,7 +1127,6 @@ Version 0.5 - October 20, 2011
 - instead of working with polygon and converting to Vector3 when needed, work with Vector3 and convert to polygon once at the end
 - update Poly2Tri library so that it ArdorPolyPoint overrides the setter method otherwise setting has no effect 
 - update Poly2Tri library so that it ArdorPolyPoint works on a "copy" to input Vector3 so that it does not change the value of original vector
-*
 - use wall.drawPolygon to generate the invisible mesh of walls
 - pull up snapToWallsPolygon to superclass Roof
 - ensure that edit points in HipRoof staying within boundaries
@@ -1162,6 +1161,7 @@ Version 0.5 - October 20, 2011
 - allow undo and redo of color changes
 - automatically refresh undo redo in gui inside undoManager
 - fix problem with if color is changed to black, then to a dark color, the color stays black if in Simple Texture mode.
+*
 - fix orbit control camera initial direction
 - reset camera direction when creating new file
 - release version 0.7.6

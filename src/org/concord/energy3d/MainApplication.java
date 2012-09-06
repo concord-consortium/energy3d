@@ -14,14 +14,10 @@ public class MainApplication {
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Energy3D");
 		}
 		Config.setWebStart(System.getProperty("javawebstart.version", null) != null);
-		if (Config.isWebStart()) {
+		if (Config.isWebStart())
 			System.out.println("Application is lauched by webstart.");
-		} else
-			try {
-				setupLibraryPath();
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
+		else
+			setupLibraryPath();
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
