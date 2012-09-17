@@ -1175,7 +1175,13 @@ Version 0.5 - October 20, 2011
 - fix problem with darker color in simple texture mode by setting mesh default color to white
 - release version 0.7.8
 - fix exception when inserting hip roof on narrow walls that do not include the center such as U shape roofs 
-
+- update jar maker to include new ardor3d projects
+- enlarge the scene for improved shadow rendering
+- make 1-to-1 correlation between 3D world coordinates and 1cm instead of 1-to-10 correlation 
+- after loading old models scale them up by 10 times
+- set the default size and height of house parts to 10 times larger 
+- scale up the location of the camera by 10 times
+- increase the grid size of all house parts by 10 times
 
 - *undo wall direction when undoing wall add or move or delete 
 

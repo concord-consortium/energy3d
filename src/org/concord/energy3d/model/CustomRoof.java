@@ -19,7 +19,7 @@ public class CustomRoof extends Roof {
 	private transient boolean recalculateEditPoints;
 
 	public CustomRoof() {
-		super(1, 1, 0.5);
+		super(1);
 	}
 
 	@Override

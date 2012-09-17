@@ -33,7 +33,7 @@ public class Window extends HousePart {
 	private transient Line bars;
 
 	public Window() {
-		super(2, 4, 0.30);
+		super(2, 4, 30.0);
 	}
 
 	@Override

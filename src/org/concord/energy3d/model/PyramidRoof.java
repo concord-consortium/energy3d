@@ -14,7 +14,7 @@ public class PyramidRoof extends Roof {
 	private transient boolean recalculateEditPoints;
 
 	public PyramidRoof() {
-		super(1, 1, 0.5);
+		super(1);
 	}
 
 	@Override

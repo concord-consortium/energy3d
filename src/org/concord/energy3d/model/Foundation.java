@@ -39,11 +39,11 @@ public class Foundation extends HousePart {
 	private transient double maxY;
 
 	public Foundation() {
-		super(2, 8, 0.1);
+		super(2, 8, 1);
 	}
 
 	public Foundation(final double xLength, final double yLength) {
-		super(2, 8, 0.1, true);
+		super(2, 8, 1, true);
 		points.get(0).set(-xLength / 2.0, -yLength / 2.0, 0);
 		points.get(2).set(xLength / 2.0, -yLength / 2.0, 0);
 		points.get(1).set(-xLength / 2.0, yLength / 2.0, 0);
@@ -279,6 +279,13 @@ public class Foundation extends HousePart {
 				applyNewHeight(child.getChildren(), scale, finalize);
 			}
 		}
+	}
+
+	public void scaleHouse(final double scale) {
+		final double h = points.get(4).getZ() - height;
+		applyNewHeight(h, h * 10, true);
+		for (int i = 0; i < points.size(); i++)
+			points.get(i).multiplyLocal(10);
 	}
 
 	@Override

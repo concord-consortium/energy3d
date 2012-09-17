@@ -26,6 +26,7 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
@@ -101,7 +102,7 @@ public abstract class HousePart implements Serializable {
 	public HousePart(final int numOfDrawPoints, final int numOfEditPoints, final double height, final boolean complete) {
 		this.numOfDrawPoints = numOfDrawPoints;
 		this.numOfEditPoints = numOfEditPoints;
-		this.height = orgHeight = height;
+		this.height = height;
 		points = new ArrayList<Vector3>(numOfEditPoints);
 		init();
 		allocateNewPoint();
@@ -153,7 +154,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public double getGridSize() {
-		return 0.1;
+		return 1.0;
 	}
 
 	private void addNewEditPointShape(final int i) {
@@ -283,7 +284,6 @@ public abstract class HousePart implements Serializable {
 				container.drawGrids(getGridSize());
 				container.gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 			} else if (this instanceof Foundation) {
-				SceneManager.getInstance().drawGrids(getGridSize());
 				SceneManager.getInstance().setGridsVisible(true);
 			}
 		}
@@ -420,8 +420,6 @@ public abstract class HousePart implements Serializable {
 
 	public void setGridsVisible(final boolean visible) {
 		if (container == null) {
-			if (visible)
-				SceneManager.getInstance().drawGrids(getGridSize());
 			SceneManager.getInstance().setGridsVisible(visible);
 		} else if (this instanceof Roof) {
 			if (visible)
@@ -436,8 +434,13 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void updateEditShapes() {
-		for (int i = 0; i < points.size(); i++)
-			getEditPointShape(i).setTranslation(getAbsPoint(i));
+		for (int i = 0; i < points.size(); i++) {
+			final Vector3 p = getAbsPoint(i);
+			final Camera camera = Camera.getCurrentCamera();
+			if (camera != null)
+				getEditPointShape(i).setScale(camera.getLocation().distance(p) / 10);
+			getEditPointShape(i).setTranslation(p);
+		}
 		/* remove remaining edit shapes */
 		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++)
 			pointsRoot.detachChildAt(points.size());

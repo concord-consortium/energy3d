@@ -15,7 +15,7 @@ public class HipRoof extends Roof {
 	private transient boolean recalculateEditPoints;
 
 	public HipRoof() {
-		super(1, 3, 0.5);
+		super(3);
 	}
 
 	@Override

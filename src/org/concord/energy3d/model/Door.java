@@ -18,7 +18,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static double defaultDoorHeight = 1.5;
+	private static double defaultDoorHeight = 15;
 
 	public Door() {
 		super(2, 4, defaultDoorHeight);

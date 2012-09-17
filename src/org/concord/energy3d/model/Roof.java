@@ -84,8 +84,8 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-	public Roof(final int numOfDrawPoints, final int numOfEditPoints, final double height) {
-		super(numOfDrawPoints, numOfEditPoints, height);
+	public Roof(final int numOfEditPoints) {
+		super(1, numOfEditPoints, 5.0);
 	}
 
 	@Override

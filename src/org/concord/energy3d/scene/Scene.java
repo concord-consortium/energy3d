@@ -54,6 +54,7 @@ public class Scene implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
 	private static final Node originalHouseRoot = new Node("Original House Root");
+	private static final int currentVersion = 1;
 	private static Scene instance;
 	private static URL url = null;
 	private static boolean redrawAll = false;
@@ -71,7 +72,8 @@ public class Scene implements Serializable {
 	private ReadOnlyColorRGBA floorColor = ColorRGBA.WHITE;
 	private ReadOnlyColorRGBA roofColor = ColorRGBA.WHITE;
 	private double overhangLength = 0.2;
-	private double annotationScale = 10;
+	private double annotationScale = 1;
+	private int version = currentVersion;
 	private boolean isAnnotationsVisible = true;
 
 	public static Scene getInstance() {
@@ -97,7 +99,7 @@ public class Scene implements Serializable {
 			e.printStackTrace();
 		}
 
-		final Foundation foundation = new Foundation(xLength / 10, yLength / 10);
+		final Foundation foundation = new Foundation(xLength, yLength);
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
@@ -126,6 +128,9 @@ public class Scene implements Serializable {
 			final ObjectInputStream in = new ObjectInputStream(file.openStream());
 			instance = (Scene) in.readObject();
 			in.close();
+
+			for (final HousePart part : instance.parts)
+				part.getRoot();
 
 			instance.cleanup();
 			loadCameraLocation();
@@ -227,6 +232,15 @@ public class Scene implements Serializable {
 			overhangLength = 0.2;
 			foundationColor = wallColor = doorColor = floorColor = roofColor = ColorRGBA.WHITE;
 		}
+
+		if (version < 1) {
+			for (final HousePart part : parts) {
+				if (part instanceof Foundation)
+					((Foundation)part).scaleHouse(10);
+			}
+		}
+
+		version = currentVersion ;
 
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
 		for (final HousePart housePart : getParts()) {

@@ -37,7 +37,7 @@ public class Floor extends HousePart {
 	private transient Mesh wireframeMesh;
 
 	public Floor() {
-		super(1, 1, 0.5);
+		super(1, 1, 5.0);
 	}
 
 	@Override
