@@ -50,7 +50,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double MIN_WALL_LENGTH = 0.01;
+	private static final double MIN_WALL_LENGTH = 0.1;
 	private static double defaultWallHeight = 20.0; // the recommended default wall height is 20cm
 	private static int currentVisitStamp = 1;
 	private static boolean extendToRoofEnabled = true;
@@ -65,7 +65,7 @@ public class Wall extends HousePart {
 	private transient AnyToXYTransform toXY;
 	private transient XYToAnyTransform fromXY;
 	private transient List<ArrayList<Vector3>> wallAndWindowsPoints;
-	private final double wallThickness = 0.05;
+	private double wallThickness;
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
@@ -87,6 +87,9 @@ public class Wall extends HousePart {
 	protected void init() {
 		super.init();
 		relativeToHorizontal = true;
+		wallThickness = 0.5;
+		if (thicknessNormal != null)
+			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
 
 		mesh = new Mesh("Wall");
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
