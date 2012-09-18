@@ -369,6 +369,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			camera.setLocation(rotate.applyPre(camera.getLocation(), null));
 			camera.lookAt(0, 0, 1, Vector3.UNIT_Z);
 			getCameraNode().updateFromCamera();
+			cameraControl.updateEditShapes();
 		}
 
 		if (sunAnim)
@@ -895,6 +896,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		camera.lookAt(lookAt, Vector3.UNIT_Z);
 
 		cameraNode.updateFromCamera();
+		cameraControl.updateEditShapes();
 	}
 
 	private void resizeCamera() {
@@ -929,6 +931,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		loc.multiplyLocal((up ? 1 : -1) * MOVE_SPEED * tpf).addLocal(camera.getLocation());
 		camera.setLocation(loc);
 		cameraNode.updateFromCamera();
+		cameraControl.updateEditShapes();
 		SceneManager.getInstance().refresh();
 	}
 

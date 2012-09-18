@@ -576,4 +576,5 @@ public class Scene implements Serializable {
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();
 	}
+
 }

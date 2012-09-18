@@ -433,7 +433,7 @@ public abstract class HousePart implements Serializable {
 		}
 	}
 
-	protected void updateEditShapes() {
+	public void updateEditShapes() {
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 p = getAbsPoint(i);
 			final Camera camera = Camera.getCurrentCamera();

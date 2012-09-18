@@ -1182,7 +1182,8 @@ Version 0.5 - October 20, 2011
 - set the default size and height of house parts to 10 times larger 
 - scale up the location of the camera by 10 times
 - increase the grid size of all house parts by 10 times
-
+- dynamically increase the size of edit points when camera moves
+ 
 - *undo wall direction when undoing wall add or move or delete 
 
 TODO:
