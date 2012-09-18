@@ -131,7 +131,8 @@ public abstract class Roof extends HousePart {
 		computeGableEditPoints();
 		final Polygon polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
-		fillMeshWithPolygon(mesh, polygon);
+		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
+//		fillMeshWithPolygon(mesh, polygon);
 		// create roof parts
 		MeshLib.groupByPlanner(mesh, roofPartsRoot);
 		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
@@ -280,7 +281,7 @@ public abstract class Roof extends HousePart {
 		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
 		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 2, new TPoint(0, 0, 0), new TPoint(1, 0, 0), new TPoint(0, 1, 0));
+		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 200, new TPoint(0, 0, 0), new TPoint(10, 0, 0), new TPoint(0, 10, 0));
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
 	}
@@ -288,7 +289,6 @@ public abstract class Roof extends HousePart {
 	private void initWallUpperPoints(final Wall startWall, final List<Wall> walls, final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
 		walls.clear();
 		wallUpperPoints.clear();
-		;
 		wallNormals.clear();
 		startWall.visitNeighbors(new WallVisitor() {
 			@Override

@@ -386,17 +386,18 @@ public class Wall extends HousePart {
 					toXY.transform(tp);
 
 		if (texture) {
-			final Vector3 p01 = getAbsPoint(1).subtract(getAbsPoint(0), null).normalizeLocal();
-			final Vector3 p02 = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
-			final TPoint o = new TPoint(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getAbsPoint(0).getZ());
+			final Vector3 p0 = getAbsPoint(0);
+			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 10.0;
+			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
+			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
+			final TPoint o = new TPoint(p0.getX(), p0.getY(), p0.getZ());
 			final TPoint u = new TPoint(p01.getX(), p01.getY(), p01.getZ());
 			final TPoint v = new TPoint(p02.getX(), p02.getY(), p02.getZ());
 			toXY.transform(o);
 			toXY.transform(u);
-			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.1 : 1.0;
-			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, scale, o, u, v);
+			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, o, u, v);
 		} else
-			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, 0, null, null, null);
+			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, null, null, null);
 	}
 
 	private void drawWireframe(final List<ArrayList<Vector3>> wallAndWindowsPoints) {

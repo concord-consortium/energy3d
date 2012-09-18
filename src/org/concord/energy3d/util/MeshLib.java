@@ -9,7 +9,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
-import org.poly2tri.transform.coordinate.XYToAnyTransform;
+import org.poly2tri.transform.coordinate.CoordinateTransform;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
@@ -49,10 +49,10 @@ public class MeshLib {
 	public static ArrayList<GroupData> extractGroups(final Mesh mesh) {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
-		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
+//		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
 		vertexBuffer.rewind();
 		normalBuffer.rewind();
-		textureBuffer.rewind();
+//		textureBuffer.rewind();
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
 		final Vector3 norm = new Vector3();
@@ -90,9 +90,9 @@ public class MeshLib {
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
-			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
-			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
-			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
+//			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
+//			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
+//			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
 		}
 		combineGroups(groups);
 		return groups;
@@ -131,13 +131,13 @@ public class MeshLib {
 							group1.normals.add(group2.normals.get(w * 3));
 							group1.normals.add(group2.normals.get(w * 3 + 1));
 							group1.normals.add(group2.normals.get(w * 3 + 2));
-							group1.textures.add(group2.textures.get(w * 3));
-							group1.textures.add(group2.textures.get(w * 3 + 1));
-							group1.textures.add(group2.textures.get(w * 3 + 2));
+//							group1.textures.add(group2.textures.get(w * 3));
+//							group1.textures.add(group2.textures.get(w * 3 + 1));
+//							group1.textures.add(group2.textures.get(w * 3 + 2));
 							for (int count = 0; count < 3; count++) {
 								group2.vertices.remove(w);
 								group2.normals.remove(w);
-								group2.textures.remove(w);
+//								group2.textures.remove(w);
 							}
 							changed = true;
 							if (group2.vertices.isEmpty()) {
@@ -158,8 +158,7 @@ public class MeshLib {
 		for (final GroupData group : groups) {
 			final Vector3 normal = group.normals.get(0);
 
-			final Vector3 n1 = new Vector3();
-			n1.set(normal.getX(), normal.getY(), 0).normalizeLocal();
+			final Vector3 n1 = new Vector3(normal.getX(), normal.getY(), 0).normalizeLocal();
 			double angleZ = n1.smallestAngleBetween(Vector3.NEG_UNIT_Y);
 
 			if (n1.dot(Vector3.UNIT_X) > 0)
@@ -173,7 +172,8 @@ public class MeshLib {
 
 			final Matrix3 matrix = new Matrix3().fromAngles(angleX, 0, 0).multiplyLocal(matrixZ);
 
-			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 5.0 : 1.0;
+			// final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 5.0 : 1.0;
+			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
 			double minV = Double.MAX_VALUE;
 
 			for (int i = 0; i < group.vertices.size(); i++) {
@@ -181,7 +181,8 @@ public class MeshLib {
 				matrix.applyPost(p, p);
 				final double v = p.getZ() * scale;
 				final double u = p.getX() * scale;
-				group.textures.get(i).set(u, v);
+//				group.textures.get(i).set(u, v);
+				group.textures.add(new Vector2(u, v));
 				if (minV > v)
 					minV = v;
 			}
@@ -360,7 +361,7 @@ public class MeshLib {
 		return sortedOutlinePoints;
 	}
 
-	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final XYToAnyTransform fromXY, final boolean generateNormals, final double textureScale, final TPoint o, final TPoint u, final TPoint v) {
+	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v) {
 		// final Vector2 min = new Vector2(Double.MAX_VALUE, Double.MAX_VALUE);
 		// final Vector2 max = new Vector2(Double.MIN_VALUE, Double.MIN_VALUE);
 		// for (final TriangulationPoint p : polygon.getPoints()) {
@@ -441,12 +442,23 @@ public class MeshLib {
 
 			throw e;
 		}
-		ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
-		if (generateNormals)
-			ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
-		// ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
+		if (fromXY == null)
+			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
+		else
+			ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
+
+		if (generateNormals) {
+//			if (fromXY == null)
+//				ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
+//			else
+//				ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
+			if (fromXY == null)
+				ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
+			else
+				ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
+		}
 		if (o != null)
-			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), textureScale, o, u, v);
+			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1.0, o, u, v);
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
 	}
