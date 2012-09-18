@@ -1187,6 +1187,8 @@ Version 0.5 - October 20, 2011
 - adjust texture size for the new roof size
 - adjust window bars for the new window size
 - increase the wall thickness for new wall size
+- adjust annotation size and font for new larger parts
+
  
 - *undo wall direction when undoing wall add or move or delete 
 

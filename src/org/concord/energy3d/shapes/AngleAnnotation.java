@@ -48,12 +48,12 @@ public class AngleAnnotation extends Annotation {
 		final double end = start + angle;
 		final long angleDegrees = Math.round((end - start) * 180.0 / Math.PI);
 
-		final double radius = end == start ? 0.0 : 0.3 / Math.sqrt(end - start);
+		final double radius = end == start ? 0.0 : 3.0 / Math.sqrt(end - start);
 		if (angleDegrees == 90) {
 			final ReadOnlyVector3[] p = new ReadOnlyVector3[3];
-			p[0] = a.normalize(null).multiplyLocal(0.2);
-			p[1] = a.normalize(null).addLocal(b.normalize(null)).multiplyLocal(0.2);
-			p[2] = b.normalize(null).multiplyLocal(0.2);
+			p[0] = a.normalize(null).multiplyLocal(2.0);
+			p[1] = a.normalize(null).addLocal(b.normalize(null)).multiplyLocal(2.0);
+			p[2] = b.normalize(null).multiplyLocal(2.0);
 			final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 			buf.rewind();
 			buf.limit(9);
@@ -77,6 +77,7 @@ public class AngleAnnotation extends Annotation {
 			attachChild(label);
 		}
 		mesh.updateModelBound();
-		this.setTranslation(mainPoint.add(n.multiply(0.02, null), null));
+//		this.setTranslation(mainPoint.add(n.multiply(0.02, null), null));
+		this.setTranslation(mainPoint.add(n.multiply(0.05, null), null));
 	}
 }

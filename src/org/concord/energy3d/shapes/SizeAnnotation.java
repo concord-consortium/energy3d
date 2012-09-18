@@ -55,11 +55,11 @@ public class SizeAnnotation extends Annotation {
 
 	@Override
 	public void draw() {
-		final double C = 0.1;
+		final double C = 1.0;
 		final Vector3 v = new Vector3();
 		final Vector3 offset = new Vector3();
 		if (front && !drawInside)
-			offset.set(faceDirection).normalizeLocal().multiplyLocal(C);
+			offset.set(faceDirection).normalizeLocal().multiplyLocal(C).addLocal(0, 0, 0.05);
 		else {
 			offset.set(to).subtractLocal(from).normalizeLocal().crossLocal(faceDirection).multiplyLocal(C);
 			if (autoFlipOffset) {
@@ -118,7 +118,7 @@ public class SizeAnnotation extends Annotation {
 
 		// arrow
 		offset.multiplyLocal(0.5);
-		body.set(to).subtractLocal(from).normalizeLocal().multiplyLocal(0.05);
+		body.set(to).subtractLocal(from).normalizeLocal().multiplyLocal(0.5);
 
 		mesh.updateModelBound();;
 
@@ -144,7 +144,7 @@ public class SizeAnnotation extends Annotation {
 
 		updateWorldTransform(true);
 		updateWorldBound(true);
-		this.setTranslation(faceDirection.multiply(0.005, null));
+		this.setTranslation(faceDirection.multiply(0.05, null));
 	}
 
 	@Override

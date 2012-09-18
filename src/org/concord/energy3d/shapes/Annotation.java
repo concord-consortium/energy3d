@@ -13,7 +13,7 @@ import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.AutoScale;
 
 public abstract class Annotation extends Node {
-	private static double fontSize = 0.1;
+	private static double fontSize = 1.0;
 	protected final Line mesh;
 	protected final BMText label = makeNewLabel();
 
