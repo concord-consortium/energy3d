@@ -10,8 +10,6 @@
 
 package org.concord.energy3d.scene;
 
-import com.ardor3d.input.Key;
-import com.ardor3d.input.KeyboardState;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
@@ -29,60 +27,60 @@ public class OrbitControl extends CameraControl {
 		super(upAxis);
 	}
 
-	@Override
-	protected void move(final Camera camera, final KeyboardState kb, final double tpf) {
-		// MOVEMENT
-		int moveFB = 0, strafeLR = 0;
-		if (kb.isDown(Key.W)) {
-			moveFB += 1;
-		}
-		if (kb.isDown(Key.S)) {
-			moveFB -= 1;
-		}
-		if (kb.isDown(Key.A)) {
-			strafeLR += 1;
-		}
-		if (kb.isDown(Key.D)) {
-			strafeLR -= 1;
-		}
-
-		if (moveFB != 0 || strafeLR != 0) {
-			final Vector3 loc = _workerVector.zero();
-			if (moveFB == 1) {
-				loc.addLocal(camera.getDirection());
-			} else if (moveFB == -1) {
-				loc.subtractLocal(camera.getDirection());
-			}
-			if (strafeLR == 1) {
-				loc.addLocal(camera.getLeft());
-			} else if (strafeLR == -1) {
-				loc.subtractLocal(camera.getLeft());
-			}
-			loc.normalizeLocal().multiplyLocal(_moveSpeed * tpf).addLocal(camera.getLocation());
-			if (loc.length() > SceneManager.SKY_RADIUS)
-				return;
-			camera.setLocation(loc);
-			clearOrbitCenter();
-		}
-
-		// ROTATION
-		int rotX = 0, rotY = 0;
-		if (kb.isDown(Key.UP)) {
-			rotY += 1;
-		}
-		if (kb.isDown(Key.DOWN)) {
-			rotY -= 1;
-		}
-		if (kb.isDown(Key.LEFT)) {
-			rotX += 1;
-		}
-		if (kb.isDown(Key.RIGHT)) {
-			rotX -= 1;
-		}
-		if (rotX != 0 || rotY != 0) {
-			rotate(camera, rotX * (_keyRotateSpeed / _mouseRotateSpeed) * tpf, rotY * (_keyRotateSpeed / _mouseRotateSpeed) * tpf);
-		}
-	}
+//	@Override
+//	protected void move(final Camera camera, final KeyboardState kb, final double tpf) {
+//		// MOVEMENT
+//		int moveFB = 0, strafeLR = 0;
+//		if (kb.isDown(Key.W)) {
+//			moveFB += 1;
+//		}
+//		if (kb.isDown(Key.S)) {
+//			moveFB -= 1;
+//		}
+//		if (kb.isDown(Key.A)) {
+//			strafeLR += 1;
+//		}
+//		if (kb.isDown(Key.D)) {
+//			strafeLR -= 1;
+//		}
+//
+//		if (moveFB != 0 || strafeLR != 0) {
+//			final Vector3 loc = _workerVector.zero();
+//			if (moveFB == 1) {
+//				loc.addLocal(camera.getDirection());
+//			} else if (moveFB == -1) {
+//				loc.subtractLocal(camera.getDirection());
+//			}
+//			if (strafeLR == 1) {
+//				loc.addLocal(camera.getLeft());
+//			} else if (strafeLR == -1) {
+//				loc.subtractLocal(camera.getLeft());
+//			}
+//			loc.normalizeLocal().multiplyLocal(_moveSpeed * tpf).addLocal(camera.getLocation());
+//			if (loc.length() > SceneManager.SKY_RADIUS)
+//				return;
+//			camera.setLocation(loc);
+//			clearOrbitCenter();
+//		}
+//
+//		// ROTATION
+//		int rotX = 0, rotY = 0;
+//		if (kb.isDown(Key.UP)) {
+//			rotY += 1;
+//		}
+//		if (kb.isDown(Key.DOWN)) {
+//			rotY -= 1;
+//		}
+//		if (kb.isDown(Key.LEFT)) {
+//			rotX += 1;
+//		}
+//		if (kb.isDown(Key.RIGHT)) {
+//			rotX -= 1;
+//		}
+//		if (rotX != 0 || rotY != 0) {
+//			rotate(camera, rotX * (_keyRotateSpeed / _mouseRotateSpeed) * tpf, rotY * (_keyRotateSpeed / _mouseRotateSpeed) * tpf);
+//		}
+//	}
 
 	@Override
 	protected void rotate(final Camera camera, final double dx, final double dy) {

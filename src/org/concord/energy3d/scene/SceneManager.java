@@ -838,7 +838,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			cameraControl = new OrbitControl(Vector3.UNIT_Z);
 		else if (type == CameraMode.FIRST_PERSON)
 			cameraControl = new FirstPersonControl(Vector3.UNIT_Z);
-		cameraControl.setupKeyboardTriggers(logicalLayer);
+//		cameraControl.setupKeyboardTriggers(logicalLayer);
 		cameraControl.setupMouseTriggers(logicalLayer, true);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		cameraControl.setKeyRotateSpeed(1);
