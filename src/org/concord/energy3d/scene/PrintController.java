@@ -414,6 +414,7 @@ public class PrintController implements Updater {
 
 			final Box box = new Box("Page Boundary");
 			box.setData(upperLeftCorner.add(0, 0.1, 0, null), upperLeftCorner.add(pageWidth, 0.2, -pageHeight, null));
+			box.updateModelBound();
 			pagesRoot.attachChild(box);
 
 			final BMText footNote = Annotation.makeNewLabel();
@@ -424,6 +425,7 @@ public class PrintController implements Updater {
 			footNote.setTranslation(upperLeftCorner.add(pageWidth / 2.0, 0.0, -pageBottom - spaceBetweenParts / 2.0, null));
 			pagesRoot.attachChild(footNote);
 		}
+		pagesRoot.updateGeometricState(0);
 	}
 
 	private void computePrintCenters(final ArrayList<ArrayList<Spatial>> pages) {
@@ -552,5 +554,9 @@ public class PrintController implements Updater {
 	public void restartAnimation() {
 		restartFlag = true;
 		setPrintPreview(false);
+	}
+
+	public Node getPagesRoot() {
+		return pagesRoot;
 	}
 }

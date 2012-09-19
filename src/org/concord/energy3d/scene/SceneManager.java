@@ -80,6 +80,8 @@ import com.ardor3d.input.logical.MouseMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -189,7 +191,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Sphere kinectPointer;
 	private MouseState lastSelectedEditPointMouseState;
 
-
 	public static SceneManager getInstance() {
 		return instance;
 	}
@@ -261,8 +262,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		light.setAmbient(new ColorRGBA(1, 1, 1, 1));
 		light.setEnabled(true);
 
-
-
 		lightState.setEnabled(false);
 		lightState.attach(light);
 		root.setRenderState(lightState);
@@ -283,7 +282,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		passManager.add(rootPass);
 
 		shadowPass = new ParallelSplitShadowMapPass(light, 2048, 4);
-//		shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
+		// shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
 		shadowPass.setEnabled(false);
 		shadowPass.setUseObjectCullFace(true);
 		shadowPass.add(floor);
@@ -322,9 +321,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				refresh = false;
 
 				try {
-//					final long t = System.nanoTime();
+					// final long t = System.nanoTime();
 					frameHandler.updateFrame();
-//					System.out.println((System.nanoTime() - t)/1000000);
+					// System.out.println((System.nanoTime() - t)/1000000);
 				} catch (final Throwable e) {
 					e.printStackTrace();
 					if (shadowPass.isEnabled()) {
@@ -422,7 +421,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 		}
 
-//		 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
+		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
 
 		passManager.renderPasses(renderer);
 		try {
@@ -652,11 +651,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				if (!isTopView() && inputStates.getCurrent().getMouseState().getClickCount(MouseButton.LEFT) == 2) {
-					final PickedHousePart pickedHousePart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), root);
-					if (pickedHousePart == null)
-						return;
-					final Vector3 clickedPoint = pickedHousePart.getPoint();
-					cameraControl.zoomAtPoint(clickedPoint);
+					if (PrintController.getInstance().isPrintPreview()) {
+						final MouseState mouse = inputStates.getCurrent().getMouseState();
+						final Ray3 pickRay = Camera.getCurrentCamera().getPickRay(new Vector2(mouse.getX(), mouse.getY()), false, null);
+						final PickResults pickResults = new PrimitivePickResults();
+						PickingUtil.findPick(PrintController.getInstance().getPagesRoot(), pickRay, pickResults, false);
+						if (pickResults.getNumber() > 0)
+							cameraControl.zoomAtPoint(pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0));
+					} else {
+						final PickedHousePart pickedHousePart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), root);
+						if (pickedHousePart != null)
+							cameraControl.zoomAtPoint(pickedHousePart.getPoint());
+					}
 				}
 			}
 		}));
@@ -691,33 +697,33 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				hideAllEditPoints();
 			}
 		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Q), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				// moveUpDown(source, tpf, true);
-//			}
-//		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				// if (!inputStates.getCurrent().getKeyboardState().isAtLeastOneDown(Key.LCONTROL, Key.RCONTROL))
-//				// moveUpDown(source, tpf, false);
-//			}
-//		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				if (viewMode == ViewMode.TOP_VIEW)
-//					moveUpDown(source, tpf, true);
-//			}
-//		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.S), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				if (viewMode == ViewMode.TOP_VIEW)
-//					moveUpDown(source, tpf, false);
-//			}
-//		}));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Q), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// // moveUpDown(source, tpf, true);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// // if (!inputStates.getCurrent().getKeyboardState().isAtLeastOneDown(Key.LCONTROL, Key.RCONTROL))
+		// // moveUpDown(source, tpf, false);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// if (viewMode == ViewMode.TOP_VIEW)
+		// moveUpDown(source, tpf, true);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.S), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// if (viewMode == ViewMode.TOP_VIEW)
+		// moveUpDown(source, tpf, false);
+		// }
+		// }));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -726,60 +732,60 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				refresh = true;
 			}
 		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.X), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				heliodon.setHourAngle(heliodon.getHourAngle() + 0.03, true, true);
-//			}
-//		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				heliodon.setHourAngle(heliodon.getHourAngle() - 0.03, true, true);
-//			}
-//		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.UP), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				if (!heliodonControl)
-//					return;
-//				heliodon.setObserverLatitude(heliodon.getObserverLatitude() + 0.01);
-//			}
-//		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DOWN), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				if (!heliodonControl)
-//					return;
-//				heliodon.setObserverLatitude(heliodon.getObserverLatitude() - 0.01);
-//			}
-//		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.RIGHT), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				if (!heliodonControl)
-//					return;
-//				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() + 0.01, true, true);
-//			}
-//		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				if (!heliodonControl)
-//					return;
-//				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() - 0.01, true, true);
-//			}
-//		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.B), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				drawBounds = !drawBounds;
-//				if (drawBounds)
-//					System.out.println("Enabling draw bounds...");
-//				else
-//					System.out.println("Disabling draw bounds...");
-//			}
-//		}));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.X), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// heliodon.setHourAngle(heliodon.getHourAngle() + 0.03, true, true);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// heliodon.setHourAngle(heliodon.getHourAngle() - 0.03, true, true);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.UP), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// if (!heliodonControl)
+		// return;
+		// heliodon.setObserverLatitude(heliodon.getObserverLatitude() + 0.01);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DOWN), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// if (!heliodonControl)
+		// return;
+		// heliodon.setObserverLatitude(heliodon.getObserverLatitude() - 0.01);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.RIGHT), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// if (!heliodonControl)
+		// return;
+		// heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() + 0.01, true, true);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// if (!heliodonControl)
+		// return;
+		// heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() - 0.01, true, true);
+		// }
+		// }));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.B), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// drawBounds = !drawBounds;
+		// if (drawBounds)
+		// System.out.println("Enabling draw bounds...");
+		// else
+		// System.out.println("Disabling draw bounds...");
+		// }
+		// }));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.I), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -806,12 +812,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				Scene.getInstance().removeAllRoofs();
 			}
 		}));
-//		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.G), new TriggerAction() {
-//			@Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//				Scene.getInstance().removeAllGables();
-//			}
-//		}));
+		// logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.G), new TriggerAction() {
+		// @Override
+		// public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+		// Scene.getInstance().removeAllGables();
+		// }
+		// }));
 	}
 
 	public void setCameraControl(final CameraMode type) {
@@ -822,7 +828,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			cameraControl = new OrbitControl(Vector3.UNIT_Z);
 		else if (type == CameraMode.FIRST_PERSON)
 			cameraControl = new FirstPersonControl(Vector3.UNIT_Z);
-//		cameraControl.setupKeyboardTriggers(logicalLayer);
+		// cameraControl.setupKeyboardTriggers(logicalLayer);
 		cameraControl.setupMouseTriggers(logicalLayer, true);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		cameraControl.setKeyRotateSpeed(1);

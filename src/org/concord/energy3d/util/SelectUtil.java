@@ -10,7 +10,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 
-import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -19,6 +18,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 
@@ -37,8 +37,9 @@ public class SelectUtil {
 			target = SceneManager.getInstance().getFloor();
 		pickResults.clear();
 
-		final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-		final Ray3 pickRay = canvasRenderer.getCamera().getPickRay(new Vector2(x, y), false, null);
+//		final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
+//		final Ray3 pickRay = canvasRenderer.getCamera().getPickRay(new Vector2(x, y), false, null);
+		final Ray3 pickRay = Camera.getCurrentCamera().getPickRay(new Vector2(x, y), false, null);
 		PickingUtil.findPick(target, pickRay, pickResults, false);
 		return getPickResult(pickRay);
 	}
