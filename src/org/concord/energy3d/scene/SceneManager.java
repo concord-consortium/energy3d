@@ -145,14 +145,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());
-	private static final double MOVE_SPEED = 5;
+	private static final double MOVE_SPEED = 50;
 	private final Canvas canvas;
 	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
 	private final Node root = new Node("Root");
 	private final Node backgroundRoot = new Node("Scenary Root");
 	private final BasicPassManager passManager = new BasicPassManager();
-	private final Mesh floor = new Quad("Floor", 200, 200);
+	private final Mesh floor = new Quad("Floor", 2000, 2000);
 	private final Mesh gridsMesh = new Line("Floor Grids");
 	private final LightState lightState = new LightState();
 	private final UndoManager undoManager = new UndoManager();
@@ -549,7 +549,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createSky() {
-		final Dome sky = new Dome("Sky", 100, 100, 100);
+		final Dome sky = new Dome("Sky", 100, 100, 1000);
 		sky.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("sky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
@@ -560,7 +560,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Spatial createAxis() {
-		final int axisLen = 100;
+		final int axisLen = 1000;
 		final Node axisRoot = new Node();
 		FloatBuffer buf;
 		Line line;
@@ -912,7 +912,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final double ratio = (double) size.width / size.height;
 
 		final double near = 1;
-		final double far = 1000;
+		final double far = 2000;
 		if (camera.getProjectionMode() == ProjectionMode.Parallel)
 			camera.setFrustum(near, far, -orthoWidth / 2, orthoWidth / 2, orthoWidth / ratio / 2, -orthoWidth / ratio / 2);
 		else
