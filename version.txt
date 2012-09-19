@@ -1193,7 +1193,10 @@ Version 0.5 - October 20, 2011
 - prevent camera from falling outside of sky sphere
 - disable camera control by keyboard
 - disable unnecessary shortkeys from scene manager
- 
+- scale up the camera location upon loading older version models
+- scale up double-click zoom distance
+- scale up the minimum distance between angle annotations 
+
 - *undo wall direction when undoing wall add or move or delete 
 
 TODO:

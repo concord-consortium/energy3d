@@ -238,6 +238,7 @@ public class Scene implements Serializable {
 				if (part instanceof Foundation)
 					((Foundation)part).scaleHouse(10);
 			}
+			cameraLocation = cameraLocation.multiply(10, null);
 		}
 
 		version = currentVersion ;

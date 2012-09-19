@@ -10,6 +10,7 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BMText.AutoFade;
 import com.ardor3d.ui.text.BMText.AutoScale;
 
 public abstract class Annotation extends Node {
@@ -27,6 +28,7 @@ public abstract class Annotation extends Node {
 		label.setAutoScale(AutoScale.Off);
 		label.setFontScale(fontSize);
 		label.setAutoRotate(false);
+		label.setAutoFade(AutoFade.Off);
 		label.setModelBound(new BoundingBox());
 		label.updateWorldTransform(true);
 		label.getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);

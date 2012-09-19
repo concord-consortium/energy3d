@@ -272,11 +272,11 @@ public abstract class CameraControl {
 
 	public void zoomAtPoint(final ReadOnlyVector3 clickedPoint) {
 		final boolean isPrintPreview = PrintController.getInstance().isPrintPreview();
-		final double zoomInDistance = isPrintPreview ? 5 : 2;
+		final double zoomInDistance = isPrintPreview ? 50 : 20;
 		final double zoomDistance;
 		final boolean zoomOut = Camera.getCurrentCamera().getLocation().distance(clickedPoint) < zoomInDistance + 1;
 		if (zoomOut)
-			zoomDistance = 10.0;
+			zoomDistance = 100.0;
 		else
 			zoomDistance = zoomInDistance;
 
