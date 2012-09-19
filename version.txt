@@ -1190,6 +1190,7 @@ Version 0.5 - October 20, 2011
 - adjust annotation size and font for new larger parts
 - adjust the size of the sky and land for new scene size
 - adjust camera control speed
+- prevent camera from falling outside of sky sphere
 
  
 - *undo wall direction when undoing wall add or move or delete 

@@ -145,7 +145,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());
-	private static final double MOVE_SPEED = 50;
+	private static final double MOVE_SPEED = 5;
 	private final Canvas canvas;
 	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
@@ -181,6 +181,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean refresh = true;
 	private boolean zoomLock = false;
 
+	public static final double SKY_RADIUS = 1000;
 	public final static byte DEFAULT_THEME = 0;
 	public final static byte SKETCHUP_THEME = 1;
 	private final byte theme = DEFAULT_THEME;
@@ -549,7 +550,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createSky() {
-		final Dome sky = new Dome("Sky", 100, 100, 1000);
+		final Dome sky = new Dome("Sky", 100, 100, SKY_RADIUS);
 		sky.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
 		final TextureState ts = new TextureState();
 		ts.setTexture(TextureManager.load("sky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));

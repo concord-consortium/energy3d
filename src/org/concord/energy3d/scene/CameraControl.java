@@ -258,7 +258,9 @@ public abstract class CameraControl {
 			setMoveSpeed(2 * camera.getFrustumTop() * camera.getFrustumTop());
 		} else {
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
-			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * _moveSpeed * 2 * tpf).addLocal(camera.getLocation());
+			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * (_moveSpeed * 10) * 2 * tpf).addLocal(camera.getLocation());
+			if (loc.length() > SceneManager.SKY_RADIUS)
+				return;
 			camera.setLocation(loc);
 
 			if (this instanceof OrbitControl)

@@ -59,6 +59,8 @@ public class OrbitControl extends CameraControl {
 				loc.subtractLocal(camera.getLeft());
 			}
 			loc.normalizeLocal().multiplyLocal(_moveSpeed * tpf).addLocal(camera.getLocation());
+			if (loc.length() > SceneManager.SKY_RADIUS)
+				return;
 			camera.setLocation(loc);
 			clearOrbitCenter();
 		}
@@ -95,6 +97,8 @@ public class OrbitControl extends CameraControl {
 		final Vector3 d = _workerVector.subtract(_center, null).normalizeLocal();
 		final double MIN = 0.1;
 		if (Math.abs(d.getX()) > MIN || Math.abs(d.getY()) > MIN) {
+			if (_workerVector.length() > SceneManager.SKY_RADIUS)
+				return;
 			camera.setLocation(_workerVector);
 			camera.lookAt(_center, _upAxis);
 		}
@@ -106,6 +110,8 @@ public class OrbitControl extends CameraControl {
 		camera.getModelViewProjectionMatrix().applyPost(_workerVector4, _workerVector4);
 		_workerVector.set(_workerVector4.getX(), _workerVector4.getY(), _workerVector4.getZ());
 		_workerVector.addLocal(camera.getLocation());
+		if (_workerVector.length() > SceneManager.SKY_RADIUS)
+			return;
 		camera.setLocation(_workerVector);
 		clearOrbitCenter();
 	}
