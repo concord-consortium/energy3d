@@ -172,7 +172,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private double refreshTime = -1;
 	private long lastRenderTime;
 	private boolean mouseControlEnabled = true;
-	private boolean drawBounds = false;
+	private final boolean drawBounds = false;
 	private boolean rotAnim = false;
 	private boolean heliodonControl;
 	private boolean sunAnim;
@@ -676,29 +676,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.DELETE), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				taskManager.update(new Callable<Object>() {
-					@Override
-					public Object call() throws Exception {
-						undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-						Scene.getInstance().remove(selectedHousePart);
-						selectedHousePart = null;
-						return null;
-					}
-				});
+				deleteCurrentHousePart();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.BACK), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				taskManager.update(new Callable<Object>() {
-					@Override
-					public Object call() throws Exception {
-						undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-						Scene.getInstance().remove(selectedHousePart);
-						selectedHousePart = null;
-						return null;
-					}
-				});
+				deleteCurrentHousePart();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.ESCAPE), new TriggerAction() {
@@ -707,33 +691,33 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				hideAllEditPoints();
 			}
 		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Q), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				// moveUpDown(source, tpf, true);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				// if (!inputStates.getCurrent().getKeyboardState().isAtLeastOneDown(Key.LCONTROL, Key.RCONTROL))
-				// moveUpDown(source, tpf, false);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (viewMode == ViewMode.TOP_VIEW)
-					moveUpDown(source, tpf, true);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.S), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (viewMode == ViewMode.TOP_VIEW)
-					moveUpDown(source, tpf, false);
-			}
-		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Q), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				// moveUpDown(source, tpf, true);
+//			}
+//		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				// if (!inputStates.getCurrent().getKeyboardState().isAtLeastOneDown(Key.LCONTROL, Key.RCONTROL))
+//				// moveUpDown(source, tpf, false);
+//			}
+//		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				if (viewMode == ViewMode.TOP_VIEW)
+//					moveUpDown(source, tpf, true);
+//			}
+//		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.S), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				if (viewMode == ViewMode.TOP_VIEW)
+//					moveUpDown(source, tpf, false);
+//			}
+//		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -742,60 +726,60 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				refresh = true;
 			}
 		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.X), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				heliodon.setHourAngle(heliodon.getHourAngle() + 0.03, true, true);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				heliodon.setHourAngle(heliodon.getHourAngle() - 0.03, true, true);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.UP), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (!heliodonControl)
-					return;
-				heliodon.setObserverLatitude(heliodon.getObserverLatitude() + 0.01);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DOWN), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (!heliodonControl)
-					return;
-				heliodon.setObserverLatitude(heliodon.getObserverLatitude() - 0.01);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.RIGHT), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (!heliodonControl)
-					return;
-				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() + 0.01, true, true);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (!heliodonControl)
-					return;
-				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() - 0.01, true, true);
-			}
-		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.B), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				drawBounds = !drawBounds;
-				if (drawBounds)
-					System.out.println("Enabling draw bounds...");
-				else
-					System.out.println("Disabling draw bounds...");
-			}
-		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.X), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				heliodon.setHourAngle(heliodon.getHourAngle() + 0.03, true, true);
+//			}
+//		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Z), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				heliodon.setHourAngle(heliodon.getHourAngle() - 0.03, true, true);
+//			}
+//		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.UP), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				if (!heliodonControl)
+//					return;
+//				heliodon.setObserverLatitude(heliodon.getObserverLatitude() + 0.01);
+//			}
+//		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.DOWN), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				if (!heliodonControl)
+//					return;
+//				heliodon.setObserverLatitude(heliodon.getObserverLatitude() - 0.01);
+//			}
+//		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.RIGHT), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				if (!heliodonControl)
+//					return;
+//				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() + 0.01, true, true);
+//			}
+//		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.LEFT), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				if (!heliodonControl)
+//					return;
+//				heliodon.setDeclinationAngle(heliodon.getDeclinationAngle() - 0.01, true, true);
+//			}
+//		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.B), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				drawBounds = !drawBounds;
+//				if (drawBounds)
+//					System.out.println("Enabling draw bounds...");
+//				else
+//					System.out.println("Disabling draw bounds...");
+//			}
+//		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.I), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -822,12 +806,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				Scene.getInstance().removeAllRoofs();
 			}
 		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.G), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				Scene.getInstance().removeAllGables();
-			}
-		}));
+//		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.G), new TriggerAction() {
+//			@Override
+//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+//				Scene.getInstance().removeAllGables();
+//			}
+//		}));
 	}
 
 	public void setCameraControl(final CameraMode type) {
@@ -1402,6 +1386,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			mouseReleased(lastSelectedEditPointMouseState);
 		else
 			mousePressed(lastSelectedEditPointMouseState);
+	}
+
+	private void deleteCurrentHousePart() {
+		taskManager.update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
+				Scene.getInstance().remove(selectedHousePart);
+				selectedHousePart = null;
+				return null;
+			}
+		});
 	}
 
 }

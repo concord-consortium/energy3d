@@ -1191,8 +1191,8 @@ Version 0.5 - October 20, 2011
 - adjust the size of the sky and land for new scene size
 - adjust camera control speed
 - prevent camera from falling outside of sky sphere
-- disable camera control by keyboard 
-
+- disable camera control by keyboard
+- disable unnecessary shortkeys from scene manager
  
 - *undo wall direction when undoing wall add or move or delete 
 
