@@ -850,7 +850,8 @@ public abstract class Roof extends HousePart {
 		for (final ReadOnlyVector3 p : wallUpperPoints)
 			maxZ = Math.max(maxZ, p.getZ());
 		// to make height relative to container wall so that applyHeight() runs the same way
-		height = 0.5 + maxZ - container.getPoints().get(1).getZ();
+//		height = 0.5 + maxZ - container.getPoints().get(1).getZ();
+		height = height + maxZ - container.getPoints().get(1).getZ();
 	}
 
 	public void applyHeight() {

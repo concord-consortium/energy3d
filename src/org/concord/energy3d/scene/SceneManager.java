@@ -270,7 +270,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		backgroundRoot.attachChild(createSky());
 		backgroundRoot.attachChild(createFloor());
 		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
-		drawGrids(1);
+		drawGrids(2.0);
 		backgroundRoot.attachChild(gridsMesh);
 		backgroundRoot.attachChild(createAxis());
 		backgroundRoot.attachChild(createKinectPointer());
@@ -505,8 +505,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		gridsMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(gridsMesh);
 
-		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(200, null);
-		final ReadOnlyVector3 height = Vector3.UNIT_Y.multiply(200, null);
+		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(2000, null);
+		final ReadOnlyVector3 height = Vector3.UNIT_Y.multiply(2000, null);
 		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
 		final ReadOnlyVector3 pMiddle = Vector3.ZERO;
 

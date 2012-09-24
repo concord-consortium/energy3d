@@ -379,7 +379,7 @@ public class Foundation extends HousePart {
 			return;
 		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
 		for (final ReadOnlyVector3 p : points)
-			buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.01f);
+			buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.1f);
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
 	}
@@ -489,7 +489,7 @@ public class Foundation extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return 0.2;
+		return 2.0;
 	}
 
 	@Override

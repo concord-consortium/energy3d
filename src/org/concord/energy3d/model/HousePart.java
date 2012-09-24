@@ -280,9 +280,11 @@ public abstract class HousePart implements Serializable {
 				SceneManager.getInstance().setGridsVisible(false);
 			else if (container != null)
 				previousContainer.gridsMesh.getSceneHints().setCullHint(CullHint.Always);
+
 			if (container != null && !(this instanceof Roof)) {
-				container.drawGrids(getGridSize());
-				container.gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
+//				container.drawGrids(getGridSize());
+//				container.gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
+				setGridsVisible(true);
 			} else if (this instanceof Foundation) {
 				SceneManager.getInstance().setGridsVisible(true);
 			}

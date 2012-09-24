@@ -71,7 +71,7 @@ public class Scene implements Serializable {
 	private ReadOnlyColorRGBA doorColor = ColorRGBA.WHITE;
 	private ReadOnlyColorRGBA floorColor = ColorRGBA.WHITE;
 	private ReadOnlyColorRGBA roofColor = ColorRGBA.WHITE;
-	private double overhangLength = 0.2;
+	private double overhangLength = 2.0;
 	private double annotationScale = 1;
 	private int version = currentVersion;
 	private boolean isAnnotationsVisible = true;
@@ -133,6 +133,7 @@ public class Scene implements Serializable {
 				part.getRoot();
 
 			instance.cleanup();
+			instance.upgradeSceneToNewVersion();
 			loadCameraLocation();
 		}
 
@@ -200,6 +201,7 @@ public class Scene implements Serializable {
 			instance.fixUnintializedVariables();
 
 			instance.cleanup();
+			instance.upgradeSceneToNewVersion();
 
 			if (url != null) {
 				for (final HousePart housePart : instance.getParts()) {
@@ -227,6 +229,19 @@ public class Scene implements Serializable {
 	}
 
 	private void cleanup() {
+		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
+		for (final HousePart housePart : getParts()) {
+			if (!housePart.isValid() || ((housePart instanceof Roof || housePart instanceof Window || housePart instanceof Door) && housePart.getContainer() == null))
+				toBeRemoved.add(housePart);
+		}
+
+		for (final HousePart housePart : toBeRemoved)
+			remove(housePart);
+
+		fixDisconnectedWalls();
+	}
+
+	private void upgradeSceneToNewVersion() {
 		if (textureMode == null) {
 			textureMode = TextureMode.Full;
 			overhangLength = 0.2;
@@ -239,20 +254,10 @@ public class Scene implements Serializable {
 					((Foundation)part).scaleHouse(10);
 			}
 			cameraLocation = cameraLocation.multiply(10, null);
+			setOverhangLength(getOverhangLength() * 10);
 		}
 
 		version = currentVersion ;
-
-		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
-		for (final HousePart housePart : getParts()) {
-			if (!housePart.isValid() || ((housePart instanceof Roof || housePart instanceof Window || housePart instanceof Door) && housePart.getContainer() == null))
-				toBeRemoved.add(housePart);
-		}
-
-		for (final HousePart housePart : toBeRemoved)
-			remove(housePart);
-
-		fixDisconnectedWalls();
 	}
 
 	private void fixDisconnectedWalls() {
@@ -313,6 +318,7 @@ public class Scene implements Serializable {
 	public void remove(final HousePart housePart) {
 		if (housePart == null)
 			return;
+		housePart.setGridsVisible(false);
 		final HousePart container = housePart.getContainer();
 		if (container != null)
 			container.getChildren().remove(housePart);
