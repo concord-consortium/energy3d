@@ -174,7 +174,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private double refreshTime = -1;
 	private long lastRenderTime;
 	private boolean mouseControlEnabled = true;
-	private final boolean drawBounds = false;
+//	private final boolean drawBounds = false;
 	private boolean rotAnim = false;
 	private boolean heliodonControl;
 	private boolean sunAnim;
@@ -369,7 +369,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			camera.setLocation(rotate.applyPre(camera.getLocation(), null));
 			camera.lookAt(0, 0, 1, Vector3.UNIT_Z);
 			getCameraNode().updateFromCamera();
-			cameraControl.updateEditShapes();
+			Scene.getInstance().updateEditShapes();
 		}
 
 		if (sunAnim)
@@ -388,38 +388,38 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (cameraNode == null)
 			initCamera();
 
-		if (drawBounds && selectedHousePart != null) {
-			if (selectedHousePart instanceof Roof) {
-				final Node flattenedMeshesRoot = ((Roof) selectedHousePart).getRoofPartsRoot();
-				if (flattenedMeshesRoot != null && pick != null) {
-					// com.ardor3d.util.geom.Debugger.drawBounds(flattenedMeshesRoot.getChild(pick.getIndex()), renderer, true);
-					final Spatial node = ((Node) flattenedMeshesRoot.getChild(pick.getIndex())).getChild(0);
-					com.ardor3d.util.geom.Debugger.drawBounds(node, renderer, true);
-					System.out.println(node.getWorldBound());
-				}
-			} else {
-				com.ardor3d.util.geom.Debugger.drawBounds(selectedHousePart.getMesh(), renderer, true);
-				if (selectedHousePart.getMesh() != null)
-					System.out.println(selectedHousePart.getMesh().getWorldBound());
-			}
-		}
-
-		if (drawBounds) {
-			// for (final HousePart selectedHousePart : PrintController.getInstance().getPrintParts())
-			for (final HousePart selectedHousePart : Scene.getInstance().getParts())
-				if (selectedHousePart instanceof Roof) {
-					final Node flattenedMeshesRoot = ((Roof) selectedHousePart).getRoofPartsRoot();
-					if (flattenedMeshesRoot != null) {
-						for (int i = 0; i < flattenedMeshesRoot.getNumberOfChildren(); i++) {
-							// com.ardor3d.util.geom.Debugger.drawBounds(flattenedMeshesRoot.getChild(pick.getIndex()), renderer, true);
-							final Spatial node = ((Node) flattenedMeshesRoot.getChild(i)).getChild(0);
-							node.getWorldBound();
-							com.ardor3d.util.geom.Debugger.drawBounds(node, renderer, true);
-							System.out.println(node.getWorldBound());
-						}
-					}
-				}
-		}
+//		if (drawBounds && selectedHousePart != null) {
+//			if (selectedHousePart instanceof Roof) {
+//				final Node flattenedMeshesRoot = ((Roof) selectedHousePart).getRoofPartsRoot();
+//				if (flattenedMeshesRoot != null && pick != null) {
+//					// com.ardor3d.util.geom.Debugger.drawBounds(flattenedMeshesRoot.getChild(pick.getIndex()), renderer, true);
+//					final Spatial node = ((Node) flattenedMeshesRoot.getChild(pick.getIndex())).getChild(0);
+//					com.ardor3d.util.geom.Debugger.drawBounds(node, renderer, true);
+//					System.out.println(node.getWorldBound());
+//				}
+//			} else {
+//				com.ardor3d.util.geom.Debugger.drawBounds(selectedHousePart.getMesh(), renderer, true);
+//				if (selectedHousePart.getMesh() != null)
+//					System.out.println(selectedHousePart.getMesh().getWorldBound());
+//			}
+//		}
+//
+//		if (drawBounds) {
+//			// for (final HousePart selectedHousePart : PrintController.getInstance().getPrintParts())
+//			for (final HousePart selectedHousePart : Scene.getInstance().getParts())
+//				if (selectedHousePart instanceof Roof) {
+//					final Node flattenedMeshesRoot = ((Roof) selectedHousePart).getRoofPartsRoot();
+//					if (flattenedMeshesRoot != null) {
+//						for (int i = 0; i < flattenedMeshesRoot.getNumberOfChildren(); i++) {
+//							// com.ardor3d.util.geom.Debugger.drawBounds(flattenedMeshesRoot.getChild(pick.getIndex()), renderer, true);
+//							final Spatial node = ((Node) flattenedMeshesRoot.getChild(i)).getChild(0);
+//							node.getWorldBound();
+//							com.ardor3d.util.geom.Debugger.drawBounds(node, renderer, true);
+//							System.out.println(node.getWorldBound());
+//						}
+//					}
+//				}
+//		}
 
 		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getInstance().getOriginalHouseRoot(), renderer, true);
 
@@ -442,6 +442,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
 		root.attachChild(cameraNode);
 		cameraNode.updateFromCamera();
+		Scene.getInstance().updateEditShapes();
 		setCameraControl(CameraMode.ORBIT);
 		resetCamera(ViewMode.NORMAL);
 		SceneManager.getInstance().getCameraControl().reset();
@@ -453,6 +454,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				compass.setScale(0.1);
 				compass.setTranslation(-1, -0.7, 2);
 				cameraNode.attachChild(compass);
+				Scene.getInstance().updateEditShapes();
 				return null;
 			}
 		});
@@ -887,7 +889,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		camera.lookAt(lookAt, Vector3.UNIT_Z);
 
 		cameraNode.updateFromCamera();
-		cameraControl.updateEditShapes();
+		Scene.getInstance().updateEditShapes();
 	}
 
 	private void resizeCamera() {
@@ -914,17 +916,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		rotAnim = !rotAnim;
 	}
 
-	private void moveUpDown(final Canvas canvas, final double tpf, boolean up) {
-		final Camera camera = canvas.getCanvasRenderer().getCamera();
-		final Vector3 loc = new Vector3(camera.getUp());
-		if (viewMode == ViewMode.TOP_VIEW)
-			up = !up;
-		loc.multiplyLocal((up ? 1 : -1) * MOVE_SPEED * tpf).addLocal(camera.getLocation());
-		camera.setLocation(loc);
-		cameraNode.updateFromCamera();
-		cameraControl.updateEditShapes();
-		SceneManager.getInstance().refresh();
-	}
+//	private void moveUpDown(final Canvas canvas, final double tpf, boolean up) {
+//		final Camera camera = canvas.getCanvasRenderer().getCamera();
+//		final Vector3 loc = new Vector3(camera.getUp());
+//		if (viewMode == ViewMode.TOP_VIEW)
+//			up = !up;
+//		loc.multiplyLocal((up ? 1 : -1) * MOVE_SPEED * tpf).addLocal(camera.getLocation());
+//		camera.setLocation(loc);
+//		cameraNode.updateFromCamera();
+//		Scene.getInstance().updateEditShapes();
+//		SceneManager.getInstance().refresh();
+//	}
 
 	public void setOperation(final Operation operation) {
 		operationStick = false;

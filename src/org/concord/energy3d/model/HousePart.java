@@ -438,9 +438,10 @@ public abstract class HousePart implements Serializable {
 	public void updateEditShapes() {
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 p = getAbsPoint(i);
-			final Camera camera = Camera.getCurrentCamera();
-			if (camera != null)
-				getEditPointShape(i).setScale(camera.getLocation().distance(p) / 10);
+//			final Camera camera = Camera.getCurrentCamera();
+			final Camera camera = SceneManager.getInstance().getCameraNode().getCamera();
+//			if (camera != null)
+			getEditPointShape(i).setScale(camera.getLocation().distance(p) / 10);
 			getEditPointShape(i).setTranslation(p);
 		}
 		/* remove remaining edit shapes */

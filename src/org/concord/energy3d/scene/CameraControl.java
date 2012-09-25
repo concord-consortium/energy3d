@@ -10,8 +10,6 @@
 
 package org.concord.energy3d.scene;
 
-import org.concord.energy3d.model.HousePart;
-
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.Key;
@@ -145,11 +143,11 @@ public abstract class CameraControl {
 							final double dy = -mouse.getDy() * fac / Camera.getCurrentCamera().getHeight() / 4.0;
 							move(source.getCanvasRenderer().getCamera(), dx, dy);
                     		SceneManager.getInstance().getCameraNode().updateFromCamera();
-                    		updateEditShapes();
+                    		Scene.getInstance().updateEditShapes();
 						} else if (left && leftButtonAction == ButtonAction.ROTATE || right && rightButtonAction == ButtonAction.ROTATE) {
                     		rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
                     		SceneManager.getInstance().getCameraNode().updateFromCamera();
-                    		updateEditShapes();
+                    		Scene.getInstance().updateEditShapes();
 						} else if (middle || left && leftButtonAction == ButtonAction.ZOOM || right && rightButtonAction == ButtonAction.ZOOM) {
 							int dy = inputStates.getCurrent().getMouseState().getDy();
 							if (dy < -4)
@@ -266,7 +264,7 @@ public abstract class CameraControl {
 				((OrbitControl) this).computeNewFrontDistance();
 		}
 		SceneManager.getInstance().getCameraNode().updateFromCamera();
-		updateEditShapes();
+		Scene.getInstance().updateEditShapes();
 		SceneManager.getInstance().refresh();
 	}
 
@@ -307,7 +305,7 @@ public abstract class CameraControl {
 		Camera.getCurrentCamera().setLocation(currentLocation);
 		Camera.getCurrentCamera().lookAt(currentLocation.add(currentDirection, null), Vector3.UNIT_Z);
 		SceneManager.getInstance().getCameraNode().updateFromCamera();
-		updateEditShapes();
+		Scene.getInstance().updateEditShapes();
 		if (t > animationDuration)
 			animationTime = -1;
 	}
@@ -342,11 +340,6 @@ public abstract class CameraControl {
 
 	public void setLeftButtonAction(final ButtonAction leftButtonAction) {
 		this.leftButtonAction = leftButtonAction;
-	}
-
-	public void updateEditShapes() {
-		for (final HousePart part : Scene.getInstance().getParts())
-			part.updateEditShapes();
 	}
 
 }

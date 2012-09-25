@@ -18,20 +18,15 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
-import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 
-import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.ui.text.BMText;
-import com.ardor3d.ui.text.BMText.AutoScale;
 
 public class Scene implements Serializable {
 	public static enum Unit {
@@ -183,6 +178,7 @@ public class Scene implements Serializable {
 			camera.lookAt(instance.getCameraLocation().add(instance.getCameraDirection(), null), Vector3.UNIT_Z);
 		}
 		SceneManager.getInstance().getCameraNode().updateFromCamera();
+		Scene.getInstance().updateEditShapes();
 	}
 
 	public static void importFile(final URL url) throws Exception {
@@ -442,36 +438,36 @@ public class Scene implements Serializable {
 		return textureMode;
 	}
 
-	public void updateTextSizes() {
-		getOriginalHouseRoot().updateWorldBound(true);
-		final BoundingBox bounds = (BoundingBox) getOriginalHouseRoot().getWorldBound();
-		if (bounds != null) {
-			final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
-			final double fontSize = size / 20.0;
-			updateTextSizes(fontSize);
-		}
-	}
-
-	public void updateTextSizes(final double fontSize) {
-		Annotation.setFontSize(fontSize);
-		updateTextSizes(root, fontSize);
-	}
-
-	private void updateTextSizes(final Spatial spatial, final double fontSize) {
-		if (spatial instanceof BMText) {
-			final BMText label = (BMText) spatial;
-			if (label.getAutoScale() == AutoScale.Off) {
-				label.setFontScale(fontSize);
-				label.updateGeometricState(0);
-			}
-		} else if (spatial instanceof Node) {
-			for (final Spatial child : ((Node) spatial).getChildren())
-				updateTextSizes(child, fontSize);
-			// now that text font is updated redraw the annotation
-			if (spatial instanceof Annotation)
-				((Annotation) spatial).draw();
-		}
-	}
+//	public void updateTextSizes() {
+//		getOriginalHouseRoot().updateWorldBound(true);
+//		final BoundingBox bounds = (BoundingBox) getOriginalHouseRoot().getWorldBound();
+//		if (bounds != null) {
+//			final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
+//			final double fontSize = size / 20.0;
+//			updateTextSizes(fontSize);
+//		}
+//	}
+//
+//	public void updateTextSizes(final double fontSize) {
+//		Annotation.setFontSize(fontSize);
+//		updateTextSizes(root, fontSize);
+//	}
+//
+//	private void updateTextSizes(final Spatial spatial, final double fontSize) {
+//		if (spatial instanceof BMText) {
+//			final BMText label = (BMText) spatial;
+//			if (label.getAutoScale() == AutoScale.Off) {
+//				label.setFontScale(fontSize);
+//				label.updateGeometricState(0);
+//			}
+//		} else if (spatial instanceof Node) {
+//			for (final Spatial child : ((Node) spatial).getChildren())
+//				updateTextSizes(child, fontSize);
+//			// now that text font is updated redraw the annotation
+//			if (spatial instanceof Annotation)
+//				((Annotation) spatial).draw();
+//		}
+//	}
 
 	public void updateRoofDashLinesColor() {
 		for (final HousePart part : parts)
@@ -584,4 +580,8 @@ public class Scene implements Serializable {
 			MainFrame.getInstance().updateTitleBar();
 	}
 
+	public void updateEditShapes() {
+		for (final HousePart part : parts)
+			part.updateEditShapes();
+	}
 }
