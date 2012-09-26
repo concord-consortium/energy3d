@@ -1205,6 +1205,11 @@ Version 0.5 - October 20, 2011
 - scale up the distance between parts when in print preview with annotations on
 - improve the wall texture image file to avoid double line
 - delete un-used texture files
+- fix problem with zero degree annotation
+- in outline algorithm remove the last vertex if duplication of the first vertex of convex hull   
+- avoid inserting angle annotation if it's 180 degrees
+- avoid flipping the size annotation if it's almost 180 degree
+- improve outline computation algorithm so that it omits 180 degree connection points
 
 - *undo wall direction when undoing wall add or move or delete 
 

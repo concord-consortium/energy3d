@@ -435,21 +435,32 @@ public abstract class Roof extends HousePart {
 				final ReadOnlyVector3 p1 = convexHull.get(i);
 				final ReadOnlyVector3 p2 = convexHull.get((i + 1) % n);
 				final ReadOnlyVector3 p3 = convexHull.get((i + 2) % n);
+//				while (isAlmost180(p1, p2, p3) && i < n) {
+//					i++;
+//					p2 = convexHull.get((i + 1) % n);
+//					p3 = convexHull.get((i + 2) % n);
+//				}
+
+//				if (i == n)
+//					break;
 
 				// Size annotation
 				final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
 				final SizeAnnotation sizeAnnot = fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1));
-				sizeAnnot.setRange(p2, p3, center, normal, false, Align.Center, true, true, Scene.isDrawAnnotationsInside());
+				final boolean drawAnnotationsInside = Scene.isDrawAnnotationsInside();
+				sizeAnnot.setRange(p2, p3, center, normal, false, Align.Center, true, true, drawAnnotationsInside);
 				sizeAnnot.setLineWidth(original == null ? 1f : 2f);
-				if (Scene.isDrawAnnotationsInside())
+				if (drawAnnotationsInside)
 					sizeAnnot.setColor(ColorRGBA.WHITE);
 				else
 					sizeAnnot.setColor(ColorRGBA.BLACK);
 
 				// Angle annotations
-				final AngleAnnotation angleAnnot = fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2));
-				angleAnnot.setLineWidth(original == null ? 1f : 2f);
-				angleAnnot.setRange(p2, p1, p3, normal);
+//				if (!isAlmost180) {
+					final AngleAnnotation angleAnnot = fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2));
+					angleAnnot.setLineWidth(original == null ? 1f : 2f);
+					angleAnnot.setRange(p2, p1, p3, normal);
+//				}
 			}
 		}
 	}

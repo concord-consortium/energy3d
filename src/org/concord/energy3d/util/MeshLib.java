@@ -358,7 +358,26 @@ public class MeshLib {
 				break;
 		}
 
+		// remove last point if duplicated of first point
+		if (sortedOutlinePoints.get(0).equals(sortedOutlinePoints.get(sortedOutlinePoints.size() - 1)))
+			sortedOutlinePoints.remove(sortedOutlinePoints.size() - 1);
+
+		for (int i = 0; i < sortedOutlinePoints.size(); i++) {
+			final ReadOnlyVector3 p1 = sortedOutlinePoints.get(i);
+			final ReadOnlyVector3 p2 = sortedOutlinePoints.get((i + 1) % sortedOutlinePoints.size());
+			final ReadOnlyVector3 p3 = sortedOutlinePoints.get((i + 2) % sortedOutlinePoints.size());
+
+			if (isAlmost180(p1, p2, p3)) {
+				sortedOutlinePoints.remove((i + 1) % sortedOutlinePoints.size());
+				i--;
+			}
+		}
+
 		return sortedOutlinePoints;
+	}
+
+	private static boolean isAlmost180(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
+		return Math.abs(p1.subtract(p2, null).normalizeLocal().smallestAngleBetween(p3.subtract(p1, null).normalizeLocal())) > Math.PI - Math.PI / 180.0;
 	}
 
 	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v) {
