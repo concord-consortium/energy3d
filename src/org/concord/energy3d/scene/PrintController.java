@@ -45,7 +45,7 @@ import com.ardor3d.util.Timer;
 
 public class PrintController implements Updater {
 	private static PrintController instance = new PrintController();
-	private static final double SPACE_BETWEEN_PAGES = 0.5;
+	private static final double SPACE_BETWEEN_PAGES = 5.0;
 	private static final double exactFromPageToWorldCoord = 1.0 / 72.0 / 4.0 / 10.6 * 10.8;
 	private static double spaceBetweenParts = 0;
 	private final ArrayList<ReadOnlyVector3> printCenters = new ArrayList<ReadOnlyVector3>();
@@ -321,7 +321,7 @@ public class PrintController implements Updater {
 	}
 
 	private void computePageDimension() {
-		spaceBetweenParts = Scene.getInstance().isAnnotationsVisible() ? 0.3 : 0;
+		spaceBetweenParts = Scene.getInstance().isAnnotationsVisible() ? 3.0 : 0;
 		double fromPageToWorldCoord;
 		if (!isScaleToFit)
 			fromPageToWorldCoord = exactFromPageToWorldCoord / (Scene.getInstance().getAnnotationScale() / 10.0);
@@ -374,7 +374,7 @@ public class PrintController implements Updater {
 		pageTop = pageFormat.getImageableY() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
 		if (labelHeight == 0.0) {
 			final BMText label = Annotation.makeNewLabel();
-			label.setFontScale(0.05);
+			label.setFontScale(0.5);
 			labelHeight = label.getHeight();
 		}
 		pageBottom = (pageFormat.getImageableY() + pageFormat.getImageableHeight()) * fromPageToWorldCoord - spaceBetweenParts / 2.0 - labelHeight;
@@ -420,7 +420,7 @@ public class PrintController implements Updater {
 			final BMText footNote = Annotation.makeNewLabel();
 			final String url = Scene.getURL() != null ? Scene.getURL().getFile().substring(Scene.getURL().getFile().lastIndexOf('/') + 1, Scene.getURL().getFile().length()) + " -" : "";
 			footNote.setText(url.replaceAll("%20", " ") + " Page " + printCenters.size() + " / " + pages.size() + " - http://energy.concord.org/");
-			footNote.setFontScale(0.05);
+			footNote.setFontScale(0.5);
 			footNote.setAlign(Align.North);
 			footNote.setTranslation(upperLeftCorner.add(pageWidth / 2.0, 0.0, -pageBottom - spaceBetweenParts / 2.0, null));
 			pagesRoot.attachChild(footNote);

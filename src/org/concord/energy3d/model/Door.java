@@ -125,7 +125,7 @@ public class Door extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Full ? "door.jpg" : "door2.png";
+		return Scene.getInstance().getTextureMode() == TextureMode.Full ? "door.jpg" : "door.png";
 	}
 
 	@Override

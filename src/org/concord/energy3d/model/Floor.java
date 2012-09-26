@@ -193,7 +193,7 @@ public class Floor extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "floor2.png" : "floor.jpg";
+		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "floor.png" : "floor.jpg";
 	}
 
 	@Override

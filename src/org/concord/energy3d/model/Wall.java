@@ -390,9 +390,13 @@ public class Wall extends HousePart {
 
 		if (texture) {
 			final Vector3 p0 = getAbsPoint(0);
-			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 10.0;
+			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 8.0;
 			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
 			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
+			if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
+				p01.multiplyLocal(1.5);
+				p02.multiplyLocal(2.0);
+			}
 			final TPoint o = new TPoint(p0.getX(), p0.getY(), p0.getZ());
 			final TPoint u = new TPoint(p01.getX(), p01.getY(), p01.getZ());
 			final TPoint v = new TPoint(p02.getX(), p02.getY(), p02.getZ());
@@ -1011,7 +1015,7 @@ public class Wall extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "wall5.png" : "wall.jpg";
+		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "wall.png" : "wall.jpg";
 	}
 
 	public boolean isVisited() {

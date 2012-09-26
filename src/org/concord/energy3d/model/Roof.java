@@ -521,7 +521,7 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "roof3.png" : "roof.jpg";
+		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "roof.png" : "roof.jpg";
 	}
 
 	protected abstract void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints);

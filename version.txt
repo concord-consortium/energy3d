@@ -1202,9 +1202,9 @@ Version 0.5 - October 20, 2011
 - scale up the default overhangs and overhangs after loading an older model
 - fix problem with grids not hiding after canceling insertion of a house part
 - update edit shape size at startup
-
-- *scale up the distance between parts when in print preview with annotations on
+- scale up the distance between parts when in print preview with annotations on
 - improve the wall texture image file to avoid double line
+- delete un-used texture files
 
 - *undo wall direction when undoing wall add or move or delete 
 
