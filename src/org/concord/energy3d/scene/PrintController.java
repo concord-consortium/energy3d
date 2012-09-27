@@ -356,8 +356,8 @@ public class PrintController implements Updater {
 			maxWidth *= 2;
 			maxHeight *= 2;
 
-			maxWidth += spaceBetweenParts;
-			maxHeight += spaceBetweenParts;
+			maxWidth += 2 * spaceBetweenParts;
+			maxHeight += 2 * spaceBetweenParts;
 			final double ratio = pageFormat.getImageableWidth() / pageFormat.getImageableHeight();
 			if (maxWidth / maxHeight > ratio) {
 				pageWidth = ratio < 1 ? Math.min(maxWidth, maxHeight) : Math.max(maxWidth, maxHeight);
@@ -501,7 +501,7 @@ public class PrintController implements Updater {
 						final OrientedBoundingBox otherPartBound = (OrientedBoundingBox) otherPart.getWorldBound().clone(null);
 						otherPartBound.setCenter(((UserData) otherPart.getUserData()).getPrintCenter());
 
-						if (printPartBound.getExtent().getX() + otherPartBound.getExtent().getX() > Math.abs(printPartBound.getCenter().getX() - otherPartBound.getCenter().getX()) + MathUtils.ZERO_TOLERANCE && printPartBound.getExtent().getZ() + otherPartBound.getExtent().getZ() > Math.abs(printPartBound.getCenter().getZ() - otherPartBound.getCenter().getZ()) + MathUtils.ZERO_TOLERANCE) {
+						if (printPartBound.getExtent().getX() + otherPartBound.getExtent().getX() > Math.abs(printPartBound.getCenter().getX() - otherPartBound.getCenter().getX()) - spaceBetweenParts + MathUtils.ZERO_TOLERANCE && printPartBound.getExtent().getZ() + otherPartBound.getExtent().getZ() > Math.abs(printPartBound.getCenter().getZ() - otherPartBound.getCenter().getZ()) - spaceBetweenParts + MathUtils.ZERO_TOLERANCE) {
 							collision = true;
 							break;
 						}

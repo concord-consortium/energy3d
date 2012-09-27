@@ -1210,6 +1210,8 @@ Version 0.5 - October 20, 2011
 - avoid inserting angle annotation if it's 180 degrees
 - avoid flipping the size annotation if it's almost 180 degree
 - improve outline computation algorithm so that it omits 180 degree connection points
+- in print preview, when determining page size take into account the annotation width
+- in print preview, when determining if two parts collide within a page take into account the annotation width
 
 - *undo wall direction when undoing wall add or move or delete 
 
