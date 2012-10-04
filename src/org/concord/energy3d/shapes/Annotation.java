@@ -6,7 +6,6 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BMText;
@@ -31,7 +30,7 @@ public abstract class Annotation extends Node {
 		label.setAutoFade(AutoFade.Off);
 		label.setModelBound(new BoundingBox());
 		label.updateWorldTransform(true);
-		label.getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);
+//		label.getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);
 		Util.disablePickShadowLight(label);
 		return label;
 	}

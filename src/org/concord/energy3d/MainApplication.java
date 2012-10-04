@@ -38,7 +38,7 @@ public class MainApplication {
 //		HandTrackerApplication.main(null);
 	}
 
-	private static void setupLibraryPath() {
+	public static void setupLibraryPath() {
 		final String orgLibraryPath = System.getProperty("java.library.path");
 		final String sep = System.getProperty("file.separator");
 		final String rendererNativePath = "." + sep + "lib" + sep + (Config.JOGL ? "jogl" : "lwjgl") + sep + "native";
