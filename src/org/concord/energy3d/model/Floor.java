@@ -114,7 +114,9 @@ public class Floor extends HousePart {
 		}
 		mesh.getSceneHints().setCullHint(CullHint.Inherit);
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
-		fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
+		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 2.0 : 10.0;
+		MeshLib.fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints), null, true, new TPoint(0, 0, 0), new TPoint(scale, 0, 0), new TPoint(0, scale, 0));
+//		fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
 		drawWireframe();
 		updateEditShapes();
 	}

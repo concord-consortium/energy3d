@@ -403,7 +403,7 @@ public class MainPanel extends JPanel {
 				}
 			});
 			rotAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/rotate.png")));
-			rotAnimButton.setToolTipText("Animate scene roatation");
+			rotAnimButton.setToolTipText("Animate scene rotation");
 			rotAnimButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {

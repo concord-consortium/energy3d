@@ -61,11 +61,11 @@ public class Scene implements Serializable {
 	private TextureMode textureMode = TextureMode.Full;
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
-	private ReadOnlyColorRGBA foundationColor = ColorRGBA.WHITE;
-	private ReadOnlyColorRGBA wallColor = ColorRGBA.WHITE;
-	private ReadOnlyColorRGBA doorColor = ColorRGBA.WHITE;
-	private ReadOnlyColorRGBA floorColor = ColorRGBA.WHITE;
-	private ReadOnlyColorRGBA roofColor = ColorRGBA.WHITE;
+	private ReadOnlyColorRGBA foundationColor;
+	private ReadOnlyColorRGBA wallColor;
+	private ReadOnlyColorRGBA doorColor;
+	private ReadOnlyColorRGBA floorColor;
+	private ReadOnlyColorRGBA roofColor;
 	private double overhangLength = 2.0;
 	private double annotationScale = 1;
 	private int version = currentVersion;

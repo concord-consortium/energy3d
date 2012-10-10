@@ -284,6 +284,18 @@ public class Foundation extends HousePart {
 	public void scaleHouse(final double scale) {
 		final double h = points.get(4).getZ() - height;
 		applyNewHeight(h, h * 10, true);
+
+		final double oldHeight = height;
+		height *= scale;
+		final double addHeight = height - oldHeight;
+		for (final HousePart wall : children) {
+			for (final Vector3 point : wall.points)
+				point.addLocal(0, 0, addHeight);
+			for (final HousePart floor : wall.children)
+				if (floor instanceof Floor)
+					floor.setHeight(floor.getHeight() + addHeight);
+		}
+
 		for (int i = 0; i < points.size(); i++)
 			points.get(i).multiplyLocal(10);
 	}

@@ -595,7 +595,9 @@ public abstract class HousePart implements Serializable {
 		updateTextureAndColor(mesh, defaultColor, Scene.getInstance().getTextureMode());
 	}
 
-	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
+	protected void updateTextureAndColor(final Mesh mesh, ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
+		if (defaultColor == null)
+			defaultColor = ColorRGBA.WHITE;
 		if (textureMode == TextureMode.None || getTextureFileName() == null) {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(defaultColor);

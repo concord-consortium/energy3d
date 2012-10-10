@@ -1212,6 +1212,10 @@ Version 0.5 - October 20, 2011
 - improve outline computation algorithm so that it omits 180 degree connection points
 - in print preview, when determining page size take into account the annotation width
 - in print preview, when determining if two parts collide within a page take into account the annotation width
+- set default color to null and paint parts White if color is null
+- fix scale up platform height
+- fix scale up wall bottom points
+- fix scale up floor texture 
 
 - *undo wall direction when undoing wall add or move or delete 
 
