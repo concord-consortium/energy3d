@@ -208,8 +208,10 @@ public class MeshLib {
 				node.attachChild(newMesh);
 				node.attachChild(new Node("Roof Size Annot"));
 				node.attachChild(new Node("Roof Angle Annot"));
-				final BMText label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+//				final BMText label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+				final BMText label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.South, Justify.Center);
 				Util.initHousePartLabel(label);
+				label.setTranslation(group.key);
 				node.attachChild(label);
 				node.getChild(3).getSceneHints().setCullHint(CullHint.Always);
 

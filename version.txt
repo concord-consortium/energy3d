@@ -1219,7 +1219,7 @@ Version 0.5 - October 20, 2011
 - reset annotation scale to 1 for older model versions
 - fix problem with invisble lables in print preview mode
 - fix problem with roof mesh falling behind paper in print preview in U-Shaped2.gc3 by taking the paper back 1.0 units
-
+- make roof labels more visible by making them south aligned
 
 - *undo wall direction when undoing wall add or move or delete
 - *fix dash lines in U-Shaped1.gc3 model
