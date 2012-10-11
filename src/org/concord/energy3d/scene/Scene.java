@@ -251,6 +251,7 @@ public class Scene implements Serializable {
 			}
 			cameraLocation = cameraLocation.multiply(10, null);
 			setOverhangLength(getOverhangLength() * 10);
+			setAnnotationScale(1.0);
 		}
 
 		version = currentVersion ;

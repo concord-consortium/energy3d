@@ -1215,7 +1215,9 @@ Version 0.5 - October 20, 2011
 - set default color to null and paint parts White if color is null
 - fix scale up platform height
 - fix scale up wall bottom points
-- fix scale up floor texture 
+- fix scale up floor texture
+- reset annotation scale to 1 for older model versions
+
 
 - *undo wall direction when undoing wall add or move or delete 
 
