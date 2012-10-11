@@ -1217,9 +1217,15 @@ Version 0.5 - October 20, 2011
 - fix scale up wall bottom points
 - fix scale up floor texture
 - reset annotation scale to 1 for older model versions
+- fix problem with invisble lables in print preview mode
 
 
-- *undo wall direction when undoing wall add or move or delete 
+- *undo wall direction when undoing wall add or move or delete
+- *fix dash lines in U-Shaped1.gc3 model
+- *fix dash lines in U-Shaped2.gc3 model
+- *fix problem with TwoStories2.gc3 model
+
+ 
 
 TODO:
 - add a list of textures for wall and roof and floor for users to choose from

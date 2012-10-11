@@ -56,7 +56,7 @@ public class Floor extends HousePart {
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(wireframeMesh);
-		root.attachChild(wireframeMesh);
+//		root.attachChild(wireframeMesh);
 
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);

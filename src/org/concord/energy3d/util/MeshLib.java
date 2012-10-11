@@ -208,7 +208,9 @@ public class MeshLib {
 				node.attachChild(newMesh);
 				node.attachChild(new Node("Roof Size Annot"));
 				node.attachChild(new Node("Roof Angle Annot"));
-				node.attachChild(new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center));
+				final BMText label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+				Util.initHousePartLabel(label);
+				node.attachChild(label);
 				node.getChild(3).getSceneHints().setCullHint(CullHint.Always);
 
 				final Mesh wireframeMesh = new Line("Roof (wireframe)");

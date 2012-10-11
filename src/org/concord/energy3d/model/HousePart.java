@@ -525,6 +525,7 @@ public abstract class HousePart implements Serializable {
 			label.getSceneHints().setCullHint(CullHint.Inherit);
 		} else {
 			label = new BMText("Label Text", text, FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+			Util.initHousePartLabel(label);
 			labelsRoot.attachChild(label);
 		}
 		return label;

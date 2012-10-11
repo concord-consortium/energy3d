@@ -20,6 +20,9 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
+import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BMText.AutoFade;
+import com.ardor3d.ui.text.BMText.AutoScale;
 
 public class Util {
 
@@ -209,5 +212,10 @@ public class Util {
 	            return null;
 	    } else
 	    	return null;
+	}
+
+	public static void initHousePartLabel(final BMText label) {
+		label.setAutoScale(AutoScale.FixedScreenSize);
+		label.setAutoFade(AutoFade.Off);
 	}
 }
