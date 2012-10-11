@@ -413,7 +413,7 @@ public class PrintController implements Updater {
 				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(upperLeftCorner);
 
 			final Box box = new Box("Page Boundary");
-			box.setData(upperLeftCorner.add(0, 0.1, 0, null), upperLeftCorner.add(pageWidth, 0.2, -pageHeight, null));
+			box.setData(upperLeftCorner.add(0, 1, 0, null), upperLeftCorner.add(pageWidth, 1.2, -pageHeight, null));
 			box.updateModelBound();
 			pagesRoot.attachChild(box);
 
