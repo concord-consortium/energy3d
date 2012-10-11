@@ -215,6 +215,7 @@ public class Util {
 	}
 
 	public static void initHousePartLabel(final BMText label) {
+		label.setFontScale(0.6);
 		label.setAutoScale(AutoScale.FixedScreenSize);
 		label.setAutoFade(AutoFade.Off);
 	}
