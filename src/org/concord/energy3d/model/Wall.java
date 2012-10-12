@@ -498,7 +498,8 @@ public class Wall extends HousePart {
 			Vector3 direction = null;
 			ReadOnlyVector3 previousStretchPoint = polygon.get(3);
 
-			final double step = 0.01;
+//			final double step = 0.01;
+			final double step = 0.1;
 			for (double d = length - step; d > step; d -= step) {
 				final Vector3 p = dir.multiply(d, null).addLocal(o);
 				final double findRoofIntersection = findRoofIntersection(p);
@@ -557,6 +558,10 @@ public class Wall extends HousePart {
 
 		enforceGablePointsRangeAndRemoveDuplicatedGablePoints(polygon.get(0));
 		extendToRoof(polygon.get(0));
+
+		// lower the z of back wall to ensure it doesn't stick up through the roof
+		for (final Vector3 p : polygon.get(0))
+			p.setZ(p.getZ() - 0.5);
 
 		drawPolygon(polygon, backMesh, true, true, false);
 	}

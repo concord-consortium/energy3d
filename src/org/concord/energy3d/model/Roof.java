@@ -229,7 +229,7 @@ public abstract class Roof extends HousePart {
 		ReadOnlyVector3 previousStretchPoint = null;
 		boolean firstInsert = false;
 
-		final double step = 0.01;
+		final double step = 0.1;
 		for (double d = length; d > step; d -= step) {
 			final Vector3 p = dir.multiply(d, null).addLocal(p1);
 			final ReadOnlyVector3 currentStretchPoint = findRoofIntersection(roof, p);
