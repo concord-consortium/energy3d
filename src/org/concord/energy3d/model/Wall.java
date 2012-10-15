@@ -560,8 +560,9 @@ public class Wall extends HousePart {
 		extendToRoof(polygon.get(0));
 
 		// lower the z of back wall to ensure it doesn't stick up through the roof
-		for (final Vector3 p : polygon.get(0))
-			p.setZ(p.getZ() - 0.5);
+		if (roof != null)
+			for (final Vector3 p : polygon.get(0))
+				p.setZ(p.getZ() - 0.3);
 
 		drawPolygon(polygon, backMesh, true, true, false);
 	}

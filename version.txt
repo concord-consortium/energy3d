@@ -1220,15 +1220,15 @@ Version 0.5 - October 20, 2011
 - fix problem with invisble lables in print preview mode
 - fix problem with roof mesh falling behind paper in print preview in U-Shaped2.gc3 by taking the paper back 1.0 units
 - make roof labels more visible by making them south aligned
+- scaleup extend to roof algorithm to improve speed of editing roofs
 - release version 1.0
-- scaleup extend to roof algorithm to improve speed of editing roofs 
 
 
 - *undo wall direction when undoing wall add or move or delete
 - *fix dash lines in U-Shaped1.gc3 model
 - *fix dash lines in U-Shaped2.gc3 model
 - *fix problem with TwoStories2.gc3 model
-
+- *fix wall sticking through roof in U-Shaped3-bug.ng3
  
 
 TODO:
