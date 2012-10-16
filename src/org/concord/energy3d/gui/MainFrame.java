@@ -366,7 +366,7 @@ public class MainFrame extends JFrame {
 			fileMenu.add(getSaveasMenuItem());
 			fileMenu.add(getSeparator());
 			fileMenu.add(getImportMenuItem());
-			fileMenu.add(getImportColladaMenuItem());
+//			fileMenu.add(getImportColladaMenuItem());
 			fileMenu.add(getSeparator_3());
 			fileMenu.add(getScaleToFitRadioButtonMenuItem());
 			fileMenu.add(getExactSizeRadioButtonMenuItem());

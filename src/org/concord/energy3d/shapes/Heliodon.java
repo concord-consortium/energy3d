@@ -53,7 +53,6 @@ import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TransparencyType;
@@ -72,7 +71,7 @@ public class Heliodon {
 	private static final int SUN_PATH_VERTICES = 291 / 3;
 	private static final double TILT_ANGLE = 23.45 / 180.0 * Math.PI;
 	private final Node root = new Node("Heliodon Root");
-	private final Spatial sun = new Sphere("Sun", 20, 20, 0.3);
+	private final Mesh sun = new Sphere("Sun", 20, 20, 0.3);
 	private final DirectionalLight light;
 	private final Line sunPath;
 	private final Mesh sunRegion;
@@ -103,6 +102,7 @@ public class Heliodon {
 		final MaterialState material = new MaterialState();
 		material.setEmissive(ColorRGBA.WHITE);
 		sun.setRenderState(material);
+		sun.updateModelBound();
 		sun.setTranslation(0, 0, 5);
 		root.attachChild(sun);
 
