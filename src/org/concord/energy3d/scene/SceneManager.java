@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -130,6 +131,7 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
+import com.ardor3d.util.resource.URLResourceSource;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
@@ -190,6 +192,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private Sphere kinectPointer;
 	private MouseState lastSelectedEditPointMouseState;
+	private Node newImport;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -1408,4 +1411,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 	}
 
+	public void newImport(final URL file) throws IOException {
+//		final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, file);
+		final ResourceSource source = new URLResourceSource(file);
+		final ColladaImporter colladaImporter = new ColladaImporter();
+		Logger.getLogger(ColladaAnimUtils.class.getName()).setLevel(Level.SEVERE);
+		Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
+		final ColladaStorage storage = colladaImporter.load(source);
+		newImport = storage.getScene();
+		root.attachChild(newImport);
+	}
 }

@@ -1222,7 +1222,7 @@ Version 0.5 - October 20, 2011
 - make roof labels more visible by making them south aligned
 - scaleup extend to roof algorithm to improve speed of editing roofs
 - release version 1.0
-
+- allow importing collada models
 
 - *undo wall direction when undoing wall add or move or delete
 - *fix dash lines in U-Shaped1.gc3 model
