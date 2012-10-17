@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SpinnerDateModel;
@@ -65,6 +66,9 @@ public class MainPanel extends JPanel {
 	private JToggleButton roofCustomButton = null;
 	private JToggleButton zoomButton = null;
 	private JToggleButton roofGableButton = null;
+	private JSplitPane splitPane;
+	private EnergyPanel energyPanel;
+	private JPanel canvasPanel;
 
 	public static MainPanel getInstance() {
 		return instance;
@@ -101,6 +105,7 @@ public class MainPanel extends JPanel {
 		this.setSize(1000, 300);
 		setLayout(new BorderLayout());
 		this.add(getAppToolbar(), BorderLayout.NORTH);
+		add(getSplitPane(), BorderLayout.CENTER);
 	}
 
 	/**
@@ -934,5 +939,29 @@ public class MainPanel extends JPanel {
 			}
 		}
 		getCalendarPanel().setVisible(enabled && (getLightButton().isSelected() || getHeliodonButton().isSelected()));
+	}
+
+	private JSplitPane getSplitPane() {
+		if (splitPane == null) {
+			splitPane = new JSplitPane();
+			splitPane.setResizeWeight(1.0);
+			splitPane.setRightComponent(getEnergyPanel());
+			splitPane.setLeftComponent(getCanvasPanel());
+		}
+		return splitPane;
+	}
+
+	private EnergyPanel getEnergyPanel() {
+		if (energyPanel == null) {
+			energyPanel = new EnergyPanel();
+		}
+		return energyPanel;
+	}
+
+	public JPanel getCanvasPanel() {
+		if (canvasPanel == null) {
+			canvasPanel = new JPanel();
+		}
+		return canvasPanel;
 	}
 }

@@ -149,7 +149,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
-	private static final SceneManager instance = new SceneManager(MainPanel.getInstance());
+	private static final SceneManager instance = new SceneManager(MainPanel.getInstance().getCanvasPanel());
 	private static final double MOVE_SPEED = 5;
 	private final Canvas canvas;
 	private final FrameHandler frameHandler;
