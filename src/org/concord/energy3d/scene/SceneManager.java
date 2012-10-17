@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.math.EnergyComputer;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -803,6 +804,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				for (final Spatial mesh : Scene.getInstance().getOriginalHouseRoot().getChildren()) {
 					System.out.println(mesh);
 				}
+				System.out.println("---- Energy: ------------------------");
+				EnergyComputer.computeArea();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {

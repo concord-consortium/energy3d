@@ -1224,6 +1224,11 @@ Version 0.5 - October 20, 2011
 - allow importing collada models
 - fix problem with not being able to pick the sun and drag it
 - release version 1.0
+- calculate area of house parts
+
+
+- *fix problem while in rotation (or after stopped rotating) click on annotation to turn it off the house parts are not drawn properly
+- *turn off heliodon afer opening a new file   
 
 
 - *undo wall direction when undoing wall add or move or delete

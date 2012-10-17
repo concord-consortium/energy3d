@@ -697,4 +697,13 @@ public abstract class HousePart implements Serializable {
 		return true;
 	}
 
+	public double computeArea() {
+		final Vector3 p0 = getAbsPoint(0);
+		final Vector3 p1 = getAbsPoint(1);
+		final Vector3 p2 = getAbsPoint(2);
+		final double C = 100.0;
+//		return Math.round(Math.round(Math.abs(p1.getX() - p2.getX()) * C) / C * Math.round(Math.abs(p1.getZ() - p2.getZ()) * C) / C * C) / C;
+		return Math.round(Math.round(p2.subtract(p0, null).length() * C) / C * Math.round(p1.subtract(p0, null).length() * C) / C * C) / C;
+	}
+
 }

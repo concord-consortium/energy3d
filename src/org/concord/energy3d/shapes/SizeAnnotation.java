@@ -160,7 +160,7 @@ public class SizeAnnotation extends Annotation {
         // because the above code calls the constructor of this object (which adds 3 children) and then clones the node.children (which then adds extra 3 children) we need to undo the effect of last step
         node.detachChildAt(5);
         node.detachChildAt(4);
-        node.detachChildAt(3);;
+        node.detachChildAt(3);
         return node;
     }
 }

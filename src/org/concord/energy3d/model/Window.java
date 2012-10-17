@@ -260,7 +260,6 @@ public class Window extends HousePart {
 
 		final Vector3 center = trans.applyForward(getCenter(), null);
 		final float lineWidth = original == null ? 1f : 2f;
-		;
 
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
 		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, true, false);

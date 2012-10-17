@@ -153,17 +153,17 @@ public class Util {
 		return pa;
 	}
 
-	public static Vector2 closestPoint(final ReadOnlyVector2 v, final ReadOnlyVector2 w, final ReadOnlyVector2 p) {
-		final double l2 = v.distanceSquared(w);
+	public static Vector2 closestPoint(final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p) {
+		final double l2 = p1.distanceSquared(p2);
 		if (l2 == 0.0)
-			return v.clone();
-		final double t = p.subtract(v, null).dot(w.subtract(v, null)) / l2; // dot(p - v, w - v) / l2;
+			return p1.clone();
+		final double t = p.subtract(p1, null).dot(p2.subtract(p1, null)) / l2; // dot(p - v, w - v) / l2;
 		if (t < 0.0)
-			return v.clone();
+			return p1.clone();
 		else if (t > 1.0)
-			return w.clone();
+			return p2.clone();
 		else
-			return w.subtract(v, null).multiplyLocal(t).addLocal(v); // v + t * (w - v);
+			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t * (w - v);
 	}
 
 	public static Vector2 snapToPolygon(final ReadOnlyVector3 point, final List<? extends ReadOnlyVector3> polygon, final List<? extends ReadOnlyVector3> wallNormals) {

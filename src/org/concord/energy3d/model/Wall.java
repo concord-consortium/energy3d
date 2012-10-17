@@ -1180,4 +1180,13 @@ public class Wall extends HousePart {
 			p.set(point.getX(), point.getY(), point.getZ());
 		}
 	}
+
+	@Override
+	public double computeArea() {
+		double area = super.computeArea();
+		for (final HousePart child : children)
+			if (child instanceof Window || child instanceof Door)
+				area -= child.computeArea();
+		return area;
+	}
 }
