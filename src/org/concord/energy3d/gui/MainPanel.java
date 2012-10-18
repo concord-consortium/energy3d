@@ -953,7 +953,7 @@ public class MainPanel extends JPanel {
 
 	private EnergyPanel getEnergyPanel() {
 		if (energyPanel == null) {
-			energyPanel = new EnergyPanel();
+			energyPanel = EnergyPanel.getInstance();
 		}
 		return energyPanel;
 	}

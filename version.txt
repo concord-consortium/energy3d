@@ -1226,6 +1226,7 @@ Version 0.5 - October 20, 2011
 - release version 1.0
 - calculate area of house parts
 - add JavaFX charts
+- update JavaFX chart with computed area values
 
 - *fix problem while in rotation (or after stopped rotating) click on annotation to turn it off the house parts are not drawn properly
 - *turn off heliodon afer opening a new file   
