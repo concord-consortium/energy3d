@@ -11,6 +11,7 @@ import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.math.EnergyComputer;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -278,7 +279,7 @@ public class Scene implements Serializable {
 		out.writeObject(instance);
 		out.close();
 		SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
-		Scene.getInstance().setEdited(false);
+//		Scene.getInstance().setEdited(false);
 		System.out.println("done");
 	}
 
@@ -575,10 +576,14 @@ public class Scene implements Serializable {
 		return edited;
 	}
 
+	int a = 0;
+
 	public void setEdited(final boolean edited) {
 		this.edited  = edited;
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();
+		if (edited)
+			EnergyComputer.computeArea();
 	}
 
 	public void updateEditShapes() {

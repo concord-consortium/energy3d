@@ -14,7 +14,7 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 	@Override
 	public synchronized boolean addEdit(final UndoableEdit anEdit) {
 		final boolean result = super.addEdit(anEdit);
-		Scene.getInstance().setEdited(true);
+		Scene.getInstance().setEdited(!(anEdit instanceof SaveCommand));
 		refreshUndoRedoGui();
 		return result;
 	}

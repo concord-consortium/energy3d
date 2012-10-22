@@ -1,0 +1,15 @@
+.series0.chart-bar {
+    -fx-bar-fill: orange;
+}
+
+.series1.chart-bar {
+    -fx-bar-fill: blue;
+}
+
+.series2.chart-bar {
+    -fx-bar-fill: grey;
+}
+
+.series3.chart-bar {
+    -fx-bar-fill: brown;
+}

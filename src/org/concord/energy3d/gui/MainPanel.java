@@ -961,6 +961,7 @@ public class MainPanel extends JPanel {
 	public JPanel getCanvasPanel() {
 		if (canvasPanel == null) {
 			canvasPanel = new JPanel();
+			canvasPanel.setLayout(new BorderLayout(0, 0));
 		}
 		return canvasPanel;
 	}
