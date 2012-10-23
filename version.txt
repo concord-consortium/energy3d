@@ -1230,6 +1230,8 @@ Version 0.5 - October 20, 2011
 - customize the colors of JavaFX chart with css stylesheet
 - calculate energy loss of house parts
 - update JavaFX chart with computed energy values
+- fix problem with not being able to adjust the split pane
+
 
 - *fix problem while in rotation (or after stopped rotating) click on annotation to turn it off the house parts are not drawn properly
 - *turn off heliodon afer opening a new file   

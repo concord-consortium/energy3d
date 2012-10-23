@@ -34,7 +34,8 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private EnergyPanel() {
-		setPreferredSize(new Dimension(250, 0));
+		setMinimumSize(new Dimension(230, 0));
+		setPreferredSize(new Dimension(230, 0));
 		setLayout(new BorderLayout(0, 0));
 		fxPanel = new JFXPanel();
 		add(fxPanel, BorderLayout.CENTER);
@@ -64,15 +65,15 @@ public class EnergyPanel extends JPanel {
 				chart.getData().add(series);
 
 				series = new XYChart.Series<String, Number>();
-				series.setName("Windows");
-				series.getData().add(windowsArea);
-				series.getData().add(windowsEnergy);
-				chart.getData().add(series);
-
-				series = new XYChart.Series<String, Number>();
 				series.setName("Doors");
 				series.getData().add(doorsArea);
 				series.getData().add(doorsEnergy);
+				chart.getData().add(series);
+
+				series = new XYChart.Series<String, Number>();
+				series.setName("Windows");
+				series.getData().add(windowsArea);
+				series.getData().add(windowsEnergy);
 				chart.getData().add(series);
 
 				series = new XYChart.Series<String, Number>();

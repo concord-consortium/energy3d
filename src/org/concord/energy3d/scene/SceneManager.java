@@ -220,6 +220,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}
 
+		((Component)canvas).setMinimumSize(new Dimension(500, 0));
+
 		frameHandler = new FrameHandler(new Timer());
 		frameHandler.addCanvas(canvas);
 

@@ -3,11 +3,11 @@
 }
 
 .series1.chart-bar {
-    -fx-bar-fill: blue;
+    -fx-bar-fill: grey;
 }
 
 .series2.chart-bar {
-    -fx-bar-fill: grey;
+    -fx-bar-fill: blue;
 }
 
 .series3.chart-bar {

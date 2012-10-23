@@ -944,6 +944,7 @@ public class MainPanel extends JPanel {
 	private JSplitPane getSplitPane() {
 		if (splitPane == null) {
 			splitPane = new JSplitPane();
+			splitPane.setOneTouchExpandable(true);
 			splitPane.setResizeWeight(1.0);
 			splitPane.setRightComponent(getEnergyPanel());
 			splitPane.setLeftComponent(getCanvasPanel());

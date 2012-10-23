@@ -10,10 +10,10 @@ import org.concord.energy3d.scene.Scene;
 
 public class EnergyComputer {
 	private static final double deltaT = 10;
-	private static final double wallUFactor = 0.41;
-	private static final double windowUFactor = 1.22;
-	private static final double doorUFactor = 0.64;
-	private static final double roofUFactor = 0.48;
+	private static final double wallUFactor = 0.09;
+	private static final double windowUFactor = 0.50;
+	private static final double doorUFactor = 0.30;
+	private static final double roofUFactor = 0.05;
 
 	public static void computeAreaAndEnergy() {
 		double wallsArea = 0;
