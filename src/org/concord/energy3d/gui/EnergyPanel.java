@@ -34,7 +34,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private EnergyPanel() {
-		setPreferredSize(new Dimension(200, 0));
+		setPreferredSize(new Dimension(250, 0));
 		setLayout(new BorderLayout(0, 0));
 		fxPanel = new JFXPanel();
 		add(fxPanel, BorderLayout.CENTER);
@@ -42,6 +42,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	XYChart.Series<String, Number> series;
+
 	private void initFxComponents() {
 
 		Platform.runLater(new Runnable() {
@@ -90,18 +91,21 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateArea(final double walls, final double windows, final double doors, final double roofs) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				final double total = (walls + windows + doors + roofs) / 100.0;
-				System.out.println(total);
-				wallsArea.setYValue(walls / total);
-				windowsArea.setYValue(windows / total);
-				doorsArea.setYValue(doors / total);
-				roofsArea.setYValue(roofs / total);
-			}
-		});
+		final double total = (walls + windows + doors + roofs) / 100.0;
+		System.out.println(total);
+		wallsArea.setYValue(walls / total);
+		windowsArea.setYValue(windows / total);
+		doorsArea.setYValue(doors / total);
+		roofsArea.setYValue(roofs / total);
+	}
 
+	public void updateEnergyLoss(final double walls, final double windows, final double doors, final double roofs) {
+		final double total = (walls + windows + doors + roofs) / 100.0;
+		System.out.println(total);
+		wallsEnergy.setYValue(walls / total);
+		windowsEnergy.setYValue(windows / total);
+		doorsEnergy.setYValue(doors / total);
+		roofsEnergy.setYValue(roofs / total);
 	}
 
 }

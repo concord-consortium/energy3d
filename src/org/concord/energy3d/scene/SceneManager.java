@@ -805,7 +805,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					System.out.println(mesh);
 				}
 				System.out.println("---- Energy: ------------------------");
-				EnergyComputer.computeArea();
+				EnergyComputer.computeAreaAndEnergy();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {
