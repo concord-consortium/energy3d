@@ -9,9 +9,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
-import org.concord.energy3d.math.EnergyComputer;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -583,7 +583,7 @@ public class Scene implements Serializable {
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();
 		if (edited)
-			EnergyComputer.computeAreaAndEnergy();
+			EnergyPanel.getInstance().computeAreaAndEnergy();
 	}
 
 	public void updateEditShapes() {

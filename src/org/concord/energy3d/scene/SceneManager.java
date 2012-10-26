@@ -16,8 +16,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
-import org.concord.energy3d.math.EnergyComputer;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -220,15 +220,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}
 
-		((Component)canvas).setMinimumSize(new Dimension(500, 0));
+		final Component canvasComponent = (Component) canvas;
+		canvasComponent.setMinimumSize(new Dimension(500, 0));
 
 		frameHandler = new FrameHandler(new Timer());
 		frameHandler.addCanvas(canvas);
 
 		logicalLayer = new LogicalLayer();
-		final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper((Component) canvas, new AwtMouseManager((Component) canvas));
-		final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper((Component) canvas);
-		final AwtFocusWrapper focusWrapper = new AwtFocusWrapper((Component) canvas);
+		final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(canvasComponent, new AwtMouseManager(canvasComponent));
+		final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvasComponent);
+		final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvasComponent);
 		final PhysicalLayer physicalLayer = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
 		logicalLayer.registerInput(canvas, physicalLayer);
 
@@ -245,7 +246,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					heliodon.updateBloom();
 			}
 		});
-		panel.add((Component) canvas, BorderLayout.CENTER);
+		panel.add(canvasComponent, BorderLayout.CENTER);
 		System.out.println("done");
 		System.out.print("Initializing SceneManager...");
 		AWTImageLoader.registerLoader();
@@ -807,7 +808,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					System.out.println(mesh);
 				}
 				System.out.println("---- Energy: ------------------------");
-				EnergyComputer.computeAreaAndEnergy();
+				EnergyPanel.getInstance().computeAreaAndEnergy();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {

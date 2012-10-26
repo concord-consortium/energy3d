@@ -1231,6 +1231,8 @@ Version 0.5 - October 20, 2011
 - calculate energy loss of house parts
 - update JavaFX chart with computed energy values
 - fix problem with not being able to adjust the split pane
+- allow setting values for temperature and U-Factor through GUI
+- display total energy loss
 
 
 - *fix problem while in rotation (or after stopped rotating) click on annotation to turn it off the house parts are not drawn properly
