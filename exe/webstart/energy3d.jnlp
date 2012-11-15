@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp codebase="http://energy.concord.org/energy3d/" href="http://energy.concord.org/energy3d/energy3d.jnlp">
+<jnlp codebase="http://energy.concord.org/energy3d/" href="energy3d.jnlp">
 	<information>
 		<title>Energy3D</title>
 		<vendor>The Concord Consortium</vendor>
@@ -23,7 +23,7 @@
 		<jar href="energy3d.jar" main="true" />
 		<jar href="resources/guava-r09.jar" />
 		<jar href="resources/jdom.jar" />
-		<extension name="jogl" href="resources/jogl.jnlp" />
+		<extension name="jogl-all-awt" href="resources/jogl-all-awt.jnlp" />
 	</resources>
 	<application-desc main-class="org.concord.energy3d.MainApplication" />
 </jnlp>

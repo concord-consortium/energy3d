@@ -39,6 +39,7 @@ public class MainApplication {
 	}
 
 	public static void setupLibraryPath() {
+		System.out.println(System.getProperty("java.version") + ", " + System.getProperty("os.arch"));
 		final String orgLibraryPath = System.getProperty("java.library.path");
 		final String sep = System.getProperty("file.separator");
 		final String rendererNativePath = "." + sep + "lib" + sep + (Config.JOGL ? "jogl" : "lwjgl") + sep + "native";
