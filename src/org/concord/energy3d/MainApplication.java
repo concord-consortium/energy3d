@@ -1,5 +1,11 @@
 package org.concord.energy3d;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.gui.MainFrame;
@@ -34,6 +40,8 @@ public class MainApplication {
 			mainFrame.open(args[1]);
 
 		mainFrame.updateTitleBar();
+
+		startPeriodicFileSave();
 
 //		HandTrackerApplication.main(null);
 	}
@@ -75,6 +83,32 @@ public class MainApplication {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void startPeriodicFileSave() {
+		new Thread() {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						sleep(6000);
+					} catch (final InterruptedException e) {
+						e.printStackTrace();
+					}
+					if (Scene.getInstance().isEdited()) {
+						final Date date = Calendar.getInstance().getTime();
+						final String filename = new SimpleDateFormat("yyyy-MM-dd HH-mm").format(date) + ".ng3";
+						try {
+							Scene.save(new File(filename).toURI().toURL());
+						} catch (final Exception e) {
+							e.printStackTrace();
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in Auto-Save! Models will no longer be saved automatically. Please notify the teacher of this problem:\n" + e.getMessage(), "Auto-Save Error", JOptionPane.ERROR_MESSAGE);
+							break;
+						}
+					}
+				}
+			}
+		}.start();
 	}
 
 }
