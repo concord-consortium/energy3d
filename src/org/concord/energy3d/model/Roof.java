@@ -618,7 +618,7 @@ public abstract class Roof extends HousePart {
 			return;
 		for (final int nearestIndex : gableEditPointToWallMap.keySet()) {
 			final Vector3 nearestEditPoint = getAbsPoint(nearestIndex);
-			for (final Wall wall : gableEditPointToWallMap.get(nearestIndex)) {
+			for (final HousePart wall : gableEditPointToWallMap.get(nearestIndex)) {
 				if (wall != null) { // TODO do this check before adding
 					final ReadOnlyVector3 n = wall.getFaceDirection();
 					double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(Scene.getInstance().getOverhangLength(), null)), null).dot(n);
@@ -678,7 +678,7 @@ public abstract class Roof extends HousePart {
 			return;
 
 		/* Two Options: hide using estimating direction with wall. Or, hide using roof part number (it be wrong)) */
-		for (final Wall wall : gableWalls) {
+		for (final HousePart wall : gableWalls) {
 			if (wall == null)
 				continue;
 			final Vector3[] base_i = { wall.getAbsPoint(0), wall.getAbsPoint(2) };

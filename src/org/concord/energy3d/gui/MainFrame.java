@@ -129,6 +129,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem roofColorMenuItem;
 	private JMenuItem importColladaMenuItem;
 	private JMenuItem saveAsImageMenuItem;
+	private JMenuItem freezeMenuItem;
+	private JMenuItem unfreezeMenuItem;
+	private JSeparator separator_10;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -746,6 +749,9 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
+			sceneMenu.add(getFreezeMenuItem());
+			sceneMenu.add(getUnfreezeMenuItem());
+			sceneMenu.add(getSeparator_10());
 			sceneMenu.add(getUnitsMenu());
 			sceneMenu.add(getScaleMenuItem());
 			sceneMenu.add(getSeparator_8());
@@ -1444,5 +1450,35 @@ public class MainFrame extends JFrame {
 				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+	}
+	private JMenuItem getFreezeMenuItem() {
+		if (freezeMenuItem == null) {
+			freezeMenuItem = new JMenuItem("Freeze");
+			freezeMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().setFreeze(true);
+				}
+			});
+		}
+		return freezeMenuItem;
+	}
+	private JMenuItem getUnfreezeMenuItem() {
+		if (unfreezeMenuItem == null) {
+			unfreezeMenuItem = new JMenuItem("Unfreeze");
+			unfreezeMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().setFreeze(false);
+				}
+			});
+		}
+		return unfreezeMenuItem;
+	}
+	private JSeparator getSeparator_10() {
+		if (separator_10 == null) {
+			separator_10 = new JSeparator();
+		}
+		return separator_10;
 	}
 }

@@ -1247,6 +1247,10 @@ Version 0.5 - October 20, 2011
 - allow capturing screenshot of current model
 - convert captured screenshot to image file
 - add Save As Image... menu item to File menu
+- add freeze attribute to all house parts
+- when a house part is frozen draw it as semi-transparent object which is not editable
+- add Freeze and Unfreeze menu tems to Edit menu
+
 
 
 

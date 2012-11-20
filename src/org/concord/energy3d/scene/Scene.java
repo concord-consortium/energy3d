@@ -22,7 +22,6 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -195,7 +194,7 @@ public class Scene implements Serializable {
 			final Scene instance = (Scene) in.readObject();
 			in.close();
 
-			instance.fixUnintializedVariables();
+//			instance.fixUnintializedVariables();
 
 			instance.cleanup();
 			instance.upgradeSceneToNewVersion();
@@ -217,13 +216,13 @@ public class Scene implements Serializable {
 		}
 	}
 
-	private void fixUnintializedVariables() {
-		if (textureMode == null) {
-			textureMode = TextureMode.Full;
-			overhangLength = 0.2;
-			foundationColor = wallColor = doorColor = floorColor = roofColor = ColorRGBA.WHITE;
-		}
-	}
+//	private void fixUnintializedVariables() {
+//		if (textureMode == null) {
+//			textureMode = TextureMode.Full;
+//			overhangLength = 0.2;
+////			foundationColor = wallColor = doorColor = floorColor = roofColor = ColorRGBA.WHITE;
+//		}
+//	}
 
 	private void cleanup() {
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
@@ -242,7 +241,7 @@ public class Scene implements Serializable {
 		if (textureMode == null) {
 			textureMode = TextureMode.Full;
 			overhangLength = 0.2;
-			foundationColor = wallColor = doorColor = floorColor = roofColor = ColorRGBA.WHITE;
+//			foundationColor = wallColor = doorColor = floorColor = roofColor = ColorRGBA.WHITE;
 		}
 
 		if (version < 1) {
@@ -588,5 +587,12 @@ public class Scene implements Serializable {
 	public void updateEditShapes() {
 		for (final HousePart part : parts)
 			part.updateEditShapes();
+	}
+
+	public void setFreeze(final boolean freeze) {
+		for (final HousePart part : parts) {
+			part.setFreeze(freeze);
+		}
+		redrawAll();
 	}
 }

@@ -341,6 +341,12 @@ public class Wall extends HousePart {
 		if (!isDrawable())
 			return;
 
+//		adjustTransparency(mesh);
+		adjustTransparency(backMesh);
+//		adjustTransparency(surroundMesh);
+//		adjustTransparency(windowsSurroundMesh);
+//		adjustTransparency(wireframeMesh);
+
 		computeNormalAndXYTransform();
 
 		wallAndWindowsPoints = computeWallAndWindowPolygon(false);
@@ -634,7 +640,7 @@ public class Wall extends HousePart {
 		neighbor = neighbors[whichNeighbor];
 
 		if (neighbor != null && neighbor.getNeighborOf(this).getPoints().size() >= 4) {
-			final Wall other = neighbor.getNeighborOf(this);
+			final HousePart other = neighbor.getNeighborOf(this);
 			final int otherPointIndex = neighbor.getSnapPointIndexOfNeighborOf(this);
 			final Vector3 otherWallDir = other.getAbsPoint(otherPointIndex == 0 ? 2 : 0).subtract(other.getAbsPoint(otherPointIndex), null).normalizeLocal();
 			if (n.dot(otherWallDir) < 0)
@@ -990,7 +996,7 @@ public class Wall extends HousePart {
 				}
 			});
 
-		for (final Wall wall : walls) {
+		for (final HousePart wall : walls) {
 			wall.draw();
 			wall.drawChildren();
 		}
@@ -1003,7 +1009,7 @@ public class Wall extends HousePart {
 		final Vector3 wallDir = wall.getAbsPoint(pointIndex == 0 ? 2 : 0).subtract(wall.getAbsPoint(pointIndex), null).normalizeLocal();
 
 		final int otherPointIndex = prev.getSnapPointIndexOfNeighborOf(wall);
-		final Wall other = prev.getNeighborOf(wall);
+		final HousePart other = prev.getNeighborOf(wall);
 		if (!other.isFirstPointInserted())
 			return;
 		final Vector3 otherWallDir = other.getAbsPoint(otherPointIndex == 0 ? 2 : 0).subtract(other.getAbsPoint(otherPointIndex), null).normalizeLocal();

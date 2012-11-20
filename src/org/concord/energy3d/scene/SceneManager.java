@@ -1377,7 +1377,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	protected void removeExistingRoof() {
 		if (selectedHousePart instanceof Roof) {
-			final Wall wall = (Wall) ((Roof) selectedHousePart).getContainer();
+			final HousePart wall = (HousePart) ((Roof) selectedHousePart).getContainer();
 			for (final HousePart part : Scene.getInstance().getParts())
 				if (part instanceof Roof && part != selectedHousePart && ((Roof) part).getContainer() == wall) {
 					undoManager.addEdit(new RemoveHousePartCommand(part, false));
