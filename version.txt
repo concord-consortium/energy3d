@@ -1240,12 +1240,13 @@ Version 0.5 - October 20, 2011
 - reconfigure energy3d jnlp
 - fix problem with Energy3D not working with Java 7 under Mac OS X
 - release version 1.1
-
 - auto-save models every minute if the scene is edited
 - set the name of the auto-save files to the date and time of save
-
 - accept argument -autosave in main
 - modify open argument so that the filename is always assumed to be last argument
+- allow capturing screenshot of current model
+- convert captured screenshot to image file
+- add Save As Image... menu item to File menu
 
 
 

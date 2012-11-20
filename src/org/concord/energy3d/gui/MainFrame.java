@@ -13,11 +13,13 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -51,6 +53,7 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.Printout;
 
 import com.apple.eawt.Application;
 import com.apple.eawt.ApplicationAdapter;
@@ -125,6 +128,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem floorColorMenuItem;
 	private JMenuItem roofColorMenuItem;
 	private JMenuItem importColladaMenuItem;
+	private JMenuItem saveAsImageMenuItem;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -364,9 +368,10 @@ public class MainFrame extends JFrame {
 			fileMenu.add(getOpenMenuItem());
 			fileMenu.add(getSaveMenuItem());
 			fileMenu.add(getSaveasMenuItem());
+			fileMenu.add(getSaveAsImageMenuItem());
 			fileMenu.add(getSeparator());
 			fileMenu.add(getImportMenuItem());
-//			fileMenu.add(getImportColladaMenuItem());
+			// fileMenu.add(getImportColladaMenuItem());
 			fileMenu.add(getSeparator_3());
 			fileMenu.add(getScaleToFitRadioButtonMenuItem());
 			fileMenu.add(getExactSizeRadioButtonMenuItem());
@@ -925,19 +930,18 @@ public class MainFrame extends JFrame {
 	}
 
 	private void saveFile() {
-		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
+		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-		try {
-			File file = fileChooser.getSelectedFile();
-			if (file == null)
-				return;
-			if (!file.getName().toLowerCase().endsWith(".ng3"))
-				file = new File(file.toString() + ".ng3");
-			Scene.save(file.toURI().toURL());
-			updateTitleBar();
-		} catch (final Throwable err) {
-			err.printStackTrace();
-			JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			try {
+				File file = fileChooser.getSelectedFile();
+				if (!file.getName().toLowerCase().endsWith(".ng3"))
+					file = new File(file.toString() + ".ng3");
+				Scene.save(file.toURI().toURL());
+				updateTitleBar();
+			} catch (final Throwable err) {
+				err.printStackTrace();
+				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 
@@ -1408,5 +1412,37 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return importColladaMenuItem;
+	}
+
+	private JMenuItem getSaveAsImageMenuItem() {
+		if (saveAsImageMenuItem == null) {
+			saveAsImageMenuItem = new JMenuItem("Save As Image...");
+			saveAsImageMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					saveAsImage();
+				}
+			});
+		}
+		return saveAsImageMenuItem;
+	}
+
+	private void saveAsImage() {
+		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+			System.out.print("Saving snapshot: ");
+			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
+			try {
+				File file = fileChooser.getSelectedFile();
+				if (!file.getName().toLowerCase().endsWith(".png"))
+					file = new File(file.toString() + ".png");
+				System.out.print(file + "...");
+				final BufferedImage snapShot = Printout.takeSnapShot();
+				ImageIO.write(snapShot, "png", file);
+				System.out.println("done");
+			} catch (final Throwable err) {
+				err.printStackTrace();
+				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
 	}
 }

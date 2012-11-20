@@ -29,7 +29,7 @@ public class Printout implements Printable, Pageable {
 	private final Dimension targetSize;
 	private final double visibleSceneWidth;
 	private final double visibleSceneHeight;
-	private ByteBuffer _scratch;
+	private final ByteBuffer _scratch;
 	private int lastImagePage = -1;
 
 	public Printout(final PageFormat pageFormat, final Dimension targetSize, final double visibleSceneWidth, final double visibleSceneHeight, final ArrayList<ReadOnlyVector3> printCorners) {
@@ -43,7 +43,7 @@ public class Printout implements Printable, Pageable {
 		image = new BufferedImage(targetSize.width, targetSize.height, BufferedImage.TYPE_INT_RGB);
 	}
 
-	public ImageDataFormat getFormat() {
+	public static ImageDataFormat getFormat() {
 		return ImageDataFormat.RGB;
 	}
 
@@ -96,28 +96,7 @@ public class Printout implements Printable, Pageable {
 			SceneManager.getInstance().getFrameHandler().updateFrame();
 
 			// Ask the renderer for the current scene to be stored in the buffer
-			_scratch = BufferUtils.createByteBuffer(camera.getWidth() * camera.getHeight() * ImageUtils.getPixelByteSize(getFormat(), PixelDataType.UnsignedByte));
-			SceneManager.getInstance().getCanvas().getCanvasRenderer().makeCurrentContext();
-			renderer.grabScreenContents(_scratch, getFormat(), 0, 0, width, height);
-			SceneManager.getInstance().getCanvas().getCanvasRenderer().releaseCurrentContext();
-
-			int index, r, g, b;
-			int argb;
-			for (int x = 0; x < width; x++) {
-				for (int y = 0; y < height; y++) {
-					index = 3 * ((height - y - 1) * width + x);
-					r = _scratch.get(index + 0);
-					g = _scratch.get(index + 1);
-					b = _scratch.get(index + 2);
-
-					argb = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
-
-					final int imgX = currentX + x;
-					final int imgY = currentY + y;
-					if (imgX < image.getWidth() && imgY < image.getHeight())
-						image.setRGB(imgX, imgY, argb);
-				}
-			}
+			takeSnapShot(image, _scratch, renderer, width, height, currentX, currentY);
 
 			currentX += width;
 			if (currentX > targetSize.width) {
@@ -135,6 +114,41 @@ public class Printout implements Printable, Pageable {
 		}
 
 		return image;
+	}
+
+	public static BufferedImage takeSnapShot() {
+		final Camera camera = Camera.getCurrentCamera();
+		final int width = camera.getWidth();
+		final int height = camera.getHeight();
+		final ByteBuffer _scratch = BufferUtils.createByteBuffer(width * height * ImageUtils.getPixelByteSize(getFormat(), PixelDataType.UnsignedByte));
+		final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		takeSnapShot(image, _scratch, SceneManager.getInstance().getCanvas().getCanvasRenderer().getRenderer(), width, height, 0, 0);
+		return image;
+	}
+
+	private static void takeSnapShot(final BufferedImage image, ByteBuffer _scratch, final Renderer renderer, final int width, final int height, final int currentX, final int currentY) {
+		_scratch = BufferUtils.createByteBuffer(width * height * ImageUtils.getPixelByteSize(getFormat(), PixelDataType.UnsignedByte));
+		SceneManager.getInstance().getCanvas().getCanvasRenderer().makeCurrentContext();
+		renderer.grabScreenContents(_scratch, getFormat(), 0, 0, width, height);
+		SceneManager.getInstance().getCanvas().getCanvasRenderer().releaseCurrentContext();
+
+		int index, r, g, b;
+		int argb;
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				index = 3 * ((height - y - 1) * width + x);
+				r = _scratch.get(index + 0);
+				g = _scratch.get(index + 1);
+				b = _scratch.get(index + 2);
+
+				argb = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+
+				final int imgX = currentX + x;
+				final int imgY = currentY + y;
+				if (imgX < image.getWidth() && imgY < image.getHeight())
+					image.setRGB(imgX, imgY, argb);
+			}
+		}
 	}
 
 }
