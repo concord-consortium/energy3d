@@ -1244,6 +1244,9 @@ Version 0.5 - October 20, 2011
 - auto-save models every minute if the scene is edited
 - set the name of the auto-save files to the date and time of save
 
+- accept argument -autosave in main
+- modify open argument so that the filename is always assumed to be last argument
+
 
 
 - *fix problem while in rotation (or after stopped rotating) click on annotation to turn it off the house parts are not drawn properly

@@ -36,14 +36,22 @@ public class MainApplication {
 		new Thread(scene, "Energy 3D Application").start();
 		Scene.getInstance();
 
-		if (!Config.isMac() && args.length > 1)
-			mainFrame.open(args[1]);
+		if (!Config.isMac() && args.length > 1 && !args[args.length - 1].startsWith("-"))
+			mainFrame.open(args[args.length - 1]);
 
 		mainFrame.updateTitleBar();
 
-		startPeriodicFileSave();
+		if (argsContain("-autosave", args))
+			startPeriodicFileSave();
 
 //		HandTrackerApplication.main(null);
+	}
+
+	private static boolean argsContain(final String command, final String[] args) {
+		for (final String arg : args)
+			if (arg.startsWith(command))
+				return true;
+		return false;
 	}
 
 	public static void setupLibraryPath() {
@@ -91,7 +99,7 @@ public class MainApplication {
 			public void run() {
 				while (true) {
 					try {
-						sleep(6000);
+						sleep(60000);
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
