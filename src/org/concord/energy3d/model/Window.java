@@ -153,7 +153,7 @@ public class Window extends HousePart {
 		mesh.updateModelBound();
 
 		final double divisionLength = 3.0;
-		if (getAbsPoint(2).subtractLocal(getAbsPoint(0)).length() < MathUtils.ZERO_TOLERANCE || getAbsPoint(1).subtractLocal(getAbsPoint(0)).length() < MathUtils.ZERO_TOLERANCE)
+		if (isFrozen() || getAbsPoint(2).subtractLocal(getAbsPoint(0)).length() < MathUtils.ZERO_TOLERANCE || getAbsPoint(1).subtractLocal(getAbsPoint(0)).length() < MathUtils.ZERO_TOLERANCE)
 			bars.getSceneHints().setCullHint(CullHint.Always);
 		else {
 			bars.getSceneHints().setCullHint(CullHint.Inherit);

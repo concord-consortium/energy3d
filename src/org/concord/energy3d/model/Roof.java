@@ -132,7 +132,7 @@ public abstract class Roof extends HousePart {
 		final Polygon polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
 		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
-//		fillMeshWithPolygon(mesh, polygon);
+		// fillMeshWithPolygon(mesh, polygon);
 		// create roof parts
 		MeshLib.groupByPlanner(mesh, roofPartsRoot);
 		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
@@ -150,7 +150,7 @@ public abstract class Roof extends HousePart {
 		}
 		drawWireframe();
 		drawDashLines();
-		updateTextureAndColor();
+		// updateTextureAndColor();
 	}
 
 	protected void drawWalls() {
@@ -174,42 +174,49 @@ public abstract class Roof extends HousePart {
 		if (container == null)
 			return;
 
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-					final Node roofPartNode = (Node) roofPart;
-					final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
-					final ArrayList<ReadOnlyVector3> result = new ArrayList<ReadOnlyVector3>();
-					((Wall) container).visitNeighbors(new WallVisitor() {
-						@Override
-						public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
-							stretchToRoof(result, (Mesh) roofPartNode.getChild(0), currentWall.getAbsPoint(0), currentWall.getAbsPoint(2));
-						}
-					});
-					if (result.isEmpty()) {
-						dashLinesMesh.setVisible(false);
-					} else {
-						dashLinesMesh.setVisible(true);
-						FloatBuffer vertexBuffer = dashLinesMesh.getMeshData().getVertexBuffer();
-						if (vertexBuffer == null || vertexBuffer.capacity() < result.size() * 3) {
-							vertexBuffer = BufferUtils.createVector3Buffer(result.size());
-							dashLinesMesh.getMeshData().setVertexBuffer(vertexBuffer);
-						}
-						vertexBuffer.limit(result.size() * 3);
-						vertexBuffer.rewind();
-
-						for (final ReadOnlyVector3 p : result)
-							vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-
-						dashLinesMesh.getMeshData().updateVertexCount();
-						dashLinesMesh.updateModelBound();
-					}
-				}
-				updateDashLinesColor();
-				return null;
+		if (isFrozen()) {
+			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+				final Node roofPartNode = (Node) roofPart;
+				final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
+				dashLinesMesh.setVisible(false);
 			}
-		});
+		} else
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+						final Node roofPartNode = (Node) roofPart;
+						final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
+						final ArrayList<ReadOnlyVector3> result = new ArrayList<ReadOnlyVector3>();
+						((Wall) container).visitNeighbors(new WallVisitor() {
+							@Override
+							public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
+								stretchToRoof(result, (Mesh) roofPartNode.getChild(0), currentWall.getAbsPoint(0), currentWall.getAbsPoint(2));
+							}
+						});
+						if (result.isEmpty()) {
+							dashLinesMesh.setVisible(false);
+						} else {
+							dashLinesMesh.setVisible(true);
+							FloatBuffer vertexBuffer = dashLinesMesh.getMeshData().getVertexBuffer();
+							if (vertexBuffer == null || vertexBuffer.capacity() < result.size() * 3) {
+								vertexBuffer = BufferUtils.createVector3Buffer(result.size());
+								dashLinesMesh.getMeshData().setVertexBuffer(vertexBuffer);
+							}
+							vertexBuffer.limit(result.size() * 3);
+							vertexBuffer.rewind();
+
+							for (final ReadOnlyVector3 p : result)
+								vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+
+							dashLinesMesh.getMeshData().updateVertexCount();
+							dashLinesMesh.updateModelBound();
+						}
+					}
+					updateDashLinesColor();
+					return null;
+				}
+			});
 	}
 
 	public void updateDashLinesColor() {
@@ -435,14 +442,14 @@ public abstract class Roof extends HousePart {
 				final ReadOnlyVector3 p1 = convexHull.get(i);
 				final ReadOnlyVector3 p2 = convexHull.get((i + 1) % n);
 				final ReadOnlyVector3 p3 = convexHull.get((i + 2) % n);
-//				while (isAlmost180(p1, p2, p3) && i < n) {
-//					i++;
-//					p2 = convexHull.get((i + 1) % n);
-//					p3 = convexHull.get((i + 2) % n);
-//				}
+				// while (isAlmost180(p1, p2, p3) && i < n) {
+				// i++;
+				// p2 = convexHull.get((i + 1) % n);
+				// p3 = convexHull.get((i + 2) % n);
+				// }
 
-//				if (i == n)
-//					break;
+				// if (i == n)
+				// break;
 
 				// Size annotation
 				final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
@@ -456,11 +463,11 @@ public abstract class Roof extends HousePart {
 					sizeAnnot.setColor(ColorRGBA.BLACK);
 
 				// Angle annotations
-//				if (!isAlmost180) {
-					final AngleAnnotation angleAnnot = fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2));
-					angleAnnot.setLineWidth(original == null ? 1f : 2f);
-					angleAnnot.setRange(p2, p1, p3, normal);
-//				}
+				// if (!isAlmost180) {
+				final AngleAnnotation angleAnnot = fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2));
+				angleAnnot.setLineWidth(original == null ? 1f : 2f);
+				angleAnnot.setRange(p2, p1, p3, normal);
+				// }
 			}
 		}
 	}
@@ -861,7 +868,7 @@ public abstract class Roof extends HousePart {
 		for (final ReadOnlyVector3 p : wallUpperPoints)
 			maxZ = Math.max(maxZ, p.getZ());
 		// to make height relative to container wall so that applyHeight() runs the same way
-//		height = 0.5 + maxZ - container.getPoints().get(1).getZ();
+		// height = 0.5 + maxZ - container.getPoints().get(1).getZ();
 		height = height + maxZ - container.getPoints().get(1).getZ();
 	}
 

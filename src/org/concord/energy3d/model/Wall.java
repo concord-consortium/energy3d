@@ -342,7 +342,7 @@ public class Wall extends HousePart {
 			return;
 
 //		adjustTransparency(mesh);
-		adjustTransparency(backMesh);
+//		adjustTransparency(backMesh);
 //		adjustTransparency(surroundMesh);
 //		adjustTransparency(windowsSurroundMesh);
 //		adjustTransparency(wireframeMesh);
@@ -350,7 +350,8 @@ public class Wall extends HousePart {
 		computeNormalAndXYTransform();
 
 		wallAndWindowsPoints = computeWallAndWindowPolygon(false);
-		extendToRoof(wallAndWindowsPoints.get(0));
+		if (!isFrozen())
+			extendToRoof(wallAndWindowsPoints.get(0));
 
 		if (Scene.getInstance().isDrawThickness() && isShortWall) {
 			final Vector3 dir = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
@@ -374,9 +375,11 @@ public class Wall extends HousePart {
 		drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
 		CollisionTreeManager.INSTANCE.updateCollisionTree(invisibleMesh);
 
-		drawBackMesh(computeWallAndWindowPolygon(true));
-		drawSurroundMesh(thicknessNormal);
-		drawWindowsSurroundMesh(thicknessNormal);
+		if (!isFrozen()) {
+			drawBackMesh(computeWallAndWindowPolygon(true));
+			drawSurroundMesh(thicknessNormal);
+			drawWindowsSurroundMesh(thicknessNormal);
+		}
 
 		root.updateWorldBound(true);
 	}

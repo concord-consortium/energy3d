@@ -22,6 +22,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -45,6 +46,9 @@ public class Scene implements Serializable {
 	public static enum TextureMode {
 		None, Simple, Full
 	};
+
+	public static final float TRANSPARENCY_LEVEL = 0.4f;
+	public static final ColorRGBA WHITE = new ColorRGBA(1, 1, 1, TRANSPARENCY_LEVEL);
 
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
@@ -532,7 +536,10 @@ public class Scene implements Serializable {
 	}
 
 	public ReadOnlyColorRGBA getFoundationColor() {
-		return foundationColor;
+		if (foundationColor == null)
+			return WHITE;
+		else
+			return foundationColor;
 	}
 
 	public void setFoundationColor(final ReadOnlyColorRGBA foundationColor) {
@@ -540,7 +547,10 @@ public class Scene implements Serializable {
 	}
 
 	public ReadOnlyColorRGBA getWallColor() {
-		return wallColor;
+		if (wallColor == null)
+			return WHITE;
+		else
+			return wallColor;
 	}
 
 	public void setWallColor(final ReadOnlyColorRGBA wallColor) {
@@ -548,7 +558,10 @@ public class Scene implements Serializable {
 	}
 
 	public ReadOnlyColorRGBA getDoorColor() {
-		return doorColor;
+		if (doorColor == null)
+			return WHITE;
+		else
+			return doorColor;
 	}
 
 	public void setDoorColor(final ReadOnlyColorRGBA doorColor) {
@@ -556,7 +569,10 @@ public class Scene implements Serializable {
 	}
 
 	public ReadOnlyColorRGBA getFloorColor() {
-		return floorColor;
+		if (floorColor == null)
+			return WHITE;
+		else
+			return floorColor;
 	}
 
 	public void setFloorColor(final ReadOnlyColorRGBA floorColor) {
@@ -564,7 +580,10 @@ public class Scene implements Serializable {
 	}
 
 	public ReadOnlyColorRGBA getRoofColor() {
-		return roofColor;
+		if (roofColor == null)
+			return WHITE;
+		else
+			return roofColor;
 	}
 
 	public void setRoofColor(final ReadOnlyColorRGBA roofColor) {
@@ -590,9 +609,10 @@ public class Scene implements Serializable {
 	}
 
 	public void setFreeze(final boolean freeze) {
-		for (final HousePart part : parts) {
+		for (final HousePart part : parts)
 			part.setFreeze(freeze);
-		}
+		if (freeze)
+			SceneManager.getInstance().hideAllEditPoints();
 		redrawAll();
 	}
 }

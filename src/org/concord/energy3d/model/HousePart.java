@@ -77,8 +77,6 @@ public abstract class HousePart implements Serializable {
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	protected boolean freeze;
-	public final float TRANSPARENCY_LEVEL = 0.5f;
-	private final ColorRGBA WHITE = new ColorRGBA(1, 1, 1, TRANSPARENCY_LEVEL);
 
 	public static boolean isSnapToObjects() {
 		return snapToObjects;
@@ -411,7 +409,7 @@ public abstract class HousePart implements Serializable {
 			if (root == null)
 				init();
 
-			if (freeze) {
+			if (isFrozen()) {
 				final BlendState blendState = new BlendState();
 				blendState.setBlendEnabled(true);
 				root.setRenderState(blendState);
@@ -426,7 +424,7 @@ public abstract class HousePart implements Serializable {
 			updateTextureAndColor();
 			updateEditShapes();
 			clearAnnotations();
-			if (isDrawable())
+			if (isDrawable() && !isFrozen())
 				drawAnnotations();
 			root.updateGeometricState(0);
 		} catch (final Throwable e) {
@@ -614,10 +612,11 @@ public abstract class HousePart implements Serializable {
 		updateTextureAndColor(mesh, defaultColor, Scene.getInstance().getTextureMode());
 	}
 
-	protected void updateTextureAndColor(final Mesh mesh, ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
-		if (defaultColor == null)
-			defaultColor = WHITE;
-		if (textureMode == TextureMode.None || getTextureFileName() == null) {
+	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
+		if (isFrozen()) {
+			mesh.clearRenderState(StateType.Texture);
+			mesh.setDefaultColor(Scene.WHITE);
+		} else if (textureMode == TextureMode.None || getTextureFileName() == null) {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(defaultColor);
 		} else {
@@ -628,7 +627,7 @@ public abstract class HousePart implements Serializable {
 			if (textureMode == TextureMode.None)
 				mesh.setDefaultColor(defaultColor);
 			else
-				mesh.setDefaultColor(WHITE);
+				mesh.setDefaultColor(Scene.WHITE);
 		}
 	}
 
@@ -726,11 +725,15 @@ public abstract class HousePart implements Serializable {
 
 	protected void adjustTransparency(final Mesh mesh) {
 		final ReadOnlyColorRGBA c = mesh.getDefaultColor();
-		mesh.setDefaultColor(new ColorRGBA(c.getRed(), c.getGreen(), c.getBlue(), freeze ? TRANSPARENCY_LEVEL : 1));
+		mesh.setDefaultColor(new ColorRGBA(c.getRed(), c.getGreen(), c.getBlue(), freeze ? Scene.TRANSPARENCY_LEVEL : 1));
 	}
 
 	public void setFreeze(final boolean freeze) {
 		this.freeze = freeze;
+	}
+
+	public boolean isFrozen() {
+		return freeze;
 	}
 
 }

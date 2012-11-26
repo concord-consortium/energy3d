@@ -1181,6 +1181,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && hoveredHousePart != pick.getHousePart())
 					hoveredHousePart.setEditPointsVisible(false);
 				hoveredHousePart = pick.getHousePart();
+				if (hoveredHousePart.isFrozen())
+					hoveredHousePart = null;
 				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && !PrintController.getInstance().isPrintPreview())
 					hoveredHousePart.setEditPointsVisible(true);
 				if (pick.getIndex() != -1)
@@ -1275,6 +1277,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							selectedHousePart = null;
 						else
 							selectedHousePart = pick.getHousePart();
+						if (selectedHousePart != null && selectedHousePart.isFrozen())
+							selectedHousePart = null;
 						System.out.print("Clicked on: " + pick);
 						if (pick != null && pick.isEditPoint())
 							cameraControl.setLeftMouseButtonEnabled(false);
@@ -1377,7 +1381,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	protected void removeExistingRoof() {
 		if (selectedHousePart instanceof Roof) {
-			final HousePart wall = (HousePart) ((Roof) selectedHousePart).getContainer();
+			final HousePart wall = ((Roof) selectedHousePart).getContainer();
 			for (final HousePart part : Scene.getInstance().getParts())
 				if (part instanceof Roof && part != selectedHousePart && ((Roof) part).getContainer() == wall) {
 					undoManager.addEdit(new RemoveHousePartCommand(part, false));
