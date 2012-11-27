@@ -99,13 +99,13 @@ public class MainApplication {
 			public void run() {
 				while (true) {
 					try {
-						sleep(60000);
+						sleep(20000);
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
 					if (Scene.getInstance().isEdited()) {
 						final Date date = Calendar.getInstance().getTime();
-						final String filename = new SimpleDateFormat("yyyy-MM-dd HH-mm").format(date) + ".ng3";
+						final String filename = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(date) + ".ng3";
 						try {
 							Scene.save(new File(filename).toURI().toURL());
 						} catch (final Exception e) {
