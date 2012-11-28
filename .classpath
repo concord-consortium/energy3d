@@ -10,6 +10,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.7.0_03"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-examples"/>
 	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/jfxrt.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-jogl2"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-jogl"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -18,7 +18,6 @@
         <javaElement handleIdentifier="=Energy3D/src&lt;com.apple.eio"/>
         <javaElement handleIdentifier="=ardor3d-math/src\/main\/java"/>
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.scene"/>
-        <javaElement handleIdentifier="=ardor3d-jogl2/src\/main\/java"/>
         <file path="/ardor3d-collada/lib/jdom/jdom.jar"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/resources&lt;com.ardor3d.extension.effect.bloom"/>
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d"/>
@@ -37,6 +36,7 @@
         <javaElement handleIdentifier="=ardor3d-collada/src\/main\/java"/>
         <javaElement handleIdentifier="=Energy3D/poly2tri"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.effect.bloom"/>
+        <javaElement handleIdentifier="=ardor3d-jogl/src\/main\/java"/>
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.gui"/>
     </selectedElements>
 </jardesc>

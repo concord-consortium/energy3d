@@ -1257,7 +1257,10 @@ Version 0.5 - October 20, 2011
 - avoid drawing roof dash lines when frozen
 - avoid drawing wall back mesh and surround mesh when frozen
 - avoid stretching wall to roof when frozen
-- avoid drawing window bars when frozen 
+- avoid drawing window bars when frozen
+- update Ardor3D
+- create log folder and store auto-save files in there
+
 
 
 
