@@ -41,10 +41,8 @@ public class MainApplication {
 
 		mainFrame.updateTitleBar();
 
-		if (argsContain("-autosave", args)) {
-			System.out.println("-autosave");
-			startPeriodicFileSave();
-		}
+		// TODO: disable the following after the school test
+		startPeriodicFileSave();
 
 //		HandTrackerApplication.main(null);
 	}
