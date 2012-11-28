@@ -94,6 +94,8 @@ public class MainApplication {
 	}
 
 	private static void startPeriodicFileSave() {
+		final String dir = "log";
+		new File(dir).mkdir();
 		new Thread() {
 			@Override
 			public void run() {
@@ -105,7 +107,7 @@ public class MainApplication {
 					}
 					if (Scene.getInstance().isEdited()) {
 						final Date date = Calendar.getInstance().getTime();
-						final String filename = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(date) + ".ng3";
+						final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(date) + ".ng3";
 						try {
 							Scene.save(new File(filename).toURI().toURL());
 						} catch (final Exception e) {
