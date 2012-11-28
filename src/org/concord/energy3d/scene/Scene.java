@@ -47,8 +47,11 @@ public class Scene implements Serializable {
 		None, Simple, Full
 	};
 
-	public static final float TRANSPARENCY_LEVEL = 0.4f;
-	public static final ColorRGBA WHITE = new ColorRGBA(1, 1, 1, TRANSPARENCY_LEVEL);
+//	public static final float TRANSPARENCY_LEVEL = 0.4f;
+//	public static final ReadOnlyColorRGBA WHITE = new ColorRGBA(1, 1, 1, TRANSPARENCY_LEVEL);
+	public static final ReadOnlyColorRGBA WHITE = ColorRGBA.WHITE;
+	public static final ReadOnlyColorRGBA GRAY = ColorRGBA.GRAY;
+
 
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");

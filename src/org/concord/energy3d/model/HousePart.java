@@ -27,8 +27,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
@@ -38,7 +36,6 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
-import com.ardor3d.scenegraph.hint.TransparencyType;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -409,16 +406,16 @@ public abstract class HousePart implements Serializable {
 			if (root == null)
 				init();
 
-			if (isFrozen()) {
-				final BlendState blendState = new BlendState();
-				blendState.setBlendEnabled(true);
-				root.setRenderState(blendState);
-			} else
-				root.clearRenderState(StateType.Blend);
+//			if (isFrozen()) {
+//				final BlendState blendState = new BlendState();
+//				blendState.setBlendEnabled(true);
+//				root.setRenderState(blendState);
+//			} else
+//				root.clearRenderState(StateType.Blend);
 
-			root.getSceneHints().setRenderBucketType(freeze ? RenderBucketType.Transparent : RenderBucketType.Inherit);
-			root.getSceneHints().setTransparencyType(freeze ? TransparencyType.TwoPass : TransparencyType.Inherit);
-			root.getSceneHints().setLightCombineMode(freeze ? LightCombineMode.Off : LightCombineMode.Inherit);
+//			root.getSceneHints().setRenderBucketType(isFrozen() ? RenderBucketType.Transparent : RenderBucketType.Inherit);
+//			root.getSceneHints().setTransparencyType(isFrozen() ? TransparencyType.TwoPass : TransparencyType.Inherit);
+//			root.getSceneHints().setLightCombineMode(isFrozen() ? LightCombineMode.Off : LightCombineMode.Inherit);
 
 			drawMesh();
 			updateTextureAndColor();
@@ -615,7 +612,7 @@ public abstract class HousePart implements Serializable {
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
 		if (isFrozen()) {
 			mesh.clearRenderState(StateType.Texture);
-			mesh.setDefaultColor(Scene.WHITE);
+			mesh.setDefaultColor(Scene.GRAY);
 		} else if (textureMode == TextureMode.None || getTextureFileName() == null) {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(defaultColor);
@@ -723,10 +720,10 @@ public abstract class HousePart implements Serializable {
 		return Math.round(Math.round(p2.subtract(p0, null).length() * C) / C * Math.round(p1.subtract(p0, null).length() * C) / C * C) / C;
 	}
 
-	protected void adjustTransparency(final Mesh mesh) {
-		final ReadOnlyColorRGBA c = mesh.getDefaultColor();
-		mesh.setDefaultColor(new ColorRGBA(c.getRed(), c.getGreen(), c.getBlue(), freeze ? Scene.TRANSPARENCY_LEVEL : 1));
-	}
+//	protected void adjustTransparency(final Mesh mesh) {
+//		final ReadOnlyColorRGBA c = mesh.getDefaultColor();
+//		mesh.setDefaultColor(new ColorRGBA(c.getRed(), c.getGreen(), c.getBlue(), isFrozen() ? Scene.TRANSPARENCY_LEVEL : 1));
+//	}
 
 	public void setFreeze(final boolean freeze) {
 		this.freeze = freeze;

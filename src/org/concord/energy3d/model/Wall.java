@@ -331,12 +331,12 @@ public class Wall extends HousePart {
 
 	@Override
 	protected void drawMesh() {
-		final CullHint cull = isDrawable() ? CullHint.Inherit : CullHint.Always;
-		mesh.getSceneHints().setCullHint(cull);
-		backMesh.getSceneHints().setCullHint(cull);
-		surroundMesh.getSceneHints().setCullHint(cull);
-		windowsSurroundMesh.getSceneHints().setCullHint(cull);
-		wireframeMesh.getSceneHints().setCullHint(cull);
+//		final CullHint cull = isDrawable() ? CullHint.Inherit : CullHint.Always;
+		mesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
+		backMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
+		surroundMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
+		windowsSurroundMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
+		wireframeMesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
 
 		if (!isDrawable())
 			return;

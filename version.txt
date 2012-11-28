@@ -1260,7 +1260,9 @@ Version 0.5 - October 20, 2011
 - avoid drawing window bars when frozen
 - update Ardor3D
 - create log folder and store auto-save files in there
-
+- remove transparency from the frozen house parts due to shadow problems
+- change the color of frozen house parts to gray
+- fix problem with null exception with pressing delete when no house part is selected
 
 
 

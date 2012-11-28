@@ -1411,15 +1411,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void deleteCurrentHousePart() {
-		taskManager.update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-				Scene.getInstance().remove(selectedHousePart);
-				selectedHousePart = null;
-				return null;
-			}
-		});
+		if (selectedHousePart != null)
+			taskManager.update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
+					Scene.getInstance().remove(selectedHousePart);
+					selectedHousePart = null;
+					return null;
+				}
+			});
 	}
 
 	public void newImport(final URL file) throws IOException {
