@@ -822,7 +822,6 @@ public class MainFrame extends JFrame {
 				}
 			});
 			buttonGroup.add(centimetersRadioButtonMenuItem);
-			centimetersRadioButtonMenuItem.setSelected(true);
 		}
 		return centimetersRadioButtonMenuItem;
 	}
