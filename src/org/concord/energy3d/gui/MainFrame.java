@@ -955,7 +955,7 @@ public class MainFrame extends JFrame {
 				File file = fileChooser.getSelectedFile();
 				if (!file.getName().toLowerCase().endsWith(".ng3"))
 					file = new File(file.toString() + ".ng3");
-				Scene.save(file.toURI().toURL());
+				Scene.save(file.toURI().toURL(), true);
 				updateTitleBar();
 			} catch (final Throwable err) {
 				err.printStackTrace();
@@ -1418,7 +1418,7 @@ public class MainFrame extends JFrame {
 		try {
 			final URL url = Scene.getURL();
 			if (url != null)
-				Scene.save(url);
+				Scene.save(url, false);
 			else
 				saveFile();
 		} catch (final Throwable err) {

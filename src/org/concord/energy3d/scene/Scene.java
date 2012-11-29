@@ -273,12 +273,13 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public static void save(final URL url) throws Exception {
+	public static void save(final URL url, final boolean setAsCurrentFile) throws Exception {
 		instance.cleanup();
 		// save camera to file
 		saveCameraLocation();
 
-		Scene.url = url;
+		if (setAsCurrentFile)
+			Scene.url = url;
 		System.out.print("Saving " + Scene.url + "...");
 		ObjectOutputStream out;
 		out = new ObjectOutputStream(new FileOutputStream(Scene.url.toURI().getPath()));

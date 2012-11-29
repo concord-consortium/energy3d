@@ -1266,9 +1266,11 @@ Version 0.5 - October 20, 2011
 - fix problem with buffer size too small exception when saving as image if the canvas width is not multiple of 4
 - change color of frozen parts to light gray instead of gray
 - reset camera center after rotation animation is clicked
-
+- avoid setting current file to last log file
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
+- *allow small walls but hide the windows to avoid exception
+
 
 
 - *fix problem while in rotation (or after stopped rotating) click on annotation to turn it off the house parts are not drawn properly

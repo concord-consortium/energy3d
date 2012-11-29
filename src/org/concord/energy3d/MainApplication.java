@@ -109,7 +109,7 @@ public class MainApplication {
 						final Date date = Calendar.getInstance().getTime();
 						final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(date) + ".ng3";
 						try {
-							Scene.save(new File(filename).toURI().toURL());
+							Scene.save(new File(filename).toURI().toURL(), false);
 						} catch (final Exception e) {
 							e.printStackTrace();
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in Auto-Save! Models will no longer be saved automatically. Please notify the teacher of this problem:\n" + e.getMessage(), "Auto-Save Error", JOptionPane.ERROR_MESSAGE);
