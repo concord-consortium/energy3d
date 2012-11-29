@@ -118,7 +118,7 @@ public class Printout implements Printable, Pageable {
 
 	public static BufferedImage takeSnapShot() {
 		final Camera camera = Camera.getCurrentCamera();
-		final int width = camera.getWidth();
+		final int width = camera.getWidth() - camera.getWidth() % 4;
 		final int height = camera.getHeight();
 		final ByteBuffer _scratch = BufferUtils.createByteBuffer(width * height * ImageUtils.getPixelByteSize(getFormat(), PixelDataType.UnsignedByte));
 		final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -126,8 +126,7 @@ public class Printout implements Printable, Pageable {
 		return image;
 	}
 
-	private static void takeSnapShot(final BufferedImage image, ByteBuffer _scratch, final Renderer renderer, final int width, final int height, final int currentX, final int currentY) {
-		_scratch = BufferUtils.createByteBuffer(width * height * ImageUtils.getPixelByteSize(getFormat(), PixelDataType.UnsignedByte));
+	private static void takeSnapShot(final BufferedImage image, final ByteBuffer _scratch, final Renderer renderer, final int width, final int height, final int currentX, final int currentY) {
 		SceneManager.getInstance().getCanvas().getCanvasRenderer().makeCurrentContext();
 		renderer.grabScreenContents(_scratch, getFormat(), 0, 0, width, height);
 		SceneManager.getInstance().getCanvas().getCanvasRenderer().releaseCurrentContext();
