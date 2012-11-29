@@ -280,9 +280,9 @@ public class Scene implements Serializable {
 
 		if (setAsCurrentFile)
 			Scene.url = url;
-		System.out.print("Saving " + Scene.url + "...");
+		System.out.print("Saving " + url + "...");
 		ObjectOutputStream out;
-		out = new ObjectOutputStream(new FileOutputStream(Scene.url.toURI().getPath()));
+		out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
 		out.writeObject(instance);
 		out.close();
 		SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
