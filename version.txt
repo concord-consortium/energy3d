@@ -1264,6 +1264,8 @@ Version 0.5 - October 20, 2011
 - change the color of frozen house parts to gray
 - fix problem with null exception with pressing delete when no house part is selected
 - fix problem with buffer size too small exception when saving as image if the canvas width is not multiple of 4
+- change color of frozen parts to light gray instead of gray
+- reset camera center after rotation animation is clicked
 
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.

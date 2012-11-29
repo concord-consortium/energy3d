@@ -923,6 +923,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void toggleRotation() {
+		cameraControl.reset();
 		rotAnim = !rotAnim;
 	}
 
@@ -1432,5 +1433,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final ColladaStorage storage = colladaImporter.load(source);
 		newImport = storage.getScene();
 		root.attachChild(newImport);
+	}
+
+	public Camera getCamera() {
+		return SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera();
 	}
 }

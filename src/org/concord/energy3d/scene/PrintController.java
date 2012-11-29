@@ -234,8 +234,8 @@ public class PrintController implements Updater {
 
 		final Dimension orgCanvasSize = canvas.getSize();
 		final Dimension canvasSize = (Dimension) orgCanvasSize.clone();
-		if (canvasSize.width % 32 != 0) {
-			canvasSize.width -= canvasSize.width % 32;
+		if (canvasSize.width % 4 != 0) {
+			canvasSize.width -= canvasSize.width % 4;
 			canvas.setSize(canvasSize);
 			canvas.validate();
 		}
