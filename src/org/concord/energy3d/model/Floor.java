@@ -9,14 +9,11 @@ import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
-import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.point.TPoint;
-import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -94,18 +91,6 @@ public class Floor extends HousePart {
 		return new Polygon(wallUpperPoints);
 	}
 
-	private void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon) {
-		Poly2Tri.triangulate(polygon);
-		ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
-		ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
-		ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.2 : 1.0;
-		ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), scale, new TPoint(0, 0, 0), new TPoint(1, 0, 0), new TPoint(0, 1, 0));
-		mesh.getMeshData().updateVertexCount();
-		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
-		mesh.updateModelBound();
-	}
-
 	@Override
 	protected void drawMesh() {
 		if (container == null) {
@@ -116,7 +101,6 @@ public class Floor extends HousePart {
 		wallUpperPoints = exploreWallNeighbors((Wall) container);
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 2.0 : 10.0;
 		MeshLib.fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints), null, true, new TPoint(0, 0, 0), new TPoint(scale, 0, 0), new TPoint(0, scale, 0));
-//		fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints));
 		drawWireframe();
 		updateEditShapes();
 	}

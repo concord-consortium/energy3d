@@ -107,7 +107,7 @@ public class MainApplication {
 					}
 					if (Scene.getInstance().isEdited()) {
 						final Date date = Calendar.getInstance().getTime();
-						final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(date) + ".ng3";
+						final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd   HH-mm-ss   ").format(date) + SceneManager.getInstance().getUndoManager().getEditCounts() + ".ng3";
 						try {
 							Scene.save(new File(filename).toURI().toURL(), false);
 						} catch (final Exception e) {

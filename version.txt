@@ -1268,6 +1268,7 @@ Version 0.5 - October 20, 2011
 - reset camera center after rotation animation is clicked
 - avoid setting current file to last log file
 - fix problem with default bounding box being oriented bounding box and throwing exception when computing heliodon size
+- append the number of changes to the end of log file names
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

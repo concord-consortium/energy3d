@@ -10,11 +10,17 @@ import org.concord.energy3d.util.Config;
 
 public class UndoManager extends javax.swing.undo.UndoManager {
 	private static final long serialVersionUID = 1L;
+	private int counter = 0;
 
 	@Override
 	public synchronized boolean addEdit(final UndoableEdit anEdit) {
 		final boolean result = super.addEdit(anEdit);
-		Scene.getInstance().setEdited(!(anEdit instanceof SaveCommand));
+		final boolean isSaveCommand = anEdit instanceof SaveCommand;
+		Scene.getInstance().setEdited(!isSaveCommand);
+		if (isSaveCommand)
+			counter = 0;
+		else
+			counter++;
 		refreshUndoRedoGui();
 		return result;
 	}
@@ -53,4 +59,9 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 		if (!Config.isApplet())
 			MainFrame.getInstance().refreshUndoRedo();
 	}
+
+	public int getEditCounts() {
+		return counter;
+	}
+
 }
