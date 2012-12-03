@@ -101,7 +101,7 @@ public class MainApplication {
 			public void run() {
 				while (true) {
 					try {
-						sleep(10000);
+						sleep(20000);
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
