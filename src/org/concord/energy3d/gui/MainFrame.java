@@ -1478,6 +1478,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getFreezeMenuItem() {
 		if (freezeMenuItem == null) {
 			freezeMenuItem = new JMenuItem("Freeze");
+			freezeMenuItem.setVisible(false);
 			freezeMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1490,6 +1491,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getUnfreezeMenuItem() {
 		if (unfreezeMenuItem == null) {
 			unfreezeMenuItem = new JMenuItem("Unfreeze");
+			unfreezeMenuItem.setVisible(false);
 			unfreezeMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1502,6 +1504,7 @@ public class MainFrame extends JFrame {
 	private JSeparator getSeparator_10() {
 		if (separator_10 == null) {
 			separator_10 = new JSeparator();
+			separator_10.setVisible(false);
 		}
 		return separator_10;
 	}
