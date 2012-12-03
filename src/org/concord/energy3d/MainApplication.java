@@ -101,7 +101,7 @@ public class MainApplication {
 			public void run() {
 				while (true) {
 					try {
-						sleep(20000);
+						sleep(20000); // 20 seconds seem to be optimal
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
