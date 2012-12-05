@@ -8,6 +8,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -41,6 +42,8 @@ public class SizeAnnotation extends Annotation {
 	}
 
 	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, final boolean autoFlipOffset, final boolean upsideDownText, final boolean drawInside) {
+		if (from.distanceSquared(to) < MathUtils.ZERO_TOLERANCE)
+			throw new RuntimeException("The 'from' and 'to' vectors are almost the same.");
 		this.from = from;
 		this.to = to;
 		this.center = center;
@@ -74,8 +77,15 @@ public class SizeAnnotation extends Annotation {
 
 		final ReadOnlyVector3 dir = to.subtract(from, null).normalizeLocal();
 		final int scale = upsideDownText ? -1 : 1;
-		label.setRotation(new Matrix3().fromAxes(dir.multiply(scale, null), faceDirection, faceDirection.cross(dir, null).multiplyLocal(scale)));
 
+//		label.setRotation(new Matrix3().fromAxes(dir.multiply(scale, null), faceDirection, faceDirection.cross(dir, null).multiplyLocal(scale)));
+
+		final Vector3 xdir = dir.multiply(scale, null);
+		final Vector3 ydir = faceDirection.normalize(null);
+		final Vector3 zdir = ydir.cross(xdir, null).normalizeLocal();
+		zdir.cross(ydir, xdir);
+		final Matrix3 matrix = new Matrix3().fromAxes(xdir, ydir, zdir);
+		label.setRotation(matrix);
 
 		FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();

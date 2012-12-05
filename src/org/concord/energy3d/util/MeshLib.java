@@ -363,7 +363,8 @@ public class MeshLib {
 		}
 
 		// remove last point if duplicated of first point
-		if (sortedOutlinePoints.get(0).equals(sortedOutlinePoints.get(sortedOutlinePoints.size() - 1)))
+//		if (sortedOutlinePoints.get(0).equals(sortedOutlinePoints.get(sortedOutlinePoints.size() - 1)))
+		if (sortedOutlinePoints.get(0).distanceSquared(sortedOutlinePoints.get(sortedOutlinePoints.size() - 1)) < MathUtils.ZERO_TOLERANCE)
 			sortedOutlinePoints.remove(sortedOutlinePoints.size() - 1);
 
 		for (int i = 0; i < sortedOutlinePoints.size(); i++) {
