@@ -910,4 +910,9 @@ public abstract class Roof extends HousePart {
 		}
 		return area;
 	}
+
+	@Override
+	public boolean isDrawable() {
+		return true;
+	}
 }
