@@ -52,7 +52,7 @@ public class SelectUtil {
 			PickingUtil.findPick(SceneManager.getInstance().getFloor(), pickRay, pickResults, false);
 		else
 			for (final HousePart housePart : Scene.getInstance().getParts())
-				if (typeOfHousePart.isInstance(housePart))
+				if (!housePart.isFrozen() && typeOfHousePart.isInstance(housePart))
 					PickingUtil.findPick(housePart.getRoot(), pickRay, pickResults, false);
 
 		return getPickResult(pickRay);
