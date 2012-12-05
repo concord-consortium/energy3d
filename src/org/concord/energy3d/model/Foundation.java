@@ -91,10 +91,12 @@ public class Foundation extends HousePart {
 
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
 		this.resizeHouseMode = resizeHouseMode;
-		if (resizeHouseMode)
-			scanChildrenHeight();
-		setEditPointsVisible(resizeHouseMode);
-		boundingMesh.getSceneHints().setCullHint(resizeHouseMode ? CullHint.Inherit : CullHint.Always);
+		if (!isFrozen()) {
+			if (resizeHouseMode)
+				scanChildrenHeight();
+			setEditPointsVisible(resizeHouseMode);
+			boundingMesh.getSceneHints().setCullHint(resizeHouseMode ? CullHint.Inherit : CullHint.Always);
+		}
 	}
 
 	public boolean isResizeHouseMode() {

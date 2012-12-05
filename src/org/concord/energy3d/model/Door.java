@@ -7,7 +7,6 @@ import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
@@ -80,10 +79,10 @@ public class Door extends HousePart {
 		}
 	}
 
-	@Override
-	public boolean isDrawable() {
-		return points.size() >= 4 && getAbsPoint(2).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE && getAbsPoint(1).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE;
-	}
+//	@Override
+//	public boolean isDrawable() {
+//		return points.size() >= 4 && getAbsPoint(2).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE && getAbsPoint(1).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE;
+//	}
 
 	@Override
 	protected void drawMesh() {

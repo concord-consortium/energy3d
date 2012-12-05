@@ -1271,10 +1271,10 @@ Version 0.5 - October 20, 2011
 - append the number of changes to the end of log file names
 - hide freeze and unfreeze menus temporarely
 - fix exception and hanging with new version of Ardor3D when annotation is on
-- calculate annotation lable rotation matrix in such a way to ensure that it is a rotational matrix
+- calculate annotation label rotation matrix in such a way to ensure that it is a rotational matrix
+- do not make frozen parts resizable
 
-- *do not make frozen parts resizable
-- *disallow adding roof to frozen aprts
+- disallow adding roof to frozen aprts
 
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
