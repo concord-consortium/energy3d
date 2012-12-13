@@ -10,8 +10,6 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -31,10 +29,6 @@ public class Door extends HousePart {
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
-
-		final MaterialState ms = new MaterialState();
-		ms.setColorMaterial(ColorMaterial.Diffuse);
-		mesh.setRenderState(ms);
 
 		updateTextureAndColor();
 

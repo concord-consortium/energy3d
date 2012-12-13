@@ -1280,6 +1280,8 @@ Version 0.5 - October 20, 2011
 - offset wall front mesh, back mesh, surround mesh and window surround mesh
 - offset platform mesh, roof mesh (MeshLib), and floor mesh
 - offset world floor mesh
+- remove MaterialState because it is not necessary when there is no per-point color
+- remove windows mesh because it is useless
  
 
 

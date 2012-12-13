@@ -40,8 +40,6 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -143,9 +141,6 @@ public abstract class Roof extends HousePart {
 			mesh.setUserData(new UserData(this, roofPartIndex, false));
 			if (Scene.getInstance().getTextureMode() == TextureMode.None)
 				mesh.setDefaultColor(Scene.getInstance().getRoofColor());
-			final MaterialState ms = new MaterialState();
-			ms.setColorMaterial(ColorMaterial.Diffuse);
-			mesh.setRenderState(ms);
 			roofPartIndex++;
 		}
 		drawWireframe();

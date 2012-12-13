@@ -19,8 +19,6 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -55,10 +53,6 @@ public class Floor extends HousePart {
 		wireframeMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(wireframeMesh);
 //		root.attachChild(wireframeMesh);
-
-		final MaterialState ms = new MaterialState();
-		ms.setColorMaterial(ColorMaterial.Diffuse);
-		mesh.setRenderState(ms);
 
 		updateTextureAndColor();
 

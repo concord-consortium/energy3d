@@ -36,8 +36,6 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
@@ -94,9 +92,6 @@ public class Wall extends HousePart {
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
-		final MaterialState ms = new MaterialState();
-		ms.setColorMaterial(ColorMaterial.Diffuse);
-		mesh.setRenderState(ms);
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(mesh);

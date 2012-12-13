@@ -15,8 +15,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
@@ -61,9 +59,6 @@ public class Foundation extends HousePart {
 		resizeHouseMode = false;
 
 		mesh = new Box("Foundation", new Vector3(), new Vector3());
-		final MaterialState ms = new MaterialState();
-		ms.setColorMaterial(ColorMaterial.Diffuse);
-		mesh.setRenderState(ms);
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new BoundingBox());
 		updateTextureAndColor();
