@@ -27,6 +27,8 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.state.OffsetState;
+import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
@@ -45,6 +47,9 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
+
+	public static final OffsetState offsetState = new OffsetState();
+
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
 	protected static final float printWireframeThickness = 2f;
@@ -73,7 +78,13 @@ public abstract class HousePart implements Serializable {
 	private transient boolean isPrintVertical;
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
-	protected boolean freeze;
+	private boolean freeze;
+
+	static {
+		offsetState.setTypeEnabled(OffsetType.Fill, true);
+		offsetState.setFactor(1f);
+		offsetState.setUnits(1f);
+	}
 
 	public static boolean isSnapToObjects() {
 		return snapToObjects;

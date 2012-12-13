@@ -154,7 +154,7 @@ public class SizeAnnotation extends Annotation {
 
 		updateWorldTransform(true);
 		updateWorldBound(true);
-		this.setTranslation(faceDirection.multiply(0.05, null));
+//		this.setTranslation(faceDirection.multiply(0.05, null));
 	}
 
 	@Override

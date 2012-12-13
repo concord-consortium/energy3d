@@ -46,6 +46,7 @@ public class Floor extends HousePart {
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 //		mesh.setModelBound(new OrientedBoundingBox());
+		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new BoundingBox());
 
 		wireframeMesh = new Line("Floor (Wireframe)");

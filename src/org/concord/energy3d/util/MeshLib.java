@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.poly2tri.Poly2Tri;
@@ -204,6 +205,7 @@ public class MeshLib {
 			} else {
 				node = new Node("Roof Part #" + meshIndex);
 				newMesh = new Mesh("Roof Mesh #" + meshIndex);
+				newMesh.setRenderState(HousePart.offsetState);
 				newMesh.setModelBound(new OrientedBoundingBox());
 				node.attachChild(newMesh);
 				node.attachChild(new Node("Roof Size Annot"));

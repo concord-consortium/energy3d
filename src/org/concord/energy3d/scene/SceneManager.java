@@ -106,8 +106,6 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.renderer.state.OffsetState;
-import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
@@ -490,11 +488,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			break;
 		}
 
-		final OffsetState offsetState = new OffsetState();
-		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(0.5f);
-		offsetState.setUnits(0.5f);
-		floor.setRenderState(offsetState);
+//		final OffsetState offsetState = new OffsetState();
+//		offsetState.setTypeEnabled(OffsetType.Fill, true);
+//		offsetState.setFactor(0.5f);
+//		offsetState.setUnits(0.5f);
+		floor.setRenderState(HousePart.offsetState);
 
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);

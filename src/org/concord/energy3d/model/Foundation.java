@@ -64,6 +64,7 @@ public class Foundation extends HousePart {
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
+		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new BoundingBox());
 		updateTextureAndColor();
 		root.attachChild(mesh);

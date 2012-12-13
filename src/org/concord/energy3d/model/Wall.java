@@ -38,8 +38,6 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.renderer.state.OffsetState;
-import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
@@ -99,10 +97,6 @@ public class Wall extends HousePart {
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		mesh.setRenderState(ms);
-		final OffsetState offsetState = new OffsetState();
-		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(1f);
-		offsetState.setUnits(1f);
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(mesh);
@@ -113,6 +107,7 @@ public class Wall extends HousePart {
 		backMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		backMesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		backMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		backMesh.setRenderState(offsetState);
 		backMesh.setModelBound(new BoundingBox());
 		root.attachChild(backMesh);
 
@@ -121,6 +116,7 @@ public class Wall extends HousePart {
 		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(12));
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(12));
 		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
+		surroundMesh.setRenderState(offsetState);
 		surroundMesh.setModelBound(new BoundingBox());
 		root.attachChild(surroundMesh);
 
@@ -128,6 +124,7 @@ public class Wall extends HousePart {
 		invisibleMesh.getMeshData().setIndexMode(IndexMode.Quads);
 		invisibleMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
+		invisibleMesh.setRenderState(offsetState);
 		invisibleMesh.setModelBound(new BoundingBox());
 		root.attachChild(invisibleMesh);
 
@@ -137,6 +134,7 @@ public class Wall extends HousePart {
 		windowsSurroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(1000));
 		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		windowsSurroundMesh.setRenderState(offsetState);
 		/* lets not use bounds for this mesh because when there are no windows its bounds is set to center 0,0,0 which shifts the overall bounds toward zero */
 		windowsSurroundMesh.setModelBound(null);
 		root.attachChild(windowsSurroundMesh);

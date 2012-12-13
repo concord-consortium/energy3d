@@ -1232,7 +1232,6 @@ Version 0.5 - October 20, 2011
 - fix problem with not being able to adjust the split pane
 - allow setting values for temperature and U-Factor through GUI
 - display total energy loss
-*
 - integrate with jogl 2
 - introduce experiment flag to hide expermental feature before a release
 - replaced jogl 1 libraries with jogl 2
@@ -1268,6 +1267,7 @@ Version 0.5 - October 20, 2011
 - reset camera center after rotation animation is clicked
 - avoid setting current file to last log file
 - fix problem with default bounding box being oriented bounding box and throwing exception when computing heliodon size
+*
 - append the number of changes to the end of log file names
 - hide freeze and unfreeze menus temporarely
 - fix exception and hanging with new version of Ardor3D when annotation is on
@@ -1275,6 +1275,12 @@ Version 0.5 - October 20, 2011
 - do not make frozen parts resizable
 - disallow adding roof to frozen parts
 - fix problem with removing roofs after an edit
+- fix problem with back mesh rendering in front of wall mesh when zoomed out in mac os x
+- remove translation offset for annotations
+- offset wall front mesh, back mesh, surround mesh and window surround mesh
+- offset platform mesh, roof mesh (MeshLib), and floor mesh
+- offset world floor mesh
+ 
 
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
