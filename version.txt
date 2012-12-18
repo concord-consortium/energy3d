@@ -1282,7 +1282,9 @@ Version 0.5 - October 20, 2011
 - offset world floor mesh
 - remove MaterialState because it is not necessary when there is no per-point color
 - remove windows mesh because it is useless
- 
+- fix problem with security exception when Always Trust Certificate is not selected
+- file a java bug report for above
+- combine the main energy3d jnlp with jogl and gluegen-rt as a work-around to above security exception
 
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
