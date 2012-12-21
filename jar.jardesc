@@ -29,14 +29,15 @@
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.shapes"/>
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.model"/>
         <javaElement handleIdentifier="=ardor3d-savable/src\/main\/java"/>
+        <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.test"/>
         <javaElement handleIdentifier="=ardor3d-core/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.shadow.map"/>
         <javaElement handleIdentifier="=ardor3d-animation/src\/main\/java"/>
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.resources.images"/>
         <javaElement handleIdentifier="=ardor3d-collada/src\/main\/java"/>
         <javaElement handleIdentifier="=Energy3D/poly2tri"/>
+        <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.gui"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.effect.bloom"/>
         <javaElement handleIdentifier="=ardor3d-jogl/src\/main\/java"/>
-        <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.gui"/>
     </selectedElements>
 </jardesc>
