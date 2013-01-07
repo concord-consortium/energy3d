@@ -1214,8 +1214,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public void init() {
-//		if (Config.JOGL)
-//			initCamera();
+		if (Config.JOGL)
+			initCamera();
 		if (Config.isHeliodonMode())
 			MainPanel.getInstance().getHeliodonButton().setSelected(true);
 
