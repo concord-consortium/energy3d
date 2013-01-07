@@ -41,4 +41,8 @@ public class Config {
 		return isMac;
 	}
 
+	public static boolean isClassroomMode() {
+		return false;
+	}
+
 }

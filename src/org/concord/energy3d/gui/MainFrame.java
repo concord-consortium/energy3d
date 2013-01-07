@@ -759,8 +759,10 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
-			sceneMenu.add(getFreezeMenuItem());
-			sceneMenu.add(getUnfreezeMenuItem());
+			if (Config.isClassroomMode()) {
+				sceneMenu.add(getFreezeMenuItem());
+				sceneMenu.add(getUnfreezeMenuItem());
+			}
 			sceneMenu.add(getSeparator_10());
 			sceneMenu.add(getUnitsMenu());
 			sceneMenu.add(getScaleMenuItem());

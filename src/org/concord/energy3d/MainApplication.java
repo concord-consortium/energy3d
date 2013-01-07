@@ -41,8 +41,8 @@ public class MainApplication {
 
 		mainFrame.updateTitleBar();
 
-		// TODO: disable the following after the school test
-		startPeriodicFileSave();
+		if (Config.isClassroomMode())
+			startPeriodicFileSave();
 
 //		HandTrackerApplication.main(null);
 	}
