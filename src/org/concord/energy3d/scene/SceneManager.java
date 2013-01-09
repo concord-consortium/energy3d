@@ -324,7 +324,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (now > refreshTime)
 					refreshTime = -1;
 				refresh = false;
-
 				try {
 					// final long t = System.nanoTime();
 					frameHandler.updateFrame();
@@ -444,7 +443,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void initCamera() {
-		cameraNode = new CameraNode("Camera Node", canvas.getCanvasRenderer().getCamera());
+		System.out.println("initCamera()");
+		final Camera camera = canvas.getCanvasRenderer().getCamera();
+		System.out.println("camera = " + camera);
+		cameraNode = new CameraNode("Camera Node", camera);
 		root.attachChild(cameraNode);
 		cameraNode.updateFromCamera();
 		Scene.getInstance().updateEditShapes();
@@ -1214,8 +1216,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public void init() {
-		if (Config.JOGL)
-			initCamera();
+//		if (Config.JOGL)
+//			initCamera();
 		if (Config.isHeliodonMode())
 			MainPanel.getInstance().getHeliodonButton().setSelected(true);
 

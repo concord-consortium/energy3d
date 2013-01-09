@@ -23,13 +23,13 @@
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d"/>
         <javaElement handleIdentifier="=ardor3d-awt/src\/main\/java"/>
         <file path="/ardor3d-collada/lib/jdom/saxpath.jar"/>
+        <javaElement handleIdentifier="=ardor3d-lwjgl/src\/main\/java"/>
         <javaElement handleIdentifier="=Energy3D/src&lt;com.apple.eawt"/>
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.resources.icons"/>
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.resources"/>
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.shapes"/>
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.model"/>
         <javaElement handleIdentifier="=ardor3d-savable/src\/main\/java"/>
-        <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.test"/>
         <javaElement handleIdentifier="=ardor3d-core/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.shadow.map"/>
         <javaElement handleIdentifier="=ardor3d-animation/src\/main\/java"/>
