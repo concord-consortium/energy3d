@@ -203,6 +203,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
+		final long time = System.nanoTime();
 		if (Config.JOGL) {
 			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 2, 0, 4, false, false);
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
@@ -309,11 +310,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		root.updateGeometricState(0, true);
 		System.out.println("Finished initialization.");
+		System.out.println("time = " + (System.nanoTime() - time) / 1000000000.0);
 	}
 
 	@Override
 	public synchronized void run() {
 		frameHandler.init();
+		double time = 0.0;
+		int time_n = 0;
 		while (true) {
 			logicalLayer.checkTriggers(frameHandler.getTimer().getTimePerFrame());
 			final double now = frameHandler.getTimer().getTimeInSeconds();
@@ -325,9 +329,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					refreshTime = -1;
 				refresh = false;
 				try {
-					// final long t = System.nanoTime();
+					final long t = System.nanoTime();
 					frameHandler.updateFrame();
-					// System.out.println((System.nanoTime() - t)/1000000);
+					time += System.nanoTime() - t;
+					time_n++;
+					if (time_n == 100)
+						System.out.println("time = " + time / 1000000000.0);
 				} catch (final Throwable e) {
 					e.printStackTrace();
 					if (shadowPass.isEnabled()) {

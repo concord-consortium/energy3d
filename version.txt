@@ -1294,6 +1294,7 @@ Version 0.5 - October 20, 2011
 - initialize camera in init() method
 - create lwjgl webstart version
 - replace jogl with lwjgl since it appears to be more stable
+- add performance measurement code
 
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.

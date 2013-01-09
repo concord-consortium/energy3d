@@ -89,10 +89,12 @@ public class MainPanel extends JPanel {
 		super();
 		System.out.println("Version: " + Config.VERSION);
 		System.out.print("Initiating GUI Panel...");
+		final long time = System.nanoTime();
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		initialize();
 		System.out.println("done");
+		System.out.println("time = " + (System.nanoTime() - time) / 1000000000.0);
 	}
 
 	/**
