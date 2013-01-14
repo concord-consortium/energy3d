@@ -9,7 +9,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-lwjgl"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-examples"/>
-	<classpathentry kind="lib" path="C:/Program Files (x86)/Java/jre7/lib/jfxrt.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/jfxrt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-jogl"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

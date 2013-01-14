@@ -691,6 +691,7 @@ public class MainPanel extends JPanel {
 					final Heliodon heliodon = SceneManager.getInstance().getHeliodon();
 					if (heliodon != null)
 						heliodon.setDate((Date) dateSpinner.getValue());
+					EnergyPanel.getInstance().computeAreaAndEnergy();
 				}
 			});
 		}

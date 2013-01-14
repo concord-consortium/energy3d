@@ -8,6 +8,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.Date;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -38,6 +39,7 @@ import org.concord.energy3d.model.Window;
 
 public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
+	private static final double[] averageTemperature = new double[] {28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8};
 	private static final EnergyPanel instance = new EnergyPanel();
 	private final JFXPanel fxPanel;
 	private final XYChart.Data<String, Number> wallsArea = new XYChart.Data<String, Number>("Area", 0);
@@ -55,6 +57,7 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox doorsComboBox;
 	private final JComboBox windowsComboBox;
 	private final JComboBox roofsComboBox;
+	private final JCheckBox autoCheckBox;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -98,7 +101,13 @@ public class EnergyPanel extends JPanel {
 		final GridBagLayout gbl_panel = new GridBagLayout();
 		panel.setLayout(gbl_panel);
 
-		final JCheckBox autoCheckBox = new JCheckBox("Auto outside temperature");
+		autoCheckBox = new JCheckBox("Auto outside temperature");
+		autoCheckBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				computeAreaAndEnergy();
+			}
+		});
 		final GridBagConstraints gbc_autoCheckBox = new GridBagConstraints();
 		gbc_autoCheckBox.insets = new Insets(0, 0, 5, 5);
 		gbc_autoCheckBox.gridwidth = 4;
@@ -317,7 +326,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateEnergyLoss(final double walls, final double doors, final double windows, final double roofs) {
-		final double total = (walls + windows + doors + roofs) / 100.0;
+		final double total = Math.round(walls + windows + doors + roofs) / 100.0;
 		energyLossTextField.setText("" + total);
 		wallsEnergy.setYValue(walls / total);
 		doorsEnergy.setYValue(doors / total);
@@ -326,6 +335,8 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void computeAreaAndEnergy() {
+		if (autoCheckBox.isSelected())
+			updateOutsideTemperature();
 		double wallsArea = 0;
 		double doorsArea = 0;
 		double windowsArea = 0;
@@ -349,6 +360,11 @@ public class EnergyPanel extends JPanel {
 		final double roofsEnergyLoss = roofsArea * Double.parseDouble((String)roofsComboBox.getSelectedItem()) * deltaT;
 
 		updateEnergyLoss(wallsEnergyLoss, doorsEnergyLoss, windowsEnergyLoss, roofsEnergyLoss);
+	}
+
+	private void updateOutsideTemperature() {
+		final Date date = (Date) MainPanel.getInstance().getDateSpinner().getValue();
+		outsideTemperatureTextField.setText("" + averageTemperature[date.getMonth()]);
 	}
 
 }

@@ -204,13 +204,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
 		final long time = System.nanoTime();
+		final DisplaySettings settings = new DisplaySettings(400, 300, 16, 0, 0, 8, 0, 4, false, false);
 		if (Config.JOGL) {
-			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 2, 0, 4, false, false);
+//			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 2, 0, 4, false, false);
+//			final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
 			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
 			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
 		} else {
 			// final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 0, false, false);
-			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 4, false, false);
+//			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 60, 0, 8, 0, 4, false, false);
+//			final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
+//			final DisplaySettings settings = new DisplaySettings(800, 600, 32, 0, 0, 8, 0, 4, false, false);
+
 			try {
 				canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
 				TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
@@ -1223,8 +1228,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public void init() {
-//		if (Config.JOGL)
-//			initCamera();
+		if (Config.JOGL)
+			initCamera();
 		if (Config.isHeliodonMode())
 			MainPanel.getInstance().getHeliodonButton().setSelected(true);
 
