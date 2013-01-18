@@ -16,6 +16,9 @@ import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
 
@@ -71,6 +74,7 @@ public class MainFrame extends JFrame {
 	private JMenu fileMenu = null;
 	private JMenuItem newMenuItem = null;
 	private JMenuItem openMenuItem = null;
+	private JMenuItem openFolderMenuItem = null;
 	private JMenuItem saveMenuItem = null;
 	private JMenuItem printMenuItem = null;
 	private JCheckBoxMenuItem previewMenuItem = null;
@@ -182,7 +186,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes mainPanel
-	 *
+	 * 
 	 * @return org.concord.energy3d.gui.MainPanel
 	 */
 	public MainPanel getMainPanel() {
@@ -235,7 +239,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes this
-	 *
+	 * 
 	 * @return void
 	 */
 	private void initialize() {
@@ -330,7 +334,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes appMenuBar
-	 *
+	 * 
 	 * @return javax.swing.JMenuBar
 	 */
 	private JMenuBar getAppMenuBar() {
@@ -347,7 +351,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes fileMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getFileMenu() {
@@ -372,6 +376,8 @@ public class MainFrame extends JFrame {
 			fileMenu.setText("File");
 			fileMenu.add(getNewMenuItem());
 			fileMenu.add(getOpenMenuItem());
+			if (Config.isAssessmentMode())
+				fileMenu.add(getOpenFolderMenuItem());
 			fileMenu.add(getSaveMenuItem());
 			fileMenu.add(getSaveasMenuItem());
 			fileMenu.add(getSaveAsImageMenuItem());
@@ -393,7 +399,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes newMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getNewMenuItem() {
@@ -414,7 +420,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes openMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getOpenMenuItem() {
@@ -425,6 +431,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().refresh(1);
+					fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					fileChooser.addChoosableFileFilter(ng3Filter);
 					fileChooser.addChoosableFileFilter(serFilter);
 					fileChooser.removeChoosableFileFilter(pngFilter);
@@ -447,6 +454,45 @@ public class MainFrame extends JFrame {
 		return openMenuItem;
 	}
 
+	private JMenuItem getOpenFolderMenuItem() {
+		if (openFolderMenuItem == null) {
+			openFolderMenuItem = new JMenuItem("Open Folder...");
+			openFolderMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().refresh(1);
+					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					fileChooser.removeChoosableFileFilter(ng3Filter);
+					fileChooser.removeChoosableFileFilter(serFilter);
+					fileChooser.removeChoosableFileFilter(pngFilter);
+					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
+						File dir = fileChooser.getSelectedFile();
+						if (dir.isDirectory()) {
+							final File[] files = dir.listFiles();
+							new Thread() {
+								public void run() {
+									for (File x : files) {
+										try {
+											if (x.getName().endsWith(".ng3")) {
+												Scene.open(x.toURI().toURL());
+												updateTitleBar();
+												sleep(1000);
+											}
+										} catch (final Exception e) {
+											e.printStackTrace();
+										}
+									}
+								}
+							}.start();
+						}
+					}
+				}
+			});
+		}
+		return openFolderMenuItem;
+	}
+
 	public void updateTitleBar() {
 		final String star = Scene.getInstance().isEdited() ? "*" : "";
 		if (Scene.getURL() == null)
@@ -457,7 +503,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes saveMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getSaveMenuItem() {
@@ -476,7 +522,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes printMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getPrintMenuItem() {
@@ -512,7 +558,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes previewMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getPreviewMenuItem() {
@@ -530,7 +576,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes cameraMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	public JMenu getCameraMenu() {
@@ -566,7 +612,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes orbitMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getOrbitMenuItem() {
@@ -586,7 +632,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes firstPersonMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getFirstPersonMenuItem() {
@@ -605,7 +651,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes lightingMenu
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getShadeMenu() {
@@ -624,7 +670,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes exitMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getExitMenuItem() {
@@ -643,7 +689,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes helpMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getHelpMenu() {
@@ -667,7 +713,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getAboutMenuItem() {
@@ -686,7 +732,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutDialog
-	 *
+	 * 
 	 * @return javax.swing.JDialog
 	 */
 	private JDialog getAboutDialog() {
@@ -704,7 +750,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes wallThicknessMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	private JCheckBoxMenuItem getWallThicknessMenuItem() {
@@ -947,6 +993,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void saveFile() {
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(serFilter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
@@ -967,6 +1014,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void importFile() {
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(serFilter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
@@ -984,6 +1032,7 @@ public class MainFrame extends JFrame {
 
 	private void importColladaFile() {
 		// TODO
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.removeChoosableFileFilter(serFilter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
 		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
@@ -1456,6 +1505,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void saveAsImage() {
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(pngFilter);
 		fileChooser.removeChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(serFilter);
@@ -1477,6 +1527,7 @@ public class MainFrame extends JFrame {
 			}
 		}
 	}
+
 	private JMenuItem getFreezeMenuItem() {
 		if (freezeMenuItem == null) {
 			freezeMenuItem = new JMenuItem("Freeze");
@@ -1490,6 +1541,7 @@ public class MainFrame extends JFrame {
 		}
 		return freezeMenuItem;
 	}
+
 	private JMenuItem getUnfreezeMenuItem() {
 		if (unfreezeMenuItem == null) {
 			unfreezeMenuItem = new JMenuItem("Unfreeze");
@@ -1503,6 +1555,7 @@ public class MainFrame extends JFrame {
 		}
 		return unfreezeMenuItem;
 	}
+
 	private JSeparator getSeparator_10() {
 		if (separator_10 == null) {
 			separator_10 = new JSeparator();

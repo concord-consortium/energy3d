@@ -45,4 +45,9 @@ public class Config {
 		return false;
 	}
 
+	// support a researcher to analyze logged data
+	public static boolean isAssessmentMode() {
+		return false;
+	}
+
 }
