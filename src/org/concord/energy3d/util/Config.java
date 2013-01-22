@@ -41,13 +41,17 @@ public class Config {
 		return isMac;
 	}
 
+	// XIE: the following methods support logging and analysis
+
 	public static boolean isClassroomMode() {
 		return false;
 	}
 
-	// support a researcher to analyze logged data
 	public static boolean isAssessmentMode() {
 		return false;
 	}
+
+	public static boolean replaying = true;
+	public static boolean backward, forward;
 
 }

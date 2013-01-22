@@ -15,10 +15,8 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
 
@@ -469,18 +467,55 @@ public class MainFrame extends JFrame {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						File dir = fileChooser.getSelectedFile();
 						if (dir.isDirectory()) {
-							final File[] files = dir.listFiles();
+							final File[] files = dir.listFiles(new FilenameFilter() {
+								@Override
+								public boolean accept(File dir, String name) {
+									return name.endsWith(".ng3");
+								}
+							});
+							final int n = files.length;
 							new Thread() {
 								public void run() {
-									for (File x : files) {
-										try {
-											if (x.getName().endsWith(".ng3")) {
-												Scene.open(x.toURI().toURL());
+									int i = -1;
+									while (i < n) {
+										if (Config.replaying) {
+											i++;
+											if (i == n) // cycle back
+												i = 0;
+											System.out.println("Play back " + i + " of " + n);
+											try {
+												Scene.open(files[i].toURI().toURL());
 												updateTitleBar();
 												sleep(1000);
+											} catch (final Exception e) {
+												e.printStackTrace();
 											}
-										} catch (final Exception e) {
-											e.printStackTrace();
+										} else {
+											if (Config.backward) {
+												if (i > 0) {
+													i--;
+													System.out.println("Play back " + i + " of " + n);
+													try {
+														Scene.open(files[i].toURI().toURL());
+														updateTitleBar();
+													} catch (final Exception e) {
+														e.printStackTrace();
+													}
+												}
+												Config.backward = false;
+											} else if (Config.forward) {
+												if (i < n - 1) {
+													i++;
+													System.out.println("Play back " + i + " of " + n);
+													try {
+														Scene.open(files[i].toURI().toURL());
+														updateTitleBar();
+													} catch (final Exception e) {
+														e.printStackTrace();
+													}
+												}
+												Config.forward = false;
+											}
 										}
 									}
 								}
