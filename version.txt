@@ -1296,6 +1296,8 @@ Version 0.5 - October 20, 2011
 - replace jogl with lwjgl since it appears to be more stable
 - add performance measurement code
 - implement the auto-temperature feature to update outside temperature with the average monthly temperature of boston
+- fix problem with bleeding polygon in ThinkPad laptops by increasing color and depth size to 32
+- fix print preview problem due to wrong bounding type
 
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
