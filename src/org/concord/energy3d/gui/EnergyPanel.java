@@ -353,13 +353,17 @@ public class EnergyPanel extends JPanel {
 		}
 		updateArea(wallsArea, doorsArea, windowsArea, roofsArea);
 
-		final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - Double.parseDouble(outsideTemperatureTextField.getText());
+		final double deltaT = toCelsius(Double.parseDouble(insideTemperatureTextField.getText())) - toCelsius(Double.parseDouble(outsideTemperatureTextField.getText()));
 		final double wallsEnergyLoss = wallsArea * Double.parseDouble((String)wallsComboBox.getSelectedItem()) * deltaT ;
 		final double doorsEnergyLoss = doorsArea *  Double.parseDouble((String)doorsComboBox.getSelectedItem()) * deltaT;
 		final double windowsEnergyLoss = windowsArea * Double.parseDouble((String)windowsComboBox.getSelectedItem()) * deltaT;
 		final double roofsEnergyLoss = roofsArea * Double.parseDouble((String)roofsComboBox.getSelectedItem()) * deltaT;
 
 		updateEnergyLoss(wallsEnergyLoss, doorsEnergyLoss, windowsEnergyLoss, roofsEnergyLoss);
+	}
+
+	private double toCelsius(double f) {
+		return ((f - 32.0) * 5.0 / 9.0);
 	}
 
 	private void updateOutsideTemperature() {
