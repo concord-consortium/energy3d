@@ -38,5 +38,6 @@
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.effect.bloom"/>
         <javaElement handleIdentifier="=ardor3d-jogl/src\/main\/java"/>
         <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.gui"/>
+        <javaElement handleIdentifier="=Energy3D/src&lt;org.concord.energy3d.css"/>
     </selectedElements>
 </jardesc>

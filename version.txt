@@ -1299,7 +1299,9 @@ Version 0.5 - October 20, 2011
 - fix problem with bleeding polygon in ThinkPad laptops by increasing color and depth size to 32
 - fix print preview problem due to wrong bounding type
 - fix broken date spinner
-
+- convert energy temperature units from Fahrenheit to Celsius before computing energy loss
+- include jfxrt.jar in the webstart configuration
+- include css in jar built configuration
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception
