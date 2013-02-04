@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -39,7 +40,8 @@ import org.concord.energy3d.model.Window;
 
 public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private static final double[] averageTemperature = new double[] {28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8};
+	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
+	private static final int[] daysInMonth = new int[] { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	private static final EnergyPanel instance = new EnergyPanel();
 	private final JFXPanel fxPanel;
 	private final XYChart.Data<String, Number> wallsArea = new XYChart.Data<String, Number>("Area", 0);
@@ -58,6 +60,8 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox windowsComboBox;
 	private final JComboBox roofsComboBox;
 	private final JCheckBox autoCheckBox;
+	private final JTextField yearlyEnergyLossTextField;
+	private final JTextField yearlyCostTextField;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -69,20 +73,86 @@ public class EnergyPanel extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		final JPanel panel_1 = new JPanel();
+		panel_1.setBorder(new TitledBorder(null, "Energy Loss", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel_1);
+		final GridBagLayout gbl_panel_1 = new GridBagLayout();
+		panel_1.setLayout(gbl_panel_1);
 
-		final JLabel label = new JLabel("Energy Loss:");
-		panel_1.add(label);
+		final JLabel lossRateLabel = new JLabel("Loss Rate:");
+		final GridBagConstraints gbc_lossRateLabel = new GridBagConstraints();
+		gbc_lossRateLabel.anchor = GridBagConstraints.EAST;
+		gbc_lossRateLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_lossRateLabel.gridx = 0;
+		gbc_lossRateLabel.gridy = 0;
+		panel_1.add(lossRateLabel, gbc_lossRateLabel);
 
 		energyLossTextField = new JTextField();
-		panel_1.add(energyLossTextField);
+		final GridBagConstraints gbc_energyLossTextField = new GridBagConstraints();
+		gbc_energyLossTextField.insets = new Insets(0, 0, 5, 5);
+		gbc_energyLossTextField.gridx = 1;
+		gbc_energyLossTextField.gridy = 0;
+		panel_1.add(energyLossTextField, gbc_energyLossTextField);
 		energyLossTextField.setEditable(false);
 		energyLossTextField.setColumns(10);
 
 		final JLabel wattsLabel = new JLabel("watts");
-		panel_1.add(wattsLabel);
+		final GridBagConstraints gbc_wattsLabel = new GridBagConstraints();
+		gbc_wattsLabel.anchor = GridBagConstraints.WEST;
+		gbc_wattsLabel.insets = new Insets(0, 0, 5, 0);
+		gbc_wattsLabel.gridx = 2;
+		gbc_wattsLabel.gridy = 0;
+		panel_1.add(wattsLabel, gbc_wattsLabel);
+
+		final JLabel yearlyLabel = new JLabel("Yearly Loss:");
+		final GridBagConstraints gbc_yearlyLabel = new GridBagConstraints();
+		gbc_yearlyLabel.anchor = GridBagConstraints.EAST;
+		gbc_yearlyLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_yearlyLabel.gridx = 0;
+		gbc_yearlyLabel.gridy = 1;
+		panel_1.add(yearlyLabel, gbc_yearlyLabel);
+
+		yearlyEnergyLossTextField = new JTextField();
+		yearlyEnergyLossTextField.setEditable(false);
+		final GridBagConstraints gbc_yearlyEnergyLossTextField = new GridBagConstraints();
+		gbc_yearlyEnergyLossTextField.insets = new Insets(0, 0, 5, 5);
+		gbc_yearlyEnergyLossTextField.gridx = 1;
+		gbc_yearlyEnergyLossTextField.gridy = 1;
+		panel_1.add(yearlyEnergyLossTextField, gbc_yearlyEnergyLossTextField);
+		yearlyEnergyLossTextField.setColumns(10);
 
 		panel_1.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_1.getPreferredSize().height));
+
+		final JLabel kwhyearLabel = new JLabel("kWh/year");
+		final GridBagConstraints gbc_kwhyearLabel = new GridBagConstraints();
+		gbc_kwhyearLabel.anchor = GridBagConstraints.WEST;
+		gbc_kwhyearLabel.insets = new Insets(0, 0, 5, 0);
+		gbc_kwhyearLabel.gridx = 2;
+		gbc_kwhyearLabel.gridy = 1;
+		panel_1.add(kwhyearLabel, gbc_kwhyearLabel);
+
+		final JLabel yearlyCostLabel = new JLabel("Yearly Cost:");
+		final GridBagConstraints gbc_yearlyCostLabel = new GridBagConstraints();
+		gbc_yearlyCostLabel.anchor = GridBagConstraints.EAST;
+		gbc_yearlyCostLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_yearlyCostLabel.gridx = 0;
+		gbc_yearlyCostLabel.gridy = 2;
+		panel_1.add(yearlyCostLabel, gbc_yearlyCostLabel);
+
+		yearlyCostTextField = new JTextField();
+		yearlyCostTextField.setEditable(false);
+		final GridBagConstraints gbc_yearlyCostTextField = new GridBagConstraints();
+		gbc_yearlyCostTextField.insets = new Insets(0, 0, 0, 5);
+		gbc_yearlyCostTextField.gridx = 1;
+		gbc_yearlyCostTextField.gridy = 2;
+		panel_1.add(yearlyCostTextField, gbc_yearlyCostTextField);
+		yearlyCostTextField.setColumns(10);
+
+		final JLabel label = new JLabel("$");
+		final GridBagConstraints gbc_label = new GridBagConstraints();
+		gbc_label.anchor = GridBagConstraints.WEST;
+		gbc_label.gridx = 2;
+		gbc_label.gridy = 2;
+		panel_1.add(label, gbc_label);
 
 		fxPanel = new JFXPanel();
 		final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
@@ -182,7 +252,7 @@ public class EnergyPanel extends JPanel {
 				computeAreaAndEnergy();
 			}
 		});
-		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.28"}));
+		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.28" }));
 		wallsComboBox.setPreferredSize(new Dimension(50, 20));
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
 		gbc_wallsComboBox.insets = new Insets(0, 0, 5, 5);
@@ -206,7 +276,7 @@ public class EnergyPanel extends JPanel {
 				computeAreaAndEnergy();
 			}
 		});
-		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] {"1.14"}));
+		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.14" }));
 		doorsComboBox.setPreferredSize(new Dimension(50, 20));
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
 		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
@@ -230,7 +300,7 @@ public class EnergyPanel extends JPanel {
 				computeAreaAndEnergy();
 			}
 		});
-		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] {"1.89"}));
+		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.89" }));
 		windowsComboBox.setPreferredSize(new Dimension(50, 20));
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
 		gbc_windowsComboBox.insets = new Insets(0, 0, 0, 5);
@@ -254,7 +324,7 @@ public class EnergyPanel extends JPanel {
 				computeAreaAndEnergy();
 			}
 		});
-		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] {"1.14"}));
+		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.14" }));
 		roofsComboBox.setPreferredSize(new Dimension(50, 20));
 		roofsComboBox.setEditable(true);
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
@@ -341,6 +411,8 @@ public class EnergyPanel extends JPanel {
 		double doorsArea = 0;
 		double windowsArea = 0;
 		double roofsArea = 0;
+
+		/* compute area */
 		for (final HousePart part : org.concord.energy3d.scene.Scene.getInstance().getParts()) {
 			if (part instanceof Wall)
 				wallsArea += part.computeArea();
@@ -353,13 +425,40 @@ public class EnergyPanel extends JPanel {
 		}
 		updateArea(wallsArea, doorsArea, windowsArea, roofsArea);
 
-		final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - Double.parseDouble(outsideTemperatureTextField.getText());
-		final double wallsEnergyLoss = wallsArea * Double.parseDouble((String)wallsComboBox.getSelectedItem()) * deltaT ;
-		final double doorsEnergyLoss = doorsArea *  Double.parseDouble((String)doorsComboBox.getSelectedItem()) * deltaT;
-		final double windowsEnergyLoss = windowsArea * Double.parseDouble((String)windowsComboBox.getSelectedItem()) * deltaT;
-		final double roofsEnergyLoss = roofsArea * Double.parseDouble((String)roofsComboBox.getSelectedItem()) * deltaT;
+		/* compute energy loss rate */
+		{
+			final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - Double.parseDouble(outsideTemperatureTextField.getText());
+			final double wallsEnergyLoss = wallsArea * Double.parseDouble((String) wallsComboBox.getSelectedItem()) * deltaT;
+			final double doorsEnergyLoss = doorsArea * Double.parseDouble((String) doorsComboBox.getSelectedItem()) * deltaT;
+			final double windowsEnergyLoss = windowsArea * Double.parseDouble((String) windowsComboBox.getSelectedItem()) * deltaT;
+			final double roofsEnergyLoss = roofsArea * Double.parseDouble((String) roofsComboBox.getSelectedItem()) * deltaT;
+			updateEnergyLoss(wallsEnergyLoss, doorsEnergyLoss, windowsEnergyLoss, roofsEnergyLoss);
+		}
 
-		updateEnergyLoss(wallsEnergyLoss, doorsEnergyLoss, windowsEnergyLoss, roofsEnergyLoss);
+		/* compute yearly energy loss */
+		double yearlyEnergyLoss = 0.0;
+		int totalDays = 0;
+		for (int i = 0; i < 12; i++) {
+			final double temperature = toCelsius(averageTemperature[i]);
+			final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - temperature;
+			double monthlyEnergyLoss = 0;
+			if (deltaT > 0) {
+				monthlyEnergyLoss = wallsArea * Double.parseDouble((String) wallsComboBox.getSelectedItem()) * deltaT;
+				monthlyEnergyLoss += doorsArea * Double.parseDouble((String) doorsComboBox.getSelectedItem()) * deltaT;
+				monthlyEnergyLoss += windowsArea * Double.parseDouble((String) windowsComboBox.getSelectedItem()) * deltaT;
+				monthlyEnergyLoss += roofsArea * Double.parseDouble((String) roofsComboBox.getSelectedItem()) * deltaT;
+				monthlyEnergyLoss *= 24 * daysInMonth[i] / 1000.0;
+			}
+			totalDays += daysInMonth[i];
+			yearlyEnergyLoss += monthlyEnergyLoss;
+		}
+		System.out.println("Total days in year = " + totalDays);
+		final DecimalFormat decimalFormat = new DecimalFormat("###,###");
+		yearlyEnergyLossTextField.setText(decimalFormat.format(yearlyEnergyLoss));
+
+		/* compute yearly energy cost */
+		final double COST_PER_KWH = 0.13;
+		yearlyCostTextField.setText(decimalFormat.format(yearlyEnergyLoss * COST_PER_KWH));
 	}
 
 	private double toCelsius(final double f) {

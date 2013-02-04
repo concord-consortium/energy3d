@@ -1288,8 +1288,7 @@ Version 0.5 - October 20, 2011
 - experiment with latest jogl from git
 - collaborate with jogl team to help fix problem with intel drivers initializing on a wrong thread when ran from webstart
 - integrate new jogl libraries to fix Gears jogl demo
-- integrate new ardor libraries to fix Ardor3D Intel Graphics Card problem  
-*
+- integrate new ardor libraries to fix Ardor3D Intel Graphics Card problem
 - disable classroom features such as autosave and freeze/unfreeze
 - initialize camera in init() method
 - create lwjgl webstart version
@@ -1307,7 +1306,10 @@ Version 0.5 - October 20, 2011
 - convert Boston monthly average temperature from Farenheit to Celsius 
 - use new default values for U-Factor of house parts
 - use W/m2/C for U-factor unit
--  
+*
+- compute average monthly head loss in kWh
+- compute yearly heat loss
+- compute yearly cost due to heat loss
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception
