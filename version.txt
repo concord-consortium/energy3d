@@ -1302,6 +1302,12 @@ Version 0.5 - October 20, 2011
 - convert energy temperature units from Fahrenheit to Celsius before computing energy loss
 - include jfxrt.jar in the webstart configuration
 - include css in jar built configuration
+- display all temperature units in GUI in Celsius units
+- compute energy loss based on assumption that all temperature units are Celcius
+- convert Boston monthly average temperature from Farenheit to Celsius 
+- use new default values for U-Factor of house parts
+- use W/m2/C for U-factor unit
+-  
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

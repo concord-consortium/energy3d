@@ -96,7 +96,7 @@ public class EnergyPanel extends JPanel {
 			add(fxPanel, gbc_fxPanel);
 
 		final JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(null, "Temperature", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature (C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel);
 		final GridBagLayout gbl_panel = new GridBagLayout();
 		panel.setLayout(gbl_panel);
@@ -129,7 +129,7 @@ public class EnergyPanel extends JPanel {
 				computeAreaAndEnergy();
 			}
 		});
-		insideTemperatureTextField.setText("75");
+		insideTemperatureTextField.setText("21");
 		final GridBagConstraints gbc_insideTemperatureTextField = new GridBagConstraints();
 		gbc_insideTemperatureTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_insideTemperatureTextField.gridx = 1;
@@ -151,7 +151,7 @@ public class EnergyPanel extends JPanel {
 				computeAreaAndEnergy();
 			}
 		});
-		outsideTemperatureTextField.setText("65");
+		outsideTemperatureTextField.setText("10");
 		final GridBagConstraints gbc_outsideTemperatureTextField = new GridBagConstraints();
 		gbc_outsideTemperatureTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_outsideTemperatureTextField.gridx = 3;
@@ -162,7 +162,7 @@ public class EnergyPanel extends JPanel {
 		panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel.getPreferredSize().height));
 
 		final JPanel panel_2 = new JPanel();
-		panel_2.setBorder(new TitledBorder(null, "U-Factor", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor (W/m2/C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel_2);
 		final GridBagLayout gbl_panel_2 = new GridBagLayout();
 		panel_2.setLayout(gbl_panel_2);
@@ -182,7 +182,7 @@ public class EnergyPanel extends JPanel {
 				computeAreaAndEnergy();
 			}
 		});
-		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.09"}));
+		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.28"}));
 		wallsComboBox.setPreferredSize(new Dimension(50, 20));
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
 		gbc_wallsComboBox.insets = new Insets(0, 0, 5, 5);
@@ -206,7 +206,7 @@ public class EnergyPanel extends JPanel {
 				computeAreaAndEnergy();
 			}
 		});
-		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.50"}));
+		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] {"1.14"}));
 		doorsComboBox.setPreferredSize(new Dimension(50, 20));
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
 		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
@@ -230,7 +230,7 @@ public class EnergyPanel extends JPanel {
 				computeAreaAndEnergy();
 			}
 		});
-		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.30"}));
+		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] {"1.89"}));
 		windowsComboBox.setPreferredSize(new Dimension(50, 20));
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
 		gbc_windowsComboBox.insets = new Insets(0, 0, 0, 5);
@@ -254,7 +254,7 @@ public class EnergyPanel extends JPanel {
 				computeAreaAndEnergy();
 			}
 		});
-		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.05"}));
+		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] {"1.14"}));
 		roofsComboBox.setPreferredSize(new Dimension(50, 20));
 		roofsComboBox.setEditable(true);
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
@@ -353,7 +353,7 @@ public class EnergyPanel extends JPanel {
 		}
 		updateArea(wallsArea, doorsArea, windowsArea, roofsArea);
 
-		final double deltaT = toCelsius(Double.parseDouble(insideTemperatureTextField.getText())) - toCelsius(Double.parseDouble(outsideTemperatureTextField.getText()));
+		final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - Double.parseDouble(outsideTemperatureTextField.getText());
 		final double wallsEnergyLoss = wallsArea * Double.parseDouble((String)wallsComboBox.getSelectedItem()) * deltaT ;
 		final double doorsEnergyLoss = doorsArea *  Double.parseDouble((String)doorsComboBox.getSelectedItem()) * deltaT;
 		final double windowsEnergyLoss = windowsArea * Double.parseDouble((String)windowsComboBox.getSelectedItem()) * deltaT;
@@ -362,13 +362,13 @@ public class EnergyPanel extends JPanel {
 		updateEnergyLoss(wallsEnergyLoss, doorsEnergyLoss, windowsEnergyLoss, roofsEnergyLoss);
 	}
 
-	private double toCelsius(double f) {
+	private double toCelsius(final double f) {
 		return ((f - 32.0) * 5.0 / 9.0);
 	}
 
 	private void updateOutsideTemperature() {
 		final Date date = (Date) MainPanel.getInstance().getDateSpinner().getValue();
-		outsideTemperatureTextField.setText("" + averageTemperature[date.getMonth()]);
+		outsideTemperatureTextField.setText("" + Math.round(toCelsius(averageTemperature[date.getMonth()])));
 	}
 
 }
