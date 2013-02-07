@@ -74,7 +74,7 @@ public class Scene implements Serializable {
 	private ReadOnlyColorRGBA floorColor;
 	private ReadOnlyColorRGBA roofColor;
 	private double overhangLength = 2.0;
-	private double annotationScale = 1;
+	private double annotationScale = 0.2;
 	private int version = currentVersion;
 	private boolean isAnnotationsVisible = true;
 
@@ -85,16 +85,20 @@ public class Scene implements Serializable {
 					final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
 					open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
 				} else
-					newFile(40, 30);
+					newFile();
 			} catch (final Throwable e) {
 				e.printStackTrace();
-				newFile(40, 30);
+				newFile();
 			}
 		}
 		return instance;
 	}
 
-	public static void newFile(final double xLength, final double yLength) {
+	public static void newFile() {
+		newFile(40, 30);
+	}
+
+	private static void newFile(final double xLength, final double yLength) {
 		try {
 			open(null);
 		} catch (final Exception e) {

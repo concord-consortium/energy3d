@@ -184,7 +184,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes mainPanel
-	 * 
+	 *
 	 * @return org.concord.energy3d.gui.MainPanel
 	 */
 	public MainPanel getMainPanel() {
@@ -237,7 +237,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes this
-	 * 
+	 *
 	 * @return void
 	 */
 	private void initialize() {
@@ -332,7 +332,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes appMenuBar
-	 * 
+	 *
 	 * @return javax.swing.JMenuBar
 	 */
 	private JMenuBar getAppMenuBar() {
@@ -349,7 +349,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes fileMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getFileMenu() {
@@ -397,7 +397,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes newMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getNewMenuItem() {
@@ -406,7 +406,7 @@ public class MainFrame extends JFrame {
 			newMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					Scene.newFile(40, 30);
+					Scene.newFile();
 					SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
 					SceneManager.getInstance().getCameraControl().reset();
 					updateTitleBar();
@@ -418,7 +418,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes openMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getOpenMenuItem() {
@@ -465,16 +465,17 @@ public class MainFrame extends JFrame {
 					fileChooser.removeChoosableFileFilter(pngFilter);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-						File dir = fileChooser.getSelectedFile();
+						final File dir = fileChooser.getSelectedFile();
 						if (dir.isDirectory()) {
 							final File[] files = dir.listFiles(new FilenameFilter() {
 								@Override
-								public boolean accept(File dir, String name) {
+								public boolean accept(final File dir, final String name) {
 									return name.endsWith(".ng3");
 								}
 							});
 							final int n = files.length;
 							new Thread() {
+								@Override
 								public void run() {
 									int i = -1;
 									while (i < n) {
@@ -538,7 +539,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes saveMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getSaveMenuItem() {
@@ -557,7 +558,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes printMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getPrintMenuItem() {
@@ -593,7 +594,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes previewMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getPreviewMenuItem() {
@@ -611,7 +612,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes cameraMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	public JMenu getCameraMenu() {
@@ -647,7 +648,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes orbitMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getOrbitMenuItem() {
@@ -667,7 +668,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes firstPersonMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getFirstPersonMenuItem() {
@@ -686,7 +687,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes lightingMenu
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getShadeMenu() {
@@ -705,7 +706,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes exitMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getExitMenuItem() {
@@ -724,7 +725,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes helpMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getHelpMenu() {
@@ -748,7 +749,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getAboutMenuItem() {
@@ -767,7 +768,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutDialog
-	 * 
+	 *
 	 * @return javax.swing.JDialog
 	 */
 	private JDialog getAboutDialog() {
@@ -785,7 +786,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes wallThicknessMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	private JCheckBoxMenuItem getWallThicknessMenuItem() {

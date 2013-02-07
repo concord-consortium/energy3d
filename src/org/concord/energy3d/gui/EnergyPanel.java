@@ -324,7 +324,7 @@ public class EnergyPanel extends JPanel {
 				computeAreaAndEnergy();
 			}
 		});
-		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.14" }));
+		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.14"}));
 		roofsComboBox.setPreferredSize(new Dimension(50, 20));
 		roofsComboBox.setEditable(true);
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();

@@ -9,12 +9,15 @@ import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -33,12 +36,12 @@ public class Window extends HousePart {
 	protected void init() {
 		label1 = Annotation.makeNewLabel();
 		super.init();
-//		mesh = new Mesh("Window");
-//		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-//		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-//		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
-//		mesh.setModelBound(new BoundingBox());
-//		mesh.getSceneHints().setCullHint(CullHint.Always);
+		mesh = new Mesh("Window");
+		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
+		mesh.setModelBound(new OrientedBoundingBox());
+		mesh.getSceneHints().setCullHint(CullHint.Always);
 //
 //		// Transparency
 //		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.4f, 0.5f, 0.7f));
@@ -128,12 +131,12 @@ public class Window extends HousePart {
 		if (points.size() < 4)
 			return;
 
-//		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-//		vertexBuffer.rewind();
-//		for (int i = 0; i < points.size(); i++) {
-//			final ReadOnlyVector3 p = getAbsPoint(i);
-//			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-//		}
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		vertexBuffer.rewind();
+		for (int i = 0; i < points.size(); i++) {
+			final ReadOnlyVector3 p = getAbsPoint(i);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
 //
 //		// Compute normals
 //		final Vector3 normal = getAbsPoint(2).subtract(getAbsPoint(0), null).crossLocal(getAbsPoint(1).subtract(getAbsPoint(0), null)).normalizeLocal();

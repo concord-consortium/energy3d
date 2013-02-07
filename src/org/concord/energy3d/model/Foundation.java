@@ -499,7 +499,7 @@ public class Foundation extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return 2.0;
+		return 1.0;
 	}
 
 	@Override

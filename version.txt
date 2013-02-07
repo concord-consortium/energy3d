@@ -1310,6 +1310,9 @@ Version 0.5 - October 20, 2011
 - compute average monthly head loss in kWh
 - compute yearly heat loss
 - compute yearly cost due to heat loss
+- rescale the default scene to make it proportional in meters
+- rescale the default wall height to be 3 meters
+- rescale the default door height to be 2 meters
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

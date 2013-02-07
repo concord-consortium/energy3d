@@ -47,7 +47,8 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double MIN_WALL_LENGTH = 0.1;
-	private static double defaultWallHeight = 20.0; // the recommended default wall height is 20cm
+//	private static double defaultWallHeight = 20.0; // the recommended default wall height is 20cm
+	private static double defaultWallHeight = 15.0; // the recommended default wall height is 3m
 	private static int currentVisitStamp = 1;
 	private static boolean extendToRoofEnabled = true;
 	private transient Mesh backMesh;

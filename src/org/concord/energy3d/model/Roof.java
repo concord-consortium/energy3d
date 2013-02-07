@@ -895,11 +895,12 @@ public abstract class Roof extends HousePart {
 			final Mesh mesh = (Mesh) ((Node) child).getChild(0);
 			final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 			buf.rewind();
+			final double annotationScale = Scene.getInstance().getAnnotationScale();
 			while (buf.hasRemaining()) {
 				final Vector3 p1 = new Vector3(buf.get(), buf.get(), buf.get());
 				final Vector3 p2 = new Vector3(buf.get(), buf.get(), buf.get());
 				final Vector3 p3 = new Vector3(buf.get(), buf.get(), buf.get());
-				final double trigArea = p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() / 2.0;
+				final double trigArea = p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;
 				area += trigArea;
 			}
 		}
