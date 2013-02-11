@@ -8,6 +8,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -389,19 +390,21 @@ public class EnergyPanel extends JPanel {
 
 	public void updateArea(final double walls, final double doors, final double windows, final double roofs) {
 		final double total = (walls + windows + doors + roofs) / 100.0;
-		wallsArea.setYValue(walls / total);
-		doorsArea.setYValue(doors / total);
-		windowsArea.setYValue(windows / total);
-		roofsArea.setYValue(roofs / total);
+		final boolean isZero = total == 0.0;
+		wallsArea.setYValue(isZero ? 0 : walls / total);
+		doorsArea.setYValue(isZero ? 0 : doors / total);
+		windowsArea.setYValue(isZero ? 0 : windows / total);
+		roofsArea.setYValue(isZero ? 0 : roofs / total);
 	}
 
 	public void updateEnergyLoss(final double walls, final double doors, final double windows, final double roofs) {
 		final double total = Math.round(walls + windows + doors + roofs) / 100.0;
+		final boolean isZero = total == 0.0;
 		energyLossTextField.setText("" + total);
-		wallsEnergy.setYValue(walls / total);
-		doorsEnergy.setYValue(doors / total);
-		windowsEnergy.setYValue(windows / total);
-		roofsEnergy.setYValue(roofs / total);
+		wallsEnergy.setYValue(isZero ? 0 : walls / total);
+		doorsEnergy.setYValue(isZero ? 0 : doors / total);
+		windowsEnergy.setYValue(isZero ? 0 : windows / total);
+		roofsEnergy.setYValue(isZero ? 0 : roofs / total);
 	}
 
 	public void computeAreaAndEnergy() {

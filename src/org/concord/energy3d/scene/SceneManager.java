@@ -864,9 +864,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				for (final Spatial mesh : Scene.getInstance().getOriginalHouseRoot().getChildren()) {
 					System.out.println(mesh);
 				}
-				System.out.println("---- Energy: ------------------------");
-				if (Config.EXPERIMENT)
-					EnergyPanel.getInstance().computeAreaAndEnergy();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {
