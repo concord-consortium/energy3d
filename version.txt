@@ -1314,7 +1314,9 @@ Version 0.5 - October 20, 2011
 - rescale the default wall height to be 3 meters
 - rescale the default door height to be 2 meters
 - reset energy energy data and chat to zero when new file is created
-- recalculate energy data and chart when existing file is opened 
+- recalculate energy data and chart when existing file is opened
+- compute energy gain due to sun based on window size and sun location
+- update sun energy gain upon sun location change with mouse
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

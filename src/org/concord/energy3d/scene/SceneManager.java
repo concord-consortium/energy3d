@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
@@ -162,7 +161,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private HousePart selectedHousePart = null;
 	private HousePart hoveredHousePart = null;
 	private Operation operation = Operation.SELECT;
-	private Heliodon heliodon;
 	private CameraControl cameraControl;
 	private ParallelSplitShadowMapPass shadowPass;
 	private ViewMode viewMode = ViewMode.NORMAL;
@@ -252,8 +250,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public void componentResized(final java.awt.event.ComponentEvent e) {
 				resizeCamera();
 				refresh();
-				if (heliodon != null)
-					heliodon.updateBloom();
+				if (Heliodon.getInstance() != null)
+					Heliodon.getInstance().updateBloom();
 			}
 		});
 		panel.add(canvasComponent, BorderLayout.CENTER);
@@ -307,7 +305,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.addOccluder(Scene.getRoot());
 
 		final Date today = Calendar.getInstance().getTime();
-		heliodon = new Heliodon(root, light, passManager, logicalLayer, today);
+		new Heliodon(root, light, passManager, logicalLayer, today);
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
@@ -394,9 +392,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			Scene.getInstance().updateEditShapes();
 		}
 
+		final Heliodon heliodon = Heliodon.getInstance();
 		if (sunAnim)
 			heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true);
-
 		heliodon.update();
 
 		if (cameraControl != null && cameraControl.isAnimating())
@@ -459,7 +457,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		passManager.renderPasses(renderer);
 		try {
-			if (!heliodon.isNightTime())
+			if (!Heliodon.getInstance().isNightTime())
 				shadowPass.renderPass(renderer);
 		} catch (final Throwable e) {
 			e.printStackTrace();
@@ -1101,7 +1099,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setHeliodonControl(final boolean selected) {
 		heliodonControl = selected;
-		heliodon.setVisible(selected);
+		Heliodon.getInstance().setVisible(selected);
 		enableDisableRotationControl();
 	}
 
@@ -1245,7 +1243,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			taskManager.update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					heliodon.updateSize();
+					Heliodon.getInstance().updateSize();
 					return null;
 				}
 			});
@@ -1291,10 +1289,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void setMouseControlEnabled(final boolean enabled) {
 		mouseControlEnabled = enabled;
 		cameraControl.setMouseEnabled(enabled);
-	}
-
-	public Heliodon getHeliodon() {
-		return heliodon;
 	}
 
 	@Override

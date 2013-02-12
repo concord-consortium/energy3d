@@ -20,6 +20,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Annotation;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.Printout;
 
@@ -172,7 +173,7 @@ public class PrintController implements Updater {
 
 				SceneManager.getInstance().setShading(shadingSelected);
 				SceneManager.getInstance().setShadow(shadowSelected);
-				SceneManager.getInstance().getHeliodon().setVisible(heliodonSelected);
+				Heliodon.getInstance().setVisible(heliodonSelected);
 
 				SceneManager.getInstance().updatePrintPreviewScene(false);
 				if (!doTheEndAnimation) { // to avoid concurrency exception
@@ -289,7 +290,7 @@ public class PrintController implements Updater {
 			if (shadowSelected)
 				SceneManager.getInstance().setShadow(false);
 			if (heliodonSelected)
-				SceneManager.getInstance().getHeliodon().setVisible(false);
+				Heliodon.getInstance().setVisible(false);
 		}
 	}
 

@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -70,6 +71,7 @@ public class Heliodon {
 	private static final int SUN_REGION_VERTICES = 8064 / 3;
 	private static final int SUN_PATH_VERTICES = 291 / 3;
 	private static final double TILT_ANGLE = 23.45 / 180.0 * Math.PI;
+	private static Heliodon instance;
 	private final Node root = new Node("Heliodon Root");
 	private final Mesh sun = new Sphere("Sun", 20, 20, 0.3);
 	private final DirectionalLight light;
@@ -91,6 +93,10 @@ public class Heliodon {
 	private boolean forceSunRegionOn = true;
 	private BloomRenderPass bloomRenderPass;
 	private final BasicPassManager passManager;
+
+	public static Heliodon getInstance() {
+		return instance;
+	}
 
 	public Heliodon(final Node scene, final DirectionalLight light, final BasicPassManager passManager, final LogicalLayer logicalLayer, final Date timeAndDate) {
 		this.light = light;
@@ -211,6 +217,8 @@ public class Heliodon {
 			setSunRegionAlwaysVisible(true);
 
 		draw();
+
+		instance = this;
 	}
 
 	private void initMouse(final LogicalLayer logicalLayer) {
@@ -589,6 +597,12 @@ public class Heliodon {
 			light.setDirection(Vector3.ZERO);
 		if (bloomRenderPass != null)
 			bloomRenderPass.setEnabled(enabled);
+		if (Config.EXPERIMENT && instance != null)
+			EnergyPanel.getInstance().computeSunEnergy();
+	}
+
+	public ReadOnlyVector3 getSunLocation() {
+		return sun.getTranslation();
 	}
 
 	public boolean isNightTime() {

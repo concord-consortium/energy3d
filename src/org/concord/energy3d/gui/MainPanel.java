@@ -688,7 +688,7 @@ public class MainPanel extends JPanel {
 				    	firstCall = false;
 				        return;
 				    }
-					final Heliodon heliodon = SceneManager.getInstance().getHeliodon();
+					final Heliodon heliodon = Heliodon.getInstance();
 					if (heliodon != null)
 						heliodon.setDate((Date) dateSpinner.getValue());
 					if (Config.EXPERIMENT)
@@ -718,7 +718,7 @@ public class MainPanel extends JPanel {
                     	firstCall = false;
                         return;
                     }
-					final Heliodon heliodon = SceneManager.getInstance().getHeliodon();
+					final Heliodon heliodon = Heliodon.getInstance();
 					if (heliodon != null)
 						heliodon.setTime((Date) timeSpinner.getValue());
 				}
@@ -811,7 +811,7 @@ public class MainPanel extends JPanel {
 			latitudeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
 				@Override
 				public void stateChanged(final javax.swing.event.ChangeEvent e) {
-					SceneManager.getInstance().getHeliodon().setObserverLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
+					Heliodon.getInstance().setObserverLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				}
 			});
 		}

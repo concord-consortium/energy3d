@@ -8,14 +8,12 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.StackedBarChart;
@@ -38,6 +36,10 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.shapes.Heliodon;
+
+import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -347,7 +349,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void run() {
 				final GridPane grid = new GridPane();
-				final Scene scene = new Scene(grid, 800, 400);
+				final javafx.scene.Scene scene = new javafx.scene.Scene(grid, 800, 400);
 				scene.getStylesheets().add("org/concord/energy3d/css/fx.css");
 				final NumberAxis yAxis = new NumberAxis(0, 100, 10);
 				final CategoryAxis xAxis = new CategoryAxis();
@@ -416,7 +418,7 @@ public class EnergyPanel extends JPanel {
 		double roofsArea = 0;
 
 		/* compute area */
-		for (final HousePart part : org.concord.energy3d.scene.Scene.getInstance().getParts()) {
+		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Wall)
 				wallsArea += part.computeArea();
 			else if (part instanceof Window)
@@ -440,7 +442,6 @@ public class EnergyPanel extends JPanel {
 
 		/* compute yearly energy loss */
 		double yearlyEnergyLoss = 0.0;
-		int totalDays = 0;
 		for (int i = 0; i < 12; i++) {
 			final double temperature = toCelsius(averageTemperature[i]);
 			final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - temperature;
@@ -452,16 +453,28 @@ public class EnergyPanel extends JPanel {
 				monthlyEnergyLoss += roofsArea * Double.parseDouble((String) roofsComboBox.getSelectedItem()) * deltaT;
 				monthlyEnergyLoss *= 24 * daysInMonth[i] / 1000.0;
 			}
-			totalDays += daysInMonth[i];
 			yearlyEnergyLoss += monthlyEnergyLoss;
 		}
-		System.out.println("Total days in year = " + totalDays);
 		final DecimalFormat decimalFormat = new DecimalFormat("###,###");
 		yearlyEnergyLossTextField.setText(decimalFormat.format(yearlyEnergyLoss));
 
 		/* compute yearly energy cost */
 		final double COST_PER_KWH = 0.13;
 		yearlyCostTextField.setText(decimalFormat.format(yearlyEnergyLoss * COST_PER_KWH));
+	}
+
+	public void computeSunEnergy() {
+		double totalEnergy = 0.0;
+		final ReadOnlyVector3 sunVector = Heliodon.getInstance().getSunLocation();
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Window) {
+				final ReadOnlyVector3 windowNormal = part.getContainer().getFaceDirection();
+				final double dot = windowNormal.dot(sunVector);
+				if (dot > 0)
+					totalEnergy += 1000 * part.computeArea() * dot;
+			}
+		}
+		System.out.println("Sun Energy =" + totalEnergy);
 	}
 
 	private double toCelsius(final double f) {
