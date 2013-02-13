@@ -391,22 +391,22 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateArea(final double walls, final double doors, final double windows, final double roofs) {
-		final double total = (walls + windows + doors + roofs) / 100.0;
-		final boolean isZero = total == 0.0;
-		wallsArea.setYValue(isZero ? 0 : walls / total);
-		doorsArea.setYValue(isZero ? 0 : doors / total);
-		windowsArea.setYValue(isZero ? 0 : windows / total);
-		roofsArea.setYValue(isZero ? 0 : roofs / total);
+		final double total = walls + windows + doors + roofs;
+		final boolean isZero = (total == 0.0);
+		wallsArea.setYValue(isZero ? 0 : walls / total * 100.0);
+		doorsArea.setYValue(isZero ? 0 : doors / total * 100.0);
+		windowsArea.setYValue(isZero ? 0 : windows / total * 100.0);
+		roofsArea.setYValue(isZero ? 0 : roofs / total * 100.0);
 	}
 
 	public void updateEnergyLoss(final double walls, final double doors, final double windows, final double roofs) {
-		final double total = Math.round(walls + windows + doors + roofs) / 100.0;
-		final boolean isZero = total == 0.0;
+		final double total = walls + windows + doors + roofs;
 		energyLossTextField.setText("" + total);
-		wallsEnergy.setYValue(isZero ? 0 : walls / total);
-		doorsEnergy.setYValue(isZero ? 0 : doors / total);
-		windowsEnergy.setYValue(isZero ? 0 : windows / total);
-		roofsEnergy.setYValue(isZero ? 0 : roofs / total);
+		final boolean isZero = (total == 0.0);
+		wallsEnergy.setYValue(isZero ? 0 : walls / total * 100.0);
+		doorsEnergy.setYValue(isZero ? 0 : doors / total * 100.0);
+		windowsEnergy.setYValue(isZero ? 0 : windows / total * 100.0);
+		roofsEnergy.setYValue(isZero ? 0 : roofs / total * 100.0);
 	}
 
 	public void computeAreaAndEnergy() {
