@@ -48,15 +48,20 @@ public class EnergyPanel extends JPanel {
 	private static final int[] daysInMonth = new int[] { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	private static final double COST_PER_KWH = 0.13;
 	private static final EnergyPanel instance = new EnergyPanel();
+	private final DecimalFormat decimalFormat = new DecimalFormat("###,###.##");
+	private double wallsArea;
+	private double doorsArea;
+	private double windowsArea;
+	private double roofsArea;
 	private final JFXPanel fxPanel;
-	private final XYChart.Data<String, Number> wallsArea = new XYChart.Data<String, Number>("Area", 0);
-	private final XYChart.Data<String, Number> windowsArea = new XYChart.Data<String, Number>("Area", 0);
-	private final XYChart.Data<String, Number> doorsArea = new XYChart.Data<String, Number>("Area", 0);
-	private final XYChart.Data<String, Number> roofsArea = new XYChart.Data<String, Number>("Area", 0);
-	private final XYChart.Data<String, Number> wallsEnergy = new XYChart.Data<String, Number>("Energy Loss", 0);
-	private final XYChart.Data<String, Number> windowsEnergy = new XYChart.Data<String, Number>("Energy Loss", 0);
-	private final XYChart.Data<String, Number> doorsEnergy = new XYChart.Data<String, Number>("Energy Loss", 0);
-	private final XYChart.Data<String, Number> roofsEnergy = new XYChart.Data<String, Number>("Energy Loss", 0);
+	private final XYChart.Data<String, Number> wallsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
+	private final XYChart.Data<String, Number> windowsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
+	private final XYChart.Data<String, Number> doorsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
+	private final XYChart.Data<String, Number> roofsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
+	private final XYChart.Data<String, Number> wallsEnergyChartData = new XYChart.Data<String, Number>("Energy Loss", 0);
+	private final XYChart.Data<String, Number> windowsEnergyChartData = new XYChart.Data<String, Number>("Energy Loss", 0);
+	private final XYChart.Data<String, Number> doorsEnergyChartData = new XYChart.Data<String, Number>("Energy Loss", 0);
+	private final XYChart.Data<String, Number> roofsEnergyChartData = new XYChart.Data<String, Number>("Energy Loss", 0);
 	private final JTextField heatingRateTextField;
 	private final JTextField insideTemperatureTextField;
 	private final JTextField outsideTemperatureTextField;
@@ -520,26 +525,26 @@ public class EnergyPanel extends JPanel {
 
 				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
 				series.setName("Walls");
-				series.getData().add(wallsArea);
-				series.getData().add(wallsEnergy);
+				series.getData().add(wallsAreaChartData);
+				series.getData().add(wallsEnergyChartData);
 				chart.getData().add(series);
 
 				series = new XYChart.Series<String, Number>();
 				series.setName("Doors");
-				series.getData().add(doorsArea);
-				series.getData().add(doorsEnergy);
+				series.getData().add(doorsAreaChartData);
+				series.getData().add(doorsEnergyChartData);
 				chart.getData().add(series);
 
 				series = new XYChart.Series<String, Number>();
 				series.setName("Windows");
-				series.getData().add(windowsArea);
-				series.getData().add(windowsEnergy);
+				series.getData().add(windowsAreaChartData);
+				series.getData().add(windowsEnergyChartData);
 				chart.getData().add(series);
 
 				series = new XYChart.Series<String, Number>();
 				series.setName("Roof");
-				series.getData().add(roofsArea);
-				series.getData().add(roofsEnergy);
+				series.getData().add(roofsAreaChartData);
+				series.getData().add(roofsEnergyChartData);
 				chart.getData().add(series);
 
 				// grid.setVgap(20);
@@ -554,29 +559,29 @@ public class EnergyPanel extends JPanel {
 	public void updateArea(final double walls, final double doors, final double windows, final double roofs) {
 		final double total = walls + windows + doors + roofs;
 		final boolean isZero = (total == 0.0);
-		wallsArea.setYValue(isZero ? 0 : walls / total * 100.0);
-		doorsArea.setYValue(isZero ? 0 : doors / total * 100.0);
-		windowsArea.setYValue(isZero ? 0 : windows / total * 100.0);
-		roofsArea.setYValue(isZero ? 0 : roofs / total * 100.0);
+		wallsAreaChartData.setYValue(isZero ? 0 : walls / total * 100.0);
+		doorsAreaChartData.setYValue(isZero ? 0 : doors / total * 100.0);
+		windowsAreaChartData.setYValue(isZero ? 0 : windows / total * 100.0);
+		roofsAreaChartData.setYValue(isZero ? 0 : roofs / total * 100.0);
 	}
 
 	public void updateEnergyLoss(final double walls, final double doors, final double windows, final double roofs) {
 		final double total = walls + windows + doors + roofs;
 		heatingRateTextField.setText("" + total);
 		final boolean isZero = (total == 0.0);
-		wallsEnergy.setYValue(isZero ? 0 : walls / total * 100.0);
-		doorsEnergy.setYValue(isZero ? 0 : doors / total * 100.0);
-		windowsEnergy.setYValue(isZero ? 0 : windows / total * 100.0);
-		roofsEnergy.setYValue(isZero ? 0 : roofs / total * 100.0);
+		wallsEnergyChartData.setYValue(isZero ? 0 : walls / total * 100.0);
+		doorsEnergyChartData.setYValue(isZero ? 0 : doors / total * 100.0);
+		windowsEnergyChartData.setYValue(isZero ? 0 : windows / total * 100.0);
+		roofsEnergyChartData.setYValue(isZero ? 0 : roofs / total * 100.0);
 	}
 
 	public void computeAreaAndEnergy() {
 		if (autoCheckBox.isSelected())
 			updateOutsideTemperature();
-		double wallsArea = 0;
-		double doorsArea = 0;
-		double windowsArea = 0;
-		double roofsArea = 0;
+		wallsArea = 0;
+		doorsArea = 0;
+		windowsArea = 0;
+		roofsArea = 0;
 
 		/* compute area */
 		for (final HousePart part : Scene.getInstance().getParts()) {
@@ -591,39 +596,53 @@ public class EnergyPanel extends JPanel {
 		}
 		updateArea(wallsArea, doorsArea, windowsArea, roofsArea);
 
-		/* compute energy loss rate */
-		{
-			final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - Double.parseDouble(outsideTemperatureTextField.getText());
-			final double wallsEnergyLoss = wallsArea * Double.parseDouble((String) wallsComboBox.getSelectedItem()) * deltaT;
-			final double doorsEnergyLoss = doorsArea * Double.parseDouble((String) doorsComboBox.getSelectedItem()) * deltaT;
-			final double windowsEnergyLoss = windowsArea * Double.parseDouble((String) windowsComboBox.getSelectedItem()) * deltaT;
-			final double roofsEnergyLoss = roofsArea * Double.parseDouble((String) roofsComboBox.getSelectedItem()) * deltaT;
-			updateEnergyLoss(wallsEnergyLoss, doorsEnergyLoss, windowsEnergyLoss, roofsEnergyLoss);
+		/* compute energy loss/gain rate and energy loss/gain today */
+		final double energyLossRate = computeEnergyLossRate(Double.parseDouble(insideTemperatureTextField.getText()) - Double.parseDouble(outsideTemperatureTextField.getText()), true);
+		final double energyLossToday = energyLossRate / 1000.0 * 24.0;
+
+		if (energyLossRate > 0.0) {
+			heatingRateTextField.setText(decimalFormat.format(energyLossRate));
+			coolingRateTextField.setText("0.0");
+			heatingTodayTextField.setText(decimalFormat.format(energyLossToday));
+			coolingTodayTextField.setText("0.0");
+		} else {
+			coolingRateTextField.setText(decimalFormat.format(-energyLossRate));
+			heatingRateTextField.setText("0.0");
+			coolingTodayTextField.setText(decimalFormat.format(-energyLossToday));
+			heatingTodayTextField.setText("0.0");
 		}
 
 		/* compute yearly energy loss */
 		double yearlyEnergyLoss = 0.0;
+		double yearlyEnergyGain = 0.0;
 		for (int i = 0; i < 12; i++) {
 			final double temperature = toCelsius(averageTemperature[i]);
 			final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - temperature;
-			double monthlyEnergyLoss = 0;
-			if (deltaT > 0) {
-				monthlyEnergyLoss = wallsArea * Double.parseDouble((String) wallsComboBox.getSelectedItem()) * deltaT;
-				monthlyEnergyLoss += doorsArea * Double.parseDouble((String) doorsComboBox.getSelectedItem()) * deltaT;
-				monthlyEnergyLoss += windowsArea * Double.parseDouble((String) windowsComboBox.getSelectedItem()) * deltaT;
-				monthlyEnergyLoss += roofsArea * Double.parseDouble((String) roofsComboBox.getSelectedItem()) * deltaT;
-				monthlyEnergyLoss *= 24 * daysInMonth[i] / 1000.0;
-			}
-			yearlyEnergyLoss += monthlyEnergyLoss;
+			final double monthlyEnergy = computeEnergyLossRate(deltaT, false) / 1000.0 * 24.0 * daysInMonth[i];
+			if (monthlyEnergy > 0.0)
+				yearlyEnergyLoss += monthlyEnergy;
+			else
+				yearlyEnergyGain += -monthlyEnergy;
 		}
-		final DecimalFormat decimalFormat = new DecimalFormat("###,###");
 		heatingYearlyTextField.setText(decimalFormat.format(yearlyEnergyLoss));
+		coolingYearlyTextField.setText(decimalFormat.format(yearlyEnergyGain));
 
 		/* compute yearly energy cost */
 		heatingCostTextField.setText(decimalFormat.format(yearlyEnergyLoss * COST_PER_KWH));
+		coolingCostTextField.setText(decimalFormat.format(yearlyEnergyGain * COST_PER_KWH));
 
 		computeSolarEnergyToday();
 		computeSolarEnergyYearly();
+	}
+
+	public double computeEnergyLossRate(final double deltaT, final boolean draw) {
+		final double wallsEnergyLoss = wallsArea * Double.parseDouble((String) wallsComboBox.getSelectedItem()) * deltaT;
+		final double doorsEnergyLoss = doorsArea * Double.parseDouble((String) doorsComboBox.getSelectedItem()) * deltaT;
+		final double windowsEnergyLoss = windowsArea * Double.parseDouble((String) windowsComboBox.getSelectedItem()) * deltaT;
+		final double roofsEnergyLoss = roofsArea * Double.parseDouble((String) roofsComboBox.getSelectedItem()) * deltaT;
+		if (draw)
+			updateEnergyLoss(wallsEnergyLoss, doorsEnergyLoss, windowsEnergyLoss, roofsEnergyLoss);
+		return wallsEnergyLoss + doorsEnergyLoss + windowsEnergyLoss + roofsEnergyLoss;
 	}
 
 	public void computeSolarEnergyRate() {
