@@ -598,7 +598,7 @@ public class Heliodon {
 		if (bloomRenderPass != null)
 			bloomRenderPass.setEnabled(enabled);
 		if (Config.EXPERIMENT && instance != null)
-			EnergyPanel.getInstance().computeSunEnergy();
+			EnergyPanel.getInstance().computeSolarEnergyRate();
 	}
 
 	public ReadOnlyVector3 getSunLocation() {

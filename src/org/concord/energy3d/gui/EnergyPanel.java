@@ -622,7 +622,7 @@ public class EnergyPanel extends JPanel {
 		solarCostTextField.setText(decimalFormat.format(yearlyEnergyLoss * COST_PER_KWH));
 	}
 
-	public void computeSunEnergy() {
+	public void computeSolarEnergyRate() {
 		double totalEnergy = 0.0;
 		final ReadOnlyVector3 sunVector = Heliodon.getInstance().getSunLocation();
 		for (final HousePart part : Scene.getInstance().getParts()) {
