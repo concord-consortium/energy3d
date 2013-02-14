@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 
 import javafx.application.Platform;
@@ -45,6 +46,7 @@ public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
 	private static final int[] daysInMonth = new int[] { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	private static final double COST_PER_KWH = 0.13;
 	private static final EnergyPanel instance = new EnergyPanel();
 	private final JFXPanel fxPanel;
 	private final XYChart.Data<String, Number> wallsArea = new XYChart.Data<String, Number>("Area", 0);
@@ -618,22 +620,61 @@ public class EnergyPanel extends JPanel {
 		heatingYearlyTextField.setText(decimalFormat.format(yearlyEnergyLoss));
 
 		/* compute yearly energy cost */
-		final double COST_PER_KWH = 0.13;
-		solarCostTextField.setText(decimalFormat.format(yearlyEnergyLoss * COST_PER_KWH));
+		heatingCostTextField.setText(decimalFormat.format(yearlyEnergyLoss * COST_PER_KWH));
+
+		computeSolarEnergyToday();
+		computeSolarEnergyYearly();
 	}
 
 	public void computeSolarEnergyRate() {
-		double totalEnergy = 0.0;
 		final ReadOnlyVector3 sunVector = Heliodon.getInstance().getSunLocation();
+		final double totalRate = computeSolarEnergyRate(sunVector);
+		solarRateTextField.setText("" + totalRate);
+	}
+
+	public double computeSolarEnergyRate(final ReadOnlyVector3 sunVector) {
+		double totalRate = 0.0;
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Window) {
-				final ReadOnlyVector3 windowNormal = part.getContainer().getFaceDirection();
-				final double dot = windowNormal.dot(sunVector);
-				if (dot > 0)
-					totalEnergy += 1000 * part.computeArea() * dot;
+				final double dot = part.getContainer().getFaceDirection().dot(sunVector);
+				if (dot > 0.0)
+					totalRate += 1000.0 * part.computeArea() * dot;
 			}
 		}
-		System.out.println("Sun Energy =" + totalEnergy);
+		return totalRate;
+	}
+
+	public void computeSolarEnergyToday() {
+		final Calendar today = Calendar.getInstance();
+		final double totalRateToday = computeSolarEnergyToday(today);
+		solarTodayTextField.setText("" + totalRateToday / 1000.0 / 24.0);
+	}
+
+	public double computeSolarEnergyToday(final Calendar today) {
+		double totalRateToday = 0.0;
+		final Heliodon heliodon = Heliodon.getInstance();
+		today.set(Calendar.SECOND, 0);
+		today.set(Calendar.MINUTE, 0);
+		today.set(Calendar.HOUR, 0);
+		for (int i = 0; i < 24; i++) {
+			heliodon.setTime(today.getTime());
+			totalRateToday += computeSolarEnergyRate(heliodon.getSunLocation());
+			today.add(Calendar.HOUR, 1);
+		}
+		return totalRateToday / 1000.0 / 24.0;
+	}
+
+	public void computeSolarEnergyYearly() {
+		double totalEnergyYearly = 0.0;
+		final Calendar date = Calendar.getInstance();
+		date.set(Calendar.DAY_OF_MONTH, 0);
+		date.set(Calendar.MONTH, 0);
+		for (int monthIndex = 0; monthIndex < 11; monthIndex++) {
+			totalEnergyYearly += computeSolarEnergyToday(date) * daysInMonth[monthIndex];
+			date.add(Calendar.MONTH, 1);
+		}
+		solarYearlyTextField.setText("" + totalEnergyYearly);
+		solarCostTextField.setText("$" + totalEnergyYearly * COST_PER_KWH);
 	}
 
 	private double toCelsius(final double f) {
