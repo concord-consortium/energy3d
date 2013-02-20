@@ -304,11 +304,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.add(Scene.getRoot());
 		shadowPass.addOccluder(Scene.getRoot());
 
-		final Date today = Calendar.getInstance().getTime();
-		new Heliodon(root, light, passManager, logicalLayer, today);
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
+				final Date today = Calendar.getInstance().getTime();
+				new Heliodon(root, light, passManager, logicalLayer, today);
 				MainPanel.getInstance().getDateSpinner().setValue(today);
 				MainPanel.getInstance().getTimeSpinner().setValue(today);
 				return null;

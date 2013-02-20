@@ -81,13 +81,12 @@ public class Heliodon {
 	private final Mesh base;
 	private final Mesh baseTicks;
 	private final Calendar calendar = Calendar.getInstance();
-	private double baseAngle = 0;
+	private final double baseAngle = 0;
 	private double hourAngle;
 	private double declinationAngle;
 	private double observerLatitude;
 	private boolean sunGrabbed = false;
 	private boolean selectDifferentDeclinationWithMouse = false;
-	private boolean lock = false;
 	private boolean dirtySunRegion = false;
 	private boolean dirtySunPath = false;
 	private boolean forceSunRegionOn = true;
@@ -231,7 +230,7 @@ public class Heliodon {
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				lock = true;
+//				lock = true;
 				final int x = inputStates.getCurrent().getMouseState().getX();
 				final int y = inputStates.getCurrent().getMouseState().getY();
 				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
@@ -256,7 +255,7 @@ public class Heliodon {
 				if (!forceSunRegionOn)
 					sunRegion.getSceneHints().setCullHint(CullHint.Always);
 				SceneManager.getInstance().setMouseControlEnabled(true);
-				lock = false;
+//				lock = false;
 			}
 		}));
 
@@ -360,8 +359,11 @@ public class Heliodon {
 				final boolean hourAngleChanged = Math.abs(newHourAngle - hourAngle) > MathUtils.EPSILON;
 				if (hourAngleChanged)
 					setHourAngle(newHourAngle, false, true);
-				if (declinationChanged || hourAngleChanged)
+				if (declinationChanged || hourAngleChanged) {
 					setSunLocation(newSunLocation);
+					if (Config.EXPERIMENT)
+						EnergyPanel.getInstance().computeAreaAndEnergy();
+				}
 			}
 		}));
 	}
@@ -372,12 +374,6 @@ public class Heliodon {
 
 	public double getBaseAngle() {
 		return baseAngle;
-	}
-
-	public void setBaseAngle(final double baseAngle) {
-		this.baseAngle = baseAngle % 360;
-		root.setRotation(new Matrix3().fromAngleAxis(baseAngle * Math.PI / 180, Vector3.UNIT_Z));
-		drawSun();
 	}
 
 	public double getHourAngle() {
@@ -597,8 +593,10 @@ public class Heliodon {
 			light.setDirection(Vector3.ZERO);
 		if (bloomRenderPass != null)
 			bloomRenderPass.setEnabled(enabled);
-		if (Config.EXPERIMENT && instance != null)
-			EnergyPanel.getInstance().computeSolarEnergyRate();
+	}
+
+	public ReadOnlyVector3 computeSunLocation(final Calendar calendar) {
+		return computeSunLocation(computeHourAngle(calendar), computeDeclinationAngle(calendar), observerLatitude);
 	}
 
 	public ReadOnlyVector3 getSunLocation() {
@@ -622,31 +620,33 @@ public class Heliodon {
 	}
 
 	public void setTime(final Date time) {
-		if (lock)
-			return;
 		final Calendar timeCalendar = Calendar.getInstance();
 		timeCalendar.setTime(time);
 		calendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
 		calendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
+		setHourAngle(computeHourAngle(calendar), true, false);
+	}
 
+	private double computeHourAngle(final Calendar calendar) {
 		final int minutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE) - 12 * 60;
-		setHourAngle(minutes / (12.0 * 60.0) * Math.PI, true, false);
+		final double hourAngle = minutes / (12.0 * 60.0) * Math.PI;
+		return hourAngle;
 	}
 
 	public void setDate(final Date date) {
-		if (lock)
-			return;
 		final Calendar dateCalendar = Calendar.getInstance();
 		dateCalendar.setTime(date);
 		calendar.set(dateCalendar.get(Calendar.YEAR), dateCalendar.get(Calendar.MONTH), dateCalendar.get(Calendar.DAY_OF_MONTH));
-
-		final int days = calendar.get(Calendar.DAY_OF_YEAR);
-		setDeclinationAngle(TILT_ANGLE * MathUtils.sin(MathUtils.TWO_PI * (284 + days) / 365.25), true, false);
-
+		setDeclinationAngle(computeDeclinationAngle(calendar), true, false);
 		dirtySunPath = true;
-
 		if (SceneManager.getInstance() != null)
 			SceneManager.getInstance().refresh();
+	}
+
+	private double computeDeclinationAngle(final Calendar calendar) {
+		final int days = calendar.get(Calendar.DAY_OF_YEAR);
+		final double declinationAngle = TILT_ANGLE * MathUtils.sin(MathUtils.TWO_PI * (284 + days) / 365.25);
+		return declinationAngle;
 	}
 
 	public void update() {
@@ -656,7 +656,6 @@ public class Heliodon {
 			drawSunPath();
 			drawSun();
 		}
-
 	}
 
 	public void setSunRegionAlwaysVisible(final boolean forceSunRegionOn) {
@@ -665,5 +664,9 @@ public class Heliodon {
 			sunRegion.getSceneHints().setCullHint(CullHint.Inherit);
 		else
 			sunRegion.getSceneHints().setCullHint(CullHint.Always);
+	}
+
+	public Calendar getCalander() {
+		return calendar;
 	}
 }

@@ -46,12 +46,15 @@ public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
 	private static final int[] daysInMonth = new int[] { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	private static final int[] heatingDegreeDays = new int[] { 652, 523, 414, 294, 181, 101, 12, 10, 102, 235, 468, 540 };
+	private static final int[] coolingDegreeDays = new int[] { 0, 0, 4, 7, 9, 48, 98, 90, 16, 2, 0, 0 };
 	private static final double COST_PER_KWH = 0.13;
 	private static final EnergyPanel instance = new EnergyPanel();
 	private final DecimalFormat decimalFormat = new DecimalFormat("###,###.##");
 	private final EnergyAmount solar = new EnergyAmount();
 	private final EnergyAmount heating = new EnergyAmount();
 	private final EnergyAmount cooling = new EnergyAmount();
+	private final double[] solarEnergyArray = new double[12];
 	private double wallsArea;
 	private double doorsArea;
 	private double windowsArea;
@@ -588,6 +591,11 @@ public class EnergyPanel extends JPanel {
 	public void computeAreaAndEnergy() {
 		if (autoCheckBox.isSelected())
 			updateOutsideTemperature();
+
+		computeSolarEnergyRate();
+		computeSolarEnergyToday();
+		computeSolarEnergyYearly();
+
 		wallsArea = 0;
 		doorsArea = 0;
 		windowsArea = 0;
@@ -614,29 +622,35 @@ public class EnergyPanel extends JPanel {
 			heating.rate = energyLossRate;
 			cooling.rate = 0.0;
 			heatingRateTextField.setText(decimalFormat.format(energyLossRate));
-			coolingRateTextField.setText("0.0");
+			coolingRateTextField.setText("0");
 			heatingTodayTextField.setText(decimalFormat.format(energyLossToday));
-			coolingTodayTextField.setText("0.0");
+			coolingTodayTextField.setText("0");
 		} else {
 			cooling.rate = -energyLossRate;
 			heating.rate = 0.0;
-			coolingRateTextField.setText(decimalFormat.format(-energyLossRate));
-			heatingRateTextField.setText("0.0");
-			coolingTodayTextField.setText(decimalFormat.format(-energyLossToday));
-			heatingTodayTextField.setText("0.0");
+			coolingRateTextField.setText(decimalFormat.format(energyLossRate == 0.0 ? 0.0 : -energyLossRate));
+			heatingRateTextField.setText("0");
+			coolingTodayTextField.setText(decimalFormat.format(energyLossToday == 0.0 ? 0.0 : -energyLossToday));
+			heatingTodayTextField.setText("0");
 		}
 
 		/* compute yearly energy loss */
 		double yearlyEnergyLoss = 0.0;
 		double yearlyEnergyGain = 0.0;
+		double yearlyTotal = 0.0;
 		for (int i = 0; i < 12; i++) {
-			final double temperature = toCelsius(averageTemperature[i]);
-			final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - temperature;
-			final double monthlyEnergy = computeEnergyLossRate(deltaT, false) / 1000.0 * 24.0 * daysInMonth[i];
-			if (monthlyEnergy > 0.0)
-				yearlyEnergyLoss += monthlyEnergy;
-			else
-				yearlyEnergyGain += -monthlyEnergy;
+//			final double temperature = toCelsius(averageTemperature[i]);
+//			final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - temperature;
+//			final double monthlyEnergy = computeEnergyLossRate(deltaT, false) / 1000.0 * 24.0 * daysInMonth[i];
+//			if (monthlyEnergy > 0.0)
+//				yearlyEnergyLoss += monthlyEnergy;
+//			else
+//				yearlyEnergyGain += -monthlyEnergy;
+			final double monthlyEnergyLoss = computeEnergyLossRate(heatingDegreeDays[i], false) / 1000.0 * 24.0;
+			final double monthlyEnergyGain = computeEnergyLossRate(coolingDegreeDays[i], false) / 1000.0 * 24.0;
+			yearlyEnergyLoss += monthlyEnergyLoss;
+			yearlyEnergyGain += monthlyEnergyGain;
+			yearlyTotal += addEnergy(solarEnergyArray[i], monthlyEnergyLoss, monthlyEnergyGain);
 		}
 		heating.yearly = yearlyEnergyLoss;
 		cooling.yearly = yearlyEnergyGain;
@@ -649,18 +663,19 @@ public class EnergyPanel extends JPanel {
 		heatingCostTextField.setText(decimalFormat.format(heating.cost));
 		coolingCostTextField.setText(decimalFormat.format(cooling.cost));
 
-		computeSolarEnergyRate();
-		computeSolarEnergyToday();
-		computeSolarEnergyYearly();
 
-		totalRateTextField.setText(decimalFormat.format(solar.rate + heating.rate + cooling.rate));
-		totalTodayTextField.setText(decimalFormat.format(solar.today + heating.today + cooling.today));
-		totalYearlyTextField.setText(decimalFormat.format(solar.rate + heating.rate + cooling.rate));
-		totalRateTextField.setText(decimalFormat.format(solar.rate + heating.rate + cooling.rate));
+		totalRateTextField.setText(decimalFormat.format(addEnergy(solar.rate, heating.rate, cooling.rate)));
+		totalTodayTextField.setText(decimalFormat.format(addEnergy(solar.today, heating.today, cooling.today)));
+		totalYearlyTextField.setText(decimalFormat.format(yearlyTotal));
+		totalCostTextField.setText(decimalFormat.format(yearlyTotal * COST_PER_KWH));
 
 	}
 
-	public double computeEnergyLossRate(final double deltaT, final boolean draw) {
+	public double addEnergy(final double solar, final double heating, final double cooling) {
+		return Math.max(0.0, heating - solar) + cooling + solar;
+	}
+
+	private double computeEnergyLossRate(final double deltaT, final boolean draw) {
 		final double wallsEnergyLoss = wallsArea * Double.parseDouble((String) wallsComboBox.getSelectedItem()) * deltaT;
 		final double doorsEnergyLoss = doorsArea * Double.parseDouble((String) doorsComboBox.getSelectedItem()) * deltaT;
 		final double windowsEnergyLoss = windowsArea * Double.parseDouble((String) windowsComboBox.getSelectedItem()) * deltaT;
@@ -670,12 +685,14 @@ public class EnergyPanel extends JPanel {
 		return wallsEnergyLoss + doorsEnergyLoss + windowsEnergyLoss + roofsEnergyLoss;
 	}
 
-	public void computeSolarEnergyRate() {
-		solar.rate = computeSolarEnergyRate(Heliodon.getInstance().getSunLocation());
+	private void computeSolarEnergyRate() {
+		solar.rate = computeSolarEnergyRate(Heliodon.getInstance().getSunLocation().normalize(null));
 		solarRateTextField.setText(decimalFormat.format(solar.rate));
 	}
 
-	public double computeSolarEnergyRate(final ReadOnlyVector3 sunVector) {
+	private double computeSolarEnergyRate(final ReadOnlyVector3 sunVector) {
+		if (sunVector.getZ() <= 0.0)
+			return 0.0;
 		double totalRate = 0.0;
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Window) {
@@ -687,32 +704,32 @@ public class EnergyPanel extends JPanel {
 		return totalRate;
 	}
 
-	public void computeSolarEnergyToday() {
-		solar.today = computeSolarEnergyToday(Calendar.getInstance());
+	private void computeSolarEnergyToday() {
+		solar.today = computeSolarEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		solarTodayTextField.setText(decimalFormat.format(solar.today));
 	}
 
-	public double computeSolarEnergyToday(final Calendar today) {
+	private double computeSolarEnergyToday(final Calendar today) {
 		double totalRateToday = 0.0;
 		final Heliodon heliodon = Heliodon.getInstance();
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR, 0);
 		for (int i = 0; i < 24; i++) {
-			heliodon.setTime(today.getTime());
-			totalRateToday += computeSolarEnergyRate(heliodon.getSunLocation());
+			totalRateToday += computeSolarEnergyRate(heliodon.computeSunLocation(today));
 			today.add(Calendar.HOUR, 1);
 		}
 		return totalRateToday / 1000.0 / 24.0;
 	}
 
-	public void computeSolarEnergyYearly() {
+	private void computeSolarEnergyYearly() {
 		double totalEnergyYearly = 0.0;
 		final Calendar date = Calendar.getInstance();
 		date.set(Calendar.DAY_OF_MONTH, 0);
 		date.set(Calendar.MONTH, 0);
 		for (int monthIndex = 0; monthIndex < 11; monthIndex++) {
-			totalEnergyYearly += computeSolarEnergyToday(date) * daysInMonth[monthIndex];
+			solarEnergyArray[monthIndex] = computeSolarEnergyToday(date) * daysInMonth[monthIndex];
+			totalEnergyYearly += solarEnergyArray[monthIndex];
 			date.add(Calendar.MONTH, 1);
 		}
 		solar.yearly = totalEnergyYearly;
