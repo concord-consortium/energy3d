@@ -29,6 +29,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
@@ -50,7 +51,9 @@ public class EnergyPanel extends JPanel {
 	private static final int[] coolingDegreeDays = new int[] { 0, 0, 4, 7, 9, 48, 98, 90, 16, 2, 0, 0 };
 	private static final double COST_PER_KWH = 0.13;
 	private static final EnergyPanel instance = new EnergyPanel();
-	private final DecimalFormat decimalFormat = new DecimalFormat("###,###.##");
+	private final DecimalFormat twoDecimals = new DecimalFormat("###,###.##");
+	private final DecimalFormat noDecimals = new DecimalFormat("###,###");
+	private final DecimalFormat moneyDecimals = new DecimalFormat("$###,###");
 	private final EnergyAmount solar = new EnergyAmount();
 	private final EnergyAmount heating = new EnergyAmount();
 	private final EnergyAmount cooling = new EnergyAmount();
@@ -104,18 +107,92 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private EnergyPanel() {
-		setMinimumSize(new Dimension(230, 0));
-		setPreferredSize(new Dimension(230, 388));
+		setMinimumSize(new Dimension(250, 0));
+		setPreferredSize(new Dimension(250, 388));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+		final JPanel panel = new JPanel();
+		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature Today (C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(panel);
+		final GridBagLayout gbl_panel = new GridBagLayout();
+		panel.setLayout(gbl_panel);
+
+		autoCheckBox = new JCheckBox("Auto");
+		autoCheckBox.setSelected(true);
+		autoCheckBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final boolean selected = autoCheckBox.isSelected();
+				insideTemperatureTextField.setEnabled(!selected);
+				outsideTemperatureTextField.setEnabled(!selected);
+				if (selected) {
+					insideTemperatureTextField.setText("20");
+					updateOutsideTemperature();
+				}
+				computeEnergy();
+			}
+		});
+		final GridBagConstraints gbc_autoCheckBox = new GridBagConstraints();
+		gbc_autoCheckBox.insets = new Insets(0, 0, 0, 5);
+		gbc_autoCheckBox.gridx = 0;
+		gbc_autoCheckBox.gridy = 0;
+		panel.add(autoCheckBox, gbc_autoCheckBox);
+
+		final JLabel insideTemperatureLabel = new JLabel("Inside:");
+		final GridBagConstraints gbc_insideTemperatureLabel = new GridBagConstraints();
+		gbc_insideTemperatureLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_insideTemperatureLabel.gridx = 1;
+		gbc_insideTemperatureLabel.gridy = 0;
+		panel.add(insideTemperatureLabel, gbc_insideTemperatureLabel);
+
+		insideTemperatureTextField = new JTextField();
+		insideTemperatureTextField.setEnabled(false);
+		insideTemperatureTextField.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				computeEnergy();
+			}
+		});
+		insideTemperatureTextField.setText("20");
+		final GridBagConstraints gbc_insideTemperatureTextField = new GridBagConstraints();
+		gbc_insideTemperatureTextField.insets = new Insets(0, 0, 0, 5);
+		gbc_insideTemperatureTextField.gridx = 2;
+		gbc_insideTemperatureTextField.gridy = 0;
+		panel.add(insideTemperatureTextField, gbc_insideTemperatureTextField);
+		insideTemperatureTextField.setColumns(4);
+
+		final JLabel outsideTemperatureLabel = new JLabel("Outside:");
+		final GridBagConstraints gbc_outsideTemperatureLabel = new GridBagConstraints();
+		gbc_outsideTemperatureLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_outsideTemperatureLabel.gridx = 3;
+		gbc_outsideTemperatureLabel.gridy = 0;
+		panel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
+
+		outsideTemperatureTextField = new JTextField();
+		outsideTemperatureTextField.setEnabled(false);
+		outsideTemperatureTextField.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				computeEnergy();
+			}
+		});
+		outsideTemperatureTextField.setText("10");
+		final GridBagConstraints gbc_outsideTemperatureTextField = new GridBagConstraints();
+		gbc_outsideTemperatureTextField.gridx = 4;
+		gbc_outsideTemperatureTextField.gridy = 0;
+		panel.add(outsideTemperatureTextField, gbc_outsideTemperatureTextField);
+		outsideTemperatureTextField.setColumns(4);
+
+		panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel.getPreferredSize().height));
 
 		final JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel_1);
 		final GridBagLayout gbl_panel_1 = new GridBagLayout();
-		gbl_panel_1.columnWeights = new double[] { 0.0, 1.0, 1.0, 1.0, 1.0 };
 		panel_1.setLayout(gbl_panel_1);
 
 		final JLabel solarLabel = new JLabel("Solar");
+		solarLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_solarLabel = new GridBagConstraints();
 		gbc_solarLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_solarLabel.gridx = 1;
@@ -123,6 +200,7 @@ public class EnergyPanel extends JPanel {
 		panel_1.add(solarLabel, gbc_solarLabel);
 
 		final JLabel heatingLabel = new JLabel("Heating");
+		heatingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_heatingLabel = new GridBagConstraints();
 		gbc_heatingLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_heatingLabel.gridx = 2;
@@ -130,6 +208,7 @@ public class EnergyPanel extends JPanel {
 		panel_1.add(heatingLabel, gbc_heatingLabel);
 
 		final JLabel coolingLabel = new JLabel("Cooling");
+		coolingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_coolingLabel = new GridBagConstraints();
 		gbc_coolingLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_coolingLabel.gridx = 3;
@@ -137,23 +216,25 @@ public class EnergyPanel extends JPanel {
 		panel_1.add(coolingLabel, gbc_coolingLabel);
 
 		final JLabel totalLabel = new JLabel("Total");
+		totalLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_totalLabel = new GridBagConstraints();
 		gbc_totalLabel.insets = new Insets(0, 0, 5, 0);
 		gbc_totalLabel.gridx = 4;
 		gbc_totalLabel.gridy = 0;
 		panel_1.add(totalLabel, gbc_totalLabel);
 
-		final JLabel rateLabel = new JLabel("Rate (watts):");
-		final GridBagConstraints gbc_rateLabel = new GridBagConstraints();
-		gbc_rateLabel.anchor = GridBagConstraints.WEST;
-		gbc_rateLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_rateLabel.gridx = 0;
-		gbc_rateLabel.gridy = 1;
-		panel_1.add(rateLabel, gbc_rateLabel);
+		final JLabel nowLabel = new JLabel("Now (watts):");
+		final GridBagConstraints gbc_nowLabel = new GridBagConstraints();
+		gbc_nowLabel.anchor = GridBagConstraints.WEST;
+		gbc_nowLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_nowLabel.gridx = 0;
+		gbc_nowLabel.gridy = 1;
+		panel_1.add(nowLabel, gbc_nowLabel);
 
 		solarRateTextField = new JTextField();
 		solarRateTextField.setEditable(false);
 		final GridBagConstraints gbc_solarRateTextField = new GridBagConstraints();
+		gbc_solarRateTextField.weightx = 1.0;
 		gbc_solarRateTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_solarRateTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_solarRateTextField.gridx = 1;
@@ -163,6 +244,7 @@ public class EnergyPanel extends JPanel {
 
 		heatingRateTextField = new JTextField();
 		final GridBagConstraints gbc_heatingRateTextField = new GridBagConstraints();
+		gbc_heatingRateTextField.weightx = 1.0;
 		gbc_heatingRateTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_heatingRateTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_heatingRateTextField.gridx = 2;
@@ -174,6 +256,7 @@ public class EnergyPanel extends JPanel {
 		coolingRateTextField = new JTextField();
 		coolingRateTextField.setEditable(false);
 		final GridBagConstraints gbc_coolingRateTextField = new GridBagConstraints();
+		gbc_coolingRateTextField.weightx = 1.0;
 		gbc_coolingRateTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_coolingRateTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_coolingRateTextField.gridx = 3;
@@ -184,6 +267,7 @@ public class EnergyPanel extends JPanel {
 		totalRateTextField = new JTextField();
 		totalRateTextField.setEditable(false);
 		final GridBagConstraints gbc_totalRateTextField = new GridBagConstraints();
+		gbc_totalRateTextField.weightx = 1.0;
 		gbc_totalRateTextField.insets = new Insets(0, 0, 5, 0);
 		gbc_totalRateTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_totalRateTextField.gridx = 4;
@@ -336,6 +420,11 @@ public class EnergyPanel extends JPanel {
 		panel_1.add(totalCostTextField, gbc_totalCostTextField);
 		totalCostTextField.setColumns(10);
 
+		final Dimension size = heatingLabel.getMinimumSize();
+		coolingLabel.setMinimumSize(size);
+		solarLabel.setMinimumSize(size);
+		totalLabel.setMinimumSize(size);
+
 		fxPanel = new JFXPanel();
 		final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
 		fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
@@ -344,74 +433,9 @@ public class EnergyPanel extends JPanel {
 		gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_fxPanel.gridx = 0;
 		gbc_fxPanel.gridy = 1;
+
 		if (true)
 			add(fxPanel, gbc_fxPanel);
-
-		final JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature (C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(panel);
-		final GridBagLayout gbl_panel = new GridBagLayout();
-		panel.setLayout(gbl_panel);
-
-		autoCheckBox = new JCheckBox("Auto outside temperature");
-		autoCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				computeAreaAndEnergy();
-			}
-		});
-		final GridBagConstraints gbc_autoCheckBox = new GridBagConstraints();
-		gbc_autoCheckBox.insets = new Insets(0, 0, 5, 5);
-		gbc_autoCheckBox.gridwidth = 4;
-		gbc_autoCheckBox.gridx = 0;
-		gbc_autoCheckBox.gridy = 0;
-		panel.add(autoCheckBox, gbc_autoCheckBox);
-
-		final JLabel insideTemperatureLabel = new JLabel("Inside:");
-		final GridBagConstraints gbc_insideTemperatureLabel = new GridBagConstraints();
-		gbc_insideTemperatureLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_insideTemperatureLabel.gridx = 0;
-		gbc_insideTemperatureLabel.gridy = 1;
-		panel.add(insideTemperatureLabel, gbc_insideTemperatureLabel);
-
-		insideTemperatureTextField = new JTextField();
-		insideTemperatureTextField.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				computeAreaAndEnergy();
-			}
-		});
-		insideTemperatureTextField.setText("21");
-		final GridBagConstraints gbc_insideTemperatureTextField = new GridBagConstraints();
-		gbc_insideTemperatureTextField.insets = new Insets(0, 0, 5, 5);
-		gbc_insideTemperatureTextField.gridx = 1;
-		gbc_insideTemperatureTextField.gridy = 1;
-		panel.add(insideTemperatureTextField, gbc_insideTemperatureTextField);
-		insideTemperatureTextField.setColumns(4);
-
-		final JLabel outsideTemperatureLabel = new JLabel("Outside:");
-		final GridBagConstraints gbc_outsideTemperatureLabel = new GridBagConstraints();
-		gbc_outsideTemperatureLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_outsideTemperatureLabel.gridx = 2;
-		gbc_outsideTemperatureLabel.gridy = 1;
-		panel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
-
-		outsideTemperatureTextField = new JTextField();
-		outsideTemperatureTextField.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				computeAreaAndEnergy();
-			}
-		});
-		outsideTemperatureTextField.setText("10");
-		final GridBagConstraints gbc_outsideTemperatureTextField = new GridBagConstraints();
-		gbc_outsideTemperatureTextField.insets = new Insets(0, 0, 5, 5);
-		gbc_outsideTemperatureTextField.gridx = 3;
-		gbc_outsideTemperatureTextField.gridy = 1;
-		panel.add(outsideTemperatureTextField, gbc_outsideTemperatureTextField);
-		outsideTemperatureTextField.setColumns(4);
-
-		panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel.getPreferredSize().height));
 
 		final JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor (W/m2/C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -431,7 +455,7 @@ public class EnergyPanel extends JPanel {
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				computeAreaAndEnergy();
+				computeEnergy();
 			}
 		});
 		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.28" }));
@@ -455,7 +479,7 @@ public class EnergyPanel extends JPanel {
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				computeAreaAndEnergy();
+				computeEnergy();
 			}
 		});
 		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.14" }));
@@ -479,7 +503,7 @@ public class EnergyPanel extends JPanel {
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				computeAreaAndEnergy();
+				computeEnergy();
 			}
 		});
 		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.89" }));
@@ -503,7 +527,7 @@ public class EnergyPanel extends JPanel {
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				computeAreaAndEnergy();
+				computeEnergy();
 			}
 		});
 		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.14" }));
@@ -588,7 +612,7 @@ public class EnergyPanel extends JPanel {
 		roofsEnergyChartData.setYValue(isZero ? 0 : roofs / total * 100.0);
 	}
 
-	public void computeAreaAndEnergy() {
+	public void computeEnergy() {
 		if (autoCheckBox.isSelected())
 			updateOutsideTemperature();
 
@@ -621,16 +645,20 @@ public class EnergyPanel extends JPanel {
 		if (energyLossRate > 0.0) {
 			heating.rate = energyLossRate;
 			cooling.rate = 0.0;
-			heatingRateTextField.setText(decimalFormat.format(energyLossRate));
+			heating.today = energyLossToday;
+			cooling.today = 0.0;
+			heatingRateTextField.setText(noDecimals.format(energyLossRate));
 			coolingRateTextField.setText("0");
-			heatingTodayTextField.setText(decimalFormat.format(energyLossToday));
+			heatingTodayTextField.setText(twoDecimals.format(energyLossToday));
 			coolingTodayTextField.setText("0");
 		} else {
 			cooling.rate = -energyLossRate;
 			heating.rate = 0.0;
-			coolingRateTextField.setText(decimalFormat.format(energyLossRate == 0.0 ? 0.0 : -energyLossRate));
+			cooling.today = -energyLossToday;
+			heating.today = 0.0;
+			coolingRateTextField.setText(noDecimals.format(energyLossRate == 0.0 ? 0.0 : -energyLossRate));
 			heatingRateTextField.setText("0");
-			coolingTodayTextField.setText(decimalFormat.format(energyLossToday == 0.0 ? 0.0 : -energyLossToday));
+			coolingTodayTextField.setText(twoDecimals.format(energyLossToday == 0.0 ? 0.0 : -energyLossToday));
 			heatingTodayTextField.setText("0");
 		}
 
@@ -639,41 +667,62 @@ public class EnergyPanel extends JPanel {
 		double yearlyEnergyGain = 0.0;
 		double yearlyTotal = 0.0;
 		for (int i = 0; i < 12; i++) {
-//			final double temperature = toCelsius(averageTemperature[i]);
-//			final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - temperature;
-//			final double monthlyEnergy = computeEnergyLossRate(deltaT, false) / 1000.0 * 24.0 * daysInMonth[i];
-//			if (monthlyEnergy > 0.0)
-//				yearlyEnergyLoss += monthlyEnergy;
-//			else
-//				yearlyEnergyGain += -monthlyEnergy;
+			// final double temperature = toCelsius(averageTemperature[i]);
+			// final double deltaT = Double.parseDouble(insideTemperatureTextField.getText()) - temperature;
+			// final double monthlyEnergy = computeEnergyLossRate(deltaT, false) / 1000.0 * 24.0 * daysInMonth[i];
+			// if (monthlyEnergy > 0.0)
+			// yearlyEnergyLoss += monthlyEnergy;
+			// else
+			// yearlyEnergyGain += -monthlyEnergy;
 			final double monthlyEnergyLoss = computeEnergyLossRate(heatingDegreeDays[i], false) / 1000.0 * 24.0;
 			final double monthlyEnergyGain = computeEnergyLossRate(coolingDegreeDays[i], false) / 1000.0 * 24.0;
-			yearlyEnergyLoss += monthlyEnergyLoss;
-			yearlyEnergyGain += monthlyEnergyGain;
-			yearlyTotal += addEnergy(solarEnergyArray[i], monthlyEnergyLoss, monthlyEnergyGain);
+			// yearlyEnergyLoss += monthlyEnergyLoss;
+			// yearlyEnergyGain += monthlyEnergyGain;
+			// yearlyTotal += addEnergy(solarEnergyArray[i], monthlyEnergyLoss, monthlyEnergyGain);
+			yearlyEnergyLoss += computeHeatingEnergy(monthlyEnergyLoss, solarEnergyArray[i]);
+			yearlyEnergyGain += computeCoolingEnergy(monthlyEnergyLoss, monthlyEnergyGain, solarEnergyArray[i]);
 		}
+		yearlyTotal = yearlyEnergyLoss + yearlyEnergyGain;
 		heating.yearly = yearlyEnergyLoss;
 		cooling.yearly = yearlyEnergyGain;
-		heatingYearlyTextField.setText(decimalFormat.format(yearlyEnergyLoss));
-		coolingYearlyTextField.setText(decimalFormat.format(yearlyEnergyGain));
+		heatingYearlyTextField.setText(noDecimals.format(yearlyEnergyLoss));
+		coolingYearlyTextField.setText(noDecimals.format(yearlyEnergyGain));
 
 		/* compute yearly energy cost */
 		heating.cost = yearlyEnergyLoss * COST_PER_KWH;
 		cooling.cost = yearlyEnergyGain * COST_PER_KWH;
-		heatingCostTextField.setText(decimalFormat.format(heating.cost));
-		coolingCostTextField.setText(decimalFormat.format(cooling.cost));
+		heatingCostTextField.setText(moneyDecimals.format(heating.cost));
+		coolingCostTextField.setText(moneyDecimals.format(cooling.cost));
 
-
-		totalRateTextField.setText(decimalFormat.format(addEnergy(solar.rate, heating.rate, cooling.rate)));
-		totalTodayTextField.setText(decimalFormat.format(addEnergy(solar.today, heating.today, cooling.today)));
-		totalYearlyTextField.setText(decimalFormat.format(yearlyTotal));
-		totalCostTextField.setText(decimalFormat.format(yearlyTotal * COST_PER_KWH));
+		totalRateTextField.setText(noDecimals.format(computeCoolingAndHeatingRate(heating.rate, cooling.rate, solar.rate)));
+		totalTodayTextField.setText(twoDecimals.format(computeCoolingAndHeatingEnergy(heating.today, cooling.today, solar.today)));
+		totalYearlyTextField.setText(noDecimals.format(yearlyTotal));
+		totalCostTextField.setText(moneyDecimals.format(yearlyTotal * COST_PER_KWH));
 
 	}
 
-	public double addEnergy(final double solar, final double heating, final double cooling) {
-		return Math.max(0.0, heating - solar) + cooling + solar;
+	public double computeCoolingAndHeatingRate(final double energyLoss, final double energyGain, final double solarEnergy) {
+		if (energyLoss > 0.0)
+			return computeHeatingEnergy(energyLoss, solarEnergy);
+		else
+			return computeCoolingEnergy(energyLoss, energyGain, solarEnergy);
 	}
+
+	private double computeCoolingAndHeatingEnergy(final double energyLoss, final double energyGain, final double solarEnergy) {
+		return computeHeatingEnergy(energyLoss, solarEnergy) + computeCoolingEnergy(energyLoss, energyGain, solarEnergy);
+	}
+
+	private double computeCoolingEnergy(final double energyLoss, final double energyGain, final double solarEnergy) {
+		return energyGain + computeHeatingEnergy(solarEnergy, energyLoss);
+	}
+
+	private double computeHeatingEnergy(final double energyLoss, final double solarEnergy) {
+		return Math.max(0, energyLoss - solarEnergy);
+	}
+
+	// public double addEnergy(final double solar, final double heating, final double cooling) {
+	// return Math.max(0.0, heating - solar) + cooling + solar;
+	// }
 
 	private double computeEnergyLossRate(final double deltaT, final boolean draw) {
 		final double wallsEnergyLoss = wallsArea * Double.parseDouble((String) wallsComboBox.getSelectedItem()) * deltaT;
@@ -686,13 +735,13 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void computeSolarEnergyRate() {
-		solar.rate = computeSolarEnergyRate(Heliodon.getInstance().getSunLocation().normalize(null));
-		solarRateTextField.setText(decimalFormat.format(solar.rate));
+		solar.rate = 0.0;
+		if (Heliodon.getInstance().isVisible() && !Heliodon.getInstance().isNightTime())
+			solar.rate = computeSolarEnergyRate(Heliodon.getInstance().getSunLocation().normalize(null));
+		solarRateTextField.setText(noDecimals.format(solar.rate));
 	}
 
 	private double computeSolarEnergyRate(final ReadOnlyVector3 sunVector) {
-		if (sunVector.getZ() <= 0.0)
-			return 0.0;
 		double totalRate = 0.0;
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Window) {
@@ -705,8 +754,10 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void computeSolarEnergyToday() {
-		solar.today = computeSolarEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone());
-		solarTodayTextField.setText(decimalFormat.format(solar.today));
+		solar.today = 0.0;
+		if (Heliodon.getInstance().isVisible())
+			solar.today = computeSolarEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone());
+		solarTodayTextField.setText(twoDecimals.format(solar.today));
 	}
 
 	private double computeSolarEnergyToday(final Calendar today) {
@@ -724,18 +775,20 @@ public class EnergyPanel extends JPanel {
 
 	private void computeSolarEnergyYearly() {
 		double totalEnergyYearly = 0.0;
-		final Calendar date = Calendar.getInstance();
-		date.set(Calendar.DAY_OF_MONTH, 0);
-		date.set(Calendar.MONTH, 0);
-		for (int monthIndex = 0; monthIndex < 11; monthIndex++) {
-			solarEnergyArray[monthIndex] = computeSolarEnergyToday(date) * daysInMonth[monthIndex];
-			totalEnergyYearly += solarEnergyArray[monthIndex];
-			date.add(Calendar.MONTH, 1);
+		if (Heliodon.getInstance().isVisible()) {
+			final Calendar date = Calendar.getInstance();
+			date.set(Calendar.DAY_OF_MONTH, 0);
+			date.set(Calendar.MONTH, 0);
+			for (int monthIndex = 0; monthIndex < 11; monthIndex++) {
+				solarEnergyArray[monthIndex] = computeSolarEnergyToday(date) * daysInMonth[monthIndex];
+				totalEnergyYearly += solarEnergyArray[monthIndex];
+				date.add(Calendar.MONTH, 1);
+			}
 		}
 		solar.yearly = totalEnergyYearly;
 		solar.cost = totalEnergyYearly * COST_PER_KWH;
-		solarYearlyTextField.setText(decimalFormat.format(solar.yearly));
-		solarCostTextField.setText(decimalFormat.format(solar.cost));
+		solarYearlyTextField.setText(noDecimals.format(solar.yearly));
+		solarCostTextField.setText(moneyDecimals.format(solar.cost));
 	}
 
 	private double toCelsius(final double f) {

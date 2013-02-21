@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
@@ -1101,6 +1102,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		heliodonControl = selected;
 		Heliodon.getInstance().setVisible(selected);
 		enableDisableRotationControl();
+		EnergyPanel.getInstance().computeEnergy();
+
 	}
 
 	public void setSunAnim(final boolean selected) {

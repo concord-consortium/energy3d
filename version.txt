@@ -1325,10 +1325,12 @@ Version 0.5 - October 20, 2011
 - compute daily energy loss and gain rate (today)
 - compute yearly energy loss and gain rate
 - compute total energy for all types of energy and duration
-
 - compute the heat gain and loss from the cooling and heating degree days
 - compute the total yearly energy by subtracting or adding solar at each month
 - separate the computation and visual code in heliodon
+- switch off solar energy computation when the heliodon is off
+- compute the energy rate total by applying solar only to the non zero heating or cooling
+- compute the yearly energy by subtracting solar from heating and adding the remaining to cooling at monthly iteration 
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

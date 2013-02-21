@@ -92,6 +92,7 @@ public class Heliodon {
 	private boolean forceSunRegionOn = true;
 	private BloomRenderPass bloomRenderPass;
 	private final BasicPassManager passManager;
+	private boolean visible;
 
 	public static Heliodon getInstance() {
 		return instance;
@@ -362,7 +363,7 @@ public class Heliodon {
 				if (declinationChanged || hourAngleChanged) {
 					setSunLocation(newSunLocation);
 					if (Config.EXPERIMENT)
-						EnergyPanel.getInstance().computeAreaAndEnergy();
+						EnergyPanel.getInstance().computeEnergy();
 				}
 			}
 		}));
@@ -431,7 +432,12 @@ public class Heliodon {
 			SceneManager.getInstance().refresh();
 	}
 
+	public boolean isVisible() {
+		return visible;
+	}
+
 	public void setVisible(final boolean visible) {
+		this.visible = visible;
 		if (bloomRenderPass == null) {
 			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
 			passManager.add(bloomRenderPass);

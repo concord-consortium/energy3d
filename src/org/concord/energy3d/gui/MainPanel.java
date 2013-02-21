@@ -692,7 +692,7 @@ public class MainPanel extends JPanel {
 					if (heliodon != null)
 						heliodon.setDate((Date) dateSpinner.getValue());
 					if (Config.EXPERIMENT)
-						EnergyPanel.getInstance().computeAreaAndEnergy();
+						EnergyPanel.getInstance().computeEnergy();
 				}
 			});
 		}
@@ -722,7 +722,7 @@ public class MainPanel extends JPanel {
 					if (heliodon != null)
 						heliodon.setTime((Date) timeSpinner.getValue());
 					if (Config.EXPERIMENT)
-						EnergyPanel.getInstance().computeAreaAndEnergy();
+						EnergyPanel.getInstance().computeEnergy();
 				}
 			});
 		}

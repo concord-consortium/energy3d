@@ -178,7 +178,7 @@ public class Scene implements Serializable {
 				SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
 				Scene.getInstance().setEdited(false);
 				if (Config.EXPERIMENT)
-					EnergyPanel.getInstance().computeAreaAndEnergy();
+					EnergyPanel.getInstance().computeEnergy();
 				return null;
 			}
 		});
@@ -610,7 +610,7 @@ public class Scene implements Serializable {
 			MainFrame.getInstance().updateTitleBar();
 		if (edited)
 			if (Config.EXPERIMENT)
-				EnergyPanel.getInstance().computeAreaAndEnergy();
+				EnergyPanel.getInstance().computeEnergy();
 	}
 
 	public void updateEditShapes() {
