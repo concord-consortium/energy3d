@@ -34,6 +34,10 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Config;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.HierarchyBoundsAdapter;
+import java.awt.event.HierarchyEvent;
 
 public class MainPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -677,8 +681,15 @@ public class MainPanel extends JPanel {
 			final Calendar date = Calendar.getInstance();
 			// initially set the date to September 29 so that it will resize itself to max
 			date.set(2011, 8, 29);
-			model.setValue(date.getTime());
+			model.setValue(date.getTime());			
 			dateSpinner = new JSpinner(model);
+			dateSpinner.addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
+				@Override
+				public void ancestorResized(final HierarchyEvent e) {
+					dateSpinner.setMinimumSize(dateSpinner.getPreferredSize());
+					dateSpinner.removeHierarchyBoundsListener(this);
+				}
+			});
 			dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
 			dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
 			    boolean firstCall = true;
@@ -751,6 +762,8 @@ public class MainPanel extends JPanel {
 			cityComboBox.addItem("Singapore");
 			cityComboBox.addItem("Sydney");
 			cityComboBox.addItem("Buenos Aires");
+			
+			cityComboBox.setSelectedItem("Boston");
 
 			cityComboBox.addActionListener(new java.awt.event.ActionListener() {
 				@Override
@@ -809,7 +822,7 @@ public class MainPanel extends JPanel {
 	private JSpinner getLatitudeSpinner() {
 		if (latitudeSpinner == null) {
 			latitudeSpinner = new JSpinner();
-			latitudeSpinner.setModel(new SpinnerNumberModel(0, -90, 90, 1));
+			latitudeSpinner.setModel(new SpinnerNumberModel(Heliodon.DEFAULT_LATITUDE, -90, 90, 1));
 			latitudeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
 				@Override
 				public void stateChanged(final javax.swing.event.ChangeEvent e) {

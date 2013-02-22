@@ -174,12 +174,12 @@ public class EnergyPanel extends JPanel {
 		
 		outsideTemperatureSpinner = new JSpinner();
 		outsideTemperatureSpinner.setEnabled(false);
+		outsideTemperatureSpinner.setModel(new SpinnerNumberModel(10, -70, 60, 1));
 		outsideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				computeEnergy();
 			}
 		});
-		outsideTemperatureSpinner.setModel(new SpinnerNumberModel(10, -70, 60, 1));
 		GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
 		gbc_outsideTemperatureSpinner.gridx = 4;
 		gbc_outsideTemperatureSpinner.gridy = 0;

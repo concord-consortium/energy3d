@@ -310,8 +310,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() throws Exception {
 				final Date today = Calendar.getInstance().getTime();
 				new Heliodon(root, light, passManager, logicalLayer, today);
-				MainPanel.getInstance().getDateSpinner().setValue(today);
-				MainPanel.getInstance().getTimeSpinner().setValue(today);
 				return null;
 			}
 		});
