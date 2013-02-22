@@ -51,8 +51,8 @@ public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
 	private static final int[] daysInMonth = new int[] { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-	private static final int[] heatingDegreeDays = new int[] { 652, 523, 414, 294, 181, 101, 12, 10, 102, 235, 468, 540 };
-	private static final int[] coolingDegreeDays = new int[] { 0, 0, 4, 7, 9, 48, 98, 90, 16, 2, 0, 0 };
+	private static final int[] heatingDegreeDays = new int[] { 654, 548, 471, 292, 166, 67, 11, 14, 74, 232, 371, 550 };
+	private static final int[] coolingDegreeDays = new int[] { 0, 0, 1, 7, 17, 52, 124, 95, 34, 4, 0, 0 };
 	private static final double COST_PER_KWH = 0.13;
 	private static final EnergyPanel instance = new EnergyPanel();
 	private final DecimalFormat twoDecimals = new DecimalFormat("###,###.##");
