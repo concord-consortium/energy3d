@@ -42,6 +42,10 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -72,8 +76,6 @@ public class EnergyPanel extends JPanel {
 	private final XYChart.Data<String, Number> doorsEnergyChartData = new XYChart.Data<String, Number>("Energy Loss", 0);
 	private final XYChart.Data<String, Number> roofsEnergyChartData = new XYChart.Data<String, Number>("Energy Loss", 0);
 	private final JTextField heatingRateTextField;
-	private final JTextField insideTemperatureTextField;
-	private final JTextField outsideTemperatureTextField;
 	private final JComboBox wallsComboBox;
 	private final JComboBox doorsComboBox;
 	private final JComboBox windowsComboBox;
@@ -94,6 +96,8 @@ public class EnergyPanel extends JPanel {
 	private final JTextField heatingCostTextField;
 	private final JTextField coolingCostTextField;
 	private final JTextField totalCostTextField;
+	private JSpinner insideTemperatureSpinner;
+	private JSpinner outsideTemperatureSpinner;
 
 	public class EnergyAmount {
 		double rate;
@@ -123,10 +127,10 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final boolean selected = autoCheckBox.isSelected();
-				insideTemperatureTextField.setEnabled(!selected);
-				outsideTemperatureTextField.setEnabled(!selected);
+				insideTemperatureSpinner.setEnabled(!selected);
+				outsideTemperatureSpinner.setEnabled(!selected);
 				if (selected) {
-					insideTemperatureTextField.setText("20");
+					insideTemperatureSpinner.setValue(20);
 					updateOutsideTemperature();
 				}
 				computeEnergy();
@@ -144,22 +148,20 @@ public class EnergyPanel extends JPanel {
 		gbc_insideTemperatureLabel.gridx = 1;
 		gbc_insideTemperatureLabel.gridy = 0;
 		panel.add(insideTemperatureLabel, gbc_insideTemperatureLabel);
-
-		insideTemperatureTextField = new JTextField();
-		insideTemperatureTextField.setEnabled(false);
-		insideTemperatureTextField.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
+		
+		insideTemperatureSpinner = new JSpinner();
+		insideTemperatureSpinner.setEnabled(false);
+		insideTemperatureSpinner.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
 				computeEnergy();
 			}
 		});
-		insideTemperatureTextField.setText("20");
-		final GridBagConstraints gbc_insideTemperatureTextField = new GridBagConstraints();
-		gbc_insideTemperatureTextField.insets = new Insets(0, 0, 0, 5);
-		gbc_insideTemperatureTextField.gridx = 2;
-		gbc_insideTemperatureTextField.gridy = 0;
-		panel.add(insideTemperatureTextField, gbc_insideTemperatureTextField);
-		insideTemperatureTextField.setColumns(4);
+		insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
+		GridBagConstraints gbc_insideTemperatureSpinner = new GridBagConstraints();
+		gbc_insideTemperatureSpinner.insets = new Insets(0, 0, 0, 5);
+		gbc_insideTemperatureSpinner.gridx = 2;
+		gbc_insideTemperatureSpinner.gridy = 0;
+		panel.add(insideTemperatureSpinner, gbc_insideTemperatureSpinner);
 
 		final JLabel outsideTemperatureLabel = new JLabel("Outside:");
 		final GridBagConstraints gbc_outsideTemperatureLabel = new GridBagConstraints();
@@ -168,22 +170,20 @@ public class EnergyPanel extends JPanel {
 		gbc_outsideTemperatureLabel.gridy = 0;
 		panel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
 
-		outsideTemperatureTextField = new JTextField();
-		outsideTemperatureTextField.setEnabled(false);
-		outsideTemperatureTextField.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
+		panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel.getPreferredSize().height));
+		
+		outsideTemperatureSpinner = new JSpinner();
+		outsideTemperatureSpinner.setEnabled(false);
+		outsideTemperatureSpinner.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
 				computeEnergy();
 			}
 		});
-		outsideTemperatureTextField.setText("10");
-		final GridBagConstraints gbc_outsideTemperatureTextField = new GridBagConstraints();
-		gbc_outsideTemperatureTextField.gridx = 4;
-		gbc_outsideTemperatureTextField.gridy = 0;
-		panel.add(outsideTemperatureTextField, gbc_outsideTemperatureTextField);
-		outsideTemperatureTextField.setColumns(4);
-
-		panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel.getPreferredSize().height));
+		outsideTemperatureSpinner.setModel(new SpinnerNumberModel(10, -70, 60, 1));
+		GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
+		gbc_outsideTemperatureSpinner.gridx = 4;
+		gbc_outsideTemperatureSpinner.gridy = 0;
+		panel.add(outsideTemperatureSpinner, gbc_outsideTemperatureSpinner);
 
 		final JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -639,7 +639,7 @@ public class EnergyPanel extends JPanel {
 		updateArea(wallsArea, doorsArea, windowsArea, roofsArea);
 
 		/* compute energy loss/gain rate and energy loss/gain today */
-		final double energyLossRate = computeEnergyLossRate(Double.parseDouble(insideTemperatureTextField.getText()) - Double.parseDouble(outsideTemperatureTextField.getText()), true);
+		final double energyLossRate = computeEnergyLossRate((Integer)insideTemperatureSpinner.getValue() - (Integer)outsideTemperatureSpinner.getValue(), true);
 		final double energyLossToday = energyLossRate / 1000.0 * 24.0;
 
 		if (energyLossRate > 0.0) {
@@ -797,7 +797,7 @@ public class EnergyPanel extends JPanel {
 
 	private void updateOutsideTemperature() {
 		final Date date = (Date) MainPanel.getInstance().getDateSpinner().getValue();
-		outsideTemperatureTextField.setText("" + Math.round(toCelsius(averageTemperature[date.getMonth()])));
+		outsideTemperatureSpinner.setValue((int)Math.round(toCelsius(averageTemperature[date.getMonth()])));
 	}
 
 }
