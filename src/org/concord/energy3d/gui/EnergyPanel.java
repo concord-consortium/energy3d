@@ -28,10 +28,14 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.HousePart;
@@ -42,10 +46,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
 
 public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -96,8 +96,8 @@ public class EnergyPanel extends JPanel {
 	private final JTextField heatingCostTextField;
 	private final JTextField coolingCostTextField;
 	private final JTextField totalCostTextField;
-	private JSpinner insideTemperatureSpinner;
-	private JSpinner outsideTemperatureSpinner;
+	private final JSpinner insideTemperatureSpinner;
+	private final JSpinner outsideTemperatureSpinner;
 
 	public class EnergyAmount {
 		double rate;
@@ -148,16 +148,17 @@ public class EnergyPanel extends JPanel {
 		gbc_insideTemperatureLabel.gridx = 1;
 		gbc_insideTemperatureLabel.gridy = 0;
 		panel.add(insideTemperatureLabel, gbc_insideTemperatureLabel);
-		
+
 		insideTemperatureSpinner = new JSpinner();
 		insideTemperatureSpinner.setEnabled(false);
 		insideTemperatureSpinner.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
 				computeEnergy();
 			}
 		});
 		insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
-		GridBagConstraints gbc_insideTemperatureSpinner = new GridBagConstraints();
+		final GridBagConstraints gbc_insideTemperatureSpinner = new GridBagConstraints();
 		gbc_insideTemperatureSpinner.insets = new Insets(0, 0, 0, 5);
 		gbc_insideTemperatureSpinner.gridx = 2;
 		gbc_insideTemperatureSpinner.gridy = 0;
@@ -171,16 +172,17 @@ public class EnergyPanel extends JPanel {
 		panel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
 
 		panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel.getPreferredSize().height));
-		
+
 		outsideTemperatureSpinner = new JSpinner();
 		outsideTemperatureSpinner.setEnabled(false);
 		outsideTemperatureSpinner.setModel(new SpinnerNumberModel(10, -70, 60, 1));
 		outsideTemperatureSpinner.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
 				computeEnergy();
 			}
 		});
-		GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
+		final GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
 		gbc_outsideTemperatureSpinner.gridx = 4;
 		gbc_outsideTemperatureSpinner.gridy = 0;
 		panel.add(outsideTemperatureSpinner, gbc_outsideTemperatureSpinner);
@@ -713,11 +715,17 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private double computeCoolingEnergy(final double energyLoss, final double energyGain, final double solarEnergy) {
-		return energyGain + computeHeatingEnergy(solarEnergy, energyLoss);
+		if (Heliodon.getInstance().isVisible())
+			return energyGain + computeHeatingEnergy(solarEnergy, energyLoss);
+		else
+			return energyGain;
 	}
 
 	private double computeHeatingEnergy(final double energyLoss, final double solarEnergy) {
-		return Math.max(0, energyLoss - solarEnergy);
+		if (Heliodon.getInstance().isVisible())
+			return Math.max(0, energyLoss - solarEnergy);
+		else
+			return energyLoss;
 	}
 
 	// public double addEnergy(final double solar, final double heating, final double cooling) {

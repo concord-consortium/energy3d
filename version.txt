@@ -1337,6 +1337,7 @@ Version 0.5 - October 20, 2011
 - set the default location for heliodon to Boston
 - fix the problem with date spinner not large enough for september
 - correct the size of heliodon direction labels by scaling them up
+- do not consider solar gain for yearly calculation when the heliodon is off
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception
