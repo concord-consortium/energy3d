@@ -1331,6 +1331,7 @@ Version 0.5 - October 20, 2011
 - switch off solar energy computation when the heliodon is off
 - compute the energy rate total by applying solar only to the non zero heating or cooling
 - compute the yearly energy by subtracting solar from heating and adding the remaining to cooling at monthly iteration 
+- correct the size of heliodon direction labels by scaling them up
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

@@ -60,6 +60,7 @@ import com.ardor3d.scenegraph.hint.TransparencyType;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.ui.text.BMText.AutoFade;
 import com.ardor3d.ui.text.BMText.AutoScale;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -167,30 +168,18 @@ public class Heliodon {
 		root.attachChild(baseTicks);
 
 		// Compass Labels N S E W
-		final BMText northLabel = new BMText("North", "N", FontManager.getInstance().getAnnotationFont(), Align.Center);
-		northLabel.setAutoRotate(false);
-		northLabel.setAutoScale(AutoScale.Off);
+		final BMText northLabel = createText("N");
 		northLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, 0));
 		northLabel.setTranslation(0, 6, 0);
-		root.attachChild(northLabel);
-		final BMText southLabel = new BMText("South", "S", FontManager.getInstance().getAnnotationFont(), Align.Center);
-		southLabel.setAutoRotate(false);
-		southLabel.setAutoScale(AutoScale.Off);
+		final BMText southLabel = createText("S");
 		southLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, Math.PI));
 		southLabel.setTranslation(0, -6, 0);
-		root.attachChild(southLabel);
-		final BMText eastLabel = new BMText("East", "E", FontManager.getInstance().getAnnotationFont(), Align.Center);
-		eastLabel.setAutoRotate(false);
-		eastLabel.setAutoScale(AutoScale.Off);
+		final BMText eastLabel = createText("E");
 		eastLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, -MathUtils.HALF_PI));
 		eastLabel.setTranslation(6, 0, 0);
-		root.attachChild(eastLabel);
-		final BMText westLabel = new BMText("West", "W", FontManager.getInstance().getAnnotationFont(), Align.Center);
-		westLabel.setAutoRotate(false);
-		westLabel.setAutoScale(AutoScale.Off);
+		final BMText westLabel = createText("W");
 		westLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, MathUtils.HALF_PI));
 		westLabel.setTranslation(-6, 0, 0);
-		root.attachChild(westLabel);
 
 		// Clip
 		final ClipState cs = new ClipState();
@@ -219,6 +208,16 @@ public class Heliodon {
 		draw();
 
 		instance = this;
+	}
+
+	private BMText createText(final String text) {
+		final BMText label = new BMText(text, text, FontManager.getInstance().getAnnotationFont(), Align.Center);
+		label.setAutoRotate(false);
+		label.setAutoScale(AutoScale.Off);
+		label.setAutoFade(AutoFade.Off);
+		label.setFontScale(5.0);
+		root.attachChild(label);
+		return label;
 	}
 
 	private void initMouse(final LogicalLayer logicalLayer) {
