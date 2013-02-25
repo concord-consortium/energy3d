@@ -3,6 +3,9 @@ package org.concord.energy3d.shapes;
 import java.nio.FloatBuffer;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.Callable;
+
+import javax.swing.SwingUtilities;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
@@ -65,6 +68,7 @@ import com.ardor3d.ui.text.BMText.AutoScale;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Heliodon {
+	public static final double DEFAULT_LATITUDE = 42;
 	private static final int BASE_DIVISIONS = 72;
 	private static final int DECLINATION_DIVISIONS = 12;
 	private static final int HOUR_DIVISIONS = 96;
@@ -85,7 +89,7 @@ public class Heliodon {
 	private final double baseAngle = 0;
 	private double hourAngle;
 	private double declinationAngle;
-	private double observerLatitude;
+	private double observerLatitude = DEFAULT_LATITUDE / 180.0 * Math.PI;
 	private boolean sunGrabbed = false;
 	private boolean selectDifferentDeclinationWithMouse = false;
 	private boolean dirtySunRegion = false;
@@ -194,13 +198,18 @@ public class Heliodon {
 		scene.attachChild(root);
 
 		setDate(timeAndDate);
+		MainPanel.getInstance().getDateSpinner().setValue(timeAndDate);
 		setTime(timeAndDate);
-
+		
 		if (isNightTime()) {
 			final Calendar calendar = Calendar.getInstance();
-			calendar.set(2000, 1, 1, 12, 0, 0);
+			calendar.set(Calendar.HOUR, 0);
+			calendar.set(Calendar.AM_PM, 1);
+			calendar.set(Calendar.MINUTE, 0);
 			setTime(calendar.getTime());
-		}
+			MainPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
+		} else
+			MainPanel.getInstance().getTimeSpinner().setValue(timeAndDate);
 
 		if (Config.isHeliodonMode())
 			setSunRegionAlwaysVisible(true);
@@ -480,7 +489,7 @@ public class Heliodon {
 		return coords;
 	}
 
-	private double toPlusMinusPIRange(final double radian, final double min, final double max) {
+	private static double toPlusMinusPIRange(final double radian, final double min, final double max) {
 		double result = radian - (int) (radian / MathUtils.TWO_PI) * MathUtils.TWO_PI;
 		if (Math.abs(result) > Math.PI)
 			result = -Math.signum(result) * (MathUtils.TWO_PI - Math.abs(result));

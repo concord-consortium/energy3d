@@ -1331,6 +1331,11 @@ Version 0.5 - October 20, 2011
 - switch off solar energy computation when the heliodon is off
 - compute the energy rate total by applying solar only to the non zero heating or cooling
 - compute the yearly energy by subtracting solar from heating and adding the remaining to cooling at monthly iteration 
+- compute the yearly energy by subtracting solar from heating and adding the remaining to cooling at monthly iteration
+- replace inside and outside temperature text boxes with spinners
+- update HDD and CDD to be based on inside temperature of 21 degrees
+- set the default location for heliodon to Boston
+- fix the problem with date spinner not large enough for september
 - correct the size of heliodon direction labels by scaling them up
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
