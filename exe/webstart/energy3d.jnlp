@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp codebase="http://energy.concord.org/energy3d/" href="energy3d.jnlp">
+<jnlp codebase="http://energy.concord.org/energy3d-2/" href="energy3d.jnlp">
 	<information>
 		<title>Energy3D</title>
 		<vendor>The Concord Consortium</vendor>
@@ -24,45 +24,45 @@
 		<jar href="resources/guava-r09.jar" />
 		<jar href="resources/jdom.jar" />
 
-		<jar href="resources/jar/jogl-all.jar" />
-		<jar href="resources/jar/gluegen-rt.jar" />
+		<jar href="resources/jogl/jogl-all-2.0-rc11.jar" />
+		<jar href="resources/jogl/gluegen-rt-2.0-rc11.jar" />
 	</resources>
 
 	<resources os="Windows" arch="x86">
-		<nativelib href = "resources/jar/jogl-all-natives-windows-i586.jar" />
-		<nativelib href = "resources/jar/gluegen-rt-natives-windows-i586.jar" />
+		<nativelib href = "resources/jogl/jogl-all-2.0-rc11-natives-windows-i586.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0-rc11-natives-windows-i586.jar" />
 	</resources>
 	<resources os="Windows" arch="amd64">
-		<nativelib href = "resources/jar/jogl-all-natives-windows-amd64.jar" />
-		<nativelib href = "resources/jar/gluegen-rt-natives-windows-amd64.jar" />
+		<nativelib href = "resources/jogl/jogl-all-2.0-rc11-natives-windows-amd64.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0-rc11-natives-windows-amd64.jar" />
 	</resources>
 	<resources os="Windows" arch="x86_64">
-		<nativelib href = "resources/jar/jogl-all-natives-windows-amd64.jar" />
-		<nativelib href = "resources/jar/gluegen-rt-natives-windows-amd64.jar" />
+		<nativelib href = "resources/jogl/jogl-all-2.0-rc11-natives-windows-amd64.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0-rc11-natives-windows-amd64.jar" />
 	</resources>
 	<resources os="Linux" arch="i386">
-		<nativelib href = "resources/jar/jogl-all-natives-linux-i586.jar" />
-		<nativelib href = "resources/jar/gluegen-rt-natives-linux-i586.jar" />
+		<nativelib href = "resources/jogl/jogl-all-2.0-rc11-natives-linux-i586.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0-rc11-natives-linux-i586.jar" />
 	</resources>
 	<resources os="Linux" arch="x86">
-		<nativelib href = "resources/jar/jogl-all-natives-linux-i586.jar" />
-		<nativelib href = "resources/jar/gluegen-rt-natives-linux-i586.jar" />
+		<nativelib href = "resources/jogl/jogl-all-2.0-rc11-natives-linux-i586.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0-rc11-natives-linux-i586.jar" />
 	</resources>
 	<resources os="Linux" arch="amd64">
-		<nativelib href = "resources/jar/jogl-all-natives-linux-amd64.jar" />
-		<nativelib href = "resources/jar/gluegen-rt-natives-linux-amd64.jar" />
+		<nativelib href = "resources/jogl/jogl-all-2.0-rc11-natives-linux-amd64.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0-rc11-natives-linux-amd64.jar" />
 	</resources>
 	<resources os="Linux" arch="x86_64">
-		<nativelib href = "resources/jar/jogl-all-natives-linux-amd64.jar" />
-		<nativelib href = "resources/jar/gluegen-rt-natives-linux-amd64.jar" />
+		<nativelib href = "resources/jogl/jogl-all-2.0-rc11-natives-linux-amd64.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0-rc11-natives-linux-amd64.jar" />
 	</resources>
 	<resources os="Mac OS X" arch="i386">
-		<nativelib href = "resources/jar/jogl-all-natives-macosx-universal.jar" />
-		<nativelib href = "resources/jar/gluegen-rt-natives-macosx-universal.jar" />
+		<nativelib href = "resources/jogl/jogl-all-2.0-rc11-natives-macosx-universal.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0-rc11-natives-macosx-universal.jar" />
 	</resources>
 	<resources os="Mac OS X" arch="x86_64">
-		<nativelib href = "resources/jar/jogl-all-natives-macosx-universal.jar" />
-		<nativelib href = "resources/jar/gluegen-rt-natives-macosx-universal.jar" />
+		<nativelib href = "resources/jogl/jogl-all-2.0-rc11-natives-macosx-universal.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0-rc11-natives-macosx-universal.jar" />
 	</resources>
 
 	<application-desc main-class="org.concord.energy3d.MainApplication" />

@@ -1341,6 +1341,7 @@ Version 0.5 - October 20, 2011
 - use threads to compute energy in the background
 - abort previous thread if a new compute energy request is made
 - convert Energy3D project to a maven project
+- use the new jogl jars and update the webstart jnlp
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception
