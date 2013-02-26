@@ -1338,6 +1338,8 @@ Version 0.5 - October 20, 2011
 - fix the problem with date spinner not large enough for september
 - correct the size of heliodon direction labels by scaling them up
 - do not consider solar gain for yearly calculation when the heliodon is off
+- use threads to compute energy in the background
+- abort previous thread if a new compute energy request is made
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

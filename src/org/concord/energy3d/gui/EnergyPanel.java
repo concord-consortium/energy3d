@@ -98,6 +98,7 @@ public class EnergyPanel extends JPanel {
 	private final JTextField totalCostTextField;
 	private final JSpinner insideTemperatureSpinner;
 	private final JSpinner outsideTemperatureSpinner;
+	private Thread thread;
 
 	public class EnergyAmount {
 		double rate;
@@ -615,6 +616,18 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void computeEnergy() {
+		if (thread != null && thread.isAlive())
+			thread.stop();
+		thread = new Thread() {
+			@Override
+			public void run() {
+				computeEnergyNow();
+			}
+		};
+		thread.start();
+	}
+
+	private void computeEnergyNow() {
 		if (autoCheckBox.isSelected())
 			updateOutsideTemperature();
 
