@@ -19,10 +19,11 @@
 	</security>
 	<resources>
 		<j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+" />
-		<property name="sun.java2d.noddraw" value="true" />
+
 		<jar href="energy3d.jar" main="true" />
-		<jar href="resources/guava-r09.jar" />
-		<jar href="resources/jdom.jar" />
+		<jar href="resources/guava-13.0.1.jar" />
+		<jar href="resources/jdom2-2.0.4.jar" />
+		<jar href="resources/jfxrt.jar" />
 
 		<jar href="resources/jogl/jogl-all-2.0-rc11.jar" />
 		<jar href="resources/jogl/gluegen-rt-2.0-rc11.jar" />

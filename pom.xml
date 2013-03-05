@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>Energy3D</groupId>
-  <artifactId>Energy3D</artifactId>
+  <groupId>org.concord.energy3d</groupId>
+  <artifactId>energy3d</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -22,20 +22,55 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+      <plugin>
+      	<groupId>com.zenjava</groupId>
+      	<artifactId>javafx-maven-plugin</artifactId>
+      	<version>1.5</version>
+	      <configuration>
+	          <mainClass>org.concord.energy3d.MainApplication</mainClass>
+	      </configuration>
+      </plugin>
     </plugins>
   </build>
   <dependencies>
   	<dependency>
   		<groupId>com.ardor3d</groupId>
-  		<artifactId>ardor3d-jogl</artifactId>
+  		<artifactId>ardor3d-core</artifactId>
   		<version>0.9-SNAPSHOT</version>
-  		<type>bundle</type>
   	</dependency>
   	<dependency>
   		<groupId>com.ardor3d</groupId>
   		<artifactId>ardor3d-lwjgl</artifactId>
   		<version>0.9-SNAPSHOT</version>
-  		<type>bundle</type>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.ardor3d</groupId>
+  		<artifactId>ardor3d-jogl</artifactId>
+  		<version>0.9-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.ardor3d</groupId>
+  		<artifactId>ardor3d-collada</artifactId>
+  		<version>0.9-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.ardor3d</groupId>
+  		<artifactId>ardor3d-awt</artifactId>
+  		<version>0.9-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.ardor3d</groupId>
+  		<artifactId>ardor3d-effects</artifactId>
+  		<version>0.9-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.ardor3d</groupId>
+  		<artifactId>ardor3d-examples</artifactId>
+  		<version>0.9-SNAPSHOT</version>
   	</dependency>
   </dependencies>
+  <name>Energy3D</name>
+  <organization>
+  	<name>Concord Consoritum</name>
+  </organization>
 </project>

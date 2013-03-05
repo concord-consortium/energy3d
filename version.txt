@@ -1306,7 +1306,6 @@ Version 0.5 - October 20, 2011
 - convert Boston monthly average temperature from Farenheit to Celsius 
 - use new default values for U-Factor of house parts
 - use W/m2/C for U-factor unit
-*
 - compute average monthly head loss in kWh
 - compute yearly heat loss
 - compute yearly cost due to heat loss
@@ -1342,6 +1341,10 @@ Version 0.5 - October 20, 2011
 - abort previous thread if a new compute energy request is made
 - convert Energy3D project to a maven project
 - use the new jogl jars and update the webstart jnlp
+*
+- convert project to maven
+
+
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

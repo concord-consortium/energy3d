@@ -54,8 +54,8 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
-import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
+import com.ardor3d.framework.jogl.JoglNewtAwtCanvas;
 import com.ardor3d.framework.lwjgl.LwjglAwtCanvas;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.image.Texture;
@@ -203,13 +203,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
 		final long time = System.nanoTime();
-		final DisplaySettings settings = new DisplaySettings(400, 300, 16, 0, 0, 8, 0, 4, false, false);
+//		final DisplaySettings settings = new DisplaySettings(400, 300, 16, 0, 0, 8, 0, 4, false, false);
+		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
 		if (Config.JOGL) {
 			// final DisplaySettings settings = new DisplaySettings(800, 600,
 			// 32, 60, 0, 2, 0, 4, false, false);
 			// final DisplaySettings settings = new DisplaySettings(400, 300,
 			// 24, 0, 0, 16, 0, 0, false, false);
-			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
+//			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
+			canvas = new JoglNewtAwtCanvas(settings, new JoglCanvasRenderer(this));
+
 			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
 		} else {
 			// final DisplaySettings settings = new DisplaySettings(800, 600,
@@ -332,6 +335,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isUpdateTime = refreshTime != -1 && now <= refreshTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
+			refresh = true;
 			if (refresh || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
 				if (now > refreshTime)
 					refreshTime = -1;
@@ -1294,8 +1298,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public void init() {
-		if (Config.JOGL)
-			initCamera();
+//		if (Config.JOGL)
+//			initCamera();
 		if (Config.isHeliodonMode())
 			MainPanel.getInstance().getHeliodonButton().setSelected(true);
 
