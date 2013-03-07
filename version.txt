@@ -1343,6 +1343,12 @@ Version 0.5 - October 20, 2011
 - use the new jogl jars and update the webstart jnlp
 *
 - convert project to maven
+- save resources in same packages hierarchy as the classes that need them 
+- add support for new renderer: Jogl Newt
+- fix problem with null context by setting an initial size for Canvas
+- fix mouse event problem by using Newt wrappers
+- add ability to switch between Newt, Jogl and LWJGL
+
 
 
 

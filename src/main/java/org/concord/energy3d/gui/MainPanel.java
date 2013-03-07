@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyBoundsAdapter;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Calendar;
@@ -34,10 +36,6 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Config;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.HierarchyBoundsAdapter;
-import java.awt.event.HierarchyEvent;
 
 public class MainPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -193,7 +191,7 @@ public class MainPanel extends JPanel {
 			});
 			selectButton.setSelected(true);
 			selectButton.setToolTipText("Select");
-			selectButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/select.png")));
+			selectButton.setIcon(new ImageIcon(MainPanel.class.getResource("icons/select.png")));
 			selectButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
@@ -213,7 +211,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getWallButton() {
 		if (wallButton == null) {
 			wallButton = new JToggleButton();
-			wallButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/wall.png")));
+			wallButton.setIcon(new ImageIcon(getClass().getResource("icons/wall.png")));
 			wallButton.setToolTipText("Draw wall");
 			wallButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
@@ -247,7 +245,7 @@ public class MainPanel extends JPanel {
 			doorButton = new JToggleButton();
 			doorButton.setText("");
 			doorButton.setToolTipText("Draw door");
-			doorButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/door.png")));
+			doorButton.setIcon(new ImageIcon(getClass().getResource("icons/door.png")));
 			doorButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
@@ -278,7 +276,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getRoofButton() {
 		if (roofButton == null) {
 			roofButton = new JToggleButton();
-			roofButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_pyramid.png")));
+			roofButton.setIcon(new ImageIcon(getClass().getResource("icons/roof_pyramid.png")));
 			roofButton.setToolTipText("Draw pyramid roof");
 			roofButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
@@ -310,7 +308,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getWindowButton() {
 		if (windowButton == null) {
 			windowButton = new JToggleButton();
-			windowButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/window.png")));
+			windowButton.setIcon(new ImageIcon(getClass().getResource("icons/window.png")));
 			windowButton.setToolTipText("Draw window");
 			windowButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
@@ -342,7 +340,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getPlatformButton() {
 		if (platformButton == null) {
 			platformButton = new JToggleButton();
-			platformButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/foundation.png")));
+			platformButton.setIcon(new ImageIcon(getClass().getResource("icons/foundation.png")));
 			platformButton.setToolTipText("Draw platform");
 			platformButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
@@ -380,7 +378,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().refresh();
 				}
 			});
-			lightButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/shadow.png")));
+			lightButton.setIcon(new ImageIcon(getClass().getResource("icons/shadow.png")));
 			lightButton.setToolTipText("Show shadows");
 			lightButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
@@ -416,7 +414,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().refresh();
 				}
 			});
-			rotAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/rotate.png")));
+			rotAnimButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate.png")));
 			rotAnimButton.setToolTipText("Animate scene rotation");
 			rotAnimButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
@@ -437,7 +435,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getFloorButton() {
 		if (floorButton == null) {
 			floorButton = new JToggleButton();
-			floorButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/floor.png")));
+			floorButton.setIcon(new ImageIcon(getClass().getResource("icons/floor.png")));
 			floorButton.setToolTipText("Draw floor");
 			floorButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
@@ -469,7 +467,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getRoofHipButton() {
 		if (roofHipButton == null) {
 			roofHipButton = new JToggleButton();
-			roofHipButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_hip.png")));
+			roofHipButton.setIcon(new ImageIcon(getClass().getResource("icons/roof_hip.png")));
 			roofHipButton.setToolTipText("Draw hip roof");
 			roofHipButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
@@ -507,7 +505,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().refresh();
 				}
 			});
-			resizeButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/resize.png")));
+			resizeButton.setIcon(new ImageIcon(getClass().getResource("icons/resize.png")));
 			resizeButton.setToolTipText("Resize house");
 			resizeButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
@@ -534,7 +532,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().refresh();
 				}
 			});
-			heliodonButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/sun_heliodon.png")));
+			heliodonButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_heliodon.png")));
 			heliodonButton.setToolTipText("Show sun heliodon");
 			heliodonButton.addItemListener(new java.awt.event.ItemListener() {
 				@Override
@@ -564,7 +562,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().refresh();
 				}
 			});
-			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/sun_anim.png")));
+			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_anim.png")));
 			sunAnimButton.setEnabled(false);
 			sunAnimButton.setToolTipText("Animate sun");
 			sunAnimButton.addItemListener(new java.awt.event.ItemListener() {
@@ -592,7 +590,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().refresh();
 				}
 			});
-			previewButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/print_preview.png")));
+			previewButton.setIcon(new ImageIcon(getClass().getResource("icons/print_preview.png")));
 			previewButton.setToolTipText("Preview printable parts");
 			// must be ItemListner to be triggered when selection is changed by code
 			previewButton.addItemListener(new java.awt.event.ItemListener() {
@@ -681,7 +679,7 @@ public class MainPanel extends JPanel {
 			final Calendar date = Calendar.getInstance();
 			// initially set the date to September 29 so that it will resize itself to max
 			date.set(2011, 8, 29);
-			model.setValue(date.getTime());			
+			model.setValue(date.getTime());
 			dateSpinner = new JSpinner(model);
 			dateSpinner.addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
 				@Override
@@ -762,7 +760,7 @@ public class MainPanel extends JPanel {
 			cityComboBox.addItem("Singapore");
 			cityComboBox.addItem("Sydney");
 			cityComboBox.addItem("Buenos Aires");
-			
+
 			cityComboBox.setSelectedItem("Boston");
 
 			cityComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -841,7 +839,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getRoofCustomButton() {
 		if (roofCustomButton == null) {
 			roofCustomButton = new JToggleButton();
-			roofCustomButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_custom.png")));
+			roofCustomButton.setIcon(new ImageIcon(getClass().getResource("icons/roof_custom.png")));
 			roofCustomButton.setToolTipText("Draw custom roof");
 			roofCustomButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
@@ -880,7 +878,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().refresh();
 				}
 			});
-			annotationToggleButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/annotation.png")));
+			annotationToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/annotation.png")));
 			annotationToggleButton.setToolTipText("Show annotations");
 			annotationToggleButton.addActionListener(new ActionListener() {
 				@Override
@@ -907,7 +905,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().refresh();
 				}
 			});
-			zoomButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/zoom.png")));
+			zoomButton.setIcon(new ImageIcon(getClass().getResource("icons/zoom.png")));
 			zoomButton.setToolTipText("Zoom");
 			zoomButton.addItemListener(new java.awt.event.ItemListener() {
 				@Override
@@ -929,7 +927,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getRoofGableButton() {
 		if (roofGableButton == null) {
 			roofGableButton = new JToggleButton();
-			roofGableButton.setIcon(new ImageIcon(getClass().getResource("/org/concord/energy3d/resources/icons/roof_gable.png")));
+			roofGableButton.setIcon(new ImageIcon(getClass().getResource("icons/roof_gable.png")));
 			roofGableButton.setToolTipText("Convert to gable roof");
 			roofGableButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override

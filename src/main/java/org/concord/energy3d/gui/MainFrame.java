@@ -215,7 +215,7 @@ public class MainFrame extends JFrame {
 	private MainFrame() {
 		super();
 		System.out.print("Initiating GUI...");
-		setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/org/concord/energy3d/resources/icons/icon.gif")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icons/icon.gif")));
 		try {
 			final String directoryPath = Preferences.userNodeForPackage(MainApplication.class).get("dir", null);
 			fileChooser = new JFileChooser(directoryPath);

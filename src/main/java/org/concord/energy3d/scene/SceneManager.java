@@ -39,6 +39,7 @@ import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.undo.UndoManager;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.Config.RenderMode;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
@@ -54,6 +55,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
+import com.ardor3d.framework.jogl.JoglAwtCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.framework.jogl.JoglNewtAwtCanvas;
 import com.ardor3d.framework.lwjgl.LwjglAwtCanvas;
@@ -62,14 +64,21 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.ButtonState;
+import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.input.Key;
+import com.ardor3d.input.KeyboardWrapper;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
+import com.ardor3d.input.MouseWrapper;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.awt.AwtFocusWrapper;
 import com.ardor3d.input.awt.AwtKeyboardWrapper;
 import com.ardor3d.input.awt.AwtMouseManager;
 import com.ardor3d.input.awt.AwtMouseWrapper;
+import com.ardor3d.input.jogl.JoglNewtFocusWrapper;
+import com.ardor3d.input.jogl.JoglNewtKeyboardWrapper;
+import com.ardor3d.input.jogl.JoglNewtMouseManager;
+import com.ardor3d.input.jogl.JoglNewtMouseWrapper;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyHeldCondition;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -203,17 +212,32 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
 		final long time = System.nanoTime();
+//		panel.setSize(100, 100);
 //		final DisplaySettings settings = new DisplaySettings(400, 300, 16, 0, 0, 8, 0, 4, false, false);
 		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
-		if (Config.JOGL) {
+		final MouseWrapper mouseWrapper;
+		final KeyboardWrapper keyboardWrapper;
+		final FocusWrapper focusWrapper;
+
+		if (Config.RENDER_MODE == RenderMode.NEWT) {
 			// final DisplaySettings settings = new DisplaySettings(800, 600,
 			// 32, 60, 0, 2, 0, 4, false, false);
 			// final DisplaySettings settings = new DisplaySettings(400, 300,
 			// 24, 0, 0, 16, 0, 0, false, false);
 //			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
-			canvas = new JoglNewtAwtCanvas(settings, new JoglCanvasRenderer(this));
-
+			final JoglNewtAwtCanvas canvas = new JoglNewtAwtCanvas(settings, new JoglCanvasRenderer(this));
 			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
+			mouseWrapper = new JoglNewtMouseWrapper(canvas, new JoglNewtMouseManager(canvas));
+			keyboardWrapper = new JoglNewtKeyboardWrapper(canvas);
+			focusWrapper = new JoglNewtFocusWrapper(canvas);
+			this.canvas = canvas;
+		} else if (Config.RENDER_MODE == RenderMode.JOGL) {
+			final JoglAwtCanvas canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
+			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
+			mouseWrapper = new AwtMouseWrapper(canvas, new AwtMouseManager(canvas));
+			keyboardWrapper = new AwtKeyboardWrapper(canvas);
+			focusWrapper = new AwtFocusWrapper(canvas);
+			this.canvas = canvas;
 		} else {
 			// final DisplaySettings settings = new DisplaySettings(800, 600,
 			// 32, 60, 0, 8, 0, 0, false, false);
@@ -225,23 +249,34 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			// 32, 0, 0, 8, 0, 4, false, false);
 
 			try {
-				canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
+				final LwjglAwtCanvas canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
 				TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
+				mouseWrapper = new AwtMouseWrapper(canvas, new AwtMouseManager(canvas));
+				keyboardWrapper = new AwtKeyboardWrapper(canvas);
+				focusWrapper = new AwtFocusWrapper(canvas);
+				this.canvas = canvas;
 			} catch (final LWJGLException e) {
 				throw new RuntimeException(e);
 			}
+
+
 		}
 
 		final Component canvasComponent = (Component) canvas;
-		canvasComponent.setMinimumSize(new Dimension(500, 0));
+		canvasComponent.setMinimumSize(new Dimension(500, 500));
 
 		frameHandler = new FrameHandler(new Timer());
 		frameHandler.addCanvas(canvas);
 
 		logicalLayer = new LogicalLayer();
-		final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(canvasComponent, new AwtMouseManager(canvasComponent));
-		final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvasComponent);
-		final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvasComponent);
+////		final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(canvasComponent, new AwtMouseManager(canvasComponent));
+////		final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvasComponent);
+////		final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvasComponent);
+//
+//		final MouseWrapper mouseWrapper = new JoglNewtMouseWrapper(canvas, new AwtMouseManager(canvasComponent));
+//		final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvasComponent);
+//		final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvasComponent);
+
 		final PhysicalLayer physicalLayer = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
 		logicalLayer.registerInput(canvas, physicalLayer);
 
@@ -263,9 +298,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.out.print("Initializing SceneManager...");
 		AWTImageLoader.registerLoader();
 		try {
-			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(SceneManager.class.getClassLoader().getResource("org/concord/energy3d/resources/images/")));
-			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(SceneManager.class.getClassLoader().getResource("org/concord/energy3d/resources/")));
-			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, new SimpleResourceLocator(SceneManager.class.getClassLoader().getResource("org/concord/energy3d/resources/")));
+			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(getClass().getResource("/org/concord/energy3d/scene/images/")));
+			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(getClass().getResource("/org/concord/energy3d/scene/fonts/")));
+			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, new SimpleResourceLocator(getClass().getResource("models/")));
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}

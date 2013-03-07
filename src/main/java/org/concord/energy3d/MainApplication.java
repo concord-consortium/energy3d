@@ -12,6 +12,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.Config.RenderMode;
 
 public class MainApplication {
 	public static void main(final String[] args) {
@@ -32,19 +33,27 @@ public class MainApplication {
 		}
 		final SceneManager scene = SceneManager.getInstance();
 		final MainFrame mainFrame = MainFrame.getInstance();
+		mainFrame.updateTitleBar();
 		mainFrame.setVisible(true);
-		new Thread(scene, "Energy 3D Application").start();
 		Scene.getInstance();
+//		SwingUtilities.invokeLater(new Runnable() {
+//			@Override
+//			public void run() {
+				new Thread(scene, "Energy 3D Application").start();
+//			}
+//		});
+//		new Thread(scene, "Energy 3D Application").start();
 
 		if (!Config.isMac() && args.length > 1 && !args[args.length - 1].startsWith("-"))
 			mainFrame.open(args[args.length - 1]);
 
-		mainFrame.updateTitleBar();
 
 		if (Config.isClassroomMode())
 			startPeriodicFileSave();
 
 //		HandTrackerApplication.main(null);
+
+//		scene.run();
 	}
 
 	private static boolean argsContain(final String command, final String[] args) {
@@ -58,7 +67,7 @@ public class MainApplication {
 		System.out.println(System.getProperty("java.version") + ", " + System.getProperty("os.arch"));
 		final String orgLibraryPath = System.getProperty("java.library.path");
 		final String sep = System.getProperty("file.separator");
-		final String rendererNativePath = "." + sep + "lib" + sep + (Config.JOGL ? "jogl" : "lwjgl") + sep + "native";
+		final String rendererNativePath = "." + sep + "lib" + sep + (Config.RENDER_MODE == RenderMode.LWJGL ? "lwjgl" : "jogl") + sep + "native";
 		final String OSPath;
 		final String os = System.getProperty("os.name").toLowerCase();
 		if (os.startsWith("windows")) {

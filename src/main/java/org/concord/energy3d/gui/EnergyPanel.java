@@ -556,7 +556,7 @@ public class EnergyPanel extends JPanel {
 			public void run() {
 				final GridPane grid = new GridPane();
 				final javafx.scene.Scene scene = new javafx.scene.Scene(grid, 800, 400);
-				scene.getStylesheets().add("org/concord/energy3d/css/fx.css");
+				scene.getStylesheets().add("org/concord/energy3d/gui/css/fx.css");
 				final NumberAxis yAxis = new NumberAxis(0, 100, 10);
 				final CategoryAxis xAxis = new CategoryAxis();
 				xAxis.setCategories(FXCollections.<String> observableArrayList(Arrays.asList("Area", "Energy Loss")));

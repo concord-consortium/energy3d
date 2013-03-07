@@ -4,15 +4,6 @@
   <artifactId>energy3d</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <build>
-    <sourceDirectory>src</sourceDirectory>
-    <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -30,6 +21,18 @@
 	          <mainClass>org.concord.energy3d.MainApplication</mainClass>
 	      </configuration>
       </plugin>
+      <plugin>
+      	<groupId>org.apache.maven.plugins</groupId>
+      	<artifactId>maven-jar-plugin</artifactId>
+      	<version>2.4</version>
+      	<configuration>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+            <forced>true</forced>
+            <manifestFile>manifest.mf</manifestFile>
+          </archive>
+      	</configuration>
+      </plugin>
     </plugins>
   </build>
   <dependencies>
@@ -45,11 +48,6 @@
   	</dependency>
   	<dependency>
   		<groupId>com.ardor3d</groupId>
-  		<artifactId>ardor3d-jogl</artifactId>
-  		<version>0.9-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.ardor3d</groupId>
   		<artifactId>ardor3d-collada</artifactId>
   		<version>0.9-SNAPSHOT</version>
   	</dependency>
@@ -61,11 +59,6 @@
   	<dependency>
   		<groupId>com.ardor3d</groupId>
   		<artifactId>ardor3d-effects</artifactId>
-  		<version>0.9-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.ardor3d</groupId>
-  		<artifactId>ardor3d-examples</artifactId>
   		<version>0.9-SNAPSHOT</version>
   	</dependency>
   </dependencies>
