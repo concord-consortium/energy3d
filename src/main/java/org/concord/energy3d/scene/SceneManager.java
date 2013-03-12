@@ -43,7 +43,6 @@ import org.concord.energy3d.util.Config.RenderMode;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
-import org.lwjgl.LWJGLException;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
@@ -213,8 +212,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.out.print("Constructing SceneManager...");
 		final long time = System.nanoTime();
 //		panel.setSize(100, 100);
-//		final DisplaySettings settings = new DisplaySettings(400, 300, 16, 0, 0, 8, 0, 4, false, false);
-		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
+		final DisplaySettings settings = new DisplaySettings(400, 300, 16, 0, 0, 8, 0, 4, false, false);
+//		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
 		final MouseWrapper mouseWrapper;
 		final KeyboardWrapper keyboardWrapper;
 		final FocusWrapper focusWrapper;
@@ -255,11 +254,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				keyboardWrapper = new AwtKeyboardWrapper(canvas);
 				focusWrapper = new AwtFocusWrapper(canvas);
 				this.canvas = canvas;
-			} catch (final LWJGLException e) {
+			} catch (final Exception e) {
 				throw new RuntimeException(e);
 			}
 
-
+//			mouseWrapper = null;
+//			keyboardWrapper = null;
+//			focusWrapper = null;
+//
+//			canvas = null;
 		}
 
 		final Component canvasComponent = (Component) canvas;
@@ -298,8 +301,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.out.print("Initializing SceneManager...");
 		AWTImageLoader.registerLoader();
 		try {
-			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(getClass().getResource("/org/concord/energy3d/scene/images/")));
-			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(getClass().getResource("/org/concord/energy3d/scene/fonts/")));
+			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(getClass().getResource("images/")));
+			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(getClass().getResource("fonts/")));
 			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, new SimpleResourceLocator(getClass().getResource("models/")));
 		} catch (final Exception ex) {
 			ex.printStackTrace();
@@ -370,7 +373,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isUpdateTime = refreshTime != -1 && now <= refreshTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
-			refresh = true;
+//			refresh = true;
 			if (refresh || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
 				if (now > refreshTime)
 					refreshTime = -1;
@@ -431,9 +434,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		final Heliodon heliodon = Heliodon.getInstance();
-		if (sunAnim)
-			heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true);
-		heliodon.update();
+		if (heliodon != null) {
+			if (sunAnim)
+				heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true);
+			heliodon.update();
+		}
 
 		if (cameraControl != null && cameraControl.isAnimating())
 			cameraControl.animate();

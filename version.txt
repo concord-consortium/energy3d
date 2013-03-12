@@ -1348,7 +1348,7 @@ Version 0.5 - October 20, 2011
 - fix problem with null context by setting an initial size for Canvas
 - fix mouse event problem by using Newt wrappers
 - add ability to switch between Newt, Jogl and LWJGL
-
+- use maven to create jar and sign it
 
 
 

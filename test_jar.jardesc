@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="C:/exe/Energy3D/test.jar"/>
+    <jar path="C:/exe/Energy3D/energy3d.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/Energy3D/test_jar.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
-    <manifest generateManifest="true" mainClassHandleIdentifier="=ardor3d-examples/src\/main\/java&lt;com.ardor3d.example.canvas{JoglAwtExample.java[JoglAwtExample" manifestLocation="/Energy3D/manifest.mf" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+    <manifest generateManifest="true" mainClassHandleIdentifier="=Energy3D/src\/test\/java&lt;org.concord.energy3d.test{JoglNewtAwtExample.java[JoglNewtAwtExample" manifestLocation="/Energy3D/manifest.mf" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
         <sealing sealJar="true">
             <packagesToSeal/>
             <packagesToUnSeal/>
@@ -12,21 +12,20 @@
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <javaElement handleIdentifier="=ardor3d-examples/src\/main\/resources"/>
-        <file path="/ardor3d-collada/lib/jdom/jaxen.jar"/>
-        <file path="/ardor3d-collada/lib/jdom/saxpath.jar"/>
         <javaElement handleIdentifier="=ardor3d-lwjgl/src\/main\/java"/>
-        <javaElement handleIdentifier="=ardor3d-effects/src\/main\/resources&lt;com.ardor3d.extension.shadow.map"/>
         <javaElement handleIdentifier="=ardor3d-core/src\/main\/resources"/>
+        <javaElement handleIdentifier="=Energy3D/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-savable/src\/main\/java"/>
+        <javaElement handleIdentifier="=Energy3D/src\/test\/java"/>
         <javaElement handleIdentifier="=ardor3d-core/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.shadow.map"/>
-        <javaElement handleIdentifier="=ardor3d-examples/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-math/src\/main\/java"/>
+        <javaElement handleIdentifier="=ardor3d-examples/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-animation/src\/main\/java"/>
-        <file path="/ardor3d-collada/lib/jdom/jdom.jar"/>
-        <javaElement handleIdentifier="=ardor3d-effects/src\/main\/resources&lt;com.ardor3d.extension.effect.bloom"/>
         <javaElement handleIdentifier="=ardor3d-collada/src\/main\/java"/>
+        <javaElement handleIdentifier="=Energy3D/poly2tri"/>
         <javaElement handleIdentifier="=ardor3d-jogl/src\/main\/java"/>
+        <javaElement handleIdentifier="=Energy3D/src\/main\/resources"/>
         <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.effect.bloom"/>
         <javaElement handleIdentifier="=ardor3d-awt/src\/main\/java"/>
     </selectedElements>
