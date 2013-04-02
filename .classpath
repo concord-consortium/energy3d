@@ -48,5 +48,6 @@
 	<classpathentry kind="lib" path="C:/Users/snourian/.m2/repository/org/jogamp/jogl/jogl-all/2.0-rc11post06/jogl-all-2.0-rc11post06-natives-solaris-i586.jar"/>
 	<classpathentry kind="lib" path="C:/Users/snourian/.m2/repository/org/jogamp/jogl/jogl-all/2.0-rc11post06/jogl-all-2.0-rc11post06-natives-windows-amd64.jar"/>
 	<classpathentry kind="lib" path="C:/Users/snourian/.m2/repository/org/jogamp/jogl/jogl-all/2.0-rc11post06/jogl-all-2.0-rc11post06-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/jfxrt.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

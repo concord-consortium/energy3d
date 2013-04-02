@@ -19,7 +19,7 @@
 	</security>
 	<resources>
 		<j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+" />
-
+		<property name="prism.verbose" value="true" />		
 		<jar href="energy3d.jar" main="true" />
 		<jar href="resources/guava-13.0.1.jar" />
 		<jar href="resources/jdom2-2.0.4.jar" />

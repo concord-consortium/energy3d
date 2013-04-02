@@ -1495,6 +1495,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						cameraControl.setLeftMouseButtonEnabled(true);
 					}
 				}
+				System.out.println("mouse released: " + selectedHousePart);
 				if (sceneChanged)
 					updateHeliodonAndAnnotationSize();
 				return null;

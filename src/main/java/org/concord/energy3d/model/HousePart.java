@@ -170,7 +170,8 @@ public abstract class HousePart implements Serializable {
 	}
 
 	private void addNewEditPointShape(final int i) {
-		final Sphere pointShape = new Sphere("Point", Vector3.ZERO, 8, 8, 0.05);
+//		final Sphere pointShape = new Sphere("Point", Vector3.ZERO, 8, 8, 0.05);
+		final Sphere pointShape = new Sphere("Point", Vector3.ZERO, 8, 8, 0.1);
 		pointShape.setUserData(new UserData(this, i, true));
 		pointShape.updateModelBound(); // important
 		pointShape.getSceneHints().setCullHint(CullHint.Always);
@@ -630,19 +631,15 @@ public abstract class HousePart implements Serializable {
 			mesh.setDefaultColor(defaultColor);
 		} else {
 			final TextureState ts = new TextureState();
-			final Texture texture = getTexture(getTextureFileName(), defaultColor);
+			final Texture texture = getTexture(getTextureFileName(), textureMode != TextureMode.Full, defaultColor);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
-			if (textureMode == TextureMode.None)
-				mesh.setDefaultColor(defaultColor);
-			else
-				mesh.setDefaultColor(Scene.WHITE);
 		}
 	}
 
-	private Texture getTexture(final String filename, final ReadOnlyColorRGBA defaultColor) {
+	private Texture getTexture(final String filename, final boolean isTrasparent, final ReadOnlyColorRGBA defaultColor) {
 		final Texture texture = TextureManager.load(filename, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
-		if (Scene.getInstance().getTextureMode() == TextureMode.Simple) {
+		if (isTrasparent) {
 			final Color color = new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue());
 			final Image image = texture.getImage();
 			final ByteBuffer data = image.getData(0);

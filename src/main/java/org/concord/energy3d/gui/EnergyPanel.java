@@ -66,7 +66,7 @@ public class EnergyPanel extends JPanel {
 	private double doorsArea;
 	private double windowsArea;
 	private double roofsArea;
-	private final JFXPanel fxPanel;
+	private JFXPanel fxPanel;
 	private final XYChart.Data<String, Number> wallsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
 	private final XYChart.Data<String, Number> windowsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
 	private final XYChart.Data<String, Number> doorsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
@@ -428,17 +428,16 @@ public class EnergyPanel extends JPanel {
 		solarLabel.setMinimumSize(size);
 		totalLabel.setMinimumSize(size);
 
-		fxPanel = new JFXPanel();
-		final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
-		fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
-		gbc_fxPanel.gridwidth = 3;
-		gbc_fxPanel.fill = GridBagConstraints.BOTH;
-		gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
-		gbc_fxPanel.gridx = 0;
-		gbc_fxPanel.gridy = 1;
-
-		if (true)
-			add(fxPanel, gbc_fxPanel);
+//		fxPanel = new JFXPanel();
+//		final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
+//		fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
+//		gbc_fxPanel.gridwidth = 3;
+//		gbc_fxPanel.fill = GridBagConstraints.BOTH;
+//		gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
+//		gbc_fxPanel.gridx = 0;
+//		gbc_fxPanel.gridy = 1;
+//
+//		add(fxPanel, gbc_fxPanel);
 
 		final JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor (W/m2/C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -545,7 +544,27 @@ public class EnergyPanel extends JPanel {
 
 		final Component verticalGlue = Box.createVerticalGlue();
 		add(verticalGlue);
-		initFxComponents();
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(10000);
+				} catch (final InterruptedException e) {
+					e.printStackTrace();
+				}
+				fxPanel = new JFXPanel();
+				final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
+				fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
+				gbc_fxPanel.gridwidth = 3;
+				gbc_fxPanel.fill = GridBagConstraints.BOTH;
+				gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
+				gbc_fxPanel.gridx = 0;
+				gbc_fxPanel.gridy = 1;
+
+				add(fxPanel, gbc_fxPanel);
+				initFxComponents();
+			};
+		}.start();
 	}
 
 	private void initFxComponents() {
@@ -554,6 +573,7 @@ public class EnergyPanel extends JPanel {
 
 			@Override
 			public void run() {
+
 				final GridPane grid = new GridPane();
 				final javafx.scene.Scene scene = new javafx.scene.Scene(grid, 800, 400);
 				scene.getStylesheets().add("org/concord/energy3d/gui/css/fx.css");
@@ -616,15 +636,21 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void computeEnergy() {
-		if (thread != null && thread.isAlive())
-			thread.stop();
-		thread = new Thread() {
-			@Override
-			public void run() {
+//		if (thread != null && thread.isAlive())
+//			thread.stop();
+//		thread = new Thread() {
+//			@Override
+//			public void run() {
+//				try {
+//					Thread.sleep(2000);
+//				} catch (final InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//				System.out.println("computeEnergyNow()");
 				computeEnergyNow();
-			}
-		};
-		thread.start();
+//			}
+//		};
+//		thread.start();
 	}
 
 	private void computeEnergyNow() {

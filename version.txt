@@ -1342,15 +1342,28 @@ Version 0.5 - October 20, 2011
 - convert Energy3D project to a maven project
 - use the new jogl jars and update the webstart jnlp
 *
-- convert project to maven
-- save resources in same packages hierarchy as the classes that need them 
+- create pom.xml for the maven configuration of energy3d
+- add Ardor3D maven dependancies to energy3d project
+- add JOGL nightly built maven dependancies to energy3d project
+- add maven plugins to package energy3d project
+- add maven plugins to perform JavaFX integration and packaging
+- save resources in same packages hierarchy as the classes that need them
+- use relative path to load resources instead of absolute path
+- collaborate with JOGL team in making Newt work in Mac OS X 
 - add support for new renderer: Jogl Newt
 - fix problem with null context by setting an initial size for Canvas
 - fix mouse event problem by using Newt wrappers
 - add ability to switch between Newt, Jogl and LWJGL
 - use maven to create jar and sign it
-
-
+- study JOGL to see why AWT Graphics configuration is unavailable in Mac OS X when a JavaFX component is present
+- fix problem with JavaFX not working with JOGL in Mac OS X by placing a 10 seconds delay before adding JavaFX components
+- in experiment mode prompt the user about which renderer to use
+- in experiment mode prompt the user about whether or not to load JavaFX GUI elements
+- fix problem with not being able to drag edit points in windows laptops with integrated graphics cards
+- fix problem with GUI hanging due to the calculations threads while moving the heliodon sun too quickly
+- fix problem with heat calculations not updating when the month changes
+- fix problem with heat calculations not updating when the U Factor of house parts change
+- fix problem with some textures no visible in older graphics card due by resizing the textures to be 2^x 
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

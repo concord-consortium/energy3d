@@ -1024,7 +1024,7 @@ public class Wall extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "wall.png" : "wall.jpg";
+		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "wall.png" : "wall_brick.png";
 	}
 
 	public boolean isVisited() {
