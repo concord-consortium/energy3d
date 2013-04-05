@@ -721,6 +721,8 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public double computeArea() {
+		if (!isDrawCompleted())
+			return 0.0;
 		final Vector3 p0 = getAbsPoint(0);
 		final Vector3 p1 = getAbsPoint(1);
 		final Vector3 p2 = getAbsPoint(2);

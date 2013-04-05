@@ -99,6 +99,7 @@ public class EnergyPanel extends JPanel {
 	private final JSpinner insideTemperatureSpinner;
 	private final JSpinner outsideTemperatureSpinner;
 	private Thread thread;
+	private boolean computeRequest;
 
 	public class EnergyAmount {
 		double rate;
@@ -428,16 +429,16 @@ public class EnergyPanel extends JPanel {
 		solarLabel.setMinimumSize(size);
 		totalLabel.setMinimumSize(size);
 
-//		fxPanel = new JFXPanel();
-//		final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
-//		fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
-//		gbc_fxPanel.gridwidth = 3;
-//		gbc_fxPanel.fill = GridBagConstraints.BOTH;
-//		gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
-//		gbc_fxPanel.gridx = 0;
-//		gbc_fxPanel.gridy = 1;
-//
-//		add(fxPanel, gbc_fxPanel);
+		// fxPanel = new JFXPanel();
+		// final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
+		// fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
+		// gbc_fxPanel.gridwidth = 3;
+		// gbc_fxPanel.fill = GridBagConstraints.BOTH;
+		// gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
+		// gbc_fxPanel.gridx = 0;
+		// gbc_fxPanel.gridy = 1;
+		//
+		// add(fxPanel, gbc_fxPanel);
 
 		final JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor (W/m2/C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -636,24 +637,29 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void computeEnergy() {
-//		if (thread != null && thread.isAlive())
-//			thread.stop();
-//		thread = new Thread() {
-//			@Override
-//			public void run() {
-//				try {
-//					Thread.sleep(2000);
-//				} catch (final InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//				System.out.println("computeEnergyNow()");
-				computeEnergyNow();
-//			}
-//		};
-//		thread.start();
+		if (thread != null && thread.isAlive()) {
+			computeRequest = true;
+		} else {
+			thread = new Thread() {
+				@Override
+				public void run() {
+					do {
+						try {
+							Thread.sleep(500);
+						} catch (final InterruptedException e) {
+							e.printStackTrace();
+						}
+						computeRequest = false;
+						computeEnergyNow();
+					} while (computeRequest);
+				}
+			};
+			thread.start();
+		}
 	}
 
 	private void computeEnergyNow() {
+		System.out.println("computeEnergyNow()");
 		if (autoCheckBox.isSelected())
 			updateOutsideTemperature();
 
@@ -680,7 +686,7 @@ public class EnergyPanel extends JPanel {
 		updateArea(wallsArea, doorsArea, windowsArea, roofsArea);
 
 		/* compute energy loss/gain rate and energy loss/gain today */
-		final double energyLossRate = computeEnergyLossRate((Integer)insideTemperatureSpinner.getValue() - (Integer)outsideTemperatureSpinner.getValue(), true);
+		final double energyLossRate = computeEnergyLossRate((Integer) insideTemperatureSpinner.getValue() - (Integer) outsideTemperatureSpinner.getValue(), true);
 		final double energyLossToday = energyLossRate / 1000.0 * 24.0;
 
 		if (energyLossRate > 0.0) {
@@ -844,7 +850,7 @@ public class EnergyPanel extends JPanel {
 
 	private void updateOutsideTemperature() {
 		final Date date = (Date) MainPanel.getInstance().getDateSpinner().getValue();
-		outsideTemperatureSpinner.setValue((int)Math.round(toCelsius(averageTemperature[date.getMonth()])));
+		outsideTemperatureSpinner.setValue((int) Math.round(toCelsius(averageTemperature[date.getMonth()])));
 	}
 
 }
