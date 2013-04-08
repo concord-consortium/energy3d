@@ -57,8 +57,7 @@ public class Floor extends HousePart {
 
 		updateTextureAndColor();
 
-		final UserData userData = new UserData(this);
-		mesh.setUserData(userData);
+		mesh.setUserData(new UserData(this));
 	}
 
 	@Override

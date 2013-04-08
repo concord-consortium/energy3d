@@ -1366,6 +1366,8 @@ Version 0.5 - October 20, 2011
 - fix problem with some textures no visible in older graphics card due by resizing the textures to be 2^x 
 - improve energy computation threading to avoid using the stop method
 - fix problem with freezing GUI due to energy computation being done too frequently by introducing delay and ensuring single threading
+- fix problem with print preview exception in the presence of a window
+- fix problem with not being able to select window by clicking on its main mesh
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

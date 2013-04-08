@@ -9,6 +9,7 @@ import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
@@ -55,9 +56,9 @@ public class Window extends HousePart {
 //		final MaterialState ms = new MaterialState();
 //		ms.setColorMaterial(ColorMaterial.AmbientAndDiffuse);
 //		mesh.setRenderState(ms);
-//		mesh.setUserData(new UserData(this));
-//
-//		root.attachChild(mesh);
+
+		mesh.setUserData(new UserData(this));
+		root.attachChild(mesh);
 
 		label1.setAlign(Align.SouthWest);
 		root.attachChild(label1);
@@ -146,7 +147,8 @@ public class Window extends HousePart {
 //		for (int i = 0; i < points.size(); i++)
 //			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
 //
-//		mesh.updateModelBound();
+		mesh.updateModelBound();
+		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 
 		final double divisionLength = 3.0;
 		if (isFrozen() || getAbsPoint(2).subtractLocal(getAbsPoint(0)).length() < MathUtils.ZERO_TOLERANCE || getAbsPoint(1).subtractLocal(getAbsPoint(0)).length() < MathUtils.ZERO_TOLERANCE)
