@@ -113,8 +113,8 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private EnergyPanel() {
-		setMinimumSize(new Dimension(250, 0));
-		setPreferredSize(new Dimension(250, 388));
+//		setMinimumSize(new Dimension(250, 0));
+//		setPreferredSize(new Dimension(250, 388));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		final JPanel panel = new JPanel();
@@ -566,6 +566,8 @@ public class EnergyPanel extends JPanel {
 				initFxComponents();
 			};
 		}.start();
+
+		setPreferredSize(getMinimumSize());
 	}
 
 	private void initFxComponents() {
@@ -614,7 +616,6 @@ public class EnergyPanel extends JPanel {
 				fxPanel.setScene(scene);
 			}
 		});
-
 	}
 
 	public void updateArea(final double walls, final double doors, final double windows, final double roofs) {
