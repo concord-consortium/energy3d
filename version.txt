@@ -1373,6 +1373,7 @@ Version 0.5 - October 20, 2011
 - remove explicit preferred sizes of combo-boxes
 - add toolbar button to toggle energy panel on and off
 - make the default size of energy panel so that text fields have 5 digits length
+- do not exit if the user cancels file saving after prompted to save
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

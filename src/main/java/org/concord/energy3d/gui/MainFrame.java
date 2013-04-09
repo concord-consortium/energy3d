@@ -203,7 +203,7 @@ public class MainFrame extends JFrame {
 			@Override
 			public void run() {
 				final MainFrame thisClass = new MainFrame();
-				thisClass.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				thisClass.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 				thisClass.setVisible(true);
 			}
 		});
@@ -1496,12 +1496,14 @@ public class MainFrame extends JFrame {
 	private void exit() {
 		if (Scene.getInstance().isEdited()) {
 			final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
-			if (save == JOptionPane.YES_OPTION)
+			if (save == JOptionPane.YES_OPTION) {
 				save();
-			else if (save == JOptionPane.CANCEL_OPTION)
-				return;
-		}
-		SceneManager.getInstance().exit();
+				if (!Scene.getInstance().isEdited())
+					SceneManager.getInstance().exit();
+			} else if (save != JOptionPane.CANCEL_OPTION)
+				SceneManager.getInstance().exit();
+		} else
+			SceneManager.getInstance().exit();
 	}
 
 	private void save() {

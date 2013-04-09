@@ -291,7 +291,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			@Override
 			public void componentResized(final java.awt.event.ComponentEvent e) {
 				resizeCamera();
-				refresh(1000);
+				refresh(1);
 				if (Heliodon.getInstance() != null)
 					Heliodon.getInstance().updateBloom();
 			}
@@ -1363,8 +1363,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		refresh = true;
 	}
 
-	public void refresh(final double updateTime) {
-		refreshTime = frameHandler.getTimer().getTimeInSeconds() + updateTime;
+	public void refresh(final double updateDurationInSeconds) {
+		refreshTime = frameHandler.getTimer().getTimeInSeconds() + updateDurationInSeconds;
 	}
 
 	public UndoManager getUndoManager() {
