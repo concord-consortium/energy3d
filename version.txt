@@ -1370,7 +1370,9 @@ Version 0.5 - October 20, 2011
 - fix problem with not being able to select window by clicking on its main mesh
 - properly initialize the minimum size of the EnergyPanel so that it reflects the OS GUI default size
 - add JavaFX components to GUI as soon as JFrame is activated
-- remove explicit preferred sizes of combo-boxes 
+- remove explicit preferred sizes of combo-boxes
+- add toolbar button to toggle energy panel on and off
+- make the default size of energy panel so that text fields have 5 digits length
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

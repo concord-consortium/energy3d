@@ -71,6 +71,7 @@ public class MainPanel extends JPanel {
 	private JSplitPane splitPane;
 	private EnergyPanel energyPanel;
 	private JPanel canvasPanel;
+	private JToggleButton energyToggleButton;
 
 	public static MainPanel getInstance() {
 		return instance;
@@ -159,6 +160,7 @@ public class MainPanel extends JPanel {
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
 			bg.add(zoomButton);
+			appToolbar.add(getEnergyToggleButton());
 			if (showEditTools) {
 				bg.add(resizeButton);
 				bg.add(platformButton);
@@ -985,5 +987,21 @@ public class MainPanel extends JPanel {
 			canvasPanel.setLayout(new BorderLayout(0, 0));
 		}
 		return canvasPanel;
+	}
+	private JToggleButton getEnergyToggleButton() {
+		if (energyToggleButton == null) {
+			energyToggleButton = new JToggleButton("");
+			energyToggleButton.setToolTipText("Show energy analysis");
+			energyToggleButton.setSelected(true);
+			energyToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/chart.png")));
+			energyToggleButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					EnergyPanel.getInstance().setVisible(energyToggleButton.isSelected());
+					splitPane.resetToPreferredSizes();
+				}
+			});
+		}
+		return energyToggleButton;
 	}
 }

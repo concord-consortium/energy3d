@@ -198,7 +198,7 @@ public class EnergyPanel extends JPanel {
 		final JLabel solarLabel = new JLabel("Solar");
 		solarLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_solarLabel = new GridBagConstraints();
-		gbc_solarLabel.insets = new Insets(0, 0, 5, 5);
+//		gbc_solarLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_solarLabel.gridx = 1;
 		gbc_solarLabel.gridy = 0;
 		panel_1.add(solarLabel, gbc_solarLabel);
@@ -206,7 +206,7 @@ public class EnergyPanel extends JPanel {
 		final JLabel heatingLabel = new JLabel("Heating");
 		heatingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_heatingLabel = new GridBagConstraints();
-		gbc_heatingLabel.insets = new Insets(0, 0, 5, 5);
+//		gbc_heatingLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_heatingLabel.gridx = 2;
 		gbc_heatingLabel.gridy = 0;
 		panel_1.add(heatingLabel, gbc_heatingLabel);
@@ -214,7 +214,7 @@ public class EnergyPanel extends JPanel {
 		final JLabel coolingLabel = new JLabel("Cooling");
 		coolingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_coolingLabel = new GridBagConstraints();
-		gbc_coolingLabel.insets = new Insets(0, 0, 5, 5);
+//		gbc_coolingLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_coolingLabel.gridx = 3;
 		gbc_coolingLabel.gridy = 0;
 		panel_1.add(coolingLabel, gbc_coolingLabel);
@@ -222,7 +222,7 @@ public class EnergyPanel extends JPanel {
 		final JLabel totalLabel = new JLabel("Total");
 		totalLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_totalLabel = new GridBagConstraints();
-		gbc_totalLabel.insets = new Insets(0, 0, 5, 0);
+//		gbc_totalLabel.insets = new Insets(0, 0, 5, 0);
 		gbc_totalLabel.gridx = 4;
 		gbc_totalLabel.gridy = 0;
 		panel_1.add(totalLabel, gbc_totalLabel);
@@ -230,7 +230,7 @@ public class EnergyPanel extends JPanel {
 		final JLabel nowLabel = new JLabel("Now (watts):");
 		final GridBagConstraints gbc_nowLabel = new GridBagConstraints();
 		gbc_nowLabel.anchor = GridBagConstraints.WEST;
-		gbc_nowLabel.insets = new Insets(0, 0, 5, 5);
+//		gbc_nowLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_nowLabel.gridx = 0;
 		gbc_nowLabel.gridy = 1;
 		panel_1.add(nowLabel, gbc_nowLabel);
@@ -239,50 +239,50 @@ public class EnergyPanel extends JPanel {
 		solarRateTextField.setEditable(false);
 		final GridBagConstraints gbc_solarRateTextField = new GridBagConstraints();
 		gbc_solarRateTextField.weightx = 1.0;
-		gbc_solarRateTextField.insets = new Insets(0, 0, 5, 5);
+//		gbc_solarRateTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_solarRateTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_solarRateTextField.gridx = 1;
 		gbc_solarRateTextField.gridy = 1;
+		solarRateTextField.setColumns(5);
 		panel_1.add(solarRateTextField, gbc_solarRateTextField);
-		solarRateTextField.setColumns(10);
 
 		heatingRateTextField = new JTextField();
 		final GridBagConstraints gbc_heatingRateTextField = new GridBagConstraints();
 		gbc_heatingRateTextField.weightx = 1.0;
 		gbc_heatingRateTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_heatingRateTextField.insets = new Insets(0, 0, 5, 5);
+//		gbc_heatingRateTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_heatingRateTextField.gridx = 2;
 		gbc_heatingRateTextField.gridy = 1;
 		panel_1.add(heatingRateTextField, gbc_heatingRateTextField);
 		heatingRateTextField.setEditable(false);
-		heatingRateTextField.setColumns(10);
+		heatingRateTextField.setColumns(5);
 
 		coolingRateTextField = new JTextField();
 		coolingRateTextField.setEditable(false);
 		final GridBagConstraints gbc_coolingRateTextField = new GridBagConstraints();
 		gbc_coolingRateTextField.weightx = 1.0;
-		gbc_coolingRateTextField.insets = new Insets(0, 0, 5, 5);
+//		gbc_coolingRateTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_coolingRateTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_coolingRateTextField.gridx = 3;
 		gbc_coolingRateTextField.gridy = 1;
 		panel_1.add(coolingRateTextField, gbc_coolingRateTextField);
-		coolingRateTextField.setColumns(10);
+		coolingRateTextField.setColumns(5);
 
 		totalRateTextField = new JTextField();
 		totalRateTextField.setEditable(false);
 		final GridBagConstraints gbc_totalRateTextField = new GridBagConstraints();
 		gbc_totalRateTextField.weightx = 1.0;
-		gbc_totalRateTextField.insets = new Insets(0, 0, 5, 0);
+//		gbc_totalRateTextField.insets = new Insets(0, 0, 5, 0);
 		gbc_totalRateTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_totalRateTextField.gridx = 4;
 		gbc_totalRateTextField.gridy = 1;
 		panel_1.add(totalRateTextField, gbc_totalRateTextField);
-		totalRateTextField.setColumns(10);
+		totalRateTextField.setColumns(5);
 
-		final JLabel todayLabel = new JLabel("Today (kWh):");
+		final JLabel todayLabel = new JLabel("Today (kWh): ");
 		final GridBagConstraints gbc_todayLabel = new GridBagConstraints();
 		gbc_todayLabel.anchor = GridBagConstraints.WEST;
-		gbc_todayLabel.insets = new Insets(0, 0, 5, 5);
+//		gbc_todayLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_todayLabel.gridx = 0;
 		gbc_todayLabel.gridy = 2;
 		panel_1.add(todayLabel, gbc_todayLabel);
@@ -290,47 +290,47 @@ public class EnergyPanel extends JPanel {
 		solarTodayTextField = new JTextField();
 		solarTodayTextField.setEditable(false);
 		final GridBagConstraints gbc_solarTodayTextField = new GridBagConstraints();
-		gbc_solarTodayTextField.insets = new Insets(0, 0, 5, 5);
+//		gbc_solarTodayTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_solarTodayTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_solarTodayTextField.gridx = 1;
 		gbc_solarTodayTextField.gridy = 2;
 		panel_1.add(solarTodayTextField, gbc_solarTodayTextField);
-		solarTodayTextField.setColumns(10);
+		solarTodayTextField.setColumns(5);
 
 		heatingTodayTextField = new JTextField();
 		heatingTodayTextField.setEditable(false);
 		final GridBagConstraints gbc_heatingTodayTextField = new GridBagConstraints();
-		gbc_heatingTodayTextField.insets = new Insets(0, 0, 5, 5);
+//		gbc_heatingTodayTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_heatingTodayTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_heatingTodayTextField.gridx = 2;
 		gbc_heatingTodayTextField.gridy = 2;
 		panel_1.add(heatingTodayTextField, gbc_heatingTodayTextField);
-		heatingTodayTextField.setColumns(10);
+		heatingTodayTextField.setColumns(5);
 
 		coolingTodayTextField = new JTextField();
 		coolingTodayTextField.setEditable(false);
 		final GridBagConstraints gbc_coolingTodayTextField = new GridBagConstraints();
-		gbc_coolingTodayTextField.insets = new Insets(0, 0, 5, 5);
+//		gbc_coolingTodayTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_coolingTodayTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_coolingTodayTextField.gridx = 3;
 		gbc_coolingTodayTextField.gridy = 2;
 		panel_1.add(coolingTodayTextField, gbc_coolingTodayTextField);
-		coolingTodayTextField.setColumns(10);
+		coolingTodayTextField.setColumns(5);
 
 		totalTodayTextField = new JTextField();
 		totalTodayTextField.setEditable(false);
 		final GridBagConstraints gbc_totalTodayTextField = new GridBagConstraints();
-		gbc_totalTodayTextField.insets = new Insets(0, 0, 5, 0);
+//		gbc_totalTodayTextField.insets = new Insets(0, 0, 5, 0);
 		gbc_totalTodayTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_totalTodayTextField.gridx = 4;
 		gbc_totalTodayTextField.gridy = 2;
 		panel_1.add(totalTodayTextField, gbc_totalTodayTextField);
-		totalTodayTextField.setColumns(10);
+		totalTodayTextField.setColumns(5);
 
-		final JLabel yearlyLabel = new JLabel("Yearly (kWh):");
+		final JLabel yearlyLabel = new JLabel("Yearly (kWh): ");
 		final GridBagConstraints gbc_yearlyLabel = new GridBagConstraints();
 		gbc_yearlyLabel.anchor = GridBagConstraints.WEST;
-		gbc_yearlyLabel.insets = new Insets(0, 0, 5, 5);
+//		gbc_yearlyLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_yearlyLabel.gridx = 0;
 		gbc_yearlyLabel.gridy = 3;
 		panel_1.add(yearlyLabel, gbc_yearlyLabel);
@@ -340,47 +340,47 @@ public class EnergyPanel extends JPanel {
 		solarYearlyTextField = new JTextField();
 		solarYearlyTextField.setEditable(false);
 		final GridBagConstraints gbc_solarYearlyTextField = new GridBagConstraints();
-		gbc_solarYearlyTextField.insets = new Insets(0, 0, 5, 5);
+//		gbc_solarYearlyTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_solarYearlyTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_solarYearlyTextField.gridx = 1;
 		gbc_solarYearlyTextField.gridy = 3;
 		panel_1.add(solarYearlyTextField, gbc_solarYearlyTextField);
-		solarYearlyTextField.setColumns(10);
+		solarYearlyTextField.setColumns(5);
 
 		heatingYearlyTextField = new JTextField();
 		heatingYearlyTextField.setEditable(false);
 		final GridBagConstraints gbc_heatingYearlyTextField = new GridBagConstraints();
 		gbc_heatingYearlyTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_heatingYearlyTextField.insets = new Insets(0, 0, 5, 5);
+//		gbc_heatingYearlyTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_heatingYearlyTextField.gridx = 2;
 		gbc_heatingYearlyTextField.gridy = 3;
 		panel_1.add(heatingYearlyTextField, gbc_heatingYearlyTextField);
-		heatingYearlyTextField.setColumns(10);
+		heatingYearlyTextField.setColumns(5);
 
 		coolingYearlyTextField = new JTextField();
 		coolingYearlyTextField.setEditable(false);
 		final GridBagConstraints gbc_coolingYearlyTextField = new GridBagConstraints();
-		gbc_coolingYearlyTextField.insets = new Insets(0, 0, 5, 5);
+//		gbc_coolingYearlyTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_coolingYearlyTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_coolingYearlyTextField.gridx = 3;
 		gbc_coolingYearlyTextField.gridy = 3;
 		panel_1.add(coolingYearlyTextField, gbc_coolingYearlyTextField);
-		coolingYearlyTextField.setColumns(10);
+		coolingYearlyTextField.setColumns(5);
 
 		totalYearlyTextField = new JTextField();
 		totalYearlyTextField.setEditable(false);
 		final GridBagConstraints gbc_totalYearlyTextField = new GridBagConstraints();
-		gbc_totalYearlyTextField.insets = new Insets(0, 0, 5, 0);
+//		gbc_totalYearlyTextField.insets = new Insets(0, 0, 5, 0);
 		gbc_totalYearlyTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_totalYearlyTextField.gridx = 4;
 		gbc_totalYearlyTextField.gridy = 3;
 		panel_1.add(totalYearlyTextField, gbc_totalYearlyTextField);
-		totalYearlyTextField.setColumns(10);
+		totalYearlyTextField.setColumns(5);
 
 		final JLabel yearlyCostLabel = new JLabel("Yearly Cost:");
 		final GridBagConstraints gbc_yearlyCostLabel = new GridBagConstraints();
 		gbc_yearlyCostLabel.anchor = GridBagConstraints.WEST;
-		gbc_yearlyCostLabel.insets = new Insets(0, 0, 0, 5);
+//		gbc_yearlyCostLabel.insets = new Insets(0, 0, 0, 5);
 		gbc_yearlyCostLabel.gridx = 0;
 		gbc_yearlyCostLabel.gridy = 4;
 		panel_1.add(yearlyCostLabel, gbc_yearlyCostLabel);
@@ -388,32 +388,32 @@ public class EnergyPanel extends JPanel {
 		solarCostTextField = new JTextField();
 		solarCostTextField.setEditable(false);
 		final GridBagConstraints gbc_solarCostTextField = new GridBagConstraints();
-		gbc_solarCostTextField.insets = new Insets(0, 0, 0, 5);
+//		gbc_solarCostTextField.insets = new Insets(0, 0, 0, 5);
 		gbc_solarCostTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_solarCostTextField.gridx = 1;
 		gbc_solarCostTextField.gridy = 4;
 		panel_1.add(solarCostTextField, gbc_solarCostTextField);
-		solarCostTextField.setColumns(10);
+		solarCostTextField.setColumns(5);
 
 		heatingCostTextField = new JTextField();
 		heatingCostTextField.setEditable(false);
 		final GridBagConstraints gbc_heatingCostTextField = new GridBagConstraints();
-		gbc_heatingCostTextField.insets = new Insets(0, 0, 0, 5);
+//		gbc_heatingCostTextField.insets = new Insets(0, 0, 0, 5);
 		gbc_heatingCostTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_heatingCostTextField.gridx = 2;
 		gbc_heatingCostTextField.gridy = 4;
 		panel_1.add(heatingCostTextField, gbc_heatingCostTextField);
-		heatingCostTextField.setColumns(10);
+		heatingCostTextField.setColumns(5);
 
 		coolingCostTextField = new JTextField();
 		coolingCostTextField.setEditable(false);
 		final GridBagConstraints gbc_coolingCostTextField = new GridBagConstraints();
-		gbc_coolingCostTextField.insets = new Insets(0, 0, 0, 5);
+//		gbc_coolingCostTextField.insets = new Insets(0, 0, 0, 5);
 		gbc_coolingCostTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_coolingCostTextField.gridx = 3;
 		gbc_coolingCostTextField.gridy = 4;
 		panel_1.add(coolingCostTextField, gbc_coolingCostTextField);
-		coolingCostTextField.setColumns(10);
+		coolingCostTextField.setColumns(5);
 
 		totalCostTextField = new JTextField();
 		totalCostTextField.setEditable(false);
@@ -422,7 +422,7 @@ public class EnergyPanel extends JPanel {
 		gbc_totalCostTextField.gridx = 4;
 		gbc_totalCostTextField.gridy = 4;
 		panel_1.add(totalCostTextField, gbc_totalCostTextField);
-		totalCostTextField.setColumns(10);
+		totalCostTextField.setColumns(5);
 
 		final Dimension size = heatingLabel.getMinimumSize();
 		coolingLabel.setMinimumSize(size);
@@ -451,6 +451,7 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.28" }));
+		wallsComboBox.setPreferredSize(wallsComboBox.getMinimumSize());
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
 		gbc_wallsComboBox.insets = new Insets(0, 0, 5, 5);
 		gbc_wallsComboBox.gridx = 1;
@@ -474,6 +475,7 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.14" }));
+		doorsComboBox.setPreferredSize(doorsComboBox.getMinimumSize());
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
 		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
 		gbc_doorsComboBox.gridx = 3;
@@ -497,6 +499,7 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.89" }));
+		windowsComboBox.setPreferredSize(windowsComboBox.getMinimumSize());
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
 		gbc_windowsComboBox.insets = new Insets(0, 0, 0, 5);
 		gbc_windowsComboBox.gridx = 1;
@@ -520,6 +523,7 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.14" }));
+		roofsComboBox.setPreferredSize(roofsComboBox.getMinimumSize());
 		roofsComboBox.setEditable(true);
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
 		gbc_roofsComboBox.gridx = 3;
@@ -531,7 +535,7 @@ public class EnergyPanel extends JPanel {
 		final Component verticalGlue = Box.createVerticalGlue();
 		add(verticalGlue);
 
-		setPreferredSize(getMinimumSize());
+//		setPreferredSize(getMinimumSize());
 	}
 
 	public void initJavaFXGUI() {
