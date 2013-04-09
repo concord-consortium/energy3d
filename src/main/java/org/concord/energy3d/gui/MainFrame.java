@@ -304,6 +304,7 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
+
 		addWindowStateListener(new WindowStateListener() {
 			@Override
 			public void windowStateChanged(final WindowEvent e) {
@@ -325,6 +326,8 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void windowActivated(final WindowEvent arg0) {
+				if (Config.EXPERIMENT)
+					EnergyPanel.getInstance().initJavaFXGUI();
 				SceneManager.getInstance().refresh();
 			}
 		});

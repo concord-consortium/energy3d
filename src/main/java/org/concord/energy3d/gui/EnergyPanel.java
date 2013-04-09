@@ -113,8 +113,8 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private EnergyPanel() {
-//		setMinimumSize(new Dimension(250, 0));
-//		setPreferredSize(new Dimension(250, 388));
+		// setMinimumSize(new Dimension(250, 0));
+		// setPreferredSize(new Dimension(250, 388));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		final JPanel panel = new JPanel();
@@ -429,17 +429,6 @@ public class EnergyPanel extends JPanel {
 		solarLabel.setMinimumSize(size);
 		totalLabel.setMinimumSize(size);
 
-		// fxPanel = new JFXPanel();
-		// final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
-		// fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
-		// gbc_fxPanel.gridwidth = 3;
-		// gbc_fxPanel.fill = GridBagConstraints.BOTH;
-		// gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
-		// gbc_fxPanel.gridx = 0;
-		// gbc_fxPanel.gridy = 1;
-		//
-		// add(fxPanel, gbc_fxPanel);
-
 		final JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor (W/m2/C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel_2);
@@ -462,7 +451,6 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.28" }));
-		wallsComboBox.setPreferredSize(new Dimension(50, 20));
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
 		gbc_wallsComboBox.insets = new Insets(0, 0, 5, 5);
 		gbc_wallsComboBox.gridx = 1;
@@ -486,7 +474,6 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.14" }));
-		doorsComboBox.setPreferredSize(new Dimension(50, 20));
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
 		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
 		gbc_doorsComboBox.gridx = 3;
@@ -510,7 +497,6 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.89" }));
-		windowsComboBox.setPreferredSize(new Dimension(50, 20));
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
 		gbc_windowsComboBox.insets = new Insets(0, 0, 0, 5);
 		gbc_windowsComboBox.gridx = 1;
@@ -534,7 +520,6 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.14" }));
-		roofsComboBox.setPreferredSize(new Dimension(50, 20));
 		roofsComboBox.setEditable(true);
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
 		gbc_roofsComboBox.gridx = 3;
@@ -545,29 +530,24 @@ public class EnergyPanel extends JPanel {
 
 		final Component verticalGlue = Box.createVerticalGlue();
 		add(verticalGlue);
-		new Thread() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(10000);
-				} catch (final InterruptedException e) {
-					e.printStackTrace();
-				}
-				fxPanel = new JFXPanel();
-				final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
-				fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
-				gbc_fxPanel.gridwidth = 3;
-				gbc_fxPanel.fill = GridBagConstraints.BOTH;
-				gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
-				gbc_fxPanel.gridx = 0;
-				gbc_fxPanel.gridy = 1;
-
-				add(fxPanel, gbc_fxPanel);
-				initFxComponents();
-			};
-		}.start();
 
 		setPreferredSize(getMinimumSize());
+	}
+
+	public void initJavaFXGUI() {
+		if (fxPanel == null) {
+			fxPanel = new JFXPanel();
+			final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
+			fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
+			gbc_fxPanel.gridwidth = 3;
+			gbc_fxPanel.fill = GridBagConstraints.BOTH;
+			gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
+			gbc_fxPanel.gridx = 0;
+			gbc_fxPanel.gridy = 1;
+
+			add(fxPanel, gbc_fxPanel);
+			initFxComponents();
+		}
 	}
 
 	private void initFxComponents() {

@@ -1369,6 +1369,8 @@ Version 0.5 - October 20, 2011
 - fix problem with print preview exception in the presence of a window
 - fix problem with not being able to select window by clicking on its main mesh
 - properly initialize the minimum size of the EnergyPanel so that it reflects the OS GUI default size
+- add JavaFX components to GUI as soon as JFrame is activated
+- remove explicit preferred sizes of combo-boxes 
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception
