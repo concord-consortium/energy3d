@@ -54,11 +54,6 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
-import com.ardor3d.framework.jogl.JoglAwtCanvas;
-import com.ardor3d.framework.jogl.JoglCanvasRenderer;
-import com.ardor3d.framework.jogl.JoglNewtAwtCanvas;
-import com.ardor3d.framework.lwjgl.LwjglAwtCanvas;
-import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -70,14 +65,6 @@ import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.MouseWrapper;
 import com.ardor3d.input.PhysicalLayer;
-import com.ardor3d.input.awt.AwtFocusWrapper;
-import com.ardor3d.input.awt.AwtKeyboardWrapper;
-import com.ardor3d.input.awt.AwtMouseManager;
-import com.ardor3d.input.awt.AwtMouseWrapper;
-import com.ardor3d.input.jogl.JoglNewtFocusWrapper;
-import com.ardor3d.input.jogl.JoglNewtKeyboardWrapper;
-import com.ardor3d.input.jogl.JoglNewtMouseManager;
-import com.ardor3d.input.jogl.JoglNewtMouseWrapper;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyHeldCondition;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -104,9 +91,6 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRendererFactory;
-import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
-import com.ardor3d.renderer.lwjgl.LwjglTextureRendererProvider;
 import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -211,59 +195,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
 		final long time = System.nanoTime();
-		// panel.setSize(100, 100);
 		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 24, 0, 4, false, false);
-		// final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
-		final MouseWrapper mouseWrapper;
-		final KeyboardWrapper keyboardWrapper;
-		final FocusWrapper focusWrapper;
 
-		if (Config.RENDER_MODE == RenderMode.NEWT) {
-			// final DisplaySettings settings = new DisplaySettings(800, 600,
-			// 32, 60, 0, 2, 0, 4, false, false);
-			// final DisplaySettings settings = new DisplaySettings(400, 300,
-			// 24, 0, 0, 16, 0, 0, false, false);
-			// canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
-			final JoglNewtAwtCanvas canvas = new JoglNewtAwtCanvas(settings, new JoglCanvasRenderer(this));
-			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
-			mouseWrapper = new JoglNewtMouseWrapper(canvas, new JoglNewtMouseManager(canvas));
-			keyboardWrapper = new JoglNewtKeyboardWrapper(canvas);
-			focusWrapper = new JoglNewtFocusWrapper(canvas);
-			this.canvas = canvas;
-		} else if (Config.RENDER_MODE == RenderMode.JOGL) {
-			final JoglAwtCanvas canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
-			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
-			mouseWrapper = new AwtMouseWrapper(canvas, new AwtMouseManager(canvas));
-			keyboardWrapper = new AwtKeyboardWrapper(canvas);
-			focusWrapper = new AwtFocusWrapper(canvas);
-			this.canvas = canvas;
-		} else {
-			// final DisplaySettings settings = new DisplaySettings(800, 600,
-			// 32, 60, 0, 8, 0, 0, false, false);
-			// final DisplaySettings settings = new DisplaySettings(800, 600,
-			// 32, 60, 0, 8, 0, 4, false, false);
-			// final DisplaySettings settings = new DisplaySettings(400, 300,
-			// 24, 0, 0, 16, 0, 0, false, false);
-			// final DisplaySettings settings = new DisplaySettings(800, 600,
-			// 32, 0, 0, 8, 0, 4, false, false);
+		final RendererFactory rendererFactory;
+		if (Config.RENDER_MODE == RenderMode.NEWT)
+			rendererFactory = new JoglNewtFactory(settings, this);
+		else if (Config.RENDER_MODE == RenderMode.JOGL)
+			rendererFactory = new JoglFactory(settings, this);
+		else
+			rendererFactory = new LwjglFactory(settings, this);
 
-			try {
-				final LwjglAwtCanvas canvas = new LwjglAwtCanvas(settings, new LwjglCanvasRenderer(this));
-				TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
-				mouseWrapper = new AwtMouseWrapper(canvas, new AwtMouseManager(canvas));
-				keyboardWrapper = new AwtKeyboardWrapper(canvas);
-				focusWrapper = new AwtFocusWrapper(canvas);
-				this.canvas = canvas;
-			} catch (final Exception e) {
-				throw new RuntimeException(e);
-			}
-
-			// mouseWrapper = null;
-			// keyboardWrapper = null;
-			// focusWrapper = null;
-			//
-			// canvas = null;
-		}
+		final MouseWrapper mouseWrapper = rendererFactory.getMouseWrapper();
+		final KeyboardWrapper keyboardWrapper = rendererFactory.getKeyboardWrapper();
+		final FocusWrapper focusWrapper = rendererFactory.getFocusWrapper();
+		canvas = rendererFactory.getCanvas();
 
 		final Component canvasComponent = (Component) canvas;
 		canvasComponent.setMinimumSize(new Dimension(500, 500));
@@ -272,13 +217,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.addCanvas(canvas);
 
 		logicalLayer = new LogicalLayer();
-		// // final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(canvasComponent, new AwtMouseManager(canvasComponent));
-		// // final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvasComponent);
-		// // final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvasComponent);
-		//
-		// final MouseWrapper mouseWrapper = new JoglNewtMouseWrapper(canvas, new AwtMouseManager(canvasComponent));
-		// final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvasComponent);
-		// final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvasComponent);
 
 		final PhysicalLayer physicalLayer = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
 		logicalLayer.registerInput(canvas, physicalLayer);

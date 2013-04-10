@@ -11,18 +11,17 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=ardor3d-lwjgl/src\/main\/java"/>
-        <javaElement handleIdentifier="=Energy3D/src\/main\/java"/>
-        <javaElement handleIdentifier="=ardor3d-savable/src\/main\/java"/>
-        <javaElement handleIdentifier="=ardor3d-core/src\/main\/java"/>
-        <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.shadow.map"/>
         <javaElement handleIdentifier="=ardor3d-math/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-animation/src\/main\/java"/>
-        <javaElement handleIdentifier="=ardor3d-collada/src\/main\/java"/>
+        <javaElement handleIdentifier="=ardor3d-savable/src\/main\/java"/>
+        <javaElement handleIdentifier="=Energy3D/src\/main\/java"/>
         <javaElement handleIdentifier="=Energy3D/poly2tri"/>
+        <javaElement handleIdentifier="=ardor3d-collada/src\/main\/java"/>
         <javaElement handleIdentifier="=ardor3d-jogl/src\/main\/java"/>
-        <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.effect.bloom"/>
         <javaElement handleIdentifier="=Energy3D/src\/main\/resources"/>
+        <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.effect.bloom"/>
         <javaElement handleIdentifier="=ardor3d-awt/src\/main\/java"/>
+        <javaElement handleIdentifier="=ardor3d-core/src\/main\/java"/>
+        <javaElement handleIdentifier="=ardor3d-effects/src\/main\/java&lt;com.ardor3d.extension.shadow.map"/>
     </selectedElements>
 </jardesc>

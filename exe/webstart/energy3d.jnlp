@@ -27,8 +27,6 @@
 
 		<jar href="resources/jogl/jogl-all-2.0-rc11post06.jar" />
 		<jar href="resources/jogl/gluegen-rt-2.0-rc11post06.jar" />
-		
-		<extension name="lwjgl" href="http://lwjgl.org/webstart/2.8.5/extension.jnlp" />
 	</resources>
 
 	<resources os="Windows" arch="x86">
