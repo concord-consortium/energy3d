@@ -211,9 +211,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
 		final long time = System.nanoTime();
-//		panel.setSize(100, 100);
-		final DisplaySettings settings = new DisplaySettings(400, 300, 16, 0, 0, 8, 0, 4, false, false);
-//		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
+		// panel.setSize(100, 100);
+		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 24, 0, 4, false, false);
+		// final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
 		final MouseWrapper mouseWrapper;
 		final KeyboardWrapper keyboardWrapper;
 		final FocusWrapper focusWrapper;
@@ -223,7 +223,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			// 32, 60, 0, 2, 0, 4, false, false);
 			// final DisplaySettings settings = new DisplaySettings(400, 300,
 			// 24, 0, 0, 16, 0, 0, false, false);
-//			canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
+			// canvas = new JoglAwtCanvas(settings, new JoglCanvasRenderer(this));
 			final JoglNewtAwtCanvas canvas = new JoglNewtAwtCanvas(settings, new JoglCanvasRenderer(this));
 			TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
 			mouseWrapper = new JoglNewtMouseWrapper(canvas, new JoglNewtMouseManager(canvas));
@@ -258,11 +258,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				throw new RuntimeException(e);
 			}
 
-//			mouseWrapper = null;
-//			keyboardWrapper = null;
-//			focusWrapper = null;
-//
-//			canvas = null;
+			// mouseWrapper = null;
+			// keyboardWrapper = null;
+			// focusWrapper = null;
+			//
+			// canvas = null;
 		}
 
 		final Component canvasComponent = (Component) canvas;
@@ -272,13 +272,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.addCanvas(canvas);
 
 		logicalLayer = new LogicalLayer();
-////		final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(canvasComponent, new AwtMouseManager(canvasComponent));
-////		final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvasComponent);
-////		final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvasComponent);
-//
-//		final MouseWrapper mouseWrapper = new JoglNewtMouseWrapper(canvas, new AwtMouseManager(canvasComponent));
-//		final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvasComponent);
-//		final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvasComponent);
+		// // final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(canvasComponent, new AwtMouseManager(canvasComponent));
+		// // final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvasComponent);
+		// // final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvasComponent);
+		//
+		// final MouseWrapper mouseWrapper = new JoglNewtMouseWrapper(canvas, new AwtMouseManager(canvasComponent));
+		// final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(canvasComponent);
+		// final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(canvasComponent);
 
 		final PhysicalLayer physicalLayer = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
 		logicalLayer.registerInput(canvas, physicalLayer);
@@ -373,7 +373,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isUpdateTime = refreshTime != -1 && now <= refreshTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
-//			refresh = true;
 			if (refresh || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
 				if (now > refreshTime)
 					refreshTime = -1;
@@ -561,11 +560,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			break;
 		}
 
-		// final OffsetState offsetState = new OffsetState();
-		// offsetState.setTypeEnabled(OffsetType.Fill, true);
-		// offsetState.setFactor(0.5f);
-		// offsetState.setUnits(0.5f);
-		floor.setRenderState(HousePart.offsetState);
+//		final OffsetState offsetState = new OffsetState();
+//		offsetState.setTypeEnabled(OffsetType.Fill, true);
+//		offsetState.setFactor(1f);
+//		offsetState.setUnits(1f);
+//		floor.setRenderState(HousePart.offsetState);
 
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
@@ -1338,8 +1337,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public void init() {
-//		if (Config.JOGL)
-//			initCamera();
+		// if (Config.JOGL)
+		// initCamera();
 		if (Config.isHeliodonMode())
 			MainPanel.getInstance().getHeliodonButton().setSelected(true);
 
