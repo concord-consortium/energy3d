@@ -1383,6 +1383,10 @@ Version 0.5 - October 20, 2011
 
 - *fix problem with frozen program after trying to open a new file when in print preview
 
+- *replace window bars with rectangle meshes
+- *fix change of view point, print preview on, then annotation, then print preview off
+
+
 - *ignore frozen buildings when calculating energy3d
 
 
