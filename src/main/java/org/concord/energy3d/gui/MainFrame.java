@@ -431,28 +431,37 @@ public class MainFrame extends JFrame {
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().refresh(1);
-					fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-					fileChooser.addChoosableFileFilter(ng3Filter);
-					fileChooser.addChoosableFileFilter(serFilter);
-					fileChooser.removeChoosableFileFilter(pngFilter);
-					fileChooser.setFileFilter(ng3Filter);
-					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
-						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-						File file = fileChooser.getSelectedFile();
-						if (!file.getName().toLowerCase().endsWith(".ng3"))
-							file = new File(file.toString() + ".ng3");
-						try {
-							Scene.open(file.toURI().toURL());
-							updateTitleBar();
-						} catch (final Throwable err) {
-							showUnexpectedErrorMessage(err);
-						}
-					}
+					open();
 				}
 			});
 		}
 		return openMenuItem;
+	}
+
+	public void open() {
+		new Thread() {
+			@Override
+			public void run() {
+				SceneManager.getInstance().refresh(1);
+				fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fileChooser.addChoosableFileFilter(ng3Filter);
+				fileChooser.addChoosableFileFilter(serFilter);
+				fileChooser.removeChoosableFileFilter(pngFilter);
+				fileChooser.setFileFilter(ng3Filter);
+				if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+					Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
+					File file = fileChooser.getSelectedFile();
+					if (!file.getName().toLowerCase().endsWith(".ng3"))
+						file = new File(file.toString() + ".ng3");
+					try {
+						Scene.open(file.toURI().toURL());
+						updateTitleBar();
+					} catch (final Throwable err) {
+						showUnexpectedErrorMessage(err);
+					}
+				}
+			}
+		}.start();
 	}
 
 	private JMenuItem getOpenFolderMenuItem() {
