@@ -1377,6 +1377,14 @@ Version 0.5 - October 20, 2011
 - fix exception when loading older models that have null texture mode
 - increase depth bits from 8 to 24 to fix z fighting problem
 - move all Jogl and Lwjgl related code from SceneManager to RendererFactory subclasses to avoid missing class exception
+- add show/hide energy panel button to toolbar
+- include shadow resources in jar file
+- help fix clipping bug in Ardor3D  
+
+- *fix problem with frozen program after trying to open a new file when in print preview
+
+- *ignore frozen buildings when calculating energy3d
+
 
 - *avoid resizing canvas before print snapshots. instead use a smaller width value to read.
 - *allow small walls but hide the windows to avoid exception

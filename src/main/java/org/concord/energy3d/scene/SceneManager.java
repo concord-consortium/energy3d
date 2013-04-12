@@ -56,7 +56,7 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
-import com.ardor3d.image.util.AWTImageLoader;
+import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.input.Key;
@@ -98,6 +98,8 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.OffsetState;
+import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
@@ -196,6 +198,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.out.print("Constructing SceneManager...");
 		final long time = System.nanoTime();
 		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 24, 0, 4, false, false);
+//		final DisplaySettings settings = new DisplaySettings(400, 300, 24, -1, 0, 8, 0, 0, false, false);
 
 		final RendererFactory rendererFactory;
 		if (Config.RENDER_MODE == RenderMode.NEWT)
@@ -498,11 +501,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			break;
 		}
 
-//		final OffsetState offsetState = new OffsetState();
-//		offsetState.setTypeEnabled(OffsetType.Fill, true);
-//		offsetState.setFactor(1f);
-//		offsetState.setUnits(1f);
-//		floor.setRenderState(HousePart.offsetState);
+		final OffsetState offsetState = new OffsetState();
+		offsetState.setTypeEnabled(OffsetType.Fill, true);
+		offsetState.setFactor(0.5f);
+		offsetState.setUnits(0.5f);
+		floor.setRenderState(HousePart.offsetState);
 
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
