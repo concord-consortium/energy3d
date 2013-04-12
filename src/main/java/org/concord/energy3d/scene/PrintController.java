@@ -128,7 +128,8 @@ public class PrintController implements Updater {
 				computePrintCenters(pages);
 
 				arrangePrintPages(pages);
-				SceneManager.getInstance().updatePrintPreviewScene(true);
+				if (!restartFlag)
+					SceneManager.getInstance().updatePrintPreviewScene(true);
 				drawPrintParts(0);
 			}
 			originalHouseRoot.getSceneHints().setCullHint(CullHint.Always);
@@ -148,6 +149,11 @@ public class PrintController implements Updater {
 		if (finish) {
 			if (isPrintPreview)
 				Scene.getRoot().attachChild(pagesRoot);
+
+			if (isPrintPreview && restartFlag) {
+				restartFlag = false;
+			}
+
 			final boolean doTheEndAnimation = timer.getTimeInSeconds() > viewSwitchDelay; // (time - startTime) > 1.0;
 			if (!isPrintPreview && doTheEndAnimation) {
 				originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
@@ -156,7 +162,7 @@ public class PrintController implements Updater {
 					Scene.getRoot().detachChild(housePart.getRoot());
 				printParts = null;
 				if (!isPrintPreview && restartFlag) {
-					restartFlag = false;
+//					restartFlag = false;
 					// /* to force redraw when animated back to normal scene */
 					Scene.getInstance().redrawAllNow(); // redraw does not stretch the walls of print parts the roof. there is also no need for redraw since nothing has changed
 					setPrintPreview(true);
