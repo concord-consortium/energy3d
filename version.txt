@@ -1384,6 +1384,7 @@ Version 0.5 - October 20, 2011
 - fix change of view point, print preview on, then annotation, then print preview off
 - use maven-shade-plugin for creating jar files that excluse dlls and unnecessary java dependancies
 - re-enable jar signing with maven
+- use linear interpolation to calculate daily heating and cooling energy
 
 - *replace window bars with rectangle meshes
 
