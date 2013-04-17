@@ -4,6 +4,9 @@
 	<groupId>org.concord.energy3d</groupId>
 	<artifactId>energy3d</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	<build>
 		<plugins>
 			<plugin>
@@ -14,28 +17,31 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-			<!--  
-			<plugin>
-				<groupId>com.zenjava</groupId>
-				<artifactId>javafx-maven-plugin</artifactId>
-				<version>1.5</version>
-				<configuration>
-					<mainClass>org.concord.energy3d.MainApplication</mainClass>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.0</version>
 				<configuration>
-					<finalName>energy3d</finalName>
-					<outputDirectory>C:\exe\energy3d\</outputDirectory>
-					<archive>
-						<addMavenDescriptor>false</addMavenDescriptor>
-						<forced>true</forced>
-						<manifestFile>manifest.mf</manifestFile>
-					</archive>
+					<artifactSet>
+						<includes>
+							<include>*:ardor3d*</include>
+						</includes>
+					</artifactSet>
+					<transformers>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+							<mainClass>org.concord.energy3d.MainApplication</mainClass>
+						</transformer>
+					</transformers>
+					<outputFile>C:\exe\energy3d\energy3d.jar</outputFile>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -45,6 +51,7 @@
 					<keystore>C:\exe\energy3d\cc-keystore</keystore>
 					<alias>concord</alias>
 					<storepass>${keystore.store.password}</storepass>
+					<archive>C:\exe\energy3d\energy3d.jar</archive>
 				</configuration>
 				<executions>
 					<execution>
@@ -61,48 +68,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>fully.qualified.MainClass</mainClass>
-						</manifest>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>descriptor.xml</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-			</plugin>
-			-->
-	<plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-shade-plugin</artifactId>
-		<version>2.0</version>
-		<configuration>
-			<artifactSet>
-				<includes>
-					<include>*:ardor3d*</include>
-				</includes>
-			</artifactSet>
-			<transformers>
-				<transformer
-					implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-					<mainClass>org.concord.energy3d.MainApplication</mainClass>
-				</transformer>
-			</transformers>
-			<outputFile>C:\exe\energy3d\energy3d.jar</outputFile>
-		</configuration>
-		<executions>
-			<execution>
-				<phase>package</phase>
-				<goals>
-					<goal>shade</goal>
-				</goals>
-			</execution>
-		</executions>
-	</plugin>			
 		</plugins>
 	</build>
 	<dependencies>
