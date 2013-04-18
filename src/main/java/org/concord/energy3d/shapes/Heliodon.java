@@ -3,9 +3,6 @@ package org.concord.energy3d.shapes;
 import java.nio.FloatBuffer;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.Callable;
-
-import javax.swing.SwingUtilities;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
@@ -200,7 +197,7 @@ public class Heliodon {
 		setDate(timeAndDate);
 		MainPanel.getInstance().getDateSpinner().setValue(timeAndDate);
 		setTime(timeAndDate);
-		
+
 		if (isNightTime()) {
 			final Calendar calendar = Calendar.getInstance();
 			calendar.set(Calendar.HOUR, 0);
@@ -413,11 +410,12 @@ public class Heliodon {
 	public void setDeclinationAngle(final double declinationAngle, final boolean redrawHeliodon, final boolean updateGUI) {
 		this.declinationAngle = toPlusMinusPIRange(declinationAngle, -TILT_ANGLE, TILT_ANGLE);
 
-		final double days = MathUtils.asin(this.declinationAngle / TILT_ANGLE) / MathUtils.TWO_PI * 365.25 - 284.0;
-		calendar.set(calendar.get(Calendar.YEAR), 0, (int) Math.round(days));
-
-		if (updateGUI)
+		if (updateGUI) {
+			// calendar must not be updated if this method is called from setDate() because this method can only computer 6 months of the year from declination angle
+			final double days = MathUtils.asin(this.declinationAngle / TILT_ANGLE) / MathUtils.TWO_PI * 365.25 - 284.0;
+			calendar.set(calendar.get(Calendar.YEAR), 0, (int) Math.round(days));	//
 			MainPanel.getInstance().getDateSpinner().setValue(calendar.getTime());
+		}
 
 		if (redrawHeliodon)
 			dirtySunPath = true;

@@ -1385,6 +1385,7 @@ Version 0.5 - October 20, 2011
 - use maven-shade-plugin for creating jar files that excluse dlls and unnecessary java dependancies
 - re-enable jar signing with maven
 - use linear interpolation to calculate daily heating and cooling energy
+- prevent updating Heliodon.calendar if update is a side effect of calling setDate()
 
 - *replace window bars with rectangle meshes
 
