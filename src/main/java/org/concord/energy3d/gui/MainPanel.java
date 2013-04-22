@@ -745,7 +745,7 @@ public class MainPanel extends JPanel {
 	 *
 	 * @return javax.swing.JComboBox
 	 */
-	private JComboBox getCityComboBox() {
+	public JComboBox getCityComboBox() {
 		if (cityComboBox == null) {
 			cityComboBox = new JComboBox();
 			cityComboBox.setMaximumRowCount(15);

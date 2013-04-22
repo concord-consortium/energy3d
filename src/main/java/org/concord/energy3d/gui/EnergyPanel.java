@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Hashtable;
+import java.util.Map;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -50,10 +52,24 @@ public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
 	private static final int[] daysInMonth = new int[] { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-	// private static final int[] heatingDegreeDays = new int[] { 654, 548, 471, 292, 166, 67, 11, 14, 74, 232, 371, 550 };
-	private static final int[] heatingDegreeDays = new int[] { 499, 406, 320, 158, 59, 9, 0, 0, 10, 99, 224, 396 }; // 15 degrees base temperature
-	// private static final int[] coolingDegreeDays = new int[] { 0, 0, 1, 7, 17, 52, 124, 95, 34, 4, 0, 0 };
-	private static final int[] coolingDegreeDays = new int[] { 0, 0, 0, 2, 3, 13, 34, 20, 6, 1, 0, 0 };
+//	 private static final int[] heatingDegreeDays = new int[] { 654, 548, 471, 292, 166, 67, 11, 14, 74, 232, 371, 550 };
+//	private static final int[] heatingDegreeDays = new int[] { 499, 406, 320, 158, 59, 9, 0, 0, 10, 99, 224, 396 }; // 15 degrees base temperature
+//	 private static final int[] coolingDegreeDays = new int[] { 0, 0, 1, 7, 17, 52, 124, 95, 34, 4, 0, 0 };
+//	private static final int[] coolingDegreeDays = new int[] { 0, 0, 0, 2, 3, 13, 34, 20, 6, 1, 0, 0 };
+
+	private static final Map<String, int[]> heatingDegreeDays = new Hashtable<String, int[]>();
+	private static final Map<String, int[]> coolingDegreeDays = new Hashtable<String, int[]>();
+
+	static {
+		/* 15 degrees base temperature */
+		heatingDegreeDays.put("Boston", new int[] { 499, 406, 320, 158, 59, 9, 0, 0, 10, 99, 224, 396 });
+		coolingDegreeDays.put("Boston", new int[] { 0, 0, 0, 2, 3, 13, 34, 20, 6, 1, 0, 0 });
+		heatingDegreeDays.put("Sydney", new int[] { 0, 0, 0, 6, 32, 55, 84, 63, 24, 11, 1, 0 });
+		coolingDegreeDays.put("Sydney", new int[] { 22, 17, 9, 1, 0, 0, 0, 0, 4, 6, 13, 11 });
+//		heatingDegreeDays.put("", new int[] {  });
+//		coolingDegreeDays.put("", new int[] {  });
+
+	}
 
 	private static final double COST_PER_KWH = 0.13;
 	private static final EnergyPanel instance = new EnergyPanel();
@@ -691,8 +707,11 @@ public class EnergyPanel extends JPanel {
 			portion = (double) (day - halfMonth) / totalDaysOfMonth;
 		}
 
-		final double energyLossToday = (heatingDegreeDays[monthFrom] + (heatingDegreeDays[monthTo] - heatingDegreeDays[monthFrom]) * portion) / totalDaysOfMonth * 24.0;
-		final double energyGainToday = (coolingDegreeDays[monthFrom] + (coolingDegreeDays[monthTo] - coolingDegreeDays[monthFrom]) * portion) / totalDaysOfMonth * 24.0;
+		final int[] heatingDD = heatingDegreeDays.get(MainPanel.getInstance().getCityComboBox().getSelectedItem());
+		final int[] coolingDD = coolingDegreeDays.get(MainPanel.getInstance().getCityComboBox().getSelectedItem());
+
+		final double energyLossToday = (heatingDD[monthFrom] + (heatingDD[monthTo] - heatingDD[monthFrom]) * portion) / totalDaysOfMonth * 24.0;
+		final double energyGainToday = (coolingDD[monthFrom] + (coolingDD[monthTo] - coolingDD[monthFrom]) * portion) / totalDaysOfMonth * 24.0;
 
 		heating.today = energyLossToday;
 		cooling.today = energyGainToday;
@@ -704,8 +723,8 @@ public class EnergyPanel extends JPanel {
 		double yearlyEnergyGain = 0.0;
 		double yearlyTotal = 0.0;
 		for (int i = 0; i < 12; i++) {
-			final double monthlyEnergyLoss = computeEnergyLossRate(heatingDegreeDays[i], false) / 1000.0 * 24.0;
-			final double monthlyEnergyGain = computeEnergyLossRate(coolingDegreeDays[i], false) / 1000.0 * 24.0;
+			final double monthlyEnergyLoss = computeEnergyLossRate(heatingDD[i], false) / 1000.0 * 24.0;
+			final double monthlyEnergyGain = computeEnergyLossRate(coolingDD[i], false) / 1000.0 * 24.0;
 			yearlyEnergyLoss += computeHeatingEnergy(monthlyEnergyLoss, solarEnergyArray[i]);
 			yearlyEnergyGain += computeCoolingEnergy(monthlyEnergyLoss, monthlyEnergyGain, solarEnergyArray[i]);
 		}
