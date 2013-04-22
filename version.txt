@@ -1386,6 +1386,7 @@ Version 0.5 - October 20, 2011
 - re-enable jar signing with maven
 - use linear interpolation to calculate daily heating and cooling energy
 - prevent updating Heliodon.calendar if update is a side effect of calling setDate()
+- catch JavaFX missing related errors safely 
 
 - *replace window bars with rectangle meshes
 

@@ -102,6 +102,7 @@ public class EnergyPanel extends JPanel {
 	private final JSpinner outsideTemperatureSpinner;
 	private Thread thread;
 	private boolean computeRequest;
+	private boolean initJavaFxAlreadyCalled = false;
 
 	public class EnergyAmount {
 		double rate;
@@ -516,18 +517,25 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void initJavaFXGUI() {
-		if (fxPanel == null) {
-			fxPanel = new JFXPanel();
-			final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
-			fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
-			gbc_fxPanel.gridwidth = 3;
-			gbc_fxPanel.fill = GridBagConstraints.BOTH;
-			gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
-			gbc_fxPanel.gridx = 0;
-			gbc_fxPanel.gridy = 1;
+		if (fxPanel == null && !initJavaFxAlreadyCalled) {
+			initJavaFxAlreadyCalled  = true;
+			try {
+				System.out.println("initJavaFXGUI()");
+				fxPanel = new JFXPanel();
+				final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
+				fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
+				gbc_fxPanel.gridwidth = 3;
+				gbc_fxPanel.fill = GridBagConstraints.BOTH;
+				gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
+				gbc_fxPanel.gridx = 0;
+				gbc_fxPanel.gridy = 1;
 
-			add(fxPanel, gbc_fxPanel);
-			initFxComponents();
+				add(fxPanel, gbc_fxPanel);
+				initFxComponents();
+			} catch (final Throwable e) {
+				System.out.println("Error occured when initializing JavaFX: JavaFX is probably not supported!");
+				e.printStackTrace();
+			}
 		}
 	}
 
