@@ -1389,6 +1389,14 @@ Version 0.5 - October 20, 2011
 - catch JavaFX missing related errors safely
 - add support for multi-city heating and cooling energy calculations
 - add degree day data for Sydney 
+- rewrite the energy calculation algorithms to compute solar, heating and cooling energy more precisely by iterating though every hour
+
+
+- *allow move house with one click
+- *allow 90 degree rotation of house
+- *option to treat entire side of building as window
+- *allow sun heat calculation of partially shaded window
+- *save sun location when saving
 
 - *replace window bars with rectangle meshes
 
