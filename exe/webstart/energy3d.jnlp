@@ -5,7 +5,7 @@
 		<vendor>The Concord Consortium</vendor>
 		<homepage href="http://energy.concord.org/energy3d" />
 		<description>Energy3D</description>
-		<description kind="short">An educational CAD tool for green building design.</description>
+		<description kind="short">An educational CAD tool for designing houses and analyzing their cooling and heating energy flow.</description>
 		<icon href="resources/icon.gif" />
 		<icon kind="splash" href="resources/splash.png" /> 
 		<offline-allowed/>
@@ -26,8 +26,6 @@
 
 		<jar href="resources/jogl/jogl-all-2.0.2-rc20130404.jar" />
 		<jar href="resources/jogl/gluegen-rt-2.0.2-rc20130404.jar" />
-		
-		<extension name="lwjgl" href="http://lwjgl.org/webstart/2.8.5/extension.jnlp" />
 	</resources>
 
 	<resources os="Windows" arch="x86">

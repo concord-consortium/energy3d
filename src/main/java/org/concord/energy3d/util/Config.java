@@ -1,13 +1,10 @@
 package org.concord.energy3d.util;
 
-import javax.swing.JOptionPane;
-
 import org.concord.energy3d.MainApplet;
 
 public class Config {
-	public static final String VERSION = "1.3";
-	public static RenderMode RENDER_MODE = RenderMode.JOGL;
-	public static boolean EXPERIMENT = false;
+	public static final String VERSION = "2.0";
+	public final static RenderMode RENDER_MODE = RenderMode.JOGL;
 	private static MainApplet applet;
 	private static boolean isWebstart;
 	private static final boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac");
@@ -15,10 +12,9 @@ public class Config {
 	public static enum RenderMode {NEWT, JOGL, LWJGL};
 
 	static {
-		final Object renderer = JOptionPane.showInputDialog(null, "Which renderer?", null, JOptionPane.QUESTION_MESSAGE, null, new RenderMode[] {RenderMode.JOGL,  RenderMode.LWJGL, RenderMode.NEWT}, RenderMode.JOGL);
-		if (renderer != null)
-			RENDER_MODE = (RenderMode) renderer;
-		EXPERIMENT = JOptionPane.showConfirmDialog(null, "Use JavaFX?", null, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+//		final Object renderer = JOptionPane.showInputDialog(null, "Which renderer?", null, JOptionPane.QUESTION_MESSAGE, null, new RenderMode[] {RenderMode.JOGL,  RenderMode.LWJGL, RenderMode.NEWT}, RenderMode.JOGL);
+//		if (renderer != null)
+//			RENDER_MODE = (RenderMode) renderer;
 	}
 
 	public static MainApplet getApplet() {

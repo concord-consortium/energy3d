@@ -326,8 +326,7 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void windowActivated(final WindowEvent arg0) {
-				if (Config.EXPERIMENT)
-					EnergyPanel.getInstance().initJavaFXGUI();
+				EnergyPanel.getInstance().initJavaFXGUI();
 				SceneManager.getInstance().refresh();
 			}
 		});

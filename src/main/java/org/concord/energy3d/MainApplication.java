@@ -36,24 +36,13 @@ public class MainApplication {
 		mainFrame.updateTitleBar();
 		mainFrame.setVisible(true);
 		Scene.getInstance();
-//		SwingUtilities.invokeLater(new Runnable() {
-//			@Override
-//			public void run() {
-				new Thread(scene, "Energy 3D Application").start();
-//			}
-//		});
-//		new Thread(scene, "Energy 3D Application").start();
+		new Thread(scene, "Energy 3D Application").start();
 
 		if (!Config.isMac() && args.length > 1 && !args[args.length - 1].startsWith("-"))
 			mainFrame.open(args[args.length - 1]);
 
-
 		if (Config.isClassroomMode())
 			startPeriodicFileSave();
-
-//		HandTrackerApplication.main(null);
-
-//		scene.run();
 	}
 
 	private static boolean argsContain(final String command, final String[] args) {

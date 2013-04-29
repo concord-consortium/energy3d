@@ -108,10 +108,7 @@ public class MainPanel extends JPanel {
 		this.setSize(1000, 300);
 		setLayout(new BorderLayout());
 		this.add(getAppToolbar(), BorderLayout.NORTH);
-		if (Config.EXPERIMENT)
-			add(getSplitPane(), BorderLayout.CENTER);
-		else
-			add(getCanvasPanel(), BorderLayout.CENTER);
+		this.add(getSplitPane(), BorderLayout.CENTER);
 	}
 
 	/**

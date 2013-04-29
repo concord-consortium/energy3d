@@ -1396,7 +1396,10 @@ Version 0.5 - October 20, 2011
 - let the Auto check box control the value of outside temperature only
 - move the date & location settings from toolbar to energy panel
 - improve hide/show of the energy panel
+- remove debug dialog box
+- remove lwjgl dependency 
 
+- release version 2.0
 
 - *allow move house with one click
 - *allow 90 degree rotation of house
