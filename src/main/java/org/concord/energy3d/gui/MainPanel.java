@@ -2,41 +2,27 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.HierarchyBoundsAdapter;
-import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.FocusManager;
 import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.ToolTipManager;
 
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
-import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Config;
 
 public class MainPanel extends JPanel {
@@ -59,14 +45,6 @@ public class MainPanel extends JPanel {
 	private JToggleButton sunAnimButton = null;
 	private JToggleButton annotationToggleButton;
 	private JToggleButton previewButton = null;
-	private JPanel calendarPanel = null;
-	private JLabel dateLabel = null;
-	private JSpinner dateSpinner = null;
-	private JLabel timeLabel = null;
-	private JSpinner timeSpinner = null;
-	private JLabel latitudeLabel = null;
-	private JComboBox cityComboBox = null;
-	private JSpinner latitudeSpinner = null;
 	private JToggleButton roofCustomButton = null;
 	private JToggleButton zoomButton = null;
 	private JToggleButton roofGableButton = null;
@@ -163,7 +141,6 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getLightButton());
 			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimButton());
-			appToolbar.add(getCalendarPanel());
 			if (showEditTools) {
 				appToolbar.addSeparator();
 				appToolbar.add(getRotAnimButton());
@@ -416,7 +393,6 @@ public class MainPanel extends JPanel {
 						SceneManager.getInstance().setShadow(lightButton.isSelected());
 					}
 					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
-					calendarPanel.setVisible(showSunTools);
 					sunAnimButton.setEnabled(showSunTools);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
@@ -566,7 +542,6 @@ public class MainPanel extends JPanel {
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setHeliodonControl(heliodonButton.isSelected());
 					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
-					calendarPanel.setVisible(showSunTools);
 					sunAnimButton.setEnabled(showSunTools);
 					FocusManager.getCurrentManager().clearGlobalFocusOwner();
 				}
@@ -635,194 +610,6 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return previewButton;
-	}
-
-	/**
-	 * This method initializes calendarPanel
-	 *
-	 * @return javax.swing.JPanel
-	 */
-	private JPanel getCalendarPanel() {
-		if (calendarPanel == null) {
-			final GridBagConstraints gridBagConstraints4 = new GridBagConstraints();
-			gridBagConstraints4.gridx = 3;
-			gridBagConstraints4.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints4.insets = new Insets(0, 0, 0, 1);
-			gridBagConstraints4.gridy = 1;
-			final GridBagConstraints gridBagConstraints31 = new GridBagConstraints();
-			gridBagConstraints31.fill = GridBagConstraints.BOTH;
-			gridBagConstraints31.gridy = 0;
-			gridBagConstraints31.insets = new Insets(0, 1, 0, 1);
-			gridBagConstraints31.gridwidth = 2;
-			gridBagConstraints31.gridx = 2;
-			final GridBagConstraints gridBagConstraints21 = new GridBagConstraints();
-			gridBagConstraints21.gridx = 2;
-			gridBagConstraints21.gridy = 1;
-			latitudeLabel = new JLabel();
-			latitudeLabel.setText(" Latitude:");
-			final GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
-			gridBagConstraints3.gridx = 1;
-			gridBagConstraints3.gridy = 1;
-			gridBagConstraints3.fill = GridBagConstraints.HORIZONTAL;
-			final GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
-			gridBagConstraints2.gridx = 0;
-			gridBagConstraints2.gridy = 1;
-			timeLabel = new JLabel();
-			timeLabel.setText(" Time: ");
-			final GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
-			gridBagConstraints1.gridx = 1;
-			gridBagConstraints1.gridy = 0;
-			gridBagConstraints1.weightx = 1.0;
-			gridBagConstraints1.fill = GridBagConstraints.HORIZONTAL;
-			final GridBagConstraints gridBagConstraints = new GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 0;
-			dateLabel = new JLabel();
-			dateLabel.setText(" Date: ");
-			calendarPanel = new JPanel();
-			calendarPanel.setLayout(new GridBagLayout());
-			calendarPanel.setVisible(false);
-			calendarPanel.add(dateLabel, gridBagConstraints);
-			calendarPanel.add(getDateSpinner(), gridBagConstraints1);
-			calendarPanel.add(timeLabel, gridBagConstraints2);
-			calendarPanel.add(getTimeSpinner(), gridBagConstraints3);
-			calendarPanel.add(latitudeLabel, gridBagConstraints21);
-			calendarPanel.add(getCityComboBox(), gridBagConstraints31);
-			calendarPanel.add(getLatitudeSpinner(), gridBagConstraints4);
-
-			calendarPanel.setMaximumSize(new Dimension(calendarPanel.getPreferredSize().width, 2147483647));
-		}
-		return calendarPanel;
-	}
-
-	/**
-	 * This method initializes dateSpinner
-	 *
-	 * @return javax.swing.JSpinner
-	 */
-	public JSpinner getDateSpinner() {
-		if (dateSpinner == null) {
-			final SpinnerDateModel model = new SpinnerDateModel();
-			final Calendar date = Calendar.getInstance();
-			// initially set the date to September 29 so that it will resize itself to max
-			date.set(2011, 8, 29);
-			model.setValue(date.getTime());
-			dateSpinner = new JSpinner(model);
-			dateSpinner.addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
-				@Override
-				public void ancestorResized(final HierarchyEvent e) {
-					dateSpinner.setMinimumSize(dateSpinner.getPreferredSize());
-					dateSpinner.removeHierarchyBoundsListener(this);
-				}
-			});
-			dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
-			dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-				boolean firstCall = true;
-
-				@Override
-				public void stateChanged(final javax.swing.event.ChangeEvent e) {
-					if (firstCall) {
-						firstCall = false;
-						return;
-					}
-					final Heliodon heliodon = Heliodon.getInstance();
-					if (heliodon != null)
-						heliodon.setDate((Date) dateSpinner.getValue());
-					if (Config.EXPERIMENT)
-						EnergyPanel.getInstance().computeEnergy();
-				}
-			});
-		}
-		return dateSpinner;
-	}
-
-	/**
-	 * This method initializes timeSpinner
-	 *
-	 * @return javax.swing.JSpinner
-	 */
-	public JSpinner getTimeSpinner() {
-		if (timeSpinner == null) {
-			timeSpinner = new JSpinner(new SpinnerDateModel());
-			timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
-			timeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-				private boolean firstCall = true;
-
-				@Override
-				public void stateChanged(final javax.swing.event.ChangeEvent e) {
-					// ignore the first event
-					if (firstCall) {
-						firstCall = false;
-						return;
-					}
-					final Heliodon heliodon = Heliodon.getInstance();
-					if (heliodon != null)
-						heliodon.setTime((Date) timeSpinner.getValue());
-					if (Config.EXPERIMENT)
-						EnergyPanel.getInstance().computeEnergy();
-				}
-			});
-		}
-		return timeSpinner;
-	}
-
-	/**
-	 * This method initializes cityComboBox
-	 *
-	 * @return javax.swing.JComboBox
-	 */
-	public JComboBox getCityComboBox() {
-		if (cityComboBox == null) {
-			cityComboBox = new JComboBox();
-			cityComboBox.setMaximumRowCount(15);
-			cityComboBox.addItem("");
-			cityComboBox.addItem("Moscow");
-			cityComboBox.addItem("Ottawa");
-			cityComboBox.addItem("Boston");
-			cityComboBox.addItem("Beijing");
-			cityComboBox.addItem("Washington DC");
-			cityComboBox.addItem("Tehran");
-			cityComboBox.addItem("Los Angeles");
-			cityComboBox.addItem("Miami");
-			cityComboBox.addItem("Mexico City");
-			cityComboBox.addItem("Singapore");
-			cityComboBox.addItem("Sydney");
-			cityComboBox.addItem("Buenos Aires");
-
-			cityComboBox.setSelectedItem("Boston");
-
-			cityComboBox.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					if (!cityComboBox.getSelectedItem().equals(""))
-						latitudeSpinner.setValue(cityLatitute.get(cityComboBox.getSelectedItem()));
-				}
-			});
-		}
-		return cityComboBox;
-	}
-
-	/**
-	 * This method initializes latitudeSpinner
-	 *
-	 * @return javax.swing.JSpinner
-	 */
-	private JSpinner getLatitudeSpinner() {
-		if (latitudeSpinner == null) {
-			latitudeSpinner = new JSpinner();
-			latitudeSpinner.setModel(new SpinnerNumberModel(Heliodon.DEFAULT_LATITUDE, -90, 90, 1));
-			latitudeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-				@Override
-				public void stateChanged(final javax.swing.event.ChangeEvent e) {
-					if (!cityComboBox.getSelectedItem().equals("") && !cityLatitute.values().contains(latitudeSpinner.getValue()))
-						cityComboBox.setSelectedItem("");
-					Heliodon.getInstance().setObserverLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
-					if (Config.EXPERIMENT)
-						EnergyPanel.getInstance().computeEnergy();
-				}
-			});
-		}
-		return latitudeSpinner;
 	}
 
 	/**
@@ -954,7 +741,6 @@ public class MainPanel extends JPanel {
 					c.setEnabled(enabled);
 			}
 		}
-		getCalendarPanel().setVisible(enabled && (getLightButton().isSelected() || getHeliodonButton().isSelected()));
 	}
 
 	private JSplitPane getSplitPane() {

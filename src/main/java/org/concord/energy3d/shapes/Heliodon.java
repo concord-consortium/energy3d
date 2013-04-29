@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
@@ -195,7 +194,7 @@ public class Heliodon {
 		scene.attachChild(root);
 
 		setDate(timeAndDate);
-		MainPanel.getInstance().getDateSpinner().setValue(timeAndDate);
+		EnergyPanel.getInstance().getDateSpinner().setValue(timeAndDate);
 		setTime(timeAndDate);
 
 		if (isNightTime()) {
@@ -204,9 +203,9 @@ public class Heliodon {
 			calendar.set(Calendar.AM_PM, 1);
 			calendar.set(Calendar.MINUTE, 0);
 			setTime(calendar.getTime());
-			MainPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
+			EnergyPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
 		} else
-			MainPanel.getInstance().getTimeSpinner().setValue(timeAndDate);
+			EnergyPanel.getInstance().getTimeSpinner().setValue(timeAndDate);
 
 		if (Config.isHeliodonMode())
 			setSunRegionAlwaysVisible(true);
@@ -392,7 +391,7 @@ public class Heliodon {
 		calendar.set(Calendar.MINUTE, minutes);
 
 		if (updateGUI)
-			MainPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
+			EnergyPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
 
 		if (redrawHeliodon)
 			drawSun();
@@ -412,7 +411,7 @@ public class Heliodon {
 			// calendar must not be updated if this method is called from setDate() because this method can only computer 6 months of the year from declination angle
 			final double days = MathUtils.asin(this.declinationAngle / TILT_ANGLE) / MathUtils.TWO_PI * 365.25 - 284.0;
 			calendar.set(calendar.get(Calendar.YEAR), 0, (int) Math.round(days));	//
-			MainPanel.getInstance().getDateSpinner().setValue(calendar.getTime());
+			EnergyPanel.getInstance().getDateSpinner().setValue(calendar.getTime());
 		}
 
 		if (redrawHeliodon)

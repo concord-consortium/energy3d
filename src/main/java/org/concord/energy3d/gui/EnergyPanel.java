@@ -7,9 +7,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyBoundsAdapter;
+import java.awt.event.HierarchyEvent;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -31,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -51,10 +55,23 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
+	private static final Map<String, Integer> cityLatitute = new Hashtable<String, Integer>();
 	private static final Map<String, int[]> avgMonthlyLowTemperatures = new Hashtable<String, int[]>();
 	private static final Map<String, int[]> avgMonthlyHighTemperatures = new Hashtable<String, int[]>();
 
 	static {
+		cityLatitute.put("Moscow", 55);
+		cityLatitute.put("Ottawa", 45);
+		cityLatitute.put("Boston", 42);
+		cityLatitute.put("Beijing", 39);
+		cityLatitute.put("Washington DC", 38);
+		cityLatitute.put("Tehran", 35);
+		cityLatitute.put("Los Angeles", 34);
+		cityLatitute.put("Miami", 25);
+		cityLatitute.put("Mexico City", 19);
+		cityLatitute.put("Singapore", 1);
+		cityLatitute.put("Sydney", -33);
+		cityLatitute.put("Buenos Aires", -34);
 		avgMonthlyLowTemperatures.put("Boston", new int[] { -6, -4, -1, 5, 10, 16, 18, 18, 14, 8, 3, -2 });
 		avgMonthlyHighTemperatures.put("Boston", new int[] { 2, 4, 7, 13, 19, 24, 28, 27, 22, 16, 11, 5 });
 		avgMonthlyLowTemperatures.put("Moscow", new int[] { -14, -14, -9, 0, 6, 10, 13, 11, 6, 1, -5, -10 });
@@ -125,6 +142,13 @@ public class EnergyPanel extends JPanel {
 	private Thread thread;
 	private boolean computeRequest;
 	private boolean initJavaFxAlreadyCalled = false;
+	private final JLabel dateLabel;
+	private final JLabel timeLabel;
+	private final JSpinner dateSpinner;
+	private final JSpinner timeSpinner;
+	private final JComboBox cityComboBox;
+	private final JLabel latitudeLabel;
+	private final JSpinner latitudeSpinner;
 
 	private class EnergyAmount {
 		double solar;
@@ -138,6 +162,131 @@ public class EnergyPanel extends JPanel {
 
 	private EnergyPanel() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+		final JPanel panel_3 = new JPanel();
+		panel_3.setBorder(new TitledBorder(null, "Time & Location", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(panel_3);
+		final GridBagLayout gbl_panel_3 = new GridBagLayout();
+		panel_3.setLayout(gbl_panel_3);
+
+		dateLabel = new JLabel("Date: ");
+		final GridBagConstraints gbc_dateLabel = new GridBagConstraints();
+		gbc_dateLabel.gridx = 0;
+		gbc_dateLabel.gridy = 0;
+		panel_3.add(dateLabel, gbc_dateLabel);
+
+		dateSpinner = new JSpinner();
+		dateSpinner.setModel(new SpinnerDateModel(new Date(1380427200000L), null, null, Calendar.MONTH));
+		dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
+		dateSpinner.addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
+			@Override
+			public void ancestorResized(final HierarchyEvent e) {
+				dateSpinner.setMinimumSize(dateSpinner.getPreferredSize());
+				dateSpinner.setPreferredSize(dateSpinner.getPreferredSize());
+				dateSpinner.removeHierarchyBoundsListener(this);
+			}
+		});
+		dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+			boolean firstCall = true;
+
+			@Override
+			public void stateChanged(final javax.swing.event.ChangeEvent e) {
+				if (firstCall) {
+					firstCall = false;
+					return;
+				}
+				final Heliodon heliodon = Heliodon.getInstance();
+				if (heliodon != null)
+					heliodon.setDate((Date) dateSpinner.getValue());
+				computeEnergy();
+			}
+		});
+		final GridBagConstraints gbc_dateSpinner = new GridBagConstraints();
+		gbc_dateSpinner.insets = new Insets(0, 0, 1, 1);
+		gbc_dateSpinner.gridx = 1;
+		gbc_dateSpinner.gridy = 0;
+		panel_3.add(dateSpinner, gbc_dateSpinner);
+
+		cityComboBox = new JComboBox();
+		cityComboBox.setModel(new DefaultComboBoxModel(new String[] { "", "Moscow", "Ottawa", "Boston", "Beijing", "Washington DC", "Tehran", "Los Angeles", "Miami", "Mexico City", "Singapore", "Sydney", "Buenos Aires" }));
+		cityComboBox.setSelectedItem("Boston");
+		cityComboBox.setMaximumRowCount(15);
+		cityComboBox.addActionListener(new java.awt.event.ActionListener() {
+			@Override
+			public void actionPerformed(final java.awt.event.ActionEvent e) {
+				if (!cityComboBox.getSelectedItem().equals("")) {
+					final Integer newLatitude = cityLatitute.get(cityComboBox.getSelectedItem());
+					if (newLatitude.equals(latitudeSpinner.getValue()))
+						computeEnergy();
+					else
+						latitudeSpinner.setValue(newLatitude);
+				}
+			}
+		});
+
+		final GridBagConstraints gbc_cityComboBox = new GridBagConstraints();
+		gbc_cityComboBox.gridwidth = 2;
+		gbc_cityComboBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_cityComboBox.gridx = 2;
+		gbc_cityComboBox.gridy = 0;
+		panel_3.add(cityComboBox, gbc_cityComboBox);
+
+		timeLabel = new JLabel("Time: ");
+		final GridBagConstraints gbc_timeLabel = new GridBagConstraints();
+		gbc_timeLabel.gridx = 0;
+		gbc_timeLabel.gridy = 1;
+		panel_3.add(timeLabel, gbc_timeLabel);
+
+		timeSpinner = new JSpinner(new SpinnerDateModel());
+		timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
+		timeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+			private boolean firstCall = true;
+
+			@Override
+			public void stateChanged(final javax.swing.event.ChangeEvent e) {
+				// ignore the first event
+				if (firstCall) {
+					firstCall = false;
+					return;
+				}
+				final Heliodon heliodon = Heliodon.getInstance();
+				if (heliodon != null)
+					heliodon.setTime((Date) timeSpinner.getValue());
+				computeEnergy();
+			}
+		});
+		final GridBagConstraints gbc_timeSpinner = new GridBagConstraints();
+		gbc_timeSpinner.insets = new Insets(0, 0, 0, 1);
+		gbc_timeSpinner.fill = GridBagConstraints.HORIZONTAL;
+		gbc_timeSpinner.gridx = 1;
+		gbc_timeSpinner.gridy = 1;
+		panel_3.add(timeSpinner, gbc_timeSpinner);
+
+		latitudeLabel = new JLabel("Latitude: ");
+		final GridBagConstraints gbc_altitudeLabel = new GridBagConstraints();
+		gbc_altitudeLabel.insets = new Insets(0, 1, 0, 0);
+		gbc_altitudeLabel.gridx = 2;
+		gbc_altitudeLabel.gridy = 1;
+		panel_3.add(latitudeLabel, gbc_altitudeLabel);
+
+		latitudeSpinner = new JSpinner();
+		latitudeSpinner.setModel(new SpinnerNumberModel(Heliodon.DEFAULT_LATITUDE, -90, 90, 1));
+		latitudeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+			@Override
+			public void stateChanged(final javax.swing.event.ChangeEvent e) {
+				if (!cityComboBox.getSelectedItem().equals("") && !cityLatitute.values().contains(latitudeSpinner.getValue()))
+					cityComboBox.setSelectedItem("");
+				Heliodon.getInstance().setObserverLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
+				computeEnergy();
+			}
+		});
+		final GridBagConstraints gbc_latitudeSpinner = new GridBagConstraints();
+		gbc_latitudeSpinner.fill = GridBagConstraints.HORIZONTAL;
+		gbc_latitudeSpinner.gridx = 3;
+		gbc_latitudeSpinner.gridy = 1;
+		panel_3.add(latitudeSpinner, gbc_latitudeSpinner);
+
+		panel_3.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_3.getPreferredSize().height));
 
 		final JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature (\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -766,7 +915,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private Object getSelectedCity() {
-		return MainPanel.getInstance().getCityComboBox().getSelectedItem();
+		return cityComboBox.getSelectedItem();
 	}
 
 	private EnergyAmount computeEnergyRate(final ReadOnlyVector3 sunLocation, final double insideTemperature, final double outsideTemperature) {
@@ -825,4 +974,10 @@ public class EnergyPanel extends JPanel {
 		outsideTemperatureSpinner.setValue((int) Math.round(toCelsius(averageTemperature[Heliodon.getInstance().getCalander().get(Calendar.MONTH)])));
 	}
 
+	public JSpinner getDateSpinner() {
+		return dateSpinner;
+	}
+	public JSpinner getTimeSpinner() {
+		return timeSpinner;
+	}
 }
