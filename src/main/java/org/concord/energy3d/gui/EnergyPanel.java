@@ -51,14 +51,34 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
-	private static final int[] daysInMonth = new int[] { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	private static final Map<String, int[]> avgMonthlyLowTemperatures = new Hashtable<String, int[]>();
 	private static final Map<String, int[]> avgMonthlyHighTemperatures = new Hashtable<String, int[]>();
-
 
 	static {
 		avgMonthlyLowTemperatures.put("Boston", new int[] { -6, -4, -1, 5, 10, 16, 18, 18, 14, 8, 3, -2 });
 		avgMonthlyHighTemperatures.put("Boston", new int[] { 2, 4, 7, 13, 19, 24, 28, 27, 22, 16, 11, 5 });
+		avgMonthlyLowTemperatures.put("Moscow", new int[] { -14, -14, -9, 0, 6, 10, 13, 11, 6, 1, -5, -10 });
+		avgMonthlyHighTemperatures.put("Moscow", new int[] { -7, -6, 0, 9, 17, 22, 24, 22, 16, 8, 0, -5 });
+		avgMonthlyLowTemperatures.put("Ottawa", new int[] { -16, -14, -7, 1, 7, 12, 15, 14, 9, 3, -2, -11 });
+		avgMonthlyHighTemperatures.put("Ottawa", new int[] { -7, -5, 2, 11, 18, 23, 26, 24, 19, 13, 4, -4 });
+		avgMonthlyLowTemperatures.put("Beijing", new int[] { -9, -7, -1, 7, 13, 18, 21, 20, 14, 7, -1, -7 });
+		avgMonthlyHighTemperatures.put("Beijing", new int[] { 1, 4, 11, 19, 26, 30, 31, 29, 26, 19, 10, 3 });
+		avgMonthlyLowTemperatures.put("Washington DC", new int[] { -2, -1, 3, 8, 13, 19, 22, 21, 17, 11, 5, 1 });
+		avgMonthlyHighTemperatures.put("Washington DC", new int[] { 6, 8, 13, 19, 24, 29, 32, 31, 27, 30, 14, 8 });
+		avgMonthlyLowTemperatures.put("Tehran", new int[] { 1, 3, 7, 13, 17, 22, 25, 25, 21, 15, 8, 3 });
+		avgMonthlyHighTemperatures.put("Tehran", new int[] { 8, 11, 16, 23, 28, 34, 37, 36, 32, 25, 16, 10 });
+		avgMonthlyLowTemperatures.put("Los Angeles", new int[] { 9, 9, 11, 12, 14, 16, 18, 18, 17, 15, 11, 8 });
+		avgMonthlyHighTemperatures.put("Los Angeles", new int[] { 20, 21, 21, 23, 26, 28, 29, 28, 26, 23, 20 });
+		avgMonthlyLowTemperatures.put("Miami", new int[] { 16, 17, 18, 21, 23, 25, 26, 26, 26, 24, 21, 18 });
+		avgMonthlyHighTemperatures.put("Miami", new int[] { 23, 24, 24, 26, 28, 31, 31, 32, 31, 29, 26, 24 });
+		avgMonthlyLowTemperatures.put("Mexico City", new int[] { 6, 7, 9, 11, 12, 12, 12, 12, 12, 10, 8, 7 });
+		avgMonthlyHighTemperatures.put("Mexico City", new int[] { 21, 23, 25, 26, 26, 24, 23, 23, 23, 22, 22, 21 });
+		avgMonthlyLowTemperatures.put("Singapore", new int[] { 23, 23, 24, 24, 24, 24, 24, 24, 24, 24, 23, 23 });
+		avgMonthlyHighTemperatures.put("Singapore", new int[] { 29, 31, 31, 32, 31, 31, 31, 31, 31, 31, 30, 29 });
+		avgMonthlyLowTemperatures.put("Sydney", new int[] { 19, 19, 18, 15, 12, 9, 8, 8, 11, 14, 16, 18 });
+		avgMonthlyHighTemperatures.put("Sydney", new int[] { 26, 26, 25, 23, 20, 17, 17, 18, 20, 22, 23, 25 });
+		avgMonthlyLowTemperatures.put("Buenos Aires", new int[] { 20, 19, 18, 14, 11, 8, 8, 9, 11, 13, 16, 18 });
+		avgMonthlyHighTemperatures.put("Buenos Aires", new int[] { 28, 27, 25, 22, 18, 15, 14, 16, 18, 21, 24, 27 });
 	}
 
 	private static final double COST_PER_KWH = 0.13;
@@ -120,41 +140,20 @@ public class EnergyPanel extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		final JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature Today (C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature (\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel);
 		final GridBagLayout gbl_panel = new GridBagLayout();
 		panel.setLayout(gbl_panel);
 
-		autoCheckBox = new JCheckBox("Auto");
-		autoCheckBox.setSelected(true);
-		autoCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final boolean selected = autoCheckBox.isSelected();
-				insideTemperatureSpinner.setEnabled(!selected);
-				outsideTemperatureSpinner.setEnabled(!selected);
-				if (selected) {
-					insideTemperatureSpinner.setValue(20);
-					updateOutsideTemperature();
-				}
-				computeEnergy();
-			}
-		});
-		final GridBagConstraints gbc_autoCheckBox = new GridBagConstraints();
-		gbc_autoCheckBox.insets = new Insets(0, 0, 0, 5);
-		gbc_autoCheckBox.gridx = 0;
-		gbc_autoCheckBox.gridy = 0;
-		panel.add(autoCheckBox, gbc_autoCheckBox);
-
-		final JLabel insideTemperatureLabel = new JLabel("Inside:");
+		final JLabel insideTemperatureLabel = new JLabel("Inside: ");
+		insideTemperatureLabel.setToolTipText("");
 		final GridBagConstraints gbc_insideTemperatureLabel = new GridBagConstraints();
-		gbc_insideTemperatureLabel.insets = new Insets(0, 0, 0, 5);
 		gbc_insideTemperatureLabel.gridx = 1;
 		gbc_insideTemperatureLabel.gridy = 0;
 		panel.add(insideTemperatureLabel, gbc_insideTemperatureLabel);
 
 		insideTemperatureSpinner = new JSpinner();
-		insideTemperatureSpinner.setEnabled(false);
+		insideTemperatureSpinner.setToolTipText("Thermostat temperature setting for the inside of the house");
 		insideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
@@ -163,14 +162,13 @@ public class EnergyPanel extends JPanel {
 		});
 		insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
 		final GridBagConstraints gbc_insideTemperatureSpinner = new GridBagConstraints();
-		gbc_insideTemperatureSpinner.insets = new Insets(0, 0, 0, 5);
 		gbc_insideTemperatureSpinner.gridx = 2;
 		gbc_insideTemperatureSpinner.gridy = 0;
 		panel.add(insideTemperatureSpinner, gbc_insideTemperatureSpinner);
 
-		final JLabel outsideTemperatureLabel = new JLabel("Outside:");
+		final JLabel outsideTemperatureLabel = new JLabel(" Outside: ");
+		outsideTemperatureLabel.setToolTipText("");
 		final GridBagConstraints gbc_outsideTemperatureLabel = new GridBagConstraints();
-		gbc_outsideTemperatureLabel.insets = new Insets(0, 0, 0, 5);
 		gbc_outsideTemperatureLabel.gridx = 3;
 		gbc_outsideTemperatureLabel.gridy = 0;
 		panel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
@@ -178,6 +176,7 @@ public class EnergyPanel extends JPanel {
 		panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel.getPreferredSize().height));
 
 		outsideTemperatureSpinner = new JSpinner();
+		outsideTemperatureSpinner.setToolTipText("Outside temperature at this time and day");
 		outsideTemperatureSpinner.setEnabled(false);
 		outsideTemperatureSpinner.setModel(new SpinnerNumberModel(10, -70, 60, 1));
 		outsideTemperatureSpinner.addChangeListener(new ChangeListener() {
@@ -190,6 +189,24 @@ public class EnergyPanel extends JPanel {
 		gbc_outsideTemperatureSpinner.gridx = 4;
 		gbc_outsideTemperatureSpinner.gridy = 0;
 		panel.add(outsideTemperatureSpinner, gbc_outsideTemperatureSpinner);
+
+		autoCheckBox = new JCheckBox("Auto");
+		autoCheckBox.setToolTipText("Automatically set the outside temperature based on historic average of the selected city");
+		autoCheckBox.setSelected(true);
+		autoCheckBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final boolean selected = autoCheckBox.isSelected();
+				outsideTemperatureSpinner.setEnabled(!selected);
+				if (selected)
+					updateOutsideTemperature();
+				computeEnergy();
+			}
+		});
+		final GridBagConstraints gbc_autoCheckBox = new GridBagConstraints();
+		gbc_autoCheckBox.gridx = 5;
+		gbc_autoCheckBox.gridy = 0;
+		panel.add(autoCheckBox, gbc_autoCheckBox);
 
 		final JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -410,7 +427,7 @@ public class EnergyPanel extends JPanel {
 		totalLabel.setMinimumSize(size);
 
 		final JPanel panel_2 = new JPanel();
-		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor (W/m2/C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor (W/m2/\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel_2);
 		final GridBagLayout gbl_panel_2 = new GridBagLayout();
 		panel_2.setLayout(gbl_panel_2);
@@ -430,7 +447,7 @@ public class EnergyPanel extends JPanel {
 				computeEnergy();
 			}
 		});
-		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.28" }));
+		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.28 " }));
 		wallsComboBox.setPreferredSize(wallsComboBox.getMinimumSize());
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
 		gbc_wallsComboBox.insets = new Insets(0, 0, 5, 5);
@@ -454,7 +471,7 @@ public class EnergyPanel extends JPanel {
 				computeEnergy();
 			}
 		});
-		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.14" }));
+		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.14 " }));
 		doorsComboBox.setPreferredSize(doorsComboBox.getMinimumSize());
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
 		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
@@ -478,7 +495,7 @@ public class EnergyPanel extends JPanel {
 				computeEnergy();
 			}
 		});
-		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.89" }));
+		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.89 " }));
 		windowsComboBox.setPreferredSize(windowsComboBox.getMinimumSize());
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
 		gbc_windowsComboBox.insets = new Insets(0, 0, 0, 5);
@@ -502,7 +519,7 @@ public class EnergyPanel extends JPanel {
 				computeEnergy();
 			}
 		});
-		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.14" }));
+		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.14 " }));
 		roofsComboBox.setPreferredSize(roofsComboBox.getMinimumSize());
 		roofsComboBox.setEditable(true);
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
@@ -518,7 +535,7 @@ public class EnergyPanel extends JPanel {
 
 	public void initJavaFXGUI() {
 		if (fxPanel == null && !initJavaFxAlreadyCalled) {
-			initJavaFxAlreadyCalled  = true;
+			initJavaFxAlreadyCalled = true;
 			try {
 				System.out.println("initJavaFXGUI()");
 				fxPanel = new JFXPanel();
@@ -677,13 +694,14 @@ public class EnergyPanel extends JPanel {
 	private EnergyAmount computeEnergyYearly(final double insideTemperature) {
 		final EnergyAmount energyYearly = new EnergyAmount();
 		final Calendar date = Calendar.getInstance();
-		date.set(Calendar.DAY_OF_MONTH, 0);
+		date.set(Calendar.DAY_OF_MONTH, 15);
 		date.set(Calendar.MONTH, 0);
 		for (int month = 0; month < 11; month++) {
 			final EnergyAmount energyToday = computeEnergyToday(date, insideTemperature);
-			energyYearly.solar += energyToday.solar * daysInMonth[month];
-			energyYearly.heating += energyToday.heating * daysInMonth[month];
-			energyYearly.cooling += energyToday.cooling * daysInMonth[month];
+			final int daysInMonth = date.getActualMaximum(Calendar.DAY_OF_MONTH);
+			energyYearly.solar += energyToday.solar * daysInMonth;
+			energyYearly.heating += energyToday.heating * daysInMonth;
+			energyYearly.cooling += energyToday.cooling * daysInMonth;
 			date.add(Calendar.MONTH, 1);
 		}
 		return energyYearly;
@@ -722,10 +740,20 @@ public class EnergyPanel extends JPanel {
 
 		final int[] monthlyLowTemperatures = avgMonthlyLowTemperatures.get(getSelectedCity());
 		final int[] monthlyHighTemperatures = avgMonthlyHighTemperatures.get(getSelectedCity());
-		final int monthFromIndex = monthFrom.get(Calendar.MONTH);
-		final int monthToIndex = monthTo.get(Calendar.MONTH);
-		final double outsideLowTemperature = monthlyLowTemperatures[monthFromIndex] + (monthlyLowTemperatures[monthToIndex] - monthlyLowTemperatures[monthFromIndex]) * portion;
-		final double outsideHighTemperature = monthlyHighTemperatures[monthFromIndex] + (monthlyHighTemperatures[monthToIndex] - monthlyHighTemperatures[monthFromIndex]) * portion;
+		final double outsideLowTemperature;
+		final double outsideHighTemperature;
+		if (monthlyLowTemperatures == null || monthlyHighTemperatures == null) {
+			/* if there are no temperatures available for the selected city compute zero for cooling and heating */
+			outsideLowTemperature = insideTemperature;
+			outsideHighTemperature = insideTemperature;
+			energyToday.heating = Double.NaN;
+			energyToday.cooling = Double.NaN;
+		} else {
+			final int monthFromIndex = monthFrom.get(Calendar.MONTH);
+			final int monthToIndex = monthTo.get(Calendar.MONTH);
+			outsideLowTemperature = monthlyLowTemperatures[monthFromIndex] + (monthlyLowTemperatures[monthToIndex] - monthlyLowTemperatures[monthFromIndex]) * portion;
+			outsideHighTemperature = monthlyHighTemperatures[monthFromIndex] + (monthlyHighTemperatures[monthToIndex] - monthlyHighTemperatures[monthFromIndex]) * portion;
+		}
 
 		for (int hour = 0; hour < 24; hour++) {
 			final EnergyAmount energyThisHour = computeEnergyRate(heliodon.computeSunLocation(today), insideTemperature, outsideLowTemperature + (outsideHighTemperature - outsideLowTemperature) / 24 * hour);

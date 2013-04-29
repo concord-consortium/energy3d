@@ -14,6 +14,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Hashtable;
+import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.FocusManager;
@@ -72,6 +74,22 @@ public class MainPanel extends JPanel {
 	private EnergyPanel energyPanel;
 	private JPanel canvasPanel;
 	private JToggleButton energyToggleButton;
+
+	final static Map<String, Integer> cityLatitute = new Hashtable<String, Integer>();
+	static {
+		cityLatitute.put("Moscow", 55);
+		cityLatitute.put("Ottawa", 45);
+		cityLatitute.put("Boston", 42);
+		cityLatitute.put("Beijing", 39);
+		cityLatitute.put("Washington DC", 38);
+		cityLatitute.put("Tehran", 35);
+		cityLatitute.put("Los Angeles", 34);
+		cityLatitute.put("Miami", 25);
+		cityLatitute.put("Mexico City", 19);
+		cityLatitute.put("Singapore", 1);
+		cityLatitute.put("Sydney", -33);
+		cityLatitute.put("Buenos Aires", -34);
+	}
 
 	public static MainPanel getInstance() {
 		return instance;
@@ -228,6 +246,7 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+
 				@Override
 				public void mouseExited(final MouseEvent e) {
 					SceneManager.getInstance().refresh();
@@ -261,6 +280,7 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+
 				@Override
 				public void mouseExited(final MouseEvent e) {
 					SceneManager.getInstance().refresh();
@@ -293,6 +313,7 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+
 				@Override
 				public void mouseExited(final MouseEvent e) {
 					SceneManager.getInstance().refresh();
@@ -325,6 +346,7 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+
 				@Override
 				public void mouseExited(final MouseEvent e) {
 					SceneManager.getInstance().refresh();
@@ -357,6 +379,7 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+
 				@Override
 				public void mouseExited(final MouseEvent e) {
 					SceneManager.getInstance().refresh();
@@ -452,6 +475,7 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+
 				@Override
 				public void mouseExited(final MouseEvent e) {
 					SceneManager.getInstance().refresh();
@@ -484,6 +508,7 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+
 				@Override
 				public void mouseExited(final MouseEvent e) {
 					SceneManager.getInstance().refresh();
@@ -692,13 +717,14 @@ public class MainPanel extends JPanel {
 			});
 			dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
 			dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-			    boolean firstCall = true;
+				boolean firstCall = true;
+
 				@Override
 				public void stateChanged(final javax.swing.event.ChangeEvent e) {
-				    if (firstCall) {
-				    	firstCall = false;
-				        return;
-				    }
+					if (firstCall) {
+						firstCall = false;
+						return;
+					}
 					final Heliodon heliodon = Heliodon.getInstance();
 					if (heliodon != null)
 						heliodon.setDate((Date) dateSpinner.getValue());
@@ -720,15 +746,15 @@ public class MainPanel extends JPanel {
 			timeSpinner = new JSpinner(new SpinnerDateModel());
 			timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
 			timeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-                private boolean firstCall = true;
+				private boolean firstCall = true;
 
-                @Override
-                public void stateChanged(final javax.swing.event.ChangeEvent e) {
-                    // ignore the first event
-                    if (firstCall) {
-                    	firstCall = false;
-                        return;
-                    }
+				@Override
+				public void stateChanged(final javax.swing.event.ChangeEvent e) {
+					// ignore the first event
+					if (firstCall) {
+						firstCall = false;
+						return;
+					}
 					final Heliodon heliodon = Heliodon.getInstance();
 					if (heliodon != null)
 						heliodon.setTime((Date) timeSpinner.getValue());
@@ -768,46 +794,8 @@ public class MainPanel extends JPanel {
 			cityComboBox.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					int latitude = 0;
-					switch (cityComboBox.getSelectedIndex()) {
-					case 1:
-						latitude = 55;
-						break;
-					case 2:
-						latitude = 45;
-						break;
-					case 3:
-						latitude = 42;
-						break;
-					case 4:
-						latitude = 39;
-						break;
-					case 5:
-						latitude = 38;
-						break;
-					case 6:
-						latitude = 35;
-						break;
-					case 7:
-						latitude = 34;
-						break;
-					case 8:
-						latitude = 25;
-						break;
-					case 9:
-						latitude = 19;
-						break;
-					case 10:
-						latitude = 1;
-						break;
-					case 11:
-						latitude = -33;
-						break;
-					case 12:
-						latitude = -34;
-						break;
-					}
-					latitudeSpinner.setValue(latitude);
+					if (!cityComboBox.getSelectedItem().equals(""))
+						latitudeSpinner.setValue(cityLatitute.get(cityComboBox.getSelectedItem()));
 				}
 			});
 		}
@@ -826,7 +814,11 @@ public class MainPanel extends JPanel {
 			latitudeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
 				@Override
 				public void stateChanged(final javax.swing.event.ChangeEvent e) {
+					if (!cityComboBox.getSelectedItem().equals("") && !cityLatitute.values().contains(latitudeSpinner.getValue()))
+						cityComboBox.setSelectedItem("");
 					Heliodon.getInstance().setObserverLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
+					if (Config.EXPERIMENT)
+						EnergyPanel.getInstance().computeEnergy();
 				}
 			});
 		}
@@ -856,6 +848,7 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+
 				@Override
 				public void mouseExited(final MouseEvent e) {
 					SceneManager.getInstance().refresh();
@@ -944,6 +937,7 @@ public class MainPanel extends JPanel {
 					if (e.getClickCount() > 1)
 						SceneManager.getInstance().setOperationStick(true);
 				}
+
 				@Override
 				public void mouseExited(final MouseEvent e) {
 					SceneManager.getInstance().refresh();
@@ -988,6 +982,7 @@ public class MainPanel extends JPanel {
 		}
 		return canvasPanel;
 	}
+
 	private JToggleButton getEnergyToggleButton() {
 		if (energyToggleButton == null) {
 			energyToggleButton = new JToggleButton("");

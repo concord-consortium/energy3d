@@ -1390,6 +1390,10 @@ Version 0.5 - October 20, 2011
 - add support for multi-city heating and cooling energy calculations
 - add degree day data for Sydney 
 - rewrite the energy calculation algorithms to compute solar, heating and cooling energy more precisely by iterating though every hour
+- add average low and high temperatures for all cities in the combo box
+- display ? (NaN) for heating and cooling energy values when none of the combo box cities are selected
+- automatically set the selected city to none when the value of latitude spinner is modified
+- let the Auto check box control the value of outside temperature only
 
 
 - *allow move house with one click
@@ -1397,6 +1401,8 @@ Version 0.5 - October 20, 2011
 - *option to treat entire side of building as window
 - *allow sun heat calculation of partially shaded window
 - *save sun location when saving
+
+- *deselect heliodon button when opening a new file
 
 - *replace window bars with rectangle meshes
 
