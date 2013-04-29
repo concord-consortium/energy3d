@@ -1395,6 +1395,7 @@ Version 0.5 - October 20, 2011
 - automatically set the selected city to none when the value of latitude spinner is modified
 - let the Auto check box control the value of outside temperature only
 - move the date & location settings from toolbar to energy panel
+- improve hide/show of the energy panel
 
 
 - *allow move house with one click

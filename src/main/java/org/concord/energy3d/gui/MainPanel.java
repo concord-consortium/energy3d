@@ -2,6 +2,7 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -18,6 +19,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
+import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -750,6 +752,7 @@ public class MainPanel extends JPanel {
 			splitPane.setResizeWeight(1.0);
 			splitPane.setRightComponent(getEnergyPanel());
 			splitPane.setLeftComponent(getCanvasPanel());
+			splitPane.setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
 		}
 		return splitPane;
 	}
@@ -776,10 +779,17 @@ public class MainPanel extends JPanel {
 			energyToggleButton.setSelected(true);
 			energyToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/chart.png")));
 			energyToggleButton.addActionListener(new ActionListener() {
+				int defaultDividerSize = -1;
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (defaultDividerSize == -1)
+						defaultDividerSize = splitPane.getDividerSize();
 					EnergyPanel.getInstance().setVisible(energyToggleButton.isSelected());
-					splitPane.resetToPreferredSizes();
+					splitPane.setDividerSize(energyToggleButton.isSelected() ? defaultDividerSize : 0);
+					if (energyToggleButton.isSelected())
+						splitPane.setDividerLocation(splitPane.getLastDividerLocation());
+					else
+						splitPane.setDividerLocation(1.0);
 				}
 			});
 		}
