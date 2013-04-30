@@ -750,16 +750,20 @@ public class EnergyPanel extends JPanel {
 		});
 	}
 
-	public void updateArea(final double walls, final double doors, final double windows, final double roofs) {
-		final double total = walls + windows + doors + roofs;
+	public void updateAreaChart() {
+		final double total = wallsArea + doorsArea + windowsArea + roofsArea;
 		final boolean isZero = (total == 0.0);
-		wallsAreaChartData.setYValue(isZero ? 0 : walls / total * 100.0);
-		doorsAreaChartData.setYValue(isZero ? 0 : doors / total * 100.0);
-		windowsAreaChartData.setYValue(isZero ? 0 : windows / total * 100.0);
-		roofsAreaChartData.setYValue(isZero ? 0 : roofs / total * 100.0);
+		wallsAreaChartData.setYValue(isZero ? 0 : wallsArea / total * 100.0);
+		doorsAreaChartData.setYValue(isZero ? 0 : doorsArea / total * 100.0);
+		windowsAreaChartData.setYValue(isZero ? 0 : windowsArea / total * 100.0);
+		roofsAreaChartData.setYValue(isZero ? 0 : roofsArea / total * 100.0);
 	}
 
-	public void updateEnergyLoss(final double walls, final double doors, final double windows, final double roofs) {
+	public void updateEnergyLossChart() {
+		final double walls = wallsArea * Double.parseDouble((String) wallsComboBox.getSelectedItem());
+		final double doors = doorsArea * Double.parseDouble((String) doorsComboBox.getSelectedItem());
+		final double windows = windowsArea * Double.parseDouble((String) windowsComboBox.getSelectedItem());
+		final double roofs = roofsArea * Double.parseDouble((String) roofsComboBox.getSelectedItem());
 		final double total = walls + windows + doors + roofs;
 		final boolean isZero = (total == 0.0);
 		wallsEnergyChartData.setYValue(isZero ? 0 : walls / total * 100.0);
@@ -811,11 +815,12 @@ public class EnergyPanel extends JPanel {
 			else if (part instanceof Roof)
 				roofsArea += part.computeArea();
 		}
-		updateArea(wallsArea, doorsArea, windowsArea, roofsArea);
+		updateAreaChart();
 
 		final int insideTemperature = (Integer) insideTemperatureSpinner.getValue();
 		final int outsideTemperature = (Integer) outsideTemperatureSpinner.getValue();
-		computeEnergyLossRate(insideTemperature - outsideTemperature, true);
+		computeEnergyLossRate(insideTemperature - outsideTemperature);
+		updateEnergyLossChart();
 		final EnergyAmount energyRate = computeEnergyRate(Heliodon.getInstance().getSunLocation(), insideTemperature, outsideTemperature);
 		solarRateTextField.setText(noDecimals.format(energyRate.solar));
 		heatingRateTextField.setText(noDecimals.format(energyRate.heating));
@@ -924,7 +929,7 @@ public class EnergyPanel extends JPanel {
 		if (Heliodon.getInstance().isVisible() && !Heliodon.getInstance().isNightTime())
 			energyRate.solar = computeSolarEnergyRate(sunLocation.normalize(null));
 
-		final double energyLossRate = computeEnergyLossRate(insideTemperature - outsideTemperature, false);
+		final double energyLossRate = computeEnergyLossRate(insideTemperature - outsideTemperature);
 		if (energyLossRate >= 0.0) {
 			energyRate.heating = energyLossRate;
 			energyRate.cooling = 0.0;
@@ -944,13 +949,11 @@ public class EnergyPanel extends JPanel {
 		return energyRate;
 	}
 
-	private double computeEnergyLossRate(final double deltaT, final boolean draw) {
+	private double computeEnergyLossRate(final double deltaT) {
 		final double wallsEnergyLoss = wallsArea * Double.parseDouble((String) wallsComboBox.getSelectedItem()) * deltaT;
 		final double doorsEnergyLoss = doorsArea * Double.parseDouble((String) doorsComboBox.getSelectedItem()) * deltaT;
 		final double windowsEnergyLoss = windowsArea * Double.parseDouble((String) windowsComboBox.getSelectedItem()) * deltaT;
 		final double roofsEnergyLoss = roofsArea * Double.parseDouble((String) roofsComboBox.getSelectedItem()) * deltaT;
-		if (draw)
-			updateEnergyLoss(wallsEnergyLoss, doorsEnergyLoss, windowsEnergyLoss, roofsEnergyLoss);
 		return wallsEnergyLoss + doorsEnergyLoss + windowsEnergyLoss + roofsEnergyLoss;
 	}
 

@@ -184,7 +184,7 @@ public class Scene implements Serializable {
 	}
 
 	public static void loadCameraLocation() {
-		final Camera camera = SceneManager.getInstance().getCameraNode().getCamera();
+		final Camera camera = SceneManager.getInstance().getCamera();
 		if (instance.getCameraLocation() != null && instance.getCameraDirection() != null) {
 			camera.setLocation(instance.getCameraLocation());
 			camera.lookAt(instance.getCameraLocation().add(instance.getCameraDirection(), null), Vector3.UNIT_Z);
@@ -296,9 +296,9 @@ public class Scene implements Serializable {
 	}
 
 	public static void saveCameraLocation() {
-		final Camera camera = SceneManager.getInstance().getCameraNode().getCamera();
+		final Camera camera = SceneManager.getInstance().getCamera();
 		instance.setCameraLocation(camera.getLocation().clone());
-		instance.setCameraDirection(SceneManager.getInstance().getCameraNode().getCamera().getDirection().clone());
+		instance.setCameraDirection(SceneManager.getInstance().getCamera().getDirection().clone());
 	}
 
 	public static Node getRoot() {

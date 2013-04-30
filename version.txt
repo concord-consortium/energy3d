@@ -1397,7 +1397,9 @@ Version 0.5 - October 20, 2011
 - move the date & location settings from toolbar to energy panel
 - improve hide/show of the energy panel
 - remove debug dialog box
-- remove lwjgl dependency 
+- remove lwjgl dependency
+- fix problem with energy loss chart falling to zero at June
+- fix problem with exception if clicking on canvas before Camaera.getCurrentCamera() is initialized
 
 - release version 2.0
 

@@ -366,7 +366,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (rotAnim && viewMode == ViewMode.NORMAL && canvas.getCanvasRenderer() != null) {
 			final Matrix3 rotate = new Matrix3();
 			rotate.fromAngleNormalAxis(45 * tpf * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
-			final Camera camera = canvas.getCanvasRenderer().getCamera();
+			final Camera camera = getCamera();
 			camera.setLocation(rotate.applyPre(camera.getLocation(), null));
 			camera.lookAt(0, 0, 1, Vector3.UNIT_Z);
 			getCameraNode().updateFromCamera();
@@ -455,7 +455,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void initCamera() {
 		System.out.println("initCamera()");
-		final Camera camera = canvas.getCanvasRenderer().getCamera();
+		final Camera camera = getCamera();
 		System.out.println("camera = " + camera);
 		cameraNode = new CameraNode("Camera Node", camera);
 		root.attachChild(cameraNode);
@@ -918,7 +918,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void resetCamera(final ViewMode viewMode) {
 		this.viewMode = viewMode;
-		final Camera camera = canvas.getCanvasRenderer().getCamera();
+		final Camera camera = getCamera();
 		cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		ReadOnlyVector3 loc = new Vector3(10, -50, 30);
@@ -969,7 +969,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void resizeCamera(final double orthoWidth) {
-		final Camera camera = canvas.getCanvasRenderer().getCamera();
+		final Camera camera = getCamera();
 		if (camera == null)
 			return;
 		final Dimension size = ((Component) canvas).getSize();
@@ -991,7 +991,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	// private void moveUpDown(final Canvas canvas, final double tpf, boolean
 	// up) {
-	// final Camera camera = canvas.getCanvasRenderer().getCamera();
+	// final Camera camera = getCamera();
 	// final Vector3 loc = new Vector3(camera.getUp());
 	// if (viewMode == ViewMode.TOP_VIEW)
 	// up = !up;
@@ -1205,7 +1205,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		compass.addController(new SpatialController<Spatial>() {
 			@Override
 			public void update(final double time, final Spatial caller) {
-				final Vector3 direction = canvas.getCanvasRenderer().getCamera().getDirection().normalize(null);
+				final Vector3 direction = getCamera().getDirection().normalize(null);
 				direction.setZ(0);
 				direction.normalizeLocal();
 				double angle = -direction.smallestAngleBetween(Vector3.UNIT_Y);
@@ -1456,11 +1456,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void moveMouse(final float x, final float y) {
-		final int pixelX = (int) ((-x + 500f) * canvas.getCanvasRenderer().getCamera().getWidth() / 1000f);
-		final int pixelY = (int) ((y + 200f) * canvas.getCanvasRenderer().getCamera().getHeight() / 400f);
+		final int pixelX = (int) ((-x + 500f) * getCamera().getWidth() / 1000f);
+		final int pixelY = (int) ((y + 200f) * getCamera().getHeight() / 400f);
 		mouseState = new MouseState(pixelX, pixelY, 0, 0, 0, null, null);
 
-		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(pixelX, pixelY), false, null);
+		final Ray3 pickRay = getCamera().getPickRay(new Vector2(pixelX, pixelY), false, null);
 		final ReadOnlyVector3 origin = pickRay.getOrigin();
 		kinectPointer.setTranslation(origin.getX(), origin.getY(), origin.getZ());
 
@@ -1501,6 +1501,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public Camera getCamera() {
-		return SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera();
+		return canvas.getCanvasRenderer().getCamera();
 	}
 }

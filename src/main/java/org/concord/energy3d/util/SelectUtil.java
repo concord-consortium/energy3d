@@ -18,7 +18,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 
@@ -36,17 +35,14 @@ public class SelectUtil {
 		if (target == null)
 			target = SceneManager.getInstance().getFloor();
 		pickResults.clear();
-
-//		final CanvasRenderer canvasRenderer = SceneManager.getInstance().getCanvas().getCanvasRenderer();
-//		final Ray3 pickRay = canvasRenderer.getCamera().getPickRay(new Vector2(x, y), false, null);
-		final Ray3 pickRay = Camera.getCurrentCamera().getPickRay(new Vector2(x, y), false, null);
+		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
 		PickingUtil.findPick(target, pickRay, pickResults, false);
 		return getPickResult(pickRay);
 	}
 
 	public static PickedHousePart pickPart(final int x, final int y, final Class<?> typeOfHousePart) {
 		pickResults.clear();
-		final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
+		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
 
 		if (typeOfHousePart == null)
 			PickingUtil.findPick(SceneManager.getInstance().getFloor(), pickRay, pickResults, false);

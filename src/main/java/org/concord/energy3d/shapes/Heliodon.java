@@ -268,7 +268,7 @@ public class Heliodon {
 				if (!sunGrabbed)
 					return;
 				final MouseState mouse = inputStates.getCurrent().getMouseState();
-				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(mouse.getX(), mouse.getY()), false, null);
+				final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(mouse.getX(), mouse.getY()), false, null);
 
 				pickResults.clear();
 				PickingUtil.findPick(sunRegion, pickRay, pickResults);
@@ -441,7 +441,7 @@ public class Heliodon {
 	public void setVisible(final boolean visible) {
 		this.visible = visible;
 		if (bloomRenderPass == null) {
-			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera(), 4);
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 4);
 			passManager.add(bloomRenderPass);
 			bloomRenderPass.add(sun);
 		}

@@ -643,7 +643,7 @@ public class Wall extends HousePart {
 			if (n.dot(otherWallDir) < 0)
 				n.negateLocal();
 		} else {
-			final ReadOnlyVector3 camera = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getDirection();
+			final ReadOnlyVector3 camera = SceneManager.getInstance().getCamera().getDirection();
 			if (camera.dot(n) < 0)
 				n.negateLocal();
 		}
