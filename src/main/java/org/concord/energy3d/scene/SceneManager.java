@@ -196,7 +196,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
-		final long time = System.nanoTime();
 		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 24, 0, 4, false, false);
 //		final DisplaySettings settings = new DisplaySettings(400, 300, 24, -1, 0, 8, 0, 0, false, false);
 
@@ -300,31 +299,33 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		root.updateGeometricState(0, true);
 		System.out.println("Finished initialization.");
-		System.out.println("time = " + (System.nanoTime() - time) / 1000000000.0);
 	}
 
 	@Override
 	public synchronized void run() {
 		frameHandler.init();
-		double time = 0.0;
-		int time_n = 0;
+//		double time = 0.0;
+//		int time_n = 0;
+		final long sleepTime = 1000L / 60L;
 		while (true) {
 			logicalLayer.checkTriggers(frameHandler.getTimer().getTimePerFrame());
 			final double now = frameHandler.getTimer().getTimeInSeconds();
 			final boolean isUpdateTime = refreshTime != -1 && now <= refreshTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
+//			if (time_n != 100)
+//				refresh = true;
 			if (refresh || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
 				if (now > refreshTime)
 					refreshTime = -1;
 				refresh = false;
 				try {
-					final long t = System.nanoTime();
+//					final long t = System.nanoTime();
 					frameHandler.updateFrame();
-					time += System.nanoTime() - t;
-					time_n++;
-					if (time_n == 100)
-						System.out.println("time = " + time / 1000000000.0);
+//					time += System.nanoTime() - t;
+//					time_n++;
+//					if (time_n == 100)
+//						System.out.println("fps = " + (int) (time_n / (time / 1000000000.0)));
 				} catch (final Throwable e) {
 					e.printStackTrace();
 					if (shadowPass.isEnabled()) {
@@ -343,7 +344,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					e.printStackTrace();
 				}
 			}
-			lastRenderTime = System.nanoTime();
+//			lastRenderTime = System.nanoTime();
+//			Thread.yield();
+//			try {
+//				Thread.sleep(10);
+//			} catch (final InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		}
 	}
 
@@ -388,8 +395,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public boolean renderUnto(final Renderer renderer) {
-		if (cameraNode == null)
+		if (cameraNode == null) {
 			initCamera();
+			return false;
+		}
+//		Config.printTimeUntilFirstRender();
+
+//		System.out.println("RenderUnto()");
 
 		// if (drawBounds && selectedHousePart != null) {
 		// if (selectedHousePart instanceof Roof) {
@@ -456,7 +468,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void initCamera() {
 		System.out.println("initCamera()");
 		final Camera camera = getCamera();
-		System.out.println("camera = " + camera);
 		cameraNode = new CameraNode("Camera Node", camera);
 		root.attachChild(cameraNode);
 		cameraNode.updateFromCamera();
@@ -917,6 +928,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void resetCamera(final ViewMode viewMode) {
+		System.out.println("resetCamera()");
 		this.viewMode = viewMode;
 		final Camera camera = getCamera();
 		cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
@@ -959,6 +971,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		camera.setFrame(loc, left, up, lookAt);
 		camera.lookAt(lookAt, Vector3.UNIT_Z);
+		camera.update();
 
 		cameraNode.updateFromCamera();
 		Scene.getInstance().updateEditShapes();
@@ -1278,8 +1291,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public void init() {
-		// if (Config.JOGL)
-		// initCamera();
+		 if (Config.RENDER_MODE != RenderMode.LWJGL)
+			 initCamera();
 		if (Config.isHeliodonMode())
 			MainPanel.getInstance().getHeliodonButton().setSelected(true);
 

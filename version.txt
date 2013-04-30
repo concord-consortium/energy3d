@@ -1341,7 +1341,6 @@ Version 0.5 - October 20, 2011
 - abort previous thread if a new compute energy request is made
 - convert Energy3D project to a maven project
 - use the new jogl jars and update the webstart jnlp
-*
 - create pom.xml for the maven configuration of energy3d
 - add Ardor3D maven dependancies to energy3d project
 - add JOGL nightly built maven dependancies to energy3d project
@@ -1381,6 +1380,7 @@ Version 0.5 - October 20, 2011
 - include shadow resources in jar file
 - help fix clipping bug in Ardor3D  
 - fix problem with frozen program after trying to open a new file when in print preview
+*
 - fix change of view point, print preview on, then annotation, then print preview off
 - use maven-shade-plugin for creating jar files that excluse dlls and unnecessary java dependancies
 - re-enable jar signing with maven
@@ -1400,6 +1400,8 @@ Version 0.5 - October 20, 2011
 - remove lwjgl dependency
 - fix problem with energy loss chart falling to zero at June
 - fix problem with exception if clicking on canvas before Camaera.getCurrentCamera() is initialized
+- fix problem with cavanas initially rendered at wrong camera view
+
 
 - release version 2.0
 
