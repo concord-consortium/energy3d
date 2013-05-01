@@ -4,7 +4,7 @@ import org.concord.energy3d.MainApplet;
 
 public class Config {
 	public static final String VERSION = "2.0";
-	public static RenderMode RENDER_MODE = RenderMode.JOGL;
+	public static final RenderMode RENDER_MODE = RenderMode.JOGL;
 	private static MainApplet applet;
 	private static boolean isWebstart;
 	private static final boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac");
@@ -16,7 +16,7 @@ public class Config {
 //		final Object renderer = JOptionPane.showInputDialog(null, "Which renderer?", null, JOptionPane.QUESTION_MESSAGE, null, new RenderMode[] {RenderMode.JOGL,  RenderMode.LWJGL, RenderMode.NEWT}, RenderMode.JOGL);
 //		if (renderer != null)
 //			RENDER_MODE = (RenderMode) renderer;
-//		startTime = System.nanoTime();
+////		startTime = System.nanoTime();
 //	}
 
 //	public static void printTimeUntilFirstRender() {

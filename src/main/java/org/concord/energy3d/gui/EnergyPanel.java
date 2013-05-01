@@ -31,6 +31,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -107,6 +108,10 @@ public class EnergyPanel extends JPanel {
 	private double doorsArea;
 	private double windowsArea;
 	private double roofsArea;
+	private double wallUFactor;
+	private double doorUFactor;
+	private double windowUFactor;
+	private double roofUFactor;
 	private JFXPanel fxPanel;
 	private final XYChart.Data<String, Number> wallsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
 	private final XYChart.Data<String, Number> windowsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
@@ -589,21 +594,20 @@ public class EnergyPanel extends JPanel {
 		gbc_wallsLabel.gridy = 0;
 		panel_2.add(wallsLabel, gbc_wallsLabel);
 
-		wallsComboBox = new JComboBox();
+		wallsComboBox = new WideComboBox();
+		wallsComboBox.setEditable(true);
+		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.28 ", "0.67 (Concrete 8\")", "0.41 (Masonary Brick 8\")", "0.04 (Flat Metal 8\" Fiberglass Insulation)"}));
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				computeEnergy();
 			}
 		});
-		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.28 " }));
-		wallsComboBox.setPreferredSize(wallsComboBox.getMinimumSize());
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
 		gbc_wallsComboBox.insets = new Insets(0, 0, 5, 5);
 		gbc_wallsComboBox.gridx = 1;
 		gbc_wallsComboBox.gridy = 0;
 		panel_2.add(wallsComboBox, gbc_wallsComboBox);
-		wallsComboBox.setEditable(true);
 
 		final JLabel doorsLabel = new JLabel("Doors:");
 		final GridBagConstraints gbc_doorsLabel = new GridBagConstraints();
@@ -613,21 +617,22 @@ public class EnergyPanel extends JPanel {
 		gbc_doorsLabel.gridy = 0;
 		panel_2.add(doorsLabel, gbc_doorsLabel);
 
-		doorsComboBox = new JComboBox();
+		doorsComboBox = new WideComboBox();
+		doorsComboBox.setEditable(true);
+		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.00 "}));
+		doorsComboBox.setMinimumSize(doorsComboBox.getMinimumSize());
+		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] {"1.14 ", "1.20 (Steel)", "0.64 (Wood)"}));
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				computeEnergy();
 			}
 		});
-		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.14 " }));
-		doorsComboBox.setPreferredSize(doorsComboBox.getMinimumSize());
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
 		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
 		gbc_doorsComboBox.gridx = 3;
 		gbc_doorsComboBox.gridy = 0;
 		panel_2.add(doorsComboBox, gbc_doorsComboBox);
-		doorsComboBox.setEditable(true);
 
 		final JLabel windowsLabel = new JLabel("Windows:");
 		final GridBagConstraints gbc_windowsLabel = new GridBagConstraints();
@@ -637,21 +642,20 @@ public class EnergyPanel extends JPanel {
 		gbc_windowsLabel.gridy = 1;
 		panel_2.add(windowsLabel, gbc_windowsLabel);
 
-		windowsComboBox = new JComboBox();
+		windowsComboBox = new WideComboBox();
+		windowsComboBox.setEditable(true);
+		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] {"1.89 ", "1.22 (Single Pane)", "0.70 (Double Pane)"}));
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				computeEnergy();
 			}
 		});
-		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.89 " }));
-		windowsComboBox.setPreferredSize(windowsComboBox.getMinimumSize());
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
 		gbc_windowsComboBox.insets = new Insets(0, 0, 0, 5);
 		gbc_windowsComboBox.gridx = 1;
 		gbc_windowsComboBox.gridy = 1;
 		panel_2.add(windowsComboBox, gbc_windowsComboBox);
-		windowsComboBox.setEditable(true);
 
 		final JLabel roofsLabel = new JLabel("Roofs:");
 		final GridBagConstraints gbc_roofsLabel = new GridBagConstraints();
@@ -661,16 +665,15 @@ public class EnergyPanel extends JPanel {
 		gbc_roofsLabel.gridy = 1;
 		panel_2.add(roofsLabel, gbc_roofsLabel);
 
-		roofsComboBox = new JComboBox();
+		roofsComboBox = new WideComboBox();
+		roofsComboBox.setEditable(true);
+		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.14 ", "0.23 (Concrete 3\")", "0.11 (Flat Metal 3\" Fiberglass Insulation)", "0.10 (Wood 3\" Fiberglass Insulation)"}));
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				computeEnergy();
 			}
 		});
-		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.14 " }));
-		roofsComboBox.setPreferredSize(roofsComboBox.getMinimumSize());
-		roofsComboBox.setEditable(true);
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
 		gbc_roofsComboBox.gridx = 3;
 		gbc_roofsComboBox.gridy = 1;
@@ -760,10 +763,10 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateEnergyLossChart() {
-		final double walls = wallsArea * Double.parseDouble((String) wallsComboBox.getSelectedItem());
-		final double doors = doorsArea * Double.parseDouble((String) doorsComboBox.getSelectedItem());
-		final double windows = windowsArea * Double.parseDouble((String) windowsComboBox.getSelectedItem());
-		final double roofs = roofsArea * Double.parseDouble((String) roofsComboBox.getSelectedItem());
+		final double walls = wallsArea * wallUFactor;
+		final double doors = doorsArea * doorUFactor;
+		final double windows = windowsArea * windowUFactor;
+		final double roofs = roofsArea * roofUFactor;
 		final double total = walls + windows + doors + roofs;
 		final boolean isZero = (total == 0.0);
 		wallsEnergyChartData.setYValue(isZero ? 0 : walls / total * 100.0);
@@ -798,6 +801,17 @@ public class EnergyPanel extends JPanel {
 		System.out.println("computeEnergyNow()");
 		if (autoCheckBox.isSelected())
 			updateOutsideTemperature();
+
+		try {
+			wallUFactor = parseUFactor(wallsComboBox);
+			doorUFactor = parseUFactor(doorsComboBox);
+			windowUFactor = parseUFactor(windowsComboBox);
+			roofUFactor = parseUFactor(roofsComboBox);
+		} catch (final Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(MainPanel.getInstance(), "Invalid U-Factor value: " + e.getMessage(), "Invalid U-Factor", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
 
 		wallsArea = 0;
 		doorsArea = 0;
@@ -843,6 +857,12 @@ public class EnergyPanel extends JPanel {
 		heatingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.heating));
 		coolingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.cooling));
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
+	}
+
+	public double parseUFactor(final JComboBox comboBox) {
+		final String valueStr = comboBox.getSelectedItem().toString();
+		final int indexOfSpace = valueStr.indexOf(' ');
+		return Double.parseDouble(valueStr.substring(0, indexOfSpace != -1 ? indexOfSpace : valueStr.length()));
 	}
 
 	private EnergyAmount computeEnergyYearly(final double insideTemperature) {
@@ -950,10 +970,10 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private double computeEnergyLossRate(final double deltaT) {
-		final double wallsEnergyLoss = wallsArea * Double.parseDouble((String) wallsComboBox.getSelectedItem()) * deltaT;
-		final double doorsEnergyLoss = doorsArea * Double.parseDouble((String) doorsComboBox.getSelectedItem()) * deltaT;
-		final double windowsEnergyLoss = windowsArea * Double.parseDouble((String) windowsComboBox.getSelectedItem()) * deltaT;
-		final double roofsEnergyLoss = roofsArea * Double.parseDouble((String) roofsComboBox.getSelectedItem()) * deltaT;
+		final double wallsEnergyLoss = wallsArea * wallUFactor * deltaT;
+		final double doorsEnergyLoss = doorsArea * doorUFactor * deltaT;
+		final double windowsEnergyLoss = windowsArea * windowUFactor * deltaT;
+		final double roofsEnergyLoss = roofsArea * roofUFactor * deltaT;
 		return wallsEnergyLoss + doorsEnergyLoss + windowsEnergyLoss + roofsEnergyLoss;
 	}
 
