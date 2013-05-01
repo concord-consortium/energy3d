@@ -86,7 +86,7 @@ public class EnergyPanel extends JPanel {
 		avgMonthlyLowTemperatures.put("Tehran", new int[] { 1, 3, 7, 13, 17, 22, 25, 25, 21, 15, 8, 3 });
 		avgMonthlyHighTemperatures.put("Tehran", new int[] { 8, 11, 16, 23, 28, 34, 37, 36, 32, 25, 16, 10 });
 		avgMonthlyLowTemperatures.put("Los Angeles", new int[] { 9, 9, 11, 12, 14, 16, 18, 18, 17, 15, 11, 8 });
-		avgMonthlyHighTemperatures.put("Los Angeles", new int[] { 20, 21, 21, 23, 26, 28, 29, 28, 26, 23, 20 });
+		avgMonthlyHighTemperatures.put("Los Angeles", new int[] { 20, 21, 21, 23, 23, 26, 28, 29, 28, 26, 23, 20 });
 		avgMonthlyLowTemperatures.put("Miami", new int[] { 16, 17, 18, 21, 23, 25, 26, 26, 26, 24, 21, 18 });
 		avgMonthlyHighTemperatures.put("Miami", new int[] { 23, 24, 24, 26, 28, 31, 31, 32, 31, 29, 26, 24 });
 		avgMonthlyLowTemperatures.put("Mexico City", new int[] { 6, 7, 9, 11, 12, 12, 12, 12, 12, 10, 8, 7 });
@@ -620,7 +620,6 @@ public class EnergyPanel extends JPanel {
 		doorsComboBox = new WideComboBox();
 		doorsComboBox.setEditable(true);
 		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.00 "}));
-		doorsComboBox.setMinimumSize(doorsComboBox.getMinimumSize());
 		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] {"1.14 ", "1.20 (Steel)", "0.64 (Wood)"}));
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
@@ -983,7 +982,7 @@ public class EnergyPanel extends JPanel {
 			if (part instanceof Window) {
 				final double dot = part.getContainer().getFaceDirection().dot(sunVector);
 				if (dot > 0.0)
-					totalRate += 700.0 * part.computeArea() * dot;
+					totalRate += 100.0 * part.computeArea() * dot;
 			}
 		}
 		return totalRate;
