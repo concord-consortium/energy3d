@@ -166,7 +166,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private UserData pick;
 	private TwoInputStates firstClickState;
 	private double refreshTime = -1;
-	private long lastRenderTime;
 	private boolean mouseControlEnabled = true;
 	// private final boolean drawBounds = false;
 	private boolean rotAnim = false;
@@ -306,8 +305,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.init();
 //		double time = 0.0;
 //		int time_n = 0;
-		final long sleepTime = 1000L / 60L;
+		long frameStartTime;
+		final long msPerFrame = 1000 / 60;
 		while (true) {
+			frameStartTime = System.currentTimeMillis();
 			logicalLayer.checkTriggers(frameHandler.getTimer().getTimePerFrame());
 			final double now = frameHandler.getTimer().getTimeInSeconds();
 			final boolean isUpdateTime = refreshTime != -1 && now <= refreshTime;
@@ -335,22 +336,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			} else
 				frameHandler.getTimer().update();
-			final double syncNS = 1000000000.0 / 60.0;
-			final long sinceLast = System.nanoTime() - lastRenderTime;
-			if (sinceLast < syncNS) {
+
+			final long sleepTime = msPerFrame - (System.currentTimeMillis() - frameStartTime);
+			if (sleepTime > 0) {
 				try {
-					Thread.sleep(Math.round((syncNS - sinceLast) / 1000000L));
-				} catch (final Exception e) {
+					Thread.sleep(sleepTime);
+				} catch (final InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-//			lastRenderTime = System.nanoTime();
-//			Thread.yield();
-//			try {
-//				Thread.sleep(10);
-//			} catch (final InterruptedException e) {
-//				e.printStackTrace();
-//			}
 		}
 	}
 

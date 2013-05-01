@@ -1401,7 +1401,7 @@ Version 0.5 - October 20, 2011
 - fix problem with energy loss chart falling to zero at June
 - fix problem with exception if clicking on canvas before Camaera.getCurrentCamera() is initialized
 - fix problem with cavanas initially rendered at wrong camera view
-
+- change frame time calculations from nano to milli because nano precision is not necessary
 
 - release version 2.0
 
