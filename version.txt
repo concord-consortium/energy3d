@@ -1406,7 +1406,7 @@ Version 0.5 - October 20, 2011
 - create a custom combobox component that has a different popup wide than preferred size
 - change solar gain from 1000 watts to 100 watts
 - remove *.ser filter and all *.ser references
-
+- edit wall texture to remove extra wide space between two brick rows
 
 
 - release version 2.0
