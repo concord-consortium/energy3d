@@ -1405,6 +1405,9 @@ Version 0.5 - October 20, 2011
 - add several default U-Factors to comboboxes
 - create a custom combobox component that has a different popup wide than preferred size
 - change solar gain from 1000 watts to 100 watts
+- remove *.ser filter and all *.ser references
+
+
 
 - release version 2.0
 

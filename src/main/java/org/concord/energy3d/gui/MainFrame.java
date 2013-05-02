@@ -136,7 +136,6 @@ public class MainFrame extends JFrame {
 	private JSeparator separator_10;
 
 	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
-	private final ExtensionFileFilter serFilter = new ExtensionFileFilter("Old Energy3D Project (*.ser)", "ser");
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
@@ -444,7 +443,6 @@ public class MainFrame extends JFrame {
 				SceneManager.getInstance().refresh(1);
 				fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				fileChooser.addChoosableFileFilter(ng3Filter);
-				fileChooser.addChoosableFileFilter(serFilter);
 				fileChooser.removeChoosableFileFilter(pngFilter);
 				fileChooser.setFileFilter(ng3Filter);
 				if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
@@ -472,7 +470,6 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().refresh(1);
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					fileChooser.removeChoosableFileFilter(ng3Filter);
-					fileChooser.removeChoosableFileFilter(serFilter);
 					fileChooser.removeChoosableFileFilter(pngFilter);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
@@ -1042,7 +1039,6 @@ public class MainFrame extends JFrame {
 	private void saveFile() {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(ng3Filter);
-		fileChooser.removeChoosableFileFilter(serFilter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
 		fileChooser.setFileFilter(ng3Filter);
 		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
@@ -1063,7 +1059,6 @@ public class MainFrame extends JFrame {
 	private void importFile() {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(ng3Filter);
-		fileChooser.removeChoosableFileFilter(serFilter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
 		fileChooser.setFileFilter(ng3Filter);
 		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
@@ -1080,7 +1075,6 @@ public class MainFrame extends JFrame {
 	private void importColladaFile() {
 		// TODO
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fileChooser.removeChoosableFileFilter(serFilter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
 		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
@@ -1557,7 +1551,6 @@ public class MainFrame extends JFrame {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(pngFilter);
 		fileChooser.removeChoosableFileFilter(ng3Filter);
-		fileChooser.removeChoosableFileFilter(serFilter);
 		fileChooser.setFileFilter(pngFilter);
 		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 			System.out.print("Saving snapshot: ");

@@ -128,7 +128,6 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox roofsComboBox;
 	private final JCheckBox autoCheckBox;
 	private final JTextField heatingYearlyTextField;
-	private final JTextField solarCostTextField;
 	private final JTextField solarRateTextField;
 	private final JTextField solarTodayTextField;
 	private final JTextField solarYearlyTextField;
@@ -294,7 +293,7 @@ public class EnergyPanel extends JPanel {
 		panel_3.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_3.getPreferredSize().height));
 
 		final JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature (\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel);
 		final GridBagLayout gbl_panel = new GridBagLayout();
 		panel.setLayout(gbl_panel);
@@ -539,15 +538,6 @@ public class EnergyPanel extends JPanel {
 		gbc_yearlyCostLabel.gridy = 4;
 		panel_1.add(yearlyCostLabel, gbc_yearlyCostLabel);
 
-		solarCostTextField = new JTextField();
-		solarCostTextField.setEditable(false);
-		final GridBagConstraints gbc_solarCostTextField = new GridBagConstraints();
-		gbc_solarCostTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_solarCostTextField.gridx = 1;
-		gbc_solarCostTextField.gridy = 4;
-		panel_1.add(solarCostTextField, gbc_solarCostTextField);
-		solarCostTextField.setColumns(5);
-
 		heatingCostTextField = new JTextField();
 		heatingCostTextField.setEditable(false);
 		final GridBagConstraints gbc_heatingCostTextField = new GridBagConstraints();
@@ -581,7 +571,7 @@ public class EnergyPanel extends JPanel {
 		totalLabel.setMinimumSize(size);
 
 		final JPanel panel_2 = new JPanel();
-		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor (W/m2/\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel_2);
 		final GridBagLayout gbl_panel_2 = new GridBagLayout();
 		panel_2.setLayout(gbl_panel_2);
@@ -744,8 +734,7 @@ public class EnergyPanel extends JPanel {
 				series.getData().add(roofsEnergyChartData);
 				chart.getData().add(series);
 
-				// grid.setVgap(20);
-				// grid.setHgap(20);
+//				GridPane.setMargin(chart, new javafx.geometry.Insets(0, 15, 0, 15));
 				grid.add(chart, 0, 0);
 				fxPanel.setScene(scene);
 			}
@@ -852,7 +841,6 @@ public class EnergyPanel extends JPanel {
 		coolingYearlyTextField.setText(noDecimals.format(energyYearly.cooling));
 		totalYearlyTextField.setText(noDecimals.format(energyYearly.heating + energyYearly.cooling));
 
-		solarCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.solar));
 		heatingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.heating));
 		coolingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.cooling));
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
