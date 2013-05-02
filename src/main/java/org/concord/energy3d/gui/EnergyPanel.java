@@ -818,11 +818,11 @@ public class EnergyPanel extends JPanel {
 				roofsArea += part.computeArea();
 		}
 		updateAreaChart();
+		updateEnergyLossChart();
 
 		final int insideTemperature = (Integer) insideTemperatureSpinner.getValue();
 		final int outsideTemperature = (Integer) outsideTemperatureSpinner.getValue();
 		computeEnergyLossRate(insideTemperature - outsideTemperature);
-		updateEnergyLossChart();
 		final EnergyAmount energyRate = computeEnergyRate(Heliodon.getInstance().getSunLocation(), insideTemperature, outsideTemperature);
 		solarRateTextField.setText(noDecimals.format(energyRate.solar));
 		heatingRateTextField.setText(noDecimals.format(energyRate.heating));
@@ -846,7 +846,7 @@ public class EnergyPanel extends JPanel {
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
 	}
 
-	public double parseUFactor(final JComboBox comboBox) {
+	private double parseUFactor(final JComboBox comboBox) {
 		final String valueStr = comboBox.getSelectedItem().toString();
 		final int indexOfSpace = valueStr.indexOf(' ');
 		return Double.parseDouble(valueStr.substring(0, indexOfSpace != -1 ? indexOfSpace : valueStr.length()));

@@ -1407,6 +1407,7 @@ Version 0.5 - October 20, 2011
 - change solar gain from 1000 watts to 100 watts
 - remove *.ser filter and all *.ser references
 - edit wall texture to remove extra wide space between two brick rows
+- avoid drawing floor if it is attached to only one wall
 
 
 - release version 2.0
