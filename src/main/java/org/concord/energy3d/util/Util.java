@@ -88,6 +88,12 @@ public class Util {
 		spatial.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 	}
 
+	public static void disablePickShadowLight(final Spatial spatial, final boolean disablePick) {
+		spatial.getSceneHints().setPickingHint(PickingHint.Pickable, !disablePick);
+		spatial.getSceneHints().setCastsShadows(false);
+		spatial.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+	}
+
 	public static boolean insidePolygon(final ReadOnlyVector3 p, final List<? extends ReadOnlyVector3> polygon) {
 		int counter = 0;
 		int i;

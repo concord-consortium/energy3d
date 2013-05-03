@@ -8,7 +8,6 @@ import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.scene.SceneManager.Operation;
 
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
@@ -111,11 +110,11 @@ public class SelectUtil {
 		return pickedHousePart;
 	}
 
-	public static UserData selectHousePart(final int x, final int y, final boolean edit) {
+	public static PickedHousePart selectHousePart(final int x, final int y, final boolean edit) {
 		final PickedHousePart pickedHousePart;
-		if (SceneManager.getInstance().getOperation() == Operation.RESIZE)
-			pickedHousePart = pickPart(x, y, Foundation.class);
-		else
+//		if (SceneManager.getInstance().getOperation() == Operation.RESIZE)
+//			pickedHousePart = pickPart(x, y, Foundation.class);
+//		else
 			pickedHousePart = pickPart(x, y, Scene.getRoot());
 		UserData data = null;
 		if (pickedHousePart != null)
@@ -149,7 +148,7 @@ public class SelectUtil {
 			else
 				Blinker.getInstance().setTarget(data.getHousePart().getOriginal().getRoot());
 		}
-		return data;
+		return pickedHousePart;
 	}
 
 	public static void nextPickLayer() {

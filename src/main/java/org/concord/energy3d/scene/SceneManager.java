@@ -184,6 +184,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Sphere kinectPointer;
 	private MouseState lastSelectedEditPointMouseState;
 	private Node newImport;
+	private Vector3 houseMoveStartPoint;
+	private ArrayList<Vector3> houseMovePoints;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -196,7 +198,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private SceneManager(final Container panel) {
 		System.out.print("Constructing SceneManager...");
 		final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 24, 0, 4, false, false);
-//		final DisplaySettings settings = new DisplaySettings(400, 300, 24, -1, 0, 8, 0, 0, false, false);
+		// final DisplaySettings settings = new DisplaySettings(400, 300, 24, -1, 0, 8, 0, 0, false, false);
 
 		final RendererFactory rendererFactory;
 		if (Config.RENDER_MODE == RenderMode.NEWT)
@@ -303,8 +305,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	@Override
 	public synchronized void run() {
 		frameHandler.init();
-//		double time = 0.0;
-//		int time_n = 0;
+		// double time = 0.0;
+		// int time_n = 0;
 		long frameStartTime;
 		final long msPerFrame = 1000 / 60;
 		while (true) {
@@ -314,19 +316,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isUpdateTime = refreshTime != -1 && now <= refreshTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
-//			if (time_n != 100)
-//				refresh = true;
+			// if (time_n != 100)
+			// refresh = true;
 			if (refresh || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
 				if (now > refreshTime)
 					refreshTime = -1;
 				refresh = false;
 				try {
-//					final long t = System.nanoTime();
+					// final long t = System.nanoTime();
 					frameHandler.updateFrame();
-//					time += System.nanoTime() - t;
-//					time_n++;
-//					if (time_n == 100)
-//						System.out.println("fps = " + (int) (time_n / (time / 1000000000.0)));
+					// time += System.nanoTime() - t;
+					// time_n++;
+					// if (time_n == 100)
+					// System.out.println("fps = " + (int) (time_n / (time / 1000000000.0)));
 				} catch (final Throwable e) {
 					e.printStackTrace();
 					if (shadowPass.isEnabled()) {
@@ -393,9 +395,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			initCamera();
 			return false;
 		}
-//		Config.printTimeUntilFirstRender();
+		// Config.printTimeUntilFirstRender();
 
-//		System.out.println("RenderUnto()");
+		// System.out.println("RenderUnto()");
 
 		// if (drawBounds && selectedHousePart != null) {
 		// if (selectedHousePart instanceof Roof) {
@@ -1249,15 +1251,26 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
-		} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
-			pick = SelectUtil.selectHousePart(x, y, false);
+		} else if (houseMoveStartPoint != null && operation == Operation.RESIZE && selectedHousePart.isDrawCompleted()) {
+			final PickedHousePart pick = SelectUtil.pickPart(x, y, floor);
 			if (pick != null) {
-				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && hoveredHousePart != pick.getHousePart())
+				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
+				for (int i = 0; i < houseMovePoints.size(); i++) {
+					selectedHousePart.getPoints().get(i).set(houseMovePoints.get(i).add(d, null));
+					Scene.getInstance().redrawAll();
+				}
+			}
+		} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
+			final PickedHousePart selectHousePart = SelectUtil.selectHousePart(x, y, false);
+			pick = selectHousePart == null ? null : selectHousePart.getUserData();
+			final HousePart housePart = pick == null ? null : pick.getHousePart();
+			if (pick != null) {
+				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && hoveredHousePart != housePart)
 					hoveredHousePart.setEditPointsVisible(false);
-				hoveredHousePart = pick.getHousePart();
+				hoveredHousePart = housePart;
 				if (hoveredHousePart.isFrozen())
 					hoveredHousePart = null;
-				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && !PrintController.getInstance().isPrintPreview())
+				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && !PrintController.getInstance().isPrintPreview() && operation != Operation.RESIZE)
 					hoveredHousePart.setEditPointsVisible(true);
 				if (pick.getIndex() != -1)
 					lastSelectedEditPointMouseState = mouseState;
@@ -1285,8 +1298,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public void init() {
-		 if (Config.RENDER_MODE != RenderMode.LWJGL)
-			 initCamera();
+		if (Config.RENDER_MODE != RenderMode.LWJGL)
+			initCamera();
 		if (Config.isHeliodonMode())
 			MainPanel.getInstance().getHeliodonButton().setSelected(true);
 
@@ -1342,7 +1355,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.DRAW_ROOF_GABLE) {
 					if (selectedHousePart == null || selectedHousePart.isDrawCompleted()) {
 						final HousePart previousSelectedHousePart = selectedHousePart;
-						final UserData pick = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
+						final PickedHousePart selectHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
+						final UserData pick = selectHousePart == null ? null : selectHousePart.getUserData();
 						if (pick == null)
 							selectedHousePart = null;
 						else
@@ -1375,6 +1389,24 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							final Roof roof = (Roof) selectedHousePart;
 							roof.setGable(roofPartIndex, true, undoManager);
 						}
+						if (operation == Operation.RESIZE && (selectedHousePart instanceof Foundation)) {
+							final PickedHousePart pick2 = SelectUtil.pickPart(mouseState.getX(), mouseState.getY(), Scene.getRoot());
+							if (pick2 != null && pick2.getUserData() != null) {
+								selectedHousePart = pick2.getUserData().getHousePart();
+								while (selectedHousePart.getContainer() != null)
+									selectedHousePart = selectedHousePart.getContainer();
+								if (selectedHousePart instanceof Foundation) {
+									cameraControl.setLeftMouseButtonEnabled(false);
+									houseMoveStartPoint = pick2.getPoint();
+									final ArrayList<Vector3> points = selectedHousePart.getPoints();
+									houseMovePoints = new ArrayList<Vector3>(points.size());
+									for (final Vector3 p : points)
+										houseMovePoints.add(p.clone());
+								} else
+									selectedHousePart = null;
+
+							}
+						}
 					}
 				} else {
 					selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
@@ -1393,6 +1425,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					selectedHousePart.setGridsVisible(false);
 				boolean sceneChanged = false;
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
+					houseMoveStartPoint = null;
+					houseMovePoints = null;
 					if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 						if (selectedHousePart.isDrawable())
 							selectedHousePart.complete();
