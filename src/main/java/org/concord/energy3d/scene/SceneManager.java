@@ -150,6 +150,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Node backgroundRoot = new Node("Scenary Root");
 	private final BasicPassManager passManager = new BasicPassManager();
 	private final Mesh floor = new Quad("Floor", 2000, 2000);
+	private final Mesh invisibleFloor = new Quad("Floor", 2000, 2000);
 	private final Mesh gridsMesh = new Line("Floor Grids");
 	private final LightState lightState = new LightState();
 	private final UndoManager undoManager = new UndoManager();
@@ -267,6 +268,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		backgroundRoot.getSceneHints().setAllPickingHints(false);
 		backgroundRoot.attachChild(createSky());
 		backgroundRoot.attachChild(createFloor());
+		invisibleFloor.setModelBound(new BoundingBox());
+		invisibleFloor.getSceneHints().setCullHint(CullHint.Always);
+		root.attachChild(invisibleFloor);
 		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
 		drawGrids(1.0);
 		backgroundRoot.attachChild(gridsMesh);
@@ -361,7 +365,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			executeOperation();
 
 		if (mouseState != null)
-			executeMouseMove();
+			mouseMoved();
 
 		if (Scene.isRedrawAll())
 			Scene.getInstance().redrawAllNow();
@@ -1243,7 +1247,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			});
 	}
 
-	public void executeMouseMove() {
+	private void mouseMoved() {
 		if (!mouseControlEnabled)
 			return;
 		final int x = mouseState.getX();
@@ -1252,7 +1256,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
 		} else if (houseMoveStartPoint != null && operation == Operation.RESIZE && selectedHousePart.isDrawCompleted()) {
-			final PickedHousePart pick = SelectUtil.pickPart(x, y, floor);
+			final PickedHousePart pick = SelectUtil.pickPart(x, y, invisibleFloor);
 			if (pick != null) {
 				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
 				for (int i = 0; i < houseMovePoints.size(); i++) {
@@ -1389,15 +1393,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							final Roof roof = (Roof) selectedHousePart;
 							roof.setGable(roofPartIndex, true, undoManager);
 						}
-						if (operation == Operation.RESIZE && (selectedHousePart instanceof Foundation)) {
-							final PickedHousePart pick2 = SelectUtil.pickPart(mouseState.getX(), mouseState.getY(), Scene.getRoot());
-							if (pick2 != null && pick2.getUserData() != null) {
-								selectedHousePart = pick2.getUserData().getHousePart();
-								while (selectedHousePart.getContainer() != null)
-									selectedHousePart = selectedHousePart.getContainer();
+						if (operation == Operation.RESIZE) {
+							if (selectHousePart != null && selectHousePart.getUserData() != null) {
+								selectedHousePart = selectHousePart.getUserData().getHousePart();
+								if (!(selectedHousePart instanceof Foundation)) {
+									selectedHousePart.setEditPointsVisible(false);
+									selectedHousePart.setGridsVisible(false);
+									while (selectedHousePart.getContainer() != null)
+										selectedHousePart = selectedHousePart.getContainer();
+								}
 								if (selectedHousePart instanceof Foundation) {
 									cameraControl.setLeftMouseButtonEnabled(false);
-									houseMoveStartPoint = pick2.getPoint();
+									houseMoveStartPoint = selectHousePart.getPoint();
+									invisibleFloor.setTranslation(0, 0, houseMoveStartPoint.getZ());
 									final ArrayList<Vector3> points = selectedHousePart.getPoints();
 									houseMovePoints = new ArrayList<Vector3>(points.size());
 									for (final Vector3 p : points)
