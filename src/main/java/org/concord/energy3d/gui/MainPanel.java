@@ -11,7 +11,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
-import javax.swing.FocusManager;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -190,7 +189,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -211,7 +210,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			wallButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -245,7 +244,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			doorButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -278,7 +277,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			roofButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -311,7 +310,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			windowButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -344,7 +343,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			platformButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -391,7 +390,7 @@ public class MainPanel extends JPanel {
 					}
 					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
 					sunAnimButton.setEnabled(showSunTools);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -418,7 +417,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().toggleRotation();
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -439,7 +438,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			floorButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -472,7 +471,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			roofHipButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -511,7 +510,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(Operation.RESIZE);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -540,7 +539,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().setHeliodonControl(heliodonButton.isSelected());
 					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
 					sunAnimButton.setEnabled(showSunTools);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -568,7 +567,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setSunAnim(sunAnimButton.isSelected());
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -602,7 +601,7 @@ public class MainPanel extends JPanel {
 					}
 					deselect();
 					PrintController.getInstance().setPrintPreview(previewButton.isSelected());
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -623,7 +622,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_CUSTOM);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			roofCustomButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -663,7 +662,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -691,7 +690,7 @@ public class MainPanel extends JPanel {
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 					SceneManager.getInstance().setZoomLock(zoomButton.isSelected());
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -712,7 +711,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(Operation.DRAW_ROOF_GABLE);
-					FocusManager.getCurrentManager().clearGlobalFocusOwner();
+					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			roofGableButton.addMouseListener(new java.awt.event.MouseAdapter() {

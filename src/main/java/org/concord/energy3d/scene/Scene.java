@@ -126,6 +126,8 @@ public class Scene implements Serializable {
 				Thread.yield();
 		}
 
+		MainPanel.getInstance().getHeliodonButton().setSelected(false);
+
 		if (url == null) {
 			instance = new Scene();
 			System.out.println("done");
