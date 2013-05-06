@@ -1371,34 +1371,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (pick != null && pick.isEditPoint())
 							cameraControl.setLeftMouseButtonEnabled(false);
 
-						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
-							previousSelectedHousePart.setEditPointsVisible(false);
-							previousSelectedHousePart.setGridsVisible(false);
-						}
-						if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
-							selectedHousePart.setEditPointsVisible(true);
-							if (pick.isEditPoint() && pick.getIndex() != -1) {
-								selectedHousePart.setGridsVisible(true);
-								if (selectedHousePart instanceof Foundation)
-									editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart);
-								else
-									editHousePartCommand = new EditHousePartCommand(selectedHousePart);
-							}
-						}
-						SelectUtil.nextPickLayer();
-						if (operation == Operation.DRAW_ROOF_GABLE && selectedHousePart instanceof Roof) {
-							System.out.println(selectedHousePart);
-							System.out.println("deleting roof #" + pick.getIndex());
-							final int roofPartIndex = pick.getIndex();
-							final Roof roof = (Roof) selectedHousePart;
-							roof.setGable(roofPartIndex, true, undoManager);
-						}
 						if (operation == Operation.RESIZE) {
 							if (selectHousePart != null && selectHousePart.getUserData() != null) {
 								selectedHousePart = selectHousePart.getUserData().getHousePart();
 								if (!(selectedHousePart instanceof Foundation)) {
 									selectedHousePart.setEditPointsVisible(false);
-									selectedHousePart.setGridsVisible(false);
 									while (selectedHousePart.getContainer() != null)
 										selectedHousePart = selectedHousePart.getContainer();
 								}
@@ -1414,6 +1391,29 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									selectedHousePart = null;
 
 							}
+						}
+
+						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
+							previousSelectedHousePart.setEditPointsVisible(false);
+							previousSelectedHousePart.setGridsVisible(false);
+						}
+						if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
+							selectedHousePart.setEditPointsVisible(true);
+							if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE) {
+								selectedHousePart.setGridsVisible(true);
+								if (selectedHousePart instanceof Foundation)
+									editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart);
+								else
+									editHousePartCommand = new EditHousePartCommand(selectedHousePart);
+							}
+						}
+						SelectUtil.nextPickLayer();
+						if (operation == Operation.DRAW_ROOF_GABLE && selectedHousePart instanceof Roof) {
+							System.out.println(selectedHousePart);
+							System.out.println("deleting roof #" + pick.getIndex());
+							final int roofPartIndex = pick.getIndex();
+							final Roof roof = (Roof) selectedHousePart;
+							roof.setGable(roofPartIndex, true, undoManager);
 						}
 					}
 				} else {
@@ -1435,7 +1435,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 					houseMoveStartPoint = null;
 					houseMovePoints = null;
-					if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
+					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || operation == Operation.RESIZE)) {
 						if (selectedHousePart.isDrawable())
 							selectedHousePart.complete();
 						else {

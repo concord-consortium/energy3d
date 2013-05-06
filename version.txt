@@ -1410,6 +1410,7 @@ Version 0.5 - October 20, 2011
 - *release version 2.0
 - avoid drawing floor if it is attached to only one wall
 - add feature to allow moving the entire house with mouse
+- make house move an undoable action
 
 - *make default window size bigger so that toolbar will fit
 
