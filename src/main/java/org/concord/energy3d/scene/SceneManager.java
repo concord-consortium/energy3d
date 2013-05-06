@@ -1371,26 +1371,22 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (pick != null && pick.isEditPoint())
 							cameraControl.setLeftMouseButtonEnabled(false);
 
-						if (operation == Operation.RESIZE) {
-							if (selectHousePart != null && selectHousePart.getUserData() != null) {
-								selectedHousePart = selectHousePart.getUserData().getHousePart();
-								if (!(selectedHousePart instanceof Foundation)) {
-									selectedHousePart.setEditPointsVisible(false);
-									while (selectedHousePart.getContainer() != null)
-										selectedHousePart = selectedHousePart.getContainer();
-								}
-								if (selectedHousePart instanceof Foundation) {
-									cameraControl.setLeftMouseButtonEnabled(false);
-									houseMoveStartPoint = selectHousePart.getPoint();
-									invisibleFloor.setTranslation(0, 0, houseMoveStartPoint.getZ());
-									final ArrayList<Vector3> points = selectedHousePart.getPoints();
-									houseMovePoints = new ArrayList<Vector3>(points.size());
-									for (final Vector3 p : points)
-										houseMovePoints.add(p.clone());
-								} else
-									selectedHousePart = null;
-
+						if (operation == Operation.RESIZE && selectedHousePart != null) {
+							if (!(selectedHousePart instanceof Foundation)) {
+								selectedHousePart.setEditPointsVisible(false);
+								while (selectedHousePart.getContainer() != null)
+									selectedHousePart = selectedHousePart.getContainer();
 							}
+							if (selectedHousePart instanceof Foundation) {
+								cameraControl.setLeftMouseButtonEnabled(false);
+								houseMoveStartPoint = selectHousePart.getPoint();
+								invisibleFloor.setTranslation(0, 0, houseMoveStartPoint.getZ());
+								final ArrayList<Vector3> points = selectedHousePart.getPoints();
+								houseMovePoints = new ArrayList<Vector3>(points.size());
+								for (final Vector3 p : points)
+									houseMovePoints.add(p.clone());
+							} else
+								selectedHousePart = null;
 						}
 
 						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
@@ -1433,9 +1429,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					selectedHousePart.setGridsVisible(false);
 				boolean sceneChanged = false;
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-					houseMoveStartPoint = null;
-					houseMovePoints = null;
-					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || operation == Operation.RESIZE)) {
+					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || (operation == Operation.RESIZE && houseMoveStartPoint != null))) {
 						if (selectedHousePart.isDrawable())
 							selectedHousePart.complete();
 						else {
@@ -1455,6 +1449,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 					if (!zoomLock)
 						cameraControl.setLeftMouseButtonEnabled(true);
+					houseMoveStartPoint = null;
+					houseMovePoints = null;
 				} else {
 					if (!selectedHousePart.isDrawCompleted()) {
 						selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
