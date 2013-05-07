@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import javafx.application.Platform;
@@ -51,7 +52,13 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
 
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.math.Ray3;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.shape.Sphere;
 
 public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -153,6 +160,7 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox cityComboBox;
 	private final JLabel latitudeLabel;
 	private final JSpinner latitudeSpinner;
+	private final Map<HousePart, long[][]> solarOnWall = new Hashtable<HousePart, long[][]>();
 
 	private class EnergyAmount {
 		double solar;
@@ -845,29 +853,10 @@ public class EnergyPanel extends JPanel {
 		coolingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.cooling));
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
 
-//		System.out.println(computerSolarOnWalls());
+//		computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
+		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
+		printSolarOnWalls();
 	}
-
-//	private double computerSolarOnWalls() {
-//		for (final HousePart part : Scene.getInstance().getParts()) {
-//			int sun = 0, total = 0;
-//			if (part instanceof Wall) {
-//				final List<ReadOnlyVector3> solarPoints = ((Wall) part).getSolarPoints();
-//				for (final ReadOnlyVector3 p : solarPoints) {
-//					for (double z = part.getPoints().get(0).getZ() * 1.01; z < p.getZ(); z += Wall.SOLAR_STEP) {
-//						final Ray3 pickRay = new Ray3(new Vector3(p.getX(), p.getY(), z), Heliodon.getInstance().getSunLocation().normalize(null));
-//						final PickResults pickResults = new PrimitivePickResults();
-//						PickingUtil.findPick(Scene.getRoot(), pickRay, pickResults, true);
-//						if (pickResults.getNumber() == 0 || (pickResults.getNumber() == 1 && pickResults.getPickData(0).getTarget() instanceof Sphere))
-//							sun++;
-//						total++;
-//					}
-//				}
-//				System.out.println(sun * 100 / total + "%");
-//			}
-//		}
-//		return 0;
-//	}
 
 	private double parseUFactor(final JComboBox comboBox) {
 		final String valueStr = comboBox.getSelectedItem().toString();
@@ -1013,5 +1002,58 @@ public class EnergyPanel extends JPanel {
 
 	public JSpinner getTimeSpinner() {
 		return timeSpinner;
+	}
+
+	private void computerSolarOnWalls(final ReadOnlyVector3 sunLocation) {
+		final Vector3 directionTowardSun = sunLocation.normalize(null);
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Wall && part.getFaceDirection().dot(directionTowardSun) > 0) {
+				final Wall wall = (Wall) part;
+				final List<ReadOnlyVector3> solarPoints = wall.getSolarPoints();
+				long[][] solar = solarOnWall.get(wall);
+				if (solar == null || solar.length != solarPoints.size()) {
+					solar = new long[solarPoints.size()][(int)(wall.getHighestPoint() / Wall.SOLAR_STEP)];
+					solarOnWall.put(wall, solar);
+				}
+				int i = 0;
+				for (final ReadOnlyVector3 p : solarPoints) {
+					int j = 0;
+					for (double z = part.getPoints().get(0).getZ() * 1.01; z < p.getZ(); z += Wall.SOLAR_STEP) {
+						final Ray3 pickRay = new Ray3(new Vector3(p.getX(), p.getY(), z), directionTowardSun);
+						final PickResults pickResults = new PrimitivePickResults();
+						PickingUtil.findPick(Scene.getRoot(), pickRay, pickResults, true);
+						if (pickResults.getNumber() == 0 || (pickResults.getNumber() == 1 && pickResults.getPickData(0).getTarget() instanceof Sphere))
+							solar[i][j++]++;
+					}
+					i++;
+				}
+			}
+		}
+	}
+
+	private void computeSolarOnWallsToday(final Calendar today) {
+		final Heliodon heliodon = Heliodon.getInstance();
+		today.set(Calendar.SECOND, 0);
+		today.set(Calendar.MINUTE, 0);
+		today.set(Calendar.HOUR, 0);
+
+		for (int hour = 0; hour < 24; hour++) {
+			computerSolarOnWalls(heliodon.computeSunLocation(today));
+			today.add(Calendar.HOUR, 1);
+		}
+	}
+
+	private void printSolarOnWalls() {
+		System.out.println("--------------------------");
+		for (final HousePart part : solarOnWall.keySet()) {
+			System.out.println(part);
+			final long[][] solar = solarOnWall.get(part);
+			for (int j = solar[0].length - 1; j > 0 ; j--) {
+				for (int i = solar.length - 1; i > 0 ; i--) {
+					System.out.print(solar[i][j] + " ");
+				}
+				System.out.println();
+			}
+		}
 	}
 }

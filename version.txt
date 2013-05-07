@@ -1412,9 +1412,11 @@ Version 0.5 - October 20, 2011
 - make house move an undoable action
 - turn off the heliodon before opening a new file
 - set focus to canvas after clicking on toolbar buttons
-- release version 2.0
 - improve heliodon size and fix bound type cast exceptions
 - prevent floor or roof from being added to a single wall
+- release version 2.0
+
+- write algorithm to compute the total solar duration on walls grids during the course of a day 
 
 - *make default window size bigger so that toolbar will fit
 

@@ -45,7 +45,7 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
-	public static final double SOLAR_STEP = 5.0;
+	public static final double SOLAR_STEP = 1.0;
 	private static final long serialVersionUID = 1L;
 	private static final double MIN_WALL_LENGTH = 0.1;
 	private static double defaultWallHeight = 15.0; // the recommended default wall height is 3m
@@ -62,11 +62,12 @@ public class Wall extends HousePart {
 	private transient AnyToXYTransform toXY;
 	private transient XYToAnyTransform fromXY;
 	private transient List<ArrayList<Vector3>> wallAndWindowsPoints;
-//	private transient List<ReadOnlyVector3> solarPoints;
+	private transient List<ReadOnlyVector3> solarPoints;
 	private double wallThickness;
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
+	private double highestPoint;
 
 	public static void clearVisits() {
 		currentVisitStamp = ++currentVisitStamp % 1000;
@@ -86,7 +87,7 @@ public class Wall extends HousePart {
 		super.init();
 		relativeToHorizontal = true;
 		wallThickness = 0.5;
-//		solarPoints = new ArrayList<ReadOnlyVector3>();
+		solarPoints = new ArrayList<ReadOnlyVector3>();
 		if (thicknessNormal != null)
 			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
 
@@ -486,9 +487,13 @@ public class Wall extends HousePart {
 
 		final int[] upper = { 0, 3 };
 
+		highestPoint = 0.0;
 		for (final int i : upper) {
 			final Vector3 tp = polygon.get(i);
-			tp.set(tp.getX(), tp.getY(), findRoofIntersection(tp));
+			final double z = findRoofIntersection(tp);
+			tp.set(tp.getX(), tp.getY(), z);
+			if (z > highestPoint)
+				highestPoint = z;
 		}
 
 		Vector3 tp = polygon.get(0);
@@ -503,8 +508,8 @@ public class Wall extends HousePart {
 			Vector3 direction = null;
 			ReadOnlyVector3 previousStretchPoint = polygon.get(3);
 
-//			if (computeSolarPoints)
-//				solarPoints.clear();
+			if (computeSolarPoints)
+				solarPoints.clear();
 
 			final double step = 0.1;
 			for (double d = length - step; d > step; d -= step) {
@@ -523,8 +528,8 @@ public class Wall extends HousePart {
 				}
 				previousStretchPoint = currentStretchPoint;
 
-//				if (computeSolarPoints && (solarPoints.isEmpty() || solarPoints.get(solarPoints.size() - 1).distance(p) > SOLAR_STEP ))
-//					solarPoints.add(p);
+				if (computeSolarPoints && (solarPoints.isEmpty() || solarPoints.get(solarPoints.size() - 1).distance(p) > SOLAR_STEP ))
+					solarPoints.add(p);
 
 			}
 		}
@@ -1201,7 +1206,11 @@ public class Wall extends HousePart {
 		return area;
 	}
 
-//	public List<ReadOnlyVector3> getSolarPoints() {
-//		return solarPoints;
-//	}
+	public List<ReadOnlyVector3> getSolarPoints() {
+		return solarPoints;
+	}
+
+	public double getHighestPoint() {
+		return highestPoint;
+	}
 }
