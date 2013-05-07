@@ -1465,10 +1465,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						sceneChanged = true;
 					}
 					if (selectedHousePart != null && selectedHousePart.isDrawCompleted()) {
-						if (addHousePartCommand != null && selectedHousePart.isDrawable()) {
+						if (selectedHousePart.isDrawable()) {
 							undoManager.addEdit(addHousePartCommand);
 							removeExistingRoof();
 							addHousePartCommand = null;
+						} else {
+							Scene.getInstance().remove(selectedHousePart);
 						}
 						selectedHousePart.setEditPointsVisible(false);
 						selectedHousePart = null;
