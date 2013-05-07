@@ -8,9 +8,8 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 
-import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.bounding.BoundingVolume.Type;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
@@ -27,14 +26,7 @@ import com.ardor3d.ui.text.BMText.AutoScale;
 public class Util {
 
 	public static double findBoundLength(final BoundingVolume bounds) {
-		double d;
-		if (bounds instanceof BoundingSphere)
-			d = ((BoundingSphere)bounds).getRadius() * 2;
-		else {
-			final BoundingBox boundingBox = (BoundingBox)bounds;
-			d = 2 * Math.max(boundingBox.getXExtent(), Math.max(boundingBox.getYExtent(), boundingBox.getZExtent()));
-		}
-		return d;
+		return 2 * bounds.asType(Type.Sphere).getRadius();
 	}
 
 	public static double findExactHeight(final ArrayList<HousePart> parts) {

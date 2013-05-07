@@ -45,9 +45,9 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
+	public static final double SOLAR_STEP = 5.0;
 	private static final long serialVersionUID = 1L;
 	private static final double MIN_WALL_LENGTH = 0.1;
-//	private static double defaultWallHeight = 20.0; // the recommended default wall height is 20cm
 	private static double defaultWallHeight = 15.0; // the recommended default wall height is 3m
 	private static int currentVisitStamp = 1;
 	private static boolean extendToRoofEnabled = true;
@@ -62,6 +62,7 @@ public class Wall extends HousePart {
 	private transient AnyToXYTransform toXY;
 	private transient XYToAnyTransform fromXY;
 	private transient List<ArrayList<Vector3>> wallAndWindowsPoints;
+//	private transient List<ReadOnlyVector3> solarPoints;
 	private double wallThickness;
 	private final Snap[] neighbors = new Snap[2];
 	private Vector3 thicknessNormal;
@@ -85,6 +86,7 @@ public class Wall extends HousePart {
 		super.init();
 		relativeToHorizontal = true;
 		wallThickness = 0.5;
+//		solarPoints = new ArrayList<ReadOnlyVector3>();
 		if (thicknessNormal != null)
 			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
 
@@ -345,7 +347,7 @@ public class Wall extends HousePart {
 
 		wallAndWindowsPoints = computeWallAndWindowPolygon(false);
 		if (!isFrozen())
-			extendToRoof(wallAndWindowsPoints.get(0));
+			extendToRoof(wallAndWindowsPoints.get(0), true);
 
 		if (Scene.getInstance().isDrawThickness() && isShortWall) {
 			final Vector3 dir = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
@@ -478,7 +480,7 @@ public class Wall extends HousePart {
 		points.add(housePart.getAbsPoint(index).addLocal(trans));
 	}
 
-	private void extendToRoof(final List<Vector3> polygon) {
+	private void extendToRoof(final List<Vector3> polygon, final boolean computeSolarPoints) {
 		if (!extendToRoofEnabled)
 			return;
 
@@ -501,7 +503,9 @@ public class Wall extends HousePart {
 			Vector3 direction = null;
 			ReadOnlyVector3 previousStretchPoint = polygon.get(3);
 
-//			final double step = 0.01;
+//			if (computeSolarPoints)
+//				solarPoints.clear();
+
 			final double step = 0.1;
 			for (double d = length - step; d > step; d -= step) {
 				final Vector3 p = dir.multiply(d, null).addLocal(o);
@@ -518,6 +522,10 @@ public class Wall extends HousePart {
 					polygon.add(p);
 				}
 				previousStretchPoint = currentStretchPoint;
+
+//				if (computeSolarPoints && (solarPoints.isEmpty() || solarPoints.get(solarPoints.size() - 1).distance(p) > SOLAR_STEP ))
+//					solarPoints.add(p);
+
 			}
 		}
 	}
@@ -560,7 +568,7 @@ public class Wall extends HousePart {
 		}
 
 		enforceGablePointsRangeAndRemoveDuplicatedGablePoints(polygon.get(0));
-		extendToRoof(polygon.get(0));
+		extendToRoof(polygon.get(0), false);
 
 		// lower the z of back wall to ensure it doesn't stick up through the roof
 		if (roof != null)
@@ -1192,4 +1200,8 @@ public class Wall extends HousePart {
 				area -= child.computeArea();
 		return area;
 	}
+
+//	public List<ReadOnlyVector3> getSolarPoints() {
+//		return solarPoints;
+//	}
 }

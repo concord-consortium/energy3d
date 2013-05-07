@@ -586,7 +586,7 @@ public class EnergyPanel extends JPanel {
 
 		wallsComboBox = new WideComboBox();
 		wallsComboBox.setEditable(true);
-		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.28 ", "0.67 (Concrete 8\")", "0.41 (Masonary Brick 8\")", "0.04 (Flat Metal 8\" Fiberglass Insulation)"}));
+		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.28 ", "0.67 (Concrete 8\")", "0.41 (Masonary Brick 8\")", "0.04 (Flat Metal 8\" Fiberglass Insulation)" }));
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -609,8 +609,8 @@ public class EnergyPanel extends JPanel {
 
 		doorsComboBox = new WideComboBox();
 		doorsComboBox.setEditable(true);
-		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.00 "}));
-		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] {"1.14 ", "1.20 (Steel)", "0.64 (Wood)"}));
+		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.00 " }));
+		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.14 ", "1.20 (Steel)", "0.64 (Wood)" }));
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -633,7 +633,7 @@ public class EnergyPanel extends JPanel {
 
 		windowsComboBox = new WideComboBox();
 		windowsComboBox.setEditable(true);
-		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] {"1.89 ", "1.22 (Single Pane)", "0.70 (Double Pane)"}));
+		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.89 ", "1.22 (Single Pane)", "0.70 (Double Pane)" }));
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -656,7 +656,7 @@ public class EnergyPanel extends JPanel {
 
 		roofsComboBox = new WideComboBox();
 		roofsComboBox.setEditable(true);
-		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] {"0.14 ", "0.23 (Concrete 3\")", "0.11 (Flat Metal 3\" Fiberglass Insulation)", "0.10 (Wood 3\" Fiberglass Insulation)"}));
+		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.14 ", "0.23 (Concrete 3\")", "0.11 (Flat Metal 3\" Fiberglass Insulation)", "0.10 (Wood 3\" Fiberglass Insulation)" }));
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -734,7 +734,7 @@ public class EnergyPanel extends JPanel {
 				series.getData().add(roofsEnergyChartData);
 				chart.getData().add(series);
 
-//				GridPane.setMargin(chart, new javafx.geometry.Insets(0, 15, 0, 15));
+				// GridPane.setMargin(chart, new javafx.geometry.Insets(0, 15, 0, 15));
 				grid.add(chart, 0, 0);
 				fxPanel.setScene(scene);
 			}
@@ -844,7 +844,30 @@ public class EnergyPanel extends JPanel {
 		heatingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.heating));
 		coolingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.cooling));
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
+
+//		System.out.println(computerSolarOnWalls());
 	}
+
+//	private double computerSolarOnWalls() {
+//		for (final HousePart part : Scene.getInstance().getParts()) {
+//			int sun = 0, total = 0;
+//			if (part instanceof Wall) {
+//				final List<ReadOnlyVector3> solarPoints = ((Wall) part).getSolarPoints();
+//				for (final ReadOnlyVector3 p : solarPoints) {
+//					for (double z = part.getPoints().get(0).getZ() * 1.01; z < p.getZ(); z += Wall.SOLAR_STEP) {
+//						final Ray3 pickRay = new Ray3(new Vector3(p.getX(), p.getY(), z), Heliodon.getInstance().getSunLocation().normalize(null));
+//						final PickResults pickResults = new PrimitivePickResults();
+//						PickingUtil.findPick(Scene.getRoot(), pickRay, pickResults, true);
+//						if (pickResults.getNumber() == 0 || (pickResults.getNumber() == 1 && pickResults.getPickData(0).getTarget() instanceof Sphere))
+//							sun++;
+//						total++;
+//					}
+//				}
+//				System.out.println(sun * 100 / total + "%");
+//			}
+//		}
+//		return 0;
+//	}
 
 	private double parseUFactor(final JComboBox comboBox) {
 		final String valueStr = comboBox.getSelectedItem().toString();
@@ -987,6 +1010,7 @@ public class EnergyPanel extends JPanel {
 	public JSpinner getDateSpinner() {
 		return dateSpinner;
 	}
+
 	public JSpinner getTimeSpinner() {
 		return timeSpinner;
 	}
