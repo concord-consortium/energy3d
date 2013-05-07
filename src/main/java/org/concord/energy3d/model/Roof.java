@@ -116,14 +116,16 @@ public abstract class Roof extends HousePart {
 			}
 		}
 
-		if (container == null) {
+		wallUpperPoints.clear();
+		if (container != null)
+			initWallUpperPoints((Wall) container, walls, wallUpperPoints, wallNormals);
+		if (!isDrawable()) {
 			roofPartsRoot.getSceneHints().setCullHint(CullHint.Always);
 			setEditPointsVisible(false);
 			return;
 		}
 		roofPartsRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
-		initWallUpperPoints((Wall) container, walls, wallUpperPoints, wallNormals);
 		applyOverhang(wallUpperPoints, wallNormals);
 		processRoofEditPoints(wallUpperPoints);
 		computeGableEditPoints();
@@ -909,6 +911,6 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		return true;
+		return container != null && wallUpperPoints.size() >= 3;
 	}
 }

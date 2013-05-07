@@ -46,7 +46,6 @@ public class Floor extends HousePart {
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setRenderState(offsetState);
-//		mesh.setModelBound(new BoundingBox());
 
 		wireframeMesh = new Line("Floor (Wireframe)");
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
@@ -88,12 +87,9 @@ public class Floor extends HousePart {
 
 	@Override
 	protected void drawMesh() {
-		if (container == null) {
-			mesh.getSceneHints().setCullHint(CullHint.Always);
-			return;
-		}
-		wallUpperPoints = exploreWallNeighbors((Wall) container);
-		if (wallUpperPoints.size() < 3) {
+		if (container != null)
+			wallUpperPoints = exploreWallNeighbors((Wall) container);
+		if (!isDrawable()) {
 			mesh.getSceneHints().setCullHint(CullHint.Always);
 			return;
 		}
@@ -205,7 +201,7 @@ public class Floor extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		return container != null;
+		return container != null && wallUpperPoints != null && wallUpperPoints.size() >= 3;
 	}
 
 	@Override

@@ -1414,6 +1414,7 @@ Version 0.5 - October 20, 2011
 - set focus to canvas after clicking on toolbar buttons
 - release version 2.0
 - improve heliodon size and fix bound type cast exceptions
+- prevent floor or roof from being added to a single wall
 
 - *make default window size bigger so that toolbar will fit
 
