@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
@@ -20,7 +21,9 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Foundation extends HousePart {
@@ -35,6 +38,7 @@ public class Foundation extends HousePart {
 	private transient double minY;
 	private transient double maxX;
 	private transient double maxY;
+	private transient BMText solarLabel;
 
 	public Foundation() {
 		super(2, 8, 1);
@@ -83,6 +87,11 @@ public class Foundation extends HousePart {
 		boundingMesh.setUserData(userData);
 
 		setLabelOffset(-0.11);
+
+		solarLabel = new BMText("Solar value Text", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+		Util.initHousePartLabel(solarLabel);
+		solarLabel.setFontScale(1.0);
+		root.attachChild(solarLabel);
 	}
 
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
@@ -309,6 +318,7 @@ public class Foundation extends HousePart {
 			CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 			drawWireframe(boundingMesh, points.get(7).getZf());
 			drawWireframe(wireframeMesh, (float) height);
+			updateSolarLabelPosition();
 		}
 	}
 
@@ -402,7 +412,7 @@ public class Foundation extends HousePart {
 		buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + height);
 	}
 
-	private void scanChildrenHeight() {
+	public void scanChildrenHeight() {
 		if (!isFirstPointInserted())
 			return;
 		boundingHeight = scanChildrenHeight(this) - height;
@@ -412,6 +422,12 @@ public class Foundation extends HousePart {
 		newBoundingHeight = boundingHeight;
 		syncUpperPoints();
 		updateEditShapes();
+		updateSolarLabelPosition();
+	}
+
+	public void updateSolarLabelPosition() {
+		final ReadOnlyVector3 center = getCenter();
+		solarLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 1.0);
 	}
 
 	private double scanChildrenHeight(final HousePart part) {
@@ -505,5 +521,9 @@ public class Foundation extends HousePart {
 	@Override
 	public void updateTextureAndColor() {
 		updateTextureAndColor(mesh, Scene.getInstance().getFoundationColor());
+	}
+
+	public void setSolarValue(final long solarValue) {
+		solarLabel.setText(String.valueOf(solarValue));
 	}
 }

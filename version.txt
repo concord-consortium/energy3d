@@ -1416,7 +1416,8 @@ Version 0.5 - October 20, 2011
 - prevent floor or roof from being added to a single wall
 - release version 2.0
 
-- write algorithm to compute the total solar duration on walls grids during the course of a day 
+- write algorithm to compute the total solar duration on walls grids during the course of a day
+- compute the total solar exposure of walls of a house and display it as a text label above the house 
 
 - *make default window size bigger so that toolbar will fit
 

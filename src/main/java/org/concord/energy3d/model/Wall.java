@@ -209,6 +209,9 @@ public class Wall extends HousePart {
 
 		drawThisAndNeighbors(false);
 		setEditPointsVisible(true);
+
+		if (container != null)
+			((Foundation) container).scanChildrenHeight();
 	}
 
 	public Vector3 findClosestPointOnFoundation(final int x, final int y) {
@@ -328,7 +331,7 @@ public class Wall extends HousePart {
 
 	@Override
 	protected void drawMesh() {
-//		final CullHint cull = isDrawable() ? CullHint.Inherit : CullHint.Always;
+		// final CullHint cull = isDrawable() ? CullHint.Inherit : CullHint.Always;
 		mesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
 		backMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
 		surroundMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
@@ -338,11 +341,11 @@ public class Wall extends HousePart {
 		if (!isDrawable())
 			return;
 
-//		adjustTransparency(mesh);
-//		adjustTransparency(backMesh);
-//		adjustTransparency(surroundMesh);
-//		adjustTransparency(windowsSurroundMesh);
-//		adjustTransparency(wireframeMesh);
+		// adjustTransparency(mesh);
+		// adjustTransparency(backMesh);
+		// adjustTransparency(surroundMesh);
+		// adjustTransparency(windowsSurroundMesh);
+		// adjustTransparency(wireframeMesh);
 
 		computeNormalAndXYTransform();
 
@@ -508,13 +511,16 @@ public class Wall extends HousePart {
 			Vector3 direction = null;
 			ReadOnlyVector3 previousStretchPoint = polygon.get(3);
 
-			if (computeSolarPoints)
-				solarPoints.clear();
+//			if (computeSolarPoints)
+//				solarPoints.clear();
 
 			final double step = 0.1;
 			for (double d = length - step; d > step; d -= step) {
 				final Vector3 p = dir.multiply(d, null).addLocal(o);
 				final double findRoofIntersection = findRoofIntersection(p);
+
+				if (findRoofIntersection > highestPoint)
+					highestPoint = findRoofIntersection;
 
 				final ReadOnlyVector3 currentStretchPoint = new Vector3(p.getX(), p.getY(), findRoofIntersection);
 				final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();
@@ -528,9 +534,17 @@ public class Wall extends HousePart {
 				}
 				previousStretchPoint = currentStretchPoint;
 
-				if (computeSolarPoints && (solarPoints.isEmpty() || solarPoints.get(solarPoints.size() - 1).distance(p) > SOLAR_STEP ))
-					solarPoints.add(p);
+//				if (computeSolarPoints && (solarPoints.isEmpty() || solarPoints.get(solarPoints.size() - 1).distance(p) > SOLAR_STEP))
+//					solarPoints.add(p);
 
+			}
+		}
+
+		if (computeSolarPoints) {
+			solarPoints.clear();
+			for (double d = 0; d < length; d += SOLAR_STEP) {
+				final Vector3 p = dir.multiply(d, null).addLocal(o);
+				solarPoints.add(p);
 			}
 		}
 	}
@@ -1163,7 +1177,7 @@ public class Wall extends HousePart {
 								System.out.println("Fixing neighbor...");
 								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
 							}
-				}
+						}
 			}
 		}
 	}

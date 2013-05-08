@@ -45,11 +45,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 
 import com.ardor3d.intersection.PickResults;
@@ -853,9 +855,12 @@ public class EnergyPanel extends JPanel {
 		coolingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.cooling));
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
 
-//		computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
-		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
+		solarOnWall.clear();
+		computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
+		// computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		printSolarOnWalls();
+		;
+		updateSolarValueOnAllHouses();
 	}
 
 	private double parseUFactor(final JComboBox comboBox) {
@@ -1012,16 +1017,16 @@ public class EnergyPanel extends JPanel {
 				final List<ReadOnlyVector3> solarPoints = wall.getSolarPoints();
 				long[][] solar = solarOnWall.get(wall);
 				if (solar == null || solar.length != solarPoints.size()) {
-					solar = new long[solarPoints.size()][(int)(wall.getHighestPoint() / Wall.SOLAR_STEP)];
+					solar = new long[solarPoints.size()][(int) (wall.getHighestPoint() / Wall.SOLAR_STEP)];
 					solarOnWall.put(wall, solar);
 				}
 				int i = 0;
 				for (final ReadOnlyVector3 p : solarPoints) {
 					int j = 0;
 					for (double z = part.getPoints().get(0).getZ() * 1.01; z < p.getZ(); z += Wall.SOLAR_STEP) {
-						final Ray3 pickRay = new Ray3(new Vector3(p.getX(), p.getY(), z), directionTowardSun);
+						final Ray3 pickRay = new Ray3(new Vector3(p.getX(), p.getY(), z).addLocal(directionTowardSun), directionTowardSun);
 						final PickResults pickResults = new PrimitivePickResults();
-						PickingUtil.findPick(Scene.getRoot(), pickRay, pickResults, true);
+						PickingUtil.findPick(Scene.getRoot(), pickRay, pickResults, false);
 						if (pickResults.getNumber() == 0 || (pickResults.getNumber() == 1 && pickResults.getPickData(0).getTarget() instanceof Sphere))
 							solar[i][j++]++;
 					}
@@ -1043,13 +1048,33 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
+	private void updateSolarValueOnAllHouses() {
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation) {
+				final Foundation foundation = (Foundation) part;
+				long total = 0;
+				for (final HousePart houseChild : foundation.getChildren()) {
+					if (houseChild instanceof Wall) {
+						final long[][] solar = solarOnWall.get(houseChild);
+						if (solar != null)
+							for (int i = 0; i < solar.length; i++)
+								for (int j = 0; j < solar[i].length; j++)
+									total += solar[i][j];
+					}
+				}
+				foundation.setSolarValue(total);
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	private void printSolarOnWalls() {
 		System.out.println("--------------------------");
 		for (final HousePart part : solarOnWall.keySet()) {
 			System.out.println(part);
 			final long[][] solar = solarOnWall.get(part);
-			for (int j = solar[0].length - 1; j > 0 ; j--) {
-				for (int i = solar.length - 1; i > 0 ; i--) {
+			for (int j = solar[0].length - 1; j > 0; j--) {
+				for (int i = solar.length - 1; i > 0; i--) {
 					System.out.print(solar[i][j] + " ");
 				}
 				System.out.println();
