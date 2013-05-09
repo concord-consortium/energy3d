@@ -87,7 +87,6 @@ public class Wall extends HousePart {
 		super.init();
 		relativeToHorizontal = true;
 		wallThickness = 0.5;
-		solarPoints = new ArrayList<ReadOnlyVector3>();
 		if (thicknessNormal != null)
 			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
 
@@ -511,9 +510,6 @@ public class Wall extends HousePart {
 			Vector3 direction = null;
 			ReadOnlyVector3 previousStretchPoint = polygon.get(3);
 
-//			if (computeSolarPoints)
-//				solarPoints.clear();
-
 			final double step = 0.1;
 			for (double d = length - step; d > step; d -= step) {
 				final Vector3 p = dir.multiply(d, null).addLocal(o);
@@ -533,19 +529,14 @@ public class Wall extends HousePart {
 					polygon.add(p);
 				}
 				previousStretchPoint = currentStretchPoint;
-
-//				if (computeSolarPoints && (solarPoints.isEmpty() || solarPoints.get(solarPoints.size() - 1).distance(p) > SOLAR_STEP))
-//					solarPoints.add(p);
-
 			}
 		}
 
 		if (computeSolarPoints) {
-			solarPoints.clear();
-			for (double d = 0; d < length; d += SOLAR_STEP) {
-				final Vector3 p = dir.multiply(d, null).addLocal(o);
-				solarPoints.add(p);
-			}
+			final int size = (int)Math.round(length / SOLAR_STEP);
+			solarPoints = new ArrayList<ReadOnlyVector3>(size);
+			for (int i = 0, d = 0; i < size; i++, d += SOLAR_STEP)
+				solarPoints.add(dir.multiply(Math.min(d, length), null).addLocal(o));
 		}
 	}
 
@@ -1226,5 +1217,9 @@ public class Wall extends HousePart {
 
 	public double getHighestPoint() {
 		return highestPoint;
+	}
+
+	public Mesh getInvisibleMesh() {
+		return invisibleMesh;
 	}
 }

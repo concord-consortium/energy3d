@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyEvent;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -60,6 +61,7 @@ import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Sphere;
 
 public class EnergyPanel extends JPanel {
@@ -163,6 +165,7 @@ public class EnergyPanel extends JPanel {
 	private final JLabel latitudeLabel;
 	private final JSpinner latitudeSpinner;
 	private final Map<HousePart, long[][]> solarOnWall = new Hashtable<HousePart, long[][]>();
+	private final List<Spatial> solarCollidables = new ArrayList<Spatial>();
 
 	private class EnergyAmount {
 		double solar;
@@ -855,11 +858,12 @@ public class EnergyPanel extends JPanel {
 		coolingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.cooling));
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
 
+		initSolarCollidables();
+
 		solarOnWall.clear();
-		computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
-		// computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
-		printSolarOnWalls();
-		;
+//		computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
+		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
+//		printSolarOnWalls();
 		updateSolarValueOnAllHouses();
 	}
 
@@ -1009,7 +1013,19 @@ public class EnergyPanel extends JPanel {
 		return timeSpinner;
 	}
 
+	private void initSolarCollidables() {
+		solarCollidables.clear();
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Wall)
+				solarCollidables.add(((Wall) part).getInvisibleMesh());
+			else if (part instanceof Roof)
+				solarCollidables.add(part.getMesh());
+		}
+	}
+
 	private void computerSolarOnWalls(final ReadOnlyVector3 sunLocation) {
+		if (sunLocation.getZ() <= 0)
+			return;
 		final Vector3 directionTowardSun = sunLocation.normalize(null);
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Wall && part.getFaceDirection().dot(directionTowardSun) > 0) {
@@ -1026,7 +1042,8 @@ public class EnergyPanel extends JPanel {
 					for (double z = part.getPoints().get(0).getZ() * 1.01; z < p.getZ(); z += Wall.SOLAR_STEP) {
 						final Ray3 pickRay = new Ray3(new Vector3(p.getX(), p.getY(), z).addLocal(directionTowardSun), directionTowardSun);
 						final PickResults pickResults = new PrimitivePickResults();
-						PickingUtil.findPick(Scene.getRoot(), pickRay, pickResults, false);
+						for (final Spatial spatial : solarCollidables)
+							PickingUtil.findPick(spatial, pickRay, pickResults, false);
 						if (pickResults.getNumber() == 0 || (pickResults.getNumber() == 1 && pickResults.getPickData(0).getTarget() instanceof Sphere))
 							solar[i][j++]++;
 					}
