@@ -16,6 +16,7 @@ import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
@@ -473,32 +474,43 @@ public class MainFrame extends JFrame {
 					fileChooser.removeChoosableFileFilter(pngFilter);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-						final File dir = fileChooser.getSelectedFile();
+						File dir = fileChooser.getSelectedFile();
 						if (dir.isDirectory()) {
 							final File[] files = dir.listFiles(new FilenameFilter() {
 								@Override
-								public boolean accept(final File dir, final String name) {
+								public boolean accept(File dir, String name) {
 									return name.endsWith(".ng3");
 								}
 							});
 							final int n = files.length;
+							final File file = new File(fileChooser.getCurrentDirectory() + System.getProperty("file.separator") + "prop.txt");
+							PrintWriter logWriter = null;
+							try {
+								logWriter = new PrintWriter(file);
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
+							final PrintWriter pw = logWriter;
 							new Thread() {
-								@Override
 								public void run() {
 									int i = -1;
-									while (i < n) {
+									while (i < n - 1) {
 										if (Config.replaying) {
 											i++;
-											if (i == n) // cycle back
-												i = 0;
+											// if (i == n) i = 0;
 											System.out.println("Play back " + i + " of " + n);
 											try {
 												Scene.open(files[i].toURI().toURL());
 												updateTitleBar();
-												sleep(1000);
+												sleep(100);
 											} catch (final Exception e) {
 												e.printStackTrace();
 											}
+											int size = Scene.getInstance().getParts().size();
+											if (size >= 70)
+												pw.println((files[i].lastModified() - files[0].lastModified()) / 1000 + "  " + (size - 70));
+											else
+												pw.println((files[i].lastModified() - files[0].lastModified()) / 1000 + "  " + size);
 										} else {
 											if (Config.backward) {
 												if (i > 0) {
@@ -527,6 +539,7 @@ public class MainFrame extends JFrame {
 											}
 										}
 									}
+									pw.close();
 								}
 							}.start();
 						}
