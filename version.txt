@@ -1419,6 +1419,11 @@ Version 0.5 - October 20, 2011
 - write algorithm to compute the total solar duration on walls grids during the course of a day
 - compute the total solar exposure of walls of a house and display it as a text label above the house 
 - test solar exposure picking against wall invisible mesh and roof mesh only
+- generate textures for walls based on the solar exposure data
+
+- *assign unique id to each part
+- *save the state of heliodon with file
+- *add text box for design rational
 
 - *make default window size bigger so that toolbar will fit
 

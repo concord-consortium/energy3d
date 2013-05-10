@@ -1032,22 +1032,25 @@ public class EnergyPanel extends JPanel {
 				final Wall wall = (Wall) part;
 				final List<ReadOnlyVector3> solarPoints = wall.getSolarPoints();
 				long[][] solar = solarOnWall.get(wall);
-				if (solar == null || solar.length != solarPoints.size()) {
-					solar = new long[solarPoints.size()][(int) (wall.getHighestPoint() / Wall.SOLAR_STEP)];
+				final int h = (int) (wall.getHighestPoint() / Wall.SOLAR_STEP);
+				final int w = solarPoints.size();
+				if (solar == null) {
+					solar = new long[h][w];
 					solarOnWall.put(wall, solar);
 				}
-				int i = 0;
+				int j = 0;
 				for (final ReadOnlyVector3 p : solarPoints) {
-					int j = 0;
+					int i = 0;
 					for (double z = part.getPoints().get(0).getZ() * 1.01; z < p.getZ(); z += Wall.SOLAR_STEP) {
 						final Ray3 pickRay = new Ray3(new Vector3(p.getX(), p.getY(), z).addLocal(directionTowardSun), directionTowardSun);
 						final PickResults pickResults = new PrimitivePickResults();
 						for (final Spatial spatial : solarCollidables)
 							PickingUtil.findPick(spatial, pickRay, pickResults, false);
 						if (pickResults.getNumber() == 0 || (pickResults.getNumber() == 1 && pickResults.getPickData(0).getTarget() instanceof Sphere))
-							solar[i][j++]++;
+							solar[i][j]++;
+						i++;
 					}
-					i++;
+					j++;
 				}
 			}
 		}
@@ -1077,6 +1080,7 @@ public class EnergyPanel extends JPanel {
 							for (int i = 0; i < solar.length; i++)
 								for (int j = 0; j < solar[i].length; j++)
 									total += solar[i][j];
+						((Wall) houseChild).applySolarTexture(solar);
 					}
 				}
 				foundation.setSolarValue(total);

@@ -1,5 +1,6 @@
 package org.concord.energy3d.model;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,11 @@ import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.PixelDataType;
+import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.image.Texture2D;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -36,12 +42,14 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
@@ -399,12 +407,16 @@ public class Wall extends HousePart {
 		if (texture) {
 			final Vector3 p0 = getAbsPoint(0);
 			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 8.0;
-			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
-			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
-			if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
-				p01.multiplyLocal(1.5);
-				p02.multiplyLocal(2.0);
-			}
+//			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
+//			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
+//			if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
+//				p01.multiplyLocal(1.5);
+//				p02.multiplyLocal(2.0);
+//			}
+//			p01.normalizeLocal().multiplyLocal(10);
+//			p02.normalizeLocal().multiplyLocal(10); //TODO
+			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0);
+			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0);
 			final TPoint o = new TPoint(p0.getX(), p0.getY(), p0.getZ());
 			final TPoint u = new TPoint(p01.getX(), p01.getY(), p01.getZ());
 			final TPoint v = new TPoint(p02.getX(), p02.getY(), p02.getZ());
@@ -533,7 +545,7 @@ public class Wall extends HousePart {
 		}
 
 		if (computeSolarPoints) {
-			final int size = (int)Math.round(length / SOLAR_STEP);
+			final int size = (int) Math.round(length / SOLAR_STEP);
 			solarPoints = new ArrayList<ReadOnlyVector3>(size);
 			for (int i = 0, d = 0; i < size; i++, d += SOLAR_STEP)
 				solarPoints.add(dir.multiply(Math.min(d, length), null).addLocal(o));
@@ -1213,6 +1225,78 @@ public class Wall extends HousePart {
 
 	public List<ReadOnlyVector3> getSolarPoints() {
 		return solarPoints;
+	}
+
+	public void applySolarTexture(final long[][] solarData) {
+		// final TextureState textureState = new TextureState();
+		// final Texture texture = new Texture2D();
+		// final ByteBuffer data = BufferUtils.createByteBuffer(3 * solarData.length * solarData[0].length);
+		// for (int i = 0; i < solarData.length; i++) {
+		// for (int j = 0; j < solarData[0].length; j++) {
+		// data.put((byte)(solarData[i][j] / 1000));
+		// data.put((byte)(solarData[i][j] / 1000));
+		// data.put((byte)(solarData[i][j] / 1000));
+		// }
+		// }
+		// final Image image = new Image(ImageDataFormat.RGB, PixelDataType.Float, solarData.length, solarData[0].length, data , null);
+		// texture.setImage(image );
+		// textureState.setTexture(texture );
+		// mesh.setRenderState(textureState);
+
+		if (solarData == null)
+			return;
+
+		final int h = solarData.length;
+		final int w = solarData[0].length;
+
+		final Texture2D texture = new Texture2D();
+		texture.setMinificationFilter(MinificationFilter.NearestNeighborNoMipMaps);
+		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
+//		final Image img = new Image();
+//		img.setWidth(w);
+//		img.setHeight(h);
+//		img.setDepth(0);
+
+        final ByteBuffer data = BufferUtils.createByteBuffer(w * h * 3);
+
+        for (int i = 0; i < h; i++) {
+        	for (int j = 0; j < w; j++) {
+				data.put((byte) (100*solarData[i][j]));
+//        		data.put((byte) (255));
+				data.put((byte) (0));
+				data.put((byte) (0));
+				System.out.print(solarData[i][j] + " ");
+			}
+			System.out.println();
+		}
+
+        while (data.hasRemaining())
+        	data.put((byte) 0);
+
+//        for (int i = w - 2; i >= 0; i--) {
+//        	for (int j = h - 1; j >= 0; j--) {
+//				data.put((byte) (0));
+//				data.put((byte) (255));
+//				data.put((byte) (0));
+//				System.out.print(solarData[i][j] + " ");
+//			}
+//			System.out.println();
+//		}
+
+
+        data.rewind();
+        final ImageDataFormat fmt = ImageDataFormat.RGB;
+        final Image colorImage = new Image(fmt, PixelDataType.UnsignedByte, w, h, data, null);
+
+//		img.setDataFormat(colorImage.getDataFormat());
+//		img.setDataType(colorImage.getDataType());
+//		img.setData(data);
+		texture.setImage(colorImage);
+
+		final TextureState ts = new TextureState();
+//		texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
+		ts.setTexture(texture);
+		mesh.setRenderState(ts);
 	}
 
 	public double getHighestPoint() {
