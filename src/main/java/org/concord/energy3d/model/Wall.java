@@ -407,14 +407,14 @@ public class Wall extends HousePart {
 		if (texture) {
 			final Vector3 p0 = getAbsPoint(0);
 			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 8.0;
-//			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
-//			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
-//			if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
-//				p01.multiplyLocal(1.5);
-//				p02.multiplyLocal(2.0);
-//			}
-//			p01.normalizeLocal().multiplyLocal(10);
-//			p02.normalizeLocal().multiplyLocal(10); //TODO
+			// final Vector3 p01 = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
+			// final Vector3 p02 = getAbsPoint(2).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
+			// if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
+			// p01.multiplyLocal(1.5);
+			// p02.multiplyLocal(2.0);
+			// }
+			// p01.normalizeLocal().multiplyLocal(10);
+			// p02.normalizeLocal().multiplyLocal(10); //TODO
 			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0);
 			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0);
 			final TPoint o = new TPoint(p0.getX(), p0.getY(), p0.getZ());
@@ -1227,74 +1227,41 @@ public class Wall extends HousePart {
 		return solarPoints;
 	}
 
-	public void applySolarTexture(final long[][] solarData) {
-		// final TextureState textureState = new TextureState();
-		// final Texture texture = new Texture2D();
-		// final ByteBuffer data = BufferUtils.createByteBuffer(3 * solarData.length * solarData[0].length);
-		// for (int i = 0; i < solarData.length; i++) {
-		// for (int j = 0; j < solarData[0].length; j++) {
-		// data.put((byte)(solarData[i][j] / 1000));
-		// data.put((byte)(solarData[i][j] / 1000));
-		// data.put((byte)(solarData[i][j] / 1000));
-		// }
-		// }
-		// final Image image = new Image(ImageDataFormat.RGB, PixelDataType.Float, solarData.length, solarData[0].length, data , null);
-		// texture.setImage(image );
-		// textureState.setTexture(texture );
-		// mesh.setRenderState(textureState);
+	public void applySolarTexture(final long[][] solarData, final long maxValue) {
+		final int h;
+		final int w;
 
-		if (solarData == null)
-			return;
-
-		final int h = solarData.length;
-		final int w = solarData[0].length;
-
-		final Texture2D texture = new Texture2D();
-		texture.setMinificationFilter(MinificationFilter.NearestNeighborNoMipMaps);
-		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
-//		final Image img = new Image();
-//		img.setWidth(w);
-//		img.setHeight(h);
-//		img.setDepth(0);
-
-        final ByteBuffer data = BufferUtils.createByteBuffer(w * h * 3);
-
-        for (int i = 0; i < h; i++) {
-        	for (int j = 0; j < w; j++) {
-				data.put((byte) (100*solarData[i][j]));
-//        		data.put((byte) (255));
-				data.put((byte) (0));
-				data.put((byte) (0));
-				System.out.print(solarData[i][j] + " ");
-			}
-			System.out.println();
+		if (solarData == null) {
+			h = w = 1;
+		} else {
+			h = solarData.length;
+			w = solarData[0].length;
 		}
 
-        while (data.hasRemaining())
-        	data.put((byte) 0);
+		final Texture2D texture = new Texture2D();
+		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
+		final ByteBuffer data = BufferUtils.createByteBuffer(w * h * 3);
 
-//        for (int i = w - 2; i >= 0; i--) {
-//        	for (int j = h - 1; j >= 0; j--) {
-//				data.put((byte) (0));
-//				data.put((byte) (255));
-//				data.put((byte) (0));
+		for (int i = 0; i < h; i++) {
+			for (int j = 0; j < w; j++) {
+				final byte colorValue;
+				if (solarData == null)
+					colorValue = (byte) 0;
+				else
+					colorValue = (byte) (255 * solarData[i][j] / maxValue);
+				data.put(colorValue);
+				data.put((byte) 0);
+				data.put((byte) (255 - colorValue));
 //				System.out.print(solarData[i][j] + " ");
-//			}
+			}
 //			System.out.println();
-//		}
+		}
 
+		final ImageDataFormat fmt = ImageDataFormat.RGB;
+		final Image colorImage = new Image(fmt, PixelDataType.UnsignedByte, w, h, data, null);
 
-        data.rewind();
-        final ImageDataFormat fmt = ImageDataFormat.RGB;
-        final Image colorImage = new Image(fmt, PixelDataType.UnsignedByte, w, h, data, null);
-
-//		img.setDataFormat(colorImage.getDataFormat());
-//		img.setDataType(colorImage.getDataType());
-//		img.setData(data);
 		texture.setImage(colorImage);
-
 		final TextureState ts = new TextureState();
-//		texture.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
 		ts.setTexture(texture);
 		mesh.setRenderState(ts);
 	}

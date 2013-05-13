@@ -166,6 +166,7 @@ public class EnergyPanel extends JPanel {
 	private final JSpinner latitudeSpinner;
 	private final Map<HousePart, long[][]> solarOnWall = new Hashtable<HousePart, long[][]>();
 	private final List<Spatial> solarCollidables = new ArrayList<Spatial>();
+	private long maxSolarValue;
 
 	private class EnergyAmount {
 		double solar;
@@ -861,9 +862,10 @@ public class EnergyPanel extends JPanel {
 		initSolarCollidables();
 
 		solarOnWall.clear();
+		maxSolarValue = 0;
 //		computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
 		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
-//		printSolarOnWalls();
+		printSolarOnWalls();
 		updateSolarValueOnAllHouses();
 	}
 
@@ -1026,31 +1028,33 @@ public class EnergyPanel extends JPanel {
 	private void computerSolarOnWalls(final ReadOnlyVector3 sunLocation) {
 		if (sunLocation.getZ() <= 0)
 			return;
+		maxSolarValue++;
 		final Vector3 directionTowardSun = sunLocation.normalize(null);
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Wall && part.getFaceDirection().dot(directionTowardSun) > 0) {
 				final Wall wall = (Wall) part;
 				final List<ReadOnlyVector3> solarPoints = wall.getSolarPoints();
 				long[][] solar = solarOnWall.get(wall);
-				final int h = (int) (wall.getHighestPoint() / Wall.SOLAR_STEP);
-				final int w = solarPoints.size();
+				final int rows = (int) (wall.getHighestPoint() / Wall.SOLAR_STEP);
+				final int cols = solarPoints.size();
 				if (solar == null) {
-					solar = new long[h][w];
+					solar = new long[rows][cols];
 					solarOnWall.put(wall, solar);
 				}
-				int j = 0;
-				for (final ReadOnlyVector3 p : solarPoints) {
-					int i = 0;
-					for (double z = part.getPoints().get(0).getZ() * 1.01; z < p.getZ(); z += Wall.SOLAR_STEP) {
-						final Ray3 pickRay = new Ray3(new Vector3(p.getX(), p.getY(), z).addLocal(directionTowardSun), directionTowardSun);
+				final double baseZ = part.getPoints().get(0).getZ();
+				final Vector3 p = new Vector3();
+				for (int col = 0; col < cols; col++) {
+					p.set(solarPoints.get(col));
+					for (int row = 0; row < rows; row++) {
+						p.setZ(baseZ + row * Wall.SOLAR_STEP);
+						p.addLocal(directionTowardSun);
+						final Ray3 pickRay = new Ray3(p, directionTowardSun);
 						final PickResults pickResults = new PrimitivePickResults();
 						for (final Spatial spatial : solarCollidables)
 							PickingUtil.findPick(spatial, pickRay, pickResults, false);
 						if (pickResults.getNumber() == 0 || (pickResults.getNumber() == 1 && pickResults.getPickData(0).getTarget() instanceof Sphere))
-							solar[i][j]++;
-						i++;
+							solar[row][col]++;
 					}
-					j++;
 				}
 			}
 		}
@@ -1062,9 +1066,10 @@ public class EnergyPanel extends JPanel {
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR, 0);
 
-		for (int hour = 0; hour < 24; hour++) {
+		final int SOLAR_MINUTE_STEP = 60;
+		for (int minute = 0; minute < 1440; minute += SOLAR_MINUTE_STEP ) {
 			computerSolarOnWalls(heliodon.computeSunLocation(today));
-			today.add(Calendar.HOUR, 1);
+			today.add(Calendar.MINUTE, SOLAR_MINUTE_STEP);
 		}
 	}
 
@@ -1080,7 +1085,7 @@ public class EnergyPanel extends JPanel {
 							for (int i = 0; i < solar.length; i++)
 								for (int j = 0; j < solar[i].length; j++)
 									total += solar[i][j];
-						((Wall) houseChild).applySolarTexture(solar);
+						((Wall) houseChild).applySolarTexture(solar, maxSolarValue);
 					}
 				}
 				foundation.setSolarValue(total);
