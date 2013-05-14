@@ -408,17 +408,19 @@ public class Wall extends HousePart {
 
 		if (texture) {
 			final Vector3 p0 = getAbsPoint(0);
-			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 8.0;
-			// final Vector3 p01 = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
-			// final Vector3 p02 = getAbsPoint(2).subtractLocal(p0).normalizeLocal().multiplyLocal(scale);
-			// if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
-			// p01.multiplyLocal(1.5);
-			// p02.multiplyLocal(2.0);
-			// }
-			// p01.normalizeLocal().multiplyLocal(10);
-			// p02.normalizeLocal().multiplyLocal(10); //TODO
-			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(getHighestPoint());
+			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0);
 			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0);
+			if (SceneManager.getInstance().isSolarColorMode()) {
+				p01.normalizeLocal().multiplyLocal(getHighestPoint());
+			} else {
+				final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 8.0;
+				p01.normalizeLocal().multiplyLocal(scale);
+				p02.normalizeLocal().multiplyLocal(scale);
+				if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
+					p01.multiplyLocal(1.5);
+					p02.multiplyLocal(2.0);
+				}
+			}
 			final TPoint o = new TPoint(p0.getX(), p0.getY(), p0.getZ());
 			final TPoint u = new TPoint(p01.getX(), p01.getY(), p01.getZ());
 			final TPoint v = new TPoint(p02.getX(), p02.getY(), p02.getZ());
@@ -1239,9 +1241,9 @@ public class Wall extends HousePart {
 			cols = solarData[0].length;
 		}
 
-        final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED, ColorRGBA.WHITE};
-        final DefaultColorInterpolationController controller = new DefaultColorInterpolationController();
-        controller.setControls(colors);
+		final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED, ColorRGBA.WHITE };
+		final DefaultColorInterpolationController controller = new DefaultColorInterpolationController();
+		controller.setControls(colors);
 
 		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
 		for (int row = 0; row < rows; row++) {

@@ -187,6 +187,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Node newImport;
 	private Vector3 houseMoveStartPoint;
 	private ArrayList<Vector3> houseMovePoints;
+	private boolean solarColorMode = true;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -1549,5 +1550,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public Camera getCamera() {
 		return canvas.getCanvasRenderer().getCamera();
+	}
+
+	public boolean isSolarColorMode() {
+		return solarColorMode;
+	}
+
+	public void setSolarColorMode(final boolean solarColorMode) {
+		this.solarColorMode = solarColorMode;
 	}
 }
