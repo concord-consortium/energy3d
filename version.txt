@@ -1424,6 +1424,7 @@ Version 0.5 - October 20, 2011
 - computer solar value even for top solar row
 - fix problem with roof not affecting solar average
 - prevent solar collision between edge of wall with the neighboring wall by using an offset
+- interpolate over several colors when generate solar exposure texture
 
 - *assign unique id to each part
 - *save the state of heliodon with file

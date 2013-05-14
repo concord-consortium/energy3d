@@ -862,9 +862,9 @@ public class EnergyPanel extends JPanel {
 
 		solarOnWall.clear();
 		maxSolarValue = 0;
-		// computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
+//		 computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
 		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
-		printSolarOnWalls();
+//		printSolarOnWalls();
 		updateSolarValueOnAllHouses();
 	}
 
@@ -1056,8 +1056,6 @@ public class EnergyPanel extends JPanel {
 								PickingUtil.findPick(spatial, pickRay, pickResults, false);
 						if (pickResults.getNumber() == 0)
 							solar[row][col]++;
-						else
-							System.out.println();
 					}
 				}
 			}

@@ -40,12 +40,14 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.controller.interpolation.DefaultColorInterpolationController;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText.Align;
@@ -1228,29 +1230,37 @@ public class Wall extends HousePart {
 	}
 
 	public void applySolarTexture(final long[][] solarData, final long maxValue) {
-		final int h;
-		final int w;
+		final int rows;
+		final int cols;
 		if (solarData == null) {
-			h = w = 1;
+			rows = cols = 1;
 		} else {
-			h = solarData.length;
-			w = solarData[0].length;
+			rows = solarData.length;
+			cols = solarData[0].length;
 		}
 
-		final ByteBuffer data = BufferUtils.createByteBuffer(w * h * 3);
-		for (int i = 0; i < h; i++) {
-			for (int j = 0; j < w; j++) {
-				final byte colorValue;
-				if (solarData == null)
-					colorValue = (byte) 0;
-				else
-					colorValue = (byte) (255 * solarData[i][j] / maxValue);
-				data.put(colorValue);
-				data.put((byte) 0);
-				data.put((byte) (255 - colorValue));
+        final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED, ColorRGBA.WHITE};
+        final DefaultColorInterpolationController controller = new DefaultColorInterpolationController();
+        controller.setControls(colors);
+
+		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				final long value = solarData == null ? maxValue : solarData[row][col];
+				long valuePerColorRange = maxValue / (colors.length - 1);
+				final int colorIndex;
+				if (valuePerColorRange == 0) {
+					valuePerColorRange = 1;
+					colorIndex = 0;
+				} else
+					colorIndex = (int) Math.min(value / valuePerColorRange, colors.length - 2);
+				final float scaler = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
+				final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scaler);
+				data.put((byte) (color.getRed() * 255)).put((byte) (color.getGreen() * 255)).put((byte) (color.getBlue() * 255));
 			}
 		}
-		final Image image = new Image(ImageDataFormat.RGB, PixelDataType.UnsignedByte, w, h, data, null);
+
+		final Image image = new Image(ImageDataFormat.RGB, PixelDataType.UnsignedByte, cols, rows, data, null);
 		final Texture2D texture = new Texture2D();
 		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
 		texture.setImage(image);
