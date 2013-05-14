@@ -415,7 +415,7 @@ public class Wall extends HousePart {
 			// }
 			// p01.normalizeLocal().multiplyLocal(10);
 			// p02.normalizeLocal().multiplyLocal(10); //TODO
-			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0);
+			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(getHighestPoint());
 			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0);
 			final TPoint o = new TPoint(p0.getX(), p0.getY(), p0.getZ());
 			final TPoint u = new TPoint(p01.getX(), p01.getY(), p01.getZ());
@@ -1230,7 +1230,6 @@ public class Wall extends HousePart {
 	public void applySolarTexture(final long[][] solarData, final long maxValue) {
 		final int h;
 		final int w;
-
 		if (solarData == null) {
 			h = w = 1;
 		} else {
@@ -1238,10 +1237,7 @@ public class Wall extends HousePart {
 			w = solarData[0].length;
 		}
 
-		final Texture2D texture = new Texture2D();
-		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
 		final ByteBuffer data = BufferUtils.createByteBuffer(w * h * 3);
-
 		for (int i = 0; i < h; i++) {
 			for (int j = 0; j < w; j++) {
 				final byte colorValue;
@@ -1252,22 +1248,19 @@ public class Wall extends HousePart {
 				data.put(colorValue);
 				data.put((byte) 0);
 				data.put((byte) (255 - colorValue));
-//				System.out.print(solarData[i][j] + " ");
 			}
-//			System.out.println();
 		}
-
-		final ImageDataFormat fmt = ImageDataFormat.RGB;
-		final Image colorImage = new Image(fmt, PixelDataType.UnsignedByte, w, h, data, null);
-
-		texture.setImage(colorImage);
-		final TextureState ts = new TextureState();
-		ts.setTexture(texture);
-		mesh.setRenderState(ts);
+		final Image image = new Image(ImageDataFormat.RGB, PixelDataType.UnsignedByte, w, h, data, null);
+		final Texture2D texture = new Texture2D();
+		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
+		texture.setImage(image);
+		final TextureState textureState = new TextureState();
+		textureState.setTexture(texture);
+		mesh.setRenderState(textureState);
 	}
 
 	public double getHighestPoint() {
-		return highestPoint;
+		return highestPoint - points.get(0).getZ();
 	}
 
 	public Mesh getInvisibleMesh() {

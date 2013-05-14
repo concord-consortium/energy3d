@@ -62,7 +62,6 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.shape.Sphere;
 
 public class EnergyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -863,7 +862,7 @@ public class EnergyPanel extends JPanel {
 
 		solarOnWall.clear();
 		maxSolarValue = 0;
-//		computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
+		// computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
 		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		printSolarOnWalls();
 		updateSolarValueOnAllHouses();
@@ -1021,7 +1020,7 @@ public class EnergyPanel extends JPanel {
 			if (part instanceof Wall)
 				solarCollidables.add(((Wall) part).getInvisibleMesh());
 			else if (part instanceof Roof)
-				solarCollidables.add(part.getMesh());
+				solarCollidables.add(((Roof) part).getRoofPartsRoot());
 		}
 	}
 
@@ -1029,7 +1028,10 @@ public class EnergyPanel extends JPanel {
 		if (sunLocation.getZ() <= 0)
 			return;
 		maxSolarValue++;
-		final Vector3 directionTowardSun = sunLocation.normalize(null);
+		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
+		/* needed in order to prevent picking collision with neighboring wall at wall edge */
+		final double OFFSET = 0.1;
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Wall && part.getFaceDirection().dot(directionTowardSun) > 0) {
 				final Wall wall = (Wall) part;
@@ -1047,13 +1049,15 @@ public class EnergyPanel extends JPanel {
 					p.set(solarPoints.get(col));
 					for (int row = 0; row < rows; row++) {
 						p.setZ(baseZ + row * Wall.SOLAR_STEP);
-						p.addLocal(directionTowardSun);
-						final Ray3 pickRay = new Ray3(p, directionTowardSun);
+						final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
 						final PickResults pickResults = new PrimitivePickResults();
 						for (final Spatial spatial : solarCollidables)
-							PickingUtil.findPick(spatial, pickRay, pickResults, false);
-						if (pickResults.getNumber() == 0 || (pickResults.getNumber() == 1 && pickResults.getPickData(0).getTarget() instanceof Sphere))
+							if (spatial != wall.getInvisibleMesh())
+								PickingUtil.findPick(spatial, pickRay, pickResults, false);
+						if (pickResults.getNumber() == 0)
 							solar[row][col]++;
+						else
+							System.out.println();
 					}
 				}
 			}
@@ -1066,8 +1070,8 @@ public class EnergyPanel extends JPanel {
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR, 0);
 
-		final int SOLAR_MINUTE_STEP = 60;
-		for (int minute = 0; minute < 1440; minute += SOLAR_MINUTE_STEP ) {
+		final int SOLAR_MINUTE_STEP = 15;
+		for (int minute = 0; minute < 1440; minute += SOLAR_MINUTE_STEP) {
 			computerSolarOnWalls(heliodon.computeSunLocation(today));
 			today.add(Calendar.MINUTE, SOLAR_MINUTE_STEP);
 		}
@@ -1099,10 +1103,9 @@ public class EnergyPanel extends JPanel {
 		for (final HousePart part : solarOnWall.keySet()) {
 			System.out.println(part);
 			final long[][] solar = solarOnWall.get(part);
-			for (int j = solar[0].length - 1; j > 0; j--) {
-				for (int i = solar.length - 1; i > 0; i--) {
+			for (int i = solar.length - 1; i > 0; i--) {
+				for (int j = 0; j < solar[0].length; j++)
 					System.out.print(solar[i][j] + " ");
-				}
 				System.out.println();
 			}
 		}
