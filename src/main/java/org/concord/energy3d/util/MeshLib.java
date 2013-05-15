@@ -1,5 +1,6 @@
 package org.concord.energy3d.util;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,20 +18,29 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.PixelDataType;
+import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.LineSegment3;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.controller.interpolation.DefaultColorInterpolationController;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
+import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class MeshLib {
@@ -488,4 +498,45 @@ public class MeshLib {
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
 	}
+
+	public static void applySolarTexture(final Mesh mesh, final long[][] solarData, final long maxValue) {
+		final int rows;
+		final int cols;
+		if (solarData == null) {
+			rows = cols = 1;
+		} else {
+			rows = solarData.length;
+			cols = solarData[0].length;
+		}
+
+		final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED, ColorRGBA.WHITE };
+		final DefaultColorInterpolationController controller = new DefaultColorInterpolationController();
+		controller.setControls(colors);
+
+		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				final long value = solarData == null ? maxValue : solarData[row][col];
+				long valuePerColorRange = maxValue / (colors.length - 1);
+				final int colorIndex;
+				if (valuePerColorRange == 0) {
+					valuePerColorRange = 1;
+					colorIndex = 0;
+				} else
+					colorIndex = (int) Math.min(value / valuePerColorRange, colors.length - 2);
+				final float scaler = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
+				final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scaler);
+				data.put((byte) (color.getRed() * 255)).put((byte) (color.getGreen() * 255)).put((byte) (color.getBlue() * 255));
+			}
+		}
+
+		final Image image = new Image(ImageDataFormat.RGB, PixelDataType.UnsignedByte, cols, rows, data, null);
+		final Texture2D texture = new Texture2D();
+		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
+		texture.setImage(image);
+		final TextureState textureState = new TextureState();
+		textureState.setTexture(texture);
+		mesh.setRenderState(textureState);
+	}
+
 }

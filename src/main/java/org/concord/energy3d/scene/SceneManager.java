@@ -93,13 +93,7 @@ import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
-import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.LightState;
-import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.renderer.state.OffsetState;
-import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
@@ -149,7 +143,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Node root = new Node("Root");
 	private final Node backgroundRoot = new Node("Scenary Root");
 	private final BasicPassManager passManager = new BasicPassManager();
-	private final Mesh floor = new Quad("Floor", 2000, 2000);
+//	private final Mesh floor = new Quad("Floor", 2000, 2000);
+	private final Mesh floor = new Quad("Floor", 300, 300);
 	private final Mesh invisibleFloor = new Quad("Floor", 2000, 2000);
 	private final Mesh gridsMesh = new Line("Floor Grids");
 	private final LightState lightState = new LightState();
@@ -504,29 +499,29 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createFloor() {
-		switch (theme) {
-		case DEFAULT_THEME:
-			floor.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
-			break;
-		case SKETCHUP_THEME:
-			floor.setDefaultColor(new ColorRGBA(1, 1, 1, 0.9f));
-			break;
-		}
+//		switch (theme) {
+//		case DEFAULT_THEME:
+//			floor.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
+//			break;
+//		case SKETCHUP_THEME:
+//			floor.setDefaultColor(new ColorRGBA(1, 1, 1, 0.9f));
+//			break;
+//		}
 
-		final OffsetState offsetState = new OffsetState();
-		offsetState.setTypeEnabled(OffsetType.Fill, true);
-		offsetState.setFactor(0.5f);
-		offsetState.setUnits(0.5f);
-		floor.setRenderState(HousePart.offsetState);
-
-		final BlendState blendState = new BlendState();
-		blendState.setBlendEnabled(true);
-		floor.setRenderState(blendState);
-		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-
-		final MaterialState ms = new MaterialState();
-		ms.setColorMaterial(ColorMaterial.Diffuse);
-		floor.setRenderState(ms);
+//		final OffsetState offsetState = new OffsetState();
+//		offsetState.setTypeEnabled(OffsetType.Fill, true);
+//		offsetState.setFactor(0.5f);
+//		offsetState.setUnits(0.5f);
+//		floor.setRenderState(HousePart.offsetState);
+//
+//		final BlendState blendState = new BlendState();
+//		blendState.setBlendEnabled(true);
+//		floor.setRenderState(blendState);
+//		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+//
+//		final MaterialState ms = new MaterialState();
+//		ms.setColorMaterial(ColorMaterial.Diffuse);
+//		floor.setRenderState(ms);
 		floor.updateModelBound();
 		return floor;
 	}
@@ -1340,7 +1335,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return frameHandler.getTimer();
 	}
 
-	public Spatial getFloor() {
+	public Mesh getFloor() {
 		return floor;
 	}
 

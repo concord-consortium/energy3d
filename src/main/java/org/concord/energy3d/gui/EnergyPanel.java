@@ -54,6 +54,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.MeshLib;
 
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -166,6 +167,7 @@ public class EnergyPanel extends JPanel {
 	private final Map<HousePart, long[][]> solarOnWall = new Hashtable<HousePart, long[][]>();
 	private final List<Spatial> solarCollidables = new ArrayList<Spatial>();
 	private long maxSolarValue;
+	private long[][] solarOnLand;
 
 	private class EnergyAmount {
 		double solar;
@@ -861,10 +863,12 @@ public class EnergyPanel extends JPanel {
 		initSolarCollidables();
 
 		solarOnWall.clear();
-		maxSolarValue = 0;
-//		 computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
+		solarOnLand = null;
+		maxSolarValue = 1;
+//		computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
+//		computerSolarOnLand(Heliodon.getInstance().getSunLocation());
 		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
-//		printSolarOnWalls();
+		// printSolarOnWalls();
 		updateSolarValueOnAllHouses();
 	}
 
@@ -1024,10 +1028,9 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	private void computerSolarOnWalls(final ReadOnlyVector3 sunLocation) {
+	private void computeSolarOnWalls(final ReadOnlyVector3 sunLocation) {
 		if (sunLocation.getZ() <= 0)
 			return;
-		maxSolarValue++;
 		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final double OFFSET = 0.1;
@@ -1062,20 +1065,50 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
+	private void computeSolarOnLand(final ReadOnlyVector3 sunLocation) {
+		if (sunLocation.getZ() <= 0)
+			return;
+		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
+		/* needed in order to prevent picking collision with neighboring wall at wall edge */
+		final double OFFSET = 0.1;
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+//		final int rows = (int) (Heliodon.getInstance().getRadius() * 2 / Wall.SOLAR_STEP);
+		final int rows = (int) (300 / Wall.SOLAR_STEP);
+		final int cols = rows;
+		if (solarOnLand == null)
+			solarOnLand = new long[rows][cols];
+		final Vector3 p = new Vector3();
+		for (int col = 0; col < cols; col++) {
+			p.setX((col - cols / 2) * Wall.SOLAR_STEP);
+			for (int row = 0; row < rows; row++) {
+				p.setY((row - rows / 2) * Wall.SOLAR_STEP);
+				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
+				final PickResults pickResults = new PrimitivePickResults();
+				for (final Spatial spatial : solarCollidables)
+					PickingUtil.findPick(spatial, pickRay, pickResults, false);
+				if (pickResults.getNumber() == 0)
+					solarOnLand[row][col]++;
+			}
+		}
+	}
+
 	private void computeSolarOnWallsToday(final Calendar today) {
 		final Heliodon heliodon = Heliodon.getInstance();
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR, 0);
-
 		final int SOLAR_MINUTE_STEP = 15;
 		for (int minute = 0; minute < 1440; minute += SOLAR_MINUTE_STEP) {
-			computerSolarOnWalls(heliodon.computeSunLocation(today));
+			final ReadOnlyVector3 sunLocation = heliodon.computeSunLocation(today);
+			computeSolarOnWalls(sunLocation);
+			computeSolarOnLand(sunLocation);
 			today.add(Calendar.MINUTE, SOLAR_MINUTE_STEP);
+			maxSolarValue++;
 		}
 	}
 
 	private void updateSolarValueOnAllHouses() {
+		MeshLib.applySolarTexture(SceneManager.getInstance().getFloor(), solarOnLand, maxSolarValue);;
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
 				final Foundation foundation = (Foundation) part;

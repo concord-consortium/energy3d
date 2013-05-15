@@ -470,6 +470,10 @@ public class Heliodon {
 			SceneManager.getInstance().refresh();
 	}
 
+	public double getRadius() {
+		return root.getScale().getX() * 5.0;
+	}
+
 	private Vector3 computeSunLocation(final double hourAngle, final double declinationAngle, final double observerLatitude) {
 		final double altitudeAngle = MathUtils.asin(MathUtils.sin(declinationAngle) * MathUtils.sin(observerLatitude) + MathUtils.cos(declinationAngle) * MathUtils.cos(hourAngle) * MathUtils.cos(observerLatitude));
 		final double x_azm = MathUtils.sin(hourAngle) * MathUtils.cos(declinationAngle);
