@@ -1427,6 +1427,7 @@ Version 0.5 - October 20, 2011
 - interpolate over several colors when generate solar exposure texture
 - use different texture coordinates based on whether or not solar exposure coloring is enabled
 - compute and apply solar exposure texture for the land
+- add toolbar button to enable/disable solar colormap mode
 
 - *assign unique id to each part
 - *save the state of heliodon with file

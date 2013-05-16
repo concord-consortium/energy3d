@@ -410,7 +410,7 @@ public class Wall extends HousePart {
 			final Vector3 p0 = getAbsPoint(0);
 			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0);
 			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0);
-			if (SceneManager.getInstance().isSolarColorMode()) {
+			if (SceneManager.getInstance().isSolarColorMap()) {
 				p01.normalizeLocal().multiplyLocal(getHighestPoint());
 			} else {
 				final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 8.0;

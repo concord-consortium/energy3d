@@ -860,6 +860,7 @@ public class EnergyPanel extends JPanel {
 		coolingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.cooling));
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
 
+		if (SceneManager.getInstance().isSolarColorMap()) {
 		initSolarCollidables();
 
 		solarOnWall.clear();
@@ -870,6 +871,7 @@ public class EnergyPanel extends JPanel {
 		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		// printSolarOnWalls();
 		updateSolarValueOnAllHouses();
+		}
 	}
 
 	private double parseUFactor(final JComboBox comboBox) {
@@ -1108,7 +1110,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void updateSolarValueOnAllHouses() {
-		MeshLib.applySolarTexture(SceneManager.getInstance().getFloor(), solarOnLand, maxSolarValue);;
+		MeshLib.applySolarTexture(SceneManager.getInstance().getSolarLand(), solarOnLand, maxSolarValue);;
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
 				final Foundation foundation = (Foundation) part;

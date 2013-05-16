@@ -53,8 +53,16 @@ public class MainPanel extends JPanel {
 	private EnergyPanel energyPanel;
 	private JPanel canvasPanel;
 	private JToggleButton energyToggleButton;
+	private JToggleButton solarButton;
 
 	final static Map<String, Integer> cityLatitute = new Hashtable<String, Integer>();
+	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
+		@Override
+		public void mouseExited(final MouseEvent e) {
+			SceneManager.getInstance().refresh();
+		}
+	};
+
 	static {
 		cityLatitute.put("Moscow", 55);
 		cityLatitute.put("Ottawa", 45);
@@ -116,54 +124,42 @@ public class MainPanel extends JPanel {
 	private JToolBar getAppToolbar() {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
-			final boolean showEditTools = !Config.isHeliodonMode();
 			appToolbar.add(getSelectButton());
-			if (showEditTools)
-				appToolbar.add(getResizeButton());
+			appToolbar.add(getResizeButton());
 			appToolbar.add(getZoomButton());
-			if (showEditTools) {
-				appToolbar.addSeparator();
-				appToolbar.add(getPlatformButton());
-				appToolbar.add(getWallButton());
-				appToolbar.add(getDoorButton());
-				appToolbar.add(getWindowButton());
-				appToolbar.add(getRoofButton());
-				appToolbar.add(getRoofHipButton());
-				appToolbar.add(getRoofCustomButton());
-				appToolbar.add(getRoofGableButton());
-				appToolbar.add(getFloorButton());
-			}
+			appToolbar.add(getRotAnimButton());
+			appToolbar.addSeparator();
+			appToolbar.add(getAnnotationToggleButton());
+			appToolbar.add(getPreviewButton());
+			appToolbar.addSeparator();
+			appToolbar.add(getPlatformButton());
+			appToolbar.add(getWallButton());
+			appToolbar.add(getDoorButton());
+			appToolbar.add(getWindowButton());
+			appToolbar.add(getRoofButton());
+			appToolbar.add(getRoofHipButton());
+			appToolbar.add(getRoofCustomButton());
+			appToolbar.add(getRoofGableButton());
+			appToolbar.add(getFloorButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
 			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimButton());
-			if (showEditTools) {
-				appToolbar.addSeparator();
-				appToolbar.add(getRotAnimButton());
-				appToolbar.addSeparator();
-			} else
-				appToolbar.add(getRotAnimButton());
-
-			appToolbar.add(getAnnotationToggleButton());
-			if (showEditTools)
-				appToolbar.add(getPreviewButton());
-
+			appToolbar.add(getSolarButton());
+			appToolbar.add(getEnergyToggleButton());
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
 			bg.add(zoomButton);
-			appToolbar.add(getEnergyToggleButton());
-			if (showEditTools) {
-				bg.add(resizeButton);
-				bg.add(platformButton);
-				bg.add(wallButton);
-				bg.add(doorButton);
-				bg.add(windowButton);
-				bg.add(roofButton);
-				bg.add(roofHipButton);
-				bg.add(roofCustomButton);
-				bg.add(floorButton);
-				bg.add(roofGableButton);
-			}
+			bg.add(resizeButton);
+			bg.add(platformButton);
+			bg.add(wallButton);
+			bg.add(doorButton);
+			bg.add(windowButton);
+			bg.add(roofButton);
+			bg.add(roofHipButton);
+			bg.add(roofCustomButton);
+			bg.add(floorButton);
+			bg.add(roofGableButton);
 		}
 		return appToolbar;
 	}
@@ -176,12 +172,7 @@ public class MainPanel extends JPanel {
 	public JToggleButton getSelectButton() {
 		if (selectButton == null) {
 			selectButton = new JToggleButton();
-			selectButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			selectButton.addMouseListener(refreshUponMouseExit);
 			selectButton.setSelected(true);
 			selectButton.setToolTipText("Select");
 			selectButton.setIcon(new ImageIcon(MainPanel.class.getResource("icons/select.png")));
@@ -189,7 +180,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -210,7 +201,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			wallButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -244,7 +235,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			doorButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -277,7 +268,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			roofButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -310,7 +301,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			windowButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -343,7 +334,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			platformButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -370,12 +361,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getLightButton() {
 		if (lightButton == null) {
 			lightButton = new JToggleButton();
-			lightButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			lightButton.addMouseListener(refreshUponMouseExit);
 			lightButton.setIcon(new ImageIcon(getClass().getResource("icons/shadow.png")));
 			lightButton.setToolTipText("Show shadows");
 			lightButton.addActionListener(new java.awt.event.ActionListener() {
@@ -390,7 +376,7 @@ public class MainPanel extends JPanel {
 					}
 					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
 					sunAnimButton.setEnabled(showSunTools);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -405,19 +391,14 @@ public class MainPanel extends JPanel {
 	private JToggleButton getRotAnimButton() {
 		if (rotAnimButton == null) {
 			rotAnimButton = new JToggleButton();
-			rotAnimButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			rotAnimButton.addMouseListener(refreshUponMouseExit);
 			rotAnimButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate.png")));
 			rotAnimButton.setToolTipText("Animate scene rotation");
 			rotAnimButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().toggleRotation();
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -438,7 +419,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			floorButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -471,7 +452,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			roofHipButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -498,19 +479,14 @@ public class MainPanel extends JPanel {
 	private JToggleButton getResizeButton() {
 		if (resizeButton == null) {
 			resizeButton = new JToggleButton();
-			resizeButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			resizeButton.addMouseListener(refreshUponMouseExit);
 			resizeButton.setIcon(new ImageIcon(getClass().getResource("icons/resize.png")));
 			resizeButton.setToolTipText("Resize house");
 			resizeButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(Operation.RESIZE);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -525,12 +501,7 @@ public class MainPanel extends JPanel {
 	public JToggleButton getHeliodonButton() {
 		if (heliodonButton == null) {
 			heliodonButton = new JToggleButton();
-			heliodonButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			heliodonButton.addMouseListener(refreshUponMouseExit);
 			heliodonButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_heliodon.png")));
 			heliodonButton.setToolTipText("Show sun heliodon");
 			heliodonButton.addItemListener(new java.awt.event.ItemListener() {
@@ -539,7 +510,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().setHeliodonControl(heliodonButton.isSelected());
 					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
 					sunAnimButton.setEnabled(showSunTools);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -554,12 +525,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getSunAnimButton() {
 		if (sunAnimButton == null) {
 			sunAnimButton = new JToggleButton();
-			sunAnimButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			sunAnimButton.addMouseListener(refreshUponMouseExit);
 			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_anim.png")));
 			sunAnimButton.setEnabled(false);
 			sunAnimButton.setToolTipText("Animate sun");
@@ -567,7 +533,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setSunAnim(sunAnimButton.isSelected());
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -582,12 +548,7 @@ public class MainPanel extends JPanel {
 	public JToggleButton getPreviewButton() {
 		if (previewButton == null) {
 			previewButton = new JToggleButton();
-			previewButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			previewButton.addMouseListener(refreshUponMouseExit);
 			previewButton.setIcon(new ImageIcon(getClass().getResource("icons/print_preview.png")));
 			previewButton.setToolTipText("Preview printable parts");
 			// must be ItemListner to be triggered when selection is changed by code
@@ -601,7 +562,7 @@ public class MainPanel extends JPanel {
 					}
 					deselect();
 					PrintController.getInstance().setPrintPreview(previewButton.isSelected());
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -622,7 +583,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_CUSTOM);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			roofCustomButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -650,19 +611,14 @@ public class MainPanel extends JPanel {
 		if (annotationToggleButton == null) {
 			annotationToggleButton = new JToggleButton();
 			annotationToggleButton.setSelected(Config.isApplet() ? false : true);
-			annotationToggleButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			annotationToggleButton.addMouseListener(refreshUponMouseExit);
 			annotationToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/annotation.png")));
 			annotationToggleButton.setToolTipText("Show annotations");
 			annotationToggleButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -677,12 +633,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getZoomButton() {
 		if (zoomButton == null) {
 			zoomButton = new JToggleButton();
-			zoomButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			zoomButton.addMouseListener(refreshUponMouseExit);
 			zoomButton.setIcon(new ImageIcon(getClass().getResource("icons/zoom.png")));
 			zoomButton.setToolTipText("Zoom");
 			zoomButton.addItemListener(new java.awt.event.ItemListener() {
@@ -690,7 +641,7 @@ public class MainPanel extends JPanel {
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 					SceneManager.getInstance().setZoomLock(zoomButton.isSelected());
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -711,7 +662,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					SceneManager.getInstance().setOperation(Operation.DRAW_ROOF_GABLE);
-					((Component)SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			roofGableButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -774,6 +725,7 @@ public class MainPanel extends JPanel {
 			energyToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/chart.png")));
 			energyToggleButton.addActionListener(new ActionListener() {
 				int defaultDividerSize = -1;
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (defaultDividerSize == -1)
@@ -788,5 +740,21 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return energyToggleButton;
+	}
+
+	private JToggleButton getSolarButton() {
+		if (solarButton == null) {
+			solarButton = new JToggleButton("");
+			solarButton.setToolTipText("Draw sun exposure colormap");
+			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
+			solarButton.addMouseListener(refreshUponMouseExit);
+			solarButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
+				}
+			});
+		}
+		return solarButton;
 	}
 }

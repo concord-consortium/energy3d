@@ -93,7 +93,11 @@ import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.pass.BasicPassManager;
 import com.ardor3d.renderer.pass.RenderPass;
+import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.LightState;
+import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
@@ -143,8 +147,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Node root = new Node("Root");
 	private final Node backgroundRoot = new Node("Scenary Root");
 	private final BasicPassManager passManager = new BasicPassManager();
-//	private final Mesh floor = new Quad("Floor", 2000, 2000);
-	private final Mesh floor = new Quad("Floor", 300, 300);
+	private final Mesh land = new Quad("Floor", 2000, 2000);
+	private final Mesh solarLand = new Quad("Floor", 300, 300);
 	private final Mesh invisibleFloor = new Quad("Floor", 2000, 2000);
 	private final Mesh gridsMesh = new Line("Floor Grids");
 	private final LightState lightState = new LightState();
@@ -182,7 +186,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Node newImport;
 	private Vector3 houseMoveStartPoint;
 	private ArrayList<Vector3> houseMovePoints;
-	private boolean solarColorMode = true;
+	private boolean solarColorMap = false;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -263,7 +267,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		backgroundRoot.getSceneHints().setAllPickingHints(false);
 		backgroundRoot.attachChild(createSky());
-		backgroundRoot.attachChild(createFloor());
+		backgroundRoot.attachChild(createLand());
+		solarLand.setVisible(false);
+		backgroundRoot.attachChild(solarLand);
 		invisibleFloor.setModelBound(new BoundingBox());
 		invisibleFloor.getSceneHints().setCullHint(CullHint.Always);
 		root.attachChild(invisibleFloor);
@@ -283,7 +289,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
 		shadowPass.setEnabled(false);
 		shadowPass.setUseObjectCullFace(true);
-		shadowPass.add(floor);
+		shadowPass.add(land);
+		shadowPass.add(solarLand);
 		shadowPass.add(Scene.getRoot());
 		shadowPass.addOccluder(Scene.getRoot());
 
@@ -498,32 +505,28 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return canvas;
 	}
 
-	private Mesh createFloor() {
-//		switch (theme) {
-//		case DEFAULT_THEME:
-//			floor.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
-//			break;
-//		case SKETCHUP_THEME:
-//			floor.setDefaultColor(new ColorRGBA(1, 1, 1, 0.9f));
-//			break;
-//		}
+	private Mesh createLand() {
+		switch (theme) {
+		case DEFAULT_THEME:
+			land.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
+			break;
+		case SKETCHUP_THEME:
+			land.setDefaultColor(new ColorRGBA(1, 1, 1, 0.9f));
+			break;
+		}
 
-//		final OffsetState offsetState = new OffsetState();
-//		offsetState.setTypeEnabled(OffsetType.Fill, true);
-//		offsetState.setFactor(0.5f);
-//		offsetState.setUnits(0.5f);
-//		floor.setRenderState(HousePart.offsetState);
-//
-//		final BlendState blendState = new BlendState();
-//		blendState.setBlendEnabled(true);
-//		floor.setRenderState(blendState);
-//		floor.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-//
-//		final MaterialState ms = new MaterialState();
-//		ms.setColorMaterial(ColorMaterial.Diffuse);
-//		floor.setRenderState(ms);
-		floor.updateModelBound();
-		return floor;
+		land.setRenderState(HousePart.offsetState);
+
+		final BlendState blendState = new BlendState();
+		blendState.setBlendEnabled(true);
+		land.setRenderState(blendState);
+		land.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+
+		final MaterialState ms = new MaterialState();
+		ms.setColorMaterial(ColorMaterial.Diffuse);
+		land.setRenderState(ms);
+		land.updateModelBound();
+		return land;
 	}
 
 	public void drawGrids(final double gridSize) {
@@ -1335,8 +1338,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return frameHandler.getTimer();
 	}
 
-	public Mesh getFloor() {
-		return floor;
+	public Mesh getLand() {
+		return land;
+	}
+
+	public Mesh getSolarLand() {
+		return solarLand;
 	}
 
 	public boolean isHeliodonControlEnabled() {
@@ -1547,11 +1554,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return canvas.getCanvasRenderer().getCamera();
 	}
 
-	public boolean isSolarColorMode() {
-		return solarColorMode;
+	public boolean isSolarColorMap() {
+		return solarColorMap;
 	}
 
-	public void setSolarColorMode(final boolean solarColorMode) {
-		this.solarColorMode = solarColorMode;
+	public void setSolarColorMap(final boolean solarColorMap) {
+		this.solarColorMap = solarColorMap;
+		solarLand.setVisible(solarColorMap);
+		Scene.getInstance().redrawAll();
+		EnergyPanel.getInstance().computeEnergy();
 	}
+
 }

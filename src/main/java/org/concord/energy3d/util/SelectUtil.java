@@ -32,7 +32,7 @@ public class SelectUtil {
 
 	public static PickedHousePart pickPart(final int x, final int y, Spatial target) {
 		if (target == null)
-			target = SceneManager.getInstance().getFloor();
+			target = SceneManager.getInstance().getLand();
 		pickResults.clear();
 		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
 		PickingUtil.findPick(target, pickRay, pickResults, false);
@@ -44,7 +44,7 @@ public class SelectUtil {
 		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
 
 		if (typeOfHousePart == null)
-			PickingUtil.findPick(SceneManager.getInstance().getFloor(), pickRay, pickResults, false);
+			PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
 		else
 			for (final HousePart housePart : Scene.getInstance().getParts())
 				if (!housePart.isFrozen() && typeOfHousePart.isInstance(housePart))
