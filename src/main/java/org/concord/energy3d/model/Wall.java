@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
@@ -55,7 +56,6 @@ import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
-	public static final double SOLAR_STEP = 1.0;
 	private static final long serialVersionUID = 1L;
 	private static final double MIN_WALL_LENGTH = 0.1;
 	private static double defaultWallHeight = 15.0; // the recommended default wall height is 3m
@@ -549,9 +549,9 @@ public class Wall extends HousePart {
 		}
 
 		if (computeSolarPoints) {
-			final int size = (int) Math.round(length / SOLAR_STEP);
+			final int size = (int) Math.round(length / EnergyPanel.SOLAR_STEP);
 			solarPoints = new ArrayList<ReadOnlyVector3>(size);
-			for (int i = 0, d = 0; i < size; i++, d += SOLAR_STEP)
+			for (int i = 0, d = 0; i < size; i++, d += EnergyPanel.SOLAR_STEP)
 				solarPoints.add(dir.multiply(Math.min(d, length), null).addLocal(o));
 		}
 	}

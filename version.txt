@@ -1429,7 +1429,8 @@ Version 0.5 - October 20, 2011
 - compute and apply solar exposure texture for the land
 - add toolbar button to enable/disable solar colormap mode
 - improve solar colormap contrast by not considering night time
-- fix problem with starting at noon instead of midnight when iterating over day for solar colormap 
+- fix problem with starting at noon instead of midnight when iterating over day for solar colormap
+- speed up solar color mapping
 
 - *assign unique id to each part
 - *save the state of heliodon with file

@@ -65,11 +65,14 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Spatial;
 
 public class EnergyPanel extends JPanel {
+	public static final double SOLAR_STEP = 2.0;
 	private static final long serialVersionUID = 1L;
 	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
 	private static final Map<String, Integer> cityLatitute = new Hashtable<String, Integer>();
 	private static final Map<String, int[]> avgMonthlyLowTemperatures = new Hashtable<String, int[]>();
 	private static final Map<String, int[]> avgMonthlyHighTemperatures = new Hashtable<String, int[]>();
+	private static final double COST_PER_KWH = 0.13;
+	private static final EnergyPanel instance = new EnergyPanel();
 
 	static {
 		cityLatitute.put("Moscow", 55);
@@ -110,8 +113,6 @@ public class EnergyPanel extends JPanel {
 		avgMonthlyHighTemperatures.put("Buenos Aires", new int[] { 28, 27, 25, 22, 18, 15, 14, 16, 18, 21, 24, 27 });
 	}
 
-	private static final double COST_PER_KWH = 0.13;
-	private static final EnergyPanel instance = new EnergyPanel();
 	private final DecimalFormat twoDecimals = new DecimalFormat("###,###.##");
 	private final DecimalFormat noDecimals = new DecimalFormat("###,###");
 	private final DecimalFormat moneyDecimals = new DecimalFormat("$###,###");
@@ -802,6 +803,10 @@ public class EnergyPanel extends JPanel {
 
 	private void computeEnergyNow() {
 		System.out.println("computeEnergyNow()");
+
+		if (SceneManager.getInstance().isSolarColorMap())
+			computeSolarColorMap();
+
 		if (autoCheckBox.isSelected())
 			updateOutsideTemperature();
 
@@ -860,21 +865,22 @@ public class EnergyPanel extends JPanel {
 		coolingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.cooling));
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
 
-		if (SceneManager.getInstance().isSolarColorMap()) {
-			final long t = System.nanoTime();
+	}
 
-			initSolarCollidables();
+	public void computeSolarColorMap() {
+		final long t = System.nanoTime();
 
-			solarOnWall.clear();
-			solarOnLand = null;
-			maxSolarValue = 1;
+		initSolarCollidables();
+
+		solarOnWall.clear();
+		solarOnLand = null;
+		maxSolarValue = 1;
 //			computeSolarOnLand(Heliodon.getInstance().getSunLocation());
 //			 computeSolarOnWalls(Heliodon.getInstance().getSunLocation());
-			computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
-			// printSolarOnWalls();
-			updateSolarValueOnAllHouses();
-			System.out.println("time = " + (System.nanoTime() - t) / 1000000000);
-		}
+		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
+		// printSolarOnWalls();
+		updateSolarValueOnAllHouses();
+		System.out.println("time = " + (System.nanoTime() - t) / 1000000000);
 	}
 
 	private double parseUFactor(final JComboBox comboBox) {
@@ -1045,7 +1051,7 @@ public class EnergyPanel extends JPanel {
 				final Wall wall = (Wall) part;
 				final List<ReadOnlyVector3> solarPoints = wall.getSolarPoints();
 				long[][] solar = solarOnWall.get(wall);
-				final int rows = (int) (wall.getHighestPoint() / Wall.SOLAR_STEP);
+				final int rows = (int) (wall.getHighestPoint() / SOLAR_STEP);
 				final int cols = solarPoints.size();
 				if (solar == null) {
 					solar = new long[rows][cols];
@@ -1056,7 +1062,7 @@ public class EnergyPanel extends JPanel {
 				for (int col = 0; col < cols; col++) {
 					p.set(solarPoints.get(col));
 					for (int row = 0; row < rows; row++) {
-						p.setZ(baseZ + row * Wall.SOLAR_STEP);
+						p.setZ(baseZ + row * SOLAR_STEP);
 						final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
 						final PickResults pickResults = new PrimitivePickResults();
 						for (final Spatial spatial : solarCollidables)
@@ -1077,16 +1083,16 @@ public class EnergyPanel extends JPanel {
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
-		// final int rows = (int) (Heliodon.getInstance().getRadius() * 2 / Wall.SOLAR_STEP);
-		final int rows = (int) (300 / Wall.SOLAR_STEP);
+		final double SOLAR_STEP = 10;
+		final int rows = (int) (300 / SOLAR_STEP);
 		final int cols = rows;
 		if (solarOnLand == null)
 			solarOnLand = new long[rows][cols];
 		final Vector3 p = new Vector3();
 		for (int col = 0; col < cols; col++) {
-			p.setX((col - cols / 2) * Wall.SOLAR_STEP);
+			p.setX((col - cols / 2) * SOLAR_STEP);
 			for (int row = 0; row < rows; row++) {
-				p.setY((row - rows / 2) * Wall.SOLAR_STEP);
+				p.setY((row - rows / 2) * SOLAR_STEP);
 				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
 				for (final Spatial spatial : solarCollidables)
