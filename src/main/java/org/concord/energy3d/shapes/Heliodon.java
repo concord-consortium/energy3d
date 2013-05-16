@@ -200,7 +200,7 @@ public class Heliodon {
 		if (isNightTime()) {
 			final Calendar calendar = Calendar.getInstance();
 			calendar.set(Calendar.HOUR, 0);
-			calendar.set(Calendar.AM_PM, 1);
+			calendar.set(Calendar.AM_PM, Calendar.PM);
 			calendar.set(Calendar.MINUTE, 0);
 			setTime(calendar.getTime());
 			EnergyPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());

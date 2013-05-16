@@ -861,16 +861,19 @@ public class EnergyPanel extends JPanel {
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
 
 		if (SceneManager.getInstance().isSolarColorMap()) {
-		initSolarCollidables();
+			final long t = System.nanoTime();
 
-		solarOnWall.clear();
-		solarOnLand = null;
-		maxSolarValue = 1;
-//		computerSolarOnWalls(Heliodon.getInstance().getSunLocation());
-//		computerSolarOnLand(Heliodon.getInstance().getSunLocation());
-		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
-		// printSolarOnWalls();
-		updateSolarValueOnAllHouses();
+			initSolarCollidables();
+
+			solarOnWall.clear();
+			solarOnLand = null;
+			maxSolarValue = 1;
+//			computeSolarOnLand(Heliodon.getInstance().getSunLocation());
+//			 computeSolarOnWalls(Heliodon.getInstance().getSunLocation());
+			computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
+			// printSolarOnWalls();
+			updateSolarValueOnAllHouses();
+			System.out.println("time = " + (System.nanoTime() - t) / 1000000000);
 		}
 	}
 
@@ -902,7 +905,7 @@ public class EnergyPanel extends JPanel {
 
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
-		today.set(Calendar.HOUR, 0);
+		today.set(Calendar.HOUR_OF_DAY, 0);
 
 		final int day = today.get(Calendar.DAY_OF_MONTH);
 		final int daysInMonth = today.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -949,7 +952,7 @@ public class EnergyPanel extends JPanel {
 			energyToday.solar += energyThisHour.solar / 1000.0;
 			energyToday.heating += energyThisHour.heating / 1000.0;
 			energyToday.cooling += energyThisHour.cooling / 1000.0;
-			today.add(Calendar.HOUR, 1);
+			today.add(Calendar.HOUR_OF_DAY, 1);
 		}
 		return energyToday;
 	}
@@ -1074,7 +1077,7 @@ public class EnergyPanel extends JPanel {
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
-//		final int rows = (int) (Heliodon.getInstance().getRadius() * 2 / Wall.SOLAR_STEP);
+		// final int rows = (int) (Heliodon.getInstance().getRadius() * 2 / Wall.SOLAR_STEP);
 		final int rows = (int) (300 / Wall.SOLAR_STEP);
 		final int cols = rows;
 		if (solarOnLand == null)
@@ -1098,19 +1101,21 @@ public class EnergyPanel extends JPanel {
 		final Heliodon heliodon = Heliodon.getInstance();
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
-		today.set(Calendar.HOUR, 0);
+		today.set(Calendar.HOUR_OF_DAY, 0);
 		final int SOLAR_MINUTE_STEP = 15;
 		for (int minute = 0; minute < 1440; minute += SOLAR_MINUTE_STEP) {
 			final ReadOnlyVector3 sunLocation = heliodon.computeSunLocation(today);
-			computeSolarOnWalls(sunLocation);
-			computeSolarOnLand(sunLocation);
+			if (sunLocation.getZ() > 0) {
+				computeSolarOnWalls(sunLocation);
+				computeSolarOnLand(sunLocation);
+				maxSolarValue++;
+			}
 			today.add(Calendar.MINUTE, SOLAR_MINUTE_STEP);
-			maxSolarValue++;
 		}
 	}
 
 	private void updateSolarValueOnAllHouses() {
-		MeshLib.applySolarTexture(SceneManager.getInstance().getSolarLand(), solarOnLand, maxSolarValue);;
+		MeshLib.applySolarTexture(SceneManager.getInstance().getSolarLand(), solarOnLand, maxSolarValue);
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
 				final Foundation foundation = (Foundation) part;
