@@ -35,6 +35,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
@@ -169,6 +170,7 @@ public class EnergyPanel extends JPanel {
 	private final List<Spatial> solarCollidables = new ArrayList<Spatial>();
 	private long maxSolarValue;
 	private long[][] solarOnLand;
+	private JProgressBar progressBar;
 
 	private class EnergyAmount {
 		double solar;
@@ -182,6 +184,9 @@ public class EnergyPanel extends JPanel {
 
 	private EnergyPanel() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+		progressBar = new JProgressBar();
+		add(progressBar);
 
 		final JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new TitledBorder(null, "Time & Location", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -793,7 +798,16 @@ public class EnergyPanel extends JPanel {
 							e.printStackTrace();
 						}
 						computeRequest = false;
-						computeEnergyNow();
+						try {
+							computeEnergyNow();
+						} finally {
+							try {
+								Thread.sleep(500);
+							} catch (final InterruptedException e) {
+								e.printStackTrace();
+							}
+							progressBar.setValue(0);
+						}
 					} while (computeRequest);
 				}
 			};
@@ -803,6 +817,8 @@ public class EnergyPanel extends JPanel {
 
 	private void computeEnergyNow() {
 		System.out.println("computeEnergyNow()");
+
+		progressBar.setValue(0);
 
 		if (SceneManager.getInstance().isSolarColorMap())
 			computeSolarColorMap();
@@ -865,6 +881,7 @@ public class EnergyPanel extends JPanel {
 		coolingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.cooling));
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
 
+		progressBar.setValue(100);
 	}
 
 	public void computeSolarColorMap() {
@@ -1119,6 +1136,7 @@ public class EnergyPanel extends JPanel {
 				maxSolarValue++;
 			}
 			today.add(Calendar.MINUTE, SOLAR_MINUTE_STEP);
+			progress();
 		}
 	}
 
@@ -1155,5 +1173,10 @@ public class EnergyPanel extends JPanel {
 				System.out.println();
 			}
 		}
+	}
+
+	private void progress() {
+		progressBar.setValue(progressBar.getValue() + 1);
+		System.out.println(progressBar.getValue());
 	}
 }
