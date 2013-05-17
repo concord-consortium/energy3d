@@ -301,7 +301,7 @@ public class EnergyPanel extends JPanel {
 			public void stateChanged(final javax.swing.event.ChangeEvent e) {
 				if (!cityComboBox.getSelectedItem().equals("") && !cityLatitute.values().contains(latitudeSpinner.getValue()))
 					cityComboBox.setSelectedItem("");
-				Heliodon.getInstance().setObserverLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
+				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				computeEnergy();
 			}
 		});
@@ -943,8 +943,8 @@ public class EnergyPanel extends JPanel {
 			portion = (double) (day - halfMonth) / totalDaysOfMonth;
 		}
 
-		final int[] monthlyLowTemperatures = avgMonthlyLowTemperatures.get(getSelectedCity());
-		final int[] monthlyHighTemperatures = avgMonthlyHighTemperatures.get(getSelectedCity());
+		final int[] monthlyLowTemperatures = avgMonthlyLowTemperatures.get(getCity());
+		final int[] monthlyHighTemperatures = avgMonthlyHighTemperatures.get(getCity());
 		final double outsideLowTemperature;
 		final double outsideHighTemperature;
 		if (monthlyLowTemperatures == null || monthlyHighTemperatures == null) {
@@ -970,8 +970,12 @@ public class EnergyPanel extends JPanel {
 		return energyToday;
 	}
 
-	private Object getSelectedCity() {
-		return cityComboBox.getSelectedItem();
+	public String getCity() {
+		return (String) cityComboBox.getSelectedItem();
+	}
+
+	public void setCity(final String city) {
+		cityComboBox.setSelectedItem(city);
 	}
 
 	private EnergyAmount computeEnergyRate(final ReadOnlyVector3 sunLocation, final double insideTemperature, final double outsideTemperature) {
@@ -1183,5 +1187,13 @@ public class EnergyPanel extends JPanel {
 
 	private void progress() {
 		progressBar.setValue(progressBar.getValue() + 1);
+	}
+
+	public void setLatitude(final int latitude) {
+		latitudeSpinner.setValue(latitude);
+	}
+
+	public int getLatitude() {
+		return (Integer)latitudeSpinner.getValue();
 	}
 }

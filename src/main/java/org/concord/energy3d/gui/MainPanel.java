@@ -528,7 +528,7 @@ public class MainPanel extends JPanel {
 			sunAnimButton.addMouseListener(refreshUponMouseExit);
 			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_anim.png")));
 			sunAnimButton.setEnabled(false);
-			sunAnimButton.setToolTipText("Animate sun");
+			sunAnimButton.setToolTipText("Animate sun motion");
 			sunAnimButton.addItemListener(new java.awt.event.ItemListener() {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
@@ -746,7 +746,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getSolarButton() {
 		if (solarButton == null) {
 			solarButton = new JToggleButton("");
-			solarButton.setToolTipText("Draw sun exposure color map");
+			solarButton.setToolTipText("Generate solar radiation heat map");
 			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
 			solarButton.addMouseListener(refreshUponMouseExit);
 			solarButton.addActionListener(new ActionListener() {

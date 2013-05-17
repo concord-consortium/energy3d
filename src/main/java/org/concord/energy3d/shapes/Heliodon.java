@@ -85,7 +85,7 @@ public class Heliodon {
 	private final double baseAngle = 0;
 	private double hourAngle;
 	private double declinationAngle;
-	private double observerLatitude = DEFAULT_LATITUDE / 180.0 * Math.PI;
+	private double latitude = DEFAULT_LATITUDE / 180.0 * Math.PI;
 	private boolean sunGrabbed = false;
 	private boolean selectDifferentDeclinationWithMouse = false;
 	private boolean dirtySunRegion = false;
@@ -348,7 +348,7 @@ public class Heliodon {
 					}
 					rowCounter++;
 					if (resultRow != -1) {
-						if (rowCounter < DECLINATION_DIVISIONS && observerLatitude > 0)
+						if (rowCounter < DECLINATION_DIVISIONS && latitude > 0)
 							resultRow += DECLINATION_DIVISIONS - rowCounter;
 						final double newDeclinationAngle = -TILT_ANGLE + (2.0 * TILT_ANGLE * resultRow / DECLINATION_DIVISIONS);
 						declinationChanged = Math.abs(newDeclinationAngle - declinationAngle) > MathUtils.EPSILON;
@@ -420,12 +420,12 @@ public class Heliodon {
 			SceneManager.getInstance().refresh();
 	}
 
-	public double getObserverLatitude() {
-		return observerLatitude;
+	public double getLatitude() {
+		return latitude;
 	}
 
-	public void setObserverLatitude(final double observerLatitude) {
-		this.observerLatitude = toPlusMinusPIRange(observerLatitude, -MathUtils.HALF_PI, MathUtils.HALF_PI);
+	public void setLatitude(final double latitude) {
+		this.latitude = toPlusMinusPIRange(latitude, -MathUtils.HALF_PI, MathUtils.HALF_PI);
 
 		dirtySunRegion = true;
 		dirtySunPath = true;
@@ -458,6 +458,7 @@ public class Heliodon {
 	public void updateSize() {
 		Scene.getRoot().updateWorldBound(true);
 		final BoundingVolume bounds = Scene.getRoot().getWorldBound();
+		System.out.println(bounds);
 		if (bounds == null)
 			root.setScale(1);
 		else {
@@ -555,10 +556,10 @@ public class Heliodon {
 					hourAngle2 = Math.PI;
 				if (declinationAngle2 > TILT_ANGLE)
 					declinationAngle2 = TILT_ANGLE;
-				final Vector3 v1 = computeSunLocation(hourAngle, declinationAngle, observerLatitude);
-				final Vector3 v2 = computeSunLocation(hourAngle2, declinationAngle, observerLatitude);
-				final Vector3 v3 = computeSunLocation(hourAngle2, declinationAngle2, observerLatitude);
-				final Vector3 v4 = computeSunLocation(hourAngle, declinationAngle2, observerLatitude);
+				final Vector3 v1 = computeSunLocation(hourAngle, declinationAngle, latitude);
+				final Vector3 v2 = computeSunLocation(hourAngle2, declinationAngle, latitude);
+				final Vector3 v3 = computeSunLocation(hourAngle2, declinationAngle2, latitude);
+				final Vector3 v4 = computeSunLocation(hourAngle, declinationAngle2, latitude);
 				if (v1.getZ() >= 0 || v2.getZ() >= 0 || v3.getZ() >= 0 || v4.getZ() >= 0) {
 					buf.put(v1.getXf()).put(v1.getYf()).put(v1.getZf()).put(v2.getXf()).put(v2.getYf()).put(v2.getZf()).put(v3.getXf()).put(v3.getYf()).put(v3.getZf()).put(v4.getXf()).put(v4.getYf()).put(v4.getZf());
 					limit += 12;
@@ -579,7 +580,7 @@ public class Heliodon {
 		final double step = MathUtils.TWO_PI / HOUR_DIVISIONS;
 		int limit = 0;
 		for (double hourAngle = -Math.PI; hourAngle < Math.PI + step / 2.0; hourAngle += step) {
-			final Vector3 v = computeSunLocation(hourAngle, declinationAngle, observerLatitude);
+			final Vector3 v = computeSunLocation(hourAngle, declinationAngle, latitude);
 			if (v.getZ() > -0.3) {
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 				limit += 3;
@@ -592,7 +593,7 @@ public class Heliodon {
 	}
 
 	private void drawSun() {
-		final Vector3 sunLocation = computeSunLocation(hourAngle, declinationAngle, observerLatitude);
+		final Vector3 sunLocation = computeSunLocation(hourAngle, declinationAngle, latitude);
 		setSunLocation(sunLocation);
 	}
 
@@ -608,7 +609,7 @@ public class Heliodon {
 	}
 
 	public ReadOnlyVector3 computeSunLocation(final Calendar calendar) {
-		return computeSunLocation(computeHourAngle(calendar), computeDeclinationAngle(calendar), observerLatitude);
+		return computeSunLocation(computeHourAngle(calendar), computeDeclinationAngle(calendar), latitude);
 	}
 
 	public ReadOnlyVector3 getSunLocation() {

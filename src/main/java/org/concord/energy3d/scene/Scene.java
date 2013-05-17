@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
@@ -19,6 +20,7 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 
@@ -78,6 +80,10 @@ public class Scene implements Serializable {
 	private int version = currentVersion;
 	private boolean isAnnotationsVisible = true;
 	private long idCounter;
+	private Calendar calendar = Calendar.getInstance();
+	private String city = "Boston";
+	private int latitude;
+	private  boolean isHeliodonVisible;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -172,16 +178,26 @@ public class Scene implements Serializable {
 				if (url != null) {
 					for (final HousePart housePart : instance.getParts())
 						originalHouseRoot.attachChild(housePart.getRoot());
-					redrawAll = true;
+//					redrawAll = true;
+					/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
+					instance.redrawAllNow();
 					System.out.println("done");
 				}
 
 				root.updateWorldBound(true);
 				SceneManager.getInstance().updateHeliodonAndAnnotationSize();
+				final EnergyPanel energyPanel = EnergyPanel.getInstance();
+				if (instance.calendar != null) {
+					energyPanel.getDateSpinner().setValue(instance.calendar.getTime());
+					energyPanel.getTimeSpinner().setValue(instance.calendar.getTime());
+					energyPanel.setLatitude(instance.latitude);
+					energyPanel.setCity(instance.city);
+					MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
+				}
 				SceneManager.getInstance().getUndoManager().die();
 				SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
 				Scene.getInstance().setEdited(false);
-				EnergyPanel.getInstance().computeEnergy();
+				energyPanel.computeEnergy();
 				return null;
 			}
 		});
@@ -286,6 +302,11 @@ public class Scene implements Serializable {
 		instance.cleanup();
 		// save camera to file
 		saveCameraLocation();
+
+		instance.calendar = Heliodon.getInstance().getCalander();
+		instance.latitude = EnergyPanel.getInstance().getLatitude();
+		instance.city = EnergyPanel.getInstance().getCity();
+		instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 
 		if (setAsCurrentFile)
 			Scene.url = url;
