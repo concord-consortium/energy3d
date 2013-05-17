@@ -1431,6 +1431,7 @@ Version 0.5 - October 20, 2011
 - improve solar colormap contrast by not considering night time
 - fix problem with starting at noon instead of midnight when iterating over day for solar colormap
 - speed up solar color mapping
+- draw sun exposure colormap on frozen buildings
 
 - *assign unique id to each part
 - *save the state of heliodon with file

@@ -723,6 +723,7 @@ public class MainPanel extends JPanel {
 			energyToggleButton.setToolTipText("Show energy analysis");
 			energyToggleButton.setSelected(true);
 			energyToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/chart.png")));
+			energyToggleButton.addMouseListener(refreshUponMouseExit);
 			energyToggleButton.addActionListener(new ActionListener() {
 				int defaultDividerSize = -1;
 
@@ -745,7 +746,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getSolarButton() {
 		if (solarButton == null) {
 			solarButton = new JToggleButton("");
-			solarButton.setToolTipText("Draw sun exposure colormap");
+			solarButton.setToolTipText("Draw sun exposure color map");
 			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
 			solarButton.addMouseListener(refreshUponMouseExit);
 			solarButton.addActionListener(new ActionListener() {

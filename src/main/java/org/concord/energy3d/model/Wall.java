@@ -359,7 +359,7 @@ public class Wall extends HousePart {
 		computeNormalAndXYTransform();
 
 		wallAndWindowsPoints = computeWallAndWindowPolygon(false);
-		if (!isFrozen())
+//		if (!isFrozen())
 			extendToRoof(wallAndWindowsPoints.get(0), true);
 
 		if (Scene.getInstance().isDrawThickness() && isShortWall) {
@@ -522,7 +522,7 @@ public class Wall extends HousePart {
 		final double length = dir.length();
 		dir.normalizeLocal();
 
-		if (roof != null) {
+		if (roof != null && !isFrozen()) {
 			Vector3 direction = null;
 			ReadOnlyVector3 previousStretchPoint = polygon.get(3);
 

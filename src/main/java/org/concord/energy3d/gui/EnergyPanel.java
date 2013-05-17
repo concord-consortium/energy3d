@@ -1046,8 +1046,10 @@ public class EnergyPanel extends JPanel {
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Wall && part.getFaceDirection().dot(directionTowardSun) > 0) {
+		final ArrayList<HousePart> parts = Scene.getInstance().getParts();
+		for (int i = 0; i < parts.size(); i++) {
+			final HousePart part = parts.get(i);
+			if (part instanceof Wall && part.isDrawCompleted() && part.getFaceDirection().dot(directionTowardSun) > 0) {
 				final Wall wall = (Wall) part;
 				final List<ReadOnlyVector3> solarPoints = wall.getSolarPoints();
 				long[][] solar = solarOnWall.get(wall);
