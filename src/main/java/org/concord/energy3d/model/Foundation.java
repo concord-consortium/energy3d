@@ -524,6 +524,11 @@ public class Foundation extends HousePart {
 	}
 
 	public void setSolarValue(final long solarValue) {
-		solarLabel.setText(String.valueOf(solarValue));
+		if (solarValue == 0)
+			solarLabel.setVisible(false);
+		else {
+			solarLabel.setVisible(true);
+			solarLabel.setText(String.valueOf(solarValue));
+		}
 	}
 }

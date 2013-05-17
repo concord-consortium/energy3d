@@ -822,6 +822,12 @@ public class EnergyPanel extends JPanel {
 
 		if (SceneManager.getInstance().isSolarColorMap())
 			computeSolarColorMap();
+		else {
+			for (final HousePart part : Scene.getInstance().getParts())
+				if (part instanceof Foundation)
+					((Foundation) part).setSolarValue(0);
+			SceneManager.getInstance().refresh();
+		}
 
 		if (autoCheckBox.isSelected())
 			updateOutsideTemperature();
@@ -882,22 +888,6 @@ public class EnergyPanel extends JPanel {
 		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
 
 		progressBar.setValue(100);
-	}
-
-	public void computeSolarColorMap() {
-		final long t = System.nanoTime();
-
-		initSolarCollidables();
-
-		solarOnWall.clear();
-		solarOnLand = null;
-		maxSolarValue = 1;
-//			computeSolarOnLand(Heliodon.getInstance().getSunLocation());
-//			 computeSolarOnWalls(Heliodon.getInstance().getSunLocation());
-		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
-		// printSolarOnWalls();
-		updateSolarValueOnAllHouses();
-		System.out.println("time = " + (System.nanoTime() - t) / 1000000000);
 	}
 
 	private double parseUFactor(final JComboBox comboBox) {
@@ -1046,6 +1036,22 @@ public class EnergyPanel extends JPanel {
 		return timeSpinner;
 	}
 
+	private void computeSolarColorMap() {
+			final long t = System.nanoTime();
+
+			initSolarCollidables();
+
+			solarOnWall.clear();
+			solarOnLand = null;
+			maxSolarValue = 1;
+	//			computeSolarOnLand(Heliodon.getInstance().getSunLocation());
+	//			 computeSolarOnWalls(Heliodon.getInstance().getSunLocation());
+			computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
+			// printSolarOnWalls();
+			updateSolarValueOnAllHouses();
+			System.out.println("time = " + (System.nanoTime() - t) / 1000000000);
+		}
+
 	private void initSolarCollidables() {
 		solarCollidables.clear();
 		for (final HousePart part : Scene.getInstance().getParts()) {
@@ -1177,6 +1183,5 @@ public class EnergyPanel extends JPanel {
 
 	private void progress() {
 		progressBar.setValue(progressBar.getValue() + 1);
-		System.out.println(progressBar.getValue());
 	}
 }

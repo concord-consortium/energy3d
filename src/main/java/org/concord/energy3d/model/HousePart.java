@@ -80,6 +80,7 @@ public abstract class HousePart implements Serializable {
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
+	private long id;
 
 	static {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
@@ -137,6 +138,9 @@ public abstract class HousePart implements Serializable {
 		orgHeight = height;
 		flattenCenter = new Vector3();
 		isPrintVertical = false;
+
+		if (id == 0)
+			id = Scene.getInstance().nextID();
 
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");
@@ -675,7 +679,7 @@ public abstract class HousePart implements Serializable {
 
 	@Override
 	public String toString() {
-		String s = this.getClass().getSimpleName() + "(" + Integer.toHexString(hashCode()) + ")";
+		String s = this.getClass().getSimpleName() + "(" + id + ")";
 		for (int i = 0; i < points.size(); i += 2)
 			s += "\t" + Util.toString(getAbsPoint(i));
 		s += ("\teditPoint = " + editPointIndex);
@@ -751,6 +755,10 @@ public abstract class HousePart implements Serializable {
 
 	public boolean isFrozen() {
 		return freeze;
+	}
+
+	public long getId() {
+		return id;
 	}
 
 }

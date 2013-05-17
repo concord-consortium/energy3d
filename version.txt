@@ -1435,8 +1435,9 @@ Version 0.5 - October 20, 2011
 - add progress bar to gui to show solar color map computations progress
 - clear the texture when in solar color map mode
 - maintain the color map while refreshing the color map
+- assign unique id to each part
+- hide solar exposure label when color mapping is turned off
 
-- *assign unique id to each part
 - *save the state of heliodon with file
 - *add text box for design rational
 

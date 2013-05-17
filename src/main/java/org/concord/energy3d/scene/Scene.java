@@ -77,6 +77,7 @@ public class Scene implements Serializable {
 	private double annotationScale = 0.2;
 	private int version = currentVersion;
 	private boolean isAnnotationsVisible = true;
+	private long idCounter;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -625,5 +626,9 @@ public class Scene implements Serializable {
 		if (freeze)
 			SceneManager.getInstance().hideAllEditPoints();
 		redrawAll();
+	}
+
+	public long nextID() {
+		return ++idCounter;
 	}
 }
