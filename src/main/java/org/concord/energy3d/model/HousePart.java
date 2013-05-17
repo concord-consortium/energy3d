@@ -69,13 +69,14 @@ public abstract class HousePart implements Serializable {
 	protected transient Vector3 flattenCenter;
 	protected transient double orgHeight;
 	protected transient boolean relativeToHorizontal;
+	private transient boolean isPrintVertical;
+	private transient boolean textureCleared;
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
 	protected HousePart container = null;
 	protected double height;
 	protected int editPointIndex = -1;
 	protected boolean drawCompleted = false;
-	private transient boolean isPrintVertical;
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
@@ -623,17 +624,24 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
-		if (isFrozen()) {
+		final boolean isSolarColorMap = SceneManager.getInstance().isSolarColorMap();
+		if (isSolarColorMap && textureCleared)
+			return;
+
+		if (isFrozen() || isSolarColorMap) {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(Scene.GRAY);
+			textureCleared = true;
 		} else if (textureMode == TextureMode.None || getTextureFileName() == null) {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(defaultColor);
+			textureCleared = false;
 		} else {
 			final TextureState ts = new TextureState();
 			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
+			textureCleared = false;
 		}
 	}
 

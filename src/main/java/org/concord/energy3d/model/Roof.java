@@ -141,8 +141,6 @@ public abstract class Roof extends HousePart {
 		for (final Spatial child : roofPartsRoot.getChildren()) {
 			final Mesh mesh = (Mesh) ((Node) child).getChild(0);
 			mesh.setUserData(new UserData(this, roofPartIndex, false));
-			if (Scene.getInstance().getTextureMode() == TextureMode.None)
-				mesh.setDefaultColor(Scene.getInstance().getRoofColor());
 			roofPartIndex++;
 		}
 		drawWireframe();
