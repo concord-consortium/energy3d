@@ -879,7 +879,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// }));
 
 		// XIE: Run/pause model replay
-		if (Config.isAssessmentMode()) {
+		if (Config.isResearchMode()) {
 			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
