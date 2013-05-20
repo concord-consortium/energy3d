@@ -63,7 +63,7 @@ public class Config {
 		return false;
 	}
 
-	public static boolean isAssessmentMode() {
+	public static boolean isResearchMode() {
 		return false;
 	}
 

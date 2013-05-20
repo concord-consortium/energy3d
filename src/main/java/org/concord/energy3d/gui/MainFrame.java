@@ -184,7 +184,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes mainPanel
-	 *
+	 * 
 	 * @return org.concord.energy3d.gui.MainPanel
 	 */
 	public MainPanel getMainPanel() {
@@ -237,7 +237,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes this
-	 *
+	 * 
 	 * @return void
 	 */
 	private void initialize() {
@@ -334,7 +334,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes appMenuBar
-	 *
+	 * 
 	 * @return javax.swing.JMenuBar
 	 */
 	private JMenuBar getAppMenuBar() {
@@ -351,7 +351,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes fileMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getFileMenu() {
@@ -376,7 +376,7 @@ public class MainFrame extends JFrame {
 			fileMenu.setText("File");
 			fileMenu.add(getNewMenuItem());
 			fileMenu.add(getOpenMenuItem());
-			if (Config.isAssessmentMode())
+			if (Config.isResearchMode())
 				fileMenu.add(getOpenFolderMenuItem());
 			fileMenu.add(getSaveMenuItem());
 			fileMenu.add(getSaveasMenuItem());
@@ -399,7 +399,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes newMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getNewMenuItem() {
@@ -420,7 +420,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes openMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getOpenMenuItem() {
@@ -560,7 +560,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes saveMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getSaveMenuItem() {
@@ -579,7 +579,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes printMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getPrintMenuItem() {
@@ -615,7 +615,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes previewMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getPreviewMenuItem() {
@@ -633,7 +633,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes cameraMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	public JMenu getCameraMenu() {
@@ -669,7 +669,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes orbitMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getOrbitMenuItem() {
@@ -689,7 +689,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes firstPersonMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getFirstPersonMenuItem() {
@@ -708,7 +708,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes lightingMenu
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getShadeMenu() {
@@ -727,7 +727,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes exitMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getExitMenuItem() {
@@ -746,7 +746,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes helpMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getHelpMenu() {
@@ -770,7 +770,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getAboutMenuItem() {
@@ -789,7 +789,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutDialog
-	 *
+	 * 
 	 * @return javax.swing.JDialog
 	 */
 	private JDialog getAboutDialog() {
@@ -798,7 +798,7 @@ public class MainFrame extends JFrame {
 			aboutDialog.setTitle("About");
 			final JPanel p = new JPanel(new BorderLayout());
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + Config.VERSION + "<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grant #0918449 to the Concord Consortium. </html>"), BorderLayout.CENTER);
+			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + Config.VERSION + "<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grant #0918449.</html>"), BorderLayout.CENTER);
 			aboutDialog.setContentPane(p);
 			aboutDialog.pack();
 		}
@@ -807,7 +807,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes wallThicknessMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	private JCheckBoxMenuItem getWallThicknessMenuItem() {
@@ -862,7 +862,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
-			if (Config.isClassroomMode()) {
+			if (Config.isResearchMode()) {
 				sceneMenu.add(getFreezeMenuItem());
 				sceneMenu.add(getUnfreezeMenuItem());
 			}
@@ -1060,8 +1060,16 @@ public class MainFrame extends JFrame {
 				File file = fileChooser.getSelectedFile();
 				if (!file.getName().toLowerCase().endsWith(".ng3"))
 					file = new File(file.toString() + ".ng3");
-				Scene.save(file.toURI().toURL(), true);
-				updateTitleBar();
+				boolean doIt = true;
+				if (file.exists()) {
+					if (JOptionPane.showConfirmDialog(MainFrame.this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+						doIt = false;
+					}
+				}
+				if (doIt) {
+					Scene.save(file.toURI().toURL(), true);
+					updateTitleBar();
+				}
 			} catch (final Throwable err) {
 				err.printStackTrace();
 				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -1573,9 +1581,17 @@ public class MainFrame extends JFrame {
 				if (!file.getName().toLowerCase().endsWith(".png"))
 					file = new File(file.toString() + ".png");
 				System.out.print(file + "...");
-				final BufferedImage snapShot = Printout.takeSnapShot();
-				ImageIO.write(snapShot, "png", file);
-				System.out.println("done");
+				boolean doIt = true;
+				if (file.exists()) {
+					if (JOptionPane.showConfirmDialog(MainFrame.this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+						doIt = false;
+					}
+				}
+				if (doIt) {
+					final BufferedImage snapShot = Printout.takeSnapShot();
+					ImageIO.write(snapShot, "png", file);
+					System.out.println("done");
+				}
 			} catch (final Throwable err) {
 				err.printStackTrace();
 				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -1586,7 +1602,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem getFreezeMenuItem() {
 		if (freezeMenuItem == null) {
 			freezeMenuItem = new JMenuItem("Freeze");
-			freezeMenuItem.setVisible(false);
 			freezeMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1600,7 +1615,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem getUnfreezeMenuItem() {
 		if (unfreezeMenuItem == null) {
 			unfreezeMenuItem = new JMenuItem("Unfreeze");
-			unfreezeMenuItem.setVisible(false);
 			unfreezeMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
