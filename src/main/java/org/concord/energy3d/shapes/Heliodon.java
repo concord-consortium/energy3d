@@ -458,7 +458,6 @@ public class Heliodon {
 	public void updateSize() {
 		Scene.getRoot().updateWorldBound(true);
 		final BoundingVolume bounds = Scene.getRoot().getWorldBound();
-		System.out.println(bounds);
 		if (bounds == null)
 			root.setScale(1);
 		else {

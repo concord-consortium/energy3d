@@ -80,8 +80,8 @@ public class Scene implements Serializable {
 	private int version = currentVersion;
 	private boolean isAnnotationsVisible = true;
 	private long idCounter;
-	private Calendar calendar = Calendar.getInstance();
-	private String city = "Boston";
+	private Calendar calendar;
+	private String city;
 	private int latitude;
 	private  boolean isHeliodonVisible;
 
