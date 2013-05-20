@@ -138,6 +138,7 @@ public class MainFrame extends JFrame {
 
 	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
+	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -184,7 +185,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes mainPanel
-	 * 
+	 *
 	 * @return org.concord.energy3d.gui.MainPanel
 	 */
 	public MainPanel getMainPanel() {
@@ -237,7 +238,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes this
-	 * 
+	 *
 	 * @return void
 	 */
 	private void initialize() {
@@ -334,7 +335,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes appMenuBar
-	 * 
+	 *
 	 * @return javax.swing.JMenuBar
 	 */
 	private JMenuBar getAppMenuBar() {
@@ -351,7 +352,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes fileMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getFileMenu() {
@@ -399,7 +400,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes newMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getNewMenuItem() {
@@ -420,7 +421,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes openMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getOpenMenuItem() {
@@ -474,11 +475,11 @@ public class MainFrame extends JFrame {
 					fileChooser.removeChoosableFileFilter(pngFilter);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-						File dir = fileChooser.getSelectedFile();
+						final File dir = fileChooser.getSelectedFile();
 						if (dir.isDirectory()) {
 							final File[] files = dir.listFiles(new FilenameFilter() {
 								@Override
-								public boolean accept(File dir, String name) {
+								public boolean accept(final File dir, final String name) {
 									return name.endsWith(".ng3");
 								}
 							});
@@ -487,11 +488,12 @@ public class MainFrame extends JFrame {
 							PrintWriter logWriter = null;
 							try {
 								logWriter = new PrintWriter(file);
-							} catch (Exception ex) {
+							} catch (final Exception ex) {
 								ex.printStackTrace();
 							}
 							final PrintWriter pw = logWriter;
 							new Thread() {
+								@Override
 								public void run() {
 									int i = -1;
 									while (i < n - 1) {
@@ -506,7 +508,7 @@ public class MainFrame extends JFrame {
 											} catch (final Exception e) {
 												e.printStackTrace();
 											}
-											int size = Scene.getInstance().getParts().size();
+											final int size = Scene.getInstance().getParts().size();
 											if (size >= 70)
 												pw.println((files[i].lastModified() - files[0].lastModified()) / 1000 + "  " + (size - 70));
 											else
@@ -560,7 +562,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes saveMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getSaveMenuItem() {
@@ -579,7 +581,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes printMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getPrintMenuItem() {
@@ -615,7 +617,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes previewMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getPreviewMenuItem() {
@@ -633,7 +635,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes cameraMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	public JMenu getCameraMenu() {
@@ -669,7 +671,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes orbitMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getOrbitMenuItem() {
@@ -689,7 +691,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes firstPersonMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getFirstPersonMenuItem() {
@@ -708,7 +710,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes lightingMenu
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getShadeMenu() {
@@ -727,7 +729,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes exitMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getExitMenuItem() {
@@ -746,7 +748,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes helpMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getHelpMenu() {
@@ -770,7 +772,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getAboutMenuItem() {
@@ -789,7 +791,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutDialog
-	 * 
+	 *
 	 * @return javax.swing.JDialog
 	 */
 	private JDialog getAboutDialog() {
@@ -807,7 +809,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes wallThicknessMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	private JCheckBoxMenuItem getWallThicknessMenuItem() {
@@ -1004,6 +1006,8 @@ public class MainFrame extends JFrame {
 			});
 			editMenu.add(getUndoMenuItem());
 			editMenu.add(getRedoMenuItem());
+			editMenu.addSeparator();
+			editMenu.add(getNoteCheckBoxMenuItem());
 		}
 		return editMenu;
 	}
@@ -1631,5 +1635,17 @@ public class MainFrame extends JFrame {
 			separator_10.setVisible(false);
 		}
 		return separator_10;
+	}
+	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {
+		if (noteCheckBoxMenuItem == null) {
+			noteCheckBoxMenuItem = new JCheckBoxMenuItem("Note");
+			noteCheckBoxMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					MainPanel.getInstance().setNoteVisible(noteCheckBoxMenuItem.isSelected());
+				}
+			});
+		}
+		return noteCheckBoxMenuItem;
 	}
 }

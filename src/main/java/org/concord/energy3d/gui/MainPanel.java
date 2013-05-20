@@ -14,7 +14,9 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
@@ -49,11 +51,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton roofCustomButton = null;
 	private JToggleButton zoomButton = null;
 	private JToggleButton roofGableButton = null;
-	private JSplitPane splitPane;
+	private JSplitPane energyCanvasNoteSplitPane;
 	private EnergyPanel energyPanel;
 	private JPanel canvasPanel;
 	private JToggleButton energyToggleButton;
 	private JToggleButton solarButton;
+	private int defaultDividerSize = -1;
 
 	final static Map<String, Integer> cityLatitute = new Hashtable<String, Integer>();
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
@@ -62,6 +65,9 @@ public class MainPanel extends JPanel {
 			SceneManager.getInstance().refresh();
 		}
 	};
+	private JSplitPane canvasNoteSplitPane;
+	private JScrollPane noteScrollPane;
+	private JTextArea noteTextArea;
 
 	static {
 		cityLatitute.put("Moscow", 55);
@@ -113,7 +119,7 @@ public class MainPanel extends JPanel {
 		this.setSize(1000, 300);
 		setLayout(new BorderLayout());
 		this.add(getAppToolbar(), BorderLayout.NORTH);
-		this.add(getSplitPane(), BorderLayout.CENTER);
+		this.add(getEnergyCanvasNoteSplitPane(), BorderLayout.CENTER);
 	}
 
 	/**
@@ -690,16 +696,16 @@ public class MainPanel extends JPanel {
 		}
 	}
 
-	private JSplitPane getSplitPane() {
-		if (splitPane == null) {
-			splitPane = new JSplitPane();
-			splitPane.setOneTouchExpandable(true);
-			splitPane.setResizeWeight(1.0);
-			splitPane.setRightComponent(getEnergyPanel());
-			splitPane.setLeftComponent(getCanvasPanel());
-			splitPane.setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
+	private JSplitPane getEnergyCanvasNoteSplitPane() {
+		if (energyCanvasNoteSplitPane == null) {
+			energyCanvasNoteSplitPane = new JSplitPane();
+			energyCanvasNoteSplitPane.setResizeWeight(1.0);
+			energyCanvasNoteSplitPane.setRightComponent(getEnergyPanel());
+			energyCanvasNoteSplitPane.setLeftComponent(getCanvasNoteSplitPane());
+			energyCanvasNoteSplitPane.setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
+			defaultDividerSize = energyCanvasNoteSplitPane.getDividerSize();
 		}
-		return splitPane;
+		return energyCanvasNoteSplitPane;
 	}
 
 	private EnergyPanel getEnergyPanel() {
@@ -725,18 +731,9 @@ public class MainPanel extends JPanel {
 			energyToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/chart.png")));
 			energyToggleButton.addMouseListener(refreshUponMouseExit);
 			energyToggleButton.addActionListener(new ActionListener() {
-				int defaultDividerSize = -1;
-
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (defaultDividerSize == -1)
-						defaultDividerSize = splitPane.getDividerSize();
-					EnergyPanel.getInstance().setVisible(energyToggleButton.isSelected());
-					splitPane.setDividerSize(energyToggleButton.isSelected() ? defaultDividerSize : 0);
-					if (energyToggleButton.isSelected())
-						splitPane.setDividerLocation(splitPane.getLastDividerLocation());
-					else
-						splitPane.setDividerLocation(1.0);
+					setSplitComponentVisible(energyToggleButton.isSelected(), getEnergyCanvasNoteSplitPane(), EnergyPanel.getInstance());
 				}
 			});
 		}
@@ -757,5 +754,42 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return solarButton;
+	}
+	private JSplitPane getCanvasNoteSplitPane() {
+		if (canvasNoteSplitPane == null) {
+			canvasNoteSplitPane = new JSplitPane();
+			canvasNoteSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+			canvasNoteSplitPane.setLeftComponent(getCanvasPanel());
+			canvasNoteSplitPane.setRightComponent(getNoteScrollPane());
+			canvasNoteSplitPane.setDividerSize(0);
+			getNoteScrollPane().setVisible(false);
+		}
+		return canvasNoteSplitPane;
+	}
+	private JScrollPane getNoteScrollPane() {
+		if (noteScrollPane == null) {
+			noteScrollPane = new JScrollPane();
+			noteScrollPane.setViewportView(getNoteTextArea());
+		}
+		return noteScrollPane;
+	}
+	private JTextArea getNoteTextArea() {
+		if (noteTextArea == null) {
+			noteTextArea = new JTextArea();
+		}
+		return noteTextArea;
+	}
+
+	public void setNoteVisible(final boolean visible) {
+		setSplitComponentVisible(visible, getCanvasNoteSplitPane(), noteScrollPane);
+	}
+
+	private void setSplitComponentVisible(final boolean visible, final JSplitPane splitPane, final Component component) {
+		component.setVisible(visible);
+		splitPane.setDividerSize(visible ? defaultDividerSize : 0);
+		if (visible)
+			splitPane.setDividerLocation(splitPane.getLastDividerLocation());
+		else
+			splitPane.setDividerLocation(1.0);
 	}
 }

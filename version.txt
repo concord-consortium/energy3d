@@ -1439,8 +1439,8 @@ Version 0.5 - October 20, 2011
 - hide solar exposure label when color mapping is turned off
 - save heliodon state, city, date, time and latitude with file
 - fix problem with heliodon size when opening file with heliodon on
+- add note text box to gui and option to turn it on/off to menu
 
-- *save the state of heliodon with file
 - *add text box for design rational
 
 - *make default window size bigger so that toolbar will fit
