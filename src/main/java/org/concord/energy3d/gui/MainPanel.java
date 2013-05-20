@@ -755,6 +755,7 @@ public class MainPanel extends JPanel {
 		}
 		return solarButton;
 	}
+
 	private JSplitPane getCanvasNoteSplitPane() {
 		if (canvasNoteSplitPane == null) {
 			canvasNoteSplitPane = new JSplitPane();
@@ -766,6 +767,7 @@ public class MainPanel extends JPanel {
 		}
 		return canvasNoteSplitPane;
 	}
+
 	private JScrollPane getNoteScrollPane() {
 		if (noteScrollPane == null) {
 			noteScrollPane = new JScrollPane();
@@ -773,7 +775,8 @@ public class MainPanel extends JPanel {
 		}
 		return noteScrollPane;
 	}
-	private JTextArea getNoteTextArea() {
+
+	public JTextArea getNoteTextArea() {
 		if (noteTextArea == null) {
 			noteTextArea = new JTextArea();
 		}

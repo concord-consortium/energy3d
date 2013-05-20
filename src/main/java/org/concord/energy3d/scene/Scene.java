@@ -83,7 +83,8 @@ public class Scene implements Serializable {
 	private Calendar calendar;
 	private String city;
 	private int latitude;
-	private  boolean isHeliodonVisible;
+	private boolean isHeliodonVisible;
+	private String note;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -148,7 +149,6 @@ public class Scene implements Serializable {
 				part.getRoot();
 			}
 
-//			instance.cleanup();
 			instance.upgradeSceneToNewVersion();
 			loadCameraLocation();
 		}
@@ -178,7 +178,6 @@ public class Scene implements Serializable {
 				if (url != null) {
 					for (final HousePart housePart : instance.getParts())
 						originalHouseRoot.attachChild(housePart.getRoot());
-//					redrawAll = true;
 					/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
 					instance.redrawAllNow();
 					System.out.println("done");
@@ -194,6 +193,7 @@ public class Scene implements Serializable {
 					energyPanel.setCity(instance.city);
 					MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 				}
+				MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
 				SceneManager.getInstance().getUndoManager().die();
 				SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
 				Scene.getInstance().setEdited(false);
@@ -307,6 +307,7 @@ public class Scene implements Serializable {
 		instance.latitude = EnergyPanel.getInstance().getLatitude();
 		instance.city = EnergyPanel.getInstance().getCity();
 		instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
+		instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 
 		if (setAsCurrentFile)
 			Scene.url = url;
@@ -316,7 +317,6 @@ public class Scene implements Serializable {
 		out.writeObject(instance);
 		out.close();
 		SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
-//		Scene.getInstance().setEdited(false);
 		System.out.println("done");
 	}
 
