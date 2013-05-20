@@ -467,6 +467,7 @@ public class Heliodon {
 			if (!Double.isInfinite(scale))
 				root.setScale(scale);
 		}
+		root.updateGeometricState(0);
 		if (SceneManager.getInstance() != null)
 			SceneManager.getInstance().refresh();
 	}

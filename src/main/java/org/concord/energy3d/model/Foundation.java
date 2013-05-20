@@ -91,6 +91,7 @@ public class Foundation extends HousePart {
 		solarLabel = new BMText("Solar value Text", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
 		Util.initHousePartLabel(solarLabel);
 		solarLabel.setFontScale(1.0);
+		solarLabel.setVisible(false);
 		root.attachChild(solarLabel);
 	}
 

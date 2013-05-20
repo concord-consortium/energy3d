@@ -1438,8 +1438,7 @@ Version 0.5 - October 20, 2011
 - assign unique id to each part
 - hide solar exposure label when color mapping is turned off
 - save heliodon state, city, date, time and latitude with file
-
-- *fix problem with heliodon size when opening file with heliodon on
+- fix problem with heliodon size when opening file with heliodon on
 
 - *save the state of heliodon with file
 - *add text box for design rational
