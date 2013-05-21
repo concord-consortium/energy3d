@@ -734,6 +734,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					setSplitComponentVisible(energyToggleButton.isSelected(), getEnergyCanvasNoteSplitPane(), EnergyPanel.getInstance());
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -750,6 +751,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}

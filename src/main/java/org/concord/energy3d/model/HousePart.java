@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -70,7 +72,7 @@ public abstract class HousePart implements Serializable {
 	protected transient double orgHeight;
 	protected transient boolean relativeToHorizontal;
 	private transient boolean isPrintVertical;
-	private transient boolean textureCleared;
+	private transient Map<Mesh, Boolean> textureCleared;
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
 	protected HousePart container = null;
@@ -138,6 +140,7 @@ public abstract class HousePart implements Serializable {
 		orgHeight = height;
 		flattenCenter = new Vector3();
 		isPrintVertical = false;
+		textureCleared = new HashMap<Mesh, Boolean>();
 
 		if (id == 0)
 			id = Scene.getInstance().nextID();
@@ -456,7 +459,8 @@ public abstract class HousePart implements Serializable {
 		} else if (this instanceof Roof) {
 			if (visible)
 				drawGrids(getGridSize());
-			gridsMesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+			if (gridsMesh != null)
+				gridsMesh.setVisible(visible);
 		} else if (container != null) {
 			if (visible)
 				container.drawGrids(getGridSize());
@@ -629,23 +633,24 @@ public abstract class HousePart implements Serializable {
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
 		final boolean isSolarColorMap = SceneManager.getInstance().isSolarColorMap();
-		if (isSolarColorMap && textureCleared)
+		if (isSolarColorMap && textureCleared.get(mesh) == Boolean.TRUE)
 			return;
+		if (isSolarColorMap)
+			textureCleared.put(mesh, Boolean.TRUE);
+		else if (!textureCleared.isEmpty())
+			textureCleared.clear();
 
 		if (isFrozen() || isSolarColorMap) {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(Scene.GRAY);
-			textureCleared = true;
 		} else if (textureMode == TextureMode.None || getTextureFileName() == null) {
 			mesh.clearRenderState(StateType.Texture);
 			mesh.setDefaultColor(defaultColor);
-			textureCleared = false;
 		} else {
 			final TextureState ts = new TextureState();
 			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
-			textureCleared = false;
 		}
 	}
 
