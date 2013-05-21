@@ -127,7 +127,7 @@ public class MainPanel extends JPanel {
 	 *
 	 * @return javax.swing.JToolBar
 	 */
-	private JToolBar getAppToolbar() {
+	public JToolBar getAppToolbar() {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
 			appToolbar.add(getSelectButton());

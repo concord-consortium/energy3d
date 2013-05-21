@@ -1443,8 +1443,9 @@ Version 0.5 - October 20, 2011
 - save the content of the note text box with the file
 - improve cleanup by removing house parts that are children of an existing but don't exist the Scene.parts list
 - fix problem with roof only resetting the color of one of its meshes when solar colormap is enabled
+- make default window size bigger so that toolbar will fit
 
-- *make default window size bigger so that toolbar will fit
+- *monthly solar colormap
 
 - *allow move house with one click
 - *allow 90 degree rotation of house

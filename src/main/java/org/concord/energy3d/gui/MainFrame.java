@@ -246,18 +246,17 @@ public class MainFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setTitle("Energy3D v" + Config.VERSION);
 
-		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		setJMenuBar(getAppMenuBar());
+		setContentPane(getMainPanel());
 
-		this.setSize(Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_width", 900), screenSize.width), Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_height", 600), screenSize.height));
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		this.setSize(Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_width", Math.max(900, MainPanel.getInstance().getAppToolbar().getPreferredSize().width)), screenSize.width), Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_height", 600), screenSize.height));
 		this.setLocation((int) (screenSize.getWidth() - this.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2);
 		this.setLocation(Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_x", (int) (screenSize.getWidth() - this.getSize().getWidth()) / 2), Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_y", (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2));
 		this.setLocation(MathUtils.clamp(this.getLocation().x, 0, screenSize.width - this.getSize().width), MathUtils.clamp(this.getLocation().y, 0, screenSize.height - this.getSize().height));
 		final int windowState = Preferences.userNodeForPackage(MainApplication.class).getInt("window_state", JFrame.NORMAL);
 		if ((windowState & JFrame.ICONIFIED) == 0)
 			setExtendedState(windowState);
-
-		setJMenuBar(getAppMenuBar());
-		setContentPane(getMainPanel());
 
 		if (Config.isMac()) {
 			final Application anApp = new Application();
