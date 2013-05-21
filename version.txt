@@ -1441,6 +1441,7 @@ Version 0.5 - October 20, 2011
 - fix problem with heliodon size when opening file with heliodon on
 - add note text box to gui and option to turn it on/off to menu
 - save the content of the note text box with the file
+- improve cleanup by removing house parts that are children of an existing but don't exist the Scene.parts list
 
 - *make default window size bigger so that toolbar will fit
 

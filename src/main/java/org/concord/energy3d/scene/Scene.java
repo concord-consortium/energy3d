@@ -149,6 +149,7 @@ public class Scene implements Serializable {
 				part.getRoot();
 			}
 
+			instance.cleanup();
 			instance.upgradeSceneToNewVersion();
 			loadCameraLocation();
 		}
@@ -228,7 +229,7 @@ public class Scene implements Serializable {
 
 //			instance.fixUnintializedVariables();
 
-//			instance.cleanup();
+			instance.cleanup();
 			instance.upgradeSceneToNewVersion();
 
 			if (url != null) {
@@ -261,12 +262,19 @@ public class Scene implements Serializable {
 		for (final HousePart housePart : getParts()) {
 			if (!housePart.isValid() || ((housePart instanceof Roof || housePart instanceof Window || housePart instanceof Door) && housePart.getContainer() == null))
 				toBeRemoved.add(housePart);
+			removeDeadChildren(housePart, toBeRemoved);
 		}
 
 		for (final HousePart housePart : toBeRemoved)
 			remove(housePart);
 
 		fixDisconnectedWalls();
+	}
+
+	private void removeDeadChildren(final HousePart parent, final ArrayList<HousePart> toBeRemoved) {
+		for (final HousePart part : parent.getChildren())
+			if (!getParts().contains(part))
+				toBeRemoved.add(part);
 	}
 
 	private void upgradeSceneToNewVersion() {
@@ -441,7 +449,6 @@ public class Scene implements Serializable {
 
 	public void redrawAllNow() {
 		Snap.clearAnnotationDrawn();
-//		cleanup();
 		for (final HousePart part : parts)
 			if (part instanceof Roof)
 				part.draw();

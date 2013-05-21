@@ -91,7 +91,6 @@ public abstract class Roof extends HousePart {
 		super.init();
 		relativeToHorizontal = true;
 		orgCenters = new HashMap<Node, ReadOnlyVector3>();
-		wallUpperPoints = new ArrayList<Vector3>();
 		wallNormals = new ArrayList<Vector3>();
 		walls = new ArrayList<Wall>();
 		roofPartPrintVerticalMap = new Hashtable<Spatial, Boolean>();
@@ -116,7 +115,10 @@ public abstract class Roof extends HousePart {
 			}
 		}
 
-		wallUpperPoints.clear();
+		if (wallUpperPoints == null)
+			wallUpperPoints = new ArrayList<Vector3>();
+		else
+			wallUpperPoints.clear();
 		if (container != null)
 			initWallUpperPoints((Wall) container, walls, wallUpperPoints, wallNormals);
 		if (!isDrawable()) {
@@ -909,6 +911,7 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		return container != null && wallUpperPoints.size() >= 3;
+		/* if wallUpperPoints is null then it has not been drawn yet so we assume wallUpperPoints size is okay otherwise all roofs would be invalid at init time */
+		return container != null && (wallUpperPoints == null || wallUpperPoints.size() >= 3);
 	}
 }

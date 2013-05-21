@@ -201,7 +201,7 @@ public class Floor extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		return container != null && wallUpperPoints != null && wallUpperPoints.size() >= 3;
+		return container != null && (wallUpperPoints == null || wallUpperPoints.size() >= 3);
 	}
 
 	@Override
