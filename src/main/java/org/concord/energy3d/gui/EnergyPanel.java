@@ -1082,13 +1082,18 @@ public class EnergyPanel extends JPanel {
 				final Wall wall = (Wall) part;
 				final List<ReadOnlyVector3> solarPoints = wall.getSolarPoints();
 				long[][] solar = solarOnWall.get(wall);
-				final int rows = roundToPowerOfTwo((int) (wall.getHighestPoint() / SOLAR_STEP));
-				final int cols = roundToPowerOfTwo(solarPoints.size());
 
+				int rows = (int) (wall.getHighestPoint() / SOLAR_STEP);
+				int cols = solarPoints.size();
 				if (solar == null) {
-					solar = new long[rows][cols];
+					solar = new long[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
 					solarOnWall.put(wall, solar);
 				}
+				if (rows < solar.length)
+					rows++;
+				if (cols < solar[0].length)
+					cols++;
+
 				final ReadOnlyVector3 origin = part.getAbsPoint(0);
 				final double baseZ = origin.getZ();
 				final Vector3 p = new Vector3();
