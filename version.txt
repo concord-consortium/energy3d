@@ -1447,9 +1447,9 @@ Version 0.5 - October 20, 2011
 - generate colormap textures of power of two size to be compatible with older graphic cards
 - avoid computing solar exposure for portion of colormap texture that falls outside of the mesh in order to improve performance
 - no longer need to computer and store solar points in wall
+- texture blue when no solar color map data is available
 
 - *change all instances of Hashtable to HashMap for improved performance
-- *texture blue when no solar color map data is available
 - *monthly solar colormap
 
 - *allow move house with one click

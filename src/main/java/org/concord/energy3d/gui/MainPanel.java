@@ -130,6 +130,7 @@ public class MainPanel extends JPanel {
 	public JToolBar getAppToolbar() {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
+			appToolbar.setFloatable(false);
 			appToolbar.add(getSelectButton());
 			appToolbar.add(getResizeButton());
 			appToolbar.add(getZoomButton());
