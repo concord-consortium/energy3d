@@ -428,7 +428,7 @@ public class Foundation extends HousePart {
 
 	public void updateSolarLabelPosition() {
 		final ReadOnlyVector3 center = getCenter();
-		solarLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 1.0);
+		solarLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 3.0);
 	}
 
 	private double scanChildrenHeight(final HousePart part) {

@@ -3,7 +3,6 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -93,7 +92,7 @@ public abstract class Roof extends HousePart {
 		orgCenters = new HashMap<Node, ReadOnlyVector3>();
 		wallNormals = new ArrayList<Vector3>();
 		walls = new ArrayList<Wall>();
-		roofPartPrintVerticalMap = new Hashtable<Spatial, Boolean>();
+		roofPartPrintVerticalMap = new HashMap<Spatial, Boolean>();
 
 		roofPartsRoot = new Node("Roof Meshes Root");
 		root.attachChild(roofPartsRoot);
@@ -568,7 +567,7 @@ public abstract class Roof extends HousePart {
 		if (gableWalls == null)
 			gableWalls = new ArrayList<Wall>();
 		if (gableEditPointToWallMap == null)
-			gableEditPointToWallMap = new Hashtable<Integer, ArrayList<Wall>>();
+			gableEditPointToWallMap = new HashMap<Integer, ArrayList<Wall>>();
 
 		if (isGable) {
 			final ArrayList<Integer> editPoints = new ArrayList<Integer>();

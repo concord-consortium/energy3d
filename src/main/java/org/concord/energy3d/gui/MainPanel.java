@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
@@ -58,7 +58,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton solarButton;
 	private int defaultDividerSize = -1;
 
-	final static Map<String, Integer> cityLatitute = new Hashtable<String, Integer>();
+	final static Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
 		@Override
 		public void mouseExited(final MouseEvent e) {

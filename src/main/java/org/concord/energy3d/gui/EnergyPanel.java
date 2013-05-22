@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -70,9 +69,9 @@ public class EnergyPanel extends JPanel {
 	public static final double SOLAR_STEP = 2.0;
 	private static final long serialVersionUID = 1L;
 	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
-	private static final Map<String, Integer> cityLatitute = new Hashtable<String, Integer>();
-	private static final Map<String, int[]> avgMonthlyLowTemperatures = new Hashtable<String, int[]>();
-	private static final Map<String, int[]> avgMonthlyHighTemperatures = new Hashtable<String, int[]>();
+	private static final Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
+	private static final Map<String, int[]> avgMonthlyLowTemperatures = new HashMap<String, int[]>();
+	private static final Map<String, int[]> avgMonthlyHighTemperatures = new HashMap<String, int[]>();
 	private static final double COST_PER_KWH = 0.13;
 	private static final EnergyPanel instance = new EnergyPanel();
 
@@ -167,7 +166,7 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox cityComboBox;
 	private final JLabel latitudeLabel;
 	private final JSpinner latitudeSpinner;
-	private final Map<HousePart, long[][]> solarOnWall = new Hashtable<HousePart, long[][]>();
+	private final Map<HousePart, long[][]> solarOnWall = new HashMap<HousePart, long[][]>();
 	private final List<Spatial> solarCollidables = new ArrayList<Spatial>();
 	private long maxSolarValue;
 	private long[][] solarOnLand;
