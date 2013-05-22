@@ -1080,11 +1080,10 @@ public class EnergyPanel extends JPanel {
 			final HousePart part = parts.get(i);
 			if (part instanceof Wall && part.isDrawCompleted() && part.getFaceDirection().dot(directionTowardSun) > 0) {
 				final Wall wall = (Wall) part;
-				final List<ReadOnlyVector3> solarPoints = wall.getSolarPoints();
-				long[][] solar = solarOnWall.get(wall);
 
 				int rows = (int) (wall.getHighestPoint() / SOLAR_STEP);
-				int cols = solarPoints.size();
+				int cols = (int) (wall.getAbsPoint(2).subtractLocal(wall.getAbsPoint(0)).length() / SOLAR_STEP);
+				long[][] solar = solarOnWall.get(wall);
 				if (solar == null) {
 					solar = new long[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
 					solarOnWall.put(wall, solar);
