@@ -1444,7 +1444,10 @@ Version 0.5 - October 20, 2011
 - improve cleanup by removing house parts that are children of an existing but don't exist the Scene.parts list
 - fix problem with roof only resetting the color of one of its meshes when solar colormap is enabled
 - make default window size bigger so that toolbar will fit
+- generate colormap textures of power of two size to be compatible with older graphic cards
 
+- *change all instances of Hashtable to HashMap for improved performance
+- *texture blue when no solar color map data is available
 - *monthly solar colormap
 
 - *allow move house with one click

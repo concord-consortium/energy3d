@@ -411,7 +411,9 @@ public class Wall extends HousePart {
 			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0);
 			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0);
 			if (SceneManager.getInstance().isSolarColorMap()) {
-				p01.normalizeLocal().multiplyLocal(getHighestPoint());
+				p01.normalizeLocal().multiplyLocal(EnergyPanel.getInstance().roundToPowerOfTwo((int) (getHighestPoint() / EnergyPanel.SOLAR_STEP)) * EnergyPanel.SOLAR_STEP);
+				final double p02Legth = p02.length();
+				p02.normalizeLocal().multiplyLocal(EnergyPanel.getInstance().roundToPowerOfTwo((int) (p02Legth / EnergyPanel.SOLAR_STEP)) * EnergyPanel.SOLAR_STEP);
 			} else {
 				final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 8.0;
 				p01.normalizeLocal().multiplyLocal(scale);

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -171,6 +172,7 @@ public class EnergyPanel extends JPanel {
 	private long maxSolarValue;
 	private long[][] solarOnLand;
 	private JProgressBar progressBar;
+	private final Map<Integer, Integer> powerOfTwo = new HashMap<Integer, Integer>();
 
 	private class EnergyAmount {
 		double solar;
@@ -1041,20 +1043,20 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void computeSolarColorMap() {
-			final long t = System.nanoTime();
+		final long t = System.nanoTime();
 
-			initSolarCollidables();
+		initSolarCollidables();
 
-			solarOnWall.clear();
-			solarOnLand = null;
-			maxSolarValue = 1;
-	//			computeSolarOnLand(Heliodon.getInstance().getSunLocation());
-	//			 computeSolarOnWalls(Heliodon.getInstance().getSunLocation());
-			computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
-			// printSolarOnWalls();
-			updateSolarValueOnAllHouses();
-			System.out.println("time = " + (System.nanoTime() - t) / 1000000000);
-		}
+		solarOnWall.clear();
+		solarOnLand = null;
+		maxSolarValue = 1;
+		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
+//		computeSolarOnWalls(Heliodon.getInstance().getSunLocation());
+		 computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
+		// printSolarOnWalls();
+		updateSolarValueOnAllHouses();
+		System.out.println("time = " + (System.nanoTime() - t) / 1000000000);
+	}
 
 	private void initSolarCollidables() {
 		solarCollidables.clear();
@@ -1080,16 +1082,19 @@ public class EnergyPanel extends JPanel {
 				final Wall wall = (Wall) part;
 				final List<ReadOnlyVector3> solarPoints = wall.getSolarPoints();
 				long[][] solar = solarOnWall.get(wall);
-				final int rows = (int) (wall.getHighestPoint() / SOLAR_STEP);
-				final int cols = solarPoints.size();
+				final int rows = roundToPowerOfTwo((int) (wall.getHighestPoint() / SOLAR_STEP));
+				final int cols = roundToPowerOfTwo(solarPoints.size());
+
 				if (solar == null) {
 					solar = new long[rows][cols];
 					solarOnWall.put(wall, solar);
 				}
-				final double baseZ = part.getPoints().get(0).getZ();
+				final ReadOnlyVector3 origin = part.getAbsPoint(0);
+				final double baseZ = origin.getZ();
 				final Vector3 p = new Vector3();
+				final ReadOnlyVector3 dir = part.getAbsPoint(2).subtract(origin, null).normalizeLocal();
 				for (int col = 0; col < cols; col++) {
-					p.set(solarPoints.get(col));
+					p.set(dir).multiplyLocal(col * SOLAR_STEP).addLocal(origin);
 					for (int row = 0; row < rows; row++) {
 						p.setZ(baseZ + row * SOLAR_STEP);
 						final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
@@ -1112,8 +1117,8 @@ public class EnergyPanel extends JPanel {
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
-		final double SOLAR_STEP = 10;
-		final int rows = (int) (300 / SOLAR_STEP);
+		final double SOLAR_STEP = 8;
+		final int rows = (int) (256 / SOLAR_STEP);
 		final int cols = rows;
 		if (solarOnLand == null)
 			solarOnLand = new long[rows][cols];
@@ -1194,6 +1199,20 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public int getLatitude() {
-		return (Integer)latitudeSpinner.getValue();
+		return (Integer) latitudeSpinner.getValue();
+	}
+
+	public int roundToPowerOfTwo(final int n) {
+		final Integer result = powerOfTwo.get(n);
+		if (result != null)
+			return result;
+		else {
+			int powerOfTwo = 2;
+			while (true) {
+				if (powerOfTwo >= n)
+					return powerOfTwo;
+				powerOfTwo *= 2;
+			}
+		}
 	}
 }

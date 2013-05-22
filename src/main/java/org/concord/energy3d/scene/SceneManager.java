@@ -148,7 +148,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Node backgroundRoot = new Node("Scenary Root");
 	private final BasicPassManager passManager = new BasicPassManager();
 	private final Mesh land = new Quad("Floor", 2000, 2000);
-	private final Mesh solarLand = new Quad("Floor", 300, 300);
+	private final Mesh solarLand = new Quad("Floor", 256, 256);
 	private final Mesh invisibleFloor = new Quad("Floor", 2000, 2000);
 	private final Mesh gridsMesh = new Line("Floor Grids");
 	private final LightState lightState = new LightState();
