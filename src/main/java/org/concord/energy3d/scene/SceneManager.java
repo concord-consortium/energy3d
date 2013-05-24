@@ -769,16 +769,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if(!Config.isApplet()) 
+				if(!Config.isApplet())
 					return;
-				KeyboardState ks = inputStates.getCurrent().getKeyboardState();
+				final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
 				if (Config.isMac()) {
 					if(ks.isDown(Key.LMETA) || ks.isDown(Key.RMETA)){
-						resetCamera();						
+						resetCamera();
 					}
 				} else {
 					if(ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL)){
-						resetCamera();						
+						resetCamera();
 					}
 				}
 			}
@@ -966,7 +966,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (viewMode == ViewMode.TOP_VIEW) {
 			camera.setProjectionMode(ProjectionMode.Parallel);
 			cameraControl.setMoveSpeed(5 * MOVE_SPEED);
-			loc = new Vector3(0, 0, 100);
+			loc = new Vector3(0, 0, 500);
 			up = new Vector3(0, 1, 0);
 			lookAt = new Vector3(0, 0, -10);
 			resizeCamera(Util.findBoundLength(Scene.getRoot().getWorldBound()));

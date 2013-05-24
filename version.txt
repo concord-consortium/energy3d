@@ -1450,6 +1450,12 @@ Version 0.5 - October 20, 2011
 - texture blue when no solar color map data is available
 - change all instances of Hashtable to HashMap for improved performance
 - move the total solar exposure number label slightly higher
+- fix problem with solar label of tall buildings disappearing in top view
+
+- *fix blue edge in colormap of walls
+- *add colormap ledgend
+- *rotate top view counter-clockwise
+
 
 - *monthly solar colormap
 
