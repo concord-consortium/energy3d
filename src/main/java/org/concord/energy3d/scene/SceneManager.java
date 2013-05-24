@@ -45,6 +45,7 @@ import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.ColladaMaterialUtils;
@@ -964,11 +965,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			resizeCamera();
 		} else if (viewMode == ViewMode.TOP_VIEW) {
 			camera.setProjectionMode(ProjectionMode.Parallel);
-			cameraControl.setMoveSpeed(5 * MOVE_SPEED);
 			loc = new Vector3(0, 0, 500);
 			up = new Vector3(0, 1, 0);
 			lookAt = new Vector3(0, 0, 0);
-			resizeCamera(Util.findBoundLength(Scene.getRoot().getWorldBound()));
+			final double boundLength = Util.findBoundLength(Scene.getRoot().getWorldBound());
+			cameraControl.setMoveSpeed(boundLength / 2);
+			resizeCamera(boundLength);
 		} else if (viewMode == ViewMode.PRINT) {
 			camera.setProjectionMode(ProjectionMode.Parallel);
 			/* location will be set in PrintController.print() */
@@ -991,7 +993,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void resizeCamera() {
-		resizeCamera(2);
+		final BoundingVolume bounds = Scene.getRoot().getWorldBound();
+		if (bounds == null)
+			resizeCamera(2);
+		else
+			resizeCamera(Util.findBoundLength(bounds));
 	}
 
 	public void resizeCamera(final double orthoWidth) {

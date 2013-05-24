@@ -29,6 +29,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -472,11 +473,11 @@ public abstract class HousePart implements Serializable {
 	public void updateEditShapes() {
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 p = getAbsPoint(i);
-//			final Camera camera = Camera.getCurrentCamera();
-//			final Camera camera = SceneManager.getInstance().getCameraNode().getCamera();
 			final Camera camera = SceneManager.getInstance().getCamera();
-			if (camera != null)	// for Lwjgl
+			if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel)	// for Lwjgl
 				getEditPointShape(i).setScale(camera.getLocation().distance(p) / 10);
+			else
+				getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
 			getEditPointShape(i).setTranslation(p);
 		}
 		/* remove remaining edit shapes */
