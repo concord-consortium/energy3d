@@ -1455,6 +1455,7 @@ Version 0.5 - October 20, 2011
 - fix problem with edit point of floors always at 0,0,0 after opening file 
 - restore camera view after returning from top view
 - fix top view changes after window resize by reseting parallel view
+- append foundation id to solar label
 
 - *fix blue edge in colormap of walls
 - *add colormap ledgend

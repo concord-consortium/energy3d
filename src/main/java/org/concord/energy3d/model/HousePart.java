@@ -83,7 +83,7 @@ public abstract class HousePart implements Serializable {
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
-	private long id;
+	protected long id;
 
 	static {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
