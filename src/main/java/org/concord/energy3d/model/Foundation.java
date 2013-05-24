@@ -90,7 +90,7 @@ public class Foundation extends HousePart {
 
 		solarLabel = new BMText("Solar value Text", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
 		Util.initHousePartLabel(solarLabel);
-		solarLabel.setFontScale(1.0);
+		solarLabel.setFontScale(0.75);
 		solarLabel.setVisible(false);
 		root.attachChild(solarLabel);
 	}
@@ -428,7 +428,7 @@ public class Foundation extends HousePart {
 
 	public void updateSolarLabelPosition() {
 		final ReadOnlyVector3 center = getCenter();
-		solarLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 3.0);
+		solarLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 6.0);
 	}
 
 	private double scanChildrenHeight(final HousePart part) {
@@ -529,7 +529,7 @@ public class Foundation extends HousePart {
 			solarLabel.setVisible(false);
 		else {
 			solarLabel.setVisible(true);
-			solarLabel.setText("(" + id + ") " + String.valueOf(solarValue));
+			solarLabel.setText("(#" + id + ")\n" + String.valueOf(solarValue));
 		}
 	}
 }
