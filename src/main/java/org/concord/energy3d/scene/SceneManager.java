@@ -60,6 +60,7 @@ import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.input.Key;
+import com.ardor3d.input.KeyboardState;
 import com.ardor3d.input.KeyboardWrapper;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
@@ -768,9 +769,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				resetCamera(viewMode);
-				cameraControl.reset();
-				refresh = true;
+				if(!Config.isApplet()) 
+					return;
+				KeyboardState ks = inputStates.getCurrent().getKeyboardState();
+				if (Config.isMac()) {
+					if(ks.isDown(Key.LMETA) || ks.isDown(Key.RMETA)){
+						resetCamera();						
+					}
+				} else {
+					if(ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL)){
+						resetCamera();						
+					}
+				}
 			}
 		}));
 		// logicalLayer.registerTrigger(new InputTrigger(new
@@ -923,6 +933,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			part.setEditPointsVisible(false);
 			part.setGridsVisible(false);
 		}
+		refresh = true;
+	}
+
+	public void resetCamera() {
+		resetCamera(viewMode);
+		cameraControl.reset();
 		refresh = true;
 	}
 

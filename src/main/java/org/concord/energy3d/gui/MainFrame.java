@@ -81,6 +81,7 @@ public class MainFrame extends JFrame {
 	private JMenu cameraMenu = null;
 	private JRadioButtonMenuItem orbitMenuItem = null;
 	private JRadioButtonMenuItem firstPersonMenuItem = null;
+	private JMenuItem resetCameraMenuItem = null;
 	private JMenuItem saveasMenuItem;
 	private JMenu sceneMenu;
 	private JMenu unitsMenu;
@@ -406,6 +407,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getNewMenuItem() {
 		if (newMenuItem == null) {
 			newMenuItem = new JMenuItem("New");
+			newMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
 			newMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
@@ -678,6 +680,7 @@ public class MainFrame extends JFrame {
 			bg.add(firstPersonMenuItem);
 			cameraMenu.add(getSeparator_7());
 			cameraMenu.add(getTopViewCheckBoxMenuItem());
+			cameraMenu.add(getResetCameraMenuItem());
 		}
 		return cameraMenu;
 	}
@@ -719,6 +722,26 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return firstPersonMenuItem;
+	}
+
+	/**
+	 * This method initializes resetCameraMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getResetCameraMenuItem() {
+		if (resetCameraMenuItem == null) {
+			resetCameraMenuItem = new JMenuItem();
+			resetCameraMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
+			resetCameraMenuItem.setText("Reset View");
+			resetCameraMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
+					SceneManager.getInstance().resetCamera();
+				}
+			});
+		}
+		return resetCameraMenuItem;
 	}
 
 	/**
