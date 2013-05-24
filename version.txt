@@ -1452,12 +1452,13 @@ Version 0.5 - October 20, 2011
 - move the total solar exposure number label slightly higher
 - fix problem with solar label of tall buildings disappearing in top view
 - fix north side of top view by rotating it counter-clockwise
+- fix problem with edit point of floors always at 0,0,0 after opening file 
+
 
 - *fix blue edge in colormap of walls
 - *add colormap ledgend
 - *top view changes after window resize
-- improve cleanup code so that floor without parent is removed
-
+- *restore camera view after returning from top view
 
 - *monthly solar colormap
 

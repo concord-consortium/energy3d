@@ -81,7 +81,6 @@ public class Floor extends HousePart {
 			if (p.getY() > maxY)
 				maxY = p.getY();
 		}
-		points.get(0).set(toRelative(getCenter(), container.getContainer()));
 		return new Polygon(wallUpperPoints);
 	}
 
@@ -97,6 +96,7 @@ public class Floor extends HousePart {
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 2.0 : 10.0;
 		MeshLib.fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints), null, true, new TPoint(0, 0, 0), new TPoint(scale, 0, 0), new TPoint(0, scale, 0));
 		drawWireframe();
+		points.get(0).set(toRelative(getCenter(), container.getContainer()));
 		updateEditShapes();
 	}
 
