@@ -949,7 +949,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		ReadOnlyVector3 loc = new Vector3(10, -50, 30);
-		ReadOnlyVector3 left = new Vector3(-1, 0, 0);
 		ReadOnlyVector3 up = new Vector3(0, 0, 1);
 		ReadOnlyVector3 lookAt = new Vector3(0, 0, 10);
 
@@ -968,14 +967,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			cameraControl.setMoveSpeed(5 * MOVE_SPEED);
 			loc = new Vector3(0, 0, 500);
 			up = new Vector3(0, 1, 0);
-			lookAt = new Vector3(0, 0, -10);
+			lookAt = new Vector3(0, 0, 0);
 			resizeCamera(Util.findBoundLength(Scene.getRoot().getWorldBound()));
 		} else if (viewMode == ViewMode.PRINT) {
 			camera.setProjectionMode(ProjectionMode.Parallel);
 			/* location will be set in PrintController.print() */
 			loc = new Vector3(0, -10, 0);
 			up = new Vector3(0, 0, -1);
-			left = new Vector3(1, 0, 0);
 		} else if (viewMode == ViewMode.PRINT_PREVIEW) {
 			cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 			camera.setProjectionMode(ProjectionMode.Perspective);
@@ -984,8 +982,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			resizeCamera(PrintController.getInstance().getPageWidth());
 		}
 
-		camera.setFrame(loc, left, up, lookAt);
-		camera.lookAt(lookAt, Vector3.UNIT_Z);
+		camera.setLocation(loc);
+		camera.lookAt(lookAt, up);
 		camera.update();
 
 		cameraNode.updateFromCamera();

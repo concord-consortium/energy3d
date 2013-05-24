@@ -1451,10 +1451,12 @@ Version 0.5 - October 20, 2011
 - change all instances of Hashtable to HashMap for improved performance
 - move the total solar exposure number label slightly higher
 - fix problem with solar label of tall buildings disappearing in top view
+- fix north side of top view by rotating it counter-clockwise
 
 - *fix blue edge in colormap of walls
 - *add colormap ledgend
-- *rotate top view counter-clockwise
+- *top view changes after window resize
+- improve cleanup code so that floor without parent is removed
 
 
 - *monthly solar colormap
