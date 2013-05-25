@@ -4,6 +4,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 
@@ -18,6 +19,12 @@ public class EditFoundationCommand extends EditHousePartCommand {
 		isResizeMode = SceneManager.getInstance().getOperation() == Operation.RESIZE;
 	}
 
+	// for action logging
+	@Override
+	public HousePart getHousePart() {
+		return foundation;
+	}
+	
 	@Override
 	public void undo() throws CannotUndoException {
 		foundation.setResizeHouseMode(isResizeMode);

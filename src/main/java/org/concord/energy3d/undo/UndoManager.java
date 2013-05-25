@@ -64,4 +64,9 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 		return counter;
 	}
 
+	@Override
+	public UndoableEdit lastEdit() {
+		return super.lastEdit();
+	}
+
 }

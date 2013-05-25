@@ -21,6 +21,11 @@ public class RemoveHousePartCommand extends AbstractUndoableEdit {
 		this.isSignificant  = isSignificant;
 	}
 
+	// for action logging
+	public HousePart getHousePart() {
+		return housePart;
+	}
+
 	@Override
 	public boolean isSignificant() {
 		return isSignificant;

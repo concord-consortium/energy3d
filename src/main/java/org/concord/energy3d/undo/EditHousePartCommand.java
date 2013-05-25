@@ -28,6 +28,11 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 			orgPoints.add(p.clone());
 	}
 
+	// for action logging
+	public HousePart getHousePart() {
+		return housePart;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
