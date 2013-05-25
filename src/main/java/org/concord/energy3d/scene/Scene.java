@@ -411,7 +411,7 @@ public class Scene implements Serializable {
 			SceneManager.getInstance().refresh();
 
 	}
-
+	
 	public void setTextureMode(final TextureMode textureMode) {
 		this.textureMode = textureMode;
 		redrawAll();

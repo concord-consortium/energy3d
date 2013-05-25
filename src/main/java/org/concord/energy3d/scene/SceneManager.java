@@ -770,15 +770,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if(!Config.isApplet())
+				if (!Config.isApplet())
 					return;
 				final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
 				if (Config.isMac()) {
-					if(ks.isDown(Key.LMETA) || ks.isDown(Key.RMETA)){
+					if (ks.isDown(Key.LMETA) || ks.isDown(Key.RMETA)) {
 						resetCamera();
 					}
 				} else {
-					if(ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL)){
+					if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL)) {
 						resetCamera();
 					}
 				}
@@ -1122,6 +1122,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setSunAnim(final boolean selected) {
 		sunAnim = selected;
+	}
+
+	public boolean isSunAnim() {
+		return sunAnim;
 	}
 
 	public void enableDisableRotationControl() {
