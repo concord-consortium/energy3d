@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
@@ -41,8 +42,13 @@ public class MainApplication {
 		if (!Config.isMac() && args.length > 1 && !args[args.length - 1].startsWith("-"))
 			mainFrame.open(args[args.length - 1]);
 
-		if (Config.isClassroomMode())
-			startPeriodicFileSave();
+		if (Config.isClassroomMode()) {
+			final File dir = new File("log");
+			if (!dir.exists())
+				dir.mkdir();
+			logSnapshots(20, dir);
+			new TimeSeriesLogger(1, dir, scene).start();
+		}
 	}
 
 	private static boolean argsContain(final String command, final String[] args) {
@@ -91,15 +97,13 @@ public class MainApplication {
 		}
 	}
 
-	private static void startPeriodicFileSave() {
-		final String dir = "log";
-		new File(dir).mkdir();
+	private static void logSnapshots(final int period, final File dir) {
 		new Thread() {
 			@Override
 			public void run() {
 				while (true) {
 					try {
-						sleep(20000); // 20 seconds seem to be optimal
+						sleep(1000 * period); // 20 seconds seem to be optimal
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
