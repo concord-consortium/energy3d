@@ -6,8 +6,10 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import javax.swing.JOptionPane;
 import javax.swing.undo.UndoableEdit;
 
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -19,7 +21,8 @@ import org.concord.energy3d.undo.UndoManager;
 public class TimeSeriesLogger {
 
 	private final static String space = "   ";
-	private int period = 1; // in seconds
+	private int logPeriod = 1; // in seconds
+	private int savePeriod = 20; // save less frequently
 	private File dir;
 	private File file;
 	private SceneManager sceneManager;
@@ -29,8 +32,9 @@ public class TimeSeriesLogger {
 	private String content = "";
 	private int counter = 0;
 
-	public TimeSeriesLogger(int period, File dir, SceneManager sceneManager) {
-		this.period = period;
+	public TimeSeriesLogger(int logPeriod, int savePeriod, File dir, SceneManager sceneManager) {
+		this.logPeriod = logPeriod;
+		this.savePeriod = savePeriod;
 		this.dir = dir;
 		this.sceneManager = sceneManager;
 		undoManager = sceneManager.getUndoManager();
@@ -38,9 +42,10 @@ public class TimeSeriesLogger {
 	}
 
 	private void log() {
-		counter++;
 		String timestamp = new SimpleDateFormat("yyyy-MM-dd" + space + "HH:mm:ss").format(Calendar.getInstance().getTime());
 		URL url = Scene.getURL();
+		if (url == null) // no logging if not using a template
+			return;
 		String filename = url == null ? null : new File(url.getFile()).getName();
 		String undoAction = undoManager.getUndoPresentationName();
 		if (undoAction.startsWith("Undo")) {
@@ -61,7 +66,7 @@ public class TimeSeriesLogger {
 		String line = timestamp;
 		line += space + (filename != null ? "[" + filename + "]" : null);
 		line += space + (undoAction != null ? "[" + undoAction + "]" : null);
-		line += space + (undoAction != null ? "[" + getId(getTopContainer(actedHousePart)) + "]" : null);
+		line += space + (undoAction != null ? "[" + getBuildingId(actedHousePart) + "]" : null);
 		line += space + (undoAction != null ? "[" + getId(actedHousePart) + "]" : null);
 		Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
 		line += space + "[Time " + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "]";
@@ -73,25 +78,36 @@ public class TimeSeriesLogger {
 		line += space + (Scene.getInstance().isAnnotationsVisible() ? "[Annotation]" : null);
 		System.out.println(line);
 		content += line + System.getProperty("line.separator");
-		if (counter % 10 == 0) {
-			try {
-				saveString(content);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		if (counter % savePeriod == 0) {
+			saveLog();
 		}
+		counter++;
 	}
 
-	private void saveString(String s) throws Exception {
-		PrintWriter writer = new PrintWriter(file);
-		writer.print(s);
-		writer.close();
+	public void saveLog() {
+		try {
+			PrintWriter writer = new PrintWriter(file);
+			writer.print(content);
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging! Please notify the teacher of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private String getId(final HousePart p) {
 		if (p == null)
 			return null;
 		return p.getClass().getSimpleName() + " #" + p.getId();
+	}
+
+	private String getBuildingId(final HousePart p) {
+		if (p == null)
+			return null;
+		HousePart x = getTopContainer(actedHousePart);
+		if (x == null)
+			return null;
+		return "Building #" + x.getId();
 	}
 
 	private HousePart getTopContainer(final HousePart p) {
@@ -111,19 +127,21 @@ public class TimeSeriesLogger {
 	public void start() {
 		String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
 		file = new File(dir, timestamp + ".txt");
-		new Thread() {
+		Thread t = new Thread() {
 			@Override
 			public void run() {
 				while (true) {
 					try {
-						sleep(1000 * period);
+						sleep(1000 * logPeriod);
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
 					log();
 				}
 			}
-		}.start();
+		};
+		t.setPriority(Thread.MIN_PRIORITY);
+		t.start();
 	}
 
 }

@@ -24,7 +24,7 @@ public class EditFoundationCommand extends EditHousePartCommand {
 	public HousePart getHousePart() {
 		return foundation;
 	}
-	
+
 	@Override
 	public void undo() throws CannotUndoException {
 		foundation.setResizeHouseMode(isResizeMode);
@@ -52,4 +52,12 @@ public class EditFoundationCommand extends EditHousePartCommand {
 		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
 	}
+
+	@Override
+	public String getPresentationName() {
+		if (foundation.isResizeHouseMode())
+			return "Resize Building";
+		return "Edit " + foundation.getClass().getSimpleName();
+	}
+
 }

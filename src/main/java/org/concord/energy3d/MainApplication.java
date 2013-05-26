@@ -47,7 +47,13 @@ public class MainApplication {
 			if (!dir.exists())
 				dir.mkdir();
 			logSnapshots(20, dir);
-			new TimeSeriesLogger(1, dir, scene).start();
+			final TimeSeriesLogger logger = new TimeSeriesLogger(1, 20, dir, scene);
+			scene.addShutdownHook(new Runnable() {
+				public void run() {
+					logger.saveLog();
+				}
+			});
+			logger.start();
 		}
 	}
 
@@ -98,29 +104,37 @@ public class MainApplication {
 	}
 
 	private static void logSnapshots(final int period, final File dir) {
-		new Thread() {
+		Thread t = new Thread() {
 			@Override
 			public void run() {
 				while (true) {
 					try {
-						sleep(1000 * period); // 20 seconds seem to be optimal
+						sleep(1000 * period); // 20 seconds seem optimal
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
-					if (Scene.getInstance().isEdited()) {
-						final Date date = Calendar.getInstance().getTime();
-						final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd   HH-mm-ss   ").format(date) + SceneManager.getInstance().getUndoManager().getEditCounts() + ".ng3";
+					if (Scene.getURL() != null) { // log only when student starts with a template
 						try {
-							Scene.save(new File(filename).toURI().toURL(), false);
+							saveSnapshot(dir);
 						} catch (final Exception e) {
 							e.printStackTrace();
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in Auto-Save! Models will no longer be saved automatically. Please notify the teacher of this problem:\n" + e.getMessage(), "Auto-Save Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging! Please notify the teacher of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
 							break;
 						}
 					}
 				}
 			}
-		}.start();
+		};
+		t.setPriority(Thread.MIN_PRIORITY);
+		t.start();
+	}
+
+	private static void saveSnapshot(final File dir) throws Exception {
+		if (Scene.getInstance().isEdited()) {
+			final Date date = Calendar.getInstance().getTime();
+			final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd  HH-mm-ss  ").format(date) + SceneManager.getInstance().getUndoManager().getEditCounts() + ".ng3";
+			Scene.save(new File(filename).toURI().toURL(), false);
+		}
 	}
 
 }

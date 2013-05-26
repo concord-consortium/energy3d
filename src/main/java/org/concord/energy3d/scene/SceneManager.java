@@ -189,6 +189,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Vector3 houseMoveStartPoint;
 	private ArrayList<Vector3> houseMovePoints;
 	private boolean solarColorMap = false;
+	
+	private ArrayList<Runnable> shutdownHooks;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -1150,8 +1152,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public boolean isTopView() {
 		return viewMode == ViewMode.TOP_VIEW;
 	}
+	
+	public void addShutdownHook(Runnable r){
+		if(shutdownHooks == null)
+			shutdownHooks = new ArrayList<Runnable>();
+		if(!shutdownHooks.contains(r))
+			shutdownHooks.add(r);
+	}
 
 	public void exit() {
+		if(shutdownHooks != null) { // e.g., save the log file before exit to ensure that the last segment is saved
+			for(Runnable r : shutdownHooks)
+				r.run();
+		}
 		// System.out.print("exit cleaning up...");
 		// this.exit = true;
 		// try {
