@@ -1461,6 +1461,10 @@ Version 0.5 - October 20, 2011
 - cleanup loaded scene so that house parts that are not set as completed are set as completed
 - improve solar colormap compute algorithm by using dot product of light with surface normal  
 - control the contrast of solar colormap using slider
+- save solar contrast with file
+
+- *stop sun animation before opening new file
+- *change undo text for move commad
 
 - *fix blue edge in colormap of walls
 - *add colormap ledgend

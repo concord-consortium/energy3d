@@ -85,6 +85,7 @@ public class Scene implements Serializable {
 	private int latitude;
 	private boolean isHeliodonVisible;
 	private String note;
+	private int solarContrast = 50;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -194,6 +195,7 @@ public class Scene implements Serializable {
 					energyPanel.setCity(instance.city);
 					MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 				}
+				energyPanel.getColorMapSlider().setValue(instance.solarContrast);
 				MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
 				SceneManager.getInstance().getUndoManager().die();
 				SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
@@ -318,6 +320,7 @@ public class Scene implements Serializable {
 		instance.city = EnergyPanel.getInstance().getCity();
 		instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 		instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
+		instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
 
 		if (setAsCurrentFile)
 			Scene.url = url;

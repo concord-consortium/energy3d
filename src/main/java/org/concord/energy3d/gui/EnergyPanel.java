@@ -1242,4 +1242,7 @@ public class EnergyPanel extends JPanel {
 			}
 		}
 	}
+	public JSlider getColorMapSlider() {
+		return colorMapSlider;
+	}
 }
