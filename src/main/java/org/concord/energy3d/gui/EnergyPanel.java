@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
@@ -166,12 +167,14 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox cityComboBox;
 	private final JLabel latitudeLabel;
 	private final JSpinner latitudeSpinner;
-	private final Map<HousePart, long[][]> solarOnWall = new HashMap<HousePart, long[][]>();
+	private final Map<HousePart, double[][]> solarOnWall = new HashMap<HousePart, double[][]>();
 	private final List<Spatial> solarCollidables = new ArrayList<Spatial>();
 	private long maxSolarValue;
-	private long[][] solarOnLand;
+	private double[][] solarOnLand;
 	private JProgressBar progressBar;
 	private final Map<Integer, Integer> powerOfTwo = new HashMap<Integer, Integer>();
+	private JPanel panel_4;
+	private JSlider colorMapSlider;
 
 	private class EnergyAmount {
 		double solar;
@@ -313,6 +316,25 @@ public class EnergyPanel extends JPanel {
 		panel_3.add(latitudeSpinner, gbc_latitudeSpinner);
 
 		panel_3.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_3.getPreferredSize().height));
+
+		panel_4 = new JPanel();
+		panel_4.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Radiation Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(panel_4);
+
+		colorMapSlider = new JSlider();
+		colorMapSlider.setMaximum(90);
+		colorMapSlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				if (!colorMapSlider.getValueIsAdjusting())
+					computeEnergy();
+			}
+		});
+		colorMapSlider.setSnapToTicks(true);
+		colorMapSlider.setMinorTickSpacing(10);
+		colorMapSlider.setMajorTickSpacing(10);
+		colorMapSlider.setPaintTicks(true);
+		panel_4.add(colorMapSlider);
 
 		final JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -1082,9 +1104,9 @@ public class EnergyPanel extends JPanel {
 
 				int rows = (int) (wall.getHighestPoint() / SOLAR_STEP);
 				int cols = (int) (wall.getAbsPoint(2).subtractLocal(wall.getAbsPoint(0)).length() / SOLAR_STEP);
-				long[][] solar = solarOnWall.get(wall);
+				double[][] solar = solarOnWall.get(wall);
 				if (solar == null) {
-					solar = new long[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
+					solar = new double[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
 					solarOnWall.put(wall, solar);
 				}
 				if (rows < solar.length)
@@ -1096,6 +1118,7 @@ public class EnergyPanel extends JPanel {
 				final double baseZ = origin.getZ();
 				final Vector3 p = new Vector3();
 				final ReadOnlyVector3 dir = part.getAbsPoint(2).subtract(origin, null).normalizeLocal();
+				final double dot = part.getFaceDirection().dot(directionTowardSun);
 				for (int col = 0; col < cols; col++) {
 					p.set(dir).multiplyLocal(col * SOLAR_STEP).addLocal(origin);
 					for (int row = 0; row < rows; row++) {
@@ -1106,7 +1129,7 @@ public class EnergyPanel extends JPanel {
 							if (spatial != wall.getInvisibleMesh())
 								PickingUtil.findPick(spatial, pickRay, pickResults, false);
 						if (pickResults.getNumber() == 0)
-							solar[row][col]++;
+							solar[row][col] += dot;
 					}
 				}
 			}
@@ -1124,7 +1147,7 @@ public class EnergyPanel extends JPanel {
 		final int rows = (int) (256 / SOLAR_STEP);
 		final int cols = rows;
 		if (solarOnLand == null)
-			solarOnLand = new long[rows][cols];
+			solarOnLand = new double[rows][cols];
 		final Vector3 p = new Vector3();
 		for (int col = 0; col < cols; col++) {
 			p.setX((col - cols / 2) * SOLAR_STEP);
@@ -1135,7 +1158,7 @@ public class EnergyPanel extends JPanel {
 				for (final Spatial spatial : solarCollidables)
 					PickingUtil.findPick(spatial, pickRay, pickResults, false);
 				if (pickResults.getNumber() == 0)
-					solarOnLand[row][col]++;
+					solarOnLand[row][col] += directionTowardSun.dot(Vector3.UNIT_Z);
 			}
 		}
 	}
@@ -1151,11 +1174,12 @@ public class EnergyPanel extends JPanel {
 			if (sunLocation.getZ() > 0) {
 				computeSolarOnWalls(sunLocation);
 				computeSolarOnLand(sunLocation);
-				maxSolarValue++;
 			}
+			maxSolarValue++;
 			today.add(Calendar.MINUTE, SOLAR_MINUTE_STEP);
 			progress();
 		}
+		maxSolarValue *= (100 - colorMapSlider.getValue()) / 100.0;
 	}
 
 	private void updateSolarValueOnAllHouses() {
@@ -1166,12 +1190,12 @@ public class EnergyPanel extends JPanel {
 				long total = 0;
 				for (final HousePart houseChild : foundation.getChildren()) {
 					if (houseChild instanceof Wall) {
-						final long[][] solar = solarOnWall.get(houseChild);
+						final double[][] solar = solarOnWall.get(houseChild);
 						if (solar != null)
 							for (int i = 0; i < solar.length; i++)
 								for (int j = 0; j < solar[i].length; j++)
 									total += solar[i][j];
-						((Wall) houseChild).applySolarTexture(solar, maxSolarValue);
+						MeshLib.applySolarTexture(houseChild.getMesh(), solar, maxSolarValue);
 					}
 				}
 				foundation.setSolarValue(total);
@@ -1184,7 +1208,7 @@ public class EnergyPanel extends JPanel {
 		System.out.println("--------------------------");
 		for (final HousePart part : solarOnWall.keySet()) {
 			System.out.println(part);
-			final long[][] solar = solarOnWall.get(part);
+			final double[][] solar = solarOnWall.get(part);
 			for (int i = solar.length - 1; i > 0; i--) {
 				for (int j = 0; j < solar[0].length; j++)
 					System.out.print(solar[i][j] + " ");

@@ -1,6 +1,5 @@
 package org.concord.energy3d.model;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +26,6 @@ import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
-import com.ardor3d.image.Image;
-import com.ardor3d.image.ImageDataFormat;
-import com.ardor3d.image.PixelDataType;
-import com.ardor3d.image.Texture.MinificationFilter;
-import com.ardor3d.image.Texture2D;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -41,18 +35,14 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.controller.interpolation.DefaultColorInterpolationController;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText.Align;
-import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
@@ -1221,45 +1211,45 @@ public class Wall extends HousePart {
 		return area;
 	}
 
-	public void applySolarTexture(final long[][] solarData, final long maxValue) {
-		final int rows;
-		final int cols;
-		if (solarData == null) {
-			rows = cols = 1;
-		} else {
-			rows = solarData.length;
-			cols = solarData[0].length;
-		}
-
-		final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
-		final DefaultColorInterpolationController controller = new DefaultColorInterpolationController();
-		controller.setControls(colors);
-
-		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
-		for (int row = 0; row < rows; row++) {
-			for (int col = 0; col < cols; col++) {
-				final long value = solarData == null ? 0 : solarData[row][col];
-				long valuePerColorRange = maxValue / (colors.length - 1);
-				final int colorIndex;
-				if (valuePerColorRange == 0) {
-					valuePerColorRange = 1;
-					colorIndex = 0;
-				} else
-					colorIndex = (int) Math.min(value / valuePerColorRange, colors.length - 2);
-				final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
-				final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
-				data.put((byte) (color.getRed() * 255)).put((byte) (color.getGreen() * 255)).put((byte) (color.getBlue() * 255));
-			}
-		}
-
-		final Image image = new Image(ImageDataFormat.RGB, PixelDataType.UnsignedByte, cols, rows, data, null);
-		final Texture2D texture = new Texture2D();
-		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
-		texture.setImage(image);
-		final TextureState textureState = new TextureState();
-		textureState.setTexture(texture);
-		mesh.setRenderState(textureState);
-	}
+//	public void applySolarTexture(final double[][] solarData, final long maxValue) {
+//		final int rows;
+//		final int cols;
+//		if (solarData == null) {
+//			rows = cols = 1;
+//		} else {
+//			rows = solarData.length;
+//			cols = solarData[0].length;
+//		}
+//
+//		final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
+//		final DefaultColorInterpolationController controller = new DefaultColorInterpolationController();
+//		controller.setControls(colors);
+//
+//		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
+//		for (int row = 0; row < rows; row++) {
+//			for (int col = 0; col < cols; col++) {
+//				final double value = solarData == null ? 0 : solarData[row][col];
+//				long valuePerColorRange = maxValue / (colors.length - 1);
+//				final int colorIndex;
+//				if (valuePerColorRange == 0) {
+//					valuePerColorRange = 1;
+//					colorIndex = 0;
+//				} else
+//					colorIndex = (int) Math.min(value / valuePerColorRange, colors.length - 2);
+//				final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
+//				final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
+//				data.put((byte) (color.getRed() * 255)).put((byte) (color.getGreen() * 255)).put((byte) (color.getBlue() * 255));
+//			}
+//		}
+//
+//		final Image image = new Image(ImageDataFormat.RGB, PixelDataType.UnsignedByte, cols, rows, data, null);
+//		final Texture2D texture = new Texture2D();
+//		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
+//		texture.setImage(image);
+//		final TextureState textureState = new TextureState();
+//		textureState.setTexture(texture);
+//		mesh.setRenderState(textureState);
+//	}
 
 	public double getHighestPoint() {
 		return highestPoint - points.get(0).getZ();

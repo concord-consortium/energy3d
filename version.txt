@@ -1459,11 +1459,14 @@ Version 0.5 - October 20, 2011
 - remove the white from solar colormap so that red is not the hottest
 - fix problem with some walls showing as blue in solarmap
 - cleanup loaded scene so that house parts that are not set as completed are set as completed
+- improve solar colormap compute algorithm by using dot product of light with surface normal  
+- control the contrast of solar colormap using slider
 
 - *fix blue edge in colormap of walls
 - *add colormap ledgend
 - *copy and paste for the entire house
 - *fix problem with double clicking moves the edit point
+- replace existing roof with new roof instead of double roof
 
 - *monthly solar colormap
 

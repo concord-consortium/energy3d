@@ -499,7 +499,7 @@ public class MeshLib {
 		mesh.updateModelBound();
 	}
 
-	public static void applySolarTexture(final Mesh mesh, final long[][] solarData, final long maxValue) {
+	public static void applySolarTexture(final Mesh mesh, final double[][] solarData, final long maxValue) {
 		final int rows;
 		final int cols;
 		if (solarData == null) {
@@ -509,14 +509,14 @@ public class MeshLib {
 			cols = solarData[0].length;
 		}
 
-		final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED, ColorRGBA.WHITE };
+		final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
 		final DefaultColorInterpolationController controller = new DefaultColorInterpolationController();
 		controller.setControls(colors);
 
 		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
-				final long value = solarData == null ? maxValue : solarData[row][col];
+				final double value = solarData == null ? 0 : solarData[row][col];
 				long valuePerColorRange = maxValue / (colors.length - 1);
 				final int colorIndex;
 				if (valuePerColorRange == 0) {
@@ -524,8 +524,8 @@ public class MeshLib {
 					colorIndex = 0;
 				} else
 					colorIndex = (int) Math.min(value / valuePerColorRange, colors.length - 2);
-				final float scaler = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
-				final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scaler);
+				final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
+				final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
 				data.put((byte) (color.getRed() * 255)).put((byte) (color.getGreen() * 255)).put((byte) (color.getBlue() * 255));
 			}
 		}
