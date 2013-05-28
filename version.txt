@@ -1456,9 +1456,13 @@ Version 0.5 - October 20, 2011
 - restore camera view after returning from top view
 - fix top view changes after window resize by reseting parallel view
 - append foundation id to solar label
+- remove the white from solar colormap so that red is not the hottest
+  
 
 - *fix blue edge in colormap of walls
 - *add colormap ledgend
+- *copy and paste for the entire house
+- *fix problem with double clicking moves the edit point
 
 - *monthly solar colormap
 

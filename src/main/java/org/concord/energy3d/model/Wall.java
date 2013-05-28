@@ -1231,7 +1231,7 @@ public class Wall extends HousePart {
 			cols = solarData[0].length;
 		}
 
-		final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED, ColorRGBA.WHITE };
+		final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
 		final DefaultColorInterpolationController controller = new DefaultColorInterpolationController();
 		controller.setControls(colors);
 
