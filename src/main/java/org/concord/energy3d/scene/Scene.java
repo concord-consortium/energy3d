@@ -260,6 +260,8 @@ public class Scene implements Serializable {
 	private void cleanup() {
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
 		for (final HousePart housePart : getParts()) {
+			if (!housePart.isDrawCompleted())
+				housePart.complete();
 			if (!housePart.isValid() || ((housePart instanceof Roof || housePart instanceof Window || housePart instanceof Door) && housePart.getContainer() == null))
 				toBeRemoved.add(housePart);
 			removeDeadChildren(housePart, toBeRemoved);
@@ -411,7 +413,7 @@ public class Scene implements Serializable {
 			SceneManager.getInstance().refresh();
 
 	}
-	
+
 	public void setTextureMode(final TextureMode textureMode) {
 		this.textureMode = textureMode;
 		redrawAll();
@@ -448,6 +450,7 @@ public class Scene implements Serializable {
 	}
 
 	public void redrawAllNow() {
+		System.out.println("redrawAllNow()");
 		Snap.clearAnnotationDrawn();
 		for (final HousePart part : parts)
 			if (part instanceof Roof)

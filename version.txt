@@ -1457,7 +1457,8 @@ Version 0.5 - October 20, 2011
 - fix top view changes after window resize by reseting parallel view
 - append foundation id to solar label
 - remove the white from solar colormap so that red is not the hottest
-  
+- fix problem with some walls showing as blue in solarmap
+- cleanup loaded scene so that house parts that are not set as completed are set as completed
 
 - *fix blue edge in colormap of walls
 - *add colormap ledgend
