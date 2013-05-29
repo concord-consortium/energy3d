@@ -336,6 +336,8 @@ public class EnergyPanel extends JPanel {
 		colorMapSlider.setPaintTicks(true);
 		panel_4.add(colorMapSlider);
 
+		panel_4.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_4.getPreferredSize().height));
+
 		final JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel);
