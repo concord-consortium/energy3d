@@ -1,7 +1,9 @@
 package org.concord.energy3d.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -61,12 +63,15 @@ import org.concord.energy3d.util.MeshLib;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Spatial;
 
 public class EnergyPanel extends JPanel {
+	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
 	public static final double SOLAR_STEP = 2.0;
 	private static final long serialVersionUID = 1L;
 	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
@@ -175,6 +180,9 @@ public class EnergyPanel extends JPanel {
 	private final Map<Integer, Integer> powerOfTwo = new HashMap<Integer, Integer>();
 	private JPanel panel_4;
 	private JSlider colorMapSlider;
+	private JPanel colormapPanel;
+	private JLabel legendLabel;
+	private JLabel contrastLabel;
 
 	private class EnergyAmount {
 		double solar;
@@ -318,8 +326,16 @@ public class EnergyPanel extends JPanel {
 		panel_3.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_3.getPreferredSize().height));
 
 		panel_4 = new JPanel();
-		panel_4.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Radiation Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_4.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Radiation Heat Map", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel_4);
+		final GridBagLayout gbl_panel_4 = new GridBagLayout();
+		panel_4.setLayout(gbl_panel_4);
+
+		legendLabel = new JLabel("Legend: ");
+		final GridBagConstraints gbc_legendLabel = new GridBagConstraints();
+		gbc_legendLabel.gridx = 0;
+		gbc_legendLabel.gridy = 0;
+		panel_4.add(legendLabel, gbc_legendLabel);
 
 		colorMapSlider = new JSlider();
 		colorMapSlider.setMaximum(90);
@@ -330,11 +346,40 @@ public class EnergyPanel extends JPanel {
 					computeEnergy();
 			}
 		});
+
+		colormapPanel = new JPanel() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void paint(final Graphics g) {
+				final int STEP = 5;
+				final Dimension size = getSize();
+				for (int x = 0; x < size.width - STEP; x += STEP) {
+					final ColorRGBA color = MeshLib.computeSolarColor(x, size.width);
+					g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+					g.fillRect(x, 0, x + STEP, size.height);
+				}
+			}
+		};
+		final GridBagConstraints gbc_colormapPanel = new GridBagConstraints();
+		gbc_colormapPanel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_colormapPanel.gridy = 0;
+		gbc_colormapPanel.gridx = 1;
+		panel_4.add(colormapPanel, gbc_colormapPanel);
+
+		contrastLabel = new JLabel("Contrast: ");
+		final GridBagConstraints gbc_contrastLabel = new GridBagConstraints();
+		gbc_contrastLabel.gridx = 0;
+		gbc_contrastLabel.gridy = 1;
+		panel_4.add(contrastLabel, gbc_contrastLabel);
 		colorMapSlider.setSnapToTicks(true);
 		colorMapSlider.setMinorTickSpacing(10);
 		colorMapSlider.setMajorTickSpacing(10);
 		colorMapSlider.setPaintTicks(true);
-		panel_4.add(colorMapSlider);
+		final GridBagConstraints gbc_colorMapSlider = new GridBagConstraints();
+		gbc_colorMapSlider.gridy = 1;
+		gbc_colorMapSlider.gridx = 1;
+		panel_4.add(colorMapSlider, gbc_colorMapSlider);
 
 		panel_4.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_4.getPreferredSize().height));
 
@@ -1074,8 +1119,8 @@ public class EnergyPanel extends JPanel {
 		solarOnLand = null;
 		maxSolarValue = 1;
 		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
-//		computeSolarOnWalls(Heliodon.getInstance().getSunLocation());
-		 computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
+		// computeSolarOnWalls(Heliodon.getInstance().getSunLocation());
+		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		// printSolarOnWalls();
 		updateSolarValueOnAllHouses();
 		System.out.println("time = " + (System.nanoTime() - t) / 1000000000);
@@ -1244,6 +1289,7 @@ public class EnergyPanel extends JPanel {
 			}
 		}
 	}
+
 	public JSlider getColorMapSlider() {
 		return colorMapSlider;
 	}

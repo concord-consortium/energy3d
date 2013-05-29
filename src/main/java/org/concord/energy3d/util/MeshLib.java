@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -35,7 +36,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.controller.interpolation.DefaultColorInterpolationController;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -509,23 +509,11 @@ public class MeshLib {
 			cols = solarData[0].length;
 		}
 
-		final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
-		final DefaultColorInterpolationController controller = new DefaultColorInterpolationController();
-		controller.setControls(colors);
-
 		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 				final double value = solarData == null ? 0 : solarData[row][col];
-				long valuePerColorRange = maxValue / (colors.length - 1);
-				final int colorIndex;
-				if (valuePerColorRange == 0) {
-					valuePerColorRange = 1;
-					colorIndex = 0;
-				} else
-					colorIndex = (int) Math.min(value / valuePerColorRange, colors.length - 2);
-				final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
-				final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
+				final ColorRGBA color = computeSolarColor(value, maxValue);
 				data.put((byte) (color.getRed() * 255)).put((byte) (color.getGreen() * 255)).put((byte) (color.getBlue() * 255));
 			}
 		}
@@ -537,6 +525,20 @@ public class MeshLib {
 		final TextureState textureState = new TextureState();
 		textureState.setTexture(texture);
 		mesh.setRenderState(textureState);
+	}
+
+	public static ColorRGBA computeSolarColor(final double value, final long maxValue) {
+		final ReadOnlyColorRGBA[] colors = EnergyPanel.solarColors;
+		long valuePerColorRange = maxValue / (colors.length - 1);
+		final int colorIndex;
+		if (valuePerColorRange == 0) {
+			valuePerColorRange = 1;
+			colorIndex = 0;
+		} else
+			colorIndex = (int) Math.min(value / valuePerColorRange, colors.length - 2);
+		final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
+		final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
+		return color;
 	}
 
 }

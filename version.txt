@@ -1464,9 +1464,9 @@ Version 0.5 - October 20, 2011
 - save solar contrast with file
 - stop sun animation before opening new file
 - change undo text for move foundation commad
+- add colormap ledgend
 
 - *fix blue edge in colormap of walls
-- *add colormap ledgend
 - *copy and paste for the entire house
 - *fix problem with double clicking moves the edit point
 - replace existing roof with new roof instead of double roof
