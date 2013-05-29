@@ -12,11 +12,13 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 public class EditFoundationCommand extends EditHousePartCommand {
 	private final Foundation foundation;
 	private final boolean isResizeMode;
+	private final boolean isMoveMode;
 
-	public EditFoundationCommand(final Foundation foundation) {
+	public EditFoundationCommand(final Foundation foundation, final boolean moveMode) {
 		super(foundation);
 		this.foundation = foundation;
 		isResizeMode = SceneManager.getInstance().getOperation() == Operation.RESIZE;
+		isMoveMode = moveMode;
 	}
 
 	// for action logging
@@ -55,9 +57,13 @@ public class EditFoundationCommand extends EditHousePartCommand {
 
 	@Override
 	public String getPresentationName() {
-		if (foundation.isResizeHouseMode())
+//		if (foundation.isResizeHouseMode())
+		if (isMoveMode)
+			return "Move Building";
+		else if (isResizeMode)
 			return "Resize Building";
-		return "Edit " + foundation.getClass().getSimpleName();
+		else
+			return "Edit " + foundation.getClass().getSimpleName();
 	}
 
 }

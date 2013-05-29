@@ -1463,8 +1463,7 @@ Version 0.5 - October 20, 2011
 - control the contrast of solar colormap using slider
 - save solar contrast with file
 - stop sun animation before opening new file
-
-- *change undo text for move commad
+- change undo text for move foundation commad
 
 - *fix blue edge in colormap of walls
 - *add colormap ledgend
