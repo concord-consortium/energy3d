@@ -57,7 +57,6 @@ public class EditFoundationCommand extends EditHousePartCommand {
 
 	@Override
 	public String getPresentationName() {
-//		if (foundation.isResizeHouseMode())
 		if (isMoveMode)
 			return "Move Building";
 		else if (isResizeMode)

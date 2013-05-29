@@ -4,6 +4,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 
@@ -18,7 +19,7 @@ public class RemoveHousePartCommand extends AbstractUndoableEdit {
 
 	public RemoveHousePartCommand(final HousePart housePart, final boolean isSignificant) {
 		this.housePart = housePart;
-		this.isSignificant  = isSignificant;
+		this.isSignificant = isSignificant;
 	}
 
 	// for action logging
@@ -45,6 +46,9 @@ public class RemoveHousePartCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Remove " + housePart.getClass().getSimpleName();
+		if (housePart instanceof Foundation && !housePart.getChildren().isEmpty())
+			return "Remove Building";
+		else
+			return "Remove " + housePart.getClass().getSimpleName();
 	}
 }
