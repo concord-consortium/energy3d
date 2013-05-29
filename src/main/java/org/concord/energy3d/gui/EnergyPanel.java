@@ -331,8 +331,9 @@ public class EnergyPanel extends JPanel {
 		final GridBagLayout gbl_panel_4 = new GridBagLayout();
 		panel_4.setLayout(gbl_panel_4);
 
-		legendLabel = new JLabel("Legend: ");
+		legendLabel = new JLabel("Color Scale: ");
 		final GridBagConstraints gbc_legendLabel = new GridBagConstraints();
+		gbc_legendLabel.anchor = GridBagConstraints.WEST;
 		gbc_legendLabel.gridx = 0;
 		gbc_legendLabel.gridy = 0;
 		panel_4.add(legendLabel, gbc_legendLabel);
@@ -369,6 +370,7 @@ public class EnergyPanel extends JPanel {
 
 		contrastLabel = new JLabel("Contrast: ");
 		final GridBagConstraints gbc_contrastLabel = new GridBagConstraints();
+		gbc_contrastLabel.anchor = GridBagConstraints.WEST;
 		gbc_contrastLabel.gridx = 0;
 		gbc_contrastLabel.gridy = 1;
 		panel_4.add(contrastLabel, gbc_contrastLabel);
