@@ -529,7 +529,7 @@ public class MainPanel extends JPanel {
 	 *
 	 * @return javax.swing.JToggleButton
 	 */
-	private JToggleButton getSunAnimButton() {
+	public JToggleButton getSunAnimButton() {
 		if (sunAnimButton == null) {
 			sunAnimButton = new JToggleButton();
 			sunAnimButton.addMouseListener(refreshUponMouseExit);
