@@ -364,7 +364,7 @@ public class Heliodon {
 					setHourAngle(newHourAngle, false, true);
 				if (declinationChanged || hourAngleChanged) {
 					setSunLocation(newSunLocation);
-					EnergyPanel.getInstance().computeEnergy();
+					EnergyPanel.getInstance().compute();
 				}
 			}
 		}));

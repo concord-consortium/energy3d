@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyEvent;
+import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,8 +59,12 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.util.MeshLib;
 
+import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.PixelDataType;
+import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.image.Texture2D;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -68,7 +73,11 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.util.TextureKey;
+import com.ardor3d.util.geom.BufferUtils;
 
 public class EnergyPanel extends JPanel {
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
@@ -183,6 +192,7 @@ public class EnergyPanel extends JPanel {
 	private JPanel colormapPanel;
 	private JLabel legendLabel;
 	private JLabel contrastLabel;
+	private final Map<HousePart, Double> solarTotal = new HashMap<HousePart, Double>();
 
 	private class EnergyAmount {
 		double solar;
@@ -235,7 +245,7 @@ public class EnergyPanel extends JPanel {
 				final Heliodon heliodon = Heliodon.getInstance();
 				if (heliodon != null)
 					heliodon.setDate((Date) dateSpinner.getValue());
-				computeEnergy();
+				compute();
 			}
 		});
 		final GridBagConstraints gbc_dateSpinner = new GridBagConstraints();
@@ -254,7 +264,7 @@ public class EnergyPanel extends JPanel {
 				if (!cityComboBox.getSelectedItem().equals("")) {
 					final Integer newLatitude = cityLatitute.get(cityComboBox.getSelectedItem());
 					if (newLatitude.equals(latitudeSpinner.getValue()))
-						computeEnergy();
+						compute();
 					else
 						latitudeSpinner.setValue(newLatitude);
 				}
@@ -289,7 +299,7 @@ public class EnergyPanel extends JPanel {
 				final Heliodon heliodon = Heliodon.getInstance();
 				if (heliodon != null)
 					heliodon.setTime((Date) timeSpinner.getValue());
-				computeEnergy();
+				compute();
 			}
 		});
 		final GridBagConstraints gbc_timeSpinner = new GridBagConstraints();
@@ -314,7 +324,7 @@ public class EnergyPanel extends JPanel {
 				if (!cityComboBox.getSelectedItem().equals("") && !cityLatitute.values().contains(latitudeSpinner.getValue()))
 					cityComboBox.setSelectedItem("");
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
-				computeEnergy();
+				compute();
 			}
 		});
 		final GridBagConstraints gbc_latitudeSpinner = new GridBagConstraints();
@@ -344,7 +354,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				if (!colorMapSlider.getValueIsAdjusting())
-					computeEnergy();
+					compute();
 			}
 		});
 
@@ -356,7 +366,7 @@ public class EnergyPanel extends JPanel {
 				final int STEP = 5;
 				final Dimension size = getSize();
 				for (int x = 0; x < size.width - STEP; x += STEP) {
-					final ColorRGBA color = MeshLib.computeSolarColor(x, size.width);
+					final ColorRGBA color = computeSolarColor(x, size.width);
 					g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 					g.fillRect(x, 0, x + STEP, size.height);
 				}
@@ -403,7 +413,7 @@ public class EnergyPanel extends JPanel {
 		insideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				computeEnergy();
+				compute();
 			}
 		});
 		insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
@@ -428,7 +438,7 @@ public class EnergyPanel extends JPanel {
 		outsideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				computeEnergy();
+				compute();
 			}
 		});
 		final GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
@@ -446,7 +456,7 @@ public class EnergyPanel extends JPanel {
 				outsideTemperatureSpinner.setEnabled(!selected);
 				if (selected)
 					updateOutsideTemperature();
-				computeEnergy();
+				compute();
 			}
 		});
 		final GridBagConstraints gbc_autoCheckBox = new GridBagConstraints();
@@ -683,7 +693,7 @@ public class EnergyPanel extends JPanel {
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				computeEnergy();
+				compute();
 			}
 		});
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
@@ -707,7 +717,7 @@ public class EnergyPanel extends JPanel {
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				computeEnergy();
+				compute();
 			}
 		});
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
@@ -730,7 +740,7 @@ public class EnergyPanel extends JPanel {
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				computeEnergy();
+				compute();
 			}
 		});
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
@@ -753,7 +763,7 @@ public class EnergyPanel extends JPanel {
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				computeEnergy();
+				compute();
 			}
 		});
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
@@ -856,7 +866,7 @@ public class EnergyPanel extends JPanel {
 		roofsEnergyChartData.setYValue(isZero ? 0 : roofs / total * 100.0);
 	}
 
-	public void computeEnergy() {
+	public void compute() {
 		if (thread != null && thread.isAlive()) {
 			computeRequest = true;
 		} else {
@@ -871,7 +881,7 @@ public class EnergyPanel extends JPanel {
 						}
 						computeRequest = false;
 						try {
-							computeEnergyNow();
+							computeNow();
 						} finally {
 							try {
 								Thread.sleep(500);
@@ -887,13 +897,13 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	private void computeEnergyNow() {
+	private void computeNow() {
 		System.out.println("computeEnergyNow()");
 
 		progressBar.setValue(0);
 
 		if (SceneManager.getInstance().isSolarColorMap())
-			computeSolarColorMap();
+			computeRadiation();
 		else {
 			for (final HousePart part : Scene.getInstance().getParts())
 				if (part instanceof Foundation)
@@ -1054,7 +1064,7 @@ public class EnergyPanel extends JPanel {
 		final EnergyAmount energyRate = new EnergyAmount();
 
 		if (Heliodon.getInstance().isVisible() && !Heliodon.getInstance().isNightTime())
-			energyRate.solar = computeSolarEnergyRate(sunLocation.normalize(null));
+			energyRate.solar = computeEnergySolarRate(sunLocation.normalize(null));
 
 		final double energyLossRate = computeEnergyLossRate(insideTemperature - outsideTemperature);
 		if (energyLossRate >= 0.0) {
@@ -1084,7 +1094,7 @@ public class EnergyPanel extends JPanel {
 		return wallsEnergyLoss + doorsEnergyLoss + windowsEnergyLoss + roofsEnergyLoss;
 	}
 
-	private double computeSolarEnergyRate(final ReadOnlyVector3 sunVector) {
+	private double computeEnergySolarRate(final ReadOnlyVector3 sunVector) {
 		double totalRate = 0.0;
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Window) {
@@ -1112,19 +1122,19 @@ public class EnergyPanel extends JPanel {
 		return timeSpinner;
 	}
 
-	private void computeSolarColorMap() {
+	private void computeRadiation() {
 		final long t = System.nanoTime();
 
 		initSolarCollidables();
-
 		solarOnWall.clear();
+		solarTotal.clear();
 		solarOnLand = null;
 		maxSolarValue = 1;
 		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
-		// computeSolarOnWalls(Heliodon.getInstance().getSunLocation());
-		computeSolarOnWallsToday((Calendar) Heliodon.getInstance().getCalander().clone());
-		// printSolarOnWalls();
+		// computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
+		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		updateSolarValueOnAllHouses();
+
 		System.out.println("time = " + (System.nanoTime() - t) / 1000000000);
 	}
 
@@ -1138,7 +1148,7 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	private void computeSolarOnWalls(final ReadOnlyVector3 sunLocation) {
+	private void computeRadiationOnWalls(final ReadOnlyVector3 sunLocation) {
 		if (sunLocation.getZ() <= 0)
 			return;
 		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
@@ -1150,42 +1160,65 @@ public class EnergyPanel extends JPanel {
 			final HousePart part = parts.get(i);
 			if (part instanceof Wall && part.isDrawCompleted() && part.getFaceDirection().dot(directionTowardSun) > 0) {
 				final Wall wall = (Wall) part;
-
-				int rows = (int) (wall.getHighestPoint() / SOLAR_STEP);
-				int cols = (int) (wall.getAbsPoint(2).subtractLocal(wall.getAbsPoint(0)).length() / SOLAR_STEP);
+				final int rows = (int) Math.ceil(wall.getHighestPoint() / SOLAR_STEP);
+				final ReadOnlyVector3 origin = part.getAbsPoint(0);
+				final ReadOnlyVector3 p2 = wall.getAbsPoint(2);
+				final int cols = (int) Math.ceil(p2.subtract(origin, null).length() / SOLAR_STEP);
 				double[][] solar = solarOnWall.get(wall);
 				if (solar == null) {
 					solar = new double[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
 					solarOnWall.put(wall, solar);
 				}
-				if (rows < solar.length)
-					rows++;
-				if (cols < solar[0].length)
-					cols++;
 
-				final ReadOnlyVector3 origin = part.getAbsPoint(0);
 				final double baseZ = origin.getZ();
+				final ReadOnlyVector3 dir = p2.subtract(origin, null).normalizeLocal();
 				final Vector3 p = new Vector3();
-				final ReadOnlyVector3 dir = part.getAbsPoint(2).subtract(origin, null).normalizeLocal();
 				final double dot = part.getFaceDirection().dot(directionTowardSun);
 				for (int col = 0; col < cols; col++) {
 					p.set(dir).multiplyLocal(col * SOLAR_STEP).addLocal(origin);
+					final double w;
+					if (col == cols - 1)
+						w = p2.distance(p);
+					else
+						w = SOLAR_STEP;
 					for (int row = 0; row < rows; row++) {
 						p.setZ(baseZ + row * SOLAR_STEP);
+						final double h;
+						if (row == rows - 1)
+							h = wall.getHighestPoint() - (row * SOLAR_STEP);
+						else
+							h = SOLAR_STEP;
 						final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
 						final PickResults pickResults = new PrimitivePickResults();
 						for (final Spatial spatial : solarCollidables)
 							if (spatial != wall.getInvisibleMesh())
 								PickingUtil.findPick(spatial, pickRay, pickResults, false);
-						if (pickResults.getNumber() == 0)
+						if (pickResults.getNumber() == 0) {
 							solar[row][col] += dot;
+							final HousePart house = wall.getContainer();
+							final Double val = solarTotal.get(house);
+							solarTotal.put(house, val == null ? 0 : val + dot * w * h);
+						}
 					}
 				}
+				if (rows < solar.length)
+					for (int col = 0; col < solar[0].length; col++) {
+						solar[solar.length - 1][col] = solar[0][col];
+						if (rows != solar.length - 1)
+							solar[rows][col] = solar[0][col];
+					}
+
+				if (cols < solar[0].length)
+					for (int row = 0; row < solar.length; row++) {
+						solar[row][solar[0].length - 1] = solar[row][0];
+						if (cols != solar[0].length - 1)
+							solar[row][cols] = solar[row][0];
+					}
 			}
 		}
 	}
 
-	private void computeSolarOnLand(final ReadOnlyVector3 sunLocation) {
+	private void computeRadiationOnLand(final ReadOnlyVector3 sunLocation) {
 		if (sunLocation.getZ() <= 0)
 			return;
 		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
@@ -1212,7 +1245,7 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	private void computeSolarOnWallsToday(final Calendar today) {
+	private void computeRadiationToday(final Calendar today) {
 		final Heliodon heliodon = Heliodon.getInstance();
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
@@ -1221,8 +1254,8 @@ public class EnergyPanel extends JPanel {
 		for (int minute = 0; minute < 1440; minute += SOLAR_MINUTE_STEP) {
 			final ReadOnlyVector3 sunLocation = heliodon.computeSunLocation(today);
 			if (sunLocation.getZ() > 0) {
-				computeSolarOnWalls(sunLocation);
-				computeSolarOnLand(sunLocation);
+				computeRadiationOnWalls(sunLocation);
+				computeRadiationOnLand(sunLocation);
 			}
 			maxSolarValue++;
 			today.add(Calendar.MINUTE, SOLAR_MINUTE_STEP);
@@ -1232,38 +1265,19 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void updateSolarValueOnAllHouses() {
-		MeshLib.applySolarTexture(SceneManager.getInstance().getSolarLand(), solarOnLand, maxSolarValue);
+		applySolarTexture(SceneManager.getInstance().getSolarLand(), solarOnLand, maxSolarValue);
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
 				final Foundation foundation = (Foundation) part;
-				long total = 0;
 				for (final HousePart houseChild : foundation.getChildren()) {
-					if (houseChild instanceof Wall) {
-						final double[][] solar = solarOnWall.get(houseChild);
-						if (solar != null)
-							for (int i = 0; i < solar.length; i++)
-								for (int j = 0; j < solar[i].length; j++)
-									total += solar[i][j];
-						MeshLib.applySolarTexture(houseChild.getMesh(), solar, maxSolarValue);
-					}
+					if (houseChild instanceof Wall)
+						applySolarTexture(houseChild.getMesh(), solarOnWall.get(houseChild), maxSolarValue);
 				}
-				foundation.setSolarValue(total);
+				final Double val = solarTotal.get(foundation);
+				foundation.setSolarValue(val == null ? 0 : val.longValue());
 			}
 		}
 		SceneManager.getInstance().refresh();
-	}
-
-	private void printSolarOnWalls() {
-		System.out.println("--------------------------");
-		for (final HousePart part : solarOnWall.keySet()) {
-			System.out.println(part);
-			final double[][] solar = solarOnWall.get(part);
-			for (int i = solar.length - 1; i > 0; i--) {
-				for (int j = 0; j < solar[0].length; j++)
-					System.out.print(solar[i][j] + " ");
-				System.out.println();
-			}
-		}
 	}
 
 	private void progress() {
@@ -1295,4 +1309,47 @@ public class EnergyPanel extends JPanel {
 	public JSlider getColorMapSlider() {
 		return colorMapSlider;
 	}
+
+	private void applySolarTexture(final Mesh mesh, final double[][] solarData, final long maxValue) {
+		final int rows;
+		final int cols;
+		if (solarData == null) {
+			rows = cols = 1;
+		} else {
+			rows = solarData.length;
+			cols = solarData[0].length;
+		}
+
+		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				final double value = solarData == null ? 0 : solarData[row][col];
+				final ColorRGBA color = computeSolarColor(value, maxValue);
+				data.put((byte) (color.getRed() * 255)).put((byte) (color.getGreen() * 255)).put((byte) (color.getBlue() * 255));
+			}
+		}
+
+		final Image image = new Image(ImageDataFormat.RGB, PixelDataType.UnsignedByte, cols, rows, data, null);
+		final Texture2D texture = new Texture2D();
+		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
+		texture.setImage(image);
+		final TextureState textureState = new TextureState();
+		textureState.setTexture(texture);
+		mesh.setRenderState(textureState);
+	}
+
+	private ColorRGBA computeSolarColor(final double value, final long maxValue) {
+		final ReadOnlyColorRGBA[] colors = EnergyPanel.solarColors;
+		long valuePerColorRange = maxValue / (colors.length - 1);
+		final int colorIndex;
+		if (valuePerColorRange == 0) {
+			valuePerColorRange = 1;
+			colorIndex = 0;
+		} else
+			colorIndex = (int) Math.min(value / valuePerColorRange, colors.length - 2);
+		final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
+		final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
+		return color;
+	}
+
 }

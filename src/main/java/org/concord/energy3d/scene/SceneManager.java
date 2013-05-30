@@ -1118,7 +1118,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		heliodonControl = selected;
 		Heliodon.getInstance().setVisible(selected);
 		enableDisableRotationControl();
-		EnergyPanel.getInstance().computeEnergy();
+		EnergyPanel.getInstance().compute();
 
 	}
 
@@ -1599,7 +1599,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.solarColorMap = solarColorMap;
 		solarLand.setVisible(solarColorMap);
 		Scene.getInstance().redrawAll();
-		EnergyPanel.getInstance().computeEnergy();
+		EnergyPanel.getInstance().compute();
 	}
 
 }
