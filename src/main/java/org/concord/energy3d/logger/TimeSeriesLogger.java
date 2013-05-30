@@ -3,6 +3,7 @@ package org.concord.energy3d.logger;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -18,8 +19,12 @@ import org.concord.energy3d.undo.AddHousePartCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.UndoManager;
 
+import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.Camera;
+
 public class TimeSeriesLogger {
 
+	private final static DecimalFormat FORMAT = new DecimalFormat(".###");
 	private final static String space = "   ";
 	private int logPeriod = 1; // in seconds
 	private int savePeriod = 20; // save less frequently
@@ -31,6 +36,10 @@ public class TimeSeriesLogger {
 	private HousePart actedHousePart;
 	private String content = "";
 	private int counter = 0;
+	private String oldHeliodonTime = null;
+	private String oldHeliodonLatitude = null;
+	private String oldLine = null;
+	private String oldCameraPosition = null;
 
 	public TimeSeriesLogger(int logPeriod, int savePeriod, File dir, SceneManager sceneManager) {
 		this.logPeriod = logPeriod;
@@ -63,23 +72,60 @@ public class TimeSeriesLogger {
 		} else {
 			undoAction = null;
 		}
-		String line = timestamp;
-		line += space + (filename != null ? "[" + filename + "]" : null);
-		line += space + (undoAction != null ? "[" + undoAction + "]" : null);
-		line += space + (undoAction != null ? "[" + getBuildingId(actedHousePart) + "]" : null);
-		line += space + (undoAction != null ? "[" + getId(actedHousePart) + "]" : null);
+		String line = "[" + filename + "]";
+		if (undoAction != null) {
+			line += space + "[" + undoAction + "]";
+			line += space + "[" + getBuildingId(actedHousePart) + "]";
+			line += space + "[" + getId(actedHousePart) + "]";
+		}
 		Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
-		line += space + "[Time " + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "]";
-		line += space + "[Latitude " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI) + "]";
-		line += space + (sceneManager.isHeliodonControlEnabled() ? "[Heliodon]" : null);
-		line += space + (sceneManager.isSolarColorMap() ? "[Solar Simulator]" : null);
-		line += space + (sceneManager.isSunAnim() ? "[Sun Animation]" : null);
-		line += space + (sceneManager.isShadowEnabled() ? "[Shadow]" : null);
-		line += space + (Scene.getInstance().isAnnotationsVisible() ? "[Annotation]" : null);
-		System.out.println(line);
-		content += line + System.getProperty("line.separator");
-		if (counter % savePeriod == 0) {
-			saveLog();
+		String heliodonTime = "[Time " + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "]";
+		if (!heliodonTime.equals(oldHeliodonTime)) {
+			line += space + heliodonTime;
+			oldHeliodonTime = heliodonTime;
+		}
+		String heliodonLatitude = "[Latitude " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI) + "]";
+		if (!heliodonLatitude.equals(oldHeliodonLatitude)) {
+			line += space + heliodonLatitude;
+			oldHeliodonLatitude = heliodonLatitude;
+		}
+		if (sceneManager.isHeliodonControlEnabled()) {
+			line += space + "[Heliodon]";
+		}
+		if (sceneManager.isSolarColorMap()) {
+			line += space + "[Solar Map]";
+		}
+		if (sceneManager.isSunAnim()) {
+			line += space + "[Sun Animation]";
+		}
+		if (sceneManager.isShadowEnabled()) {
+			line += space + "[Shadow]";
+		}
+		if (Scene.getInstance().isAnnotationsVisible()) {
+			line += space + "[Annotation]";
+		}
+		Camera camera = SceneManager.getInstance().getCamera();
+		if (camera != null) {
+			ReadOnlyVector3 location = camera.getLocation();
+			ReadOnlyVector3 direction = camera.getDirection();
+			String cameraPosition = FORMAT.format(location.getX());
+			cameraPosition += ", " + FORMAT.format(location.getY());
+			cameraPosition += ", " + FORMAT.format(location.getZ());
+			cameraPosition += ", " + FORMAT.format(direction.getX());
+			cameraPosition += ", " + FORMAT.format(direction.getY());
+			cameraPosition += ", " + FORMAT.format(direction.getZ());
+			if (!cameraPosition.equals(oldCameraPosition)) {
+				line += space + "[Camera " + cameraPosition + "]";
+				oldCameraPosition = cameraPosition;
+			}
+		}
+		if (undoAction != null || !line.equals(oldLine)) {
+			System.out.println(timestamp + space + line);
+			content += timestamp + space + line + System.getProperty("line.separator");
+			if (counter % savePeriod == 0) {
+				saveLog();
+			}
+			oldLine = line;
 		}
 		counter++;
 	}

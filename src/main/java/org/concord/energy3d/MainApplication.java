@@ -47,7 +47,7 @@ public class MainApplication {
 			if (!dir.exists())
 				dir.mkdir();
 			logSnapshots(20, dir);
-			final TimeSeriesLogger logger = new TimeSeriesLogger(1, 20, dir, scene);
+			final TimeSeriesLogger logger = new TimeSeriesLogger(2, 20, dir, scene);
 			scene.addShutdownHook(new Runnable() {
 				public void run() {
 					logger.saveLog();
@@ -133,7 +133,7 @@ public class MainApplication {
 		if (Scene.getInstance().isEdited()) {
 			final Date date = Calendar.getInstance().getTime();
 			final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd  HH-mm-ss  ").format(date) + SceneManager.getInstance().getUndoManager().getEditCounts() + ".ng3";
-			Scene.save(new File(filename).toURI().toURL(), false);
+			Scene.save(new File(filename).toURI().toURL(), false, false);
 		}
 	}
 

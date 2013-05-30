@@ -49,11 +49,10 @@ public class Scene implements Serializable {
 		None, Simple, Full
 	};
 
-//	public static final float TRANSPARENCY_LEVEL = 0.4f;
-//	public static final ReadOnlyColorRGBA WHITE = new ColorRGBA(1, 1, 1, TRANSPARENCY_LEVEL);
+	// public static final float TRANSPARENCY_LEVEL = 0.4f;
+	// public static final ReadOnlyColorRGBA WHITE = new ColorRGBA(1, 1, 1, TRANSPARENCY_LEVEL);
 	public static final ReadOnlyColorRGBA WHITE = ColorRGBA.WHITE;
 	public static final ReadOnlyColorRGBA GRAY = ColorRGBA.LIGHT_GRAY;
-
 
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
@@ -231,7 +230,7 @@ public class Scene implements Serializable {
 			final Scene instance = (Scene) in.readObject();
 			in.close();
 
-//			instance.fixUnintializedVariables();
+			// instance.fixUnintializedVariables();
 
 			instance.cleanup();
 			instance.upgradeSceneToNewVersion();
@@ -253,13 +252,13 @@ public class Scene implements Serializable {
 		}
 	}
 
-//	private void fixUnintializedVariables() {
-//		if (textureMode == null) {
-//			textureMode = TextureMode.Full;
-//			overhangLength = 0.2;
-////			foundationColor = wallColor = doorColor = floorColor = roofColor = ColorRGBA.WHITE;
-//		}
-//	}
+	// private void fixUnintializedVariables() {
+	// if (textureMode == null) {
+	// textureMode = TextureMode.Full;
+	// overhangLength = 0.2;
+	// // foundationColor = wallColor = doorColor = floorColor = roofColor = ColorRGBA.WHITE;
+	// }
+	// }
 
 	private void cleanup() {
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
@@ -287,20 +286,20 @@ public class Scene implements Serializable {
 		if (textureMode == null) {
 			textureMode = TextureMode.Full;
 			overhangLength = 0.2;
-//			foundationColor = wallColor = doorColor = floorColor = roofColor = ColorRGBA.WHITE;
+			// foundationColor = wallColor = doorColor = floorColor = roofColor = ColorRGBA.WHITE;
 		}
 
 		if (version < 1) {
 			for (final HousePart part : parts) {
 				if (part instanceof Foundation)
-					((Foundation)part).scaleHouse(10);
+					((Foundation) part).scaleHouse(10);
 			}
 			cameraLocation = cameraLocation.multiply(10, null);
 			setOverhangLength(getOverhangLength() * 10);
 			setAnnotationScale(1.0);
 		}
 
-		version = currentVersion ;
+		version = currentVersion;
 	}
 
 	private void fixDisconnectedWalls() {
@@ -313,6 +312,10 @@ public class Scene implements Serializable {
 	}
 
 	public static void save(final URL url, final boolean setAsCurrentFile) throws Exception {
+		save(url, setAsCurrentFile, true);
+	}
+
+	public static void save(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager) throws Exception {
 		instance.cleanup();
 		// save camera to file
 		saveCameraLocation();
@@ -331,7 +334,8 @@ public class Scene implements Serializable {
 		out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
 		out.writeObject(instance);
 		out.close();
-		SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
+		if (notifyUndoManager)
+			SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
 		System.out.println("done");
 	}
 
@@ -492,36 +496,36 @@ public class Scene implements Serializable {
 		return textureMode;
 	}
 
-//	public void updateTextSizes() {
-//		getOriginalHouseRoot().updateWorldBound(true);
-//		final BoundingBox bounds = (BoundingBox) getOriginalHouseRoot().getWorldBound();
-//		if (bounds != null) {
-//			final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
-//			final double fontSize = size / 20.0;
-//			updateTextSizes(fontSize);
-//		}
-//	}
-//
-//	public void updateTextSizes(final double fontSize) {
-//		Annotation.setFontSize(fontSize);
-//		updateTextSizes(root, fontSize);
-//	}
-//
-//	private void updateTextSizes(final Spatial spatial, final double fontSize) {
-//		if (spatial instanceof BMText) {
-//			final BMText label = (BMText) spatial;
-//			if (label.getAutoScale() == AutoScale.Off) {
-//				label.setFontScale(fontSize);
-//				label.updateGeometricState(0);
-//			}
-//		} else if (spatial instanceof Node) {
-//			for (final Spatial child : ((Node) spatial).getChildren())
-//				updateTextSizes(child, fontSize);
-//			// now that text font is updated redraw the annotation
-//			if (spatial instanceof Annotation)
-//				((Annotation) spatial).draw();
-//		}
-//	}
+	// public void updateTextSizes() {
+	// getOriginalHouseRoot().updateWorldBound(true);
+	// final BoundingBox bounds = (BoundingBox) getOriginalHouseRoot().getWorldBound();
+	// if (bounds != null) {
+	// final double size = Math.max(bounds.getXExtent(), Math.max(bounds.getYExtent(), bounds.getZExtent()));
+	// final double fontSize = size / 20.0;
+	// updateTextSizes(fontSize);
+	// }
+	// }
+	//
+	// public void updateTextSizes(final double fontSize) {
+	// Annotation.setFontSize(fontSize);
+	// updateTextSizes(root, fontSize);
+	// }
+	//
+	// private void updateTextSizes(final Spatial spatial, final double fontSize) {
+	// if (spatial instanceof BMText) {
+	// final BMText label = (BMText) spatial;
+	// if (label.getAutoScale() == AutoScale.Off) {
+	// label.setFontScale(fontSize);
+	// label.updateGeometricState(0);
+	// }
+	// } else if (spatial instanceof Node) {
+	// for (final Spatial child : ((Node) spatial).getChildren())
+	// updateTextSizes(child, fontSize);
+	// // now that text font is updated redraw the annotation
+	// if (spatial instanceof Annotation)
+	// ((Annotation) spatial).draw();
+	// }
+	// }
 
 	public void updateRoofDashLinesColor() {
 		for (final HousePart part : parts)
@@ -644,7 +648,7 @@ public class Scene implements Serializable {
 	}
 
 	public void setEdited(final boolean edited) {
-		this.edited  = edited;
+		this.edited = edited;
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();
 		if (edited)
