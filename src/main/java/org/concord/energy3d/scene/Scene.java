@@ -196,8 +196,7 @@ public class Scene implements Serializable {
 					energyPanel.setCity(instance.city);
 					MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 				}
-				if (instance.solarContrast != 0)
-					energyPanel.getColorMapSlider().setValue(instance.solarContrast);
+				energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
 				MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
 				SceneManager.getInstance().getUndoManager().die();
 				SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());

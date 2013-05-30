@@ -529,7 +529,7 @@ public class Foundation extends HousePart {
 			solarLabel.setVisible(false);
 		else {
 			solarLabel.setVisible(true);
-			solarLabel.setText("(#" + id + ")\n" + String.valueOf(solarValue));
+			solarLabel.setText("(#" + id + ")\n" + String.valueOf(solarValue) + "kWh");
 		}
 	}
 }
