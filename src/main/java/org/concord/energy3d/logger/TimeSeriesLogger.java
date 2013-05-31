@@ -17,6 +17,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddHousePartCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
+import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.undo.UndoManager;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -57,10 +58,16 @@ public class TimeSeriesLogger {
 			return;
 		String filename = url == null ? null : new File(url.getFile()).getName();
 		String undoAction = undoManager.getUndoPresentationName();
+		String redoAction = undoManager.getRedoPresentationName();
 		if (undoAction.startsWith("Undo")) {
 			undoAction = undoAction.substring(4).trim();
 			if (undoAction.equals(""))
 				undoAction = null;
+		}
+		if (redoAction.startsWith("Redo")) {
+			redoAction = redoAction.substring(4).trim();
+			if (redoAction.equals(""))
+				redoAction = null;
 		}
 		if (undoManager.lastEdit() != lastEdit) {
 			lastEdit = undoManager.lastEdit();
@@ -68,13 +75,16 @@ public class TimeSeriesLogger {
 				actedHousePart = ((AddHousePartCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof EditHousePartCommand) {
 				actedHousePart = ((EditHousePartCommand) lastEdit).getHousePart();
+			} else if (lastEdit instanceof RemoveHousePartCommand) {
+				actedHousePart = ((RemoveHousePartCommand) lastEdit).getHousePart();
 			}
 		} else {
 			undoAction = null;
 		}
 		String line = "[" + filename + "]";
-		if (undoAction != null) {
-			line += space + "[" + undoAction + "]";
+		String action = redoAction == null ? undoAction : "Undo";
+		if (action != null) {
+			line += space + "[" + action + "]";
 			line += space + "[" + getBuildingId(actedHousePart) + "]";
 			line += space + "[" + getId(actedHousePart) + "]";
 		}
@@ -120,7 +130,7 @@ public class TimeSeriesLogger {
 			}
 		}
 		if (!line.trim().endsWith(".ng3]")) {
-			if (undoAction != null || !line.equals(oldLine)) {
+			if (action != null || !line.equals(oldLine)) {
 				System.out.println(timestamp + space + line);
 				content += timestamp + space + line + System.getProperty("line.separator");
 				if (counter % savePeriod == 0) {
