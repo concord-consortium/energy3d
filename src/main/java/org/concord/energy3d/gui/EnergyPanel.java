@@ -82,6 +82,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class EnergyPanel extends JPanel {
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
 	public static final double SOLAR_STEP = 2.0;
+	private static final int SOLAR_MINUTE_STEP = 15;
 	private static final long serialVersionUID = 1L;
 	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
 	private static final Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
@@ -1197,7 +1198,7 @@ public class EnergyPanel extends JPanel {
 							solar[row][col] += dot;
 							final HousePart house = wall.getContainer();
 							final Double val = solarTotal.get(house);
-							solarTotal.put(house, val == null ? 0 : val + dot * w * h);
+							solarTotal.put(house, val == null ? 0 : val + dot * w * h * Scene.getInstance().getAnnotationScale());
 						}
 					}
 				}
@@ -1250,7 +1251,6 @@ public class EnergyPanel extends JPanel {
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
-		final int SOLAR_MINUTE_STEP = 15;
 		for (int minute = 0; minute < 1440; minute += SOLAR_MINUTE_STEP) {
 			final ReadOnlyVector3 sunLocation = heliodon.computeSunLocation(today);
 			if (sunLocation.getZ() > 0) {
@@ -1274,7 +1274,7 @@ public class EnergyPanel extends JPanel {
 						applySolarTexture(houseChild.getMesh(), solarOnWall.get(houseChild), maxSolarValue);
 				}
 				final Double val = solarTotal.get(foundation);
-				foundation.setSolarValue(val == null ? 0 : val.longValue());
+				foundation.setSolarValue(val == null ? 0 : val.longValue() / (60 / SOLAR_MINUTE_STEP));
 			}
 		}
 		SceneManager.getInstance().refresh();

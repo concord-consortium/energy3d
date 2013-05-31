@@ -1467,6 +1467,8 @@ Version 0.5 - October 20, 2011
 - add colormap ledgend
 - improve solar exposure algorithm to consider area of grid in calculations
 - fix blue edge in colormap of walls
+- convert solar exposure to kWh
+- consider scale in solar exposure calculation
 
 
 
