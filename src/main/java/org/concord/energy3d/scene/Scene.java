@@ -198,7 +198,7 @@ public class Scene implements Serializable {
 				energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
 				MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
 				SceneManager.getInstance().getUndoManager().die();
-				SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
+				// SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
 				Scene.getInstance().setEdited(false);
 				energyPanel.compute();
 				return null;

@@ -10,17 +10,15 @@ import org.concord.energy3d.util.Config;
 
 public class UndoManager extends javax.swing.undo.UndoManager {
 	private static final long serialVersionUID = 1L;
-	private int counter = 0;
+	private boolean undoFlag = false;
+	private boolean redoFlag = false;
+	private boolean saveFlag = false;
 
 	@Override
 	public synchronized boolean addEdit(final UndoableEdit anEdit) {
 		final boolean result = super.addEdit(anEdit);
-		final boolean isSaveCommand = anEdit instanceof SaveCommand;
-		Scene.getInstance().setEdited(!isSaveCommand);
-		if (isSaveCommand)
-			counter = 0;
-		else
-			counter++;
+		saveFlag = anEdit instanceof SaveCommand;
+		Scene.getInstance().setEdited(!saveFlag);
 		refreshUndoRedoGui();
 		return result;
 	}
@@ -35,6 +33,8 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 			Scene.getInstance().setEdited(true);
 		SaveCommand.setGloabalSignificant(false);
 		refreshUndoRedoGui();
+		undoFlag = true;
+		redoFlag = false;
 	}
 
 	@Override
@@ -47,12 +47,17 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 			Scene.getInstance().setEdited(true);
 		SaveCommand.setGloabalSignificant(false);
 		refreshUndoRedoGui();
+		undoFlag = false;
+		redoFlag = true;
 	}
 
 	@Override
 	public void die() {
 		super.die();
 		refreshUndoRedoGui();
+		undoFlag = false;
+		redoFlag = false;
+		saveFlag = false;
 	}
 
 	private void refreshUndoRedoGui() {
@@ -60,8 +65,28 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 			MainFrame.getInstance().refreshUndoRedo();
 	}
 
-	public int getEditCounts() {
-		return counter;
+	public void setUndoFlag(boolean undoFlag) {
+		this.undoFlag = undoFlag;
+	}
+
+	public boolean getUndoFlag() {
+		return undoFlag;
+	}
+
+	public void setRedoFlag(boolean redoFlag) {
+		this.redoFlag = redoFlag;
+	}
+
+	public boolean getRedoFlag() {
+		return redoFlag;
+	}
+
+	public void setSaveFlag(boolean saveFlag) {
+		this.saveFlag = saveFlag;
+	}
+
+	public boolean getSaveFlag() {
+		return saveFlag;
 	}
 
 	@Override

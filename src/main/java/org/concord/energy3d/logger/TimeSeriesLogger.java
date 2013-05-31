@@ -18,6 +18,7 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddHousePartCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
+import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.undo.UndoManager;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -57,19 +58,13 @@ public class TimeSeriesLogger {
 		if (url == null) // no logging if not using a template
 			return;
 		String filename = url == null ? null : new File(url.getFile()).getName();
-		String undoAction = undoManager.getUndoPresentationName();
-		String redoAction = undoManager.getRedoPresentationName();
-		if (undoAction.startsWith("Undo")) {
-			undoAction = undoAction.substring(4).trim();
-			if (undoAction.equals(""))
-				undoAction = null;
+		String action = undoManager.getUndoPresentationName();
+		if (action.startsWith("Undo")) {
+			action = action.substring(4).trim();
+			if (action.equals(""))
+				action = null;
 		}
-		if (redoAction.startsWith("Redo")) {
-			redoAction = redoAction.substring(4).trim();
-			if (redoAction.equals(""))
-				redoAction = null;
-		}
-		if (undoManager.lastEdit() != lastEdit) {
+		if (!(undoManager.lastEdit() instanceof SaveCommand) && undoManager.lastEdit() != lastEdit) {
 			lastEdit = undoManager.lastEdit();
 			if (lastEdit instanceof AddHousePartCommand) {
 				actedHousePart = ((AddHousePartCommand) lastEdit).getHousePart();
@@ -79,14 +74,32 @@ public class TimeSeriesLogger {
 				actedHousePart = ((RemoveHousePartCommand) lastEdit).getHousePart();
 			}
 		} else {
-			undoAction = null;
+			action = null;
+		}
+		boolean type2Action = false;
+		if (action == null) {
+			if (undoManager.getUndoFlag()) {
+				action = "Undo";
+				undoManager.setUndoFlag(false);
+				type2Action = true;
+			} else if (undoManager.getRedoFlag()) {
+				action = "Redo";
+				undoManager.setRedoFlag(false);
+				type2Action = true;
+			}
+			if (undoManager.getSaveFlag()) {
+				action = "Save";
+				undoManager.setSaveFlag(false);
+				type2Action = true;
+			}
 		}
 		String line = "{" + filename + "}";
-		String action = redoAction == null ? undoAction : "Undo";
 		if (action != null) {
 			line += space + "[" + action + "]";
-			line += space + "[" + getBuildingId(actedHousePart) + "]";
-			line += space + "[" + getId(actedHousePart) + "]";
+			if (!type2Action) {
+				line += space + "[" + getBuildingId(actedHousePart) + "]";
+				line += space + "[" + getId(actedHousePart) + "]";
+			}
 		}
 		Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
 		String heliodonTime = "[Time: " + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "]";
@@ -129,7 +142,7 @@ public class TimeSeriesLogger {
 				oldCameraPosition = cameraPosition;
 			}
 		}
-		if (!line.trim().endsWith(".ng3]")) {
+		if (!line.trim().endsWith(".ng3}")) {
 			if (action != null || !line.equals(oldLine)) {
 				System.out.println(timestamp + space + line);
 				content += timestamp + space + line + System.getProperty("line.separator");

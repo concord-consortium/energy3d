@@ -187,7 +187,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes mainPanel
-	 *
+	 * 
 	 * @return org.concord.energy3d.gui.MainPanel
 	 */
 	public MainPanel getMainPanel() {
@@ -240,7 +240,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes this
-	 *
+	 * 
 	 * @return void
 	 */
 	private void initialize() {
@@ -336,7 +336,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes appMenuBar
-	 *
+	 * 
 	 * @return javax.swing.JMenuBar
 	 */
 	private JMenuBar getAppMenuBar() {
@@ -353,7 +353,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes fileMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getFileMenu() {
@@ -401,7 +401,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes newMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getNewMenuItem() {
@@ -423,7 +423,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes openMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getOpenMenuItem() {
@@ -433,7 +433,16 @@ public class MainFrame extends JFrame {
 			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					open();
+					if (Scene.getInstance().isEdited()) {
+						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+						if (save == JOptionPane.YES_OPTION) {
+							save();
+							if (!Scene.getInstance().isEdited())
+								open();
+						} else if (save != JOptionPane.CANCEL_OPTION)
+							open();
+					} else
+						open();
 				}
 			});
 		}
@@ -577,7 +586,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes saveMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getSaveMenuItem() {
@@ -596,7 +605,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes printMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getPrintMenuItem() {
@@ -632,7 +641,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes previewMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getPreviewMenuItem() {
@@ -650,7 +659,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes cameraMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	public JMenu getCameraMenu() {
@@ -687,7 +696,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes orbitMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getOrbitMenuItem() {
@@ -707,7 +716,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes firstPersonMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getFirstPersonMenuItem() {
@@ -726,7 +735,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes resetCameraMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getResetCameraMenuItem() {
@@ -746,7 +755,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes lightingMenu
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getShadeMenu() {
@@ -765,7 +774,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes exitMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getExitMenuItem() {
@@ -784,7 +793,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes helpMenu
-	 *
+	 * 
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getHelpMenu() {
@@ -808,7 +817,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getAboutMenuItem() {
@@ -827,7 +836,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutDialog
-	 *
+	 * 
 	 * @return javax.swing.JDialog
 	 */
 	private JDialog getAboutDialog() {
@@ -845,7 +854,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes wallThicknessMenuItem
-	 *
+	 * 
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	private JCheckBoxMenuItem getWallThicknessMenuItem() {
