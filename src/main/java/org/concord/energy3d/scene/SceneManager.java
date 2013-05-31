@@ -278,7 +278,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		invisibleFloor.getSceneHints().setCullHint(CullHint.Always);
 		root.attachChild(invisibleFloor);
 		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
-		drawGrids(1.0);
+		drawGrids(5);
 		backgroundRoot.attachChild(gridsMesh);
 		backgroundRoot.attachChild(createAxis());
 		backgroundRoot.attachChild(createKinectPointer());

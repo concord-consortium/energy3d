@@ -175,7 +175,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public double getGridSize() {
-		return 1.0;
+		return 2.5;
 	}
 
 	private void addNewEditPointShape(final int i) {

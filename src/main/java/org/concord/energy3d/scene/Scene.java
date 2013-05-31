@@ -315,7 +315,8 @@ public class Scene implements Serializable {
 	}
 
 	public static void save(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager) throws Exception {
-		instance.cleanup();
+		if (notifyUndoManager)
+			instance.cleanup();
 		// save camera to file
 		saveCameraLocation();
 
