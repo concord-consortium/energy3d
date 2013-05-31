@@ -293,6 +293,7 @@ public abstract class Roof extends HousePart {
 		walls.clear();
 		wallUpperPoints.clear();
 		wallNormals.clear();
+//		System.out.println("-----");
 		startWall.visitNeighbors(new WallVisitor() {
 			@Override
 			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
@@ -307,6 +308,10 @@ public abstract class Roof extends HousePart {
 					final int pointIndex1 = pointIndex2 == 1 ? 3 : 1;
 					final Vector3 p1 = currentWall.getAbsPoint(pointIndex1);
 					final Vector3 p2 = currentWall.getAbsPoint(pointIndex2);
+//					System.out.println(currentWall.getPoints().get(pointIndex1));
+//					System.out.println(p1);
+//					System.out.println(currentWall.getPoints().get(pointIndex2));
+//					System.out.println(p2);
 					final ReadOnlyVector3 normal = currentWall.getFaceDirection();
 					addPointToPolygon(p1, normal, wallUpperPoints, wallNormals);
 					addPointToPolygon(p2, normal, wallUpperPoints, wallNormals);
@@ -316,11 +321,14 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void addPointToPolygon(final Vector3 p, final ReadOnlyVector3 normal, final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
+		final double DELTA = 1;
 		int index = -1;
+		final Vector3 pWithoutZ = p.multiply(1, 1, 0, null);
 		/* check to see if there is another point with same x,y coords */
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			final Vector3 p_i = wallUpperPoints.get(i);
 			if (p.getX() == p_i.getX() && p.getY() == p_i.getY()) {
+//			if (pWithoutZ.distance(p_i.multiplyLocal(1, 1, 0)) < DELTA) {
 				index = i;
 				break;
 			}
@@ -546,7 +554,7 @@ public abstract class Roof extends HousePart {
 			final Vector3 p = wallUpperPoints.get(i);
 			op.set(wallNormals.get(i)).multiplyLocal(Scene.getInstance().getOverhangLength());
 			p.addLocal(op);
-			roundPoint(p);
+//			roundPoint(p);
 		}
 	}
 

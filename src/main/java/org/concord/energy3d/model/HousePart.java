@@ -346,15 +346,8 @@ public abstract class HousePart implements Serializable {
 		final Vector3 pointOnSpace = origin.add(width.multiply(p.getX(), null), null).add(height.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
 		if (relativeToHorizontal)
 			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
-//		if (!Vector3.isValid(pointOnSpace))
-//			System.out.println("xxx");
-		roundPoint(pointOnSpace);
+		/* do not round the result, otherwise neighboring walls won't have exact same edit points */
 		return pointOnSpace;
-	}
-
-	protected Vector3 roundPoint(final Vector3 pointOnSpace) {
-		final double C = 1000.0;
-		return pointOnSpace.set(Math.round(pointOnSpace.getX() * C) / C, Math.round(pointOnSpace.getY() * C) / C, Math.round(pointOnSpace.getZ() * C) / C);
 	}
 
 	protected void snapToGrid(final Vector3 p, final ReadOnlyVector3 current, final double gridSize) {

@@ -55,7 +55,8 @@ public class Util {
 	}
 
 	public static String toString(final ReadOnlyVector3 v) {
-		return "(" + Math.round(v.getX()*100) / 100.0 + ", " + Math.round(v.getY()*100) / 100.0 + ", " + Math.round(v.getZ()*100) / 100.0 + ")";
+		final double C = 1000.0;
+		return "(" + Math.round(v.getX()*C) / C + ", " + Math.round(v.getY()*C) / C + ", " + Math.round(v.getZ()*C) / C + ")";
 	}
 
 	public static String toString(final double v) {

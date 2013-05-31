@@ -524,7 +524,7 @@ public class Foundation extends HousePart {
 		updateTextureAndColor(mesh, Scene.getInstance().getFoundationColor());
 	}
 
-	public void setSolarValue(final long solarValue) {
+	public void setSolarValue(final double solarValue) {
 		if (solarValue == 0)
 			solarLabel.setVisible(false);
 		else {
