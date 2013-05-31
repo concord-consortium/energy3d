@@ -102,12 +102,12 @@ public class TimeSeriesLogger {
 			}
 		}
 		Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
-		String heliodonTime = "[Time: " + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "]";
+		String heliodonTime = "{Time: " + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "}";
 		if (!heliodonTime.equals(oldHeliodonTime)) {
 			line += space + heliodonTime;
 			oldHeliodonTime = heliodonTime;
 		}
-		String heliodonLatitude = "[Latitude: " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI) + "]";
+		String heliodonLatitude = "{Latitude: " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI) + "}";
 		if (!heliodonLatitude.equals(oldHeliodonLatitude)) {
 			line += space + heliodonLatitude;
 			oldHeliodonLatitude = heliodonLatitude;
