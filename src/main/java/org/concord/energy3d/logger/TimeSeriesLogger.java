@@ -81,7 +81,7 @@ public class TimeSeriesLogger {
 		} else {
 			undoAction = null;
 		}
-		String line = "[" + filename + "]";
+		String line = "{" + filename + "}";
 		String action = redoAction == null ? undoAction : "Undo";
 		if (action != null) {
 			line += space + "[" + action + "]";
@@ -100,32 +100,32 @@ public class TimeSeriesLogger {
 			oldHeliodonLatitude = heliodonLatitude;
 		}
 		if (sceneManager.isHeliodonControlEnabled()) {
-			line += space + "[Heliodon]";
+			line += space + "<Heliodon>";
 		}
 		if (sceneManager.isSolarColorMap()) {
-			line += space + "[Solar Map]";
+			line += space + "<Solar Map>";
 		}
 		if (sceneManager.isSunAnim()) {
-			line += space + "[Sun Animation]";
+			line += space + "<Sun Animation>";
 		}
 		if (sceneManager.isShadowEnabled()) {
-			line += space + "[Shadow]";
+			line += space + "<Shadow>";
 		}
 		if (Scene.getInstance().isAnnotationsVisible()) {
-			line += space + "[Annotation]";
+			line += space + "<Annotation>";
 		}
 		Camera camera = SceneManager.getInstance().getCamera();
 		if (camera != null) {
 			ReadOnlyVector3 location = camera.getLocation();
 			ReadOnlyVector3 direction = camera.getDirection();
-			String cameraPosition = FORMAT.format(location.getX());
+			String cameraPosition = "(" + FORMAT.format(location.getX());
 			cameraPosition += ", " + FORMAT.format(location.getY());
 			cameraPosition += ", " + FORMAT.format(location.getZ());
-			cameraPosition += ", " + FORMAT.format(direction.getX());
+			cameraPosition += ")   (" + FORMAT.format(direction.getX());
 			cameraPosition += ", " + FORMAT.format(direction.getY());
-			cameraPosition += ", " + FORMAT.format(direction.getZ());
+			cameraPosition += ", " + FORMAT.format(direction.getZ()) + ")";
 			if (!cameraPosition.equals(oldCameraPosition)) {
-				line += space + "[Camera: " + cameraPosition + "]";
+				line += space + "{Camera: " + cameraPosition + "}";
 				oldCameraPosition = cameraPosition;
 			}
 		}
