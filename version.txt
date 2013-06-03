@@ -1380,7 +1380,6 @@ Version 0.5 - October 20, 2011
 - include shadow resources in jar file
 - help fix clipping bug in Ardor3D  
 - fix problem with frozen program after trying to open a new file when in print preview
-*
 - fix change of view point, print preview on, then annotation, then print preview off
 - use maven-shade-plugin for creating jar files that excluse dlls and unnecessary java dependancies
 - re-enable jar signing with maven
@@ -1416,13 +1415,17 @@ Version 0.5 - October 20, 2011
 - prevent floor or roof from being added to a single wall
 - release version 2.0
 
+**********************************************************************************************
+Version 2.0 - May 15, 2013
+
 - write algorithm to compute the total solar duration on walls grids during the course of a day
 - compute the total solar exposure of walls of a house and display it as a text label above the house 
 - test solar exposure picking against wall invisible mesh and roof mesh only
 - generate textures for walls based on the solar exposure data
 - improve textures by using accurate max solar value
-- computer solar value even for top solar row
+- compute solar value even for top solar row
 - fix problem with roof not affecting solar average
+*
 - prevent solar collision between edge of wall with the neighboring wall by using an offset
 - interpolate over several colors when generate solar exposure texture
 - use different texture coordinates based on whether or not solar exposure coloring is enabled
@@ -1471,6 +1474,7 @@ Version 0.5 - October 20, 2011
 - consider scale in solar exposure calculation
 - fix problem with total radiation number changing when moving the house
 - fix problem with loss of precision of neighboring wall edit points
+- format the total solar label
 
 - *copy and paste for the entire house
 - *fix problem with double clicking moves the edit point

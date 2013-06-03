@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.Scene;
@@ -28,6 +29,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private static DecimalFormat format = new DecimalFormat("###,###,###");
 	private transient Mesh boundingMesh;
 	private transient Mesh wireframeMesh;
 	private transient ArrayList<Vector3> orgPoints;
@@ -524,12 +526,12 @@ public class Foundation extends HousePart {
 		updateTextureAndColor(mesh, Scene.getInstance().getFoundationColor());
 	}
 
-	public void setSolarValue(final double solarValue) {
+	public void setSolarValue(final long solarValue) {
 		if (solarValue == 0)
 			solarLabel.setVisible(false);
 		else {
 			solarLabel.setVisible(true);
-			solarLabel.setText("(#" + id + ")\n" + String.valueOf(solarValue) + "kWh");
+			solarLabel.setText("(#" + id + ")\n" + format.format(solarValue) + "kWh");
 		}
 	}
 }

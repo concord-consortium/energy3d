@@ -314,4 +314,9 @@ public class Window extends HousePart {
 			return super.getAbsPoint(index);
 	}
 
+	@Override
+	public double getGridSize() {
+		return 1.0;
+	}
+
 }
