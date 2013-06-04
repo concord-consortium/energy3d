@@ -29,7 +29,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static DecimalFormat format = new DecimalFormat("###,###,###");
+	private static DecimalFormat format = new DecimalFormat();
 	private transient Mesh boundingMesh;
 	private transient Mesh wireframeMesh;
 	private transient ArrayList<Vector3> orgPoints;
@@ -41,6 +41,10 @@ public class Foundation extends HousePart {
 	private transient double maxX;
 	private transient double maxY;
 	private transient BMText solarLabel;
+
+	static {
+		format.setGroupingUsed(true);
+	}
 
 	public Foundation() {
 		super(2, 8, 1);

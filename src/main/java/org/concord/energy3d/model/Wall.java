@@ -196,9 +196,9 @@ public class Wall extends HousePart {
 			final int lower = (editPointIndex == 1) ? 0 : 2;
 			final Vector3 base = getAbsPoint(lower);
 			final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
-			final boolean snappedToWall = snapToWall(closestPoint, lower);
-			if (!snappedToWall)
-				snapToGrid(closestPoint, getAbsPoint(editPointIndex), 1.0);
+//			final boolean snappedToWall = snapToWall(base, lower);
+//			if (!snappedToWall)
+			snapToGrid(closestPoint, getAbsPoint(editPointIndex), 1.0);
 			defaultWallHeight = height = Math.max(0.1, closestPoint.getZ() - base.getZ());
 			final double z = height + base.getZ();
 			points.get(1).setZ(z);

@@ -293,7 +293,7 @@ public abstract class Roof extends HousePart {
 		walls.clear();
 		wallUpperPoints.clear();
 		wallNormals.clear();
-//		System.out.println("-----");
+		// System.out.println("-----");
 		startWall.visitNeighbors(new WallVisitor() {
 			@Override
 			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
@@ -308,10 +308,10 @@ public abstract class Roof extends HousePart {
 					final int pointIndex1 = pointIndex2 == 1 ? 3 : 1;
 					final Vector3 p1 = currentWall.getAbsPoint(pointIndex1);
 					final Vector3 p2 = currentWall.getAbsPoint(pointIndex2);
-//					System.out.println(currentWall.getPoints().get(pointIndex1));
-//					System.out.println(p1);
-//					System.out.println(currentWall.getPoints().get(pointIndex2));
-//					System.out.println(p2);
+					// System.out.println(currentWall.getPoints().get(pointIndex1));
+					// System.out.println(p1);
+					// System.out.println(currentWall.getPoints().get(pointIndex2));
+					// System.out.println(p2);
 					final ReadOnlyVector3 normal = currentWall.getFaceDirection();
 					addPointToPolygon(p1, normal, wallUpperPoints, wallNormals);
 					addPointToPolygon(p2, normal, wallUpperPoints, wallNormals);
@@ -328,7 +328,7 @@ public abstract class Roof extends HousePart {
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			final Vector3 p_i = wallUpperPoints.get(i);
 			if (p.getX() == p_i.getX() && p.getY() == p_i.getY()) {
-//			if (pWithoutZ.distance(p_i.multiplyLocal(1, 1, 0)) < DELTA) {
+				// if (pWithoutZ.distance(p_i.multiplyLocal(1, 1, 0)) < DELTA) {
 				index = i;
 				break;
 			}
@@ -554,7 +554,7 @@ public abstract class Roof extends HousePart {
 			final Vector3 p = wallUpperPoints.get(i);
 			op.set(wallNormals.get(i)).multiplyLocal(Scene.getInstance().getOverhangLength());
 			p.addLocal(op);
-//			roundPoint(p);
+			// roundPoint(p);
 		}
 	}
 
@@ -872,8 +872,8 @@ public abstract class Roof extends HousePart {
 		for (final ReadOnlyVector3 p : wallUpperPoints)
 			maxZ = Math.max(maxZ, p.getZ());
 		// to make height relative to container wall so that applyHeight() runs the same way
-		// height = 0.5 + maxZ - container.getPoints().get(1).getZ();
-		height = height + maxZ - container.getPoints().get(1).getZ();
+		height = 5.0 + maxZ - container.getPoints().get(1).getZ();
+		// height = height + maxZ - container.getPoints().get(1).getZ(); // avoid this because it will result in increasing height when hovering mouse from one wall contain to another before fully inserting the roof
 	}
 
 	public void applyHeight() {
