@@ -32,7 +32,6 @@ public abstract class Annotation extends Node {
 		label.setModelBound(new BoundingBox());
 		label.updateWorldTransform(true);
 		label.getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);
-//		Util.disablePickShadowLight(label);
 		return label;
 	}
 

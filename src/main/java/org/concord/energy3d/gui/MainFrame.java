@@ -68,8 +68,6 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
-	private JFileChooser fileChooser;
-	private final JColorChooser colorChooser;
 	private JMenuBar appMenuBar = null;
 	private JMenu fileMenu = null;
 	private JMenuItem newMenuItem = null;
@@ -132,15 +130,17 @@ public class MainFrame extends JFrame {
 	private JMenuItem doorColorMenuItem;
 	private JMenuItem floorColorMenuItem;
 	private JMenuItem roofColorMenuItem;
-	private JMenuItem importColladaMenuItem;
+//	private JMenuItem importColladaMenuItem;
 	private JMenuItem saveAsImageMenuItem;
 	private JMenuItem freezeMenuItem;
 	private JMenuItem unfreezeMenuItem;
 	private JSeparator separator_10;
+	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
+	private final JFileChooser fileChooser;
+	private final JColorChooser colorChooser;
 	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
-	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -187,7 +187,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes mainPanel
-	 * 
+	 *
 	 * @return org.concord.energy3d.gui.MainPanel
 	 */
 	public MainPanel getMainPanel() {
@@ -219,20 +219,15 @@ public class MainFrame extends JFrame {
 		super();
 		System.out.print("Initiating GUI...");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icons/icon.gif")));
-		try {
-			final String directoryPath = Preferences.userNodeForPackage(MainApplication.class).get("dir", null);
-			fileChooser = new JFileChooser(directoryPath);
-			if (!Config.isWebStart() && directoryPath == null) {
-				final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
-				fileChooser.setCurrentDirectory(dir);
-			}
-			fileChooser.setAcceptAllFileFilterUsed(false);
-			fileChooser.addChoosableFileFilter(ng3Filter);
-			fileChooser.setFileFilter(ng3Filter);
-		} catch (final Exception e) {
-			fileChooser = null;
-			e.printStackTrace();
+		final String directoryPath = Preferences.userNodeForPackage(MainApplication.class).get("dir", null);
+		fileChooser = new JFileChooser(directoryPath);
+		if (!Config.isWebStart() && directoryPath == null) {
+			final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
+			fileChooser.setCurrentDirectory(dir);
 		}
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		fileChooser.addChoosableFileFilter(ng3Filter);
+		fileChooser.setFileFilter(ng3Filter);
 		colorChooser = new JColorChooser();
 		initialize();
 		System.out.println("done");
@@ -240,7 +235,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes this
-	 * 
+	 *
 	 * @return void
 	 */
 	private void initialize() {
@@ -336,7 +331,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes appMenuBar
-	 * 
+	 *
 	 * @return javax.swing.JMenuBar
 	 */
 	private JMenuBar getAppMenuBar() {
@@ -353,7 +348,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes fileMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getFileMenu() {
@@ -401,7 +396,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes newMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getNewMenuItem() {
@@ -423,7 +418,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes openMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getOpenMenuItem() {
@@ -586,7 +581,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes saveMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getSaveMenuItem() {
@@ -605,7 +600,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes printMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getPrintMenuItem() {
@@ -641,7 +636,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes previewMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getPreviewMenuItem() {
@@ -659,7 +654,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes cameraMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	public JMenu getCameraMenu() {
@@ -696,7 +691,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes orbitMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getOrbitMenuItem() {
@@ -716,7 +711,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes firstPersonMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JRadioButtonMenuItem
 	 */
 	private JRadioButtonMenuItem getFirstPersonMenuItem() {
@@ -735,7 +730,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes resetCameraMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getResetCameraMenuItem() {
@@ -755,7 +750,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes lightingMenu
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	public JCheckBoxMenuItem getShadeMenu() {
@@ -774,7 +769,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes exitMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getExitMenuItem() {
@@ -793,7 +788,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes helpMenu
-	 * 
+	 *
 	 * @return javax.swing.JMenu
 	 */
 	private JMenu getHelpMenu() {
@@ -817,7 +812,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JMenuItem
 	 */
 	private JMenuItem getAboutMenuItem() {
@@ -836,7 +831,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes aboutDialog
-	 * 
+	 *
 	 * @return javax.swing.JDialog
 	 */
 	private JDialog getAboutDialog() {
@@ -854,7 +849,7 @@ public class MainFrame extends JFrame {
 
 	/**
 	 * This method initializes wallThicknessMenuItem
-	 * 
+	 *
 	 * @return javax.swing.JCheckBoxMenuItem
 	 */
 	private JCheckBoxMenuItem getWallThicknessMenuItem() {
@@ -1142,20 +1137,19 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void importColladaFile() {
-		// TODO
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fileChooser.removeChoosableFileFilter(pngFilter);
-		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
-			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-			try {
-				SceneManager.getInstance().newImport(fileChooser.getSelectedFile().toURI().toURL());
-			} catch (final Throwable err) {
-				err.printStackTrace();
-				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-	}
+//	private void importColladaFile() {
+//		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+//		fileChooser.removeChoosableFileFilter(pngFilter);
+//		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+//			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
+//			try {
+//				SceneManager.getInstance().newImport(fileChooser.getSelectedFile().toURI().toURL());
+//			} catch (final Throwable err) {
+//				err.printStackTrace();
+//				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+//			}
+//		}
+//	}
 
 	private JMenuItem getPageSetupMenuItem() {
 		if (pageSetupMenuItem == null) {
@@ -1596,18 +1590,18 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private JMenuItem getImportColladaMenuItem() {
-		if (importColladaMenuItem == null) {
-			importColladaMenuItem = new JMenuItem("Import Collada...");
-			importColladaMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					importColladaFile();
-				}
-			});
-		}
-		return importColladaMenuItem;
-	}
+//	private JMenuItem getImportColladaMenuItem() {
+//		if (importColladaMenuItem == null) {
+//			importColladaMenuItem = new JMenuItem("Import Collada...");
+//			importColladaMenuItem.addActionListener(new ActionListener() {
+//				@Override
+//				public void actionPerformed(final ActionEvent e) {
+//					importColladaFile();
+//				}
+//			});
+//		}
+//		return importColladaMenuItem;
+//	}
 
 	private JMenuItem getSaveAsImageMenuItem() {
 		if (saveAsImageMenuItem == null) {

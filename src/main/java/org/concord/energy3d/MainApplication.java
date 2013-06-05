@@ -49,19 +49,13 @@ public class MainApplication {
 			logSnapshots(20, dir);
 			final TimeSeriesLogger logger = new TimeSeriesLogger(2, 20, dir, scene);
 			scene.addShutdownHook(new Runnable() {
+				@Override
 				public void run() {
 					logger.saveLog();
 				}
 			});
 			logger.start();
 		}
-	}
-
-	private static boolean argsContain(final String command, final String[] args) {
-		for (final String arg : args)
-			if (arg.startsWith(command))
-				return true;
-		return false;
 	}
 
 	public static void setupLibraryPath() {
@@ -104,7 +98,7 @@ public class MainApplication {
 	}
 
 	private static void logSnapshots(final int period, final File dir) {
-		Thread t = new Thread() {
+		final Thread t = new Thread() {
 			@Override
 			public void run() {
 				while (true) {

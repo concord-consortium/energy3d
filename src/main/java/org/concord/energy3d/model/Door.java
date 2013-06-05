@@ -15,7 +15,6 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
-//	private static double defaultDoorHeight = 15;
 	private static double defaultDoorHeight = 10;
 
 	public Door() {
@@ -73,11 +72,6 @@ public class Door extends HousePart {
 			setEditPointsVisible(true);
 		}
 	}
-
-//	@Override
-//	public boolean isDrawable() {
-//		return points.size() >= 4 && getAbsPoint(2).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE && getAbsPoint(1).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE;
-//	}
 
 	@Override
 	protected void drawMesh() {

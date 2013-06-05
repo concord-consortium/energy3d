@@ -78,8 +78,6 @@ public class SizeAnnotation extends Annotation {
 		final ReadOnlyVector3 dir = to.subtract(from, null).normalizeLocal();
 		final int scale = upsideDownText ? -1 : 1;
 
-//		label.setRotation(new Matrix3().fromAxes(dir.multiply(scale, null), faceDirection, faceDirection.cross(dir, null).multiplyLocal(scale)));
-
 		final Vector3 xdir = dir.multiply(scale, null);
 		final Vector3 ydir = faceDirection.normalize(null);
 		final Vector3 zdir = ydir.cross(xdir, null).normalizeLocal();
@@ -154,7 +152,6 @@ public class SizeAnnotation extends Annotation {
 
 		updateWorldTransform(true);
 		updateWorldBound(true);
-//		this.setTranslation(faceDirection.multiply(0.05, null));
 	}
 
 	@Override

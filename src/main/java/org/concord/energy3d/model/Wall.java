@@ -196,8 +196,6 @@ public class Wall extends HousePart {
 			final int lower = (editPointIndex == 1) ? 0 : 2;
 			final Vector3 base = getAbsPoint(lower);
 			final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
-//			final boolean snappedToWall = snapToWall(base, lower);
-//			if (!snappedToWall)
 			snapToGrid(closestPoint, getAbsPoint(editPointIndex), 1.0);
 			defaultWallHeight = height = Math.max(0.1, closestPoint.getZ() - base.getZ());
 			final double z = height + base.getZ();
@@ -329,7 +327,6 @@ public class Wall extends HousePart {
 
 	@Override
 	protected void drawMesh() {
-		// final CullHint cull = isDrawable() ? CullHint.Inherit : CullHint.Always;
 		mesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
 		backMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
 		surroundMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
@@ -339,17 +336,10 @@ public class Wall extends HousePart {
 		if (!isDrawable())
 			return;
 
-		// adjustTransparency(mesh);
-		// adjustTransparency(backMesh);
-		// adjustTransparency(surroundMesh);
-		// adjustTransparency(windowsSurroundMesh);
-		// adjustTransparency(wireframeMesh);
-
 		computeNormalAndXYTransform();
 
 		wallAndWindowsPoints = computeWallAndWindowPolygon(false);
-//		if (!isFrozen())
-			extendToRoof(wallAndWindowsPoints.get(0));
+		extendToRoof(wallAndWindowsPoints.get(0));
 
 		if (Scene.getInstance().isDrawThickness() && isShortWall) {
 			final Vector3 dir = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
@@ -1210,46 +1200,6 @@ public class Wall extends HousePart {
 				area -= child.computeArea();
 		return area;
 	}
-
-//	public void applySolarTexture(final double[][] solarData, final long maxValue) {
-//		final int rows;
-//		final int cols;
-//		if (solarData == null) {
-//			rows = cols = 1;
-//		} else {
-//			rows = solarData.length;
-//			cols = solarData[0].length;
-//		}
-//
-//		final ReadOnlyColorRGBA[] colors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
-//		final DefaultColorInterpolationController controller = new DefaultColorInterpolationController();
-//		controller.setControls(colors);
-//
-//		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
-//		for (int row = 0; row < rows; row++) {
-//			for (int col = 0; col < cols; col++) {
-//				final double value = solarData == null ? 0 : solarData[row][col];
-//				long valuePerColorRange = maxValue / (colors.length - 1);
-//				final int colorIndex;
-//				if (valuePerColorRange == 0) {
-//					valuePerColorRange = 1;
-//					colorIndex = 0;
-//				} else
-//					colorIndex = (int) Math.min(value / valuePerColorRange, colors.length - 2);
-//				final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
-//				final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
-//				data.put((byte) (color.getRed() * 255)).put((byte) (color.getGreen() * 255)).put((byte) (color.getBlue() * 255));
-//			}
-//		}
-//
-//		final Image image = new Image(ImageDataFormat.RGB, PixelDataType.UnsignedByte, cols, rows, data, null);
-//		final Texture2D texture = new Texture2D();
-//		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
-//		texture.setImage(image);
-//		final TextureState textureState = new TextureState();
-//		textureState.setTexture(texture);
-//		mesh.setRenderState(textureState);
-//	}
 
 	public double getHighestPoint() {
 		return highestPoint - points.get(0).getZ();

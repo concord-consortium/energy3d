@@ -88,8 +88,6 @@ public abstract class CameraControl {
         _keyRotateSpeed = speed;
     }
 
-//    protected abstract void move(final Camera camera, final KeyboardState kb, final double tpf);
-
     protected abstract void move(final Camera camera, final double dx, final double dy);
 
     protected abstract void rotate(final Camera camera, final double dx, final double dy);
@@ -105,7 +103,6 @@ public abstract class CameraControl {
      * @return a new FirstPersonControl object
      */
     public void setupTriggers(final LogicalLayer layer, final ReadOnlyVector3 upAxis, final boolean dragOnly) {
-//        setupKeyboardTriggers(layer);
         setupMouseTriggers(layer, dragOnly);
     }
 
@@ -174,41 +171,6 @@ public abstract class CameraControl {
 			}
 		}));
     }
-
-//    public Predicate<TwoInputStates> setupKeyboardTriggers(final LogicalLayer layer) {
-//
-//        final CameraControl control = this;
-//
-//        // WASD control
-//        final Predicate<TwoInputStates> keysHeld = new Predicate<TwoInputStates>() {
-//            Key[] keys = new Key[] { Key.W, Key.A, Key.S, Key.D, Key.LEFT, Key.RIGHT, Key.UP, Key.DOWN };
-//
-//            @Override
-//			public boolean apply(final TwoInputStates states) {
-//                for (final Key k : keys) {
-//                    if (states.getCurrent() != null && states.getCurrent().getKeyboardState().isDown(k)) {
-//                        return true;
-//                    }
-//                }
-//                return false;
-//            }
-//        };
-//
-//        final TriggerAction moveAction = new TriggerAction() {
-//            @Override
-//			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-//            	if (!enabled) return;
-//                control.move(source.getCanvasRenderer().getCamera(), inputStates.getCurrent().getKeyboardState(), tpf);
-//                SceneManager.getInstance().getCameraNode().updateFromCamera();
-//                updateEditShapes();
-//        		SceneManager.getInstance().refresh();
-//            }
-//        };
-//        _keyTrigger = new InputTrigger(keysHeld, moveAction);
-//        layer.registerTrigger(_keyTrigger);
-//
-//        return keysHeld;
-//    }
 
     public InputTrigger getKeyTrigger() {
         return _keyTrigger;

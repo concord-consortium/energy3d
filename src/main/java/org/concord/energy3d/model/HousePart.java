@@ -49,10 +49,8 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class HousePart implements Serializable {
-	private static final long serialVersionUID = 1L;
-
 	public static final OffsetState offsetState = new OffsetState();
-
+	private static final long serialVersionUID = 1L;
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
 	protected static final float printWireframeThickness = 2f;
@@ -179,7 +177,6 @@ public abstract class HousePart implements Serializable {
 	}
 
 	private void addNewEditPointShape(final int i) {
-//		final Sphere pointShape = new Sphere("Point", Vector3.ZERO, 8, 8, 0.05);
 		final Sphere pointShape = new Sphere("Point", Vector3.ZERO, 8, 8, 0.1);
 		pointShape.setUserData(new UserData(this, i, true));
 		pointShape.updateModelBound(); // important
@@ -419,17 +416,6 @@ public abstract class HousePart implements Serializable {
 		try {
 			if (root == null)
 				init();
-
-//			if (isFrozen()) {
-//				final BlendState blendState = new BlendState();
-//				blendState.setBlendEnabled(true);
-//				root.setRenderState(blendState);
-//			} else
-//				root.clearRenderState(StateType.Blend);
-
-//			root.getSceneHints().setRenderBucketType(isFrozen() ? RenderBucketType.Transparent : RenderBucketType.Inherit);
-//			root.getSceneHints().setTransparencyType(isFrozen() ? TransparencyType.TwoPass : TransparencyType.Inherit);
-//			root.getSceneHints().setLightCombineMode(isFrozen() ? LightCombineMode.Off : LightCombineMode.Inherit);
 
 			drawMesh();
 			updateTextureAndColor();
@@ -738,15 +724,9 @@ public abstract class HousePart implements Serializable {
 		final Vector3 p1 = getAbsPoint(1);
 		final Vector3 p2 = getAbsPoint(2);
 		final double C = 100.0;
-//		return Math.round(Math.round(Math.abs(p1.getX() - p2.getX()) * C) / C * Math.round(Math.abs(p1.getZ() - p2.getZ()) * C) / C * C) / C;
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		return Math.round(Math.round(p2.subtract(p0, null).length() * annotationScale * C) / C * Math.round(p1.subtract(p0, null).length() * annotationScale * C) / C * C) / C;
 	}
-
-//	protected void adjustTransparency(final Mesh mesh) {
-//		final ReadOnlyColorRGBA c = mesh.getDefaultColor();
-//		mesh.setDefaultColor(new ColorRGBA(c.getRed(), c.getGreen(), c.getBlue(), isFrozen() ? Scene.TRANSPARENCY_LEVEL : 1));
-//	}
 
 	public void setFreeze(final boolean freeze) {
 		this.freeze = freeze;

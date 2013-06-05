@@ -56,19 +56,19 @@ public class MainPanel extends JPanel {
 	private JPanel canvasPanel;
 	private JToggleButton energyToggleButton;
 	private JToggleButton solarButton;
+	private JSplitPane canvasNoteSplitPane;
+	private JScrollPane noteScrollPane;
+	private JTextArea noteTextArea;
 	private int defaultDividerSize = -1;
 
-	final static Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
 		@Override
 		public void mouseExited(final MouseEvent e) {
 			SceneManager.getInstance().refresh();
 		}
 	};
-	private JSplitPane canvasNoteSplitPane;
-	private JScrollPane noteScrollPane;
-	private JTextArea noteTextArea;
 
+	final static Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
 	static {
 		cityLatitute.put("Moscow", 55);
 		cityLatitute.put("Ottawa", 45);

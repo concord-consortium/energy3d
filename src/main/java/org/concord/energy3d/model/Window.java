@@ -43,19 +43,6 @@ public class Window extends HousePart {
 		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.getSceneHints().setCullHint(CullHint.Always);
-//
-//		// Transparency
-//		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.4f, 0.5f, 0.7f));
-//		final BlendState blendState = new BlendState();
-//		blendState.setBlendEnabled(true);
-//		blendState.setTestEnabled(true);
-//		mesh.setRenderState(blendState);
-//		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-//
-//		// Add a material to the box, to show both vertex color and lighting/shading.
-//		final MaterialState ms = new MaterialState();
-//		ms.setColorMaterial(ColorMaterial.AmbientAndDiffuse);
-//		mesh.setRenderState(ms);
 
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
@@ -122,11 +109,6 @@ public class Window extends HousePart {
 		}
 	}
 
-//	@Override
-//	public boolean isDrawable() {
-//		return points.size() >= 4 && getAbsPoint(2).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE && getAbsPoint(1).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE;
-//	}
-
 	@Override
 	protected void drawMesh() {
 		if (points.size() < 4)
@@ -138,15 +120,6 @@ public class Window extends HousePart {
 			final ReadOnlyVector3 p = getAbsPoint(i);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
-//
-//		// Compute normals
-//		final Vector3 normal = getAbsPoint(2).subtract(getAbsPoint(0), null).crossLocal(getAbsPoint(1).subtract(getAbsPoint(0), null)).normalizeLocal();
-//		normal.negateLocal();
-//		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
-//		normalBuffer.rewind();
-//		for (int i = 0; i < points.size(); i++)
-//			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
-//
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 

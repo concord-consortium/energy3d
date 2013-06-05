@@ -29,7 +29,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Floor extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
-	private transient Mesh wireframeMesh;
+	private transient Line wireframeMesh;
 
 	public Floor() {
 		super(1, 1, 5.0);
@@ -52,7 +52,7 @@ public class Floor extends HousePart {
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
 		wireframeMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(wireframeMesh);
-//		root.attachChild(wireframeMesh);
+		/* no need to attach because floor wireframe is only need in print preview */
 
 		updateTextureAndColor();
 
@@ -194,7 +194,7 @@ public class Floor extends HousePart {
 		wallUpperPoints = ((Floor) original).wallUpperPoints;
 		root.detachChild(wireframeMesh);
 		wireframeMesh = ((Floor) original).wireframeMesh.makeCopy(true);
-		((Line) wireframeMesh).setLineWidth(printWireframeThickness);
+		wireframeMesh.setLineWidth(printWireframeThickness);
 		root.attachChild(wireframeMesh);
 		super.setOriginal(original);
 	}

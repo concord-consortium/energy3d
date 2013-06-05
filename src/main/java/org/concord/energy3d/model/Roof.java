@@ -133,7 +133,6 @@ public abstract class Roof extends HousePart {
 		final Polygon polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
 		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
-		// fillMeshWithPolygon(mesh, polygon);
 		// create roof parts
 		MeshLib.groupByPlanner(mesh, roofPartsRoot);
 		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
@@ -146,7 +145,6 @@ public abstract class Roof extends HousePart {
 		}
 		drawWireframe();
 		drawDashLines();
-		// updateTextureAndColor();
 	}
 
 	protected void drawWalls() {
@@ -293,7 +291,6 @@ public abstract class Roof extends HousePart {
 		walls.clear();
 		wallUpperPoints.clear();
 		wallNormals.clear();
-		// System.out.println("-----");
 		startWall.visitNeighbors(new WallVisitor() {
 			@Override
 			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
@@ -308,10 +305,6 @@ public abstract class Roof extends HousePart {
 					final int pointIndex1 = pointIndex2 == 1 ? 3 : 1;
 					final Vector3 p1 = currentWall.getAbsPoint(pointIndex1);
 					final Vector3 p2 = currentWall.getAbsPoint(pointIndex2);
-					// System.out.println(currentWall.getPoints().get(pointIndex1));
-					// System.out.println(p1);
-					// System.out.println(currentWall.getPoints().get(pointIndex2));
-					// System.out.println(p2);
 					final ReadOnlyVector3 normal = currentWall.getFaceDirection();
 					addPointToPolygon(p1, normal, wallUpperPoints, wallNormals);
 					addPointToPolygon(p2, normal, wallUpperPoints, wallNormals);
@@ -321,14 +314,11 @@ public abstract class Roof extends HousePart {
 	}
 
 	protected void addPointToPolygon(final Vector3 p, final ReadOnlyVector3 normal, final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
-		final double DELTA = 1;
 		int index = -1;
-		final Vector3 pWithoutZ = p.multiply(1, 1, 0, null);
 		/* check to see if there is another point with same x,y coords */
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			final Vector3 p_i = wallUpperPoints.get(i);
 			if (p.getX() == p_i.getX() && p.getY() == p_i.getY()) {
-				// if (pWithoutZ.distance(p_i.multiplyLocal(1, 1, 0)) < DELTA) {
 				index = i;
 				break;
 			}
@@ -446,14 +436,6 @@ public abstract class Roof extends HousePart {
 				final ReadOnlyVector3 p1 = convexHull.get(i);
 				final ReadOnlyVector3 p2 = convexHull.get((i + 1) % n);
 				final ReadOnlyVector3 p3 = convexHull.get((i + 2) % n);
-				// while (isAlmost180(p1, p2, p3) && i < n) {
-				// i++;
-				// p2 = convexHull.get((i + 1) % n);
-				// p3 = convexHull.get((i + 2) % n);
-				// }
-
-				// if (i == n)
-				// break;
 
 				// Size annotation
 				final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
@@ -467,11 +449,9 @@ public abstract class Roof extends HousePart {
 					sizeAnnot.setColor(ColorRGBA.BLACK);
 
 				// Angle annotations
-				// if (!isAlmost180) {
 				final AngleAnnotation angleAnnot = fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2));
 				angleAnnot.setLineWidth(original == null ? 1f : 2f);
 				angleAnnot.setRange(p2, p1, p3, normal);
-				// }
 			}
 		}
 	}
@@ -484,7 +464,6 @@ public abstract class Roof extends HousePart {
 			final Node roofPartNode = (Node) roofPart;
 			final Mesh wireframeMesh = (Mesh) roofPartNode.getChild(4);
 
-			// final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeConvexHull(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
 			final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeOutline(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
 			final int totalVertices = convexHull.size();
 
@@ -554,7 +533,6 @@ public abstract class Roof extends HousePart {
 			final Vector3 p = wallUpperPoints.get(i);
 			op.set(wallNormals.get(i)).multiplyLocal(Scene.getInstance().getOverhangLength());
 			p.addLocal(op);
-			// roundPoint(p);
 		}
 	}
 

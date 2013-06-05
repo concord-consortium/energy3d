@@ -90,8 +90,14 @@ public class EnergyPanel extends JPanel {
 	private static final Map<String, int[]> avgMonthlyHighTemperatures = new HashMap<String, int[]>();
 	private static final double COST_PER_KWH = 0.13;
 	private static final EnergyPanel instance = new EnergyPanel();
+	private static final DecimalFormat twoDecimals = new DecimalFormat();
+	private static final DecimalFormat noDecimals = new DecimalFormat();
+	private static final DecimalFormat moneyDecimals = new DecimalFormat();
 
 	static {
+		twoDecimals.setMaximumFractionDigits(2);
+		noDecimals.setMaximumFractionDigits(0);
+		moneyDecimals.setMaximumFractionDigits(0);
 		cityLatitute.put("Moscow", 55);
 		cityLatitute.put("Ottawa", 45);
 		cityLatitute.put("Boston", 42);
@@ -130,17 +136,6 @@ public class EnergyPanel extends JPanel {
 		avgMonthlyHighTemperatures.put("Buenos Aires", new int[] { 28, 27, 25, 22, 18, 15, 14, 16, 18, 21, 24, 27 });
 	}
 
-	private final DecimalFormat twoDecimals = new DecimalFormat("###,###.##");
-	private final DecimalFormat noDecimals = new DecimalFormat("###,###");
-	private final DecimalFormat moneyDecimals = new DecimalFormat("$###,###");
-	private double wallsArea;
-	private double doorsArea;
-	private double windowsArea;
-	private double roofsArea;
-	private double wallUFactor;
-	private double doorUFactor;
-	private double windowUFactor;
-	private double roofUFactor;
 	private JFXPanel fxPanel;
 	private final XYChart.Data<String, Number> wallsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
 	private final XYChart.Data<String, Number> windowsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
@@ -172,9 +167,6 @@ public class EnergyPanel extends JPanel {
 	private final JTextField totalCostTextField;
 	private final JSpinner insideTemperatureSpinner;
 	private final JSpinner outsideTemperatureSpinner;
-	private Thread thread;
-	private boolean computeRequest;
-	private boolean initJavaFxAlreadyCalled = false;
 	private final JLabel dateLabel;
 	private final JLabel timeLabel;
 	private final JSpinner dateSpinner;
@@ -182,20 +174,32 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox cityComboBox;
 	private final JLabel latitudeLabel;
 	private final JSpinner latitudeSpinner;
-	private final Map<HousePart, double[][]> solarOnWall = new HashMap<HousePart, double[][]>();
-	private final List<Spatial> solarCollidables = new ArrayList<Spatial>();
-	private long maxSolarValue;
-	private double[][] solarOnLand;
-	private JProgressBar progressBar;
-	private final Map<Integer, Integer> powerOfTwo = new HashMap<Integer, Integer>();
-	private JPanel panel_4;
-	private JSlider colorMapSlider;
-	private JPanel colormapPanel;
-	private JLabel legendLabel;
-	private JLabel contrastLabel;
-	private final Map<HousePart, Double> solarTotal = new HashMap<HousePart, Double>();
+	private final JPanel panel_4;
+	private final JSlider colorMapSlider;
+	private final JPanel colormapPanel;
+	private final JLabel legendLabel;
+	private final JLabel contrastLabel;
+	private final JProgressBar progressBar;
 
-	private class EnergyAmount {
+	private final Map<HousePart, double[][]> solarOnWall = new HashMap<HousePart, double[][]>();
+	private final Map<Integer, Integer> powerOfTwo = new HashMap<Integer, Integer>();
+	private final Map<HousePart, Double> solarTotal = new HashMap<HousePart, Double>();
+	private final List<Spatial> solarCollidables = new ArrayList<Spatial>();
+	private double[][] solarOnLand;
+	private Thread thread;
+	private double wallsArea;
+	private double doorsArea;
+	private double windowsArea;
+	private double roofsArea;
+	private double wallUFactor;
+	private double doorUFactor;
+	private double windowUFactor;
+	private double roofUFactor;
+	private long maxSolarValue;
+	private boolean computeRequest;
+	private boolean initJavaFxAlreadyCalled = false;
+
+	private static class EnergyAmount {
 		double solar;
 		double heating;
 		double cooling;
@@ -350,6 +354,7 @@ public class EnergyPanel extends JPanel {
 		panel_4.add(legendLabel, gbc_legendLabel);
 
 		colorMapSlider = new JSlider();
+		colorMapSlider.setMinimum(10);
 		colorMapSlider.setMaximum(90);
 		colorMapSlider.addChangeListener(new ChangeListener() {
 			@Override
@@ -838,7 +843,6 @@ public class EnergyPanel extends JPanel {
 				series.getData().add(roofsEnergyChartData);
 				chart.getData().add(series);
 
-				// GridPane.setMargin(chart, new javafx.geometry.Insets(0, 15, 0, 15));
 				grid.add(chart, 0, 0);
 				fxPanel.setScene(scene);
 			}
@@ -966,9 +970,9 @@ public class EnergyPanel extends JPanel {
 		coolingYearlyTextField.setText(noDecimals.format(energyYearly.cooling));
 		totalYearlyTextField.setText(noDecimals.format(energyYearly.heating + energyYearly.cooling));
 
-		heatingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.heating));
-		coolingCostTextField.setText(moneyDecimals.format(COST_PER_KWH * energyYearly.cooling));
-		totalCostTextField.setText(moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
+		heatingCostTextField.setText("$" + moneyDecimals.format(COST_PER_KWH * energyYearly.heating));
+		coolingCostTextField.setText("$" + moneyDecimals.format(COST_PER_KWH * energyYearly.cooling));
+		totalCostTextField.setText("$" + moneyDecimals.format(COST_PER_KWH * (energyYearly.heating + energyYearly.cooling)));
 
 		progressBar.setValue(100);
 	}
@@ -1124,19 +1128,15 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void computeRadiation() {
-		final long t = System.nanoTime();
-
 		initSolarCollidables();
 		solarOnWall.clear();
 		solarTotal.clear();
 		solarOnLand = null;
 		maxSolarValue = 1;
 		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
-//		 computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
+		// computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
 		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		updateSolarValueOnAllHouses();
-
-		System.out.println("time = " + (System.nanoTime() - t) / 1000000000);
 	}
 
 	private void initSolarCollidables() {
@@ -1208,7 +1208,6 @@ public class EnergyPanel extends JPanel {
 							final HousePart house = wall.getContainer();
 							final Double val = solarTotal.get(house);
 							solarTotal.put(house, val == null ? 0 : val + repeat * dot * w * h * Scene.getInstance().getAnnotationScale());
-//							System.out.println(row + ", " + col + "\t");
 						}
 					}
 				}

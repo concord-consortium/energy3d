@@ -50,10 +50,8 @@ public class MeshLib {
 	public static ArrayList<GroupData> extractGroups(final Mesh mesh) {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
-//		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
 		vertexBuffer.rewind();
 		normalBuffer.rewind();
-//		textureBuffer.rewind();
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
 		final Vector3 norm = new Vector3();
@@ -91,9 +89,6 @@ public class MeshLib {
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
-//			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
-//			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
-//			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
 		}
 		combineGroups(groups);
 		return groups;
@@ -132,13 +127,9 @@ public class MeshLib {
 							group1.normals.add(group2.normals.get(w * 3));
 							group1.normals.add(group2.normals.get(w * 3 + 1));
 							group1.normals.add(group2.normals.get(w * 3 + 2));
-//							group1.textures.add(group2.textures.get(w * 3));
-//							group1.textures.add(group2.textures.get(w * 3 + 1));
-//							group1.textures.add(group2.textures.get(w * 3 + 2));
 							for (int count = 0; count < 3; count++) {
 								group2.vertices.remove(w);
 								group2.normals.remove(w);
-//								group2.textures.remove(w);
 							}
 							changed = true;
 							if (group2.vertices.isEmpty()) {
@@ -173,7 +164,6 @@ public class MeshLib {
 
 			final Matrix3 matrix = new Matrix3().fromAngles(angleX, 0, 0).multiplyLocal(matrixZ);
 
-			// final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 5.0 : 1.0;
 			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
 			double minV = Double.MAX_VALUE;
 
@@ -182,7 +172,6 @@ public class MeshLib {
 				matrix.applyPost(p, p);
 				final double v = p.getZ() * scale;
 				final double u = p.getX() * scale;
-//				group.textures.get(i).set(u, v);
 				group.textures.add(new Vector2(u, v));
 				if (minV > v)
 					minV = v;
@@ -210,7 +199,6 @@ public class MeshLib {
 				node.attachChild(newMesh);
 				node.attachChild(new Node("Roof Size Annot"));
 				node.attachChild(new Node("Roof Angle Annot"));
-//				final BMText label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
 				final BMText label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.South, Justify.Center);
 				Util.initHousePartLabel(label);
 				label.setTranslation(group.key);
@@ -365,7 +353,6 @@ public class MeshLib {
 		}
 
 		// remove last point if duplicated of first point
-//		if (sortedOutlinePoints.get(0).equals(sortedOutlinePoints.get(sortedOutlinePoints.size() - 1)))
 		if (sortedOutlinePoints.get(0).distanceSquared(sortedOutlinePoints.get(sortedOutlinePoints.size() - 1)) < MathUtils.ZERO_TOLERANCE)
 			sortedOutlinePoints.remove(sortedOutlinePoints.size() - 1);
 
@@ -388,96 +375,13 @@ public class MeshLib {
 	}
 
 	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v) {
-		// final Vector2 min = new Vector2(Double.MAX_VALUE, Double.MAX_VALUE);
-		// final Vector2 max = new Vector2(Double.MIN_VALUE, Double.MIN_VALUE);
-		// for (final TriangulationPoint p : polygon.getPoints()) {
-		// if (p.getX() > max.getX())
-		// max.setX(p.getX());
-		// else if (p.getX() < min.getX())
-		// min.setX(p.getX());
-		//
-		// if (p.getY() > max.getY())
-		// max.setY(p.getY());
-		// else if (p.getY() < min.getY())
-		// min.setY(p.getY());
-		// }
-		//
-		// final double c = 0.5;
-		// min.addLocal(c, c);
-		// max.subtractLocal(c, c);
-		//
-		// if (polygon.getHoles() != null) {
-		// //// polygon.getHoles().remove(3);
-		// // polygon.getHoles().remove(9);
-		// //// polygon.getHoles().remove(8);
-		// // polygon.getHoles().remove(7);
-		// // polygon.getHoles().remove(6);
-		// // polygon.getHoles().remove(5);
-		// // polygon.getHoles().remove(4);
-		// //// polygon.getHoles().remove(3);
-		// // polygon.getHoles().remove(2);
-		// //// polygon.getHoles().remove(1);
-		// // polygon.getHoles().remove(0);
-		// for (final Polygon hole : polygon.getHoles()) {
-		// for (final TriangulationPoint p : hole.getPoints())
-		// p.set(MathUtils.clamp(p.getX(), min.getX(), max.getX()), MathUtils.clamp(p.getY(), min.getY(), max.getY()), p.getZ());
-		// }
-		// }
-
-		// if (polygon.getHoles() != null)
-		// for (final Polygon hole : polygon.getHoles()) {
-		// for (int i = 0; i < 4; i++) {
-		// // for (final TriangulationPoint p : hole.getPoints()) {
-		// final TriangulationPoint p = hole.getPoints().get(i);
-		// if (!insidePolygon(polygon, p)) {
-		// p.set(p.getX() , p.getY() + 0.1, p.getZ());
-		// final int ii;
-		// if (i == 0)
-		// ii = 1;
-		// else if (i == 1)
-		// ii = 0;
-		// else if (i == 2)
-		// ii = 3;
-		// else
-		// ii = 2;
-		// final TriangulationPoint p2 = hole.getPoints().get(ii);
-		// p2.set(p2.getX(), p2.getY() + 0.1, p2.getZ());
-		// // System.err.println("Hole outside wall!");
-		// }
-		// }
-		// }
-
-		try {
-			Poly2Tri.triangulate(polygon);
-		} catch (final RuntimeException e) {
-			// e.printStackTrace();
-			// System.out.println("Triangulate exception received with the following polygon:");
-			// System.out.println("final Polygon polygon = new Polygon(new PolygonPoint[] {");
-			// for (final TriangulationPoint p : polygon.getPoints())
-			// System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
-			// System.out.println("});");
-			//
-			// System.out.println("Polygon hole;");
-			// for (final Polygon hole : polygon.getHoles()) {
-			// System.out.println("hole = new Polygon(new PolygonPoint[] {");
-			// for (final TriangulationPoint p : hole.getPoints())
-			// System.out.println("\tnew PolygonPoint(" + p.getX() + ", " + p.getY() + ", " + p.getZ() + "),");
-			// System.out.println("});");
-			// System.out.println("polygon.addHole(hole);");
-			// }
-
-			throw e;
-		}
+		Poly2Tri.triangulate(polygon);
 		if (fromXY == null)
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 		else
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
 
 		if (generateNormals) {
-//			if (fromXY == null)
-//				ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles());
-//			else
-//				ArdorMeshMapper.updateVertexNormals(mesh, polygon.getTriangles(), fromXY);
 			if (fromXY == null)
 				ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
 			else

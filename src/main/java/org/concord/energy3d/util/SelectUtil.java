@@ -112,10 +112,7 @@ public class SelectUtil {
 
 	public static PickedHousePart selectHousePart(final int x, final int y, final boolean edit) {
 		final PickedHousePart pickedHousePart;
-//		if (SceneManager.getInstance().getOperation() == Operation.RESIZE)
-//			pickedHousePart = pickPart(x, y, Foundation.class);
-//		else
-			pickedHousePart = pickPart(x, y, Scene.getRoot());
+		pickedHousePart = pickPart(x, y, Scene.getRoot());
 		UserData data = null;
 		if (pickedHousePart != null)
 			data = pickedHousePart.getUserData();
