@@ -30,6 +30,9 @@
 					<transformers>
 						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 							<mainClass>org.concord.energy3d.MainApplication</mainClass>
+							<manifestEntries>
+								<Class-Path>lib/guava-13.0.1.jar lib/jogl/jogl-all.jar lib/jogl/gluegen-rt.jar lib/jdom2-2.0.4.jar lib/lwjgl/lwjgl.jar lib/jfxrt.jar</Class-Path>
+							</manifestEntries>							
 						</transformer>
 					</transformers>
 					<outputFile>C:\exe\energy3d\energy3d.jar</outputFile>

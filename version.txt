@@ -1477,6 +1477,8 @@ Version 2.0 - May 15, 2013
 - format the total solar label
 - fix problem with neighboring walls detaching when moving uppser points
 - fix problem with roof height increasing when hovering back and forth on different wall containers
+- release version 2.1
+- add manifest classpath to pom.xml
 
 - *copy and paste for the entire house
 - *fix problem with double clicking moves the edit point
