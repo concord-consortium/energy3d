@@ -1683,7 +1683,7 @@ public class MainFrame extends JFrame {
 
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {
 		if (noteCheckBoxMenuItem == null) {
-			noteCheckBoxMenuItem = new JCheckBoxMenuItem("Note");
+			noteCheckBoxMenuItem = new JCheckBoxMenuItem("Show Note");
 			noteCheckBoxMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

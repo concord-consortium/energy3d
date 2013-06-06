@@ -19,8 +19,11 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -774,6 +777,7 @@ public class MainPanel extends JPanel {
 	private JScrollPane getNoteScrollPane() {
 		if (noteScrollPane == null) {
 			noteScrollPane = new JScrollPane();
+			noteScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 			noteScrollPane.setViewportView(getNoteTextArea());
 		}
 		return noteScrollPane;
@@ -782,6 +786,24 @@ public class MainPanel extends JPanel {
 	public JTextArea getNoteTextArea() {
 		if (noteTextArea == null) {
 			noteTextArea = new JTextArea();
+			noteTextArea.setWrapStyleWord(true);
+			noteTextArea.setLineWrap(true);
+			noteTextArea.getDocument().addDocumentListener(new DocumentListener() {
+				@Override
+				public void removeUpdate(final DocumentEvent e) {
+				}
+
+				@Override
+				public void insertUpdate(final DocumentEvent e) {
+				}
+
+				@Override
+				public void changedUpdate(final DocumentEvent e) {
+					Scene.getInstance().setEdited(true);
+					if (!Config.isApplet())
+						MainFrame.getInstance().refreshUndoRedo();
+				}
+			});
 		}
 		return noteTextArea;
 	}
