@@ -789,19 +789,24 @@ public class MainPanel extends JPanel {
 			noteTextArea.setWrapStyleWord(true);
 			noteTextArea.setLineWrap(true);
 			noteTextArea.getDocument().addDocumentListener(new DocumentListener() {
+				public void updateEditFlag() {
+					Scene.getInstance().setEdited(true);
+					if (!Config.isApplet())
+						MainFrame.getInstance().updateTitleBar();
+				}
+
 				@Override
 				public void removeUpdate(final DocumentEvent e) {
+					updateEditFlag();
 				}
 
 				@Override
 				public void insertUpdate(final DocumentEvent e) {
+					updateEditFlag();
 				}
 
 				@Override
 				public void changedUpdate(final DocumentEvent e) {
-					Scene.getInstance().setEdited(true);
-					if (!Config.isApplet())
-						MainFrame.getInstance().refreshUndoRedo();
 				}
 			});
 		}
