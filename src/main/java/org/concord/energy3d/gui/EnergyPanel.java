@@ -912,14 +912,14 @@ public class EnergyPanel extends JPanel {
 		else {
 			int counter = 0;
 			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Foundation && !part.isFrozen())
+				if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
 					counter++;
 					if (counter >= 2)
 						break;
 			}
 			for (final HousePart part : Scene.getInstance().getParts())
 				if (part instanceof Foundation)
-					((Foundation) part).setSolarValue(counter >= 2 ? 0 : -1);
+					((Foundation) part).setSolarValue(counter >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? 0 : -1);
 			SceneManager.getInstance().refresh();
 		}
 

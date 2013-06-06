@@ -1481,6 +1481,7 @@ Version 2.0 - May 15, 2013
 - add manifest classpath to pom.xml
 - cleanup
 - show house id label if there are more than one unfrozen foundations in the scene
+- do not show id on frozen buildings or foundations with nothing on them
 
 - *copy and paste for the entire house
 - *fix problem with double clicking moves the edit point
