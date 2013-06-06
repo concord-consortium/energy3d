@@ -1480,6 +1480,7 @@ Version 2.0 - May 15, 2013
 - release version 2.1
 - add manifest classpath to pom.xml
 - cleanup
+- show house id label if there are more than one unfrozen foundations in the scene
 
 - *copy and paste for the entire house
 - *fix problem with double clicking moves the edit point

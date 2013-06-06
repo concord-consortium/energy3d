@@ -531,11 +531,15 @@ public class Foundation extends HousePart {
 	}
 
 	public void setSolarValue(final long solarValue) {
-		if (solarValue == 0)
+		if (solarValue < 0)
 			solarLabel.setVisible(false);
 		else {
 			solarLabel.setVisible(true);
-			solarLabel.setText("(#" + id + ")\n" + format.format(solarValue) + "kWh");
+			final String idLabel = "(#" + id + ")";
+			if (solarValue == 0)
+				solarLabel.setText(idLabel);
+			else
+				solarLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
 		}
 	}
 }
