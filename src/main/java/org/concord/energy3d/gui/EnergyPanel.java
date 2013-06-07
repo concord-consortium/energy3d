@@ -93,6 +93,7 @@ public class EnergyPanel extends JPanel {
 	private static final DecimalFormat twoDecimals = new DecimalFormat();
 	private static final DecimalFormat noDecimals = new DecimalFormat();
 	private static final DecimalFormat moneyDecimals = new DecimalFormat();
+	private static final RuntimeException cancelException = new RuntimeException("CANCEL");
 
 	static {
 		twoDecimals.setMaximumFractionDigits(2);
@@ -444,7 +445,8 @@ public class EnergyPanel extends JPanel {
 		outsideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				compute();
+			    if (thread == null)
+			    	compute();
 			}
 		});
 		final GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
@@ -872,30 +874,28 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void compute() {
-		if (thread != null && thread.isAlive()) {
+		if (thread != null) {
 			computeRequest = true;
 		} else {
 			thread = new Thread() {
 				@Override
 				public void run() {
 					do {
-						try {
-							Thread.sleep(500);
-						} catch (final InterruptedException e) {
-							e.printStackTrace();
-						}
 						computeRequest = false;
 						try {
 							computeNow();
-						} finally {
 							try {
 								Thread.sleep(500);
 							} catch (final InterruptedException e) {
 								e.printStackTrace();
 							}
 							progressBar.setValue(0);
+						} catch (final RuntimeException e) {
+							if (e != cancelException)
+								e.printStackTrace();
 						}
 					} while (computeRequest);
+					thread = null;
 				}
 			};
 			thread.start();
@@ -1073,6 +1073,8 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private EnergyAmount computeEnergyRate(final ReadOnlyVector3 sunLocation, final double insideTemperature, final double outsideTemperature) {
+		if (computeRequest)
+			throw cancelException;
 		final EnergyAmount energyRate = new EnergyAmount();
 
 		if (Heliodon.getInstance().isVisible() && !Heliodon.getInstance().isNightTime())
@@ -1190,6 +1192,8 @@ public class EnergyPanel extends JPanel {
 					else
 						w = SOLAR_STEP;
 					for (int row = 0; row < rows; row++) {
+						if (computeRequest)
+							throw cancelException;
 						p.setZ(baseZ + row * SOLAR_STEP);
 						final double h;
 						if (row == rows - 1)
@@ -1251,6 +1255,8 @@ public class EnergyPanel extends JPanel {
 		for (int col = 0; col < cols; col++) {
 			p.setX((col - cols / 2) * SOLAR_STEP);
 			for (int row = 0; row < rows; row++) {
+				if (computeRequest)
+					throw cancelException;
 				p.setY((row - rows / 2) * SOLAR_STEP);
 				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
