@@ -960,16 +960,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return viewMode == ViewMode.TOP_VIEW;
 	}
 
-	public void addShutdownHook(final Runnable r){
-		if(shutdownHooks == null)
+	public void addShutdownHook(final Runnable r) {
+		if (shutdownHooks == null)
 			shutdownHooks = new ArrayList<Runnable>();
-		if(!shutdownHooks.contains(r))
+		if (!shutdownHooks.contains(r))
 			shutdownHooks.add(r);
 	}
 
 	public void exit() {
-		if(shutdownHooks != null) { // e.g., save the log file before exit to ensure that the last segment is saved
-			for(final Runnable r : shutdownHooks)
+		if (shutdownHooks != null) { // e.g., save the log file before exit to ensure that the last segment is saved
+			for (final Runnable r : shutdownHooks)
 				r.run();
 		}
 		// System.out.print("exit cleaning up...");
@@ -1274,7 +1274,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() {
 				if (selectedHousePart != null)
 					selectedHousePart.setGridsVisible(false);
-				boolean sceneChanged = false;
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || (operation == Operation.RESIZE && houseMoveStartPoint != null))) {
 						if (selectedHousePart.isDrawable())
@@ -1287,7 +1286,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							Scene.getInstance().remove(selectedHousePart);
 							selectedHousePart = null;
 						}
-						sceneChanged = true;
 						if (editHousePartCommand != null) {
 							if (editHousePartCommand.isReallyEdited())
 								undoManager.addEdit(editHousePartCommand);
@@ -1299,26 +1297,23 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					houseMoveStartPoint = null;
 					houseMovePoints = null;
 				} else {
-					if (!selectedHousePart.isDrawCompleted()) {
+					if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 						selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
 						if (selectedHousePart.isDrawCompleted() && !selectedHousePart.isDrawable()) {
 							addHousePartCommand = null;
 							Scene.getInstance().remove(selectedHousePart);
 							selectedHousePart = null;
-							selectedHousePart = null;
 							if (operationStick)
 								operationFlag = true;
 						}
-						sceneChanged = true;
 					}
 					if (selectedHousePart != null && selectedHousePart.isDrawCompleted()) {
 						if (selectedHousePart.isDrawable()) {
-							undoManager.addEdit(addHousePartCommand);
-							removeExistingRoof();
+							if (addHousePartCommand != null)
+								undoManager.addEdit(addHousePartCommand);
 							addHousePartCommand = null;
-						} else {
+						} else
 							Scene.getInstance().remove(selectedHousePart);
-						}
 						selectedHousePart.setEditPointsVisible(false);
 						selectedHousePart = null;
 						if (operationStick)
@@ -1330,23 +1325,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 				}
 				System.out.println("mouse released: " + selectedHousePart);
-				if (sceneChanged)
-					updateHeliodonAndAnnotationSize();
+				updateHeliodonAndAnnotationSize();
 				return null;
 			}
 		});
-	}
-
-	protected void removeExistingRoof() {
-		if (selectedHousePart instanceof Roof) {
-			final HousePart wall = ((Roof) selectedHousePart).getContainer();
-			for (final HousePart part : Scene.getInstance().getParts())
-				if (part instanceof Roof && part != selectedHousePart && ((Roof) part).getContainer() == wall) {
-					undoManager.addEdit(new RemoveHousePartCommand(part, false));
-					Scene.getInstance().remove(part);
-					return;
-				}
-		}
 	}
 
 	public void moveMouse(final float x, final float y) {

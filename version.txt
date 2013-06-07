@@ -1484,10 +1484,12 @@ Version 2.0 - May 15, 2013
 - do not show id on frozen buildings or foundations with nothing on them
 - set the edited flag to true when the note is edited
 - make the note text wrap 
+- avoid replace existing roof with new roof
 
+- *display energy only for the currently selected house
+- *fix problem with deleting house that has roof, then undo, result has no roof
 - *copy and paste for the entire house
 - *fix problem with double clicking moves the edit point
-- replace existing roof with new roof instead of double roof
 
 - *monthly solar colormap
 

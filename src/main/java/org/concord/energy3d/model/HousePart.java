@@ -288,8 +288,10 @@ public abstract class HousePart implements Serializable {
 				if (container != null)
 					container.getChildren().remove(this);
 				if (userData != null && userData.getHousePart().isDrawCompleted()) {
-					container = userData.getHousePart();
-					container.getChildren().add(this);
+					if (!(this instanceof Roof) || ((Wall) userData.getHousePart()).getRoof() == null) {
+						container = userData.getHousePart();
+						container.getChildren().add(this);
+					}
 				} else
 					container = null;
 			}
@@ -301,8 +303,6 @@ public abstract class HousePart implements Serializable {
 				previousContainer.gridsMesh.getSceneHints().setCullHint(CullHint.Always);
 
 			if (container != null && !(this instanceof Roof)) {
-//				container.drawGrids(getGridSize());
-//				container.gridsMesh.getSceneHints().setCullHint(CullHint.Inherit);
 				setGridsVisible(true);
 			} else if (this instanceof Foundation) {
 				SceneManager.getInstance().setGridsVisible(true);
@@ -453,7 +453,7 @@ public abstract class HousePart implements Serializable {
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 p = getAbsPoint(i);
 			final Camera camera = SceneManager.getInstance().getCamera();
-			if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel)	// for Lwjgl
+			if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) // for Lwjgl
 				getEditPointShape(i).setScale(camera.getLocation().distance(p) / 10);
 			else
 				getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
