@@ -55,7 +55,7 @@ public class MainApplication {
 			});
 			Scene.getInstance().addPropertyChangeListener(logger);
 			logger.start();
-			logSnapshots(5, dir, logger);
+			logSnapshots(20, dir, logger);
 		}
 	}
 

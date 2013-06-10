@@ -172,7 +172,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		}
 		if (!line.trim().endsWith(".ng3\"")) {
 			if (action != null || !line.equals(oldLine)) {
-				System.out.println("#" + counter + ": " + timestamp + space + line);
+				// System.out.println("#" + counter + ": " + timestamp + space + line);
 				content += timestamp + space + line + System.getProperty("line.separator");
 				if (counter % saveInterval == 0) {
 					saveLog();
