@@ -1,5 +1,7 @@
 package org.concord.energy3d.scene;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -84,6 +86,8 @@ public class Scene implements Serializable {
 	private String note;
 	private int solarContrast;
 
+	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+
 	public static Scene getInstance() {
 		if (instance == null) {
 			try {
@@ -121,6 +125,22 @@ public class Scene implements Serializable {
 				return null;
 			}
 		});
+	}
+
+	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
+		propertyChangeListeners.add(pcl);
+	}
+
+	public void removePropertyChangeListener(final PropertyChangeListener pcl) {
+		propertyChangeListeners.remove(pcl);
+	}
+
+	private void notifyPropertyChangeListeners(final PropertyChangeEvent evt) {
+		if (!propertyChangeListeners.isEmpty()) {
+			for (PropertyChangeListener x : propertyChangeListeners) {
+				x.propertyChange(evt);
+			}
+		}
 	}
 
 	public static void open(final URL file) throws Exception {
@@ -603,6 +623,8 @@ public class Scene implements Serializable {
 	}
 
 	public void setEdited(final boolean edited) {
+		if (edited)
+			notifyPropertyChangeListeners(new PropertyChangeEvent(this, "Edit", this.edited, edited));
 		this.edited = edited;
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();

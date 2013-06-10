@@ -46,15 +46,16 @@ public class MainApplication {
 			final File dir = new File("log");
 			if (!dir.exists())
 				dir.mkdir();
-			logSnapshots(20, dir);
-			final TimeSeriesLogger logger = new TimeSeriesLogger(2, 20, dir, scene);
+			final TimeSeriesLogger logger = new TimeSeriesLogger(2, 5, dir, scene);
 			scene.addShutdownHook(new Runnable() {
 				@Override
 				public void run() {
 					logger.saveLog();
 				}
 			});
+			Scene.getInstance().addPropertyChangeListener(logger);
 			logger.start();
+			logSnapshots(5, dir, logger);
 		}
 	}
 
@@ -97,7 +98,7 @@ public class MainApplication {
 		}
 	}
 
-	private static void logSnapshots(final int period, final File dir) {
+	private static void logSnapshots(final int period, final File dir, final TimeSeriesLogger logger) {
 		final Thread t = new Thread() {
 			@Override
 			public void run() {
@@ -108,12 +109,15 @@ public class MainApplication {
 						e.printStackTrace();
 					}
 					if (Scene.getURL() != null) { // log only when student starts with a template
-						try {
-							saveSnapshot(dir);
-						} catch (final Exception e) {
-							e.printStackTrace();
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging! Please notify the teacher of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
-							break;
+						if (logger.isEdited()) {
+							try {
+								saveSnapshot(dir);
+							} catch (final Exception e) {
+								e.printStackTrace();
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging! Please notify the teacher of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
+								break;
+							}
+							logger.resetEditFlags();
 						}
 					}
 				}
@@ -124,11 +128,9 @@ public class MainApplication {
 	}
 
 	private static void saveSnapshot(final File dir) throws Exception {
-		if (Scene.getInstance().isEdited()) {
-			final Date date = Calendar.getInstance().getTime();
-			final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd  HH-mm-ss").format(date) + ".ng3";
-			Scene.save(new File(filename).toURI().toURL(), false, false);
-		}
+		final Date date = Calendar.getInstance().getTime();
+		final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd  HH-mm-ss").format(date) + ".ng3";
+		Scene.save(new File(filename).toURI().toURL(), false, false);
 	}
 
 }

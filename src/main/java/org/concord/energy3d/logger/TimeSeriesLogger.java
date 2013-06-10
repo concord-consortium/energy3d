@@ -1,5 +1,7 @@
 package org.concord.energy3d.logger;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -8,9 +10,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -24,12 +29,12 @@ import org.concord.energy3d.undo.UndoManager;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 
-public class TimeSeriesLogger {
+public class TimeSeriesLogger implements PropertyChangeListener {
 
 	private final static DecimalFormat FORMAT = new DecimalFormat(".###");
 	private final static String space = "   ";
-	private int logPeriod = 1; // in seconds
-	private int savePeriod = 20; // save less frequently
+	private int logInterval = 1; // in seconds
+	private int saveInterval = 5; // save every N valid actions
 	private File dir;
 	private File file;
 	private SceneManager sceneManager;
@@ -42,14 +47,32 @@ public class TimeSeriesLogger {
 	private String oldHeliodonLatitude = null;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
+	private boolean noteEditedFlag = false;
+	private boolean sceneEditedFlag = false;
 
-	public TimeSeriesLogger(int logPeriod, int savePeriod, File dir, SceneManager sceneManager) {
-		this.logPeriod = logPeriod;
-		this.savePeriod = savePeriod;
+	public TimeSeriesLogger(int logInterval, int saveInterval, File dir, SceneManager sceneManager) {
+		this.logInterval = logInterval;
+		this.saveInterval = saveInterval;
 		this.dir = dir;
 		this.sceneManager = sceneManager;
 		undoManager = sceneManager.getUndoManager();
 		lastEdit = undoManager.lastEdit();
+		MainPanel.getInstance().getNoteTextArea().getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(final DocumentEvent e) {
+				noteEditedFlag = true;
+			}
+
+			@Override
+			public void insertUpdate(final DocumentEvent e) {
+				noteEditedFlag = true;
+			}
+
+			@Override
+			public void changedUpdate(final DocumentEvent e) {
+				noteEditedFlag = true;
+			}
+		});
 	}
 
 	private void log() {
@@ -142,17 +165,22 @@ public class TimeSeriesLogger {
 				oldCameraPosition = cameraPosition;
 			}
 		}
+		if (noteEditedFlag) {
+			String note = MainPanel.getInstance().getNoteTextArea().getText();
+			line += space + "[Note: " + note.length() + "]";
+			noteEditedFlag = false;
+		}
 		if (!line.trim().endsWith(".ng3\"")) {
 			if (action != null || !line.equals(oldLine)) {
-				System.out.println(timestamp + space + line);
+				System.out.println("#" + counter + ": " + timestamp + space + line);
 				content += timestamp + space + line + System.getProperty("line.separator");
-				if (counter % savePeriod == 0) {
+				if (counter % saveInterval == 0) {
 					saveLog();
 				}
 				oldLine = line;
+				counter++;
 			}
 		}
-		counter++;
 	}
 
 	public void saveLog() {
@@ -164,6 +192,26 @@ public class TimeSeriesLogger {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging! Please notify the teacher of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		if (evt.getSource() == Scene.getInstance()) {
+			if (evt.getPropertyName().equals("Edit")) {
+				Object newValue = evt.getNewValue();
+				if (newValue.equals(Boolean.TRUE))
+					sceneEditedFlag = true;
+			}
+		}
+	}
+
+	public boolean isEdited() {
+		return sceneEditedFlag || noteEditedFlag;
+	}
+
+	public void resetEditFlags() {
+		sceneEditedFlag = false;
+		noteEditedFlag = false;
 	}
 
 	private String getId(final HousePart p) {
@@ -203,7 +251,7 @@ public class TimeSeriesLogger {
 			public void run() {
 				while (true) {
 					try {
-						sleep(1000 * logPeriod);
+						sleep(1000 * logInterval);
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
