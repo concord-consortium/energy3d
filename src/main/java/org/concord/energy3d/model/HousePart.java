@@ -365,7 +365,8 @@ public abstract class HousePart implements Serializable {
 						center = container.getCenter();
 
 					if (snapToZ)
-						origin = center;
+						/* a dirty way of solving problem with foundation height of 1.0 which does not fit in the grid by shifting the grid upward by 1.0 */
+						origin = this instanceof Wall ? center.add(0, 0, points.get(0).getZ(), null) : center;
 					else
 						origin = center.add(0, 0, p.getZ(), null);
 				} else
