@@ -54,7 +54,7 @@ public class MeshLib {
 		normalBuffer.rewind();
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
-		final Vector3 norm = new Vector3();
+		final Vector3 normal = new Vector3();
 		final ArrayList<GroupData> groups = new ArrayList<GroupData>();
 		for (int i = 0; i < vertexBuffer.limit() / 9; i++) {
 			final Vector3 p1 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
@@ -64,12 +64,16 @@ public class MeshLib {
 				continue;
 			p2.subtract(p1, v1);
 			p3.subtract(p1, v2);
-			v1.cross(v2, norm);
-			norm.normalizeLocal();
+			v1.cross(v2, normal);
+			normal.normalizeLocal();
+
+			final Vector3 firstNormal = new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get());
+			if (Double.isNaN(firstNormal.length()))
+				continue;
 
 			GroupData group = null;
 			for (final GroupData g : groups) {
-				if (g.key.dot(norm) > 0.99) { // if there is less than 8 degrees difference between the two vectors
+				if (g.key.dot(normal) > 0.99) { // if there is less than 8 degrees difference between the two vectors
 					// if there is an edge in common with the existing triangles
 					if (hasCommonEdge(g, p1, p2, p3)) {
 						group = g;
@@ -80,13 +84,14 @@ public class MeshLib {
 
 			if (group == null) {
 				group = new GroupData();
-				group.key.set(norm);
+				group.key.set(normal);
 				groups.add(group);
 			}
+
 			group.vertices.add(p1);
 			group.vertices.add(p2);
 			group.vertices.add(p3);
-			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
+			group.normals.add(firstNormal);
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 		}

@@ -1494,6 +1494,7 @@ Version 2.0 - May 15, 2013
 - snap wall to proper gridSize when stretching the height
 - fix problem with undo detaching all walls
 - fix problem with deleting house that has roof, then undo, result has no roof
+- fix problem with NaN exception when custome roof results in a triangle that forms a line
 
 
 - *display energy only for the currently selected house
