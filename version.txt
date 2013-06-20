@@ -1488,6 +1488,7 @@ Version 2.0 - May 15, 2013
 - abort energy computation thread immediently when new computation is requested
 - fix problem with wall snapping to walls in another platform
 - fix snap wall menu item being checked in reversed
+- stop sun animation if both shadow and heliodon are off
 
 - *display energy only for the currently selected house
 - *fix problem with deleting house that has roof, then undo, result has no roof

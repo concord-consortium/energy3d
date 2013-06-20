@@ -384,9 +384,8 @@ public class MainPanel extends JPanel {
 						SceneManager.getInstance().setShading(lightButton.isSelected());
 						SceneManager.getInstance().setShadow(lightButton.isSelected());
 					}
-					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
-					sunAnimButton.setEnabled(showSunTools);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					disableSunAnim();
 				}
 			});
 		}
@@ -518,9 +517,8 @@ public class MainPanel extends JPanel {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
 					SceneManager.getInstance().setHeliodonControl(heliodonButton.isSelected());
-					final boolean showSunTools = lightButton.isSelected() || heliodonButton.isSelected();
-					sunAnimButton.setEnabled(showSunTools);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					disableSunAnim();
 				}
 			});
 		}
@@ -824,5 +822,14 @@ public class MainPanel extends JPanel {
 			splitPane.setDividerLocation(splitPane.getLastDividerLocation());
 		else
 			splitPane.setDividerLocation(1.0);
+	}
+
+	private void disableSunAnim() {
+		final boolean enableSunAnim = lightButton.isSelected() || heliodonButton.isSelected();
+		sunAnimButton.setEnabled(enableSunAnim);
+		if (!enableSunAnim && sunAnimButton.isSelected()) {
+			sunAnimButton.setSelected(false);
+			SceneManager.getInstance().setSunAnim(false);
+		}
 	}
 }
