@@ -48,7 +48,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double MIN_WALL_LENGTH = 0.1;
-	private static double defaultWallHeight = 15.0; // the recommended default wall height is 3m
+	private static final double DEFAULT_WALL_HEIGHT = 15.0; // the recommended default wall height is 3m
 	private static int currentVisitStamp = 1;
 	private static boolean extendToRoofEnabled = true;
 	private transient Mesh backMesh;
@@ -73,7 +73,7 @@ public class Wall extends HousePart {
 	}
 
 	public Wall() {
-		super(2, 4, defaultWallHeight);
+		super(2, 4, DEFAULT_WALL_HEIGHT);
 	}
 
 	@Override
@@ -197,7 +197,7 @@ public class Wall extends HousePart {
 			final Vector3 base = getAbsPoint(lower);
 			final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
 			snapToGrid(closestPoint, getAbsPoint(editPointIndex), 1.0);
-			defaultWallHeight = height = Math.max(0.1, closestPoint.getZ() - base.getZ());
+			height = Math.max(getGridSize(), closestPoint.getZ() - base.getZ());
 			final double z = height + base.getZ();
 			points.get(1).setZ(z);
 			points.get(3).setZ(z);
