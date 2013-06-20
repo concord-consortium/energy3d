@@ -1486,6 +1486,7 @@ Version 2.0 - May 15, 2013
 - make the note text wrap 
 - avoid replace existing roof with new roof
 - abort energy computation thread immediently when new computation is requested
+- fix problem with wall snapping to walls in another platform
 
 - *display energy only for the currently selected house
 - *fix problem with deleting house that has roof, then undo, result has no roof

@@ -257,7 +257,7 @@ public class Wall extends HousePart {
 		double closestDistance = Double.MAX_VALUE;
 		Wall closestWall = null;
 		int closestPointIndex = -1;
-		for (final HousePart housePart : Scene.getInstance().getParts()) {
+		for (final HousePart housePart : container.getChildren()) {
 			if (housePart instanceof Wall && housePart != this) {
 				final Wall wall = (Wall) housePart;
 				for (int i = 0; i < wall.points.size(); i += 2) {
