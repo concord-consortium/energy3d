@@ -137,7 +137,7 @@ public class Scene implements Serializable {
 
 	private void notifyPropertyChangeListeners(final PropertyChangeEvent evt) {
 		if (!propertyChangeListeners.isEmpty()) {
-			for (PropertyChangeListener x : propertyChangeListeners) {
+			for (final PropertyChangeListener x : propertyChangeListeners) {
 				x.propertyChange(evt);
 			}
 		}
@@ -466,6 +466,7 @@ public class Scene implements Serializable {
 
 	public void redrawAllNow() {
 		System.out.println("redrawAllNow()");
+		cleanup();
 		Snap.clearAnnotationDrawn();
 		for (final HousePart part : parts)
 			if (part instanceof Roof)
