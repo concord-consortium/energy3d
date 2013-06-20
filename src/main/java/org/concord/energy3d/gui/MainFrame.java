@@ -1237,6 +1237,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem getSnapCheckBoxMenuItem() {
 		if (snapCheckBoxMenuItem == null) {
 			snapCheckBoxMenuItem = new JCheckBoxMenuItem("Snap Walls");
+			snapCheckBoxMenuItem.setSelected(true);
 			snapCheckBoxMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

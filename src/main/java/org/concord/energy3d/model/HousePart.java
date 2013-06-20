@@ -55,7 +55,7 @@ public abstract class HousePart implements Serializable {
 	protected static int printSequence;
 	protected static final float printWireframeThickness = 2f;
 	private static HousePart gridsHighlightedHousePart;
-	private static boolean snapToObjects = false;
+	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = true;
 	protected transient final int numOfDrawPoints;
 	protected transient final int numOfEditPoints;
