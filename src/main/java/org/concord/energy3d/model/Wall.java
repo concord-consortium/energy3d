@@ -196,7 +196,7 @@ public class Wall extends HousePart {
 			final int lower = (editPointIndex == 1) ? 0 : 2;
 			final Vector3 base = getAbsPoint(lower);
 			final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
-			snapToGrid(closestPoint, getAbsPoint(editPointIndex), 1.0);
+			snapToGrid(closestPoint, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(getGridSize(), closestPoint.getZ() - base.getZ());
 			final double z = height + base.getZ();
 			points.get(1).setZ(z);

@@ -512,7 +512,7 @@ public class Foundation extends HousePart {
 
 	@Override
 	protected ReadOnlyVector3 getCenter() {
-		return super.getCenter().multiply(new Vector3(1, 1, 0), null);
+		return super.getCenter().multiply(1, 1, 0, null).addLocal(0, 0, height);
 	}
 
 	@Override

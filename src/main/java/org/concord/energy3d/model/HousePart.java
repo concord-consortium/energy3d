@@ -356,7 +356,6 @@ public abstract class HousePart implements Serializable {
 			if (p.distance(current) < gridSize)
 				p.set(current);
 			else if (container != null) {
-				final ReadOnlyVector3 p0 = container.getAbsPoint(0);
 				final ReadOnlyVector3 origin;
 				if (relativeToHorizontal) {
 					final ReadOnlyVector3 center;
@@ -370,7 +369,7 @@ public abstract class HousePart implements Serializable {
 					else
 						origin = center.add(0, 0, p.getZ(), null);
 				} else
-					origin = p0;
+					origin = container.getAbsPoint(0);
 
 				final ReadOnlyVector3 originToP = p.subtract(origin, null);
 				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), snapToZ ? originToP.getY() : 0, 0);
