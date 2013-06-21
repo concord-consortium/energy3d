@@ -164,11 +164,11 @@ public class Scene implements Serializable {
 			instance = (Scene) in.readObject();
 			in.close();
 
-			for (final HousePart part : instance.parts) {
+			for (final HousePart part : instance.parts)
 				part.getRoot();
-			}
 
-			instance.cleanup();
+			if (instance.version >= 1)
+				instance.cleanup();
 			instance.upgradeSceneToNewVersion();
 			loadCameraLocation();
 		}

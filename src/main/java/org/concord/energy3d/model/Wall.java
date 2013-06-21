@@ -47,7 +47,6 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double MIN_WALL_LENGTH = 0.1;
 	private static final double DEFAULT_WALL_HEIGHT = 15.0; // the recommended default wall height is 3m
 	private static int currentVisitStamp = 1;
 	private static boolean extendToRoofEnabled = true;
@@ -322,7 +321,8 @@ public class Wall extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		return points.size() >= 4 && points.get(0).subtract(points.get(2), null).length() > MIN_WALL_LENGTH;
+		Scene.getInstance().getAnnotationScale();
+		return points.size() >= 4 && getAbsPoint(2).subtract(getAbsPoint(0), null).length() >= getGridSize();
 	}
 
 	@Override
