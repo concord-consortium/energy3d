@@ -218,4 +218,8 @@ public class Util {
 		label.setAutoScale(AutoScale.FixedScreenSize);
 		label.setAutoFade(AutoFade.Off);
 	}
+
+	public static double round(final double x) {
+		return Math.round(x * 100) / 100;
+	}
 }

@@ -1497,6 +1497,7 @@ Version 2.0 - May 15, 2013
 - fix problem with NaN exception when custome roof results in a triangle that forms a line
 - improve algorithm for deciding the inside/outside side of the walls by traversing through all of them first and noting turn-left and turn-right counts
 - fix problem with invisible wall unless stretched to multiple grids due to Wall testing drawability based on points instead of AbsPoints
+- fix exception when print previewing block city with frozen block due to round off error
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
