@@ -680,8 +680,10 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void drawChildren() {
-		for (final HousePart child : children)
+		for (final HousePart child : children) {
+			child.drawChildren();
 			child.draw();
+		}
 	}
 
 	public double getHeight() {

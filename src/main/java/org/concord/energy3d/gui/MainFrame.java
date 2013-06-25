@@ -366,8 +366,7 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					mainPanel.getSelectButton().setSelected(true);
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
+					MainFrame.getInstance().deselect();
 				}
 			});
 			fileMenu.setText("File");
@@ -1067,9 +1066,9 @@ public class MainFrame extends JFrame {
 			undoMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					MainPanel.getInstance().deselect();
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().undo();
-					Scene.getInstance().redrawAll();
 				}
 			});
 		}
@@ -1084,9 +1083,9 @@ public class MainFrame extends JFrame {
 			redoMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					MainPanel.getInstance().deselect();
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().redo();
-					Scene.getInstance().redrawAll();
 				}
 			});
 		}
