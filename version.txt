@@ -1501,6 +1501,8 @@ Version 2.0 - May 15, 2013
 - fix problem: can no longer resize
 - fix problem: resize box does not extend all the way to top of the roof
 - only draw children of house when resizing instead of redrawing the entire scene
+- update the outside temperature based on selected city
+- release version 2.2
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house

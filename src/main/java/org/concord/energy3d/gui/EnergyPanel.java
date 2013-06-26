@@ -84,7 +84,6 @@ public class EnergyPanel extends JPanel {
 	public static final double SOLAR_STEP = 2.0;
 	private static final int SOLAR_MINUTE_STEP = 15;
 	private static final long serialVersionUID = 1L;
-	private static final double[] averageTemperature = new double[] { 28.8, 29.4, 37.1, 47.2, 57.9, 67.2, 72.7, 71, 64.1, 54.0, 43.7, 32.8 };
 	private static final Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
 	private static final Map<String, int[]> avgMonthlyLowTemperatures = new HashMap<String, int[]>();
 	private static final Map<String, int[]> avgMonthlyHighTemperatures = new HashMap<String, int[]>();
@@ -267,7 +266,9 @@ public class EnergyPanel extends JPanel {
 		cityComboBox.addActionListener(new java.awt.event.ActionListener() {
 			@Override
 			public void actionPerformed(final java.awt.event.ActionEvent e) {
-				if (!cityComboBox.getSelectedItem().equals("")) {
+				if (cityComboBox.getSelectedItem().equals(""))
+					compute();
+				else {
 					final Integer newLatitude = cityLatitute.get(cityComboBox.getSelectedItem());
 					if (newLatitude.equals(latitudeSpinner.getValue()))
 						compute();
@@ -1014,8 +1015,30 @@ public class EnergyPanel extends JPanel {
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
 
+		final double[] outsideTemperature;
+
+		if (getCity().isEmpty()) {
+			/* if there are no temperatures available for the selected city compute zero for cooling and heating */
+			outsideTemperature = new double[] { insideTemperature, insideTemperature };
+			energyToday.heating = Double.NaN;
+			energyToday.cooling = Double.NaN;
+		} else
+			outsideTemperature = computeOutsideTemperature(today);
+
+		for (int hour = 0; hour < 24; hour++) {
+			final EnergyAmount energyThisHour = computeEnergyRate(heliodon.computeSunLocation(today), insideTemperature, outsideTemperature[0] + (outsideTemperature[1] - outsideTemperature[0]) / 24 * hour);
+			energyToday.solar += energyThisHour.solar / 1000.0;
+			energyToday.heating += energyThisHour.heating / 1000.0;
+			energyToday.cooling += energyThisHour.cooling / 1000.0;
+			today.add(Calendar.HOUR_OF_DAY, 1);
+		}
+		return energyToday;
+	}
+
+	private double[] computeOutsideTemperature(final Calendar today) {
 		final int day = today.get(Calendar.DAY_OF_MONTH);
 		final int daysInMonth = today.getActualMaximum(Calendar.DAY_OF_MONTH);
+		final double[] outsideTemperature = new double[2];
 
 		final Calendar monthFrom, monthTo;
 		final int halfMonth = daysInMonth / 2;
@@ -1039,29 +1062,11 @@ public class EnergyPanel extends JPanel {
 
 		final int[] monthlyLowTemperatures = avgMonthlyLowTemperatures.get(getCity());
 		final int[] monthlyHighTemperatures = avgMonthlyHighTemperatures.get(getCity());
-		final double outsideLowTemperature;
-		final double outsideHighTemperature;
-		if (monthlyLowTemperatures == null || monthlyHighTemperatures == null) {
-			/* if there are no temperatures available for the selected city compute zero for cooling and heating */
-			outsideLowTemperature = insideTemperature;
-			outsideHighTemperature = insideTemperature;
-			energyToday.heating = Double.NaN;
-			energyToday.cooling = Double.NaN;
-		} else {
-			final int monthFromIndex = monthFrom.get(Calendar.MONTH);
-			final int monthToIndex = monthTo.get(Calendar.MONTH);
-			outsideLowTemperature = monthlyLowTemperatures[monthFromIndex] + (monthlyLowTemperatures[monthToIndex] - monthlyLowTemperatures[monthFromIndex]) * portion;
-			outsideHighTemperature = monthlyHighTemperatures[monthFromIndex] + (monthlyHighTemperatures[monthToIndex] - monthlyHighTemperatures[monthFromIndex]) * portion;
-		}
-
-		for (int hour = 0; hour < 24; hour++) {
-			final EnergyAmount energyThisHour = computeEnergyRate(heliodon.computeSunLocation(today), insideTemperature, outsideLowTemperature + (outsideHighTemperature - outsideLowTemperature) / 24 * hour);
-			energyToday.solar += energyThisHour.solar / 1000.0;
-			energyToday.heating += energyThisHour.heating / 1000.0;
-			energyToday.cooling += energyThisHour.cooling / 1000.0;
-			today.add(Calendar.HOUR_OF_DAY, 1);
-		}
-		return energyToday;
+		final int monthFromIndex = monthFrom.get(Calendar.MONTH);
+		final int monthToIndex = monthTo.get(Calendar.MONTH);
+		outsideTemperature[0] = monthlyLowTemperatures[monthFromIndex] + (monthlyLowTemperatures[monthToIndex] - monthlyLowTemperatures[monthFromIndex]) * portion;
+		outsideTemperature[1] = monthlyHighTemperatures[monthFromIndex] + (monthlyHighTemperatures[monthToIndex] - monthlyHighTemperatures[monthFromIndex]) * portion;
+		return outsideTemperature;
 	}
 
 	public String getCity() {
@@ -1125,7 +1130,13 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void updateOutsideTemperature() {
-		outsideTemperatureSpinner.setValue((int) Math.round(toCelsius(averageTemperature[Heliodon.getInstance().getCalander().get(Calendar.MONTH)])));
+		if (getCity().isEmpty())
+			outsideTemperatureSpinner.setValue(15);
+		else {
+			final double[] temperature = computeOutsideTemperature(Heliodon.getInstance().getCalander());
+			final double avgTemperature = (temperature[0] + temperature[1]) / 2.0;
+			outsideTemperatureSpinner.setValue((int) Math.round(avgTemperature));
+		}
 	}
 
 	public JSpinner getDateSpinner() {
