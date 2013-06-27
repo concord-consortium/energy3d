@@ -1503,6 +1503,10 @@ Version 2.0 - May 15, 2013
 - only draw children of house when resizing instead of redrawing the entire scene
 - update the outside temperature based on selected city
 - release version 2.2
+- remember the previous wall height
+- reset the default wall height upon new file
+
+- *enforce a minimum distance between platforms
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
