@@ -1486,9 +1486,25 @@ Version 2.0 - May 15, 2013
 - make the note text wrap 
 - avoid replace existing roof with new roof
 - abort energy computation thread immediently when new computation is requested
+- fix problem with wall snapping to walls in another platform
+- fix snap wall menu item being checked in reversed
+- stop sun animation if both shadow and heliodon are off
+- avoid changing default wall and door height
+- use gridSize as the minimum wall and door height
+- snap wall to proper gridSize when stretching the height
+- fix problem with undo detaching all walls
+- fix problem with deleting house that has roof, then undo, result has no roof
+- fix problem with NaN exception when custome roof results in a triangle that forms a line
+- improve algorithm for deciding the inside/outside side of the walls by traversing through all of them first and noting turn-left and turn-right counts
+- fix problem with invisible wall unless stretched to multiple grids due to Wall testing drawability based on points instead of AbsPoints
+- fix exception when print previewing block city with frozen block due to round off error
+- fix problem: can no longer resize
+- fix problem: resize box does not extend all the way to top of the roof
+- only draw children of house when resizing instead of redrawing the entire scene
+- update the outside temperature based on selected city
+- release version 2.2
 
 - *display energy only for the currently selected house
-- *fix problem with deleting house that has roof, then undo, result has no roof
 - *copy and paste for the entire house
 - *fix problem with double clicking moves the edit point
 

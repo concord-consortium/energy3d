@@ -15,10 +15,10 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static double defaultDoorHeight = 10;
+	private static final double DEFAULT_DOOR_HEIGHT = 10;
 
 	public Door() {
-		super(2, 4, defaultDoorHeight);
+		super(2, 4, DEFAULT_DOOR_HEIGHT);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class Door extends HousePart {
 				final int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				points.set(index, toRelative(p));
 				if (editPointIndex != -1)
-					defaultDoorHeight = height = getAbsPoint(editPointIndex == 0 ? 2 : 0).subtract(getAbsPoint(editPointIndex == 0 ? 3 : 1), null).length();
+					height = getAbsPoint(editPointIndex == 0 ? 2 : 0).subtract(getAbsPoint(editPointIndex == 0 ? 3 : 1), null).length();
 				p.setZ(p.getZ() + height);
 				points.set(index + 1, toRelative(p));
 			}
@@ -61,7 +61,7 @@ public class Door extends HousePart {
 			final Vector3 absoluteBase = toAbsolute(base);
 			final Vector3 p = Util.closestPoint(absoluteBase, Vector3.UNIT_Z, x, y);
 			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
-			defaultDoorHeight = height = Math.max(0, p.getZ() - absoluteBase.getZ());
+			height = Math.max(getGridSize(), p.getZ() - absoluteBase.getZ());
 
 			final double rel_z = toRelative(absoluteBase.addLocal(0, 0, height)).getZ();
 			points.get(1).setZ(rel_z);

@@ -55,7 +55,7 @@ public abstract class HousePart implements Serializable {
 	protected static int printSequence;
 	protected static final float printWireframeThickness = 2f;
 	private static HousePart gridsHighlightedHousePart;
-	private static boolean snapToObjects = false;
+	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = true;
 	protected transient final int numOfDrawPoints;
 	protected transient final int numOfEditPoints;
@@ -356,7 +356,6 @@ public abstract class HousePart implements Serializable {
 			if (p.distance(current) < gridSize)
 				p.set(current);
 			else if (container != null) {
-				final ReadOnlyVector3 p0 = container.getAbsPoint(0);
 				final ReadOnlyVector3 origin;
 				if (relativeToHorizontal) {
 					final ReadOnlyVector3 center;
@@ -366,11 +365,12 @@ public abstract class HousePart implements Serializable {
 						center = container.getCenter();
 
 					if (snapToZ)
-						origin = center;
+						/* a dirty way of solving problem with foundation height of 1.0 which does not fit in the grid by shifting the grid upward by 1.0 */
+						origin = this instanceof Wall ? center.add(0, 0, points.get(0).getZ(), null) : center;
 					else
 						origin = center.add(0, 0, p.getZ(), null);
 				} else
-					origin = p0;
+					origin = container.getAbsPoint(0);
 
 				final ReadOnlyVector3 originToP = p.subtract(origin, null);
 				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), snapToZ ? originToP.getY() : 0, 0);
@@ -680,8 +680,10 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void drawChildren() {
-		for (final HousePart child : children)
+		for (final HousePart child : children) {
+			child.drawChildren();
 			child.draw();
+		}
 	}
 
 	public double getHeight() {

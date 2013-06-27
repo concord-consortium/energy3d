@@ -30,6 +30,8 @@ public class AddHousePartCommand extends AbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		Scene.getInstance().add(housePart);
+		/* to reconnect walls */
+		Scene.getInstance().redrawAll();
 	}
 
 	@Override

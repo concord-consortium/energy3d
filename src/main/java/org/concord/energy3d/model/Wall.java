@@ -47,8 +47,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double MIN_WALL_LENGTH = 0.1;
-	private static double defaultWallHeight = 15.0; // the recommended default wall height is 3m
+	private static final double DEFAULT_WALL_HEIGHT = 15.0; // the recommended default wall height is 3m
 	private static int currentVisitStamp = 1;
 	private static boolean extendToRoofEnabled = true;
 	private transient Mesh backMesh;
@@ -73,7 +72,7 @@ public class Wall extends HousePart {
 	}
 
 	public Wall() {
-		super(2, 4, defaultWallHeight);
+		super(2, 4, DEFAULT_WALL_HEIGHT);
 	}
 
 	@Override
@@ -196,8 +195,8 @@ public class Wall extends HousePart {
 			final int lower = (editPointIndex == 1) ? 0 : 2;
 			final Vector3 base = getAbsPoint(lower);
 			final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
-			snapToGrid(closestPoint, getAbsPoint(editPointIndex), 1.0);
-			defaultWallHeight = height = Math.max(0.1, closestPoint.getZ() - base.getZ());
+			snapToGrid(closestPoint, getAbsPoint(editPointIndex), getGridSize());
+			height = Math.max(getGridSize(), closestPoint.getZ() - base.getZ());
 			final double z = height + base.getZ();
 			points.get(1).setZ(z);
 			points.get(3).setZ(z);
@@ -239,10 +238,10 @@ public class Wall extends HousePart {
 		thicknessNormal = null;
 		isShortWall = true;
 		Wall.extendToRoofEnabled = extendToRoofEnabled;
-		draw();
-		drawChildren();
 		if (isDrawable())
 			drawNeighborWalls();
+		draw();
+		drawChildren();
 		Wall.extendToRoofEnabled = true;
 	}
 
@@ -257,7 +256,7 @@ public class Wall extends HousePart {
 		double closestDistance = Double.MAX_VALUE;
 		Wall closestWall = null;
 		int closestPointIndex = -1;
-		for (final HousePart housePart : Scene.getInstance().getParts()) {
+		for (final HousePart housePart : container.getChildren()) {
 			if (housePart instanceof Wall && housePart != this) {
 				final Wall wall = (Wall) housePart;
 				for (int i = 0; i < wall.points.size(); i += 2) {
@@ -273,7 +272,7 @@ public class Wall extends HousePart {
 			}
 		}
 
-		final double snapDistance = isSnapToObjects() ? SNAP_DISTANCE : getGridSize() * 2;
+		final double snapDistance = isSnapToObjects() ? getGridSize() * 2 : SNAP_DISTANCE;
 
 		final boolean snap;
 		if (isFirstPointInserted() && p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() < getGridSize() * 2)
@@ -322,7 +321,8 @@ public class Wall extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		return points.size() >= 4 && points.get(0).subtract(points.get(2), null).length() > MIN_WALL_LENGTH;
+		Scene.getInstance().getAnnotationScale();
+		return points.size() >= 4 && getAbsPoint(2).subtract(getAbsPoint(0), null).length() >= getGridSize();
 	}
 
 	@Override
@@ -972,62 +972,61 @@ public class Wall extends HousePart {
 
 	private void drawNeighborWalls() {
 		final ArrayList<Wall> walls = new ArrayList<Wall>();
+
+		final int[] side = new int[] { 0 };
+
 		Wall.clearVisits();
-		if (neighbors[0] != null)
-			visitNeighborsForward(this, neighbors[1], new WallVisitor() {
-				boolean nextIsShort = false;
-
-				@Override
-				public void visit(final Wall wall, final Snap prev, final Snap next) {
-					visitWallAndReverseThickness(wall, prev);
-					if (wall != Wall.this && !walls.contains(wall))
-						walls.add(wall);
-					wall.isShortWall = nextIsShort;
-					nextIsShort = !nextIsShort;
+		visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall wall, final Snap prev, final Snap next) {
+				if (next != null) {
+					final int indexP2 = next.getSnapPointIndexOf(wall);
+					final Vector3 p1 = wall.getAbsPoint(indexP2 == 0 ? 2 : 0);
+					final Vector3 p2 = wall.getAbsPoint(indexP2);
+					final Vector3 p3 = next.getNeighborOf(wall).getAbsPoint(next.getSnapPointIndexOfNeighborOf(wall) == 0 ? 2 : 0);
+					final Vector3 p1_p2 = p2.subtract(p1, null);
+					final Vector3 p2_p3 = p3.subtract(p2, null);
+					final double crossDirection = p1_p2.cross(p2_p3, null).getZ();
+					if (crossDirection > 0)
+						side[0]++;
+					else if (crossDirection < 0)
+						side[0]--;
 				}
-			});
+				if (wall != Wall.this && !walls.contains(wall))
+					walls.add(wall);
+			}
+		});
 
-		if (neighbors[1] != null)
-			visitNeighborsForward(this, neighbors[0], new WallVisitor() {
-				boolean nextIsShort = false;
+		System.out.println("Side = " + side[0]);
 
-				@Override
-				public void visit(final Wall wall, final Snap prev, final Snap next) {
-					visitWallAndReverseThickness(wall, prev);
-					if (wall != Wall.this && !walls.contains(wall))
-						walls.add(wall);
-					wall.isShortWall = nextIsShort;
-					nextIsShort = !nextIsShort;
+		Wall.clearVisits();
+		visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall wall, final Snap prev, final Snap next) {
+				if (next != null) {
+					final int indexP2 = next.getSnapPointIndexOf(wall);
+					final Vector3 p1 = wall.getAbsPoint(indexP2 == 0 ? 2 : 0);
+					final Vector3 p2 = wall.getAbsPoint(indexP2);
+					final Vector3 p1_p2 = p2.subtract(p1, null);
+					wall.thicknessNormal = p1_p2.cross(Vector3.UNIT_Z, null).normalizeLocal().multiplyLocal(wallThickness);
+					if (side[0] > 0)
+						wall.thicknessNormal.negateLocal();
+				} else if (prev != null){
+					final int indexP2 = prev.getSnapPointIndexOf(wall);
+					final Vector3 p2 = wall.getAbsPoint(indexP2);
+					final Vector3 p3 = wall.getAbsPoint(indexP2 == 0 ? 2 : 0);
+					final Vector3 p2_p3 = p3.subtract(p2, null);
+					wall.thicknessNormal = p2_p3.cross(Vector3.UNIT_Z, null).normalizeLocal().multiplyLocal(wallThickness);
+					if (side[0] > 0)
+						wall.thicknessNormal.negateLocal();
 				}
-			});
+			}
+		});
 
 		for (final HousePart wall : walls) {
 			wall.draw();
 			wall.drawChildren();
 		}
-	}
-
-	private void visitWallAndReverseThickness(final Wall wall, final Snap prev) {
-		if (wall == Wall.this || !wall.isFirstPointInserted())
-			return;
-		final int pointIndex = prev.getSnapPointIndexOf(wall);
-		final Vector3 wallDir = wall.getAbsPoint(pointIndex == 0 ? 2 : 0).subtract(wall.getAbsPoint(pointIndex), null).normalizeLocal();
-
-		final int otherPointIndex = prev.getSnapPointIndexOfNeighborOf(wall);
-		final HousePart other = prev.getNeighborOf(wall);
-		if (!other.isFirstPointInserted())
-			return;
-		final Vector3 otherWallDir = other.getAbsPoint(otherPointIndex == 0 ? 2 : 0).subtract(other.getAbsPoint(otherPointIndex), null).normalizeLocal();
-
-		final Vector3 n1 = new Vector3(wall.getThicknessNormal()).normalizeLocal();
-		final Vector3 n2 = new Vector3(prev.getNeighborOf(wall).getThicknessNormal()).normalizeLocal();
-		final Vector3 add = n1.add(n2, null).normalizeLocal();
-
-		final double dotWall1 = Math.signum(add.dot(wallDir));
-		final double dotWall2 = Math.signum(add.dot(otherWallDir));
-		final boolean reverse = dotWall1 != dotWall2;
-		if (reverse || (dotWall1 == 0 && dotWall2 == 0 && n1.dot(n2) < 0))
-			wall.getThicknessNormal().negateLocal();
 	}
 
 	@Override
