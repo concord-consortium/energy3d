@@ -16,6 +16,7 @@ import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.WallVisitor;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
@@ -285,8 +286,16 @@ public abstract class HousePart implements Serializable {
 			if (picked != null)
 				userData = picked.getUserData();
 			if (container == null || userData == null || container != userData.getHousePart()) {
-				if (container != null)
+				if (container != null) {
 					container.getChildren().remove(this);
+					if (this instanceof Roof)
+						((Wall)container).visitNeighbors(new WallVisitor() {
+							@Override
+							public void visit(final Wall wall, final Snap prev, final Snap next) {
+								wall.setRoof(null);
+							}
+						});
+				}
 				if (userData != null && userData.getHousePart().isDrawCompleted()) {
 					if (!(this instanceof Roof) || ((Wall) userData.getHousePart()).getRoof() == null) {
 						container = userData.getHousePart();

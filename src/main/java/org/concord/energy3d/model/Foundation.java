@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -225,6 +226,24 @@ public class Foundation extends HousePart {
 			drawChildren();
 		draw();
 		setEditPointsVisible(true);
+	}
+
+	@Override
+	protected void drawChildren() {
+		final List<HousePart> children = new ArrayList<HousePart>();
+		collectChildren(this, children);
+		for (final HousePart part : children)
+			if (part instanceof Roof)
+				part.draw();
+		for (final HousePart part : children)
+			part.draw();
+	}
+
+	private void collectChildren(final HousePart part, final List<HousePart> children) {
+		if (!children.contains(part))
+			children.add(part);
+		for (final HousePart child : part.getChildren())
+			collectChildren(child, children);
 	}
 
 	private Vector3 ensureNotTooSmall(final Vector3 p, final int index) {
