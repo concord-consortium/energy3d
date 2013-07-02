@@ -1511,6 +1511,7 @@ Version 2.0 - May 15, 2013
 - draw children of foundation with roof first
 - release version 2.3
 - after fixing a disconnected wall recompute the direction of the new neighbors by calling drawNeighbors
+- remove wall if it is inserted at exact same location as another wall (allow undo)
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
