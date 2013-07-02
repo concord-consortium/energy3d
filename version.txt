@@ -1466,6 +1466,7 @@ Version 2.0 - May 15, 2013
 - control the contrast of solar colormap using slider
 - save solar contrast with file
 - stop sun animation before opening new file
+*
 - change undo text for move foundation commad
 - add colormap ledgend
 - improve solar exposure algorithm to consider area of grid in calculations
@@ -1475,7 +1476,7 @@ Version 2.0 - May 15, 2013
 - fix problem with total radiation number changing when moving the house
 - fix problem with loss of precision of neighboring wall edit points
 - format the total solar label
-- fix problem with neighboring walls detaching when moving uppser points
+- fix problem with neighboring walls detaching when moving upper points
 - fix problem with roof height increasing when hovering back and forth on different wall containers
 - release version 2.1
 - add manifest classpath to pom.xml
@@ -1507,7 +1508,9 @@ Version 2.0 - May 15, 2013
 - reset the default wall height upon new file
 - enforce a minimum distance between platforms
 - fix bug with roof not added to children of wall if the wall.roof was already set to that roof
-- draw children of foundation with roof first 
+- draw children of foundation with roof first
+- release version 2.3
+- after fixing a disconnected wall recompute the direction of the new neighbors by calling drawNeighbors
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house

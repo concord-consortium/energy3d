@@ -1003,8 +1003,6 @@ public class Wall extends HousePart {
 			}
 		});
 
-		System.out.println("Side = " + side[0]);
-
 		Wall.clearVisits();
 		visitNeighbors(new WallVisitor() {
 			@Override
@@ -1162,6 +1160,7 @@ public class Wall extends HousePart {
 							if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && otherWall.getAbsPoint(otherIndex * 2).distance(getAbsPoint(index * 2)) < MathUtils.ZERO_TOLERANCE) {
 								System.out.println("Fixing neighbor...");
 								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
+								drawNeighborWalls();
 							}
 						}
 			}
