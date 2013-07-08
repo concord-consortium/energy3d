@@ -328,7 +328,22 @@ public class Wall extends HousePart {
 	@Override
 	public boolean isDrawable() {
 		Scene.getInstance().getAnnotationScale();
-		return points.size() >= 4 && getAbsPoint(2).subtract(getAbsPoint(0), null).length() >= getGridSize();
+		return points.size() >= 4 && getAbsPoint(2).subtract(getAbsPoint(0), null).length() >= getGridSize() && !isAtSamePlaceAsAnotherPart(this);
+	}
+
+	private boolean isAtSamePlaceAsAnotherPart(final HousePart selectedHousePart) {
+		if (selectedHousePart instanceof Wall) {
+			final Vector3 p0 = selectedHousePart.getAbsPoint(0);
+			final Vector3 p2 = selectedHousePart.getAbsPoint(2);
+			for (final HousePart part : selectedHousePart.getContainer().getChildren())
+				if (part != selectedHousePart) {
+					final Vector3 q0 = part.getAbsPoint(0);
+					final Vector3 q2 = part.getAbsPoint(2);
+					if ((p0.equals(q0) && p2.equals(q2)) || (p2.equals(q0) && p0.equals(q2)))
+						return true;
+				}
+		}
+		return false;
 	}
 
 	@Override

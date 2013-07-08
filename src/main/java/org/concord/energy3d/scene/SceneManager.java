@@ -1276,7 +1276,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					selectedHousePart.setGridsVisible(false);
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || (operation == Operation.RESIZE && houseMoveStartPoint != null))) {
-						if (selectedHousePart.isDrawable() && !isAtSamePlaceAsAnotherPart(selectedHousePart))
+						if (selectedHousePart.isDrawable())
 							selectedHousePart.complete();
 						else {
 							editHousePartCommand.undo();
@@ -1327,21 +1327,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				System.out.println("mouse released: " + selectedHousePart);
 				updateHeliodonAndAnnotationSize();
 				return null;
-			}
-
-			private boolean isAtSamePlaceAsAnotherPart(final HousePart selectedHousePart) {
-				if (selectedHousePart instanceof Wall) {
-					final Vector3 p0 = selectedHousePart.getAbsPoint(0);
-					final Vector3 p2 = selectedHousePart.getAbsPoint(2);
-					for (final HousePart part : selectedHousePart.getContainer().getChildren())
-						if (part != selectedHousePart) {
-							final Vector3 q0 = part.getAbsPoint(0);
-							final Vector3 q2 = part.getAbsPoint(2);
-							if ((p0.equals(q0) && p2.equals(q2)) || (p2.equals(q0) && p0.equals(q2)))
-								return true;
-						}
-				}
-				return false;
 			}
 		});
 	}
