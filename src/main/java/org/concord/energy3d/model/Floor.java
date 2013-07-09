@@ -20,6 +20,8 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.OffsetState;
+import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -28,8 +30,15 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Floor extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private static final OffsetState offsetState = new OffsetState();
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
 	private transient Line wireframeMesh;
+
+	static {
+		offsetState.setTypeEnabled(OffsetType.Fill, true);
+		offsetState.setFactor(10f);
+		offsetState.setUnits(1f);
+	}
 
 	public Floor() {
 		super(1, 1, 5.0);

@@ -220,6 +220,6 @@ public class Util {
 	}
 
 	public static double round(final double x) {
-		return Math.round(x * 100) / 100;
+		return Math.round(x * 100.0) / 100.0;
 	}
 }
