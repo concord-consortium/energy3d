@@ -10,6 +10,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
+import org.poly2tri.geometry.primitives.Point;
 import org.poly2tri.transform.coordinate.CoordinateTransform;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
@@ -380,6 +381,14 @@ public class MeshLib {
 	}
 
 	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v) {
+		/* round all points */
+		for (final Point p : polygon.getPoints())
+			p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
+		if (polygon.getHoles() != null)
+			for (final Polygon hole : polygon.getHoles())
+				for (final Point p : hole.getPoints())
+					p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
+
 		Poly2Tri.triangulate(polygon);
 		if (fromXY == null)
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);

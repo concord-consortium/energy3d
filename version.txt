@@ -1514,7 +1514,8 @@ Version 2.0 - May 15, 2013
 - remove wall if it is inserted at exact same location as another wall (allow undo)
 - move the code for checking if wall occupies the space of another wall, from SceneManager to Wall
 - fix rounding problem with floor polygon points
-- use a special offsetState for floor in order to render it behind walls 
+- use a special offsetState for floor in order to render it behind walls
+- round polygon points before triangulating them to reduce triangulation problems
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
