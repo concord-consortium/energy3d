@@ -1516,6 +1516,7 @@ Version 2.0 - May 15, 2013
 - fix rounding problem with floor polygon points
 - use a special offsetState for floor in order to render it behind walls
 - round polygon points before triangulating them to reduce triangulation problems
+- remove holes that share a point in polygons
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house

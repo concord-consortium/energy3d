@@ -382,12 +382,56 @@ public class MeshLib {
 
 	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v) {
 		/* round all points */
-		for (final Point p : polygon.getPoints())
+		System.out.println("------ Polygon ------");
+		for (final Point p : polygon.getPoints()) {
 			p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
-		if (polygon.getHoles() != null)
-			for (final Polygon hole : polygon.getHoles())
-				for (final Point p : hole.getPoints())
+			System.out.println(p);
+		}
+		if (polygon.getHoles() != null) {
+			int i = 1;
+			for (final Polygon hole : polygon.getHoles()) {
+				System.out.println("Hole #" + i++ + ":");
+				for (final Point p : hole.getPoints()) {
 					p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
+					System.out.println(p);
+				}
+			}
+		}
+
+		if (polygon.getHoles() != null)
+			for (int i = 0; i < polygon.getHoles().size(); i++) {
+				final Polygon hole1 = polygon.getHoles().get(i);
+				for (int j = polygon.getHoles().size() - 1; j > i; j--) {
+					final Polygon hole2 = polygon.getHoles().get(j);
+					boolean found = false;
+					for (final Point p1 : hole1.getPoints()) {
+						for (final Point p2 : hole2.getPoints())
+							if (p1.equals(p2)) {
+								polygon.getHoles().remove(hole2);
+								System.out.println("Removing " + p1);
+								found = true;
+								break;
+							}
+						if (found)
+							break;
+					}
+
+				}
+			}
+
+		System.out.println("------ Polygon 2 ------");
+		for (final Point p : polygon.getPoints()) {
+			System.out.println(p);
+		}
+		if (polygon.getHoles() != null) {
+			int i = 1;
+			for (final Polygon hole : polygon.getHoles()) {
+				System.out.println("Hole #" + i++ + ":");
+				for (final Point p : hole.getPoints()) {
+					System.out.println(p);
+				}
+			}
+		}
 
 		Poly2Tri.triangulate(polygon);
 		if (fromXY == null)
