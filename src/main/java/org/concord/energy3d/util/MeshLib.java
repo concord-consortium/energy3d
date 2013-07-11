@@ -382,21 +382,12 @@ public class MeshLib {
 
 	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v) {
 		/* round all points */
-		System.out.println("------ Polygon ------");
-		for (final Point p : polygon.getPoints()) {
+		for (final Point p : polygon.getPoints())
 			p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
-			System.out.println(p);
-		}
-		if (polygon.getHoles() != null) {
-			int i = 1;
-			for (final Polygon hole : polygon.getHoles()) {
-				System.out.println("Hole #" + i++ + ":");
-				for (final Point p : hole.getPoints()) {
+		if (polygon.getHoles() != null)
+			for (final Polygon hole : polygon.getHoles())
+				for (final Point p : hole.getPoints())
 					p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
-					System.out.println(p);
-				}
-			}
-		}
 
 		/* remove holes that collide with other holes */
 		if (polygon.getHoles() != null)
@@ -435,20 +426,6 @@ public class MeshLib {
 						polygon.getHoles().remove(hole2);
 				}
 			}
-
-		System.out.println("------ Polygon 2 ------");
-		for (final Point p : polygon.getPoints()) {
-			System.out.println(p);
-		}
-		if (polygon.getHoles() != null) {
-			int i = 1;
-			for (final Polygon hole : polygon.getHoles()) {
-				System.out.println("Hole #" + i++ + ":");
-				for (final Point p : hole.getPoints()) {
-					System.out.println(p);
-				}
-			}
-		}
 
 		Poly2Tri.triangulate(polygon);
 		if (fromXY == null)
