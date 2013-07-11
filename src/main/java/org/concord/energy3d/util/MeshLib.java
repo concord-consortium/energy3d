@@ -398,24 +398,41 @@ public class MeshLib {
 			}
 		}
 
+		/* remove holes that collide with other holes */
 		if (polygon.getHoles() != null)
 			for (int i = 0; i < polygon.getHoles().size(); i++) {
 				final Polygon hole1 = polygon.getHoles().get(i);
+				double minX1, minY1, maxX1, maxY1;
+				minX1 = minY1 = Double.POSITIVE_INFINITY;
+				maxX1 = maxY1 = Double.NEGATIVE_INFINITY;
+				for (final Point p : hole1.getPoints()) {
+					if (p.getX() < minX1)
+						minX1 = p.getX();
+					if (p.getX() > maxX1)
+						maxX1 = p.getX();
+					if (p.getY() < minY1)
+						minY1 = p.getY();
+					if (p.getY() > maxY1)
+						maxY1 = p.getY();
+				}
 				for (int j = polygon.getHoles().size() - 1; j > i; j--) {
 					final Polygon hole2 = polygon.getHoles().get(j);
-					boolean found = false;
-					for (final Point p1 : hole1.getPoints()) {
-						for (final Point p2 : hole2.getPoints())
-							if (p1.equals(p2)) {
-								polygon.getHoles().remove(hole2);
-								System.out.println("Removing " + p1);
-								found = true;
-								break;
-							}
-						if (found)
-							break;
+					double minX2, minY2, maxX2, maxY2;
+					minX2 = minY2 = Double.POSITIVE_INFINITY;
+					maxX2 = maxY2 = Double.NEGATIVE_INFINITY;
+					for (final Point p : hole2.getPoints()) {
+						if (p.getX() < minX2)
+							minX2 = p.getX();
+						if (p.getX() > maxX2)
+							maxX2 = p.getX();
+						if (p.getY() < minY2)
+							minY2 = p.getY();
+						if (p.getY() > maxY2)
+							maxY2 = p.getY();
 					}
-
+					final boolean isOutside = (minX2 < minX1 && maxX2 < minX1 || minX2 > maxX1 && maxX2 > maxX1) || (minY2 < minY1 && maxY2 < minY1 || minY2 > maxY1 && maxY2 > maxY1);
+					if (!isOutside)
+						polygon.getHoles().remove(hole2);
 				}
 			}
 
