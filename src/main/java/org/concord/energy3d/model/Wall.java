@@ -63,7 +63,7 @@ public class Wall extends HousePart {
 	private transient XYToAnyTransform fromXY;
 	private transient List<ArrayList<Vector3>> wallAndWindowsPoints;
 	private double wallThickness;
-	private final Snap[] neighbors = new Snap[2];
+	private transient Snap[] neighbors;
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
 	private double highestPoint;
@@ -90,6 +90,7 @@ public class Wall extends HousePart {
 		super.init();
 		relativeToHorizontal = true;
 		wallThickness = 0.5;
+		neighbors = new Snap[2];
 		if (thicknessNormal != null)
 			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
 
@@ -336,7 +337,7 @@ public class Wall extends HousePart {
 			final Vector3 p0 = selectedHousePart.getAbsPoint(0);
 			final Vector3 p2 = selectedHousePart.getAbsPoint(2);
 			for (final HousePart part : selectedHousePart.getContainer().getChildren())
-				if (part != selectedHousePart) {
+				if (part != selectedHousePart && part.isDrawCompleted()) {
 					final Vector3 q0 = part.getAbsPoint(0);
 					final Vector3 q2 = part.getAbsPoint(2);
 					if ((p0.equals(q0) && p2.equals(q2)) || (p2.equals(q0) && p0.equals(q2)))
@@ -994,7 +995,7 @@ public class Wall extends HousePart {
 	private void drawNeighborWalls() {
 		final ArrayList<Wall> walls = new ArrayList<Wall>();
 
-		final int[] side = new int[] { 0 };
+		final double[] side = new double[] { 0.0 };
 
 		Wall.clearVisits();
 		visitNeighbors(new WallVisitor() {
@@ -1002,16 +1003,12 @@ public class Wall extends HousePart {
 			public void visit(final Wall wall, final Snap prev, final Snap next) {
 				if (next != null) {
 					final int indexP2 = next.getSnapPointIndexOf(wall);
-					final Vector3 p1 = wall.getAbsPoint(indexP2 == 0 ? 2 : 0);
-					final Vector3 p2 = wall.getAbsPoint(indexP2);
-					final Vector3 p3 = next.getNeighborOf(wall).getAbsPoint(next.getSnapPointIndexOfNeighborOf(wall) == 0 ? 2 : 0);
-					final Vector3 p1_p2 = p2.subtract(p1, null);
-					final Vector3 p2_p3 = p3.subtract(p2, null);
-					final double crossDirection = p1_p2.cross(p2_p3, null).getZ();
-					if (crossDirection > 0)
-						side[0]++;
-					else if (crossDirection < 0)
-						side[0]--;
+					final ReadOnlyVector3 p1 = wall.getAbsPoint(indexP2 == 0 ? 2 : 0);
+					final ReadOnlyVector3 p2 = wall.getAbsPoint(indexP2);
+					final ReadOnlyVector3 p3 = next.getNeighborOf(wall).getAbsPoint(next.getSnapPointIndexOfNeighborOf(wall) == 0 ? 2 : 0);
+					final ReadOnlyVector3 p1_p2 = p2.subtract(p1, null).normalizeLocal();
+					final ReadOnlyVector3 p2_p3 = p3.subtract(p2, null).normalizeLocal();
+					side[0] += Util.angleBetween(p1_p2, p2_p3, Vector3.UNIT_Z);
 				}
 				if (wall != Wall.this && !walls.contains(wall))
 					walls.add(wall);

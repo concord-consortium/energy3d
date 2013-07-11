@@ -1518,6 +1518,7 @@ Version 2.0 - May 15, 2013
 - round polygon points before triangulating them to reduce triangulation problems
 - remove holes that share a point in polygons
 - remove polygon holes that collide with other polygon holes to avoid unpredictable windows shape
+- count the angle between walls for deciding which side is the inside
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
