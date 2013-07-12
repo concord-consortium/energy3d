@@ -205,7 +205,7 @@ public abstract class CameraControl {
 
 	}
 
-	private void zoom(final Canvas canvas, final double tpf, final double val) {
+	protected void zoom(final Canvas canvas, final double tpf, final double val) {
 		if (Camera.getCurrentCamera().getProjectionMode() == ProjectionMode.Parallel) {
 			final double fac = val > 0 ? 1.1 : 0.9;
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
