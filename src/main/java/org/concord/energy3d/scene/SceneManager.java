@@ -1102,10 +1102,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final PickedHousePart pick = SelectUtil.pickPart(x, y, invisibleFloor);
 			if (pick != null) {
 				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
-				for (int i = 0; i < houseMovePoints.size(); i++) {
-					selectedHousePart.getPoints().get(i).set(houseMovePoints.get(i).add(d, null));
-					Scene.getInstance().redrawAll();
-				}
+				((Foundation)selectedHousePart).move(d, houseMovePoints);
+//				for (int i = 0; i < houseMovePoints.size(); i++) {
+//					selectedHousePart.getPoints().get(i).set(houseMovePoints.get(i).add(d, null));
+//					Scene.getInstance().redrawAll();
+//				}
 			}
 		} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
 			final PickedHousePart selectHousePart = SelectUtil.selectHousePart(x, y, false);

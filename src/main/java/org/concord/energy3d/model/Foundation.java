@@ -612,4 +612,21 @@ public class Foundation extends HousePart {
 				solarLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
 		}
 	}
+
+	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
+		final List<Vector3> orgPoints = new ArrayList<Vector3>(houseMovePoints.size());
+		for (int i = 0; i < points.size(); i++)
+			orgPoints.add(points.get(i));
+
+		for (int i = 0; i < points.size(); i++) {
+			final Vector3 newP = houseMovePoints.get(i).add(d, null);
+			points.set(i, newP);
+			if (i == points.size() -1 && ensureDistanceFromOtherFoundations(newP, i) != newP) {
+				for (int j = 0; j < points.size(); j++)
+					points.set(j, orgPoints.get(i));
+				return;
+			}
+		}
+		Scene.getInstance().redrawAll();
+	}
 }
