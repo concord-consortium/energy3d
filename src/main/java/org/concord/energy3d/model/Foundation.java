@@ -623,7 +623,7 @@ public class Foundation extends HousePart {
 			points.set(i, newP);
 			if (i == points.size() -1 && ensureDistanceFromOtherFoundations(newP, i) != newP) {
 				for (int j = 0; j < points.size(); j++)
-					points.set(j, orgPoints.get(i));
+					points.set(j, orgPoints.get(j));
 				return;
 			}
 		}

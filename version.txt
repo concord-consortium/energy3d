@@ -1521,6 +1521,7 @@ Version 2.0 - May 15, 2013
 - count the angle between walls for deciding which side is the inside
 - fix problem with unable to rotate when zoomed out due to collision with sky
 - ensure minimum distance between foundations when moving them 
+- fix problem with removed foundation when moving it to where another foundation exists
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
