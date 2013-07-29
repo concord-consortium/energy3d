@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -187,6 +188,7 @@ public class Foundation extends HousePart {
 		if (pick != null && index < 4) {
 			p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
+			p = ensureDistanceFromOtherFoundations(p, index);
 			if (resizeHouseMode)
 				p = ensureNotTooSmall(p, index);
 			else
@@ -224,6 +226,24 @@ public class Foundation extends HousePart {
 			drawChildren();
 		draw();
 		setEditPointsVisible(true);
+	}
+
+	@Override
+	protected void drawChildren() {
+		final List<HousePart> children = new ArrayList<HousePart>();
+		collectChildren(this, children);
+		for (final HousePart part : children)
+			if (part instanceof Roof)
+				part.draw();
+		for (final HousePart part : children)
+			part.draw();
+	}
+
+	private void collectChildren(final HousePart part, final List<HousePart> children) {
+		if (!children.contains(part))
+			children.add(part);
+		for (final HousePart child : part.getChildren())
+			collectChildren(child, children);
 	}
 
 	private Vector3 ensureNotTooSmall(final Vector3 p, final int index) {
@@ -274,6 +294,55 @@ public class Foundation extends HousePart {
 				p.setY(maxY);
 		}
 
+		return p;
+	}
+
+	private Vector3 ensureDistanceFromOtherFoundations(final Vector3 p, final int index) {
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation && part != this) {
+				final Vector3 p0 = part.getAbsPoint(0);
+				final Vector3 p1 = part.getAbsPoint(1);
+				final Vector3 p2 = part.getAbsPoint(2);
+				final double minX = Math.min(p0.getX(), p2.getX()) - getGridSize();
+				final double maxX = Math.max(p0.getX(), p2.getX()) + getGridSize();
+				final double minY = Math.min(p0.getY(), p1.getY()) - getGridSize();
+				final double maxY = Math.max(p0.getY(), p1.getY()) + getGridSize();
+				if (isFirstPointInserted()) {
+					final double oppositeX = getAbsPoint(index == 0 || index == 1 ? 2 : 0).getX();
+					final double oppositeY = getAbsPoint(index == 0 || index == 2 ? 1 : 0).getY();
+					if (!(oppositeX <= minX && p.getX() <= minX || oppositeX >= maxX && p.getX() >= maxX || oppositeY <= minY && p.getY() <= minY || oppositeY >= maxY && p.getY() >= maxY)) {
+						return getAbsPoint(index);
+					}
+				} else {
+					if (p.getX() > minX && p.getX() < maxX && p.getY() > minY && p.getY() < maxY) {
+						double shortestDistance = Double.MAX_VALUE;
+						double distance;
+						final Vector3 newP = new Vector3();
+						distance = p.getX() - minX;
+						if (distance < shortestDistance) {
+							shortestDistance = distance;
+							newP.set(minX, p.getY(), p.getZ());
+						}
+						distance = maxX - p.getX();
+						if (distance < shortestDistance) {
+							shortestDistance = distance;
+							newP.set(maxX, p.getY(), p.getZ());
+						}
+						distance = p.getY() - minY;
+						if (distance < shortestDistance) {
+							shortestDistance = distance;
+							newP.set(p.getX(), minY, p.getZ());
+						}
+						distance = maxY - p.getY();
+						if (distance < shortestDistance) {
+							shortestDistance = distance;
+							newP.set(p.getX(), maxY, p.getZ());
+						}
+						return newP;
+					}
+				}
+			}
+		}
 		return p;
 	}
 
@@ -542,5 +611,22 @@ public class Foundation extends HousePart {
 			else
 				solarLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
 		}
+	}
+
+	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
+		final List<Vector3> orgPoints = new ArrayList<Vector3>(houseMovePoints.size());
+		for (int i = 0; i < points.size(); i++)
+			orgPoints.add(points.get(i));
+
+		for (int i = 0; i < points.size(); i++) {
+			final Vector3 newP = houseMovePoints.get(i).add(d, null);
+			points.set(i, newP);
+			if (i == points.size() -1 && ensureDistanceFromOtherFoundations(newP, i) != newP) {
+				for (int j = 0; j < points.size(); j++)
+					points.set(j, orgPoints.get(j));
+				return;
+			}
+		}
+		Scene.getInstance().redrawAll();
 	}
 }

@@ -40,8 +40,10 @@ public class OrbitControl extends CameraControl {
 		final Vector3 d = _workerVector.subtract(_center, null).normalizeLocal();
 		final double MIN = 0.1;
 		if (Math.abs(d.getX()) > MIN || Math.abs(d.getY()) > MIN) {
-			if (_workerVector.length() > SceneManager.SKY_RADIUS)
+			if (_workerVector.length() > SceneManager.SKY_RADIUS) {
+				zoom(SceneManager.getInstance().getCanvas(), 1, -0.1);
 				return;
+			}
 			camera.setLocation(_workerVector);
 			camera.lookAt(_center, _upAxis);
 		}

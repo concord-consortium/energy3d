@@ -154,6 +154,7 @@ public class Scene implements Serializable {
 
 		MainPanel.getInstance().getHeliodonButton().setSelected(false);
 		MainPanel.getInstance().getSunAnimButton().setSelected(false);
+		Wall.resetDefaultWallHeight();
 
 		if (url == null) {
 			instance = new Scene();

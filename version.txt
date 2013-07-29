@@ -1466,6 +1466,7 @@ Version 2.0 - May 15, 2013
 - control the contrast of solar colormap using slider
 - save solar contrast with file
 - stop sun animation before opening new file
+*
 - change undo text for move foundation commad
 - add colormap ledgend
 - improve solar exposure algorithm to consider area of grid in calculations
@@ -1475,7 +1476,7 @@ Version 2.0 - May 15, 2013
 - fix problem with total radiation number changing when moving the house
 - fix problem with loss of precision of neighboring wall edit points
 - format the total solar label
-- fix problem with neighboring walls detaching when moving uppser points
+- fix problem with neighboring walls detaching when moving upper points
 - fix problem with roof height increasing when hovering back and forth on different wall containers
 - release version 2.1
 - add manifest classpath to pom.xml
@@ -1503,6 +1504,24 @@ Version 2.0 - May 15, 2013
 - only draw children of house when resizing instead of redrawing the entire scene
 - update the outside temperature based on selected city
 - release version 2.2
+- remember the previous wall height
+- reset the default wall height upon new file
+- enforce a minimum distance between platforms
+- fix bug with roof not added to children of wall if the wall.roof was already set to that roof
+- draw children of foundation with roof first
+- release version 2.3
+- after fixing a disconnected wall recompute the direction of the new neighbors by calling drawNeighbors
+- remove wall if it is inserted at exact same location as another wall (allow undo)
+- move the code for checking if wall occupies the space of another wall, from SceneManager to Wall
+- fix rounding problem with floor polygon points
+- use a special offsetState for floor in order to render it behind walls
+- round polygon points before triangulating them to reduce triangulation problems
+- remove holes that share a point in polygons
+- remove polygon holes that collide with other polygon holes to avoid unpredictable windows shape
+- count the angle between walls for deciding which side is the inside
+- fix problem with unable to rotate when zoomed out due to collision with sky
+- ensure minimum distance between foundations when moving them 
+- fix problem with removed foundation when moving it to where another foundation exists
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
