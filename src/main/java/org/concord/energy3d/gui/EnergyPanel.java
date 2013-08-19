@@ -198,6 +198,7 @@ public class EnergyPanel extends JPanel {
 	private long maxSolarValue;
 	private boolean computeRequest;
 	private boolean initJavaFxAlreadyCalled = false;
+	private boolean alreadyRendered = false;
 
 	private static class EnergyAmount {
 		double solar;
@@ -908,9 +909,13 @@ public class EnergyPanel extends JPanel {
 
 		progressBar.setValue(0);
 
-		if (SceneManager.getInstance().isSolarColorMap())
+		if (SceneManager.getInstance().isSolarColorMap() && !alreadyRendered) {
+			alreadyRendered = true;
 			computeRadiation();
-		else {
+		} else {
+			if (SceneManager.getInstance().isSolarColorMap()) {
+				MainPanel.getInstance().getSolarButton().setSelected(false);
+			}
 			int counter = 0;
 			for (final HousePart part : Scene.getInstance().getParts()) {
 				if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
@@ -1383,6 +1388,10 @@ public class EnergyPanel extends JPanel {
 		final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
 		final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
 		return color;
+	}
+
+	public void clearAlreadyRendered() {
+		alreadyRendered = false;
 	}
 
 }

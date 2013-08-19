@@ -1386,6 +1386,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.solarColorMap = solarColorMap;
 		solarLand.setVisible(solarColorMap);
 		Scene.getInstance().redrawAll();
+		if (solarColorMap)
+			EnergyPanel.getInstance().clearAlreadyRendered();
 		EnergyPanel.getInstance().compute();
 	}
 

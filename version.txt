@@ -1524,8 +1524,7 @@ Version 2.0 - May 15, 2013
 - ensure minimum distance between foundations when moving them 
 - fix problem with removed foundation when moving it to where another foundation exists
 - avoid recomputing energy when typing notes
-
-- *turn off heatmap after all undoable actions except text editing
+- turn off solar colormap whenever enegery recompute is requested except the first time it is clicked
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
