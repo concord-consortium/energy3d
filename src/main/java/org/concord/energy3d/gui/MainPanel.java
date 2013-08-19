@@ -788,7 +788,7 @@ public class MainPanel extends JPanel {
 			noteTextArea.setLineWrap(true);
 			noteTextArea.getDocument().addDocumentListener(new DocumentListener() {
 				public void updateEditFlag() {
-					Scene.getInstance().setEdited(true);
+					Scene.getInstance().setEdited(true, false);
 					if (!Config.isApplet())
 						MainFrame.getInstance().updateTitleBar();
 				}
