@@ -93,6 +93,7 @@ public class EnergyPanel extends JPanel {
 	private static final DecimalFormat noDecimals = new DecimalFormat();
 	private static final DecimalFormat moneyDecimals = new DecimalFormat();
 	private static final RuntimeException cancelException = new RuntimeException("CANCEL");
+	private static boolean keepHeatmapOn = false;
 
 	static {
 		twoDecimals.setMaximumFractionDigits(2);
@@ -909,7 +910,7 @@ public class EnergyPanel extends JPanel {
 
 		progressBar.setValue(0);
 
-		if (SceneManager.getInstance().isSolarColorMap() && !alreadyRendered) {
+		if (SceneManager.getInstance().isSolarColorMap() && (!alreadyRendered || keepHeatmapOn)) {
 			alreadyRendered = true;
 			computeRadiation();
 		} else {
@@ -1128,10 +1129,6 @@ public class EnergyPanel extends JPanel {
 			}
 		}
 		return totalRate;
-	}
-
-	private double toCelsius(final double f) {
-		return ((f - 32.0) * 5.0 / 9.0);
 	}
 
 	private void updateOutsideTemperature() {
@@ -1392,6 +1389,10 @@ public class EnergyPanel extends JPanel {
 
 	public void clearAlreadyRendered() {
 		alreadyRendered = false;
+	}
+
+	public static void setKeepHeatmapOn(final boolean on) {
+		keepHeatmapOn  = on;
 	}
 
 }

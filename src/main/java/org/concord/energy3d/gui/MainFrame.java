@@ -11,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
@@ -38,7 +40,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
@@ -102,24 +103,14 @@ public class MainFrame extends JFrame {
 	private JMenuItem undoMenuItem;
 	private JMenuItem redoMenuItem;
 	private JMenuItem pageSetupMenuItem;
-	private JSeparator separator;
-	private JSeparator separator_1;
 	private JRadioButtonMenuItem scaleToFitRadioButtonMenuItem;
 	private JRadioButtonMenuItem exactSizeRadioButtonMenuItem;
-	private JSeparator separator_2;
 	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
 	private JMenuItem importMenuItem;
-	private JSeparator separator_3;
 	private JCheckBoxMenuItem snapCheckBoxMenuItem;
 	private JCheckBoxMenuItem gridsCheckBoxMenuItem;
-	private JSeparator separator_4;
-	private JSeparator separator_5;
-	private JSeparator separator_6;
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
-	private JSeparator separator_7;
-	private JSeparator separator_8;
 	private JMenuItem roofOverhangLengthMenuItem;
-	private JSeparator separator_9;
 	private JRadioButtonMenuItem noTextureRadioButtonMenuItem;
 	private JRadioButtonMenuItem simpleTextureRadioButtonMenuItem;
 	private JRadioButtonMenuItem fullTextureRadioButtonMenuItem;
@@ -134,13 +125,13 @@ public class MainFrame extends JFrame {
 	private JMenuItem saveAsImageMenuItem;
 	private JMenuItem freezeMenuItem;
 	private JMenuItem unfreezeMenuItem;
-	private JSeparator separator_10;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
 	private final JFileChooser fileChooser;
 	private final JColorChooser colorChooser;
 	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
+	private JCheckBoxMenuItem keepHeatmapOnCheckBoxMenuItem;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -377,17 +368,17 @@ public class MainFrame extends JFrame {
 			fileMenu.add(getSaveMenuItem());
 			fileMenu.add(getSaveasMenuItem());
 			fileMenu.add(getSaveAsImageMenuItem());
-			fileMenu.add(getSeparator());
+			fileMenu.addSeparator();
 			fileMenu.add(getImportMenuItem());
 			// fileMenu.add(getImportColladaMenuItem());
-			fileMenu.add(getSeparator_3());
+			fileMenu.addSeparator();
 			fileMenu.add(getScaleToFitRadioButtonMenuItem());
 			fileMenu.add(getExactSizeRadioButtonMenuItem());
-			fileMenu.add(getSeparator_2());
+			fileMenu.addSeparator();
 			fileMenu.add(getPageSetupMenuItem());
 			fileMenu.add(getPreviewMenuItem());
 			fileMenu.add(getPrintMenuItem());
-			fileMenu.add(getSeparator_1());
+			fileMenu.addSeparator();
 			fileMenu.add(getExitMenuItem());
 		}
 		return fileMenu;
@@ -681,7 +672,7 @@ public class MainFrame extends JFrame {
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(orbitMenuItem);
 			bg.add(firstPersonMenuItem);
-			cameraMenu.add(getSeparator_7());
+			cameraMenu.addSeparator();
 			cameraMenu.add(getTopViewCheckBoxMenuItem());
 			cameraMenu.add(getResetCameraMenuItem());
 		}
@@ -907,25 +898,27 @@ public class MainFrame extends JFrame {
 				sceneMenu.add(getFreezeMenuItem());
 				sceneMenu.add(getUnfreezeMenuItem());
 			}
-			sceneMenu.add(getSeparator_10());
+			sceneMenu.addSeparator();
 			sceneMenu.add(getUnitsMenu());
 			sceneMenu.add(getScaleMenuItem());
-			sceneMenu.add(getSeparator_8());
+			sceneMenu.addSeparator();
 			sceneMenu.add(getRoofOverhangLengthMenuItem());
-			sceneMenu.add(getSeparator_9());
+			sceneMenu.addSeparator();
 			sceneMenu.add(getGridsCheckBoxMenuItem());
 			sceneMenu.add(getSnapCheckBoxMenuItem());
-			sceneMenu.add(getSeparator_4());
+			sceneMenu.addSeparator();
 			sceneMenu.add(getShadeMenu());
 			sceneMenu.add(getShadowMenu());
-			sceneMenu.add(getSeparator_5());
+			sceneMenu.addSeparator();
 			sceneMenu.add(getNoTextureRadioButtonMenuItem());
 			sceneMenu.add(getSimpleTextureRadioButtonMenuItem());
 			sceneMenu.add(getFullTextureRadioButtonMenuItem());
 			sceneMenu.add(getColorMenu());
-			sceneMenu.add(getSeparator_6());
+			sceneMenu.addSeparator();
 			sceneMenu.add(getWallThicknessMenuItem());
 			sceneMenu.add(getAnnotationsInward());
+			sceneMenu.addSeparator();
+			sceneMenu.add(getKeepHeatmapOnCheckBoxMenuItem());
 		}
 		return sceneMenu;
 	}
@@ -1163,20 +1156,6 @@ public class MainFrame extends JFrame {
 		return pageSetupMenuItem;
 	}
 
-	private JSeparator getSeparator() {
-		if (separator == null) {
-			separator = new JSeparator();
-		}
-		return separator;
-	}
-
-	private JSeparator getSeparator_1() {
-		if (separator_1 == null) {
-			separator_1 = new JSeparator();
-		}
-		return separator_1;
-	}
-
 	private JRadioButtonMenuItem getScaleToFitRadioButtonMenuItem() {
 		if (scaleToFitRadioButtonMenuItem == null) {
 			scaleToFitRadioButtonMenuItem = new JRadioButtonMenuItem("Scale To Fit Paper");
@@ -1206,13 +1185,6 @@ public class MainFrame extends JFrame {
 		return exactSizeRadioButtonMenuItem;
 	}
 
-	private JSeparator getSeparator_2() {
-		if (separator_2 == null) {
-			separator_2 = new JSeparator();
-		}
-		return separator_2;
-	}
-
 	private JMenuItem getImportMenuItem() {
 		if (importMenuItem == null) {
 			importMenuItem = new JMenuItem("Import...");
@@ -1224,13 +1196,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return importMenuItem;
-	}
-
-	private JSeparator getSeparator_3() {
-		if (separator_3 == null) {
-			separator_3 = new JSeparator();
-		}
-		return separator_3;
 	}
 
 	private JCheckBoxMenuItem getSnapCheckBoxMenuItem() {
@@ -1261,27 +1226,6 @@ public class MainFrame extends JFrame {
 		return gridsCheckBoxMenuItem;
 	}
 
-	private JSeparator getSeparator_4() {
-		if (separator_4 == null) {
-			separator_4 = new JSeparator();
-		}
-		return separator_4;
-	}
-
-	private JSeparator getSeparator_5() {
-		if (separator_5 == null) {
-			separator_5 = new JSeparator();
-		}
-		return separator_5;
-	}
-
-	private JSeparator getSeparator_6() {
-		if (separator_6 == null) {
-			separator_6 = new JSeparator();
-		}
-		return separator_6;
-	}
-
 	private JCheckBoxMenuItem getTopViewCheckBoxMenuItem() {
 		if (topViewCheckBoxMenuItem == null) {
 			topViewCheckBoxMenuItem = new JCheckBoxMenuItem("Top View");
@@ -1299,20 +1243,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return topViewCheckBoxMenuItem;
-	}
-
-	private JSeparator getSeparator_7() {
-		if (separator_7 == null) {
-			separator_7 = new JSeparator();
-		}
-		return separator_7;
-	}
-
-	private JSeparator getSeparator_8() {
-		if (separator_8 == null) {
-			separator_8 = new JSeparator();
-		}
-		return separator_8;
 	}
 
 	private JMenuItem getRoofOverhangLengthMenuItem() {
@@ -1346,13 +1276,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return roofOverhangLengthMenuItem;
-	}
-
-	private JSeparator getSeparator_9() {
-		if (separator_9 == null) {
-			separator_9 = new JSeparator();
-		}
-		return separator_9;
 	}
 
 	public JRadioButtonMenuItem getNoTextureRadioButtonMenuItem() {
@@ -1673,14 +1596,6 @@ public class MainFrame extends JFrame {
 		return unfreezeMenuItem;
 	}
 
-	private JSeparator getSeparator_10() {
-		if (separator_10 == null) {
-			separator_10 = new JSeparator();
-			separator_10.setVisible(false);
-		}
-		return separator_10;
-	}
-
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {
 		if (noteCheckBoxMenuItem == null) {
 			noteCheckBoxMenuItem = new JCheckBoxMenuItem("Show Note");
@@ -1692,5 +1607,17 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return noteCheckBoxMenuItem;
+	}
+	private JCheckBoxMenuItem getKeepHeatmapOnCheckBoxMenuItem() {
+		if (keepHeatmapOnCheckBoxMenuItem == null) {
+			keepHeatmapOnCheckBoxMenuItem = new JCheckBoxMenuItem("Keep Heat Map On");
+			keepHeatmapOnCheckBoxMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					EnergyPanel.setKeepHeatmapOn(keepHeatmapOnCheckBoxMenuItem.isSelected());
+				}
+			});
+		}
+		return keepHeatmapOnCheckBoxMenuItem;
 	}
 }
