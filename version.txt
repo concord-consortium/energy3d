@@ -1526,7 +1526,10 @@ Version 2.0 - May 15, 2013
 - avoid recomputing energy when typing notes
 - turn off solar colormap whenever enegery recompute is requested except the first time it is clicked
 - ensure the windows are within the boundaries of the wall to prevent strange back wall polygons sticking out
-- add menu to keep heatmap on 
+- add menu to keep heatmap on
+- always log data and snapshots by default
+- store log data in approperiate places in windows vista+ and windows xp- and mac os x. For all other OS save logs in a folder in user's home directory.
+- release version 2.4  
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
