@@ -60,6 +60,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
@@ -1275,12 +1276,27 @@ public class EnergyPanel extends JPanel {
 							if (lowestPoint == null || p.getZ() < lowestPoint.getZ()) {
 								secondLowestPoint = lowestPoint;
 								lowestPoint = p;
-							} else if (secondLowestPoint == null)
+							} else if (secondLowestPoint == null || p.getZ() < secondLowestPoint.getZ())
 								secondLowestPoint = p;
 							if (highestPoint == null || p.getZ() > highestPoint.getZ())
 								highestPoint = p;
 						}
 						final ReadOnlyVector3 p1 = lowestPoint.multiply(1, 1, 0, null).addLocal(0, 0, highestPoint.getZ());
+						final ReadOnlyVector3 o = lowestPoint;
+						final ReadOnlyVector3 u = secondLowestPoint.subtract(o, null);
+						final ReadOnlyVector3 v = p1.subtract(o, null);
+						final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
+						textureBuffer.rewind();
+						vertexBuffer.rewind();
+						while (vertexBuffer.hasRemaining()) {
+							final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+							System.out.println(p);
+							final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
+							final float uScale = (float) (uP.distance(o) / u.length());
+							final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
+							final float vScale = (float) (vP.distance(o) / v.length());
+							textureBuffer.put(uScale).put(vScale);
+						}
 						computeRadiationOnMesh(directionTowardSun, roof.getContainer(), mesh, faceDirection, lowestPoint, p1, secondLowestPoint, false);
 					}
 				}
@@ -1445,6 +1461,7 @@ public class EnergyPanel extends JPanel {
 //						applySolarTexture(houseChild.getMesh(), solarOnWall.get(houseChild), maxSolarValue);
 						final Wall wall = (Wall) houseChild;
 						applySolarTexture(houseChild.getMesh(), solarOnWall.get(wall.getInvisibleMesh()), maxSolarValue);
+						print(wall, solarOnWall.get(wall.getInvisibleMesh()));
 						final Roof roof = (Roof) wall.getRoof();
 						if (roof != null && !roofs.contains(roof))
 							roofs.add(roof);
@@ -1454,12 +1471,26 @@ public class EnergyPanel extends JPanel {
 					for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
 						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
 						applySolarTexture(mesh, solarOnWall.get(mesh), maxSolarValue);
+						print(roof, solarOnWall.get(mesh));
 					}
 				final Double val = solarTotal.get(foundation);
 				foundation.setSolarValue(val == null ? 0 : val.longValue() / (60 / SOLAR_MINUTE_STEP));
 			}
 		}
 		SceneManager.getInstance().refresh();
+	}
+
+	private void print(final HousePart part, final double[][] solar) {
+		System.out.println(part);
+		if (solar == null)
+			System.out.println("null");
+		else
+		for (int i = 0; i < solar.length; i++) {
+			for (int j = 0; j < solar[0].length; j++)
+				System.out.print((int) Math.round(solar[i][j]) + " ");
+			System.out.println();
+		}
+
 	}
 
 	private void progress() {
