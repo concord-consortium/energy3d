@@ -1532,6 +1532,8 @@ Version 2.0 - May 15, 2013
 - release version 2.4
 - extract radiation texture compute code from wall to be generic and applicable to roofs
 - generate the texture coordinates for roof polygons to correspond to exact size of solar radiation texture
+- stretch the texture coordinates according to mesh vertices
+- combine methods for computing texture coords of both wall and roof in one generic method
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
