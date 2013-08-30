@@ -1536,6 +1536,7 @@ Version 2.0 - May 15, 2013
 - combine methods for computing texture coords of both wall and roof in one generic method
 - fix problem with radiation colormap not drawn due to to colormap called before scene redraw
 - instead of using z of roof highest point, project highest point on the v direction of the polygon before calculating colormap texture
+- for horizontal roofs use the y axis to find lowest/highest points for colormap texturing 
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
