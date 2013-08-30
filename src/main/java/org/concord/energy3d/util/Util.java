@@ -222,4 +222,9 @@ public class Util {
 	public static double round(final double x) {
 		return Math.round(x * 100.0) / 100.0;
 	}
+
+	public static double distanceFromPointToLine(final ReadOnlyVector3 p, final ReadOnlyVector3 origin, final ReadOnlyVector3 direction) {
+		final ReadOnlyVector3 op = origin.subtract(p, null);
+		return direction.multiply(op.dot(direction), null).negateLocal().addLocal(op).length();
+	}
 }

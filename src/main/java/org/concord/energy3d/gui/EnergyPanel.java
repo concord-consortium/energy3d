@@ -1282,7 +1282,12 @@ public class EnergyPanel extends JPanel {
 							if (highestPoint == null || p.getZ() > highestPoint.getZ())
 								highestPoint = p;
 						}
-						final ReadOnlyVector3 p1 = lowestPoint.multiply(1, 1, 0, null).addLocal(0, 0, highestPoint.getZ());
+//						final double z = Util.distanceFromPointToLine(highestPoint, lowestPoint, secondLowestPoint.subtract(lowestPoint, null).normalizeLocal());
+						final ReadOnlyVector3 o = lowestPoint;
+						final ReadOnlyVector3 u = secondLowestPoint.subtract(lowestPoint, null).normalizeLocal();
+						final ReadOnlyVector3 v = u.cross(faceDirection, null);
+						final ReadOnlyVector3 projectedHighestPoint = Util.closestPoint(o, v, highestPoint, u);
+//						final ReadOnlyVector3 p1 = lowestPoint.multiply(1, 1, 0, null).addLocal(0, 0, z);
 //						final ReadOnlyVector3 o = lowestPoint;
 //						final ReadOnlyVector3 u = secondLowestPoint.subtract(o, null);
 //						final ReadOnlyVector3 v = p1.subtract(o, null);
@@ -1298,7 +1303,7 @@ public class EnergyPanel extends JPanel {
 //							final float vScale = (float) (vP.distance(o) / v.length());
 //							textureBuffer.put(uScale).put(vScale);
 //						}
-						computeRadiationOnMesh(directionTowardSun, roof.getContainer(), mesh, mesh, faceDirection, lowestPoint, p1, secondLowestPoint, false);
+						computeRadiationOnMesh(directionTowardSun, roof.getContainer(), mesh, mesh, faceDirection, lowestPoint, projectedHighestPoint, secondLowestPoint, false);
 					}
 				}
 			}
