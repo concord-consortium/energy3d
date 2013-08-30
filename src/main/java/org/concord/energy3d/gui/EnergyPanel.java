@@ -84,7 +84,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class EnergyPanel extends JPanel {
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
-	public static final double SOLAR_STEP = 2.0;
+	public static final double SOLAR_STEP = 0.5;
 	private static final int SOLAR_MINUTE_STEP = 15;
 	private static final long serialVersionUID = 1L;
 	private static final Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
@@ -1153,6 +1153,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void computeRadiation() {
+		System.out.println("computeRadiation()");
 		initSolarCollidables();
 		solarOnWall.clear();
 		solarTotal.clear();
@@ -1323,8 +1324,7 @@ public class EnergyPanel extends JPanel {
 				final ReadOnlyVector3 p1 = wall.getAbsPoint(1).multiplyLocal(1, 1, 0).addLocal(0, 0, wall.getHighestPoint());
 
 				computeRadiationOnMesh(directionTowardSun, wall.getContainer(), wall.getMesh(), wall.getInvisibleMesh(), faceDirection,  part.getAbsPoint(0), p1, wall.getAbsPoint(2), true);
-			} else
-				System.out.println("ignoring " + part);
+			}
 		}
 	}
 
@@ -1421,7 +1421,6 @@ public class EnergyPanel extends JPanel {
 		textureBuffer.rewind();
 		while (vertexBuffer.hasRemaining()) {
 			final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-			System.out.println(p);
 			final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
 			final float uScale = (float) (uP.distance(o) / u.length());
 			final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
@@ -1509,15 +1508,15 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void print(final HousePart part, final double[][] solar) {
-		System.out.println(part);
-		if (solar == null)
-			System.out.println("null");
-		else
-		for (int i = 0; i < solar.length; i++) {
-			for (int j = 0; j < solar[0].length; j++)
-				System.out.print((int) Math.round(solar[i][j]) + " ");
-			System.out.println();
-		}
+//		System.out.println(part);
+//		if (solar == null)
+//			System.out.println("null");
+//		else
+//		for (int i = 0; i < solar.length; i++) {
+//			for (int j = 0; j < solar[0].length; j++)
+//				System.out.print((int) Math.round(solar[i][j]) + " ");
+//			System.out.println();
+//		}
 
 	}
 
