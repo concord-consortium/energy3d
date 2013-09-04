@@ -84,7 +84,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class EnergyPanel extends JPanel {
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
-	public static final double SOLAR_STEP = 0.5;
+	public static final double SOLAR_STEP = 2.0;
 	private static final int SOLAR_MINUTE_STEP = 15;
 	private static final long serialVersionUID = 1L;
 	private static final Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
@@ -1414,14 +1414,14 @@ public class EnergyPanel extends JPanel {
 			for (int col = 0; col < solar[0].length; col++) {
 				solar[solar.length - 1][col] = solar[0][col];
 				if (rows != solar.length - 1)
-					solar[rows][col] = solar[0][col];
+					solar[rows][col] = solar[rows - 1][col];
 			}
 
 		if (cols < solar[0].length)
 			for (int row = 0; row < solar.length; row++) {
 				solar[row][solar[0].length - 1] = solar[row][0];
 				if (cols != solar[0].length - 1)
-					solar[row][cols] = solar[row][0];
+					solar[row][cols] = solar[row][cols - 1];
 			}
 
 		updateRadiationMeshTextureCoords(drawMesh, origin, u, v, rows, cols);
