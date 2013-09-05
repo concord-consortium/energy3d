@@ -84,7 +84,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class EnergyPanel extends JPanel {
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
-	public static final double SOLAR_STEP = 2.0;
+	public static final double SOLAR_STEP = 0.5;
 	private static final int SOLAR_MINUTE_STEP = 15;
 	private static final long serialVersionUID = 1L;
 	private static final Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
@@ -1269,36 +1269,58 @@ public class EnergyPanel extends JPanel {
 					if (faceDirection.dot(directionTowardSun) > 0) {
 						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
 						final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-						ReadOnlyVector3 lowestPoint, secondLowestPoint, highestPoint;
-						lowestPoint = secondLowestPoint = highestPoint = null;
+						ReadOnlyVector3 lowestPoint, secondLowestPoint, highestPoint, secondHighestPoint;
+						lowestPoint = secondLowestPoint = highestPoint = secondHighestPoint = null;
 						vertexBuffer.rewind();
-						if (faceDirection.equals(Vector3.UNIT_Z))
-							while (vertexBuffer.hasRemaining()) {
-								final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-								if (lowestPoint == null || p.getY() < lowestPoint.getY()) {
-									secondLowestPoint = lowestPoint;
-									lowestPoint = p;
-								} else if (secondLowestPoint == null || p.getY() < secondLowestPoint.getY())
-									secondLowestPoint = p;
-								if (highestPoint == null || p.getY() > highestPoint.getY())
-									highestPoint = p;
-							}
-						else
-							while (vertexBuffer.hasRemaining()) {
-								final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-								if (lowestPoint == null || p.getZ() < lowestPoint.getZ()) {
-									secondLowestPoint = lowestPoint;
-									lowestPoint = p;
-								} else if (secondLowestPoint == null || p.getZ() < secondLowestPoint.getZ())
-									secondLowestPoint = p;
-								if (highestPoint == null || p.getZ() > highestPoint.getZ())
-									highestPoint = p;
-							}
+						final int index = faceDirection.equals(Vector3.UNIT_Z) ? 1 : 2;
+						while (vertexBuffer.hasRemaining()) {
+							final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+							if (p.equals(lowestPoint) || p.equals(secondLowestPoint) || p.equals(highestPoint) || p.equals(secondHighestPoint))
+								continue;
+							if (lowestPoint == null || p.getValue(index) < lowestPoint.getValue(index)) {
+								secondLowestPoint = lowestPoint;
+								lowestPoint = p;
+							} else if (secondLowestPoint == null || p.getValue(index) < secondLowestPoint.getValue(index))
+								secondLowestPoint = p;
+							if (highestPoint == null || p.getValue(index) > highestPoint.getValue(index)) {
+								secondHighestPoint = highestPoint;
+								highestPoint = p;
+							} else if (secondHighestPoint == null || p.getValue(index) > secondHighestPoint.getValue(index))
+								secondHighestPoint = p;
+						}
+
+						if (lowestPoint.getX() == secondLowestPoint.getX() && lowestPoint.getX() == highestPoint.getX()) {
+							final ReadOnlyVector3 tmp = highestPoint;
+							highestPoint = secondHighestPoint;
+							secondHighestPoint = tmp;
+						}
+
+
+						// else
+						// while (vertexBuffer.hasRemaining()) {
+						// final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+						// if (lowestPoint == null || p.getZ() < lowestPoint.getZ()) {
+						// secondLowestPoint = lowestPoint;
+						// lowestPoint = p;
+						// } else if (secondLowestPoint == null || p.getZ() < secondLowestPoint.getZ())
+						// secondLowestPoint = p;
+						// if (highestPoint == null || p.get.get(Z() > highestPoint.getZ()) {
+						// secondHighestPoint = highestPoint;
+						// highestPoint = p;
+						// } else if (secondHighestPoint == null || p.getZ() > secondHighestPoint.getZ())
+						// secondHighestPoint = p;
+						// }
 						// final double z = Util.distanceFromPointToLine(highestPoint, lowestPoint, secondLowestPoint.subtract(lowestPoint, null).normalizeLocal());
 						final ReadOnlyVector3 o = lowestPoint;
-						final ReadOnlyVector3 u = secondLowestPoint.subtract(lowestPoint, null).normalizeLocal();
+						final ReadOnlyVector3 u;
+						if (lowestPoint.getValue(index) != secondLowestPoint.getValue(index) && highestPoint.getValue(index) == secondHighestPoint.getValue(index))
+							u = secondHighestPoint.subtract(highestPoint, null);
+						else
+							u = secondLowestPoint.subtract(lowestPoint, null);
 						final ReadOnlyVector3 v = u.cross(faceDirection, null);
-						final ReadOnlyVector3 projectedHighestPoint = Util.closestPoint(o, v, highestPoint, u);
+
+//						final ReadOnlyVector3 projectedHighestPoint = Util.closestPoint(o, v, highestPoint, u);
+						final ReadOnlyVector3 projectedHighestPoint = Util.closestPointBetweenTwoLines(lowestPoint, v, highestPoint, u);
 						// final ReadOnlyVector3 p1 = lowestPoint.multiply(1, 1, 0, null).addLocal(0, 0, z);
 						// final ReadOnlyVector3 o = lowestPoint;
 						// final ReadOnlyVector3 u = secondLowestPoint.subtract(o, null);
