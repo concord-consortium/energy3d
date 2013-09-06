@@ -1539,6 +1539,8 @@ Version 2.0 - May 15, 2013
 - for horizontal roofs use the y axis to find lowest/highest points for colormap texturing
 - fix problem with wall radiation colormap not considering the height of base when computing p1
 - fix problem with remaining texture buffer using the first row for extra upper row instead of using rows-1 values
+- use toXY transformer to project all points on XY plane before determining the size and u,v direction of colormap textures
+- allow solar colormap even for roof parts are on top or side with only one vertex at base
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
