@@ -42,21 +42,6 @@ public class MainApplication {
 		if (!Config.isMac() && args.length > 1 && !args[args.length - 1].startsWith("-"))
 			mainFrame.open(args[args.length - 1]);
 
-		if (Config.isClassroomMode()) {
-			final File dir = new File("log");
-			if (!dir.exists())
-				dir.mkdir();
-			final TimeSeriesLogger logger = new TimeSeriesLogger(2, 5, dir, scene);
-			scene.addShutdownHook(new Runnable() {
-				@Override
-				public void run() {
-					logger.saveLog();
-				}
-			});
-			Scene.getInstance().addPropertyChangeListener(logger);
-			logger.start();
-			logSnapshots(20, dir, logger);
-		}
 		/* initialize data logging */
 		final String logPath;
 		if (Config.isWebStart()) {
