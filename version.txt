@@ -1503,6 +1503,7 @@ Version 2.0 - May 15, 2013
 - fix problem: resize box does not extend all the way to top of the roof
 - only draw children of house when resizing instead of redrawing the entire scene
 - update the outside temperature based on selected city
+*
 - release version 2.2
 - remember the previous wall height
 - reset the default wall height upon new file
@@ -1522,6 +1523,24 @@ Version 2.0 - May 15, 2013
 - fix problem with unable to rotate when zoomed out due to collision with sky
 - ensure minimum distance between foundations when moving them 
 - fix problem with removed foundation when moving it to where another foundation exists
+- avoid recomputing energy when typing notes
+- turn off solar colormap whenever enegery recompute is requested except the first time it is clicked
+- ensure the windows are within the boundaries of the wall to prevent strange back wall polygons sticking out
+- add menu to keep heatmap on
+- always log data and snapshots by default
+- store log data in approperiate places in windows vista+ and windows xp- and mac os x. For all other OS save logs in a folder in user's home directory.
+- release version 2.4
+- extract radiation texture compute code from wall to be generic and applicable to roofs
+- generate the texture coordinates for roof polygons to correspond to exact size of solar radiation texture
+- stretch the texture coordinates according to mesh vertices
+- combine methods for computing texture coords of both wall and roof in one generic method
+- fix problem with radiation colormap not drawn due to to colormap called before scene redraw
+- instead of using z of roof highest point, project highest point on the v direction of the polygon before calculating colormap texture
+- for horizontal roofs use the y axis to find lowest/highest points for colormap texturing
+- fix problem with wall radiation colormap not considering the height of base when computing p1
+- fix problem with remaining texture buffer using the first row for extra upper row instead of using rows-1 values
+- use toXY transformer to project all points on XY plane before determining the size and u,v direction of colormap textures
+- allow solar colormap even for roof parts are on top or side with only one vertex at base
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house

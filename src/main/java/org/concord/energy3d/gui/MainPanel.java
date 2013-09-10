@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -743,17 +745,22 @@ public class MainPanel extends JPanel {
 		return energyToggleButton;
 	}
 
-	private JToggleButton getSolarButton() {
+	public JToggleButton getSolarButton() {
 		if (solarButton == null) {
 			solarButton = new JToggleButton("");
 			solarButton.setToolTipText("Generate solar radiation heat map");
 			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
 			solarButton.addMouseListener(refreshUponMouseExit);
+			solarButton.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+				}
+			});
 			solarButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
@@ -788,7 +795,7 @@ public class MainPanel extends JPanel {
 			noteTextArea.setLineWrap(true);
 			noteTextArea.getDocument().addDocumentListener(new DocumentListener() {
 				public void updateEditFlag() {
-					Scene.getInstance().setEdited(true);
+					Scene.getInstance().setEdited(true, false);
 					if (!Config.isApplet())
 						MainFrame.getInstance().updateTitleBar();
 				}

@@ -222,4 +222,39 @@ public class Util {
 	public static double round(final double x) {
 		return Math.round(x * 100.0) / 100.0;
 	}
+
+	public static double distanceFromPointToLine(final ReadOnlyVector3 p, final ReadOnlyVector3 origin, final ReadOnlyVector3 direction) {
+		final ReadOnlyVector3 op = origin.subtract(p, null);
+		return direction.multiply(op.dot(direction), null).negateLocal().addLocal(op).length();
+	}
+
+	public static ReadOnlyVector3 closestPointBetweenTwoLines(final ReadOnlyVector3 p1, final ReadOnlyVector3 dir1, final ReadOnlyVector3 p2, final ReadOnlyVector3 dir2)
+	{
+		final ReadOnlyVector3 u = dir1;
+		final ReadOnlyVector3 v = dir2;
+		final ReadOnlyVector3 w = p1.subtract(p2, null);
+	    final double a = u.dot(u);         // always >= 0
+	    final double b = u.dot(v);
+	    final double c = v.dot(v);         // always >= 0
+	    final double d = u.dot(w);
+	    final double e = v.dot(w);
+	    final double D = a*c - b*b;        // always >= 0
+	    double sc, tc;
+
+	    // compute the line parameters of the two closest points
+	    if (D < MathUtils.ZERO_TOLERANCE) {          // the lines are almost parallel
+	        sc = 0.0;
+	        tc = (b>c ? d/b : e/c);    // use the largest denominator
+	    }
+	    else {
+	        sc = (b*e - c*d) / D;
+	        tc = (a*e - b*d) / D;
+	    }
+
+//	    // get the difference of the two closest points
+//	    final Vector   dP = w + (sc * u) - (tc * v);  // =  L1(sc) - L2(tc)
+//
+//	    return norm(dP);   // return the closest distance
+	    return u.multiply(sc, null).addLocal(p1);
+	}
 }

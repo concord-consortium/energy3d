@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyEvent;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +60,11 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.Util;
+import org.poly2tri.geometry.primitives.Point;
+import org.poly2tri.transform.coordinate.AnyToXYTransform;
+import org.poly2tri.transform.coordinate.XYToAnyTransform;
+import org.poly2tri.triangulation.point.TPoint;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
@@ -75,6 +81,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
@@ -93,6 +100,7 @@ public class EnergyPanel extends JPanel {
 	private static final DecimalFormat noDecimals = new DecimalFormat();
 	private static final DecimalFormat moneyDecimals = new DecimalFormat();
 	private static final RuntimeException cancelException = new RuntimeException("CANCEL");
+	private static boolean keepHeatmapOn = false;
 
 	static {
 		twoDecimals.setMaximumFractionDigits(2);
@@ -181,7 +189,7 @@ public class EnergyPanel extends JPanel {
 	private final JLabel contrastLabel;
 	private final JProgressBar progressBar;
 
-	private final Map<HousePart, double[][]> solarOnWall = new HashMap<HousePart, double[][]>();
+	private final Map<Mesh, double[][]> solarOnWall = new HashMap<Mesh, double[][]>();
 	private final Map<Integer, Integer> powerOfTwo = new HashMap<Integer, Integer>();
 	private final Map<HousePart, Double> solarTotal = new HashMap<HousePart, Double>();
 	private final List<Spatial> solarCollidables = new ArrayList<Spatial>();
@@ -198,6 +206,7 @@ public class EnergyPanel extends JPanel {
 	private long maxSolarValue;
 	private boolean computeRequest;
 	private boolean initJavaFxAlreadyCalled = false;
+	private boolean alreadyRendered = false;
 
 	private static class EnergyAmount {
 		double solar;
@@ -446,8 +455,8 @@ public class EnergyPanel extends JPanel {
 		outsideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-			    if (thread == null)
-			    	compute();
+				if (thread == null)
+					compute();
 			}
 		});
 		final GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
@@ -908,15 +917,19 @@ public class EnergyPanel extends JPanel {
 
 		progressBar.setValue(0);
 
-		if (SceneManager.getInstance().isSolarColorMap())
+		if (SceneManager.getInstance().isSolarColorMap() && (!alreadyRendered || keepHeatmapOn)) {
+			alreadyRendered = true;
 			computeRadiation();
-		else {
+		} else {
+			if (SceneManager.getInstance().isSolarColorMap()) {
+				MainPanel.getInstance().getSolarButton().setSelected(false);
+			}
 			int counter = 0;
 			for (final HousePart part : Scene.getInstance().getParts()) {
 				if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
 					counter++;
-					if (counter >= 2)
-						break;
+				if (counter >= 2)
+					break;
 			}
 			for (final HousePart part : Scene.getInstance().getParts())
 				if (part instanceof Foundation)
@@ -1125,10 +1138,6 @@ public class EnergyPanel extends JPanel {
 		return totalRate;
 	}
 
-	private double toCelsius(final double f) {
-		return ((f - 32.0) * 5.0 / 9.0);
-	}
-
 	private void updateOutsideTemperature() {
 		if (getCity().isEmpty())
 			outsideTemperatureSpinner.setValue(15);
@@ -1148,14 +1157,16 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void computeRadiation() {
+		System.out.println("computeRadiation()");
 		initSolarCollidables();
 		solarOnWall.clear();
 		solarTotal.clear();
 		solarOnLand = null;
 		maxSolarValue = 1;
 		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
-		// computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
-		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
+		computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
+		computeRadiationOnRoofs(Heliodon.getInstance().getSunLocation());
+		// computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		updateSolarValueOnAllHouses();
 	}
 
@@ -1169,84 +1180,401 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
+	// private void computeRadiationOnWallsOrg(final ReadOnlyVector3 sunLocation) {
+	// if (sunLocation.getZ() <= 0)
+	// return;
+	// final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
+	// /* needed in order to prevent picking collision with neighboring wall at wall edge */
+	// final double OFFSET = 0.1;
+	// final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+	// final ArrayList<HousePart> parts = Scene.getInstance().getParts();
+	// for (int i = 0; i < parts.size(); i++) {
+	// final HousePart part = parts.get(i);
+	// if (part instanceof Wall && part.isDrawCompleted() && part.getFaceDirection().dot(directionTowardSun) > 0) {
+	// final Wall wall = (Wall) part;
+	// final int rows = (int) Math.ceil(Math.round(wall.getHighestPoint()) / SOLAR_STEP);
+	// final ReadOnlyVector3 origin = part.getAbsPoint(0);
+	// final ReadOnlyVector3 p2 = wall.getAbsPoint(2);
+	// final int cols = (int) Math.ceil(p2.subtract(origin, null).length() / SOLAR_STEP);
+	// double[][] solar = solarOnWall.get(wall);
+	// if (solar == null) {
+	// solar = new double[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
+	// solarOnWall.put(wall, solar);
+	// }
+	//
+	// final double baseZ = origin.getZ();
+	// final ReadOnlyVector3 dir = p2.subtract(origin, null).normalizeLocal();
+	// final Vector3 p = new Vector3();
+	// final double dot = part.getFaceDirection().dot(directionTowardSun);
+	// for (int col = 1; col < cols - 1; col++) {
+	// p.set(dir).multiplyLocal(col * SOLAR_STEP).addLocal(origin);
+	// final double w;
+	// if (col == cols - 1)
+	// w = p2.distance(p);
+	// else
+	// w = SOLAR_STEP;
+	// for (int row = 0; row < rows; row++) {
+	// if (computeRequest)
+	// throw cancelException;
+	// p.setZ(baseZ + row * SOLAR_STEP);
+	// final double h;
+	// if (row == rows - 1)
+	// h = wall.getHighestPoint() - (row * SOLAR_STEP);
+	// else
+	// h = SOLAR_STEP;
+	// final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
+	// final PickResults pickResults = new PrimitivePickResults();
+	// for (final Spatial spatial : solarCollidables)
+	// if (spatial != wall.getInvisibleMesh()) {
+	// PickingUtil.findPick(spatial, pickRay, pickResults, false);
+	// }
+	// if (pickResults.getNumber() == 0) {
+	// solar[row][col] += dot;
+	// int repeat = 1;
+	// if (col == 1) {
+	// solar[row][0] += dot;
+	// repeat++;
+	// } else if (col == cols - 2) {
+	// solar[row][cols - 1] += dot;
+	// repeat++;
+	// }
+	// final HousePart house = wall.getContainer();
+	// final Double val = solarTotal.get(house);
+	// solarTotal.put(house, val == null ? 0 : val + repeat * dot * w * h * Scene.getInstance().getAnnotationScale());
+	// }
+	// }
+	// }
+	// if (rows < solar.length)
+	// for (int col = 0; col < solar[0].length; col++) {
+	// solar[solar.length - 1][col] = solar[0][col];
+	// if (rows != solar.length - 1)
+	// solar[rows][col] = solar[0][col];
+	// }
+	//
+	// if (cols < solar[0].length)
+	// for (int row = 0; row < solar.length; row++) {
+	// solar[row][solar[0].length - 1] = solar[row][0];
+	// if (cols != solar[0].length - 1)
+	// solar[row][cols] = solar[row][0];
+	// }
+	// }
+	// }
+	// }
+
+	private void computeRadiationOnRoofs(final ReadOnlyVector3 sunLocation) {
+		if (sunLocation.getZ() <= 0)
+			return;
+		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Roof && part.isDrawCompleted()) { // && faceDirection.dot(directionTowardSun) > 0) {
+				final Roof roof = (Roof) part;
+				for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
+					final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
+					if (faceDirection.dot(directionTowardSun) > 0) {
+						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+						final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+						ReadOnlyVector3 lowestPoint, secondLowestPoint, highestPoint, secondHighestPoint;
+						lowestPoint = secondLowestPoint = highestPoint = secondHighestPoint = null;
+						vertexBuffer.rewind();
+						final int index = faceDirection.equals(Vector3.UNIT_Z) ? 1 : 2;
+						while (vertexBuffer.hasRemaining()) {
+							final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+							if (p.equals(lowestPoint) || p.equals(secondLowestPoint) || p.equals(highestPoint) || p.equals(secondHighestPoint))
+								continue;
+							if (lowestPoint == null || p.getValue(index) < lowestPoint.getValue(index)) {
+								secondLowestPoint = lowestPoint;
+								lowestPoint = p;
+							} else if (secondLowestPoint == null || p.getValue(index) < secondLowestPoint.getValue(index))
+								secondLowestPoint = p;
+							if (highestPoint == null || p.getValue(index) > highestPoint.getValue(index)) {
+								secondHighestPoint = highestPoint;
+								highestPoint = p;
+							} else if (secondHighestPoint == null || p.getValue(index) > secondHighestPoint.getValue(index))
+								secondHighestPoint = p;
+						}
+
+						if (lowestPoint.getX() == secondLowestPoint.getX() && lowestPoint.getX() == highestPoint.getX()) {
+							final ReadOnlyVector3 tmp = highestPoint;
+							highestPoint = secondHighestPoint;
+							secondHighestPoint = tmp;
+						}
+
+
+						// else
+						// while (vertexBuffer.hasRemaining()) {
+						// final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+						// if (lowestPoint == null || p.getZ() < lowestPoint.getZ()) {
+						// secondLowestPoint = lowestPoint;
+						// lowestPoint = p;
+						// } else if (secondLowestPoint == null || p.getZ() < secondLowestPoint.getZ())
+						// secondLowestPoint = p;
+						// if (highestPoint == null || p.get.get(Z() > highestPoint.getZ()) {
+						// secondHighestPoint = highestPoint;
+						// highestPoint = p;
+						// } else if (secondHighestPoint == null || p.getZ() > secondHighestPoint.getZ())
+						// secondHighestPoint = p;
+						// }
+						// final double z = Util.distanceFromPointToLine(highestPoint, lowestPoint, secondLowestPoint.subtract(lowestPoint, null).normalizeLocal());
+						final ReadOnlyVector3 o = lowestPoint;
+						final ReadOnlyVector3 u;
+						if (lowestPoint.getValue(index) != secondLowestPoint.getValue(index) && highestPoint.getValue(index) == secondHighestPoint.getValue(index))
+							u = secondHighestPoint.subtract(highestPoint, null);
+						else
+							u = secondLowestPoint.subtract(lowestPoint, null);
+						final ReadOnlyVector3 v = u.cross(faceDirection, null);
+
+//						final ReadOnlyVector3 projectedHighestPoint = Util.closestPoint(o, v, highestPoint, u);
+						final ReadOnlyVector3 projectedHighestPoint = Util.closestPointBetweenTwoLines(lowestPoint, v, highestPoint, u);
+						// final ReadOnlyVector3 p1 = lowestPoint.multiply(1, 1, 0, null).addLocal(0, 0, z);
+						// final ReadOnlyVector3 o = lowestPoint;
+						// final ReadOnlyVector3 u = secondLowestPoint.subtract(o, null);
+						// final ReadOnlyVector3 v = p1.subtract(o, null);
+						// final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
+						// textureBuffer.rewind();
+						// vertexBuffer.rewind();
+						// while (vertexBuffer.hasRemaining()) {
+						// final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+						// System.out.println(p);
+						// final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
+						// final float uScale = (float) (uP.distance(o) / u.length());
+						// final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
+						// final float vScale = (float) (vP.distance(o) / v.length());
+						// textureBuffer.put(uScale).put(vScale);
+						// }
+//						computeRadiationOnMesh(directionTowardSun, roof.getContainer(), mesh, mesh, faceDirection, lowestPoint, projectedHighestPoint, secondLowestPoint, false);
+						computeRadiationOnMesh(directionTowardSun, roof.getContainer(), mesh, mesh, faceDirection, false);
+					}
+				}
+			}
+		}
+	}
+
 	private void computeRadiationOnWalls(final ReadOnlyVector3 sunLocation) {
 		if (sunLocation.getZ() <= 0)
 			return;
 		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
+		// /* needed in order to prevent picking collision with neighboring wall at wall edge */
+		// final double OFFSET = 0.1;
+		// final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+		// final ArrayList<HousePart> parts = Scene.getInstance().getParts();
+		// for (int i = 0; i < parts.size(); i++) {
+		// final HousePart part = parts.get(i);
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			final ReadOnlyVector3 faceDirection = part.getFaceDirection();
+			if (part instanceof Wall && part.isDrawCompleted() && faceDirection.dot(directionTowardSun) > 0) {
+				final Wall wall = (Wall) part;
+				// final int rows = (int) Math.ceil(Math.round(wall.getHighestPoint()) / SOLAR_STEP);
+				// final ReadOnlyVector3 p1 = wall.getAbsPoint(1);
+				final ReadOnlyVector3 p1 = wall.getAbsPoint(1).multiplyLocal(1, 1, 0).addLocal(0, 0, wall.getHighestPoint());
+
+//				computeRadiationOnMesh(directionTowardSun, wall.getContainer(), wall.getMesh(), wall.getInvisibleMesh(), faceDirection, part.getAbsPoint(0), p1, wall.getAbsPoint(2), true);
+				computeRadiationOnMesh(directionTowardSun, wall.getContainer(), wall.getMesh(), wall.getInvisibleMesh(), faceDirection, true);
+			}
+		}
+	}
+
+//	private void computeRadiationOnMesh(final ReadOnlyVector3 directionTowardSun, final HousePart house, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 faceDirection, final ReadOnlyVector3 origin, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final boolean addToTotal) {
+//		/* needed in order to prevent picking collision with neighboring wall at wall edge */
+//		final double OFFSET = 0.1;
+//		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+//
+//		final int rows = (int) Math.ceil(p1.subtract(origin, null).length() / SOLAR_STEP);
+//		final int cols = (int) Math.ceil(p2.subtract(origin, null).length() / SOLAR_STEP);
+//		// double[][] solar = solarOnWall.get(wall);
+//		double[][] solar = solarOnWall.get(drawMesh);
+//		if (solar == null) {
+//			solar = new double[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
+//			// solarOnWall.put(wall, solar);
+//			solarOnWall.put(drawMesh, solar);
+//		}
+//
+//		// final double baseZ = origin.getZ();
+//		final ReadOnlyVector3 u = p2.subtract(origin, null).normalizeLocal();
+//		final ReadOnlyVector3 v = p1.subtract(origin, null).normalizeLocal();
+//		final double dot = faceDirection.dot(directionTowardSun);
+//		// for (int col = 1; col < cols - 1; col++) {
+//		for (int col = 0; col < cols; col++) {
+//			// p.set(u).multiplyLocal(col * SOLAR_STEP).addLocal(origin);
+//			final ReadOnlyVector3 pU = u.multiply(col * SOLAR_STEP, null).addLocal(origin);
+//			final double w;
+//			if (col == cols - 1)
+//				w = p2.distance(pU);
+//			else
+//				w = SOLAR_STEP;
+//			for (int row = 0; row < rows; row++) {
+//				if (computeRequest)
+//					throw cancelException;
+//				// p.setZ(baseZ + row * SOLAR_STEP);
+//				// p.addLocal(v.multiply(row * SOLAR_STEP, null));
+//				final ReadOnlyVector3 p = v.multiply(row * SOLAR_STEP, null).addLocal(pU);
+//				final double h;
+//				if (row == rows - 1)
+//					// h = wall.getHighestPoint() - (row * SOLAR_STEP);
+//					h = p1.getZ() - (row * SOLAR_STEP);
+//				else
+//					h = SOLAR_STEP;
+//				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
+//				final PickResults pickResults = new PrimitivePickResults();
+//				for (final Spatial spatial : solarCollidables)
+//					if (spatial != collisionMesh) {
+//						PickingUtil.findPick(spatial, pickRay, pickResults, false);
+//						if (pickResults.getNumber() != 0)
+//							break;
+//					}
+//				if (pickResults.getNumber() == 0) {
+//					solar[row][col] += dot;
+//					final int repeat = 1;
+//					// if (col == 1) {
+//					// solar[row][0] += dot;
+//					// repeat++;
+//					// } else if (col == cols - 2) {
+//					// solar[row][cols - 1] += dot;
+//					// repeat++;
+//					// }
+//					if (addToTotal) {
+//						final Double val = solarTotal.get(house);
+//						solarTotal.put(house, val == null ? 0 : val + repeat * dot * w * h * Scene.getInstance().getAnnotationScale());
+//					}
+//				}
+//			}
+//		}
+//		if (rows < solar.length)
+//			for (int col = 0; col < solar[0].length; col++) {
+//				solar[solar.length - 1][col] = solar[0][col];
+//				if (rows != solar.length - 1)
+//					solar[rows][col] = solar[rows - 1][col];
+//			}
+//
+//		if (cols < solar[0].length)
+//			for (int row = 0; row < solar.length; row++) {
+//				solar[row][solar[0].length - 1] = solar[row][0];
+//				if (cols != solar[0].length - 1)
+//					solar[row][cols] = solar[row][cols - 1];
+//			}
+//
+//		updateRadiationMeshTextureCoords(drawMesh, origin, u, v, rows, cols);
+//	}
+
+	private void computeRadiationOnMesh(final ReadOnlyVector3 directionTowardSun, final HousePart house, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
-		final ArrayList<HousePart> parts = Scene.getInstance().getParts();
-		for (int i = 0; i < parts.size(); i++) {
-			final HousePart part = parts.get(i);
-			if (part instanceof Wall && part.isDrawCompleted() && part.getFaceDirection().dot(directionTowardSun) > 0) {
-				final Wall wall = (Wall) part;
-				final int rows = (int) Math.ceil(Math.round(wall.getHighestPoint()) / SOLAR_STEP);
-				final ReadOnlyVector3 origin = part.getAbsPoint(0);
-				final ReadOnlyVector3 p2 = wall.getAbsPoint(2);
-				final int cols = (int) Math.ceil(p2.subtract(origin, null).length() / SOLAR_STEP);
-				double[][] solar = solarOnWall.get(wall);
-				if (solar == null) {
-					solar = new double[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
-					solarOnWall.put(wall, solar);
-				}
 
-				final double baseZ = origin.getZ();
-				final ReadOnlyVector3 dir = p2.subtract(origin, null).normalizeLocal();
-				final Vector3 p = new Vector3();
-				final double dot = part.getFaceDirection().dot(directionTowardSun);
-				for (int col = 1; col < cols - 1; col++) {
-					p.set(dir).multiplyLocal(col * SOLAR_STEP).addLocal(origin);
-					final double w;
-					if (col == cols - 1)
-						w = p2.distance(p);
-					else
-						w = SOLAR_STEP;
-					for (int row = 0; row < rows; row++) {
-						if (computeRequest)
-							throw cancelException;
-						p.setZ(baseZ + row * SOLAR_STEP);
-						final double h;
-						if (row == rows - 1)
-							h = wall.getHighestPoint() - (row * SOLAR_STEP);
-						else
-							h = SOLAR_STEP;
-						final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
-						final PickResults pickResults = new PrimitivePickResults();
-						for (final Spatial spatial : solarCollidables)
-							if (spatial != wall.getInvisibleMesh()) {
-								PickingUtil.findPick(spatial, pickRay, pickResults, false);
-							}
-						if (pickResults.getNumber() == 0) {
-							solar[row][col] += dot;
-							int repeat = 1;
-							if (col == 1) {
-								solar[row][0] += dot;
-								repeat++;
-							} else if (col == cols - 2) {
-								solar[row][cols - 1] += dot;
-								repeat++;
-							}
-							final HousePart house = wall.getContainer();
-							final Double val = solarTotal.get(house);
-							solarTotal.put(house, val == null ? 0 : val + repeat * dot * w * h * Scene.getInstance().getAnnotationScale());
-						}
+		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
+		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
+
+		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
+		vertexBuffer.rewind();
+		double minX, minY, maxX, maxY;
+		minX = minY = Double.POSITIVE_INFINITY;
+		maxX = maxY = Double.NEGATIVE_INFINITY;
+//		final List<Point> points = new ArrayList<Point>(vertexBuffer.limit() / 3);
+
+		double z = Double.NaN;
+		while (vertexBuffer.hasRemaining()) {
+			final Point p = new TPoint(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+			toXY.transform(p);
+			if (p.getX() < minX)
+				minX = p.getX();
+			if (p.getX() > maxX)
+				maxX = p.getX();
+			if (p.getY() < minY)
+				minY = p.getY();
+			if (p.getY() > maxY)
+				maxY = p.getY();
+			if (Double.isNaN(z))
+				z = p.getZ();
+//			points.add(p);
+		}
+
+		final Point tmp = new TPoint(minX, minY, z);
+		fromXY.transform(tmp);
+		final ReadOnlyVector3 origin = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
+
+		tmp.set(minX, maxY, z);
+		fromXY.transform(tmp);
+		final ReadOnlyVector3 p1 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
+
+		tmp.set(maxX, minY, z);
+		fromXY.transform(tmp);
+		final ReadOnlyVector3 p2 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
+
+		final int rows = (int) Math.ceil(p1.subtract(origin, null).length() / SOLAR_STEP);
+		final int cols = (int) Math.ceil(p2.subtract(origin, null).length() / SOLAR_STEP);;
+		double[][] solar = solarOnWall.get(drawMesh);
+		if (solar == null) {
+			solar = new double[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
+			solarOnWall.put(drawMesh, solar);
+		}
+		final ReadOnlyVector3 u = p2.subtract(origin, null).normalizeLocal();
+		final ReadOnlyVector3 v = p1.subtract(origin, null).normalizeLocal();
+		final double dot = normal.dot(directionTowardSun);
+		for (int col = 0; col < cols; col++) {
+			final ReadOnlyVector3 pU = u.multiply(col * SOLAR_STEP, null).addLocal(origin);
+			final double w;
+			if (col == cols - 1)
+				w = p2.distance(pU);
+			else
+				w = SOLAR_STEP;
+			for (int row = 0; row < rows; row++) {
+				if (computeRequest)
+					throw cancelException;
+				final ReadOnlyVector3 p = v.multiply(row * SOLAR_STEP, null).addLocal(pU);
+				final double h;
+				if (row == rows - 1)
+					h = p1.getZ() - (row * SOLAR_STEP);
+				else
+					h = SOLAR_STEP;
+				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
+				final PickResults pickResults = new PrimitivePickResults();
+				for (final Spatial spatial : solarCollidables)
+					if (spatial != collisionMesh) {
+						PickingUtil.findPick(spatial, pickRay, pickResults, false);
+						if (pickResults.getNumber() != 0)
+							break;
+					}
+				if (pickResults.getNumber() == 0) {
+					solar[row][col] += dot;
+					final int repeat = 1;
+					if (addToTotal) {
+						final Double val = solarTotal.get(house);
+						solarTotal.put(house, val == null ? 0 : val + repeat * dot * w * h * Scene.getInstance().getAnnotationScale());
 					}
 				}
-				if (rows < solar.length)
-					for (int col = 0; col < solar[0].length; col++) {
-						solar[solar.length - 1][col] = solar[0][col];
-						if (rows != solar.length - 1)
-							solar[rows][col] = solar[0][col];
-					}
-
-				if (cols < solar[0].length)
-					for (int row = 0; row < solar.length; row++) {
-						solar[row][solar[0].length - 1] = solar[row][0];
-						if (cols != solar[0].length - 1)
-							solar[row][cols] = solar[row][0];
-					}
 			}
+		}
+		if (rows < solar.length)
+			for (int col = 0; col < solar[0].length; col++) {
+				solar[solar.length - 1][col] = solar[0][col];
+				if (rows != solar.length - 1)
+					solar[rows][col] = solar[rows - 1][col];
+			}
+
+		if (cols < solar[0].length)
+			for (int row = 0; row < solar.length; row++) {
+				solar[row][solar[0].length - 1] = solar[row][0];
+				if (cols != solar[0].length - 1)
+					solar[row][cols] = solar[row][cols - 1];
+			}
+
+		updateRadiationMeshTextureCoords(drawMesh, origin, u, v, rows, cols);
+	}
+
+	private void updateRadiationMeshTextureCoords(final Mesh drawMesh, final ReadOnlyVector3 origin, final ReadOnlyVector3 uDir, final ReadOnlyVector3 vDir, final int rows, final int cols) {
+		final ReadOnlyVector3 o = origin;
+		final ReadOnlyVector3 u = uDir.multiply(roundToPowerOfTwo(cols) * EnergyPanel.SOLAR_STEP, null);
+		final ReadOnlyVector3 v = vDir.multiply(roundToPowerOfTwo(rows) * EnergyPanel.SOLAR_STEP, null);
+		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
+		final FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
+		vertexBuffer.rewind();
+		textureBuffer.rewind();
+		while (vertexBuffer.hasRemaining()) {
+			final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+			final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
+			final float uScale = (float) (uP.distance(o) / u.length());
+			final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
+			final float vScale = (float) (vP.distance(o) / v.length());
+			textureBuffer.put(uScale).put(vScale);
 		}
 	}
 
@@ -1288,6 +1616,7 @@ public class EnergyPanel extends JPanel {
 			final ReadOnlyVector3 sunLocation = heliodon.computeSunLocation(today);
 			if (sunLocation.getZ() > 0) {
 				computeRadiationOnWalls(sunLocation);
+				computeRadiationOnRoofs(sunLocation);
 				computeRadiationOnLand(sunLocation);
 			}
 			maxSolarValue++;
@@ -1301,16 +1630,43 @@ public class EnergyPanel extends JPanel {
 		applySolarTexture(SceneManager.getInstance().getSolarLand(), solarOnLand, maxSolarValue);
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
+				final List<Roof> roofs = new ArrayList<Roof>();
 				final Foundation foundation = (Foundation) part;
 				for (final HousePart houseChild : foundation.getChildren()) {
-					if (houseChild instanceof Wall)
-						applySolarTexture(houseChild.getMesh(), solarOnWall.get(houseChild), maxSolarValue);
+					if (houseChild instanceof Wall) {
+						// applySolarTexture(houseChild.getMesh(), solarOnWall.get(houseChild), maxSolarValue);
+						final Wall wall = (Wall) houseChild;
+						applySolarTexture(houseChild.getMesh(), solarOnWall.get(wall.getMesh()), maxSolarValue);
+						print(wall, solarOnWall.get(wall.getMesh()));
+						final Roof roof = (Roof) wall.getRoof();
+						if (roof != null && !roofs.contains(roof))
+							roofs.add(roof);
+					}
 				}
+				for (final Roof roof : roofs)
+					for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
+						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+						applySolarTexture(mesh, solarOnWall.get(mesh), maxSolarValue);
+						print(roof, solarOnWall.get(mesh));
+					}
 				final Double val = solarTotal.get(foundation);
 				foundation.setSolarValue(val == null ? 0 : val.longValue() / (60 / SOLAR_MINUTE_STEP));
 			}
 		}
 		SceneManager.getInstance().refresh();
+	}
+
+	private void print(final HousePart part, final double[][] solar) {
+		// System.out.println(part);
+		// if (solar == null)
+		// System.out.println("null");
+		// else
+		// for (int i = 0; i < solar.length; i++) {
+		// for (int j = 0; j < solar[0].length; j++)
+		// System.out.print((int) Math.round(solar[i][j]) + " ");
+		// System.out.println();
+		// }
+
 	}
 
 	private void progress() {
@@ -1383,6 +1739,14 @@ public class EnergyPanel extends JPanel {
 		final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
 		final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
 		return color;
+	}
+
+	public void clearAlreadyRendered() {
+		alreadyRendered = false;
+	}
+
+	public static void setKeepHeatmapOn(final boolean on) {
+		keepHeatmapOn = on;
 	}
 
 }

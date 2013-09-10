@@ -625,12 +625,16 @@ public class Scene implements Serializable {
 	}
 
 	public void setEdited(final boolean edited) {
+		setEdited(edited, true);
+	}
+
+	public void setEdited(final boolean edited, final boolean recomputeEnergy) {
 		if (edited)
 			notifyPropertyChangeListeners(new PropertyChangeEvent(this, "Edit", this.edited, edited));
 		this.edited = edited;
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();
-		if (edited)
+		if (edited && recomputeEnergy)
 			EnergyPanel.getInstance().compute();
 	}
 

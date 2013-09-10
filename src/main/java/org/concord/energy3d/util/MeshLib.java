@@ -389,14 +389,37 @@ public class MeshLib {
 				for (final Point p : hole.getPoints())
 					p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
 
-		/* remove holes that collide with other holes */
-		if (polygon.getHoles() != null)
+		/* remove holes that collide with polygon or other holes */
+		if (polygon.getHoles() != null) {
+			double minX, minY, maxX, maxY;
+			minX = minY = Double.POSITIVE_INFINITY;
+			maxX = maxY = Double.NEGATIVE_INFINITY;
+			for (final Point p : polygon.getPoints()) {
+				if (p.getX() < minX)
+					minX = p.getX();
+				if (p.getX() > maxX)
+					maxX = p.getX();
+				if (p.getY() < minY)
+					minY = p.getY();
+				if (p.getY() > maxY)
+					maxY = p.getY();
+			}
 			for (int i = 0; i < polygon.getHoles().size(); i++) {
 				final Polygon hole1 = polygon.getHoles().get(i);
 				double minX1, minY1, maxX1, maxY1;
 				minX1 = minY1 = Double.POSITIVE_INFINITY;
 				maxX1 = maxY1 = Double.NEGATIVE_INFINITY;
 				for (final Point p : hole1.getPoints()) {
+					/* ensure p is within the rectangular boundaries of the polygon */
+					if (p.getX() <= minX)
+						p.set(minX + 0.1, p.getY(), p.getZ());
+					if (p.getY() <= minY)
+						p.set(p.getX(), minY + 0.1, p.getZ());
+					if (p.getX() >= maxX)
+						p.set(maxX - 0.1, p.getY(), p.getZ());
+					if (p.getY() >= maxY)
+						p.set(p.getX(), maxY - 0.1, p.getZ());
+
 					if (p.getX() < minX1)
 						minX1 = p.getX();
 					if (p.getX() > maxX1)
@@ -426,6 +449,7 @@ public class MeshLib {
 						polygon.getHoles().remove(hole2);
 				}
 			}
+		}
 
 		Poly2Tri.triangulate(polygon);
 		if (fromXY == null)

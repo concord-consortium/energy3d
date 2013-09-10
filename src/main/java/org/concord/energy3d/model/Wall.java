@@ -407,6 +407,7 @@ public class Wall extends HousePart {
 				for (final TriangulationPoint tp : hole.getPoints())
 					toXY.transform(tp);
 
+		final int removethis = 0;
 		if (texture) {
 			final Vector3 p0 = getAbsPoint(0);
 			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0);
@@ -1218,7 +1219,7 @@ public class Wall extends HousePart {
 	}
 
 	public double getHighestPoint() {
-		return highestPoint - points.get(0).getZ();
+		return highestPoint; // - points.get(0).getZ();
 	}
 
 	public Mesh getInvisibleMesh() {
