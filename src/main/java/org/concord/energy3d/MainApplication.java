@@ -42,6 +42,7 @@ public class MainApplication {
 		if (!Config.isMac() && args.length > 1 && !args[args.length - 1].startsWith("-"))
 			mainFrame.open(args[args.length - 1]);
 
+		if (!Config.isResearchMode()) {
 		/* initialize data logging */
 		final String logPath;
 		if (Config.isWebStart()) {
@@ -82,6 +83,7 @@ public class MainApplication {
 		Scene.getInstance().addPropertyChangeListener(logger);
 		logger.start();
 		logSnapshots(5, dir, logger);
+		}
 	}
 
 	public static void setupLibraryPath() {

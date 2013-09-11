@@ -1170,9 +1170,9 @@ public class EnergyPanel extends JPanel {
 		maxSolarValue = 1;
 		counter = 0;
 		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
-//		computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
-//		computeRadiationOnRoofs(Heliodon.getInstance().getSunLocation());
-		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
+		computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
+		computeRadiationOnRoofs(Heliodon.getInstance().getSunLocation());
+//		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		updateSolarValueOnAllHouses();
 		System.out.println("COUNTER = " + counter);
 	}
@@ -1183,7 +1183,9 @@ public class EnergyPanel extends JPanel {
 			if (part instanceof Wall)
 				solarCollidables.add(((Wall) part).getInvisibleMesh());
 			else if (part instanceof Roof)
-				solarCollidables.add(((Roof) part).getRoofPartsRoot());
+//				solarCollidables.add(((Roof) part).getRoofPartsRoot());
+				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
+					solarCollidables.add(((Node) roofPart).getChild(0));
 		}
 	}
 
@@ -1534,6 +1536,7 @@ public class EnergyPanel extends JPanel {
 							solar[row][col] = -1;
 					}
 				}
+//			print(house, solar);
 		}
 
 		final ReadOnlyVector3 u = p2.subtract(origin, null).normalizeLocal();
@@ -1594,6 +1597,7 @@ public class EnergyPanel extends JPanel {
 //				// solar[row][cols + 1] = solar[row][cols - 1];
 //			}
 
+//		print(house, solar);
 		if (textureCoordsAlreadyComputed.get(drawMesh) == null) {
 			counter++;
 			updateRadiationMeshTextureCoords(drawMesh, origin, u, v, rows, cols);
@@ -1704,6 +1708,7 @@ public class EnergyPanel extends JPanel {
 		else
 			for (int i = 0; i < solar.length; i++) {
 				for (int j = 0; j < solar[0].length; j++)
+//					System.out.print((int) Math.round(solar[i][j]) + " ");
 					System.out.print((int) Math.round(solar[i][j]) + " ");
 				System.out.println();
 			}
