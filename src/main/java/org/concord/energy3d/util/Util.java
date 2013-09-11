@@ -117,29 +117,29 @@ public class Util {
 			return true;
 	}
 
-//	private static double sign(final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3)
-//	{
-//	  return (p1.getX() - p3.getX()) * (p2.getY() - p3.getY()) - (p2.getX() - p3.getX()) * (p1.getY() - p3.getY());
-//	}
-//
-//	public static boolean isPointInsideTriangle(final ReadOnlyVector2 pt, final ReadOnlyVector2 v1, final ReadOnlyVector2 v2, final ReadOnlyVector2 v3)
-//	{
-//	  final boolean b1 = sign(pt, v1, v2) < 0.0f;
-//	  final boolean b2 = sign(pt, v2, v3) < 0.0f;
-//	  final boolean b3 = sign(pt, v3, v1) < 0.0f;
-//	  return ((b1 == b2) && (b2 == b3));
-//	}
+	private static double sign(final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3)
+	{
+	  return (p1.getX() - p3.getX()) * (p2.getY() - p3.getY()) - (p2.getX() - p3.getX()) * (p1.getY() - p3.getY());
+	}
 
-//	public static boolean isPointInsideTriangle(final ReadOnlyVector2 p, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3)
-//	{
-//	  final double alpha = ((p2.getY() - p3.getY())*(p.getX() - p3.getX()) + (p3.getX() - p2.getX())*(p.getY() - p3.getY())) /
-//		        ((p2.getY() - p3.getY())*(p1.getX() - p3.getX()) + (p3.getX() - p2.getX())*(p1.getY() - p3.getY()));
-//	  final double beta = ((p3.getY() - p1.getY())*(p.getX() - p3.getX()) + (p1.getX() - p3.getX())*(p.getY() - p3.getY())) /
-//		       ((p2.getY() - p3.getY())*(p1.getX() - p3.getX()) + (p3.getX() - p2.getX())*(p1.getY() - p3.getY()));
-//	  final double gamma = 1.0f - alpha - beta;
-//
-//	  return alpha >= 0.0 && beta >= 0.0 && gamma >= 0.0;
-//	}
+	public static boolean isPointInsideTriangle2(final ReadOnlyVector2 pt, final ReadOnlyVector2 v1, final ReadOnlyVector2 v2, final ReadOnlyVector2 v3)
+	{
+	  final boolean b1 = sign(pt, v1, v2) < 0.0f;
+	  final boolean b2 = sign(pt, v2, v3) < 0.0f;
+	  final boolean b3 = sign(pt, v3, v1) < 0.0f;
+	  return ((b1 == b2) && (b2 == b3));
+	}
+
+	public static boolean isPointInsideTriangle1(final ReadOnlyVector2 p, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3)
+	{
+	  final double alpha = ((p2.getY() - p3.getY())*(p.getX() - p3.getX()) + (p3.getX() - p2.getX())*(p.getY() - p3.getY())) /
+		        ((p2.getY() - p3.getY())*(p1.getX() - p3.getX()) + (p3.getX() - p2.getX())*(p1.getY() - p3.getY()));
+	  final double beta = ((p3.getY() - p1.getY())*(p.getX() - p3.getX()) + (p1.getX() - p3.getX())*(p.getY() - p3.getY())) /
+		       ((p2.getY() - p3.getY())*(p1.getX() - p3.getX()) + (p3.getX() - p2.getX())*(p1.getY() - p3.getY()));
+	  final double gamma = 1.0f - alpha - beta;
+
+	  return alpha >= 0.0 && beta >= 0.0 && gamma >= 0.0;
+	}
 
 	private static double area(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3)
 	{
@@ -163,7 +163,7 @@ public class Util {
 	   final double A3 = area (p1.getX(), p1.getY(), p2.getX(), p2.getY(), p.getX(), p.getY());
 
 	   /* Check if sum of A1, A2 and A3 is same as A */
-	   return (A == A1 + A2 + A3);
+	   return Math.abs(A1 + A2 + A3 - A) < MathUtils.ZERO_TOLERANCE;
 	}
 
 	public static Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 v1, final int x, final int y) {

@@ -1171,8 +1171,8 @@ public class EnergyPanel extends JPanel {
 		counter = 0;
 		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
 //		computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
-		computeRadiationOnRoofs(Heliodon.getInstance().getSunLocation());
-//		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
+//		computeRadiationOnRoofs(Heliodon.getInstance().getSunLocation());
+		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		updateSolarValueOnAllHouses();
 		System.out.println("COUNTER = " + counter);
 	}
@@ -1514,76 +1514,70 @@ public class EnergyPanel extends JPanel {
 
 		if (textureCoordsAlreadyComputed.get(drawMesh) == null) {
 			System.out.println(drawMesh);
-		final ReadOnlyVector2 originXY = new Vector2(minX, minY);
-		final ReadOnlyVector2 uXY = new Vector2(maxX - minX, 0).normalizeLocal();
-		final ReadOnlyVector2 vXY = new Vector2(0, maxY - minY).normalizeLocal();
-		for (int row = 0; row < solar.length; row++)
-			for (int col = 0; col < solar[0].length; col++) {
-				if (row >= rows || col >= cols)
-					solar[row][col] = 0;
-				else {
-					final ReadOnlyVector2 p = originXY.add(uXY.multiply(col * SOLAR_STEP, null), null).add(vXY.multiply(row  * SOLAR_STEP, null), null);
-//					final List<ReadOnlyVector3> polygon = new ArrayList<ReadOnlyVector3>(3);
-					boolean isInside = false;
-					for (int i = 0; i < points.size(); i += 3) {
-//						polygon.clear();
-//						polygon.add(points.get(i));
-//						polygon.add(points.get(i + 1));
-//						polygon.add(points.get(i + 2));
-						if (Util.isPointInsideTriangle(p, points.get(i), points.get(i + 1), points.get(i + 2))) {
-							isInside = true;
-							break;
+			final ReadOnlyVector2 originXY = new Vector2(minX, minY);
+			final ReadOnlyVector2 uXY = new Vector2(maxX - minX, 0).normalizeLocal();
+			final ReadOnlyVector2 vXY = new Vector2(0, maxY - minY).normalizeLocal();
+			for (int row = 0; row < solar.length; row++)
+				for (int col = 0; col < solar[0].length; col++) {
+					if (row >= rows || col >= cols)
+						solar[row][col] = -1;
+					else {
+						final ReadOnlyVector2 p = originXY.add(uXY.multiply(col * SOLAR_STEP, null), null).add(vXY.multiply(row * SOLAR_STEP, null), null);
+						boolean isInside = false;
+						for (int i = 0; i < points.size(); i += 3) {
+							if (Util.isPointInsideTriangle(p, points.get(i), points.get(i + 1), points.get(i + 2))) {
+								isInside = true;
+								break;
+							}
 						}
+						if (!isInside)
+							solar[row][col] = -1;
 					}
-					if (isInside)
-						solar[row][col] = 1;
-					else
-						solar[row][col] = 0;
 				}
-			}
-			print(house, solar);
 		}
 
 		final ReadOnlyVector3 u = p2.subtract(origin, null).normalizeLocal();
 		final ReadOnlyVector3 v = p1.subtract(origin, null).normalizeLocal();
-//		final double dot = normal.dot(directionTowardSun);
-//		for (int col = 0; col < cols; col++) {
-//			final ReadOnlyVector3 pU = u.multiply(col * SOLAR_STEP, null).addLocal(origin);
-//			final double w = (col == cols - 1) ? p2.distance(pU) : SOLAR_STEP;
-//			for (int row = 0; row < rows; row++) {
-//				if (computeRequest)
-//					throw cancelException;
-//				final ReadOnlyVector3 p = v.multiply(row * SOLAR_STEP, null).addLocal(pU);
-//				final double h;
-//				if (row == rows - 1)
-//					h = p1.getZ() - (row * SOLAR_STEP);
-//				else
-//					h = SOLAR_STEP;
-//				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
-//				final PickResults pickResults = new PrimitivePickResults();
-//				for (final Spatial spatial : solarCollidables)
-//					if (spatial != collisionMesh) {
-//						PickingUtil.findPick(spatial, pickRay, pickResults, false);
-//						if (pickResults.getNumber() != 0)
-//							break;
-//					}
-//				if (pickResults.getNumber() == 0) {
-//					solar[row][col] += dot;
-//					final int repeat = 1;
-//					if (addToTotal) {
-//						final Double val = solarTotal.get(house);
-//						solarTotal.put(house, val == null ? 0 : val + repeat * dot * w * h * Scene.getInstance().getAnnotationScale());
-//					}
-//				}
-//			}
-//		}
+		final double dot = normal.dot(directionTowardSun);
+		for (int col = 0; col < cols; col++) {
+			final ReadOnlyVector3 pU = u.multiply(col * SOLAR_STEP, null).addLocal(origin);
+			final double w = (col == cols - 1) ? p2.distance(pU) : SOLAR_STEP;
+			for (int row = 0; row < rows; row++) {
+				if (computeRequest)
+					throw cancelException;
+				if (solar[row][col] == -1)
+					continue;
+				final ReadOnlyVector3 p = v.multiply(row * SOLAR_STEP, null).addLocal(pU);
+				final double h;
+				if (row == rows - 1)
+					h = p1.getZ() - (row * SOLAR_STEP);
+				else
+					h = SOLAR_STEP;
+				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
+				final PickResults pickResults = new PrimitivePickResults();
+				for (final Spatial spatial : solarCollidables)
+					if (spatial != collisionMesh) {
+						PickingUtil.findPick(spatial, pickRay, pickResults, false);
+						if (pickResults.getNumber() != 0)
+							break;
+					}
+				if (pickResults.getNumber() == 0) {
+					solar[row][col] += dot;
+					final int repeat = 1;
+					if (addToTotal) {
+						final Double val = solarTotal.get(house);
+						solarTotal.put(house, val == null ? 0 : val + repeat * dot * w * h * Scene.getInstance().getAnnotationScale());
+					}
+				}
+			}
+		}
 //		if (rows < solar.length)
 //			for (int col = 0; col < solar[0].length; col++) {
 //				solar[solar.length - 1][col] = solar[0][col];
-////				for (int remainingRow = rows; remainingRow < solar.length - 1; remainingRow++)
-////					solar[remainingRow][col] = solar[rows - 1][col];
-//				 if (rows != solar.length - 1)
-//				 solar[rows][col] = solar[rows - 1][col];
+//				// for (int remainingRow = rows; remainingRow < solar.length - 1; remainingRow++)
+//				// solar[remainingRow][col] = solar[rows - 1][col];
+//				if (rows != solar.length - 1)
+//					solar[rows][col] = solar[rows - 1][col];
 //				// if (rows + 1 != solar.length - 1 && rows + 1 < solar.length)
 //				// solar[rows + 1][col] = solar[rows - 1][col];
 //			}
@@ -1591,17 +1585,17 @@ public class EnergyPanel extends JPanel {
 //		if (cols < solar[0].length)
 //			for (int row = 0; row < solar.length; row++) {
 //				solar[row][solar[0].length - 1] = solar[row][0];
-////				for (int remainingCol = cols; remainingCol < solar[0].length - 1; remainingCol++)
-////					solar[row][remainingCol] = solar[row][cols - 1];
+//				// for (int remainingCol = cols; remainingCol < solar[0].length - 1; remainingCol++)
+//				// solar[row][remainingCol] = solar[row][cols - 1];
 //
-//				 if (cols != solar[0].length - 1)
-//				 solar[row][cols] = solar[row][cols - 1];
+//				if (cols != solar[0].length - 1)
+//					solar[row][cols] = solar[row][cols - 1];
 //				// if (cols + 1 != solar[0].length - 1 && cols + 1 < solar[0].length)
 //				// solar[row][cols + 1] = solar[row][cols - 1];
 //			}
 
 		if (textureCoordsAlreadyComputed.get(drawMesh) == null) {
-			counter ++;
+			counter++;
 			updateRadiationMeshTextureCoords(drawMesh, origin, u, v, rows, cols);
 			textureCoordsAlreadyComputed.put(drawMesh, Boolean.TRUE);
 		}
@@ -1747,6 +1741,9 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void applySolarTexture(final Mesh mesh, final double[][] solarData, final long maxValue) {
+		if (solarData != null)
+			fillBlanksWithNeighboringValues(solarData);
+
 		final int rows;
 		final int cols;
 		if (solarData == null) {
@@ -1772,6 +1769,20 @@ public class EnergyPanel extends JPanel {
 		final TextureState textureState = new TextureState();
 		textureState.setTexture(texture);
 		mesh.setRenderState(textureState);
+	}
+
+	private void fillBlanksWithNeighboringValues(final double[][] solarData) {
+		final int cols = solarData[0].length;
+		for (int repeat = 0; repeat < 2; repeat++)
+		for (int row = 0; row < solarData.length; row++)
+			for (int col = 0; col < cols; col++)
+				if (solarData[row][col] == -1)
+					if (solarData[row][(col + 1) % cols] != -1)
+						solarData[row][col] = solarData[row][(col + 1) % cols];
+					else if (col != 0 && solarData[row][col - 1] != -1)
+						solarData[row][col] = solarData[row][col - 1];
+					else if (col == 0 && solarData[row][cols - 1] != -1)
+						solarData[row][col] = solarData[row][cols - 1];
 	}
 
 	private ColorRGBA computeSolarColor(final double value, final long maxValue) {
