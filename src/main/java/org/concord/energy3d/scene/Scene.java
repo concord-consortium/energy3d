@@ -309,6 +309,10 @@ public class Scene implements Serializable {
 	}
 
 	private void fixDisconnectedWalls() {
+		for (final HousePart part : parts)
+			if (part instanceof Wall)
+				((Wall) part).clearNeighbors();
+
 		for (final HousePart part : parts) {
 			if (part instanceof Wall) {
 				final Wall wall = (Wall) part;

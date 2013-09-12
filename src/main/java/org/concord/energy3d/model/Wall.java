@@ -1226,4 +1226,8 @@ public class Wall extends HousePart {
 	public Mesh getInvisibleMesh() {
 		return invisibleMesh;
 	}
+
+	public void clearNeighbors() {
+		neighbors[0] = neighbors[1] = null;
+	}
 }
