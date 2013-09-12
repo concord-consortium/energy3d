@@ -1545,7 +1545,9 @@ Version 2.0 - May 15, 2013
 - fill the blank regions within two pixel of non-blank regions with closest computed solar value
 - fix problem with wrong roof solar due to collision with self
 - avoid awt thread lock by calling showOpenDialog from awt thread 
+- open models faster by avoiding redrawing after each fixDisconnectWall call 
 
+- *TODO: change the X hot key to Ctrl+X to avoid unintentional remove
 - *display energy only for the currently selected house
 - *copy and paste for the entire house
 - *fix problem with double clicking moves the edit point
