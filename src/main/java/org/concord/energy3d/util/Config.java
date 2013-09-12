@@ -65,7 +65,7 @@ public class Config {
 	}
 
 	public static boolean isResearchMode() {
-		return true;
+		return false;
 	}
 
 	public static boolean isWindows() {

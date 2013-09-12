@@ -1543,7 +1543,8 @@ Version 2.0 - May 15, 2013
 - allow solar colormap even for roof parts are on top or side with only one vertex at base
 - detect regions of texture that fall outside of the polygon and mark them blank (-1)
 - fill the blank regions within two pixel of non-blank regions with closest computed solar value
-- fix problem with wrong roof solar due to collision with self 
+- fix problem with wrong roof solar due to collision with self
+- avoid awt thread lock by calling showOpenDialog from awt thread 
 
 - *display energy only for the currently selected house
 - *copy and paste for the entire house

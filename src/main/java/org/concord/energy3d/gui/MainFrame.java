@@ -3,7 +3,6 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -121,7 +120,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem doorColorMenuItem;
 	private JMenuItem floorColorMenuItem;
 	private JMenuItem roofColorMenuItem;
-//	private JMenuItem importColladaMenuItem;
+	// private JMenuItem importColladaMenuItem;
 	private JMenuItem saveAsImageMenuItem;
 	private JMenuItem freezeMenuItem;
 	private JMenuItem unfreezeMenuItem;
@@ -435,41 +434,43 @@ public class MainFrame extends JFrame {
 	}
 
 	public void open() {
-		new Thread() {
-			@Override
-			public void run() {
-				SceneManager.getInstance().refresh(1);
-				fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				fileChooser.addChoosableFileFilter(ng3Filter);
-				fileChooser.removeChoosableFileFilter(pngFilter);
-				fileChooser.setFileFilter(ng3Filter);
-				if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
-					SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
-					Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-					File file = fileChooser.getSelectedFile();
-					if (!file.getName().toLowerCase().endsWith(".ng3"))
-						file = new File(file.toString() + ".ng3");
+		SceneManager.getInstance().refresh(1);
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.addChoosableFileFilter(ng3Filter);
+		fileChooser.removeChoosableFileFilter(pngFilter);
+		fileChooser.setFileFilter(ng3Filter);
+		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+			SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
+			final File file;
+			if (!fileChooser.getSelectedFile().getName().toLowerCase().endsWith(".ng3"))
+				file = new File(fileChooser.getSelectedFile().toString() + ".ng3");
+			else
+				file = fileChooser.getSelectedFile();
+			new Thread() {
+				@Override
+				public void run() {
 					try {
 						Scene.open(file.toURI().toURL());
 						updateTitleBar();
 					} catch (final Throwable err) {
 						showUnexpectedErrorMessage(err);
 					}
-					EventQueue.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							if (topViewCheckBoxMenuItem == null)
-								return;
-							// temporarily remove the action listener before selection
-							final ActionListener al = topViewCheckBoxMenuItem.getActionListeners()[0];
-							topViewCheckBoxMenuItem.removeActionListener(al);
-							topViewCheckBoxMenuItem.setSelected(false);
-							topViewCheckBoxMenuItem.addActionListener(al);
-						}
-					});
 				}
-			}
-		}.start();
+			}.start();
+			// EventQueue.invokeLater(new Runnable() {
+			// @Override
+			// public void run() {
+			// if (topViewCheckBoxMenuItem == null)
+			// return;
+			// // temporarily remove the action listener before selection
+			// final ActionListener al = topViewCheckBoxMenuItem.getActionListeners()[0];
+			// topViewCheckBoxMenuItem.removeActionListener(al);
+			topViewCheckBoxMenuItem.setSelected(false);
+			// topViewCheckBoxMenuItem.addActionListener(al);
+			// }
+			// });
+		}
 	}
 
 	private JMenuItem getOpenFolderMenuItem() {
@@ -1129,19 +1130,19 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-//	private void importColladaFile() {
-//		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-//		fileChooser.removeChoosableFileFilter(pngFilter);
-//		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
-//			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-//			try {
-//				SceneManager.getInstance().newImport(fileChooser.getSelectedFile().toURI().toURL());
-//			} catch (final Throwable err) {
-//				err.printStackTrace();
-//				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-//			}
-//		}
-//	}
+	// private void importColladaFile() {
+	// fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	// fileChooser.removeChoosableFileFilter(pngFilter);
+	// if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+	// Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
+	// try {
+	// SceneManager.getInstance().newImport(fileChooser.getSelectedFile().toURI().toURL());
+	// } catch (final Throwable err) {
+	// err.printStackTrace();
+	// JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	// }
+	// }
+	// }
 
 	private JMenuItem getPageSetupMenuItem() {
 		if (pageSetupMenuItem == null) {
@@ -1513,18 +1514,18 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-//	private JMenuItem getImportColladaMenuItem() {
-//		if (importColladaMenuItem == null) {
-//			importColladaMenuItem = new JMenuItem("Import Collada...");
-//			importColladaMenuItem.addActionListener(new ActionListener() {
-//				@Override
-//				public void actionPerformed(final ActionEvent e) {
-//					importColladaFile();
-//				}
-//			});
-//		}
-//		return importColladaMenuItem;
-//	}
+	// private JMenuItem getImportColladaMenuItem() {
+	// if (importColladaMenuItem == null) {
+	// importColladaMenuItem = new JMenuItem("Import Collada...");
+	// importColladaMenuItem.addActionListener(new ActionListener() {
+	// @Override
+	// public void actionPerformed(final ActionEvent e) {
+	// importColladaFile();
+	// }
+	// });
+	// }
+	// return importColladaMenuItem;
+	// }
 
 	private JMenuItem getSaveAsImageMenuItem() {
 		if (saveAsImageMenuItem == null) {
@@ -1608,6 +1609,7 @@ public class MainFrame extends JFrame {
 		}
 		return noteCheckBoxMenuItem;
 	}
+
 	private JCheckBoxMenuItem getKeepHeatmapOnCheckBoxMenuItem() {
 		if (keepHeatmapOnCheckBoxMenuItem == null) {
 			keepHeatmapOnCheckBoxMenuItem = new JCheckBoxMenuItem("Keep Heat Map On");
