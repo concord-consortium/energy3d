@@ -1546,6 +1546,9 @@ Version 2.0 - May 15, 2013
 - fix problem with wrong roof solar due to collision with self
 - avoid awt thread lock by calling showOpenDialog from awt thread 
 - open models faster by avoiding redrawing after each fixDisconnectWall call 
+- update pom to use stable ardor3d v0.9
+- disable javafx
+- release version 2.5
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove
 - *display energy only for the currently selected house

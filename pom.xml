@@ -77,32 +77,32 @@
 		<dependency>
 			<groupId>com.ardor3d</groupId>
 			<artifactId>ardor3d-core</artifactId>
-			<version>0.9-SNAPSHOT</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ardor3d</groupId>
 			<artifactId>ardor3d-lwjgl</artifactId>
-			<version>0.9-SNAPSHOT</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ardor3d</groupId>
 			<artifactId>ardor3d-collada</artifactId>
-			<version>0.9-SNAPSHOT</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ardor3d</groupId>
 			<artifactId>ardor3d-awt</artifactId>
-			<version>0.9-SNAPSHOT</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ardor3d</groupId>
 			<artifactId>ardor3d-effects</artifactId>
-			<version>0.9-SNAPSHOT</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ardor3d</groupId>
 			<artifactId>ardor3d-jogl</artifactId>
-			<version>0.9-SNAPSHOT</version>
+			<version>0.9</version>
 		</dependency>
 	</dependencies>
 	<name>Energy3D</name>

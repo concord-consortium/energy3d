@@ -23,8 +23,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-math"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-savable"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-collada"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-examples"/>
-	<classpathentry kind="lib" path="C:/Program Files/Java/jre7/lib/jfxrt.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
@@ -35,5 +33,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Program Files (x86)/Java/jre7/lib/jfxrt.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
