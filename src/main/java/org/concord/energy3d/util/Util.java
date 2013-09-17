@@ -1,12 +1,8 @@
 package org.concord.energy3d.util;
 
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
-import org.poly2tri.geometry.polygon.PolygonPoint;
 
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.BoundingVolume.Type;
@@ -29,50 +25,14 @@ public class Util {
 		return 2 * bounds.asType(Type.Sphere).getRadius();
 	}
 
-	public static double findExactHeight(final ArrayList<HousePart> parts) {
-		double min = Double.MAX_VALUE;
-		double max = Double.MIN_VALUE;
-		for (final HousePart part : parts) {
-			for (int i = 0; i < part.getPoints().size(); i++) {
-				final Vector3 p = part.getAbsPoint(i);
-				final double z = p.getZ();
-				if (z > max)
-					max = z;
-				if (z < min)
-					min = z;
-			}
-		}
-		return max - min;
-	}
-
-	/** require that a and b are normalized **/
+	/* require that a and b are normalized */
 	public static double angleBetween(final ReadOnlyVector3 a, final ReadOnlyVector3 b, final ReadOnlyVector3 n) {
 		return Math.atan2(b.dot(n.cross(a, null)), b.dot(a));
-	}
-
-	public static long degree(final double radian) {
-		return Math.round(radian * 180.0 / Math.PI);
 	}
 
 	public static String toString(final ReadOnlyVector3 v) {
 		final double C = 1000.0;
 		return "(" + Math.round(v.getX()*C) / C + ", " + Math.round(v.getY()*C) / C + ", " + Math.round(v.getZ()*C) / C + ")";
-	}
-
-	public static String toString(final double v) {
-		return "" + Math.round(v*100) / 100.0;
-	}
-
-	public static Vector3 get(final Vector3 p, final FloatBuffer buf) {
-		return p.set(buf.get(), buf.get(), buf.get());
-	}
-
-	public static void put(final Vector3 p, final FloatBuffer buf) {
-		buf.put(p.getXf()).put(p.getYf()).put(p.getZf());
-	}
-
-	public static PolygonPoint toPolygonPoint(final Vector3 p) {
-		return new PolygonPoint(p.getX(), p.getY(), p.getZ());
 	}
 
 	public static void disablePickShadowLight(final Spatial spatial) {
@@ -117,52 +77,18 @@ public class Util {
 			return true;
 	}
 
-	private static double sign(final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3)
-	{
-	  return (p1.getX() - p3.getX()) * (p2.getY() - p3.getY()) - (p2.getX() - p3.getX()) * (p1.getY() - p3.getY());
-	}
-
-	public static boolean isPointInsideTriangle2(final ReadOnlyVector2 pt, final ReadOnlyVector2 v1, final ReadOnlyVector2 v2, final ReadOnlyVector2 v3)
-	{
-	  final boolean b1 = sign(pt, v1, v2) < 0.0f;
-	  final boolean b2 = sign(pt, v2, v3) < 0.0f;
-	  final boolean b3 = sign(pt, v3, v1) < 0.0f;
-	  return ((b1 == b2) && (b2 == b3));
-	}
-
-	public static boolean isPointInsideTriangle1(final ReadOnlyVector2 p, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3)
-	{
-	  final double alpha = ((p2.getY() - p3.getY())*(p.getX() - p3.getX()) + (p3.getX() - p2.getX())*(p.getY() - p3.getY())) /
-		        ((p2.getY() - p3.getY())*(p1.getX() - p3.getX()) + (p3.getX() - p2.getX())*(p1.getY() - p3.getY()));
-	  final double beta = ((p3.getY() - p1.getY())*(p.getX() - p3.getX()) + (p1.getX() - p3.getX())*(p.getY() - p3.getY())) /
-		       ((p2.getY() - p3.getY())*(p1.getX() - p3.getX()) + (p3.getX() - p2.getX())*(p1.getY() - p3.getY()));
-	  final double gamma = 1.0f - alpha - beta;
-
-	  return alpha >= 0.0 && beta >= 0.0 && gamma >= 0.0;
-	}
-
 	private static double area(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3)
 	{
 	   return Math.abs((x1*(y2-y3) + x2*(y3-y1)+ x3*(y1-y2))/2.0);
 	}
 
-	/* A function to check whether point P(x, y) lies inside the triangle formed
-	   by A(x1, y1), B(x2, y2) and C(x3, y3) */
+	/* A function to check whether point P(x, y) lies inside the triangle formed by A(x1, y1), B(x2, y2) and C(x3, y3) */
 	public static boolean isPointInsideTriangle(final ReadOnlyVector2 p, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3)
 	{
-	   /* Calculate area of triangle ABC */
 	   final double A = area (p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
-
-	   /* Calculate area of triangle PBC */
 	   final double A1 = area (p.getX(), p.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
-
-	   /* Calculate area of triangle PAC */
 	   final double A2 = area (p1.getX(), p1.getY(), p.getX(), p.getY(), p3.getX(), p3.getY());
-
-	   /* Calculate area of triangle PAB */
 	   final double A3 = area (p1.getX(), p1.getY(), p2.getX(), p2.getY(), p.getX(), p.getY());
-
-	   /* Check if sum of A1, A2 and A3 is same as A */
 	   return isEqual(A1 + A2 + A3, A);
 	}
 
@@ -270,11 +196,6 @@ public class Util {
 
 	public static double round(final double x) {
 		return Math.round(x * 100.0) / 100.0;
-	}
-
-	public static double distanceFromPointToLine(final ReadOnlyVector3 p, final ReadOnlyVector3 origin, final ReadOnlyVector3 direction) {
-		final ReadOnlyVector3 op = origin.subtract(p, null);
-		return direction.multiply(op.dot(direction), null).negateLocal().addLocal(op).length();
 	}
 
 	public static ReadOnlyVector3 closestPointBetweenTwoLines(final ReadOnlyVector3 p1, final ReadOnlyVector3 dir1, final ReadOnlyVector3 p2, final ReadOnlyVector3 dir2)

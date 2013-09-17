@@ -311,8 +311,6 @@ public abstract class Roof extends HousePart {
 				}
 			}
 		});
-		for (final Vector3 p : wallUpperPoints)
-			System.out.println(p);
 	}
 
 	protected void addPointToPolygon(final Vector3 p, final ReadOnlyVector3 normal, final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
