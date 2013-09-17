@@ -288,22 +288,17 @@ public class Util {
 	    final double d = u.dot(w);
 	    final double e = v.dot(w);
 	    final double D = a*c - b*b;        // always >= 0
-	    double sc, tc;
+	    double sc;
 
-	    // compute the line parameters of the two closest points
-	    if (D < MathUtils.ZERO_TOLERANCE) {          // the lines are almost parallel
+	    if (D < MathUtils.ZERO_TOLERANCE)          // the lines are almost parallel
 	        sc = 0.0;
-	        tc = (b>c ? d/b : e/c);    // use the largest denominator
-	    }
-	    else {
+	    else
 	        sc = (b*e - c*d) / D;
-	        tc = (a*e - b*d) / D;
-	    }
 
-//	    // get the difference of the two closest points
-//	    final Vector   dP = w + (sc * u) - (tc * v);  // =  L1(sc) - L2(tc)
-//
-//	    return norm(dP);   // return the closest distance
 	    return u.multiply(sc, null).addLocal(p1);
+	}
+
+	public static boolean isSame(final double a, final double b) {
+		return Math.abs(a - b) < MathUtils.ZERO_TOLERANCE;
 	}
 }

@@ -1548,6 +1548,7 @@ Version 2.0 - May 15, 2013
 - open models faster by avoiding redrawing after each fixDisconnectWall call 
 - update pom to use stable ardor3d v0.9
 - disable javafx
+- fix problem with court house roof not drawing hole due to duplicated upper points due to float errors
 - release version 2.5
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove

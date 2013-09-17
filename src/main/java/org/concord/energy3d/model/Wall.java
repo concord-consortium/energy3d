@@ -1175,6 +1175,7 @@ public class Wall extends HousePart {
 								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
 //								drawNeighborWalls();
 								Scene.getInstance().redrawAll();
+								break;
 							}
 						}
 			}

@@ -311,6 +311,8 @@ public abstract class Roof extends HousePart {
 				}
 			}
 		});
+		for (Vector3 p : wallUpperPoints)
+			System.out.println(p);
 	}
 
 	protected void addPointToPolygon(final Vector3 p, final ReadOnlyVector3 normal, final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
@@ -318,7 +320,7 @@ public abstract class Roof extends HousePart {
 		/* check to see if there is another point with same x,y coords */
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			final Vector3 p_i = wallUpperPoints.get(i);
-			if (p.getX() == p_i.getX() && p.getY() == p_i.getY()) {
+			if (Util.isSame(p.getX(), p_i.getX()) && Util.isSame(p.getY(), p_i.getY())) {
 				index = i;
 				break;
 			}
