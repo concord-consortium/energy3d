@@ -124,7 +124,7 @@ public class Window extends HousePart {
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 
 		final double divisionLength = 3.0;
-		if (isFrozen() || getAbsPoint(2).subtractLocal(getAbsPoint(0)).length() < MathUtils.ZERO_TOLERANCE || getAbsPoint(1).subtractLocal(getAbsPoint(0)).length() < MathUtils.ZERO_TOLERANCE)
+		if (isFrozen() || Util.isEqual(getAbsPoint(2), getAbsPoint(0)) || Util.isEqual(getAbsPoint(1), getAbsPoint(0)))
 			bars.getSceneHints().setCullHint(CullHint.Always);
 		else {
 			bars.getSceneHints().setCullHint(CullHint.Inherit);
@@ -262,7 +262,7 @@ public class Window extends HousePart {
 		if (container == null)
 			return new Vector3(p);
 		double wallx = container.getAbsPoint(2).subtract(container.getAbsPoint(0), null).length();
-		if (wallx < MathUtils.ZERO_TOLERANCE)
+		if (Util.isZero(wallx))
 			wallx = MathUtils.ZERO_TOLERANCE;
 		final double margin = 0.2 / wallx;
 		double x = Math.max(p.getX(), margin);

@@ -311,7 +311,7 @@ public abstract class Roof extends HousePart {
 				}
 			}
 		});
-		for (Vector3 p : wallUpperPoints)
+		for (final Vector3 p : wallUpperPoints)
 			System.out.println(p);
 	}
 
@@ -320,7 +320,7 @@ public abstract class Roof extends HousePart {
 		/* check to see if there is another point with same x,y coords */
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			final Vector3 p_i = wallUpperPoints.get(i);
-			if (Util.isSame(p.getX(), p_i.getX()) && Util.isSame(p.getY(), p_i.getY())) {
+			if (Util.isEqual(p.getX(), p_i.getX()) && Util.isEqual(p.getY(), p_i.getY())) {
 				index = i;
 				break;
 			}
@@ -709,7 +709,7 @@ public abstract class Roof extends HousePart {
 				buf.rewind();
 				boolean found = false;
 				while (buf.hasRemaining() && !found) {
-					if (p.distance(new Vector3(buf.get(), buf.get(), buf.get())) < MathUtils.ZERO_TOLERANCE)
+					if (Util.isEqual(p, new Vector3(buf.get(), buf.get(), buf.get())))
 						found = true;
 				}
 				if (!found) {

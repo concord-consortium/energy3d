@@ -8,7 +8,6 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -42,7 +41,7 @@ public class SizeAnnotation extends Annotation {
 	}
 
 	public void setRange(final ReadOnlyVector3 from, final ReadOnlyVector3 to, final ReadOnlyVector3 center, final ReadOnlyVector3 faceDirection, final boolean front, final Align align, final boolean autoFlipOffset, final boolean upsideDownText, final boolean drawInside) {
-		if (from.distanceSquared(to) < MathUtils.ZERO_TOLERANCE)
+		if (Util.isEqual(from, to))
 			throw new RuntimeException("The 'from' and 'to' vectors are almost the same.");
 		this.from = from;
 		this.to = to;

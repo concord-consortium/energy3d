@@ -331,7 +331,7 @@ public abstract class HousePart implements Serializable {
 		final Vector3 p = org.subtract(origin, null);
 		final Vector3 wallx = container.getAbsPoint(2).subtract(origin, null);
 		final Vector3 wally = container.getAbsPoint(1).subtract(origin, null);
-		final Vector3 pointOnWall = new Vector3(Math.abs(wallx.getX()) < MathUtils.ZERO_TOLERANCE ? p.getY() / wallx.getY() : p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY() : org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
+		final Vector3 pointOnWall = new Vector3(Util.isZero(wallx.getX()) ? p.getY() / wallx.getY() : p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY() : org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
 		return pointOnWall;
 	}
 
@@ -344,10 +344,10 @@ public abstract class HousePart implements Serializable {
 			return new Vector3(p);
 		final ReadOnlyVector3 origin = container.getAbsPoint(0);
 		ReadOnlyVector3 width = container.getAbsPoint(2).subtract(origin, null);
-		if (width.length() < MathUtils.ZERO_TOLERANCE)
+		if (Util.isZero(width.length()))
 			width = new Vector3(MathUtils.ZERO_TOLERANCE, 0, 0);
 		ReadOnlyVector3 height = container.getAbsPoint(1).subtract(origin, null);
-		if (height.length() < MathUtils.ZERO_TOLERANCE)
+		if (Util.isZero(height.length()))
 			height = new Vector3(0, relativeToHorizontal ? MathUtils.ZERO_TOLERANCE : 0, relativeToHorizontal ? 0 : MathUtils.ZERO_TOLERANCE);
 		final Vector3 pointOnSpace = origin.add(width.multiply(p.getX(), null), null).add(height.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
 		if (relativeToHorizontal)
@@ -708,7 +708,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public boolean isDrawable() {
-		return points.size() >= 4 && getAbsPoint(2).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE && getAbsPoint(1).distance(getAbsPoint(0)) > MathUtils.ZERO_TOLERANCE;
+		return points.size() >= 4 && !Util.isEqual(getAbsPoint(2), getAbsPoint(0)) && !Util.isEqual(getAbsPoint(1), getAbsPoint(0));
 	}
 
 	public void setPrintVertical(final boolean isVertical) {

@@ -610,7 +610,7 @@ public class Wall extends HousePart {
 			tp.set(Math.min(tp.getX(), max.getX()), Math.min(tp.getY(), max.getY()), tp.getZ());
 			for (int j = 0; j < i; j++) {
 				final Vector3 tpj = polygonPoints.get(j);
-				if (Math.abs(tpj.getX() - tp.getX()) < MathUtils.ZERO_TOLERANCE && Math.abs(tpj.getY() - tp.getY()) < MathUtils.ZERO_TOLERANCE) {
+				if (Util.isEqual(tpj.getX(), tp.getX()) && Util.isEqual(tpj.getY(), tp.getY())) {
 					polygonPoints.remove(i);
 					i--;
 					break;
@@ -1170,7 +1170,7 @@ public class Wall extends HousePart {
 				for (int index = 0; index < 2; index++)
 					if (neighbors[index] == null)
 						for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
-							if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && otherWall.getAbsPoint(otherIndex * 2).distance(getAbsPoint(index * 2)) < MathUtils.ZERO_TOLERANCE) {
+							if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
 								System.out.println("Fixing neighbor...");
 								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
 //								drawNeighborWalls();

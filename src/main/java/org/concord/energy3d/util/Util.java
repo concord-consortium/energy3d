@@ -163,7 +163,7 @@ public class Util {
 	   final double A3 = area (p1.getX(), p1.getY(), p2.getX(), p2.getY(), p.getX(), p.getY());
 
 	   /* Check if sum of A1, A2 and A3 is same as A */
-	   return Math.abs(A1 + A2 + A3 - A) < MathUtils.ZERO_TOLERANCE;
+	   return isEqual(A1 + A2 + A3, A);
 	}
 
 	public static Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 v1, final int x, final int y) {
@@ -290,15 +290,23 @@ public class Util {
 	    final double D = a*c - b*b;        // always >= 0
 	    double sc;
 
-	    if (D < MathUtils.ZERO_TOLERANCE)          // the lines are almost parallel
+	    if (Util.isZero(D))          // the lines are almost parallel
 	        sc = 0.0;
 	    else
 	        sc = (b*e - c*d) / D;
 
 	    return u.multiply(sc, null).addLocal(p1);
 	}
+	
+	public static boolean isEqual(final ReadOnlyVector3 a, final ReadOnlyVector3 b) {
+		return isZero(a.distance(b));
+	}
 
-	public static boolean isSame(final double a, final double b) {
-		return Math.abs(a - b) < MathUtils.ZERO_TOLERANCE;
+	public static boolean isEqual(final double a, final double b) {
+		return isZero(a - b);
+	}
+
+	public static boolean isZero(final double x) {
+		return Math.abs(x) < MathUtils.ZERO_TOLERANCE;
 	}
 }

@@ -20,7 +20,6 @@ import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.LineSegment3;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -344,7 +343,7 @@ public class MeshLib {
 		while (!outlinePoints.isEmpty()) {
 			boolean foundSomething = false;
 			for (int i = 0; i < outlinePoints.size(); i++) {
-				if (outlinePoints.get(i).distanceSquared(lastPoint) < MathUtils.ZERO_TOLERANCE) {
+				if (Util.isEqual(outlinePoints.get(i), lastPoint)) {
 					final int otherEndIndex = i % 2 == 0 ? i + 1 : i - 1;
 					lastPoint = outlinePoints.get(otherEndIndex);
 					sortedOutlinePoints.add(lastPoint);
@@ -359,7 +358,7 @@ public class MeshLib {
 		}
 
 		// remove last point if duplicated of first point
-		if (sortedOutlinePoints.get(0).distanceSquared(sortedOutlinePoints.get(sortedOutlinePoints.size() - 1)) < MathUtils.ZERO_TOLERANCE)
+		if (Util.isEqual(sortedOutlinePoints.get(0), sortedOutlinePoints.get(sortedOutlinePoints.size() - 1)))
 			sortedOutlinePoints.remove(sortedOutlinePoints.size() - 1);
 
 		for (int i = 0; i < sortedOutlinePoints.size(); i++) {
