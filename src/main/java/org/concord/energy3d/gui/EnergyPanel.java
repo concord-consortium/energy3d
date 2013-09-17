@@ -1353,7 +1353,7 @@ public class EnergyPanel extends JPanel {
 
 						// final ReadOnlyVector3 projectedHighestPoint =
 						// Util.closestPoint(o, v, highestPoint, u);
-						final ReadOnlyVector3 projectedHighestPoint = Util.closestPointBetweenTwoLines(lowestPoint, v, highestPoint, u);
+//						final ReadOnlyVector3 projectedHighestPoint = Util.closestPointBetweenTwoLines(lowestPoint, v, highestPoint, u);
 						// final ReadOnlyVector3 p1 = lowestPoint.multiply(1, 1,
 						// 0, null).addLocal(0, 0, z);
 						// final ReadOnlyVector3 o = lowestPoint;
