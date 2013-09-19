@@ -176,11 +176,6 @@ public class MainFrame extends JFrame {
 		return instance;
 	}
 
-	/**
-	 * This method initializes mainPanel
-	 *
-	 * @return org.concord.energy3d.gui.MainPanel
-	 */
 	public MainPanel getMainPanel() {
 		if (mainPanel == null) {
 			mainPanel = MainPanel.getInstance();
@@ -189,9 +184,6 @@ public class MainFrame extends JFrame {
 		return mainPanel;
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -203,9 +195,6 @@ public class MainFrame extends JFrame {
 		});
 	}
 
-	/**
-	 * This is the default constructor
-	 */
 	private MainFrame() {
 		super();
 		System.out.print("Initiating GUI...");
@@ -224,11 +213,6 @@ public class MainFrame extends JFrame {
 		System.out.println("done");
 	}
 
-	/**
-	 * This method initializes this
-	 *
-	 * @return void
-	 */
 	private void initialize() {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -320,11 +304,6 @@ public class MainFrame extends JFrame {
 		});
 	}
 
-	/**
-	 * This method initializes appMenuBar
-	 *
-	 * @return javax.swing.JMenuBar
-	 */
 	private JMenuBar getAppMenuBar() {
 		if (appMenuBar == null) {
 			appMenuBar = new JMenuBar();
@@ -337,11 +316,6 @@ public class MainFrame extends JFrame {
 		return appMenuBar;
 	}
 
-	/**
-	 * This method initializes fileMenu
-	 *
-	 * @return javax.swing.JMenu
-	 */
 	private JMenu getFileMenu() {
 		if (fileMenu == null) {
 			fileMenu = new JMenu();
@@ -384,11 +358,6 @@ public class MainFrame extends JFrame {
 		return fileMenu;
 	}
 
-	/**
-	 * This method initializes newMenuItem
-	 *
-	 * @return javax.swing.JMenuItem
-	 */
 	private JMenuItem getNewMenuItem() {
 		if (newMenuItem == null) {
 			newMenuItem = new JMenuItem("New");
@@ -406,11 +375,6 @@ public class MainFrame extends JFrame {
 		return newMenuItem;
 	}
 
-	/**
-	 * This method initializes openMenuItem
-	 *
-	 * @return javax.swing.JMenuItem
-	 */
 	private JMenuItem getOpenMenuItem() {
 		if (openMenuItem == null) {
 			openMenuItem = new JMenuItem("Open...");
@@ -459,18 +423,7 @@ public class MainFrame extends JFrame {
 					}
 				}
 			}.start();
-			// EventQueue.invokeLater(new Runnable() {
-			// @Override
-			// public void run() {
-			// if (topViewCheckBoxMenuItem == null)
-			// return;
-			// // temporarily remove the action listener before selection
-			// final ActionListener al = topViewCheckBoxMenuItem.getActionListeners()[0];
-			// topViewCheckBoxMenuItem.removeActionListener(al);
 			topViewCheckBoxMenuItem.setSelected(false);
-			// topViewCheckBoxMenuItem.addActionListener(al);
-			// }
-			// });
 		}
 	}
 
@@ -571,11 +524,6 @@ public class MainFrame extends JFrame {
 			setTitle("Energy3D v" + Config.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
 	}
 
-	/**
-	 * This method initializes saveMenuItem
-	 *
-	 * @return javax.swing.JMenuItem
-	 */
 	private JMenuItem getSaveMenuItem() {
 		if (saveMenuItem == null) {
 			saveMenuItem = new JMenuItem("Save");
@@ -590,11 +538,6 @@ public class MainFrame extends JFrame {
 		return saveMenuItem;
 	}
 
-	/**
-	 * This method initializes printMenuItem
-	 *
-	 * @return javax.swing.JMenuItem
-	 */
 	private JMenuItem getPrintMenuItem() {
 		if (printMenuItem == null) {
 			printMenuItem = new JMenuItem("Print...");
@@ -626,11 +569,6 @@ public class MainFrame extends JFrame {
 		return printMenuItem;
 	}
 
-	/**
-	 * This method initializes previewMenuItem
-	 *
-	 * @return javax.swing.JCheckBoxMenuItem
-	 */
 	public JCheckBoxMenuItem getPreviewMenuItem() {
 		if (previewMenuItem == null) {
 			previewMenuItem = new JCheckBoxMenuItem("Print Preview");
@@ -644,11 +582,6 @@ public class MainFrame extends JFrame {
 		return previewMenuItem;
 	}
 
-	/**
-	 * This method initializes cameraMenu
-	 *
-	 * @return javax.swing.JMenu
-	 */
 	public JMenu getCameraMenu() {
 		if (cameraMenu == null) {
 			cameraMenu = new JMenu();
@@ -681,11 +614,6 @@ public class MainFrame extends JFrame {
 		return cameraMenu;
 	}
 
-	/**
-	 * This method initializes orbitMenuItem
-	 *
-	 * @return javax.swing.JRadioButtonMenuItem
-	 */
 	private JRadioButtonMenuItem getOrbitMenuItem() {
 		if (orbitMenuItem == null) {
 			orbitMenuItem = new JRadioButtonMenuItem();
@@ -701,11 +629,6 @@ public class MainFrame extends JFrame {
 		return orbitMenuItem;
 	}
 
-	/**
-	 * This method initializes firstPersonMenuItem
-	 *
-	 * @return javax.swing.JRadioButtonMenuItem
-	 */
 	private JRadioButtonMenuItem getFirstPersonMenuItem() {
 		if (firstPersonMenuItem == null) {
 			firstPersonMenuItem = new JRadioButtonMenuItem();
@@ -720,11 +643,6 @@ public class MainFrame extends JFrame {
 		return firstPersonMenuItem;
 	}
 
-	/**
-	 * This method initializes resetCameraMenuItem
-	 *
-	 * @return javax.swing.JMenuItem
-	 */
 	private JMenuItem getResetCameraMenuItem() {
 		if (resetCameraMenuItem == null) {
 			resetCameraMenuItem = new JMenuItem();
@@ -740,11 +658,6 @@ public class MainFrame extends JFrame {
 		return resetCameraMenuItem;
 	}
 
-	/**
-	 * This method initializes lightingMenu
-	 *
-	 * @return javax.swing.JCheckBoxMenuItem
-	 */
 	public JCheckBoxMenuItem getShadeMenu() {
 		if (shadeMenu == null) {
 			shadeMenu = new JCheckBoxMenuItem();
@@ -759,11 +672,6 @@ public class MainFrame extends JFrame {
 		return shadeMenu;
 	}
 
-	/**
-	 * This method initializes exitMenuItem
-	 *
-	 * @return javax.swing.JMenuItem
-	 */
 	private JMenuItem getExitMenuItem() {
 		if (exitMenuItem == null) {
 			exitMenuItem = new JMenuItem();
@@ -778,11 +686,6 @@ public class MainFrame extends JFrame {
 		return exitMenuItem;
 	}
 
-	/**
-	 * This method initializes helpMenu
-	 *
-	 * @return javax.swing.JMenu
-	 */
 	private JMenu getHelpMenu() {
 		if (helpMenu == null) {
 			helpMenu = new JMenu();
@@ -802,11 +705,6 @@ public class MainFrame extends JFrame {
 		aboutDialog.setVisible(true);
 	}
 
-	/**
-	 * This method initializes aboutMenuItem
-	 *
-	 * @return javax.swing.JMenuItem
-	 */
 	private JMenuItem getAboutMenuItem() {
 		if (aboutMenuItem == null) {
 			aboutMenuItem = new JMenuItem();
@@ -821,11 +719,6 @@ public class MainFrame extends JFrame {
 		return aboutMenuItem;
 	}
 
-	/**
-	 * This method initializes aboutDialog
-	 *
-	 * @return javax.swing.JDialog
-	 */
 	private JDialog getAboutDialog() {
 		if (aboutDialog == null) {
 			aboutDialog = new JDialog(this);
@@ -839,11 +732,6 @@ public class MainFrame extends JFrame {
 		return aboutDialog;
 	}
 
-	/**
-	 * This method initializes wallThicknessMenuItem
-	 *
-	 * @return javax.swing.JCheckBoxMenuItem
-	 */
 	private JCheckBoxMenuItem getWallThicknessMenuItem() {
 		if (wallThicknessMenuItem == null) {
 			wallThicknessMenuItem = new JCheckBoxMenuItem();

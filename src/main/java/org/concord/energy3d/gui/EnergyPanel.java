@@ -888,7 +888,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void compute(final boolean updateRadiationColorMap) {
-		this.updateRadiationColorMap  = updateRadiationColorMap;
+		this.updateRadiationColorMap = updateRadiationColorMap;
 		if (thread != null) {
 			computeRequest = true;
 		} else {
@@ -901,24 +901,24 @@ public class EnergyPanel extends JPanel {
 							System.out.println("EnergyPanel.compute()");
 							progressBar.setValue(0);
 							if (EnergyPanel.this.updateRadiationColorMap) {
-							if (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn)) {
-								alreadyRenderedHeatmap = true;
-								computeRadiation();
-							} else {
-								if (SceneManager.getInstance().isSolarColorMap())
-									MainPanel.getInstance().getSolarButton().setSelected(false);
-								int counter = 0;
-								for (final HousePart part : Scene.getInstance().getParts()) {
-									if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
-										counter++;
-									if (counter >= 2)
-										break;
+								if (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn)) {
+									alreadyRenderedHeatmap = true;
+									computeRadiation();
+								} else {
+									if (SceneManager.getInstance().isSolarColorMap())
+										MainPanel.getInstance().getSolarButton().setSelected(false);
+									int counter = 0;
+									for (final HousePart part : Scene.getInstance().getParts()) {
+										if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
+											counter++;
+										if (counter >= 2)
+											break;
+									}
+									for (final HousePart part : Scene.getInstance().getParts())
+										if (part instanceof Foundation)
+											((Foundation) part).setSolarValue(counter >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? 0 : -1);
+									SceneManager.getInstance().refresh();
 								}
-								for (final HousePart part : Scene.getInstance().getParts())
-									if (part instanceof Foundation)
-										((Foundation) part).setSolarValue(counter >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? 0 : -1);
-								SceneManager.getInstance().refresh();
-							}
 							}
 							computeEnergy();
 							try {
@@ -1034,7 +1034,10 @@ public class EnergyPanel extends JPanel {
 		final double[] outsideTemperature;
 
 		if (getCity().isEmpty()) {
-			/* if there are no temperatures available for the selected city compute zero for cooling and heating */
+			/*
+			 * if there are no temperatures available for the selected city
+			 * compute zero for cooling and heating
+			 */
 			outsideTemperature = new double[] { insideTemperature, insideTemperature };
 			energyToday.heating = Double.NaN;
 			energyToday.cooling = Double.NaN;
@@ -1190,45 +1193,13 @@ public class EnergyPanel extends JPanel {
 			return;
 		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Roof && part.isDrawCompleted()) { 
+			if (part instanceof Roof && part.isDrawCompleted()) {
 				final Roof roof = (Roof) part;
 				for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
 					final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
 					if (faceDirection.dot(directionTowardSun) > 0) {
 						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-						final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-						ReadOnlyVector3 lowestPoint, secondLowestPoint, highestPoint, secondHighestPoint;
-						lowestPoint = secondLowestPoint = highestPoint = secondHighestPoint = null;
-						vertexBuffer.rewind();
-						final int index = faceDirection.equals(Vector3.UNIT_Z) ? 1 : 2;
-						while (vertexBuffer.hasRemaining()) {
-							final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-							if (p.equals(lowestPoint) || p.equals(secondLowestPoint) || p.equals(highestPoint) || p.equals(secondHighestPoint))
-								continue;
-							if (lowestPoint == null || p.getValue(index) < lowestPoint.getValue(index)) {
-								secondLowestPoint = lowestPoint;
-								lowestPoint = p;
-							} else if (secondLowestPoint == null || p.getValue(index) < secondLowestPoint.getValue(index))
-								secondLowestPoint = p;
-							if (highestPoint == null || p.getValue(index) > highestPoint.getValue(index)) {
-								secondHighestPoint = highestPoint;
-								highestPoint = p;
-							} else if (secondHighestPoint == null || p.getValue(index) > secondHighestPoint.getValue(index))
-								secondHighestPoint = p;
-						}
-
-						if (lowestPoint.getX() == secondLowestPoint.getX() && lowestPoint.getX() == highestPoint.getX()) {
-							final ReadOnlyVector3 tmp = highestPoint;
-							highestPoint = secondHighestPoint;
-							secondHighestPoint = tmp;
-						}
-
-						final ReadOnlyVector3 u;
-						if (lowestPoint.getValue(index) != secondLowestPoint.getValue(index) && highestPoint.getValue(index) == secondHighestPoint.getValue(index))
-							u = secondHighestPoint.subtract(highestPoint, null);
-						else
-							u = secondLowestPoint.subtract(lowestPoint, null);
-						computeRadiationOnMesh(directionTowardSun, roof.getContainer(), mesh, mesh, faceDirection, false);
+						computeRadiationOnMesh(directionTowardSun, null, mesh, mesh, faceDirection, false);
 					}
 				}
 			}
@@ -1249,7 +1220,10 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void computeRadiationOnMesh(final ReadOnlyVector3 directionTowardSun, final HousePart house, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
-		/* needed in order to prevent picking collision with neighboring wall at wall edge */
+		/*
+		 * needed in order to prevent picking collision with neighboring wall at
+		 * wall edge
+		 */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 
@@ -1386,7 +1360,10 @@ public class EnergyPanel extends JPanel {
 		if (sunLocation.getZ() <= 0)
 			return;
 		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
-		/* needed in order to prevent picking collision with neighboring wall at wall edge */
+		/*
+		 * needed in order to prevent picking collision with neighboring wall at
+		 * wall edge
+		 */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 		final double SOLAR_STEP = 8;
@@ -1457,18 +1434,18 @@ public class EnergyPanel extends JPanel {
 		SceneManager.getInstance().refresh();
 	}
 
-//	private void print(final HousePart part, final double[][] solar) {
-//		System.out.println(part);
-//		if (solar == null)
-//			System.out.println("null");
-//		else
-//			for (int i = 0; i < solar.length; i++) {
-//				for (int j = 0; j < solar[0].length; j++)
-//					System.out.print((int) Math.round(solar[i][j]) + " ");
-//				System.out.println();
-//			}
-//
-//	}
+	// private void print(final HousePart part, final double[][] solar) {
+	// System.out.println(part);
+	// if (solar == null)
+	// System.out.println("null");
+	// else
+	// for (int i = 0; i < solar.length; i++) {
+	// for (int j = 0; j < solar[0].length; j++)
+	// System.out.print((int) Math.round(solar[i][j]) + " ");
+	// System.out.println();
+	// }
+	//
+	// }
 
 	private void progress() {
 		progressBar.setValue(progressBar.getValue() + 1);

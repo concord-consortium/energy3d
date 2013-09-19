@@ -101,9 +101,6 @@ public class MainPanel extends JPanel {
 		return mainFrame;
 	}
 
-	/**
-	 * This is the default constructor
-	 */
 	private MainPanel() {
 		super();
 		System.out.println("Version: " + Config.VERSION);
@@ -114,11 +111,6 @@ public class MainPanel extends JPanel {
 		System.out.println("done");
 	}
 
-	/**
-	 * This method initializes this
-	 *
-	 * @return void
-	 */
 	private void initialize() {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		this.setSize(1000, 300);
@@ -127,11 +119,6 @@ public class MainPanel extends JPanel {
 		this.add(getEnergyCanvasNoteSplitPane(), BorderLayout.CENTER);
 	}
 
-	/**
-	 * This method initializes appToolbar
-	 *
-	 * @return javax.swing.JToolBar
-	 */
 	public JToolBar getAppToolbar() {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
@@ -176,11 +163,6 @@ public class MainPanel extends JPanel {
 		return appToolbar;
 	}
 
-	/**
-	 * This method initializes selectButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	public JToggleButton getSelectButton() {
 		if (selectButton == null) {
 			selectButton = new JToggleButton();
@@ -199,11 +181,6 @@ public class MainPanel extends JPanel {
 		return selectButton;
 	}
 
-	/**
-	 * This method initializes wallButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getWallButton() {
 		if (wallButton == null) {
 			wallButton = new JToggleButton();
@@ -232,11 +209,6 @@ public class MainPanel extends JPanel {
 		return wallButton;
 	}
 
-	/**
-	 * This method initializes doorButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getDoorButton() {
 		if (doorButton == null) {
 			doorButton = new JToggleButton();
@@ -266,11 +238,6 @@ public class MainPanel extends JPanel {
 		return doorButton;
 	}
 
-	/**
-	 * This method initializes roofButton
-	 *
-	 * @return javax.swing.JButton
-	 */
 	private JToggleButton getRoofButton() {
 		if (roofButton == null) {
 			roofButton = new JToggleButton();
@@ -299,11 +266,6 @@ public class MainPanel extends JPanel {
 		return roofButton;
 	}
 
-	/**
-	 * This method initializes windowButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getWindowButton() {
 		if (windowButton == null) {
 			windowButton = new JToggleButton();
@@ -332,11 +294,6 @@ public class MainPanel extends JPanel {
 		return windowButton;
 	}
 
-	/**
-	 * This method initializes platformButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getPlatformButton() {
 		if (platformButton == null) {
 			platformButton = new JToggleButton();
@@ -365,11 +322,6 @@ public class MainPanel extends JPanel {
 		return platformButton;
 	}
 
-	/**
-	 * This method initializes lightButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getLightButton() {
 		if (lightButton == null) {
 			lightButton = new JToggleButton();
@@ -394,11 +346,6 @@ public class MainPanel extends JPanel {
 		return lightButton;
 	}
 
-	/**
-	 * This method initializes rotAnimButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getRotAnimButton() {
 		if (rotAnimButton == null) {
 			rotAnimButton = new JToggleButton();
@@ -416,11 +363,6 @@ public class MainPanel extends JPanel {
 		return rotAnimButton;
 	}
 
-	/**
-	 * This method initializes floorButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getFloorButton() {
 		if (floorButton == null) {
 			floorButton = new JToggleButton();
@@ -449,11 +391,6 @@ public class MainPanel extends JPanel {
 		return floorButton;
 	}
 
-	/**
-	 * This method initializes roofHipButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getRoofHipButton() {
 		if (roofHipButton == null) {
 			roofHipButton = new JToggleButton();
@@ -482,11 +419,6 @@ public class MainPanel extends JPanel {
 		return roofHipButton;
 	}
 
-	/**
-	 * This method initializes resizeButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getResizeButton() {
 		if (resizeButton == null) {
 			resizeButton = new JToggleButton();
@@ -504,11 +436,6 @@ public class MainPanel extends JPanel {
 		return resizeButton;
 	}
 
-	/**
-	 * This method initializes heliodonButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	public JToggleButton getHeliodonButton() {
 		if (heliodonButton == null) {
 			heliodonButton = new JToggleButton();
@@ -527,11 +454,6 @@ public class MainPanel extends JPanel {
 		return heliodonButton;
 	}
 
-	/**
-	 * This method initializes sunAnimButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	public JToggleButton getSunAnimButton() {
 		if (sunAnimButton == null) {
 			sunAnimButton = new JToggleButton();
@@ -550,11 +472,6 @@ public class MainPanel extends JPanel {
 		return sunAnimButton;
 	}
 
-	/**
-	 * This method initializes previewButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	public JToggleButton getPreviewButton() {
 		if (previewButton == null) {
 			previewButton = new JToggleButton();
@@ -579,11 +496,6 @@ public class MainPanel extends JPanel {
 		return previewButton;
 	}
 
-	/**
-	 * This method initializes roofCustomButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getRoofCustomButton() {
 		if (roofCustomButton == null) {
 			roofCustomButton = new JToggleButton();
@@ -635,11 +547,6 @@ public class MainPanel extends JPanel {
 		return annotationToggleButton;
 	}
 
-	/**
-	 * This method initializes zoomButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getZoomButton() {
 		if (zoomButton == null) {
 			zoomButton = new JToggleButton();
@@ -658,11 +565,6 @@ public class MainPanel extends JPanel {
 		return zoomButton;
 	}
 
-	/**
-	 * This method initializes roofGableButton
-	 *
-	 * @return javax.swing.JToggleButton
-	 */
 	private JToggleButton getRoofGableButton() {
 		if (roofGableButton == null) {
 			roofGableButton = new JToggleButton();

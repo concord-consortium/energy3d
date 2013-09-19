@@ -35,22 +35,6 @@ public class ScaleDialog extends JDialog {
 	private JLabel scaleLabel;
 	private JRadioButton scaleByMeasurementRadioButton;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(final String[] args) {
-		try {
-			final ScaleDialog dialog = new ScaleDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Create the dialog.
-	 */
 	public ScaleDialog() {
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
