@@ -521,7 +521,7 @@ public class Scene implements Serializable {
 	public void removeAllRoofs() {
 		final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
 		for (final HousePart part : parts)
-			if (part instanceof Roof)
+			if (part instanceof Roof && !part.isFrozen())
 				roofs.add(part);
 
 		for (final HousePart part : roofs)

@@ -1550,6 +1550,8 @@ Version 2.0 - May 15, 2013
 - disable javafx
 - fix problem with court house roof not drawing hole due to duplicated upper points due to float errors
 - avoid turning off the radiation colormap after turning heliodon on
+- add menu item: remove all roofs
+- remove shortcut X for removing all roofs
 - release version 2.5
 
 

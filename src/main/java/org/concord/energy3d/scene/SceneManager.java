@@ -707,12 +707,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				Scene.getInstance().redrawAll();
 			}
 		}));
-		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.X), new TriggerAction() {
-			@Override
-			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				Scene.getInstance().removeAllRoofs();
-			}
-		}));
 		// XIE: Run/pause model replay
 		if (Config.isResearchMode()) {
 			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {

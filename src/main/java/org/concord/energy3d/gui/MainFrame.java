@@ -131,6 +131,7 @@ public class MainFrame extends JFrame {
 	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
 	private JCheckBoxMenuItem keepHeatmapOnCheckBoxMenuItem;
+	private JMenuItem mntmRemoveAllRoofs;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -918,6 +919,7 @@ public class MainFrame extends JFrame {
 			sceneMenu.addSeparator();
 			sceneMenu.add(getWallThicknessMenuItem());
 			sceneMenu.add(getAnnotationsInward());
+			sceneMenu.add(getMntmRemoveAllRoofs());
 			sceneMenu.addSeparator();
 			sceneMenu.add(getKeepHeatmapOnCheckBoxMenuItem());
 		}
@@ -1621,5 +1623,17 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return keepHeatmapOnCheckBoxMenuItem;
+	}
+	private JMenuItem getMntmRemoveAllRoofs() {
+		if (mntmRemoveAllRoofs == null) {
+			mntmRemoveAllRoofs = new JMenuItem("Remove All Roofs");
+			mntmRemoveAllRoofs.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().removeAllRoofs();
+				}
+			});
+		}
+		return mntmRemoveAllRoofs;
 	}
 }
