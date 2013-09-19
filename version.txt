@@ -1549,7 +1549,9 @@ Version 2.0 - May 15, 2013
 - update pom to use stable ardor3d v0.9
 - disable javafx
 - fix problem with court house roof not drawing hole due to duplicated upper points due to float errors
+- avoid turning off the radiation colormap after turning heliodon on
 - release version 2.5
+
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove
 - *display energy only for the currently selected house

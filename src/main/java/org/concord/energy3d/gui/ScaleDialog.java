@@ -180,7 +180,7 @@ public class ScaleDialog extends JDialog {
 							Scene.getInstance().setAnnotationScale(Scene.getInstance().getAnnotationScale() * scale);
 							ScaleDialog.this.dispose();
 							Scene.getInstance().redrawAll();
-							EnergyPanel.getInstance().compute();
+							EnergyPanel.getInstance().compute(true);
 						} catch (final NumberFormatException err) {
 							err.printStackTrace();
 							JOptionPane.showMessageDialog(ScaleDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);

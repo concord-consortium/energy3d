@@ -218,7 +218,7 @@ public class Scene implements Serializable {
 				MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
 				SceneManager.getInstance().getUndoManager().die();
 				Scene.getInstance().setEdited(false);
-				energyPanel.compute();
+				energyPanel.compute(true);
 				return null;
 			}
 		});
@@ -639,7 +639,7 @@ public class Scene implements Serializable {
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();
 		if (edited && recomputeEnergy)
-			EnergyPanel.getInstance().compute();
+			EnergyPanel.getInstance().compute(true);
 	}
 
 	public void updateEditShapes() {

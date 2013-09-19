@@ -198,27 +198,6 @@ public class Util {
 		return Math.round(x * 100.0) / 100.0;
 	}
 
-	public static ReadOnlyVector3 closestPointBetweenTwoLines(final ReadOnlyVector3 p1, final ReadOnlyVector3 dir1, final ReadOnlyVector3 p2, final ReadOnlyVector3 dir2)
-	{
-		final ReadOnlyVector3 u = dir1;
-		final ReadOnlyVector3 v = dir2;
-		final ReadOnlyVector3 w = p1.subtract(p2, null);
-	    final double a = u.dot(u);         // always >= 0
-	    final double b = u.dot(v);
-	    final double c = v.dot(v);         // always >= 0
-	    final double d = u.dot(w);
-	    final double e = v.dot(w);
-	    final double D = a*c - b*b;        // always >= 0
-	    double sc;
-
-	    if (Util.isZero(D))          // the lines are almost parallel
-	        sc = 0.0;
-	    else
-	        sc = (b*e - c*d) / D;
-
-	    return u.multiply(sc, null).addLocal(p1);
-	}
-	
 	public static boolean isEqual(final ReadOnlyVector3 a, final ReadOnlyVector3 b) {
 		return isZero(a.distance(b));
 	}

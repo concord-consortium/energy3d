@@ -351,7 +351,7 @@ public class Heliodon {
 						if (rowCounter < DECLINATION_DIVISIONS && latitude > 0)
 							resultRow += DECLINATION_DIVISIONS - rowCounter;
 						final double newDeclinationAngle = -TILT_ANGLE + (2.0 * TILT_ANGLE * resultRow / DECLINATION_DIVISIONS);
-						declinationChanged = Util.isEqual(newDeclinationAngle, declinationAngle);
+						declinationChanged = !Util.isEqual(newDeclinationAngle, declinationAngle);
 						if (declinationChanged) {
 							setDeclinationAngle(newDeclinationAngle, false, true);
 							dirtySunPath = true;
@@ -359,12 +359,12 @@ public class Heliodon {
 					}
 				}
 				final double newHourAngle = (hourVertex - Math.floor(totalHourVertices / 2.0)) * Math.PI / 48.0;
-				final boolean hourAngleChanged = Util.isEqual(newHourAngle, hourAngle);
+				final boolean hourAngleChanged = !Util.isEqual(newHourAngle, hourAngle);
 				if (hourAngleChanged)
 					setHourAngle(newHourAngle, false, true);
 				if (declinationChanged || hourAngleChanged) {
 					setSunLocation(newSunLocation);
-					EnergyPanel.getInstance().compute();
+					EnergyPanel.getInstance().compute(false);
 				}
 			}
 		}));
