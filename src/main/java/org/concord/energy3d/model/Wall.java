@@ -4,7 +4,6 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
@@ -407,24 +406,12 @@ public class Wall extends HousePart {
 				for (final TriangulationPoint tp : hole.getPoints())
 					toXY.transform(tp);
 
-		final int removethis = 0;
 		if (texture) {
-			final Vector3 p0 = getAbsPoint(0);
-			final Vector3 p01 = getAbsPoint(1).subtractLocal(p0);
-			final Vector3 p02 = getAbsPoint(2).subtractLocal(p0);
-			if (SceneManager.getInstance().isSolarColorMap()) {
-				p01.normalizeLocal().multiplyLocal(EnergyPanel.getInstance().roundToPowerOfTwo((int) Math.ceil(getHighestPoint() / EnergyPanel.SOLAR_STEP)) * EnergyPanel.SOLAR_STEP);
-				final double p02Legth = p02.length();
-				p02.normalizeLocal().multiplyLocal(EnergyPanel.getInstance().roundToPowerOfTwo((int) Math.ceil(p02Legth / EnergyPanel.SOLAR_STEP)) * EnergyPanel.SOLAR_STEP);
-			} else {
-				final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 8.0;
-				p01.normalizeLocal().multiplyLocal(scale);
-				p02.normalizeLocal().multiplyLocal(scale);
-				if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
-					p01.multiplyLocal(1.5);
-					p02.multiplyLocal(2.0);
-				}
-			}
+			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 8.0;
+			final boolean fullTexture = Scene.getInstance().getTextureMode() == TextureMode.Full;
+			final ReadOnlyVector3 p0 = getAbsPoint(0);
+			final ReadOnlyVector3 p01 = getAbsPoint(1).subtractLocal(p0).normalizeLocal().multiplyLocal(scale * (fullTexture ? 1.5 : 1.0));
+			final ReadOnlyVector3 p02 = getAbsPoint(2).subtractLocal(p0).normalizeLocal().multiplyLocal(scale * (fullTexture ? 2.0 : 1.0));
 			final TPoint o = new TPoint(p0.getX(), p0.getY(), p0.getZ());
 			final TPoint u = new TPoint(p01.getX(), p01.getY(), p01.getZ());
 			final TPoint v = new TPoint(p02.getX(), p02.getY(), p02.getZ());
