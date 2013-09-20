@@ -759,7 +759,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	@Override
-	protected ReadOnlyVector3 getCenter() {
+	protected Vector3 getCenter() {
 		final Vector3 min = new Vector3(wallUpperPoints.get(0));
 		final Vector3 max = new Vector3(wallUpperPoints.get(0));
 		for (final Vector3 p : wallUpperPoints) {
@@ -788,7 +788,9 @@ public abstract class Roof extends HousePart {
 		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(bounds.getXExtent() * 2, null);
 		final ReadOnlyVector3 height = Vector3.UNIT_Y.multiply(bounds.getYExtent() * 2, null);
 		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
-		final ReadOnlyVector3 pMiddle = getAbsPoint(0);
+//		final ReadOnlyVector3 pMiddle = getAbsPoint(0);
+		final ReadOnlyVector3 center = getCenter();
+		final ReadOnlyVector3 pMiddle = new Vector3(center.getX(), center.getY(), getAbsPoint(0).getZ());
 
 		final int cols = (int) (width.length() / gridSize);
 

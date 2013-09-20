@@ -360,16 +360,20 @@ public abstract class HousePart implements Serializable {
 		snapToGrid(p, current, gridSize, true);
 	}
 
-	protected void snapToGrid(final Vector3 p, final ReadOnlyVector3 current, final double gridSize, final boolean snapToZ) {
+	protected void snapToGrid(final Vector3 p, final ReadOnlyVector3 previous, final double gridSize, final boolean snapToZ) {
 		if (isSnapToGrids()) {
-			if (p.distance(current) < gridSize)
-				p.set(current);
-			else if (container != null) {
+//			if (p.distance(current) < gridSize)
+//				p.set(current);
+//			else
+			final Vector3 newP = new Vector3();
+			if (container == null) 
+				newP.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+			else {
 				final ReadOnlyVector3 origin;
 				if (relativeToHorizontal) {
 					final ReadOnlyVector3 center;
 					if (this instanceof Roof)
-						center = getCenter();
+						center = getCenter().multiply(1, 1, 0, null);
 					else
 						center = container.getCenter();
 
@@ -389,9 +393,19 @@ public abstract class HousePart implements Serializable {
 				final ReadOnlyVector3 verticalDir = new Vector3(0, snapToZ ? 0 : originToP.getY(), snapToZ ? originToP.getZ() : 0);
 				final double snapedVerticalLength = Math.round(verticalDir.length() / gridSize) * gridSize;
 				final ReadOnlyVector3 v = verticalDir.normalize(null).multiplyLocal(snapedVerticalLength);
-				p.set(origin).addLocal(u).addLocal(v);
-			} else
-				p.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
+				newP.set(origin).addLocal(u).addLocal(v);
+			}
+//			if (newP.distance(p) < newP.distance(previous) * 0.25)
+//				p.set(newP);
+//			else
+//				p.set(previous);
+			
+			for (int xyz = 0; xyz < 3; xyz++)
+			if (Math.abs(newP.getValue(xyz) - p.getValue(xyz)) < Math.abs(newP.getValue(xyz) - previous.getValue(xyz)) * 0.40)
+				p.setValue(xyz, newP.getValue(xyz));
+			else
+				p.setValue(xyz, previous.getValue(xyz));
+			
 		}
 	}
 

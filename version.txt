@@ -1552,6 +1552,8 @@ Version 2.0 - May 15, 2013
 - avoid turning off the radiation colormap after turning heliodon on
 - add menu item: remove all roofs
 - remove shortcut X for removing all roofs
+- fix problem with roof edit points not snapping to grids properly
+- improve snapping to snap independently to x, y, and z instead of consider total value
 - release version 2.5
 
 
