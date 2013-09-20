@@ -593,8 +593,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					// if editing object using select or resize then only mouse
-					// drag is allowed
+					// if editing object using select or resize then only mouse drag is allowed
 					if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 						firstClickState = null;
 						mouseReleased(inputStates.getCurrent().getMouseState());
@@ -1097,10 +1096,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (pick != null) {
 				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
 				((Foundation)selectedHousePart).move(d, houseMovePoints);
-//				for (int i = 0; i < houseMovePoints.size(); i++) {
-//					selectedHousePart.getPoints().get(i).set(houseMovePoints.get(i).add(d, null));
-//					Scene.getInstance().redrawAll();
-//				}
 			}
 		} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
 			final PickedHousePart selectHousePart = SelectUtil.selectHousePart(x, y, false);

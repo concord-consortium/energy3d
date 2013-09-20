@@ -65,7 +65,6 @@ public class Wall extends HousePart {
 	private transient Snap[] neighbors;
 	private Vector3 thicknessNormal;
 	private boolean isShortWall;
-	private double highestPoint;
 
 	public static void resetDefaultWallHeight() {
 		userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
@@ -253,7 +252,7 @@ public class Wall extends HousePart {
 
 	@Override
 	public void complete() {
-		drawThisAndNeighbors(true); // TODO is this necessary
+//		drawThisAndNeighbors(true); // TODO is this necessary
 		super.complete();
 	}
 
@@ -496,13 +495,10 @@ public class Wall extends HousePart {
 
 		final int[] upper = { 0, 3 };
 
-		highestPoint = 0.0;
 		for (final int i : upper) {
 			final Vector3 tp = polygon.get(i);
 			final double z = findRoofIntersection(tp);
 			tp.set(tp.getX(), tp.getY(), z);
-			if (z > highestPoint)
-				highestPoint = z;
 		}
 
 		Vector3 tp = polygon.get(0);
@@ -521,9 +517,6 @@ public class Wall extends HousePart {
 			for (double d = length - step; d > step; d -= step) {
 				final Vector3 p = dir.multiply(d, null).addLocal(o);
 				final double findRoofIntersection = findRoofIntersection(p);
-
-				if (findRoofIntersection > highestPoint)
-					highestPoint = findRoofIntersection;
 
 				final ReadOnlyVector3 currentStretchPoint = new Vector3(p.getX(), p.getY(), findRoofIntersection);
 				final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();
@@ -1160,7 +1153,6 @@ public class Wall extends HousePart {
 							if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
 								System.out.println("Fixing neighbor...");
 								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
-//								drawNeighborWalls();
 								Scene.getInstance().redrawAll();
 								break;
 							}
@@ -1205,10 +1197,6 @@ public class Wall extends HousePart {
 			if (child instanceof Window || child instanceof Door)
 				area -= child.computeArea();
 		return area;
-	}
-
-	public double getHighestPoint() {
-		return highestPoint; // - points.get(0).getZ();
 	}
 
 	public Mesh getInvisibleMesh() {
