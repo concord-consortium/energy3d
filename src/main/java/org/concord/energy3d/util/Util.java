@@ -127,17 +127,22 @@ public class Util {
 		return pa;
 	}
 
-	public static Vector2 closestPoint(final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p) {
-		final double l2 = p1.distanceSquared(p2);
-		if (l2 == 0.0)
+	public static Vector2 projectPointOnLine(final ReadOnlyVector2 point, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final boolean limitToLineSegment) {
+		final double t = projectPointOnLineScale(point, p1, p2);
+		if (limitToLineSegment && t < 0.0)
 			return p1.clone();
-		final double t = p.subtract(p1, null).dot(p2.subtract(p1, null)) / l2; // dot(p - v, w - v) / l2;
-		if (t < 0.0)
-			return p1.clone();
-		else if (t > 1.0)
+		else if (limitToLineSegment && t > 1.0)
 			return p2.clone();
 		else
 			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t * (w - v);
+	}
+
+	public static double projectPointOnLineScale(final ReadOnlyVector2 point, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2) {
+		final double l2 = p1.distanceSquared(p2);
+		if (l2 == 0.0)
+			return 0.0;
+		final double t = point.subtract(p1, null).dot(p2.subtract(p1, null)) / l2; // dot(p - v, w - v) / l2;
+		return t;
 	}
 
 	public static Vector2 snapToPolygon(final ReadOnlyVector3 point, final List<? extends ReadOnlyVector3> polygon, final List<? extends ReadOnlyVector3> wallNormals) {
@@ -154,7 +159,7 @@ public class Util {
 			final ReadOnlyVector3 pp2 = polygon.get((i + 1) % n);
 			l2.set(pp2.getX(), pp2.getY());
 			if (l1.distanceSquared(l2) > MathUtils.ZERO_TOLERANCE) {
-				final Vector2 pointOnLine = closestPoint(l1, l2, p);
+				final Vector2 pointOnLine = projectPointOnLine(p, l1, l2, true);
 				final double distance = pointOnLine.distanceSquared(p);
 				if (distance < shortestDistance) {
 					shortestDistance = distance;

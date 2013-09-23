@@ -308,7 +308,7 @@ public class Wall extends HousePart {
 		for (int i = 0; i < indices.length - 1; i++) {
 			final Vector3 p1 = container.getAbsPoint(indices[i]);
 			final Vector3 p2 = container.getAbsPoint(indices[i + 1]);
-			final Vector2 p2D = Util.closestPoint(new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()), new Vector2(current.getX(), current.getY()));
+			final Vector2 p2D = Util.projectPointOnLine(new Vector2(current.getX(), current.getY()), new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()), true);
 			final Vector3 p = new Vector3(p2D.getX(), p2D.getY(), current.getZ());
 			final double d = p.distance(current);
 			if (d < snapDistance) {
