@@ -1556,6 +1556,8 @@ Version 2.0 - May 15, 2013
 - improve snapping to snap independently to x, y, and z instead of consider total value
 - fix problem with windows not rendering if the wall is not parallel to x or y axis
 - compute and use u and v and project window points on them when detecting if windows collide with eachother
+- fix problem with wall preview stoping upon snapping to new neighbor due to cleanup call
+- avoid calling cleanup in most redraw calls
 - release version 2.5
 
 

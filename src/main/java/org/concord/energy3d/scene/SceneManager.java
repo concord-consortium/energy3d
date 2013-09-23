@@ -703,7 +703,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				Scene.getInstance().redrawAll();
+				Scene.getInstance().redrawAll(true);
 			}
 		}));
 		// XIE: Run/pause model replay
@@ -1083,12 +1083,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			});
 	}
 
-	private void mouseMoved() {
+	private void mouseMoved() {		
 		if (!mouseControlEnabled)
 			return;
 		final int x = mouseState.getX();
 		final int y = mouseState.getY();
-
+		
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
 		} else if (houseMoveStartPoint != null && operation == Operation.RESIZE && selectedHousePart.isDrawCompleted()) {

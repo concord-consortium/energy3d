@@ -85,6 +85,7 @@ public class Scene implements Serializable {
 	private boolean isHeliodonVisible;
 	private String note;
 	private int solarContrast;
+	private boolean cleanup = false;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -463,6 +464,11 @@ public class Scene implements Serializable {
 	}
 
 	public void redrawAll() {
+		redrawAll(false);
+	}
+	
+	public void redrawAll(final boolean cleanup) {
+		this.cleanup  = cleanup;
 		if (PrintController.getInstance().isPrintPreview())
 			PrintController.getInstance().restartAnimation();
 		else
@@ -471,7 +477,10 @@ public class Scene implements Serializable {
 
 	public void redrawAllNow() {
 		System.out.println("redrawAllNow()");
-		cleanup();
+		if (cleanup) {
+			cleanup();
+			cleanup = false;
+		}
 		Snap.clearAnnotationDrawn();
 		for (final HousePart part : parts)
 			if (part instanceof Roof)
