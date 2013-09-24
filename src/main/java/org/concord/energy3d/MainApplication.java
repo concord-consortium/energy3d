@@ -42,48 +42,46 @@ public class MainApplication {
 		if (!Config.isMac() && args.length > 1 && !args[args.length - 1].startsWith("-"))
 			mainFrame.open(args[args.length - 1]);
 
-		if (!Config.isResearchMode()) {
-			/* initialize data logging */
-			final String logPath;
-			if (Config.isWebStart()) {
-				final String rootPathRelative = File.separator + "Energy3D";
-				final String rootPathAbsolute;
-				if (Config.isWindows()) {
-					final float winVersion = Float.parseFloat(System.getProperty("os.version"));
-					System.out.println("Windows " + winVersion);
-					if (winVersion < 6)
-						rootPathAbsolute = System.getProperty("user.home") + "\\Local Settings\\Application Data" + rootPathRelative;
-					else
-						rootPathAbsolute = System.getenv("LOCALAPPDATA") + rootPathRelative;
-				} else if (Config.isMac())
-					rootPathAbsolute = System.getProperty("user.home") + "/Library/Logs/Energy3D";
+		/* initialize data logging */
+		final String logPath;
+		if (Config.isWebStart()) {
+			final String rootPathRelative = File.separator + "Energy3D";
+			final String rootPathAbsolute;
+			if (Config.isWindows()) {
+				final float winVersion = Float.parseFloat(System.getProperty("os.version"));
+				System.out.println("Windows " + winVersion);
+				if (winVersion < 6)
+					rootPathAbsolute = System.getProperty("user.home") + "\\Local Settings\\Application Data" + rootPathRelative;
 				else
-					rootPathAbsolute = System.getProperty("user.home") + rootPathRelative;
-				if (Config.isMac())
-					logPath = rootPathAbsolute;
-				else {
-					final File dir = new File(rootPathAbsolute);
-					if (!dir.exists())
-						dir.mkdir();
-					logPath = rootPathAbsolute + File.separator + "log";
-				}
-			} else
-				logPath = "log";
-			final File dir = new File(logPath);
-			System.out.println("Log folder: " + dir.toString());
-			if (!dir.exists())
-				dir.mkdir();
-			final TimeSeriesLogger logger = new TimeSeriesLogger(2, 5, dir, scene);
-			scene.addShutdownHook(new Runnable() {
-				@Override
-				public void run() {
-					logger.saveLog();
-				}
-			});
-			Scene.getInstance().addPropertyChangeListener(logger);
-			logger.start();
-			logSnapshots(5, dir, logger);
-		}
+					rootPathAbsolute = System.getenv("LOCALAPPDATA") + rootPathRelative;
+			} else if (Config.isMac())
+				rootPathAbsolute = System.getProperty("user.home") + "/Library/Logs/Energy3D";
+			else
+				rootPathAbsolute = System.getProperty("user.home") + rootPathRelative;
+			if (Config.isMac())
+				logPath = rootPathAbsolute;
+			else {
+				final File dir = new File(rootPathAbsolute);
+				if (!dir.exists())
+					dir.mkdir();
+				logPath = rootPathAbsolute + File.separator + "log";
+			}
+		} else
+			logPath = "log";
+		final File dir = new File(logPath);
+		System.out.println("Log folder: " + dir.toString());
+		if (!dir.exists())
+			dir.mkdir();
+		final TimeSeriesLogger logger = new TimeSeriesLogger(2, 5, dir, scene);
+		scene.addShutdownHook(new Runnable() {
+			@Override
+			public void run() {
+				logger.saveLog();
+			}
+		});
+		Scene.getInstance().addPropertyChangeListener(logger);
+		logger.start();
+		logSnapshots(5, dir, logger);
 	}
 
 	public static void setupLibraryPath() {

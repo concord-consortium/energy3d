@@ -83,21 +83,21 @@ public class MainFrame extends JFrame {
 	private JMenuItem saveasMenuItem;
 	private JMenu sceneMenu;
 	private JMenu unitsMenu;
-	private JRadioButtonMenuItem metersRadioButtonMenuItem;
-	private JRadioButtonMenuItem centimetersRadioButtonMenuItem;
-	private JRadioButtonMenuItem inchesRadioButtonMenuItem;
+	private JRadioButtonMenuItem metersMenuItem;
+	private JRadioButtonMenuItem centimetersMenuItem;
+	private JRadioButtonMenuItem inchesMenuItem;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JMenuItem scaleMenuItem;
-	private JCheckBoxMenuItem shadowMenu;
+	private JCheckBoxMenuItem shadowMenuItem;
 	protected Object lastSelection;
-	private JCheckBoxMenuItem shadeMenu = null;
+	private JCheckBoxMenuItem shadeMenuItem = null;
 	private JMenuItem exitMenuItem = null;
 	private JMenu helpMenu = null;
 	private JMenuItem aboutMenuItem = null;
 	private JDialog aboutDialog = null;
 	private JCheckBoxMenuItem wallThicknessMenuItem = null;
 	private MainPanel mainPanel = null;
-	private JCheckBoxMenuItem annotationsInward;
+	private JCheckBoxMenuItem annotationsInwardMenuItem;
 	private JMenu editMenu;
 	private JMenuItem undoMenuItem;
 	private JMenuItem redoMenuItem;
@@ -106,13 +106,13 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem exactSizeRadioButtonMenuItem;
 	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
 	private JMenuItem importMenuItem;
-	private JCheckBoxMenuItem snapCheckBoxMenuItem;
-	private JCheckBoxMenuItem gridsCheckBoxMenuItem;
+	private JCheckBoxMenuItem snapMenuItem;
+	private JCheckBoxMenuItem gridsMenuItem;
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
 	private JMenuItem roofOverhangLengthMenuItem;
-	private JRadioButtonMenuItem noTextureRadioButtonMenuItem;
-	private JRadioButtonMenuItem simpleTextureRadioButtonMenuItem;
-	private JRadioButtonMenuItem fullTextureRadioButtonMenuItem;
+	private JRadioButtonMenuItem noTextureMenuItem;
+	private JRadioButtonMenuItem simpleTextureMenuItem;
+	private JRadioButtonMenuItem fullTextureMenuItem;
 	private final ButtonGroup buttonGroup_2 = new ButtonGroup();
 	private JMenu colorMenu;
 	private JMenuItem platformColorMenuItem;
@@ -130,8 +130,8 @@ public class MainFrame extends JFrame {
 	private final JColorChooser colorChooser;
 	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
-	private JCheckBoxMenuItem keepHeatmapOnCheckBoxMenuItem;
-	private JMenuItem mntmRemoveAllRoofs;
+	private JCheckBoxMenuItem keepHeatmapOnMenuItem;
+	private JMenuItem removeAllRoofsMenuItem;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -433,6 +433,8 @@ public class MainFrame extends JFrame {
 			openFolderMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
+					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION))
+						return;
 					SceneManager.getInstance().refresh(1);
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					fileChooser.removeChoosableFileFilter(ng3Filter);
@@ -658,18 +660,18 @@ public class MainFrame extends JFrame {
 		return resetCameraMenuItem;
 	}
 
-	public JCheckBoxMenuItem getShadeMenu() {
-		if (shadeMenu == null) {
-			shadeMenu = new JCheckBoxMenuItem();
-			shadeMenu.setText("Shade");
-			shadeMenu.addItemListener(new java.awt.event.ItemListener() {
+	public JCheckBoxMenuItem getShadeMenuItem() {
+		if (shadeMenuItem == null) {
+			shadeMenuItem = new JCheckBoxMenuItem();
+			shadeMenuItem.setText("Shade");
+			shadeMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
-					SceneManager.getInstance().setShading(shadeMenu.isSelected());
+					SceneManager.getInstance().setShading(shadeMenuItem.isSelected());
 				}
 			});
 		}
-		return shadeMenu;
+		return shadeMenuItem;
 	}
 
 	private JMenuItem getExitMenuItem() {
@@ -783,33 +785,32 @@ public class MainFrame extends JFrame {
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
-			});
-			if (Config.isResearchMode()) {
-				sceneMenu.add(getFreezeMenuItem());
-				sceneMenu.add(getUnfreezeMenuItem());
-			}
+			});			
+			sceneMenu.add(getNoTextureMenuItem());
+			sceneMenu.add(getSimpleTextureMenuItem());
+			sceneMenu.add(getFullTextureMenuItem());
+			sceneMenu.add(getColorMenu());
 			sceneMenu.addSeparator();
 			sceneMenu.add(getUnitsMenu());
 			sceneMenu.add(getScaleMenuItem());
 			sceneMenu.addSeparator();
 			sceneMenu.add(getRoofOverhangLengthMenuItem());
 			sceneMenu.addSeparator();
-			sceneMenu.add(getGridsCheckBoxMenuItem());
-			sceneMenu.add(getSnapCheckBoxMenuItem());
+			sceneMenu.add(getGridsMenuItem());
+			sceneMenu.add(getSnapMenuItem());
 			sceneMenu.addSeparator();
-			sceneMenu.add(getShadeMenu());
-			sceneMenu.add(getShadowMenu());
+			sceneMenu.add(getShadeMenuItem());
+			sceneMenu.add(getShadowMenuItem());
 			sceneMenu.addSeparator();
-			sceneMenu.add(getNoTextureRadioButtonMenuItem());
-			sceneMenu.add(getSimpleTextureRadioButtonMenuItem());
-			sceneMenu.add(getFullTextureRadioButtonMenuItem());
-			sceneMenu.add(getColorMenu());
-			sceneMenu.addSeparator();
+			sceneMenu.add(getAnnotationsInwardMenuItem());
 			sceneMenu.add(getWallThicknessMenuItem());
-			sceneMenu.add(getAnnotationsInward());
-			sceneMenu.add(getMntmRemoveAllRoofs());
-			sceneMenu.addSeparator();
-			sceneMenu.add(getKeepHeatmapOnCheckBoxMenuItem());
+			sceneMenu.add(getRemoveAllRoofsMenuItem());
+			sceneMenu.add(getKeepHeatmapOnMenuItem());			
+			if (Config.isResearchMode()) {
+				sceneMenu.add(getFreezeMenuItem());
+				sceneMenu.add(getUnfreezeMenuItem());
+			}
+
 		}
 		return sceneMenu;
 	}
@@ -817,67 +818,67 @@ public class MainFrame extends JFrame {
 	private JMenu getUnitsMenu() {
 		if (unitsMenu == null) {
 			unitsMenu = new JMenu("Units");
-			unitsMenu.add(getMetersRadioButtonMenuItem());
-			unitsMenu.add(getCentimetersRadioButtonMenuItem());
-			unitsMenu.add(getInchesRadioButtonMenuItem());
+			unitsMenu.add(getMetersMenuItem());
+			unitsMenu.add(getCentimetersMenuItem());
+			unitsMenu.add(getInchesMenuItem());
 		}
 		return unitsMenu;
 	}
 
-	public JCheckBoxMenuItem getShadowMenu() {
-		if (shadowMenu == null) {
-			shadowMenu = new JCheckBoxMenuItem("Shadows", false);
-			shadowMenu.addItemListener(new java.awt.event.ItemListener() {
+	public JCheckBoxMenuItem getShadowMenuItem() {
+		if (shadowMenuItem == null) {
+			shadowMenuItem = new JCheckBoxMenuItem("Shadows", false);
+			shadowMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
-					SceneManager.getInstance().setShadow(shadowMenu.isSelected());
+					SceneManager.getInstance().setShadow(shadowMenuItem.isSelected());
 				}
 			});
 		}
-		return shadowMenu;
+		return shadowMenuItem;
 	}
 
-	private JRadioButtonMenuItem getMetersRadioButtonMenuItem() {
-		if (metersRadioButtonMenuItem == null) {
-			metersRadioButtonMenuItem = new JRadioButtonMenuItem("Meters (m)");
-			metersRadioButtonMenuItem.addActionListener(new ActionListener() {
+	private JRadioButtonMenuItem getMetersMenuItem() {
+		if (metersMenuItem == null) {
+			metersMenuItem = new JRadioButtonMenuItem("Meters (m)");
+			metersMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setUnit(Unit.Meter);
 				}
 			});
-			buttonGroup.add(metersRadioButtonMenuItem);
-			metersRadioButtonMenuItem.setSelected(true);
+			buttonGroup.add(metersMenuItem);
+			metersMenuItem.setSelected(true);
 		}
-		return metersRadioButtonMenuItem;
+		return metersMenuItem;
 	}
 
-	private JRadioButtonMenuItem getCentimetersRadioButtonMenuItem() {
-		if (centimetersRadioButtonMenuItem == null) {
-			centimetersRadioButtonMenuItem = new JRadioButtonMenuItem("Centimeters (cm)");
-			centimetersRadioButtonMenuItem.addActionListener(new ActionListener() {
+	private JRadioButtonMenuItem getCentimetersMenuItem() {
+		if (centimetersMenuItem == null) {
+			centimetersMenuItem = new JRadioButtonMenuItem("Centimeters (cm)");
+			centimetersMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setUnit(Unit.Centimeter);
 				}
 			});
-			buttonGroup.add(centimetersRadioButtonMenuItem);
+			buttonGroup.add(centimetersMenuItem);
 		}
-		return centimetersRadioButtonMenuItem;
+		return centimetersMenuItem;
 	}
 
-	private JRadioButtonMenuItem getInchesRadioButtonMenuItem() {
-		if (inchesRadioButtonMenuItem == null) {
-			inchesRadioButtonMenuItem = new JRadioButtonMenuItem("Inches (\")");
-			inchesRadioButtonMenuItem.addActionListener(new ActionListener() {
+	private JRadioButtonMenuItem getInchesMenuItem() {
+		if (inchesMenuItem == null) {
+			inchesMenuItem = new JRadioButtonMenuItem("Inches (\")");
+			inchesMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setUnit(Unit.Inches);
 				}
 			});
-			buttonGroup.add(inchesRadioButtonMenuItem);
+			buttonGroup.add(inchesMenuItem);
 		}
-		return inchesRadioButtonMenuItem;
+		return inchesMenuItem;
 	}
 
 	private JMenuItem getScaleMenuItem() {
@@ -894,18 +895,18 @@ public class MainFrame extends JFrame {
 		return scaleMenuItem;
 	}
 
-	private JCheckBoxMenuItem getAnnotationsInward() {
-		if (annotationsInward == null) {
-			annotationsInward = new JCheckBoxMenuItem("Annotations Inward");
-			annotationsInward.addItemListener(new java.awt.event.ItemListener() {
+	private JCheckBoxMenuItem getAnnotationsInwardMenuItem() {
+		if (annotationsInwardMenuItem == null) {
+			annotationsInwardMenuItem = new JCheckBoxMenuItem("Annotations Inward");
+			annotationsInwardMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
-					Scene.setDrawAnnotationsInside(annotationsInward.isSelected());
+					Scene.setDrawAnnotationsInside(annotationsInwardMenuItem.isSelected());
 				}
 			});
 
 		}
-		return annotationsInward;
+		return annotationsInwardMenuItem;
 	}
 
 	public JMenu getEditMenu() {
@@ -1089,32 +1090,32 @@ public class MainFrame extends JFrame {
 		return importMenuItem;
 	}
 
-	private JCheckBoxMenuItem getSnapCheckBoxMenuItem() {
-		if (snapCheckBoxMenuItem == null) {
-			snapCheckBoxMenuItem = new JCheckBoxMenuItem("Snap Walls");
-			snapCheckBoxMenuItem.setSelected(true);
-			snapCheckBoxMenuItem.addActionListener(new ActionListener() {
+	private JCheckBoxMenuItem getSnapMenuItem() {
+		if (snapMenuItem == null) {
+			snapMenuItem = new JCheckBoxMenuItem("Snap Walls");
+			snapMenuItem.setSelected(true);
+			snapMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart.setSnapToObjects(snapCheckBoxMenuItem.isSelected());
+					HousePart.setSnapToObjects(snapMenuItem.isSelected());
 				}
 			});
 		}
-		return snapCheckBoxMenuItem;
+		return snapMenuItem;
 	}
 
-	private JCheckBoxMenuItem getGridsCheckBoxMenuItem() {
-		if (gridsCheckBoxMenuItem == null) {
-			gridsCheckBoxMenuItem = new JCheckBoxMenuItem("Snap To Grids");
-			gridsCheckBoxMenuItem.setSelected(true);
-			gridsCheckBoxMenuItem.addActionListener(new ActionListener() {
+	private JCheckBoxMenuItem getGridsMenuItem() {
+		if (gridsMenuItem == null) {
+			gridsMenuItem = new JCheckBoxMenuItem("Snap To Grids");
+			gridsMenuItem.setSelected(true);
+			gridsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart.setSnapToGrids(gridsCheckBoxMenuItem.isSelected());
+					HousePart.setSnapToGrids(gridsMenuItem.isSelected());
 				}
 			});
 		}
-		return gridsCheckBoxMenuItem;
+		return gridsMenuItem;
 	}
 
 	private JCheckBoxMenuItem getTopViewCheckBoxMenuItem() {
@@ -1169,50 +1170,50 @@ public class MainFrame extends JFrame {
 		return roofOverhangLengthMenuItem;
 	}
 
-	public JRadioButtonMenuItem getNoTextureRadioButtonMenuItem() {
-		if (noTextureRadioButtonMenuItem == null) {
-			noTextureRadioButtonMenuItem = new JRadioButtonMenuItem("No Texture");
-			noTextureRadioButtonMenuItem.addActionListener(new ActionListener() {
+	public JRadioButtonMenuItem getNoTextureMenuItem() {
+		if (noTextureMenuItem == null) {
+			noTextureMenuItem = new JRadioButtonMenuItem("No Texture");
+			noTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.None);
 				}
 			});
-			buttonGroup_2.add(noTextureRadioButtonMenuItem);
+			buttonGroup_2.add(noTextureMenuItem);
 		}
-		return noTextureRadioButtonMenuItem;
+		return noTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getSimpleTextureRadioButtonMenuItem() {
-		if (simpleTextureRadioButtonMenuItem == null) {
-			simpleTextureRadioButtonMenuItem = new JRadioButtonMenuItem("Simple Texture");
-			simpleTextureRadioButtonMenuItem.addActionListener(new ActionListener() {
+	public JRadioButtonMenuItem getSimpleTextureMenuItem() {
+		if (simpleTextureMenuItem == null) {
+			simpleTextureMenuItem = new JRadioButtonMenuItem("Simple Texture");
+			simpleTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Simple);
 				}
 			});
-			buttonGroup_2.add(simpleTextureRadioButtonMenuItem);
+			buttonGroup_2.add(simpleTextureMenuItem);
 		}
-		return simpleTextureRadioButtonMenuItem;
+		return simpleTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getFullTextureRadioButtonMenuItem() {
-		if (fullTextureRadioButtonMenuItem == null) {
-			fullTextureRadioButtonMenuItem = new JRadioButtonMenuItem("Full Texture");
-			fullTextureRadioButtonMenuItem.addActionListener(new ActionListener() {
+	public JRadioButtonMenuItem getFullTextureMenuItem() {
+		if (fullTextureMenuItem == null) {
+			fullTextureMenuItem = new JRadioButtonMenuItem("Full Texture");
+			fullTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Full);
 				}
 			});
-			fullTextureRadioButtonMenuItem.setSelected(true);
-			buttonGroup_2.add(fullTextureRadioButtonMenuItem);
+			fullTextureMenuItem.setSelected(true);
+			buttonGroup_2.add(fullTextureMenuItem);
 		}
-		return fullTextureRadioButtonMenuItem;
+		return fullTextureMenuItem;
 	}
 
 	private JMenu getColorMenu() {
@@ -1327,8 +1328,8 @@ public class MainFrame extends JFrame {
 			}
 		};
 		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
-		if (fullTextureRadioButtonMenuItem.isSelected()) {
-			noTextureRadioButtonMenuItem.setSelected(true);
+		if (fullTextureMenuItem.isSelected()) {
+			noTextureMenuItem.setSelected(true);
 			Scene.getInstance().setTextureMode(TextureMode.None);
 		}
 
@@ -1500,28 +1501,28 @@ public class MainFrame extends JFrame {
 		return noteCheckBoxMenuItem;
 	}
 
-	private JCheckBoxMenuItem getKeepHeatmapOnCheckBoxMenuItem() {
-		if (keepHeatmapOnCheckBoxMenuItem == null) {
-			keepHeatmapOnCheckBoxMenuItem = new JCheckBoxMenuItem("Keep Heat Map On");
-			keepHeatmapOnCheckBoxMenuItem.addItemListener(new ItemListener() {
+	private JCheckBoxMenuItem getKeepHeatmapOnMenuItem() {
+		if (keepHeatmapOnMenuItem == null) {
+			keepHeatmapOnMenuItem = new JCheckBoxMenuItem("Keep Heat Map On");
+			keepHeatmapOnMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					EnergyPanel.setKeepHeatmapOn(keepHeatmapOnCheckBoxMenuItem.isSelected());
+					EnergyPanel.setKeepHeatmapOn(keepHeatmapOnMenuItem.isSelected());
 				}
 			});
 		}
-		return keepHeatmapOnCheckBoxMenuItem;
+		return keepHeatmapOnMenuItem;
 	}
-	private JMenuItem getMntmRemoveAllRoofs() {
-		if (mntmRemoveAllRoofs == null) {
-			mntmRemoveAllRoofs = new JMenuItem("Remove All Roofs");
-			mntmRemoveAllRoofs.addActionListener(new ActionListener() {
+	private JMenuItem getRemoveAllRoofsMenuItem() {
+		if (removeAllRoofsMenuItem == null) {
+			removeAllRoofsMenuItem = new JMenuItem("Remove All Roofs");
+			removeAllRoofsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().removeAllRoofs();
 				}
 			});
 		}
-		return mntmRemoveAllRoofs;
+		return removeAllRoofsMenuItem;
 	}
 }

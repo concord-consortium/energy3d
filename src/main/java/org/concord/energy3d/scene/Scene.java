@@ -177,11 +177,11 @@ public class Scene implements Serializable {
 
 		if (!Config.isApplet()) {
 			if (instance.textureMode == TextureMode.None)
-				MainFrame.getInstance().getNoTextureRadioButtonMenuItem().setSelected(true);
+				MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
 			else if (instance.textureMode == TextureMode.Simple)
-				MainFrame.getInstance().getSimpleTextureRadioButtonMenuItem().setSelected(true);
+				MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
 			else
-				MainFrame.getInstance().getFullTextureRadioButtonMenuItem().setSelected(true);
+				MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
 		}
 		MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
 

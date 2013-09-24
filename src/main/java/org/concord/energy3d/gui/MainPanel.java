@@ -332,8 +332,8 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					if (mainFrame != null) {
-						mainFrame.getShadeMenu().setSelected(lightButton.isSelected());
-						mainFrame.getShadowMenu().setSelected(lightButton.isSelected());
+						mainFrame.getShadeMenuItem().setSelected(lightButton.isSelected());
+						mainFrame.getShadowMenuItem().setSelected(lightButton.isSelected());
 					} else {
 						SceneManager.getInstance().setShading(lightButton.isSelected());
 						SceneManager.getInstance().setShadow(lightButton.isSelected());
