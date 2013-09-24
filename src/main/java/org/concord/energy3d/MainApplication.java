@@ -127,7 +127,7 @@ public class MainApplication {
 	}
 
 	private static void logSnapshots(final int period, final File dir, final TimeSeriesLogger logger) {
-		final Thread t = new Thread() {
+		final Thread t = new Thread("Snapshots Logger") {
 			@Override
 			public void run() {
 				while (true) {

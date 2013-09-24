@@ -35,11 +35,11 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private final static String space = "   ";
 	private int logInterval = 1; // in seconds
 	private int saveInterval = 5; // save every N valid actions
-	private File dir;
+	private final File dir;
 	private File file;
-	private SceneManager sceneManager;
+	private final SceneManager sceneManager;
 	private UndoableEdit lastEdit;
-	private UndoManager undoManager;
+	private final UndoManager undoManager;
 	private HousePart actedHousePart;
 	private String content = "";
 	private int counter = 0;
@@ -50,7 +50,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
 
-	public TimeSeriesLogger(int logInterval, int saveInterval, File dir, SceneManager sceneManager) {
+	public TimeSeriesLogger(final int logInterval, final int saveInterval, final File dir, final SceneManager sceneManager) {
 		this.logInterval = logInterval;
 		this.saveInterval = saveInterval;
 		this.dir = dir;
@@ -76,11 +76,11 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	}
 
 	private void log() {
-		String timestamp = new SimpleDateFormat("yyyy-MM-dd" + space + "HH:mm:ss").format(Calendar.getInstance().getTime());
-		URL url = Scene.getURL();
+		final String timestamp = new SimpleDateFormat("yyyy-MM-dd" + space + "HH:mm:ss").format(Calendar.getInstance().getTime());
+		final URL url = Scene.getURL();
 		if (url == null) // no logging if not using a template
 			return;
-		String filename = url == null ? null : new File(url.getFile()).getName();
+		final String filename = url == null ? null : new File(url.getFile()).getName();
 		String action = undoManager.getUndoPresentationName();
 		if (action.startsWith("Undo")) {
 			action = action.substring(4).trim();
@@ -124,13 +124,13 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				line += space + "{" + getId(actedHousePart) + "}";
 			}
 		}
-		Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
-		String heliodonTime = "[Time: " + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "]";
+		final Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
+		final String heliodonTime = "[Time: " + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "]";
 		if (!heliodonTime.equals(oldHeliodonTime)) {
 			line += space + heliodonTime;
 			oldHeliodonTime = heliodonTime;
 		}
-		String heliodonLatitude = "[Latitude: " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI) + "]";
+		final String heliodonLatitude = "[Latitude: " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI) + "]";
 		if (!heliodonLatitude.equals(oldHeliodonLatitude)) {
 			line += space + heliodonLatitude;
 			oldHeliodonLatitude = heliodonLatitude;
@@ -150,10 +150,10 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (Scene.getInstance().isAnnotationsVisible()) {
 			line += space + "<Annotation>";
 		}
-		Camera camera = SceneManager.getInstance().getCamera();
+		final Camera camera = SceneManager.getInstance().getCamera();
 		if (camera != null) {
-			ReadOnlyVector3 location = camera.getLocation();
-			ReadOnlyVector3 direction = camera.getDirection();
+			final ReadOnlyVector3 location = camera.getLocation();
+			final ReadOnlyVector3 direction = camera.getDirection();
 			String cameraPosition = "(" + FORMAT.format(location.getX());
 			cameraPosition += ", " + FORMAT.format(location.getY());
 			cameraPosition += ", " + FORMAT.format(location.getZ());
@@ -166,7 +166,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			}
 		}
 		if (noteEditedFlag) {
-			String note = MainPanel.getInstance().getNoteTextArea().getText();
+			final String note = MainPanel.getInstance().getNoteTextArea().getText();
 			line += space + "[Note: " + note.length() + "]";
 			noteEditedFlag = false;
 		}
@@ -185,20 +185,20 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	public void saveLog() {
 		try {
-			PrintWriter writer = new PrintWriter(file);
+			final PrintWriter writer = new PrintWriter(file);
 			writer.print(content);
 			writer.close();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging! Please notify the teacher of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
+	public void propertyChange(final PropertyChangeEvent evt) {
 		if (evt.getSource() == Scene.getInstance()) {
 			if (evt.getPropertyName().equals("Edit")) {
-				Object newValue = evt.getNewValue();
+				final Object newValue = evt.getNewValue();
 				if (newValue.equals(Boolean.TRUE))
 					sceneEditedFlag = true;
 			}
@@ -223,7 +223,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private String getBuildingId(final HousePart p) {
 		if (p == null)
 			return null;
-		HousePart x = getTopContainer(actedHousePart);
+		final HousePart x = getTopContainer(actedHousePart);
 		if (x == null)
 			return null;
 		return "Building #" + x.getId();
@@ -244,9 +244,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	}
 
 	public void start() {
-		String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
+		final String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
 		file = new File(dir, timestamp + ".txt");
-		Thread t = new Thread() {
+		final Thread t = new Thread("Time Series Logger") {
 			@Override
 			public void run() {
 				while (true) {

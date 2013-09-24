@@ -889,10 +889,10 @@ public class EnergyPanel extends JPanel {
 
 	public void compute(final boolean updateRadiationColorMap) {
 		this.updateRadiationColorMap = updateRadiationColorMap;
-		if (thread != null) {
+		if (thread != null && thread.isAlive()) {
 			computeRequest = true;
 		} else {
-			thread = new Thread() {
+			thread = new Thread("Energy Computer") {
 				@Override
 				public void run() {
 					do {
@@ -1265,7 +1265,8 @@ public class EnergyPanel extends JPanel {
 		fromXY.transform(tmp);
 		final ReadOnlyVector3 p2 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
 
-		final int rows = (int) Math.ceil(p1.subtract(origin, null).length() / SOLAR_STEP);
+		final double height = p1.subtract(origin, null).length();
+		final int rows = (int) Math.ceil(height / SOLAR_STEP);
 		final int cols = (int) Math.ceil(p2.subtract(origin, null).length() / SOLAR_STEP);
 		double[][] solar = solarOnWall.get(drawMesh);
 		if (solar == null) {
@@ -1310,7 +1311,7 @@ public class EnergyPanel extends JPanel {
 				final ReadOnlyVector3 p = v.multiply(row * SOLAR_STEP, null).addLocal(pU);
 				final double h;
 				if (row == rows - 1)
-					h = p1.getZ() - (row * SOLAR_STEP);
+					h = height - (row * SOLAR_STEP);
 				else
 					h = SOLAR_STEP;
 				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
@@ -1326,7 +1327,8 @@ public class EnergyPanel extends JPanel {
 					final int repeat = 1;
 					if (addToTotal) {
 						final Double val = solarTotal.get(house);
-						solarTotal.put(house, val == null ? 0 : val + repeat * dot * w * h * Scene.getInstance().getAnnotationScale());
+						final double solarValue = repeat * dot * w * h * Scene.getInstance().getAnnotationScale();
+						solarTotal.put(house, val == null ? 0 : val + solarValue);
 					}
 				}
 			}

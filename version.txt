@@ -1558,6 +1558,7 @@ Version 2.0 - May 15, 2013
 - compute and use u and v and project window points on them when detecting if windows collide with eachother
 - fix problem with wall preview stoping upon snapping to new neighbor due to cleanup call
 - avoid calling cleanup in most redraw calls
+- fix problem with negative energy due to wrong heigh axis
 - release version 2.5
 
 
