@@ -1559,6 +1559,8 @@ Version 2.0 - May 15, 2013
 - fix problem with wall preview stoping upon snapping to new neighbor due to cleanup call
 - avoid calling cleanup in most redraw calls
 - fix problem with negative energy due to wrong heigh axis
+- fix problem with wall inside out
+- avoid saving wall inside direction, instead recompute upon redrawAll
 - release version 2.5
 
 

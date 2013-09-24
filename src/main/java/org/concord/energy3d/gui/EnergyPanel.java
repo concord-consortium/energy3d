@@ -224,6 +224,9 @@ public class EnergyPanel extends JPanel {
 
 	private EnergyPanel() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		
+		this.repaint();
+		this.paint(null);
 
 		progressBar = new JProgressBar();
 		add(progressBar);

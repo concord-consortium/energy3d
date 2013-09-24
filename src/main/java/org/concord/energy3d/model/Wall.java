@@ -46,7 +46,9 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double DEFAULT_WALL_HEIGHT = 15.0; // the recommended default wall height is 3m
+	private static final double DEFAULT_WALL_HEIGHT = 15.0; // the recommended
+															// default wall
+															// height is 3m
 	private static double userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
 	private static int currentVisitStamp = 1;
 	private static boolean extendToRoofEnabled = true;
@@ -63,7 +65,7 @@ public class Wall extends HousePart {
 	private transient List<ArrayList<Vector3>> wallAndWindowsPoints;
 	private double wallThickness;
 	private transient Snap[] neighbors;
-	private Vector3 thicknessNormal;
+	private transient Vector3 thicknessNormal;
 	private boolean isShortWall;
 
 	public static void resetDefaultWallHeight() {
@@ -135,7 +137,11 @@ public class Wall extends HousePart {
 		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		windowsSurroundMesh.setRenderState(offsetState);
-		/* lets not use bounds for this mesh because when there are no windows its bounds is set to center 0,0,0 which shifts the overall bounds toward zero */
+		/*
+		 * lets not use bounds for this mesh because when there are no windows
+		 * its bounds is set to center 0,0,0 which shifts the overall bounds
+		 * toward zero
+		 */
 		windowsSurroundMesh.setModelBound(null);
 		root.attachChild(windowsSurroundMesh);
 
@@ -184,13 +190,16 @@ public class Wall extends HousePart {
 			boolean snappedToWall = snapToWall(p, index);
 			if (!snappedToWall) {
 				snapToGrid(p, getAbsPoint(index), getGridSize(), false);
-				snappedToWall = snapToWall(p, index); // see if it can be snapped after grid move
+				snappedToWall = snapToWall(p, index); // see if it can be
+														// snapped after grid
+														// move
 			}
 
 			if (!snappedToWall)
 				snapToFoundation(p);
 
-			if (index == 2) // make sure z of 2nd base point is same as 2st (needed for platform picking side)
+			if (index == 2) // make sure z of 2nd base point is same as 2st
+							// (needed for platform picking side)
 				p.setZ(points.get(0).getZ());
 			final Vector3 p_rel = toRelative(p);
 			points.get(index).set(p_rel);
@@ -244,7 +253,7 @@ public class Wall extends HousePart {
 		isShortWall = true;
 		Wall.extendToRoofEnabled = extendToRoofEnabled;
 		if (isDrawable())
-			drawNeighborWalls();
+			computeInsideDirectionOfAttachedWalls(true);
 		draw();
 		drawChildren();
 		Wall.extendToRoofEnabled = true;
@@ -252,7 +261,7 @@ public class Wall extends HousePart {
 
 	@Override
 	public void complete() {
-//		drawThisAndNeighbors(true); // TODO is this necessary
+		// drawThisAndNeighbors(true); // TODO is this necessary
 		super.complete();
 	}
 
@@ -460,7 +469,8 @@ public class Wall extends HousePart {
 	public List<ArrayList<Vector3>> computeWallAndWindowPolygon(final boolean backMesh) {
 		final List<ArrayList<Vector3>> polygonPoints = new ArrayList<ArrayList<Vector3>>();
 		final ReadOnlyVector3 trans = backMesh ? getThicknessNormal() : Vector3.ZERO;
-		// Start the polygon with (1) then 0, 2, 3, [roof points] so that roof points are appended to the end of vertex list
+		// Start the polygon with (1) then 0, 2, 3, [roof points] so that roof
+		// points are appended to the end of vertex list
 		final ArrayList<Vector3> wallPoints = new ArrayList<Vector3>(4);
 		addPolygonPoint(wallPoints, this, 1, trans);
 		addPolygonPoint(wallPoints, this, 0, trans);
@@ -573,7 +583,8 @@ public class Wall extends HousePart {
 		enforceGablePointsRangeAndRemoveDuplicatedGablePoints(polygon.get(0));
 		extendToRoof(polygon.get(0));
 
-		// lower the z of back wall to ensure it doesn't stick up through the roof
+		// lower the z of back wall to ensure it doesn't stick up through the
+		// roof
 		if (roof != null)
 			for (final Vector3 p : polygon.get(0))
 				p.setZ(p.getZ() - 0.3);
@@ -634,7 +645,12 @@ public class Wall extends HousePart {
 
 		final int whichNeighbor;
 		if (editPointIndex == 0 || editPointIndex == 1) {
-			/* if edit point has snapped to a new wall then use the angle with new wall to determine inside direction of this wall otherwise use the angle with the other wall attached to none moving corner of the this wall */
+			/*
+			 * if edit point has snapped to a new wall then use the angle with
+			 * new wall to determine inside direction of this wall otherwise use
+			 * the angle with the other wall attached to none moving corner of
+			 * the this wall
+			 */
 			if (neighbors[0] == null)
 				whichNeighbor = 1;
 			else
@@ -795,7 +811,8 @@ public class Wall extends HousePart {
 		final Snap oldSnap = neighbors[i];
 		neighbors[i] = newSnap;
 
-		if (newSnap == null && !updateNeighbors) { // see if it is attached to another wall
+		if (newSnap == null && !updateNeighbors) { // see if it is attached to
+													// another wall
 			fixDisconnectedWalls();
 			return;
 		}
@@ -973,8 +990,15 @@ public class Wall extends HousePart {
 			visitor.visit(visit.wall, visit.prev, visit.next);
 	}
 
-	private void drawNeighborWalls() {
-		final ArrayList<Wall> walls = new ArrayList<Wall>();
+	public void computeInsideDirectionOfAttachedWalls(final boolean drawNeighborWalls) {
+		if (this.thicknessNormal != null)
+			return;
+
+		final ArrayList<Wall> walls;
+		if (drawNeighborWalls)
+			walls = new ArrayList<Wall>();
+		else
+			walls = null;
 
 		final double[] side = new double[] { 0.0 };
 
@@ -991,7 +1015,7 @@ public class Wall extends HousePart {
 					final ReadOnlyVector3 p2_p3 = p3.subtract(p2, null).normalizeLocal();
 					side[0] += Util.angleBetween(p1_p2, p2_p3, Vector3.UNIT_Z);
 				}
-				if (wall != Wall.this && !walls.contains(wall))
+				if (drawNeighborWalls && wall != Wall.this && !walls.contains(wall))
 					walls.add(wall);
 			}
 		});
@@ -1008,7 +1032,7 @@ public class Wall extends HousePart {
 					wall.thicknessNormal = p1_p2.cross(Vector3.UNIT_Z, null).normalizeLocal().multiplyLocal(wallThickness);
 					if (side[0] > 0)
 						wall.thicknessNormal.negateLocal();
-				} else if (prev != null){
+				} else if (prev != null) {
 					final int indexP2 = prev.getSnapPointIndexOf(wall);
 					final Vector3 p2 = wall.getAbsPoint(indexP2);
 					final Vector3 p3 = wall.getAbsPoint(indexP2 == 0 ? 2 : 0);
@@ -1020,10 +1044,11 @@ public class Wall extends HousePart {
 			}
 		});
 
-		for (final HousePart wall : walls) {
-			wall.draw();
-			wall.drawChildren();
-		}
+		if (drawNeighborWalls)
+			for (final HousePart wall : walls) {
+				wall.draw();
+				wall.drawChildren();
+			}
 	}
 
 	@Override
@@ -1127,6 +1152,7 @@ public class Wall extends HousePart {
 	public void reset() {
 		super.reset();
 		thicknessNormal = null;
+		neighbors[0] = neighbors[1] = null;
 	}
 
 	public void setBackMeshesVisible(final boolean visible) {
@@ -1203,7 +1229,4 @@ public class Wall extends HousePart {
 		return invisibleMesh;
 	}
 
-	public void clearNeighbors() {
-		neighbors[0] = neighbors[1] = null;
-	}
 }

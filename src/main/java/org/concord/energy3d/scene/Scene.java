@@ -281,7 +281,7 @@ public class Scene implements Serializable {
 		for (final HousePart housePart : toBeRemoved)
 			remove(housePart);
 
-		fixDisconnectedWalls();
+		connectWalls();
 	}
 
 	private void removeDeadChildren(final HousePart parent, final ArrayList<HousePart> toBeRemoved) {
@@ -309,15 +309,22 @@ public class Scene implements Serializable {
 		version = currentVersion;
 	}
 
-	private void fixDisconnectedWalls() {
+	private void connectWalls() {
 		for (final HousePart part : parts)
 			if (part instanceof Wall)
-				((Wall) part).clearNeighbors();
+				part.reset();
 
 		for (final HousePart part : parts) {
 			if (part instanceof Wall) {
 				final Wall wall = (Wall) part;
 				wall.fixDisconnectedWalls();
+			}
+		}
+		
+		for (final HousePart part : parts) {
+			if (part instanceof Wall) {
+				final Wall wall = (Wall) part;
+				wall.computeInsideDirectionOfAttachedWalls(false);
 			}
 		}
 	}
