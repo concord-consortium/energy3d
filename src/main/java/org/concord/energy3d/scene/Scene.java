@@ -121,8 +121,7 @@ public class Scene implements Serializable {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				instance.add(foundation);
-				redrawAll = true;
+				instance.add(foundation, true);
 				return null;
 			}
 		});
@@ -277,9 +276,9 @@ public class Scene implements Serializable {
 		}
 
 		for (final HousePart housePart : toBeRemoved)
-			remove(housePart);
+			remove(housePart, false);
 
-		connectWalls();
+//		connectWalls();
 	}
 
 	private void removeDeadChildren(final HousePart parent, final ArrayList<HousePart> toBeRemoved) {
@@ -362,13 +361,15 @@ public class Scene implements Serializable {
 	private Scene() {
 	}
 
-	public void add(final HousePart housePart) {
+	public void add(final HousePart housePart, final boolean redraw) {
 		final HousePart container = housePart.getContainer();
 		if (container != null)
 			container.getChildren().add(housePart);
 		addTree(housePart);
-		if (container != null)
-			container.draw();
+//		if (container != null)
+//			container.draw();
+		if (redraw)
+			redrawAll();		
 	}
 
 	private void addTree(final HousePart housePart) {
@@ -379,7 +380,7 @@ public class Scene implements Serializable {
 			addTree(child);
 	}
 
-	public void remove(final HousePart housePart) {
+	public void remove(final HousePart housePart, final boolean redraw) {
 		if (housePart == null)
 			return;
 		housePart.setGridsVisible(false);
@@ -387,8 +388,10 @@ public class Scene implements Serializable {
 		if (container != null)
 			container.getChildren().remove(housePart);
 		removeTree(housePart);
-		if (container != null)
-			container.draw();
+//		if (container != null)
+//			container.draw();
+		if (redraw)
+			redrawAll();
 	}
 
 	private void removeTree(final HousePart housePart) {
@@ -479,6 +482,7 @@ public class Scene implements Serializable {
 			cleanup();
 			cleanup = false;
 		}
+		connectWalls();
 		Snap.clearAnnotationDrawn();
 		for (final HousePart part : parts)
 			if (part instanceof Roof)
@@ -532,7 +536,7 @@ public class Scene implements Serializable {
 				roofs.add(part);
 
 		for (final HousePart part : roofs)
-			remove(part);
+			remove(part, false);
 	}
 
 	public static boolean isRedrawAll() {

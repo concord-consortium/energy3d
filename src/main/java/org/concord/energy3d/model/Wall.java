@@ -257,7 +257,7 @@ public class Wall extends HousePart {
 
 	@Override
 	public void complete() {
-		// drawThisAndNeighbors(true); // TODO is this necessary
+		drawThisAndNeighbors(true); // needed in order to extend wall to roof
 		super.complete();
 	}
 
@@ -800,10 +800,10 @@ public class Wall extends HousePart {
 		final Snap oldSnap = neighbors[i];
 		neighbors[i] = newSnap;
 
-		if (newSnap == null && !updateNeighbors) { // see if it is attached to another wall
-			connectedWalls();
-			return;
-		}
+//		if (newSnap == null && !updateNeighbors) { // see if it is attached to another wall
+//			connectedWalls();
+//			return;
+//		}
 
 		if (!updateNeighbors || oldSnap == newSnap || (oldSnap != null && oldSnap.equals(newSnap)))
 			return;
@@ -1158,9 +1158,9 @@ public class Wall extends HousePart {
 				for (int index = 0; index < 2; index++)
 					if (neighbors[index] == null)
 						for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
-							if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
+//							if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
+							if (otherWall.neighbors[otherIndex] == null && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
 								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
-								Scene.getInstance().redrawAll();
 								break;
 							}
 						}

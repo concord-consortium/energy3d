@@ -856,7 +856,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (selectedHousePart.isDrawCompleted())
 				selectedHousePart.setEditPointsVisible(false);
 			else
-				Scene.getInstance().remove(selectedHousePart);
+				Scene.getInstance().remove(selectedHousePart, true);
 		}
 
 		for (final HousePart part : Scene.getInstance().getParts())
@@ -894,7 +894,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else
 			return null;
 
-		Scene.getInstance().add(drawn);
+		Scene.getInstance().add(drawn, false);
 		addHousePartCommand = new AddHousePartCommand(drawn);
 		return drawn;
 	}
@@ -1273,7 +1273,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							selectedHousePart.reset();
 							selectedHousePart.draw();
 							undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-							Scene.getInstance().remove(selectedHousePart);
+							Scene.getInstance().remove(selectedHousePart, true);
 							selectedHousePart = null;
 						}
 						if (editHousePartCommand != null) {
@@ -1291,7 +1291,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
 						if (selectedHousePart.isDrawCompleted() && !selectedHousePart.isDrawable()) {
 							addHousePartCommand = null;
-							Scene.getInstance().remove(selectedHousePart);
+							Scene.getInstance().remove(selectedHousePart, true);
 							selectedHousePart = null;
 							if (operationStick)
 								operationFlag = true;
@@ -1303,7 +1303,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								undoManager.addEdit(addHousePartCommand);
 							addHousePartCommand = null;
 						} else
-							Scene.getInstance().remove(selectedHousePart);
+							Scene.getInstance().remove(selectedHousePart, true);
 						selectedHousePart.setEditPointsVisible(false);
 						selectedHousePart = null;
 						if (operationStick)
@@ -1346,7 +1346,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				@Override
 				public Object call() throws Exception {
 					undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-					Scene.getInstance().remove(selectedHousePart);
+					Scene.getInstance().remove(selectedHousePart, true);
 					selectedHousePart = null;
 					return null;
 				}

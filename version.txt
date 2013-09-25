@@ -1564,6 +1564,7 @@ Version 2.0 - May 15, 2013
 - improve roof mesh combination algorithm
 - fix problem with disconnected walls in older models
 - instead of micro managing wall snap neighbors, use scene.connectWall everytime any wall moves
+- redraw the entire scene upon removing or adding house part
 - release version 2.5
 
 

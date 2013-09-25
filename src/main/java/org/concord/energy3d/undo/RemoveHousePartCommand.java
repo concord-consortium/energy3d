@@ -35,15 +35,13 @@ public class RemoveHousePartCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		Scene.getInstance().add(housePart);
-		/* to reconnect walls */
-		Scene.getInstance().redrawAll();
+		Scene.getInstance().add(housePart, true);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().remove(housePart);
+		Scene.getInstance().remove(housePart, true);
 	}
 
 	@Override
