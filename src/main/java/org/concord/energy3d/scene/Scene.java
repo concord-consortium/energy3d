@@ -169,9 +169,8 @@ public class Scene implements Serializable {
 			for (final HousePart part : instance.parts)
 				part.getRoot();
 
-			if (instance.version >= 1)
-				instance.cleanup();
 			instance.upgradeSceneToNewVersion();
+			instance.cleanup();
 			loadCameraLocation();
 		}
 
@@ -270,7 +269,7 @@ public class Scene implements Serializable {
 
 	private void cleanup() {
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
-		for (final HousePart housePart : getParts()) {
+		for (final HousePart housePart : parts) {
 			if (!housePart.isDrawCompleted())
 				housePart.complete();
 			if (!housePart.isValid() || ((housePart instanceof Roof || housePart instanceof Window || housePart instanceof Door) && housePart.getContainer() == null))
@@ -286,7 +285,7 @@ public class Scene implements Serializable {
 
 	private void removeDeadChildren(final HousePart parent, final ArrayList<HousePart> toBeRemoved) {
 		for (final HousePart part : parent.getChildren())
-			if (!getParts().contains(part))
+			if (!parts.contains(part))
 				toBeRemoved.add(part);
 	}
 
@@ -297,10 +296,9 @@ public class Scene implements Serializable {
 		}
 
 		if (version < 1) {
-			for (final HousePart part : parts) {
+			for (final HousePart part : parts)
 				if (part instanceof Foundation)
 					((Foundation) part).scaleHouse(10);
-			}
 			cameraLocation = cameraLocation.multiply(10, null);
 			setOverhangLength(getOverhangLength() * 10);
 			setAnnotationScale(1.0);
@@ -310,23 +308,20 @@ public class Scene implements Serializable {
 	}
 
 	private void connectWalls() {
+		System.out.print("Connecting walls...");
 		for (final HousePart part : parts)
 			if (part instanceof Wall)
 				part.reset();
 
-		for (final HousePart part : parts) {
-			if (part instanceof Wall) {
-				final Wall wall = (Wall) part;
-				wall.fixDisconnectedWalls();
-			}
-		}
+		for (final HousePart part : parts)
+			if (part instanceof Wall)
+				((Wall) part).connectedWalls();
 		
-		for (final HousePart part : parts) {
-			if (part instanceof Wall) {
-				final Wall wall = (Wall) part;
-				wall.computeInsideDirectionOfAttachedWalls(false);
-			}
-		}
+		for (final HousePart part : parts)
+			if (part instanceof Wall)
+				((Wall) part).computeInsideDirectionOfAttachedWalls(false);
+		
+		System.out.println("done");
 	}
 
 	public static void save(final URL url, final boolean setAsCurrentFile) throws Exception {

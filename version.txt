@@ -1562,6 +1562,7 @@ Version 2.0 - May 15, 2013
 - fix problem with wall inside out
 - avoid saving wall inside direction, instead recompute upon redrawAll
 - improve roof mesh combination algorithm
+- fix problem with disconnected walls in older models
 - release version 2.5
 
 

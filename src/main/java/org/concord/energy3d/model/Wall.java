@@ -811,9 +811,8 @@ public class Wall extends HousePart {
 		final Snap oldSnap = neighbors[i];
 		neighbors[i] = newSnap;
 
-		if (newSnap == null && !updateNeighbors) { // see if it is attached to
-													// another wall
-			fixDisconnectedWalls();
+		if (newSnap == null && !updateNeighbors) { // see if it is attached to another wall
+			connectedWalls();
 			return;
 		}
 
@@ -1166,7 +1165,7 @@ public class Wall extends HousePart {
 		updateTextureAndColor(mesh, Scene.getInstance().getWallColor());
 	}
 
-	public void fixDisconnectedWalls() {
+	public void connectedWalls() {
 		if (neighbors[0] != null && neighbors[1] != null)
 			return;
 
@@ -1177,7 +1176,6 @@ public class Wall extends HousePart {
 					if (neighbors[index] == null)
 						for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
 							if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
-								System.out.println("Fixing neighbor...");
 								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
 								Scene.getInstance().redrawAll();
 								break;
