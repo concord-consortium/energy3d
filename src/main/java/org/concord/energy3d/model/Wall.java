@@ -46,9 +46,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Wall extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double DEFAULT_WALL_HEIGHT = 15.0; // the recommended
-															// default wall
-															// height is 3m
+	private static final double DEFAULT_WALL_HEIGHT = 15.0; // the recommended default wall height is 3m
 	private static double userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
 	private static int currentVisitStamp = 1;
 	private static boolean extendToRoofEnabled = true;
@@ -190,16 +188,13 @@ public class Wall extends HousePart {
 			boolean snappedToWall = snapToWall(p, index);
 			if (!snappedToWall) {
 				snapToGrid(p, getAbsPoint(index), getGridSize(), false);
-				snappedToWall = snapToWall(p, index); // see if it can be
-														// snapped after grid
-														// move
+				snappedToWall = snapToWall(p, index); // see if it can be snapped after grid move
 			}
 
 			if (!snappedToWall)
 				snapToFoundation(p);
 
-			if (index == 2) // make sure z of 2nd base point is same as 2st
-							// (needed for platform picking side)
+			if (index == 2) // make sure z of 2nd base point is same as 2st (needed for platform picking side)
 				p.setZ(points.get(0).getZ());
 			final Vector3 p_rel = toRelative(p);
 			points.get(index).set(p_rel);
@@ -216,6 +211,7 @@ public class Wall extends HousePart {
 			points.get(3).setZ(z);
 		}
 
+		Scene.getInstance().connectWalls();
 		drawThisAndNeighbors(false);
 		setEditPointsVisible(true);
 
@@ -268,8 +264,6 @@ public class Wall extends HousePart {
 	protected boolean snapToWall(final Vector3 p, final int index) {
 		ReadOnlyVector3 closestPoint = null;
 		double closestDistance = Double.MAX_VALUE;
-		Wall closestWall = null;
-		int closestPointIndex = -1;
 		for (final HousePart housePart : container.getChildren()) {
 			if (housePart instanceof Wall && housePart != this) {
 				final Wall wall = (Wall) housePart;
@@ -279,8 +273,6 @@ public class Wall extends HousePart {
 					if (distance < closestDistance) {
 						closestPoint = p2;
 						closestDistance = distance;
-						closestWall = wall;
-						closestPointIndex = i;
 					}
 				}
 			}
@@ -300,12 +292,9 @@ public class Wall extends HousePart {
 
 		if (snap) {
 			p.set(closestPoint);
-			setNeighbor(index, new Snap(this, closestWall, index, closestPointIndex), true);
 			return true;
-		} else {
-			setNeighbor(index, null, true);
+		} else
 			return false;
-		}
 	}
 
 	private boolean snapToFoundation(final Vector3 current) {
@@ -832,12 +821,6 @@ public class Wall extends HousePart {
 	}
 
 	@Override
-	public void delete() {
-		setNeighbor(0, null, true);
-		setNeighbor(2, null, true);
-	}
-
-	@Override
 	protected void setHeight(final double newHeight, final boolean finalize) {
 		super.setHeight(newHeight, finalize);
 		points.get(1).setZ(newHeight + container.height);
@@ -1166,7 +1149,7 @@ public class Wall extends HousePart {
 	}
 
 	public void connectedWalls() {
-		if (neighbors[0] != null && neighbors[1] != null)
+		if (!isDrawable() || (neighbors[0] != null && neighbors[1] != null))
 			return;
 
 		for (final HousePart part : Scene.getInstance().getParts()) {

@@ -306,7 +306,7 @@ public class Scene implements Serializable {
 		version = currentVersion;
 	}
 
-	private void connectWalls() {
+	public void connectWalls() {
 		for (final HousePart part : parts)
 			if (part instanceof Wall)
 				part.reset();
