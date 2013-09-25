@@ -308,7 +308,6 @@ public class Scene implements Serializable {
 	}
 
 	private void connectWalls() {
-		System.out.print("Connecting walls...");
 		for (final HousePart part : parts)
 			if (part instanceof Wall)
 				part.reset();
@@ -320,8 +319,6 @@ public class Scene implements Serializable {
 		for (final HousePart part : parts)
 			if (part instanceof Wall)
 				((Wall) part).computeInsideDirectionOfAttachedWalls(false);
-		
-		System.out.println("done");
 	}
 
 	public static void save(final URL url, final boolean setAsCurrentFile) throws Exception {
