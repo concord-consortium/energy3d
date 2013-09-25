@@ -1561,6 +1561,7 @@ Version 2.0 - May 15, 2013
 - fix problem with negative energy due to wrong heigh axis
 - fix problem with wall inside out
 - avoid saving wall inside direction, instead recompute upon redrawAll
+- improve roof mesh combination algorithm
 - release version 2.5
 
 

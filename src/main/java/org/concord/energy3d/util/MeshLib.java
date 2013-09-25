@@ -73,22 +73,9 @@ public class MeshLib {
 			if (Double.isNaN(firstNormal.length()))
 				continue;
 
-			GroupData group = null;
-			for (final GroupData g : groups) {
-				if (g.key.dot(normal) > 0.99) { // if there is less than 8 degrees difference between the two vectors
-					// if there is an edge in common with the existing triangles
-					if (hasCommonEdge(g, p1, p2, p3)) {
-						group = g;
-						break;
-					}
-				}
-			}
-
-			if (group == null) {
-				group = new GroupData();
-				group.key.set(normal);
-				groups.add(group);
-			}
+			final GroupData group = new GroupData();
+			group.key.set(normal);
+			groups.add(group);
 
 			group.vertices.add(p1);
 			group.vertices.add(p2);
@@ -108,6 +95,8 @@ public class MeshLib {
 			for (int k = 0; k < 3; k++) {
 				final Vector3 p = group.vertices.get(j + k);
 				if (p.equals(p1) || p.equals(p2) || p.equals(p3))
+					// if (Util.isEqual(p, p1) || Util.isEqual(p, p2) ||
+					// Util.isEqual(p, p3))
 					numOfShared++;
 			}
 			if (numOfShared > 1)
@@ -117,38 +106,36 @@ public class MeshLib {
 	}
 
 	private static void combineGroups(final ArrayList<GroupData> groups) {
-		for (int i = 0; i < groups.size(); i++) {
-			final GroupData group1 = groups.get(i);
-			for (int j = i + 1; j < groups.size(); j++) {
-				final GroupData group2 = groups.get(j);
-				boolean changed = false;
-				if (group1.key.equals(group2.key)) {
-					for (int w = 0; w < group2.vertices.size() / 3; w++) {
-						final Vector3 p1 = group2.vertices.get(w * 3);
-						final Vector3 p2 = group2.vertices.get(w * 3 + 1);
-						final Vector3 p3 = group2.vertices.get(w * 3 + 2);
-						if (hasCommonEdge(group1, p1, p2, p3)) {
-							group1.vertices.add(p1);
-							group1.vertices.add(p2);
-							group1.vertices.add(p3);
-							group1.normals.add(group2.normals.get(w * 3));
-							group1.normals.add(group2.normals.get(w * 3 + 1));
-							group1.normals.add(group2.normals.get(w * 3 + 2));
-							for (int count = 0; count < 3; count++) {
-								group2.vertices.remove(w);
-								group2.normals.remove(w);
+		boolean changed = true;
+		while (changed) {
+			changed = false;
+			for (int i = 0; i < groups.size(); i++) {
+				final GroupData group1 = groups.get(i);
+				for (int j = i + 1; j < groups.size(); j++) {
+					final GroupData group2 = groups.get(j);
+					if (Util.isEqual(group1.key, group2.key)) {
+						for (int w = 0; w < group2.vertices.size() / 3; w++) {
+							final Vector3 p1 = group2.vertices.get(w * 3);
+							final Vector3 p2 = group2.vertices.get(w * 3 + 1);
+							final Vector3 p3 = group2.vertices.get(w * 3 + 2);
+							if (hasCommonEdge(group1, p1, p2, p3)) {
+								group1.vertices.add(p1);
+								group1.vertices.add(p2);
+								group1.vertices.add(p3);
+								group1.normals.add(group2.normals.get(w * 3));
+								group1.normals.add(group2.normals.get(w * 3 + 1));
+								group1.normals.add(group2.normals.get(w * 3 + 2));
+								for (int count = 0; count < 3; count++) {
+									group2.vertices.remove(w);
+									group2.normals.remove(w);
+								}
+								if (group2.vertices.isEmpty())
+									groups.remove(group2);
+								changed = true;
 							}
-							changed = true;
-							if (group2.vertices.isEmpty()) {
-								groups.remove(group2);
-								break;
-							} else
-								w = 0;
 						}
 					}
 				}
-				if (changed)
-					j = i + 1;
 			}
 		}
 	}
@@ -296,9 +283,11 @@ public class MeshLib {
 				// if (S[j] is on left of line from P[i] to endpoint)
 				final double dot = normal.cross(endpoint.subtract(pointOnHull, null), null).dot(sj.subtract(pointOnHull, null));
 				if (!sj.equals(pointOnHull) && dot > 0)
-					endpoint.set(sj); // found greater left turn, update endpoint
+					endpoint.set(sj); // found greater left turn, update
+										// endpoint
 				else if (!sj.equals(pointOnHull) && dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
-					endpoint.set(sj); // found greater left turn, update endpoint
+					endpoint.set(sj); // found greater left turn, update
+										// endpoint
 			}
 			pointOnHull.set(endpoint);
 			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
@@ -389,7 +378,7 @@ public class MeshLib {
 			for (final Polygon hole : polygon.getHoles())
 				for (final Point p : hole.getPoints())
 					p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
-		
+
 		/* remove holes that collide with polygon or other holes */
 		if (polygon.getHoles() != null) {
 			final TriangulationPoint tp1 = polygon.getPoints().get(0);
@@ -398,7 +387,7 @@ public class MeshLib {
 			final ReadOnlyVector2 p0 = new Vector2(tp0.getX(), tp0.getY());
 			final ReadOnlyVector2 p1 = new Vector2(tp1.getX(), tp1.getY());
 			final ReadOnlyVector2 p2 = new Vector2(tp2.getX(), tp2.getY());
-			
+
 			double minX, minY, maxX, maxY;
 			minX = minY = Double.POSITIVE_INFINITY;
 			maxX = maxY = Double.NEGATIVE_INFINITY;
@@ -413,23 +402,26 @@ public class MeshLib {
 				if (pY < minY)
 					minY = pY;
 				if (pY > maxY)
-					maxY = pY;				
+					maxY = pY;
 			}
 			for (int i = 0; i < polygon.getHoles().size(); i++) {
 				final Polygon hole1 = polygon.getHoles().get(i);
 				double minX1, minY1, maxX1, maxY1;
 				minX1 = minY1 = Double.POSITIVE_INFINITY;
 				maxX1 = maxY1 = Double.NEGATIVE_INFINITY;
-				for (final Point tp : hole1.getPoints()) {					
-					/* ensure p is within the rectangular boundaries of the polygon */
+				for (final Point tp : hole1.getPoints()) {
+					/*
+					 * ensure p is within the rectangular boundaries of the
+					 * polygon
+					 */
 					final Vector2 p = new Vector2(tp.getX(), tp.getY());
 					final double sX = Util.projectPointOnLineScale(p, p0, p2);
-					final double sY = Util.projectPointOnLineScale(p, p0, p1);					
+					final double sY = Util.projectPointOnLineScale(p, p0, p1);
 					final double pX = Util.projectPointOnLine(p, p0, p2, false).distance(p0) * Math.signum(sX);
 					final double pY = Util.projectPointOnLine(p, p0, p1, false).distance(p0) * Math.signum(sY);
 					final ReadOnlyVector2 xDir = p2.subtract(p0, null).normalizeLocal();
 					final ReadOnlyVector2 yDir = p1.subtract(p0, null).normalizeLocal();
-					
+
 					if (pX <= minX)
 						p.addLocal(xDir.multiply(minX - pX + 0.1, null));
 					else if (pX >= maxX)
@@ -438,7 +430,7 @@ public class MeshLib {
 						p.addLocal(yDir.multiply(minY - pY + 0.1, null));
 					else if (pY >= maxY)
 						p.addLocal(yDir.multiply(maxY - pY - 0.1, null));
-					
+
 					tp.set(p.getX(), p.getY(), tp.getZ());
 
 					if (pX < minX1)
