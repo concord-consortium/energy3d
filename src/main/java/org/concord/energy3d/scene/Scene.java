@@ -191,7 +191,6 @@ public class Scene implements Serializable {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				System.out.print("Open file...");
 				originalHouseRoot.detachAllChildren();
 				root.detachAllChildren();
 				root.attachChild(originalHouseRoot);
@@ -199,9 +198,9 @@ public class Scene implements Serializable {
 				if (url != null) {
 					for (final HousePart housePart : instance.getParts())
 						originalHouseRoot.attachChild(housePart.getRoot());
+					System.out.println("done");
 					/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
 					instance.redrawAllNow();
-					System.out.println("done");
 				}
 
 				root.updateWorldBound(true);
