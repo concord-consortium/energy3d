@@ -24,7 +24,6 @@ import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
-import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -53,13 +52,11 @@ public abstract class Roof extends HousePart {
 	protected transient Node roofPartsRoot;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
-	private transient List<Vector3> wallUpperPoints;
-	private transient List<Vector3> wallNormals;
+	private transient List<ReadOnlyVector3> wallUpperPoints;
+	private transient List<ReadOnlyVector3> wallNormals;
 	private transient List<Wall> walls;
 	private transient HousePart previousContainer;
 	private Map<Integer, List<Wall>> gableEditPointToWallMap = null;
-
-	// private ArrayList<Wall> gableWalls = null;
 
 	protected class EditState {
 		final boolean fitTestRequired;
@@ -91,7 +88,7 @@ public abstract class Roof extends HousePart {
 		super.init();
 		relativeToHorizontal = true;
 		orgCenters = new HashMap<Node, ReadOnlyVector3>();
-		wallNormals = new ArrayList<Vector3>();
+		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
 		roofPartPrintVerticalMap = new HashMap<Spatial, Boolean>();
 
@@ -116,7 +113,7 @@ public abstract class Roof extends HousePart {
 		}
 
 		if (wallUpperPoints == null)
-			wallUpperPoints = new ArrayList<Vector3>();
+			wallUpperPoints = new ArrayList<ReadOnlyVector3>();
 		else
 			wallUpperPoints.clear();
 		if (container != null)
@@ -288,7 +285,7 @@ public abstract class Roof extends HousePart {
 		mesh.updateModelBound();
 	}
 
-	private void initWallUpperPoints(final Wall startWall, final List<Wall> walls, final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
+	private void initWallUpperPoints(final Wall startWall, final List<Wall> walls, final List<ReadOnlyVector3> wallUpperPoints, final List<ReadOnlyVector3> wallNormals) {
 		walls.clear();
 		wallUpperPoints.clear();
 		wallNormals.clear();
@@ -314,11 +311,11 @@ public abstract class Roof extends HousePart {
 		});
 	}
 
-	protected void addPointToPolygon(final Vector3 p, final ReadOnlyVector3 normal, final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
+	protected void addPointToPolygon(final Vector3 p, final ReadOnlyVector3 normal, final List<ReadOnlyVector3> wallUpperPoints, final List<ReadOnlyVector3> wallNormals) {
 		int index = -1;
 		/* check to see if there is another point with same x,y coords */
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
-			final Vector3 p_i = wallUpperPoints.get(i);
+			final ReadOnlyVector3 p_i = wallUpperPoints.get(i);
 			if (Util.isEqual(p.getX(), p_i.getX()) && Util.isEqual(p.getY(), p_i.getY())) {
 				index = i;
 				break;
@@ -330,16 +327,17 @@ public abstract class Roof extends HousePart {
 			wallNormals.add(normal.clone());
 		} else {
 			// calculate wall normal in such a way to help in drawing overhang of roofs
-			final Vector3 currentNormal = wallNormals.get(index);
+			final ReadOnlyVector3 currentNormal = wallNormals.get(index);
 			final double d = 1.0 / MathUtils.cos(currentNormal.normalize(null).smallestAngleBetween(normal) / 2.0); // assuming thickness is 1
-			currentNormal.addLocal(normal).normalizeLocal().multiplyLocal(d);
+			final Vector3 newNormal = currentNormal.add(normal, null).normalizeLocal().multiplyLocal(d);
+			wallNormals.set(index, newNormal);
 		}
 	}
 
-	private Polygon makePolygon(final List<Vector3> wallUpperPoints) {
+	private Polygon makePolygon(final List<ReadOnlyVector3> wallUpperPoints) {
 		final List<PolygonPoint> polygonPoints = new ArrayList<PolygonPoint>(wallUpperPoints.size());
-		for (final Vector3 p : wallUpperPoints)
-			polygonPoints.add(new ArdorVector3PolygonPoint(p));
+		for (final ReadOnlyVector3 p : wallUpperPoints)
+			polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
 		return new Polygon(polygonPoints);
 	}
 
@@ -528,12 +526,12 @@ public abstract class Roof extends HousePart {
 
 	protected abstract void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints);
 
-	private void applyOverhang(final List<Vector3> wallUpperPoints, final List<Vector3> wallNormals) {
+	private void applyOverhang(final List<ReadOnlyVector3> wallUpperPoints, final List<ReadOnlyVector3> wallNormals) {
 		final Vector3 op = new Vector3();
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
-			final Vector3 p = wallUpperPoints.get(i);
-			op.set(wallNormals.get(i)).multiplyLocal(Scene.getInstance().getOverhangLength());
-			p.addLocal(op);
+			final ReadOnlyVector3 p = wallUpperPoints.get(i);
+			op.set(wallNormals.get(i)).multiplyLocal(Scene.getInstance().getOverhangLength());			
+			wallUpperPoints.set(i, p.add(op, null));
 		}
 	}
 
@@ -604,16 +602,20 @@ public abstract class Roof extends HousePart {
 	private void computeGableEditPoints() {
 		if (gableEditPointToWallMap == null)
 			return;
-		for (final int nearestIndex : gableEditPointToWallMap.keySet()) {
-			final Vector3 nearestEditPoint = getAbsPoint(nearestIndex);
-			for (final HousePart wall : gableEditPointToWallMap.get(nearestIndex)) {
-				final ReadOnlyVector3 n = wall.getFaceDirection();
-				double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(Scene.getInstance().getOverhangLength(), null)), null).dot(n);
-				distance -= 0.1; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
-				nearestEditPoint.addLocal(n.multiply(distance, null));
-				snapToWallsPolygon(nearestEditPoint);
+		for (final int editPointIndex : gableEditPointToWallMap.keySet()) {
+			final Vector3 editPoint = getAbsPoint(editPointIndex);
+			final List<Wall> gableWalls = gableEditPointToWallMap.get(editPointIndex);
+			final List<ReadOnlyVector3> wallPoints = new ArrayList<ReadOnlyVector3>(gableWalls.size() * 2);
+			final List<ReadOnlyVector3> wallNormals = new ArrayList<ReadOnlyVector3>(gableWalls.size() * 2);
+			for (final HousePart wall : gableWalls) {
+				addPointToPolygon(wall.getAbsPoint(0), wall.getFaceDirection(), wallPoints, wallNormals);
+				addPointToPolygon(wall.getAbsPoint(2), wall.getFaceDirection(), wallPoints, wallNormals);
 			}
-			points.get(nearestIndex).set(toRelative(nearestEditPoint, container.getContainer()));
+			applyOverhang(wallPoints, wallNormals);
+			final ReadOnlyVector2 p2D = Util.snapToPolygon(editPoint, wallPoints, wallNormals);
+			editPoint.setX(p2D.getX());
+			editPoint.setY(p2D.getY());
+			points.get(editPointIndex).set(toRelative(editPoint, container.getContainer()));
 		}
 	}
 
@@ -758,7 +760,7 @@ public abstract class Roof extends HousePart {
 	protected Vector3 getCenter() {
 		final Vector3 min = new Vector3(wallUpperPoints.get(0));
 		final Vector3 max = new Vector3(wallUpperPoints.get(0));
-		for (final Vector3 p : wallUpperPoints) {
+		for (final ReadOnlyVector3 p : wallUpperPoints) {
 			min.setX(Math.min(min.getX(), p.getX()));
 			min.setY(Math.min(min.getY(), p.getY()));
 			max.setX(Math.max(max.getX(), p.getX()));

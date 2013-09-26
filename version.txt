@@ -1566,6 +1566,7 @@ Version 2.0 - May 15, 2013
 - instead of micro managing wall snap neighbors, use scene.connectWall everytime any wall moves
 - redraw the entire scene upon removing or adding house part
 - remove gableWalls attribute from roof because it's redundant with another attribute
+- prevent gable roof edit points from leaving the gable wall
 - release version 2.5
 
 

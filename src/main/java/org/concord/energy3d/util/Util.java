@@ -145,7 +145,7 @@ public class Util {
 		return t;
 	}
 
-	public static Vector2 snapToPolygon(final ReadOnlyVector3 point, final List<? extends ReadOnlyVector3> polygon, final List<? extends ReadOnlyVector3> wallNormals) {
+	public static Vector2 snapToPolygon(final ReadOnlyVector3 point, final List<ReadOnlyVector3> polygon, final List<ReadOnlyVector3> wallNormals) {
 		final Vector2 p = new Vector2(point.getX(), point.getY());
 		final Vector2 l1 = new Vector2();
 		final Vector2 l2 = new Vector2();
