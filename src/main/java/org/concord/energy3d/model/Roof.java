@@ -57,8 +57,9 @@ public abstract class Roof extends HousePart {
 	private transient List<Vector3> wallNormals;
 	private transient List<Wall> walls;
 	private transient HousePart previousContainer;
-	private Map<Integer, ArrayList<Wall>> gableEditPointToWallMap = null;
-	private ArrayList<Wall> gableWalls = null;
+	private Map<Integer, List<Wall>> gableEditPointToWallMap = null;
+
+	// private ArrayList<Wall> gableWalls = null;
 
 	protected class EditState {
 		final boolean fitTestRequired;
@@ -550,10 +551,8 @@ public abstract class Roof extends HousePart {
 
 	public void setGable(final Wall wall, final boolean isGable, final boolean redraw, final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints) {
 		System.out.println("setGable(" + wall + ", " + isGable + ")");
-		if (gableWalls == null)
-			gableWalls = new ArrayList<Wall>();
 		if (gableEditPointToWallMap == null)
-			gableEditPointToWallMap = new HashMap<Integer, ArrayList<Wall>>();
+			gableEditPointToWallMap = new HashMap<Integer, List<Wall>>();
 
 		if (isGable) {
 			final ArrayList<Integer> editPoints = new ArrayList<Integer>();
@@ -574,19 +573,18 @@ public abstract class Roof extends HousePart {
 				gableEditPointToWallMap.get(nearestEditPointIndex).add(wall);
 				editPoints.add(nearestEditPointIndex);
 			}
-			gableWalls.add(wall);
 		} else {
 			final List<Integer> toBeRemoved = new ArrayList<Integer>();
-			for (final Entry<Integer, ArrayList<Wall>> entry : gableEditPointToWallMap.entrySet())
-				if (entry.getValue().contains(wall)) {
-					entry.getValue().remove(wall);
-					if (entry.getValue().isEmpty())
+			for (final Entry<Integer, List<Wall>> entry : gableEditPointToWallMap.entrySet()) {
+				final List<Wall> value = entry.getValue();
+				if (value.contains(wall)) {
+					value.remove(wall);
+					if (value.isEmpty())
 						toBeRemoved.add(entry.getKey());
 				}
+			}
 			for (final int removedEditPoint : toBeRemoved)
 				gableEditPointToWallMap.remove(removedEditPoint);
-
-			gableWalls.remove(wall);
 		}
 
 		if (redraw) {
@@ -596,25 +594,24 @@ public abstract class Roof extends HousePart {
 	}
 
 	public void removeAllGables() {
-		for (final Wall wall : gableWalls)
-			setGable(wall, false, false, null);
+		for (final List<Wall> walls : gableEditPointToWallMap.values())
+			for (final Wall wall : walls)
+				setGable(wall, false, false, null);
 		draw();
 		drawWalls();
 	}
 
 	private void computeGableEditPoints() {
-		if (gableWalls == null || gableEditPointToWallMap == null)
+		if (gableEditPointToWallMap == null)
 			return;
 		for (final int nearestIndex : gableEditPointToWallMap.keySet()) {
 			final Vector3 nearestEditPoint = getAbsPoint(nearestIndex);
 			for (final HousePart wall : gableEditPointToWallMap.get(nearestIndex)) {
-				if (wall != null) { // TODO do this check before adding
-					final ReadOnlyVector3 n = wall.getFaceDirection();
-					double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(Scene.getInstance().getOverhangLength(), null)), null).dot(n);
-					distance -= 0.1; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
-					nearestEditPoint.addLocal(n.multiply(distance, null));
-					snapToWallsPolygon(nearestEditPoint);
-				}
+				final ReadOnlyVector3 n = wall.getFaceDirection();
+				double distance = -nearestEditPoint.subtract(wall.getAbsPoint(0).addLocal(n.multiply(Scene.getInstance().getOverhangLength(), null)), null).dot(n);
+				distance -= 0.1; // in order to avoid empty roof part caused by being slightly out of range of roof, and crazy roof that stretches to floor
+				nearestEditPoint.addLocal(n.multiply(distance, null));
+				snapToWallsPolygon(nearestEditPoint);
 			}
 			points.get(nearestIndex).set(toRelative(nearestEditPoint, container.getContainer()));
 		}
@@ -663,22 +660,21 @@ public abstract class Roof extends HousePart {
 	}
 
 	private void hideGableRoofParts() {
-		if (gableWalls == null)
+		if (gableEditPointToWallMap == null)
 			return;
 
 		/* Two Options: hide using estimating direction with wall. Or, hide using roof part number (it be wrong)) */
-		for (final HousePart wall : gableWalls) {
-			if (wall == null)
-				continue;
-			final Vector3[] base_i = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
-			for (final Spatial roofPart : getRoofPartsRoot().getChildren()) {
-				final ReadOnlyVector3[] base = findBasePoints((Mesh) ((Node) roofPart).getChild(0), null);
-				if (base != null && isSameBasePoints(base_i[0], base_i[1], base[0], base[1])) {
-					roofPart.removeFromParent();
-					break;
+		for (final List<Wall> walls : gableEditPointToWallMap.values())
+			for (final HousePart wall : walls) {
+				final Vector3[] base_i = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
+				for (final Spatial roofPart : getRoofPartsRoot().getChildren()) {
+					final ReadOnlyVector3[] base = findBasePoints((Mesh) ((Node) roofPart).getChild(0), null);
+					if (base != null && isSameBasePoints(base_i[0], base_i[1], base[0], base[1])) {
+						roofPart.removeFromParent();
+						break;
+					}
 				}
 			}
-		}
 	}
 
 	public boolean isSameBasePoints(final ReadOnlyVector3 a1, final ReadOnlyVector3 a2, final ReadOnlyVector3 b1, final ReadOnlyVector3 b2) {
@@ -788,7 +784,6 @@ public abstract class Roof extends HousePart {
 		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(bounds.getXExtent() * 2, null);
 		final ReadOnlyVector3 height = Vector3.UNIT_Y.multiply(bounds.getYExtent() * 2, null);
 		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
-//		final ReadOnlyVector3 pMiddle = getAbsPoint(0);
 		final ReadOnlyVector3 center = getCenter();
 		final ReadOnlyVector3 pMiddle = new Vector3(center.getX(), center.getY(), getAbsPoint(0).getZ());
 
