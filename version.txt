@@ -1567,6 +1567,8 @@ Version 2.0 - May 15, 2013
 - redraw the entire scene upon removing or adding house part
 - remove gableWalls attribute from roof because it's redundant with another attribute
 - prevent gable roof edit points from leaving the gable wall
+- fix problem with missing roof part due to wrong combine
+- speed up roof mesh combine method by quickly combining two groups as soon as two edges are found to be in common 
 - release version 2.5
 
 

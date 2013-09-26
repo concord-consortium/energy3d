@@ -131,7 +131,6 @@ public abstract class Roof extends HousePart {
 		final Polygon polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
 		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
-		// create roof parts
 		MeshLib.groupByPlanner(mesh, roofPartsRoot);
 		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
 		hideGableRoofParts();

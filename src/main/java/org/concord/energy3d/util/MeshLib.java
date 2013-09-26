@@ -38,8 +38,8 @@ import com.ardor3d.util.geom.BufferUtils;
 public class MeshLib {
 	private static class GroupData {
 		final Vector3 key = new Vector3();
-		final ArrayList<Vector3> vertices = new ArrayList<Vector3>();
-		final ArrayList<Vector3> normals = new ArrayList<Vector3>();
+		final ArrayList<ReadOnlyVector3> vertices = new ArrayList<ReadOnlyVector3>();
+		final ArrayList<ReadOnlyVector3> normals = new ArrayList<ReadOnlyVector3>();
 		final ArrayList<Vector2> textures = new ArrayList<Vector2>();
 	}
 
@@ -88,15 +88,13 @@ public class MeshLib {
 		return groups;
 	}
 
-	private static boolean hasCommonEdge(final GroupData group, final Vector3 p1, final Vector3 p2, final Vector3 p3) {
+	private static boolean hasCommonEdge(final GroupData group, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
 		boolean foundEdgeInCommon = false;
 		for (int j = 0; j < group.vertices.size() && !foundEdgeInCommon; j += 3) {
 			int numOfShared = 0;
 			for (int k = 0; k < 3; k++) {
-				final Vector3 p = group.vertices.get(j + k);
+				final ReadOnlyVector3 p = group.vertices.get(j + k);
 				if (p.equals(p1) || p.equals(p2) || p.equals(p3))
-					// if (Util.isEqual(p, p1) || Util.isEqual(p, p2) ||
-					// Util.isEqual(p, p3))
 					numOfShared++;
 			}
 			if (numOfShared > 1)
@@ -114,23 +112,14 @@ public class MeshLib {
 				for (int j = i + 1; j < groups.size(); j++) {
 					final GroupData group2 = groups.get(j);
 					if (group1.key.dot(group2.key) > 0.99) {
-						for (int w = 0; w < group2.vertices.size() / 3; w++) {
-							final Vector3 p1 = group2.vertices.get(w * 3);
-							final Vector3 p2 = group2.vertices.get(w * 3 + 1);
-							final Vector3 p3 = group2.vertices.get(w * 3 + 2);
+						for (int w = 0; w < group2.vertices.size(); w += 3) {
+							final ReadOnlyVector3 p1 = group2.vertices.get(w);
+							final ReadOnlyVector3 p2 = group2.vertices.get(w + 1);
+							final ReadOnlyVector3 p3 = group2.vertices.get(w + 2);
 							if (hasCommonEdge(group1, p1, p2, p3)) {
-								group1.vertices.add(p1);
-								group1.vertices.add(p2);
-								group1.vertices.add(p3);
-								group1.normals.add(group2.normals.get(w * 3));
-								group1.normals.add(group2.normals.get(w * 3 + 1));
-								group1.normals.add(group2.normals.get(w * 3 + 2));
-								for (int count = 0; count < 3; count++) {
-									group2.vertices.remove(w);
-									group2.normals.remove(w);
-								}
-								if (group2.vertices.isEmpty())
-									groups.remove(group2);
+								group1.vertices.addAll(group2.vertices);
+								group1.normals.addAll(group2.normals);
+								groups.remove(group2);
 								changed = true;
 							}
 						}
@@ -142,7 +131,7 @@ public class MeshLib {
 
 	private static void computeHorizontalTextureCoords(final ArrayList<GroupData> groups) {
 		for (final GroupData group : groups) {
-			final Vector3 normal = group.normals.get(0);
+			final ReadOnlyVector3 normal = group.normals.get(0);
 
 			final Vector3 n1 = new Vector3(normal.getX(), normal.getY(), 0).normalizeLocal();
 			double angleZ = n1.smallestAngleBetween(Vector3.NEG_UNIT_Y);
@@ -160,7 +149,6 @@ public class MeshLib {
 
 			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
 			double minV = Double.MAX_VALUE;
-
 			for (int i = 0; i < group.vertices.size(); i++) {
 				final Vector3 p = group.vertices.get(i).clone();
 				matrix.applyPost(p, p);
@@ -217,7 +205,7 @@ public class MeshLib {
 				root.attachChild(node);
 			}
 			final Vector3 normal = new Vector3();
-			for (final Vector3 v : group.normals)
+			for (final ReadOnlyVector3 v : group.normals)
 				normal.addLocal(v);
 			normal.normalizeLocal();
 			node.setUserData(normal);
@@ -227,7 +215,7 @@ public class MeshLib {
 			buf = BufferUtils.createVector3Buffer(n);
 			newMesh.getMeshData().setVertexBuffer(buf);
 			final Vector3 center = new Vector3();
-			for (final Vector3 v : group.vertices) {
+			for (final ReadOnlyVector3 v : group.vertices) {
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 				center.addLocal(v);
 			}
@@ -237,7 +225,7 @@ public class MeshLib {
 			n = group.normals.size();
 			buf = BufferUtils.createVector3Buffer(n);
 			newMesh.getMeshData().setNormalBuffer(buf);
-			for (final Vector3 v : group.normals)
+			for (final ReadOnlyVector3 v : group.normals)
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 
 			buf = newMesh.getMeshData().getTextureBuffer(0);
