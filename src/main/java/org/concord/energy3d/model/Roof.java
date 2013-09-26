@@ -552,7 +552,6 @@ public abstract class Roof extends HousePart {
 			gableEditPointToWallMap = new HashMap<Integer, List<Wall>>();
 
 		if (isGable) {
-			final ArrayList<Integer> editPoints = new ArrayList<Integer>();
 			for (final ReadOnlyVector3 roofPartMeshUpperPoint : roofPartMeshUpperPoints) {
 				double smallestDistanceToEditPoint = Double.MAX_VALUE;
 				int nearestEditPointIndex = -1;
@@ -568,7 +567,6 @@ public abstract class Roof extends HousePart {
 				if (gableEditPointToWallMap.get(nearestEditPointIndex) == null)
 					gableEditPointToWallMap.put(nearestEditPointIndex, new ArrayList<Wall>(2));
 				gableEditPointToWallMap.get(nearestEditPointIndex).add(wall);
-				editPoints.add(nearestEditPointIndex);
 			}
 		} else {
 			final List<Integer> toBeRemoved = new ArrayList<Integer>();
@@ -611,9 +609,16 @@ public abstract class Roof extends HousePart {
 				addPointToPolygon(wall.getAbsPoint(2), wall.getFaceDirection(), wallPoints, wallNormals);
 			}
 			applyOverhang(wallPoints, wallNormals);
-			final ReadOnlyVector2 p2D = Util.snapToPolygon(editPoint, wallPoints, wallNormals);
-			editPoint.setX(p2D.getX());
-			editPoint.setY(p2D.getY());
+			if (gableWalls.size() == 1) {
+				final ReadOnlyVector2 p2D = Util.snapToPolygon(editPoint, wallPoints, wallNormals);
+				editPoint.setX(p2D.getX());
+				editPoint.setY(p2D.getY());				
+			} else {
+				for (final ReadOnlyVector3 p1 : wallPoints)
+					for (final ReadOnlyVector3 p2 : wallPoints)
+						if (Util.isEqual(p1, p2))
+							editPoint.set(p1);
+			}
 			points.get(editPointIndex).set(toRelative(editPoint, container.getContainer()));
 		}
 	}
@@ -637,17 +642,16 @@ public abstract class Roof extends HousePart {
 			if (meshPoint.getZ() > highestZ)
 				highestZ = meshPoint.getZ();
 
-			if (storeUpperPoints != null)
+			if (storeUpperPoints != null && !storeUpperPoints.contains(meshPoint))
 				storeUpperPoints.add(meshPoint);
 
-			if (base[0].getZ() > meshPoint.getZ()) {
+			if (meshPoint.getZ() < base[0].getZ()) {
 				final ReadOnlyVector3 tmp = base[0];
 				base[0] = meshPoint;
 				meshPoint = tmp;
 			}
-			if (base[1].getZ() > meshPoint.getZ()) {
+			if (meshPoint.getZ() < base[1].getZ())
 				base[1] = meshPoint;
-			}
 		}
 
 		if (highestZ == base[0].getZ() || highestZ == base[1].getZ())
