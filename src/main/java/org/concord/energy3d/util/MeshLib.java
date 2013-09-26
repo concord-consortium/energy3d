@@ -113,7 +113,7 @@ public class MeshLib {
 				final GroupData group1 = groups.get(i);
 				for (int j = i + 1; j < groups.size(); j++) {
 					final GroupData group2 = groups.get(j);
-					if (Util.isEqual(group1.key, group2.key)) {
+					if (group1.key.dot(group2.key) > 0.99) {
 						for (int w = 0; w < group2.vertices.size() / 3; w++) {
 							final Vector3 p1 = group2.vertices.get(w * 3);
 							final Vector3 p2 = group2.vertices.get(w * 3 + 1);
