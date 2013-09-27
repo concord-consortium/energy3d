@@ -613,11 +613,18 @@ public abstract class Roof extends HousePart {
 				final ReadOnlyVector2 p2D = Util.snapToPolygon(editPoint, wallPoints, wallNormals);
 				editPoint.setX(p2D.getX());
 				editPoint.setY(p2D.getY());				
-			} else {
-				for (final ReadOnlyVector3 p1 : wallPoints)
-					for (final ReadOnlyVector3 p2 : wallPoints)
-						if (Util.isEqual(p1, p2))
-							editPoint.set(p1);
+			} else if (gableWalls.size() > 1) {
+				final Vector3 p0 = gableWalls.get(0).getAbsPoint(0);
+				final Wall secondWall = gableWalls.get(1);
+				final ReadOnlyVector3 cornerPoint;
+				final int cornerIndex;
+				if (Util.isEqual(p0, secondWall.getAbsPoint(0)) || Util.isEqual(p0, secondWall.getAbsPoint(2)))
+					cornerIndex = 0;		
+				else
+					cornerIndex = 1;
+				cornerPoint = wallPoints.get(cornerIndex).subtract(wallNormals.get(cornerIndex).multiply(0.01, null), null);
+				editPoint.setX(cornerPoint.getX());
+				editPoint.setY(cornerPoint.getY());
 			}
 			points.get(editPointIndex).set(toRelative(editPoint, container.getContainer()));
 		}

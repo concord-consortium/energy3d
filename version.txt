@@ -1568,7 +1568,8 @@ Version 2.0 - May 15, 2013
 - remove gableWalls attribute from roof because it's redundant with another attribute
 - prevent gable roof edit points from leaving the gable wall
 - fix problem with missing roof part due to wrong combine
-- speed up roof mesh combine method by quickly combining two groups as soon as two edges are found to be in common 
+- speed up roof mesh combine method by quickly combining two groups as soon as two edges are found to be in common
+- fix problem with gable roof not working when gabled on two adjacent walls and edit point should be forced to a corner
 - release version 2.5
 
 
