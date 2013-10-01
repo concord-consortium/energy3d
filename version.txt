@@ -1503,7 +1503,6 @@ Version 2.0 - May 15, 2013
 - fix problem: resize box does not extend all the way to top of the roof
 - only draw children of house when resizing instead of redrawing the entire scene
 - update the outside temperature based on selected city
-*
 - release version 2.2
 - remember the previous wall height
 - reset the default wall height upon new file
@@ -1548,6 +1547,7 @@ Version 2.0 - May 15, 2013
 - open models faster by avoiding redrawing after each fixDisconnectWall call 
 - update pom to use stable ardor3d v0.9
 - disable javafx
+*
 - fix problem with court house roof not drawing hole due to duplicated upper points due to float errors
 - avoid turning off the radiation colormap after turning heliodon on
 - add menu item: remove all roofs

@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Sealed: true
-Main-Class: org.concord.energy3d.MainApplication
-Class-Path: lib/guava-13.0.1.jar lib/jogl/jogl-all.jar lib/jogl/gluegen-rt.jar lib/jdom2-2.0.4.jar lib/lwjgl/lwjgl.jar lib/jfxrt.jar
