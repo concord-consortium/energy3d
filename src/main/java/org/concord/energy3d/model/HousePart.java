@@ -362,9 +362,6 @@ public abstract class HousePart implements Serializable {
 
 	protected void snapToGrid(final Vector3 p, final ReadOnlyVector3 previous, final double gridSize, final boolean snapToZ) {
 		if (isSnapToGrids()) {
-//			if (p.distance(current) < gridSize)
-//				p.set(current);
-//			else
 			final Vector3 newP = new Vector3();
 			if (container == null) 
 				newP.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
@@ -395,10 +392,6 @@ public abstract class HousePart implements Serializable {
 				final ReadOnlyVector3 v = verticalDir.normalize(null).multiplyLocal(snapedVerticalLength);
 				newP.set(origin).addLocal(u).addLocal(v);
 			}
-//			if (newP.distance(p) < newP.distance(previous) * 0.25)
-//				p.set(newP);
-//			else
-//				p.set(previous);
 			
 			for (int xyz = 0; xyz < 3; xyz++)
 			if (Math.abs(newP.getValue(xyz) - p.getValue(xyz)) < Math.abs(newP.getValue(xyz) - previous.getValue(xyz)) * 0.40)
