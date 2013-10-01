@@ -27,6 +27,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.PyramidRoof;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -889,8 +890,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else if (operation == Operation.DRAW_FLOOR)
 			drawn = new Floor();
 		else if (operation == Operation.DRAW_FOUNDATION) {
-			drawn = new Foundation();
-			setGridsVisible(true);
+//			drawn = new Foundation();
+//			setGridsVisible(true);
+			drawn = new SolarPanel();
 		} else
 			return null;
 

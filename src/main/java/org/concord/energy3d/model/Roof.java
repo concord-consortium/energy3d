@@ -879,6 +879,8 @@ public abstract class Roof extends HousePart {
 			draw();
 			drawWalls();
 		}
+		
+		drawChildren();
 
 		if (container != null)
 			setEditPointsVisible(true);

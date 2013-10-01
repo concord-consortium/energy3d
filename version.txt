@@ -1571,6 +1571,13 @@ Version 2.0 - May 15, 2013
 - speed up roof mesh combine method by quickly combining two groups as soon as two edges are found to be in common
 - fix problem with gable roof not working when gabled on two adjacent walls and edit point should be forced to a corner
 - release version 2.5
+- add solar panel
+- use z axis picking to place solar panels upon roof change
+- rotate solar panel based on normal of the roof part
+- align solar panel to x axis if roof is flat
+- snap to foundation grids
+- draw children upon editing roofs
+ 
 
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove
