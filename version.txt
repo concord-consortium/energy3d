@@ -1577,6 +1577,8 @@ Version 2.0 - May 15, 2013
 - align solar panel to x axis if roof is flat
 - snap to foundation grids
 - draw children upon editing roofs
+- fix problem with mouse not releasing after inserting solar panel
+- allow selecting solar panel
  
 
 

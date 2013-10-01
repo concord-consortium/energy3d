@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import org.concord.energy3d.util.Util;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -18,14 +19,17 @@ public class SolarPanel extends HousePart {
 
 	public SolarPanel() {
 		super(1, 1, 0.0);
-		mesh = new Box("SolarPanel", new Vector3(), 1, 2, 0.1);
-		root.attachChild(mesh);
 	}
 	
 	@Override
 	protected void init() {
 		super.init();
-		relativeToHorizontal = true;		
+		relativeToHorizontal = true;
+		
+		mesh = new Box("SolarPanel", new Vector3(), 1, 2, 0.1);
+		mesh.setModelBound(new BoundingBox());
+		mesh.setUserData(new UserData(this));		
+		root.attachChild(mesh);
 	}
 
 	@Override
