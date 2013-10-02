@@ -127,7 +127,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		final Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
 		final String heliodonTime = "[Time: " + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "]";
 		if (!heliodonTime.equals(oldHeliodonTime)) {
-			line += space + heliodonTime;
+			if (!sceneManager.isSunAnim()) // don't log time if sun path is animated
+				line += space + heliodonTime;
 			oldHeliodonTime = heliodonTime;
 		}
 		final String heliodonLatitude = "[Latitude: " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI) + "]";
@@ -161,7 +162,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			cameraPosition += ", " + FORMAT.format(direction.getY());
 			cameraPosition += ", " + FORMAT.format(direction.getZ()) + ")";
 			if (!cameraPosition.equals(oldCameraPosition)) {
-				line += space + "[Camera: " + cameraPosition + "]";
+				if (!sceneManager.isRotationAnimationOn()) // don't log camera if the view is being spun
+					line += space + "[Camera: " + cameraPosition + "]";
 				oldCameraPosition = cameraPosition;
 			}
 		}
