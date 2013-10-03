@@ -1579,7 +1579,8 @@ Version 2.0 - May 15, 2013
 - draw children upon editing roofs
 - fix problem with mouse not releasing after inserting solar panel
 - allow selecting solar panel
- 
+ - add solar panel icon
+- apply texture to solar panel
 
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove

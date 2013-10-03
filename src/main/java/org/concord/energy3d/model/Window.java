@@ -292,4 +292,9 @@ public class Window extends HousePart {
 		return 1.0;
 	}
 
+	@Override
+	protected String getTextureFileName() {
+		return null;
+	}
+
 }

@@ -1229,7 +1229,7 @@ public class MainFrame extends JFrame {
 			roofColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForHousePart(Operation.DRAW_ROOF);
+					showColorDialogForHousePart(Operation.DRAW_ROOF_PYRAMID);
 				}
 			});
 		}
@@ -1257,7 +1257,7 @@ public class MainFrame extends JFrame {
 				case DRAW_FLOOR:
 					Scene.getInstance().setFloorColor(color);
 					break;
-				case DRAW_ROOF:
+				case DRAW_ROOF_PYRAMID:
 					Scene.getInstance().setRoofColor(color);
 					break;
 				default:
@@ -1290,7 +1290,7 @@ public class MainFrame extends JFrame {
 		case DRAW_FLOOR:
 			color = Scene.getInstance().getFloorColor();
 			break;
-		case DRAW_ROOF:
+		case DRAW_ROOF_PYRAMID:
 			color = Scene.getInstance().getRoofColor();
 			break;
 		default:

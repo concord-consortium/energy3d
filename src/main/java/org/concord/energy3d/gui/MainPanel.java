@@ -74,6 +74,7 @@ public class MainPanel extends JPanel {
 	};
 
 	final static Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
+	private JToggleButton solarPanelButton;
 	static {
 		cityLatitute.put("Moscow", 55);
 		cityLatitute.put("Ottawa", 45);
@@ -140,6 +141,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getRoofCustomButton());
 			appToolbar.add(getRoofGableButton());
 			appToolbar.add(getFloorButton());
+			appToolbar.add(getSolarPanelButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
 			appToolbar.add(getHeliodonButton());
@@ -246,7 +248,7 @@ public class MainPanel extends JPanel {
 			roofButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_PYRAMID);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
@@ -740,5 +742,20 @@ public class MainPanel extends JPanel {
 			sunAnimButton.setSelected(false);
 			SceneManager.getInstance().setSunAnim(false);
 		}
+	}
+	
+	private JToggleButton getSolarPanelButton() {
+		if (solarPanelButton == null) {
+			solarPanelButton = new JToggleButton("");
+			solarPanelButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_SOLAR_PANEL);
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+				}
+			});
+			solarPanelButton.setIcon(new ImageIcon(getClass().getResource("icons/solarpanel.png")));
+		}
+		return solarPanelButton;
 	}
 }
