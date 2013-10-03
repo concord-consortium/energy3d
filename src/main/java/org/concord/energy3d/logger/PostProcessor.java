@@ -45,7 +45,6 @@ public class PostProcessor {
 				}
 				final PrintWriter pw = logWriter;
 				int i = -1;
-				Date date0 = null;
 				int total0 = -1;
 				int wallCount0 = -1;
 				int windowCount0 = -1;
@@ -53,20 +52,25 @@ public class PostProcessor {
 				int roofCount0 = -1;
 				int floorCount0 = -1;
 				long timestamp = -1;
+				Date date0 = null;
 				while (i < n - 1) {
 					if (replaying) {
 						i++;
-						// if (i == n) i = 0;
 						int slash = files[i].toString().lastIndexOf(System.getProperty("file.separator"));
 						String fileName = files[i].toString().substring(slash + 1).trim();
 						String[] ss = fileName.substring(0, fileName.length() - 4).split("[\\s]+"); // get time stamp
-						String[] day = ss[0].split("-");
-						String[] time = ss[1].split("-");
-						Calendar c = Calendar.getInstance();
-						c.set(Integer.parseInt(day[0]), Integer.parseInt(day[1]) - 1, Integer.parseInt(day[2]), Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
-						if (date0 == null)
-							date0 = c.getTime();
-						timestamp = Math.round((c.getTime().getTime() - date0.getTime()) * 0.001);
+						if (ss.length >= 2) {
+							String[] day = ss[0].split("-");
+							String[] time = ss[1].split("-");
+							Calendar c = Calendar.getInstance();
+							c.set(Integer.parseInt(day[0]), Integer.parseInt(day[1]) - 1, Integer.parseInt(day[2]), Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
+							if (date0 == null)
+								date0 = c.getTime();
+							timestamp = Math.round((c.getTime().getTime() - date0.getTime()) * 0.001);
+						} else {
+							System.err.println("File timestamp error");
+							timestamp = 0;
+						}
 						System.out.println("Play back " + i + " of " + n + ": " + fileName);
 						try {
 							Scene.open(files[i].toURI().toURL());
@@ -114,6 +118,7 @@ public class PostProcessor {
 						pw.print("  Roof=" + FORMAT_PART_COUNT.format(roofCount - roofCount0));
 						pw.print("  Floor=" + FORMAT_PART_COUNT.format(floorCount - floorCount0));
 						pw.println("");
+						// if (i == n - 1) i = 0;
 					} else {
 						if (backward) {
 							if (i > 0) {
@@ -139,6 +144,8 @@ public class PostProcessor {
 								}
 							}
 							forward = false;
+							if (i == n - 1)
+								i = n - 2;
 						}
 					}
 				}
