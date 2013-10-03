@@ -278,7 +278,7 @@ public class Scene implements Serializable {
 		for (final HousePart housePart : toBeRemoved)
 			remove(housePart, false);
 
-//		connectWalls();
+		// connectWalls();
 	}
 
 	private void removeDeadChildren(final HousePart parent, final ArrayList<HousePart> toBeRemoved) {
@@ -313,7 +313,7 @@ public class Scene implements Serializable {
 		for (final HousePart part : parts)
 			if (part instanceof Wall)
 				((Wall) part).connectedWalls();
-		
+
 		for (final HousePart part : parts)
 			if (part instanceof Wall)
 				((Wall) part).computeInsideDirectionOfAttachedWalls(false);
@@ -324,28 +324,34 @@ public class Scene implements Serializable {
 	}
 
 	public static void save(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager) throws Exception {
-		if (notifyUndoManager)
-			instance.cleanup();
-		// save camera to file
-		saveCameraLocation();
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				if (notifyUndoManager)
+					instance.cleanup();
+				// save camera to file
+				saveCameraLocation();
 
-		instance.calendar = Heliodon.getInstance().getCalander();
-		instance.latitude = EnergyPanel.getInstance().getLatitude();
-		instance.city = EnergyPanel.getInstance().getCity();
-		instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
-		instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
-		instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
+				instance.calendar = Heliodon.getInstance().getCalander();
+				instance.latitude = EnergyPanel.getInstance().getLatitude();
+				instance.city = EnergyPanel.getInstance().getCity();
+				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
+				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
+				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
 
-		if (setAsCurrentFile)
-			Scene.url = url;
-		System.out.print("Saving " + url + "...");
-		ObjectOutputStream out;
-		out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
-		out.writeObject(instance);
-		out.close();
-		if (notifyUndoManager)
-			SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
-		System.out.println("done");
+				if (setAsCurrentFile)
+					Scene.url = url;
+				System.out.print("Saving " + url + "...");
+				ObjectOutputStream out;
+				out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
+				out.writeObject(instance);
+				out.close();
+				if (notifyUndoManager)
+					SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
+				System.out.println("done");
+				return null;
+			}
+		});
 	}
 
 	public static void saveCameraLocation() {
@@ -366,10 +372,10 @@ public class Scene implements Serializable {
 		if (container != null)
 			container.getChildren().add(housePart);
 		addTree(housePart);
-//		if (container != null)
-//			container.draw();
+		// if (container != null)
+		// container.draw();
 		if (redraw)
-			redrawAll();		
+			redrawAll();
 	}
 
 	private void addTree(final HousePart housePart) {
@@ -388,8 +394,8 @@ public class Scene implements Serializable {
 		if (container != null)
 			container.getChildren().remove(housePart);
 		removeTree(housePart);
-//		if (container != null)
-//			container.draw();
+		// if (container != null)
+		// container.draw();
 		if (redraw)
 			redrawAll();
 	}
@@ -467,9 +473,9 @@ public class Scene implements Serializable {
 	public void redrawAll() {
 		redrawAll(false);
 	}
-	
+
 	public void redrawAll(final boolean cleanup) {
-		this.cleanup  = cleanup;
+		this.cleanup = cleanup;
 		if (PrintController.getInstance().isPrintPreview())
 			PrintController.getInstance().restartAnimation();
 		else

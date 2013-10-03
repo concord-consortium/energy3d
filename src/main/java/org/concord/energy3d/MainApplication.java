@@ -1,14 +1,9 @@
 package org.concord.energy3d;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -43,36 +38,7 @@ public class MainApplication {
 			mainFrame.open(args[args.length - 1]);
 
 		/* initialize data logging */
-		final String logPath;
-		if (Config.isWebStart()) {
-			final String rootPathRelative = File.separator + "Energy3D";
-			final String rootPathAbsolute;
-			if (Config.isWindows()) {
-				final float winVersion = Float.parseFloat(System.getProperty("os.version"));
-				System.out.println("Windows " + winVersion);
-				if (winVersion < 6)
-					rootPathAbsolute = System.getProperty("user.home") + "\\Local Settings\\Application Data" + rootPathRelative;
-				else
-					rootPathAbsolute = System.getenv("LOCALAPPDATA") + rootPathRelative;
-			} else if (Config.isMac())
-				rootPathAbsolute = System.getProperty("user.home") + "/Library/Logs/Energy3D";
-			else
-				rootPathAbsolute = System.getProperty("user.home") + rootPathRelative;
-			if (Config.isMac())
-				logPath = rootPathAbsolute;
-			else {
-				final File dir = new File(rootPathAbsolute);
-				if (!dir.exists())
-					dir.mkdir();
-				logPath = rootPathAbsolute + File.separator + "log";
-			}
-		} else
-			logPath = "log";
-		final File dir = new File(logPath);
-		System.out.println("Log folder: " + dir.toString());
-		if (!dir.exists())
-			dir.mkdir();
-		final TimeSeriesLogger logger = new TimeSeriesLogger(2, 5, dir, scene);
+		final TimeSeriesLogger logger = new TimeSeriesLogger(2, 5, scene);
 		scene.addShutdownHook(new Runnable() {
 			@Override
 			public void run() {
@@ -81,7 +47,7 @@ public class MainApplication {
 		});
 		Scene.getInstance().addPropertyChangeListener(logger);
 		logger.start();
-		logSnapshots(5, dir, logger);
+		SnapshotLogger.start(5, logger);
 	}
 
 	public static void setupLibraryPath() {
@@ -122,42 +88,6 @@ public class MainApplication {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	private static void logSnapshots(final int period, final File dir, final TimeSeriesLogger logger) {
-		final Thread t = new Thread("Snapshots Logger") {
-			@Override
-			public void run() {
-				while (true) {
-					try {
-						sleep(1000 * period); // 20 seconds seem optimal
-					} catch (final InterruptedException e) {
-						e.printStackTrace();
-					}
-					if (Scene.getURL() != null) { // log only when student
-													// starts with a template
-						if (logger.isEdited()) {
-							try {
-								saveSnapshot(dir);
-							} catch (final Exception e) {
-								e.printStackTrace();
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging! Please notify the teacher of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
-								break;
-							}
-							logger.resetEditFlags();
-						}
-					}
-				}
-			}
-		};
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();
-	}
-
-	private static void saveSnapshot(final File dir) throws Exception {
-		final Date date = Calendar.getInstance().getTime();
-		final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd  HH-mm-ss").format(date) + ".ng3";
-		Scene.save(new File(filename).toURI().toURL(), false, false);
 	}
 
 }

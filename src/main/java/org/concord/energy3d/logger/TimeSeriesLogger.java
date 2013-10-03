@@ -35,7 +35,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private final static String space = "   ";
 	private int logInterval = 1; // in seconds
 	private int saveInterval = 5; // save every N valid actions
-	private final File dir;
 	private File file;
 	private final SceneManager sceneManager;
 	private UndoableEdit lastEdit;
@@ -50,10 +49,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
 
-	public TimeSeriesLogger(final int logInterval, final int saveInterval, final File dir, final SceneManager sceneManager) {
+	public TimeSeriesLogger(final int logInterval, final int saveInterval, final SceneManager sceneManager) {
 		this.logInterval = logInterval;
 		this.saveInterval = saveInterval;
-		this.dir = dir;
 		this.sceneManager = sceneManager;
 		undoManager = sceneManager.getUndoManager();
 		lastEdit = undoManager.lastEdit();
@@ -218,7 +216,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	public void start() {
 		final String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
-		file = new File(dir, timestamp + ".txt");
+		file = new File(Util.getLogFolder(), timestamp + ".txt");
 		final Thread t = new Thread("Time Series Logger") {
 			@Override
 			public void run() {
