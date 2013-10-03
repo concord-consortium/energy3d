@@ -78,7 +78,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private void log() {
 		final String timestamp = new SimpleDateFormat("yyyy-MM-dd" + space + "HH:mm:ss").format(Calendar.getInstance().getTime());
 		final URL url = Scene.getURL();
-		if (url == null) // no logging if not using a template
+		if (url == null) // no logging if not working on a saved file
 			return;
 		final String filename = url == null ? null : new File(url.getFile()).getName();
 		String action = undoManager.getUndoPresentationName();
