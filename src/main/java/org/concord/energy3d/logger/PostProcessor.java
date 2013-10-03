@@ -14,13 +14,15 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.util.Config;
 
 /**
  * @author Charles Xie
  * 
  */
 public class PostProcessor {
+
+	public static boolean replaying = true;
+	public static boolean backward, forward;
 
 	private final static int SLEEP = 200;
 	private final static DecimalFormat FORMAT_TIME_COUNT = new DecimalFormat("000000000");
@@ -52,7 +54,7 @@ public class PostProcessor {
 				int floorCount0 = -1;
 				long timestamp = -1;
 				while (i < n - 1) {
-					if (Config.replaying) {
+					if (replaying) {
 						i++;
 						// if (i == n) i = 0;
 						int slash = files[i].toString().lastIndexOf(System.getProperty("file.separator"));
@@ -113,7 +115,7 @@ public class PostProcessor {
 						pw.print("  Floor=" + FORMAT_PART_COUNT.format(floorCount - floorCount0));
 						pw.println("");
 					} else {
-						if (Config.backward) {
+						if (backward) {
 							if (i > 0) {
 								i--;
 								System.out.println("Play back " + i + " of " + n);
@@ -124,8 +126,8 @@ public class PostProcessor {
 									e.printStackTrace();
 								}
 							}
-							Config.backward = false;
-						} else if (Config.forward) {
+							backward = false;
+						} else if (forward) {
 							if (i < n - 1) {
 								i++;
 								System.out.println("Play back " + i + " of " + n);
@@ -136,7 +138,7 @@ public class PostProcessor {
 									e.printStackTrace();
 								}
 							}
-							Config.forward = false;
+							forward = false;
 						}
 					}
 				}

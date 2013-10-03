@@ -337,7 +337,7 @@ public class MainFrame extends JFrame {
 			fileMenu.setText("File");
 			fileMenu.add(getNewMenuItem());
 			fileMenu.add(getOpenMenuItem());
-			if (Config.isResearchMode())
+			if (!Config.isRestrictMode())
 				fileMenu.add(getOpenFolderMenuItem());
 			fileMenu.add(getSaveMenuItem());
 			fileMenu.add(getSaveasMenuItem());
@@ -749,7 +749,7 @@ public class MainFrame extends JFrame {
 			sceneMenu.add(getWallThicknessMenuItem());
 			sceneMenu.add(getRemoveAllRoofsMenuItem());
 			sceneMenu.add(getKeepHeatmapOnMenuItem());
-			if (Config.isResearchMode()) {
+			if (!Config.isRestrictMode()) {
 				sceneMenu.add(getFreezeMenuItem());
 				sceneMenu.add(getUnfreezeMenuItem());
 			}

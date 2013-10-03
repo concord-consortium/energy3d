@@ -9,23 +9,26 @@ public class Config {
 	private static boolean isWebstart;
 	private static final boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac");
 	private static final boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("win");
-//	private static long startTime;
 
-	public static enum RenderMode {NEWT, JOGL, LWJGL};
+	// private static long startTime;
 
-//	static {
-//		final Object renderer = JOptionPane.showInputDialog(null, "Which renderer?", null, JOptionPane.QUESTION_MESSAGE, null, new RenderMode[] {RenderMode.JOGL,  RenderMode.LWJGL, RenderMode.NEWT}, RenderMode.JOGL);
-//		if (renderer != null)
-//			RENDER_MODE = (RenderMode) renderer;
-////		startTime = System.nanoTime();
-//	}
+	public static enum RenderMode {
+		NEWT, JOGL, LWJGL
+	};
 
-//	public static void printTimeUntilFirstRender() {
-//		if (startTime != 0) {
-//			System.out.println("Time until first render = " + (float)((System.nanoTime() - startTime) / 1000000000.0) + "s");
-//			startTime = 0;
-//		}
-//	}
+	// static {
+	// final Object renderer = JOptionPane.showInputDialog(null, "Which renderer?", null, JOptionPane.QUESTION_MESSAGE, null, new RenderMode[] {RenderMode.JOGL, RenderMode.LWJGL, RenderMode.NEWT}, RenderMode.JOGL);
+	// if (renderer != null)
+	// RENDER_MODE = (RenderMode) renderer;
+	// // startTime = System.nanoTime();
+	// }
+
+	// public static void printTimeUntilFirstRender() {
+	// if (startTime != 0) {
+	// System.out.println("Time until first render = " + (float)((System.nanoTime() - startTime) / 1000000000.0) + "s");
+	// startTime = 0;
+	// }
+	// }
 
 	public static MainApplet getApplet() {
 		return applet;
@@ -58,21 +61,12 @@ public class Config {
 		return isMac;
 	}
 
-	// XIE: the following methods support logging and analysis
-
-	public static boolean isClassroomMode() {
-		return false;
-	}
-
-	public static boolean isResearchMode() {
-		return true;
-	}
-
 	public static boolean isWindows() {
 		return isWindows;
 	}
 
-	public static boolean replaying = true;
-	public static boolean backward, forward;
+	public static boolean isRestrictMode() {
+		return false;
+	}
 
 }
