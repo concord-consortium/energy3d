@@ -27,6 +27,7 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingVolume.Type;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -792,7 +793,7 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	public void drawGrids(final double gridSize) {
-		final BoundingBox bounds = (BoundingBox) root.getWorldBound();
+		final BoundingBox bounds = (BoundingBox) root.getWorldBound().asType(Type.AABB);
 		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(bounds.getXExtent() * 2, null);
 		final ReadOnlyVector3 height = Vector3.UNIT_Y.multiply(bounds.getYExtent() * 2, null);
 		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
