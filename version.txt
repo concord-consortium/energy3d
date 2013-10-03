@@ -1581,6 +1581,7 @@ Version 2.0 - May 15, 2013
 - allow selecting solar panel
  - add solar panel icon
 - apply texture to solar panel
+- convert all bounding boxes of oriented meshes to oriented bounding box
 
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove

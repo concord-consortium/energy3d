@@ -8,7 +8,6 @@ import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.MathUtils;
@@ -52,7 +51,7 @@ public class Window extends HousePart {
 
 		bars = new Line("Window (bars)");
 		bars.setLineWidth(3);
-		bars.setModelBound(new BoundingBox());
+		bars.setModelBound(new OrientedBoundingBox());
 		Util.disablePickShadowLight(bars);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		root.attachChild(bars);

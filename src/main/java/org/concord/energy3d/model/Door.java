@@ -6,7 +6,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
@@ -32,7 +32,7 @@ public class Door extends HousePart {
 
 		updateTextureAndColor();
 
-		mesh.setModelBound(new BoundingBox());
+		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 	}

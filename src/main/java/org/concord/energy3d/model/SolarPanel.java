@@ -3,7 +3,7 @@ package org.concord.energy3d.model;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -28,7 +28,7 @@ public class SolarPanel extends HousePart {
 		relativeToHorizontal = true;
 		
 		mesh = new Box("SolarPanel", new Vector3(), 1, 2, 0.1);
-		mesh.setModelBound(new BoundingBox());
+		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));		
 		root.attachChild(mesh);
 		

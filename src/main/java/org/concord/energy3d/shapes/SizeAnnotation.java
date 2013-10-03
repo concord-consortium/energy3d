@@ -6,7 +6,7 @@ import java.text.DecimalFormat;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -33,7 +33,7 @@ public class SizeAnnotation extends Annotation {
 	public SizeAnnotation() {
 		super(new Line("Size annotation lines", BufferUtils.createVector3Buffer(8), null, null, null));
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-		arrows.setModelBound(new BoundingBox());
+		arrows.setModelBound(new OrientedBoundingBox());
 		Util.disablePickShadowLight(arrows);
 		setColor(ColorRGBA.BLACK);
 		attachChild(arrows);
