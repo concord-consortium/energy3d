@@ -1579,10 +1579,10 @@ Version 2.0 - May 15, 2013
 - draw children upon editing roofs
 - fix problem with mouse not releasing after inserting solar panel
 - allow selecting solar panel
- - add solar panel icon
+- add solar panel icon
 - apply texture to solar panel
 - convert all bounding boxes of oriented meshes to oriented bounding box
-
+- fix problem with out of bound exception when loading some models
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove
 - *display energy only for the currently selected house

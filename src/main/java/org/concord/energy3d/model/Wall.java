@@ -323,7 +323,6 @@ public class Wall extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		Scene.getInstance().getAnnotationScale();
 		return points.size() >= 4 && getAbsPoint(2).subtract(getAbsPoint(0), null).length() >= getGridSize() && !isAtSamePlaceAsAnotherPart(this);
 	}
 

@@ -726,10 +726,9 @@ public abstract class HousePart implements Serializable {
 	public boolean isValid() {
 		if (!isDrawable())
 			return false;
-		for (final ReadOnlyVector3 p : points) {
+		for (final ReadOnlyVector3 p : points)
 			if (!Vector3.isValid(p))
 				return false;
-		}
 		return true;
 	}
 

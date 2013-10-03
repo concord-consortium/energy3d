@@ -267,18 +267,18 @@ public class Scene implements Serializable {
 
 	private void cleanup() {
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
-		for (final HousePart housePart : parts) {
-			if (!housePart.isDrawCompleted())
-				housePart.complete();
-			if (!housePart.isValid() || ((housePart instanceof Roof || housePart instanceof Window || housePart instanceof Door) && housePart.getContainer() == null))
-				toBeRemoved.add(housePart);
-			removeDeadChildren(housePart, toBeRemoved);
+		for (final HousePart part : parts) {			
+			if (!part.isValid() || ((part instanceof Roof || part instanceof Window || part instanceof Door) && part.getContainer() == null))
+				toBeRemoved.add(part);
+			else {
+				removeDeadChildren(part, toBeRemoved);
+				if (!part.isDrawCompleted())
+					part.complete();
+			}
 		}
 
-		for (final HousePart housePart : toBeRemoved)
-			remove(housePart, false);
-
-		// connectWalls();
+		for (final HousePart part : toBeRemoved)
+			remove(part, false);
 	}
 
 	private void removeDeadChildren(final HousePart parent, final ArrayList<HousePart> toBeRemoved) {
