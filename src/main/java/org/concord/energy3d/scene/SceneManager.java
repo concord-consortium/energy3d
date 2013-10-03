@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -707,26 +708,27 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				Scene.getInstance().redrawAll(true);
 			}
 		}));
+
 		// XIE: Run/pause model replay
-		if (Config.isResearchMode()) {
+		if (!Config.isRestrictMode()) {
 			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					Config.replaying = !Config.replaying;
+					PostProcessor.replaying = !PostProcessor.replaying;
 				}
 			}));
 			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (!Config.replaying)
-						Config.backward = true;
+					if (!PostProcessor.replaying)
+						PostProcessor.backward = true;
 				}
 			}));
 			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.RIGHT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (!Config.replaying)
-						Config.forward = true;
+					if (!PostProcessor.replaying)
+						PostProcessor.forward = true;
 				}
 			}));
 		}
@@ -1086,19 +1088,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			});
 	}
 
-	private void mouseMoved() {		
+	private void mouseMoved() {
 		if (!mouseControlEnabled)
 			return;
 		final int x = mouseState.getX();
 		final int y = mouseState.getY();
-		
+
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
 		} else if (houseMoveStartPoint != null && operation == Operation.RESIZE && selectedHousePart.isDrawCompleted()) {
 			final PickedHousePart pick = SelectUtil.pickPart(x, y, invisibleFloor);
 			if (pick != null) {
 				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
-				((Foundation)selectedHousePart).move(d, houseMovePoints);
+				((Foundation) selectedHousePart).move(d, houseMovePoints);
 			}
 		} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
 			final PickedHousePart selectHousePart = SelectUtil.selectHousePart(x, y, false);
@@ -1386,7 +1388,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				EnergyPanel.getInstance().compute(true);
 				return null;
 			}
-			
+
 		});
 	}
 
