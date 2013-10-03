@@ -194,9 +194,7 @@ public abstract class HousePart implements Serializable {
 		return (Mesh) pointsRoot.getChild(i);
 	}
 
-	protected String getTextureFileName() {
-		return null;
-	}
+	abstract protected String getTextureFileName();
 
 	public void setOriginal(final HousePart original) {
 		this.original = original;

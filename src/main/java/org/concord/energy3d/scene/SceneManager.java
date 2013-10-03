@@ -130,7 +130,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE
+		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL
 	}
 
 	public enum CameraMode {
@@ -881,7 +881,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Door();
 		else if (operation == Operation.DRAW_WINDOW)
 			drawn = new Window();
-		else if (operation == Operation.DRAW_ROOF)
+		else if (operation == Operation.DRAW_ROOF_PYRAMID)
 			drawn = new PyramidRoof();
 		else if (operation == Operation.DRAW_ROOF_HIP)
 			drawn = new HipRoof();
@@ -889,10 +889,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new CustomRoof();
 		else if (operation == Operation.DRAW_FLOOR)
 			drawn = new Floor();
-		else if (operation == Operation.DRAW_FOUNDATION) {
-//			drawn = new Foundation();
-//			setGridsVisible(true);
+		else if (operation == Operation.DRAW_SOLAR_PANEL)
 			drawn = new SolarPanel();
+		else if (operation == Operation.DRAW_FOUNDATION) {
+			drawn = new Foundation();
+			setGridsVisible(true);
 		} else
 			return null;
 

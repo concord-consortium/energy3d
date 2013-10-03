@@ -1,5 +1,6 @@
 package org.concord.energy3d.model;
 
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -30,6 +31,8 @@ public class SolarPanel extends HousePart {
 		mesh.setModelBound(new BoundingBox());
 		mesh.setUserData(new UserData(this));		
 		root.attachChild(mesh);
+		
+		updateTextureAndColor();
 	}
 
 	@Override
@@ -79,7 +82,12 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-
+		updateTextureAndColor(mesh, null, TextureMode.Full);
 	}
+	
+	@Override
+	protected String getTextureFileName() {
+		return "solarpanel.png";
+	}	
 
 }
