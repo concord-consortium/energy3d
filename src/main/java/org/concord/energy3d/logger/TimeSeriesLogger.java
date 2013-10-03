@@ -120,8 +120,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (action != null) {
 			line += space + "{" + action + "}";
 			if (!type2Action) {
-				line += space + "{" + getBuildingId(actedHousePart) + "}";
-				line += space + "{" + getId(actedHousePart) + "}";
+				line += space + "{" + Util.getBuildingId(actedHousePart) + "}";
+				line += space + "{" + Util.getId(actedHousePart) + "}";
 			}
 		}
 		final Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
@@ -214,35 +214,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	public void resetEditFlags() {
 		sceneEditedFlag = false;
 		noteEditedFlag = false;
-	}
-
-	private String getId(final HousePart p) {
-		if (p == null)
-			return null;
-		return p.getClass().getSimpleName() + " #" + p.getId();
-	}
-
-	private String getBuildingId(final HousePart p) {
-		if (p == null)
-			return null;
-		final HousePart x = getTopContainer(actedHousePart);
-		if (x == null)
-			return null;
-		return "Building #" + x.getId();
-	}
-
-	private HousePart getTopContainer(final HousePart p) {
-		if (p == null)
-			return null;
-		HousePart c = p.getContainer();
-		if (c == null)
-			return p;
-		HousePart x = null;
-		while (c != null) {
-			x = c;
-			c = c.getContainer();
-		}
-		return x;
 	}
 
 	public void start() {
