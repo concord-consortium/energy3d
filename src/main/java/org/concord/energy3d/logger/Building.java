@@ -40,19 +40,49 @@ class Building {
 			height = h;
 	}
 
-	double getArea() {
+	private double getArea() {
 		double area = 0;
 		int n = floorVertices.size();
+		Vector2 v1, v2;
 		for (int i = 0; i < n - 1; i++) {
-			Vector2 v1 = floorVertices.get(i);
-			Vector2 v2 = floorVertices.get(i + 1);
+			v1 = floorVertices.get(i);
+			v2 = floorVertices.get(i + 1);
 			area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
 		}
-		return Math.abs(area * 0.5);
+		v1 = floorVertices.get(n - 1);
+		v2 = floorVertices.get(0);
+		area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
+		return area * 0.5;
 	}
 
-	double getVolume() {
-		return getArea() * height;
+	private double getCentroidX() {
+		double cx = 0;
+		int n = floorVertices.size();
+		Vector2 v1, v2;
+		for (int i = 0; i < n - 1; i++) {
+			v1 = floorVertices.get(i);
+			v2 = floorVertices.get(i + 1);
+			cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
+		}
+		v1 = floorVertices.get(n - 1);
+		v2 = floorVertices.get(0);
+		cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
+		return cx / 6;
+	}
+
+	private double getCentroidY() {
+		double cy = 0;
+		int n = floorVertices.size();
+		Vector2 v1, v2;
+		for (int i = 0; i < n - 1; i++) {
+			v1 = floorVertices.get(i);
+			v2 = floorVertices.get(i + 1);
+			cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
+		}
+		v1 = floorVertices.get(n - 1);
+		v2 = floorVertices.get(0);
+		cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
+		return cy / 6;
 	}
 
 	private void addVertex(ReadOnlyVector3 v3) {
@@ -77,11 +107,9 @@ class Building {
 				int pointIndex = 0;
 				if (next != null)
 					pointIndex = next.getSnapPointIndexOf(currentWall);
-				pointIndex = pointIndex + 1;
-				final ReadOnlyVector3 p1 = currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1);
-				final ReadOnlyVector3 p2 = currentWall.getAbsPoint(pointIndex);
-				addVertex(p1);
-				addVertex(p2);
+				pointIndex++;
+				addVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
+				addVertex(currentWall.getAbsPoint(pointIndex));
 			}
 		});
 	}
@@ -96,16 +124,17 @@ class Building {
 
 	@Override
 	public String toString() {
-		String s = "(ID=" + id;
-		s += " #Wall=" + walls.size();
-		s += " #Window=" + windowCount;
-		s += " height=" + FORMAT.format(height);
 		exploreWallNeighbors();
-		double area = walls.size() == floorVertices.size() ? getArea() : -1;
-		s += " n=" + floorVertices.size();
-		if (area > 0) {
-			s += " area=" + FORMAT.format(area);
-			s += " volume=" + FORMAT.format(area * height);
+		String s = "(ID=" + id;
+		if (walls.size() == floorVertices.size()) {
+			s += " #Wall=" + walls.size();
+			if (windowCount > 0)
+				s += " #Window=" + windowCount;
+			s += " height=" + FORMAT.format(height);
+			double area = getArea();
+			s += " area=" + FORMAT.format(Math.abs(area));
+			s += " volume=" + FORMAT.format(Math.abs(area) * height);
+			s += " centroid=" + FORMAT.format(getCentroidX() / area) + ", " + FORMAT.format(getCentroidY() / area);
 		}
 		return s + ")";
 	}
