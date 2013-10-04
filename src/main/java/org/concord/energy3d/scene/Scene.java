@@ -145,16 +145,18 @@ public class Scene implements Serializable {
 	}
 
 	public static void open(final URL file) throws Exception {
+		openNow(file);
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				openNow(file, true);
+				initSceneNow();
+				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				return null;
 			}
 		});
 	}
 
-	public static void openNow(final URL file, final boolean computeEnergy) throws Exception {
+	public static void openNow(final URL file) throws Exception {
 		Scene.url = file;
 
 		if (PrintController.getInstance().isPrintPreview()) {
@@ -196,8 +198,10 @@ public class Scene implements Serializable {
 
 		final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
 		if (cameraControl != null)
-			cameraControl.reset();
+			cameraControl.reset();		
+	}
 
+	public static void initSceneNow() {
 		originalHouseRoot.detachAllChildren();
 		root.detachAllChildren();
 		root.attachChild(originalHouseRoot);
@@ -224,8 +228,6 @@ public class Scene implements Serializable {
 		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
 		SceneManager.getInstance().getUndoManager().die();
 		Scene.getInstance().setEdited(false);
-		if (computeEnergy)
-			energyPanel.compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 
 	public static void loadCameraLocation() {

@@ -1583,7 +1583,8 @@ Version 2.0 - May 15, 2013
 - apply texture to solar panel
 - convert all bounding boxes of oriented meshes to oriented bounding box
 - fix problem with out of bound exception when loading some models
-- allow openNow and computerNow methods to be called without thread or queuing 
+- allow openNow and computerNow methods to be called without thread or queuing
+- divide open method into three calls: openNow(), initSceneNow(), and energyPanel.compute()
 
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove
