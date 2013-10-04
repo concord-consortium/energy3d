@@ -18,6 +18,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.shapes.Heliodon;
 
 /**
  * @author Charles Xie
@@ -79,7 +80,7 @@ public class PostProcessor {
 							System.err.println("File timestamp error");
 							timestamp = 0;
 						}
-						System.out.println("Play back " + i + " of " + n + ": " + fileName);						
+						System.out.println("Play back " + i + " of " + n + ": " + fileName);
 						try {
 							Scene.openNow(files[i].toURI().toURL());
 							Scene.initSceneNow();
@@ -153,8 +154,12 @@ public class PostProcessor {
 							floorCount0 = floorCount;
 						if (doorCount0 == -1)
 							doorCount0 = doorCount;
+						Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
+						String heliodonTime = (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY);
 						pw.print(fileName);
 						pw.print("  Timestamp=" + FORMAT_TIME_COUNT.format(timestamp));
+						pw.print("  Heliodon=" + heliodonTime);
+						pw.print("  Latitude=" + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI));
 						pw.print("  #Total=" + FORMAT_PART_COUNT.format(parts.size() - total0));
 						pw.print("  #Wall=" + FORMAT_PART_COUNT.format(wallCount - wallCount0));
 						pw.print("  #Window=" + FORMAT_PART_COUNT.format(windowCount - windowCount0));
