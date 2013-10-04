@@ -48,13 +48,13 @@ class Util {
 		return folder;
 	}
 
-	static String getBuildingId(final HousePart p, boolean prefix) {
+	static Object getBuildingId(final HousePart p, boolean prefix) {
 		if (p == null)
 			return null;
 		final HousePart x = getTopContainer(p);
 		if (x == null)
 			return null;
-		return prefix ? "Building #" + x.getId() : "" + x.getId();
+		return prefix ? "Building #" + x.getId() : x.getId();
 	}
 
 	static HousePart getTopContainer(final HousePart p) {

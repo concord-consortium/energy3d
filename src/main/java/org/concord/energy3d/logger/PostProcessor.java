@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -14,6 +15,9 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
+
+import com.ardor3d.math.Vector2;
+import com.ardor3d.math.Vector3;
 
 /**
  * @author Charles Xie
@@ -51,9 +55,10 @@ public class PostProcessor {
 				int foundationCount0 = -1;
 				int roofCount0 = -1;
 				int floorCount0 = -1;
+				int doorCount0 = -1;
 				long timestamp = -1;
 				Date date0 = null;
-				ArrayList<String> buildings0 = null;
+				ArrayList<Building> buildings0 = null;
 				while (i < n - 1) {
 					if (replaying) {
 						i++;
@@ -81,18 +86,20 @@ public class PostProcessor {
 							e.printStackTrace();
 						}
 						final ArrayList<HousePart> parts = Scene.getInstance().getParts();
-						final ArrayList<String> buildings = new ArrayList<String>();
+						final ArrayList<Building> buildings = new ArrayList<Building>();
 						int wallCount = 0;
 						int windowCount = 0;
 						int foundationCount = 0;
 						int roofCount = 0;
 						int floorCount = 0;
+						int doorCount = 0;
 						if (buildings0 == null) {
-							buildings0 = new ArrayList<String>();
+							buildings0 = new ArrayList<Building>();
 							for (HousePart x : parts) {
-								String bid = Util.getBuildingId(x, false);
-								if (!buildings0.contains(bid))
-									buildings0.add(bid);
+								int bid = ((Long) Util.getBuildingId(x, false)).intValue();
+								Building b = new Building(bid);
+								if (!buildings0.contains(b))
+									buildings0.add(b);
 							}
 						}
 						for (HousePart x : parts) {
@@ -105,11 +112,33 @@ public class PostProcessor {
 								roofCount++;
 							else if (x instanceof Floor)
 								floorCount++;
-							if (x instanceof Wall) {
+							else if (x instanceof Door)
+								doorCount++;
+							else if (x instanceof Wall) {
 								wallCount++;
-								String bid = Util.getBuildingId(x, false);
-								if (!buildings.contains(bid) && !buildings0.contains(bid))
-									buildings.add(bid);
+								int bid = ((Long) Util.getBuildingId(x, false)).intValue();
+								Building b = new Building(bid);
+								if (!buildings.contains(b) && !buildings0.contains(b))
+									buildings.add(b);
+							}
+						}
+						// scan again to compute building properties
+						for (HousePart x : parts) {
+							int bid = ((Long) Util.getBuildingId(x, false)).intValue();
+							Building b = getBuilding(buildings, bid);
+							if (b != null) {
+								if (x instanceof Window)
+									b.windowCount++;
+								else if (x instanceof Wall) {
+									b.wallCount++;
+									double height = x.getHeight();
+									if (b.height > height)
+										b.height = height;
+									Vector3 v = x.getAbsPoint(0);
+									b.floorVertices.add(new Vector2(v.getX(), v.getY()));
+									v = x.getAbsPoint(2);
+									b.floorVertices.add(new Vector2(v.getX(), v.getY()));
+								}
 							}
 						}
 						if (total0 == -1)
@@ -124,14 +153,17 @@ public class PostProcessor {
 							roofCount0 = roofCount;
 						if (floorCount0 == -1)
 							floorCount0 = floorCount;
+						if (doorCount0 == -1)
+							doorCount0 = doorCount;
 						pw.print(fileName);
 						pw.print("  Timestamp=" + FORMAT_TIME_COUNT.format(timestamp));
-						pw.print("  Total=" + FORMAT_PART_COUNT.format(parts.size() - total0));
-						pw.print("  Wall=" + FORMAT_PART_COUNT.format(wallCount - wallCount0));
-						pw.print("  Window=" + FORMAT_PART_COUNT.format(windowCount - windowCount0));
-						pw.print("  Foundation=" + FORMAT_PART_COUNT.format(foundationCount - foundationCount0));
-						pw.print("  Roof=" + FORMAT_PART_COUNT.format(roofCount - roofCount0));
-						pw.print("  Floor=" + FORMAT_PART_COUNT.format(floorCount - floorCount0));
+						pw.print("  #Total=" + FORMAT_PART_COUNT.format(parts.size() - total0));
+						pw.print("  #Wall=" + FORMAT_PART_COUNT.format(wallCount - wallCount0));
+						pw.print("  #Window=" + FORMAT_PART_COUNT.format(windowCount - windowCount0));
+						pw.print("  #Foundation=" + FORMAT_PART_COUNT.format(foundationCount - foundationCount0));
+						pw.print("  #Roof=" + FORMAT_PART_COUNT.format(roofCount - roofCount0));
+						pw.print("  #Floor=" + FORMAT_PART_COUNT.format(floorCount - floorCount0));
+						pw.print("  #Door=" + FORMAT_PART_COUNT.format(doorCount - doorCount0));
 						pw.print("  " + buildings);
 						pw.println("");
 						// if (i == n - 1) i = 0;
@@ -169,4 +201,13 @@ public class PostProcessor {
 			}
 		}.start();
 	}
+
+	private static Building getBuilding(ArrayList<Building> buildings, int id) {
+		for (Building x : buildings) {
+			if (x.id == id)
+				return x;
+		}
+		return null;
+	}
+
 }
