@@ -3,6 +3,7 @@ package org.concord.energy3d.logger;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.util.Util;
@@ -126,7 +127,7 @@ class Building {
 	public String toString() {
 		exploreWallNeighbors();
 		String s = "(ID=" + id;
-		if (walls.size() == floorVertices.size()) {
+		if (walls.size() == floorVertices.size() && !walls.isEmpty()) {
 			s += " #Wall=" + walls.size();
 			if (windowCount > 0)
 				s += " #Window=" + windowCount;
@@ -135,6 +136,8 @@ class Building {
 			s += " area=" + FORMAT.format(Math.abs(area));
 			s += " volume=" + FORMAT.format(Math.abs(area) * height);
 			s += " centroid=" + FORMAT.format(getCentroidX() / area) + ", " + FORMAT.format(getCentroidY() / area);
+			double solar = EnergyPanel.getInstance().getSolarTotal().get(LoggerUtil.getTopContainer(walls.get(0)));
+			s += " solar_energy=" + FORMAT.format(EnergyPanel.getInstance().convertSolarValue(solar));
 		}
 		return s + ")";
 	}
