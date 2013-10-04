@@ -894,7 +894,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void compute(final UpdateRadiation updateRadiation) {
-		if (computeEnabled)
+		if (!computeEnabled)
 			return;
 		this.updateRadiation = updateRadiation;
 		if (thread != null && thread.isAlive())
