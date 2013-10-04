@@ -929,16 +929,16 @@ public class EnergyPanel extends JPanel {
 				} else {
 					if (SceneManager.getInstance().isSolarColorMap())
 						MainPanel.getInstance().getSolarButton().setSelected(false);
-					int counter = 0;
+					int numberOfHouses = 0;
 					for (final HousePart part : Scene.getInstance().getParts()) {
 						if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
-							counter++;
-						if (counter >= 2)
+							numberOfHouses++;
+						if (numberOfHouses >= 2)
 							break;
 					}
 					for (final HousePart part : Scene.getInstance().getParts())
 						if (part instanceof Foundation)
-							((Foundation) part).setSolarValue(counter >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? 0 : -1);
+							((Foundation) part).setSolarValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
 					SceneManager.getInstance().refresh();
 				}
 			}
