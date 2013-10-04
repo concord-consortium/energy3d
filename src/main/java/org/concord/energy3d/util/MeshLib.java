@@ -119,7 +119,9 @@ public class MeshLib {
 								group1.vertices.addAll(group2.vertices);
 								group1.normals.addAll(group2.normals);
 								groups.remove(group2);
+								j--;
 								changed = true;
+								break;
 							}
 						}
 					}

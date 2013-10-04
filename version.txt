@@ -1586,6 +1586,7 @@ Version 2.0 - May 15, 2013
 - allow openNow and computerNow methods to be called without thread or queuing
 - divide open method into three calls: openNow(), initSceneNow(), and energyPanel.compute()
 - fix problem with disappearing radiation label if radiation value is zero
+- fix problem with extra wireframe line on roof
 
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove
