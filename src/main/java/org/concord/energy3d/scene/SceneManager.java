@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.CustomRoof;
@@ -923,7 +924,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		heliodonControl = selected;
 		Heliodon.getInstance().setVisible(selected);
 		enableDisableRotationControl();
-		EnergyPanel.getInstance().compute(false);
+		EnergyPanel.getInstance().compute(UpdateRadiation.NEVER);
 
 	}
 
@@ -1385,7 +1386,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				Scene.getInstance().redrawAllNow();
 				if (solarColorMap)
 					EnergyPanel.getInstance().clearAlreadyRendered();
-				EnergyPanel.getInstance().compute(true);
+				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				return null;
 			}
 

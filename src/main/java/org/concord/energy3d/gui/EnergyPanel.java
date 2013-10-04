@@ -103,6 +103,8 @@ public class EnergyPanel extends JPanel {
 	private static final DecimalFormat moneyDecimals = new DecimalFormat();
 	private static final RuntimeException cancelException = new RuntimeException("CANCEL");
 	private static boolean keepHeatmapOn = false;
+	
+	public enum UpdateRadiation {ALWAYS, NEVER, ONLY_IF_SLECTED_IN_GUI};
 
 	static {
 		twoDecimals.setMaximumFractionDigits(2);
@@ -210,7 +212,7 @@ public class EnergyPanel extends JPanel {
 	private boolean computeRequest;
 	private boolean initJavaFxAlreadyCalled = false;
 	private boolean alreadyRenderedHeatmap = false;
-	private boolean updateRadiationColorMap;
+	private UpdateRadiation updateRadiation;
 
 	private static class EnergyAmount {
 		double solar;
@@ -266,7 +268,7 @@ public class EnergyPanel extends JPanel {
 				final Heliodon heliodon = Heliodon.getInstance();
 				if (heliodon != null)
 					heliodon.setDate((Date) dateSpinner.getValue());
-				compute(true);
+				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
 		final GridBagConstraints gbc_dateSpinner = new GridBagConstraints();
@@ -283,11 +285,11 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void actionPerformed(final java.awt.event.ActionEvent e) {
 				if (cityComboBox.getSelectedItem().equals(""))
-					compute(true);
+					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				else {
 					final Integer newLatitude = cityLatitute.get(cityComboBox.getSelectedItem());
 					if (newLatitude.equals(latitudeSpinner.getValue()))
-						compute(true);
+						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					else
 						latitudeSpinner.setValue(newLatitude);
 				}
@@ -322,7 +324,7 @@ public class EnergyPanel extends JPanel {
 				final Heliodon heliodon = Heliodon.getInstance();
 				if (heliodon != null)
 					heliodon.setTime((Date) timeSpinner.getValue());
-				compute(false);
+				compute(UpdateRadiation.NEVER);
 			}
 		});
 		final GridBagConstraints gbc_timeSpinner = new GridBagConstraints();
@@ -347,7 +349,7 @@ public class EnergyPanel extends JPanel {
 				if (!cityComboBox.getSelectedItem().equals("") && !cityLatitute.values().contains(latitudeSpinner.getValue()))
 					cityComboBox.setSelectedItem("");
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
-				compute(true);
+				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
 		final GridBagConstraints gbc_latitudeSpinner = new GridBagConstraints();
@@ -378,7 +380,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				if (!colorMapSlider.getValueIsAdjusting())
-					compute(true);
+					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
 
@@ -437,7 +439,7 @@ public class EnergyPanel extends JPanel {
 		insideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				compute(false);
+				compute(UpdateRadiation.NEVER);
 			}
 		});
 		insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
@@ -463,7 +465,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				if (thread == null)
-					compute(false);
+					compute(UpdateRadiation.NEVER);
 			}
 		});
 		final GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
@@ -481,7 +483,7 @@ public class EnergyPanel extends JPanel {
 				outsideTemperatureSpinner.setEnabled(!selected);
 				if (selected)
 					updateOutsideTemperature();
-				compute(false);
+				compute(UpdateRadiation.NEVER);
 			}
 		});
 		final GridBagConstraints gbc_autoCheckBox = new GridBagConstraints();
@@ -718,7 +720,7 @@ public class EnergyPanel extends JPanel {
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				compute(false);
+				compute(UpdateRadiation.NEVER);
 			}
 		});
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
@@ -742,7 +744,7 @@ public class EnergyPanel extends JPanel {
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				compute(false);
+				compute(UpdateRadiation.NEVER);
 			}
 		});
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
@@ -765,7 +767,7 @@ public class EnergyPanel extends JPanel {
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				compute(false);
+				compute(UpdateRadiation.NEVER);
 			}
 		});
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
@@ -788,7 +790,7 @@ public class EnergyPanel extends JPanel {
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				compute(false);
+				compute(UpdateRadiation.NEVER);
 			}
 		});
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
@@ -890,55 +892,60 @@ public class EnergyPanel extends JPanel {
 		roofsEnergyChartData.setYValue(isZero ? 0 : roofs / total * 100.0);
 	}
 
-	public void compute(final boolean updateRadiationColorMap) {
-		this.updateRadiationColorMap = updateRadiationColorMap;
-		if (thread != null && thread.isAlive()) {
+	public void compute(final UpdateRadiation updateRadiation) {
+		this.updateRadiation = updateRadiation;
+		if (thread != null && thread.isAlive())
 			computeRequest = true;
-		} else {
+		else {
 			thread = new Thread("Energy Computer") {
 				@Override
 				public void run() {
 					do {
 						computeRequest = false;
+						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
+						computeNow(EnergyPanel.this.updateRadiation);
 						try {
-							System.out.println("EnergyPanel.compute()");
-							progressBar.setValue(0);
-							if (EnergyPanel.this.updateRadiationColorMap) {
-								if (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn)) {
-									alreadyRenderedHeatmap = true;
-									computeRadiation();
-								} else {
-									if (SceneManager.getInstance().isSolarColorMap())
-										MainPanel.getInstance().getSolarButton().setSelected(false);
-									int counter = 0;
-									for (final HousePart part : Scene.getInstance().getParts()) {
-										if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
-											counter++;
-										if (counter >= 2)
-											break;
-									}
-									for (final HousePart part : Scene.getInstance().getParts())
-										if (part instanceof Foundation)
-											((Foundation) part).setSolarValue(counter >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? 0 : -1);
-									SceneManager.getInstance().refresh();
-								}
-							}
-							computeEnergy();
-							try {
-								Thread.sleep(500);
-							} catch (final InterruptedException e) {
-								e.printStackTrace();
-							}
-							progressBar.setValue(0);
-						} catch (final RuntimeException e) {
-							if (e != cancelException)
-								e.printStackTrace();
+							Thread.sleep(500);
+						} catch (final InterruptedException e) {
+							e.printStackTrace();
 						}
+						progressBar.setValue(0);						
 					} while (computeRequest);
 					thread = null;
 				}
 			};
 			thread.start();
+		}
+	}
+
+	public void computeNow(final UpdateRadiation updateRadiation) {
+		try {
+			System.out.println("EnergyPanel.computeNow()");
+			progressBar.setValue(0);
+			if (updateRadiation != UpdateRadiation.NEVER) {
+				if (updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn))) {
+					alreadyRenderedHeatmap = true;
+					computeRadiation();
+				} else {
+					if (SceneManager.getInstance().isSolarColorMap())
+						MainPanel.getInstance().getSolarButton().setSelected(false);
+					int counter = 0;
+					for (final HousePart part : Scene.getInstance().getParts()) {
+						if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
+							counter++;
+						if (counter >= 2)
+							break;
+					}
+					for (final HousePart part : Scene.getInstance().getParts())
+						if (part instanceof Foundation)
+							((Foundation) part).setSolarValue(counter >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? 0 : -1);
+					SceneManager.getInstance().refresh();
+				}
+			}
+			computeEnergy();
+		} catch (final RuntimeException e) {
+			if (e != cancelException)
+				e.printStackTrace();
 		}
 	}
 

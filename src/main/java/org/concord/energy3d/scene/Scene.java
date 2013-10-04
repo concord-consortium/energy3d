@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
@@ -144,6 +145,16 @@ public class Scene implements Serializable {
 	}
 
 	public static void open(final URL file) throws Exception {
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				openNow(file, true);
+				return null;
+			}
+		});
+	}
+
+	public static void openNow(final URL file, final boolean computeEnergy) throws Exception {
 		Scene.url = file;
 
 		if (PrintController.getInstance().isPrintPreview()) {
@@ -187,39 +198,34 @@ public class Scene implements Serializable {
 		if (cameraControl != null)
 			cameraControl.reset();
 
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				originalHouseRoot.detachAllChildren();
-				root.detachAllChildren();
-				root.attachChild(originalHouseRoot);
+		originalHouseRoot.detachAllChildren();
+		root.detachAllChildren();
+		root.attachChild(originalHouseRoot);
 
-				if (url != null) {
-					for (final HousePart housePart : instance.getParts())
-						originalHouseRoot.attachChild(housePart.getRoot());
-					System.out.println("done");
-					/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
-					instance.redrawAllNow();
-				}
+		if (url != null) {
+			for (final HousePart housePart : instance.getParts())
+				originalHouseRoot.attachChild(housePart.getRoot());
+			System.out.println("done");
+			/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
+			instance.redrawAllNow();
+		}
 
-				root.updateWorldBound(true);
-				SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-				final EnergyPanel energyPanel = EnergyPanel.getInstance();
-				if (instance.calendar != null) {
-					energyPanel.getDateSpinner().setValue(instance.calendar.getTime());
-					energyPanel.getTimeSpinner().setValue(instance.calendar.getTime());
-					energyPanel.setLatitude(instance.latitude);
-					energyPanel.setCity(instance.city);
-					MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
-				}
-				energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
-				MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
-				SceneManager.getInstance().getUndoManager().die();
-				Scene.getInstance().setEdited(false);
-				energyPanel.compute(true);
-				return null;
-			}
-		});
+		root.updateWorldBound(true);
+		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
+		final EnergyPanel energyPanel = EnergyPanel.getInstance();
+		if (instance.calendar != null) {
+			energyPanel.getDateSpinner().setValue(instance.calendar.getTime());
+			energyPanel.getTimeSpinner().setValue(instance.calendar.getTime());
+			energyPanel.setLatitude(instance.latitude);
+			energyPanel.setCity(instance.city);
+			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
+		}
+		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
+		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
+		SceneManager.getInstance().getUndoManager().die();
+		Scene.getInstance().setEdited(false);
+		if (computeEnergy)
+			energyPanel.compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 
 	public static void loadCameraLocation() {
@@ -267,7 +273,7 @@ public class Scene implements Serializable {
 
 	private void cleanup() {
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
-		for (final HousePart part : parts) {			
+		for (final HousePart part : parts) {
 			if (!part.isValid() || ((part instanceof Roof || part instanceof Window || part instanceof Door) && part.getContainer() == null))
 				toBeRemoved.add(part);
 			else {
@@ -656,7 +662,7 @@ public class Scene implements Serializable {
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();
 		if (edited && recomputeEnergy)
-			EnergyPanel.getInstance().compute(true);
+			EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 
 	public void updateEditShapes() {
