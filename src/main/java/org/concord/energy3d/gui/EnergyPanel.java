@@ -213,6 +213,7 @@ public class EnergyPanel extends JPanel {
 	private boolean initJavaFxAlreadyCalled = false;
 	private boolean alreadyRenderedHeatmap = false;
 	private UpdateRadiation updateRadiation;
+	private boolean computeEnabled;
 
 	private static class EnergyAmount {
 		double solar;
@@ -893,6 +894,8 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void compute(final UpdateRadiation updateRadiation) {
+		if (computeEnabled)
+			return;
 		this.updateRadiation = updateRadiation;
 		if (thread != null && thread.isAlive())
 			computeRequest = true;
@@ -1554,6 +1557,10 @@ public class EnergyPanel extends JPanel {
 
 	public static void setKeepHeatmapOn(final boolean on) {
 		keepHeatmapOn = on;
+	}
+
+	public void setComputeEnabled(final boolean computeEnabled) {
+		this.computeEnabled = computeEnabled;
 	}
 
 }

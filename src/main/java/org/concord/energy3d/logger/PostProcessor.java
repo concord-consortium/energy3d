@@ -39,7 +39,9 @@ public class PostProcessor {
 	public static void process(final File[] files, final File output, final Runnable update) {
 
 		new Thread() {
+			@Override
 			public void run() {
+				EnergyPanel.getInstance().setComputeEnabled(false);
 				final int n = files.length;
 				PrintWriter logWriter = null;
 				try {
@@ -62,13 +64,13 @@ public class PostProcessor {
 				while (i < n - 1) {
 					if (replaying) {
 						i++;
-						int slash = files[i].toString().lastIndexOf(System.getProperty("file.separator"));
-						String fileName = files[i].toString().substring(slash + 1).trim();
-						String[] ss = fileName.substring(0, fileName.length() - 4).split("[\\s]+"); // get time stamp
+						final int slash = files[i].toString().lastIndexOf(System.getProperty("file.separator"));
+						final String fileName = files[i].toString().substring(slash + 1).trim();
+						final String[] ss = fileName.substring(0, fileName.length() - 4).split("[\\s]+"); // get time stamp
 						if (ss.length >= 2) {
-							String[] day = ss[0].split("-");
-							String[] time = ss[1].split("-");
-							Calendar c = Calendar.getInstance();
+							final String[] day = ss[0].split("-");
+							final String[] time = ss[1].split("-");
+							final Calendar c = Calendar.getInstance();
 							c.set(Integer.parseInt(day[0]), Integer.parseInt(day[1]) - 1, Integer.parseInt(day[2]), Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
 							if (date0 == null)
 								date0 = c.getTime();
@@ -77,7 +79,7 @@ public class PostProcessor {
 							System.err.println("File timestamp error");
 							timestamp = 0;
 						}
-						System.out.println("Play back " + i + " of " + n + ": " + fileName);
+						System.out.println("Play back " + i + " of " + n + ": " + fileName);						
 						try {
 							Scene.openNow(files[i].toURI().toURL());
 							Scene.initSceneNow();
@@ -99,14 +101,14 @@ public class PostProcessor {
 						int doorCount = 0;
 						if (buildings0 == null) {
 							buildings0 = new ArrayList<Building>();
-							for (HousePart x : parts) {
-								int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
-								Building b = new Building(bid);
+							for (final HousePart x : parts) {
+								final int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
+								final Building b = new Building(bid);
 								if (!buildings0.contains(b))
 									buildings0.add(b);
 							}
 						}
-						for (HousePart x : parts) {
+						for (final HousePart x : parts) {
 							// count the pieces by categories
 							if (x instanceof Window)
 								windowCount++;
@@ -120,16 +122,16 @@ public class PostProcessor {
 								doorCount++;
 							else if (x instanceof Wall) {
 								wallCount++;
-								int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
-								Building b = new Building(bid);
+								final int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
+								final Building b = new Building(bid);
 								if (!buildings.contains(b) && !buildings0.contains(b))
 									buildings.add(b);
 							}
 						}
 						// scan again to compute building properties
-						for (HousePart x : parts) {
-							int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
-							Building b = getBuilding(buildings, bid);
+						for (final HousePart x : parts) {
+							final int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
+							final Building b = getBuilding(buildings, bid);
 							if (b != null) {
 								if (x instanceof Window)
 									b.windowCount++;
@@ -194,12 +196,13 @@ public class PostProcessor {
 					}
 				}
 				pw.close();
+				EnergyPanel.getInstance().setComputeEnabled(true);
 			}
 		}.start();
 	}
 
-	private static Building getBuilding(ArrayList<Building> buildings, int id) {
-		for (Building x : buildings) {
+	private static Building getBuilding(final ArrayList<Building> buildings, final int id) {
+		for (final Building x : buildings) {
 			if (x.id == id)
 				return x;
 		}
