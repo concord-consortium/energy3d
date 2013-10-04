@@ -31,7 +31,7 @@ public class SnapshotLogger {
 					if (Scene.getURL() != null) { // log only when student starts with a template
 						if (logger.isEdited()) {
 							try {
-								saveSnapshot(Util.getLogFolder());
+								saveSnapshot(LoggerUtil.getLogFolder());
 							} catch (final Exception e) {
 								e.printStackTrace();
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging! Please notify the teacher of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);

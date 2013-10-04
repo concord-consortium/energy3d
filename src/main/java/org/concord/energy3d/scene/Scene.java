@@ -150,6 +150,7 @@ public class Scene implements Serializable {
 			@Override
 			public Object call() throws Exception {
 				initSceneNow();
+				initEnergy();
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				return null;
 			}
@@ -216,6 +217,12 @@ public class Scene implements Serializable {
 
 		root.updateWorldBound(true);
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
+		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
+		SceneManager.getInstance().getUndoManager().die();
+		Scene.getInstance().setEdited(false);
+	}
+
+	public static void initEnergy() {
 		final EnergyPanel energyPanel = EnergyPanel.getInstance();
 		if (instance.calendar != null) {
 			energyPanel.getDateSpinner().setValue(instance.calendar.getTime());
@@ -225,9 +232,6 @@ public class Scene implements Serializable {
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
-		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
-		SceneManager.getInstance().getUndoManager().die();
-		Scene.getInstance().setEdited(false);
 	}
 
 	public static void loadCameraLocation() {
