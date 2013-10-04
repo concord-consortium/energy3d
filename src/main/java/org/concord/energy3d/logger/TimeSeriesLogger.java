@@ -118,7 +118,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (action != null) {
 			line += space + "{" + action + "}";
 			if (!type2Action) {
-				line += space + "{" + Util.getBuildingId(actedHousePart) + "}";
+				line += space + "{" + Util.getBuildingId(actedHousePart, true) + "}";
 				line += space + "{" + Util.getId(actedHousePart) + "}";
 			}
 		}

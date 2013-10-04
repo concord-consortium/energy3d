@@ -53,6 +53,7 @@ public class PostProcessor {
 				int floorCount0 = -1;
 				long timestamp = -1;
 				Date date0 = null;
+				ArrayList<String> buildings0 = null;
 				while (i < n - 1) {
 					if (replaying) {
 						i++;
@@ -80,15 +81,23 @@ public class PostProcessor {
 							e.printStackTrace();
 						}
 						final ArrayList<HousePart> parts = Scene.getInstance().getParts();
+						final ArrayList<String> buildings = new ArrayList<String>();
 						int wallCount = 0;
 						int windowCount = 0;
 						int foundationCount = 0;
 						int roofCount = 0;
 						int floorCount = 0;
+						if (buildings0 == null) {
+							buildings0 = new ArrayList<String>();
+							for (HousePart x : parts) {
+								String bid = Util.getBuildingId(x, false);
+								if (!buildings0.contains(bid))
+									buildings0.add(bid);
+							}
+						}
 						for (HousePart x : parts) {
-							if (x instanceof Wall)
-								wallCount++;
-							else if (x instanceof Window)
+							// count the pieces by categories
+							if (x instanceof Window)
 								windowCount++;
 							else if (x instanceof Foundation)
 								foundationCount++;
@@ -96,6 +105,12 @@ public class PostProcessor {
 								roofCount++;
 							else if (x instanceof Floor)
 								floorCount++;
+							if (x instanceof Wall) {
+								wallCount++;
+								String bid = Util.getBuildingId(x, false);
+								if (!buildings.contains(bid) && !buildings0.contains(bid))
+									buildings.add(bid);
+							}
 						}
 						if (total0 == -1)
 							total0 = parts.size();
@@ -117,6 +132,7 @@ public class PostProcessor {
 						pw.print("  Foundation=" + FORMAT_PART_COUNT.format(foundationCount - foundationCount0));
 						pw.print("  Roof=" + FORMAT_PART_COUNT.format(roofCount - roofCount0));
 						pw.print("  Floor=" + FORMAT_PART_COUNT.format(floorCount - floorCount0));
+						pw.print("  " + buildings);
 						pw.println("");
 						// if (i == n - 1) i = 0;
 					} else {
@@ -153,5 +169,4 @@ public class PostProcessor {
 			}
 		}.start();
 	}
-
 }
