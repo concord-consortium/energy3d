@@ -1563,4 +1563,8 @@ public class EnergyPanel extends JPanel {
 		this.computeEnabled = computeEnabled;
 	}
 
+	public Map<HousePart, Double> getSolarTotal() {
+		return solarTotal;
+	}
+
 }
