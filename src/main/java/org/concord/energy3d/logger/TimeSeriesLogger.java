@@ -118,8 +118,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (action != null) {
 			line += space + "{" + action + "}";
 			if (!type2Action) {
-				line += space + "{" + Util.getBuildingId(actedHousePart, true) + "}";
-				line += space + "{" + Util.getId(actedHousePart) + "}";
+				line += space + "{" + LoggerUtil.getBuildingId(actedHousePart, true) + "}";
+				line += space + "{" + LoggerUtil.getId(actedHousePart) + "}";
 			}
 		}
 		final Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
@@ -216,7 +216,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	public void start() {
 		final String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
-		file = new File(Util.getLogFolder(), timestamp + ".txt");
+		file = new File(LoggerUtil.getLogFolder(), timestamp + ".txt");
 		final Thread t = new Thread("Time Series Logger") {
 			@Override
 			public void run() {

@@ -929,7 +929,7 @@ public class Wall extends HousePart {
 		}
 	}
 
-	protected void visitNeighbors(final WallVisitor visitor) {
+	public void visitNeighbors(final WallVisitor visitor) {
 		Wall currentWall = this;
 		Snap snap = null;
 		Wall.clearVisits();

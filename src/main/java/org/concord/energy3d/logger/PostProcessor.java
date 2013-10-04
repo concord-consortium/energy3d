@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -15,9 +17,7 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
-
-import com.ardor3d.math.Vector2;
-import com.ardor3d.math.Vector3;
+import org.concord.energy3d.scene.SceneManager;
 
 /**
  * @author Charles Xie
@@ -79,7 +79,11 @@ public class PostProcessor {
 						}
 						System.out.println("Play back " + i + " of " + n + ": " + fileName);
 						try {
-							Scene.open(files[i].toURI().toURL());
+							Scene.openNow(files[i].toURI().toURL());
+							Scene.initSceneNow();
+							Scene.initEnergy();
+							EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
+							SceneManager.getInstance().refresh();
 							update.run();
 							sleep(SLEEP);
 						} catch (final Exception e) {
@@ -96,7 +100,7 @@ public class PostProcessor {
 						if (buildings0 == null) {
 							buildings0 = new ArrayList<Building>();
 							for (HousePart x : parts) {
-								int bid = ((Long) Util.getBuildingId(x, false)).intValue();
+								int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
 								Building b = new Building(bid);
 								if (!buildings0.contains(b))
 									buildings0.add(b);
@@ -116,7 +120,7 @@ public class PostProcessor {
 								doorCount++;
 							else if (x instanceof Wall) {
 								wallCount++;
-								int bid = ((Long) Util.getBuildingId(x, false)).intValue();
+								int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
 								Building b = new Building(bid);
 								if (!buildings.contains(b) && !buildings0.contains(b))
 									buildings.add(b);
@@ -124,21 +128,13 @@ public class PostProcessor {
 						}
 						// scan again to compute building properties
 						for (HousePart x : parts) {
-							int bid = ((Long) Util.getBuildingId(x, false)).intValue();
+							int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
 							Building b = getBuilding(buildings, bid);
 							if (b != null) {
 								if (x instanceof Window)
 									b.windowCount++;
-								else if (x instanceof Wall) {
-									b.wallCount++;
-									double height = x.getHeight();
-									if (b.height > height)
-										b.height = height;
-									Vector3 v = x.getAbsPoint(0);
-									b.floorVertices.add(new Vector2(v.getX(), v.getY()));
-									v = x.getAbsPoint(2);
-									b.floorVertices.add(new Vector2(v.getX(), v.getY()));
-								}
+								else if (x instanceof Wall)
+									b.addWall((Wall) x);
 							}
 						}
 						if (total0 == -1)

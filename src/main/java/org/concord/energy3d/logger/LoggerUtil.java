@@ -9,7 +9,7 @@ import org.concord.energy3d.util.Config;
  * @author Charles Xie
  * 
  */
-class Util {
+class LoggerUtil {
 
 	private static File folder = null;
 

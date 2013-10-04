@@ -32,7 +32,7 @@ public class Util {
 
 	public static String toString(final ReadOnlyVector3 v) {
 		final double C = 1000.0;
-		return "(" + Math.round(v.getX()*C) / C + ", " + Math.round(v.getY()*C) / C + ", " + Math.round(v.getZ()*C) / C + ")";
+		return "(" + Math.round(v.getX() * C) / C + ", " + Math.round(v.getY() * C) / C + ", " + Math.round(v.getZ() * C) / C + ")";
 	}
 
 	public static void disablePickShadowLight(final Spatial spatial) {
@@ -77,19 +77,17 @@ public class Util {
 			return true;
 	}
 
-	private static double area(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3)
-	{
-	   return Math.abs((x1*(y2-y3) + x2*(y3-y1)+ x3*(y1-y2))/2.0);
+	private static double area(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3) {
+		return Math.abs((x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2.0);
 	}
 
 	/* A function to check whether point P(x, y) lies inside the triangle formed by A(x1, y1), B(x2, y2) and C(x3, y3) */
-	public static boolean isPointInsideTriangle(final ReadOnlyVector2 p, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3)
-	{
-	   final double A = area (p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
-	   final double A1 = area (p.getX(), p.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
-	   final double A2 = area (p1.getX(), p1.getY(), p.getX(), p.getY(), p3.getX(), p3.getY());
-	   final double A3 = area (p1.getX(), p1.getY(), p2.getX(), p2.getY(), p.getX(), p.getY());
-	   return isEqual(A1 + A2 + A3, A);
+	public static boolean isPointInsideTriangle(final ReadOnlyVector2 p, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3) {
+		final double A = area(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
+		final double A1 = area(p.getX(), p.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
+		final double A2 = area(p1.getX(), p1.getY(), p.getX(), p.getY(), p3.getX(), p3.getY());
+		final double A3 = area(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p.getX(), p.getY());
+		return isEqual(A1 + A2 + A3, A);
 	}
 
 	public static Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 v1, final int x, final int y) {
@@ -177,20 +175,20 @@ public class Util {
 	}
 
 	public static Vector3 intersectLineSegments(final ReadOnlyVector3 a1, final ReadOnlyVector3 a2, final ReadOnlyVector3 b1, final ReadOnlyVector3 b2) {
-	    final double ua_t = (b2.getX() - b1.getX()) * (a1.getY() - b1.getY()) - (b2.getY() - b1.getY()) * (a1.getX() - b1.getX());
-	    final double ub_t = (a2.getX() - a1.getX()) * (a1.getY() - b1.getY()) - (a2.getY() - a1.getY()) * (a1.getX() - b1.getX());
-	    final double u_b  = (b2.getY() - b1.getY()) * (a2.getX() - a1.getX()) - (b2.getX() - b1.getX()) * (a2.getY() - a1.getY());
+		final double ua_t = (b2.getX() - b1.getX()) * (a1.getY() - b1.getY()) - (b2.getY() - b1.getY()) * (a1.getX() - b1.getX());
+		final double ub_t = (a2.getX() - a1.getX()) * (a1.getY() - b1.getY()) - (a2.getY() - a1.getY()) * (a1.getX() - b1.getX());
+		final double u_b = (b2.getY() - b1.getY()) * (a2.getX() - a1.getX()) - (b2.getX() - b1.getX()) * (a2.getY() - a1.getY());
 
-	    if ( u_b != 0 ) {
-	    	final double ua = ua_t / u_b;
-	    	final double ub = ub_t / u_b;
+		if (u_b != 0) {
+			final double ua = ua_t / u_b;
+			final double ub = ub_t / u_b;
 
-	        if ( 0 <= ua && ua <= 1 && 0 <= ub && ub <= 1 )
-	            return new Vector3(a1.getX() + ua * (a2.getX() - a1.getX()), a1.getY() + ua * (a2.getY() - a1.getY()), a1.getZ());
-	        else
-	            return null;
-	    } else
-	    	return null;
+			if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1)
+				return new Vector3(a1.getX() + ua * (a2.getX() - a1.getX()), a1.getY() + ua * (a2.getY() - a1.getY()), a1.getZ());
+			else
+				return null;
+		} else
+			return null;
 	}
 
 	public static void initHousePartLabel(final BMText label) {
@@ -204,6 +202,10 @@ public class Util {
 	}
 
 	public static boolean isEqual(final ReadOnlyVector3 a, final ReadOnlyVector3 b) {
+		return isZero(a.distance(b));
+	}
+
+	public static boolean isEqual(final ReadOnlyVector2 a, final ReadOnlyVector2 b) {
 		return isZero(a.distance(b));
 	}
 
