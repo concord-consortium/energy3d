@@ -45,7 +45,6 @@ public class PostProcessor {
 				}
 				final PrintWriter pw = logWriter;
 				int i = -1;
-				Date date0 = null;
 				int total0 = -1;
 				int wallCount0 = -1;
 				int windowCount0 = -1;
@@ -53,20 +52,26 @@ public class PostProcessor {
 				int roofCount0 = -1;
 				int floorCount0 = -1;
 				long timestamp = -1;
+				Date date0 = null;
+				ArrayList<String> buildings0 = null;
 				while (i < n - 1) {
 					if (replaying) {
 						i++;
-						// if (i == n) i = 0;
 						int slash = files[i].toString().lastIndexOf(System.getProperty("file.separator"));
 						String fileName = files[i].toString().substring(slash + 1).trim();
 						String[] ss = fileName.substring(0, fileName.length() - 4).split("[\\s]+"); // get time stamp
-						String[] day = ss[0].split("-");
-						String[] time = ss[1].split("-");
-						Calendar c = Calendar.getInstance();
-						c.set(Integer.parseInt(day[0]), Integer.parseInt(day[1]) - 1, Integer.parseInt(day[2]), Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
-						if (date0 == null)
-							date0 = c.getTime();
-						timestamp = Math.round((c.getTime().getTime() - date0.getTime()) * 0.001);
+						if (ss.length >= 2) {
+							String[] day = ss[0].split("-");
+							String[] time = ss[1].split("-");
+							Calendar c = Calendar.getInstance();
+							c.set(Integer.parseInt(day[0]), Integer.parseInt(day[1]) - 1, Integer.parseInt(day[2]), Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
+							if (date0 == null)
+								date0 = c.getTime();
+							timestamp = Math.round((c.getTime().getTime() - date0.getTime()) * 0.001);
+						} else {
+							System.err.println("File timestamp error");
+							timestamp = 0;
+						}
 						System.out.println("Play back " + i + " of " + n + ": " + fileName);
 						try {
 							Scene.open(files[i].toURI().toURL());
@@ -76,15 +81,23 @@ public class PostProcessor {
 							e.printStackTrace();
 						}
 						final ArrayList<HousePart> parts = Scene.getInstance().getParts();
+						final ArrayList<String> buildings = new ArrayList<String>();
 						int wallCount = 0;
 						int windowCount = 0;
 						int foundationCount = 0;
 						int roofCount = 0;
 						int floorCount = 0;
+						if (buildings0 == null) {
+							buildings0 = new ArrayList<String>();
+							for (HousePart x : parts) {
+								String bid = Util.getBuildingId(x, false);
+								if (!buildings0.contains(bid))
+									buildings0.add(bid);
+							}
+						}
 						for (HousePart x : parts) {
-							if (x instanceof Wall)
-								wallCount++;
-							else if (x instanceof Window)
+							// count the pieces by categories
+							if (x instanceof Window)
 								windowCount++;
 							else if (x instanceof Foundation)
 								foundationCount++;
@@ -92,6 +105,12 @@ public class PostProcessor {
 								roofCount++;
 							else if (x instanceof Floor)
 								floorCount++;
+							if (x instanceof Wall) {
+								wallCount++;
+								String bid = Util.getBuildingId(x, false);
+								if (!buildings.contains(bid) && !buildings0.contains(bid))
+									buildings.add(bid);
+							}
 						}
 						if (total0 == -1)
 							total0 = parts.size();
@@ -113,7 +132,9 @@ public class PostProcessor {
 						pw.print("  Foundation=" + FORMAT_PART_COUNT.format(foundationCount - foundationCount0));
 						pw.print("  Roof=" + FORMAT_PART_COUNT.format(roofCount - roofCount0));
 						pw.print("  Floor=" + FORMAT_PART_COUNT.format(floorCount - floorCount0));
+						pw.print("  " + buildings);
 						pw.println("");
+						// if (i == n - 1) i = 0;
 					} else {
 						if (backward) {
 							if (i > 0) {
@@ -139,6 +160,8 @@ public class PostProcessor {
 								}
 							}
 							forward = false;
+							if (i == n - 1)
+								i = n - 2;
 						}
 					}
 				}
@@ -146,5 +169,4 @@ public class PostProcessor {
 			}
 		}.start();
 	}
-
 }
