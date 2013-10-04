@@ -135,7 +135,7 @@ class Building {
 			double area = getArea();
 			s += " area=" + FORMAT.format(Math.abs(area));
 			s += " volume=" + FORMAT.format(Math.abs(area) * height);
-			s += " centroid=" + FORMAT.format(getCentroidX() / area) + ", " + FORMAT.format(getCentroidY() / area);
+			s += " centroid=\"" + FORMAT.format(getCentroidX() / area) + "," + FORMAT.format(getCentroidY() / area) + "\"";
 			double solar = EnergyPanel.getInstance().getSolarTotal().get(LoggerUtil.getTopContainer(walls.get(0)));
 			s += " solar_energy=" + FORMAT.format(EnergyPanel.getInstance().convertSolarValue(solar));
 		}
