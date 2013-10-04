@@ -601,12 +601,12 @@ public class Foundation extends HousePart {
 	}
 
 	public void setSolarValue(final long solarValue) {
-		if (solarValue < 0)
+		if (solarValue == -2)
 			solarLabel.setVisible(false);
 		else {
 			solarLabel.setVisible(true);
 			final String idLabel = "(#" + id + ")";
-			if (solarValue == 0)
+			if (solarValue == -1)
 				solarLabel.setText(idLabel);
 			else
 				solarLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
