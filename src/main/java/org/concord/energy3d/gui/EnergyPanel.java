@@ -1443,10 +1443,14 @@ public class EnergyPanel extends JPanel {
 						applySolarTexture(mesh, solarOnWall.get(mesh), maxSolarValue);
 					}
 				final Double val = solarTotal.get(foundation);
-				foundation.setSolarValue(val == null ? 0 : val.longValue() / (60 / SOLAR_MINUTE_STEP));
+				foundation.setSolarValue(convertSolarValue(val));
 			}
 		}
 		SceneManager.getInstance().refresh();
+	}
+
+	public long convertSolarValue(final Double val) {
+		return val == null ? 0 : val.longValue() / (60 / SOLAR_MINUTE_STEP);
 	}
 
 	// private void print(final HousePart part, final double[][] solar) {

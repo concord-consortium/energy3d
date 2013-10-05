@@ -3,6 +3,7 @@ package org.concord.energy3d.logger;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.util.Util;
@@ -17,7 +18,8 @@ import com.ardor3d.math.type.ReadOnlyVector3;
  */
 class Building {
 
-	private final static DecimalFormat FORMAT = new DecimalFormat("###.#");
+	private final static DecimalFormat FORMAT1 = new DecimalFormat("###.#");
+	private final static DecimalFormat FORMAT4 = new DecimalFormat("###.####");
 
 	int id;
 	int windowCount;
@@ -126,15 +128,22 @@ class Building {
 	public String toString() {
 		exploreWallNeighbors();
 		String s = "(ID=" + id;
-		if (walls.size() == floorVertices.size()) {
+		if (walls.size() == floorVertices.size() && !walls.isEmpty()) {
 			s += " #Wall=" + walls.size();
 			if (windowCount > 0)
 				s += " #Window=" + windowCount;
-			s += " height=" + FORMAT.format(height);
+			s += " height=" + FORMAT1.format(height);
 			double area = getArea();
-			s += " area=" + FORMAT.format(Math.abs(area));
-			s += " volume=" + FORMAT.format(Math.abs(area) * height);
-			s += " centroid=" + FORMAT.format(getCentroidX() / area) + ", " + FORMAT.format(getCentroidY() / area);
+			s += " area=" + FORMAT1.format(Math.abs(area));
+			double volume = Math.abs(area) * height;
+			s += " volume=" + FORMAT1.format(volume);
+			s += " centroid=\"" + FORMAT1.format(getCentroidX() / area) + "," + FORMAT1.format(getCentroidY() / area) + "\"";
+			Double solar2 = EnergyPanel.getInstance().getSolarTotal().get(LoggerUtil.getTopContainer(walls.get(0)));
+			if (solar2 != null) {
+				double solar = EnergyPanel.getInstance().convertSolarValue(solar2);
+				s += " solar_energy=" + FORMAT1.format(solar);
+				s += " solar_energy_density=" + FORMAT4.format(solar / volume);
+			}
 		}
 		return s + ")";
 	}

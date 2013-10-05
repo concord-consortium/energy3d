@@ -18,6 +18,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.shapes.Heliodon;
 
 /**
  * @author Charles Xie
@@ -29,8 +30,9 @@ public class PostProcessor {
 	public static boolean backward, forward;
 
 	private final static int SLEEP = 200;
+	private final static DecimalFormat FORMAT_TWO_DIGITS = new DecimalFormat("00");
+	private final static DecimalFormat FORMAT_THREE_DIGITS = new DecimalFormat("000");
 	private final static DecimalFormat FORMAT_TIME_COUNT = new DecimalFormat("000000000");
-	private final static DecimalFormat FORMAT_PART_COUNT = new DecimalFormat("000");
 
 	private PostProcessor() {
 
@@ -79,7 +81,7 @@ public class PostProcessor {
 							System.err.println("File timestamp error");
 							timestamp = 0;
 						}
-						System.out.println("Play back " + i + " of " + n + ": " + fileName);						
+						System.out.println("Play back " + i + " of " + n + ": " + fileName);
 						try {
 							Scene.openNow(files[i].toURI().toURL());
 							Scene.initSceneNow();
@@ -153,15 +155,21 @@ public class PostProcessor {
 							floorCount0 = floorCount;
 						if (doorCount0 == -1)
 							doorCount0 = doorCount;
+						Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
+						String heliodonTime = FORMAT_TWO_DIGITS.format(heliodonCalendar.get(Calendar.MONTH) + 1);
+						heliodonTime += "/" + FORMAT_TWO_DIGITS.format(heliodonCalendar.get(Calendar.DAY_OF_MONTH));
+						heliodonTime += ":" + FORMAT_TWO_DIGITS.format(heliodonCalendar.get(Calendar.HOUR_OF_DAY));
 						pw.print(fileName);
 						pw.print("  Timestamp=" + FORMAT_TIME_COUNT.format(timestamp));
-						pw.print("  #Total=" + FORMAT_PART_COUNT.format(parts.size() - total0));
-						pw.print("  #Wall=" + FORMAT_PART_COUNT.format(wallCount - wallCount0));
-						pw.print("  #Window=" + FORMAT_PART_COUNT.format(windowCount - windowCount0));
-						pw.print("  #Foundation=" + FORMAT_PART_COUNT.format(foundationCount - foundationCount0));
-						pw.print("  #Roof=" + FORMAT_PART_COUNT.format(roofCount - roofCount0));
-						pw.print("  #Floor=" + FORMAT_PART_COUNT.format(floorCount - floorCount0));
-						pw.print("  #Door=" + FORMAT_PART_COUNT.format(doorCount - doorCount0));
+						pw.print("  Heliodon=" + heliodonTime);
+						pw.print("  Latitude=" + FORMAT_THREE_DIGITS.format(Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI)));
+						pw.print("  #Total=" + FORMAT_THREE_DIGITS.format(parts.size() - total0));
+						pw.print("  #Wall=" + FORMAT_THREE_DIGITS.format(wallCount - wallCount0));
+						pw.print("  #Window=" + FORMAT_THREE_DIGITS.format(windowCount - windowCount0));
+						pw.print("  #Foundation=" + FORMAT_THREE_DIGITS.format(foundationCount - foundationCount0));
+						pw.print("  #Roof=" + FORMAT_THREE_DIGITS.format(roofCount - roofCount0));
+						pw.print("  #Floor=" + FORMAT_THREE_DIGITS.format(floorCount - floorCount0));
+						pw.print("  #Door=" + FORMAT_THREE_DIGITS.format(doorCount - doorCount0));
 						pw.print("  " + buildings);
 						pw.println("");
 						// if (i == n - 1) i = 0;
