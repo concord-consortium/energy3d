@@ -213,7 +213,7 @@ public class EnergyPanel extends JPanel {
 	private boolean initJavaFxAlreadyCalled = false;
 	private boolean alreadyRenderedHeatmap = false;
 	private UpdateRadiation updateRadiation;
-	private boolean computeEnabled;
+	private boolean computeEnabled = true;
 
 	private static class EnergyAmount {
 		double solar;
