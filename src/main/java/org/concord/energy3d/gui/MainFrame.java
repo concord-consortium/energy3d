@@ -73,6 +73,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem newMenuItem = null;
 	private JMenuItem openMenuItem = null;
 	private JMenuItem openFolderMenuItem = null;
+	private JMenuItem analyzeFolderMenuItem = null;
 	private JMenuItem saveMenuItem = null;
 	private JMenuItem printMenuItem = null;
 	private JCheckBoxMenuItem previewMenuItem = null;
@@ -337,8 +338,6 @@ public class MainFrame extends JFrame {
 			fileMenu.setText("File");
 			fileMenu.add(getNewMenuItem());
 			fileMenu.add(getOpenMenuItem());
-			if (!Config.isRestrictMode())
-				fileMenu.add(getOpenFolderMenuItem());
 			fileMenu.add(getSaveMenuItem());
 			fileMenu.add(getSaveasMenuItem());
 			fileMenu.add(getSaveAsImageMenuItem());
@@ -346,6 +345,11 @@ public class MainFrame extends JFrame {
 			fileMenu.add(getImportMenuItem());
 			// fileMenu.add(getImportColladaMenuItem());
 			fileMenu.addSeparator();
+			if (!Config.isRestrictMode()) {
+				fileMenu.add(getOpenFolderMenuItem());
+				fileMenu.add(getAnalyzeFolderMenuItem());
+				fileMenu.addSeparator();
+			}
 			fileMenu.add(getScaleToFitRadioButtonMenuItem());
 			fileMenu.add(getExactSizeRadioButtonMenuItem());
 			fileMenu.addSeparator();
@@ -427,6 +431,40 @@ public class MainFrame extends JFrame {
 		}
 	}
 
+	private JMenuItem getAnalyzeFolderMenuItem() {
+		if (analyzeFolderMenuItem == null) {
+			analyzeFolderMenuItem = new JMenuItem("Analyze Folder...");
+			analyzeFolderMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				@Override
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
+					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION))
+						return;
+					SceneManager.getInstance().refresh(1);
+					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					fileChooser.removeChoosableFileFilter(ng3Filter);
+					fileChooser.removeChoosableFileFilter(pngFilter);
+					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
+						final File dir = fileChooser.getSelectedFile();
+						if (dir.isDirectory()) {
+							PostProcessor.analyze(dir.listFiles(new FilenameFilter() {
+								@Override
+								public boolean accept(final File dir, final String name) {
+									return name.endsWith(".ng3");
+								}
+							}), new File(fileChooser.getCurrentDirectory() + System.getProperty("file.separator") + "prop.txt"), new Runnable() {
+								public void run() {
+									updateTitleBar();
+								}
+							});
+						}
+					}
+				}
+			});
+		}
+		return analyzeFolderMenuItem;
+	}
+
 	private JMenuItem getOpenFolderMenuItem() {
 		if (openFolderMenuItem == null) {
 			openFolderMenuItem = new JMenuItem("Open Folder...");
@@ -443,12 +481,12 @@ public class MainFrame extends JFrame {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						final File dir = fileChooser.getSelectedFile();
 						if (dir.isDirectory()) {
-							PostProcessor.process(dir.listFiles(new FilenameFilter() {
+							PostProcessor.open(dir.listFiles(new FilenameFilter() {
 								@Override
 								public boolean accept(final File dir, final String name) {
 									return name.endsWith(".ng3");
 								}
-							}), new File(fileChooser.getCurrentDirectory() + System.getProperty("file.separator") + "prop.txt"), new Runnable() {
+							}), new Runnable() {
 								public void run() {
 									updateTitleBar();
 								}
