@@ -55,6 +55,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -1186,7 +1187,8 @@ public class EnergyPanel extends JPanel {
 		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
 		// computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
 		// computeRadiationOnRoofs(Heliodon.getInstance().getSunLocation());
-		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
+		computeRadiationOnSolarPanels(Heliodon.getInstance().getSunLocation());
+//		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		updateSolarValueOnAllHouses();
 	}
 
@@ -1228,6 +1230,19 @@ public class EnergyPanel extends JPanel {
 			if (part instanceof Wall && part.isDrawCompleted() && faceDirection.dot(directionTowardSun) > 0) {
 				final Wall wall = (Wall) part;
 				computeRadiationOnMesh(directionTowardSun, wall.getContainer(), wall.getMesh(), wall.getInvisibleMesh(), faceDirection, true);
+			}
+		}
+	}
+	
+	private void computeRadiationOnSolarPanels(final ReadOnlyVector3 sunLocation) {
+		if (sunLocation.getZ() <= 0)
+			return;
+		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			final ReadOnlyVector3 faceDirection = part.getFaceDirection();
+			if (part instanceof SolarPanel && part.isDrawCompleted() && faceDirection.dot(directionTowardSun) > 0) {
+				final SolarPanel solarPanel = (SolarPanel) part;
+				computeRadiationOnMesh(directionTowardSun, null, solarPanel.getMesh(), solarPanel.getMesh(), faceDirection, false);
 			}
 		}
 	}
@@ -1409,6 +1424,7 @@ public class EnergyPanel extends JPanel {
 			if (sunLocation.getZ() > 0) {
 				computeRadiationOnWalls(sunLocation);
 				computeRadiationOnRoofs(sunLocation);
+				computeRadiationOnSolarPanels(sunLocation);
 				computeRadiationOnLand(sunLocation);
 			}
 			maxSolarValue++;
@@ -1440,6 +1456,9 @@ public class EnergyPanel extends JPanel {
 					}
 				final Double val = solarTotal.get(foundation);
 				foundation.setSolarValue(convertSolarValue(val));
+			} else if (part instanceof SolarPanel) {
+				final Mesh mesh = part.getMesh();
+				applySolarTexture(mesh, solarOnMesh.get(mesh), maxSolarValue);
 			}
 		}
 		SceneManager.getInstance().refresh();
