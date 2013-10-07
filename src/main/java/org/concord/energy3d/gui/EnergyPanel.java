@@ -103,8 +103,10 @@ public class EnergyPanel extends JPanel {
 	private static final DecimalFormat moneyDecimals = new DecimalFormat();
 	private static final RuntimeException cancelException = new RuntimeException("CANCEL");
 	private static boolean keepHeatmapOn = false;
-	
-	public enum UpdateRadiation {ALWAYS, NEVER, ONLY_IF_SLECTED_IN_GUI};
+
+	public enum UpdateRadiation {
+		ALWAYS, NEVER, ONLY_IF_SLECTED_IN_GUI
+	};
 
 	static {
 		twoDecimals.setMaximumFractionDigits(2);
@@ -193,8 +195,7 @@ public class EnergyPanel extends JPanel {
 	private final JLabel contrastLabel;
 	private final JProgressBar progressBar;
 
-	private final Map<Mesh, double[][]> solarOnWall = new HashMap<Mesh, double[][]>();
-	private final Map<Integer, Integer> powerOfTwo = new HashMap<Integer, Integer>();
+	private final Map<Mesh, double[][]> solarOnMesh = new HashMap<Mesh, double[][]>();
 	private final Map<HousePart, Double> solarTotal = new HashMap<HousePart, Double>();
 	private final Map<Mesh, Boolean> textureCoordsAlreadyComputed = new HashMap<Mesh, Boolean>();
 	private final List<Spatial> solarCollidables = new ArrayList<Spatial>();
@@ -227,7 +228,7 @@ public class EnergyPanel extends JPanel {
 
 	private EnergyPanel() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
+
 		this.repaint();
 		this.paint(null);
 
@@ -912,7 +913,7 @@ public class EnergyPanel extends JPanel {
 						} catch (final InterruptedException e) {
 							e.printStackTrace();
 						}
-						progressBar.setValue(0);						
+						progressBar.setValue(0);
 					} while (computeRequest);
 					thread = null;
 				}
@@ -1048,8 +1049,7 @@ public class EnergyPanel extends JPanel {
 
 		if (getCity().isEmpty()) {
 			/*
-			 * if there are no temperatures available for the selected city
-			 * compute zero for cooling and heating
+			 * if there are no temperatures available for the selected city compute zero for cooling and heating
 			 */
 			outsideTemperature = new double[] { insideTemperature, insideTemperature };
 			energyToday.heating = Double.NaN;
@@ -1178,7 +1178,7 @@ public class EnergyPanel extends JPanel {
 	private void computeRadiation() {
 		System.out.println("computeRadiation()");
 		initSolarCollidables();
-		solarOnWall.clear();
+		solarOnMesh.clear();
 		solarTotal.clear();
 		textureCoordsAlreadyComputed.clear();
 		solarOnLand = null;
@@ -1233,10 +1233,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void computeRadiationOnMesh(final ReadOnlyVector3 directionTowardSun, final HousePart house, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
-		/*
-		 * needed in order to prevent picking collision with neighboring wall at
-		 * wall edge
-		 */
+		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 
@@ -1281,10 +1278,10 @@ public class EnergyPanel extends JPanel {
 		final double height = p1.subtract(origin, null).length();
 		final int rows = (int) Math.ceil(height / SOLAR_STEP);
 		final int cols = (int) Math.ceil(p2.subtract(origin, null).length() / SOLAR_STEP);
-		double[][] solar = solarOnWall.get(drawMesh);
+		double[][] solar = solarOnMesh.get(drawMesh);
 		if (solar == null) {
 			solar = new double[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
-			solarOnWall.put(drawMesh, solar);
+			solarOnMesh.put(drawMesh, solar);
 		}
 
 		if (textureCoordsAlreadyComputed.get(drawMesh) == null) {
@@ -1376,8 +1373,7 @@ public class EnergyPanel extends JPanel {
 			return;
 		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 		/*
-		 * needed in order to prevent picking collision with neighboring wall at
-		 * wall edge
+		 * needed in order to prevent picking collision with neighboring wall at wall edge
 		 */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
@@ -1431,7 +1427,7 @@ public class EnergyPanel extends JPanel {
 				for (final HousePart houseChild : foundation.getChildren()) {
 					if (houseChild instanceof Wall) {
 						final Wall wall = (Wall) houseChild;
-						applySolarTexture(houseChild.getMesh(), solarOnWall.get(wall.getMesh()), maxSolarValue);
+						applySolarTexture(houseChild.getMesh(), solarOnMesh.get(wall.getMesh()), maxSolarValue);
 						final Roof roof = (Roof) wall.getRoof();
 						if (roof != null && !roofs.contains(roof))
 							roofs.add(roof);
@@ -1440,7 +1436,7 @@ public class EnergyPanel extends JPanel {
 				for (final Roof roof : roofs)
 					for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
 						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-						applySolarTexture(mesh, solarOnWall.get(mesh), maxSolarValue);
+						applySolarTexture(mesh, solarOnMesh.get(mesh), maxSolarValue);
 					}
 				final Double val = solarTotal.get(foundation);
 				foundation.setSolarValue(convertSolarValue(val));
@@ -1479,17 +1475,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public int roundToPowerOfTwo(final int n) {
-		final Integer result = powerOfTwo.get(n);
-		if (result != null)
-			return result;
-		else {
-			int powerOfTwo = 2;
-			while (true) {
-				if (powerOfTwo >= n)
-					return powerOfTwo;
-				powerOfTwo *= 2;
-			}
-		}
+		return (int) Math.pow(2.0, Math.ceil(Math.log(n) / Math.log(2)));
 	}
 
 	public JSlider getColorMapSlider() {

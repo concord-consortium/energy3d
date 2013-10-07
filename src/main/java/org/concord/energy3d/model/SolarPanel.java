@@ -88,6 +88,11 @@ public class SolarPanel extends HousePart {
 	@Override
 	protected String getTextureFileName() {
 		return "solarpanel.png";
+	}
+	
+	@Override
+	public boolean isPrintable() {
+		return false;
 	}	
 
 }
