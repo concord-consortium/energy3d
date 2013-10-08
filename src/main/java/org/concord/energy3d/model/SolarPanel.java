@@ -17,6 +17,7 @@ import com.ardor3d.scenegraph.shape.Box;
 
 public class SolarPanel extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private ReadOnlyVector3 normal;
 
 	public SolarPanel() {
 		super(1, 1, 0.0);
@@ -68,7 +69,7 @@ public class SolarPanel extends HousePart {
 		
 		final UserData userData = (UserData) ((Spatial) pickData.getTarget()).getUserData();
 		final int roofPartIndex = userData.getIndex();
-		final ReadOnlyVector3 normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
+		normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
 		if (Util.isEqual(normal, Vector3.UNIT_Z))
 			mesh.setRotation(new Matrix3());
 		else
@@ -88,6 +89,16 @@ public class SolarPanel extends HousePart {
 	@Override
 	protected String getTextureFileName() {
 		return "solarpanel.png";
+	}
+	
+	@Override
+	public ReadOnlyVector3 getFaceDirection() {
+		return normal;
+	}
+	
+	@Override
+	public boolean isPrintable() {
+		return false;
 	}	
 
 }
