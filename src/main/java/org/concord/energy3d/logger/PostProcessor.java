@@ -73,7 +73,11 @@ public class PostProcessor {
 							final String[] day = ss[0].split("-");
 							final String[] time = ss[1].split("-");
 							final Calendar c = Calendar.getInstance();
-							c.set(Integer.parseInt(day[0]), Integer.parseInt(day[1]) - 1, Integer.parseInt(day[2]), Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
+							try {
+								c.set(Integer.parseInt(day[0]), Integer.parseInt(day[1]) - 1, Integer.parseInt(day[2]), Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 							if (date0 == null)
 								date0 = c.getTime();
 							timestamp = Math.round((c.getTime().getTime() - date0.getTime()) * 0.001);

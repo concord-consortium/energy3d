@@ -129,9 +129,9 @@ class Building {
 		exploreWallNeighbors();
 		String s = "(ID=" + id;
 		if (walls.size() == floorVertices.size() && !walls.isEmpty()) {
-			s += " #Wall=" + walls.size();
+			s += " #wall=" + walls.size();
 			if (windowCount > 0)
-				s += " #Window=" + windowCount;
+				s += " #window=" + windowCount;
 			s += " height=" + FORMAT1.format(height);
 			double area = getArea();
 			s += " area=" + FORMAT1.format(Math.abs(area));
