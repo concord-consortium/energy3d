@@ -1187,8 +1187,8 @@ public class EnergyPanel extends JPanel {
 		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
 		// computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
 		// computeRadiationOnRoofs(Heliodon.getInstance().getSunLocation());
-		computeRadiationOnSolarPanels(Heliodon.getInstance().getSunLocation());
-//		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
+//		computeRadiationOnSolarPanels(Heliodon.getInstance().getSunLocation());
+		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		updateSolarValueOnAllHouses();
 	}
 
@@ -1242,7 +1242,29 @@ public class EnergyPanel extends JPanel {
 			final ReadOnlyVector3 faceDirection = part.getFaceDirection();
 			if (part instanceof SolarPanel && part.isDrawCompleted() && faceDirection.dot(directionTowardSun) > 0) {
 				final SolarPanel solarPanel = (SolarPanel) part;
-				computeRadiationOnMesh(directionTowardSun, null, solarPanel.getMesh(), solarPanel.getMesh(), faceDirection, false);
+//				computeRadiationOnMesh(directionTowardSun, null, solarPanel.getMesh(), solarPanel.getMesh(), faceDirection, false);
+				
+				final Mesh drawMesh = solarPanel.getMesh();
+				double[][] solar = solarOnMesh.get(drawMesh);
+				if (solar == null) {
+					solar = new double[1][1];
+					solarOnMesh.put(drawMesh, solar);
+				}
+				
+				final double OFFSET = 0.1;
+				final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+				final ReadOnlyVector3 center = drawMesh.getTranslation();
+				final double dot = solarPanel.getFaceDirection().dot(directionTowardSun);
+				final Ray3 pickRay = new Ray3(center.add(offset, null), directionTowardSun);
+				final PickResults pickResults = new PrimitivePickResults();
+				for (final Spatial spatial : solarCollidables)
+					if (spatial != drawMesh) {
+						PickingUtil.findPick(spatial, pickRay, pickResults, false);
+						if (pickResults.getNumber() != 0)
+							break;
+					}
+				if (pickResults.getNumber() == 0)
+					solar[0][0] += dot;
 			}
 		}
 	}
