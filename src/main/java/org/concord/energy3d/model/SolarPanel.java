@@ -57,8 +57,6 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	protected void drawMesh() {
-		updateEditShapes();
-		
 		final PickResults pickResults = new PrimitivePickResults();
 		final Ray3 ray = new Ray3(getAbsPoint(0).addLocal(0, 0, 1000), Vector3.NEG_UNIT_Z);
 		PickingUtil.findPick(container.getRoot(), ray, pickResults);
@@ -67,6 +65,9 @@ public class SolarPanel extends HousePart {
 		final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
 		mesh.setTranslation(p);
 		
+		points.get(0).setZ(p.getZ());
+		updateEditShapes();
+
 		final UserData userData = (UserData) ((Spatial) pickData.getTarget()).getUserData();
 		final int roofPartIndex = userData.getIndex();
 		normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();

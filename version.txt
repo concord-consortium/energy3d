@@ -1589,6 +1589,7 @@ Version 2.0 - May 15, 2013
 - fix problem with extra wireframe line on roof
 - add flag to temporarely disable compute thread when opening folder
 - compute and render radiation heatmap on solar panels
+- fix problem with solar panel edit point location not being updated
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove
 - *display energy only for the currently selected house
