@@ -1,5 +1,6 @@
 package org.concord.energy3d.model;
 
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
@@ -100,6 +101,11 @@ public class SolarPanel extends HousePart {
 	@Override
 	public boolean isPrintable() {
 		return false;
-	}	
+	}
+	
+	@Override
+	public double computeArea() {
+		return Scene.getInstance().getAnnotationScale() * 2.0;
+	}
 
 }

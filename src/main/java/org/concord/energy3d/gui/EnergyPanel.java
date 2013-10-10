@@ -167,9 +167,9 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox roofsComboBox;
 	private final JCheckBox autoCheckBox;
 	private final JTextField heatingYearlyTextField;
-	private final JTextField solarRateTextField;
-	private final JTextField solarTodayTextField;
-	private final JTextField solarYearlyTextField;
+	private final JTextField sunRateTextField;
+	private final JTextField sunTodayTextField;
+	private final JTextField sunYearlyTextField;
 	private final JTextField heatingTodayTextField;
 	private final JTextField coolingRateTextField;
 	private final JTextField coolingTodayTextField;
@@ -195,7 +195,10 @@ public class EnergyPanel extends JPanel {
 	private final JLabel legendLabel;
 	private final JLabel contrastLabel;
 	private final JProgressBar progressBar;
-
+	private JTextField solarRateTextField;
+	private JTextField solarTodayTextField;
+	private JTextField solarYearlyTextField;
+	
 	private final Map<Mesh, double[][]> solarOnMesh = new HashMap<Mesh, double[][]>();
 	private final Map<HousePart, Double> solarTotal = new HashMap<HousePart, Double>();
 	private final Map<Mesh, Boolean> textureCoordsAlreadyComputed = new HashMap<Mesh, Boolean>();
@@ -217,8 +220,10 @@ public class EnergyPanel extends JPanel {
 	private UpdateRadiation updateRadiation;
 	private boolean computeEnabled = true;
 
+
 	private static class EnergyAmount {
 		double solar;
+		double solarPanel;
 		double heating;
 		double cooling;
 	}
@@ -498,58 +503,84 @@ public class EnergyPanel extends JPanel {
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel_1);
 		final GridBagLayout gbl_panel_1 = new GridBagLayout();
+		gbl_panel_1.columnWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 };
 		panel_1.setLayout(gbl_panel_1);
+
+		final JLabel sunLabel = new JLabel("Sun");
+		final GridBagConstraints gbc_sunLabel = new GridBagConstraints();
+		gbc_sunLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_sunLabel.gridx = 1;
+		gbc_sunLabel.gridy = 0;
+		panel_1.add(sunLabel, gbc_sunLabel);
 
 		final JLabel solarLabel = new JLabel("Solar");
 		solarLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_solarLabel = new GridBagConstraints();
-		gbc_solarLabel.gridx = 1;
+		gbc_solarLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_solarLabel.gridx = 2;
 		gbc_solarLabel.gridy = 0;
 		panel_1.add(solarLabel, gbc_solarLabel);
 
 		final JLabel heatingLabel = new JLabel("Heating");
 		heatingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_heatingLabel = new GridBagConstraints();
-		gbc_heatingLabel.gridx = 2;
+		gbc_heatingLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_heatingLabel.gridx = 3;
 		gbc_heatingLabel.gridy = 0;
 		panel_1.add(heatingLabel, gbc_heatingLabel);
 
 		final JLabel coolingLabel = new JLabel("Cooling");
 		coolingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_coolingLabel = new GridBagConstraints();
-		gbc_coolingLabel.gridx = 3;
+		gbc_coolingLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_coolingLabel.gridx = 4;
 		gbc_coolingLabel.gridy = 0;
 		panel_1.add(coolingLabel, gbc_coolingLabel);
 
 		final JLabel totalLabel = new JLabel("Total");
 		totalLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_totalLabel = new GridBagConstraints();
-		gbc_totalLabel.gridx = 4;
+		gbc_totalLabel.insets = new Insets(0, 0, 5, 0);
+		gbc_totalLabel.gridx = 5;
 		gbc_totalLabel.gridy = 0;
 		panel_1.add(totalLabel, gbc_totalLabel);
 
 		final JLabel nowLabel = new JLabel("Now (watts):");
 		final GridBagConstraints gbc_nowLabel = new GridBagConstraints();
+		gbc_nowLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_nowLabel.anchor = GridBagConstraints.WEST;
 		gbc_nowLabel.gridx = 0;
 		gbc_nowLabel.gridy = 1;
 		panel_1.add(nowLabel, gbc_nowLabel);
 
+		sunRateTextField = new JTextField();
+		sunRateTextField.setEditable(false);
+		final GridBagConstraints gbc_sunRateTextField = new GridBagConstraints();
+		gbc_sunRateTextField.insets = new Insets(0, 0, 5, 5);
+		gbc_sunRateTextField.weightx = 1.0;
+		gbc_sunRateTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_sunRateTextField.gridx = 1;
+		gbc_sunRateTextField.gridy = 1;
+		sunRateTextField.setColumns(5);
+		panel_1.add(sunRateTextField, gbc_sunRateTextField);
+
 		solarRateTextField = new JTextField();
 		solarRateTextField.setEditable(false);
 		final GridBagConstraints gbc_solarRateTextField = new GridBagConstraints();
 		gbc_solarRateTextField.weightx = 1.0;
+		gbc_solarRateTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_solarRateTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_solarRateTextField.gridx = 1;
+		gbc_solarRateTextField.gridx = 2;
 		gbc_solarRateTextField.gridy = 1;
-		solarRateTextField.setColumns(5);
 		panel_1.add(solarRateTextField, gbc_solarRateTextField);
+		solarRateTextField.setColumns(10);
 
 		heatingRateTextField = new JTextField();
 		final GridBagConstraints gbc_heatingRateTextField = new GridBagConstraints();
+		gbc_heatingRateTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_heatingRateTextField.weightx = 1.0;
 		gbc_heatingRateTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_heatingRateTextField.gridx = 2;
+		gbc_heatingRateTextField.gridx = 3;
 		gbc_heatingRateTextField.gridy = 1;
 		panel_1.add(heatingRateTextField, gbc_heatingRateTextField);
 		heatingRateTextField.setEditable(false);
@@ -558,9 +589,10 @@ public class EnergyPanel extends JPanel {
 		coolingRateTextField = new JTextField();
 		coolingRateTextField.setEditable(false);
 		final GridBagConstraints gbc_coolingRateTextField = new GridBagConstraints();
+		gbc_coolingRateTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_coolingRateTextField.weightx = 1.0;
 		gbc_coolingRateTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_coolingRateTextField.gridx = 3;
+		gbc_coolingRateTextField.gridx = 4;
 		gbc_coolingRateTextField.gridy = 1;
 		panel_1.add(coolingRateTextField, gbc_coolingRateTextField);
 		coolingRateTextField.setColumns(5);
@@ -568,34 +600,48 @@ public class EnergyPanel extends JPanel {
 		totalRateTextField = new JTextField();
 		totalRateTextField.setEditable(false);
 		final GridBagConstraints gbc_totalRateTextField = new GridBagConstraints();
+		gbc_totalRateTextField.insets = new Insets(0, 0, 5, 0);
 		gbc_totalRateTextField.weightx = 1.0;
 		gbc_totalRateTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_totalRateTextField.gridx = 4;
+		gbc_totalRateTextField.gridx = 5;
 		gbc_totalRateTextField.gridy = 1;
 		panel_1.add(totalRateTextField, gbc_totalRateTextField);
 		totalRateTextField.setColumns(5);
 
 		final JLabel todayLabel = new JLabel("Today (kWh): ");
 		final GridBagConstraints gbc_todayLabel = new GridBagConstraints();
+		gbc_todayLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_todayLabel.anchor = GridBagConstraints.WEST;
 		gbc_todayLabel.gridx = 0;
 		gbc_todayLabel.gridy = 2;
 		panel_1.add(todayLabel, gbc_todayLabel);
 
+		sunTodayTextField = new JTextField();
+		sunTodayTextField.setEditable(false);
+		final GridBagConstraints gbc_sunTodayTextField = new GridBagConstraints();
+		gbc_sunTodayTextField.insets = new Insets(0, 0, 5, 5);
+		gbc_sunTodayTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_sunTodayTextField.gridx = 1;
+		gbc_sunTodayTextField.gridy = 2;
+		panel_1.add(sunTodayTextField, gbc_sunTodayTextField);
+		sunTodayTextField.setColumns(5);
+
 		solarTodayTextField = new JTextField();
 		solarTodayTextField.setEditable(false);
 		final GridBagConstraints gbc_solarTodayTextField = new GridBagConstraints();
+		gbc_solarTodayTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_solarTodayTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_solarTodayTextField.gridx = 1;
+		gbc_solarTodayTextField.gridx = 2;
 		gbc_solarTodayTextField.gridy = 2;
 		panel_1.add(solarTodayTextField, gbc_solarTodayTextField);
-		solarTodayTextField.setColumns(5);
+		solarTodayTextField.setColumns(10);
 
 		heatingTodayTextField = new JTextField();
 		heatingTodayTextField.setEditable(false);
 		final GridBagConstraints gbc_heatingTodayTextField = new GridBagConstraints();
+		gbc_heatingTodayTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_heatingTodayTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_heatingTodayTextField.gridx = 2;
+		gbc_heatingTodayTextField.gridx = 3;
 		gbc_heatingTodayTextField.gridy = 2;
 		panel_1.add(heatingTodayTextField, gbc_heatingTodayTextField);
 		heatingTodayTextField.setColumns(5);
@@ -603,8 +649,9 @@ public class EnergyPanel extends JPanel {
 		coolingTodayTextField = new JTextField();
 		coolingTodayTextField.setEditable(false);
 		final GridBagConstraints gbc_coolingTodayTextField = new GridBagConstraints();
+		gbc_coolingTodayTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_coolingTodayTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_coolingTodayTextField.gridx = 3;
+		gbc_coolingTodayTextField.gridx = 4;
 		gbc_coolingTodayTextField.gridy = 2;
 		panel_1.add(coolingTodayTextField, gbc_coolingTodayTextField);
 		coolingTodayTextField.setColumns(5);
@@ -612,14 +659,16 @@ public class EnergyPanel extends JPanel {
 		totalTodayTextField = new JTextField();
 		totalTodayTextField.setEditable(false);
 		final GridBagConstraints gbc_totalTodayTextField = new GridBagConstraints();
+		gbc_totalTodayTextField.insets = new Insets(0, 0, 5, 0);
 		gbc_totalTodayTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_totalTodayTextField.gridx = 4;
+		gbc_totalTodayTextField.gridx = 5;
 		gbc_totalTodayTextField.gridy = 2;
 		panel_1.add(totalTodayTextField, gbc_totalTodayTextField);
 		totalTodayTextField.setColumns(5);
 
 		final JLabel yearlyLabel = new JLabel("Yearly (kWh): ");
 		final GridBagConstraints gbc_yearlyLabel = new GridBagConstraints();
+		gbc_yearlyLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_yearlyLabel.anchor = GridBagConstraints.WEST;
 		gbc_yearlyLabel.gridx = 0;
 		gbc_yearlyLabel.gridy = 3;
@@ -627,20 +676,32 @@ public class EnergyPanel extends JPanel {
 
 		panel_1.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_1.getPreferredSize().height));
 
+		sunYearlyTextField = new JTextField();
+		sunYearlyTextField.setEditable(false);
+		final GridBagConstraints gbc_sunYearlyTextField = new GridBagConstraints();
+		gbc_sunYearlyTextField.insets = new Insets(0, 0, 5, 5);
+		gbc_sunYearlyTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_sunYearlyTextField.gridx = 1;
+		gbc_sunYearlyTextField.gridy = 3;
+		panel_1.add(sunYearlyTextField, gbc_sunYearlyTextField);
+		sunYearlyTextField.setColumns(5);
+
 		solarYearlyTextField = new JTextField();
 		solarYearlyTextField.setEditable(false);
 		final GridBagConstraints gbc_solarYearlyTextField = new GridBagConstraints();
+		gbc_solarYearlyTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_solarYearlyTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_solarYearlyTextField.gridx = 1;
+		gbc_solarYearlyTextField.gridx = 2;
 		gbc_solarYearlyTextField.gridy = 3;
 		panel_1.add(solarYearlyTextField, gbc_solarYearlyTextField);
-		solarYearlyTextField.setColumns(5);
+		solarYearlyTextField.setColumns(10);
 
 		heatingYearlyTextField = new JTextField();
 		heatingYearlyTextField.setEditable(false);
 		final GridBagConstraints gbc_heatingYearlyTextField = new GridBagConstraints();
+		gbc_heatingYearlyTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_heatingYearlyTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_heatingYearlyTextField.gridx = 2;
+		gbc_heatingYearlyTextField.gridx = 3;
 		gbc_heatingYearlyTextField.gridy = 3;
 		panel_1.add(heatingYearlyTextField, gbc_heatingYearlyTextField);
 		heatingYearlyTextField.setColumns(5);
@@ -648,8 +709,9 @@ public class EnergyPanel extends JPanel {
 		coolingYearlyTextField = new JTextField();
 		coolingYearlyTextField.setEditable(false);
 		final GridBagConstraints gbc_coolingYearlyTextField = new GridBagConstraints();
+		gbc_coolingYearlyTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_coolingYearlyTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_coolingYearlyTextField.gridx = 3;
+		gbc_coolingYearlyTextField.gridx = 4;
 		gbc_coolingYearlyTextField.gridy = 3;
 		panel_1.add(coolingYearlyTextField, gbc_coolingYearlyTextField);
 		coolingYearlyTextField.setColumns(5);
@@ -657,15 +719,17 @@ public class EnergyPanel extends JPanel {
 		totalYearlyTextField = new JTextField();
 		totalYearlyTextField.setEditable(false);
 		final GridBagConstraints gbc_totalYearlyTextField = new GridBagConstraints();
+		gbc_totalYearlyTextField.insets = new Insets(0, 0, 5, 0);
 		// gbc_totalYearlyTextField.insets = new Insets(0, 0, 5, 0);
 		gbc_totalYearlyTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_totalYearlyTextField.gridx = 4;
+		gbc_totalYearlyTextField.gridx = 5;
 		gbc_totalYearlyTextField.gridy = 3;
 		panel_1.add(totalYearlyTextField, gbc_totalYearlyTextField);
 		totalYearlyTextField.setColumns(5);
 
 		final JLabel yearlyCostLabel = new JLabel("Yearly Cost:");
 		final GridBagConstraints gbc_yearlyCostLabel = new GridBagConstraints();
+		gbc_yearlyCostLabel.insets = new Insets(0, 0, 0, 5);
 		gbc_yearlyCostLabel.anchor = GridBagConstraints.WEST;
 		gbc_yearlyCostLabel.gridx = 0;
 		gbc_yearlyCostLabel.gridy = 4;
@@ -674,8 +738,9 @@ public class EnergyPanel extends JPanel {
 		heatingCostTextField = new JTextField();
 		heatingCostTextField.setEditable(false);
 		final GridBagConstraints gbc_heatingCostTextField = new GridBagConstraints();
+		gbc_heatingCostTextField.insets = new Insets(0, 0, 0, 5);
 		gbc_heatingCostTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_heatingCostTextField.gridx = 2;
+		gbc_heatingCostTextField.gridx = 3;
 		gbc_heatingCostTextField.gridy = 4;
 		panel_1.add(heatingCostTextField, gbc_heatingCostTextField);
 		heatingCostTextField.setColumns(5);
@@ -683,8 +748,9 @@ public class EnergyPanel extends JPanel {
 		coolingCostTextField = new JTextField();
 		coolingCostTextField.setEditable(false);
 		final GridBagConstraints gbc_coolingCostTextField = new GridBagConstraints();
+		gbc_coolingCostTextField.insets = new Insets(0, 0, 0, 5);
 		gbc_coolingCostTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_coolingCostTextField.gridx = 3;
+		gbc_coolingCostTextField.gridx = 4;
 		gbc_coolingCostTextField.gridy = 4;
 		panel_1.add(coolingCostTextField, gbc_coolingCostTextField);
 		coolingCostTextField.setColumns(5);
@@ -693,14 +759,15 @@ public class EnergyPanel extends JPanel {
 		totalCostTextField.setEditable(false);
 		final GridBagConstraints gbc_totalCostTextField = new GridBagConstraints();
 		gbc_totalCostTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_totalCostTextField.gridx = 4;
+		gbc_totalCostTextField.gridx = 5;
 		gbc_totalCostTextField.gridy = 4;
 		panel_1.add(totalCostTextField, gbc_totalCostTextField);
 		totalCostTextField.setColumns(5);
 
 		final Dimension size = heatingLabel.getMinimumSize();
-		coolingLabel.setMinimumSize(size);
+		sunLabel.setMinimumSize(size);
 		solarLabel.setMinimumSize(size);
+		coolingLabel.setMinimumSize(size);
 		totalLabel.setMinimumSize(size);
 
 		final JPanel panel_2 = new JPanel();
@@ -992,19 +1059,22 @@ public class EnergyPanel extends JPanel {
 		final int outsideTemperature = (Integer) outsideTemperatureSpinner.getValue();
 		computeEnergyLossRate(insideTemperature - outsideTemperature);
 		final EnergyAmount energyRate = computeEnergyRate(Heliodon.getInstance().getSunLocation(), insideTemperature, outsideTemperature);
-		solarRateTextField.setText(noDecimals.format(energyRate.solar));
+		sunRateTextField.setText(noDecimals.format(energyRate.solar));
+		solarRateTextField.setText(noDecimals.format(energyRate.solarPanel));
 		heatingRateTextField.setText(noDecimals.format(energyRate.heating));
 		coolingRateTextField.setText(noDecimals.format(energyRate.cooling));
 		totalRateTextField.setText(noDecimals.format(energyRate.heating + energyRate.cooling));
 
 		final EnergyAmount energyToday = computeEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone(), (Integer) insideTemperatureSpinner.getValue());
-		solarTodayTextField.setText(twoDecimals.format(energyToday.solar));
+		sunTodayTextField.setText(twoDecimals.format(energyToday.solar));
+		solarTodayTextField.setText(twoDecimals.format(energyToday.solarPanel));
 		heatingTodayTextField.setText(twoDecimals.format(energyToday.heating));
 		coolingTodayTextField.setText(twoDecimals.format(energyToday.cooling));
 		totalTodayTextField.setText(twoDecimals.format(energyToday.heating + energyToday.cooling));
 
 		final EnergyAmount energyYearly = computeEnergyYearly((Integer) insideTemperatureSpinner.getValue());
-		solarYearlyTextField.setText(noDecimals.format(energyYearly.solar));
+		sunYearlyTextField.setText(noDecimals.format(energyYearly.solar));
+		solarYearlyTextField.setText(noDecimals.format(energyYearly.solarPanel));
 		heatingYearlyTextField.setText(noDecimals.format(energyYearly.heating));
 		coolingYearlyTextField.setText(noDecimals.format(energyYearly.cooling));
 		totalYearlyTextField.setText(noDecimals.format(energyYearly.heating + energyYearly.cooling));
@@ -1031,6 +1101,7 @@ public class EnergyPanel extends JPanel {
 			final EnergyAmount energyToday = computeEnergyToday(date, insideTemperature);
 			final int daysInMonth = date.getActualMaximum(Calendar.DAY_OF_MONTH);
 			energyYearly.solar += energyToday.solar * daysInMonth;
+			energyYearly.solarPanel += energyToday.solarPanel * daysInMonth;
 			energyYearly.heating += energyToday.heating * daysInMonth;
 			energyYearly.cooling += energyToday.cooling * daysInMonth;
 			date.add(Calendar.MONTH, 1);
@@ -1061,10 +1132,15 @@ public class EnergyPanel extends JPanel {
 		for (int hour = 0; hour < 24; hour++) {
 			final EnergyAmount energyThisHour = computeEnergyRate(heliodon.computeSunLocation(today), insideTemperature, outsideTemperature[0] + (outsideTemperature[1] - outsideTemperature[0]) / 24 * hour);
 			energyToday.solar += energyThisHour.solar / 1000.0;
+			energyToday.solarPanel += energyThisHour.solarPanel / 1000.0;
 			energyToday.heating += energyThisHour.heating / 1000.0;
 			energyToday.cooling += energyThisHour.cooling / 1000.0;
 			today.add(Calendar.HOUR_OF_DAY, 1);
 		}
+		final double coolingWithSolarPanel = Math.max(0.0, energyToday.cooling - energyToday.solarPanel);
+		final double heatingWithSolarPanel = energyToday.heating - energyToday.solarPanel - (energyToday.cooling - coolingWithSolarPanel);
+		energyToday.cooling = coolingWithSolarPanel;
+		energyToday.heating = heatingWithSolarPanel;
 		return energyToday;
 	}
 
@@ -1115,8 +1191,10 @@ public class EnergyPanel extends JPanel {
 			throw cancelException;
 		final EnergyAmount energyRate = new EnergyAmount();
 
-		if (Heliodon.getInstance().isVisible() && !Heliodon.getInstance().isNightTime())
+		if (Heliodon.getInstance().isVisible() && !Heliodon.getInstance().isNightTime()) {
 			energyRate.solar = computeEnergySolarRate(sunLocation.normalize(null));
+			energyRate.solarPanel = computeEnergySolarPanelRate(sunLocation.normalize(null));
+		}
 
 		final double energyLossRate = computeEnergyLossRate(insideTemperature - outsideTemperature);
 		if (energyLossRate >= 0.0) {
@@ -1158,6 +1236,18 @@ public class EnergyPanel extends JPanel {
 		return totalRate;
 	}
 
+	private double computeEnergySolarPanelRate(final ReadOnlyVector3 sunVector) {
+		double totalRate = 0.0;
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof SolarPanel) {
+				final double dot = part.getContainer().getFaceDirection().dot(sunVector);
+				if (dot > 0.0)
+					totalRate += 100.0 * part.computeArea() * dot;
+			}
+		}
+		return totalRate;
+	}
+
 	private void updateOutsideTemperature() {
 		if (getCity().isEmpty())
 			outsideTemperatureSpinner.setValue(15);
@@ -1187,7 +1277,7 @@ public class EnergyPanel extends JPanel {
 		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
 		// computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
 		// computeRadiationOnRoofs(Heliodon.getInstance().getSunLocation());
-//		computeRadiationOnSolarPanels(Heliodon.getInstance().getSunLocation());
+		// computeRadiationOnSolarPanels(Heliodon.getInstance().getSunLocation());
 		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		updateSolarValueOnAllHouses();
 	}
@@ -1233,7 +1323,7 @@ public class EnergyPanel extends JPanel {
 			}
 		}
 	}
-	
+
 	private void computeRadiationOnSolarPanels(final ReadOnlyVector3 sunLocation) {
 		if (sunLocation.getZ() <= 0)
 			return;
@@ -1242,15 +1332,15 @@ public class EnergyPanel extends JPanel {
 			final ReadOnlyVector3 faceDirection = part.getFaceDirection();
 			if (part instanceof SolarPanel && part.isDrawCompleted() && faceDirection.dot(directionTowardSun) > 0) {
 				final SolarPanel solarPanel = (SolarPanel) part;
-//				computeRadiationOnMesh(directionTowardSun, null, solarPanel.getMesh(), solarPanel.getMesh(), faceDirection, false);
-				
+				// computeRadiationOnMesh(directionTowardSun, null, solarPanel.getMesh(), solarPanel.getMesh(), faceDirection, false);
+
 				final Mesh drawMesh = solarPanel.getMesh();
 				double[][] solar = solarOnMesh.get(drawMesh);
 				if (solar == null) {
 					solar = new double[1][1];
 					solarOnMesh.put(drawMesh, solar);
 				}
-				
+
 				final double OFFSET = 0.1;
 				final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 				final ReadOnlyVector3 center = drawMesh.getTranslation();
