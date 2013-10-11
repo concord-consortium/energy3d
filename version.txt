@@ -1592,6 +1592,7 @@ Version 2.0 - May 15, 2013
 - fix problem with solar panel edit point location not being updated
 - compute daily and yearly energy including solar panel gains
 - add gui for solar panel energy
+- adjust size of solar panel
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove
 - *display energy only for the currently selected house

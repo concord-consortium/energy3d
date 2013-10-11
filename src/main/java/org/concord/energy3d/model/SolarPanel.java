@@ -1,6 +1,5 @@
 package org.concord.energy3d.model;
 
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
@@ -18,7 +17,8 @@ import com.ardor3d.scenegraph.shape.Box;
 
 public class SolarPanel extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private ReadOnlyVector3 normal;
+	private transient ReadOnlyVector3 normal;
+	private transient double area;
 
 	public SolarPanel() {
 		super(1, 1, 0.0);
@@ -29,7 +29,10 @@ public class SolarPanel extends HousePart {
 		super.init();
 		relativeToHorizontal = true;
 		
-		mesh = new Box("SolarPanel", new Vector3(), 1, 2, 0.1);
+		final double xExtent = 0.7;
+		final double yExtent = 1.6;
+		area = xExtent * yExtent;
+		mesh = new Box("SolarPanel", new Vector3(), xExtent / 2.0 / 0.2, yExtent / 2.0 / 0.2, 0.1);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));		
 		root.attachChild(mesh);
@@ -104,8 +107,13 @@ public class SolarPanel extends HousePart {
 	}
 	
 	@Override
+	public double getGridSize() {
+		return 1.5;
+	}
+	
+	@Override
 	public double computeArea() {
-		return Scene.getInstance().getAnnotationScale() * 2.0;
+		return area;
 	}
 
 }
