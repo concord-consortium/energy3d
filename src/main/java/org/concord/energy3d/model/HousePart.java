@@ -262,7 +262,7 @@ public abstract class HousePart implements Serializable {
 		return editPointIndex;
 	}
 
-	protected PickedHousePart pick(final int x, final int y, final Class<?>[] typesOfHousePart) {
+	protected PickedHousePart pickContainer(final int x, final int y, final Class<?>[] typesOfHousePart) {
 		for (final Class<?> c : typesOfHousePart) {
 			final PickedHousePart picked = pickContainer(x, y, c);
 			if (picked != null)
@@ -753,6 +753,18 @@ public abstract class HousePart implements Serializable {
 
 	public long getId() {
 		return id;
+	}
+	
+	protected HousePart getTopContainer() {
+		HousePart c = this.getContainer();
+		if (c == null)
+			return c;
+		HousePart x = null;
+		while (c != null) {
+			x = c;
+			c = c.getContainer();
+		}
+		return x;
 	}
 
 }

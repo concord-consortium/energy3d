@@ -27,7 +27,7 @@ public class SolarPanel extends HousePart {
 	@Override
 	protected void init() {
 		super.init();
-		relativeToHorizontal = true;
+		updateRelativeToHorizontalFlag();
 		
 		final double xExtent = 0.7;
 		final double yExtent = 1.6;
@@ -40,13 +40,22 @@ public class SolarPanel extends HousePart {
 		updateTextureAndColor();
 	}
 
+	private void updateRelativeToHorizontalFlag() {
+		if (container != null)
+			relativeToHorizontal = container instanceof Roof;
+	}
+
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
-		final PickedHousePart picked = pickContainer(x, y, Roof.class);
+		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] {Roof.class, Wall.class});
+		updateRelativeToHorizontalFlag();
 		if (picked != null) {
 			final Vector3 p = picked.getPoint();
-			container.getContainer().getContainer().snapToGrid(p, getAbsPoint(0), getGridSize());
-			points.get(0).set(toRelative(p, container.getContainer().getContainer()));
+			if (container instanceof Wall)
+				snapToGrid(p, getAbsPoint(0), getGridSize());
+			else
+				getTopContainer().snapToGrid(p, getAbsPoint(0), getGridSize());
+			points.get(0).set(toRelative(p, getContainerRelative()));
 		}
 		if (container != null) {
 			draw();
@@ -56,25 +65,28 @@ public class SolarPanel extends HousePart {
 	
 	@Override
 	public Vector3 getAbsPoint(final int index) {
-		return toAbsolute(points.get(index), container == null ? null : container.getContainer().getContainer());
+		return toAbsolute(points.get(index), getContainerRelative());
 	}	
 
 	@Override
 	protected void drawMesh() {
+		if (container instanceof Roof) {
 		final PickResults pickResults = new PrimitivePickResults();
 		final Ray3 ray = new Ray3(getAbsPoint(0).addLocal(0, 0, 1000), Vector3.NEG_UNIT_Z);
 		PickingUtil.findPick(container.getRoot(), ray, pickResults);
 		
 		final PickData pickData = pickResults.getPickData(0);
 		final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
-		mesh.setTranslation(p);
 		
 		points.get(0).setZ(p.getZ());
-		updateEditShapes();
-
 		final UserData userData = (UserData) ((Spatial) pickData.getTarget()).getUserData();
 		final int roofPartIndex = userData.getIndex();
 		normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
+		} else
+			normal = container.getFaceDirection();
+		mesh.setTranslation(getAbsPoint(0));
+		updateEditShapes();
+
 		if (Util.isEqual(normal, Vector3.UNIT_Z))
 			mesh.setRotation(new Matrix3());
 		else
@@ -114,6 +126,13 @@ public class SolarPanel extends HousePart {
 	@Override
 	public double computeArea() {
 		return area;
+	}
+	
+	private HousePart getContainerRelative() {
+		if (container instanceof Wall)
+			return container;
+		else
+			return getTopContainer();
 	}
 
 }
