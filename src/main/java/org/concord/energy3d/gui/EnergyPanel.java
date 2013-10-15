@@ -573,7 +573,7 @@ public class EnergyPanel extends JPanel {
 		gbc_solarRateTextField.gridx = 2;
 		gbc_solarRateTextField.gridy = 1;
 		panel_1.add(solarRateTextField, gbc_solarRateTextField);
-		solarRateTextField.setColumns(10);
+		solarRateTextField.setColumns(5);
 
 		heatingRateTextField = new JTextField();
 		final GridBagConstraints gbc_heatingRateTextField = new GridBagConstraints();
@@ -634,7 +634,7 @@ public class EnergyPanel extends JPanel {
 		gbc_solarTodayTextField.gridx = 2;
 		gbc_solarTodayTextField.gridy = 2;
 		panel_1.add(solarTodayTextField, gbc_solarTodayTextField);
-		solarTodayTextField.setColumns(10);
+		solarTodayTextField.setColumns(5);
 
 		heatingTodayTextField = new JTextField();
 		heatingTodayTextField.setEditable(false);
@@ -694,7 +694,7 @@ public class EnergyPanel extends JPanel {
 		gbc_solarYearlyTextField.gridx = 2;
 		gbc_solarYearlyTextField.gridy = 3;
 		panel_1.add(solarYearlyTextField, gbc_solarYearlyTextField);
-		solarYearlyTextField.setColumns(10);
+		solarYearlyTextField.setColumns(5);
 
 		heatingYearlyTextField = new JTextField();
 		heatingYearlyTextField.setEditable(false);
