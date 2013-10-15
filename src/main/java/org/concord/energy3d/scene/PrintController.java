@@ -25,6 +25,7 @@ import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.Printout;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingVolume.Type;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.Updater;
@@ -338,7 +339,7 @@ public class PrintController implements Updater {
 				if (printPart.isPrintable()) {
 					if (printPart instanceof Roof) {
 						for (final Spatial roofPartNode : ((Roof) printPart).getRoofPartsRoot().getChildren()) {
-							final OrientedBoundingBox boundingBox = (OrientedBoundingBox) ((Node) roofPartNode).getChild(0).getWorldBound();
+							final OrientedBoundingBox boundingBox = (OrientedBoundingBox) ((Node) roofPartNode).getChild(0).getWorldBound().asType(Type.OBB);
 							final double width = Math.min(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
 							final double height = Math.max(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
 							if (width > maxWidth)
@@ -347,7 +348,7 @@ public class PrintController implements Updater {
 								maxHeight = height;
 						}
 					} else {
-						final OrientedBoundingBox boundingBox = (OrientedBoundingBox) printPart.getMesh().getWorldBound();
+						final OrientedBoundingBox boundingBox = (OrientedBoundingBox) printPart.getMesh().getWorldBound().asType(Type.OBB);
 						final double width = Math.min(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
 						final double height = Math.max(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
 						if (width > maxWidth)
@@ -420,6 +421,7 @@ public class PrintController implements Updater {
 
 			final Box box = new Box("Page Boundary");
 			box.setData(upperLeftCorner.add(0, 1, 0, null), upperLeftCorner.add(pageWidth, 1.2, -pageHeight, null));
+			box.setModelBound(new BoundingBox());
 			box.updateModelBound();
 			pagesRoot.attachChild(box);
 
@@ -456,7 +458,7 @@ public class PrintController implements Updater {
 	}
 
 	private boolean decideVertical(final Mesh mesh) {
-		final OrientedBoundingBox bound = (OrientedBoundingBox) mesh.getWorldBound();
+		final OrientedBoundingBox bound = (OrientedBoundingBox) mesh.getWorldBound().asType(Type.OBB);
 		final boolean isMeshVertical = bound.getExtent().getX() < bound.getExtent().getZ();
 		final double imageableWidth = pageRight - pageLeft;
 		return isMeshVertical && bound.getExtent().getZ() * 2 < imageableWidth || !isMeshVertical && bound.getExtent().getX() * 2 > imageableWidth;
@@ -468,7 +470,7 @@ public class PrintController implements Updater {
 			isFitted = fitInPage(printPart, pages.get(pageNum));
 		if (!isFitted) {
 			printPart.updateWorldBound(true);
-			final OrientedBoundingBox bounds = (OrientedBoundingBox) printPart.getWorldBound();
+			final OrientedBoundingBox bounds = (OrientedBoundingBox) printPart.getWorldBound().asType(Type.OBB);
 			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getExtent().getX() + pageLeft, 0, -bounds.getExtent().getZ() - pageTop));
 			final ArrayList<Spatial> page = new ArrayList<Spatial>();
 			page.add(printPart);
@@ -479,8 +481,8 @@ public class PrintController implements Updater {
 	private boolean fitInPage(final Spatial printPart, final ArrayList<Spatial> page) {
 		for (final Spatial neighborPart : page) {
 			final Vector3 neighborPartCenter = ((UserData) neighborPart.getUserData()).getPrintCenter();
-			final OrientedBoundingBox neighborBound = (OrientedBoundingBox) neighborPart.getWorldBound().clone(null);
-			final OrientedBoundingBox printPartBound = (OrientedBoundingBox) printPart.getWorldBound().clone(null);
+			final OrientedBoundingBox neighborBound = (OrientedBoundingBox) neighborPart.getWorldBound().asType(Type.OBB);
+			final OrientedBoundingBox printPartBound = (OrientedBoundingBox) printPart.getWorldBound().asType(Type.OBB);
 			final double xExtend = neighborBound.getExtent().getX() + printPartBound.getExtent().getX() + spaceBetweenParts;
 			final double zExtend = neighborBound.getExtent().getZ() + printPartBound.getExtent().getZ() + spaceBetweenParts;
 
@@ -504,7 +506,7 @@ public class PrintController implements Updater {
 				else
 					for (final Spatial otherPart : page) {
 						printPartBound.setCenter(tryCenter);
-						final OrientedBoundingBox otherPartBound = (OrientedBoundingBox) otherPart.getWorldBound().clone(null);
+						final OrientedBoundingBox otherPartBound = (OrientedBoundingBox) otherPart.getWorldBound().asType(Type.OBB);
 						otherPartBound.setCenter(((UserData) otherPart.getUserData()).getPrintCenter());
 
 						if (printPartBound.getExtent().getX() + otherPartBound.getExtent().getX() > Math.abs(printPartBound.getCenter().getX() - otherPartBound.getCenter().getX()) - spaceBetweenParts + MathUtils.ZERO_TOLERANCE && printPartBound.getExtent().getZ() + otherPartBound.getExtent().getZ() > Math.abs(printPartBound.getCenter().getZ() - otherPartBound.getCenter().getZ()) - spaceBetweenParts + MathUtils.ZERO_TOLERANCE) {

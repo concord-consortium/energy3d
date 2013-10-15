@@ -409,6 +409,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				shadowPass.setEnabled(false);
 			}
 		}
+//		com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
 		taskManager.getQueue(GameTaskQueue.RENDER).execute(renderer);
 		return true;
 	}

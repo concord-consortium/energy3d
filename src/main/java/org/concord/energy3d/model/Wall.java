@@ -22,8 +22,8 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.point.ardor3d.ArdorVector3Point;
 import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
-import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -97,7 +97,7 @@ public class Wall extends HousePart {
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		mesh.setRenderState(offsetState);
-		mesh.setModelBound(new OrientedBoundingBox());
+		mesh.setModelBound(new BoundingBox());
 		root.attachChild(mesh);
 
 		backMesh = new Mesh("Wall (Back)");
@@ -107,7 +107,7 @@ public class Wall extends HousePart {
 		backMesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		backMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		backMesh.setRenderState(offsetState);
-		backMesh.setModelBound(new OrientedBoundingBox());
+		backMesh.setModelBound(new BoundingBox());
 		root.attachChild(backMesh);
 
 		surroundMesh = new Mesh("Wall (Surround)");
@@ -116,7 +116,7 @@ public class Wall extends HousePart {
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(12));
 		surroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		surroundMesh.setRenderState(offsetState);
-		surroundMesh.setModelBound(new OrientedBoundingBox());
+		surroundMesh.setModelBound(new BoundingBox());
 		root.attachChild(surroundMesh);
 
 		invisibleMesh = new Mesh("Wall (Invisible)");
@@ -124,7 +124,7 @@ public class Wall extends HousePart {
 		invisibleMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		invisibleMesh.getSceneHints().setCullHint(CullHint.Always);
 		invisibleMesh.setRenderState(offsetState);
-		invisibleMesh.setModelBound(new OrientedBoundingBox());
+		invisibleMesh.setModelBound(new BoundingBox());
 		root.attachChild(invisibleMesh);
 
 		windowsSurroundMesh = new Mesh("Wall (Windows Surround)");
@@ -145,7 +145,7 @@ public class Wall extends HousePart {
 		wireframeMesh = new Line("Wall (Wireframe)");
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-		wireframeMesh.setModelBound(new OrientedBoundingBox());
+		wireframeMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(wireframeMesh);
 		root.attachChild(wireframeMesh);
 
@@ -686,7 +686,7 @@ public class Wall extends HousePart {
 				surroundMesh.setModelBound(null);
 		} else {
 			if (surroundMesh.getModelBound() == null)
-				surroundMesh.setModelBound(new OrientedBoundingBox());
+				surroundMesh.setModelBound(new BoundingBox());
 		}
 		if (!visible)
 			return;

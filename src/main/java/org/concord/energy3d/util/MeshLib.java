@@ -16,8 +16,8 @@ import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
-import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.LineSegment3;
 import com.ardor3d.math.Matrix3;
@@ -178,7 +178,7 @@ public class MeshLib {
 				node = new Node("Roof Part #" + meshIndex);
 				newMesh = new Mesh("Roof Mesh #" + meshIndex);
 				newMesh.setRenderState(HousePart.offsetState);
-				newMesh.setModelBound(new OrientedBoundingBox());
+				newMesh.setModelBound(new BoundingBox());
 				node.attachChild(newMesh);
 				node.attachChild(new Node("Roof Size Annot"));
 				node.attachChild(new Node("Roof Angle Annot"));
@@ -190,7 +190,7 @@ public class MeshLib {
 
 				final Mesh wireframeMesh = new Line("Roof (wireframe)");
 				wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-				wireframeMesh.setModelBound(new OrientedBoundingBox());
+				wireframeMesh.setModelBound(new BoundingBox());
 				wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10));
 				// offset to avoid z-fighting
 				wireframeMesh.setTranslation(group.key.multiply(0.001, null));
@@ -200,7 +200,7 @@ public class MeshLib {
 				final Line dashLineMesh = new Line("Roof (dash line)");
 				dashLineMesh.setStipplePattern((short) 0xFF00);
 				dashLineMesh.setVisible(false);
-				dashLineMesh.setModelBound(new OrientedBoundingBox());
+				dashLineMesh.setModelBound(new BoundingBox());
 				Util.disablePickShadowLight(dashLineMesh);
 				node.attachChild(dashLineMesh);
 				root.attachChild(node);
