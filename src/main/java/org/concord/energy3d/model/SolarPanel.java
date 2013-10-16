@@ -23,20 +23,20 @@ public class SolarPanel extends HousePart {
 	public SolarPanel() {
 		super(1, 1, 0.0);
 	}
-	
+
 	@Override
 	protected void init() {
 		super.init();
 		updateRelativeToHorizontalFlag();
-		
+
 		final double xExtent = 0.7;
 		final double yExtent = 1.6;
 		area = xExtent * yExtent;
 		mesh = new Box("SolarPanel", new Vector3(), xExtent / 2.0 / 0.2, yExtent / 2.0 / 0.2, 0.1);
 		mesh.setModelBound(new BoundingBox());
-		mesh.setUserData(new UserData(this));		
+		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
-		
+
 		updateTextureAndColor();
 	}
 
@@ -47,7 +47,7 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
-		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] {Roof.class, Wall.class});
+		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class });
 		updateRelativeToHorizontalFlag();
 		if (picked != null) {
 			final Vector3 p = picked.getPoint();
@@ -62,37 +62,37 @@ public class SolarPanel extends HousePart {
 			setEditPointsVisible(true);
 		}
 	}
-	
+
 	@Override
 	public Vector3 getAbsPoint(final int index) {
 		return toAbsolute(points.get(index), getContainerRelative());
-	}	
+	}
 
 	@Override
 	protected void drawMesh() {
 		if (container instanceof Roof) {
-		final PickResults pickResults = new PrimitivePickResults();
-		final Ray3 ray = new Ray3(getAbsPoint(0).addLocal(0, 0, 1000), Vector3.NEG_UNIT_Z);
-		PickingUtil.findPick(container.getRoot(), ray, pickResults);
-		
-		final PickData pickData = pickResults.getPickData(0);
-		final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
-		
-		points.get(0).setZ(p.getZ());
-		final UserData userData = (UserData) ((Spatial) pickData.getTarget()).getUserData();
-		final int roofPartIndex = userData.getIndex();
-		normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
+			final PickResults pickResults = new PrimitivePickResults();
+			final Ray3 ray = new Ray3(getAbsPoint(0).addLocal(0, 0, 1000), Vector3.NEG_UNIT_Z);
+			PickingUtil.findPick(container.getRoot(), ray, pickResults);
+			if (pickResults.getNumber() != 0) {
+				final PickData pickData = pickResults.getPickData(0);
+				final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
+				points.get(0).setZ(p.getZ());
+				final UserData userData = (UserData) ((Spatial) pickData.getTarget()).getUserData();
+				final int roofPartIndex = userData.getIndex();
+				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
+			}
 		} else
 			normal = container.getFaceDirection();
-		mesh.setTranslation(getAbsPoint(0));
 		updateEditShapes();
 
+		mesh.setTranslation(getAbsPoint(0));
 		if (Util.isEqual(normal, Vector3.UNIT_Z))
 			mesh.setRotation(new Matrix3());
 		else
 			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 	}
-	
+
 	@Override
 	public boolean isDrawable() {
 		return true;
@@ -102,32 +102,32 @@ public class SolarPanel extends HousePart {
 	public void updateTextureAndColor() {
 		updateTextureAndColor(mesh, null, TextureMode.Full);
 	}
-	
+
 	@Override
 	protected String getTextureFileName() {
 		return "solarpanel.png";
 	}
-	
+
 	@Override
 	public ReadOnlyVector3 getFaceDirection() {
 		return normal;
 	}
-	
+
 	@Override
 	public boolean isPrintable() {
 		return false;
 	}
-	
+
 	@Override
 	public double getGridSize() {
 		return 1.5;
 	}
-	
+
 	@Override
 	public double computeArea() {
 		return area;
 	}
-	
+
 	private HousePart getContainerRelative() {
 		if (container instanceof Wall)
 			return container;

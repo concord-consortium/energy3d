@@ -262,20 +262,15 @@ public abstract class HousePart implements Serializable {
 		return editPointIndex;
 	}
 
-	protected PickedHousePart pickContainer(final int x, final int y, final Class<?>[] typesOfHousePart) {
-		for (final Class<?> c : typesOfHousePart) {
-			final PickedHousePart picked = pickContainer(x, y, c);
-			if (picked != null)
-				return picked;
-		}
-		return null;
+	protected PickedHousePart pickContainer(final int x, final int y, final Class<?> typeOfHousePart) {
+		return pickContainer(x, y, new Class<?>[] {typeOfHousePart});
 	}
 
-	protected PickedHousePart pickContainer(final int x, final int y, final Class<?> typeOfHousePart) {
+	protected PickedHousePart pickContainer(final int x, final int y, final Class<?>[] typesOfHousePart) {
 		final HousePart previousContainer = container;
 		final PickedHousePart picked;
 		if (!firstPointInserted || container == null)
-			picked = SelectUtil.pickPart(x, y, typeOfHousePart);
+			picked = SelectUtil.pickPart(x, y, typesOfHousePart);
 		else
 			picked = SelectUtil.pickPart(x, y, container == null ? null : container.getRoot());
 
