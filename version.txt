@@ -1595,6 +1595,7 @@ Version 2.0 - May 15, 2013
 - adjust size of solar panel
 - allow adding solar panels to walls
 - convert all oriented bounding boxes to simple bounding box
+- fix problem with getting sun value from north window and solar panel
 - release version 2.6
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove
