@@ -33,8 +33,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	private final static DecimalFormat FORMAT = new DecimalFormat(".###");
 	private final static String space = "   ";
-	private int logInterval = 1; // in seconds
-	private int saveInterval = 5; // save every N valid actions
+	private int logInterval = 2; // in seconds
+	private int saveInterval = 20; // save every N valid actions
 	private File file;
 	private final SceneManager sceneManager;
 	private UndoableEdit lastEdit;
