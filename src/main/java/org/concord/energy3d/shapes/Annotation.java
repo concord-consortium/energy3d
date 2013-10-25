@@ -3,7 +3,7 @@ package org.concord.energy3d.shapes;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -29,7 +29,7 @@ public abstract class Annotation extends Node {
 		label.setFontScale(fontSize);
 		label.setAutoRotate(false);
 		label.setAutoFade(AutoFade.Off);
-		label.setModelBound(new OrientedBoundingBox());
+		label.setModelBound(new BoundingBox());
 		label.updateWorldTransform(true);
 		label.getSceneHints().setRenderBucketType(RenderBucketType.PostBucket);
 		return label;
@@ -38,7 +38,7 @@ public abstract class Annotation extends Node {
 	public Annotation(final Line mesh) {
 		super();
 		mesh.setDefaultColor(ColorRGBA.BLACK);
-		mesh.setModelBound(new OrientedBoundingBox());
+		mesh.setModelBound(new BoundingBox());
 		this.mesh = mesh;
 		Util.disablePickShadowLight(mesh);
 		attachChild(mesh);

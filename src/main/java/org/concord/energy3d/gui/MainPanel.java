@@ -161,6 +161,7 @@ public class MainPanel extends JPanel {
 			bg.add(roofCustomButton);
 			bg.add(floorButton);
 			bg.add(roofGableButton);
+			bg.add(solarPanelButton);
 		}
 		return appToolbar;
 	}

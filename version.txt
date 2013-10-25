@@ -1590,6 +1590,14 @@ Version 2.0 - May 15, 2013
 - add flag to temporarely disable compute thread when opening folder
 - compute and render radiation heatmap on solar panels
 - fix problem with solar panel edit point location not being updated
+- compute daily and yearly energy including solar panel gains
+- add gui for solar panel energy
+- adjust size of solar panel
+- allow adding solar panels to walls
+- convert all oriented bounding boxes to simple bounding box
+- fix problem with getting sun value from north window and solar panel
+- fix problem with solar panel inserted on far roof instead of near wall
+- release version 2.6
 
 - *TODO: change the X hot key to Ctrl+X to avoid unintentional remove
 - *display energy only for the currently selected house

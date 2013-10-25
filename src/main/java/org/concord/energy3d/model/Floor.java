@@ -13,7 +13,7 @@ import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.point.TPoint;
 
-import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -52,13 +52,13 @@ public class Floor extends HousePart {
 
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		mesh.setModelBound(new OrientedBoundingBox());
+		mesh.setModelBound(new BoundingBox());
 		mesh.setRenderState(offsetState);
 
 		wireframeMesh = new Line("Floor (Wireframe)");
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-		wireframeMesh.setModelBound(new OrientedBoundingBox());
+		wireframeMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(wireframeMesh);
 		/* no need to attach because floor wireframe is only need in print preview */
 
