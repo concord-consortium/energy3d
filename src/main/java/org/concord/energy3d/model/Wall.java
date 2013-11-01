@@ -323,7 +323,7 @@ public class Wall extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		return points.size() >= 4 && getAbsPoint(2).subtract(getAbsPoint(0), null).length() >= getGridSize() && !isAtSamePlaceAsAnotherPart(this);
+		return height >= getGridSize() && points.size() >= 4 && getAbsPoint(2).subtract(getAbsPoint(0), null).length() >= getGridSize() && !isAtSamePlaceAsAnotherPart(this);
 	}
 
 	private boolean isAtSamePlaceAsAnotherPart(final HousePart selectedHousePart) {
