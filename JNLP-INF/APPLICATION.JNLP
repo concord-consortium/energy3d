@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp codebase="http://energy.concord.org/energy3d/" href="energy3d.jnlp">
+	<information>
+		<title>Energy3D</title>
+		<vendor>The Concord Consortium</vendor>
+		<homepage href="http://energy.concord.org/energy3d" />
+		<description>Energy3D</description>
+		<description kind="short">An educational CAD tool for designing houses and analyzing their cooling and heating energy flow.</description>
+		<icon href="resources/icon.gif" />
+		<icon kind="splash" href="resources/splash.png" /> 
+		<offline-allowed/>
+		<association extensions="ng3" mime-type="application/energy3d"/>
+	    <shortcut>
+			<desktop/>
+	    </shortcut>
+	</information>
+	<security>
+		<all-permissions/>
+	</security>
+	<resources>
+		<j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+" />
+		<jar href="energy3d.jar" main="true" />
+		<jar href="resources/guava-13.0.1.jar" />
+		<jar href="resources/jdom2-2.0.4.jar" />
+		<jar href="resources/jfxrt.jar" />
+
+		<jar href="resources/jogl/jogl-all-2.0.2-rc20130404.jar" />
+		<jar href="resources/jogl/gluegen-rt-2.0.2-rc20130404.jar" />
+	</resources>
+
+	<resources os="Windows" arch="x86">
+		<nativelib href = "resources/jogl/jogl-all-2.0.2-rc20130404-natives-windows-i586.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0.2-rc20130404-natives-windows-i586.jar" />
+	</resources>
+	<resources os="Windows" arch="amd64">
+		<nativelib href = "resources/jogl/jogl-all-2.0.2-rc20130404-natives-windows-amd64.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0.2-rc20130404-natives-windows-amd64.jar" />
+	</resources>
+	<resources os="Windows" arch="x86_64">
+		<nativelib href = "resources/jogl/jogl-all-2.0.2-rc20130404-natives-windows-amd64.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0.2-rc20130404-natives-windows-amd64.jar" />
+	</resources>
+	<resources os="Linux" arch="i386">
+		<nativelib href = "resources/jogl/jogl-all-2.0.2-rc20130404-natives-linux-i586.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0.2-rc20130404-natives-linux-i586.jar" />
+	</resources>
+	<resources os="Linux" arch="x86">
+		<nativelib href = "resources/jogl/jogl-all-2.0.2-rc20130404-natives-linux-i586.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0.2-rc20130404-natives-linux-i586.jar" />
+	</resources>
+	<resources os="Linux" arch="amd64">
+		<nativelib href = "resources/jogl/jogl-all-2.0.2-rc20130404-natives-linux-amd64.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0.2-rc20130404-natives-linux-amd64.jar" />
+	</resources>
+	<resources os="Linux" arch="x86_64">
+		<nativelib href = "resources/jogl/jogl-all-2.0.2-rc20130404-natives-linux-amd64.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0.2-rc20130404-natives-linux-amd64.jar" />
+	</resources>
+	<resources os="Mac OS X" arch="i386">
+		<nativelib href = "resources/jogl/jogl-all-2.0.2-rc20130404-natives-macosx-universal.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0.2-rc20130404-natives-macosx-universal.jar" />
+	</resources>
+	<resources os="Mac OS X" arch="x86_64">
+		<nativelib href = "resources/jogl/jogl-all-2.0.2-rc20130404-natives-macosx-universal.jar" />
+		<nativelib href = "resources/jogl/gluegen-rt-2.0.2-rc20130404-natives-macosx-universal.jar" />
+	</resources>
+
+	<application-desc main-class="org.concord.energy3d.MainApplication" />
+</jnlp>
