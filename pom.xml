@@ -32,6 +32,8 @@
 							<mainClass>org.concord.energy3d.MainApplication</mainClass>
 							<manifestEntries>
 								<Class-Path>lib/guava-13.0.1.jar lib/jogl/jogl-all-2.0.2-rc20130404.jar lib/jogl/gluegen-rt-2.0.2-rc20130404.jar lib/jdom2-2.0.4.jar lib/lwjgl/lwjgl.jar lib/jfxrt.jar</Class-Path>
+								<Application-Name>Energy3D</Application-Name>
+								<Permissions>all-permissions</Permissions>
 							</manifestEntries>							
 						</transformer>
 					</transformers>
