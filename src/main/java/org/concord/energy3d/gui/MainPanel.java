@@ -676,8 +676,9 @@ public class MainPanel extends JPanel {
 		if (canvasNoteSplitPane == null) {
 			canvasNoteSplitPane = new JSplitPane();
 			canvasNoteSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-			canvasNoteSplitPane.setLeftComponent(getCanvasPanel());
-			canvasNoteSplitPane.setRightComponent(getNoteScrollPane());
+			canvasNoteSplitPane.setRightComponent(getCanvasPanel());
+			canvasNoteSplitPane.setLeftComponent(getNoteScrollPane());
+			canvasNoteSplitPane.setResizeWeight(1.0);
 			canvasNoteSplitPane.setDividerSize(0);
 			getNoteScrollPane().setVisible(false);
 		}

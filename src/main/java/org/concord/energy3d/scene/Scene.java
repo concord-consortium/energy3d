@@ -148,7 +148,7 @@ public class Scene implements Serializable {
 		openNow(file);
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
-			public Object call() throws Exception {
+			public Object call() throws Exception {				
 				initSceneNow();
 				initEnergy();
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);

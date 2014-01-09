@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
@@ -19,6 +20,8 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+
+import com.ardor3d.util.GameTaskQueue;
 
 /**
  * @author Charles Xie
@@ -75,7 +78,7 @@ public class PostProcessor {
 							final Calendar c = Calendar.getInstance();
 							try {
 								c.set(Integer.parseInt(day[0]), Integer.parseInt(day[1]) - 1, Integer.parseInt(day[2]), Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
-							} catch (Exception e) {
+							} catch (final Exception e) {
 								e.printStackTrace();
 							}
 							if (date0 == null)
@@ -159,7 +162,7 @@ public class PostProcessor {
 							floorCount0 = floorCount;
 						if (doorCount0 == -1)
 							doorCount0 = doorCount;
-						Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
+						final Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
 						String heliodonTime = FORMAT_TWO_DIGITS.format(heliodonCalendar.get(Calendar.MONTH) + 1);
 						heliodonTime += "/" + FORMAT_TWO_DIGITS.format(heliodonCalendar.get(Calendar.DAY_OF_MONTH));
 						heliodonTime += ":" + FORMAT_TWO_DIGITS.format(heliodonCalendar.get(Calendar.HOUR_OF_DAY));
@@ -232,15 +235,26 @@ public class PostProcessor {
 				while (i < n - 1) {
 					if (replaying) {
 						i++;
-						int slash = files[i].toString().lastIndexOf(System.getProperty("file.separator"));
-						String fileName = files[i].toString().substring(slash + 1).trim();
+						final int slash = files[i].toString().lastIndexOf(System.getProperty("file.separator"));
+						final String fileName = files[i].toString().substring(slash + 1).trim();
 						System.out.println("Play back " + i + " of " + n + ": " + fileName);
 						try {
 							Scene.openNow(files[i].toURI().toURL());
-							Scene.initSceneNow();
-							Scene.initEnergy();
-							// EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() throws Exception {				
+									Scene.initSceneNow();
+									Scene.initEnergy();
+									return null;
+								}
+							});
+//							
+////							Scene.initSceneNow();
+////							Scene.initEnergy();
+//							// EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
 							SceneManager.getInstance().refresh();
+							while (SceneManager.getTaskManager().getQueue(GameTaskQueue.UPDATE).size() != 0)
+								sleep(10);
 							update.run();
 							sleep(SLEEP);
 						} catch (final Exception e) {
