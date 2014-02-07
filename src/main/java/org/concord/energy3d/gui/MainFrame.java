@@ -2,6 +2,7 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -18,6 +19,7 @@ import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
@@ -675,8 +677,43 @@ public class MainFrame extends JFrame {
 			helpMenu.setText("Help");
 			if (!Config.isMac())
 				helpMenu.add(getAboutMenuItem());
+			JMenuItem mi = new JMenuItem("Download Models...");
+			mi.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					openBrowser("http://energy.concord.org/energy3d/models.html");
+				}
+			});
+			helpMenu.add(mi);
+			mi = new JMenuItem("Visit Home Page...");
+			mi.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					openBrowser("http://energy.concord.org/energy3d");
+				}
+			});
+			helpMenu.add(mi);
 		}
 		return helpMenu;
+	}
+
+	public final static void openBrowser(String url) {
+		if (Desktop.isDesktopSupported()) {
+			try {
+				Desktop.getDesktop().browse(new URI(url));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			String os = System.getProperty("os.name");
+			try {
+				if (os.startsWith("Windows")) {
+					Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+				} else if (os.startsWith("Mac OS")) {
+					Runtime.getRuntime().exec(new String[] { "open", url });
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void showAbout() {
@@ -691,7 +728,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getAboutMenuItem() {
 		if (aboutMenuItem == null) {
 			aboutMenuItem = new JMenuItem();
-			aboutMenuItem.setText("About");
+			aboutMenuItem.setText("About...");
 			aboutMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -708,7 +745,7 @@ public class MainFrame extends JFrame {
 			aboutDialog.setTitle("About");
 			final JPanel p = new JPanel(new BorderLayout());
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + Config.VERSION + "<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grant #0918449.</html>"), BorderLayout.CENTER);
+			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + Config.VERSION + "<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grants #0918449 and #1348530.</html>"), BorderLayout.CENTER);
 			aboutDialog.setContentPane(p);
 			aboutDialog.pack();
 		}
