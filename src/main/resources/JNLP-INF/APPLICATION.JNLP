@@ -7,7 +7,8 @@
 		<description>Energy3D</description>
 		<description kind="short">An educational CAD tool for designing houses and analyzing their cooling and heating energy flow.</description>
 		<icon href="resources/icon.gif" />
-		<icon kind="splash" href="resources/splash.png" /> 
+		<icon kind="splash" href="resources/splash.png" />
+		<update check="background" /> 
 		<offline-allowed/>
 		<association extensions="ng3" mime-type="application/energy3d"/>
 	    <shortcut>
