@@ -676,9 +676,15 @@ public class MainPanel extends JPanel {
 		if (canvasNoteSplitPane == null) {
 			canvasNoteSplitPane = new JSplitPane();
 			canvasNoteSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-			canvasNoteSplitPane.setRightComponent(getCanvasPanel());
-			canvasNoteSplitPane.setLeftComponent(getNoteScrollPane());
-			canvasNoteSplitPane.setResizeWeight(1.0);
+			if (Config.isMac()) {
+				canvasNoteSplitPane.setTopComponent(getNoteScrollPane());				
+				canvasNoteSplitPane.setBottomComponent(getCanvasPanel());
+				canvasNoteSplitPane.setResizeWeight(0.4);
+			} else {
+				canvasNoteSplitPane.setTopComponent(getCanvasPanel());
+				canvasNoteSplitPane.setBottomComponent(getNoteScrollPane());
+				canvasNoteSplitPane.setResizeWeight(0.6);
+			}
 			canvasNoteSplitPane.setDividerSize(0);
 			getNoteScrollPane().setVisible(false);
 		}
@@ -688,6 +694,8 @@ public class MainPanel extends JPanel {
 	private JScrollPane getNoteScrollPane() {
 		if (noteScrollPane == null) {
 			noteScrollPane = new JScrollPane();
+//			noteScrollPane.setPreferredSize(new Dimension(100, 100));
+			noteScrollPane.setMinimumSize(getNoteTextArea().getMinimumSize());
 			noteScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 			noteScrollPane.setViewportView(getNoteTextArea());
 		}
@@ -729,12 +737,11 @@ public class MainPanel extends JPanel {
 	}
 
 	private void setSplitComponentVisible(final boolean visible, final JSplitPane splitPane, final Component component) {
+		getCanvasNoteSplitPane().getSize();
+		getCanvasPanel().getPreferredSize();
 		component.setVisible(visible);
 		splitPane.setDividerSize(visible ? defaultDividerSize : 0);
-		if (visible)
-			splitPane.setDividerLocation(splitPane.getLastDividerLocation());
-		else
-			splitPane.setDividerLocation(1.0);
+		splitPane.resetToPreferredSizes();
 	}
 
 	private void disableSunAnim() {
