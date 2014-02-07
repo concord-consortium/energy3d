@@ -47,7 +47,7 @@ public class MainApplication {
 		});
 		Scene.getInstance().addPropertyChangeListener(logger);
 		logger.start();
-		SnapshotLogger.start(5, logger);
+		SnapshotLogger.start(20, logger);
 	}
 
 	public static void setupLibraryPath() {
