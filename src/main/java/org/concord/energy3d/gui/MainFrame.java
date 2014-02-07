@@ -2,6 +2,7 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -18,6 +19,7 @@ import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
@@ -694,15 +696,23 @@ public class MainFrame extends JFrame {
 	}
 
 	public final static void openBrowser(String url) {
-		String os = System.getProperty("os.name");
-		try {
-			if (os.startsWith("Windows")) {
-				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
-			} else if (os.startsWith("Mac OS")) {
-				Runtime.getRuntime().exec(new String[] { "open", url });
+		if (Desktop.isDesktopSupported()) {
+			try {
+				Desktop.getDesktop().browse(new URI(url));
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} else {
+			String os = System.getProperty("os.name");
+			try {
+				if (os.startsWith("Windows")) {
+					Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+				} else if (os.startsWith("Mac OS")) {
+					Runtime.getRuntime().exec(new String[] { "open", url });
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
