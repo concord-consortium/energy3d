@@ -200,13 +200,16 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	}
 
 	public void saveLog() {
+		PrintWriter writer = null;
 		try {
-			final PrintWriter writer = new PrintWriter(file);
+			writer = new PrintWriter(file);
 			writer.print(content);
-			writer.close();
 		} catch (final Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging! Please notify the teacher of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging: " + e.getMessage() + "\n+Please restart Energy3D.", "Logging Error", JOptionPane.ERROR_MESSAGE);
+		} finally {
+			if (writer != null)
+				writer.close();
 		}
 	}
 
