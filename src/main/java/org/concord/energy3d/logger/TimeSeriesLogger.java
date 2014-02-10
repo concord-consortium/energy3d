@@ -5,7 +5,6 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -31,7 +30,6 @@ import com.ardor3d.renderer.Camera;
 
 public class TimeSeriesLogger implements PropertyChangeListener {
 
-	private final static DecimalFormat FORMAT = new DecimalFormat(".###");
 	private final static String space = "   ";
 	private int logInterval = 2; // in seconds
 	private int saveInterval = 20; // save every N valid actions
@@ -120,8 +118,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (action != null) {
 			line += space + "{" + action + "}";
 			if (!type2Action) {
-				line += space + "{" + LoggerUtil.getBuildingId(actedHousePart, true) + "}";
-				line += space + "{" + LoggerUtil.getId(actedHousePart) + "}";
+				line += space + "[" + LoggerUtil.getInfo(actedHousePart) + "]";
 			}
 		}
 
@@ -163,12 +160,12 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			if (camera != null) {
 				final ReadOnlyVector3 location = camera.getLocation();
 				final ReadOnlyVector3 direction = camera.getDirection();
-				String cameraPosition = "(" + FORMAT.format(location.getX());
-				cameraPosition += ", " + FORMAT.format(location.getY());
-				cameraPosition += ", " + FORMAT.format(location.getZ());
-				cameraPosition += ")   (" + FORMAT.format(direction.getX());
-				cameraPosition += ", " + FORMAT.format(direction.getY());
-				cameraPosition += ", " + FORMAT.format(direction.getZ()) + ")";
+				String cameraPosition = "P=(" + LoggerUtil.FORMAT.format(location.getX());
+				cameraPosition += ", " + LoggerUtil.FORMAT.format(location.getY());
+				cameraPosition += ", " + LoggerUtil.FORMAT.format(location.getZ());
+				cameraPosition += ") V=(" + LoggerUtil.FORMAT.format(direction.getX());
+				cameraPosition += ", " + LoggerUtil.FORMAT.format(direction.getY());
+				cameraPosition += ", " + LoggerUtil.FORMAT.format(direction.getZ()) + ")";
 				if (!cameraPosition.equals(oldCameraPosition)) {
 					if (!sceneManager.isRotationAnimationOn()) // don't log camera if the view is being spun
 						line += space + "[Camera: " + cameraPosition + "]";
@@ -183,7 +180,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			if (noteLength > oldNoteLength) {
 				String s2 = note.substring(oldNoteLength, noteLength);
 				if (s2 != null && s2.length() > 0)
-					s2 = s2.replace("\n", " ||| ");
+					s2 = s2.replace("\n", " -linebreak- ");
 				line += space + "[Note: " + s2 + "]";
 			}
 			oldNoteLength = noteLength;
