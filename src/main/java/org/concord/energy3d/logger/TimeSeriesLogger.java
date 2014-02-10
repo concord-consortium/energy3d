@@ -32,7 +32,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	private final static String space = "   ";
 	private int logInterval = 2; // in seconds
-	private int saveInterval = 20; // save every N valid actions
+	private int saveInterval = 1; // save every N valid actions
 	private File file;
 	private final SceneManager sceneManager;
 	private UndoableEdit lastEdit;
@@ -44,9 +44,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private String oldHeliodonLatitude = null;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
+	private String oldNote = null;
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
-	private int oldNoteLength = 0;
 
 	public TimeSeriesLogger(final int logInterval, final int saveInterval, final SceneManager sceneManager) {
 		this.logInterval = logInterval;
@@ -177,13 +177,15 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (noteEditedFlag) {
 			final String note = MainPanel.getInstance().getNoteTextArea().getText();
 			final int noteLength = note.length();
-			if (noteLength > oldNoteLength) {
-				String s2 = note.substring(oldNoteLength, noteLength);
-				if (s2 != null && s2.length() > 0)
-					s2 = s2.replace("\n", " -linebreak- ");
-				line += space + "[Note: " + s2 + "]";
+			final int oldNoteLength = oldNote != null ? oldNote.length() : 0;
+			if (noteLength > oldNoteLength) { // insertion
+				String s2 = note.substring(oldNoteLength, noteLength).replace("\n", " -linebreak- ");
+				line += space + "[Insert Note: " + s2 + "]";
+			} else if (noteLength < oldNote.length()) { // deletion
+				String s2 = oldNote.substring(noteLength, oldNoteLength).replace("\n", " -linebreak- ");
+				line += space + "[Delete Note: " + s2 + "]";
 			}
-			oldNoteLength = noteLength;
+			oldNote = note;
 			noteEditedFlag = false;
 		}
 		if (!line.trim().endsWith(".ng3\"")) {
