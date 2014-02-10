@@ -1,15 +1,20 @@
 package org.concord.energy3d.logger;
 
 import java.io.File;
+import java.text.DecimalFormat;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.util.Config;
+
+import com.ardor3d.math.Vector3;
 
 /**
  * @author Charles Xie
  * 
  */
 class LoggerUtil {
+
+	final static DecimalFormat FORMAT = new DecimalFormat(".###");
 
 	private static File folder = null;
 
@@ -48,13 +53,13 @@ class LoggerUtil {
 		return folder;
 	}
 
-	static Object getBuildingId(final HousePart p, boolean prefix) {
+	static Object getBuildingId(final HousePart p) {
 		if (p == null)
 			return null;
 		final HousePart x = getTopContainer(p);
 		if (x == null)
 			return null;
-		return prefix ? "Building #" + x.getId() : x.getId();
+		return x.getId();
 	}
 
 	static HousePart getTopContainer(final HousePart p) {
@@ -71,10 +76,16 @@ class LoggerUtil {
 		return x;
 	}
 
-	static String getId(final HousePart p) {
+	static Object getInfo(final HousePart p) {
 		if (p == null)
 			return null;
-		return p.getClass().getSimpleName() + " #" + p.getId();
+		String s = p.getClass().getSimpleName() + ": Building=" + getBuildingId(p) + ", ID=" + p.getId();
+		int n = p.getPoints().size();
+		for (int i = 0; i < n; i++) {
+			Vector3 v = p.getAbsPoint(i);
+			s += ", P" + i + "=(" + FORMAT.format(v.getX()) + ", " + FORMAT.format(v.getY()) + ", " + FORMAT.format(v.getZ()) + ")";
+		}
+		return s;
 	}
 
 }

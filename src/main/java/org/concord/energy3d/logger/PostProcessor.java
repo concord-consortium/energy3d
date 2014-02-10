@@ -111,7 +111,7 @@ public class PostProcessor {
 						if (buildings0 == null) {
 							buildings0 = new ArrayList<Building>();
 							for (final HousePart x : parts) {
-								final int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
+								final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
 								final Building b = new Building(bid);
 								if (!buildings0.contains(b))
 									buildings0.add(b);
@@ -131,7 +131,7 @@ public class PostProcessor {
 								doorCount++;
 							else if (x instanceof Wall) {
 								wallCount++;
-								final int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
+								final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
 								final Building b = new Building(bid);
 								if (!buildings.contains(b) && !buildings0.contains(b))
 									buildings.add(b);
@@ -139,7 +139,7 @@ public class PostProcessor {
 						}
 						// scan again to compute building properties
 						for (final HousePart x : parts) {
-							final int bid = ((Long) LoggerUtil.getBuildingId(x, false)).intValue();
+							final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
 							final Building b = getBuilding(buildings, bid);
 							if (b != null) {
 								if (x instanceof Window)
@@ -242,16 +242,16 @@ public class PostProcessor {
 							Scene.openNow(files[i].toURI().toURL());
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
-								public Object call() throws Exception {				
+								public Object call() throws Exception {
 									Scene.initSceneNow();
 									Scene.initEnergy();
 									return null;
 								}
 							});
-//							
-////							Scene.initSceneNow();
-////							Scene.initEnergy();
-//							// EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
+							//
+							// // Scene.initSceneNow();
+							// // Scene.initEnergy();
+							// // EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
 							SceneManager.getInstance().refresh();
 							while (SceneManager.getTaskManager().getQueue(GameTaskQueue.UPDATE).size() != 0)
 								sleep(10);
