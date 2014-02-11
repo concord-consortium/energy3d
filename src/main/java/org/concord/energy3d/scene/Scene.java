@@ -10,6 +10,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
@@ -66,7 +68,7 @@ public class Scene implements Serializable {
 	private static boolean drawAnnotationsInside = false;
 	private static Unit unit = Unit.Meter;
 	private transient boolean edited = false;
-	private final ArrayList<HousePart> parts = new ArrayList<HousePart>();
+	private final List<HousePart> parts = Collections.synchronizedList(new ArrayList<HousePart>());
 	private TextureMode textureMode = TextureMode.Full;
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
@@ -148,7 +150,7 @@ public class Scene implements Serializable {
 		openNow(file);
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
-			public Object call() throws Exception {				
+			public Object call() throws Exception {
 				initSceneNow();
 				initEnergy();
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -199,7 +201,7 @@ public class Scene implements Serializable {
 
 		final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
 		if (cameraControl != null)
-			cameraControl.reset();		
+			cameraControl.reset();
 	}
 
 	public static void initSceneNow() {
@@ -421,7 +423,7 @@ public class Scene implements Serializable {
 		housePart.delete();
 	}
 
-	public ArrayList<HousePart> getParts() {
+	public List<HousePart> getParts() {
 		return parts;
 	}
 

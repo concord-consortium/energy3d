@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
@@ -100,7 +101,7 @@ public class PostProcessor {
 						} catch (final Exception e) {
 							e.printStackTrace();
 						}
-						final ArrayList<HousePart> parts = Scene.getInstance().getParts();
+						final List<HousePart> parts = Scene.getInstance().getParts();
 						final ArrayList<Building> buildings = new ArrayList<Building>();
 						int wallCount = 0;
 						int windowCount = 0;
