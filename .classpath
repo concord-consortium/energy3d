@@ -8,12 +8,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry including="**/*.java" kind="src" path="src/main/resources"/>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-animation"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-awt"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-core"/>
