@@ -61,6 +61,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 import org.poly2tri.geometry.primitives.Point;
 import org.poly2tri.transform.coordinate.AnyToXYTransform;
@@ -429,18 +430,18 @@ public class EnergyPanel extends JPanel {
 
 		panel_4.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_4.getPreferredSize().height));
 
-		final JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(panel);
-		final GridBagLayout gbl_panel = new GridBagLayout();
-		panel.setLayout(gbl_panel);
+		final JPanel temperaturePanel = new JPanel();
+		temperaturePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(temperaturePanel);
+		final GridBagLayout gbl_temperaturePanel = new GridBagLayout();
+		temperaturePanel.setLayout(gbl_temperaturePanel);
 
 		final JLabel insideTemperatureLabel = new JLabel("Inside: ");
 		insideTemperatureLabel.setToolTipText("");
 		final GridBagConstraints gbc_insideTemperatureLabel = new GridBagConstraints();
 		gbc_insideTemperatureLabel.gridx = 1;
 		gbc_insideTemperatureLabel.gridy = 0;
-		panel.add(insideTemperatureLabel, gbc_insideTemperatureLabel);
+		temperaturePanel.add(insideTemperatureLabel, gbc_insideTemperatureLabel);
 
 		insideTemperatureSpinner = new JSpinner();
 		insideTemperatureSpinner.setToolTipText("Thermostat temperature setting for the inside of the house");
@@ -454,16 +455,16 @@ public class EnergyPanel extends JPanel {
 		final GridBagConstraints gbc_insideTemperatureSpinner = new GridBagConstraints();
 		gbc_insideTemperatureSpinner.gridx = 2;
 		gbc_insideTemperatureSpinner.gridy = 0;
-		panel.add(insideTemperatureSpinner, gbc_insideTemperatureSpinner);
+		temperaturePanel.add(insideTemperatureSpinner, gbc_insideTemperatureSpinner);
 
 		final JLabel outsideTemperatureLabel = new JLabel(" Outside: ");
 		outsideTemperatureLabel.setToolTipText("");
 		final GridBagConstraints gbc_outsideTemperatureLabel = new GridBagConstraints();
 		gbc_outsideTemperatureLabel.gridx = 3;
 		gbc_outsideTemperatureLabel.gridy = 0;
-		panel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
+		temperaturePanel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
 
-		panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel.getPreferredSize().height));
+		temperaturePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, temperaturePanel.getPreferredSize().height));
 
 		outsideTemperatureSpinner = new JSpinner();
 		outsideTemperatureSpinner.setToolTipText("Outside temperature at this time and day");
@@ -479,7 +480,7 @@ public class EnergyPanel extends JPanel {
 		final GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
 		gbc_outsideTemperatureSpinner.gridx = 4;
 		gbc_outsideTemperatureSpinner.gridy = 0;
-		panel.add(outsideTemperatureSpinner, gbc_outsideTemperatureSpinner);
+		temperaturePanel.add(outsideTemperatureSpinner, gbc_outsideTemperatureSpinner);
 
 		autoCheckBox = new JCheckBox("Auto");
 		autoCheckBox.setToolTipText("Automatically set the outside temperature based on historic average of the selected city");
@@ -497,7 +498,7 @@ public class EnergyPanel extends JPanel {
 		final GridBagConstraints gbc_autoCheckBox = new GridBagConstraints();
 		gbc_autoCheckBox.gridx = 5;
 		gbc_autoCheckBox.gridy = 0;
-		panel.add(autoCheckBox, gbc_autoCheckBox);
+		temperaturePanel.add(autoCheckBox, gbc_autoCheckBox);
 
 		final JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -770,11 +771,11 @@ public class EnergyPanel extends JPanel {
 		coolingLabel.setMinimumSize(size);
 		totalLabel.setMinimumSize(size);
 
-		final JPanel panel_2 = new JPanel();
-		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(panel_2);
-		final GridBagLayout gbl_panel_2 = new GridBagLayout();
-		panel_2.setLayout(gbl_panel_2);
+		final JPanel uFactorPanel = new JPanel();
+		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(uFactorPanel);
+		final GridBagLayout gbl_uFactorPanel = new GridBagLayout();
+		uFactorPanel.setLayout(gbl_uFactorPanel);
 
 		final JLabel wallsLabel = new JLabel("Walls:");
 		final GridBagConstraints gbc_wallsLabel = new GridBagConstraints();
@@ -782,7 +783,7 @@ public class EnergyPanel extends JPanel {
 		gbc_wallsLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_wallsLabel.gridx = 0;
 		gbc_wallsLabel.gridy = 0;
-		panel_2.add(wallsLabel, gbc_wallsLabel);
+		uFactorPanel.add(wallsLabel, gbc_wallsLabel);
 
 		wallsComboBox = new WideComboBox();
 		wallsComboBox.setEditable(true);
@@ -797,7 +798,7 @@ public class EnergyPanel extends JPanel {
 		gbc_wallsComboBox.insets = new Insets(0, 0, 5, 5);
 		gbc_wallsComboBox.gridx = 1;
 		gbc_wallsComboBox.gridy = 0;
-		panel_2.add(wallsComboBox, gbc_wallsComboBox);
+		uFactorPanel.add(wallsComboBox, gbc_wallsComboBox);
 
 		final JLabel doorsLabel = new JLabel("Doors:");
 		final GridBagConstraints gbc_doorsLabel = new GridBagConstraints();
@@ -805,7 +806,7 @@ public class EnergyPanel extends JPanel {
 		gbc_doorsLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_doorsLabel.gridx = 2;
 		gbc_doorsLabel.gridy = 0;
-		panel_2.add(doorsLabel, gbc_doorsLabel);
+		uFactorPanel.add(doorsLabel, gbc_doorsLabel);
 
 		doorsComboBox = new WideComboBox();
 		doorsComboBox.setEditable(true);
@@ -821,7 +822,7 @@ public class EnergyPanel extends JPanel {
 		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
 		gbc_doorsComboBox.gridx = 3;
 		gbc_doorsComboBox.gridy = 0;
-		panel_2.add(doorsComboBox, gbc_doorsComboBox);
+		uFactorPanel.add(doorsComboBox, gbc_doorsComboBox);
 
 		final JLabel windowsLabel = new JLabel("Windows:");
 		final GridBagConstraints gbc_windowsLabel = new GridBagConstraints();
@@ -829,7 +830,7 @@ public class EnergyPanel extends JPanel {
 		gbc_windowsLabel.insets = new Insets(0, 0, 0, 5);
 		gbc_windowsLabel.gridx = 0;
 		gbc_windowsLabel.gridy = 1;
-		panel_2.add(windowsLabel, gbc_windowsLabel);
+		uFactorPanel.add(windowsLabel, gbc_windowsLabel);
 
 		windowsComboBox = new WideComboBox();
 		windowsComboBox.setEditable(true);
@@ -844,7 +845,7 @@ public class EnergyPanel extends JPanel {
 		gbc_windowsComboBox.insets = new Insets(0, 0, 0, 5);
 		gbc_windowsComboBox.gridx = 1;
 		gbc_windowsComboBox.gridy = 1;
-		panel_2.add(windowsComboBox, gbc_windowsComboBox);
+		uFactorPanel.add(windowsComboBox, gbc_windowsComboBox);
 
 		final JLabel roofsLabel = new JLabel("Roofs:");
 		final GridBagConstraints gbc_roofsLabel = new GridBagConstraints();
@@ -852,7 +853,7 @@ public class EnergyPanel extends JPanel {
 		gbc_roofsLabel.insets = new Insets(0, 0, 0, 5);
 		gbc_roofsLabel.gridx = 2;
 		gbc_roofsLabel.gridy = 1;
-		panel_2.add(roofsLabel, gbc_roofsLabel);
+		uFactorPanel.add(roofsLabel, gbc_roofsLabel);
 
 		roofsComboBox = new WideComboBox();
 		roofsComboBox.setEditable(true);
@@ -866,12 +867,38 @@ public class EnergyPanel extends JPanel {
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
 		gbc_roofsComboBox.gridx = 3;
 		gbc_roofsComboBox.gridy = 1;
-		panel_2.add(roofsComboBox, gbc_roofsComboBox);
+		uFactorPanel.add(roofsComboBox, gbc_roofsComboBox);
 
-		panel_2.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_2.getPreferredSize().height));
+		uFactorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, uFactorPanel.getPreferredSize().height));
 
 		final Component verticalGlue = Box.createVerticalGlue();
 		add(verticalGlue);
+		
+		if (Config.isRestrictMode()) {
+			coolingLabel.setVisible(false);
+			coolingCostTextField.setVisible(false);
+			coolingRateTextField.setVisible(false);
+			coolingTodayTextField.setVisible(false);
+			coolingYearlyTextField.setVisible(false);
+			
+			heatingLabel.setVisible(false);
+			heatingCostTextField.setVisible(false);
+			heatingRateTextField.setVisible(false);
+			heatingTodayTextField.setVisible(false);
+			heatingYearlyTextField.setVisible(false);
+			
+			totalLabel.setVisible(false);
+			totalCostTextField.setVisible(false);
+			totalRateTextField.setVisible(false);
+			totalTodayTextField.setVisible(false);
+			totalYearlyTextField.setVisible(false);
+			
+			yearlyCostLabel.setVisible(false);
+			
+			temperaturePanel.setVisible(false);
+			uFactorPanel.setVisible(false);
+		}
+		
 	}
 
 	public void initJavaFXGUI() {
