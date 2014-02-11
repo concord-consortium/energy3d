@@ -17,6 +17,7 @@ import com.ardor3d.scenegraph.shape.Box;
 
 public class SolarPanel extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private static final double widthExtent = 0.7;
 	private transient ReadOnlyVector3 normal;
 	private transient double area;
 
@@ -29,10 +30,9 @@ public class SolarPanel extends HousePart {
 		super.init();
 		updateRelativeToHorizontalFlag();
 
-		final double xExtent = 0.7;
 		final double yExtent = 1.6;
-		area = xExtent * yExtent;
-		mesh = new Box("SolarPanel", new Vector3(), xExtent / 2.0 / 0.2, yExtent / 2.0 / 0.2, 0.1);
+		area = widthExtent * yExtent;
+		mesh = new Box("SolarPanel", new Vector3(), widthExtent / 2.0 / 0.2, yExtent / 2.0 / 0.2, 0.1);
 		mesh.setModelBound(new BoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
@@ -95,6 +95,15 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
+		final Vector3 p1 = getAbsPoint(0);
+		p1.setZ(0);
+		for (final HousePart solarPanel : container.getChildren()) {
+			final Vector3 p2 = solarPanel.getAbsPoint(0);
+			p2.setZ(0);
+			System.out.println(p1.distance(p2));
+			if (solarPanel != this && p1.distance(p2) < widthExtent / 0.2)
+				return false;
+		}
 		return true;
 	}
 
