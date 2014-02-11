@@ -677,7 +677,7 @@ public class MainPanel extends JPanel {
 			canvasNoteSplitPane = new JSplitPane();
 			canvasNoteSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 			if (Config.isMac()) {
-				canvasNoteSplitPane.setTopComponent(getNoteScrollPane());				
+				canvasNoteSplitPane.setTopComponent(getNoteScrollPane());
 				canvasNoteSplitPane.setBottomComponent(getCanvasPanel());
 				canvasNoteSplitPane.setResizeWeight(0.4);
 			} else {
@@ -694,7 +694,7 @@ public class MainPanel extends JPanel {
 	private JScrollPane getNoteScrollPane() {
 		if (noteScrollPane == null) {
 			noteScrollPane = new JScrollPane();
-//			noteScrollPane.setPreferredSize(new Dimension(100, 100));
+			// noteScrollPane.setPreferredSize(new Dimension(100, 100));
 			noteScrollPane.setMinimumSize(getNoteTextArea().getMinimumSize());
 			noteScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 			noteScrollPane.setViewportView(getNoteTextArea());
@@ -704,7 +704,7 @@ public class MainPanel extends JPanel {
 
 	public JTextArea getNoteTextArea() {
 		if (noteTextArea == null) {
-			noteTextArea = new JTextArea();
+			noteTextArea = new JTextArea(new MyPlainDocument()); // want to keep a copy of what was removed
 			noteTextArea.setWrapStyleWord(true);
 			noteTextArea.setLineWrap(true);
 			noteTextArea.getDocument().addDocumentListener(new DocumentListener() {
@@ -752,7 +752,7 @@ public class MainPanel extends JPanel {
 			SceneManager.getInstance().setSunAnim(false);
 		}
 	}
-	
+
 	private JToggleButton getSolarPanelButton() {
 		if (solarPanelButton == null) {
 			solarPanelButton = new JToggleButton("");

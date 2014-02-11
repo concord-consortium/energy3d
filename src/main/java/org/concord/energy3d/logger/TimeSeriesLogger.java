@@ -11,10 +11,13 @@ import java.util.Calendar;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.gui.MyPlainDocument;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -44,7 +47,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private String oldHeliodonLatitude = null;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
-	private String oldNote = null;
+	private String noteString = "";
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
 
@@ -54,15 +57,33 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		this.sceneManager = sceneManager;
 		undoManager = sceneManager.getUndoManager();
 		lastEdit = undoManager.lastEdit();
-		MainPanel.getInstance().getNoteTextArea().getDocument().addDocumentListener(new DocumentListener() {
+		final Document noteAreaDoc = MainPanel.getInstance().getNoteTextArea().getDocument();
+		noteAreaDoc.addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(final DocumentEvent e) {
 				noteEditedFlag = true;
+				if (noteAreaDoc instanceof MyPlainDocument) {
+					String s = ((MyPlainDocument) noteAreaDoc).getRemovedString();
+					if (s != null) {
+						s = s.replace("\n", "-linebreak-");
+						noteString += "R(" + e.getOffset() + "," + s + ")";
+					}
+				}
 			}
 
 			@Override
 			public void insertUpdate(final DocumentEvent e) {
 				noteEditedFlag = true;
+				String s = null;
+				try {
+					s = noteAreaDoc.getText(e.getOffset(), e.getLength());
+				} catch (BadLocationException e1) {
+					e1.printStackTrace();
+				}
+				if (s != null) {
+					s = s.replace("\n", "-linebreak-");
+					noteString += "I(" + e.getOffset() + "," + s + ")";
+				}
 			}
 
 			@Override
@@ -175,17 +196,10 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		}
 
 		if (noteEditedFlag) {
-			final String note = MainPanel.getInstance().getNoteTextArea().getText();
-			final int noteLength = note.length();
-			final int oldNoteLength = oldNote != null ? oldNote.length() : 0;
-			if (noteLength > oldNoteLength) { // insertion
-				String s2 = note.substring(oldNoteLength, noteLength).replace("\n", " -linebreak- ");
-				line += space + "[Insert Note: " + s2 + "]";
-			} else if (noteLength < oldNote.length()) { // deletion
-				String s2 = oldNote.substring(noteLength, oldNoteLength).replace("\n", " -linebreak- ");
-				line += space + "[Delete Note: " + s2 + "]";
+			if (noteString.length() > 0) {
+				line += space + "[Note: " + noteString + "]";
+				noteString = "";
 			}
-			oldNote = note;
 			noteEditedFlag = false;
 		}
 		if (!line.trim().endsWith(".ng3\"")) {
