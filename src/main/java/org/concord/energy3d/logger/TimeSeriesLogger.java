@@ -143,7 +143,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				type2Action = true;
 			}
 		}
-		String line = "\"file\": \"" + filename + "\"";
+		String line = "\"File\": \"" + filename + "\"";
 		if (action != null) {
 			line += separator + "\"" + action + "\": " + (type2Action ? "null" : LoggerUtil.getInfo(actedHousePart));
 		}
@@ -211,7 +211,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (!line.trim().endsWith(".ng3\"")) {
 			if (action != null || !line.equals(oldLine)) {
 				// System.out.println("#" + counter + ": " + timestamp + space + line);
-				content += "{\"time\": \"" + timestamp + "\"" + separator + line + "},\n";
+				content += "{\"Time\": \"" + timestamp + "\"" + separator + line + "},\n";
 				if (counter % saveInterval == 0) {
 					saveLog();
 				}
