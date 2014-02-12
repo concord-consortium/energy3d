@@ -1,5 +1,7 @@
 package org.concord.energy3d.model;
 
+import javax.swing.JOptionPane;
+
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
@@ -100,9 +102,8 @@ public class SolarPanel extends HousePart {
 		for (final HousePart solarPanel : container.getChildren()) {
 			final Vector3 p2 = solarPanel.getAbsPoint(0);
 			p2.setZ(0);
-			System.out.println(p1.distance(p2));
-			if (solarPanel != this && p1.distance(p2) < widthExtent / 0.2)
-				return false;
+			if (solarPanel != this && p1.distance(p2) < widthExtent / 1.5 / 0.2)
+				JOptionPane.showMessageDialog(null, "Solar panels cannot touch other solar panels!");
 		}
 		return true;
 	}
