@@ -31,9 +31,15 @@ import org.concord.energy3d.undo.UndoManager;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 
+/**
+ * Code the activity stream using JSON format
+ * 
+ * @author Charles Xie
+ * 
+ */
 public class TimeSeriesLogger implements PropertyChangeListener {
 
-	private final static String space = "   ";
+	private final static String separator = ",   ";
 	private int logInterval = 2; // in seconds
 	private int saveInterval = 1; // save every N valid actions
 	private File file;
@@ -95,7 +101,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	private void log() {
 
-		final String timestamp = new SimpleDateFormat("yyyy-MM-dd" + space + "HH:mm:ss").format(Calendar.getInstance().getTime());
+		final String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
 		final URL url = Scene.getURL();
 		if (url == null) // no logging if not working on a saved file
 			return;
@@ -135,61 +141,58 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				type2Action = true;
 			}
 		}
-		String line = "\"" + filename + "\"";
+		String line = "\"file\": \"" + filename + "\"";
 		if (action != null) {
-			line += space + "{" + action + "}";
-			if (!type2Action) {
-				line += space + "[" + LoggerUtil.getInfo(actedHousePart) + "]";
-			}
+			line += separator + "\"" + action + "\": " + (type2Action ? "null" : LoggerUtil.getInfo(actedHousePart));
 		}
 
 		// toggle actions
 		if (sceneManager.isHeliodonControlEnabled()) {
-			line += space + "<Heliodon>";
+			line += separator + "\"Heliodon\": true";
 		}
 		if (sceneManager.isSolarColorMap()) {
-			line += space + "<Solar Map>";
+			line += separator + "\"Solar Map\": true";
 		}
 		if (sceneManager.isShadowEnabled()) {
-			line += space + "<Shadow>";
+			line += separator + "\"Shadow\": true";
 		}
 		if (Scene.getInstance().isAnnotationsVisible()) {
-			line += space + "<Annotation>";
+			line += separator + "\"Annotation\": true";
 		}
 
 		// continuous actions
-		final String heliodonLatitude = "[Latitude: " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI) + "]";
+		final String heliodonLatitude = "\"Latitude\": " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI);
 		if (!heliodonLatitude.equals(oldHeliodonLatitude)) {
-			line += space + heliodonLatitude;
+			line += separator + heliodonLatitude;
 			oldHeliodonLatitude = heliodonLatitude;
 		}
 		if (sceneManager.isSunAnim()) {
-			line += space + "<Sun Animation>";
+			line += separator + "\"Sun Animation\": true";
 		} else {
 			final Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
-			final String heliodonTime = "[Time: " + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "]";
+			final String heliodonTime = "\"Time\": \"" + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "\"";
 			if (!heliodonTime.equals(oldHeliodonTime)) {
 				if (!sceneManager.isSunAnim()) // don't log time if sun path is animated
-					line += space + heliodonTime;
+					line += separator + heliodonTime;
 				oldHeliodonTime = heliodonTime;
 			}
 		}
 		if (sceneManager.isRotationAnimationOn()) {
-			line += space + "<Rotation Animation>";
+			line += separator + "\"Rotation Animation\": true";
 		} else {
 			final Camera camera = SceneManager.getInstance().getCamera();
 			if (camera != null) {
 				final ReadOnlyVector3 location = camera.getLocation();
 				final ReadOnlyVector3 direction = camera.getDirection();
-				String cameraPosition = "P=(" + LoggerUtil.FORMAT.format(location.getX());
-				cameraPosition += ", " + LoggerUtil.FORMAT.format(location.getY());
-				cameraPosition += ", " + LoggerUtil.FORMAT.format(location.getZ());
-				cameraPosition += ") V=(" + LoggerUtil.FORMAT.format(direction.getX());
-				cameraPosition += ", " + LoggerUtil.FORMAT.format(direction.getY());
-				cameraPosition += ", " + LoggerUtil.FORMAT.format(direction.getZ()) + ")";
+				String cameraPosition = "\"Position\": {\"x\": " + LoggerUtil.FORMAT.format(location.getX());
+				cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(location.getY());
+				cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(location.getZ());
+				cameraPosition += "}, \"Direction\": {\"x\": " + LoggerUtil.FORMAT.format(direction.getX());
+				cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(direction.getY());
+				cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
 				if (!cameraPosition.equals(oldCameraPosition)) {
 					if (!sceneManager.isRotationAnimationOn()) // don't log camera if the view is being spun
-						line += space + "[Camera: " + cameraPosition + "]";
+						line += separator + "\"Camera\": {" + cameraPosition + "}";
 					oldCameraPosition = cameraPosition;
 				}
 			}
@@ -197,15 +200,16 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 		if (noteEditedFlag) {
 			if (noteString.length() > 0) {
-				line += space + "[Note: " + noteString + "]";
+				line += separator + "\"Note\": \"" + noteString + "\"";
 				noteString = "";
 			}
 			noteEditedFlag = false;
 		}
+
 		if (!line.trim().endsWith(".ng3\"")) {
 			if (action != null || !line.equals(oldLine)) {
 				// System.out.println("#" + counter + ": " + timestamp + space + line);
-				content += timestamp + space + line + "\n";
+				content += "{\"time\": \"" + timestamp + "\"" + separator + line + "},\n";
 				if (counter % saveInterval == 0) {
 					saveLog();
 				}
@@ -219,10 +223,10 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		PrintWriter writer = null;
 		try {
 			writer = new PrintWriter(file);
-			writer.print(content);
+			writer.print("{\n\"Activities\": [\n" + content + "]\n}");
 		} catch (final Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging: " + e.getMessage() + "\n+Please restart Energy3D.", "Logging Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging: " + e.getMessage() + "\nPlease restart Energy3D.", "Logging Error", JOptionPane.ERROR_MESSAGE);
 		} finally {
 			if (writer != null)
 				writer.close();

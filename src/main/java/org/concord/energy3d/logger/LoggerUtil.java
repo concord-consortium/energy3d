@@ -79,13 +79,19 @@ class LoggerUtil {
 	static Object getInfo(final HousePart p) {
 		if (p == null)
 			return null;
-		String s = p.getClass().getSimpleName() + ": Building=" + getBuildingId(p) + ", ID=" + p.getId();
+		String s = "{\"Building\": " + getBuildingId(p) + ", \"ID\": " + p.getId();
 		int n = p.getPoints().size();
-		for (int i = 0; i < n; i++) {
-			Vector3 v = p.getAbsPoint(i);
-			s += ", P" + i + "=(" + FORMAT.format(v.getX()) + ", " + FORMAT.format(v.getY()) + ", " + FORMAT.format(v.getZ()) + ")";
+		if (n > 0) {
+			s += ", \"Coordinates\": [";
+			for (int i = 0; i < n; i++) {
+				Vector3 v = p.getAbsPoint(i);
+				s += "{\"x\": " + FORMAT.format(v.getX()) + ", \"y\": " + FORMAT.format(v.getY()) + ", \"z\": " + FORMAT.format(v.getZ()) + "}";
+				if (i < n - 1)
+					s += ", ";
+			}
+			s += "]";
 		}
+		s += "}";
 		return s;
 	}
-
 }
