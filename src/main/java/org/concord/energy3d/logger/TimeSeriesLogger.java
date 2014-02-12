@@ -88,6 +88,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				}
 				if (s != null) {
 					s = s.replace("\n", "-linebreak-");
+					s = s.replace("\\", "\\\\");
+					s = s.replace("\"", "\\\"");
 					noteString += "I(" + e.getOffset() + "," + s + ")";
 				}
 			}
