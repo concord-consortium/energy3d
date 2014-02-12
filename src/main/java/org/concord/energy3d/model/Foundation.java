@@ -601,6 +601,7 @@ public class Foundation extends HousePart {
 	}
 
 	public void setSolarValue(final long solarValue) {
+		scanChildrenHeight();
 		if (solarValue == -2)
 			solarLabel.setVisible(false);
 		else {
