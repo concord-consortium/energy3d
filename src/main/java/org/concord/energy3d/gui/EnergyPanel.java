@@ -1218,7 +1218,8 @@ public class EnergyPanel extends JPanel {
 			throw cancelException;
 		final EnergyAmount energyRate = new EnergyAmount();
 
-		if (Heliodon.getInstance().isVisible() && sunLocation.getZ() > 0.0) {
+//		if (Heliodon.getInstance().isVisible() && sunLocation.getZ() > 0.0) {
+		if (sunLocation.getZ() > 0.0) {
 			energyRate.solar = computeEnergySolarRate(sunLocation.normalize(null));
 			energyRate.solarPanel = computeEnergySolarPanelRate(sunLocation.normalize(null));
 		}
