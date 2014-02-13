@@ -211,7 +211,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (!line.trim().endsWith(".ng3\"")) {
 			if (action != null || !line.equals(oldLine)) {
 				// System.out.println("#" + counter + ": " + timestamp + space + line);
-				content += "{\"Time\": \"" + timestamp + "\"" + separator + line + "},\n";
+				content += "{\"Timestamp\": \"" + timestamp + "\"" + separator + line + "},\n";
 				if (counter % saveInterval == 0) {
 					saveLog();
 				}
@@ -257,7 +257,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	public void start() {
 		final String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
-		file = new File(LoggerUtil.getLogFolder(), timestamp + ".txt");
+		file = new File(LoggerUtil.getLogFolder(), timestamp + ".json");
 		final Thread t = new Thread("Time Series Logger") {
 			@Override
 			public void run() {
