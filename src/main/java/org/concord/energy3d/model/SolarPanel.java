@@ -1,7 +1,5 @@
 package org.concord.energy3d.model;
 
-import javax.swing.JOptionPane;
-
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
@@ -10,6 +8,7 @@ import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
@@ -102,9 +101,12 @@ public class SolarPanel extends HousePart {
 		for (final HousePart solarPanel : container.getChildren()) {
 			final Vector3 p2 = solarPanel.getAbsPoint(0);
 			p2.setZ(0);
-			if (solarPanel != this && p1.distance(p2) < widthExtent / 1.5 / 0.2)
-				JOptionPane.showMessageDialog(null, "Solar panels cannot touch other solar panels!");
+			if (solarPanel != this && p1.distance(p2) < widthExtent / 1.5 / 0.2) {
+				mesh.setDefaultColor(ColorRGBA.RED);
+				return false;
+			}
 		}
+		mesh.setDefaultColor(ColorRGBA.WHITE);
 		return true;
 	}
 
