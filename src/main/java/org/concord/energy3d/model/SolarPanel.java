@@ -3,12 +3,11 @@ package org.concord.energy3d.model;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
@@ -34,7 +33,7 @@ public class SolarPanel extends HousePart {
 		final double yExtent = 1.6;
 		area = widthExtent * yExtent;
 		mesh = new Box("SolarPanel", new Vector3(), widthExtent / 2.0 / 0.2, yExtent / 2.0 / 0.2, 0.1);
-		mesh.setModelBound(new BoundingBox());
+		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 
@@ -61,6 +60,7 @@ public class SolarPanel extends HousePart {
 		if (container != null) {
 			draw();
 			setEditPointsVisible(true);
+			setHighlight(!isDrawable());
 		}
 	}
 
@@ -96,17 +96,22 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		final Vector3 p1 = getAbsPoint(0);
-		p1.setZ(0);
+//		final Vector3 p1 = getAbsPoint(0);
+//		p1.setZ(0);
+		if (this.mesh.getWorldBound() == null)
+			return true;
+		final OrientedBoundingBox bound = (OrientedBoundingBox) this.mesh.getWorldBound().clone(null);
+		bound.setExtent(bound.getExtent().divide(1.1, null));
 		for (final HousePart solarPanel : container.getChildren()) {
-			final Vector3 p2 = solarPanel.getAbsPoint(0);
-			p2.setZ(0);
-			if (solarPanel != this && p1.distance(p2) < widthExtent / 1.5 / 0.2) {
-				mesh.setDefaultColor(ColorRGBA.RED);
+//			final Vector3 p2 = solarPanel.getAbsPoint(0);
+//			p2.setZ(0);
+//			if (solarPanel != this && p1.distance(p2) < widthExtent / 1.5 / 0.2) {
+			if (solarPanel != this && bound.intersects(solarPanel.mesh.getWorldBound())) {
+//				mesh.setDefaultColor(ColorRGBA.RED);
 				return false;
 			}
 		}
-		mesh.setDefaultColor(ColorRGBA.WHITE);
+//		mesh.setDefaultColor(ColorRGBA.WHITE);
 		return true;
 	}
 
@@ -132,7 +137,8 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return 1.5;
+//		return 1.5;
+		return widthExtent / 0.2;
 	}
 
 	@Override

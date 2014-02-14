@@ -234,6 +234,10 @@ public abstract class HousePart implements Serializable {
 		return drawCompleted;
 	}
 
+	public void setDrawCompleted(final boolean completed) {
+		drawCompleted = completed;
+	}
+	
 	public boolean isFirstPointInserted() {
 		return firstPointInserted;
 	}
@@ -760,6 +764,10 @@ public abstract class HousePart implements Serializable {
 			c = c.getContainer();
 		}
 		return x;
+	}
+	
+	public void setHighlight(final boolean highlight) {
+		mesh.setDefaultColor(highlight ? ColorRGBA.RED : ColorRGBA.WHITE);
 	}
 
 }
