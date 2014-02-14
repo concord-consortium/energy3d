@@ -237,7 +237,7 @@ public abstract class HousePart implements Serializable {
 	public void setDrawCompleted(final boolean completed) {
 		drawCompleted = completed;
 	}
-	
+
 	public boolean isFirstPointInserted() {
 		return firstPointInserted;
 	}
@@ -267,7 +267,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected PickedHousePart pickContainer(final int x, final int y, final Class<?> typeOfHousePart) {
-		return pickContainer(x, y, new Class<?>[] {typeOfHousePart});
+		return pickContainer(x, y, new Class<?>[] { typeOfHousePart });
 	}
 
 	protected PickedHousePart pickContainer(final int x, final int y, final Class<?>[] typesOfHousePart) {
@@ -286,7 +286,7 @@ public abstract class HousePart implements Serializable {
 				if (container != null) {
 					container.getChildren().remove(this);
 					if (this instanceof Roof)
-						((Wall)container).visitNeighbors(new WallVisitor() {
+						((Wall) container).visitNeighbors(new WallVisitor() {
 							@Override
 							public void visit(final Wall wall, final Snap prev, final Snap next) {
 								wall.setRoof(null);
@@ -360,7 +360,7 @@ public abstract class HousePart implements Serializable {
 	protected void snapToGrid(final Vector3 p, final ReadOnlyVector3 previous, final double gridSize, final boolean snapToZ) {
 		if (isSnapToGrids()) {
 			final Vector3 newP = new Vector3();
-			if (container == null) 
+			if (container == null)
 				newP.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
 			else {
 				final ReadOnlyVector3 origin;
@@ -389,13 +389,13 @@ public abstract class HousePart implements Serializable {
 				final ReadOnlyVector3 v = verticalDir.normalize(null).multiplyLocal(snapedVerticalLength);
 				newP.set(origin).addLocal(u).addLocal(v);
 			}
-			
+
 			for (int xyz = 0; xyz < 3; xyz++)
-			if (Math.abs(newP.getValue(xyz) - p.getValue(xyz)) < Math.abs(newP.getValue(xyz) - previous.getValue(xyz)) * 0.40)
-				p.setValue(xyz, newP.getValue(xyz));
-			else
-				p.setValue(xyz, previous.getValue(xyz));
-			
+				if (Math.abs(newP.getValue(xyz) - p.getValue(xyz)) < Math.abs(newP.getValue(xyz) - previous.getValue(xyz)) * 0.40)
+					p.setValue(xyz, newP.getValue(xyz));
+				else
+					p.setValue(xyz, previous.getValue(xyz));
+
 		}
 	}
 
@@ -753,7 +753,7 @@ public abstract class HousePart implements Serializable {
 	public long getId() {
 		return id;
 	}
-	
+
 	protected HousePart getTopContainer() {
 		HousePart c = this.getContainer();
 		if (c == null)
@@ -765,9 +765,18 @@ public abstract class HousePart implements Serializable {
 		}
 		return x;
 	}
-	
+
 	public void setHighlight(final boolean highlight) {
-		mesh.setDefaultColor(highlight ? ColorRGBA.RED : ColorRGBA.WHITE);
+		if (highlight) {
+			final OffsetState offset = new OffsetState();
+			offset.setFactor(-1);
+			offset.setUnits(-1);
+			mesh.setRenderState(offset);
+			mesh.setDefaultColor(ColorRGBA.RED);
+		} else {
+			mesh.clearRenderState(StateType.Offset);
+			mesh.setDefaultColor(ColorRGBA.WHITE);
+		}
 	}
 
 }

@@ -63,7 +63,7 @@ public class SolarPanel extends HousePart {
 			setHighlight(!isDrawable());
 		}
 	}
-
+	
 	@Override
 	public Vector3 getAbsPoint(final int index) {
 		return toAbsolute(points.get(index), getContainerRelative());
@@ -138,7 +138,7 @@ public class SolarPanel extends HousePart {
 	@Override
 	public double getGridSize() {
 //		return 1.5;
-		return widthExtent / 0.2;
+		return widthExtent / 0.2 / 5.0;
 	}
 
 	@Override
