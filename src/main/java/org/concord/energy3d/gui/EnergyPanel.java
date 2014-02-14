@@ -1315,6 +1315,8 @@ public class EnergyPanel extends JPanel {
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Wall)
 				solarCollidables.add(((Wall) part).getInvisibleMesh());
+			else if (part instanceof SolarPanel)
+				solarCollidables.add(part.getMesh());
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
 					solarCollidables.add(((Node) roofPart).getChild(0));

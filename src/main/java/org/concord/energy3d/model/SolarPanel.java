@@ -1,5 +1,7 @@
 package org.concord.energy3d.model;
 
+import java.nio.FloatBuffer;
+
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
@@ -8,18 +10,23 @@ import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.Line;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarPanel extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final double widthExtent = 0.7;
 	private transient ReadOnlyVector3 normal;
 	private transient double area;
+	private transient Mesh wireframeMesh;
 
 	public SolarPanel() {
 		super(1, 1, 0.0);
@@ -36,6 +43,12 @@ public class SolarPanel extends HousePart {
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
+		
+		wireframeMesh = new Line("SolarPanel (Wireframe)");
+		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
+		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
+		wireframeMesh.setModelBound(new OrientedBoundingBox());
+		root.attachChild(wireframeMesh);
 
 		updateTextureAndColor();
 	}
@@ -86,12 +99,33 @@ public class SolarPanel extends HousePart {
 		} else
 			normal = container.getFaceDirection();
 		updateEditShapes();
+		
+		final FloatBuffer meshBuffer = mesh.getMeshData().getVertexBuffer();
+		final FloatBuffer wireframeBuffer = wireframeMesh.getMeshData().getVertexBuffer();
+		wireframeBuffer.rewind();
+		int i = 8*3;
+		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
+		i += 3;
+		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
+		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
+		i += 3;
+		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
+		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
+		i += 3;
+		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
+		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
+		i = 8*3;
+		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
 
 		mesh.setTranslation(getAbsPoint(0));
 		if (Util.isEqual(normal, Vector3.UNIT_Z))
 			mesh.setRotation(new Matrix3());
 		else
 			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+		
+		wireframeMesh.setTranslation(mesh.getTranslation());
+		wireframeMesh.setRotation(mesh.getRotation());
+		wireframeMesh.setRotation(mesh.getRotation());
 	}
 
 	@Override
