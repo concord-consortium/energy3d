@@ -653,7 +653,7 @@ public class MainPanel extends JPanel {
 	public JToggleButton getSolarButton() {
 		if (solarButton == null) {
 			solarButton = new JToggleButton("");
-			solarButton.setToolTipText("Generate solar radiation heat map");
+			solarButton.setToolTipText("Generate solar irradiation heat map");
 			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
 			solarButton.addMouseListener(refreshUponMouseExit);
 			solarButton.addItemListener(new ItemListener() {

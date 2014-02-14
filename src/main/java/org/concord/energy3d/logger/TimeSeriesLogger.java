@@ -153,7 +153,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			line += separator + "\"Heliodon\": true";
 		}
 		if (sceneManager.isSolarColorMap()) {
-			line += separator + "\"Solar Map\": true";
+			line += separator + "\"SolarMap\": true";
 		}
 		if (sceneManager.isShadowEnabled()) {
 			line += separator + "\"Shadow\": true";
@@ -169,7 +169,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			oldHeliodonLatitude = heliodonLatitude;
 		}
 		if (sceneManager.isSunAnim()) {
-			line += separator + "\"Sun Animation\": true";
+			line += separator + "\"SunAnimation\": true";
 		} else {
 			final Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
 			final String heliodonTime = "\"Time\": \"" + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "\"";
@@ -180,7 +180,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			}
 		}
 		if (sceneManager.isRotationAnimationOn()) {
-			line += separator + "\"Rotation Animation\": true";
+			line += separator + "\"RotationAnimation\": true";
 		} else {
 			final Camera camera = SceneManager.getInstance().getCamera();
 			if (camera != null) {
@@ -210,7 +210,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 		if (!line.trim().endsWith(".ng3\"")) {
 			if (action != null || !line.equals(oldLine)) {
-				// System.out.println("#" + counter + ": " + timestamp + space + line);
 				content += "{\"Timestamp\": \"" + timestamp + "\"" + separator + line + "},\n";
 				if (counter % saveInterval == 0) {
 					saveLog();
@@ -225,7 +224,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		PrintWriter writer = null;
 		try {
 			writer = new PrintWriter(file);
-			writer.print("{\n\"Activities\": [\n" + content + "]\n}");
+			writer.print("{\n\"Activities\": [\n" + content.substring(0, content.length() - 2) + "\n]\n}");
 		} catch (final Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging: " + e.getMessage() + "\nPlease restart Energy3D.", "Logging Error", JOptionPane.ERROR_MESSAGE);
@@ -267,7 +266,12 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
-					log();
+					try {
+						log();
+					} catch (Throwable t) {
+						t.printStackTrace();
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging: " + t + "\nPlease restart Energy3D.", "Logging Error", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		};

@@ -2,8 +2,11 @@ package org.concord.energy3d.logger;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.util.Config;
 
 import com.ardor3d.math.Vector3;
@@ -14,7 +17,7 @@ import com.ardor3d.math.Vector3;
  */
 class LoggerUtil {
 
-	final static DecimalFormat FORMAT = new DecimalFormat(".###");
+	final static DecimalFormat FORMAT = new DecimalFormat("0.###");
 
 	private static File folder = null;
 
@@ -79,7 +82,8 @@ class LoggerUtil {
 	static Object getInfo(final HousePart p) {
 		if (p == null)
 			return null;
-		String s = "{\"Building\": " + getBuildingId(p) + ", \"ID\": " + p.getId();
+		Object bid = getBuildingId(p);
+		String s = "{\"Building\": " + bid + ", \"ID\": " + p.getId();
 		int n = p.getPoints().size();
 		if (n > 0) {
 			s += ", \"Coordinates\": [";
@@ -90,6 +94,19 @@ class LoggerUtil {
 					s += ", ";
 			}
 			s += "]";
+		}
+		if (bid != null && ((Long) bid).longValue() == p.getId()) {
+			if (p instanceof Foundation) {
+				Building b = new Building((int) p.getId());
+				ArrayList<HousePart> children = p.getChildren();
+				for (HousePart x : children) {
+					if (x instanceof Wall)
+						b.addWall((Wall) x);
+				}
+				if (b.isComplete()) {
+					s += ", " + b.getGeometryJson();
+				}
+			}
 		}
 		s += "}";
 		return s;

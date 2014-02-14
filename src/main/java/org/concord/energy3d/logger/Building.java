@@ -18,8 +18,8 @@ import com.ardor3d.math.type.ReadOnlyVector3;
  */
 class Building {
 
-	private final static DecimalFormat FORMAT1 = new DecimalFormat("###.#");
-	private final static DecimalFormat FORMAT4 = new DecimalFormat("###.####");
+	private final static DecimalFormat FORMAT1 = new DecimalFormat("###0.#");
+	private final static DecimalFormat FORMAT4 = new DecimalFormat("###0.####");
 
 	int id;
 	int windowCount;
@@ -124,11 +124,47 @@ class Building {
 		return b.id == id;
 	}
 
+	boolean isComplete() {
+		exploreWallNeighbors();
+		return walls.size() == floorVertices.size() && !walls.isEmpty();
+	}
+
+	String getGeometryJson() {
+		String s = "\"Height\": " + FORMAT1.format(height);
+		double area = getArea();
+		s += ", \"Area\": " + FORMAT1.format(Math.abs(area));
+		double volume = Math.abs(area) * height;
+		s += ", \"Volume\": " + FORMAT1.format(volume);
+		s += ", \"CentroidX\": " + FORMAT1.format(getCentroidX() / area);
+		s += ", \"CentroidY\": " + FORMAT1.format(getCentroidY() / area);
+		return s;
+	}
+
+	String getSolarEnergyJson() {
+		Double solar = EnergyPanel.getInstance().getSolarTotal().get(LoggerUtil.getTopContainer(walls.get(0)));
+		if (solar == null)
+			return null;
+		return "\"SolarEnergy\": " + FORMAT1.format(EnergyPanel.getInstance().convertSolarValue(solar));
+	}
+
+	String toJson() {
+		String s = "\"ID\": " + id;
+		if (isComplete()) {
+			s += ", \"WallCount\": " + walls.size();
+			if (windowCount > 0)
+				s += ", \"WindowCount\": " + windowCount;
+			s += ", " + getGeometryJson();
+			String solar = getSolarEnergyJson();
+			if (solar != null)
+				s += ", " + solar;
+		}
+		return s;
+	}
+
 	@Override
 	public String toString() {
-		exploreWallNeighbors();
 		String s = "(ID=" + id;
-		if (walls.size() == floorVertices.size() && !walls.isEmpty()) {
+		if (isComplete()) {
 			s += " #wall=" + walls.size();
 			if (windowCount > 0)
 				s += " #window=" + windowCount;
