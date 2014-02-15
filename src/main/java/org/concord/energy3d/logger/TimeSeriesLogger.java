@@ -221,6 +221,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	}
 
 	public void saveLog() {
+		if (content == null || content.length() <= 0)
+			return;
 		PrintWriter writer = null;
 		try {
 			writer = new PrintWriter(file);
