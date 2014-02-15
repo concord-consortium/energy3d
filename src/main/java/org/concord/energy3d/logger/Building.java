@@ -18,7 +18,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
  */
 class Building {
 
-	private final static DecimalFormat FORMAT1 = new DecimalFormat("###0.#");
+	private final static DecimalFormat FORMAT1 = new DecimalFormat("###0.##");
 	private final static DecimalFormat FORMAT4 = new DecimalFormat("###0.####");
 
 	int id;

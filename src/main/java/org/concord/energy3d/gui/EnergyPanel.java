@@ -507,14 +507,14 @@ public class EnergyPanel extends JPanel {
 		gbl_panel_1.columnWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 };
 		panel_1.setLayout(gbl_panel_1);
 
-		final JLabel sunLabel = new JLabel("Sun");
+		final JLabel sunLabel = new JLabel("Passive Solar");
 		final GridBagConstraints gbc_sunLabel = new GridBagConstraints();
 		gbc_sunLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_sunLabel.gridx = 1;
 		gbc_sunLabel.gridy = 0;
 		panel_1.add(sunLabel, gbc_sunLabel);
 
-		final JLabel solarLabel = new JLabel("Solar");
+		final JLabel solarLabel = new JLabel("Photovoltaic");
 		solarLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_solarLabel = new GridBagConstraints();
 		gbc_solarLabel.insets = new Insets(0, 0, 5, 5);

@@ -823,8 +823,8 @@ public class MainFrame extends JFrame {
 			sceneMenu.add(getAnnotationsInwardMenuItem());
 			sceneMenu.add(getWallThicknessMenuItem());
 			sceneMenu.add(getRemoveAllRoofsMenuItem());
-			sceneMenu.add(getKeepHeatmapOnMenuItem());
 			if (!Config.isRestrictMode()) {
+				sceneMenu.add(getKeepHeatmapOnMenuItem());
 				sceneMenu.add(getFreezeMenuItem());
 				sceneMenu.add(getUnfreezeMenuItem());
 			}
