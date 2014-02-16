@@ -124,6 +124,11 @@ class Building {
 		return b.id == id;
 	}
 
+	@Override
+	public int hashCode() {
+		return id;
+	}
+
 	boolean isComplete() {
 		exploreWallNeighbors();
 		return walls.size() == floorVertices.size() && !walls.isEmpty();
@@ -140,11 +145,11 @@ class Building {
 		return s;
 	}
 
-	String getSolarEnergyJson() {
+	String getSolarEnergy() {
 		Double solar = EnergyPanel.getInstance().getSolarTotal().get(LoggerUtil.getTopContainer(walls.get(0)));
 		if (solar == null)
 			return null;
-		return "\"SolarEnergy\": " + FORMAT1.format(EnergyPanel.getInstance().convertSolarValue(solar));
+		return FORMAT1.format(EnergyPanel.getInstance().convertSolarValue(solar));
 	}
 
 	String toJson() {
@@ -154,9 +159,9 @@ class Building {
 			if (windowCount > 0)
 				s += ", \"WindowCount\": " + windowCount;
 			s += ", " + getGeometryJson();
-			String solar = getSolarEnergyJson();
+			String solar = getSolarEnergy();
 			if (solar != null)
-				s += ", " + solar;
+				s += ", \"SolarEnergy\": " + solar;
 		}
 		return s;
 	}

@@ -3,6 +3,7 @@ package org.concord.energy3d;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
@@ -46,6 +47,7 @@ public class MainApplication {
 			}
 		});
 		Scene.getInstance().addPropertyChangeListener(logger);
+		MainPanel.getInstance().addPropertyChangeListener(logger);
 		logger.start();
 		SnapshotLogger.start(20, logger);
 	}

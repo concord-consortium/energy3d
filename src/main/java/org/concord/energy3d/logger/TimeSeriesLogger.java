@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
@@ -18,7 +20,9 @@ import javax.swing.undo.UndoableEdit;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.MyPlainDocument;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
@@ -56,6 +60,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private String noteString = "";
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
+	private boolean solarMapActivated = false;
+	private ArrayList<Building> buildings = new ArrayList<Building>();
 
 	public TimeSeriesLogger(final int logInterval, final int saveInterval, final SceneManager sceneManager) {
 		this.logInterval = logInterval;
@@ -99,6 +105,35 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				noteEditedFlag = true;
 			}
 		});
+	}
+
+	private String getBuildingSolarEnergies() {
+		String result = "";
+		buildings.clear();
+		List<HousePart> list = Scene.getInstance().getParts();
+		synchronized (list) {
+			for (HousePart p : list) {
+				if (p instanceof Foundation) {
+					Building b = new Building((int) p.getId());
+					ArrayList<HousePart> children = p.getChildren();
+					for (HousePart x : children) {
+						if (x instanceof Wall)
+							b.addWall((Wall) x);
+					}
+					if (b.isComplete() && !buildings.contains(b)) {
+						buildings.add(b);
+					}
+				}
+			}
+		}
+		if (!buildings.isEmpty()) {
+			result = "[";
+			for (Building b : buildings)
+				result += "{\"#" + b.id + "\": " + b.getSolarEnergy() + "}, ";
+			result = result.trim().substring(0, result.length() - 2);
+			result += "]";
+		}
+		return result;
 	}
 
 	private void log() {
@@ -153,7 +188,15 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			line += separator + "\"Heliodon\": true";
 		}
 		if (sceneManager.isSolarColorMap()) {
-			line += separator + "\"SolarMap\": true";
+			if (solarMapActivated) {
+				String result = getBuildingSolarEnergies();
+				if (result.length() > 0) {
+					line += separator + "\"SolarEnergy\": " + result;
+				}
+				solarMapActivated = false;
+			} else {
+				line += separator + "\"SolarMap\": true";
+			}
 		}
 		if (sceneManager.isShadowEnabled()) {
 			line += separator + "\"Shadow\": true";
@@ -243,6 +286,12 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				final Object newValue = evt.getNewValue();
 				if (newValue.equals(Boolean.TRUE))
 					sceneEditedFlag = true;
+			}
+		} else if (evt.getSource() == MainPanel.getInstance().getSolarButton()) {
+			if (evt.getNewValue() instanceof Boolean) {
+				boolean b = (Boolean) evt.getNewValue();
+				if (b)
+					solarMapActivated = true;
 			}
 		}
 	}
