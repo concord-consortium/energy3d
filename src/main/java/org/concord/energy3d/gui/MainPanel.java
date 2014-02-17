@@ -9,9 +9,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,7 +65,6 @@ public class MainPanel extends JPanel {
 	private JScrollPane noteScrollPane;
 	private JTextArea noteTextArea;
 	private int defaultDividerSize = -1;
-	private final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
 		@Override
@@ -665,7 +661,6 @@ public class MainPanel extends JPanel {
 				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-					notifyPropertyChangeListeners(new PropertyChangeEvent(solarButton, solarButton.getToolTipText(), !solarButton.isSelected(), solarButton.isSelected()));
 				}
 			});
 			solarButton.addActionListener(new ActionListener() {
@@ -771,22 +766,6 @@ public class MainPanel extends JPanel {
 			solarPanelButton.setIcon(new ImageIcon(getClass().getResource("icons/solarpanel.png")));
 		}
 		return solarPanelButton;
-	}
-
-	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
-		propertyChangeListeners.add(pcl);
-	}
-
-	public void removePropertyChangeListener(final PropertyChangeListener pcl) {
-		propertyChangeListeners.remove(pcl);
-	}
-
-	private void notifyPropertyChangeListeners(final PropertyChangeEvent evt) {
-		if (!propertyChangeListeners.isEmpty()) {
-			for (final PropertyChangeListener x : propertyChangeListeners) {
-				x.propertyChange(evt);
-			}
-		}
 	}
 
 }

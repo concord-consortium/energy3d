@@ -11,12 +11,14 @@ import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoableEdit;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.MyPlainDocument;
@@ -60,7 +62,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private String noteString = "";
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
-	private boolean solarMapActivated = false;
+	private volatile boolean solarCalculationFinished = false;
 	private ArrayList<Building> buildings = new ArrayList<Building>();
 
 	public TimeSeriesLogger(final int logInterval, final int saveInterval, final SceneManager sceneManager) {
@@ -78,7 +80,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					String s = ((MyPlainDocument) noteAreaDoc).getRemovedString();
 					if (s != null) {
 						s = s.replace("\n", "-linebreak-");
-						noteString += "R(" + e.getOffset() + "," + s + ")";
+						noteString += "D(" + e.getOffset() + "," + s + ")";
 					}
 				}
 			}
@@ -188,14 +190,13 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			line += separator + "\"Heliodon\": true";
 		}
 		if (sceneManager.isSolarColorMap()) {
-			if (solarMapActivated) {
+			line += separator + "\"SolarMap\": true";
+			if (solarCalculationFinished) {
 				String result = getBuildingSolarEnergies();
 				if (result.length() > 0) {
 					line += separator + "\"SolarEnergy\": " + result;
 				}
-				solarMapActivated = false;
-			} else {
-				line += separator + "\"SolarMap\": true";
+				solarCalculationFinished = false;
 			}
 		}
 		if (sceneManager.isShadowEnabled()) {
@@ -287,12 +288,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				if (newValue.equals(Boolean.TRUE))
 					sceneEditedFlag = true;
 			}
-		} else if (evt.getSource() == MainPanel.getInstance().getSolarButton()) {
-			if (evt.getNewValue() instanceof Boolean) {
-				boolean b = (Boolean) evt.getNewValue();
-				if (b)
-					solarMapActivated = true;
-			}
+		} else if (evt.getSource() == EnergyPanel.getInstance()) {
+			solarCalculationFinished = true;
 		}
 	}
 

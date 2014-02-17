@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
@@ -199,7 +201,7 @@ public class EnergyPanel extends JPanel {
 	private JTextField solarRateTextField;
 	private JTextField solarTodayTextField;
 	private JTextField solarYearlyTextField;
-	
+
 	private final Map<Mesh, double[][]> solarOnMesh = new HashMap<Mesh, double[][]>();
 	private final Map<HousePart, Double> solarTotal = new HashMap<HousePart, Double>();
 	private final Map<Mesh, Boolean> textureCoordsAlreadyComputed = new HashMap<Mesh, Boolean>();
@@ -220,7 +222,7 @@ public class EnergyPanel extends JPanel {
 	private boolean alreadyRenderedHeatmap = false;
 	private UpdateRadiation updateRadiation;
 	private boolean computeEnabled = true;
-
+	private final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
 	private static class EnergyAmount {
 		double solar;
@@ -370,7 +372,7 @@ public class EnergyPanel extends JPanel {
 		panel_3.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_3.getPreferredSize().height));
 
 		panel_4 = new JPanel();
-		panel_4.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Radiation Heat Map", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_4.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Solar Irradiation Heat Map", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(panel_4);
 		final GridBagLayout gbl_panel_4 = new GridBagLayout();
 		panel_4.setLayout(gbl_panel_4);
@@ -873,32 +875,32 @@ public class EnergyPanel extends JPanel {
 
 		final Component verticalGlue = Box.createVerticalGlue();
 		add(verticalGlue);
-		
+
 		if (Config.isRestrictMode()) {
 			coolingLabel.setVisible(false);
 			coolingCostTextField.setVisible(false);
 			coolingRateTextField.setVisible(false);
 			coolingTodayTextField.setVisible(false);
 			coolingYearlyTextField.setVisible(false);
-			
+
 			heatingLabel.setVisible(false);
 			heatingCostTextField.setVisible(false);
 			heatingRateTextField.setVisible(false);
 			heatingTodayTextField.setVisible(false);
 			heatingYearlyTextField.setVisible(false);
-			
+
 			totalLabel.setVisible(false);
 			totalCostTextField.setVisible(false);
 			totalRateTextField.setVisible(false);
 			totalTodayTextField.setVisible(false);
 			totalYearlyTextField.setVisible(false);
-			
+
 			yearlyCostLabel.setVisible(false);
-			
+
 			temperaturePanel.setVisible(false);
 			uFactorPanel.setVisible(false);
 		}
-		
+
 	}
 
 	public void initJavaFXGUI() {
@@ -1025,6 +1027,7 @@ public class EnergyPanel extends JPanel {
 				if (updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn))) {
 					alreadyRenderedHeatmap = true;
 					computeRadiation();
+					notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Solar energy calculation completed", 0, 1));
 				} else {
 					if (SceneManager.getInstance().isSolarColorMap())
 						MainPanel.getInstance().getSolarButton().setSelected(false);
@@ -1218,7 +1221,7 @@ public class EnergyPanel extends JPanel {
 			throw cancelException;
 		final EnergyAmount energyRate = new EnergyAmount();
 
-//		if (Heliodon.getInstance().isVisible() && sunLocation.getZ() > 0.0) {
+		// if (Heliodon.getInstance().isVisible() && sunLocation.getZ() > 0.0) {
 		if (sunLocation.getZ() > 0.0) {
 			energyRate.solar = computeEnergySolarRate(sunLocation.normalize(null));
 			energyRate.solarPanel = computeEnergySolarPanelRate(sunLocation.normalize(null));
@@ -1718,4 +1721,19 @@ public class EnergyPanel extends JPanel {
 		return solarTotal;
 	}
 
+	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
+		propertyChangeListeners.add(pcl);
+	}
+
+	public void removePropertyChangeListener(final PropertyChangeListener pcl) {
+		propertyChangeListeners.remove(pcl);
+	}
+
+	private void notifyPropertyChangeListeners(final PropertyChangeEvent evt) {
+		if (!propertyChangeListeners.isEmpty()) {
+			for (final PropertyChangeListener x : propertyChangeListeners) {
+				x.propertyChange(evt);
+			}
+		}
+	}
 }
