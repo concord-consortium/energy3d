@@ -1004,7 +1004,12 @@ public class EnergyPanel extends JPanel {
 					do {
 						computeRequest = false;
 						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
-						computeNow(EnergyPanel.this.updateRadiation);
+						try {
+							computeNow(EnergyPanel.this.updateRadiation);
+						} catch (Throwable e) {
+							e.printStackTrace();
+							Util.reportError(e);
+						}
 						try {
 							Thread.sleep(500);
 						} catch (final InterruptedException e) {

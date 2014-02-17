@@ -356,41 +356,46 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public void update(final ReadOnlyTimer timer) {
-		final double tpf = timer.getTimePerFrame();
-		passManager.updatePasses(tpf);
-		taskManager.getQueue(GameTaskQueue.UPDATE).setExecuteMultiple(true);
-		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
+		try {
+			final double tpf = timer.getTimePerFrame();
+			passManager.updatePasses(tpf);
+			taskManager.getQueue(GameTaskQueue.UPDATE).setExecuteMultiple(true);
+			taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
 
-		if (operationFlag)
-			executeOperation();
+			if (operationFlag)
+				executeOperation();
 
-		if (mouseState != null)
-			mouseMoved();
+			if (mouseState != null)
+				mouseMoved();
 
-		if (Scene.isRedrawAll())
-			Scene.getInstance().redrawAllNow();
+			if (Scene.isRedrawAll())
+				Scene.getInstance().redrawAllNow();
 
-		if (rotAnim && viewMode == ViewMode.NORMAL && canvas.getCanvasRenderer() != null) {
-			final Matrix3 rotate = new Matrix3();
-			rotate.fromAngleNormalAxis(45 * tpf * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
-			final Camera camera = getCamera();
-			camera.setLocation(rotate.applyPre(camera.getLocation(), null));
-			camera.lookAt(0, 0, 1, Vector3.UNIT_Z);
-			getCameraNode().updateFromCamera();
-			Scene.getInstance().updateEditShapes();
+			if (rotAnim && viewMode == ViewMode.NORMAL && canvas.getCanvasRenderer() != null) {
+				final Matrix3 rotate = new Matrix3();
+				rotate.fromAngleNormalAxis(45 * tpf * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
+				final Camera camera = getCamera();
+				camera.setLocation(rotate.applyPre(camera.getLocation(), null));
+				camera.lookAt(0, 0, 1, Vector3.UNIT_Z);
+				getCameraNode().updateFromCamera();
+				Scene.getInstance().updateEditShapes();
+			}
+
+			final Heliodon heliodon = Heliodon.getInstance();
+			if (heliodon != null) {
+				if (sunAnim)
+					heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true);
+				heliodon.update();
+			}
+
+			if (cameraControl != null && cameraControl.isAnimating())
+				cameraControl.animate();
+
+			root.updateGeometricState(tpf);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			Util.reportError(e);
 		}
-
-		final Heliodon heliodon = Heliodon.getInstance();
-		if (heliodon != null) {
-			if (sunAnim)
-				heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true);
-			heliodon.update();
-		}
-
-		if (cameraControl != null && cameraControl.isAnimating())
-			cameraControl.animate();
-
-		root.updateGeometricState(tpf);
 	}
 
 	@Override
@@ -1328,9 +1333,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				return null;
 			}
 		});
-	}
-
-	public void moveMouse(final float x, final float y) {
+	}use(final float x, final float y) {
 		final int pixelX = (int) ((-x + 500f) * getCamera().getWidth() / 1000f);
 		final int pixelY = (int) ((y + 200f) * getCamera().getHeight() / 400f);
 		mouseState = new MouseState(pixelX, pixelY, 0, 0, 0, null, null);
