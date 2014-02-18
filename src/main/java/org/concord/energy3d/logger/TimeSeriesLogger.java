@@ -11,7 +11,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -38,7 +37,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 
 /**
- * Code the activity stream using JSON format
+ * Encode activity stream in JSON format
  * 
  * @author Charles Xie
  * 
