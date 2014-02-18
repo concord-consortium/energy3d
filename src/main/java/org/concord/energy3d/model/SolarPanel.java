@@ -103,6 +103,7 @@ public class SolarPanel extends HousePart {
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		area = width * height;
 		((Box) mesh).setData(Vector3.ZERO, width / 2.0 / annotationScale, height / 2.0 / annotationScale, 0.1);
+		mesh.updateModelBound();
 		
 		final FloatBuffer meshBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer wireframeBuffer = wireframeMesh.getMeshData().getVertexBuffer();
