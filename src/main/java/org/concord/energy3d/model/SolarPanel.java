@@ -24,7 +24,8 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarPanel extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static final double widthExtent = 0.7;
+	private static final double width = 0.7;
+	private static final double height = 1.6;
 	private transient ReadOnlyVector3 normal;
 	private transient double area;
 	private transient Mesh wireframeMesh;
@@ -38,9 +39,7 @@ public class SolarPanel extends HousePart {
 		super.init();
 		updateRelativeToHorizontalFlag();
 
-		final double yExtent = 1.6;
-		area = widthExtent * yExtent;
-		mesh = new Box("SolarPanel", new Vector3(), widthExtent / 2.0 / Scene.getInstance().getAnnotationScale(), yExtent / 2.0 / Scene.getInstance().getAnnotationScale(), 0.1);
+		mesh = new Box("SolarPanel");
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
@@ -100,6 +99,10 @@ public class SolarPanel extends HousePart {
 		} else
 			normal = container.getFaceDirection();
 		updateEditShapes();
+		
+		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		area = width * height;
+		((Box) mesh).setData(Vector3.ZERO, width / 2.0 / annotationScale, height / 2.0 / annotationScale, 0.1);
 		
 		final FloatBuffer meshBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer wireframeBuffer = wireframeMesh.getMeshData().getVertexBuffer();
@@ -173,7 +176,7 @@ public class SolarPanel extends HousePart {
 	@Override
 	public double getGridSize() {
 //		return 1.5;
-		return widthExtent / Scene.getInstance().getAnnotationScale() / 5.0;
+		return width / Scene.getInstance().getAnnotationScale() / 5.0;
 	}
 
 	@Override
