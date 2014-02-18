@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
@@ -39,7 +40,7 @@ public class SolarPanel extends HousePart {
 
 		final double yExtent = 1.6;
 		area = widthExtent * yExtent;
-		mesh = new Box("SolarPanel", new Vector3(), widthExtent / 2.0 / 0.2, yExtent / 2.0 / 0.2, 0.1);
+		mesh = new Box("SolarPanel", new Vector3(), widthExtent / 2.0 / Scene.getInstance().getAnnotationScale(), yExtent / 2.0 / Scene.getInstance().getAnnotationScale(), 0.1);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
@@ -172,7 +173,7 @@ public class SolarPanel extends HousePart {
 	@Override
 	public double getGridSize() {
 //		return 1.5;
-		return widthExtent / 0.2 / 5.0;
+		return widthExtent / Scene.getInstance().getAnnotationScale() / 5.0;
 	}
 
 	@Override
