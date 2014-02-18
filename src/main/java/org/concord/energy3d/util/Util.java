@@ -2,6 +2,9 @@ package org.concord.energy3d.util;
 
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.bounding.BoundingVolume;
@@ -215,5 +218,9 @@ public class Util {
 
 	public static boolean isZero(final double x) {
 		return Math.abs(x) < MathUtils.ZERO_TOLERANCE;
+	}
+
+	public static void reportError(Throwable e) {
+		JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured! Please notify us of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);		
 	}
 }
