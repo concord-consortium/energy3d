@@ -392,7 +392,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				cameraControl.animate();
 
 			root.updateGeometricState(tpf);
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			e.printStackTrace();
 			Util.reportError(e);
 		}
@@ -1333,7 +1333,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				return null;
 			}
 		});
-	}use(final float x, final float y) {
+	}
+	
+	public void moveMouse(final float x, final float y) {
 		final int pixelX = (int) ((-x + 500f) * getCamera().getWidth() / 1000f);
 		final int pixelY = (int) ((y + 200f) * getCamera().getHeight() / 400f);
 		mouseState = new MouseState(pixelX, pixelY, 0, 0, 0, null, null);
