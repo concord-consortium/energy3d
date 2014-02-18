@@ -135,9 +135,7 @@ public class Wall extends HousePart {
 		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		windowsSurroundMesh.setRenderState(offsetState);
 		/*
-		 * lets not use bounds for this mesh because when there are no windows
-		 * its bounds is set to center 0,0,0 which shifts the overall bounds
-		 * toward zero
+		 * lets not use bounds for this mesh because when there are no windows its bounds is set to center 0,0,0 which shifts the overall bounds toward zero
 		 */
 		windowsSurroundMesh.setModelBound(null);
 		root.attachChild(windowsSurroundMesh);
@@ -633,10 +631,7 @@ public class Wall extends HousePart {
 		final int whichNeighbor;
 		if (editPointIndex == 0 || editPointIndex == 1) {
 			/*
-			 * if edit point has snapped to a new wall then use the angle with
-			 * new wall to determine inside direction of this wall otherwise use
-			 * the angle with the other wall attached to none moving corner of
-			 * the this wall
+			 * if edit point has snapped to a new wall then use the angle with new wall to determine inside direction of this wall otherwise use the angle with the other wall attached to none moving corner of the this wall
 			 */
 			if (neighbors[0] == null)
 				whichNeighbor = 1;
@@ -798,10 +793,10 @@ public class Wall extends HousePart {
 		final Snap oldSnap = neighbors[i];
 		neighbors[i] = newSnap;
 
-//		if (newSnap == null && !updateNeighbors) { // see if it is attached to another wall
-//			connectedWalls();
-//			return;
-//		}
+		// if (newSnap == null && !updateNeighbors) { // see if it is attached to another wall
+		// connectedWalls();
+		// return;
+		// }
 
 		if (!updateNeighbors || oldSnap == newSnap || (oldSnap != null && oldSnap.equals(newSnap)))
 			return;
@@ -1156,7 +1151,7 @@ public class Wall extends HousePart {
 				for (int index = 0; index < 2; index++)
 					if (neighbors[index] == null)
 						for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
-//							if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
+							// if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
 							if (otherWall.neighbors[otherIndex] == null && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
 								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
 								break;
@@ -1198,9 +1193,10 @@ public class Wall extends HousePart {
 	@Override
 	public double computeArea() {
 		double area = super.computeArea();
-		for (final HousePart child : children)
-			if (child instanceof Window || child instanceof Door)
-				area -= child.computeArea();
+		if (!Scene.getInstance().isComputeSunEnergyOfWalls())
+			for (final HousePart child : children)
+				if (child instanceof Window || child instanceof Door)
+					area -= child.computeArea();
 		return area;
 	}
 

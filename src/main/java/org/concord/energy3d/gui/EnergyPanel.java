@@ -1262,13 +1262,13 @@ public class EnergyPanel extends JPanel {
 
 	private double computeEnergySolarRate(final ReadOnlyVector3 sunVector) {
 		double totalRate = 0.0;
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Window) {
+		final boolean computeSunEnergyOfWalls = Scene.getInstance().isComputeSunEnergyOfWalls();
+		for (final HousePart part : Scene.getInstance().getParts())
+			if ((part instanceof Window && !computeSunEnergyOfWalls) || (part instanceof Wall && computeSunEnergyOfWalls)) {
 				final double dot = part.getContainer().getFaceDirection().dot(sunVector);
 				if (dot > 0.0)
 					totalRate += 100.0 * part.computeArea() * dot;
 			}
-		}
 		return totalRate;
 	}
 

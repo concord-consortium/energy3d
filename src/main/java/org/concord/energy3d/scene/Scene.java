@@ -689,4 +689,8 @@ public class Scene implements Serializable {
 	public long nextID() {
 		return ++idCounter;
 	}
+
+	public boolean isComputeSunEnergyOfWalls() {
+		return true; 
+	}
 }
