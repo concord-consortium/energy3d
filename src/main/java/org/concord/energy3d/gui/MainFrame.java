@@ -46,6 +46,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.PrintController;
@@ -135,6 +136,7 @@ public class MainFrame extends JFrame {
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
 	private JCheckBoxMenuItem keepHeatmapOnMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
+	private JCheckBoxMenuItem wallReceivesSun;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -823,6 +825,7 @@ public class MainFrame extends JFrame {
 			sceneMenu.add(getAnnotationsInwardMenuItem());
 			sceneMenu.add(getWallThicknessMenuItem());
 			sceneMenu.add(getRemoveAllRoofsMenuItem());
+			sceneMenu.add(getWallReceivesSun());
 			if (!Config.isRestrictMode()) {
 				sceneMenu.add(getKeepHeatmapOnMenuItem());
 				sceneMenu.add(getFreezeMenuItem());
@@ -1543,5 +1546,18 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllRoofsMenuItem;
+	}
+	
+	public JCheckBoxMenuItem getWallReceivesSun() {
+		if (wallReceivesSun == null) {
+			wallReceivesSun = new JCheckBoxMenuItem("Wall Receives Sun Energy");
+			wallReceivesSun.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Scene.getInstance().setComputeSunEnergyOfWalls(wallReceivesSun.isSelected());
+					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				}
+			});
+		}
+		return wallReceivesSun;
 	}
 }
