@@ -83,7 +83,7 @@ public abstract class HousePart implements Serializable {
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
-	protected long id;	
+	protected long id;
 
 	static {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
@@ -755,6 +755,10 @@ public abstract class HousePart implements Serializable {
 		return id;
 	}
 
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	protected HousePart getTopContainer() {
 		HousePart c = this.getContainer();
 		if (c == null)
@@ -781,7 +785,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void setPotentialSolarEnergy(final double energy) {
-		potentialSolarEnergy  = energy;
+		potentialSolarEnergy = energy;
 	}
 
 	public double getPotentialSolarEnergy() {

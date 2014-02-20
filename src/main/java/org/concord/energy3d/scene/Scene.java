@@ -256,6 +256,15 @@ public class Scene implements Serializable {
 		}
 
 		if (url != null) {
+
+			long max = -1;
+			for (HousePart x : Scene.getInstance().parts) {
+				if (x.getId() > max)
+					max = x.getId();
+			}
+			if (max < 0)
+				max = 0;
+
 			System.out.print("Opening..." + url + "...");
 			final ObjectInputStream in = new ObjectInputStream(url.openStream());
 			final Scene instance = (Scene) in.readObject();
@@ -266,6 +275,7 @@ public class Scene implements Serializable {
 
 			if (url != null) {
 				for (final HousePart housePart : instance.getParts()) {
+					housePart.setId(max + housePart.getId());
 					Scene.getInstance().parts.add(housePart);
 					originalHouseRoot.attachChild(housePart.getRoot());
 				}
@@ -695,8 +705,8 @@ public class Scene implements Serializable {
 	public void setComputeSunEnergyOfWalls(final boolean computeSunEnergyOfWalls) {
 		this.computeSunEnergyOfWalls = computeSunEnergyOfWalls;
 	}
-	
+
 	public boolean isComputeSunEnergyOfWalls() {
-		return computeSunEnergyOfWalls; 
-	}	
+		return computeSunEnergyOfWalls;
+	}
 }
