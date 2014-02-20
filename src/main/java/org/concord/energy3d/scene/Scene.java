@@ -270,7 +270,7 @@ public class Scene implements Serializable {
 			final Scene instance = (Scene) in.readObject();
 			in.close();
 
-			instance.cleanup();
+			// instance.cleanup();
 			instance.upgradeSceneToNewVersion();
 
 			if (url != null) {
