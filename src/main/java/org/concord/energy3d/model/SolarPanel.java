@@ -16,6 +16,7 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
@@ -29,6 +30,7 @@ public class SolarPanel extends HousePart {
 	private transient ReadOnlyVector3 normal;
 	private transient double area;
 	private transient Mesh wireframeMesh;
+	private transient Box surround; 
 
 	public SolarPanel() {
 		super(1, 1, 0.0);
@@ -39,10 +41,20 @@ public class SolarPanel extends HousePart {
 		super.init();
 		updateRelativeToHorizontalFlag();
 
-		mesh = new Box("SolarPanel");
+		mesh = new Mesh("SolarPanel");
+		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
+		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
+		
+		surround = new Box("SolarPanel (Surround)");
+		surround.setModelBound(new OrientedBoundingBox());
+		final OffsetState offset = new OffsetState();
+		offset.setFactor(1);
+		offset.setUnits(1);
+		surround.setRenderState(offset);		
+		root.attachChild(surround);
 		
 		wireframeMesh = new Line("SolarPanel (Wireframe)");
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
@@ -102,34 +114,69 @@ public class SolarPanel extends HousePart {
 		
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		area = width * height;
-		((Box) mesh).setData(Vector3.ZERO, width / 2.0 / annotationScale, height / 2.0 / annotationScale, 0.1);
-		mesh.updateModelBound();
+		surround.setData(Vector3.ZERO, width / 2.0 / annotationScale, 0.1, height / 2.0 / annotationScale);
+		surround.updateModelBound();
 		
-		final FloatBuffer meshBuffer = mesh.getMeshData().getVertexBuffer();
+//		final Vector3[] boxVertices = surround.computeVertices();
+//		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+//		vertexBuffer.rewind();
+//		int j = 4;
+//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
+//		j++;
+//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
+//		j++;
+//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
+//		j = 4;
+//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
+//		j += 2;
+//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
+//		j++;
+//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
+		
+		
+		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
+		final FloatBuffer boxTextureBuffer = surround.getMeshData().getTextureBuffer(0);
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
 		final FloatBuffer wireframeBuffer = wireframeMesh.getMeshData().getVertexBuffer();
+		vertexBuffer.rewind();
 		wireframeBuffer.rewind();
-		int i = 8*3;
-		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
+		int i = 20*3;
+		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		textureBuffer.put(1).put(0);
+		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i += 3;
-		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
-		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
+		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		textureBuffer.put(0).put(0);
+		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));		
 		i += 3;
-		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
-		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
+		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		textureBuffer.put(0).put(1);
+		textureBuffer.put(0).put(1);
+		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i += 3;
-		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
-		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
-		i = 8*3;
-		wireframeBuffer.put(meshBuffer.get(i)).put(meshBuffer.get(i + 1)).put(meshBuffer.get(i + 2));
+		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		textureBuffer.put(1).put(1);
+		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		i = 20*3;
+		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		textureBuffer.put(1).put(0);
+		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 
 		mesh.setTranslation(getAbsPoint(0));
-		if (Util.isEqual(normal, Vector3.UNIT_Z))
+		if (Util.isEqual(normal, Vector3.NEG_UNIT_Y))
 			mesh.setRotation(new Matrix3());
 		else
-			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+			mesh.setRotation(new Matrix3().lookAt(Vector3.UNIT_Z, normal));
+
+		surround.setTranslation(mesh.getTranslation());
+		surround.setRotation(mesh.getRotation());
 		
 		wireframeMesh.setTranslation(mesh.getTranslation());
-		wireframeMesh.setRotation(mesh.getRotation());
 		wireframeMesh.setRotation(mesh.getRotation());
 	}
 

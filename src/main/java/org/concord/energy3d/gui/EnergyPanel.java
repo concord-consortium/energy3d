@@ -505,14 +505,14 @@ public class EnergyPanel extends JPanel {
 		gbc_autoCheckBox.gridx = 5;
 		gbc_autoCheckBox.gridy = 0;
 		temperaturePanel.add(autoCheckBox, gbc_autoCheckBox);
-		
+
 		partEnergyPanel = new JPanel();
 		partEnergyPanel.setBorder(new TitledBorder(null, "Part Energy", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(partEnergyPanel);
-		
+
 		partEnergyLabel = new JLabel("Potential Solar Energy:");
 		partEnergyPanel.add(partEnergyLabel);
-		
+
 		partEnergyTextField = new JTextField();
 		partEnergyPanel.add(partEnergyTextField);
 		partEnergyTextField.setColumns(10);
@@ -1346,35 +1346,20 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	private void computeRadiationOnRoofs(final ReadOnlyVector3 sunLocation) {
-		if (sunLocation.getZ() <= 0)
-			return;
-		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Roof && part.isDrawCompleted()) {
-				final Roof roof = (Roof) part;
-				for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
+	private void computeRadiationOnRoofs(final HousePart part, final ReadOnlyVector3 directionTowardSun) {
+				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 					final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
 					if (faceDirection.dot(directionTowardSun) > 0) {
 						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-						computeRadiationOnMesh(directionTowardSun, roof, mesh, mesh, faceDirection, false);
+						computeRadiationOnMesh(directionTowardSun, part, mesh, mesh, faceDirection, false);
 					}
 				}
-			}
-		}
 	}
 
-	private void computeRadiationOnWalls(final ReadOnlyVector3 sunLocation) {
-		if (sunLocation.getZ() <= 0)
-			return;
-		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			final ReadOnlyVector3 faceDirection = part.getFaceDirection();
-			if (part instanceof Wall && part.isDrawCompleted() && faceDirection.dot(directionTowardSun) > 0) {
-				final Wall wall = (Wall) part;
+	private void computeRadiationOnWalls(final Wall wall, final ReadOnlyVector3 directionTowardSun) {
+			final ReadOnlyVector3 faceDirection = wall.getFaceDirection();
+			if (wall.isDrawCompleted() && faceDirection.dot(directionTowardSun) > 0)
 				computeRadiationOnMesh(directionTowardSun, wall, wall.getMesh(), wall.getInvisibleMesh(), faceDirection, true);
-			}
-		}
 	}
 
 	private void computeRadiationOnSolarPanels(final ReadOnlyVector3 sunLocation) {
@@ -1515,12 +1500,12 @@ public class EnergyPanel extends JPanel {
 				if (pickResults.getNumber() == 0) {
 					solar[row][col] += dot;
 					final double annotationScale = Scene.getInstance().getAnnotationScale();
-//					final int repeat = 1;
-//					if (addToTotal) {
-//						final Double val = solarTotal.get(house);
-//						final double solarValue = repeat * dot * w * h * annotationScale;
-//						solarTotal.put(house, val == null ? 0 : val + solarValue);
-//					}
+					// final int repeat = 1;
+					// if (addToTotal) {
+					// final Double val = solarTotal.get(house);
+					// final double solarValue = repeat * dot * w * h * annotationScale;
+					// solarTotal.put(house, val == null ? 0 : val + solarValue);
+					// }
 					housePart.setPotentialSolarEnergy(dot * w * h * annotationScale * annotationScale);
 				}
 			}
@@ -1587,12 +1572,29 @@ public class EnergyPanel extends JPanel {
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		for (int minute = 0; minute < 1440; minute += SOLAR_MINUTE_STEP) {
-			final ReadOnlyVector3 sunLocation = heliodon.computeSunLocation(today);
+			final ReadOnlyVector3 sunLocation = heliodon.computeSunLocation(today).normalize(null);
 			if (sunLocation.getZ() > 0) {
-				computeRadiationOnWalls(sunLocation);
-				computeRadiationOnRoofs(sunLocation);
-				computeRadiationOnSolarPanels(sunLocation);
-				computeRadiationOnLand(sunLocation);
+				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
+				for (final HousePart part : Scene.getInstance().getParts()) {
+					if (part.isDrawCompleted())
+					if (part instanceof Wall || part instanceof Window || part instanceof SolarPanel) {
+//						computeRadiationOnWalls(part, sunLocation);
+						final ReadOnlyVector3 faceDirection = part.getFaceDirection();
+						if (faceDirection.dot(directionTowardSun) > 0)
+							computeRadiationOnMesh(directionTowardSun, part, part.getMesh(), part instanceof Wall ? ((Wall) part).getInvisibleMesh() : part.getMesh(), faceDirection, true);
+					} else if (part instanceof Roof) {
+//						computeRadiationOnRoofs(part, sunLocation);
+						for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
+							final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
+							if (faceDirection.dot(directionTowardSun) > 0) {
+								final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+								computeRadiationOnMesh(directionTowardSun, part, mesh, mesh, faceDirection, false);
+							}
+						}	
+					}
+					computeRadiationOnSolarPanels(sunLocation);
+					computeRadiationOnLand(sunLocation);
+				}
 			}
 			maxSolarValue++;
 			today.add(Calendar.MINUTE, SOLAR_MINUTE_STEP);
@@ -1760,7 +1762,7 @@ public class EnergyPanel extends JPanel {
 			}
 		}
 	}
-	
+
 	public void updatePartEnergy() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart == null || selectedPart instanceof Foundation || selectedPart instanceof Door)
