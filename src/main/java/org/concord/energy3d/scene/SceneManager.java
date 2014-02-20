@@ -1330,6 +1330,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 				System.out.println("mouse released: " + selectedHousePart);
 				updateHeliodonAndAnnotationSize();
+				EnergyPanel.getInstance().updatePartEnergy();
 				return null;
 			}
 		});

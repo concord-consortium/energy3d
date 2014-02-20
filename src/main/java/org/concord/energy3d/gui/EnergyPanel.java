@@ -223,6 +223,9 @@ public class EnergyPanel extends JPanel {
 	private UpdateRadiation updateRadiation;
 	private boolean computeEnabled = true;
 	private final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+	private JPanel partEnergyPanel;
+	private JLabel partEnergyLabel;
+	private JTextField partEnergyTextField;
 
 	private static class EnergyAmount {
 		double solar;
@@ -379,6 +382,7 @@ public class EnergyPanel extends JPanel {
 
 		legendLabel = new JLabel("Color Scale: ");
 		final GridBagConstraints gbc_legendLabel = new GridBagConstraints();
+		gbc_legendLabel.insets = new Insets(5, 0, 0, 0);
 		gbc_legendLabel.anchor = GridBagConstraints.WEST;
 		gbc_legendLabel.gridx = 0;
 		gbc_legendLabel.gridy = 0;
@@ -501,6 +505,17 @@ public class EnergyPanel extends JPanel {
 		gbc_autoCheckBox.gridx = 5;
 		gbc_autoCheckBox.gridy = 0;
 		temperaturePanel.add(autoCheckBox, gbc_autoCheckBox);
+		
+		partEnergyPanel = new JPanel();
+		partEnergyPanel.setBorder(new TitledBorder(null, "Part Energy", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(partEnergyPanel);
+		
+		partEnergyLabel = new JLabel("Potential Solar Energy:");
+		partEnergyPanel.add(partEnergyLabel);
+		
+		partEnergyTextField = new JTextField();
+		partEnergyPanel.add(partEnergyTextField);
+		partEnergyTextField.setColumns(10);
 
 		final JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -1006,7 +1021,7 @@ public class EnergyPanel extends JPanel {
 						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
 						try {
 							computeNow(EnergyPanel.this.updateRadiation);
-						} catch (Throwable e) {
+						} catch (final Throwable e) {
 							e.printStackTrace();
 							Util.reportError(e);
 						}
@@ -1342,7 +1357,7 @@ public class EnergyPanel extends JPanel {
 					final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
 					if (faceDirection.dot(directionTowardSun) > 0) {
 						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-						computeRadiationOnMesh(directionTowardSun, null, mesh, mesh, faceDirection, false);
+						computeRadiationOnMesh(directionTowardSun, roof, mesh, mesh, faceDirection, false);
 					}
 				}
 			}
@@ -1357,7 +1372,7 @@ public class EnergyPanel extends JPanel {
 			final ReadOnlyVector3 faceDirection = part.getFaceDirection();
 			if (part instanceof Wall && part.isDrawCompleted() && faceDirection.dot(directionTowardSun) > 0) {
 				final Wall wall = (Wall) part;
-				computeRadiationOnMesh(directionTowardSun, wall.getContainer(), wall.getMesh(), wall.getInvisibleMesh(), faceDirection, true);
+				computeRadiationOnMesh(directionTowardSun, wall, wall.getMesh(), wall.getInvisibleMesh(), faceDirection, true);
 			}
 		}
 	}
@@ -1397,7 +1412,7 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	private void computeRadiationOnMesh(final ReadOnlyVector3 directionTowardSun, final HousePart house, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
+	private void computeRadiationOnMesh(final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
@@ -1499,12 +1514,14 @@ public class EnergyPanel extends JPanel {
 					}
 				if (pickResults.getNumber() == 0) {
 					solar[row][col] += dot;
-					final int repeat = 1;
-					if (addToTotal) {
-						final Double val = solarTotal.get(house);
-						final double solarValue = repeat * dot * w * h * Scene.getInstance().getAnnotationScale();
-						solarTotal.put(house, val == null ? 0 : val + solarValue);
-					}
+					final double annotationScale = Scene.getInstance().getAnnotationScale();
+//					final int repeat = 1;
+//					if (addToTotal) {
+//						final Double val = solarTotal.get(house);
+//						final double solarValue = repeat * dot * w * h * annotationScale;
+//						solarTotal.put(house, val == null ? 0 : val + solarValue);
+//					}
+					housePart.setPotentialSolarEnergy(dot * w * h * annotationScale * annotationScale);
 				}
 			}
 		}
@@ -1726,10 +1743,12 @@ public class EnergyPanel extends JPanel {
 		return solarTotal;
 	}
 
+	@Override
 	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
 		propertyChangeListeners.add(pcl);
 	}
 
+	@Override
 	public void removePropertyChangeListener(final PropertyChangeListener pcl) {
 		propertyChangeListeners.remove(pcl);
 	}
@@ -1740,5 +1759,15 @@ public class EnergyPanel extends JPanel {
 				x.propertyChange(evt);
 			}
 		}
+	}
+	
+	public void updatePartEnergy() {
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart == null || selectedPart instanceof Foundation || selectedPart instanceof Door)
+			partEnergyTextField.setText("");
+		else if (MainPanel.getInstance().getSolarButton().isSelected())
+			partEnergyTextField.setText("" + selectedPart.getPotentialSolarEnergy());
+		else
+			partEnergyTextField.setText("n/a");
 	}
 }

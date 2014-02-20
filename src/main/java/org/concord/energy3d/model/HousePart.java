@@ -73,6 +73,7 @@ public abstract class HousePart implements Serializable {
 	protected transient boolean relativeToHorizontal;
 	private transient boolean isPrintVertical;
 	private transient Map<Mesh, Boolean> textureCleared;
+	private transient double potentialSolarEnergy;
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
 	protected HousePart container = null;
@@ -82,7 +83,7 @@ public abstract class HousePart implements Serializable {
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
-	protected long id;
+	protected long id;	
 
 	static {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
@@ -777,6 +778,14 @@ public abstract class HousePart implements Serializable {
 			mesh.clearRenderState(StateType.Offset);
 			mesh.setDefaultColor(ColorRGBA.WHITE);
 		}
+	}
+
+	public void setPotentialSolarEnergy(final double energy) {
+		potentialSolarEnergy  = energy;
+	}
+
+	public double getPotentialSolarEnergy() {
+		return potentialSolarEnergy;
 	}
 
 }
