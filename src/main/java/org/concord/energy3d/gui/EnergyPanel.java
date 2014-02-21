@@ -1338,7 +1338,9 @@ public class EnergyPanel extends JPanel {
 	private void initSolarCollidables() {
 		solarCollidables.clear();
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Wall)
+			if (part instanceof Foundation)
+				solarCollidables.add(part.getMesh());
+			else if (part instanceof Wall)
 				solarCollidables.add(((Wall) part).getInvisibleMesh());
 			else if (part instanceof SolarPanel)
 				solarCollidables.add(((SolarPanel) part).getSurroundMesh());
@@ -1547,7 +1549,7 @@ public class EnergyPanel extends JPanel {
 		 */
 //		final double OFFSET = 0.1;
 //		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
-		final double SOLAR_STEP = 8;
+		final double SOLAR_STEP = EnergyPanel.SOLAR_STEP * 4;
 		final int rows = (int) (256 / SOLAR_STEP);
 		final int cols = rows;
 		if (solarOnLand == null)
