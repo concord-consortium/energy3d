@@ -11,11 +11,13 @@ import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.WallVisitor;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
@@ -622,7 +624,7 @@ public class Foundation extends HousePart {
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 newP = houseMovePoints.get(i).add(d, null);
 			points.set(i, newP);
-			if (i == points.size() -1 && ensureDistanceFromOtherFoundations(newP, i) != newP) {
+			if (i == points.size() - 1 && ensureDistanceFromOtherFoundations(newP, i) != newP) {
 				for (int j = 0; j < points.size(); j++)
 					points.set(j, orgPoints.get(j));
 				return;
@@ -630,4 +632,86 @@ public class Foundation extends HousePart {
 		}
 		Scene.getInstance().redrawAll();
 	}
+
+	private ArrayList<Vector2> floorVertices;
+
+	private void initFloor() {
+		if (floorVertices == null)
+			floorVertices = new ArrayList<Vector2>();
+		else
+			floorVertices.clear();
+		if (children.isEmpty())
+			return;
+		HousePart firstBorn = children.get(0);
+		if (firstBorn instanceof Wall)
+			((Wall) firstBorn).visitNeighbors(new WallVisitor() {
+				@Override
+				public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+					int pointIndex = 0;
+					if (next != null)
+						pointIndex = next.getSnapPointIndexOf(currentWall);
+					pointIndex++;
+					addVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
+					addVertex(currentWall.getAbsPoint(pointIndex));
+				}
+			});
+	}
+
+	private void addVertex(ReadOnlyVector3 v3) {
+		Vector2 v2 = new Vector2(v3.getX(), v3.getY());
+		boolean b = false;
+		for (Vector2 x : floorVertices) {
+			if (Util.isEqual(x, v2)) {
+				b = true;
+				break;
+			}
+		}
+		if (!b)
+			floorVertices.add(v2);
+	}
+
+	public double[] getBuildingGeometry() {
+
+		initFloor();
+		int n = floorVertices.size();
+		if (n <= 0)
+			return null;
+
+		double height = Double.MAX_VALUE;
+		for (HousePart w : children) {
+			double h = w.getHeight();
+			if (height > h)
+				height = h;
+		}
+
+		double area = 0;
+		Vector2 v1, v2;
+		for (int i = 0; i < n - 1; i++) {
+			v1 = floorVertices.get(i);
+			v2 = floorVertices.get(i + 1);
+			area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
+		}
+		v1 = floorVertices.get(n - 1);
+		v2 = floorVertices.get(0);
+		area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
+		area *= 0.5;
+
+		double cx = 0, cy = 0;
+		for (int i = 0; i < n - 1; i++) {
+			v1 = floorVertices.get(i);
+			v2 = floorVertices.get(i + 1);
+			cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
+			cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
+		}
+		v1 = floorVertices.get(n - 1);
+		v2 = floorVertices.get(0);
+		cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
+		cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
+		cx /= 6;
+		cy /= 6;
+
+		return new double[] { height, area, height * area, cx, cy };
+
+	}
+
 }
