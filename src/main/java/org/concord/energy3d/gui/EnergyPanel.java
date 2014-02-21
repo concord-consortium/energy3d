@@ -526,7 +526,7 @@ public class EnergyPanel extends JPanel {
 		partPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(partPanel);
 
-		partEnergyLabel = new JLabel("Solar Potential Energy:");
+		partEnergyLabel = new JLabel("Solar Energy Potential:");
 		partPanel.add(partEnergyLabel);
 
 		partEnergyTextField = new JTextField();
@@ -544,7 +544,7 @@ public class EnergyPanel extends JPanel {
 		panel = new JPanel();
 		housePanel.add(panel);
 		
-		lblSolarPotentialEnergy = new JLabel("Solar Potential Energy:");
+		lblSolarPotentialEnergy = new JLabel("Solar Energy Potential:");
 		panel.add(lblSolarPotentialEnergy);
 		
 		houseSolarPotentialTextField = new JTextField();
@@ -1887,5 +1887,19 @@ public class EnergyPanel extends JPanel {
 			partEnergyTextField.setText(noDecimals.format(convertSolarValue(selectedPart.getSolarPotentialEnergy())));
 		else
 			partEnergyTextField.setText("n/a");
+		
+		final Foundation foundation = (Foundation) selectedPart.getTopContainer();
+		if (foundation != null) {
+			houseSolarPotentialTextField.setText("" + foundation.getSolarValue());
+			final double[] buildingGeometry = foundation.getBuildingGeometry();
+			positionTextField.setText("(" + buildingGeometry[3] + ", " + buildingGeometry[4] + ")");
+			heightTextField.setText("");
+			areaTextField.setText("");
+			volumnTextField.setText("");
+		} else {
+			heightTextField.setText("n/a");
+			areaTextField.setText("n/a");
+			volumnTextField.setText("n/a");			
+		}
 	}
 }
