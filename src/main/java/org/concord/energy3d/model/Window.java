@@ -15,7 +15,6 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -37,9 +36,9 @@ public class Window extends HousePart {
 		label1 = Annotation.makeNewLabel();
 		super.init();
 		mesh = new Mesh("Window");
-		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
+//		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
+//		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.setModelBound(new BoundingBox());
 		mesh.getSceneHints().setCullHint(CullHint.Always);
 
@@ -115,10 +114,25 @@ public class Window extends HousePart {
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
-		for (int i = 0; i < points.size(); i++) {
-			final ReadOnlyVector3 p = getAbsPoint(i);
-			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+//		for (int i = 0; i < points.size(); i++) {
+//			final ReadOnlyVector3 p = getAbsPoint(i);
+//			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+//		}
+		{
+		ReadOnlyVector3 p;
+		p = getAbsPoint(0);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		p = getAbsPoint(2);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		p = getAbsPoint(1);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		p = getAbsPoint(2);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		p = getAbsPoint(3);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
+		
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 
@@ -294,6 +308,11 @@ public class Window extends HousePart {
 	@Override
 	protected String getTextureFileName() {
 		return null;
+	}
+	
+	@Override
+	public ReadOnlyVector3 getFaceDirection() {
+		return container.getFaceDirection();
 	}
 
 }

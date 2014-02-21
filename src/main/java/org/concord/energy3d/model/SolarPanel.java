@@ -167,14 +167,17 @@ public class SolarPanel extends HousePart {
 		textureBuffer.put(1).put(0);
 		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 
+		mesh.updateModelBound();
+		wireframeMesh.updateModelBound();
+		
 		mesh.setTranslation(getAbsPoint(0));
 		if (Util.isEqual(normal, Vector3.UNIT_Z))
 			mesh.setRotation(new Matrix3());
 		else
-			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));		
 
 		surround.setTranslation(mesh.getTranslation());
-		surround.setRotation(mesh.getRotation());
+		surround.setRotation(mesh.getRotation());		
 		
 		wireframeMesh.setTranslation(mesh.getTranslation());
 		wireframeMesh.setRotation(mesh.getRotation());

@@ -92,18 +92,20 @@ public class Wall extends HousePart {
 			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
 
 		mesh = new Mesh("Wall");
-		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
+//		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+//		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+//		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
+		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
 		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new BoundingBox());
 		root.attachChild(mesh);
 
 		backMesh = new Mesh("Wall (Back)");
-		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		backMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
+//		backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+//		backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+//		backMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
+		backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
 		backMesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		backMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		backMesh.setRenderState(offsetState);
