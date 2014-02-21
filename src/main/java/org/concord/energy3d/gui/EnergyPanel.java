@@ -223,9 +223,25 @@ public class EnergyPanel extends JPanel {
 	private UpdateRadiation updateRadiation;
 	private boolean computeEnabled = true;
 	private final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
-	private JPanel partEnergyPanel;
+	private JPanel partPanel;
 	private JLabel partEnergyLabel;
 	private JTextField partEnergyTextField;
+	private JPanel housePanel;
+	private JLabel solarPotentialKWhLabel;
+	private JLabel lblSolarPotentialEnergy;
+	private JTextField houseSolarPotentialTextField;
+	private JLabel lblNewLabel;
+	private JPanel panel;
+	private JPanel panel_2;
+	private JLabel lblPosition;
+	private JTextField positionTextField;
+	private JLabel lblArea;
+	private JTextField areaTextField;
+	private JLabel lblHeight;
+	private JTextField heightTextField;
+	private JPanel panel_5;
+	private JLabel lblVolume;
+	private JTextField volumnTextField;
 
 	private static class EnergyAmount {
 		double solar;
@@ -506,16 +522,71 @@ public class EnergyPanel extends JPanel {
 		gbc_autoCheckBox.gridy = 0;
 		temperaturePanel.add(autoCheckBox, gbc_autoCheckBox);
 
-		partEnergyPanel = new JPanel();
-		partEnergyPanel.setBorder(new TitledBorder(null, "Part Energy", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(partEnergyPanel);
+		partPanel = new JPanel();
+		partPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(partPanel);
 
-		partEnergyLabel = new JLabel("Solar Potential:");
-		partEnergyPanel.add(partEnergyLabel);
+		partEnergyLabel = new JLabel("Solar Potential Energy:");
+		partPanel.add(partEnergyLabel);
 
 		partEnergyTextField = new JTextField();
-		partEnergyPanel.add(partEnergyTextField);
+		partPanel.add(partEnergyTextField);
 		partEnergyTextField.setColumns(10);
+		
+		solarPotentialKWhLabel = new JLabel("kWh");
+		partPanel.add(solarPotentialKWhLabel);
+		
+		housePanel = new JPanel();
+		housePanel.setBorder(new TitledBorder(null, "House", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(housePanel);
+		housePanel.setLayout(new BoxLayout(housePanel, BoxLayout.Y_AXIS));
+		
+		panel = new JPanel();
+		housePanel.add(panel);
+		
+		lblSolarPotentialEnergy = new JLabel("Solar Potential Energy:");
+		panel.add(lblSolarPotentialEnergy);
+		
+		houseSolarPotentialTextField = new JTextField();
+		panel.add(houseSolarPotentialTextField);
+		houseSolarPotentialTextField.setColumns(10);
+		
+		lblNewLabel = new JLabel("kWh");
+		panel.add(lblNewLabel);
+		
+		panel_2 = new JPanel();
+		housePanel.add(panel_2);
+		
+		lblPosition = new JLabel("Position:");
+		panel_2.add(lblPosition);
+		
+		positionTextField = new JTextField();
+		panel_2.add(positionTextField);
+		positionTextField.setColumns(10);
+		
+		lblHeight = new JLabel("Height:");
+		panel_2.add(lblHeight);
+		
+		heightTextField = new JTextField();
+		panel_2.add(heightTextField);
+		heightTextField.setColumns(10);
+		
+		panel_5 = new JPanel();
+		housePanel.add(panel_5);
+		
+		lblArea = new JLabel("Area:");
+		panel_5.add(lblArea);
+		
+		areaTextField = new JTextField();
+		panel_5.add(areaTextField);
+		areaTextField.setColumns(10);
+		
+		lblVolume = new JLabel("Volume:");
+		panel_5.add(lblVolume);
+		
+		volumnTextField = new JTextField();
+		panel_5.add(volumnTextField);
+		volumnTextField.setColumns(10);
 
 		final JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -1803,7 +1874,13 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updatePartEnergy() {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();		
+		final TitledBorder titledBorder = (TitledBorder) partPanel.getBorder();
+		if (selectedPart == null)
+			titledBorder.setTitle("Part");
+		else
+			titledBorder.setTitle("Part - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1));
+		partPanel.repaint();
 		if (selectedPart == null || selectedPart instanceof Foundation || selectedPart instanceof Door)
 			partEnergyTextField.setText("");
 		else if (MainPanel.getInstance().getSolarButton().isSelected())

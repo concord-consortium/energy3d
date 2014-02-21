@@ -42,6 +42,7 @@ public class Foundation extends HousePart {
 	private transient double maxX;
 	private transient double maxY;
 	private transient BMText solarLabel;
+	private long solarValue;
 
 	static {
 		format.setGroupingUsed(true);
@@ -601,6 +602,7 @@ public class Foundation extends HousePart {
 	}
 
 	public void setSolarValue(final long solarValue) {
+		this.solarValue = solarValue;
 		scanChildrenHeight();
 		if (solarValue == -2)
 			solarLabel.setVisible(false);
@@ -612,6 +614,10 @@ public class Foundation extends HousePart {
 			else
 				solarLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
 		}
+	}
+	
+	public long getSolarValue() {
+		return this.solarValue;
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
