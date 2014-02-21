@@ -1323,6 +1323,8 @@ public class EnergyPanel extends JPanel {
 		solarOnMesh.clear();
 		solarTotal.clear();
 		textureCoordsAlreadyComputed.clear();
+		for (final HousePart part : Scene.getInstance().getParts())
+			part.setPotentialSolarEnergy(0.0);
 		solarOnLand = null;
 		maxSolarValue = 1;
 		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
@@ -1339,7 +1341,7 @@ public class EnergyPanel extends JPanel {
 			if (part instanceof Wall)
 				solarCollidables.add(((Wall) part).getInvisibleMesh());
 			else if (part instanceof SolarPanel)
-				solarCollidables.add(part.getMesh());
+				solarCollidables.add(((SolarPanel) part).getSurroundMesh());
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
 					solarCollidables.add(((Node) roofPart).getChild(0));
@@ -1413,7 +1415,8 @@ public class EnergyPanel extends JPanel {
 		double z = Double.NaN;
 		final List<ReadOnlyVector2> points = new ArrayList<ReadOnlyVector2>(vertexBuffer.limit() / 3);
 		while (vertexBuffer.hasRemaining()) {
-			final Point p = new TPoint(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+			final Vector3 pWorld = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
+			final Point p = new TPoint(pWorld.getX(), pWorld.getY(), pWorld.getZ());			
 			toXY.transform(p);
 			if (p.getX() < minX)
 				minX = p.getX();
@@ -1506,8 +1509,8 @@ public class EnergyPanel extends JPanel {
 					// final double solarValue = repeat * dot * w * h * annotationScale;
 					// solarTotal.put(house, val == null ? 0 : val + solarValue);
 					// }
-					housePart.setPotentialSolarEnergy(dot * w * h * annotationScale * annotationScale);
-				}
+					housePart.setPotentialSolarEnergy(housePart.getPotentialSolarEnergy() + dot * w * h * annotationScale * annotationScale);
+				} 
 			}
 		}
 
@@ -1526,7 +1529,7 @@ public class EnergyPanel extends JPanel {
 		vertexBuffer.rewind();
 		textureBuffer.rewind();
 		while (vertexBuffer.hasRemaining()) {
-			final ReadOnlyVector3 p = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+			final ReadOnlyVector3 p = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
 			final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
 			final float uScale = (float) (uP.distance(o) / u.length());
 			final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
@@ -1592,7 +1595,7 @@ public class EnergyPanel extends JPanel {
 							}
 						}	
 					}
-					computeRadiationOnSolarPanels(sunLocation);
+//					computeRadiationOnSolarPanels(sunLocation);
 					computeRadiationOnLand(sunLocation);
 				}
 			}
@@ -1702,9 +1705,10 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void fillBlanksWithNeighboringValues(final double[][] solarData) {
+		final int rows = solarData.length;
 		final int cols = solarData[0].length;
 		for (int repeat = 0; repeat < 2; repeat++)
-			for (int row = 0; row < solarData.length; row++)
+			for (int row = 0; row < rows; row++)
 				for (int col = 0; col < cols; col++)
 					if (solarData[row][col] == -1)
 						if (solarData[row][(col + 1) % cols] != -1)
@@ -1713,6 +1717,12 @@ public class EnergyPanel extends JPanel {
 							solarData[row][col] = solarData[row][col - 1];
 						else if (col == 0 && solarData[row][cols - 1] != -1)
 							solarData[row][col] = solarData[row][cols - 1];
+						else if (solarData[(row + 1) % rows][col] != -1)
+							solarData[row][col] = solarData[(row + 1) % rows][col];
+						else if (row != 0 && solarData[row - 1][col] != -1)
+							solarData[row][col] = solarData[row - 1][col];
+						else if (row == 0 && solarData[rows - 1][col] != -1)
+							solarData[row][col] = solarData[rows - 1][col];
 	}
 
 	private ColorRGBA computeSolarColor(final double value, final long maxValue) {

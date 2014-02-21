@@ -114,7 +114,7 @@ public class SolarPanel extends HousePart {
 		
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		area = width * height;
-		surround.setData(Vector3.ZERO, width / 2.0 / annotationScale, 0.1, height / 2.0 / annotationScale);
+		surround.setData(Vector3.ZERO, width / 2.0 / annotationScale, height / 2.0 / annotationScale, 0.1);
 		surround.updateModelBound();
 		
 //		final Vector3[] boxVertices = surround.computeVertices();
@@ -141,7 +141,7 @@ public class SolarPanel extends HousePart {
 		final FloatBuffer wireframeBuffer = wireframeMesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		wireframeBuffer.rewind();
-		int i = 20*3;
+		int i = 8*3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(0);
 		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
@@ -162,16 +162,16 @@ public class SolarPanel extends HousePart {
 		textureBuffer.put(1).put(1);
 		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		i = 20*3;
+		i = 8*3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(0);
 		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 
 		mesh.setTranslation(getAbsPoint(0));
-		if (Util.isEqual(normal, Vector3.NEG_UNIT_Y))
+		if (Util.isEqual(normal, Vector3.UNIT_Z))
 			mesh.setRotation(new Matrix3());
 		else
-			mesh.setRotation(new Matrix3().lookAt(Vector3.UNIT_Z, normal));
+			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
@@ -237,6 +237,10 @@ public class SolarPanel extends HousePart {
 			return container;
 		else
 			return getTopContainer();
+	}
+
+	public Mesh getSurroundMesh() {
+		return surround;
 	}
 
 }
