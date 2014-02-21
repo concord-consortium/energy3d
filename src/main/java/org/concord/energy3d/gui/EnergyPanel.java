@@ -1560,7 +1560,7 @@ public class EnergyPanel extends JPanel {
 			for (int row = 0; row < rows; row++) {
 				if (computeRequest)
 					throw cancelException;
-				p.setY((row - rows / 2) * SOLAR_STEP + SOLAR_STEP);
+				p.setY((row - rows / 2) * SOLAR_STEP + SOLAR_STEP / 2.0);
 //				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
