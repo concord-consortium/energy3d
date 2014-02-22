@@ -203,7 +203,6 @@ public class EnergyPanel extends JPanel {
 	private JTextField solarYearlyTextField;
 
 	private final Map<Mesh, double[][]> solarOnMesh = new HashMap<Mesh, double[][]>();
-	private final Map<HousePart, Double> solarTotal = new HashMap<HousePart, Double>();
 	private final Map<Mesh, Boolean> textureCoordsAlreadyComputed = new HashMap<Mesh, Boolean>();
 	private final List<Spatial> solarCollidables = new ArrayList<Spatial>();
 	private double[][] solarOnLand;
@@ -532,58 +531,58 @@ public class EnergyPanel extends JPanel {
 		partEnergyTextField = new JTextField();
 		partPanel.add(partEnergyTextField);
 		partEnergyTextField.setColumns(10);
-		
+
 		solarPotentialKWhLabel = new JLabel("kWh");
 		partPanel.add(solarPotentialKWhLabel);
-		
+
 		housePanel = new JPanel();
 		housePanel.setBorder(new TitledBorder(null, "House", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(housePanel);
 		housePanel.setLayout(new BoxLayout(housePanel, BoxLayout.Y_AXIS));
-		
+
 		panel = new JPanel();
 		housePanel.add(panel);
-		
+
 		lblSolarPotentialEnergy = new JLabel("Solar Energy Potential:");
 		panel.add(lblSolarPotentialEnergy);
-		
+
 		houseSolarPotentialTextField = new JTextField();
 		panel.add(houseSolarPotentialTextField);
 		houseSolarPotentialTextField.setColumns(10);
-		
+
 		lblNewLabel = new JLabel("kWh");
 		panel.add(lblNewLabel);
-		
+
 		panel_2 = new JPanel();
 		housePanel.add(panel_2);
-		
+
 		lblPosition = new JLabel("Position:");
 		panel_2.add(lblPosition);
-		
+
 		positionTextField = new JTextField();
 		panel_2.add(positionTextField);
 		positionTextField.setColumns(10);
-		
+
 		lblHeight = new JLabel("Height:");
 		panel_2.add(lblHeight);
-		
+
 		heightTextField = new JTextField();
 		panel_2.add(heightTextField);
 		heightTextField.setColumns(10);
-		
+
 		panel_5 = new JPanel();
 		housePanel.add(panel_5);
-		
+
 		lblArea = new JLabel("Area:");
 		panel_5.add(lblArea);
-		
+
 		areaTextField = new JTextField();
 		panel_5.add(areaTextField);
 		areaTextField.setColumns(10);
-		
+
 		lblVolume = new JLabel("Volume:");
 		panel_5.add(lblVolume);
-		
+
 		volumnTextField = new JTextField();
 		panel_5.add(volumnTextField);
 		volumnTextField.setColumns(10);
@@ -1392,16 +1391,11 @@ public class EnergyPanel extends JPanel {
 		System.out.println("computeRadiation()");
 		initSolarCollidables();
 		solarOnMesh.clear();
-		solarTotal.clear();
 		textureCoordsAlreadyComputed.clear();
 		for (final HousePart part : Scene.getInstance().getParts())
 			part.setSolarPotentialEnergy(0.0);
 		solarOnLand = null;
 		maxSolarValue = 1;
-		// computeSolarOnLand(Heliodon.getInstance().getSunLocation());
-		// computeRadiationOnWalls(Heliodon.getInstance().getSunLocation());
-		// computeRadiationOnRoofs(Heliodon.getInstance().getSunLocation());
-		// computeRadiationOnSolarPanels(Heliodon.getInstance().getSunLocation());
 		computeRadiationToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		updateSolarValueOnAllHouses();
 	}
@@ -1418,57 +1412,6 @@ public class EnergyPanel extends JPanel {
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
 					solarCollidables.add(((Node) roofPart).getChild(0));
-		}
-	}
-
-	private void computeRadiationOnRoofs(final HousePart part, final ReadOnlyVector3 directionTowardSun) {
-				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-					final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
-					if (faceDirection.dot(directionTowardSun) > 0) {
-						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-						computeRadiationOnMesh(directionTowardSun, part, mesh, mesh, faceDirection, false);
-					}
-				}
-	}
-
-	private void computeRadiationOnWalls(final Wall wall, final ReadOnlyVector3 directionTowardSun) {
-			final ReadOnlyVector3 faceDirection = wall.getFaceDirection();
-			if (wall.isDrawCompleted() && faceDirection.dot(directionTowardSun) > 0)
-				computeRadiationOnMesh(directionTowardSun, wall, wall.getMesh(), wall.getInvisibleMesh(), faceDirection, true);
-	}
-
-	private void computeRadiationOnSolarPanels(final ReadOnlyVector3 sunLocation) {
-		if (sunLocation.getZ() <= 0)
-			return;
-		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			final ReadOnlyVector3 faceDirection = part.getFaceDirection();
-			if (part instanceof SolarPanel && part.isDrawCompleted() && faceDirection.dot(directionTowardSun) > 0) {
-				final SolarPanel solarPanel = (SolarPanel) part;
-				// computeRadiationOnMesh(directionTowardSun, null, solarPanel.getMesh(), solarPanel.getMesh(), faceDirection, false);
-
-				final Mesh drawMesh = solarPanel.getMesh();
-				double[][] solar = solarOnMesh.get(drawMesh);
-				if (solar == null) {
-					solar = new double[1][1];
-					solarOnMesh.put(drawMesh, solar);
-				}
-
-				final double OFFSET = 0.1;
-				final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
-				final ReadOnlyVector3 center = drawMesh.getTranslation();
-				final double dot = solarPanel.getFaceDirection().dot(directionTowardSun);
-				final Ray3 pickRay = new Ray3(center.add(offset, null), directionTowardSun);
-				final PickResults pickResults = new PrimitivePickResults();
-				for (final Spatial spatial : solarCollidables)
-					if (spatial != drawMesh) {
-						PickingUtil.findPick(spatial, pickRay, pickResults, false);
-						if (pickResults.getNumber() != 0)
-							break;
-					}
-				if (pickResults.getNumber() == 0)
-					solar[0][0] += dot;
-			}
 		}
 	}
 
@@ -1489,7 +1432,7 @@ public class EnergyPanel extends JPanel {
 		final List<ReadOnlyVector2> points = new ArrayList<ReadOnlyVector2>(vertexBuffer.limit() / 3);
 		while (vertexBuffer.hasRemaining()) {
 			final Vector3 pWorld = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
-			final Point p = new TPoint(pWorld.getX(), pWorld.getY(), pWorld.getZ());			
+			final Point p = new TPoint(pWorld.getX(), pWorld.getY(), pWorld.getZ());
 			toXY.transform(p);
 			if (p.getX() < minX)
 				minX = p.getX();
@@ -1576,14 +1519,8 @@ public class EnergyPanel extends JPanel {
 				if (pickResults.getNumber() == 0) {
 					solar[row][col] += dot;
 					final double annotationScale = Scene.getInstance().getAnnotationScale();
-					// final int repeat = 1;
-					// if (addToTotal) {
-					// final Double val = solarTotal.get(house);
-					// final double solarValue = repeat * dot * w * h * annotationScale;
-					// solarTotal.put(house, val == null ? 0 : val + solarValue);
-					// }
 					housePart.setSolarPotentialEnergy(housePart.getSolarPotentialEnergy() + dot * w * h * annotationScale * annotationScale);
-				} 
+				}
 			}
 		}
 
@@ -1612,24 +1549,18 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void computeRadiationOnLand(final ReadOnlyVector3 directionTowardSun) {
-		/*
-		 * needed in order to prevent picking collision with neighboring wall at wall edge
-		 */
-//		final double OFFSET = 0.1;
-//		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
-		final double SOLAR_STEP = EnergyPanel.SOLAR_STEP * 4;
-		final int rows = (int) (256 / SOLAR_STEP);
+		final double step = SOLAR_STEP * 4;
+		final int rows = (int) (256 / step);
 		final int cols = rows;
 		if (solarOnLand == null)
 			solarOnLand = new double[rows][cols];
 		final Vector3 p = new Vector3();
 		for (int col = 0; col < cols; col++) {
-			p.setX((col - cols / 2) * SOLAR_STEP + SOLAR_STEP / 2.0);
+			p.setX((col - cols / 2) * step + step / 2.0);
 			for (int row = 0; row < rows; row++) {
 				if (computeRequest)
 					throw cancelException;
-				p.setY((row - rows / 2) * SOLAR_STEP + SOLAR_STEP / 2.0);
-//				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
+				p.setY((row - rows / 2) * step + step / 2.0);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
 				for (final Spatial spatial : solarCollidables)
@@ -1647,27 +1578,24 @@ public class EnergyPanel extends JPanel {
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		for (int minute = 0; minute < 1440; minute += SOLAR_MINUTE_STEP) {
 			final ReadOnlyVector3 sunLocation = heliodon.computeSunLocation(today).normalize(null);
-//			final ReadOnlyVector3 sunLocation = heliodon.getSunLocation();
+			// final ReadOnlyVector3 sunLocation = heliodon.getSunLocation();
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (part.isDrawCompleted())
-					if (part instanceof Wall || part instanceof Window || part instanceof SolarPanel) {
-//						computeRadiationOnWalls(part, sunLocation);
-						final ReadOnlyVector3 faceDirection = part.getFaceDirection();
-						if (faceDirection.dot(directionTowardSun) > 0)
-							computeRadiationOnMesh(directionTowardSun, part, part.getMesh(), part instanceof Wall ? ((Wall) part).getInvisibleMesh() : part.getMesh(), faceDirection, true);
-					} else if (part instanceof Roof) {
-//						computeRadiationOnRoofs(part, sunLocation);
-						for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-							final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
-							if (faceDirection.dot(directionTowardSun) > 0) {
-								final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-								computeRadiationOnMesh(directionTowardSun, part, mesh, mesh, faceDirection, false);
+						if (part instanceof Wall || part instanceof Window || part instanceof SolarPanel) {
+							final ReadOnlyVector3 faceDirection = part.getFaceDirection();
+							if (faceDirection.dot(directionTowardSun) > 0)
+								computeRadiationOnMesh(directionTowardSun, part, part.getMesh(), part instanceof Wall ? ((Wall) part).getInvisibleMesh() : part.getMesh(), faceDirection, true);
+						} else if (part instanceof Roof) {
+							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
+								final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
+								if (faceDirection.dot(directionTowardSun) > 0) {
+									final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+									computeRadiationOnMesh(directionTowardSun, part, mesh, mesh, faceDirection, false);
+								}
 							}
-						}	
-					}
-//					computeRadiationOnSolarPanels(sunLocation);
+						}
 				}
 				computeRadiationOnLand(directionTowardSun);
 			}
@@ -1678,47 +1606,17 @@ public class EnergyPanel extends JPanel {
 		maxSolarValue *= (100 - colorMapSlider.getValue()) / 100.0;
 	}
 
-//	private void updateSolarValueOnAllHouses() {
-//		applySolarTexture(SceneManager.getInstance().getSolarLand(), solarOnLand, maxSolarValue);
-//		for (final HousePart part : Scene.getInstance().getParts()) {
-//			if (part instanceof Foundation) {
-//				final List<Roof> roofs = new ArrayList<Roof>();
-//				final Foundation foundation = (Foundation) part;
-//				for (final HousePart houseChild : foundation.getChildren()) {
-//					if (houseChild instanceof Wall) {
-//						final Wall wall = (Wall) houseChild;
-//						applySolarTexture(houseChild.getMesh(), solarOnMesh.get(wall.getMesh()), maxSolarValue);
-//						final Roof roof = (Roof) wall.getRoof();
-//						if (roof != null && !roofs.contains(roof))
-//							roofs.add(roof);
-//					}
-//				}
-//				for (final Roof roof : roofs)
-//					for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
-//						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-//						applySolarTexture(mesh, solarOnMesh.get(mesh), maxSolarValue);
-//					}
-//				final Double val = solarTotal.get(foundation);
-//				foundation.setSolarValue(convertSolarValue(val));
-//			} else if (part instanceof SolarPanel) {
-//				final Mesh mesh = part.getMesh();
-//				applySolarTexture(mesh, solarOnMesh.get(mesh), maxSolarValue);
-//			}
-//		}
-//		SceneManager.getInstance().refresh();
-//	}
-	
 	private void updateSolarValueOnAllHouses() {
 		applySolarTexture(SceneManager.getInstance().getSolarLand(), solarOnLand, maxSolarValue);
 		for (final HousePart part : Scene.getInstance().getParts())
 			if (part instanceof Wall || part instanceof Window || part instanceof SolarPanel)
 				applySolarTexture(part.getMesh(), solarOnMesh.get(part.getMesh()), maxSolarValue);
 			else if (part instanceof Roof)
-					for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-						applySolarTexture(mesh, solarOnMesh.get(mesh), maxSolarValue);
-					}
-		
+				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
+					final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+					applySolarTexture(mesh, solarOnMesh.get(mesh), maxSolarValue);
+				}
+
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
 				final Foundation foundation = (Foundation) part;
@@ -1727,28 +1625,15 @@ public class EnergyPanel extends JPanel {
 					if (houseChild.getTopContainer() == foundation)
 						totalSolar += houseChild.getSolarPotentialEnergy();
 				foundation.setSolarValue(convertSolarValue(totalSolar));
-			} 
+			}
 		}
-		
+
 		SceneManager.getInstance().refresh();
-	}	
+	}
 
 	public long convertSolarValue(final Double val) {
 		return val == null ? 0 : val.longValue() / (60 / SOLAR_MINUTE_STEP);
 	}
-
-	// private void print(final HousePart part, final double[][] solar) {
-	// System.out.println(part);
-	// if (solar == null)
-	// System.out.println("null");
-	// else
-	// for (int i = 0; i < solar.length; i++) {
-	// for (int j = 0; j < solar[0].length; j++)
-	// System.out.print((int) Math.round(solar[i][j]) + " ");
-	// System.out.println();
-	// }
-	//
-	// }
 
 	private void progress() {
 		progressBar.setValue(progressBar.getValue() + 1);
@@ -1848,10 +1733,6 @@ public class EnergyPanel extends JPanel {
 		this.computeEnabled = computeEnabled;
 	}
 
-	public Map<HousePart, Double> getSolarTotal() {
-		return solarTotal;
-	}
-
 	@Override
 	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
 		propertyChangeListeners.add(pcl);
@@ -1871,7 +1752,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updatePartEnergy() {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();		
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		final TitledBorder titledBorder = (TitledBorder) partPanel.getBorder();
 		if (selectedPart == null)
 			titledBorder.setTitle("Part");
@@ -1884,7 +1765,7 @@ public class EnergyPanel extends JPanel {
 			partEnergyTextField.setText(noDecimals.format(convertSolarValue(selectedPart.getSolarPotentialEnergy())));
 		else
 			partEnergyTextField.setText("n/a");
-		
+
 		final Foundation foundation = selectedPart == null ? null : (Foundation) selectedPart.getTopContainer();
 		if (foundation != null) {
 			houseSolarPotentialTextField.setText("" + foundation.getSolarValue());
