@@ -298,6 +298,7 @@ public class EnergyPanel extends JPanel {
 				if (heliodon != null)
 					heliodon.setDate((Date) dateSpinner.getValue());
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				Scene.getInstance().setEdited(true);
 			}
 		});
 		final GridBagConstraints gbc_dateSpinner = new GridBagConstraints();
@@ -322,6 +323,7 @@ public class EnergyPanel extends JPanel {
 					else
 						latitudeSpinner.setValue(newLatitude);
 				}
+				Scene.getInstance().setEdited(true);
 			}
 		});
 
@@ -354,6 +356,7 @@ public class EnergyPanel extends JPanel {
 				if (heliodon != null)
 					heliodon.setTime((Date) timeSpinner.getValue());
 				compute(UpdateRadiation.NEVER);
+				Scene.getInstance().setEdited(true);
 			}
 		});
 		final GridBagConstraints gbc_timeSpinner = new GridBagConstraints();
@@ -379,6 +382,7 @@ public class EnergyPanel extends JPanel {
 					cityComboBox.setSelectedItem("");
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				Scene.getInstance().setEdited(true);
 			}
 		});
 		final GridBagConstraints gbc_latitudeSpinner = new GridBagConstraints();
@@ -409,8 +413,10 @@ public class EnergyPanel extends JPanel {
 		colorMapSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				if (!colorMapSlider.getValueIsAdjusting())
+				if (!colorMapSlider.getValueIsAdjusting()) {
 					compute(SceneManager.getInstance().isSolarColorMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setEdited(true);
+				}
 			}
 		});
 

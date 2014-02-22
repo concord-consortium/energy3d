@@ -343,6 +343,7 @@ public class MainPanel extends JPanel {
 					}
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
+					Scene.getInstance().setEdited(true);
 				}
 			});
 		}
@@ -451,6 +452,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().setHeliodonControl(heliodonButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
+					Scene.getInstance().setEdited(true);
 				}
 			});
 		}
@@ -544,6 +546,7 @@ public class MainPanel extends JPanel {
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					Scene.getInstance().setEdited(true);
 				}
 			});
 		}

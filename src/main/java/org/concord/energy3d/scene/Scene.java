@@ -238,6 +238,7 @@ public class Scene implements Serializable {
 		}
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
 		energyPanel.setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
+		Scene.getInstance().setEdited(false);
 	}
 
 	public static void loadCameraLocation() {

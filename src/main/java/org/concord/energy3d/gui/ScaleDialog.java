@@ -163,6 +163,7 @@ class ScaleDialog extends JDialog {
 							else
 								scale = Double.parseDouble(scaleTextField.getText());
 							Scene.getInstance().setAnnotationScale(Scene.getInstance().getAnnotationScale() * scale);
+							Scene.getInstance().setEdited(true);
 							ScaleDialog.this.dispose();
 							Scene.getInstance().redrawAll();
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
