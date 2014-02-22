@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.scene.Scene;
 
 class IrradiationParametersDialog extends JDialog {
 
@@ -50,6 +51,7 @@ class IrradiationParametersDialog extends JDialog {
 					double resolution = Double.parseDouble(resolutionTextField.getText());
 					IrradiationParametersDialog.this.dispose();
 					EnergyPanel.getInstance().setSolarStep(resolution);
+					Scene.getInstance().setEdited(true);
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
