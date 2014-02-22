@@ -94,7 +94,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class EnergyPanel extends JPanel {
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
-	public static final double SOLAR_STEP = 2.0;
+	private double solarStep = 2.0;
 	private static final int SOLAR_MINUTE_STEP = 15;
 	private static final double COST_PER_KWH = 0.13;
 	private static final long serialVersionUID = 1L;
@@ -1460,8 +1460,8 @@ public class EnergyPanel extends JPanel {
 		final ReadOnlyVector3 p2 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
 
 		final double height = p1.subtract(origin, null).length();
-		final int rows = (int) Math.ceil(height / SOLAR_STEP);
-		final int cols = (int) Math.ceil(p2.subtract(origin, null).length() / SOLAR_STEP);
+		final int rows = (int) Math.ceil(height / solarStep);
+		final int cols = (int) Math.ceil(p2.subtract(origin, null).length() / solarStep);
 		double[][] solar = solarOnMesh.get(drawMesh);
 		if (solar == null) {
 			solar = new double[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
@@ -1477,7 +1477,7 @@ public class EnergyPanel extends JPanel {
 					if (row >= rows || col >= cols)
 						solar[row][col] = -1;
 					else {
-						final ReadOnlyVector2 p = originXY.add(uXY.multiply(col * SOLAR_STEP, null), null).add(vXY.multiply(row * SOLAR_STEP, null), null);
+						final ReadOnlyVector2 p = originXY.add(uXY.multiply(col * solarStep, null), null).add(vXY.multiply(row * solarStep, null), null);
 						boolean isInside = false;
 						for (int i = 0; i < points.size(); i += 3) {
 							if (Util.isPointInsideTriangle(p, points.get(i), points.get(i + 1), points.get(i + 2))) {
@@ -1495,19 +1495,19 @@ public class EnergyPanel extends JPanel {
 		final ReadOnlyVector3 v = p1.subtract(origin, null).normalizeLocal();
 		final double dot = normal.dot(directionTowardSun);
 		for (int col = 0; col < cols; col++) {
-			final ReadOnlyVector3 pU = u.multiply(SOLAR_STEP / 2.0 + col * SOLAR_STEP, null).addLocal(origin);
-			final double w = (col == cols - 1) ? p2.distance(pU) : SOLAR_STEP;
+			final ReadOnlyVector3 pU = u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(origin);
+			final double w = (col == cols - 1) ? p2.distance(pU) : solarStep;
 			for (int row = 0; row < rows; row++) {
 				if (computeRequest)
 					throw cancelException;
 				if (solar[row][col] == -1)
 					continue;
-				final ReadOnlyVector3 p = v.multiply(SOLAR_STEP / 2.0 + row * SOLAR_STEP, null).addLocal(pU);
+				final ReadOnlyVector3 p = v.multiply(solarStep / 2.0 + row * solarStep, null).addLocal(pU);
 				final double h;
 				if (row == rows - 1)
-					h = height - (row * SOLAR_STEP);
+					h = height - (row * solarStep);
 				else
-					h = SOLAR_STEP;
+					h = solarStep;
 				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
 				for (final Spatial spatial : solarCollidables)
@@ -1532,8 +1532,8 @@ public class EnergyPanel extends JPanel {
 
 	private void updateRadiationMeshTextureCoords(final Mesh drawMesh, final ReadOnlyVector3 origin, final ReadOnlyVector3 uDir, final ReadOnlyVector3 vDir, final int rows, final int cols) {
 		final ReadOnlyVector3 o = origin;
-		final ReadOnlyVector3 u = uDir.multiply(roundToPowerOfTwo(cols) * EnergyPanel.SOLAR_STEP, null);
-		final ReadOnlyVector3 v = vDir.multiply(roundToPowerOfTwo(rows) * EnergyPanel.SOLAR_STEP, null);
+		final ReadOnlyVector3 u = uDir.multiply(roundToPowerOfTwo(cols) * EnergyPanel.getInstance().getSolarStep(), null);
+		final ReadOnlyVector3 v = vDir.multiply(roundToPowerOfTwo(rows) * EnergyPanel.getInstance().getSolarStep(), null);
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 		final FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
 		vertexBuffer.rewind();
@@ -1549,7 +1549,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void computeRadiationOnLand(final ReadOnlyVector3 directionTowardSun) {
-		final double step = SOLAR_STEP * 4;
+		final double step = solarStep * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
 		if (solarOnLand == null)
@@ -1780,4 +1780,13 @@ public class EnergyPanel extends JPanel {
 			volumnTextField.setText("n/a");
 		}
 	}
+
+	public void setSolarStep(double solarStep) {
+		this.solarStep = solarStep;
+	}
+
+	public double getSolarStep() {
+		return solarStep;
+	}
+
 }

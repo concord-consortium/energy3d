@@ -92,6 +92,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem inchesMenuItem;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JMenuItem scaleMenuItem;
+	private JMenuItem irradiationParametersMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	protected Object lastSelection;
 	private JCheckBoxMenuItem shadeMenuItem = null;
@@ -821,6 +822,7 @@ public class MainFrame extends JFrame {
 			sceneMenu.addSeparator();
 			sceneMenu.add(getShadeMenuItem());
 			sceneMenu.add(getShadowMenuItem());
+			sceneMenu.add(getIrradiationParametersMenuItem());
 			sceneMenu.addSeparator();
 			sceneMenu.add(getAnnotationsInwardMenuItem());
 			sceneMenu.add(getWallThicknessMenuItem());
@@ -908,12 +910,24 @@ public class MainFrame extends JFrame {
 			scaleMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final ScaleDialog scaleDialog = new ScaleDialog();
-					scaleDialog.setVisible(true);
+					new ScaleDialog().setVisible(true);
 				}
 			});
 		}
 		return scaleMenuItem;
+	}
+
+	private JMenuItem getIrradiationParametersMenuItem() {
+		if (irradiationParametersMenuItem == null) {
+			irradiationParametersMenuItem = new JMenuItem("Irradiation Parameters...");
+			irradiationParametersMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new IrradiationParametersDialog().setVisible(true);
+				}
+			});
+		}
+		return irradiationParametersMenuItem;
 	}
 
 	private JCheckBoxMenuItem getAnnotationsInwardMenuItem() {
@@ -1547,7 +1561,7 @@ public class MainFrame extends JFrame {
 		}
 		return removeAllRoofsMenuItem;
 	}
-	
+
 	public JCheckBoxMenuItem getWallReceivesSun() {
 		if (wallReceivesSun == null) {
 			wallReceivesSun = new JCheckBoxMenuItem("Wall Receives Sun Energy");

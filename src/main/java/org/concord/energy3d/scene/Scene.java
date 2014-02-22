@@ -88,6 +88,7 @@ public class Scene implements Serializable {
 	private boolean isHeliodonVisible;
 	private String note;
 	private int solarContrast;
+	private double solarStep = 2.0;
 	private boolean cleanup = false;
 	private boolean computeSunEnergyOfWalls = false;
 
@@ -236,6 +237,7 @@ public class Scene implements Serializable {
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
+		energyPanel.setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
 	}
 
 	public static void loadCameraLocation() {
@@ -364,6 +366,7 @@ public class Scene implements Serializable {
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
+				instance.solarStep = EnergyPanel.getInstance().getSolarStep();
 
 				if (setAsCurrentFile)
 					Scene.url = url;
