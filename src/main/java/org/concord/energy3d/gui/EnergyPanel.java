@@ -1888,18 +1888,18 @@ public class EnergyPanel extends JPanel {
 		else
 			partEnergyTextField.setText("n/a");
 		
-		final Foundation foundation = (Foundation) selectedPart.getTopContainer();
+		final Foundation foundation = selectedPart == null ? null : (Foundation) selectedPart.getTopContainer();
 		if (foundation != null) {
 			houseSolarPotentialTextField.setText("" + foundation.getSolarValue());
 			final double[] buildingGeometry = foundation.getBuildingGeometry();
 			positionTextField.setText("(" + buildingGeometry[3] + ", " + buildingGeometry[4] + ")");
-			heightTextField.setText("");
-			areaTextField.setText("");
-			volumnTextField.setText("");
+			heightTextField.setText("" + buildingGeometry[0]);
+			areaTextField.setText("" + buildingGeometry[1]);
+			volumnTextField.setText("" + buildingGeometry[2]);
 		} else {
 			heightTextField.setText("n/a");
 			areaTextField.setText("n/a");
-			volumnTextField.setText("n/a");			
+			volumnTextField.setText("n/a");
 		}
 	}
 }
