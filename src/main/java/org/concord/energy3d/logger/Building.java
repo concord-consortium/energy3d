@@ -3,7 +3,8 @@ package org.concord.energy3d.logger;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.util.Util;
@@ -146,10 +147,19 @@ class Building {
 	}
 
 	String getSolarEnergy() {
-		Double solar = EnergyPanel.getInstance().getSolarTotal().get(LoggerUtil.getTopContainer(walls.get(0)));
-		if (solar == null)
+		HousePart x = LoggerUtil.getTopContainer(walls.get(0));
+		if (!(x instanceof Foundation))
 			return null;
-		return FORMAT1.format(EnergyPanel.getInstance().convertSolarValue(solar));
+		Foundation foundation = (Foundation) x;
+		return FORMAT1.format(foundation.getSolarValue());
+	}
+
+	long getSolarValue() {
+		HousePart x = LoggerUtil.getTopContainer(walls.get(0));
+		if (!(x instanceof Foundation))
+			return -1;
+		Foundation foundation = (Foundation) x;
+		return foundation.getSolarValue();
 	}
 
 	String toJson() {
@@ -179,10 +189,9 @@ class Building {
 			double volume = Math.abs(area) * height;
 			s += " volume=" + FORMAT1.format(volume);
 			s += " centroid=\"" + FORMAT1.format(getCentroidX() / area) + "," + FORMAT1.format(getCentroidY() / area) + "\"";
-			Double solar2 = EnergyPanel.getInstance().getSolarTotal().get(LoggerUtil.getTopContainer(walls.get(0)));
-			if (solar2 != null) {
-				double solar = EnergyPanel.getInstance().convertSolarValue(solar2);
-				s += " solar_energy=" + FORMAT1.format(solar);
+			long solar = getSolarValue();
+			if (solar >= 0) {
+				s += " solar_energy=" + solar;
 				s += " solar_energy_density=" + FORMAT4.format(solar / volume);
 			}
 		}
