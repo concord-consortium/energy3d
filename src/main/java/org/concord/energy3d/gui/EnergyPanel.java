@@ -1611,10 +1611,7 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	private void computeRadiationOnLand(final ReadOnlyVector3 sunLocation) {
-		if (sunLocation.getZ() <= 0)
-			return;
-		final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
+	private void computeRadiationOnLand(final ReadOnlyVector3 directionTowardSun) {
 		/*
 		 * needed in order to prevent picking collision with neighboring wall at wall edge
 		 */
@@ -1671,8 +1668,8 @@ public class EnergyPanel extends JPanel {
 						}	
 					}
 //					computeRadiationOnSolarPanels(sunLocation);
-					computeRadiationOnLand(sunLocation);
 				}
+				computeRadiationOnLand(directionTowardSun);
 			}
 			maxSolarValue++;
 			today.add(Calendar.MINUTE, SOLAR_MINUTE_STEP);
