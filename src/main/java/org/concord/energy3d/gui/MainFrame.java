@@ -1434,7 +1434,7 @@ public class MainFrame extends JFrame {
 				Scene.save(url, false);
 			else
 				saveFile();
-			Scene.getInstance().setEdited(false);
+			Scene.getInstance().setEdited(false, false);
 		} catch (final Throwable err) {
 			err.printStackTrace();
 			JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

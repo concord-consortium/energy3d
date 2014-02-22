@@ -415,7 +415,7 @@ public class EnergyPanel extends JPanel {
 			public void stateChanged(final ChangeEvent e) {
 				if (!colorMapSlider.getValueIsAdjusting()) {
 					compute(SceneManager.getInstance().isSolarColorMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					Scene.getInstance().setEdited(true);
+					Scene.getInstance().setEdited(true, false);
 				}
 			}
 		});
