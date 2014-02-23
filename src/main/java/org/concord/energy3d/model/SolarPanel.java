@@ -24,9 +24,9 @@ import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarPanel extends HousePart {
+	public static final double WIDTH = 0.7;
+	public static final double HEIGHT = 1.6;
 	private static final long serialVersionUID = 1L;
-	private static final double width = 0.7;
-	private static final double height = 1.6;
 	private transient ReadOnlyVector3 normal;
 	private transient double area;
 	private transient Mesh wireframeMesh;
@@ -113,8 +113,8 @@ public class SolarPanel extends HousePart {
 		updateEditShapes();
 		
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		area = width * height;
-		surround.setData(Vector3.ZERO, width / 2.0 / annotationScale, height / 2.0 / annotationScale, 0.1);
+		area = WIDTH * HEIGHT;
+		surround.setData(Vector3.ZERO, WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.1);
 		surround.updateModelBound();
 		
 //		final Vector3[] boxVertices = surround.computeVertices();
@@ -227,7 +227,7 @@ public class SolarPanel extends HousePart {
 	@Override
 	public double getGridSize() {
 //		return 1.5;
-		return width / Scene.getInstance().getAnnotationScale() / 5.0;
+		return WIDTH / Scene.getInstance().getAnnotationScale() / 5.0;
 	}
 
 	@Override

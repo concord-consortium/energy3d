@@ -54,6 +54,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
@@ -250,6 +251,12 @@ public class EnergyPanel extends JPanel {
 	private JTextField photovoltaicTextField;
 	private JPanel panel_7;
 	private JLabel lblKwh;
+	private JPanel panel_6;
+	private JPanel panel_8;
+	private JLabel lblWidth;
+	private JTextField partWidthTextField;
+	private JLabel lblHeight_1;
+	private JTextField partHeightTextField;
 
 	private static class EnergyAmount {
 		double solar;
@@ -539,17 +546,6 @@ public class EnergyPanel extends JPanel {
 		partPanel = new JPanel();
 		partPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(partPanel);
-
-		partEnergyLabel = new JLabel("Solar Potential:");
-		partPanel.add(partEnergyLabel);
-
-		partEnergyTextField = new JTextField();
-		partEnergyTextField.setEditable(false);
-		partPanel.add(partEnergyTextField);
-		partEnergyTextField.setColumns(10);
-
-		solarPotentialKWhLabel = new JLabel("kWh");
-		partPanel.add(solarPotentialKWhLabel);
 
 		buildingPanel = new JPanel();
 		buildingPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Building", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -1067,6 +1063,40 @@ public class EnergyPanel extends JPanel {
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
 		target = partPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
+		partPanel.setLayout(new BoxLayout(partPanel, BoxLayout.Y_AXIS));
+
+		panel_6 = new JPanel();
+		partPanel.add(panel_6);
+
+		partEnergyLabel = new JLabel("Solar Potential:");
+		panel_6.add(partEnergyLabel);
+
+		partEnergyTextField = new JTextField();
+		panel_6.add(partEnergyTextField);
+		partEnergyTextField.setEditable(false);
+		partEnergyTextField.setColumns(10);
+
+		solarPotentialKWhLabel = new JLabel("kWh");
+		panel_6.add(solarPotentialKWhLabel);
+
+		panel_8 = new JPanel();
+		partPanel.add(panel_8);
+
+		lblWidth = new JLabel("Width:");
+		panel_8.add(lblWidth);
+
+		partWidthTextField = new JTextField();
+		partWidthTextField.setEditable(false);
+		panel_8.add(partWidthTextField);
+		partWidthTextField.setColumns(10);
+
+		lblHeight_1 = new JLabel("Height:");
+		panel_8.add(lblHeight_1);
+
+		partHeightTextField = new JTextField();
+		partHeightTextField.setEditable(false);
+		panel_8.add(partHeightTextField);
+		partHeightTextField.setColumns(10);
 		target = allPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
 
@@ -1875,6 +1905,19 @@ public class EnergyPanel extends JPanel {
 			partEnergyTextField.setText("");
 		else
 			partEnergyTextField.setText(noDecimals.format(convertSolarValue(selectedPart.getSolarPotentialEnergy())));
+		
+		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor)) {
+			if (selectedPart instanceof SolarPanel) {
+				partWidthTextField.setText(twoDecimals.format(SolarPanel.WIDTH));
+				partHeightTextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
+			} else {
+				partWidthTextField.setText(twoDecimals.format((selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2))) * Scene.getInstance().getAnnotationScale()));
+				partHeightTextField.setText(twoDecimals.format((selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1))) * Scene.getInstance().getAnnotationScale()));
+			}
+		} else {
+			partWidthTextField.setText("");
+			partHeightTextField.setText("");			
+		}
 
 		final Foundation foundation = selectedPart == null ? null : (Foundation) selectedPart.getTopContainer();
 		if (foundation != null) {
