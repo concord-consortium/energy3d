@@ -617,7 +617,7 @@ public class Foundation extends HousePart {
 				solarLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
 		}
 	}
-	
+
 	public long getSolarValue() {
 		return this.solarValue < 0 ? 0 : this.solarValue;
 	}
@@ -713,8 +713,8 @@ public class Foundation extends HousePart {
 		v2 = floorVertices.get(0);
 		cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
 		cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
-		cx /= 6;
-		cy /= 6;
+		cx /= 6 * area;
+		cy /= 6 * area;
 
 		return new double[] { height, area, height * area, cx, cy };
 
