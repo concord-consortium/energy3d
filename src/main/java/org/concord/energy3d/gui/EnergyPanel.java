@@ -573,116 +573,116 @@ public class EnergyPanel extends JPanel {
 		panel_2 = new JPanel();
 		buildingPanel.add(panel_2);
 		GridBagLayout gbl_panel_2 = new GridBagLayout();
-		gbl_panel_2.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0};
-		gbl_panel_2.rowWeights = new double[]{0.0, 0.0};
+		gbl_panel_2.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0 };
+		gbl_panel_2.rowWeights = new double[] { 0.0, 0.0 };
 		panel_2.setLayout(gbl_panel_2);
-				
-						lblPosition = new JLabel("Position:");
-						GridBagConstraints gbc_lblPosition = new GridBagConstraints();
-						gbc_lblPosition.anchor = GridBagConstraints.EAST;
-						gbc_lblPosition.insets = new Insets(0, 0, 5, 5);
-						gbc_lblPosition.gridx = 0;
-						gbc_lblPosition.gridy = 0;
-						panel_2.add(lblPosition, gbc_lblPosition);
-						
-								positionTextField = new JTextField();
-								positionTextField.setEditable(false);
-								GridBagConstraints gbc_positionTextField = new GridBagConstraints();
-								gbc_positionTextField.fill = GridBagConstraints.HORIZONTAL;
-								gbc_positionTextField.anchor = GridBagConstraints.NORTH;
-								gbc_positionTextField.insets = new Insets(0, 0, 5, 5);
-								gbc_positionTextField.gridx = 1;
-								gbc_positionTextField.gridy = 0;
-								panel_2.add(positionTextField, gbc_positionTextField);
-								positionTextField.setColumns(10);
-				
-						lblHeight = new JLabel("Height:");
-						GridBagConstraints gbc_lblHeight = new GridBagConstraints();
-						gbc_lblHeight.anchor = GridBagConstraints.EAST;
-						gbc_lblHeight.insets = new Insets(0, 0, 5, 5);
-						gbc_lblHeight.gridx = 2;
-						gbc_lblHeight.gridy = 0;
-						panel_2.add(lblHeight, gbc_lblHeight);
-		
-				heightTextField = new JTextField();
-				heightTextField.setEditable(false);
-				GridBagConstraints gbc_heightTextField = new GridBagConstraints();
-				gbc_heightTextField.fill = GridBagConstraints.HORIZONTAL;
-				gbc_heightTextField.insets = new Insets(0, 0, 5, 0);
-				gbc_heightTextField.anchor = GridBagConstraints.NORTH;
-				gbc_heightTextField.gridx = 3;
-				gbc_heightTextField.gridy = 0;
-				panel_2.add(heightTextField, gbc_heightTextField);
-				heightTextField.setColumns(10);
-				
-						lblArea = new JLabel("Area:");
-						GridBagConstraints gbc_lblArea = new GridBagConstraints();
-						gbc_lblArea.anchor = GridBagConstraints.EAST;
-						gbc_lblArea.insets = new Insets(0, 0, 0, 5);
-						gbc_lblArea.gridx = 0;
-						gbc_lblArea.gridy = 1;
-						panel_2.add(lblArea, gbc_lblArea);
-						
-								areaTextField = new JTextField();
-								areaTextField.setEditable(false);
-								GridBagConstraints gbc_areaTextField = new GridBagConstraints();
-								gbc_areaTextField.fill = GridBagConstraints.HORIZONTAL;
-								gbc_areaTextField.insets = new Insets(0, 0, 0, 5);
-								gbc_areaTextField.gridx = 1;
-								gbc_areaTextField.gridy = 1;
-								panel_2.add(areaTextField, gbc_areaTextField);
-								areaTextField.setColumns(10);
-								
-										lblVolume = new JLabel("Volume:");
-										GridBagConstraints gbc_lblVolume = new GridBagConstraints();
-										gbc_lblVolume.anchor = GridBagConstraints.EAST;
-										gbc_lblVolume.insets = new Insets(0, 0, 0, 5);
-										gbc_lblVolume.gridx = 2;
-										gbc_lblVolume.gridy = 1;
-										panel_2.add(lblVolume, gbc_lblVolume);
-										
-												volumnTextField = new JTextField();
-												volumnTextField.setEditable(false);
-												GridBagConstraints gbc_volumnTextField = new GridBagConstraints();
-												gbc_volumnTextField.fill = GridBagConstraints.HORIZONTAL;
-												gbc_volumnTextField.gridx = 3;
-												gbc_volumnTextField.gridy = 1;
-												panel_2.add(volumnTextField, gbc_volumnTextField);
-												volumnTextField.setColumns(10);
-		
+
+		lblPosition = new JLabel("Position:");
+		GridBagConstraints gbc_lblPosition = new GridBagConstraints();
+		gbc_lblPosition.anchor = GridBagConstraints.EAST;
+		gbc_lblPosition.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPosition.gridx = 0;
+		gbc_lblPosition.gridy = 0;
+		panel_2.add(lblPosition, gbc_lblPosition);
+
+		positionTextField = new JTextField();
+		positionTextField.setEditable(false);
+		GridBagConstraints gbc_positionTextField = new GridBagConstraints();
+		gbc_positionTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_positionTextField.anchor = GridBagConstraints.NORTH;
+		gbc_positionTextField.insets = new Insets(0, 0, 5, 5);
+		gbc_positionTextField.gridx = 1;
+		gbc_positionTextField.gridy = 0;
+		panel_2.add(positionTextField, gbc_positionTextField);
+		positionTextField.setColumns(10);
+
+		lblHeight = new JLabel("Height:");
+		GridBagConstraints gbc_lblHeight = new GridBagConstraints();
+		gbc_lblHeight.anchor = GridBagConstraints.EAST;
+		gbc_lblHeight.insets = new Insets(0, 0, 5, 5);
+		gbc_lblHeight.gridx = 2;
+		gbc_lblHeight.gridy = 0;
+		panel_2.add(lblHeight, gbc_lblHeight);
+
+		heightTextField = new JTextField();
+		heightTextField.setEditable(false);
+		GridBagConstraints gbc_heightTextField = new GridBagConstraints();
+		gbc_heightTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_heightTextField.insets = new Insets(0, 0, 5, 0);
+		gbc_heightTextField.anchor = GridBagConstraints.NORTH;
+		gbc_heightTextField.gridx = 3;
+		gbc_heightTextField.gridy = 0;
+		panel_2.add(heightTextField, gbc_heightTextField);
+		heightTextField.setColumns(10);
+
+		lblArea = new JLabel("Area:");
+		GridBagConstraints gbc_lblArea = new GridBagConstraints();
+		gbc_lblArea.anchor = GridBagConstraints.EAST;
+		gbc_lblArea.insets = new Insets(0, 0, 0, 5);
+		gbc_lblArea.gridx = 0;
+		gbc_lblArea.gridy = 1;
+		panel_2.add(lblArea, gbc_lblArea);
+
+		areaTextField = new JTextField();
+		areaTextField.setEditable(false);
+		GridBagConstraints gbc_areaTextField = new GridBagConstraints();
+		gbc_areaTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_areaTextField.insets = new Insets(0, 0, 0, 5);
+		gbc_areaTextField.gridx = 1;
+		gbc_areaTextField.gridy = 1;
+		panel_2.add(areaTextField, gbc_areaTextField);
+		areaTextField.setColumns(10);
+
+		lblVolume = new JLabel("Volume:");
+		GridBagConstraints gbc_lblVolume = new GridBagConstraints();
+		gbc_lblVolume.anchor = GridBagConstraints.EAST;
+		gbc_lblVolume.insets = new Insets(0, 0, 0, 5);
+		gbc_lblVolume.gridx = 2;
+		gbc_lblVolume.gridy = 1;
+		panel_2.add(lblVolume, gbc_lblVolume);
+
+		volumnTextField = new JTextField();
+		volumnTextField.setEditable(false);
+		GridBagConstraints gbc_volumnTextField = new GridBagConstraints();
+		gbc_volumnTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_volumnTextField.gridx = 3;
+		gbc_volumnTextField.gridy = 1;
+		panel_2.add(volumnTextField, gbc_volumnTextField);
+		volumnTextField.setColumns(10);
+
 		allPanel = new JPanel();
 		allPanel.setBorder(new TitledBorder(null, "All", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(allPanel);
-				allPanel.setLayout(new BoxLayout(allPanel, BoxLayout.Y_AXIS));
-		
-				panel_5 = new JPanel();
-				allPanel.add(panel_5);
-		
+		allPanel.setLayout(new BoxLayout(allPanel, BoxLayout.Y_AXIS));
+
+		panel_5 = new JPanel();
+		allPanel.add(panel_5);
+
 		lblSolarPotential = new JLabel("Solar Potential:");
 		panel_5.add(lblSolarPotential);
-		
+
 		solarPotentialAlltextField = new JTextField();
 		solarPotentialAlltextField.setEditable(false);
 		panel_5.add(solarPotentialAlltextField);
 		solarPotentialAlltextField.setColumns(10);
-		
+
 		lblKwh = new JLabel("kWh");
 		panel_5.add(lblKwh);
-		
+
 		panel_7 = new JPanel();
 		allPanel.add(panel_7);
-		
+
 		lblPassiveSolar = new JLabel("Passive Solar:");
 		panel_7.add(lblPassiveSolar);
-		
+
 		passiveSolarTextField = new JTextField();
 		passiveSolarTextField.setEditable(false);
 		panel_7.add(passiveSolarTextField);
 		passiveSolarTextField.setColumns(10);
-		
+
 		lblPhotovoltaic = new JLabel("Photovoltaic:");
 		panel_7.add(lblPhotovoltaic);
-		
+
 		photovoltaicTextField = new JTextField();
 		photovoltaicTextField.setEditable(false);
 		panel_7.add(photovoltaicTextField);
@@ -1062,7 +1062,7 @@ public class EnergyPanel extends JPanel {
 
 		final Component verticalGlue = Box.createVerticalGlue();
 		add(verticalGlue);
-		
+
 		JPanel target = buildingPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
 		target = partPanel;
@@ -1862,7 +1862,7 @@ public class EnergyPanel extends JPanel {
 
 	public void updatePartEnergy() {
 		final boolean iradiationEnabled = MainPanel.getInstance().getSolarButton().isSelected();
-		
+
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		final TitledBorder titledBorder = (TitledBorder) partPanel.getBorder();
 		if (selectedPart == null)
@@ -1870,7 +1870,7 @@ public class EnergyPanel extends JPanel {
 		else
 			titledBorder.setTitle("Part - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1));
 		partPanel.repaint();
-		
+
 		if (!iradiationEnabled || selectedPart == null || selectedPart instanceof Foundation || selectedPart instanceof Door)
 			partEnergyTextField.setText("");
 		else
@@ -1883,32 +1883,32 @@ public class EnergyPanel extends JPanel {
 			else
 				houseSolarPotentialTextField.setText("");
 			final double[] buildingGeometry = foundation.getBuildingGeometry();
-			positionTextField.setText("(" + buildingGeometry[3] + ", " + buildingGeometry[4] + ")");
-			heightTextField.setText("" + buildingGeometry[0]);
-			areaTextField.setText("" + buildingGeometry[1]);
-			volumnTextField.setText("" + buildingGeometry[2]);
+			positionTextField.setText("(" + twoDecimals.format(buildingGeometry[3]) + ", " + twoDecimals.format(buildingGeometry[4]) + ")");
+			heightTextField.setText(twoDecimals.format(buildingGeometry[0]));
+			areaTextField.setText(twoDecimals.format(buildingGeometry[1]));
+			volumnTextField.setText(twoDecimals.format(buildingGeometry[2]));
 		} else {
 			houseSolarPotentialTextField.setText("");
 			heightTextField.setText("");
 			areaTextField.setText("");
 			volumnTextField.setText("");
 		}
-		
+
 		if (iradiationEnabled) {
-		double solarPotentialAll = 0.0;		
-		double passiveSolar = 0.0;
-		double photovoltaic = 0.0;
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation)
-				solarPotentialAll += ((Foundation) part).getSolarValue();
-			else if (part instanceof Window)
-				passiveSolar += part.getSolarPotentialEnergy();
-			else if (part instanceof SolarPanel)
-				photovoltaic += part.getSolarPotentialEnergy();
-		}
-		solarPotentialAlltextField.setText(noDecimals.format(solarPotentialAll));
-		passiveSolarTextField.setText(noDecimals.format(passiveSolar));
-		photovoltaicTextField.setText(noDecimals.format(photovoltaic));
+			double solarPotentialAll = 0.0;
+			double passiveSolar = 0.0;
+			double photovoltaic = 0.0;
+			for (final HousePart part : Scene.getInstance().getParts()) {
+				if (part instanceof Foundation)
+					solarPotentialAll += ((Foundation) part).getSolarValue();
+				else if (part instanceof Window)
+					passiveSolar += part.getSolarPotentialEnergy();
+				else if (part instanceof SolarPanel)
+					photovoltaic += part.getSolarPotentialEnergy();
+			}
+			solarPotentialAlltextField.setText(noDecimals.format(solarPotentialAll));
+			passiveSolarTextField.setText(noDecimals.format(passiveSolar));
+			photovoltaicTextField.setText(noDecimals.format(photovoltaic));
 		} else {
 			solarPotentialAlltextField.setText("");
 			passiveSolarTextField.setText("");
