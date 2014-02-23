@@ -619,7 +619,7 @@ public class Foundation extends HousePart {
 	}
 	
 	public long getSolarValue() {
-		return this.solarValue;
+		return this.solarValue < 0 ? 0 : this.solarValue;
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
