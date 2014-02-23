@@ -7,6 +7,7 @@ import java.awt.print.Paper;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -53,7 +54,7 @@ public class PrintController implements Updater {
 	private final ArrayList<ReadOnlyVector3> printCenters = new ArrayList<ReadOnlyVector3>();
 	private final Timer timer = new Timer();
 	private final Node pagesRoot = new Node();
-	private ArrayList<HousePart> printParts;
+	private List<HousePart> printParts;
 	private PageFormat pageFormat = new PageFormat();
 	private double labelHeight = 0.0;
 	private double pageWidth, pageHeight, pageLeft, pageRight, pageTop, pageBottom;
@@ -112,7 +113,7 @@ public class PrintController implements Updater {
 					part.getOriginal().hideLabels();
 				}
 			} else {
-				printParts = (ArrayList<HousePart>) ObjectCloner.deepCopy(Scene.getInstance().getParts());
+				printParts = (List<HousePart>) ObjectCloner.deepCopy(Scene.getInstance().getParts());
 				for (int i = 0; i < printParts.size(); i++) {
 					Scene.getRoot().attachChild(printParts.get(i).getRoot());
 					printParts.get(i).setOriginal(Scene.getInstance().getParts().get(i));
@@ -192,7 +193,7 @@ public class PrintController implements Updater {
 					if (part instanceof Foundation)
 						part.getRoot().getSceneHints().setCullHint(isPrintPreview ? CullHint.Always : CullHint.Inherit);
 
-			if (isPrintPreview) {
+			if (isPrintPreview && printParts != null) {
 				for (final HousePart part : printParts)
 					if (part instanceof Wall)
 						((Wall) part).setBackMeshesVisible(false);
@@ -200,7 +201,7 @@ public class PrintController implements Updater {
 
 			if (isPrintPreview || doTheEndAnimation) {
 				originalHouseRoot.getSceneHints().setCullHint(CullHint.Inherit);
-				if (isPrintPreview) {
+				if (isPrintPreview && printParts != null) {
 					int printSequence = 0;
 					for (final HousePart part : printParts) {
 						part.getOriginal().drawLabels(printSequence);
@@ -311,7 +312,7 @@ public class PrintController implements Updater {
 		}
 	}
 
-	public ArrayList<HousePart> getPrintParts() {
+	public List<HousePart> getPrintParts() {
 		return printParts;
 	}
 
