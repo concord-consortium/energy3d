@@ -1905,7 +1905,7 @@ public class EnergyPanel extends JPanel {
 			partEnergyTextField.setText("");
 		else
 			partEnergyTextField.setText(noDecimals.format(convertSolarValue(selectedPart.getSolarPotentialEnergy())));
-		
+
 		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor)) {
 			if (selectedPart instanceof SolarPanel) {
 				partWidthTextField.setText(twoDecimals.format(SolarPanel.WIDTH));
@@ -1916,20 +1916,33 @@ public class EnergyPanel extends JPanel {
 			}
 		} else {
 			partWidthTextField.setText("");
-			partHeightTextField.setText("");			
+			partHeightTextField.setText("");
 		}
 
-		final Foundation foundation = selectedPart == null ? null : (Foundation) selectedPart.getTopContainer();
+		final Foundation foundation;
+		if (selectedPart == null)
+			foundation = null;
+		else if (selectedPart instanceof Foundation)
+			foundation = (Foundation) selectedPart;
+		else
+			foundation = (Foundation) selectedPart.getTopContainer();
 		if (foundation != null) {
 			if (iradiationEnabled)
 				houseSolarPotentialTextField.setText("" + foundation.getSolarValue());
 			else
 				houseSolarPotentialTextField.setText("");
 			final double[] buildingGeometry = foundation.getBuildingGeometry();
-			positionTextField.setText("(" + twoDecimals.format(buildingGeometry[3]) + ", " + twoDecimals.format(buildingGeometry[4]) + ")");
-			heightTextField.setText(twoDecimals.format(buildingGeometry[0]));
-			areaTextField.setText(twoDecimals.format(buildingGeometry[1]));
-			volumnTextField.setText(twoDecimals.format(buildingGeometry[2]));
+			if (buildingGeometry != null) {
+				positionTextField.setText("(" + twoDecimals.format(buildingGeometry[3]) + ", " + twoDecimals.format(buildingGeometry[4]) + ")");
+				heightTextField.setText(twoDecimals.format(buildingGeometry[0]));
+				areaTextField.setText(twoDecimals.format(buildingGeometry[1]));
+				volumnTextField.setText(twoDecimals.format(buildingGeometry[2]));
+			} else {
+				houseSolarPotentialTextField.setText("");
+				heightTextField.setText("");
+				areaTextField.setText("");
+				volumnTextField.setText("");
+			}
 		} else {
 			houseSolarPotentialTextField.setText("");
 			heightTextField.setText("");
