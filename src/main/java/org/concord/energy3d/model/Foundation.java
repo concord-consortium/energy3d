@@ -683,12 +683,14 @@ public class Foundation extends HousePart {
 		if (n <= 0)
 			return null;
 
+		double scale = Scene.getInstance().getAnnotationScale();
 		double height = Double.MAX_VALUE;
 		for (HousePart w : children) {
 			double h = w.getHeight();
 			if (height > h)
 				height = h;
 		}
+		height *= scale;
 
 		double area = 0;
 		Vector2 v1, v2;
@@ -715,6 +717,9 @@ public class Foundation extends HousePart {
 		cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
 		cx /= 6 * area;
 		cy /= 6 * area;
+		cx *= scale;
+		cy *= scale;
+		area *= scale * scale;
 
 		return new double[] { height, area, height * area, cx, cy };
 

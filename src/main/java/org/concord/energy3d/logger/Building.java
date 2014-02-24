@@ -7,6 +7,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 
@@ -136,13 +137,14 @@ class Building {
 	}
 
 	String getGeometryJson() {
-		String s = "\"Height\": " + FORMAT1.format(height);
+		double scale = Scene.getInstance().getAnnotationScale();
+		String s = "\"Height\": " + FORMAT1.format(height * scale);
 		double area = getArea();
-		s += ", \"Area\": " + FORMAT1.format(Math.abs(area));
+		s += ", \"Area\": " + FORMAT1.format(Math.abs(area * scale * scale));
 		double volume = Math.abs(area) * height;
-		s += ", \"Volume\": " + FORMAT1.format(volume);
-		s += ", \"CentroidX\": " + FORMAT1.format(getCentroidX() / area);
-		s += ", \"CentroidY\": " + FORMAT1.format(getCentroidY() / area);
+		s += ", \"Volume\": " + FORMAT1.format(volume * scale * scale * scale);
+		s += ", \"CentroidX\": " + FORMAT1.format(getCentroidX() / area * scale);
+		s += ", \"CentroidY\": " + FORMAT1.format(getCentroidY() / area * scale);
 		return s;
 	}
 
