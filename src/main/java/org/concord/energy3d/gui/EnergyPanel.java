@@ -1954,12 +1954,14 @@ public class EnergyPanel extends JPanel {
 			double passiveSolar = 0.0;
 			double photovoltaic = 0.0;
 			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Foundation)
-					solarPotentialAll += ((Foundation) part).getSolarValue();
-				else if (part instanceof Window)
-					passiveSolar += part.getSolarPotentialEnergy();
-				else if (part instanceof SolarPanel)
-					photovoltaic += part.getSolarPotentialEnergy();
+				if (!part.isFrozen()) {
+					if (part instanceof Foundation)
+						solarPotentialAll += ((Foundation) part).getSolarValue();
+					else if (part instanceof Window)
+						passiveSolar += part.getSolarPotentialEnergy();
+					else if (part instanceof SolarPanel)
+						photovoltaic += part.getSolarPotentialEnergy();
+				}
 			}
 			solarPotentialAlltextField.setText(noDecimals.format(solarPotentialAll));
 			passiveSolarTextField.setText(noDecimals.format(passiveSolar));
