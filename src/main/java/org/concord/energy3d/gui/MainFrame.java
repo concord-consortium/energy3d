@@ -46,7 +46,6 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.MainApplication;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.PrintController;
@@ -137,7 +136,6 @@ public class MainFrame extends JFrame {
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
 	private JCheckBoxMenuItem keepHeatmapOnMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
-	private JCheckBoxMenuItem wallReceivesSun;
 
 	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
 		String description;
@@ -458,6 +456,7 @@ public class MainFrame extends JFrame {
 									return name.endsWith(".ng3");
 								}
 							}), new File(fileChooser.getCurrentDirectory() + System.getProperty("file.separator") + "prop.txt"), new Runnable() {
+								@Override
 								public void run() {
 									updateTitleBar();
 								}
@@ -492,6 +491,7 @@ public class MainFrame extends JFrame {
 									return name.endsWith(".ng3");
 								}
 							}), new Runnable() {
+								@Override
 								public void run() {
 									updateTitleBar();
 								}
@@ -682,14 +682,16 @@ public class MainFrame extends JFrame {
 				helpMenu.add(getAboutMenuItem());
 			JMenuItem mi = new JMenuItem("Download Models...");
 			mi.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
 					openBrowser("http://energy.concord.org/energy3d/models.html");
 				}
 			});
 			helpMenu.add(mi);
 			mi = new JMenuItem("Visit Home Page...");
 			mi.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
 					openBrowser("http://energy.concord.org/energy3d");
 				}
 			});
@@ -698,22 +700,22 @@ public class MainFrame extends JFrame {
 		return helpMenu;
 	}
 
-	public final static void openBrowser(String url) {
+	public final static void openBrowser(final String url) {
 		if (Desktop.isDesktopSupported()) {
 			try {
 				Desktop.getDesktop().browse(new URI(url));
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		} else {
-			String os = System.getProperty("os.name");
+			final String os = System.getProperty("os.name");
 			try {
 				if (os.startsWith("Windows")) {
 					Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
 				} else if (os.startsWith("Mac OS")) {
 					Runtime.getRuntime().exec(new String[] { "open", url });
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -827,7 +829,6 @@ public class MainFrame extends JFrame {
 			sceneMenu.add(getAnnotationsInwardMenuItem());
 			sceneMenu.add(getWallThicknessMenuItem());
 			sceneMenu.add(getRemoveAllRoofsMenuItem());
-			sceneMenu.add(getWallReceivesSun());
 			if (!Config.isRestrictMode()) {
 				sceneMenu.add(getKeepHeatmapOnMenuItem());
 				sceneMenu.add(getFreezeMenuItem());
@@ -1561,18 +1562,5 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllRoofsMenuItem;
-	}
-
-	public JCheckBoxMenuItem getWallReceivesSun() {
-		if (wallReceivesSun == null) {
-			wallReceivesSun = new JCheckBoxMenuItem("Wall Receives Sun Energy");
-			wallReceivesSun.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					Scene.getInstance().setComputeSunEnergyOfWalls(wallReceivesSun.isSelected());
-					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				}
-			});
-		}
-		return wallReceivesSun;
 	}
 }

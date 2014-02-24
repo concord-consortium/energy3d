@@ -568,13 +568,13 @@ public class EnergyPanel extends JPanel {
 
 		panel_2 = new JPanel();
 		buildingPanel.add(panel_2);
-		GridBagLayout gbl_panel_2 = new GridBagLayout();
+		final GridBagLayout gbl_panel_2 = new GridBagLayout();
 		gbl_panel_2.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0 };
 		gbl_panel_2.rowWeights = new double[] { 0.0, 0.0 };
 		panel_2.setLayout(gbl_panel_2);
 
 		lblPosition = new JLabel("Position:");
-		GridBagConstraints gbc_lblPosition = new GridBagConstraints();
+		final GridBagConstraints gbc_lblPosition = new GridBagConstraints();
 		gbc_lblPosition.anchor = GridBagConstraints.EAST;
 		gbc_lblPosition.insets = new Insets(0, 0, 5, 5);
 		gbc_lblPosition.gridx = 0;
@@ -583,7 +583,7 @@ public class EnergyPanel extends JPanel {
 
 		positionTextField = new JTextField();
 		positionTextField.setEditable(false);
-		GridBagConstraints gbc_positionTextField = new GridBagConstraints();
+		final GridBagConstraints gbc_positionTextField = new GridBagConstraints();
 		gbc_positionTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_positionTextField.anchor = GridBagConstraints.NORTH;
 		gbc_positionTextField.insets = new Insets(0, 0, 5, 5);
@@ -593,7 +593,7 @@ public class EnergyPanel extends JPanel {
 		positionTextField.setColumns(10);
 
 		lblHeight = new JLabel("Height:");
-		GridBagConstraints gbc_lblHeight = new GridBagConstraints();
+		final GridBagConstraints gbc_lblHeight = new GridBagConstraints();
 		gbc_lblHeight.anchor = GridBagConstraints.EAST;
 		gbc_lblHeight.insets = new Insets(0, 0, 5, 5);
 		gbc_lblHeight.gridx = 2;
@@ -602,7 +602,7 @@ public class EnergyPanel extends JPanel {
 
 		heightTextField = new JTextField();
 		heightTextField.setEditable(false);
-		GridBagConstraints gbc_heightTextField = new GridBagConstraints();
+		final GridBagConstraints gbc_heightTextField = new GridBagConstraints();
 		gbc_heightTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_heightTextField.insets = new Insets(0, 0, 5, 0);
 		gbc_heightTextField.anchor = GridBagConstraints.NORTH;
@@ -612,7 +612,7 @@ public class EnergyPanel extends JPanel {
 		heightTextField.setColumns(10);
 
 		lblArea = new JLabel("Area:");
-		GridBagConstraints gbc_lblArea = new GridBagConstraints();
+		final GridBagConstraints gbc_lblArea = new GridBagConstraints();
 		gbc_lblArea.anchor = GridBagConstraints.EAST;
 		gbc_lblArea.insets = new Insets(0, 0, 0, 5);
 		gbc_lblArea.gridx = 0;
@@ -621,7 +621,7 @@ public class EnergyPanel extends JPanel {
 
 		areaTextField = new JTextField();
 		areaTextField.setEditable(false);
-		GridBagConstraints gbc_areaTextField = new GridBagConstraints();
+		final GridBagConstraints gbc_areaTextField = new GridBagConstraints();
 		gbc_areaTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_areaTextField.insets = new Insets(0, 0, 0, 5);
 		gbc_areaTextField.gridx = 1;
@@ -630,7 +630,7 @@ public class EnergyPanel extends JPanel {
 		areaTextField.setColumns(10);
 
 		lblVolume = new JLabel("Volume:");
-		GridBagConstraints gbc_lblVolume = new GridBagConstraints();
+		final GridBagConstraints gbc_lblVolume = new GridBagConstraints();
 		gbc_lblVolume.anchor = GridBagConstraints.EAST;
 		gbc_lblVolume.insets = new Insets(0, 0, 0, 5);
 		gbc_lblVolume.gridx = 2;
@@ -639,7 +639,7 @@ public class EnergyPanel extends JPanel {
 
 		volumnTextField = new JTextField();
 		volumnTextField.setEditable(false);
-		GridBagConstraints gbc_volumnTextField = new GridBagConstraints();
+		final GridBagConstraints gbc_volumnTextField = new GridBagConstraints();
 		gbc_volumnTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_volumnTextField.gridx = 3;
 		gbc_volumnTextField.gridy = 1;
@@ -1486,9 +1486,8 @@ public class EnergyPanel extends JPanel {
 
 	private double computeEnergySolarRate(final ReadOnlyVector3 sunVector) {
 		double totalRate = 0.0;
-		final boolean computeSunEnergyOfWalls = Scene.getInstance().isComputeSunEnergyOfWalls();
 		for (final HousePart part : Scene.getInstance().getParts())
-			if ((part instanceof Window && !computeSunEnergyOfWalls) || (part instanceof Wall && computeSunEnergyOfWalls)) {
+			if (part instanceof Window) {
 				final double dot = part.getContainer().getFaceDirection().dot(sunVector);
 				if (dot > 0.0)
 					totalRate += 100.0 * part.computeArea() * dot;
@@ -1972,7 +1971,7 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	public void setSolarStep(double solarStep) {
+	public void setSolarStep(final double solarStep) {
 		this.solarStep = solarStep;
 	}
 

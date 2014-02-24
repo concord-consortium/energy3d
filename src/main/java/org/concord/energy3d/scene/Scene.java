@@ -90,7 +90,6 @@ public class Scene implements Serializable {
 	private int solarContrast;
 	private double solarStep = 2.0;
 	private boolean cleanup = false;
-	private boolean computeSunEnergyOfWalls = false;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -200,7 +199,6 @@ public class Scene implements Serializable {
 				MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
 		}
 		MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
-		MainFrame.getInstance().getWallReceivesSun().setSelected(instance.computeSunEnergyOfWalls);
 
 		final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
 		if (cameraControl != null)
@@ -261,7 +259,7 @@ public class Scene implements Serializable {
 		if (url != null) {
 
 			long max = -1;
-			for (HousePart x : Scene.getInstance().parts) {
+			for (final HousePart x : Scene.getInstance().parts) {
 				if (x.getId() > max)
 					max = x.getId();
 			}
@@ -706,11 +704,4 @@ public class Scene implements Serializable {
 		return ++idCounter;
 	}
 
-	public void setComputeSunEnergyOfWalls(final boolean computeSunEnergyOfWalls) {
-		this.computeSunEnergyOfWalls = computeSunEnergyOfWalls;
-	}
-
-	public boolean isComputeSunEnergyOfWalls() {
-		return computeSunEnergyOfWalls;
-	}
 }
