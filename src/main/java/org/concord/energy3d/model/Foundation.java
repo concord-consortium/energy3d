@@ -682,6 +682,8 @@ public class Foundation extends HousePart {
 		int n = floorVertices.size();
 		if (n <= 0)
 			return null;
+		if (children.size() != floorVertices.size()) // not closed
+			return null;
 
 		double scale = Scene.getInstance().getAnnotationScale();
 		double height = Double.MAX_VALUE;
