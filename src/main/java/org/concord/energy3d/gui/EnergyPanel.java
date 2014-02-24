@@ -1269,7 +1269,7 @@ public class EnergyPanel extends JPanel {
 					}
 					for (final HousePart part : Scene.getInstance().getParts())
 						if (part instanceof Foundation)
-							((Foundation) part).setSolarValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
+							((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
 					SceneManager.getInstance().refresh();
 				}
 			}
@@ -1658,7 +1658,7 @@ public class EnergyPanel extends JPanel {
 				if (pickResults.getNumber() == 0) {
 					solar[row][col] += dot;
 					final double annotationScale = Scene.getInstance().getAnnotationScale();
-					housePart.setSolarPotentialEnergy(housePart.getSolarPotentialEnergy() + dot * w * h * annotationScale * annotationScale);
+					housePart.setSolarPotentialEnergy(housePart.getSolarPotentialEnergy() + dot * w * h * annotationScale * annotationScale / (60 / SOLAR_MINUTE_STEP));
 				}
 			}
 		}
@@ -1763,15 +1763,12 @@ public class EnergyPanel extends JPanel {
 				for (final HousePart houseChild : Scene.getInstance().getParts())
 					if (houseChild.getTopContainer() == foundation)
 						totalSolar += houseChild.getSolarPotentialEnergy();
-				foundation.setSolarValue(convertSolarValue(totalSolar));
+				foundation.setSolarPotentialEnergy(totalSolar);
+				foundation.setSolarLabelValue(totalSolar);
 			}
 		}
 
 		SceneManager.getInstance().refresh();
-	}
-
-	public long convertSolarValue(final Double val) {
-		return val == null ? 0 : val.longValue() / (60 / SOLAR_MINUTE_STEP);
 	}
 
 	private void progress() {
@@ -1904,7 +1901,7 @@ public class EnergyPanel extends JPanel {
 		if (!iradiationEnabled || selectedPart == null || selectedPart instanceof Foundation || selectedPart instanceof Door)
 			partEnergyTextField.setText("");
 		else
-			partEnergyTextField.setText(noDecimals.format(convertSolarValue(selectedPart.getSolarPotentialEnergy())));
+			partEnergyTextField.setText(twoDecimals.format(selectedPart.getSolarPotentialEnergy()));
 
 		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor)) {
 			if (selectedPart instanceof SolarPanel) {
@@ -1928,7 +1925,7 @@ public class EnergyPanel extends JPanel {
 			foundation = (Foundation) selectedPart.getTopContainer();
 		if (foundation != null) {
 			if (iradiationEnabled)
-				houseSolarPotentialTextField.setText("" + foundation.getSolarValue());
+				houseSolarPotentialTextField.setText("" + foundation.getSolarPotentialEnergy());
 			else
 				houseSolarPotentialTextField.setText("");
 			final double[] buildingGeometry = foundation.getBuildingGeometry();
@@ -1958,11 +1955,11 @@ public class EnergyPanel extends JPanel {
 			for (final HousePart part : Scene.getInstance().getParts()) {
 				if (!part.isFrozen()) {
 					if (part instanceof Foundation)
-						solarPotentialAll += ((Foundation) part).getSolarValue();
+						solarPotentialAll += part.getSolarPotentialEnergy();
 					else if (part instanceof Window)
-						passiveSolar += convertSolarValue(part.getSolarPotentialEnergy());
+						passiveSolar += part.getSolarPotentialEnergy();
 					else if (part instanceof SolarPanel)
-						photovoltaic += convertSolarValue(part.getSolarPotentialEnergy());
+						photovoltaic += part.getSolarPotentialEnergy();
 				}
 			}
 			solarPotentialAlltextField.setText(noDecimals.format(solarPotentialAll));

@@ -44,10 +44,10 @@ public class Foundation extends HousePart {
 	private transient double maxX;
 	private transient double maxY;
 	private transient BMText solarLabel;
-	private long solarValue;
 
 	static {
 		format.setGroupingUsed(true);
+		format.setMaximumFractionDigits(0);
 	}
 
 	public Foundation() {
@@ -603,8 +603,7 @@ public class Foundation extends HousePart {
 		updateTextureAndColor(mesh, Scene.getInstance().getFoundationColor());
 	}
 
-	public void setSolarValue(final long solarValue) {
-		this.solarValue = solarValue;
+	public void setSolarLabelValue(final double solarValue) {
 		scanChildrenHeight();
 		if (solarValue == -2)
 			solarLabel.setVisible(false);
@@ -616,10 +615,6 @@ public class Foundation extends HousePart {
 			else
 				solarLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
 		}
-	}
-
-	public long getSolarValue() {
-		return this.solarValue < 0 ? 0 : this.solarValue;
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
@@ -648,7 +643,7 @@ public class Foundation extends HousePart {
 			floorVertices.clear();
 		if (children.isEmpty())
 			return;
-		HousePart firstBorn = children.get(0);
+		final HousePart firstBorn = children.get(0);
 		if (firstBorn instanceof Wall)
 			((Wall) firstBorn).visitNeighbors(new WallVisitor() {
 				@Override
@@ -663,10 +658,10 @@ public class Foundation extends HousePart {
 			});
 	}
 
-	private void addVertex(ReadOnlyVector3 v3) {
-		Vector2 v2 = new Vector2(v3.getX(), v3.getY());
+	private void addVertex(final ReadOnlyVector3 v3) {
+		final Vector2 v2 = new Vector2(v3.getX(), v3.getY());
 		boolean b = false;
-		for (Vector2 x : floorVertices) {
+		for (final Vector2 x : floorVertices) {
 			if (Util.isEqual(x, v2)) {
 				b = true;
 				break;
@@ -679,16 +674,16 @@ public class Foundation extends HousePart {
 	public double[] getBuildingGeometry() {
 
 		initFloor();
-		int n = floorVertices.size();
+		final int n = floorVertices.size();
 		if (n <= 0)
 			return null;
 		if (children.size() != floorVertices.size()) // not closed
 			return null;
 
-		double scale = Scene.getInstance().getAnnotationScale();
+		final double scale = Scene.getInstance().getAnnotationScale();
 		double height = Double.MAX_VALUE;
-		for (HousePart w : children) {
-			double h = w.getHeight();
+		for (final HousePart w : children) {
+			final double h = w.getHeight();
 			if (height > h)
 				height = h;
 		}
