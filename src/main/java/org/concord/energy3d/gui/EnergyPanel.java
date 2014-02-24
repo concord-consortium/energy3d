@@ -1937,13 +1937,14 @@ public class EnergyPanel extends JPanel {
 				areaTextField.setText(twoDecimals.format(buildingGeometry[1]));
 				volumnTextField.setText(twoDecimals.format(buildingGeometry[2]));
 			} else {
-				houseSolarPotentialTextField.setText("");
+				positionTextField.setText("");
 				heightTextField.setText("");
 				areaTextField.setText("");
 				volumnTextField.setText("");
 			}
 		} else {
 			houseSolarPotentialTextField.setText("");
+			positionTextField.setText("");
 			heightTextField.setText("");
 			areaTextField.setText("");
 			volumnTextField.setText("");
