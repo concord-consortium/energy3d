@@ -1274,6 +1274,7 @@ public class EnergyPanel extends JPanel {
 				}
 			}
 			computeEnergy();
+			updatePartEnergy();
 		} catch (final RuntimeException e) {
 			if (e != cancelException)
 				e.printStackTrace();

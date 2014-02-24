@@ -203,6 +203,7 @@ public class Scene implements Serializable {
 		final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
 		if (cameraControl != null)
 			cameraControl.reset();
+		SceneManager.getInstance().hideAllEditPoints();
 	}
 
 	public static void initSceneNow() {

@@ -761,6 +761,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			part.setEditPointsVisible(false);
 			part.setGridsVisible(false);
 		}
+		selectedHousePart = null;
 		refresh = true;
 	}
 
