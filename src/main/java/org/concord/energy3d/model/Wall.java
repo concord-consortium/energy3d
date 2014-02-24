@@ -277,7 +277,7 @@ public class Wall extends HousePart {
 			}
 		}
 
-		final double snapDistance = isSnapToObjects() ? getGridSize() * 2 : SNAP_DISTANCE;
+		final double snapDistance = isSnapToObjects() ? getGridSize() : SNAP_DISTANCE;
 
 		final boolean snap;
 		if (isFirstPointInserted() && p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() < getGridSize() * 2)
