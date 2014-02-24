@@ -73,7 +73,7 @@ public abstract class HousePart implements Serializable {
 	protected transient boolean relativeToHorizontal;
 	private transient boolean isPrintVertical;
 	private transient Map<Mesh, Boolean> textureCleared;
-	private transient double solarPotentialEnergy;
+	private transient double solarPotential;
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
 	protected HousePart container = null;
@@ -784,12 +784,12 @@ public abstract class HousePart implements Serializable {
 		}
 	}
 
-	public void setSolarPotentialEnergy(final double energy) {
-		solarPotentialEnergy = energy;
+	public void setSolarPotential(final double energy) {
+		solarPotential = energy;
 	}
 
-	public double getSolarPotentialEnergy() {
-		return solarPotentialEnergy;
+	public double getSolarPotential() {
+		return solarPotential;
 	}
 
 }

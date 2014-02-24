@@ -153,15 +153,15 @@ class Building {
 		if (!(x instanceof Foundation))
 			return null;
 		Foundation foundation = (Foundation) x;
-		return FORMAT1.format(foundation.getSolarValue());
+		return FORMAT1.format(foundation.getSolarPotential());
 	}
 
-	long getSolarValue() {
+	double getSolarValue() {
 		HousePart x = LoggerUtil.getTopContainer(walls.get(0));
 		if (!(x instanceof Foundation))
 			return -1;
 		Foundation foundation = (Foundation) x;
-		return foundation.getSolarValue();
+		return foundation.getSolarPotential();
 	}
 
 	String toJson() {
@@ -191,7 +191,7 @@ class Building {
 			double volume = Math.abs(area) * height;
 			s += " volume=" + FORMAT1.format(volume);
 			s += " centroid=\"" + FORMAT1.format(getCentroidX() / area) + "," + FORMAT1.format(getCentroidY() / area) + "\"";
-			long solar = getSolarValue();
+			double solar = getSolarValue();
 			if (solar >= 0) {
 				s += " solar_energy=" + solar;
 				s += " solar_energy_density=" + FORMAT4.format(solar / volume);
