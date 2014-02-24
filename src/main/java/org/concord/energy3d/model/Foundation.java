@@ -702,7 +702,7 @@ public class Foundation extends HousePart {
 		v1 = floorVertices.get(n - 1);
 		v2 = floorVertices.get(0);
 		area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
-		area *= 0.5;
+		area = Math.abs(area) * 0.5;
 
 		double cx = 0, cy = 0;
 		for (int i = 0; i < n - 1; i++) {
