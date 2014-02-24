@@ -1960,9 +1960,9 @@ public class EnergyPanel extends JPanel {
 					if (part instanceof Foundation)
 						solarPotentialAll += ((Foundation) part).getSolarValue();
 					else if (part instanceof Window)
-						passiveSolar += part.getSolarPotentialEnergy();
+						passiveSolar += convertSolarValue(part.getSolarPotentialEnergy());
 					else if (part instanceof SolarPanel)
-						photovoltaic += part.getSolarPotentialEnergy();
+						photovoltaic += convertSolarValue(part.getSolarPotentialEnergy());
 				}
 			}
 			solarPotentialAlltextField.setText(noDecimals.format(solarPotentialAll));
