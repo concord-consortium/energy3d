@@ -355,7 +355,7 @@ public class MainPanel extends JPanel {
 			rotAnimButton = new JToggleButton();
 			rotAnimButton.addMouseListener(refreshUponMouseExit);
 			rotAnimButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate.png")));
-			rotAnimButton.setToolTipText("Animate scene rotation");
+			rotAnimButton.setToolTipText("Spin view");
 			rotAnimButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
@@ -428,7 +428,7 @@ public class MainPanel extends JPanel {
 			resizeButton = new JToggleButton();
 			resizeButton.addMouseListener(refreshUponMouseExit);
 			resizeButton.setIcon(new ImageIcon(getClass().getResource("icons/resize.png")));
-			resizeButton.setToolTipText("Resize house");
+			resizeButton.setToolTipText("Resize or move a building");
 			resizeButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
@@ -445,7 +445,7 @@ public class MainPanel extends JPanel {
 			heliodonButton = new JToggleButton();
 			heliodonButton.addMouseListener(refreshUponMouseExit);
 			heliodonButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_heliodon.png")));
-			heliodonButton.setToolTipText("Show sun heliodon");
+			heliodonButton.setToolTipText("Show heliodon");
 			heliodonButton.addItemListener(new java.awt.event.ItemListener() {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
@@ -465,7 +465,7 @@ public class MainPanel extends JPanel {
 			sunAnimButton.addMouseListener(refreshUponMouseExit);
 			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_anim.png")));
 			sunAnimButton.setEnabled(false);
-			sunAnimButton.setToolTipText("Animate sun motion");
+			sunAnimButton.setToolTipText("Animate sun path");
 			sunAnimButton.addItemListener(new java.awt.event.ItemListener() {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
@@ -656,7 +656,7 @@ public class MainPanel extends JPanel {
 	public JToggleButton getSolarButton() {
 		if (solarButton == null) {
 			solarButton = new JToggleButton("");
-			solarButton.setToolTipText("Generate solar irradiation heat map");
+			solarButton.setToolTipText("Calculate solar irradiation");
 			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
 			solarButton.addMouseListener(refreshUponMouseExit);
 			solarButton.addItemListener(new ItemListener() {
