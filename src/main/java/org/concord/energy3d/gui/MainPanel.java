@@ -759,6 +759,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getSolarPanelButton() {
 		if (solarPanelButton == null) {
 			solarPanelButton = new JToggleButton("");
+			solarPanelButton.setToolTipText("Add solar panel");
 			solarPanelButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
