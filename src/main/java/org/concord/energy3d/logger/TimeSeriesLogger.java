@@ -79,6 +79,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					String s = ((MyPlainDocument) noteAreaDoc).getRemovedString();
 					if (s != null) {
 						s = s.replace("\n", "-linebreak-");
+						s = s.replace("\t", "-tab-");
 						s = s.replace("\\", "\\\\");
 						s = s.replace("\"", "\\\"");
 						noteString += "D(" + e.getOffset() + "," + s + ")";
@@ -97,6 +98,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				}
 				if (s != null) {
 					s = s.replace("\n", "-linebreak-");
+					s = s.replace("\t", "-tab-");
 					s = s.replace("\\", "\\\\");
 					s = s.replace("\"", "\\\"");
 					noteString += "I(" + e.getOffset() + "," + s + ")";
