@@ -40,12 +40,13 @@ public class MainApplication {
 
 		/* initialize data logging */
 		final TimeSeriesLogger logger = new TimeSeriesLogger(2, 2, scene);
-		scene.addShutdownHook(new Runnable() {
-			@Override
-			public void run() {
-				logger.saveLog();
-			}
-		});
+		// disable this for now because saving while shutting down seems to cause loss of data. We will take the risk to lose the last two edits instead of a lot of data
+		// scene.addShutdownHook(new Runnable() { 
+		// @Override
+		// public void run() {
+		// logger.saveLog();
+		// }
+		// });
 		Scene.getInstance().addPropertyChangeListener(logger);
 		EnergyPanel.getInstance().addPropertyChangeListener(logger);
 		logger.start();
