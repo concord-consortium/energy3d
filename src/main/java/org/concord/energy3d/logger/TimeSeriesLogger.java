@@ -273,7 +273,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		PrintWriter writer = null;
 		try {
 			writer = new PrintWriter(file);
-			writer.print("{\n\"Activities\": [\n" + content.substring(0, content.length() - 2) + "\n]\n}");
+			writer.write("{\n\"Activities\": [\n" + content.substring(0, content.length() - 2) + "\n]\n}");
 		} catch (final Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging: " + e.getMessage() + "\nPlease restart Energy3D.", "Logging Error", JOptionPane.ERROR_MESSAGE);
