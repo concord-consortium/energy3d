@@ -143,8 +143,10 @@ class Building {
 		s += ", \"Area\": " + FORMAT1.format(Math.abs(area * scale * scale));
 		double volume = Math.abs(area) * height;
 		s += ", \"Volume\": " + FORMAT1.format(volume * scale * scale * scale);
-		s += ", \"CentroidX\": " + FORMAT1.format(getCentroidX() / area * scale);
-		s += ", \"CentroidY\": " + FORMAT1.format(getCentroidY() / area * scale);
+		if (area != 0) {
+			s += ", \"CentroidX\": " + FORMAT1.format(getCentroidX() / area * scale);
+			s += ", \"CentroidY\": " + FORMAT1.format(getCentroidY() / area * scale);
+		}
 		return s;
 	}
 
