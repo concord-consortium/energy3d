@@ -26,6 +26,7 @@ import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 
@@ -236,7 +237,7 @@ public class Scene implements Serializable {
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
-		energyPanel.setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
+		SolarIrradiation.getInstance().setStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
 		Scene.getInstance().setEdited(false);
 	}
 
@@ -366,7 +367,7 @@ public class Scene implements Serializable {
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
-				instance.solarStep = EnergyPanel.getInstance().getSolarStep();
+				instance.solarStep = SolarIrradiation.getInstance().getStep();
 
 				if (setAsCurrentFile)
 					Scene.url = url;

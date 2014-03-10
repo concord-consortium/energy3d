@@ -16,6 +16,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.simulation.SolarIrradiation;
 
 class IrradiationParametersDialog extends JDialog {
 
@@ -29,28 +30,28 @@ class IrradiationParametersDialog extends JDialog {
 		setTitle("Solar Irradiation");
 
 		getContentPane().setLayout(new BorderLayout());
-		JPanel contentPanel = new JPanel();
+		final JPanel contentPanel = new JPanel();
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 
 		contentPanel.add(new JLabel("Simulation Resolution"));
 
-		final JTextField resolutionTextField = new JTextField(FORMAT1.format(EnergyPanel.getInstance().getSolarStep()));
+		final JTextField resolutionTextField = new JTextField(FORMAT1.format(SolarIrradiation.getInstance().getStep()));
 		contentPanel.add(resolutionTextField);
 		resolutionTextField.setColumns(20);
 
-		JPanel buttonPanel = new JPanel();
+		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
-		JButton okButton = new JButton("OK");
+		final JButton okButton = new JButton("OK");
 		okButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				try {
-					double resolution = Double.parseDouble(resolutionTextField.getText());
+					final double resolution = Double.parseDouble(resolutionTextField.getText());
 					IrradiationParametersDialog.this.dispose();
-					EnergyPanel.getInstance().setSolarStep(resolution);
+					SolarIrradiation.getInstance().setStep(resolution);
 					Scene.getInstance().setEdited(true);
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				} catch (final NumberFormatException err) {
