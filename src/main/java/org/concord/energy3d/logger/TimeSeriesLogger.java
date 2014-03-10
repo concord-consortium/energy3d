@@ -79,6 +79,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					String s = ((MyPlainDocument) noteAreaDoc).getRemovedString();
 					if (s != null) {
 						s = s.replace("\n", "-linebreak-");
+						s = s.replace("\t", "-tab-");
+						s = s.replace("\\", "\\\\");
+						s = s.replace("\"", "\\\"");
 						noteString += "D(" + e.getOffset() + "," + s + ")";
 					}
 				}
@@ -95,6 +98,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				}
 				if (s != null) {
 					s = s.replace("\n", "-linebreak-");
+					s = s.replace("\t", "-tab-");
 					s = s.replace("\\", "\\\\");
 					s = s.replace("\"", "\\\"");
 					noteString += "I(" + e.getOffset() + "," + s + ")";
@@ -269,7 +273,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		PrintWriter writer = null;
 		try {
 			writer = new PrintWriter(file);
-			writer.print("{\n\"Activities\": [\n" + content.substring(0, content.length() - 2) + "\n]\n}");
+			writer.write("{\n\"Activities\": [\n" + content.substring(0, content.length() - 2) + "\n]\n}");
 		} catch (final Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging: " + e.getMessage() + "\nPlease restart Energy3D.", "Logging Error", JOptionPane.ERROR_MESSAGE);

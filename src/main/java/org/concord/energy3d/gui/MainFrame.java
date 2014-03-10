@@ -90,7 +90,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem centimetersMenuItem;
 	private JRadioButtonMenuItem inchesMenuItem;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
-	private JMenuItem scaleMenuItem;
+	private JMenuItem rescaleMenuItem;
 	private JMenuItem irradiationParametersMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	protected Object lastSelection;
@@ -815,7 +815,7 @@ public class MainFrame extends JFrame {
 			sceneMenu.add(getColorMenu());
 			sceneMenu.addSeparator();
 			sceneMenu.add(getUnitsMenu());
-			sceneMenu.add(getScaleMenuItem());
+			sceneMenu.add(getRescaleMenuItem());
 			sceneMenu.addSeparator();
 			sceneMenu.add(getRoofOverhangLengthMenuItem());
 			sceneMenu.addSeparator();
@@ -905,17 +905,17 @@ public class MainFrame extends JFrame {
 		return inchesMenuItem;
 	}
 
-	private JMenuItem getScaleMenuItem() {
-		if (scaleMenuItem == null) {
-			scaleMenuItem = new JMenuItem("Scale...");
-			scaleMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getRescaleMenuItem() {
+		if (rescaleMenuItem == null) {
+			rescaleMenuItem = new JMenuItem("Rescale...");
+			rescaleMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					new ScaleDialog().setVisible(true);
 				}
 			});
 		}
-		return scaleMenuItem;
+		return rescaleMenuItem;
 	}
 
 	private JMenuItem getIrradiationParametersMenuItem() {
