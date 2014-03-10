@@ -129,6 +129,8 @@ public class SolarIrradiation {
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+		final double zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
+		final double airMass = 1 / (Math.cos(zenithAngle) + 0.50572 * Math.pow(96.07995 - zenithAngle / Math.PI * 180.0, -1.6364));
 
 		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
@@ -229,7 +231,7 @@ public class SolarIrradiation {
 				if (pickResults.getNumber() == 0) {
 					solar[row][col] += dot;
 					final double annotationScale = Scene.getInstance().getAnnotationScale();
-					housePart.setSolarPotential(housePart.getSolarPotential() + dot * w * h * annotationScale * annotationScale / (60 / SOLAR_MINUTE_STEP));
+					housePart.setSolarPotential(housePart.getSolarPotential() + dot / airMass * w * h * annotationScale * annotationScale / (60 / SOLAR_MINUTE_STEP));
 				}
 			}
 		}
