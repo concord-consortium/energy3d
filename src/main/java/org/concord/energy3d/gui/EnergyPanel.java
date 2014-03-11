@@ -63,7 +63,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.SolarIrradiation;
-import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
@@ -395,6 +394,7 @@ public class EnergyPanel extends JPanel {
 		colorMapSlider = new JSlider();
 		colorMapSlider.setMinimum(10);
 		colorMapSlider.setMaximum(90);
+		colorMapSlider.setMinimumSize(colorMapSlider.getPreferredSize());
 		colorMapSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
@@ -538,8 +538,6 @@ public class EnergyPanel extends JPanel {
 		panel_2 = new JPanel();
 		buildingPanel.add(panel_2);
 		final GridBagLayout gbl_panel_2 = new GridBagLayout();
-		gbl_panel_2.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0 };
-		gbl_panel_2.rowWeights = new double[] { 0.0, 0.0 };
 		panel_2.setLayout(gbl_panel_2);
 
 		lblPosition = new JLabel("Position:");
@@ -553,6 +551,7 @@ public class EnergyPanel extends JPanel {
 		positionTextField = new JTextField();
 		positionTextField.setEditable(false);
 		final GridBagConstraints gbc_positionTextField = new GridBagConstraints();
+		gbc_positionTextField.weightx = 1.0;
 		gbc_positionTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_positionTextField.anchor = GridBagConstraints.NORTH;
 		gbc_positionTextField.insets = new Insets(0, 0, 5, 5);
@@ -572,6 +571,7 @@ public class EnergyPanel extends JPanel {
 		heightTextField = new JTextField();
 		heightTextField.setEditable(false);
 		final GridBagConstraints gbc_heightTextField = new GridBagConstraints();
+		gbc_heightTextField.weightx = 1.0;
 		gbc_heightTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_heightTextField.insets = new Insets(0, 0, 5, 0);
 		gbc_heightTextField.anchor = GridBagConstraints.NORTH;
@@ -636,21 +636,46 @@ public class EnergyPanel extends JPanel {
 
 		panel_7 = new JPanel();
 		allPanel.add(panel_7);
+		final GridBagLayout gbl_panel_7 = new GridBagLayout();
+		panel_7.setLayout(gbl_panel_7);
 
 		lblPassiveSolar = new JLabel("Passive Solar:");
-		panel_7.add(lblPassiveSolar);
+		final GridBagConstraints gbc_lblPassiveSolar = new GridBagConstraints();
+		gbc_lblPassiveSolar.anchor = GridBagConstraints.WEST;
+		gbc_lblPassiveSolar.insets = new Insets(0, 0, 0, 5);
+		gbc_lblPassiveSolar.gridx = 0;
+		gbc_lblPassiveSolar.gridy = 0;
+		panel_7.add(lblPassiveSolar, gbc_lblPassiveSolar);
 
 		passiveSolarTextField = new JTextField();
 		passiveSolarTextField.setEditable(false);
-		panel_7.add(passiveSolarTextField);
+		final GridBagConstraints gbc_passiveSolarTextField = new GridBagConstraints();
+		gbc_passiveSolarTextField.weightx = 1.0;
+		gbc_passiveSolarTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_passiveSolarTextField.anchor = GridBagConstraints.NORTH;
+		gbc_passiveSolarTextField.insets = new Insets(0, 0, 0, 5);
+		gbc_passiveSolarTextField.gridx = 1;
+		gbc_passiveSolarTextField.gridy = 0;
+		panel_7.add(passiveSolarTextField, gbc_passiveSolarTextField);
 		passiveSolarTextField.setColumns(10);
 
 		lblPhotovoltaic = new JLabel("Photovoltaic:");
-		panel_7.add(lblPhotovoltaic);
+		final GridBagConstraints gbc_lblPhotovoltaic = new GridBagConstraints();
+		gbc_lblPhotovoltaic.anchor = GridBagConstraints.WEST;
+		gbc_lblPhotovoltaic.insets = new Insets(0, 0, 0, 5);
+		gbc_lblPhotovoltaic.gridx = 2;
+		gbc_lblPhotovoltaic.gridy = 0;
+		panel_7.add(lblPhotovoltaic, gbc_lblPhotovoltaic);
 
 		photovoltaicTextField = new JTextField();
 		photovoltaicTextField.setEditable(false);
-		panel_7.add(photovoltaicTextField);
+		final GridBagConstraints gbc_photovoltaicTextField = new GridBagConstraints();
+		gbc_photovoltaicTextField.weightx = 1.0;
+		gbc_photovoltaicTextField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_photovoltaicTextField.anchor = GridBagConstraints.NORTH;
+		gbc_photovoltaicTextField.gridx = 3;
+		gbc_photovoltaicTextField.gridy = 0;
+		panel_7.add(photovoltaicTextField, gbc_photovoltaicTextField);
 		photovoltaicTextField.setColumns(10);
 
 		final JPanel panel_1 = new JPanel();
@@ -1069,30 +1094,30 @@ public class EnergyPanel extends JPanel {
 		target = allPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
 
-		if (Config.isRestrictMode()) {
-			coolingLabel.setVisible(false);
-			coolingCostTextField.setVisible(false);
-			coolingRateTextField.setVisible(false);
-			coolingTodayTextField.setVisible(false);
-			coolingYearlyTextField.setVisible(false);
-
-			heatingLabel.setVisible(false);
-			heatingCostTextField.setVisible(false);
-			heatingRateTextField.setVisible(false);
-			heatingTodayTextField.setVisible(false);
-			heatingYearlyTextField.setVisible(false);
-
-			totalLabel.setVisible(false);
-			totalCostTextField.setVisible(false);
-			totalRateTextField.setVisible(false);
-			totalTodayTextField.setVisible(false);
-			totalYearlyTextField.setVisible(false);
-
-			yearlyCostLabel.setVisible(false);
-
-			temperaturePanel.setVisible(false);
-			uFactorPanel.setVisible(false);
-		}
+//		if (Config.isRestrictMode()) {
+//			coolingLabel.setVisible(false);
+//			coolingCostTextField.setVisible(false);
+//			coolingRateTextField.setVisible(false);
+//			coolingTodayTextField.setVisible(false);
+//			coolingYearlyTextField.setVisible(false);
+//
+//			heatingLabel.setVisible(false);
+//			heatingCostTextField.setVisible(false);
+//			heatingRateTextField.setVisible(false);
+//			heatingTodayTextField.setVisible(false);
+//			heatingYearlyTextField.setVisible(false);
+//
+//			totalLabel.setVisible(false);
+//			totalCostTextField.setVisible(false);
+//			totalRateTextField.setVisible(false);
+//			totalTodayTextField.setVisible(false);
+//			totalYearlyTextField.setVisible(false);
+//
+//			yearlyCostLabel.setVisible(false);
+//
+//			temperaturePanel.setVisible(false);
+//			uFactorPanel.setVisible(false);
+//		}
 
 	}
 
