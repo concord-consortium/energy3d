@@ -229,7 +229,7 @@ public class SolarIrradiation {
 							break;
 					}
 				if (pickResults.getNumber() == 0) {
-					solar[row][col] += dot;
+					solar[row][col] += dot / airMass;
 					final double annotationScale = Scene.getInstance().getAnnotationScale();
 					housePart.setSolarPotential(housePart.getSolarPotential() + dot / airMass * w * h * annotationScale * annotationScale / (60 / SOLAR_MINUTE_STEP));
 				}
