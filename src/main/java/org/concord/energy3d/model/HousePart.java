@@ -84,6 +84,7 @@ public abstract class HousePart implements Serializable {
 	private boolean firstPointInserted = false;
 	private boolean freeze;
 	protected long id;
+	private double heatLoss;
 
 	static {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
@@ -790,6 +791,14 @@ public abstract class HousePart implements Serializable {
 
 	public double getSolarPotential() {
 		return solarPotential;
+	}
+	
+	public void setHeatLoss(final double heatLoss) {
+		this.heatLoss = heatLoss;
+	}		
+
+	public double getHeatLoss() {
+		return heatLoss;
 	}
 
 }

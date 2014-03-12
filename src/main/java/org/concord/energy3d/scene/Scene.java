@@ -233,7 +233,7 @@ public class Scene implements Serializable {
 			energyPanel.getDateSpinner().setValue(instance.calendar.getTime());
 			energyPanel.getTimeSpinner().setValue(instance.calendar.getTime());
 			energyPanel.setLatitude(instance.latitude);
-			energyPanel.setCity(instance.city);
+			energyPanel.getCityComboBox().setSelectedItem(instance.city);
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
@@ -363,7 +363,7 @@ public class Scene implements Serializable {
 
 				instance.calendar = Heliodon.getInstance().getCalander();
 				instance.latitude = EnergyPanel.getInstance().getLatitude();
-				instance.city = EnergyPanel.getInstance().getCity();
+				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();

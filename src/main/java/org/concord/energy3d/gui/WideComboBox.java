@@ -10,13 +10,13 @@ import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
-public class WideComboBox extends JComboBox {
+public class WideComboBox extends JComboBox<String> {
 	private static final long serialVersionUID = 1L;
 	private Dimension preferredSize;
 	private boolean layingOut = false;
 
 	public WideComboBox() {
-		setModel(new DefaultComboBoxModel(new String[] {"0.00 "}));
+		setModel(new DefaultComboBoxModel<String>(new String[] {"0.00 "}));
 		setMinimumSize(getMinimumSize());
 		addActionListener(new ActionListener() {
 			@Override
@@ -24,7 +24,7 @@ public class WideComboBox extends JComboBox {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						((JTextComponent)((JComboBox)e.getSource()).getEditor().getEditorComponent()).setCaretPosition(0);
+						((JTextComponent)((JComboBox<?>)e.getSource()).getEditor().getEditorComponent()).setCaretPosition(0);
 					}
 				});
 			}
@@ -32,7 +32,7 @@ public class WideComboBox extends JComboBox {
 	}
 
 	@Override
-	public void setModel(final ComboBoxModel aModel) {
+	public void setModel(final ComboBoxModel<String> aModel) {
 		super.setModel(aModel);
 		if (aModel.getSize() > 1) {
 			preferredSize = (Dimension) getPreferredSize().clone();

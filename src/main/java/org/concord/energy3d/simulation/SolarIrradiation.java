@@ -91,12 +91,11 @@ public class SolarIrradiation {
 	}	
 
 	private void computeToday(final Calendar today) {
-		final Heliodon heliodon = Heliodon.getInstance();
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		for (int minute = 0; minute < 1440; minute += SOLAR_MINUTE_STEP) {
-			final ReadOnlyVector3 sunLocation = heliodon.computeSunLocation(today).normalize(null);
+			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
 			// final ReadOnlyVector3 sunLocation = heliodon.getSunLocation();
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);

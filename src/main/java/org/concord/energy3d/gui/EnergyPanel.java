@@ -15,21 +15,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CancellationException;
-
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.StackedBarChart;
-import javafx.scene.chart.XYChart;
-import javafx.scene.layout.GridPane;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -37,7 +25,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSlider;
@@ -57,90 +44,35 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.CityData;
+import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class EnergyPanel extends JPanel {
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
-	private static final double COST_PER_KWH = 0.13;
 	private static final long serialVersionUID = 1L;
-	private static final Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
-	private static final Map<String, int[]> avgMonthlyLowTemperatures = new HashMap<String, int[]>();
-	private static final Map<String, int[]> avgMonthlyHighTemperatures = new HashMap<String, int[]>();
 	private static final EnergyPanel instance = new EnergyPanel();
-	private static final DecimalFormat twoDecimals = new DecimalFormat();
-	private static final DecimalFormat noDecimals = new DecimalFormat();
-	private static final DecimalFormat moneyDecimals = new DecimalFormat();
+	private final DecimalFormat twoDecimals = new DecimalFormat();
+	private final DecimalFormat noDecimals = new DecimalFormat();
 	private static boolean keepHeatmapOn = false;
 
 	public enum UpdateRadiation {
 		ALWAYS, NEVER, ONLY_IF_SLECTED_IN_GUI
 	};
 
-	static {
-		twoDecimals.setMaximumFractionDigits(2);
-		noDecimals.setMaximumFractionDigits(0);
-		moneyDecimals.setMaximumFractionDigits(0);
-		cityLatitute.put("Moscow", 55);
-		cityLatitute.put("Ottawa", 45);
-		cityLatitute.put("Boston", 42);
-		cityLatitute.put("Beijing", 39);
-		cityLatitute.put("Washington DC", 38);
-		cityLatitute.put("Tehran", 35);
-		cityLatitute.put("Los Angeles", 34);
-		cityLatitute.put("Miami", 25);
-		cityLatitute.put("Mexico City", 19);
-		cityLatitute.put("Singapore", 1);
-		cityLatitute.put("Sydney", -33);
-		cityLatitute.put("Buenos Aires", -34);
-		avgMonthlyLowTemperatures.put("Boston", new int[] { -6, -4, -1, 5, 10, 16, 18, 18, 14, 8, 3, -2 });
-		avgMonthlyHighTemperatures.put("Boston", new int[] { 2, 4, 7, 13, 19, 24, 28, 27, 22, 16, 11, 5 });
-		avgMonthlyLowTemperatures.put("Moscow", new int[] { -14, -14, -9, 0, 6, 10, 13, 11, 6, 1, -5, -10 });
-		avgMonthlyHighTemperatures.put("Moscow", new int[] { -7, -6, 0, 9, 17, 22, 24, 22, 16, 8, 0, -5 });
-		avgMonthlyLowTemperatures.put("Ottawa", new int[] { -16, -14, -7, 1, 7, 12, 15, 14, 9, 3, -2, -11 });
-		avgMonthlyHighTemperatures.put("Ottawa", new int[] { -7, -5, 2, 11, 18, 23, 26, 24, 19, 13, 4, -4 });
-		avgMonthlyLowTemperatures.put("Beijing", new int[] { -9, -7, -1, 7, 13, 18, 21, 20, 14, 7, -1, -7 });
-		avgMonthlyHighTemperatures.put("Beijing", new int[] { 1, 4, 11, 19, 26, 30, 31, 29, 26, 19, 10, 3 });
-		avgMonthlyLowTemperatures.put("Washington DC", new int[] { -2, -1, 3, 8, 13, 19, 22, 21, 17, 11, 5, 1 });
-		avgMonthlyHighTemperatures.put("Washington DC", new int[] { 6, 8, 13, 19, 24, 29, 32, 31, 27, 30, 14, 8 });
-		avgMonthlyLowTemperatures.put("Tehran", new int[] { 1, 3, 7, 13, 17, 22, 25, 25, 21, 15, 8, 3 });
-		avgMonthlyHighTemperatures.put("Tehran", new int[] { 8, 11, 16, 23, 28, 34, 37, 36, 32, 25, 16, 10 });
-		avgMonthlyLowTemperatures.put("Los Angeles", new int[] { 9, 9, 11, 12, 14, 16, 18, 18, 17, 15, 11, 8 });
-		avgMonthlyHighTemperatures.put("Los Angeles", new int[] { 20, 21, 21, 23, 23, 26, 28, 29, 28, 26, 23, 20 });
-		avgMonthlyLowTemperatures.put("Miami", new int[] { 16, 17, 18, 21, 23, 25, 26, 26, 26, 24, 21, 18 });
-		avgMonthlyHighTemperatures.put("Miami", new int[] { 23, 24, 24, 26, 28, 31, 31, 32, 31, 29, 26, 24 });
-		avgMonthlyLowTemperatures.put("Mexico City", new int[] { 6, 7, 9, 11, 12, 12, 12, 12, 12, 10, 8, 7 });
-		avgMonthlyHighTemperatures.put("Mexico City", new int[] { 21, 23, 25, 26, 26, 24, 23, 23, 23, 22, 22, 21 });
-		avgMonthlyLowTemperatures.put("Singapore", new int[] { 23, 23, 24, 24, 24, 24, 24, 24, 24, 24, 23, 23 });
-		avgMonthlyHighTemperatures.put("Singapore", new int[] { 29, 31, 31, 32, 31, 31, 31, 31, 31, 31, 30, 29 });
-		avgMonthlyLowTemperatures.put("Sydney", new int[] { 19, 19, 18, 15, 12, 9, 8, 8, 11, 14, 16, 18 });
-		avgMonthlyHighTemperatures.put("Sydney", new int[] { 26, 26, 25, 23, 20, 17, 17, 18, 20, 22, 23, 25 });
-		avgMonthlyLowTemperatures.put("Buenos Aires", new int[] { 20, 19, 18, 14, 11, 8, 8, 9, 11, 13, 16, 18 });
-		avgMonthlyHighTemperatures.put("Buenos Aires", new int[] { 28, 27, 25, 22, 18, 15, 14, 16, 18, 21, 24, 27 });
-	}
-
-	private JFXPanel fxPanel;
-	private final XYChart.Data<String, Number> wallsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
-	private final XYChart.Data<String, Number> windowsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
-	private final XYChart.Data<String, Number> doorsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
-	private final XYChart.Data<String, Number> roofsAreaChartData = new XYChart.Data<String, Number>("Area", 0);
-	private final XYChart.Data<String, Number> wallsEnergyChartData = new XYChart.Data<String, Number>("Energy Loss", 0);
-	private final XYChart.Data<String, Number> windowsEnergyChartData = new XYChart.Data<String, Number>("Energy Loss", 0);
-	private final XYChart.Data<String, Number> doorsEnergyChartData = new XYChart.Data<String, Number>("Energy Loss", 0);
-	private final XYChart.Data<String, Number> roofsEnergyChartData = new XYChart.Data<String, Number>("Energy Loss", 0);
-	private final JComboBox wallsComboBox;
-	private final JComboBox doorsComboBox;
-	private final JComboBox windowsComboBox;
-	private final JComboBox roofsComboBox;
+	private final JComboBox<String> wallsComboBox;
+	private final JComboBox<String> doorsComboBox;
+	private final JComboBox<String> windowsComboBox;
+	private final JComboBox<String> roofsComboBox;
+	private final JComboBox<String> cityComboBox;
 	private final JCheckBox autoCheckBox;
 	private final JTextField heatingTodayTextField;
 	private final JTextField coolingTodayTextField;
@@ -151,7 +83,6 @@ public class EnergyPanel extends JPanel {
 	private final JLabel timeLabel;
 	private final JSpinner dateSpinner;
 	private final JSpinner timeSpinner;
-	private final JComboBox cityComboBox;
 	private final JLabel latitudeLabel;
 	private final JSpinner latitudeSpinner;
 	private final JPanel panel_4;
@@ -162,16 +93,8 @@ public class EnergyPanel extends JPanel {
 	private final JProgressBar progressBar;
 
 	private Thread thread;
-	private double wallsArea;
-	private double doorsArea;
-	private double windowsArea;
-	private double roofsArea;
-	private double wallUFactor;
-	private double doorUFactor;
-	private double windowUFactor;
-	private double roofUFactor;
 	private boolean computeRequest;
-	private boolean initJavaFxAlreadyCalled = false;
+	private final boolean initJavaFxAlreadyCalled = false;
 	private boolean alreadyRenderedHeatmap = false;
 	private UpdateRadiation updateRadiation;
 	private boolean computeEnabled = true;
@@ -215,11 +138,14 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private EnergyPanel() {
+		twoDecimals.setMaximumFractionDigits(2);
+		noDecimals.setMaximumFractionDigits(0);		
+
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		this.repaint();
 		this.paint(null);
-
+		
 		progressBar = new JProgressBar();
 		add(progressBar);
 
@@ -268,8 +194,8 @@ public class EnergyPanel extends JPanel {
 		gbc_dateSpinner.gridy = 0;
 		panel_3.add(dateSpinner, gbc_dateSpinner);
 
-		cityComboBox = new JComboBox();
-		cityComboBox.setModel(new DefaultComboBoxModel(new String[] { "", "Moscow", "Ottawa", "Boston", "Beijing", "Washington DC", "Tehran", "Los Angeles", "Miami", "Mexico City", "Singapore", "Sydney", "Buenos Aires" }));
+		cityComboBox = new JComboBox<String>();
+		cityComboBox.setModel(new DefaultComboBoxModel<String>(CityData.getInstance().getCities()));
 		cityComboBox.setSelectedItem("Boston");
 		cityComboBox.setMaximumRowCount(15);
 		cityComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -278,7 +204,7 @@ public class EnergyPanel extends JPanel {
 				if (cityComboBox.getSelectedItem().equals(""))
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				else {
-					final Integer newLatitude = cityLatitute.get(cityComboBox.getSelectedItem());
+					final Integer newLatitude = CityData.getInstance().getCityLatitutes().get(cityComboBox.getSelectedItem());
 					if (newLatitude.equals(latitudeSpinner.getValue()))
 						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					else
@@ -339,7 +265,7 @@ public class EnergyPanel extends JPanel {
 		latitudeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
 			@Override
 			public void stateChanged(final javax.swing.event.ChangeEvent e) {
-				if (!cityComboBox.getSelectedItem().equals("") && !cityLatitute.values().contains(latitudeSpinner.getValue()))
+				if (!cityComboBox.getSelectedItem().equals("") && !CityData.getInstance().getCityLatitutes().values().contains(latitudeSpinner.getValue()))
 					cityComboBox.setSelectedItem("");
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -758,7 +684,7 @@ public class EnergyPanel extends JPanel {
 		gbc_passiveSolarTextField.gridy = 1;
 		panel_1.add(passiveSolarTextField, gbc_passiveSolarTextField);
 		passiveSolarTextField.setEditable(false);
-		passiveSolarTextField.setColumns(10);
+		passiveSolarTextField.setColumns(5);
 
 		photovoltaicTextField = new JTextField();
 		final GridBagConstraints gbc_photovoltaicTextField = new GridBagConstraints();
@@ -769,7 +695,7 @@ public class EnergyPanel extends JPanel {
 		gbc_photovoltaicTextField.gridy = 1;
 		panel_1.add(photovoltaicTextField, gbc_photovoltaicTextField);
 		photovoltaicTextField.setEditable(false);
-		photovoltaicTextField.setColumns(10);
+		photovoltaicTextField.setColumns(5);
 
 		heatingTodayTextField = new JTextField();
 		heatingTodayTextField.setEditable(false);
@@ -780,7 +706,7 @@ public class EnergyPanel extends JPanel {
 		gbc_heatingTodayTextField.gridx = 2;
 		gbc_heatingTodayTextField.gridy = 1;
 		panel_1.add(heatingTodayTextField, gbc_heatingTodayTextField);
-		heatingTodayTextField.setColumns(10);
+		heatingTodayTextField.setColumns(5);
 
 		coolingTodayTextField = new JTextField();
 		coolingTodayTextField.setEditable(false);
@@ -791,16 +717,17 @@ public class EnergyPanel extends JPanel {
 		gbc_coolingTodayTextField.gridx = 3;
 		gbc_coolingTodayTextField.gridy = 1;
 		panel_1.add(coolingTodayTextField, gbc_coolingTodayTextField);
-		coolingTodayTextField.setColumns(10);
+		coolingTodayTextField.setColumns(5);
 
 		totalTodayTextField = new JTextField();
 		totalTodayTextField.setEditable(false);
 		final GridBagConstraints gbc_totalTodayTextField = new GridBagConstraints();
+		gbc_totalTodayTextField.weightx = 1.0;
 		gbc_totalTodayTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_totalTodayTextField.gridx = 4;
 		gbc_totalTodayTextField.gridy = 1;
 		panel_1.add(totalTodayTextField, gbc_totalTodayTextField);
-		totalTodayTextField.setColumns(10);
+		totalTodayTextField.setColumns(5);
 
 		panel_1.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_1.getPreferredSize().height));
 
@@ -845,120 +772,6 @@ public class EnergyPanel extends JPanel {
 		partHeightTextField.setEditable(false);
 		panel_8.add(partHeightTextField);
 		partHeightTextField.setColumns(10);
-
-		// if (Config.isRestrictMode()) {
-		// coolingLabel.setVisible(false);
-		// coolingCostTextField.setVisible(false);
-		// coolingRateTextField.setVisible(false);
-		// coolingTodayTextField.setVisible(false);
-		// coolingYearlyTextField.setVisible(false);
-		//
-		// heatingLabel.setVisible(false);
-		// heatingCostTextField.setVisible(false);
-		// heatingRateTextField.setVisible(false);
-		// heatingTodayTextField.setVisible(false);
-		// heatingYearlyTextField.setVisible(false);
-		//
-		// totalLabel.setVisible(false);
-		// totalCostTextField.setVisible(false);
-		// totalRateTextField.setVisible(false);
-		// totalTodayTextField.setVisible(false);
-		// totalYearlyTextField.setVisible(false);
-		//
-		// yearlyCostLabel.setVisible(false);
-		//
-		// temperaturePanel.setVisible(false);
-		// uFactorPanel.setVisible(false);
-		// }
-
-	}
-
-	public void initJavaFXGUI() {
-		if (fxPanel == null && !initJavaFxAlreadyCalled) {
-			initJavaFxAlreadyCalled = true;
-			try {
-				System.out.println("initJavaFXGUI()");
-				fxPanel = new JFXPanel();
-				final GridBagConstraints gbc_fxPanel = new GridBagConstraints();
-				fxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
-				gbc_fxPanel.gridwidth = 3;
-				gbc_fxPanel.fill = GridBagConstraints.BOTH;
-				gbc_fxPanel.insets = new Insets(0, 0, 5, 0);
-				gbc_fxPanel.gridx = 0;
-				gbc_fxPanel.gridy = 1;
-
-				add(fxPanel, gbc_fxPanel);
-				initFxComponents();
-			} catch (final Throwable e) {
-				System.out.println("Error occured when initializing JavaFX: JavaFX is probably not supported!");
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private void initFxComponents() {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				final GridPane grid = new GridPane();
-				final javafx.scene.Scene scene = new javafx.scene.Scene(grid, 800, 400);
-				scene.getStylesheets().add("org/concord/energy3d/gui/css/fx.css");
-				final NumberAxis yAxis = new NumberAxis(0, 100, 10);
-				final CategoryAxis xAxis = new CategoryAxis();
-				xAxis.setCategories(FXCollections.<String> observableArrayList(Arrays.asList("Area", "Energy Loss")));
-				final StackedBarChart<String, Number> chart = new StackedBarChart<String, Number>(xAxis, yAxis);
-				chart.setStyle("-fx-background-color: #" + Integer.toHexString(UIManager.getColor("Panel.background").getRGB() & 0x00FFFFFF) + ";");
-
-				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
-				series.setName("Walls");
-				series.getData().add(wallsAreaChartData);
-				series.getData().add(wallsEnergyChartData);
-				chart.getData().add(series);
-
-				series = new XYChart.Series<String, Number>();
-				series.setName("Doors");
-				series.getData().add(doorsAreaChartData);
-				series.getData().add(doorsEnergyChartData);
-				chart.getData().add(series);
-
-				series = new XYChart.Series<String, Number>();
-				series.setName("Windows");
-				series.getData().add(windowsAreaChartData);
-				series.getData().add(windowsEnergyChartData);
-				chart.getData().add(series);
-
-				series = new XYChart.Series<String, Number>();
-				series.setName("Roof");
-				series.getData().add(roofsAreaChartData);
-				series.getData().add(roofsEnergyChartData);
-				chart.getData().add(series);
-
-				grid.add(chart, 0, 0);
-				fxPanel.setScene(scene);
-			}
-		});
-	}
-
-	public void updateAreaChart() {
-		final double total = wallsArea + doorsArea + windowsArea + roofsArea;
-		final boolean isZero = (total == 0.0);
-		wallsAreaChartData.setYValue(isZero ? 0 : wallsArea / total * 100.0);
-		doorsAreaChartData.setYValue(isZero ? 0 : doorsArea / total * 100.0);
-		windowsAreaChartData.setYValue(isZero ? 0 : windowsArea / total * 100.0);
-		roofsAreaChartData.setYValue(isZero ? 0 : roofsArea / total * 100.0);
-	}
-
-	public void updateEnergyLossChart() {
-		final double walls = wallsArea * wallUFactor;
-		final double doors = doorsArea * doorUFactor;
-		final double windows = windowsArea * windowUFactor;
-		final double roofs = roofsArea * roofUFactor;
-		final double total = walls + windows + doors + roofs;
-		final boolean isZero = (total == 0.0);
-		wallsEnergyChartData.setYValue(isZero ? 0 : walls / total * 100.0);
-		doorsEnergyChartData.setYValue(isZero ? 0 : doors / total * 100.0);
-		windowsEnergyChartData.setYValue(isZero ? 0 : windows / total * 100.0);
-		roofsEnergyChartData.setYValue(isZero ? 0 : roofs / total * 100.0);
 	}
 
 	public void compute(final UpdateRadiation updateRadiation) {
@@ -1032,213 +845,14 @@ public class EnergyPanel extends JPanel {
 		if (autoCheckBox.isSelected())
 			updateOutsideTemperature();
 
-		try {
-			wallUFactor = parseUFactor(wallsComboBox);
-			doorUFactor = parseUFactor(doorsComboBox);
-			windowUFactor = parseUFactor(windowsComboBox);
-			roofUFactor = parseUFactor(roofsComboBox);
-		} catch (final Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(MainPanel.getInstance(), "Invalid U-Factor value: " + e.getMessage(), "Invalid U-Factor", JOptionPane.WARNING_MESSAGE);
-			return;
-		}
-
-		wallsArea = 0;
-		doorsArea = 0;
-		windowsArea = 0;
-		roofsArea = 0;
-
-		/* compute area */
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Wall)
-				wallsArea += part.computeArea();
-			else if (part instanceof Window)
-				windowsArea += part.computeArea();
-			else if (part instanceof Door)
-				doorsArea += part.computeArea();
-			else if (part instanceof Roof)
-				roofsArea += part.computeArea();
-		}
-		updateAreaChart();
-		updateEnergyLossChart();
-
-		final EnergyAmount energyToday = computeEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone(), (Integer) insideTemperatureSpinner.getValue());
-//		sunTodayTextField.setText(twoDecimals.format(energyToday.solar));
-//		solarTodayTextField.setText(twoDecimals.format(energyToday.solarPanel));
-		heatingTodayTextField.setText(twoDecimals.format(energyToday.heating));
-		coolingTodayTextField.setText(twoDecimals.format(energyToday.cooling));
-		totalTodayTextField.setText(twoDecimals.format(energyToday.heating + energyToday.cooling));
-
-		progressBar.setValue(100);
-	}
-
-	private double parseUFactor(final JComboBox comboBox) {
-		final String valueStr = comboBox.getSelectedItem().toString();
-		final int indexOfSpace = valueStr.indexOf(' ');
-		return Double.parseDouble(valueStr.substring(0, indexOfSpace != -1 ? indexOfSpace : valueStr.length()));
-	}
-
-	private EnergyAmount computeEnergyYearly(final double insideTemperature) {
-		final EnergyAmount energyYearly = new EnergyAmount();
-		final Calendar date = Calendar.getInstance();
-		date.set(Calendar.DAY_OF_MONTH, 15);
-		date.set(Calendar.MONTH, 0);
-		for (int month = 0; month < 11; month++) {
-			final EnergyAmount energyToday = computeEnergyToday(date, insideTemperature);
-			final int daysInMonth = date.getActualMaximum(Calendar.DAY_OF_MONTH);
-			energyYearly.solar += energyToday.solar * daysInMonth;
-			energyYearly.solarPanel += energyToday.solarPanel * daysInMonth;
-			energyYearly.heating += energyToday.heating * daysInMonth;
-			energyYearly.cooling += energyToday.cooling * daysInMonth;
-			date.add(Calendar.MONTH, 1);
-		}
-		return energyYearly;
-	}
-
-	private EnergyAmount computeEnergyToday(final Calendar today, final double insideTemperature) {
-		final EnergyAmount energyToday = new EnergyAmount();
-		final Heliodon heliodon = Heliodon.getInstance();
-
-		today.set(Calendar.SECOND, 0);
-		today.set(Calendar.MINUTE, 0);
-		today.set(Calendar.HOUR_OF_DAY, 0);
-
-		final double[] outsideTemperature;
-
-		if (getCity().isEmpty()) {
-			/*
-			 * if there are no temperatures available for the selected city compute zero for cooling and heating
-			 */
-			outsideTemperature = new double[] { insideTemperature, insideTemperature };
-			energyToday.heating = Double.NaN;
-			energyToday.cooling = Double.NaN;
-		} else
-			outsideTemperature = computeOutsideTemperature(today);
-
-		for (int hour = 0; hour < 24; hour++) {
-			final EnergyAmount energyThisHour = computeEnergyRate(heliodon.computeSunLocation(today), insideTemperature, outsideTemperature[0] + (outsideTemperature[1] - outsideTemperature[0]) / 24 * hour);
-			energyToday.solar += energyThisHour.solar / 1000.0;
-			energyToday.solarPanel += energyThisHour.solarPanel / 1000.0;
-			energyToday.heating += energyThisHour.heating / 1000.0;
-			energyToday.cooling += energyThisHour.cooling / 1000.0;
-			today.add(Calendar.HOUR_OF_DAY, 1);
-		}
-		final double coolingWithSolarPanel = Math.max(0.0, energyToday.cooling - energyToday.solarPanel);
-		final double heatingWithSolarPanel = energyToday.heating - energyToday.solarPanel - (energyToday.cooling - coolingWithSolarPanel);
-		energyToday.cooling = coolingWithSolarPanel;
-		energyToday.heating = heatingWithSolarPanel;
-		return energyToday;
-	}
-
-	private double[] computeOutsideTemperature(final Calendar today) {
-		final int day = today.get(Calendar.DAY_OF_MONTH);
-		final int daysInMonth = today.getActualMaximum(Calendar.DAY_OF_MONTH);
-		final double[] outsideTemperature = new double[2];
-
-		final Calendar monthFrom, monthTo;
-		final int halfMonth = daysInMonth / 2;
-		final double portion;
-		final int totalDaysOfMonth;
-		if (day < halfMonth) {
-			monthFrom = (Calendar) today.clone();
-			monthFrom.add(Calendar.MONTH, -1);
-			monthTo = today;
-			final int prevHalfMonth = monthFrom.getActualMaximum(Calendar.DAY_OF_MONTH) - monthFrom.getActualMaximum(Calendar.DAY_OF_MONTH) / 2;
-			totalDaysOfMonth = prevHalfMonth + daysInMonth / 2;
-			portion = (double) (day + prevHalfMonth) / totalDaysOfMonth;
-		} else {
-			monthFrom = today;
-			monthTo = (Calendar) today.clone();
-			monthTo.add(Calendar.MONTH, 1);
-			final int nextHalfMonth = monthTo.getActualMaximum(Calendar.DAY_OF_MONTH) / 2;
-			totalDaysOfMonth = halfMonth + nextHalfMonth;
-			portion = (double) (day - halfMonth) / totalDaysOfMonth;
-		}
-
-		final int[] monthlyLowTemperatures = avgMonthlyLowTemperatures.get(getCity());
-		final int[] monthlyHighTemperatures = avgMonthlyHighTemperatures.get(getCity());
-		final int monthFromIndex = monthFrom.get(Calendar.MONTH);
-		final int monthToIndex = monthTo.get(Calendar.MONTH);
-		outsideTemperature[0] = monthlyLowTemperatures[monthFromIndex] + (monthlyLowTemperatures[monthToIndex] - monthlyLowTemperatures[monthFromIndex]) * portion;
-		outsideTemperature[1] = monthlyHighTemperatures[monthFromIndex] + (monthlyHighTemperatures[monthToIndex] - monthlyHighTemperatures[monthFromIndex]) * portion;
-		return outsideTemperature;
-	}
-
-	public String getCity() {
-		return (String) cityComboBox.getSelectedItem();
-	}
-
-	public void setCity(final String city) {
-		cityComboBox.setSelectedItem(city);
-	}
-
-	private EnergyAmount computeEnergyRate(final ReadOnlyVector3 sunLocation, final double insideTemperature, final double outsideTemperature) {
-		if (computeRequest)
-			throw new CancellationException();
-		final EnergyAmount energyRate = new EnergyAmount();
-
-		// if (Heliodon.getInstance().isVisible() && sunLocation.getZ() > 0.0) {
-		if (sunLocation.getZ() > 0.0) {
-			energyRate.solar = computeEnergySolarRate(sunLocation.normalize(null));
-			energyRate.solarPanel = computeEnergySolarPanelRate(sunLocation.normalize(null));
-		}
-
-		final double energyLossRate = computeEnergyLossRate(insideTemperature - outsideTemperature);
-		if (energyLossRate >= 0.0) {
-			energyRate.heating = energyLossRate;
-			energyRate.cooling = 0.0;
-		} else {
-			energyRate.cooling = -energyLossRate;
-			energyRate.heating = 0.0;
-		}
-
-		if (Heliodon.getInstance().isVisible()) {
-			final double heatingWithSolar = Math.max(0.0, energyRate.heating - energyRate.solar);
-			final double coolingWithSolar = energyRate.cooling + energyRate.solar - (energyRate.heating - heatingWithSolar);
-			energyRate.heating = heatingWithSolar;
-			energyRate.cooling = coolingWithSolar;
-			if (outsideTemperature < insideTemperature)
-				energyRate.cooling = 0;
-		}
-		return energyRate;
-	}
-
-	private double computeEnergyLossRate(final double deltaT) {
-		final double wallsEnergyLoss = wallsArea * wallUFactor * deltaT;
-		final double doorsEnergyLoss = doorsArea * doorUFactor * deltaT;
-		final double windowsEnergyLoss = windowsArea * windowUFactor * deltaT;
-		final double roofsEnergyLoss = roofsArea * roofUFactor * deltaT;
-		return wallsEnergyLoss + doorsEnergyLoss + windowsEnergyLoss + roofsEnergyLoss;
-	}
-
-	private double computeEnergySolarRate(final ReadOnlyVector3 sunVector) {
-		double totalRate = 0.0;
-		for (final HousePart part : Scene.getInstance().getParts())
-			if (part instanceof Window) {
-				final double dot = part.getContainer().getFaceDirection().dot(sunVector);
-				if (dot > 0.0)
-					totalRate += 100.0 * part.computeArea() * dot;
-			}
-		return totalRate;
-	}
-
-	private double computeEnergySolarPanelRate(final ReadOnlyVector3 sunVector) {
-		double totalRate = 0.0;
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof SolarPanel) {
-				final double dot = part.getContainer().getFaceDirection().dot(sunVector);
-				if (dot > 0.0)
-					totalRate += 70.0 * part.computeArea() * dot;
-			}
-		}
-		return totalRate;
+		HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone(), (Integer) insideTemperatureSpinner.getValue());
 	}
 
 	private void updateOutsideTemperature() {
-		if (getCity().isEmpty())
+		if (cityComboBox.getSelectedItem().equals(""))
 			outsideTemperatureSpinner.setValue(15);
 		else {
-			final double[] temperature = computeOutsideTemperature(Heliodon.getInstance().getCalander());
+			final double[] temperature = CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander(), (String) cityComboBox.getSelectedItem());
 			final double avgTemperature = (temperature[0] + temperature[1]) / 2.0;
 			outsideTemperatureSpinner.setValue((int) Math.round(avgTemperature));
 		}
@@ -1327,19 +941,45 @@ public class EnergyPanel extends JPanel {
 			partHeightTextField.setText("");
 		}
 
-		final Foundation foundation;
+		final Foundation selectedBuilding;
 		if (selectedPart == null)
-			foundation = null;
+			selectedBuilding = null;
 		else if (selectedPart instanceof Foundation)
-			foundation = (Foundation) selectedPart;
+			selectedBuilding = (Foundation) selectedPart;
 		else
-			foundation = (Foundation) selectedPart.getTopContainer();
-		if (foundation != null) {
-			if (iradiationEnabled)
-				houseSolarPotentialTextField.setText(twoDecimals.format(foundation.getSolarPotential()));
-			else
+			selectedBuilding = (Foundation) selectedPart.getTopContainer();
+		
+		if (selectedBuilding != null) {
+			if (iradiationEnabled) {
+				houseSolarPotentialTextField.setText(twoDecimals.format(selectedBuilding.getSolarPotential()));
+				
+				double passiveSolar, photovoltaic, heating, cooling;
+				passiveSolar = photovoltaic = heating = cooling = 0.0;
+				for (final HousePart part : Scene.getInstance().getParts())
+					if (!part.isFrozen() && part.getTopContainer() == selectedBuilding) {
+						if (part instanceof Window)
+							passiveSolar += part.getSolarPotential();
+						else if (part instanceof SolarPanel)
+							photovoltaic += part.getSolarPotential();
+						else {
+							if (part.getHeatLoss() > 0)
+								heating += part.getHeatLoss();
+							else
+								cooling += -part.getHeatLoss();
+						}
+							
+					}
+				passiveSolarTextField.setText(twoDecimals.format(passiveSolar));
+				photovoltaicTextField.setText(twoDecimals.format(photovoltaic));
+				heatingTodayTextField.setText(twoDecimals.format(heating));
+				coolingTodayTextField.setText(twoDecimals.format(cooling));
+				totalTodayTextField.setText(twoDecimals.format(heating + cooling));
+			} else {
 				houseSolarPotentialTextField.setText("");
-			final double[] buildingGeometry = foundation.getBuildingGeometry();
+				passiveSolarTextField.setText("");
+				photovoltaicTextField.setText("");				
+			}
+			final double[] buildingGeometry = selectedBuilding.getBuildingGeometry();
 			if (buildingGeometry != null) {
 				positionTextField.setText("(" + twoDecimals.format(buildingGeometry[3]) + ", " + twoDecimals.format(buildingGeometry[4]) + ")");
 				heightTextField.setText(twoDecimals.format(buildingGeometry[0]));
@@ -1359,27 +999,30 @@ public class EnergyPanel extends JPanel {
 			volumnTextField.setText("");
 		}
 
-		if (iradiationEnabled) {
-			double passiveSolar = 0.0;
-			double photovoltaic = 0.0;
-			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (!part.isFrozen()) {
-					if (part instanceof Window)
-						passiveSolar += part.getSolarPotential();
-					else if (part instanceof SolarPanel)
-						photovoltaic += part.getSolarPotential();
-				}
-			}
-			passiveSolarTextField.setText(twoDecimals.format(passiveSolar));
-			photovoltaicTextField.setText(twoDecimals.format(photovoltaic));
-		} else {
-			passiveSolarTextField.setText("");
-			photovoltaicTextField.setText("");
-		}
 	}
 
 	public boolean isComputeRequest() {
 		return computeRequest;
+	}
+
+	public JComboBox<String> getWallsComboBox() {
+		return wallsComboBox;
+	}
+
+	public JComboBox<String> getDoorsComboBox() {
+		return doorsComboBox;
+	}
+
+	public JComboBox<String> getWindowsComboBox() {
+		return windowsComboBox;
+	}
+
+	public JComboBox<String> getRoofsComboBox() {
+		return roofsComboBox;
+	}
+
+	public JComboBox<String> getCityComboBox() {
+		return cityComboBox;
 	}
 
 }
