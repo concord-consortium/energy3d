@@ -85,6 +85,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem resetCameraMenuItem = null;
 	private JMenuItem saveasMenuItem;
 	private JMenu sceneMenu;
+	private JMenu simulationMenu;
 	private JMenu unitsMenu;
 	private JRadioButtonMenuItem metersMenuItem;
 	private JRadioButtonMenuItem centimetersMenuItem;
@@ -314,6 +315,7 @@ public class MainFrame extends JFrame {
 			appMenuBar.add(getFileMenu());
 			appMenuBar.add(getEditMenu());
 			appMenuBar.add(getSceneMenu());
+			appMenuBar.add(getSimulationMenu());
 			appMenuBar.add(getCameraMenu());
 			appMenuBar.add(getHelpMenu());
 		}
@@ -790,6 +792,33 @@ public class MainFrame extends JFrame {
 		return saveasMenuItem;
 	}
 
+	private JMenu getSimulationMenu() {
+		if (simulationMenu == null) {
+			simulationMenu = new JMenu("Simulation");
+			simulationMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					mainPanel.getSelectButton().setSelected(true);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
+				}
+			});
+			simulationMenu.add(getIrradiationParametersMenuItem());
+			if (!Config.isRestrictMode()) {
+				simulationMenu.add(getKeepHeatmapOnMenuItem());
+			}
+		}
+		return simulationMenu;
+	}
+
 	private JMenu getSceneMenu() {
 		if (sceneMenu == null) {
 			sceneMenu = new JMenu("Scene");
@@ -824,13 +853,11 @@ public class MainFrame extends JFrame {
 			sceneMenu.addSeparator();
 			sceneMenu.add(getShadeMenuItem());
 			sceneMenu.add(getShadowMenuItem());
-			sceneMenu.add(getIrradiationParametersMenuItem());
 			sceneMenu.addSeparator();
 			sceneMenu.add(getAnnotationsInwardMenuItem());
 			sceneMenu.add(getWallThicknessMenuItem());
 			sceneMenu.add(getRemoveAllRoofsMenuItem());
 			if (!Config.isRestrictMode()) {
-				sceneMenu.add(getKeepHeatmapOnMenuItem());
 				sceneMenu.add(getFreezeMenuItem());
 				sceneMenu.add(getUnfreezeMenuItem());
 			}

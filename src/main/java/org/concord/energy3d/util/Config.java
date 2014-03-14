@@ -66,7 +66,7 @@ public class Config {
 	}
 
 	public static boolean isRestrictMode() {
-		return true;
+		return false;
 	}
 
 }
