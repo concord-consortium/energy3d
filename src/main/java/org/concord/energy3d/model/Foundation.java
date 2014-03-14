@@ -48,6 +48,7 @@ public class Foundation extends HousePart {
 	private transient double photovoltaicToday;
 	private transient double heatingToday;
 	private transient double coolingToday;
+	private transient double totalEnergyToday;
 
 	static {
 		format.setGroupingUsed(true);
@@ -761,6 +762,14 @@ public class Foundation extends HousePart {
 
 	public void setCoolingToday(final double coolingToday) {
 		this.coolingToday = coolingToday;
+	}
+
+	public double getTotalEnergyToday() {
+		return totalEnergyToday;
+	}
+
+	public void setTotalEnergyToday(final double totalEnergyToday) {
+		this.totalEnergyToday = totalEnergyToday;
 	}
 
 }

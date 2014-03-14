@@ -485,7 +485,7 @@ public class EnergyPanel extends JPanel {
 		lblArea = new JLabel("Area:");
 		final GridBagConstraints gbc_lblArea = new GridBagConstraints();
 		gbc_lblArea.anchor = GridBagConstraints.EAST;
-		gbc_lblArea.insets = new Insets(0, 0, 0, 5);
+		gbc_lblArea.insets = new Insets(0, 0, 10, 5);
 		gbc_lblArea.gridx = 0;
 		gbc_lblArea.gridy = 1;
 		panel_2.add(lblArea, gbc_lblArea);
@@ -494,7 +494,7 @@ public class EnergyPanel extends JPanel {
 		areaTextField.setEditable(false);
 		final GridBagConstraints gbc_areaTextField = new GridBagConstraints();
 		gbc_areaTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_areaTextField.insets = new Insets(0, 0, 0, 5);
+		gbc_areaTextField.insets = new Insets(0, 0, 10, 5);
 		gbc_areaTextField.gridx = 1;
 		gbc_areaTextField.gridy = 1;
 		panel_2.add(areaTextField, gbc_areaTextField);
@@ -503,7 +503,7 @@ public class EnergyPanel extends JPanel {
 		lblVolume = new JLabel("Volume:");
 		final GridBagConstraints gbc_lblVolume = new GridBagConstraints();
 		gbc_lblVolume.anchor = GridBagConstraints.EAST;
-		gbc_lblVolume.insets = new Insets(0, 0, 0, 5);
+		gbc_lblVolume.insets = new Insets(0, 0, 10, 5);
 		gbc_lblVolume.gridx = 2;
 		gbc_lblVolume.gridy = 1;
 		panel_2.add(lblVolume, gbc_lblVolume);
@@ -511,6 +511,7 @@ public class EnergyPanel extends JPanel {
 		volumnTextField = new JTextField();
 		volumnTextField.setEditable(false);
 		final GridBagConstraints gbc_volumnTextField = new GridBagConstraints();
+		gbc_volumnTextField.insets = new Insets(0, 0, 10, 0);
 		gbc_volumnTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_volumnTextField.gridx = 3;
 		gbc_volumnTextField.gridy = 1;
@@ -951,7 +952,7 @@ public class EnergyPanel extends JPanel {
 				photovoltaicTextField.setText(twoDecimals.format(selectedBuilding.getPhotovoltaicToday()));
 				heatingTodayTextField.setText(twoDecimals.format(selectedBuilding.getHeatingToday()));
 				coolingTodayTextField.setText(twoDecimals.format(selectedBuilding.getCoolingToday()));
-				totalTodayTextField.setText(twoDecimals.format(selectedBuilding.getHeatingToday() + selectedBuilding.getCoolingToday()));
+				totalTodayTextField.setText(twoDecimals.format(selectedBuilding.getTotalEnergyToday()));
 			} else {
 				houseSolarPotentialTextField.setText("");
 				passiveSolarTextField.setText("");

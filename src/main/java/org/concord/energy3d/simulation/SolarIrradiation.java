@@ -316,24 +316,35 @@ public class SolarIrradiation {
 					}
 				
 				double heatingTotal = 0.0;
+				double coolingTotal = 0.0;
 				double passiveSolarTotal = 0.0;
 				double photovoltaicTotal = 0.0;
+				double photovoltaicLeftover = 0.0;
 				for (int i = 0; i < heatLoss.length; i++) {
-					if (Heliodon.getInstance().isVisible())
+//					if (Heliodon.getInstance().isVisible()) {
 						heatLoss[i] -= passiveSolar[i];
-					heatingTotal += heatLoss[i];
+						if (Math.abs(heatLoss[i]) > photovoltaic[i])
+							heatLoss[i] = Math.signum(heatLoss[i]) * (Math.abs(heatLoss[i]) - photovoltaic[i]);
+						else {
+							photovoltaicLeftover += photovoltaic[i] - Math.abs(heatLoss[i]);
+							heatLoss[i] = 0.0;
+						}
+//					}
+					if (heatLoss[i] > 0)
+						heatingTotal += heatLoss[i];
+					else
+						coolingTotal += -heatLoss[i];
 					passiveSolarTotal += passiveSolar[i];
 					photovoltaicTotal += photovoltaic[i];
 				}
-				if (Heliodon.getInstance().isVisible())
-					heatingTotal = Math.max(0, heatingTotal - photovoltaicTotal);
 				
 				foundation.setSolarPotentialToday(solarPotentialTotal);
 				foundation.setSolarLabelValue(solarPotentialTotal);
-				foundation.setHeatingToday(heatingTotal >= 0 ? heatingTotal : 0);
-				foundation.setCoolingToday(heatingTotal < 0 ? -heatingTotal : 0);
 				foundation.setPassiveSolarToday(passiveSolarTotal);
 				foundation.setPhotovoltaicToday(photovoltaicTotal);
+				foundation.setHeatingToday(heatingTotal);
+				foundation.setCoolingToday(coolingTotal);
+				foundation.setTotalEnergyToday(heatingTotal + coolingTotal - photovoltaicLeftover);
 			}
 		}
 
