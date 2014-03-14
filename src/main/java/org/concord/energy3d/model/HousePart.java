@@ -73,18 +73,20 @@ public abstract class HousePart implements Serializable {
 	protected transient boolean relativeToHorizontal;
 	private transient boolean isPrintVertical;
 	private transient Map<Mesh, Boolean> textureCleared;
-	private transient double solarPotential;
+	private transient double[] solarPotential;
+	private transient double[] heatLoss;
+	private transient double solarPotentialToday;
+	
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
 	protected HousePart container = null;
 	protected double height;
+	protected long id;
 	protected int editPointIndex = -1;
 	protected boolean drawCompleted = false;
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
-	protected long id;
-	private double heatLoss;
 
 	static {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
@@ -763,7 +765,7 @@ public abstract class HousePart implements Serializable {
 	public HousePart getTopContainer() {
 		HousePart c = this.getContainer();
 		if (c == null)
-			return c;
+			return null;
 		HousePart x = null;
 		while (c != null) {
 			x = c;
@@ -784,21 +786,57 @@ public abstract class HousePart implements Serializable {
 			mesh.setDefaultColor(ColorRGBA.WHITE);
 		}
 	}
-
-	public void setSolarPotential(final double energy) {
-		solarPotential = energy;
+	
+	public boolean isFoundation() {
+		return false;
 	}
 
-	public double getSolarPotential() {
+	public boolean isWall() {
+		return false;
+	}
+
+	public boolean isDoor() {
+		return false;
+	}
+
+	public boolean isWindow() {
+		return false;
+	}
+
+	public boolean isRoof() {
+		return false;
+	}
+
+	public boolean isFloor() {
+		return false;
+	}
+
+	public boolean isSolarPanel() {
+		return false;
+	}
+
+	public void setSolarPotential(final double solarPotential[]) {
+		this.solarPotential = solarPotential;
+	}
+
+	public double[] getSolarPotential() {
 		return solarPotential;
 	}
 	
-	public void setHeatLoss(final double heatLoss) {
+	public void setHeatLoss(final double[] heatLoss) {
 		this.heatLoss = heatLoss;
 	}		
 
-	public double getHeatLoss() {
+	public double[] getHeatLoss() {
 		return heatLoss;
+	}
+
+	public double getSolarPotentialToday() {
+		return solarPotentialToday;
+	}
+
+	public void setSolarPotentialToday(final double solarPotentialToday) {
+		this.solarPotentialToday = solarPotentialToday;
 	}
 
 }

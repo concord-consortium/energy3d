@@ -44,7 +44,6 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
@@ -914,19 +913,15 @@ public class EnergyPanel extends JPanel {
 
 	public void updatePartEnergy() {
 		final boolean iradiationEnabled = MainPanel.getInstance().getSolarButton().isSelected();
-
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		final TitledBorder titledBorder = (TitledBorder) partPanel.getBorder();
-		if (selectedPart == null)
-			titledBorder.setTitle("Part");
-		else
-			titledBorder.setTitle("Part - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1));
+
+		((TitledBorder) partPanel.getBorder()).setTitle("Part" + (selectedPart == null ? "" : (" - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1))));
 		partPanel.repaint();
 
 		if (!iradiationEnabled || selectedPart == null || selectedPart instanceof Foundation || selectedPart instanceof Door)
 			partEnergyTextField.setText("");
 		else
-			partEnergyTextField.setText(twoDecimals.format(selectedPart.getSolarPotential()));
+			partEnergyTextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
 
 		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor)) {
 			if (selectedPart instanceof SolarPanel) {
@@ -951,29 +946,12 @@ public class EnergyPanel extends JPanel {
 		
 		if (selectedBuilding != null) {
 			if (iradiationEnabled) {
-				houseSolarPotentialTextField.setText(twoDecimals.format(selectedBuilding.getSolarPotential()));
-				
-				double passiveSolar, photovoltaic, heating, cooling;
-				passiveSolar = photovoltaic = heating = cooling = 0.0;
-				for (final HousePart part : Scene.getInstance().getParts())
-					if (!part.isFrozen() && part.getTopContainer() == selectedBuilding) {
-						if (part instanceof Window)
-							passiveSolar += part.getSolarPotential();
-						else if (part instanceof SolarPanel)
-							photovoltaic += part.getSolarPotential();
-						else {
-							if (part.getHeatLoss() > 0)
-								heating += part.getHeatLoss();
-							else
-								cooling += -part.getHeatLoss();
-						}
-							
-					}
-				passiveSolarTextField.setText(twoDecimals.format(passiveSolar));
-				photovoltaicTextField.setText(twoDecimals.format(photovoltaic));
-				heatingTodayTextField.setText(twoDecimals.format(heating));
-				coolingTodayTextField.setText(twoDecimals.format(cooling));
-				totalTodayTextField.setText(twoDecimals.format(heating + cooling));
+				houseSolarPotentialTextField.setText(twoDecimals.format(selectedBuilding.getSolarPotentialToday()));
+				passiveSolarTextField.setText(twoDecimals.format(selectedBuilding.getPassiveSolarToday()));
+				photovoltaicTextField.setText(twoDecimals.format(selectedBuilding.getPhotovoltaicToday()));
+				heatingTodayTextField.setText(twoDecimals.format(selectedBuilding.getHeatingToday()));
+				coolingTodayTextField.setText(twoDecimals.format(selectedBuilding.getCoolingToday()));
+				totalTodayTextField.setText(twoDecimals.format(selectedBuilding.getHeatingToday() + selectedBuilding.getCoolingToday()));
 			} else {
 				houseSolarPotentialTextField.setText("");
 				passiveSolarTextField.setText("");

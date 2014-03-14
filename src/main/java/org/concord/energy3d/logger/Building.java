@@ -26,27 +26,27 @@ class Building {
 	int id;
 	int windowCount;
 	private double height = Double.MAX_VALUE;
-	private ArrayList<Wall> walls;
-	private ArrayList<Vector2> floorVertices;
+	private final ArrayList<Wall> walls;
+	private final ArrayList<Vector2> floorVertices;
 
-	Building(int id) {
+	Building(final int id) {
 		this.id = id;
 		walls = new ArrayList<Wall>();
 		floorVertices = new ArrayList<Vector2>();
 	}
 
-	void addWall(Wall w) {
+	void addWall(final Wall w) {
 		if (walls.contains(w))
 			return;
 		walls.add(w);
-		double h = w.getHeight();
+		final double h = w.getHeight();
 		if (height > h)
 			height = h;
 	}
 
 	private double getArea() {
 		double area = 0;
-		int n = floorVertices.size();
+		final int n = floorVertices.size();
 		Vector2 v1, v2;
 		for (int i = 0; i < n - 1; i++) {
 			v1 = floorVertices.get(i);
@@ -61,7 +61,7 @@ class Building {
 
 	private double getCentroidX() {
 		double cx = 0;
-		int n = floorVertices.size();
+		final int n = floorVertices.size();
 		Vector2 v1, v2;
 		for (int i = 0; i < n - 1; i++) {
 			v1 = floorVertices.get(i);
@@ -76,7 +76,7 @@ class Building {
 
 	private double getCentroidY() {
 		double cy = 0;
-		int n = floorVertices.size();
+		final int n = floorVertices.size();
 		Vector2 v1, v2;
 		for (int i = 0; i < n - 1; i++) {
 			v1 = floorVertices.get(i);
@@ -89,10 +89,10 @@ class Building {
 		return cy / 6;
 	}
 
-	private void addVertex(ReadOnlyVector3 v3) {
-		Vector2 v2 = new Vector2(v3.getX(), v3.getY());
+	private void addVertex(final ReadOnlyVector3 v3) {
+		final Vector2 v2 = new Vector2(v3.getX(), v3.getY());
 		boolean b = false;
-		for (Vector2 x : floorVertices) {
+		for (final Vector2 x : floorVertices) {
 			if (Util.isEqual(x, v2)) {
 				b = true;
 				break;
@@ -119,10 +119,10 @@ class Building {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if ((!(o instanceof Building)))
 			return false;
-		Building b = (Building) o;
+		final Building b = (Building) o;
 		return b.id == id;
 	}
 
@@ -137,11 +137,11 @@ class Building {
 	}
 
 	String getGeometryJson() {
-		double scale = Scene.getInstance().getAnnotationScale();
+		final double scale = Scene.getInstance().getAnnotationScale();
 		String s = "\"Height\": " + FORMAT1.format(height * scale);
-		double area = getArea();
+		final double area = getArea();
 		s += ", \"Area\": " + FORMAT1.format(Math.abs(area * scale * scale));
-		double volume = Math.abs(area) * height;
+		final double volume = Math.abs(area) * height;
 		s += ", \"Volume\": " + FORMAT1.format(volume * scale * scale * scale);
 		if (area != 0) {
 			s += ", \"CentroidX\": " + FORMAT1.format(getCentroidX() / area * scale);
@@ -151,19 +151,19 @@ class Building {
 	}
 
 	String getSolarEnergy() {
-		HousePart x = LoggerUtil.getTopContainer(walls.get(0));
+		final HousePart x = LoggerUtil.getTopContainer(walls.get(0));
 		if (!(x instanceof Foundation))
 			return null;
-		Foundation foundation = (Foundation) x;
-		return FORMAT1.format(foundation.getSolarPotential());
+		final Foundation foundation = (Foundation) x;
+		return FORMAT1.format(foundation.getSolarPotentialToday());
 	}
 
 	double getSolarValue() {
-		HousePart x = LoggerUtil.getTopContainer(walls.get(0));
+		final HousePart x = LoggerUtil.getTopContainer(walls.get(0));
 		if (!(x instanceof Foundation))
 			return -1;
-		Foundation foundation = (Foundation) x;
-		return foundation.getSolarPotential();
+		final Foundation foundation = (Foundation) x;
+		return foundation.getSolarPotentialToday();
 	}
 
 	String toJson() {
@@ -173,7 +173,7 @@ class Building {
 			if (windowCount > 0)
 				s += ", \"WindowCount\": " + windowCount;
 			s += ", " + getGeometryJson();
-			String solar = getSolarEnergy();
+			final String solar = getSolarEnergy();
 			if (solar != null)
 				s += ", \"SolarEnergy\": " + solar;
 		}
@@ -188,12 +188,12 @@ class Building {
 			if (windowCount > 0)
 				s += " #window=" + windowCount;
 			s += " height=" + FORMAT1.format(height);
-			double area = getArea();
+			final double area = getArea();
 			s += " area=" + FORMAT1.format(Math.abs(area));
-			double volume = Math.abs(area) * height;
+			final double volume = Math.abs(area) * height;
 			s += " volume=" + FORMAT1.format(volume);
 			s += " centroid=\"" + FORMAT1.format(getCentroidX() / area) + "," + FORMAT1.format(getCentroidY() / area) + "\"";
-			double solar = getSolarValue();
+			final double solar = getSolarValue();
 			if (solar >= 0) {
 				s += " solar_energy=" + solar;
 				s += " solar_energy_density=" + FORMAT4.format(solar / volume);

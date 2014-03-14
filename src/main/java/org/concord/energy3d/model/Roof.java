@@ -911,4 +911,9 @@ public abstract class Roof extends HousePart {
 		/* if wallUpperPoints is null then it has not been drawn yet so we assume wallUpperPoints size is okay otherwise all roofs would be invalid at init time */
 		return container != null && (wallUpperPoints == null || wallUpperPoints.size() >= 3);
 	}
+	
+	@Override
+	public boolean isRoof() {
+		return true;
+	}
 }

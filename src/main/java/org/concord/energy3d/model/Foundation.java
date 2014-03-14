@@ -44,6 +44,10 @@ public class Foundation extends HousePart {
 	private transient double maxX;
 	private transient double maxY;
 	private transient BMText solarLabel;
+	private transient double passiveSolarToday;
+	private transient double photovoltaicToday;
+	private transient double heatingToday;
+	private transient double coolingToday;
 
 	static {
 		format.setGroupingUsed(true);
@@ -720,6 +724,43 @@ public class Foundation extends HousePart {
 
 		return new double[] { height, area, height * area, cx, cy };
 
+	}
+	
+	@Override
+	public boolean isFoundation() {
+		return true;
+	}
+
+	public double getPassiveSolarToday() {
+		return passiveSolarToday;
+	}
+
+	public void setPassiveSolarToday(final double passiveSolarToday) {
+		this.passiveSolarToday = passiveSolarToday;
+	}
+
+	public double getPhotovoltaicToday() {
+		return photovoltaicToday;
+	}
+
+	public void setPhotovoltaicToday(final double photovoltaicToday) {
+		this.photovoltaicToday = photovoltaicToday;
+	}
+
+	public double getHeatingToday() {
+		return heatingToday;
+	}
+
+	public void setHeatingToday(final double heatingToday) {
+		this.heatingToday = heatingToday;
+	}
+
+	public double getCoolingToday() {
+		return coolingToday;
+	}
+
+	public void setCoolingToday(final double coolingToday) {
+		this.coolingToday = coolingToday;
 	}
 
 }

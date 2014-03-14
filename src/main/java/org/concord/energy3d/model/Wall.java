@@ -1205,4 +1205,8 @@ public class Wall extends HousePart {
 		return invisibleMesh;
 	}
 
+	@Override
+	public boolean isWall() {
+		return true;
+	}
 }

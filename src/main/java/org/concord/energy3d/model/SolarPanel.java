@@ -245,5 +245,9 @@ public class SolarPanel extends HousePart {
 	public Mesh getSurroundMesh() {
 		return surround;
 	}
-
+	
+	@Override
+	public boolean isSolarPanel() {
+		return true;
+	}
 }

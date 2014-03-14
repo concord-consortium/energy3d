@@ -314,5 +314,9 @@ public class Window extends HousePart {
 	public ReadOnlyVector3 getFaceDirection() {
 		return container.getFaceDirection();
 	}
-
+	
+	@Override
+	public boolean isWindow() {
+		return true;
+	}
 }
