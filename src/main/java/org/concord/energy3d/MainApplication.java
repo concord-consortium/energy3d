@@ -12,6 +12,9 @@ import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Config.RenderMode;
 
 public class MainApplication {
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	public static void main(final String[] args) {
 		if (System.getProperty("os.name").startsWith("Mac")) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");

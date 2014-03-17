@@ -125,7 +125,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem doorColorMenuItem;
 	private JMenuItem floorColorMenuItem;
 	private JMenuItem roofColorMenuItem;
-	// private JMenuItem importColladaMenuItem;
+	private JMenuItem importColladaMenuItem;
 	private JMenuItem saveAsImageMenuItem;
 	private JMenuItem freezeMenuItem;
 	private JMenuItem unfreezeMenuItem;
@@ -348,7 +348,7 @@ public class MainFrame extends JFrame {
 			fileMenu.add(getSaveAsImageMenuItem());
 			fileMenu.addSeparator();
 			fileMenu.add(getImportMenuItem());
-			// fileMenu.add(getImportColladaMenuItem());
+			fileMenu.add(getImportColladaMenuItem());
 			fileMenu.addSeparator();
 			if (!Config.isRestrictMode()) {
 				fileMenu.add(getOpenFolderMenuItem());
@@ -1084,19 +1084,19 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	// private void importColladaFile() {
-	// fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	// fileChooser.removeChoosableFileFilter(pngFilter);
-	// if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
-	// Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-	// try {
-	// SceneManager.getInstance().newImport(fileChooser.getSelectedFile().toURI().toURL());
-	// } catch (final Throwable err) {
-	// err.printStackTrace();
-	// JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-	// }
-	// }
-	// }
+	private void importColladaFile() {
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.removeChoosableFileFilter(pngFilter);
+		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
+			try {
+				SceneManager.getInstance().newImport(fileChooser.getSelectedFile().toURI().toURL());
+			} catch (final Throwable err) {
+				err.printStackTrace();
+				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
 
 	private JMenuItem getPageSetupMenuItem() {
 		if (pageSetupMenuItem == null) {
@@ -1469,18 +1469,18 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	// private JMenuItem getImportColladaMenuItem() {
-	// if (importColladaMenuItem == null) {
-	// importColladaMenuItem = new JMenuItem("Import Collada...");
-	// importColladaMenuItem.addActionListener(new ActionListener() {
-	// @Override
-	// public void actionPerformed(final ActionEvent e) {
-	// importColladaFile();
-	// }
-	// });
-	// }
-	// return importColladaMenuItem;
-	// }
+	private JMenuItem getImportColladaMenuItem() {
+		if (importColladaMenuItem == null) {
+			importColladaMenuItem = new JMenuItem("Import Collada...");
+			importColladaMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					importColladaFile();
+				}
+			});
+		}
+		return importColladaMenuItem;
+	}
 
 	private JMenuItem getSaveAsImageMenuItem() {
 		if (saveAsImageMenuItem == null) {

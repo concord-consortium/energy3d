@@ -30,6 +30,7 @@ import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.PyramidRoof;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -309,7 +310,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		});
 
-		initMouse();
+		initMouse();				
 
 		root.updateGeometricState(0, true);
 		System.out.println("Finished initialization.");
@@ -439,6 +440,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				compass.setTranslation(-1, -0.7, 2);
 				cameraNode.attachChild(compass);
 				Scene.getInstance().updateEditShapes();
+				Tree.loadModel();
 				return null;
 			}
 		});
@@ -903,7 +905,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else if (operation == Operation.DRAW_SOLAR_PANEL)
 			drawn = new SolarPanel();
 		else if (operation == Operation.DRAW_FOUNDATION) {
-			drawn = new Foundation();
+			drawn = new Tree();
 			setGridsVisible(true);
 		} else
 			return null;
@@ -1378,7 +1380,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
 		final ColladaStorage storage = colladaImporter.load(source);
 		newImport = storage.getScene();
-		root.attachChild(newImport);
+		Scene.getRoot().attachChild(newImport);
 	}
 
 	public Camera getCamera() {

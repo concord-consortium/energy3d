@@ -77,6 +77,7 @@ public class SolarIrradiation {
 	
 	private void initCollidables() {
 		collidables.clear();
+//		collidables.add(Scene.getRoot());
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation)
 				collidables.add(part.getMesh());
@@ -96,7 +97,7 @@ public class SolarIrradiation {
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		for (int minute = 0; minute < 1440; minute += MINUTE_STEP) {
 			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
-			// final ReadOnlyVector3 sunLocation = heliodon.getSunLocation();
+//			 final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 				for (final HousePart part : Scene.getInstance().getParts()) {
@@ -221,9 +222,10 @@ public class SolarIrradiation {
 					h = step;
 				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
+//				final PickResults pickResults = new BoundingPickResults();
 				for (final Spatial spatial : collidables)
 					if (spatial != collisionMesh) {
-						PickingUtil.findPick(spatial, pickRay, pickResults, false);
+						PickingUtil.findPick(spatial, pickRay, pickResults, false);						
 						if (pickResults.getNumber() != 0)
 							break;
 					}
