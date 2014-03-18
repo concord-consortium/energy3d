@@ -295,6 +295,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass = new ParallelSplitShadowMapPass(light, 2048, 4);
 		// shadowPass = new ParallelSplitShadowMapPass(light, 3072, 3);
 		shadowPass.setEnabled(false);
+		shadowPass.setUseSceneTexturing(true);
 		shadowPass.setUseObjectCullFace(true);
 		shadowPass.add(land);
 		shadowPass.add(solarLand);
@@ -781,6 +782,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		ReadOnlyVector3 loc = new Vector3(10, -50, 30);
 		ReadOnlyVector3 up = new Vector3(0, 0, 1);
+//		ReadOnlyVector3 up = new Vector3(0, 1, 0);
 		ReadOnlyVector3 lookAt = new Vector3(0, 0, 10);
 
 		setCompassVisible(viewMode == ViewMode.NORMAL);

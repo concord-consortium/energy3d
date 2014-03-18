@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
@@ -11,20 +12,26 @@ import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.ColladaMaterialUtils;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.BlendState.TestFunction;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.extension.BillboardNode;
+import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 
 public class Tree extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static Spatial treeModel;
-	private final Spatial model;
+	private transient Spatial model;
+	private transient BillboardNode billboard; 
 	
 	public static void loadModel() {
 		new Thread() {
 			@Override
 			public void run() {
-				System.out.println("Loading tree.");
+				System.out.print("Loading tree model...");
 				Thread.yield();
 				final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "tree.dae");
 				final ColladaImporter colladaImporter = new ColladaImporter();
@@ -37,15 +44,43 @@ public class Tree extends HousePart {
 				} catch (final IOException e) {
 					e.printStackTrace();
 				}
-				System.out.println("Finished loading tree model.");
+				System.out.println("done");
 			}
 		}.start();
 	}
 	
 	public Tree() {
 		super(1, 1, 1);
-		model = treeModel.makeCopy(true);
-		root.attachChild(model);
+		init();
+	}
+	
+	@Override
+	protected void init() {
+		super.init();
+//		model = treeModel.makeCopy(true);
+		
+		mesh = new Quad("Tree Quad", 30, 30);
+//		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));		
+//		final BlendState rs = new BlendState();
+//		rs.setBlendEnabled(true);
+//		rs.setTestEnabled(true);
+//		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		
+		
+        final BlendState bs = new BlendState();
+        bs.setEnabled(true);
+        bs.setBlendEnabled(false);
+        bs.setTestEnabled(true);
+        bs.setTestFunction(TestFunction.GreaterThan);
+        bs.setReference(0.7f);		
+        mesh.setRenderState(bs);
+        mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		
+        billboard = new BillboardNode("Billboard");
+//        billboard.setAlignment(BillboardAlignment.AxialZ);
+		billboard.attachChild(mesh);
+		root.attachChild(billboard);		
+//        root.attachChild(mesh);
 	}
 	
 	@Override
@@ -56,6 +91,7 @@ public class Tree extends HousePart {
 		if (pick != null) {
 			p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
+			p.setZ(15);
 			points.get(index).set(p);
 		}
 		draw();
@@ -73,17 +109,19 @@ public class Tree extends HousePart {
 	}
 	
 	@Override
-	protected void drawMesh() {
-		model.setTranslation(getAbsPoint(0));
+	protected void drawMesh() {		
+		billboard.setTranslation(getAbsPoint(0));
+//		mesh.setTranslation(getAbsPoint(0));
 	}
 
 	@Override
 	protected String getTextureFileName() {
-		return null;
+		return "tree.png";
 	}
 
 	@Override
 	public void updateTextureAndColor() {
+		updateTextureAndColor(mesh, Scene.getInstance().getWallColor());
 	}
 	
 }
