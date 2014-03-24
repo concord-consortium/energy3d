@@ -11,12 +11,14 @@ import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.ColladaMaterialUtils;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.TestFunction;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.extension.BillboardNode;
+import com.ardor3d.scenegraph.extension.BillboardNode.BillboardAlignment;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
@@ -60,12 +62,7 @@ public class Tree extends HousePart {
 //		model = treeModel.makeCopy(true);
 		
 		mesh = new Quad("Tree Quad", 30, 30);
-//		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));		
-//		final BlendState rs = new BlendState();
-//		rs.setBlendEnabled(true);
-//		rs.setTestEnabled(true);
-//		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-		
+		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));		
 		
         final BlendState bs = new BlendState();
         bs.setEnabled(true);
@@ -77,7 +74,7 @@ public class Tree extends HousePart {
         mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		
         billboard = new BillboardNode("Billboard");
-//        billboard.setAlignment(BillboardAlignment.AxialZ);
+        billboard.setAlignment(BillboardAlignment.AxialZ);
 		billboard.attachChild(mesh);
 		root.attachChild(billboard);		
 //        root.attachChild(mesh);
