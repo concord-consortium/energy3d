@@ -14,6 +14,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -84,7 +85,7 @@ public class SolarIrradiation {
 			else if (part instanceof Wall)
 				collidables.add(((Wall) part).getInvisibleMesh());
 			else if (part instanceof SolarPanel)
-				collidables.add(((SolarPanel) part).getSurroundMesh());
+				collidables.add(((SolarPanel) part).getSurroundMesh());			
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
 					collidables.add(((Node) roofPart).getChild(0));
@@ -96,8 +97,8 @@ public class SolarIrradiation {
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		for (int minute = 0; minute < 1440; minute += MINUTE_STEP) {
-			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
-//			 final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
+//			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
+			 final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 				for (final HousePart part : Scene.getInstance().getParts()) {
@@ -223,13 +224,24 @@ public class SolarIrradiation {
 				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
 //				final PickResults pickResults = new BoundingPickResults();
+				boolean collision = false;
 				for (final Spatial spatial : collidables)
 					if (spatial != collisionMesh) {
 						PickingUtil.findPick(spatial, pickRay, pickResults, false);						
-						if (pickResults.getNumber() != 0)
+						if (pickResults.getNumber() != 0) {
+							collision = true;
 							break;
+						}
 					}
-				if (pickResults.getNumber() == 0) {
+				if (!collision)
+					for (final HousePart part : Scene.getInstance().getParts())
+						if (part instanceof Tree)
+							if (((Tree) part).intersects(pickRay)) {
+								collision = true;
+								break;
+							}
+					
+				if (!collision) {
 					solar[row][col] += dot / airMass;
 					final double annotationScale = Scene.getInstance().getAnnotationScale();
 					housePart.getSolarPotential()[minute / MINUTE_STEP] += dot / airMass * w * h * annotationScale * annotationScale / 60 * MINUTE_STEP;

@@ -7,11 +7,14 @@ import java.util.logging.Logger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.SelectUtil;
 
+import com.ardor3d.bounding.BoundingSphere;
+import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.ColladaMaterialUtils;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
@@ -26,60 +29,68 @@ import com.ardor3d.util.resource.ResourceSource;
 public class Tree extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static Spatial treeModel;
+	private static boolean isBillboard = true;
 	private transient Spatial model;
-	private transient BillboardNode billboard; 
+	private transient BillboardNode billboard;
+	private transient BoundingVolume bounds;
 	
+
 	public static void loadModel() {
-		new Thread() {
-			@Override
-			public void run() {
-				System.out.print("Loading tree model...");
-				Thread.yield();
-				final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "tree.dae");
-				final ColladaImporter colladaImporter = new ColladaImporter();
-				Logger.getLogger(ColladaAnimUtils.class.getName()).setLevel(Level.SEVERE);
-				Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
-				ColladaStorage storage;
-				try {
-					storage = colladaImporter.load(source);
-					treeModel = storage.getScene();
-				} catch (final IOException e) {
-					e.printStackTrace();
+		if (!isBillboard)
+			new Thread() {
+				@Override
+				public void run() {
+					System.out.print("Loading tree model...");
+					Thread.yield();
+					final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "tree3.dae");
+					final ColladaImporter colladaImporter = new ColladaImporter();
+					Logger.getLogger(ColladaAnimUtils.class.getName()).setLevel(Level.SEVERE);
+					Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
+					ColladaStorage storage;
+					try {
+						storage = colladaImporter.load(source);
+						treeModel = storage.getScene();
+					} catch (final IOException e) {
+						e.printStackTrace();
+					}
+					System.out.println("done");
 				}
-				System.out.println("done");
-			}
-		}.start();
+			}.start();
 	}
-	
+
 	public Tree() {
 		super(1, 1, 1);
 		init();
 	}
-	
+
 	@Override
 	protected void init() {
 		super.init();
-//		model = treeModel.makeCopy(true);
+		bounds = new BoundingSphere(15, points.get(0));
 		
-		mesh = new Quad("Tree Quad", 30, 30);
-		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));		
-		
-        final BlendState bs = new BlendState();
-        bs.setEnabled(true);
-        bs.setBlendEnabled(false);
-        bs.setTestEnabled(true);
-        bs.setTestFunction(TestFunction.GreaterThan);
-        bs.setReference(0.7f);		
-        mesh.setRenderState(bs);
-        mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-		
-        billboard = new BillboardNode("Billboard");
-        billboard.setAlignment(BillboardAlignment.AxialZ);
-		billboard.attachChild(mesh);
-		root.attachChild(billboard);		
-//        root.attachChild(mesh);
+		if (!isBillboard) {
+			model = treeModel.makeCopy(true);
+			root.attachChild(model);
+		} else {
+			mesh = new Quad("Tree Quad", 30, 30);
+			mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
+
+			final BlendState bs = new BlendState();
+			bs.setEnabled(true);
+			bs.setBlendEnabled(false);
+			bs.setTestEnabled(true);
+			bs.setTestFunction(TestFunction.GreaterThan);
+			bs.setReference(0.7f);
+			mesh.setRenderState(bs);
+			mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+
+			billboard = new BillboardNode("Billboard");
+			billboard.setAlignment(BillboardAlignment.AxialZ);
+			billboard.attachChild(mesh);
+			root.attachChild(billboard);
+		}
 	}
-	
+
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
 		final int index = 0;
@@ -90,35 +101,43 @@ public class Tree extends HousePart {
 			snapToGrid(p, getAbsPoint(index), getGridSize());
 			p.setZ(15);
 			points.get(index).set(p);
+			bounds.setCenter(points.get(index));
 		}
 		draw();
-		setEditPointsVisible(true);				
+		setEditPointsVisible(true);
 	}
-	
+
 	@Override
 	protected boolean mustHaveContainer() {
 		return false;
-	}	
-	
+	}
+
 	@Override
 	public boolean isDrawable() {
 		return true;
 	}
-	
+
 	@Override
-	protected void drawMesh() {		
-		billboard.setTranslation(getAbsPoint(0));
-//		mesh.setTranslation(getAbsPoint(0));
+	protected void drawMesh() {
+		if (isBillboard)
+			billboard.setTranslation(getAbsPoint(0));
+		else
+			model.setTranslation(getAbsPoint(0));
 	}
 
 	@Override
 	protected String getTextureFileName() {
-		return "tree.png";
+		return "tree2.png";
 	}
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, Scene.getInstance().getWallColor());
+		if (isBillboard)
+			updateTextureAndColor(mesh, Scene.getInstance().getWallColor());
 	}
 	
+	public boolean intersects(final Ray3 ray) {
+		return bounds.intersects(ray);
+	}
+
 }
