@@ -19,10 +19,13 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.TestFunction;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.extension.BillboardNode;
 import com.ardor3d.scenegraph.extension.BillboardNode.BillboardAlignment;
+import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Quad;
+import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 
@@ -33,8 +36,8 @@ public class Tree extends HousePart {
 	private transient Spatial model;
 	private transient BillboardNode billboard;
 	private transient BoundingVolume bounds;
+	private transient Node collisionRoot;
 	
-
 	public static void loadModel() {
 		if (!isBillboard)
 			new Thread() {
@@ -66,7 +69,7 @@ public class Tree extends HousePart {
 	@Override
 	protected void init() {
 		super.init();
-		bounds = new BoundingSphere(15, points.get(0));
+		bounds = new BoundingSphere(15, points.size() > 0 ? getAbsPoint(0) : Vector3.ZERO);
 		
 		if (!isBillboard) {
 			model = treeModel.makeCopy(true);
@@ -74,6 +77,7 @@ public class Tree extends HousePart {
 		} else {
 			mesh = new Quad("Tree Quad", 30, 30);
 			mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
+			mesh.setTranslation(0, 0, 15);
 
 			final BlendState bs = new BlendState();
 			bs.setEnabled(true);
@@ -88,6 +92,19 @@ public class Tree extends HousePart {
 			billboard.setAlignment(BillboardAlignment.AxialZ);
 			billboard.attachChild(mesh);
 			root.attachChild(billboard);
+			
+			Sphere sphere = new Sphere("Tree Sphere", 10, 10, 14);
+			sphere.setScale(1, 1, 0.7);
+			sphere.setTranslation(0, 0, 19);
+			Cylinder cylinder = new Cylinder("Tree Cylinder", 10, 10, 1, 10);
+			cylinder.setTranslation(0, 0, 5);
+			
+			collisionRoot = new Node("Tree Collision Root");
+			collisionRoot.attachChild(sphere);
+			collisionRoot.attachChild(cylinder);
+			if (points.size() > 0)
+				collisionRoot.setTranslation(getAbsPoint(0));
+			root.attachChild(collisionRoot);
 		}
 	}
 
@@ -99,7 +116,7 @@ public class Tree extends HousePart {
 		if (pick != null) {
 			p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
-			p.setZ(15);
+//			p.setZ(15);
 			points.get(index).set(p);
 			bounds.setCenter(points.get(index));
 		}
@@ -119,9 +136,10 @@ public class Tree extends HousePart {
 
 	@Override
 	protected void drawMesh() {
-		if (isBillboard)
+		if (isBillboard) {
 			billboard.setTranslation(getAbsPoint(0));
-		else
+			collisionRoot.setTranslation(getAbsPoint(0));
+		} else
 			model.setTranslation(getAbsPoint(0));
 	}
 
@@ -138,6 +156,10 @@ public class Tree extends HousePart {
 	
 	public boolean intersects(final Ray3 ray) {
 		return bounds.intersects(ray);
+	}
+
+	public Node getCollisionRoot() {
+		return collisionRoot;
 	}
 
 }
