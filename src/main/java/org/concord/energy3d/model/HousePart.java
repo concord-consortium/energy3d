@@ -629,7 +629,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
-		final boolean isSolarColorMap = SceneManager.getInstance().isSolarColorMap();
+		final boolean isSolarColorMap = !(this instanceof Tree) && SceneManager.getInstance().isSolarColorMap();
 		if (isSolarColorMap && textureCleared.get(mesh) == Boolean.TRUE)
 			return;
 		if (isSolarColorMap)

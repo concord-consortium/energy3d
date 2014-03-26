@@ -86,6 +86,8 @@ public class SolarIrradiation {
 				collidables.add(((Wall) part).getInvisibleMesh());
 			else if (part instanceof SolarPanel)
 				collidables.add(((SolarPanel) part).getSurroundMesh());			
+			else if (part instanceof Tree)
+				collidables.add(((Tree) part).getCollisionRoot());			
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
 					collidables.add(((Node) roofPart).getChild(0));
@@ -233,13 +235,13 @@ public class SolarIrradiation {
 							break;
 						}
 					}
-				if (!collision)
-					for (final HousePart part : Scene.getInstance().getParts())
-						if (part instanceof Tree)
-							if (((Tree) part).intersects(pickRay)) {
-								collision = true;
-								break;
-							}
+//				if (!collision)
+//					for (final HousePart part : Scene.getInstance().getParts())
+//						if (part instanceof Tree)
+//							if (((Tree) part).intersects(pickRay)) {
+//								collision = true;
+//								break;
+//							}
 					
 				if (!collision) {
 					solar[row][col] += dot / airMass;

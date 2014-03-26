@@ -5,8 +5,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.SelectUtil;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
@@ -77,7 +79,7 @@ public class Tree extends HousePart {
 		} else {
 			mesh = new Quad("Tree Quad", 30, 30);
 			mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-			mesh.setTranslation(0, 0, 15);
+			mesh.setTranslation(0, 0, 15);			
 
 			final BlendState bs = new BlendState();
 			bs.setEnabled(true);
@@ -96,14 +98,19 @@ public class Tree extends HousePart {
 			Sphere sphere = new Sphere("Tree Sphere", 10, 10, 14);
 			sphere.setScale(1, 1, 0.7);
 			sphere.setTranslation(0, 0, 19);
+			sphere.setModelBound(new BoundingSphere());
+			sphere.updateModelBound();
 			Cylinder cylinder = new Cylinder("Tree Cylinder", 10, 10, 1, 10);
 			cylinder.setTranslation(0, 0, 5);
+			cylinder.setModelBound(new BoundingBox());
+			cylinder.updateModelBound();
 			
 			collisionRoot = new Node("Tree Collision Root");
 			collisionRoot.attachChild(sphere);
 			collisionRoot.attachChild(cylinder);
 			if (points.size() > 0)
 				collisionRoot.setTranslation(getAbsPoint(0));
+			collisionRoot.updateWorldBound(true);
 			root.attachChild(collisionRoot);
 		}
 	}
@@ -151,7 +158,7 @@ public class Tree extends HousePart {
 	@Override
 	public void updateTextureAndColor() {
 		if (isBillboard)
-			updateTextureAndColor(mesh, Scene.getInstance().getWallColor());
+			updateTextureAndColor(mesh, Scene.getInstance().getWallColor(), TextureMode.Full);
 	}
 	
 	public boolean intersects(final Ray3 ray) {
