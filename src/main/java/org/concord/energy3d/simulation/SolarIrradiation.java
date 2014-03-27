@@ -99,8 +99,8 @@ public class SolarIrradiation {
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		for (int minute = 0; minute < 1440; minute += MINUTE_STEP) {
-//			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
-			 final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
+			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
+//			 final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 				for (final HousePart part : Scene.getInstance().getParts()) {

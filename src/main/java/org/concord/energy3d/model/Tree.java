@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
@@ -83,7 +84,7 @@ public class Tree extends HousePart {
 		} else {
 			mesh = new Quad("Tree Quad", 30, 30);
 			mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-			mesh.setTranslation(0, 0, 15);			
+			mesh.setTranslation(0, 0, 15);
 
 			final BlendState bs = new BlendState();
 			bs.setEnabled(true);
@@ -117,23 +118,31 @@ public class Tree extends HousePart {
 			collisionRoot.updateWorldBound(true);
 			collisionRoot.getSceneHints().setCullHint(CullHint.Always);
 			root.attachChild(collisionRoot);
+			
+			sphere.setUserData(new UserData(this));
+			cylinder.setUserData(new UserData(this, 0, true));
 		}
 	}
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
 		final int index = 0;
-		final PickedHousePart pick = pickContainer(x, y, new Class<?>[] {Foundation.class});
+		final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[] {Foundation.class, null});
 		if (pick != null) {
 			final Vector3 p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
-			if (container != null)
-				p.setZ(container.height);
+//			if (container != null)
+//				p.setZ(container.height);
 			points.get(index).set(toRelative(p));
 			bounds.setCenter(points.get(index));
 		}
 		draw();
 		setEditPointsVisible(true);
+	}
+	
+	@Override
+	public double getGridSize() {
+		return 5.0;
 	}
 
 	@Override

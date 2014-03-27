@@ -44,6 +44,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
@@ -924,7 +925,7 @@ public class EnergyPanel extends JPanel {
 		else
 			partEnergyTextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
 
-		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor)) {
+		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof Tree)) {
 			if (selectedPart instanceof SolarPanel) {
 				partWidthTextField.setText(twoDecimals.format(SolarPanel.WIDTH));
 				partHeightTextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
