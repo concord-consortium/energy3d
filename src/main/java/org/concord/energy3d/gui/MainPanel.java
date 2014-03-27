@@ -72,9 +72,23 @@ public class MainPanel extends JPanel {
 			SceneManager.getInstance().refresh();
 		}
 	};
+	
+	java.awt.event.MouseAdapter operationStickAndRefreshUponExit = new java.awt.event.MouseAdapter() {
+		@Override
+		public void mouseClicked(final java.awt.event.MouseEvent e) {
+			if (e.getClickCount() > 1)
+				SceneManager.getInstance().setOperationStick(true);
+		}
+
+		@Override
+		public void mouseExited(final MouseEvent e) {
+			SceneManager.getInstance().refresh();
+		}
+	};	
 
 	final static Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
 	private JToggleButton solarPanelButton;
+	private JToggleButton treeButton;
 	static {
 		cityLatitute.put("Moscow", 55);
 		cityLatitute.put("Ottawa", 45);
@@ -142,6 +156,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getRoofGableButton());
 			appToolbar.add(getFloorButton());
 			appToolbar.add(getSolarPanelButton());
+			appToolbar.add(getTreeButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
 			appToolbar.add(getHeliodonButton());
@@ -162,6 +177,7 @@ public class MainPanel extends JPanel {
 			bg.add(floorButton);
 			bg.add(roofGableButton);
 			bg.add(solarPanelButton);
+			bg.add(treeButton);
 		}
 		return appToolbar;
 	}
@@ -196,18 +212,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			wallButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				@Override
-				public void mouseClicked(final java.awt.event.MouseEvent e) {
-					if (e.getClickCount() > 1)
-						SceneManager.getInstance().setOperationStick(true);
-				}
-
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			wallButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return wallButton;
 	}
@@ -225,18 +230,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			doorButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				@Override
-				public void mouseClicked(final java.awt.event.MouseEvent e) {
-					if (e.getClickCount() > 1)
-						SceneManager.getInstance().setOperationStick(true);
-				}
-
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			doorButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return doorButton;
 	}
@@ -253,18 +247,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			roofButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				@Override
-				public void mouseClicked(final java.awt.event.MouseEvent e) {
-					if (e.getClickCount() > 1)
-						SceneManager.getInstance().setOperationStick(true);
-				}
-
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			roofButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return roofButton;
 	}
@@ -281,18 +264,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			windowButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				@Override
-				public void mouseClicked(final java.awt.event.MouseEvent e) {
-					if (e.getClickCount() > 1)
-						SceneManager.getInstance().setOperationStick(true);
-				}
-
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			windowButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return windowButton;
 	}
@@ -309,18 +281,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			platformButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				@Override
-				public void mouseClicked(final java.awt.event.MouseEvent e) {
-					if (e.getClickCount() > 1)
-						SceneManager.getInstance().setOperationStick(true);
-				}
-
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			platformButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return platformButton;
 	}
@@ -379,18 +340,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			floorButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				@Override
-				public void mouseClicked(final java.awt.event.MouseEvent e) {
-					if (e.getClickCount() > 1)
-						SceneManager.getInstance().setOperationStick(true);
-				}
-
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			floorButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return floorButton;
 	}
@@ -407,18 +357,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			roofHipButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				@Override
-				public void mouseClicked(final java.awt.event.MouseEvent e) {
-					if (e.getClickCount() > 1)
-						SceneManager.getInstance().setOperationStick(true);
-				}
-
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			roofHipButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return roofHipButton;
 	}
@@ -513,18 +452,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			roofCustomButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				@Override
-				public void mouseClicked(final java.awt.event.MouseEvent e) {
-					if (e.getClickCount() > 1)
-						SceneManager.getInstance().setOperationStick(true);
-				}
-
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			roofCustomButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return roofCustomButton;
 	}
@@ -583,18 +511,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			roofGableButton.addMouseListener(new java.awt.event.MouseAdapter() {
-				@Override
-				public void mouseClicked(final java.awt.event.MouseEvent e) {
-					if (e.getClickCount() > 1)
-						SceneManager.getInstance().setOperationStick(true);
-				}
-
-				@Override
-				public void mouseExited(final MouseEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-			});
+			roofGableButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return roofGableButton;
 	}
@@ -760,6 +677,7 @@ public class MainPanel extends JPanel {
 		if (solarPanelButton == null) {
 			solarPanelButton = new JToggleButton("");
 			solarPanelButton.setToolTipText("Add solar panel");
+			solarPanelButton.setIcon(new ImageIcon(getClass().getResource("icons/solarpanel.png")));
 			solarPanelButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -767,9 +685,25 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			solarPanelButton.setIcon(new ImageIcon(getClass().getResource("icons/solarpanel.png")));
+			solarPanelButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return solarPanelButton;
 	}
 
+	private JToggleButton getTreeButton() {
+		if (treeButton == null) {
+			treeButton = new JToggleButton();
+			treeButton.setToolTipText("Insert tree");
+			treeButton.setIcon(new ImageIcon(getClass().getResource("icons/tree.png")));
+			treeButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_TREE);
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();					
+				}
+			});
+			treeButton.addMouseListener(operationStickAndRefreshUponExit);
+		}
+		return treeButton;
+	}
 }
