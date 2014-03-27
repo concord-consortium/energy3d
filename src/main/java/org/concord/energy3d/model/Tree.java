@@ -1,12 +1,13 @@
 package org.concord.energy3d.model;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
-import org.concord.energy3d.util.SelectUtil;
+import org.concord.energy3d.shapes.Heliodon;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
@@ -25,6 +26,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.extension.BillboardNode;
 import com.ardor3d.scenegraph.extension.BillboardNode.BillboardAlignment;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
@@ -39,6 +41,7 @@ public class Tree extends HousePart {
 	private transient BillboardNode billboard;
 	private transient BoundingVolume bounds;
 	private transient Node collisionRoot;
+	private transient Sphere sphere;
 	
 	public static void loadModel() {
 		if (!isBillboard)
@@ -71,6 +74,7 @@ public class Tree extends HousePart {
 	@Override
 	protected void init() {
 		super.init();
+		relativeToHorizontal = true;
 		bounds = new BoundingSphere(15, points.size() > 0 ? getAbsPoint(0) : Vector3.ZERO);
 		
 		if (!isBillboard) {
@@ -95,13 +99,13 @@ public class Tree extends HousePart {
 			billboard.attachChild(mesh);
 			root.attachChild(billboard);
 			
-			Sphere sphere = new Sphere("Tree Sphere", 10, 10, 14);
+			sphere = new Sphere("Tree Sphere", 10, 10, 14);
 			sphere.setScale(1, 1, 0.7);
 			sphere.setTranslation(0, 0, 19);
 			sphere.setModelBound(new BoundingSphere());
 			sphere.updateModelBound();
-			Cylinder cylinder = new Cylinder("Tree Cylinder", 10, 10, 1, 10);
-			cylinder.setTranslation(0, 0, 5);
+			final Cylinder cylinder = new Cylinder("Tree Cylinder", 10, 10, 1, 20);
+			cylinder.setTranslation(0, 0, 10);
 			cylinder.setModelBound(new BoundingBox());
 			cylinder.updateModelBound();
 			
@@ -111,6 +115,7 @@ public class Tree extends HousePart {
 			if (points.size() > 0)
 				collisionRoot.setTranslation(getAbsPoint(0));
 			collisionRoot.updateWorldBound(true);
+			collisionRoot.getSceneHints().setCullHint(CullHint.Always);
 			root.attachChild(collisionRoot);
 		}
 	}
@@ -118,13 +123,13 @@ public class Tree extends HousePart {
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
 		final int index = 0;
-		final PickedHousePart pick = SelectUtil.pickPart(x, y, (Spatial) null);
-		Vector3 p = points.get(index);
+		final PickedHousePart pick = pickContainer(x, y, new Class<?>[] {Foundation.class});
 		if (pick != null) {
-			p = pick.getPoint();
+			final Vector3 p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
-//			p.setZ(15);
-			points.get(index).set(p);
+			if (container != null)
+				p.setZ(container.height);
+			points.get(index).set(toRelative(p));
 			bounds.setCenter(points.get(index));
 		}
 		draw();
@@ -143,9 +148,9 @@ public class Tree extends HousePart {
 
 	@Override
 	protected void drawMesh() {
-		if (isBillboard) {
+		if (isBillboard) {			
 			billboard.setTranslation(getAbsPoint(0));
-			collisionRoot.setTranslation(getAbsPoint(0));
+			collisionRoot.setTranslation(getAbsPoint(0));					
 		} else
 			model.setTranslation(getAbsPoint(0));
 	}
@@ -166,6 +171,11 @@ public class Tree extends HousePart {
 	}
 
 	public Node getCollisionRoot() {
+		final int month = Heliodon.getInstance().getCalander().get(Calendar.MONTH);
+		sphere.removeFromParent();
+		if (month >= 3 && month <= 11)
+			collisionRoot.attachChild(sphere);
+		collisionRoot.updateWorldBound(true);		
 		return collisionRoot;
 	}
 
