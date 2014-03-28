@@ -12,13 +12,11 @@ import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
-import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.ColladaMaterialUtils;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
@@ -40,17 +38,17 @@ public class Tree extends HousePart {
 	private static boolean isBillboard = true;
 	private transient Spatial model;
 	private transient BillboardNode billboard;
-	private transient BoundingVolume bounds;
 	private transient Node collisionRoot;
 	private transient Sphere sphere;
-	
+
 	public static void loadModel() {
-		if (!isBillboard)
-			new Thread() {
-				@Override
-				public void run() {
-					System.out.print("Loading tree model...");
-					Thread.yield();
+		new Thread() {
+			@Override
+			public void run() {
+				System.out.print("Loading tree model...");
+				Thread.yield();
+				if (isBillboard) {
+				} else {
 					final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "tree3.dae");
 					final ColladaImporter colladaImporter = new ColladaImporter();
 					Logger.getLogger(ColladaAnimUtils.class.getName()).setLevel(Level.SEVERE);
@@ -62,9 +60,10 @@ public class Tree extends HousePart {
 					} catch (final IOException e) {
 						e.printStackTrace();
 					}
-					System.out.println("done");
 				}
-			}.start();
+				System.out.println("done");
+			}
+		}.start();
 	}
 
 	public Tree() {
@@ -76,30 +75,29 @@ public class Tree extends HousePart {
 	protected void init() {
 		super.init();
 		relativeToHorizontal = true;
-		bounds = new BoundingSphere(15, points.size() > 0 ? getAbsPoint(0) : Vector3.ZERO);
-		
+
 		if (!isBillboard) {
 			model = treeModel.makeCopy(true);
 			root.attachChild(model);
 		} else {
-			mesh = new Quad("Tree Quad", 30, 30);
-			mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-			mesh.setTranslation(0, 0, 15);
+			 mesh = new Quad("Tree Quad", 30, 30);
+			 mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
+			 mesh.setTranslation(0, 0, 15);
 
-			final BlendState bs = new BlendState();
-			bs.setEnabled(true);
-			bs.setBlendEnabled(false);
-			bs.setTestEnabled(true);
-			bs.setTestFunction(TestFunction.GreaterThan);
-			bs.setReference(0.7f);
-			mesh.setRenderState(bs);
-			mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+			 final BlendState bs = new BlendState();
+			 bs.setEnabled(true);
+			 bs.setBlendEnabled(false);
+			 bs.setTestEnabled(true);
+			 bs.setTestFunction(TestFunction.GreaterThan);
+			 bs.setReference(0.7f);
+			 mesh.setRenderState(bs);
+			 mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 
 			billboard = new BillboardNode("Billboard");
 			billboard.setAlignment(BillboardAlignment.AxialZ);
 			billboard.attachChild(mesh);
 			root.attachChild(billboard);
-			
+
 			sphere = new Sphere("Tree Sphere", 10, 10, 14);
 			sphere.setScale(1, 1, 0.7);
 			sphere.setTranslation(0, 0, 19);
@@ -109,7 +107,7 @@ public class Tree extends HousePart {
 			cylinder.setTranslation(0, 0, 10);
 			cylinder.setModelBound(new BoundingBox());
 			cylinder.updateModelBound();
-			
+
 			collisionRoot = new Node("Tree Collision Root");
 			collisionRoot.attachChild(sphere);
 			collisionRoot.attachChild(cylinder);
@@ -118,28 +116,26 @@ public class Tree extends HousePart {
 			collisionRoot.updateWorldBound(true);
 			collisionRoot.getSceneHints().setCullHint(CullHint.Always);
 			root.attachChild(collisionRoot);
-			
+
 			sphere.setUserData(new UserData(this));
 			cylinder.setUserData(new UserData(this, 0, true));
 		}
+		updateTextureAndColor();
 	}
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
 		final int index = 0;
-		final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[] {Foundation.class, null});
+		final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[] { Foundation.class, null });
 		if (pick != null) {
 			final Vector3 p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
-//			if (container != null)
-//				p.setZ(container.height);
 			points.get(index).set(toRelative(p));
-			bounds.setCenter(points.get(index));
 		}
 		draw();
 		setEditPointsVisible(true);
 	}
-	
+
 	@Override
 	public double getGridSize() {
 		return 5.0;
@@ -157,9 +153,9 @@ public class Tree extends HousePart {
 
 	@Override
 	protected void drawMesh() {
-		if (isBillboard) {			
+		if (isBillboard) {
 			billboard.setTranslation(getAbsPoint(0));
-			collisionRoot.setTranslation(getAbsPoint(0));					
+			collisionRoot.setTranslation(getAbsPoint(0));
 		} else
 			model.setTranslation(getAbsPoint(0));
 	}
@@ -174,17 +170,13 @@ public class Tree extends HousePart {
 		if (isBillboard)
 			updateTextureAndColor(mesh, Scene.getInstance().getWallColor(), TextureMode.Full);
 	}
-	
-	public boolean intersects(final Ray3 ray) {
-		return bounds.intersects(ray);
-	}
 
 	public Node getCollisionRoot() {
 		final int month = Heliodon.getInstance().getCalander().get(Calendar.MONTH);
 		sphere.removeFromParent();
 		if (month >= 3 && month <= 11)
 			collisionRoot.attachChild(sphere);
-		collisionRoot.updateWorldBound(true);		
+		collisionRoot.updateWorldBound(true);
 		return collisionRoot;
 	}
 
