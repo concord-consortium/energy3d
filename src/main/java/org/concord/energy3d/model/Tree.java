@@ -145,6 +145,11 @@ public class Tree extends HousePart {
 	protected boolean mustHaveContainer() {
 		return false;
 	}
+	
+	@Override
+	public boolean isPrintable() {
+		return false;
+	}
 
 	@Override
 	public boolean isDrawable() {

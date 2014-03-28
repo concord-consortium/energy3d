@@ -299,8 +299,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.setUseObjectCullFace(true);
 		shadowPass.add(land);
 		shadowPass.add(solarLand);
-		shadowPass.add(Scene.getRoot());
-		shadowPass.addOccluder(Scene.getRoot());
+//		shadowPass.add(Scene.getRoot());
+		shadowPass.add(Scene.getOriginalHouseRoot());
+//		shadowPass.add(Scene.getTreesRoot());
+//		shadowPass.addOccluder(Scene.getRoot());
+		shadowPass.addOccluder(Scene.getOriginalHouseRoot());
+		shadowPass.addOccluder(Scene.getTreesRoot());
 
 		taskManager.update(new Callable<Object>() {
 			@Override

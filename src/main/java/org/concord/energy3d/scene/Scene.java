@@ -23,6 +23,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Snap;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.shapes.Heliodon;
@@ -61,6 +62,7 @@ public class Scene implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
 	private static final Node originalHouseRoot = new Node("Original House Root");
+	private static final Node treesRoot = new Node("Trees Root");
 	private static final int currentVersion = 1;
 	private static Scene instance;
 	private static URL url = null;
@@ -208,13 +210,15 @@ public class Scene implements Serializable {
 	}
 
 	public static void initSceneNow() {
-		originalHouseRoot.detachAllChildren();
 		root.detachAllChildren();
+		originalHouseRoot.detachAllChildren();
+		treesRoot.detachAllChildren();
 		root.attachChild(originalHouseRoot);
+		root.attachChild(treesRoot);
 
 		if (url != null) {
 			for (final HousePart housePart : instance.getParts())
-				originalHouseRoot.attachChild(housePart.getRoot());
+				(housePart instanceof Tree ? treesRoot : originalHouseRoot).attachChild(housePart.getRoot());
 			System.out.println("done");
 			/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
 			instance.redrawAllNow();
@@ -410,7 +414,7 @@ public class Scene implements Serializable {
 
 	private void addTree(final HousePart housePart) {
 		System.out.println("Adding: " + housePart);
-		originalHouseRoot.attachChild(housePart.getRoot());
+		(housePart instanceof Tree ? treesRoot : originalHouseRoot).attachChild(housePart.getRoot());
 		parts.add(housePart);
 		for (final HousePart child : housePart.getChildren())
 			addTree(child);
@@ -435,7 +439,8 @@ public class Scene implements Serializable {
 		parts.remove(housePart); // this must happen before call to wall.delete()
 		for (final HousePart child : housePart.getChildren())
 			removeTree(child);
-		originalHouseRoot.detachChild(housePart.getRoot());
+//		originalHouseRoot.detachChild(housePart.getRoot());
+		housePart.getRoot().removeFromParent();
 		housePart.delete();
 	}
 
@@ -450,8 +455,12 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public Node getOriginalHouseRoot() {
+	public static Node getOriginalHouseRoot() {
 		return originalHouseRoot;
+	}
+
+	public static Node getTreesRoot() {
+		return treesRoot;
 	}
 
 	public static URL getURL() {
