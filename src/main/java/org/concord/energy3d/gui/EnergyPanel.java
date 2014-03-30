@@ -139,13 +139,13 @@ public class EnergyPanel extends JPanel {
 
 	private EnergyPanel() {
 		twoDecimals.setMaximumFractionDigits(2);
-		noDecimals.setMaximumFractionDigits(0);		
+		noDecimals.setMaximumFractionDigits(0);
 
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		this.repaint();
 		this.paint(null);
-		
+
 		progressBar = new JProgressBar();
 		add(progressBar);
 
@@ -631,7 +631,7 @@ public class EnergyPanel extends JPanel {
 		final GridBagLayout gbl_panel_1 = new GridBagLayout();
 		panel_1.setLayout(gbl_panel_1);
 
-		final JLabel sunLabel = new JLabel("Passive Solar");
+		final JLabel sunLabel = new JLabel("Windows");
 		sunLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_sunLabel = new GridBagConstraints();
 		gbc_sunLabel.fill = GridBagConstraints.HORIZONTAL;
@@ -640,7 +640,7 @@ public class EnergyPanel extends JPanel {
 		gbc_sunLabel.gridy = 0;
 		panel_1.add(sunLabel, gbc_sunLabel);
 
-		final JLabel solarLabel = new JLabel("Photovoltaic");
+		final JLabel solarLabel = new JLabel("Solar Panels");
 		solarLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_solarLabel = new GridBagConstraints();
 		gbc_solarLabel.fill = GridBagConstraints.HORIZONTAL;
@@ -667,7 +667,7 @@ public class EnergyPanel extends JPanel {
 		gbc_coolingLabel.gridy = 0;
 		panel_1.add(coolingLabel, gbc_coolingLabel);
 
-		final JLabel totalLabel = new JLabel("Total");
+		final JLabel totalLabel = new JLabel("Net");
 		totalLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_totalLabel = new GridBagConstraints();
 		gbc_totalLabel.fill = GridBagConstraints.HORIZONTAL;
@@ -842,6 +842,11 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
+	// TODO: There should be a better way to do this.
+	public void clearIrradiationHeatMap() {
+		compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+	}
+
 	private void computeEnergy() {
 		if (autoCheckBox.isSelected())
 			updateOutsideTemperature();
@@ -945,7 +950,7 @@ public class EnergyPanel extends JPanel {
 			selectedBuilding = (Foundation) selectedPart;
 		else
 			selectedBuilding = (Foundation) selectedPart.getTopContainer();
-		
+
 		if (selectedBuilding != null) {
 			if (iradiationEnabled) {
 				houseSolarPotentialTextField.setText(twoDecimals.format(selectedBuilding.getSolarPotentialToday()));
@@ -957,7 +962,7 @@ public class EnergyPanel extends JPanel {
 			} else {
 				houseSolarPotentialTextField.setText("");
 				passiveSolarTextField.setText("");
-				photovoltaicTextField.setText("");				
+				photovoltaicTextField.setText("");
 			}
 			final double[] buildingGeometry = selectedBuilding.getBuildingGeometry();
 			if (buildingGeometry != null) {

@@ -3,6 +3,7 @@ package org.concord.energy3d.undo;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
@@ -39,6 +40,7 @@ public class EditFoundationCommand extends EditHousePartCommand {
 			e.printStackTrace();
 		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
+		EnergyPanel.getInstance().clearIrradiationHeatMap();
 	}
 
 	@Override
@@ -53,6 +55,7 @@ public class EditFoundationCommand extends EditHousePartCommand {
 			e.printStackTrace();
 		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
+		EnergyPanel.getInstance().clearIrradiationHeatMap();
 	}
 
 	@Override
