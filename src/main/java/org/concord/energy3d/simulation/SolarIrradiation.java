@@ -51,14 +51,14 @@ import com.ardor3d.util.geom.BufferUtils;
 public class SolarIrradiation {
 	public static final int MINUTE_STEP = 15;
 	private static SolarIrradiation instance = new SolarIrradiation();
-	
+
 	private final Map<Mesh, double[][]> onMesh = new HashMap<Mesh, double[][]>();
 	private final Map<Mesh, Boolean> textureCoordsAlreadyComputed = new HashMap<Mesh, Boolean>();
 	private final List<Spatial> collidables = new ArrayList<Spatial>();
 	private double[][] onLand;
 	private long maxValue;
 	private double step = 2.0;
-	
+
 	public static SolarIrradiation getInstance() {
 		return instance;
 	}
@@ -75,7 +75,7 @@ public class SolarIrradiation {
 		computeToday((Calendar) Heliodon.getInstance().getCalander().clone());
 		updateValueOnAllHouses();
 	}
-	
+
 	private void initCollidables() {
 		collidables.clear();
 //		collidables.add(Scene.getRoot());
@@ -85,14 +85,14 @@ public class SolarIrradiation {
 			else if (part instanceof Wall)
 				collidables.add(((Wall) part).getInvisibleMesh());
 			else if (part instanceof SolarPanel)
-				collidables.add(((SolarPanel) part).getSurroundMesh());			
+				collidables.add(((SolarPanel) part).getSurroundMesh());
 			else if (part instanceof Tree)
-				collidables.add(((Tree) part).getCollisionRoot());			
+				collidables.add(((Tree) part).getCollisionRoot());
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
 					collidables.add(((Node) roofPart).getChild(0));
 		}
-	}	
+	}
 
 	private void computeToday(final Calendar today) {
 		today.set(Calendar.SECOND, 0);
@@ -229,7 +229,7 @@ public class SolarIrradiation {
 				boolean collision = false;
 				for (final Spatial spatial : collidables)
 					if (spatial != collisionMesh) {
-						PickingUtil.findPick(spatial, pickRay, pickResults, false);						
+						PickingUtil.findPick(spatial, pickRay, pickResults, false);
 						if (pickResults.getNumber() != 0) {
 							collision = true;
 							break;
@@ -242,7 +242,7 @@ public class SolarIrradiation {
 //								collision = true;
 //								break;
 //							}
-					
+
 				if (!collision) {
 					solar[row][col] += dot / airMass;
 					final double annotationScale = Scene.getInstance().getAnnotationScale();
@@ -310,8 +310,8 @@ public class SolarIrradiation {
 				}
 
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation) {				
-				final Foundation foundation = (Foundation) part;				
+			if (part instanceof Foundation) {
+				final Foundation foundation = (Foundation) part;
 				final double[] heatLoss = foundation.getHeatLoss();
 				final double[] passiveSolar = new double[heatLoss.length];
 				final double[] photovoltaic = new double[heatLoss.length];
@@ -322,15 +322,15 @@ public class SolarIrradiation {
 						for (int i = 0; i < houseChild.getSolarPotential().length; i++) {
 							solarPotentialTotal += houseChild.getSolarPotential()[i];
 							houseChild.setSolarPotentialToday(houseChild.getSolarPotentialToday() + houseChild.getSolarPotential()[i]);
-							if (houseChild.isWall() || houseChild.isDoor() || houseChild.isWindow() || houseChild.isRoof())								
-								heatLoss[i] += houseChild.getHeatLoss()[i];								
+							if (houseChild.isWall() || houseChild.isDoor() || houseChild.isWindow() || houseChild.isRoof())
+								heatLoss[i] += houseChild.getHeatLoss()[i];
 							if (houseChild.isWindow())
 								passiveSolar[i] += houseChild.getSolarPotential()[i];
 							else if (houseChild.isSolarPanel())
 								photovoltaic[i] += houseChild.getSolarPotential()[i];
 						}
 					}
-				
+
 				double heatingTotal = 0.0;
 				double coolingTotal = 0.0;
 				double passiveSolarTotal = 0.0;
@@ -338,7 +338,10 @@ public class SolarIrradiation {
 				double photovoltaicLeftover = 0.0;
 				for (int i = 0; i < heatLoss.length; i++) {
 //					if (Heliodon.getInstance().isVisible()) {
-						heatLoss[i] -= passiveSolar[i];
+						if (heatLoss[i] < 0)
+							heatLoss[i] -= passiveSolar[i];
+						else
+							heatLoss[i] = Math.max(0, heatLoss[i] - passiveSolar[i]);
 						if (Math.abs(heatLoss[i]) > photovoltaic[i])
 							heatLoss[i] = Math.signum(heatLoss[i]) * (Math.abs(heatLoss[i]) - photovoltaic[i]);
 						else {
@@ -353,7 +356,7 @@ public class SolarIrradiation {
 					passiveSolarTotal += passiveSolar[i];
 					photovoltaicTotal += photovoltaic[i];
 				}
-				
+
 				foundation.setSolarPotentialToday(solarPotentialTotal);
 				foundation.setSolarLabelValue(solarPotentialTotal);
 				foundation.setPassiveSolarToday(passiveSolarTotal);
@@ -366,7 +369,7 @@ public class SolarIrradiation {
 
 		SceneManager.getInstance().refresh();
 	}
-	
+
 	private void applyTexture(final Mesh mesh, final double[][] solarData, final long maxValue) {
 		if (solarData != null)
 			fillBlanksWithNeighboringValues(solarData);
@@ -397,7 +400,7 @@ public class SolarIrradiation {
 		textureState.setTexture(texture);
 		mesh.setRenderState(textureState);
 	}
-	
+
 	private void fillBlanksWithNeighboringValues(final double[][] solarData) {
 		final int rows = solarData.length;
 		final int cols = solarData[0].length;
@@ -418,7 +421,7 @@ public class SolarIrradiation {
 						else if (row == 0 && solarData[rows - 1][col] != -1)
 							solarData[row][col] = solarData[rows - 1][col];
 	}
-	
+
 	public ColorRGBA computeColor(final double value, final long maxValue) {
 		final ReadOnlyColorRGBA[] colors = EnergyPanel.solarColors;
 		long valuePerColorRange = maxValue / (colors.length - 1);
@@ -431,8 +434,8 @@ public class SolarIrradiation {
 		final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
 		final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
 		return color;
-	}	
-	
+	}
+
 	private int roundToPowerOfTwo(final int n) {
 		return (int) Math.pow(2.0, Math.ceil(Math.log(n) / Math.log(2)));
 	}
@@ -443,6 +446,6 @@ public class SolarIrradiation {
 
 	public double getStep() {
 		return step;
-	}	
+	}
 
 }

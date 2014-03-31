@@ -7,6 +7,7 @@ import java.awt.print.Paper;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
@@ -114,6 +115,10 @@ public class PrintController implements Updater {
 				}
 			} else {
 				printParts = (List<HousePart>) ObjectCloner.deepCopy(Scene.getInstance().getParts());
+				final Iterator<HousePart> iterator = printParts.iterator();
+				while (iterator.hasNext())
+					if (!iterator.next().isPrintable())
+						iterator.remove();
 				for (int i = 0; i < printParts.size(); i++) {
 					Scene.getRoot().attachChild(printParts.get(i).getRoot());
 					printParts.get(i).setOriginal(Scene.getInstance().getParts().get(i));
