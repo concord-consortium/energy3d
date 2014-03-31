@@ -857,9 +857,10 @@ public class EnergyPanel extends JPanel {
 		if (cityComboBox.getSelectedItem().equals(""))
 			outsideTemperatureSpinner.setValue(15);
 		else {
-			final double[] temperature = CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander(), (String) cityComboBox.getSelectedItem());
-			final double avgTemperature = (temperature[0] + temperature[1]) / 2.0;
-			outsideTemperatureSpinner.setValue((int) Math.round(avgTemperature));
+//			final double[] temperature = CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander(), (String) cityComboBox.getSelectedItem());
+//			final double avgTemperature = (temperature[0] + temperature[1]) / 2.0;
+//			outsideTemperatureSpinner.setValue((int) Math.round(avgTemperature));
+			outsideTemperatureSpinner.setValue(Math.round(CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander())));
 		}
 	}
 
@@ -1000,7 +1001,7 @@ public class EnergyPanel extends JPanel {
 	public JComboBox<String> getWindowsComboBox() {
 		return windowsComboBox;
 	}
-	
+
 	public JComboBox<String> getRoofsComboBox() {
 		return roofsComboBox;
 	}

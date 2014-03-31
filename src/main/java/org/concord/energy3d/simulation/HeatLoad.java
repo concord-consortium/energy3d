@@ -51,7 +51,7 @@ public class HeatLoad {
 //		energyToday.cooling = coolingWithSolarPanel;
 //		energyToday.heating = heatingWithSolarPanel;
 //		return energyToday;
-		
+
 		final double wallUFactor, doorUFactor, windowUFactor, roofUFactor;
 		try {
 			wallUFactor = parseUFactor(EnergyPanel.getInstance().getWallsComboBox());
@@ -62,14 +62,14 @@ public class HeatLoad {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(MainPanel.getInstance(), "Invalid U-Factor value: " + e.getMessage(), "Invalid U-Factor", JOptionPane.WARNING_MESSAGE);
 			return;
-		}		
-		
+		}
+
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
-		
+
 		final double[] outsideTemperatureRange;
-				
+
 		for (final HousePart part : Scene.getInstance().getParts())
 			part.setHeatLoss(new double[1440 / SolarIrradiation.MINUTE_STEP]);
 
@@ -80,11 +80,11 @@ public class HeatLoad {
 //			energyToday.heating = Double.NaN;
 //			energyToday.cooling = Double.NaN;
 		} else
-			outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());		
-		
+			outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+
 		for (int minute = 0; minute < 1440; minute += SolarIrradiation.MINUTE_STEP) {
 			for (final HousePart part : Scene.getInstance().getParts()) {
-				final double outsideTemperature = outsideTemperatureRange[0] + (outsideTemperatureRange[1] - outsideTemperatureRange[0]) / 24 * minute / 60;
+				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
 				final double deltaT = insideTemperature - outsideTemperature;
 				if (part.isDrawCompleted()) {
 					final double uFactor;
@@ -102,8 +102,8 @@ public class HeatLoad {
 				}
 			}
 		}
-		
-		
+
+
 //		if (Heliodon.getInstance().isVisible()) {
 //			final double heatingWithSolar = Math.max(0.0, energyRate.heating - energyRate.solar);
 //			final double coolingWithSolar = energyRate.cooling + energyRate.solar - (energyRate.heating - heatingWithSolar);
@@ -113,10 +113,10 @@ public class HeatLoad {
 //				energyRate.cooling = 0;
 //		}
 	}
-	
+
 	private double parseUFactor(final JComboBox<String> comboBox) {
 		final String valueStr = comboBox.getSelectedItem().toString();
 		final int indexOfSpace = valueStr.indexOf(' ');
 		return Double.parseDouble(valueStr.substring(0, indexOfSpace != -1 ? indexOfSpace : valueStr.length()));
-	}	
+	}
 }

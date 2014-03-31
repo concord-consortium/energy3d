@@ -4,17 +4,20 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.shapes.Heliodon;
+
 public class CityData {
 	private static final CityData instance = new CityData();
 	private final Map<String, Integer> cityLatitutes = new HashMap<String, Integer>();
 	private final Map<String, int[]> avgMonthlyLowTemperatures = new HashMap<String, int[]>();
 	private final Map<String, int[]> avgMonthlyHighTemperatures = new HashMap<String, int[]>();
 	private final String[] cities;
-	
+
 	public static CityData getInstance() {
 		return instance;
 	}
-	
+
 	private CityData() {
 		cities = new String[] {"", "Moscow", "Ottawa", "Boston", "Beijing", "Washington DC", "Tehran", "Los Angeles", "Miami", "Mexico City", "Singapore", "Sydney", "Buenos Aires"};
 		cityLatitutes.put("Moscow", 55);
@@ -54,7 +57,7 @@ public class CityData {
 		avgMonthlyLowTemperatures.put("Buenos Aires", new int[] { 20, 19, 18, 14, 11, 8, 8, 9, 11, 13, 16, 18 });
 		avgMonthlyHighTemperatures.put("Buenos Aires", new int[] { 28, 27, 25, 22, 18, 15, 14, 16, 18, 21, 24, 27 });
 	}
-	
+
 	public double[] computeOutsideTemperature(final Calendar today, final String city) {
 		final int day = today.get(Calendar.DAY_OF_MONTH);
 		final int daysInMonth = today.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -87,7 +90,16 @@ public class CityData {
 		outsideTemperature[0] = monthlyLowTemperatures[monthFromIndex] + (monthlyLowTemperatures[monthToIndex] - monthlyLowTemperatures[monthFromIndex]) * portion;
 		outsideTemperature[1] = monthlyHighTemperatures[monthFromIndex] + (monthlyHighTemperatures[monthToIndex] - monthlyHighTemperatures[monthFromIndex]) * portion;
 		return outsideTemperature;
-	}	
+	}
+
+	public double computeOutsideTemperatureRange(final double[] outsideTemperatureRange, final int minute) {
+		return outsideTemperatureRange[1] + (outsideTemperatureRange[0] - outsideTemperatureRange[1]) * Math.abs(minute - 12 * 60) / 60 / 12;
+	}
+
+	public double computeOutsideTemperature(final Calendar now) {
+		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander(), (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+		return computeOutsideTemperatureRange(outsideTemperatureRange, now.get(Calendar.MINUTE) + now.get(Calendar.HOUR_OF_DAY) * 60);
+	}
 
 	public String[] getCities() {
 		return cities;
