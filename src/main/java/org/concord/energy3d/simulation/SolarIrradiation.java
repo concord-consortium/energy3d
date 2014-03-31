@@ -217,13 +217,13 @@ public class SolarIrradiation {
 					throw new CancellationException();
 				if (solar[row][col] == -1)
 					continue;
-				final ReadOnlyVector3 p = v.multiply(step / 2.0 + row * step, null).addLocal(pU);
+				final ReadOnlyVector3 p = v.multiply(step / 2.0 + row * step, null).addLocal(pU).add(offset, null);
 				final double h;
 				if (row == rows - 1)
 					h = height - (row * step);
 				else
 					h = step;
-				final Ray3 pickRay = new Ray3(p.add(offset, null), directionTowardSun);
+				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
 //				final PickResults pickResults = new BoundingPickResults();
 				boolean collision = false;
@@ -308,6 +308,18 @@ public class SolarIrradiation {
 					final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
 					applyTexture(mesh, onMesh.get(mesh), maxValue);
 				}
+
+		/* subtract window potential from wall potential */
+		for (final HousePart wall : Scene.getInstance().getParts()) {
+			if (wall instanceof Wall) {
+				final double[] wallSolarPotentials = wall.getSolarPotential();
+				for (final HousePart window : wall.getChildren()) {
+					final double[] windowSolarPotentials = window.getSolarPotential();
+					for (int i = 0; i < wallSolarPotentials.length; i++)
+						wallSolarPotentials[i] -= windowSolarPotentials[i];
+				}
+			}
+		}
 
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
