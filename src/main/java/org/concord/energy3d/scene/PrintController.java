@@ -7,7 +7,6 @@ import java.awt.print.Paper;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
@@ -114,14 +113,23 @@ public class PrintController implements Updater {
 					part.getOriginal().hideLabels();
 				}
 			} else {
-				printParts = (List<HousePart>) ObjectCloner.deepCopy(Scene.getInstance().getParts());
-				final Iterator<HousePart> iterator = printParts.iterator();
-				while (iterator.hasNext())
-					if (!iterator.next().isPrintable())
-						iterator.remove();
-				for (int i = 0; i < printParts.size(); i++) {
-					Scene.getRoot().attachChild(printParts.get(i).getRoot());
-					printParts.get(i).setOriginal(Scene.getInstance().getParts().get(i));
+//				printParts = (List<HousePart>) ObjectCloner.deepCopy(Scene.getInstance().getParts());
+				printParts = new ArrayList<HousePart>(Scene.getInstance().getParts().size());
+//				final Iterator<HousePart> iterator = printParts.iterator();
+//				while (iterator.hasNext())
+//					if (!iterator.next().isPrintable())
+//						iterator.remove();
+//				for (int i = 0; i < printParts.size(); i++) {
+//				Scene.getRoot().attachChild(printParts.get(i).getRoot());
+//				printParts.get(i).setOriginal(Scene.getInstance().getParts().get(i));
+
+				for (final HousePart part : Scene.getInstance().getParts()) {
+					if (part.isPrintable()) {
+						final HousePart printPart = (HousePart) ObjectCloner.deepCopy(part);
+						printParts.add(printPart);
+						Scene.getRoot().attachChild(printPart.getRoot());
+						printPart.setOriginal(part);
+					}
 				}
 
 				for (final HousePart part : printParts)
