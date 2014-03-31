@@ -93,6 +93,10 @@ public class Scene implements Serializable {
 	private int solarContrast;
 	private double solarStep = 2.0;
 	private boolean cleanup = false;
+	private String wallUFactor;
+	private String doorUFactor;
+	private String windowUFactor;
+	private String roofUFactor;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -241,6 +245,14 @@ public class Scene implements Serializable {
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
+		if (instance.windowUFactor != null)
+			energyPanel.getWindowsComboBox().setSelectedItem(instance.windowUFactor);
+		if (instance.wallUFactor != null)
+			energyPanel.getWallsComboBox().setSelectedItem(instance.wallUFactor);
+		if (instance.doorUFactor != null)
+			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
+		if (instance.roofUFactor != null)
+			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
 		SolarIrradiation.getInstance().setStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
 		Scene.getInstance().setEdited(false);
 	}
@@ -372,6 +384,10 @@ public class Scene implements Serializable {
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
 				instance.solarStep = SolarIrradiation.getInstance().getStep();
+				instance.wallUFactor = (String) EnergyPanel.getInstance().getWallsComboBox().getSelectedItem();
+				instance.windowUFactor = (String) EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem();
+				instance.doorUFactor = (String) EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem();
+				instance.roofUFactor = (String) EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem();
 
 				if (setAsCurrentFile)
 					Scene.url = url;
@@ -439,7 +455,7 @@ public class Scene implements Serializable {
 		parts.remove(housePart); // this must happen before call to wall.delete()
 		for (final HousePart child : housePart.getChildren())
 			removeTree(child);
-//		originalHouseRoot.detachChild(housePart.getRoot());
+		// originalHouseRoot.detachChild(housePart.getRoot());
 		housePart.getRoot().removeFromParent();
 		housePart.delete();
 	}
