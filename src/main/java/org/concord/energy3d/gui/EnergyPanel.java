@@ -648,7 +648,7 @@ public class EnergyPanel extends JPanel {
 		gbc_solarLabel.gridy = 0;
 		panel_1.add(solarLabel, gbc_solarLabel);
 
-		final JLabel heatingLabel = new JLabel("Heating");
+		final JLabel heatingLabel = new JLabel("Heater");
 		heatingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_heatingLabel = new GridBagConstraints();
 		gbc_heatingLabel.fill = GridBagConstraints.HORIZONTAL;
@@ -657,7 +657,7 @@ public class EnergyPanel extends JPanel {
 		gbc_heatingLabel.gridy = 0;
 		panel_1.add(heatingLabel, gbc_heatingLabel);
 
-		final JLabel coolingLabel = new JLabel("Cooling");
+		final JLabel coolingLabel = new JLabel("AC");
 		coolingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_coolingLabel = new GridBagConstraints();
 		gbc_coolingLabel.fill = GridBagConstraints.HORIZONTAL;
