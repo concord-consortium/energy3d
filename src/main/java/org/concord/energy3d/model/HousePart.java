@@ -76,7 +76,8 @@ public abstract class HousePart implements Serializable {
 	private transient double[] solarPotential;
 	private transient double[] heatLoss;
 	private transient double solarPotentialToday;
-	
+	private transient double solarPotentialSum;
+
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
 	protected HousePart container = null;
@@ -786,7 +787,7 @@ public abstract class HousePart implements Serializable {
 			mesh.setDefaultColor(ColorRGBA.WHITE);
 		}
 	}
-	
+
 	public boolean isFoundation() {
 		return false;
 	}
@@ -822,10 +823,10 @@ public abstract class HousePart implements Serializable {
 	public double[] getSolarPotential() {
 		return solarPotential;
 	}
-	
+
 	public void setHeatLoss(final double[] heatLoss) {
 		this.heatLoss = heatLoss;
-	}		
+	}
 
 	public double[] getHeatLoss() {
 		return heatLoss;
@@ -837,6 +838,15 @@ public abstract class HousePart implements Serializable {
 
 	public void setSolarPotentialToday(final double solarPotentialToday) {
 		this.solarPotentialToday = solarPotentialToday;
+		solarPotentialSum += solarPotentialToday;
+	}
+
+	public double getSolarPotentialSum() {
+		return solarPotentialSum;
+	}
+
+	public void setSolarPotentialSum(final double solarPotentialSum) {
+		this.solarPotentialSum = solarPotentialSum;
 	}
 
 }

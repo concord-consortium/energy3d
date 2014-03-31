@@ -56,6 +56,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
+import org.concord.energy3d.simulation.SeasonalAnalysis;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Printout;
@@ -93,6 +94,7 @@ public class MainFrame extends JFrame {
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JMenuItem rescaleMenuItem;
 	private JMenuItem irradiationParametersMenuItem;
+	private JMenuItem seasonalAnalysisMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	protected Object lastSelection;
 	private JCheckBoxMenuItem shadeMenuItem = null;
@@ -811,6 +813,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
+			simulationMenu.add(getSeasonalAnalysisMenuItem());
 			simulationMenu.add(getIrradiationParametersMenuItem());
 			if (!Config.isRestrictMode()) {
 				simulationMenu.add(getKeepHeatmapOnMenuItem());
@@ -956,6 +959,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return irradiationParametersMenuItem;
+	}
+
+	private JMenuItem getSeasonalAnalysisMenuItem() {
+		if (seasonalAnalysisMenuItem == null) {
+			seasonalAnalysisMenuItem = new JMenuItem("Run Seasonal Analysis...");
+			seasonalAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new SeasonalAnalysis().compute();
+				}
+			});
+		}
+		return seasonalAnalysisMenuItem;
 	}
 
 	private JCheckBoxMenuItem getAnnotationsInwardMenuItem() {
