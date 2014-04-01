@@ -967,6 +967,9 @@ public class EnergyPanel extends JPanel {
 				houseSolarPotentialTextField.setText("");
 				passiveSolarTextField.setText("");
 				photovoltaicTextField.setText("");
+				heatingTodayTextField.setText("");
+				coolingTodayTextField.setText("");
+				totalTodayTextField.setText("");
 			}
 			final double[] buildingGeometry = selectedBuilding.getBuildingGeometry();
 			if (buildingGeometry != null) {
@@ -982,6 +985,12 @@ public class EnergyPanel extends JPanel {
 			}
 		} else {
 			houseSolarPotentialTextField.setText("");
+			passiveSolarTextField.setText("");
+			photovoltaicTextField.setText("");
+			heatingTodayTextField.setText("");
+			coolingTodayTextField.setText("");
+			totalTodayTextField.setText("");
+
 			positionTextField.setText("");
 			heightTextField.setText("");
 			areaTextField.setText("");
