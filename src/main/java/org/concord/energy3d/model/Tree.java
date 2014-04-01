@@ -145,7 +145,7 @@ public class Tree extends HousePart {
 	protected boolean mustHaveContainer() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean isPrintable() {
 		return false;
@@ -167,7 +167,15 @@ public class Tree extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		return "tree2.png";
+		if (isShedded())
+			return "tree_shedded.png";
+		else
+			return "tree.png";
+	}
+
+	private boolean isShedded() {
+		final int month = Heliodon.getInstance().getCalander().get(Calendar.MONTH);
+		return month > 10 || month < 4;
 	}
 
 	@Override
@@ -177,9 +185,8 @@ public class Tree extends HousePart {
 	}
 
 	public Node getCollisionRoot() {
-		final int month = Heliodon.getInstance().getCalander().get(Calendar.MONTH);
 		sphere.removeFromParent();
-		if (month >= 3 && month <= 11)
+		if (!isShedded())
 			collisionRoot.attachChild(sphere);
 		collisionRoot.updateWorldBound(true);
 		return collisionRoot;

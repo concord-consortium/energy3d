@@ -834,6 +834,10 @@ public class EnergyPanel extends JPanel {
 			}
 			computeEnergy();
 			updatePartEnergy();
+			for (final HousePart tree : Scene.getInstance().getParts())
+				if (tree instanceof Tree)
+					tree.updateTextureAndColor();
+			SceneManager.getInstance().refresh();
 		} catch (final CancellationException e) {
 			System.out.println("Energy compute cancelled.");
 		} catch (final RuntimeException e) {
