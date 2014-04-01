@@ -80,12 +80,13 @@ public class Tree extends HousePart {
 			model = treeModel.makeCopy(true);
 			root.attachChild(model);
 		} else {
-			mesh = new Quad("Tree Quad", 30, 30);
+			final double scale = 1 / (Scene.getInstance().getAnnotationScale() / 0.2);
+			mesh = new Quad("Tree Quad", 30 * scale, 30 * scale);
 //			mesh.setModelBound(null);
 			mesh.setModelBound(new BoundingBox());
 			mesh.updateModelBound();
 			mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-			mesh.setTranslation(0, 0, 15);
+			mesh.setTranslation(0, 0, 15 * scale);
 
 			final BlendState bs = new BlendState();
 			bs.setEnabled(true);
@@ -101,13 +102,13 @@ public class Tree extends HousePart {
 			billboard.attachChild(mesh);
 			root.attachChild(billboard);
 
-			sphere = new Sphere("Tree Sphere", 10, 10, 14);
+			sphere = new Sphere("Tree Sphere", 10, 10, 14 * scale);
 			sphere.setScale(1, 1, 0.7);
-			sphere.setTranslation(0, 0, 19);
+			sphere.setTranslation(0, 0, 19 * scale);
 			sphere.setModelBound(new BoundingSphere());
 			sphere.updateModelBound();
-			final Cylinder cylinder = new Cylinder("Tree Cylinder", 10, 10, 1, 20);
-			cylinder.setTranslation(0, 0, 10);
+			final Cylinder cylinder = new Cylinder("Tree Cylinder", 10, 10, 1 * scale, 20 * scale);
+			cylinder.setTranslation(0, 0, 10 * scale);
 			cylinder.setModelBound(new BoundingBox());
 			cylinder.updateModelBound();
 
