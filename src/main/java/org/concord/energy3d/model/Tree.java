@@ -80,18 +80,21 @@ public class Tree extends HousePart {
 			model = treeModel.makeCopy(true);
 			root.attachChild(model);
 		} else {
-			 mesh = new Quad("Tree Quad", 30, 30);
-			 mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-			 mesh.setTranslation(0, 0, 15);
+			mesh = new Quad("Tree Quad", 30, 30);
+//			mesh.setModelBound(null);
+			mesh.setModelBound(new BoundingBox());
+			mesh.updateModelBound();
+			mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
+			mesh.setTranslation(0, 0, 15);
 
-			 final BlendState bs = new BlendState();
-			 bs.setEnabled(true);
-			 bs.setBlendEnabled(false);
-			 bs.setTestEnabled(true);
-			 bs.setTestFunction(TestFunction.GreaterThan);
-			 bs.setReference(0.7f);
-			 mesh.setRenderState(bs);
-			 mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+			final BlendState bs = new BlendState();
+			bs.setEnabled(true);
+			bs.setBlendEnabled(false);
+			bs.setTestEnabled(true);
+			bs.setTestFunction(TestFunction.GreaterThan);
+			bs.setReference(0.7f);
+			mesh.setRenderState(bs);
+			mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 
 			billboard = new BillboardNode("Billboard");
 			billboard.setAlignment(BillboardAlignment.AxialZ);
