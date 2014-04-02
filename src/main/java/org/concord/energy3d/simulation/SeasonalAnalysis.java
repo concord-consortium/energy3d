@@ -1,11 +1,13 @@
 package org.concord.energy3d.simulation;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -52,6 +54,11 @@ public class SeasonalAnalysis {
 		JPanel contentPane = new JPanel(new BorderLayout());
 		contentPane.setPreferredSize(new Dimension(500, 500));
 		dialog.setContentPane(contentPane);
+		
+		JPanel panel = new JPanel();
+		panel.setBackground(Color.white);
+		panel.setBorder(BorderFactory.createEtchedBorder());
+		contentPane.add(panel, BorderLayout.CENTER);
 		
 		JPanel buttonPanel = new JPanel();
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
