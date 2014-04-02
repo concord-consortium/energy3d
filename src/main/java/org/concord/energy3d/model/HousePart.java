@@ -831,7 +831,7 @@ public abstract class HousePart implements Serializable {
 	public double[] getHeatLoss() {
 		return heatLoss;
 	}
-
+	
 	public double getSolarPotentialToday() {
 		return solarPotentialToday;
 	}

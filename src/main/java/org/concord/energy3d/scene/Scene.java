@@ -97,6 +97,8 @@ public class Scene implements Serializable {
 	private String doorUFactor;
 	private String windowUFactor;
 	private String roofUFactor;
+	private double windowSolarHeatingRate = 0.5;
+	private double solarPanelEfficiency = 0.15;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -254,6 +256,8 @@ public class Scene implements Serializable {
 		if (instance.roofUFactor != null)
 			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
 		SolarIrradiation.getInstance().setStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
+		Scene.getInstance().setWindowSolarHeatingRate(instance.windowSolarHeatingRate < 0.000001 ? 0.5 : instance.windowSolarHeatingRate);
+		Scene.getInstance().setSolarPanelEfficiency(instance.solarPanelEfficiency < 0.000001 ? 0.15 : instance.solarPanelEfficiency);
 		Scene.getInstance().setEdited(false);
 	}
 
@@ -729,6 +733,22 @@ public class Scene implements Serializable {
 
 	public long nextID() {
 		return ++idCounter;
+	}
+
+	public double getWindowSolarHeatingRate() {
+		return windowSolarHeatingRate;
+	}
+
+	public void setWindowSolarHeatingRate(double windowSolarHeatingRate) {
+		this.windowSolarHeatingRate = windowSolarHeatingRate;
+	}
+
+	public void setSolarPanelEfficiency(double solarPanelEfficiency) {
+		this.solarPanelEfficiency = solarPanelEfficiency;
+	}
+
+	public double getSolarPanelEfficiency() {
+		return solarPanelEfficiency;
 	}
 
 }
