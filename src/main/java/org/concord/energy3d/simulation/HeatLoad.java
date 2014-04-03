@@ -64,7 +64,10 @@ public class HeatLoad {
 						uFactor = roofUFactor;
 					else
 						continue;
-					part.getHeatLoss()[minute / SolarIrradiation.MINUTE_STEP] += part.computeArea() * uFactor * deltaT / 1000.0 / 60 * SolarIrradiation.MINUTE_STEP;
+					double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * SolarIrradiation.MINUTE_STEP;
+					if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
+						heatloss = 0;
+					part.getHeatLoss()[minute / SolarIrradiation.MINUTE_STEP] += heatloss;
 				}
 			}
 		}
