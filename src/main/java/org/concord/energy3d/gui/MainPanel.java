@@ -2,6 +2,7 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -26,6 +28,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.plaf.basic.BasicArrowButton;
 
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -64,7 +67,12 @@ public class MainPanel extends JPanel {
 	private JSplitPane canvasNoteSplitPane;
 	private JScrollPane noteScrollPane;
 	private JTextArea noteTextArea;
+	private JToggleButton solarPanelButton;
+	private JToggleButton treeButton;
+	private BasicArrowButton treeArrowButton;
 	private int defaultDividerSize = -1;
+	private final JPopupMenu treeMenu;
+	private Operation treeCommand = SceneManager.Operation.DRAW_TREE;
 
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
 		@Override
@@ -72,7 +80,7 @@ public class MainPanel extends JPanel {
 			SceneManager.getInstance().refresh();
 		}
 	};
-	
+
 	java.awt.event.MouseAdapter operationStickAndRefreshUponExit = new java.awt.event.MouseAdapter() {
 		@Override
 		public void mouseClicked(final java.awt.event.MouseEvent e) {
@@ -84,11 +92,9 @@ public class MainPanel extends JPanel {
 		public void mouseExited(final MouseEvent e) {
 			SceneManager.getInstance().refresh();
 		}
-	};	
+	};
 
 	final static Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
-	private JToggleButton solarPanelButton;
-	private JToggleButton treeButton;
 	static {
 		cityLatitute.put("Moscow", 55);
 		cityLatitute.put("Ottawa", 45);
@@ -123,6 +129,27 @@ public class MainPanel extends JPanel {
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		initialize();
+		final JCheckBoxMenuItem shortTreeMenu = new JCheckBoxMenuItem("Short Tree", new ImageIcon(getClass().getResource("icons/tree.png")), true);
+		final JCheckBoxMenuItem tallTreeMenu = new JCheckBoxMenuItem("Tall Tree", new ImageIcon(getClass().getResource("icons/tree_tall.png")));
+		final ActionListener treeAction = new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem)e.getSource();
+				treeButton.setIcon(selected.getIcon());
+				if (selected == shortTreeMenu)
+					treeCommand = SceneManager.Operation.DRAW_TREE;
+				else
+					treeCommand = SceneManager.Operation.DRAW_TREE_TALL;
+			}
+		};
+		shortTreeMenu.addActionListener(treeAction);
+		tallTreeMenu.addActionListener(treeAction);
+		treeMenu = new JPopupMenu();
+		treeMenu.add(shortTreeMenu);
+		treeMenu.add(tallTreeMenu);
+		final ButtonGroup bg = new ButtonGroup();
+		bg.add(shortTreeMenu);
+		bg.add(tallTreeMenu);
 		System.out.println("done");
 	}
 
@@ -157,6 +184,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getFloorButton());
 			appToolbar.add(getSolarPanelButton());
 			appToolbar.add(getTreeButton());
+			appToolbar.add(getTreeArrowButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getLightButton());
 			appToolbar.add(getHeliodonButton());
@@ -698,12 +726,31 @@ public class MainPanel extends JPanel {
 			treeButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_TREE);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();					
+					SceneManager.getInstance().setOperation(treeCommand);
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 			treeButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return treeButton;
 	}
+
+	private BasicArrowButton getTreeArrowButton() {
+		if (treeArrowButton == null) {
+			treeArrowButton = new BasicArrowButton(BasicArrowButton.SOUTH) {
+				@Override
+				public Dimension getMaximumSize() {
+					return new Dimension(13, super.getMaximumSize().height);
+				}
+			};
+			treeArrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					treeMenu.show(getTreeButton(), 0, getTreeButton().getHeight());
+				}
+			});
+		}
+		return treeArrowButton;
+	}
+
 }

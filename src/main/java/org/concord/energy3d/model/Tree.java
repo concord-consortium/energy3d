@@ -34,12 +34,15 @@ import com.ardor3d.util.resource.ResourceSource;
 
 public class Tree extends HousePart {
 	private static final long serialVersionUID = 1L;
+	public static final int SHORT = 0;
+	public static final int TALL = 1;
 	private static Spatial treeModel;
 	private static boolean isBillboard = true;
 	private transient Spatial model;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
 	private transient Sphere sphere;
+	private final int treeType;
 
 	public static void loadModel() {
 		new Thread() {
@@ -66,8 +69,9 @@ public class Tree extends HousePart {
 		}.start();
 	}
 
-	public Tree() {
+	public Tree(final int treeType) {
 		super(1, 1, 1);
+		this.treeType = treeType;
 		init();
 	}
 
@@ -80,11 +84,12 @@ public class Tree extends HousePart {
 			model = treeModel.makeCopy(true);
 			root.attachChild(model);
 		} else {
-			mesh = new Quad("Tree Quad", 30, 30);
+			final double height = treeType == SHORT ? 30 : 60;
+			mesh = new Quad("Tree Quad", 30, height);
 			mesh.setModelBound(new BoundingBox());
 			mesh.updateModelBound();
 			mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-			mesh.setTranslation(0, 0, 15);
+			mesh.setTranslation(0, 0, height / 2.0);
 
 			final BlendState bs = new BlendState();
 			bs.setEnabled(true);
@@ -172,10 +177,17 @@ public class Tree extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		if (isShedded())
-			return "tree_shedded.png";
-		else
-			return "tree.png";
+		if (treeType == SHORT) {
+			if (isShedded())
+				return "tree_shedded.png";
+			else
+				return "tree.png";
+		} else {
+			if (isShedded())
+				return "tree_tall_shedded.png";
+			else
+				return "tree_tall.png";
+		}
 	}
 
 	private boolean isShedded() {

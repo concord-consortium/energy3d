@@ -133,7 +133,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_TREE
+		SELECT, RESIZE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_TREE, DRAW_TREE_TALL
 	}
 
 	public enum CameraMode {
@@ -914,7 +914,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Foundation();
 			setGridsVisible(true);
 		} else if (operation == Operation.DRAW_TREE) {
-			drawn = new Tree();
+			drawn = new Tree(Tree.SHORT);
+			setGridsVisible(true);
+		} else if (operation == Operation.DRAW_TREE_TALL) {
+			drawn = new Tree(Tree.TALL);
 			setGridsVisible(true);
 		} else
 			return null;
