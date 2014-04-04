@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
@@ -752,6 +753,8 @@ public class MainPanel extends JPanel {
 					treeMenu.show(getTreeButton(), 0, getTreeButton().getHeight());
 				}
 			});
+			treeArrowButton.setBorder(BorderFactory.createEmptyBorder());
+			treeArrowButton.setFocusPainted(false);
 		}
 		return treeArrowButton;
 	}

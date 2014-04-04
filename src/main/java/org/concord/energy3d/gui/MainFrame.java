@@ -967,7 +967,7 @@ public class MainFrame extends JFrame {
 			seasonalAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					new SeasonalAnalysis().compute();
+					new SeasonalAnalysis().show();
 				}
 			});
 		}
