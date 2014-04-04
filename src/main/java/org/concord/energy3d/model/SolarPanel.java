@@ -30,7 +30,7 @@ public class SolarPanel extends HousePart {
 	private transient ReadOnlyVector3 normal;
 	private transient double area;
 	private transient Mesh wireframeMesh;
-	private transient Box surround; 
+	private transient Box surround;
 
 	public SolarPanel() {
 		super(1, 1, 0.0);
@@ -47,15 +47,15 @@ public class SolarPanel extends HousePart {
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
-		
+
 		surround = new Box("SolarPanel (Surround)");
 		surround.setModelBound(new OrientedBoundingBox());
 		final OffsetState offset = new OffsetState();
 		offset.setFactor(1);
 		offset.setUnits(1);
-		surround.setRenderState(offset);		
+		surround.setRenderState(offset);
 		root.attachChild(surround);
-		
+
 		wireframeMesh = new Line("SolarPanel (Wireframe)");
 		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
@@ -88,7 +88,7 @@ public class SolarPanel extends HousePart {
 			setHighlight(!isDrawable());
 		}
 	}
-	
+
 	@Override
 	public Vector3 getAbsPoint(final int index) {
 		return toAbsolute(points.get(index), getContainerRelative());
@@ -96,6 +96,9 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	protected void drawMesh() {
+		if (container == null)
+			return;
+
 		if (container instanceof Roof) {
 			final PickResults pickResults = new PrimitivePickResults();
 			final Ray3 ray = new Ray3(getAbsPoint(0).addLocal(0, 0, 1000), Vector3.NEG_UNIT_Z);
@@ -111,12 +114,12 @@ public class SolarPanel extends HousePart {
 		} else
 			normal = container.getFaceDirection();
 		updateEditShapes();
-		
+
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		area = WIDTH * HEIGHT;
 		surround.setData(Vector3.ZERO, WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.1);
 		surround.updateModelBound();
-		
+
 //		final Vector3[] boxVertices = surround.computeVertices();
 //		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 //		vertexBuffer.rewind();
@@ -132,8 +135,8 @@ public class SolarPanel extends HousePart {
 //		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
 //		j++;
 //		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
-		
-		
+
+
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
 		final FloatBuffer boxTextureBuffer = surround.getMeshData().getTextureBuffer(0);
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
@@ -149,7 +152,7 @@ public class SolarPanel extends HousePart {
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(0).put(0);
 		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));		
+		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i += 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
@@ -169,16 +172,16 @@ public class SolarPanel extends HousePart {
 
 		mesh.updateModelBound();
 		wireframeMesh.updateModelBound();
-		
+
 		mesh.setTranslation(getAbsPoint(0));
 		if (Util.isEqual(normal, Vector3.UNIT_Z))
 			mesh.setRotation(new Matrix3());
 		else
-			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));		
+			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 
 		surround.setTranslation(mesh.getTranslation());
-		surround.setRotation(mesh.getRotation());		
-		
+		surround.setRotation(mesh.getRotation());
+
 		wireframeMesh.setTranslation(mesh.getTranslation());
 		wireframeMesh.setRotation(mesh.getRotation());
 	}
@@ -245,7 +248,7 @@ public class SolarPanel extends HousePart {
 	public Mesh getSurroundMesh() {
 		return surround;
 	}
-	
+
 	@Override
 	public boolean isSolarPanel() {
 		return true;
