@@ -1,8 +1,10 @@
 package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,7 +17,9 @@ import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -29,7 +33,6 @@ import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.plaf.basic.BasicArrowButton;
 
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -70,7 +73,7 @@ public class MainPanel extends JPanel {
 	private JTextArea noteTextArea;
 	private JToggleButton solarPanelButton;
 	private JToggleButton treeButton;
-	private BasicArrowButton treeArrowButton;
+	private JButton treeArrowButton;
 	private int defaultDividerSize = -1;
 	private final JPopupMenu treeMenu;
 	private Operation treeCommand = SceneManager.Operation.DRAW_TREE;
@@ -135,7 +138,7 @@ public class MainPanel extends JPanel {
 		final ActionListener treeAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem)e.getSource();
+				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
 				treeButton.setIcon(selected.getIcon());
 				if (selected == shortTreeMenu)
 					treeCommand = SceneManager.Operation.DRAW_TREE;
@@ -739,17 +742,34 @@ public class MainPanel extends JPanel {
 		return treeButton;
 	}
 
-	private BasicArrowButton getTreeArrowButton() {
+	private JButton getTreeArrowButton() {
 		if (treeArrowButton == null) {
-			treeArrowButton = new BasicArrowButton(BasicArrowButton.SOUTH) {
+			treeArrowButton = new JButton();
+			treeArrowButton.setIcon(new Icon() {
 				@Override
-				public Dimension getMaximumSize() {
-					return new Dimension(13, super.getMaximumSize().height);
+				public void paintIcon(Component c, Graphics g, int x, int y) {
+					g.setColor(Color.BLACK);
+					int x2 = getIconWidth() / 2;
+					int y2 = getIconHeight() / 2;
+					int[] vx = new int[] { 2, getIconWidth() - 2, x2 };
+					int[] vy = new int[] { y2 - 2, y2 - 2, y2 + 4 };
+					g.fillPolygon(vx, vy, vx.length);
 				}
-			};
+
+				@Override
+				public int getIconWidth() {
+					return treeArrowButton.getWidth();
+				}
+
+				@Override
+				public int getIconHeight() {
+					return treeArrowButton.getHeight();
+				}
+			});
+			treeArrowButton.setMaximumSize(new Dimension(12, treeButton.getMaximumSize().height));
 			treeArrowButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
+				public void actionPerformed(ActionEvent arg0) {
 					treeMenu.show(getTreeButton(), 0, getTreeButton().getHeight());
 				}
 			});
