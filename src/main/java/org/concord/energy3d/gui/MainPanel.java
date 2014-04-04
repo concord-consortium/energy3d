@@ -140,6 +140,8 @@ public class MainPanel extends JPanel {
 					treeCommand = SceneManager.Operation.DRAW_TREE;
 				else
 					treeCommand = SceneManager.Operation.DRAW_TREE_TALL;
+				SceneManager.getInstance().setOperation(treeCommand);
+				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 			}
 		};
 		shortTreeMenu.addActionListener(treeAction);

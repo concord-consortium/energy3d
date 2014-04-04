@@ -106,14 +106,22 @@ public class Tree extends HousePart {
 			root.attachChild(billboard);
 
 			sphere = new Sphere("Tree Sphere", 10, 10, 14);
-			sphere.setScale(1, 1, 0.7);
-			sphere.setTranslation(0, 0, 19);
 			sphere.setModelBound(new BoundingSphere());
 			sphere.updateModelBound();
 			final Cylinder cylinder = new Cylinder("Tree Cylinder", 10, 10, 1, 20);
-			cylinder.setTranslation(0, 0, 10);
 			cylinder.setModelBound(new BoundingBox());
 			cylinder.updateModelBound();
+
+			if (treeType == SHORT) {
+				sphere.setScale(1, 1, 0.7);
+				sphere.setTranslation(0, 0, 19);
+				cylinder.setTranslation(0, 0, 10);
+			} else {
+				sphere.setScale(1, 1, 1.8);
+				sphere.setTranslation(0, 0, 33);
+				cylinder.setScale(1, 1, 2);
+				cylinder.setTranslation(0, 0, 20);
+			}
 
 			collisionRoot = new Node("Tree Collision Root");
 			collisionRoot.attachChild(sphere);
