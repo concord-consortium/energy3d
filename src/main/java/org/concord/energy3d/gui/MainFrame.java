@@ -137,6 +137,7 @@ public class MainFrame extends JFrame {
 	private final JColorChooser colorChooser;
 	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
+	private final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
 	private JCheckBoxMenuItem keepHeatmapOnMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
 
@@ -414,6 +415,7 @@ public class MainFrame extends JFrame {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
+		fileChooser.removeChoosableFileFilter(daeFilter);
 		fileChooser.setFileFilter(ng3Filter);
 		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 			SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
@@ -450,6 +452,7 @@ public class MainFrame extends JFrame {
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					fileChooser.removeChoosableFileFilter(ng3Filter);
 					fileChooser.removeChoosableFileFilter(pngFilter);
+					fileChooser.removeChoosableFileFilter(daeFilter);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						final File dir = fileChooser.getSelectedFile();
@@ -485,6 +488,7 @@ public class MainFrame extends JFrame {
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					fileChooser.removeChoosableFileFilter(ng3Filter);
 					fileChooser.removeChoosableFileFilter(pngFilter);
+					fileChooser.removeChoosableFileFilter(daeFilter);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						final File dir = fileChooser.getSelectedFile();
@@ -1060,6 +1064,7 @@ public class MainFrame extends JFrame {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
+		fileChooser.removeChoosableFileFilter(daeFilter);
 		fileChooser.setFileFilter(ng3Filter);
 		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
@@ -1088,6 +1093,7 @@ public class MainFrame extends JFrame {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
+		fileChooser.removeChoosableFileFilter(daeFilter);
 		fileChooser.setFileFilter(ng3Filter);
 		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
@@ -1103,6 +1109,9 @@ public class MainFrame extends JFrame {
 	private void importColladaFile() {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.removeChoosableFileFilter(pngFilter);
+		fileChooser.removeChoosableFileFilter(ng3Filter);
+		fileChooser.addChoosableFileFilter(daeFilter);
+		fileChooser.setFileFilter(daeFilter);
 		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 			try {
@@ -1515,6 +1524,7 @@ public class MainFrame extends JFrame {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(pngFilter);
 		fileChooser.removeChoosableFileFilter(ng3Filter);
+		fileChooser.removeChoosableFileFilter(daeFilter);
 		fileChooser.setFileFilter(pngFilter);
 		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 			System.out.print("Saving snapshot: ");
