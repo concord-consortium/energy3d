@@ -971,7 +971,9 @@ public class MainFrame extends JFrame {
 			seasonalAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					new SeasonalAnalysis().show();
+					SeasonalAnalysis sa = new SeasonalAnalysis();
+					EnergyPanel.getInstance().addPropertyChangeListener(sa);
+					sa.show();
 				}
 			});
 		}

@@ -120,22 +120,21 @@ public class SolarPanel extends HousePart {
 		surround.setData(Vector3.ZERO, WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.1);
 		surround.updateModelBound();
 
-//		final Vector3[] boxVertices = surround.computeVertices();
-//		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-//		vertexBuffer.rewind();
-//		int j = 4;
-//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
-//		j++;
-//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
-//		j++;
-//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
-//		j = 4;
-//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
-//		j += 2;
-//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
-//		j++;
-//		vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
-
+		// final Vector3[] boxVertices = surround.computeVertices();
+		// final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		// vertexBuffer.rewind();
+		// int j = 4;
+		// vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
+		// j++;
+		// vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
+		// j++;
+		// vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
+		// j = 4;
+		// vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
+		// j += 2;
+		// vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
+		// j++;
+		// vertexBuffer.put(boxVertices[j].getXf()).put(boxVertices[j].getYf()).put(boxVertices[j].getZf());
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
 		final FloatBuffer boxTextureBuffer = surround.getMeshData().getTextureBuffer(0);
@@ -144,7 +143,7 @@ public class SolarPanel extends HousePart {
 		final FloatBuffer wireframeBuffer = wireframeMesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		wireframeBuffer.rewind();
-		int i = 8*3;
+		int i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(0);
 		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
@@ -165,7 +164,7 @@ public class SolarPanel extends HousePart {
 		textureBuffer.put(1).put(1);
 		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		i = 8*3;
+		i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(0);
 		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
@@ -174,10 +173,12 @@ public class SolarPanel extends HousePart {
 		wireframeMesh.updateModelBound();
 
 		mesh.setTranslation(getAbsPoint(0));
-		if (Util.isEqual(normal, Vector3.UNIT_Z))
-			mesh.setRotation(new Matrix3());
-		else
-			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+		if (normal != null) { // FIXME: Sometimes normal is null
+			if (Util.isEqual(normal, Vector3.UNIT_Z))
+				mesh.setRotation(new Matrix3());
+			else
+				mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+		}
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
@@ -188,22 +189,22 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-//		final Vector3 p1 = getAbsPoint(0);
-//		p1.setZ(0);
+		// final Vector3 p1 = getAbsPoint(0);
+		// p1.setZ(0);
 		if (this.mesh.getWorldBound() == null)
 			return true;
 		final OrientedBoundingBox bound = (OrientedBoundingBox) this.mesh.getWorldBound().clone(null);
 		bound.setExtent(bound.getExtent().divide(1.1, null));
 		for (final HousePart solarPanel : container.getChildren()) {
-//			final Vector3 p2 = solarPanel.getAbsPoint(0);
-//			p2.setZ(0);
-//			if (solarPanel != this && p1.distance(p2) < widthExtent / 1.5 / 0.2) {
+			// final Vector3 p2 = solarPanel.getAbsPoint(0);
+			// p2.setZ(0);
+			// if (solarPanel != this && p1.distance(p2) < widthExtent / 1.5 / 0.2) {
 			if (solarPanel != this && bound.intersects(solarPanel.mesh.getWorldBound())) {
-//				mesh.setDefaultColor(ColorRGBA.RED);
+				// mesh.setDefaultColor(ColorRGBA.RED);
 				return false;
 			}
 		}
-//		mesh.setDefaultColor(ColorRGBA.WHITE);
+		// mesh.setDefaultColor(ColorRGBA.WHITE);
 		return true;
 	}
 
@@ -229,7 +230,7 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public double getGridSize() {
-//		return 1.5;
+		// return 1.5;
 		return WIDTH / Scene.getInstance().getAnnotationScale() / 5.0;
 	}
 
