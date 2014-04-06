@@ -93,7 +93,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem inchesMenuItem;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JMenuItem rescaleMenuItem;
-	private JMenuItem irradiationParametersMenuItem;
+	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem seasonalAnalysisMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	protected Object lastSelection;
@@ -818,7 +818,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 			simulationMenu.add(getSeasonalAnalysisMenuItem());
-			simulationMenu.add(getIrradiationParametersMenuItem());
+			simulationMenu.add(getSimulationSettingsMenuItem());
 			if (!Config.isRestrictMode()) {
 				simulationMenu.add(getKeepHeatmapOnMenuItem());
 			}
@@ -952,17 +952,17 @@ public class MainFrame extends JFrame {
 		return rescaleMenuItem;
 	}
 
-	private JMenuItem getIrradiationParametersMenuItem() {
-		if (irradiationParametersMenuItem == null) {
-			irradiationParametersMenuItem = new JMenuItem("Irradiation Parameters...");
-			irradiationParametersMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getSimulationSettingsMenuItem() {
+		if (simulationSettingsMenuItem == null) {
+			simulationSettingsMenuItem = new JMenuItem("Simulation Settings...");
+			simulationSettingsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					new IrradiationParametersDialog().setVisible(true);
+					new SimulationSettingsDialog().setVisible(true);
 				}
 			});
 		}
-		return irradiationParametersMenuItem;
+		return simulationSettingsMenuItem;
 	}
 
 	private JMenuItem getSeasonalAnalysisMenuItem() {

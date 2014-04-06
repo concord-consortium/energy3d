@@ -91,7 +91,7 @@ class BuildingEnergyGraph extends Graph {
 
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
 		g2.setStroke(thin);
-		int x0 = getWidth() - 80 - right;
+		int x0 = getWidth() - 100 - right;
 		int y0 = top - 10;
 		drawSquare(g2, x0, y0, 8, Color.YELLOW);
 		String s = "Windows";

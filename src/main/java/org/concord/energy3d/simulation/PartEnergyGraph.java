@@ -90,10 +90,13 @@ class PartEnergyGraph extends Graph {
 		drawCircle(g2, x0, y0, 8, Color.YELLOW);
 		String s = "Solar";
 		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+
 		s = "Heat Transfer";
-		y0 += 14;
-		drawSquare(g2, x0, y0, 8, Color.GRAY);
-		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		if (data.containsKey(s)) {
+			y0 += 14;
+			drawSquare(g2, x0, y0, 8, Color.GRAY);
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
 
 	}
 

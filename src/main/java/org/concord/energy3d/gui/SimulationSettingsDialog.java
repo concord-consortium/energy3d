@@ -2,6 +2,7 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -18,27 +19,27 @@ import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.SolarIrradiation;
 
-class IrradiationParametersDialog extends JDialog {
+class SimulationSettingsDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private final static DecimalFormat FORMAT1 = new DecimalFormat("#0.##");
 
-	public IrradiationParametersDialog() {
+	public SimulationSettingsDialog() {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setTitle("Solar Irradiation");
+		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel contentPanel = new JPanel();
-		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		final JPanel contentPanel = new JPanel(new GridLayout(1, 2));
+		contentPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 
-		contentPanel.add(new JLabel("Simulation Resolution"));
+		contentPanel.add(new JLabel("Irradiation Grid Cell Size: "));
 
-		final JTextField resolutionTextField = new JTextField(FORMAT1.format(SolarIrradiation.getInstance().getStep()));
-		contentPanel.add(resolutionTextField);
-		resolutionTextField.setColumns(20);
+		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(SolarIrradiation.getInstance().getStep()));
+		contentPanel.add(cellSizeTextField);
+		cellSizeTextField.setColumns(10);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -49,14 +50,14 @@ class IrradiationParametersDialog extends JDialog {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				try {
-					final double resolution = Double.parseDouble(resolutionTextField.getText());
-					IrradiationParametersDialog.this.dispose();
-					SolarIrradiation.getInstance().setStep(resolution);
+					final double cellSize = Double.parseDouble(cellSizeTextField.getText());
+					SimulationSettingsDialog.this.dispose();
+					SolarIrradiation.getInstance().setStep(cellSize);
 					Scene.getInstance().setEdited(true);
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
-					JOptionPane.showMessageDialog(IrradiationParametersDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -68,7 +69,7 @@ class IrradiationParametersDialog extends JDialog {
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				IrradiationParametersDialog.this.dispose();
+				SimulationSettingsDialog.this.dispose();
 			}
 		});
 		cancelButton.setActionCommand("Cancel");

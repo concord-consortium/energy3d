@@ -116,7 +116,9 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 	private void createDialog() {
 
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Seasonal Analysis: " + (selectedPart == null ? "" : selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1)), true);
+		String title = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+		title = title.replaceAll("Foundation", "Building");
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Seasonal Analysis: " + title, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		JPanel contentPane = new JPanel(new BorderLayout());
 		dialog.setContentPane(contentPane);
