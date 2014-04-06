@@ -3,18 +3,21 @@ package org.concord.energy3d.simulation;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
 /**
- * Graph for time and seasonal analyses.
+ * Graph for time and seasonal analysis.
  * 
  * @author Charles Xie
  * 
@@ -23,17 +26,18 @@ class Graph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private int top = 50, right = 20, bottom = 50, left = 20;
+	private int top = 50, right = 50, bottom = 80, left = 50;
 	private BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 8f }, 0.0f);
 	private BasicStroke thin = new BasicStroke(1);
 	private BasicStroke thick = new BasicStroke(2);
-	List<Double> data;
+	private Map<String, List<Double>> data;
 	private float xmin = 0;
-	private float xmax = 12;
+	private float xmax = 11;
+	private int numberOfTicks = 12;
 
 	Graph() {
 		super();
-		data = new ArrayList<Double>();
+		data = new HashMap<String, List<Double>>();
 	}
 
 	void setMinimum(float xmin) {
@@ -44,22 +48,32 @@ class Graph extends JPanel {
 		this.xmax = xmax;
 	}
 
-	double getData(int i) {
-		if (data.isEmpty())
-			return Double.NaN;
-		return data.get(i);
+	void addData(String name, double d) {
+		List<Double> list = data.get(name);
+		if (list == null) {
+			list = new ArrayList<Double>();
+			data.put(name, list);
+		}
+		list.add(d);
 	}
 
-	void addData(double d) {
-		data.add(d);
+	List<Double> getData(String name) {
+		return data.get(name);
+	}
+
+	int getChannel() {
+		return data.size();
+	}
+
+	int getLength() {
+		if (data.isEmpty())
+			return 0;
+		List<Double> list = data.get("Net");
+		return list.size();
 	}
 
 	void clearData() {
 		data.clear();
-	}
-
-	static Color getOppositeColor(Color c) {
-		return new Color(255 - c.getRed(), 255 - c.getGreen(), 255 - c.getBlue());
 	}
 
 	public void paintComponent(Graphics g) {
@@ -79,38 +93,119 @@ class Graph extends JPanel {
 		g2.setColor(getBackground());
 		g2.fillRect(0, 0, width, height);
 		g2.setColor(Color.GRAY);
+		g2.setStroke(thick);
 		g2.drawRect(left / 2, top / 2, width - (left + right) / 2, height - (top + bottom) / 2);
 
+		float tickWidth = (float) (width - left - right) / (float) (numberOfTicks - 1);
+		for (int i = 0; i < numberOfTicks; i++) {
+			String s = "" + (i + 1);
+			int sWidth = g2.getFontMetrics().stringWidth(s);
+			g2.drawString(s, left + tickWidth * i - sWidth / 2, height - bottom / 2 + 16);
+		}
+		String xAxisLabel = "Month";
+		String yAxisLabel = "Energy (kWh)";
+		int xAxisLabelWidth = g2.getFontMetrics().stringWidth(xAxisLabel);
+		int yAxisLabelWidth = g2.getFontMetrics().stringWidth(yAxisLabel);
+		g2.setColor(Color.BLACK);
+		g2.drawString(xAxisLabel, (width - xAxisLabelWidth) / 2, height - 10);
+		g2.rotate(-Math.PI / 2, 16, (height + yAxisLabelWidth) / 2);
+		g2.drawString(yAxisLabel, 16, (height + yAxisLabelWidth) / 2);
+		g2.rotate(Math.PI / 2, 16, (height + yAxisLabelWidth) / 2);
+
 		if (data.isEmpty()) {
+
 			g2.setColor(Color.LIGHT_GRAY);
-			g2.drawString("No data", width / 2, height / 2);
+			g2.setFont(new Font("Arial", Font.PLAIN, 20));
+			String info = "No data";
+			int infoWidth = g2.getFontMetrics().stringWidth(info);
+			g2.drawString(info, (width - infoWidth) / 2, height / 2);
+
 		} else {
-			g2.setColor(Color.BLACK);
-			int dx = Math.round((width - left - right) / (xmax - xmin));
-			double ymax = Collections.max(data);
-			double ymin = Collections.min(data);
-			int dy = Math.round((height - top - bottom) / (float) (ymax - ymin));
 
-			float dataX, dataY;
-			Path2D.Float path = new Path2D.Float();
-			for (int i = 0; i < data.size(); i++) {
-				dataX = left + dx * i;
-				dataY = (float) (height - top - (data.get(i) - ymin) * dy);
-				if (i == 0)
-					path.moveTo(dataX, dataY);
-				else
-					path.lineTo(dataX, dataY);
-			}
-			g2.setStroke(thick);
-			g2.draw(path);
+			for (String key : data.keySet()) {
 
-			g2.setColor(Color.GRAY);
-			for (int i = 0; i < data.size(); i++) {
-				dataX = left + dx * i;
-				dataY = (float) (height - top - (data.get(i) - ymin) * dy);
-				g2.fillOval(Math.round(dataX - 5), Math.round(dataY - 5), 10, 10);
+				List<Double> list = data.get(key);
+
+				if (!list.isEmpty()) {
+
+					double ymax = Collections.max(list);
+					double ymin = Collections.min(list);
+					if (ymin == ymax)
+						continue;
+					float dx = (float) (width - left - right) / (float) (xmax - xmin);
+					float dy = (float) (height - top - bottom) / (float) (ymax - ymin);
+
+					g2.setColor(Color.BLACK);
+					float dataX, dataY;
+					Path2D.Float path = new Path2D.Float();
+					for (int i = 0; i < list.size(); i++) {
+						dataX = left + dx * i;
+						dataY = (float) (height - top - (list.get(i) - ymin) * dy);
+						if (i == 0)
+							path.moveTo(dataX, dataY);
+						else
+							path.lineTo(dataX, dataY);
+					}
+					g2.setStroke(dashed);
+					g2.draw(path);
+
+					g2.setStroke(thin);
+					for (int i = 0; i < list.size(); i++) {
+						dataX = left + dx * i;
+						dataY = (float) (height - top - (list.get(i) - ymin) * dy);
+						if ("Windows".equals(key)) {
+							drawCircle(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.YELLOW);
+						} else if ("Solar Panels".equals(key)) {
+							drawSquare(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.ORANGE);
+						} else if ("Heater".equals(key)) {
+							drawSquare(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.RED);
+						} else if ("AC".equals(key)) {
+							drawSquare(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.BLUE);
+						} else if ("Net".equals(key)) {
+							drawCircle(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.GREEN);
+						}
+					}
+
+				}
+
 			}
 
 		}
+
+		g2.setFont(new Font("Arial", Font.PLAIN, 10));
+		g2.setStroke(thin);
+		int x0 = width - 60 - right;
+		int y0 = top - 10;
+		drawCircle(g2, x0, y0, 8, Color.YELLOW);
+		g2.drawString("Windows", x0 + 14, y0 + 8);
+		y0 += 12;
+		drawSquare(g2, x0, y0, 8, Color.ORANGE);
+		g2.drawString("Solar Panels", x0 + 14, y0 + 8);
+		y0 += 12;
+		drawSquare(g2, x0, y0, 8, Color.RED);
+		g2.drawString("Heater", x0 + 14, y0 + 8);
+		y0 += 12;
+		drawSquare(g2, x0, y0, 8, Color.BLUE);
+		g2.drawString("AC", x0 + 14, y0 + 8);
+		y0 += 12;
+		drawCircle(g2, x0, y0, 8, Color.GREEN);
+		g2.drawString("Net", x0 + 14, y0 + 8);
+
 	}
+
+	private void drawCircle(Graphics g, int x, int y, int d, Color c) {
+		g.setColor(c);
+		g.fillOval(x, y, d, d);
+		g.setColor(Color.BLACK);
+		g.drawOval(x, y, d, d);
+
+	}
+
+	private void drawSquare(Graphics g, int x, int y, int a, Color c) {
+		g.setColor(c);
+		g.fillRect(x, y, a, a);
+		g.setColor(Color.BLACK);
+		g.drawRect(x, y, a, a);
+	}
+
 }
