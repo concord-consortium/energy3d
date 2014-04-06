@@ -69,6 +69,8 @@ class PartEnergyGraph extends Graph {
 					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
 					if ("Solar".equals(key)) {
 						drawCircle(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.YELLOW);
+					} else if ("Heat Transfer".equals(key)) {
+						drawSquare(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.GRAY);
 					}
 				}
 
@@ -83,10 +85,14 @@ class PartEnergyGraph extends Graph {
 
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
 		g2.setStroke(thin);
-		int x0 = getWidth() - 80 - right;
+		int x0 = getWidth() - 100 - right;
 		int y0 = top - 10;
 		drawCircle(g2, x0, y0, 8, Color.YELLOW);
 		String s = "Solar";
+		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		s = "Heat Transfer";
+		y0 += 14;
+		drawSquare(g2, x0, y0, 8, Color.GRAY);
 		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 
 	}

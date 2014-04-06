@@ -15,6 +15,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import static java.util.Calendar.*;
@@ -93,6 +94,11 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 				Window window = (Window) selectedPart;
 				double solar = window.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
 				graph.addData("Solar", solar);
+				double[] loss = window.getHeatLoss();
+				double sum = 0;
+				for (double x : loss)
+					sum += x;
+				graph.addData("Heat Transfer", sum);
 			} else if (selectedPart instanceof SolarPanel) {
 				SolarPanel solarPanel = (SolarPanel) selectedPart;
 				double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiency();
@@ -138,33 +144,32 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				String[] header = null;
 				if (graph instanceof BuildingEnergyGraph) {
-					String[] header = new String[] { "Month", "Windows", "Solar Panels", "Heater", "AC", "Net" };
-					int m = header.length;
-					int n = graph.getLength();
-					Object[][] column = new Object[n][m + 1];
-					for (int i = 0; i < n; i++)
-						column[i][0] = (i + 1);
-					for (int j = 1; j < header.length; j++) {
-						List<Double> list = graph.getData(header[j]);
-						for (int i = 0; i < n; i++)
-							column[i][j] = list.get(i);
-					}
-					DataViewer.showDataWindow("Data", column, header, dialog);
+					header = new String[] { "Month", "Windows", "Solar Panels", "Heater", "AC", "Net" };
 				} else {
-					String[] header = new String[] { "Month", "Solar" };
-					int m = header.length;
-					int n = graph.getLength();
-					Object[][] column = new Object[n][m + 1];
-					for (int i = 0; i < n; i++)
-						column[i][0] = (i + 1);
-					for (int j = 1; j < header.length; j++) {
-						List<Double> list = graph.getData(header[j]);
-						for (int i = 0; i < n; i++)
-							column[i][j] = list.get(i);
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						header = new String[] { "Month", "Solar" };
+					} else if (selectedPart instanceof Window) {
+						header = new String[] { "Month", "Solar", "Heat Transfer" };
 					}
-					DataViewer.showDataWindow("Data", column, header, dialog);
 				}
+				if (header == null) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Problem in finding data.", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				int m = header.length;
+				int n = graph.getLength();
+				Object[][] column = new Object[n][m + 1];
+				for (int i = 0; i < n; i++)
+					column[i][0] = (i + 1);
+				for (int j = 1; j < header.length; j++) {
+					List<Double> list = graph.getData(header[j]);
+					for (int i = 0; i < n; i++)
+						column[i][j] = list.get(i);
+				}
+				DataViewer.showDataWindow("Data", column, header, dialog);
 			}
 		});
 		buttonPanel.add(button);
