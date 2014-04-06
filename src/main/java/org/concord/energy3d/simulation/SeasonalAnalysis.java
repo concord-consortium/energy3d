@@ -24,6 +24,8 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
@@ -46,13 +48,13 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 	private Graph graph;
 
 	public SeasonalAnalysis() {
-		graph = new Graph();
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		graph = selectedPart instanceof Foundation ? new BuildingEnergyGraph() : new PartEnergyGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
 		graph.setBackground(Color.white);
 	}
 
 	private void init() {
-		clearSum();
 		month = 0;
 		graph.clearData();
 	}
@@ -70,24 +72,12 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		createDialog();
 	}
 
-	private void clearSum() {
-		for (HousePart x : Scene.getInstance().getParts())
-			x.setSolarPotentialSum(0);
-	}
-
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
 		if (e.getSource() == EnergyPanel.getInstance()) {
 			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			Foundation selectedBuilding;
-			if (selectedPart == null) {
-				selectedBuilding = null;
-			} else if (selectedPart instanceof Foundation) {
-				selectedBuilding = (Foundation) selectedPart;
-			} else {
-				selectedBuilding = (Foundation) selectedPart.getTopContainer();
-			}
-			if (selectedBuilding != null) {
+			if (selectedPart instanceof Foundation) {
+				Foundation selectedBuilding = (Foundation) selectedPart;
 				double window = selectedBuilding.getPassiveSolarToday();
 				double solarPanel = selectedBuilding.getPhotovoltaicToday();
 				double heater = selectedBuilding.getHeatingToday();
@@ -99,8 +89,16 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 				graph.addData("Heater", heater);
 				graph.addData("AC", ac);
 				graph.addData("Net", net);
-				graph.repaint();
+			} else if (selectedPart instanceof Window) {
+				Window window = (Window) selectedPart;
+				double solar = window.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
+				graph.addData("Solar", solar);
+			} else if (selectedPart instanceof SolarPanel) {
+				SolarPanel solarPanel = (SolarPanel) selectedPart;
+				double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiency();
+				graph.addData("Solar", solar);
 			}
+			graph.repaint();
 			if (month < MONTHS.length - 1) {
 				MainPanel.getInstance().getSolarButton().doClick();
 				month++;
@@ -111,7 +109,8 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 
 	private void createDialog() {
 
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Seasonal Analysis", true);
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Seasonal Analysis: " + (selectedPart == null ? "" : selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1)), true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		JPanel contentPane = new JPanel(new BorderLayout());
 		dialog.setContentPane(contentPane);
@@ -139,18 +138,33 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String[] header = new String[] { "Month", "Windows", "Solar Panels", "Heater", "AC", "Net" };
-				int m = header.length;
-				int n = graph.getLength();
-				Object[][] column = new Object[n][m + 1];
-				for (int i = 0; i < n; i++)
-					column[i][0] = (i + 1);
-				for (int j = 1; j < header.length; j++) {
-					List<Double> list = graph.getData(header[j]);
+				if (graph instanceof BuildingEnergyGraph) {
+					String[] header = new String[] { "Month", "Windows", "Solar Panels", "Heater", "AC", "Net" };
+					int m = header.length;
+					int n = graph.getLength();
+					Object[][] column = new Object[n][m + 1];
 					for (int i = 0; i < n; i++)
-						column[i][j] = list.get(i);
+						column[i][0] = (i + 1);
+					for (int j = 1; j < header.length; j++) {
+						List<Double> list = graph.getData(header[j]);
+						for (int i = 0; i < n; i++)
+							column[i][j] = list.get(i);
+					}
+					DataViewer.showDataWindow("Data", column, header, dialog);
+				} else {
+					String[] header = new String[] { "Month", "Solar" };
+					int m = header.length;
+					int n = graph.getLength();
+					Object[][] column = new Object[n][m + 1];
+					for (int i = 0; i < n; i++)
+						column[i][0] = (i + 1);
+					for (int j = 1; j < header.length; j++) {
+						List<Double> list = graph.getData(header[j]);
+						for (int i = 0; i < n; i++)
+							column[i][j] = list.get(i);
+					}
+					DataViewer.showDataWindow("Data", column, header, dialog);
 				}
-				DataViewer.showDataWindow("Data", column, header, dialog);
 			}
 		});
 		buttonPanel.add(button);

@@ -76,7 +76,6 @@ public abstract class HousePart implements Serializable {
 	private transient double[] solarPotential;
 	private transient double[] heatLoss;
 	private transient double solarPotentialToday;
-	private transient double solarPotentialSum;
 
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
@@ -838,15 +837,6 @@ public abstract class HousePart implements Serializable {
 
 	public void setSolarPotentialToday(final double solarPotentialToday) {
 		this.solarPotentialToday = solarPotentialToday;
-		solarPotentialSum += solarPotentialToday;
-	}
-
-	public double getSolarPotentialSum() {
-		return solarPotentialSum;
-	}
-
-	public void setSolarPotentialSum(final double solarPotentialSum) {
-		this.solarPotentialSum = solarPotentialSum;
 	}
 
 }

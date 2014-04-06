@@ -971,6 +971,11 @@ public class MainFrame extends JFrame {
 			seasonalAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No selection", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
 					SeasonalAnalysis sa = new SeasonalAnalysis();
 					EnergyPanel.getInstance().addPropertyChangeListener(sa);
 					sa.show();
