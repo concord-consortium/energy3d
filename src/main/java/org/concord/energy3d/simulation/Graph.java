@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,10 +35,13 @@ class Graph extends JPanel {
 	private float xmin = 0;
 	private float xmax = 11;
 	private int numberOfTicks = 12;
+	private final DecimalFormat twoDecimals;
 
 	Graph() {
 		super();
 		data = new HashMap<String, List<Double>>();
+		twoDecimals = new DecimalFormat();
+		twoDecimals.setMaximumFractionDigits(2);
 	}
 
 	void setMinimum(float xmin) {
@@ -59,6 +63,16 @@ class Graph extends JPanel {
 
 	List<Double> getData(String name) {
 		return data.get(name);
+	}
+
+	private double getSum(String name) {
+		List<Double> x = getData(name);
+		if (x == null || x.isEmpty())
+			return 0;
+		double sum = 0;
+		for (double a : x)
+			sum += a;
+		return sum;
 	}
 
 	int getChannel() {
@@ -96,6 +110,7 @@ class Graph extends JPanel {
 		g2.setStroke(thick);
 		g2.drawRect(left / 2, top / 2, width - (left + right) / 2, height - (top + bottom) / 2);
 
+		g2.setColor(Color.BLACK);
 		float tickWidth = (float) (width - left - right) / (float) (numberOfTicks - 1);
 		for (int i = 0; i < numberOfTicks; i++) {
 			String s = "" + (i + 1);
@@ -106,7 +121,6 @@ class Graph extends JPanel {
 		String yAxisLabel = "Energy (kWh)";
 		int xAxisLabelWidth = g2.getFontMetrics().stringWidth(xAxisLabel);
 		int yAxisLabelWidth = g2.getFontMetrics().stringWidth(yAxisLabel);
-		g2.setColor(Color.BLACK);
 		g2.drawString(xAxisLabel, (width - xAxisLabelWidth) / 2, height - 10);
 		g2.rotate(-Math.PI / 2, 16, (height + yAxisLabelWidth) / 2);
 		g2.drawString(yAxisLabel, 16, (height + yAxisLabelWidth) / 2);
@@ -122,18 +136,29 @@ class Graph extends JPanel {
 
 		} else {
 
+			double ymax = 1, ymin = 0;
+			for (String key : data.keySet()) {
+				List<Double> list = data.get(key);
+				if (!list.isEmpty()) {
+					double max = Collections.max(list);
+					double min = Collections.min(list);
+					if (max > ymax)
+						ymax = max;
+					if (min < ymin)
+						ymin = min;
+				}
+			}
+			float dx = (float) (width - left - right) / (float) (xmax - xmin);
+			float dy = (float) (height - top - bottom) / (float) (ymax - ymin);
+
 			for (String key : data.keySet()) {
 
 				List<Double> list = data.get(key);
 
 				if (!list.isEmpty()) {
 
-					double ymax = Collections.max(list);
-					double ymin = Collections.min(list);
-					if (ymin == ymax)
+					if (Collections.max(list) == Collections.min(list))
 						continue;
-					float dx = (float) (width - left - right) / (float) (xmax - xmin);
-					float dy = (float) (height - top - bottom) / (float) (ymax - ymin);
 
 					g2.setColor(Color.BLACK);
 					float dataX, dataY;
@@ -154,7 +179,7 @@ class Graph extends JPanel {
 						dataX = left + dx * i;
 						dataY = (float) (height - top - (list.get(i) - ymin) * dy);
 						if ("Windows".equals(key)) {
-							drawCircle(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.YELLOW);
+							drawSquare(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.YELLOW);
 						} else if ("Solar Panels".equals(key)) {
 							drawSquare(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.ORANGE);
 						} else if ("Heater".equals(key)) {
@@ -174,22 +199,27 @@ class Graph extends JPanel {
 
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
 		g2.setStroke(thin);
-		int x0 = width - 60 - right;
+		int x0 = width - 80 - right;
 		int y0 = top - 10;
-		drawCircle(g2, x0, y0, 8, Color.YELLOW);
-		g2.drawString("Windows", x0 + 14, y0 + 8);
+		drawSquare(g2, x0, y0, 8, Color.YELLOW);
+		String s = "Windows";
+		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		s = "Solar Panels";
 		y0 += 12;
 		drawSquare(g2, x0, y0, 8, Color.ORANGE);
-		g2.drawString("Solar Panels", x0 + 14, y0 + 8);
+		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		s = "Heater";
 		y0 += 12;
 		drawSquare(g2, x0, y0, 8, Color.RED);
-		g2.drawString("Heater", x0 + 14, y0 + 8);
+		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		s = "AC";
 		y0 += 12;
 		drawSquare(g2, x0, y0, 8, Color.BLUE);
-		g2.drawString("AC", x0 + 14, y0 + 8);
+		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		s = "Net";
 		y0 += 12;
 		drawCircle(g2, x0, y0, 8, Color.GREEN);
-		g2.drawString("Net", x0 + 14, y0 + 8);
+		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 
 	}
 
