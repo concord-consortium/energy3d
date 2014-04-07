@@ -78,7 +78,7 @@ public class SolarIrradiation {
 
 	private void initCollidables() {
 		collidables.clear();
-//		collidables.add(Scene.getRoot());
+		// collidables.add(Scene.getRoot());
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation)
 				collidables.add(part.getMesh());
@@ -100,7 +100,7 @@ public class SolarIrradiation {
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		for (int minute = 0; minute < 1440; minute += MINUTE_STEP) {
 			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
-//			 final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
+			// final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 				for (final HousePart part : Scene.getInstance().getParts()) {
@@ -225,7 +225,7 @@ public class SolarIrradiation {
 					h = step;
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
-//				final PickResults pickResults = new BoundingPickResults();
+				// final PickResults pickResults = new BoundingPickResults();
 				boolean collision = false;
 				for (final Spatial spatial : collidables)
 					if (spatial != collisionMesh) {
@@ -235,13 +235,13 @@ public class SolarIrradiation {
 							break;
 						}
 					}
-//				if (!collision)
-//					for (final HousePart part : Scene.getInstance().getParts())
-//						if (part instanceof Tree)
-//							if (((Tree) part).intersects(pickRay)) {
-//								collision = true;
-//								break;
-//							}
+				// if (!collision)
+				// for (final HousePart part : Scene.getInstance().getParts())
+				// if (part instanceof Tree)
+				// if (((Tree) part).intersects(pickRay)) {
+				// collision = true;
+				// break;
+				// }
 
 				if (!collision) {
 					solar[row][col] += dot / airMass;
@@ -339,7 +339,7 @@ public class SolarIrradiation {
 							if (houseChild.isWindow())
 								passiveSolar[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getWindowSolarHeatingRate();
 							else if (houseChild.isSolarPanel())
-								photovoltaic[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getSolarPanelEfficiency();
+								photovoltaic[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
 						}
 					}
 
@@ -347,20 +347,20 @@ public class SolarIrradiation {
 				double coolingTotal = 0.0;
 				double passiveSolarTotal = 0.0;
 				double photovoltaicTotal = 0.0;
-//				double photovoltaicLeftover = 0.0;
+				// double photovoltaicLeftover = 0.0;
 				for (int i = 0; i < heatLoss.length; i++) {
-//					if (Heliodon.getInstance().isVisible()) {
-						if (heatLoss[i] < 0)
-							heatLoss[i] -= passiveSolar[i];
-						else
-							heatLoss[i] = Math.max(0, heatLoss[i] - passiveSolar[i]);
-//						if (Math.abs(heatLoss[i]) > photovoltaic[i])
-//							heatLoss[i] = Math.signum(heatLoss[i]) * (Math.abs(heatLoss[i]) - photovoltaic[i]);
-//						else {
-//							photovoltaicLeftover += photovoltaic[i] - Math.abs(heatLoss[i]);
-//							heatLoss[i] = 0.0;
-//						}
-//					}
+					// if (Heliodon.getInstance().isVisible()) {
+					if (heatLoss[i] < 0)
+						heatLoss[i] -= passiveSolar[i];
+					else
+						heatLoss[i] = Math.max(0, heatLoss[i] - passiveSolar[i]);
+					// if (Math.abs(heatLoss[i]) > photovoltaic[i])
+					// heatLoss[i] = Math.signum(heatLoss[i]) * (Math.abs(heatLoss[i]) - photovoltaic[i]);
+					// else {
+					// photovoltaicLeftover += photovoltaic[i] - Math.abs(heatLoss[i]);
+					// heatLoss[i] = 0.0;
+					// }
+					// }
 					if (heatLoss[i] > 0)
 						heatingTotal += heatLoss[i];
 					else
@@ -375,7 +375,7 @@ public class SolarIrradiation {
 				foundation.setPhotovoltaicToday(photovoltaicTotal);
 				foundation.setHeatingToday(heatingTotal);
 				foundation.setCoolingToday(coolingTotal);
-//				foundation.setTotalEnergyToday(heatingTotal + coolingTotal - photovoltaicLeftover);
+				// foundation.setTotalEnergyToday(heatingTotal + coolingTotal - photovoltaicLeftover);
 				foundation.setTotalEnergyToday(heatingTotal + coolingTotal - photovoltaicTotal);
 			}
 		}

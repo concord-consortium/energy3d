@@ -95,6 +95,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem rescaleMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem seasonalAnalysisMenuItem;
+	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	protected Object lastSelection;
 	private JCheckBoxMenuItem shadeMenuItem = null;
@@ -818,6 +819,8 @@ public class MainFrame extends JFrame {
 				}
 			});
 			simulationMenu.add(getSeasonalAnalysisMenuItem());
+			simulationMenu.add(getDailyAnalysisMenuItem());
+			simulationMenu.addSeparator();
 			simulationMenu.add(getSimulationSettingsMenuItem());
 			if (!Config.isRestrictMode()) {
 				simulationMenu.add(getKeepHeatmapOnMenuItem());
@@ -954,7 +957,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getSimulationSettingsMenuItem() {
 		if (simulationSettingsMenuItem == null) {
-			simulationSettingsMenuItem = new JMenuItem("Simulation Settings...");
+			simulationSettingsMenuItem = new JMenuItem("Change Settings...");
 			simulationSettingsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -983,6 +986,24 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return seasonalAnalysisMenuItem;
+	}
+
+	private JMenuItem getDailyAnalysisMenuItem() {
+		if (dailyAnalysisMenuItem == null) {
+			dailyAnalysisMenuItem = new JMenuItem("Run Daily Analysis...");
+			dailyAnalysisMenuItem.setEnabled(false);
+			dailyAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No selection", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+				}
+			});
+		}
+		return dailyAnalysisMenuItem;
 	}
 
 	private JCheckBoxMenuItem getAnnotationsInwardMenuItem() {

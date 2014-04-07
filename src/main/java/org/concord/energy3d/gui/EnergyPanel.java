@@ -25,6 +25,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSlider;
@@ -73,6 +74,7 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox<String> windowsComboBox;
 	private final JComboBox<String> roofsComboBox;
 	private final JComboBox<String> cityComboBox;
+	private final JComboBox<String> solarPanelEfficiencyComboBox;
 	private final JCheckBox autoCheckBox;
 	private final JTextField heatingTodayTextField;
 	private final JTextField coolingTodayTextField;
@@ -431,7 +433,7 @@ public class EnergyPanel extends JPanel {
 
 		wallsComboBox = new WideComboBox();
 		wallsComboBox.setEditable(true);
-		wallsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.28 ", "0.67 (Concrete 8\")", "0.41 (Masonary Brick 8\")", "0.04 (Flat Metal 8\" Fiberglass Insulation)" }));
+		wallsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.28 ", "0.67 (Concrete 8\")", "0.41 (Masonary Brick 8\")", "0.04 (Flat Metal 8\" Fiberglass Insulation)" }));
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -454,7 +456,7 @@ public class EnergyPanel extends JPanel {
 
 		doorsComboBox = new WideComboBox();
 		doorsComboBox.setEditable(true);
-		doorsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.14 ", "1.20 (Steel)", "0.64 (Wood)" }));
+		doorsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "1.14 ", "1.20 (Steel)", "0.64 (Wood)" }));
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -477,7 +479,7 @@ public class EnergyPanel extends JPanel {
 
 		windowsComboBox = new WideComboBox();
 		windowsComboBox.setEditable(true);
-		windowsComboBox.setModel(new DefaultComboBoxModel(new String[] { "1.22", "0.70 (Double Pane)", "0.15 (Triple Pane)"}));
+		windowsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "1.22", "0.70 (Double Pane)", "0.15 (Triple Pane)" }));
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -500,7 +502,7 @@ public class EnergyPanel extends JPanel {
 
 		roofsComboBox = new WideComboBox();
 		roofsComboBox.setEditable(true);
-		roofsComboBox.setModel(new DefaultComboBoxModel(new String[] { "0.14 ", "0.23 (Concrete 3\")", "0.11 (Flat Metal 3\" Fiberglass Insulation)", "0.10 (Wood 3\" Fiberglass Insulation)" }));
+		roofsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.14 ", "0.23 (Concrete 3\")", "0.11 (Flat Metal 3\" Fiberglass Insulation)", "0.10 (Wood 3\" Fiberglass Insulation)" }));
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -513,6 +515,37 @@ public class EnergyPanel extends JPanel {
 		uFactorPanel.add(roofsComboBox, gbc_roofsComboBox);
 
 		uFactorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, uFactorPanel.getPreferredSize().height));
+
+		final JPanel otherParametersPanel = new JPanel();
+		otherParametersPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, otherParametersPanel.getPreferredSize().height));
+		otherParametersPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Other Parameters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(otherParametersPanel);
+
+		final JLabel solarPanelEfficiencyLabel = new JLabel("Solar Panel Efficiency (%): ");
+		otherParametersPanel.add(solarPanelEfficiencyLabel);
+
+		solarPanelEfficiencyComboBox = new WideComboBox();
+		solarPanelEfficiencyComboBox.setEditable(true);
+		solarPanelEfficiencyComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10", "20", "30", "40", "50" }));
+		solarPanelEfficiencyComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// validate the input
+				String s = (String) solarPanelEfficiencyComboBox.getSelectedItem();
+				double eff = 15;
+				try {
+					eff = Float.parseFloat(s);
+				} catch (NumberFormatException ex) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be a number between 0-100.", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (eff < 0 || eff > 100) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be a number between 0-100.", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+				Scene.getInstance().setSolarPanelEfficiency(eff);
+			}
+		});
+		otherParametersPanel.add(solarPanelEfficiencyComboBox);
 
 		partPanel = new JPanel();
 		partPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -861,9 +894,9 @@ public class EnergyPanel extends JPanel {
 		if (cityComboBox.getSelectedItem().equals(""))
 			outsideTemperatureSpinner.setValue(15);
 		else {
-//			final double[] temperature = CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander(), (String) cityComboBox.getSelectedItem());
-//			final double avgTemperature = (temperature[0] + temperature[1]) / 2.0;
-//			outsideTemperatureSpinner.setValue((int) Math.round(avgTemperature));
+			// final double[] temperature = CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander(), (String) cityComboBox.getSelectedItem());
+			// final double avgTemperature = (temperature[0] + temperature[1]) / 2.0;
+			// outsideTemperatureSpinner.setValue((int) Math.round(avgTemperature));
 			outsideTemperatureSpinner.setValue(Math.round(CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander())));
 		}
 	}
@@ -1021,6 +1054,10 @@ public class EnergyPanel extends JPanel {
 
 	public JComboBox<String> getCityComboBox() {
 		return cityComboBox;
+	}
+
+	public JComboBox<String> getSolarPanelEfficiencyComboBox() {
+		return solarPanelEfficiencyComboBox;
 	}
 
 }

@@ -97,8 +97,8 @@ public class Scene implements Serializable {
 	private String doorUFactor;
 	private String windowUFactor;
 	private String roofUFactor;
+	private double solarPanelEfficiency;
 	private double windowSolarHeatingRate = 0.5;
-	private double solarPanelEfficiency = 0.15;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -255,9 +255,11 @@ public class Scene implements Serializable {
 			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
 		if (instance.roofUFactor != null)
 			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
+		if (instance.solarPanelEfficiency < 0.00000001)
+			instance.solarPanelEfficiency = 15;
+		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
 		SolarIrradiation.getInstance().setStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
 		Scene.getInstance().setWindowSolarHeatingRate(instance.windowSolarHeatingRate < 0.000001 ? 0.5 : instance.windowSolarHeatingRate);
-		Scene.getInstance().setSolarPanelEfficiency(instance.solarPanelEfficiency < 0.000001 ? 0.15 : instance.solarPanelEfficiency);
 		Scene.getInstance().setEdited(false);
 	}
 
@@ -392,6 +394,7 @@ public class Scene implements Serializable {
 				instance.windowUFactor = (String) EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem();
 				instance.doorUFactor = (String) EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem();
 				instance.roofUFactor = (String) EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem();
+				instance.solarPanelEfficiency = Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
 
 				if (setAsCurrentFile)
 					Scene.url = url;
@@ -735,20 +738,21 @@ public class Scene implements Serializable {
 		return ++idCounter;
 	}
 
-	public double getWindowSolarHeatingRate() {
-		return windowSolarHeatingRate;
-	}
-
-	public void setWindowSolarHeatingRate(double windowSolarHeatingRate) {
-		this.windowSolarHeatingRate = windowSolarHeatingRate;
+	/** @return the solar panel efficiency (not in percentage) */
+	public double getSolarPanelEfficiencyNotPercentage() {
+		return solarPanelEfficiency * 0.01;
 	}
 
 	public void setSolarPanelEfficiency(double solarPanelEfficiency) {
 		this.solarPanelEfficiency = solarPanelEfficiency;
 	}
 
-	public double getSolarPanelEfficiency() {
-		return solarPanelEfficiency;
+	public double getWindowSolarHeatingRate() {
+		return windowSolarHeatingRate;
+	}
+
+	public void setWindowSolarHeatingRate(double windowSolarHeatingRate) {
+		this.windowSolarHeatingRate = windowSolarHeatingRate;
 	}
 
 }

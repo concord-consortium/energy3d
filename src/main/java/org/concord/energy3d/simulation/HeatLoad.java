@@ -78,4 +78,5 @@ public class HeatLoad {
 		final int indexOfSpace = valueStr.indexOf(' ');
 		return Double.parseDouble(valueStr.substring(0, indexOfSpace != -1 ? indexOfSpace : valueStr.length()));
 	}
+	
 }

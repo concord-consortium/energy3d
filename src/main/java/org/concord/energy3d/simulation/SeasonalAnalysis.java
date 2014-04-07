@@ -101,7 +101,7 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 				graph.addData("Heat Transfer", sum);
 			} else if (selectedPart instanceof SolarPanel) {
 				SolarPanel solarPanel = (SolarPanel) selectedPart;
-				double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiency();
+				double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
 				graph.addData("Solar", solar);
 			}
 			graph.repaint();
