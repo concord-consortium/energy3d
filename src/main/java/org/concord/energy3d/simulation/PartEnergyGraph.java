@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Graph for seasonal analysis of energy rleated to a house part.
+ * Graph for seasonal analysis of energy related to a house part.
  * 
  * @author Charles Xie
  * 
@@ -24,22 +24,6 @@ class PartEnergyGraph extends Graph {
 	@Override
 	void drawCurves(Graphics2D g2) {
 
-		double ymax = 1, ymin = 0;
-		for (String key : data.keySet()) {
-			List<Double> list = data.get(key);
-			if (!list.isEmpty()) {
-				double max = Collections.max(list);
-				double min = Collections.min(list);
-				if (max > ymax)
-					ymax = max;
-				if (min < ymin)
-					ymin = min;
-			}
-		}
-
-		float dx = (float) (getWidth() - left - right) / (float) (xmax - xmin);
-		float dy = (float) (getHeight() - top - bottom) / (float) (ymax - ymin);
-
 		for (String key : data.keySet()) {
 
 			List<Double> list = data.get(key);
@@ -50,7 +34,7 @@ class PartEnergyGraph extends Graph {
 					continue;
 
 				g2.setColor(Color.BLACK);
-				float dataX, dataY;
+				double dataX, dataY;
 				Path2D.Float path = new Path2D.Float();
 				for (int i = 0; i < list.size(); i++) {
 					dataX = left + dx * i;
@@ -68,9 +52,9 @@ class PartEnergyGraph extends Graph {
 					dataX = left + dx * i;
 					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
 					if ("Solar".equals(key)) {
-						drawCircle(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.YELLOW);
+						drawCircle(g2, (int) Math.round(dataX - 5), (int) Math.round(dataY - 5), 10, Color.YELLOW);
 					} else if ("Heat Transfer".equals(key)) {
-						drawSquare(g2, Math.round(dataX - 5), Math.round(dataY - 5), 10, Color.GRAY);
+						drawSquare(g2, (int) Math.round(dataX - 5), (int) Math.round(dataY - 5), 10, Color.GRAY);
 					}
 				}
 

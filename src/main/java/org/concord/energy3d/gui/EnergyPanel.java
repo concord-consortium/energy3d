@@ -322,6 +322,8 @@ public class EnergyPanel extends JPanel {
 					g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 					g.fillRect(x, 0, x + STEP, size.height);
 				}
+				g.setColor(Color.DARK_GRAY);
+				g.drawRect(0, 0, size.width - 1, size.height - 1);
 			}
 		};
 		final GridBagConstraints gbc_colormapPanel = new GridBagConstraints();
@@ -532,15 +534,16 @@ public class EnergyPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				// validate the input
 				String s = (String) solarPanelEfficiencyComboBox.getSelectedItem();
-				double eff = 15;
+				double eff = 10;
 				try {
 					eff = Float.parseFloat(s);
 				} catch (NumberFormatException ex) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be a number between 0-100.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be a number between 10-50.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (eff < 0 || eff > 100) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be a number between 0-100.", "Error", JOptionPane.ERROR_MESSAGE);
+				if (eff < 10 || eff > 50) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be a number between 10-50.", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 				Scene.getInstance().setSolarPanelEfficiency(eff);
 			}

@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,13 +26,17 @@ abstract class Graph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	int top = 50, right = 50, bottom = 80, left = 50;
+	int top = 50, right = 50, bottom = 80, left = 90;
 	BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 2f }, 0.0f);
 	BasicStroke thin = new BasicStroke(1);
 	BasicStroke thick = new BasicStroke(2);
 	Map<String, List<Double>> data;
-	float xmin = 0;
-	float xmax = 11;
+	double xmin = 0;
+	double xmax = 11;
+	double ymin;
+	double ymax;
+	double dx;
+	double dy;
 	int numberOfTicks = 12;
 	String xAxisLabel = "Month";
 	String yAxisLabel = "Energy (kWh)";
@@ -135,6 +140,32 @@ abstract class Graph extends JPanel {
 			int infoWidth = g2.getFontMetrics().stringWidth(info);
 			g2.drawString(info, (width - infoWidth) / 2, height / 2);
 		} else {
+			ymax = 1;
+			ymin = 0;
+			for (String key : data.keySet()) {
+				List<Double> list = data.get(key);
+				if (!list.isEmpty()) {
+					double max = Collections.max(list);
+					double min = Collections.min(list);
+					if (max > ymax)
+						ymax = max;
+					if (min < ymin)
+						ymin = min;
+				}
+			}
+			dx = (float) (getWidth() - left - right) / (float) (xmax - xmin);
+			dy = (float) (getHeight() - top - bottom) / (float) (ymax - ymin);
+			int digits = String.valueOf(Math.round(ymax - ymin)).length() - 1;
+			digits = (int) Math.pow(10, digits);
+			int i1 = (int) Math.round(ymin / digits) - 2;
+			int i2 = (int) Math.round(ymax / digits) + 2;
+			int hVal, hPos;
+			for (int i = i1; i <= i2; i++) {
+				hVal = i * digits;
+				hPos = (int) (getHeight() - top - (hVal - ymin) * dy);
+				if (hPos > top / 2 && hPos < getHeight() - bottom / 2)
+					drawHorizontalLine(g2, hPos, Integer.toString(hVal));
+			}
 			drawCurves(g2);
 		}
 
@@ -145,6 +176,15 @@ abstract class Graph extends JPanel {
 	abstract void drawLegends(Graphics2D g2);
 
 	abstract void drawCurves(Graphics2D g2);
+
+	void drawHorizontalLine(Graphics2D g2, int yValue, String yLabel) {
+		g2.setStroke(thin);
+		g2.setColor(Color.LIGHT_GRAY);
+		g2.drawLine(left / 2, yValue, getWidth() - right / 2, yValue);
+		g2.setColor(Color.BLACK);
+		int yLabelWidth = g2.getFontMetrics().stringWidth(yLabel);
+		g2.drawString(yLabel, left / 2 - 5 - yLabelWidth, yValue + 4);
+	}
 
 	static void drawCircle(Graphics g, int x, int y, int d, Color c) {
 		g.setColor(c);

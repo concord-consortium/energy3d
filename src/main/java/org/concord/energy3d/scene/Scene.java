@@ -255,8 +255,8 @@ public class Scene implements Serializable {
 			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
 		if (instance.roofUFactor != null)
 			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
-		if (instance.solarPanelEfficiency < 0.00000001)
-			instance.solarPanelEfficiency = 15;
+		if (instance.solarPanelEfficiency < 0.001)
+			instance.solarPanelEfficiency = 10;
 		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
 		SolarIrradiation.getInstance().setStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
 		Scene.getInstance().setWindowSolarHeatingRate(instance.windowSolarHeatingRate < 0.000001 ? 0.5 : instance.windowSolarHeatingRate);
