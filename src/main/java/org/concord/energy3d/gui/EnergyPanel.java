@@ -1,9 +1,8 @@
 package org.concord.energy3d.gui;
 
-import java.awt.Color;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.CancellationException;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -87,11 +87,8 @@ public class EnergyPanel extends JPanel {
 	private final JSpinner timeSpinner;
 	private final JLabel latitudeLabel;
 	private final JSpinner latitudeSpinner;
-	private final JPanel panel_4;
+	private final JPanel heatMapPanel;
 	private final JSlider colorMapSlider;
-	private final JPanel colormapPanel;
-	private final JLabel legendLabel;
-	private final JLabel contrastLabel;
 	private final JProgressBar progressBar;
 
 	private Thread thread;
@@ -110,7 +107,7 @@ public class EnergyPanel extends JPanel {
 	private JTextField houseSolarPotentialTextField;
 	private JLabel lblNewLabel;
 	private JPanel panel;
-	private JPanel panel_2;
+	private JPanel geometryPanel;
 	private JLabel lblPosition;
 	private JTextField positionTextField;
 	private JLabel lblArea;
@@ -148,20 +145,17 @@ public class EnergyPanel extends JPanel {
 		this.repaint();
 		this.paint(null);
 
-		progressBar = new JProgressBar();
-		add(progressBar);
-
-		final JPanel panel_3 = new JPanel();
-		panel_3.setBorder(new TitledBorder(null, "Time & Location", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(panel_3);
+		final JPanel timeAndLocationPanel = new JPanel();
+		timeAndLocationPanel.setBorder(new TitledBorder(null, "Time & Location", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(timeAndLocationPanel);
 		final GridBagLayout gbl_panel_3 = new GridBagLayout();
-		panel_3.setLayout(gbl_panel_3);
+		timeAndLocationPanel.setLayout(gbl_panel_3);
 
 		dateLabel = new JLabel("Date: ");
 		final GridBagConstraints gbc_dateLabel = new GridBagConstraints();
 		gbc_dateLabel.gridx = 0;
 		gbc_dateLabel.gridy = 0;
-		panel_3.add(dateLabel, gbc_dateLabel);
+		timeAndLocationPanel.add(dateLabel, gbc_dateLabel);
 
 		dateSpinner = new JSpinner();
 		dateSpinner.setModel(new SpinnerDateModel(new Date(1380427200000L), null, null, Calendar.MONTH));
@@ -194,7 +188,7 @@ public class EnergyPanel extends JPanel {
 		gbc_dateSpinner.insets = new Insets(0, 0, 1, 1);
 		gbc_dateSpinner.gridx = 1;
 		gbc_dateSpinner.gridy = 0;
-		panel_3.add(dateSpinner, gbc_dateSpinner);
+		timeAndLocationPanel.add(dateSpinner, gbc_dateSpinner);
 
 		cityComboBox = new JComboBox<String>();
 		cityComboBox.setModel(new DefaultComboBoxModel<String>(CityData.getInstance().getCities()));
@@ -221,13 +215,13 @@ public class EnergyPanel extends JPanel {
 		gbc_cityComboBox.fill = GridBagConstraints.HORIZONTAL;
 		gbc_cityComboBox.gridx = 2;
 		gbc_cityComboBox.gridy = 0;
-		panel_3.add(cityComboBox, gbc_cityComboBox);
+		timeAndLocationPanel.add(cityComboBox, gbc_cityComboBox);
 
 		timeLabel = new JLabel("Time: ");
 		final GridBagConstraints gbc_timeLabel = new GridBagConstraints();
 		gbc_timeLabel.gridx = 0;
 		gbc_timeLabel.gridy = 1;
-		panel_3.add(timeLabel, gbc_timeLabel);
+		timeAndLocationPanel.add(timeLabel, gbc_timeLabel);
 
 		timeSpinner = new JSpinner(new SpinnerDateModel());
 		timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
@@ -253,14 +247,14 @@ public class EnergyPanel extends JPanel {
 		gbc_timeSpinner.fill = GridBagConstraints.HORIZONTAL;
 		gbc_timeSpinner.gridx = 1;
 		gbc_timeSpinner.gridy = 1;
-		panel_3.add(timeSpinner, gbc_timeSpinner);
+		timeAndLocationPanel.add(timeSpinner, gbc_timeSpinner);
 
 		latitudeLabel = new JLabel("Latitude: ");
 		final GridBagConstraints gbc_altitudeLabel = new GridBagConstraints();
 		gbc_altitudeLabel.insets = new Insets(0, 1, 0, 0);
 		gbc_altitudeLabel.gridx = 2;
 		gbc_altitudeLabel.gridy = 1;
-		panel_3.add(latitudeLabel, gbc_altitudeLabel);
+		timeAndLocationPanel.add(latitudeLabel, gbc_altitudeLabel);
 
 		latitudeSpinner = new JSpinner();
 		latitudeSpinner.setModel(new SpinnerNumberModel(Heliodon.DEFAULT_LATITUDE, -90, 90, 1));
@@ -278,76 +272,9 @@ public class EnergyPanel extends JPanel {
 		gbc_latitudeSpinner.fill = GridBagConstraints.HORIZONTAL;
 		gbc_latitudeSpinner.gridx = 3;
 		gbc_latitudeSpinner.gridy = 1;
-		panel_3.add(latitudeSpinner, gbc_latitudeSpinner);
+		timeAndLocationPanel.add(latitudeSpinner, gbc_latitudeSpinner);
 
-		panel_3.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_3.getPreferredSize().height));
-
-		panel_4 = new JPanel();
-		panel_4.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Solar Irradiation Heat Map", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(panel_4);
-		final GridBagLayout gbl_panel_4 = new GridBagLayout();
-		panel_4.setLayout(gbl_panel_4);
-
-		legendLabel = new JLabel("Color Scale: ");
-		final GridBagConstraints gbc_legendLabel = new GridBagConstraints();
-		gbc_legendLabel.insets = new Insets(5, 0, 0, 0);
-		gbc_legendLabel.anchor = GridBagConstraints.WEST;
-		gbc_legendLabel.gridx = 0;
-		gbc_legendLabel.gridy = 0;
-		panel_4.add(legendLabel, gbc_legendLabel);
-
-		colorMapSlider = new JSlider();
-		colorMapSlider.setMinimum(10);
-		colorMapSlider.setMaximum(90);
-		colorMapSlider.setMinimumSize(colorMapSlider.getPreferredSize());
-		colorMapSlider.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(final ChangeEvent e) {
-				if (!colorMapSlider.getValueIsAdjusting()) {
-					compute(SceneManager.getInstance().isSolarColorMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					Scene.getInstance().setEdited(true, false);
-				}
-			}
-		});
-
-		colormapPanel = new JPanel() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void paint(final Graphics g) {
-				final int STEP = 5;
-				final Dimension size = getSize();
-				for (int x = 0; x < size.width - STEP; x += STEP) {
-					final ColorRGBA color = SolarIrradiation.getInstance().computeColor(x, size.width);
-					g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
-					g.fillRect(x, 0, x + STEP, size.height);
-				}
-				g.setColor(Color.DARK_GRAY);
-				g.drawRect(0, 0, size.width - 1, size.height - 1);
-			}
-		};
-		final GridBagConstraints gbc_colormapPanel = new GridBagConstraints();
-		gbc_colormapPanel.fill = GridBagConstraints.HORIZONTAL;
-		gbc_colormapPanel.gridy = 0;
-		gbc_colormapPanel.gridx = 1;
-		panel_4.add(colormapPanel, gbc_colormapPanel);
-
-		contrastLabel = new JLabel("Contrast: ");
-		final GridBagConstraints gbc_contrastLabel = new GridBagConstraints();
-		gbc_contrastLabel.anchor = GridBagConstraints.WEST;
-		gbc_contrastLabel.gridx = 0;
-		gbc_contrastLabel.gridy = 1;
-		panel_4.add(contrastLabel, gbc_contrastLabel);
-		colorMapSlider.setSnapToTicks(true);
-		colorMapSlider.setMinorTickSpacing(10);
-		colorMapSlider.setMajorTickSpacing(10);
-		colorMapSlider.setPaintTicks(true);
-		final GridBagConstraints gbc_colorMapSlider = new GridBagConstraints();
-		gbc_colorMapSlider.gridy = 1;
-		gbc_colorMapSlider.gridx = 1;
-		panel_4.add(colorMapSlider, gbc_colorMapSlider);
-
-		panel_4.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_4.getPreferredSize().height));
+		timeAndLocationPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, timeAndLocationPanel.getPreferredSize().height));
 
 		final JPanel temperaturePanel = new JPanel();
 		temperaturePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -550,6 +477,30 @@ public class EnergyPanel extends JPanel {
 		});
 		otherParametersPanel.add(solarPanelEfficiencyComboBox);
 
+		heatMapPanel = new JPanel(new BorderLayout());
+		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(heatMapPanel);
+
+		colorMapSlider = new MySlider();
+		colorMapSlider.setMinimum(10);
+		colorMapSlider.setMaximum(90);
+		colorMapSlider.setMinimumSize(colorMapSlider.getPreferredSize());
+		colorMapSlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				if (!colorMapSlider.getValueIsAdjusting()) {
+					compute(SceneManager.getInstance().isSolarColorMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setEdited(true, false);
+				}
+			}
+		});
+		colorMapSlider.setSnapToTicks(true);
+		colorMapSlider.setMinorTickSpacing(5);
+		colorMapSlider.setMajorTickSpacing(5);
+		colorMapSlider.setPaintTicks(true);
+		heatMapPanel.add(colorMapSlider, BorderLayout.CENTER);
+		heatMapPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, heatMapPanel.getPreferredSize().height));
+
 		partPanel = new JPanel();
 		partPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(partPanel);
@@ -573,10 +524,10 @@ public class EnergyPanel extends JPanel {
 		lblNewLabel = new JLabel("kWh");
 		panel.add(lblNewLabel);
 
-		panel_2 = new JPanel();
-		buildingPanel.add(panel_2);
+		geometryPanel = new JPanel();
+		buildingPanel.add(geometryPanel);
 		final GridBagLayout gbl_panel_2 = new GridBagLayout();
-		panel_2.setLayout(gbl_panel_2);
+		geometryPanel.setLayout(gbl_panel_2);
 
 		lblPosition = new JLabel("Position:");
 		final GridBagConstraints gbc_lblPosition = new GridBagConstraints();
@@ -584,7 +535,7 @@ public class EnergyPanel extends JPanel {
 		gbc_lblPosition.insets = new Insets(0, 0, 5, 5);
 		gbc_lblPosition.gridx = 0;
 		gbc_lblPosition.gridy = 0;
-		panel_2.add(lblPosition, gbc_lblPosition);
+		geometryPanel.add(lblPosition, gbc_lblPosition);
 
 		positionTextField = new JTextField();
 		positionTextField.setEditable(false);
@@ -595,7 +546,7 @@ public class EnergyPanel extends JPanel {
 		gbc_positionTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_positionTextField.gridx = 1;
 		gbc_positionTextField.gridy = 0;
-		panel_2.add(positionTextField, gbc_positionTextField);
+		geometryPanel.add(positionTextField, gbc_positionTextField);
 		positionTextField.setColumns(10);
 
 		lblHeight = new JLabel("Height:");
@@ -604,7 +555,7 @@ public class EnergyPanel extends JPanel {
 		gbc_lblHeight.insets = new Insets(0, 0, 5, 5);
 		gbc_lblHeight.gridx = 2;
 		gbc_lblHeight.gridy = 0;
-		panel_2.add(lblHeight, gbc_lblHeight);
+		geometryPanel.add(lblHeight, gbc_lblHeight);
 
 		heightTextField = new JTextField();
 		heightTextField.setEditable(false);
@@ -615,7 +566,7 @@ public class EnergyPanel extends JPanel {
 		gbc_heightTextField.anchor = GridBagConstraints.NORTH;
 		gbc_heightTextField.gridx = 3;
 		gbc_heightTextField.gridy = 0;
-		panel_2.add(heightTextField, gbc_heightTextField);
+		geometryPanel.add(heightTextField, gbc_heightTextField);
 		heightTextField.setColumns(10);
 
 		lblArea = new JLabel("Area:");
@@ -624,7 +575,7 @@ public class EnergyPanel extends JPanel {
 		gbc_lblArea.insets = new Insets(0, 0, 10, 5);
 		gbc_lblArea.gridx = 0;
 		gbc_lblArea.gridy = 1;
-		panel_2.add(lblArea, gbc_lblArea);
+		geometryPanel.add(lblArea, gbc_lblArea);
 
 		areaTextField = new JTextField();
 		areaTextField.setEditable(false);
@@ -633,7 +584,7 @@ public class EnergyPanel extends JPanel {
 		gbc_areaTextField.insets = new Insets(0, 0, 10, 5);
 		gbc_areaTextField.gridx = 1;
 		gbc_areaTextField.gridy = 1;
-		panel_2.add(areaTextField, gbc_areaTextField);
+		geometryPanel.add(areaTextField, gbc_areaTextField);
 		areaTextField.setColumns(10);
 
 		lblVolume = new JLabel("Volume:");
@@ -642,7 +593,7 @@ public class EnergyPanel extends JPanel {
 		gbc_lblVolume.insets = new Insets(0, 0, 10, 5);
 		gbc_lblVolume.gridx = 2;
 		gbc_lblVolume.gridy = 1;
-		panel_2.add(lblVolume, gbc_lblVolume);
+		geometryPanel.add(lblVolume, gbc_lblVolume);
 
 		volumnTextField = new JTextField();
 		volumnTextField.setEditable(false);
@@ -651,20 +602,23 @@ public class EnergyPanel extends JPanel {
 		gbc_volumnTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_volumnTextField.gridx = 3;
 		gbc_volumnTextField.gridy = 1;
-		panel_2.add(volumnTextField, gbc_volumnTextField);
+		geometryPanel.add(volumnTextField, gbc_volumnTextField);
 		volumnTextField.setColumns(10);
 
 		final Component verticalGlue = Box.createVerticalGlue();
 		add(verticalGlue);
 
+		progressBar = new JProgressBar();
+		add(progressBar);
+
 		JPanel target = buildingPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
 
-		final JPanel panel_1 = new JPanel();
-		buildingPanel.add(panel_1);
-		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy Today (kWh)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		final JPanel energyTodayPanel = new JPanel();
+		buildingPanel.add(energyTodayPanel);
+		energyTodayPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy Today (kWh)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		final GridBagLayout gbl_panel_1 = new GridBagLayout();
-		panel_1.setLayout(gbl_panel_1);
+		energyTodayPanel.setLayout(gbl_panel_1);
 
 		final JLabel sunLabel = new JLabel("Windows");
 		sunLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -673,7 +627,7 @@ public class EnergyPanel extends JPanel {
 		gbc_sunLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_sunLabel.gridx = 0;
 		gbc_sunLabel.gridy = 0;
-		panel_1.add(sunLabel, gbc_sunLabel);
+		energyTodayPanel.add(sunLabel, gbc_sunLabel);
 
 		final JLabel solarLabel = new JLabel("Solar Panels");
 		solarLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -682,7 +636,7 @@ public class EnergyPanel extends JPanel {
 		gbc_solarLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_solarLabel.gridx = 1;
 		gbc_solarLabel.gridy = 0;
-		panel_1.add(solarLabel, gbc_solarLabel);
+		energyTodayPanel.add(solarLabel, gbc_solarLabel);
 
 		final JLabel heatingLabel = new JLabel("Heater");
 		heatingLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -691,7 +645,7 @@ public class EnergyPanel extends JPanel {
 		gbc_heatingLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_heatingLabel.gridx = 2;
 		gbc_heatingLabel.gridy = 0;
-		panel_1.add(heatingLabel, gbc_heatingLabel);
+		energyTodayPanel.add(heatingLabel, gbc_heatingLabel);
 
 		final JLabel coolingLabel = new JLabel("AC");
 		coolingLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -700,7 +654,7 @@ public class EnergyPanel extends JPanel {
 		gbc_coolingLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_coolingLabel.gridx = 3;
 		gbc_coolingLabel.gridy = 0;
-		panel_1.add(coolingLabel, gbc_coolingLabel);
+		energyTodayPanel.add(coolingLabel, gbc_coolingLabel);
 
 		final JLabel totalLabel = new JLabel("Net");
 		totalLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -709,7 +663,7 @@ public class EnergyPanel extends JPanel {
 		gbc_totalLabel.insets = new Insets(0, 0, 5, 0);
 		gbc_totalLabel.gridx = 4;
 		gbc_totalLabel.gridy = 0;
-		panel_1.add(totalLabel, gbc_totalLabel);
+		energyTodayPanel.add(totalLabel, gbc_totalLabel);
 
 		passiveSolarTextField = new JTextField();
 		final GridBagConstraints gbc_passiveSolarTextField = new GridBagConstraints();
@@ -718,7 +672,7 @@ public class EnergyPanel extends JPanel {
 		gbc_passiveSolarTextField.insets = new Insets(0, 0, 0, 5);
 		gbc_passiveSolarTextField.gridx = 0;
 		gbc_passiveSolarTextField.gridy = 1;
-		panel_1.add(passiveSolarTextField, gbc_passiveSolarTextField);
+		energyTodayPanel.add(passiveSolarTextField, gbc_passiveSolarTextField);
 		passiveSolarTextField.setEditable(false);
 		passiveSolarTextField.setColumns(5);
 
@@ -729,7 +683,7 @@ public class EnergyPanel extends JPanel {
 		gbc_photovoltaicTextField.insets = new Insets(0, 0, 0, 5);
 		gbc_photovoltaicTextField.gridx = 1;
 		gbc_photovoltaicTextField.gridy = 1;
-		panel_1.add(photovoltaicTextField, gbc_photovoltaicTextField);
+		energyTodayPanel.add(photovoltaicTextField, gbc_photovoltaicTextField);
 		photovoltaicTextField.setEditable(false);
 		photovoltaicTextField.setColumns(5);
 
@@ -741,7 +695,7 @@ public class EnergyPanel extends JPanel {
 		gbc_heatingTodayTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_heatingTodayTextField.gridx = 2;
 		gbc_heatingTodayTextField.gridy = 1;
-		panel_1.add(heatingTodayTextField, gbc_heatingTodayTextField);
+		energyTodayPanel.add(heatingTodayTextField, gbc_heatingTodayTextField);
 		heatingTodayTextField.setColumns(5);
 
 		coolingTodayTextField = new JTextField();
@@ -752,7 +706,7 @@ public class EnergyPanel extends JPanel {
 		gbc_coolingTodayTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_coolingTodayTextField.gridx = 3;
 		gbc_coolingTodayTextField.gridy = 1;
-		panel_1.add(coolingTodayTextField, gbc_coolingTodayTextField);
+		energyTodayPanel.add(coolingTodayTextField, gbc_coolingTodayTextField);
 		coolingTodayTextField.setColumns(5);
 
 		totalTodayTextField = new JTextField();
@@ -762,10 +716,10 @@ public class EnergyPanel extends JPanel {
 		gbc_totalTodayTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_totalTodayTextField.gridx = 4;
 		gbc_totalTodayTextField.gridy = 1;
-		panel_1.add(totalTodayTextField, gbc_totalTodayTextField);
+		energyTodayPanel.add(totalTodayTextField, gbc_totalTodayTextField);
 		totalTodayTextField.setColumns(5);
 
-		panel_1.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel_1.getPreferredSize().height));
+		energyTodayPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, energyTodayPanel.getPreferredSize().height));
 
 		final Dimension size = heatingLabel.getMinimumSize();
 		sunLabel.setMinimumSize(size);
@@ -808,6 +762,7 @@ public class EnergyPanel extends JPanel {
 		partHeightTextField.setEditable(false);
 		panel_8.add(partHeightTextField);
 		partHeightTextField.setColumns(10);
+
 	}
 
 	public void compute(final UpdateRadiation updateRadiation) {
@@ -835,6 +790,7 @@ public class EnergyPanel extends JPanel {
 							e.printStackTrace();
 						}
 						progressBar.setValue(0);
+						progressBar.setStringPainted(false);
 					} while (computeRequest);
 					thread = null;
 				}
@@ -847,6 +803,7 @@ public class EnergyPanel extends JPanel {
 		try {
 			System.out.println("EnergyPanel.computeNow()");
 			progressBar.setValue(0);
+			progressBar.setStringPainted(false);
 			if (updateRadiation != UpdateRadiation.NEVER) {
 				if (updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn))) {
 					alreadyRenderedHeatmap = true;
@@ -913,6 +870,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void progress() {
+		progressBar.setStringPainted(progressBar.getValue() > 0);
 		progressBar.setValue(progressBar.getValue() + 1);
 	}
 
