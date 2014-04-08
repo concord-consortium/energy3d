@@ -497,7 +497,6 @@ public class EnergyPanel extends JPanel {
 		colorMapSlider.setSnapToTicks(true);
 		colorMapSlider.setMinorTickSpacing(5);
 		colorMapSlider.setMajorTickSpacing(5);
-		colorMapSlider.setPaintTicks(true);
 		heatMapPanel.add(colorMapSlider, BorderLayout.CENTER);
 		heatMapPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, heatMapPanel.getPreferredSize().height));
 

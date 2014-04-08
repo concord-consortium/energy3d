@@ -20,6 +20,7 @@ class MySlider extends JSlider {
 
 	MySlider() {
 		setOpaque(false);
+		setPaintTicks(true);
 	}
 
 	@Override
@@ -33,9 +34,9 @@ class MySlider extends JSlider {
 			g.fillRect(x, 0, x + STEP, y1);
 		}
 		g.setColor(Color.WHITE);
-		g.fillRect(0, y1, size.width - 1, size.height -y1 - 1);
+		g.fillRect(0, y1, size.width - 1, size.height - y1 - 1);
 		g.setColor(Color.GRAY);
-		g.drawRect(0, y1, size.width - 1, size.height -y1 - 1);
+		g.drawRect(0, y1, size.width - 1, size.height - y1 - 1);
 		super.paintComponent(g);
 	}
 }
