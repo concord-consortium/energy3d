@@ -37,6 +37,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Node;
+import com.sun.webkit.ContextMenu.ShowContext;
 
 public class Scene implements Serializable {
 	public static enum Unit {
@@ -91,6 +92,7 @@ public class Scene implements Serializable {
 	private boolean isHeliodonVisible;
 	private String note;
 	private int solarContrast;
+	private boolean hideAxes;
 	private double solarStep = 2.0;
 	private boolean cleanup = false;
 	private String wallUFactor;
@@ -232,6 +234,7 @@ public class Scene implements Serializable {
 
 		root.updateWorldBound(true);
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
+		SceneManager.getInstance().showAxes(!instance.hideAxes);
 		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
 		SceneManager.getInstance().getUndoManager().die();
 		Scene.getInstance().setEdited(false);
@@ -383,6 +386,7 @@ public class Scene implements Serializable {
 				// save camera to file
 				saveCameraLocation();
 
+				instance.hideAxes = !SceneManager.getInstance().areAxesShown();
 				instance.calendar = Heliodon.getInstance().getCalander();
 				instance.latitude = EnergyPanel.getInstance().getLatitude();
 				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();

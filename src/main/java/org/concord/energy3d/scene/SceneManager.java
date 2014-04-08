@@ -192,6 +192,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Vector3 houseMoveStartPoint;
 	private ArrayList<Vector3> houseMovePoints;
 	private boolean solarColorMap = false;
+	private Spatial axes;
 
 	private ArrayList<Runnable> shutdownHooks;
 
@@ -283,7 +284,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
 		drawGrids(5);
 		backgroundRoot.attachChild(gridsMesh);
-		backgroundRoot.attachChild(createAxis());
+		axes = createAxes();
+		backgroundRoot.attachChild(axes);
 		backgroundRoot.attachChild(createKinectPointer());
 		root.attachChild(backgroundRoot);
 		root.attachChild(Scene.getRoot());
@@ -299,10 +301,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.setUseObjectCullFace(true);
 		shadowPass.add(land);
 		shadowPass.add(solarLand);
-//		shadowPass.add(Scene.getRoot());
+		// shadowPass.add(Scene.getRoot());
 		shadowPass.add(Scene.getOriginalHouseRoot());
-//		shadowPass.add(Scene.getTreesRoot());
-//		shadowPass.addOccluder(Scene.getRoot());
+		// shadowPass.add(Scene.getTreesRoot());
+		// shadowPass.addOccluder(Scene.getRoot());
 		shadowPass.addOccluder(Scene.getOriginalHouseRoot());
 		shadowPass.addOccluder(Scene.getTreesRoot());
 
@@ -319,6 +321,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		root.updateGeometricState(0, true);
 		System.out.println("Finished initialization.");
+	}
+
+	public void showAxes(boolean b) {
+		if (b)
+			backgroundRoot.attachChild(axes);
+		else
+			backgroundRoot.detachChild(axes);
+	}
+	
+	public boolean areAxesShown() {
+		return backgroundRoot.hasChild(axes);
 	}
 
 	@Override
@@ -421,7 +434,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				shadowPass.setEnabled(false);
 			}
 		}
-//		 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
+		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
 		taskManager.getQueue(GameTaskQueue.RENDER).execute(renderer);
 		return true;
 	}
@@ -548,7 +561,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return sky;
 	}
 
-	private Spatial createAxis() {
+	private Spatial createAxes() {
 		final int axisLen = 1000;
 		final Node axisRoot = new Node();
 		FloatBuffer buf;

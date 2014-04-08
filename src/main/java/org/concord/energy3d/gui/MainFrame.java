@@ -44,6 +44,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.PostProcessor;
@@ -96,6 +98,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem seasonalAnalysisMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
+	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	protected Object lastSelection;
 	private JCheckBoxMenuItem shadeMenuItem = null;
@@ -516,9 +519,9 @@ public class MainFrame extends JFrame {
 	public void updateTitleBar() {
 		final String star = Scene.getInstance().isEdited() ? "*" : "";
 		if (Scene.getURL() == null)
-			setTitle("Energy3D v" + Config.VERSION + star);
+			setTitle("Energy3D V" + Config.VERSION + star);
 		else
-			setTitle("Energy3D v" + Config.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
+			setTitle("Energy3D V" + Config.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
 	}
 
 	private JMenuItem getSaveMenuItem() {
@@ -569,6 +572,7 @@ public class MainFrame extends JFrame {
 	public JCheckBoxMenuItem getPreviewMenuItem() {
 		if (previewMenuItem == null) {
 			previewMenuItem = new JCheckBoxMenuItem("Print Preview");
+			previewMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
 			previewMenuItem.addItemListener(new java.awt.event.ItemListener() {
 				@Override
 				public void itemStateChanged(final java.awt.event.ItemEvent e) {
@@ -673,6 +677,7 @@ public class MainFrame extends JFrame {
 		if (exitMenuItem == null) {
 			exitMenuItem = new JMenuItem();
 			exitMenuItem.setText("Exit");
+			exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
 			exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
@@ -687,8 +692,6 @@ public class MainFrame extends JFrame {
 		if (helpMenu == null) {
 			helpMenu = new JMenu();
 			helpMenu.setText("Help");
-			if (!Config.isMac())
-				helpMenu.add(getAboutMenuItem());
 			JMenuItem mi = new JMenuItem("Download Models...");
 			mi.addActionListener(new ActionListener() {
 				@Override
@@ -705,6 +708,8 @@ public class MainFrame extends JFrame {
 				}
 			});
 			helpMenu.add(mi);
+			if (!Config.isMac())
+				helpMenu.add(getAboutMenuItem());
 		}
 		return helpMenu;
 	}
@@ -789,6 +794,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getSaveasMenuItem() {
 		if (saveasMenuItem == null) {
 			saveasMenuItem = new JMenuItem("Save As...");
+			saveasMenuItem.setAccelerator(KeyStroke.getKeyStroke("F12"));
 			saveasMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -848,6 +854,20 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
+			sceneMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+				@Override
+				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+					axesMenuItem.setSelected(SceneManager.getInstance().areAxesShown());
+				}
+
+				@Override
+				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				}
+
+				@Override
+				public void popupMenuCanceled(PopupMenuEvent e) {
+				}
+			});
 			sceneMenu.add(getNoTextureMenuItem());
 			sceneMenu.add(getSimpleTextureMenuItem());
 			sceneMenu.add(getFullTextureMenuItem());
@@ -861,6 +881,7 @@ public class MainFrame extends JFrame {
 			sceneMenu.add(getGridsMenuItem());
 			sceneMenu.add(getSnapMenuItem());
 			sceneMenu.addSeparator();
+			sceneMenu.add(getAxesMenuItem());
 			sceneMenu.add(getShadeMenuItem());
 			sceneMenu.add(getShadowMenuItem());
 			sceneMenu.addSeparator();
@@ -884,6 +905,19 @@ public class MainFrame extends JFrame {
 			unitsMenu.add(getInchesMenuItem());
 		}
 		return unitsMenu;
+	}
+
+	public JCheckBoxMenuItem getAxesMenuItem() {
+		if (axesMenuItem == null) {
+			axesMenuItem = new JCheckBoxMenuItem("Axes", true);
+			axesMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					SceneManager.getInstance().showAxes(axesMenuItem.isSelected());
+				}
+			});
+		}
+		return axesMenuItem;
 	}
 
 	public JCheckBoxMenuItem getShadowMenuItem() {
