@@ -18,7 +18,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.CancellationException;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
