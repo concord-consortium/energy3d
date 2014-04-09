@@ -15,7 +15,9 @@ import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 
 import javax.swing.Box;
@@ -96,7 +98,7 @@ public class EnergyPanel extends JPanel {
 	private boolean alreadyRenderedHeatmap = false;
 	private UpdateRadiation updateRadiation;
 	private boolean computeEnabled = true;
-	private final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+	private final List<PropertyChangeListener> propertyChangeListeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
 	private JPanel partPanel;
 	private JLabel partEnergyLabel;
 	private JTextField partEnergyTextField;
@@ -831,11 +833,11 @@ public class EnergyPanel extends JPanel {
 			SceneManager.getInstance().refresh();
 		} catch (final CancellationException e) {
 			System.out.println("Energy compute cancelled.");
-		} 
-		
-//		catch (final RuntimeException e) {
-//			e.printStackTrace();
-//		}
+		}
+
+		// catch (final RuntimeException e) {
+		// e.printStackTrace();
+		// }
 	}
 
 	// TODO: There should be a better way to do this.
@@ -910,8 +912,10 @@ public class EnergyPanel extends JPanel {
 
 	private void notifyPropertyChangeListeners(final PropertyChangeEvent evt) {
 		if (!propertyChangeListeners.isEmpty()) {
-			for (final PropertyChangeListener x : propertyChangeListeners) {
-				x.propertyChange(evt);
+			synchronized (propertyChangeListeners) {
+				for (final PropertyChangeListener x : propertyChangeListeners) {
+					x.propertyChange(evt);
+				}
 			}
 		}
 	}

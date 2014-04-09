@@ -37,6 +37,7 @@ abstract class Graph extends JPanel {
 	double ymax;
 	double dx;
 	double dy;
+	int symbolSize = 8;
 	int numberOfTicks = 12;
 	String xAxisLabel = "Month";
 	String yAxisLabel = "Energy (kWh)";

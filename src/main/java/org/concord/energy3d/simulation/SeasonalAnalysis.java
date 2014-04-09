@@ -23,6 +23,7 @@ import static java.util.Calendar.*;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
@@ -47,7 +48,6 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 	private final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
 	private int month = 0;
-	private int day = 20;
 	private Graph graph;
 
 	public SeasonalAnalysis() {
@@ -63,7 +63,7 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 	}
 
 	private void run() {
-		Heliodon.getInstance().getCalander().set(0, MONTHS[month], day);
+		Heliodon.getInstance().getCalander().set(MONTH, MONTHS[month]);
 		EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalander().getTime());
 		MainPanel.getInstance().getSolarButton().doClick();
 		graph.repaint();
@@ -92,16 +92,20 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 				graph.addData("Heater", heater);
 				graph.addData("AC", ac);
 				graph.addData("Net", net);
-			} else if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof) {
-				double solar = selectedPart.getSolarPotentialToday();
-				if (selectedPart instanceof Window)
-					solar *= Scene.getInstance().getWindowSolarHeatingRate();
+			} else if (selectedPart instanceof Window) {
+				double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
 				graph.addData("Solar", solar);
 				double[] loss = selectedPart.getHeatLoss();
 				double sum = 0;
 				for (double x : loss)
 					sum += x;
-				graph.addData("Heat Transfer", sum);
+				graph.addData("Heat Loss", sum);
+			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
+				double[] loss = selectedPart.getHeatLoss();
+				double sum = 0;
+				for (double x : loss)
+					sum += x;
+				graph.addData("Heat Loss", sum);
 			} else if (selectedPart instanceof SolarPanel) {
 				SolarPanel solarPanel = (SolarPanel) selectedPart;
 				double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();

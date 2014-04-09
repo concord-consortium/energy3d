@@ -980,6 +980,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return selectedHousePart;
 	}
 
+	public void setSelectedPart(HousePart p) {
+		selectedHousePart = p;
+		if (selectedHousePart != null)
+			selectedHousePart.setEditPointsVisible(true);
+	}
+
 	public boolean isTopView() {
 		return viewMode == ViewMode.TOP_VIEW;
 	}

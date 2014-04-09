@@ -50,7 +50,9 @@ import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.PostProcessor;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -1035,7 +1037,22 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart == null) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No selection", JOptionPane.INFORMATION_MESSAGE);
+						int count = 0;
+						HousePart hp = null;
+						for (HousePart x : Scene.getInstance().getParts()) {
+							if (x instanceof Foundation) {
+								count++;
+								hp = x;
+							}
+						}
+						if (count == 1) {
+							SceneManager.getInstance().setSelectedPart(hp);
+						} else {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}
+					} else if (selectedPart instanceof Tree) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
 					SeasonalAnalysis sa = new SeasonalAnalysis();
