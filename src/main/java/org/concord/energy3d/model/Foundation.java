@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.FontManager;
@@ -608,12 +609,16 @@ public class Foundation extends HousePart {
 		updateTextureAndColor(mesh, Scene.getInstance().getFoundationColor());
 	}
 
+	public void showSolarLabel(boolean b) {
+		solarLabel.setVisible(b && SceneManager.getInstance().isSolarColorMap());
+	}
+
 	public void setSolarLabelValue(final double solarValue) {
 		scanChildrenHeight();
 		if (solarValue == -2)
 			solarLabel.setVisible(false);
 		else {
-			solarLabel.setVisible(true);
+			solarLabel.setVisible(SceneManager.getInstance().areSolarLabelsShown());
 			final String idLabel = "(#" + id + ")";
 			if (solarValue == -1 || solarValue == 0)
 				solarLabel.setText(idLabel);
@@ -726,7 +731,7 @@ public class Foundation extends HousePart {
 		return new double[] { height, area, height * area, cx, cy };
 
 	}
-	
+
 	@Override
 	public boolean isFoundation() {
 		return true;

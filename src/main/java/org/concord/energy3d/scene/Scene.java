@@ -37,7 +37,6 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.scenegraph.Node;
-import com.sun.webkit.ContextMenu.ShowContext;
 
 public class Scene implements Serializable {
 
@@ -94,6 +93,7 @@ public class Scene implements Serializable {
 	private String note;
 	private int solarContrast;
 	private boolean hideAxes;
+	private boolean showSolarLabels;
 	private double solarStep = 2.0;
 	private int timeStep = 15; // in minutes
 	private boolean cleanup = false;
@@ -237,6 +237,7 @@ public class Scene implements Serializable {
 		root.updateWorldBound(true);
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 		SceneManager.getInstance().showAxes(!instance.hideAxes);
+		SceneManager.getInstance().showSolarLabels(instance.showSolarLabels);
 		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
 		SceneManager.getInstance().getUndoManager().die();
 		Scene.getInstance().setEdited(false);
@@ -390,6 +391,7 @@ public class Scene implements Serializable {
 				saveCameraLocation();
 
 				instance.hideAxes = !SceneManager.getInstance().areAxesShown();
+				instance.showSolarLabels = SceneManager.getInstance().areSolarLabelsShown();
 				instance.calendar = Heliodon.getInstance().getCalander();
 				instance.latitude = EnergyPanel.getInstance().getLatitude();
 				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();

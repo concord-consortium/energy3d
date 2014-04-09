@@ -14,6 +14,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
@@ -100,6 +101,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
+	private JCheckBoxMenuItem solarLabelsMenuItem;
 	protected Object lastSelection;
 	private JCheckBoxMenuItem shadeMenuItem = null;
 	private JMenuItem exitMenuItem = null;
@@ -297,9 +299,9 @@ public class MainFrame extends JFrame {
 			}
 		});
 
-		addWindowListener(new java.awt.event.WindowAdapter() {
+		addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(final java.awt.event.WindowEvent e) {
+			public void windowClosing(final WindowEvent e) {
 				exit();
 			}
 
@@ -309,7 +311,7 @@ public class MainFrame extends JFrame {
 			}
 
 			@Override
-			public void windowActivated(final WindowEvent arg0) {
+			public void windowActivated(final WindowEvent e) {
 				// EnergyPanel.getInstance().initJavaFXGUI();
 				// SceneManager.getInstance().refresh();
 			}
@@ -378,9 +380,9 @@ public class MainFrame extends JFrame {
 		if (newMenuItem == null) {
 			newMenuItem = new JMenuItem("New");
 			newMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-			newMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			newMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					Scene.newFile();
 					SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
 					SceneManager.getInstance().getCameraControl().reset();
@@ -395,9 +397,9 @@ public class MainFrame extends JFrame {
 		if (openMenuItem == null) {
 			openMenuItem = new JMenuItem("Open...");
 			openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-			openMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			openMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					if (Scene.getInstance().isEdited()) {
 						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
 						if (save == JOptionPane.YES_OPTION) {
@@ -447,9 +449,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem getAnalyzeFolderMenuItem() {
 		if (analyzeFolderMenuItem == null) {
 			analyzeFolderMenuItem = new JMenuItem("Analyze Folder...");
-			analyzeFolderMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			analyzeFolderMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION))
 						return;
 					SceneManager.getInstance().refresh(1);
@@ -483,9 +485,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem getOpenFolderMenuItem() {
 		if (openFolderMenuItem == null) {
 			openFolderMenuItem = new JMenuItem("Open Folder...");
-			openFolderMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			openFolderMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION))
 						return;
 					SceneManager.getInstance().refresh(1);
@@ -528,9 +530,9 @@ public class MainFrame extends JFrame {
 		if (saveMenuItem == null) {
 			saveMenuItem = new JMenuItem("Save");
 			saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-			saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			saveMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					save();
 				}
 			});
@@ -542,9 +544,9 @@ public class MainFrame extends JFrame {
 		if (printMenuItem == null) {
 			printMenuItem = new JMenuItem("Print...");
 			printMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-			printMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			printMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					final PrintController printController = PrintController.getInstance();
 					if (!printController.isPrintPreview()) {
 						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
@@ -573,9 +575,9 @@ public class MainFrame extends JFrame {
 		if (previewMenuItem == null) {
 			previewMenuItem = new JCheckBoxMenuItem("Print Preview");
 			previewMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-			previewMenuItem.addItemListener(new java.awt.event.ItemListener() {
+			previewMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(final java.awt.event.ItemEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					mainPanel.getPreviewButton().setSelected(previewMenuItem.isSelected());
 				}
 			});
@@ -620,9 +622,9 @@ public class MainFrame extends JFrame {
 			orbitMenuItem = new JRadioButtonMenuItem();
 			orbitMenuItem.setText("Orbit");
 			orbitMenuItem.setSelected(true);
-			orbitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			orbitMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setCameraControl(CameraMode.ORBIT);
 				}
 			});
@@ -634,9 +636,9 @@ public class MainFrame extends JFrame {
 		if (firstPersonMenuItem == null) {
 			firstPersonMenuItem = new JRadioButtonMenuItem();
 			firstPersonMenuItem.setText("First Person");
-			firstPersonMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			firstPersonMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setCameraControl(CameraMode.FIRST_PERSON);
 				}
 			});
@@ -649,9 +651,9 @@ public class MainFrame extends JFrame {
 			resetCameraMenuItem = new JMenuItem();
 			resetCameraMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
 			resetCameraMenuItem.setText("Reset View");
-			resetCameraMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			resetCameraMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().resetCamera();
 				}
 			});
@@ -663,9 +665,9 @@ public class MainFrame extends JFrame {
 		if (shadeMenuItem == null) {
 			shadeMenuItem = new JCheckBoxMenuItem();
 			shadeMenuItem.setText("Shade");
-			shadeMenuItem.addItemListener(new java.awt.event.ItemListener() {
+			shadeMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(final java.awt.event.ItemEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setShading(shadeMenuItem.isSelected());
 				}
 			});
@@ -678,9 +680,9 @@ public class MainFrame extends JFrame {
 			exitMenuItem = new JMenuItem();
 			exitMenuItem.setText("Exit");
 			exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
-			exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			exitMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					exit();
 				}
 			});
@@ -783,9 +785,9 @@ public class MainFrame extends JFrame {
 		if (wallThicknessMenuItem == null) {
 			wallThicknessMenuItem = new JCheckBoxMenuItem();
 			wallThicknessMenuItem.setText("Draw Wall Thickness");
-			wallThicknessMenuItem.addItemListener(new java.awt.event.ItemListener() {
+			wallThicknessMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(final java.awt.event.ItemEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					Scene.getInstance().setDrawThickness(wallThicknessMenuItem.isSelected());
 				}
 			});
@@ -866,6 +868,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 					axesMenuItem.setSelected(SceneManager.getInstance().areAxesShown());
+					solarLabelsMenuItem.setSelected(SceneManager.getInstance().areSolarLabelsShown());
 				}
 
 				@Override
@@ -892,6 +895,7 @@ public class MainFrame extends JFrame {
 			sceneMenu.add(getAxesMenuItem());
 			sceneMenu.add(getShadeMenuItem());
 			sceneMenu.add(getShadowMenuItem());
+			sceneMenu.add(getSolarLabelsMenuItem());
 			sceneMenu.addSeparator();
 			sceneMenu.add(getAnnotationsInwardMenuItem());
 			sceneMenu.add(getWallThicknessMenuItem());
@@ -928,12 +932,25 @@ public class MainFrame extends JFrame {
 		return axesMenuItem;
 	}
 
+	public JCheckBoxMenuItem getSolarLabelsMenuItem() {
+		if (solarLabelsMenuItem == null) {
+			solarLabelsMenuItem = new JCheckBoxMenuItem("Building Solar Potential Labels", false);
+			solarLabelsMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					SceneManager.getInstance().showSolarLabels(solarLabelsMenuItem.isSelected());
+				}
+			});
+		}
+		return solarLabelsMenuItem;
+	}
+
 	public JCheckBoxMenuItem getShadowMenuItem() {
 		if (shadowMenuItem == null) {
 			shadowMenuItem = new JCheckBoxMenuItem("Shadows", false);
-			shadowMenuItem.addItemListener(new java.awt.event.ItemListener() {
+			shadowMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(final java.awt.event.ItemEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setShadow(shadowMenuItem.isSelected());
 				}
 			});
@@ -1051,9 +1068,9 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem getAnnotationsInwardMenuItem() {
 		if (annotationsInwardMenuItem == null) {
 			annotationsInwardMenuItem = new JCheckBoxMenuItem("Annotations Inward");
-			annotationsInwardMenuItem.addItemListener(new java.awt.event.ItemListener() {
+			annotationsInwardMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(final java.awt.event.ItemEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					Scene.setDrawAnnotationsInside(annotationsInwardMenuItem.isSelected());
 				}
 			});
