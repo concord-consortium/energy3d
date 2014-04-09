@@ -831,9 +831,11 @@ public class EnergyPanel extends JPanel {
 			SceneManager.getInstance().refresh();
 		} catch (final CancellationException e) {
 			System.out.println("Energy compute cancelled.");
-		} catch (final RuntimeException e) {
-			e.printStackTrace();
-		}
+		} 
+		
+//		catch (final RuntimeException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	// TODO: There should be a better way to do this.

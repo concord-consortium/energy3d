@@ -143,6 +143,7 @@ public class SolarPanel extends HousePart {
 		final FloatBuffer wireframeBuffer = wireframeMesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		wireframeBuffer.rewind();
+		textureBuffer.rewind();
 		int i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(0);

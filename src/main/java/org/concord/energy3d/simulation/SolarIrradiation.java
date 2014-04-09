@@ -266,13 +266,21 @@ public class SolarIrradiation {
 		final FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
 		vertexBuffer.rewind();
 		textureBuffer.rewind();
-		while (vertexBuffer.hasRemaining()) {
-			final ReadOnlyVector3 p = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
-			final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
-			final float uScale = (float) (uP.distance(o) / u.length());
-			final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
-			final float vScale = (float) (vP.distance(o) / v.length());
-			textureBuffer.put(uScale).put(vScale);
+		final int initSize = textureBuffer.limit();
+		try {
+			while (vertexBuffer.hasRemaining()) {
+				final ReadOnlyVector3 p = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
+				final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
+				final float uScale = (float) (uP.distance(o) / u.length());
+				final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
+				final float vScale = (float) (vP.distance(o) / v.length());
+				textureBuffer.put(uScale).put(vScale);
+			}
+		} catch (final Exception e) {
+			e.printStackTrace();
+			System.out.println("init size = " + initSize);
+			System.out.println("size = " + textureBuffer.limit());
+			System.out.println("pos = " + textureBuffer.position());
 		}
 	}
 
@@ -462,7 +470,7 @@ public class SolarIrradiation {
 		return solarStep;
 	}
 
-	public void setTimeStep(int timeStep) {
+	public void setTimeStep(final int timeStep) {
 		this.timeStep = timeStep;
 	}
 
