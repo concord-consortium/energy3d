@@ -49,7 +49,8 @@ import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarIrradiation {
-	public static final int MINUTE_STEP = 15;
+
+	private int timeStep = 15;
 	private static SolarIrradiation instance = new SolarIrradiation();
 
 	private final Map<Mesh, double[][]> onMesh = new HashMap<Mesh, double[][]>();
@@ -57,7 +58,7 @@ public class SolarIrradiation {
 	private final List<Spatial> collidables = new ArrayList<Spatial>();
 	private double[][] onLand;
 	private long maxValue;
-	private double step = 2.0;
+	private double solarStep = 2.0;
 
 	public static SolarIrradiation getInstance() {
 		return instance;
@@ -69,7 +70,7 @@ public class SolarIrradiation {
 		onMesh.clear();
 		textureCoordsAlreadyComputed.clear();
 		for (final HousePart part : Scene.getInstance().getParts())
-			part.setSolarPotential(new double[1440 / SolarIrradiation.MINUTE_STEP]);
+			part.setSolarPotential(new double[1440 / timeStep]);
 		onLand = null;
 		maxValue = 1;
 		computeToday((Calendar) Heliodon.getInstance().getCalander().clone());
@@ -98,7 +99,7 @@ public class SolarIrradiation {
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
-		for (int minute = 0; minute < 1440; minute += MINUTE_STEP) {
+		for (int minute = 0; minute < 1440; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
 			// final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
 			if (sunLocation.getZ() > 0) {
@@ -122,7 +123,7 @@ public class SolarIrradiation {
 				computeOnLand(directionTowardSun);
 			}
 			maxValue++;
-			today.add(Calendar.MINUTE, MINUTE_STEP);
+			today.add(Calendar.MINUTE, timeStep);
 			EnergyPanel.getInstance().progress();
 		}
 		maxValue *= (100 - EnergyPanel.getInstance().getColorMapSlider().getValue()) / 100.0;
@@ -175,8 +176,8 @@ public class SolarIrradiation {
 		final ReadOnlyVector3 p2 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
 
 		final double height = p1.subtract(origin, null).length();
-		final int rows = (int) Math.ceil(height / step);
-		final int cols = (int) Math.ceil(p2.subtract(origin, null).length() / step);
+		final int rows = (int) Math.ceil(height / solarStep);
+		final int cols = (int) Math.ceil(p2.subtract(origin, null).length() / solarStep);
 		double[][] solar = onMesh.get(drawMesh);
 		if (solar == null) {
 			solar = new double[roundToPowerOfTwo(rows)][roundToPowerOfTwo(cols)];
@@ -192,7 +193,7 @@ public class SolarIrradiation {
 					if (row >= rows || col >= cols)
 						solar[row][col] = -1;
 					else {
-						final ReadOnlyVector2 p = originXY.add(uXY.multiply(col * step, null), null).add(vXY.multiply(row * step, null), null);
+						final ReadOnlyVector2 p = originXY.add(uXY.multiply(col * solarStep, null), null).add(vXY.multiply(row * solarStep, null), null);
 						boolean isInside = false;
 						for (int i = 0; i < points.size(); i += 3) {
 							if (Util.isPointInsideTriangle(p, points.get(i), points.get(i + 1), points.get(i + 2))) {
@@ -210,19 +211,19 @@ public class SolarIrradiation {
 		final ReadOnlyVector3 v = p1.subtract(origin, null).normalizeLocal();
 		final double dot = normal.dot(directionTowardSun);
 		for (int col = 0; col < cols; col++) {
-			final ReadOnlyVector3 pU = u.multiply(step / 2.0 + col * step, null).addLocal(origin);
-			final double w = (col == cols - 1) ? p2.distance(pU) : step;
+			final ReadOnlyVector3 pU = u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(origin);
+			final double w = (col == cols - 1) ? p2.distance(pU) : solarStep;
 			for (int row = 0; row < rows; row++) {
 				if (EnergyPanel.getInstance().isComputeRequest())
 					throw new CancellationException();
 				if (solar[row][col] == -1)
 					continue;
-				final ReadOnlyVector3 p = v.multiply(step / 2.0 + row * step, null).addLocal(pU).add(offset, null);
+				final ReadOnlyVector3 p = v.multiply(solarStep / 2.0 + row * solarStep, null).addLocal(pU).add(offset, null);
 				final double h;
 				if (row == rows - 1)
-					h = height - (row * step);
+					h = height - (row * solarStep);
 				else
-					h = step;
+					h = solarStep;
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
 				// final PickResults pickResults = new BoundingPickResults();
@@ -246,7 +247,7 @@ public class SolarIrradiation {
 				if (!collision) {
 					solar[row][col] += dot / airMass;
 					final double annotationScale = Scene.getInstance().getAnnotationScale();
-					housePart.getSolarPotential()[minute / MINUTE_STEP] += dot / airMass * w * h * annotationScale * annotationScale / 60 * MINUTE_STEP;
+					housePart.getSolarPotential()[minute / timeStep] += dot / airMass * w * h * annotationScale * annotationScale / 60 * timeStep;
 				}
 			}
 		}
@@ -259,8 +260,8 @@ public class SolarIrradiation {
 
 	private void updateTextureCoords(final Mesh drawMesh, final ReadOnlyVector3 origin, final ReadOnlyVector3 uDir, final ReadOnlyVector3 vDir, final int rows, final int cols) {
 		final ReadOnlyVector3 o = origin;
-		final ReadOnlyVector3 u = uDir.multiply(roundToPowerOfTwo(cols) * getStep(), null);
-		final ReadOnlyVector3 v = vDir.multiply(roundToPowerOfTwo(rows) * getStep(), null);
+		final ReadOnlyVector3 u = uDir.multiply(roundToPowerOfTwo(cols) * getSolarStep(), null);
+		final ReadOnlyVector3 v = vDir.multiply(roundToPowerOfTwo(rows) * getSolarStep(), null);
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 		final FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
 		vertexBuffer.rewind();
@@ -276,7 +277,7 @@ public class SolarIrradiation {
 	}
 
 	private void computeOnLand(final ReadOnlyVector3 directionTowardSun) {
-		final double step = this.step * 4;
+		final double step = this.solarStep * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
 		if (onLand == null)
@@ -453,12 +454,20 @@ public class SolarIrradiation {
 		return (int) Math.pow(2.0, Math.ceil(Math.log(n) / Math.log(2)));
 	}
 
-	public void setStep(final double solarStep) {
-		this.step = solarStep;
+	public void setSolarStep(final double solarStep) {
+		this.solarStep = solarStep;
 	}
 
-	public double getStep() {
-		return step;
+	public double getSolarStep() {
+		return solarStep;
+	}
+
+	public void setTimeStep(int timeStep) {
+		this.timeStep = timeStep;
+	}
+
+	public int getTimeStep() {
+		return timeStep;
 	}
 
 }

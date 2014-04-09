@@ -15,6 +15,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 
 public class HeatLoad {
+
 	private final static HeatLoad instance = new HeatLoad();
 
 	public static HeatLoad getInstance() {
@@ -40,15 +41,16 @@ public class HeatLoad {
 
 		final double[] outsideTemperatureRange;
 
+		final int timeStep = SolarIrradiation.getInstance().getTimeStep();
 		for (final HousePart part : Scene.getInstance().getParts())
-			part.setHeatLoss(new double[1440 / SolarIrradiation.MINUTE_STEP]);
+			part.setHeatLoss(new double[1440 / timeStep]);
 
 		if (EnergyPanel.getInstance().getCityComboBox().getSelectedItem().equals(""))
 			return;
 		else
 			outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 
-		for (int minute = 0; minute < 1440; minute += SolarIrradiation.MINUTE_STEP) {
+		for (int minute = 0; minute < 1440; minute += timeStep) {
 			for (final HousePart part : Scene.getInstance().getParts()) {
 				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
 				final double deltaT = insideTemperature - outsideTemperature;
@@ -64,10 +66,10 @@ public class HeatLoad {
 						uFactor = roofUFactor;
 					else
 						continue;
-					double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * SolarIrradiation.MINUTE_STEP;
+					double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
 					if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
 						heatloss = 0;
-					part.getHeatLoss()[minute / SolarIrradiation.MINUTE_STEP] += heatloss;
+					part.getHeatLoss()[minute / timeStep] += heatloss;
 				}
 			}
 		}
@@ -78,5 +80,5 @@ public class HeatLoad {
 		final int indexOfSpace = valueStr.indexOf(' ');
 		return Double.parseDouble(valueStr.substring(0, indexOfSpace != -1 ? indexOfSpace : valueStr.length()));
 	}
-	
+
 }

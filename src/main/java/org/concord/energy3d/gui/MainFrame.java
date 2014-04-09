@@ -1223,7 +1223,7 @@ public class MainFrame extends JFrame {
 
 	private JRadioButtonMenuItem getExactSizeRadioButtonMenuItem() {
 		if (exactSizeRadioButtonMenuItem == null) {
-			exactSizeRadioButtonMenuItem = new JRadioButtonMenuItem("Exact Size on Paper");
+			exactSizeRadioButtonMenuItem = new JRadioButtonMenuItem("Exact Size On Paper");
 			exactSizeRadioButtonMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

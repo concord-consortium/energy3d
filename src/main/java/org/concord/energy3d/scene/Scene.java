@@ -40,6 +40,7 @@ import com.ardor3d.scenegraph.Node;
 import com.sun.webkit.ContextMenu.ShowContext;
 
 public class Scene implements Serializable {
+
 	public static enum Unit {
 		Meter("m"), Centimeter("cm"), Inches("\"");
 		private final String notation;
@@ -94,6 +95,7 @@ public class Scene implements Serializable {
 	private int solarContrast;
 	private boolean hideAxes;
 	private double solarStep = 2.0;
+	private int timeStep = 15; // in minutes
 	private boolean cleanup = false;
 	private String wallUFactor;
 	private String doorUFactor;
@@ -261,7 +263,8 @@ public class Scene implements Serializable {
 		if (instance.solarPanelEfficiency < 0.001)
 			instance.solarPanelEfficiency = 10;
 		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
-		SolarIrradiation.getInstance().setStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
+		SolarIrradiation.getInstance().setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
+		SolarIrradiation.getInstance().setTimeStep(instance.timeStep == 0 ? 15 : instance.timeStep);
 		Scene.getInstance().setWindowSolarHeatingRate(instance.windowSolarHeatingRate < 0.000001 ? 0.5 : instance.windowSolarHeatingRate);
 		Scene.getInstance().setEdited(false);
 	}
@@ -393,7 +396,8 @@ public class Scene implements Serializable {
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
-				instance.solarStep = SolarIrradiation.getInstance().getStep();
+				instance.solarStep = SolarIrradiation.getInstance().getSolarStep();
+				instance.timeStep = SolarIrradiation.getInstance().getTimeStep();
 				instance.wallUFactor = (String) EnergyPanel.getInstance().getWallsComboBox().getSelectedItem();
 				instance.windowUFactor = (String) EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem();
 				instance.doorUFactor = (String) EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem();
