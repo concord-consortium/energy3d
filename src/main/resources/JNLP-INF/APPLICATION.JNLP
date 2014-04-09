@@ -6,7 +6,7 @@
 		<homepage href="http://energy.concord.org/energy3d" />
 		<description>Energy3D</description>
 		<description kind="short">An educational CAD tool for designing houses and analyzing their cooling and heating energy flow.</description>
-		<icon href="resources/icon.gif" />
+		<icon href="resources/icon.png" />
 		<icon kind="splash" href="resources/splash.png" />
 		<update check="background" /> 
 		<offline-allowed/>
