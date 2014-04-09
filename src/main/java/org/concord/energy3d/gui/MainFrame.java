@@ -212,7 +212,7 @@ public class MainFrame extends JFrame {
 	private MainFrame() {
 		super();
 		System.out.print("Initiating GUI...");
-		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icons/icon.gif")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icons/icon.png")));
 		final String directoryPath = Preferences.userNodeForPackage(MainApplication.class).get("dir", null);
 		fileChooser = new JFileChooser(directoryPath);
 		if (!Config.isWebStart() && directoryPath == null) {
