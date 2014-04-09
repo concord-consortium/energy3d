@@ -193,7 +193,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private ArrayList<Vector3> houseMovePoints;
 	private boolean solarColorMap = false;
 	private Spatial axes;
-	private boolean showSolarLabels = false;
+	private boolean showBuildingLabels = false;
 
 	private ArrayList<Runnable> shutdownHooks;
 
@@ -1433,16 +1433,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return backgroundRoot.hasChild(axes);
 	}
 
-	public void showSolarLabels(boolean b) {
-		showSolarLabels = b;
+	public void showBuildingLabels(boolean b) {
+		showBuildingLabels = b;
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation)
-				((Foundation) part).showSolarLabel(b);
+				((Foundation) part).showBuildingLabel(b);
 		}
 	}
 
-	public boolean areSolarLabelsShown() {
-		return showSolarLabels;
+	public boolean areBuildingLabelsShown() {
+		return showBuildingLabels;
 	}
 
 }

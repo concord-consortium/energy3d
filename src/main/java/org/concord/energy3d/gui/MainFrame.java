@@ -101,7 +101,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
-	private JCheckBoxMenuItem solarLabelsMenuItem;
+	private JCheckBoxMenuItem buildingLabelsMenuItem;
 	protected Object lastSelection;
 	private JCheckBoxMenuItem shadeMenuItem = null;
 	private JMenuItem exitMenuItem = null;
@@ -868,7 +868,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 					axesMenuItem.setSelected(SceneManager.getInstance().areAxesShown());
-					solarLabelsMenuItem.setSelected(SceneManager.getInstance().areSolarLabelsShown());
+					buildingLabelsMenuItem.setSelected(SceneManager.getInstance().areBuildingLabelsShown());
 				}
 
 				@Override
@@ -895,7 +895,7 @@ public class MainFrame extends JFrame {
 			sceneMenu.add(getAxesMenuItem());
 			sceneMenu.add(getShadeMenuItem());
 			sceneMenu.add(getShadowMenuItem());
-			sceneMenu.add(getSolarLabelsMenuItem());
+			sceneMenu.add(getBuildingLabelsMenuItem());
 			sceneMenu.addSeparator();
 			sceneMenu.add(getAnnotationsInwardMenuItem());
 			sceneMenu.add(getWallThicknessMenuItem());
@@ -932,17 +932,17 @@ public class MainFrame extends JFrame {
 		return axesMenuItem;
 	}
 
-	public JCheckBoxMenuItem getSolarLabelsMenuItem() {
-		if (solarLabelsMenuItem == null) {
-			solarLabelsMenuItem = new JCheckBoxMenuItem("Building Solar Potential Labels", false);
-			solarLabelsMenuItem.addItemListener(new ItemListener() {
+	public JCheckBoxMenuItem getBuildingLabelsMenuItem() {
+		if (buildingLabelsMenuItem == null) {
+			buildingLabelsMenuItem = new JCheckBoxMenuItem("Building Labels", false);
+			buildingLabelsMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().showSolarLabels(solarLabelsMenuItem.isSelected());
+					SceneManager.getInstance().showBuildingLabels(buildingLabelsMenuItem.isSelected());
 				}
 			});
 		}
-		return solarLabelsMenuItem;
+		return buildingLabelsMenuItem;
 	}
 
 	public JCheckBoxMenuItem getShadowMenuItem() {

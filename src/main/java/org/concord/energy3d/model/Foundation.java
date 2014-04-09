@@ -44,7 +44,7 @@ public class Foundation extends HousePart {
 	private transient double minY;
 	private transient double maxX;
 	private transient double maxY;
-	private transient BMText solarLabel;
+	private transient BMText buildingLabel;
 	private transient double passiveSolarToday;
 	private transient double photovoltaicToday;
 	private transient double heatingToday;
@@ -104,11 +104,11 @@ public class Foundation extends HousePart {
 
 		setLabelOffset(-0.11);
 
-		solarLabel = new BMText("Solar value Text", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
-		Util.initHousePartLabel(solarLabel);
-		solarLabel.setFontScale(0.75);
-		solarLabel.setVisible(false);
-		root.attachChild(solarLabel);
+		buildingLabel = new BMText("Solar value Text", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+		Util.initHousePartLabel(buildingLabel);
+		buildingLabel.setFontScale(0.75);
+		buildingLabel.setVisible(false);
+		root.attachChild(buildingLabel);
 	}
 
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
@@ -513,7 +513,7 @@ public class Foundation extends HousePart {
 
 	public void updateSolarLabelPosition() {
 		final ReadOnlyVector3 center = getCenter();
-		solarLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 6.0);
+		buildingLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 6.0);
 	}
 
 	private double scanChildrenHeight(final HousePart part) {
@@ -609,21 +609,21 @@ public class Foundation extends HousePart {
 		updateTextureAndColor(mesh, Scene.getInstance().getFoundationColor());
 	}
 
-	public void showSolarLabel(boolean b) {
-		solarLabel.setVisible(b && SceneManager.getInstance().isSolarColorMap());
+	public void showBuildingLabel(boolean b) {
+		buildingLabel.setVisible(b && SceneManager.getInstance().isSolarColorMap());
 	}
 
 	public void setSolarLabelValue(final double solarValue) {
 		scanChildrenHeight();
 		if (solarValue == -2)
-			solarLabel.setVisible(false);
+			buildingLabel.setVisible(false);
 		else {
-			solarLabel.setVisible(SceneManager.getInstance().areSolarLabelsShown());
+			buildingLabel.setVisible(SceneManager.getInstance().areBuildingLabelsShown());
 			final String idLabel = "(#" + id + ")";
 			if (solarValue == -1 || solarValue == 0)
-				solarLabel.setText(idLabel);
+				buildingLabel.setText(idLabel);
 			else
-				solarLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
+				buildingLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
 		}
 	}
 
