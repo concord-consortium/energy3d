@@ -455,7 +455,7 @@ public class EnergyPanel extends JPanel {
 
 		solarPanelEfficiencyComboBox = new WideComboBox();
 		solarPanelEfficiencyComboBox.setEditable(true);
-		solarPanelEfficiencyComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10", "20", "30", "40", "50" }));
+		solarPanelEfficiencyComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10", "20", "30", "40" }));
 		solarPanelEfficiencyComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -495,7 +495,7 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		colorMapSlider.setSnapToTicks(true);
-		colorMapSlider.setMinorTickSpacing(5);
+		colorMapSlider.setMinorTickSpacing(1);
 		colorMapSlider.setMajorTickSpacing(5);
 		heatMapPanel.add(colorMapSlider, BorderLayout.CENTER);
 		heatMapPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, heatMapPanel.getPreferredSize().height));

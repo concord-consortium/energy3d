@@ -708,6 +708,14 @@ public class MainFrame extends JFrame {
 				}
 			});
 			helpMenu.add(mi);
+			mi = new JMenuItem("Contact Us...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					openBrowser("http://energy.concord.org/energy3d/contact.html");
+				}
+			});
+			helpMenu.add(mi);
 			if (!Config.isMac())
 				helpMenu.add(getAboutMenuItem());
 		}

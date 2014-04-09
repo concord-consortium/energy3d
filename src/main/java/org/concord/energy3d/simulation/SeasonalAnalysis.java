@@ -25,7 +25,9 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -45,7 +47,7 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 	private final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
 	private int month = 0;
-	private int day = 1;
+	private int day = 20;
 	private Graph graph;
 
 	public SeasonalAnalysis() {
@@ -90,11 +92,12 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 				graph.addData("Heater", heater);
 				graph.addData("AC", ac);
 				graph.addData("Net", net);
-			} else if (selectedPart instanceof Window) {
-				Window window = (Window) selectedPart;
-				double solar = window.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
+			} else if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof) {
+				double solar = selectedPart.getSolarPotentialToday();
+				if (selectedPart instanceof Window)
+					solar *= Scene.getInstance().getWindowSolarHeatingRate();
 				graph.addData("Solar", solar);
-				double[] loss = window.getHeatLoss();
+				double[] loss = selectedPart.getHeatLoss();
 				double sum = 0;
 				for (double x : loss)
 					sum += x;
