@@ -49,13 +49,13 @@ abstract class Graph extends JPanel {
 	static {
 		records = new ArrayList<Results>();
 		colors = new HashMap<String, Color>();
-		colors.put("Solar", Color.YELLOW);
+		colors.put("Solar", Color.ORANGE);
 		colors.put("Heat Loss", Color.GRAY);
-		colors.put("Windows", Color.YELLOW);
-		colors.put("Solar Panels", Color.ORANGE);
+		colors.put("Windows", colors.get("Solar"));
+		colors.put("Solar Panels", Color.GREEN.darker());
 		colors.put("Heater", Color.RED);
 		colors.put("AC", Color.BLUE);
-		colors.put("Net", Color.GREEN);
+		colors.put("Net", Color.WHITE);
 	}
 
 	Graph() {
@@ -242,8 +242,7 @@ abstract class Graph extends JPanel {
 						path.lineTo(dataX, dataY);
 					}
 				}
-				Color c = colors.get(key);
-				g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 128));
+				g2.setColor(colors.get(key));
 				g2.setStroke(thin);
 				g2.draw(path);
 			}

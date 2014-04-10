@@ -48,19 +48,20 @@ class BuildingEnergyGraph extends Graph {
 				g2.draw(path);
 
 				g2.setStroke(thin);
+				Color c = colors.get(key);
 				for (int i = 0; i < list.size(); i++) {
 					dataX = left + dx * i;
 					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
 					if ("Windows".equals(key)) {
-						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, Color.YELLOW);
+						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					} else if ("Solar Panels".equals(key)) {
-						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, Color.ORANGE);
+						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					} else if ("Heater".equals(key)) {
-						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, Color.RED);
+						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					} else if ("AC".equals(key)) {
-						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, Color.BLUE);
+						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					} else if ("Net".equals(key)) {
-						drawCircle(g2, (int) Math.round(dataX - symbolSize / 2 + 1), (int) Math.round(dataY - symbolSize / 2 + 1), symbolSize - 2, Color.GREEN);
+						drawCircle(g2, (int) Math.round(dataX - symbolSize / 2 + 1), (int) Math.round(dataY - symbolSize / 2 + 1), symbolSize - 2, c);
 					}
 				}
 

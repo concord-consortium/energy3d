@@ -13,7 +13,7 @@ import java.util.Map;
  */
 class Results {
 
-	private static int n = 0;
+	private static int n = 1;
 	private int id;
 	private Map<String, List<Double>> copy;
 
