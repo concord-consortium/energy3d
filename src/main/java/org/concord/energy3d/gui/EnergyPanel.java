@@ -246,6 +246,7 @@ public class EnergyPanel extends JPanel {
 					heliodon.setTime((Date) timeSpinner.getValue());
 				compute(UpdateRadiation.NEVER);
 				Scene.getInstance().setEdited(true);
+				SceneManager.getInstance().changeSkyTexture();
 			}
 		});
 		final GridBagConstraints gbc_timeSpinner = new GridBagConstraints();

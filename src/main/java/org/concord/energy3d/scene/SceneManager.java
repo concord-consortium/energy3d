@@ -194,6 +194,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean solarColorMap = false;
 	private Spatial axes;
 	private boolean showBuildingLabels = false;
+	private Mesh sky;
+	private Texture daySky, nightSky;
 
 	private ArrayList<Runnable> shutdownHooks;
 
@@ -275,7 +277,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		root.setRenderState(lightState);
 
 		backgroundRoot.getSceneHints().setAllPickingHints(false);
-		backgroundRoot.attachChild(createSky());
+		sky = createSky();
+		backgroundRoot.attachChild(sky);
 		backgroundRoot.attachChild(createLand());
 		solarLand.setVisible(false);
 		backgroundRoot.attachChild(solarLand);
@@ -541,14 +544,24 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createSky() {
+		daySky = TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
+		nightSky = TextureManager.load("nightsky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
 		final Dome sky = new Dome("Sky", 100, 100, SKY_RADIUS);
 		sky.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
 		final TextureState ts = new TextureState();
-		ts.setTexture(TextureManager.load("sky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		ts.setTexture(daySky);
 		sky.setRenderState(ts);
 		sky.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		sky.getSceneHints().setAllPickingHints(false);
 		return sky;
+	}
+
+	public void changeSkyTexture() {
+		if (sky == null)
+			return;
+		final TextureState ts = new TextureState();
+		ts.setTexture(Heliodon.getInstance().isNightTime() ? nightSky : daySky);
+		sky.setRenderState(ts);
 	}
 
 	private Spatial createAxes() {
