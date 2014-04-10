@@ -325,6 +325,8 @@ public class EnergyPanel extends JPanel {
 		outsideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
+				if (disableActions)
+					return;
 				if (thread == null)
 					compute(UpdateRadiation.NEVER);
 			}
@@ -814,6 +816,8 @@ public class EnergyPanel extends JPanel {
 					alreadyRenderedHeatmap = true;
 					SolarIrradiation.getInstance().compute();
 					notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Solar energy calculation completed", 0, 1));
+					progressBar.setValue(0);
+					progressBar.setStringPainted(false);
 				} else {
 					if (SceneManager.getInstance().isSolarColorMap())
 						MainPanel.getInstance().getSolarButton().setSelected(false);

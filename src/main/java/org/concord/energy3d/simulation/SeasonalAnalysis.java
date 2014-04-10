@@ -53,6 +53,7 @@ public class SeasonalAnalysis {
 	private final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
 	private Graph graph;
+	private volatile boolean analysisStopped;
 
 	public SeasonalAnalysis() {
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -64,24 +65,30 @@ public class SeasonalAnalysis {
 	private void runAnalysis() {
 		new Thread(new Runnable() {
 			public void run() {
+				EnergyPanel.getInstance().disableActions(true);
 				for (int m : MONTHS) {
-					Heliodon.getInstance().getCalander().set(MONTH, m);
-					try {
-						EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					updateGraph();
-					EventQueue.invokeLater(new Runnable() {
-						public void run() {
-							EnergyPanel.getInstance().disableActions(true);
-							EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalander().getTime());
-							EnergyPanel.getInstance().disableActions(false);
+					if (!analysisStopped) {
+						Heliodon.getInstance().getCalander().set(MONTH, m);
+						try {
+							EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
-					});
+						updateGraph();
+						EventQueue.invokeLater(new Runnable() {
+							public void run() {
+								EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalander().getTime());
+							}
+						});
+					}
 				}
+				EnergyPanel.getInstance().disableActions(false);
 			}
 		}, "Seasonal Analysis").start();
+	}
+
+	private void stopAnalysis() {
+		analysisStopped = true;
 	}
 
 	public void show() {
@@ -204,6 +211,7 @@ public class SeasonalAnalysis {
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				stopAnalysis();
 				if (graph.hasData()) {
 					Object[] options = { "Yes", "No" };
 					if (JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]) == JOptionPane.YES_OPTION)
@@ -217,6 +225,7 @@ public class SeasonalAnalysis {
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
+				stopAnalysis();
 				dialog.dispose();
 			}
 		});
