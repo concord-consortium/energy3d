@@ -95,6 +95,7 @@ public class EnergyPanel extends JPanel {
 
 	private Thread thread;
 	private boolean computeRequest;
+	private boolean disableActions = false;
 	private final boolean initJavaFxAlreadyCalled = false;
 	private boolean alreadyRenderedHeatmap = false;
 	private UpdateRadiation updateRadiation;
@@ -144,13 +145,13 @@ public class EnergyPanel extends JPanel {
 		noDecimals.setMaximumFractionDigits(0);
 
 		setLayout(new BorderLayout());
-		final JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		add(new JScrollPane(mainPanel), BorderLayout.CENTER);
+		final JPanel dataPanel = new JPanel();
+		dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
+		add(new JScrollPane(dataPanel), BorderLayout.CENTER);
 
 		final JPanel timeAndLocationPanel = new JPanel();
 		timeAndLocationPanel.setBorder(new TitledBorder(null, "Time & Location", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		mainPanel.add(timeAndLocationPanel);
+		dataPanel.add(timeAndLocationPanel);
 		final GridBagLayout gbl_panel_3 = new GridBagLayout();
 		timeAndLocationPanel.setLayout(gbl_panel_3);
 
@@ -171,15 +172,17 @@ public class EnergyPanel extends JPanel {
 				dateSpinner.removeHierarchyBoundsListener(this);
 			}
 		});
-		dateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+		dateSpinner.addChangeListener(new ChangeListener() {
 			boolean firstCall = true;
 
 			@Override
-			public void stateChanged(final javax.swing.event.ChangeEvent e) {
+			public void stateChanged(final ChangeEvent e) {
 				if (firstCall) {
 					firstCall = false;
 					return;
 				}
+				if (disableActions)
+					return;
 				final Heliodon heliodon = Heliodon.getInstance();
 				if (heliodon != null)
 					heliodon.setDate((Date) dateSpinner.getValue());
@@ -228,11 +231,11 @@ public class EnergyPanel extends JPanel {
 
 		timeSpinner = new JSpinner(new SpinnerDateModel());
 		timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
-		timeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+		timeSpinner.addChangeListener(new ChangeListener() {
 			private boolean firstCall = true;
 
 			@Override
-			public void stateChanged(final javax.swing.event.ChangeEvent e) {
+			public void stateChanged(final ChangeEvent e) {
 				// ignore the first event
 				if (firstCall) {
 					firstCall = false;
@@ -261,9 +264,9 @@ public class EnergyPanel extends JPanel {
 
 		latitudeSpinner = new JSpinner();
 		latitudeSpinner.setModel(new SpinnerNumberModel(Heliodon.DEFAULT_LATITUDE, -90, 90, 1));
-		latitudeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+		latitudeSpinner.addChangeListener(new ChangeListener() {
 			@Override
-			public void stateChanged(final javax.swing.event.ChangeEvent e) {
+			public void stateChanged(final ChangeEvent e) {
 				if (!cityComboBox.getSelectedItem().equals("") && !CityData.getInstance().getCityLatitutes().values().contains(latitudeSpinner.getValue()))
 					cityComboBox.setSelectedItem("");
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
@@ -281,7 +284,7 @@ public class EnergyPanel extends JPanel {
 
 		final JPanel temperaturePanel = new JPanel();
 		temperaturePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		mainPanel.add(temperaturePanel);
+		dataPanel.add(temperaturePanel);
 		final GridBagLayout gbl_temperaturePanel = new GridBagLayout();
 		temperaturePanel.setLayout(gbl_temperaturePanel);
 
@@ -351,7 +354,7 @@ public class EnergyPanel extends JPanel {
 
 		final JPanel uFactorPanel = new JPanel();
 		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		mainPanel.add(uFactorPanel);
+		dataPanel.add(uFactorPanel);
 		final GridBagLayout gbl_uFactorPanel = new GridBagLayout();
 		uFactorPanel.setLayout(gbl_uFactorPanel);
 
@@ -451,7 +454,7 @@ public class EnergyPanel extends JPanel {
 		final JPanel otherParametersPanel = new JPanel();
 		otherParametersPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, otherParametersPanel.getPreferredSize().height));
 		otherParametersPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Other Parameters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		mainPanel.add(otherParametersPanel);
+		dataPanel.add(otherParametersPanel);
 
 		final JLabel solarPanelEfficiencyLabel = new JLabel("Solar Panel Efficiency (%): ");
 		otherParametersPanel.add(solarPanelEfficiencyLabel);
@@ -482,7 +485,7 @@ public class EnergyPanel extends JPanel {
 
 		heatMapPanel = new JPanel(new BorderLayout());
 		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		mainPanel.add(heatMapPanel);
+		dataPanel.add(heatMapPanel);
 
 		colorMapSlider = new MySlider();
 		colorMapSlider.setMinimum(10);
@@ -505,11 +508,11 @@ public class EnergyPanel extends JPanel {
 
 		partPanel = new JPanel();
 		partPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		mainPanel.add(partPanel);
+		dataPanel.add(partPanel);
 
 		buildingPanel = new JPanel();
 		buildingPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Building", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		mainPanel.add(buildingPanel);
+		dataPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
 
 		panel = new JPanel();
@@ -608,7 +611,7 @@ public class EnergyPanel extends JPanel {
 		volumnTextField.setColumns(10);
 
 		final Component verticalGlue = Box.createVerticalGlue();
-		mainPanel.add(verticalGlue);
+		dataPanel.add(verticalGlue);
 
 		progressBar = new JProgressBar();
 		add(progressBar, BorderLayout.SOUTH);
@@ -997,6 +1000,11 @@ public class EnergyPanel extends JPanel {
 			volumnTextField.setText("");
 		}
 
+	}
+
+	/** Currently this applies only to the date spinner when it is set programmatically (not by the user) */
+	public void disableActions(boolean b) {
+		disableActions = b;
 	}
 
 	public boolean isComputeRequest() {

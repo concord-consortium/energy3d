@@ -3,13 +3,12 @@ package org.concord.energy3d.simulation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -26,8 +25,9 @@ import javax.swing.event.PopupMenuListener;
 import static java.util.Calendar.*;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -48,11 +48,10 @@ import org.concord.energy3d.shapes.Heliodon;
  * 
  */
 
-public class SeasonalAnalysis implements PropertyChangeListener {
+public class SeasonalAnalysis {
 
 	private final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
-	private int month = 0;
 	private Graph graph;
 
 	public SeasonalAnalysis() {
@@ -62,67 +61,68 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		graph.setBackground(Color.white);
 	}
 
-	private void init() {
-		month = 0;
-		graph.clearData();
-	}
-
-	private void run() {
-		Heliodon.getInstance().getCalander().set(MONTH, MONTHS[month]);
-		EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalander().getTime());
-		MainPanel.getInstance().getSolarButton().doClick();
-		graph.repaint();
+	private void runAnalysis() {
+		new Thread(new Runnable() {
+			public void run() {
+				for (int m : MONTHS) {
+					Heliodon.getInstance().getCalander().set(MONTH, m);
+					try {
+						EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					updateGraph();
+					EventQueue.invokeLater(new Runnable() {
+						public void run() {
+							EnergyPanel.getInstance().disableActions(true);
+							EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalander().getTime());
+							EnergyPanel.getInstance().disableActions(false);
+						}
+					});
+				}
+			}
+		}, "Seasonal Analysis").start();
 	}
 
 	public void show() {
-		if (MainPanel.getInstance().getSolarButton().isSelected())
-			MainPanel.getInstance().getSolarButton().doClick();
 		createDialog();
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent e) {
-		if (e.getSource() == EnergyPanel.getInstance()) {
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart instanceof Foundation) {
-				Foundation selectedBuilding = (Foundation) selectedPart;
-				double window = selectedBuilding.getPassiveSolarToday();
-				double solarPanel = selectedBuilding.getPhotovoltaicToday();
-				double heater = selectedBuilding.getHeatingToday();
-				double ac = selectedBuilding.getCoolingToday();
-				double net = selectedBuilding.getTotalEnergyToday();
-				// System.out.println(month + ", " + window + ", " + solarPanel + ", " + heater + ", " + ac + ", " + net);
-				graph.addData("Windows", window);
-				graph.addData("Solar Panels", solarPanel);
-				graph.addData("Heater", heater);
-				graph.addData("AC", ac);
-				graph.addData("Net", net);
-			} else if (selectedPart instanceof Window) {
-				double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
-				graph.addData("Solar", solar);
-				double[] loss = selectedPart.getHeatLoss();
-				double sum = 0;
-				for (double x : loss)
-					sum += x;
-				graph.addData("Heat Loss", sum);
-			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
-				double[] loss = selectedPart.getHeatLoss();
-				double sum = 0;
-				for (double x : loss)
-					sum += x;
-				graph.addData("Heat Loss", sum);
-			} else if (selectedPart instanceof SolarPanel) {
-				SolarPanel solarPanel = (SolarPanel) selectedPart;
-				double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
-				graph.addData("Solar", solar);
-			}
-			graph.repaint();
-			if (month < MONTHS.length - 1) {
-				MainPanel.getInstance().getSolarButton().doClick();
-				month++;
-				run();
-			}
+	private void updateGraph() {
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart instanceof Foundation) {
+			Foundation selectedBuilding = (Foundation) selectedPart;
+			double window = selectedBuilding.getPassiveSolarToday();
+			double solarPanel = selectedBuilding.getPhotovoltaicToday();
+			double heater = selectedBuilding.getHeatingToday();
+			double ac = selectedBuilding.getCoolingToday();
+			double net = selectedBuilding.getTotalEnergyToday();
+			// System.out.println(month + ", " + window + ", " + solarPanel + ", " + heater + ", " + ac + ", " + net);
+			graph.addData("Windows", window);
+			graph.addData("Solar Panels", solarPanel);
+			graph.addData("Heater", heater);
+			graph.addData("AC", ac);
+			graph.addData("Net", net);
+		} else if (selectedPart instanceof Window) {
+			double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
+			graph.addData("Solar", solar);
+			double[] loss = selectedPart.getHeatLoss();
+			double sum = 0;
+			for (double x : loss)
+				sum += x;
+			graph.addData("Heat Loss", sum);
+		} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
+			double[] loss = selectedPart.getHeatLoss();
+			double sum = 0;
+			for (double x : loss)
+				sum += x;
+			graph.addData("Heat Loss", sum);
+		} else if (selectedPart instanceof SolarPanel) {
+			SolarPanel solarPanel = (SolarPanel) selectedPart;
+			double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
+			graph.addData("Solar", solar);
 		}
+		graph.repaint();
 	}
 
 	private void createDialog() {
@@ -193,8 +193,9 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				init();
-				run();
+				MainPanel.getInstance().getSolarButton().setSelected(true);
+				graph.clearData();
+				runAnalysis();
 			}
 		});
 		buttonPanel.add(button);
@@ -208,7 +209,6 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 					if (JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]) == JOptionPane.YES_OPTION)
 						graph.keepResults();
 				}
-				EnergyPanel.getInstance().removePropertyChangeListener(SeasonalAnalysis.this);
 				dialog.dispose();
 			}
 		});
@@ -217,7 +217,6 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				EnergyPanel.getInstance().removePropertyChangeListener(SeasonalAnalysis.this);
 				dialog.dispose();
 			}
 		});

@@ -1056,9 +1056,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					SeasonalAnalysis sa = new SeasonalAnalysis();
-					EnergyPanel.getInstance().addPropertyChangeListener(sa);
-					sa.show();
+					new SeasonalAnalysis().show();
 				}
 			});
 		}
