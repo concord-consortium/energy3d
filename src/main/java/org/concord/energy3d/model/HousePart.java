@@ -830,13 +830,25 @@ public abstract class HousePart implements Serializable {
 	public double[] getHeatLoss() {
 		return heatLoss;
 	}
-	
+
 	public double getSolarPotentialToday() {
 		return solarPotentialToday;
 	}
 
 	public void setSolarPotentialToday(final double solarPotentialToday) {
 		this.solarPotentialToday = solarPotentialToday;
+	}
+
+	public boolean isIrradiation() {
+		return true;
+	}
+
+	public Mesh getIrradiationMesh() {
+		return mesh;
+	}
+
+	public Spatial getIrradiationCollisionSpatial() {
+		return getIrradiationMesh();
 	}
 
 }

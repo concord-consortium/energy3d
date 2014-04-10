@@ -1209,4 +1209,9 @@ public class Wall extends HousePart {
 	public boolean isWall() {
 		return true;
 	}
+
+	@Override
+	public Mesh getIrradiationCollisionSpatial() {
+		return invisibleMesh;
+	}
 }

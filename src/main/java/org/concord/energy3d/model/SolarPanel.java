@@ -247,9 +247,10 @@ public class SolarPanel extends HousePart {
 			return getTopContainer();
 	}
 
-	public Mesh getSurroundMesh() {
-		return surround;
-	}
+//	@Override
+//	public Spatial getIrradiationCollision() {
+//		return surround;
+//	}
 
 	@Override
 	public boolean isSolarPanel() {

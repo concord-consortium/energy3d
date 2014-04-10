@@ -209,7 +209,8 @@ public class Tree extends HousePart {
 			updateTextureAndColor(mesh, Scene.getInstance().getWallColor(), TextureMode.Full);
 	}
 
-	public Node getCollisionRoot() {
+	@Override
+	public Spatial getIrradiationCollisionSpatial() {
 		sphere.removeFromParent();
 		if (!isShedded())
 			collisionRoot.attachChild(sphere);

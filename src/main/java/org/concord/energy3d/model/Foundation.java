@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
@@ -21,6 +21,8 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.CullState;
+import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
@@ -34,9 +36,11 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static DecimalFormat format = new DecimalFormat();
+	private transient ArrayList<Vector3> orgPoints;
 	private transient Mesh boundingMesh;
 	private transient Mesh wireframeMesh;
-	private transient ArrayList<Vector3> orgPoints;
+	private transient Mesh irradiationMesh;
+	private transient BMText buildingLabel;
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient boolean resizeHouseMode = false;
@@ -44,7 +48,6 @@ public class Foundation extends HousePart {
 	private transient double minY;
 	private transient double maxX;
 	private transient double maxY;
-	private transient BMText buildingLabel;
 	private transient double passiveSolarToday;
 	private transient double photovoltaicToday;
 	private transient double heatingToday;
@@ -83,6 +86,17 @@ public class Foundation extends HousePart {
 		mesh.setModelBound(new BoundingBox());
 		updateTextureAndColor();
 		root.attachChild(mesh);
+
+		irradiationMesh = new Mesh("Foundation (Irradiation)");
+		irradiationMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
+		irradiationMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(6));
+		irradiationMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
+		final CullState cullState = new CullState();
+		cullState.setCullFace(Face.Back);
+		irradiationMesh.setRenderState(cullState);
+		irradiationMesh.setRenderState(offsetState);
+		irradiationMesh.setModelBound(new BoundingBox());
+		root.attachChild(irradiationMesh);
 
 		boundingMesh = new Line("Foundation (Bounding)");
 		boundingMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(24));
@@ -401,7 +415,43 @@ public class Foundation extends HousePart {
 		if (drawable) {
 			((Box) mesh).setData(points.get(0), points.get(3).add(0, 0, height, null));
 			mesh.updateModelBound();
+
+			final FloatBuffer vertexBuffer = irradiationMesh.getMeshData().getVertexBuffer();
+			vertexBuffer.rewind();
+			ReadOnlyVector3 p;
+			p = getAbsPoint(0);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+			p = getAbsPoint(2);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+			p = getAbsPoint(1);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+			p = getAbsPoint(1);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+			p = getAbsPoint(2);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+			p = getAbsPoint(3);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+
+			final ReadOnlyVector3 normal = Vector3.UNIT_Z;
+			final FloatBuffer normalBuffer = irradiationMesh.getMeshData().getNormalBuffer();
+			normalBuffer.rewind();
+			for (int i = 0; i < 6; i++)
+				normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+
+			final FloatBuffer textureBuffer = irradiationMesh.getMeshData().getTextureBuffer(0);
+			textureBuffer.rewind();
+			textureBuffer.put(0).put(0);
+			textureBuffer.put(1).put(0);
+			textureBuffer.put(0).put(1);
+			textureBuffer.put(0).put(1);
+			textureBuffer.put(1).put(0);
+			textureBuffer.put(1).put(1);
+
+			irradiationMesh.updateModelBound();
+
 			CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
+			CollisionTreeManager.INSTANCE.updateCollisionTree(irradiationMesh);
+
 			drawWireframe(boundingMesh, points.get(7).getZf());
 			drawWireframe(wireframeMesh, (float) height);
 			updateSolarLabelPosition();
@@ -609,7 +659,7 @@ public class Foundation extends HousePart {
 		updateTextureAndColor(mesh, Scene.getInstance().getFoundationColor());
 	}
 
-	public void showBuildingLabel(boolean b) {
+	public void showBuildingLabel(final boolean b) {
 		buildingLabel.setVisible(b && SceneManager.getInstance().isSolarColorMap());
 	}
 
@@ -775,6 +825,11 @@ public class Foundation extends HousePart {
 
 	public void setTotalEnergyToday(final double totalEnergyToday) {
 		this.totalEnergyToday = totalEnergyToday;
+	}
+
+	@Override
+	public Mesh getIrradiationMesh() {
+		return irradiationMesh;
 	}
 
 }
