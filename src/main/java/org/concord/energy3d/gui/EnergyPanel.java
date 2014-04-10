@@ -29,6 +29,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -138,17 +139,18 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private EnergyPanel() {
+
 		twoDecimals.setMaximumFractionDigits(2);
 		noDecimals.setMaximumFractionDigits(0);
 
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-		this.repaint();
-		this.paint(null);
+		setLayout(new BorderLayout());
+		final JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		add(new JScrollPane(mainPanel), BorderLayout.CENTER);
 
 		final JPanel timeAndLocationPanel = new JPanel();
 		timeAndLocationPanel.setBorder(new TitledBorder(null, "Time & Location", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(timeAndLocationPanel);
+		mainPanel.add(timeAndLocationPanel);
 		final GridBagLayout gbl_panel_3 = new GridBagLayout();
 		timeAndLocationPanel.setLayout(gbl_panel_3);
 
@@ -279,7 +281,7 @@ public class EnergyPanel extends JPanel {
 
 		final JPanel temperaturePanel = new JPanel();
 		temperaturePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(temperaturePanel);
+		mainPanel.add(temperaturePanel);
 		final GridBagLayout gbl_temperaturePanel = new GridBagLayout();
 		temperaturePanel.setLayout(gbl_temperaturePanel);
 
@@ -349,7 +351,7 @@ public class EnergyPanel extends JPanel {
 
 		final JPanel uFactorPanel = new JPanel();
 		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(uFactorPanel);
+		mainPanel.add(uFactorPanel);
 		final GridBagLayout gbl_uFactorPanel = new GridBagLayout();
 		uFactorPanel.setLayout(gbl_uFactorPanel);
 
@@ -449,7 +451,7 @@ public class EnergyPanel extends JPanel {
 		final JPanel otherParametersPanel = new JPanel();
 		otherParametersPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, otherParametersPanel.getPreferredSize().height));
 		otherParametersPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Other Parameters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(otherParametersPanel);
+		mainPanel.add(otherParametersPanel);
 
 		final JLabel solarPanelEfficiencyLabel = new JLabel("Solar Panel Efficiency (%): ");
 		otherParametersPanel.add(solarPanelEfficiencyLabel);
@@ -480,7 +482,7 @@ public class EnergyPanel extends JPanel {
 
 		heatMapPanel = new JPanel(new BorderLayout());
 		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(heatMapPanel);
+		mainPanel.add(heatMapPanel);
 
 		colorMapSlider = new MySlider();
 		colorMapSlider.setMinimum(10);
@@ -503,11 +505,11 @@ public class EnergyPanel extends JPanel {
 
 		partPanel = new JPanel();
 		partPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(partPanel);
+		mainPanel.add(partPanel);
 
 		buildingPanel = new JPanel();
 		buildingPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Building", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(buildingPanel);
+		mainPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
 
 		panel = new JPanel();
@@ -606,10 +608,10 @@ public class EnergyPanel extends JPanel {
 		volumnTextField.setColumns(10);
 
 		final Component verticalGlue = Box.createVerticalGlue();
-		add(verticalGlue);
+		mainPanel.add(verticalGlue);
 
 		progressBar = new JProgressBar();
-		add(progressBar);
+		add(progressBar, BorderLayout.SOUTH);
 
 		JPanel target = buildingPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
