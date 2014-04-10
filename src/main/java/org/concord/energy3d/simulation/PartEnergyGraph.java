@@ -24,6 +24,8 @@ class PartEnergyGraph extends Graph {
 	@Override
 	void drawCurves(Graphics2D g2) {
 
+		Path2D.Float path = new Path2D.Float();
+
 		for (String key : data.keySet()) {
 
 			List<Double> list = data.get(key);
@@ -34,8 +36,8 @@ class PartEnergyGraph extends Graph {
 					continue;
 
 				g2.setColor(Color.BLACK);
+				path.reset();
 				double dataX, dataY;
-				Path2D.Float path = new Path2D.Float();
 				for (int i = 0; i < list.size(); i++) {
 					dataX = left + dx * i;
 					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);

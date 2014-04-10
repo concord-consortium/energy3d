@@ -15,8 +15,13 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import static java.util.Calendar.*;
 
@@ -37,7 +42,7 @@ import org.concord.energy3d.shapes.Heliodon;
 /**
  * This calculates and visualizes the seasonal trend and the yearly sum of all energy items for any selected part or building.
  * 
- * For fast feedback, by default, the sum is based on adding the energy items computed for the first day of each month and then that number is multiplied by 365/12.
+ * For fast feedback, the sum is based on adding the energy items computed for the currently selected day of each month and then that number can be multiplied by 365/12.
  * 
  * @author Charles Xie
  * 
@@ -127,6 +132,63 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		title = title.replaceAll("Foundation", "Building");
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Seasonal Analysis: " + title, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+		JMenuBar menuBar = new JMenuBar();
+		dialog.setJMenuBar(menuBar);
+
+		final JMenuItem miKeep = new JMenuItem("Keep Results of This Run");
+		final JMenuItem miClear = new JMenuItem("Clear Previous Results");
+		final JMenuItem miView = new JMenuItem("View Raw Data");
+
+		JMenu menu = new JMenu("Options");
+		menu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				miKeep.setEnabled(graph.hasData());
+				miClear.setEnabled(graph.hasRecords());
+				miView.setEnabled(graph.hasData());
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+			}
+		});
+		menuBar.add(menu);
+
+		miKeep.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int i = JOptionPane.showConfirmDialog(dialog, "Are you sure that you want to keep the results\nof this run?", "Confirmation", JOptionPane.YES_NO_OPTION);
+				if (i != JOptionPane.YES_OPTION)
+					return;
+				graph.keepResults();
+			}
+		});
+		menu.add(miKeep);
+
+		miClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int i = JOptionPane.showConfirmDialog(dialog, "Are you sure that you want to clear all the previous results\nrelated to the selected object?", "Confirmation", JOptionPane.YES_NO_OPTION);
+				if (i != JOptionPane.YES_OPTION)
+					return;
+				graph.clearRecords();
+			}
+		});
+		menu.add(miClear);
+
+		miView.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				viewRawData(dialog);
+			}
+		});
+		menu.add(miView);
+
 		JPanel contentPane = new JPanel(new BorderLayout());
 		dialog.setContentPane(contentPane);
 
@@ -145,40 +207,6 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 			public void actionPerformed(ActionEvent e) {
 				init();
 				run();
-			}
-		});
-		buttonPanel.add(button);
-
-		button = new JButton("Raw Data");
-		button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String[] header = null;
-				if (graph instanceof BuildingEnergyGraph) {
-					header = new String[] { "Month", "Windows", "Solar Panels", "Heater", "AC", "Net" };
-				} else {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof SolarPanel) {
-						header = new String[] { "Month", "Solar" };
-					} else if (selectedPart instanceof Window) {
-						header = new String[] { "Month", "Solar", "Heat Transfer" };
-					}
-				}
-				if (header == null) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Problem in finding data.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				int m = header.length;
-				int n = graph.getLength();
-				Object[][] column = new Object[n][m + 1];
-				for (int i = 0; i < n; i++)
-					column[i][0] = (i + 1);
-				for (int j = 1; j < header.length; j++) {
-					List<Double> list = graph.getData(header[j]);
-					for (int i = 0; i < n; i++)
-						column[i][j] = list.get(i);
-				}
-				DataViewer.showDataWindow("Data", column, header, dialog);
 			}
 		});
 		buttonPanel.add(button);
@@ -205,6 +233,35 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		dialog.setLocationRelativeTo(MainFrame.getInstance());
 		dialog.setVisible(true);
 
+	}
+
+	private void viewRawData(JDialog parent) {
+		String[] header = null;
+		if (graph instanceof BuildingEnergyGraph) {
+			header = new String[] { "Month", "Windows", "Solar Panels", "Heater", "AC", "Net" };
+		} else {
+			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof SolarPanel) {
+				header = new String[] { "Month", "Solar" };
+			} else if (selectedPart instanceof Window) {
+				header = new String[] { "Month", "Solar", "Heat Loss" };
+			}
+		}
+		if (header == null) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Problem in finding data.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		int m = header.length;
+		int n = graph.getLength();
+		Object[][] column = new Object[n][m + 1];
+		for (int i = 0; i < n; i++)
+			column[i][0] = (i + 1);
+		for (int j = 1; j < header.length; j++) {
+			List<Double> list = graph.getData(header[j]);
+			for (int i = 0; i < n; i++)
+				column[i][j] = list.get(i);
+		}
+		DataViewer.showDataWindow("Data", column, header, parent);
 	}
 
 }

@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.Path2D;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +32,7 @@ abstract class Graph extends JPanel {
 	BasicStroke thin = new BasicStroke(1);
 	BasicStroke thick = new BasicStroke(2);
 	Map<String, List<Double>> data;
+	static List<Results> records;
 	double xmin = 0;
 	double xmax = 11;
 	double ymin;
@@ -43,11 +45,29 @@ abstract class Graph extends JPanel {
 	String yAxisLabel = "Energy (kWh)";
 	DecimalFormat twoDecimals;
 
+	static {
+		records = new ArrayList<Results>();
+	}
+
 	Graph() {
 		super();
 		data = new HashMap<String, List<Double>>();
 		twoDecimals = new DecimalFormat();
 		twoDecimals.setMaximumFractionDigits(2);
+	}
+
+	void keepResults() {
+		if (data.isEmpty())
+			return;
+		records.add(new Results(data));
+	}
+
+	boolean hasRecords() {
+		return !records.isEmpty();
+	}
+
+	void clearRecords() {
+		records.clear();
 	}
 
 	void setMinimum(float xmin) {
@@ -96,6 +116,10 @@ abstract class Graph extends JPanel {
 		return list.size();
 	}
 
+	boolean hasData() {
+		return !data.isEmpty();
+	}
+
 	void clearData() {
 		data.clear();
 	}
@@ -134,10 +158,13 @@ abstract class Graph extends JPanel {
 		g2.drawString(yAxisLabel, 16, (height + yAxisLabelWidth) / 2);
 		g2.rotate(Math.PI / 2, 16, (height + yAxisLabelWidth) / 2);
 
+		if (hasRecords())
+			drawRecords(g2);
+
 		if (data.isEmpty()) {
 			g2.setColor(Color.LIGHT_GRAY);
 			g2.setFont(new Font("Arial", Font.PLAIN, 20));
-			String info = "No data";
+			String info = "No current data";
 			int infoWidth = g2.getFontMetrics().stringWidth(info);
 			g2.drawString(info, (width - infoWidth) / 2, height / 2);
 		} else {
@@ -171,6 +198,33 @@ abstract class Graph extends JPanel {
 		}
 
 		drawLegends(g2);
+
+	}
+
+	void drawRecords(Graphics2D g2) {
+
+		g2.setColor(Color.LIGHT_GRAY);
+		double dataX, dataY;
+		Path2D.Float path = new Path2D.Float();
+		for (Results r : records) {
+
+			Map<String, List<Double>> x = r.getData();
+			for (String key : x.keySet()) {
+				List<Double> list = x.get(key);
+				path.reset();
+				for (int i = 0; i < list.size(); i++) {
+					dataX = left + dx * i;
+					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+					if (i == 0)
+						path.moveTo(dataX, dataY);
+					else
+						path.lineTo(dataX, dataY);
+				}
+				g2.setStroke(thin);
+				g2.draw(path);
+			}
+
+		}
 
 	}
 
