@@ -1032,6 +1032,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getSeasonalAnalysisMenuItem() {
 		if (seasonalAnalysisMenuItem == null) {
 			seasonalAnalysisMenuItem = new JMenuItem("Run Seasonal Analysis...");
+			seasonalAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
 			seasonalAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1067,6 +1068,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getDailyAnalysisMenuItem() {
 		if (dailyAnalysisMenuItem == null) {
 			dailyAnalysisMenuItem = new JMenuItem("Run Daily Analysis...");
+			dailyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F8"));
 			dailyAnalysisMenuItem.setEnabled(false);
 			dailyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override

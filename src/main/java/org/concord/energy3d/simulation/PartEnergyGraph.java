@@ -50,13 +50,14 @@ class PartEnergyGraph extends Graph {
 				g2.draw(path);
 
 				g2.setStroke(thin);
+				Color c = colors.get(key);
 				for (int i = 0; i < list.size(); i++) {
 					dataX = left + dx * i;
 					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
 					if ("Solar".equals(key)) {
-						drawCircle(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, Color.YELLOW);
+						drawCircle(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					} else if ("Heat Loss".equals(key)) {
-						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, Color.GRAY);
+						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					}
 				}
 
@@ -75,14 +76,14 @@ class PartEnergyGraph extends Graph {
 		int y0 = top - 10;
 		String s = "Solar";
 		if (data.containsKey(s)) {
-			drawCircle(g2, x0, y0, 8, Color.YELLOW);
+			drawCircle(g2, x0, y0, 8, colors.get(s));
 			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 		s = "Heat Loss";
 		if (data.containsKey(s)) {
 			y0 += 14;
-			drawSquare(g2, x0, y0, 8, Color.GRAY);
+			drawSquare(g2, x0, y0, 8, colors.get(s));
 			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 

@@ -136,7 +136,6 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
 
-		final JMenuItem miKeep = new JMenuItem("Keep Results of This Run");
 		final JMenuItem miClear = new JMenuItem("Clear Previous Results");
 		final JMenuItem miView = new JMenuItem("View Raw Data");
 
@@ -144,7 +143,6 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		menu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
 			@Override
 			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-				miKeep.setEnabled(graph.hasData());
 				miClear.setEnabled(graph.hasRecords());
 				miView.setEnabled(graph.hasData());
 			}
@@ -159,17 +157,6 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		});
 		menuBar.add(menu);
 
-		miKeep.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int i = JOptionPane.showConfirmDialog(dialog, "Are you sure that you want to keep the results\nof this run?", "Confirmation", JOptionPane.YES_NO_OPTION);
-				if (i != JOptionPane.YES_OPTION)
-					return;
-				graph.keepResults();
-			}
-		});
-		menu.add(miKeep);
-
 		miClear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -177,6 +164,7 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 				if (i != JOptionPane.YES_OPTION)
 					return;
 				graph.clearRecords();
+				graph.repaint();
 			}
 		});
 		menu.add(miClear);
@@ -215,6 +203,11 @@ public class SeasonalAnalysis implements PropertyChangeListener {
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (graph.hasData()) {
+					Object[] options = { "Yes", "No" };
+					if (JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]) == JOptionPane.YES_OPTION)
+						graph.keepResults();
+				}
 				EnergyPanel.getInstance().removePropertyChangeListener(SeasonalAnalysis.this);
 				dialog.dispose();
 			}

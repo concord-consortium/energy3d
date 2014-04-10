@@ -35,8 +35,8 @@ abstract class Graph extends JPanel {
 	static List<Results> records;
 	double xmin = 0;
 	double xmax = 11;
-	double ymin;
-	double ymax;
+	double ymin = 0;
+	double ymax = 1;
 	double dx;
 	double dy;
 	int symbolSize = 8;
@@ -44,9 +44,18 @@ abstract class Graph extends JPanel {
 	String xAxisLabel = "Month";
 	String yAxisLabel = "Energy (kWh)";
 	DecimalFormat twoDecimals;
+	static Map<String, Color> colors;
 
 	static {
 		records = new ArrayList<Results>();
+		colors = new HashMap<String, Color>();
+		colors.put("Solar", Color.YELLOW);
+		colors.put("Heat Loss", Color.GRAY);
+		colors.put("Windows", Color.YELLOW);
+		colors.put("Solar Panels", Color.ORANGE);
+		colors.put("Heater", Color.RED);
+		colors.put("AC", Color.BLUE);
+		colors.put("Net", Color.GREEN);
 	}
 
 	Graph() {
@@ -54,6 +63,15 @@ abstract class Graph extends JPanel {
 		data = new HashMap<String, List<Double>>();
 		twoDecimals = new DecimalFormat();
 		twoDecimals.setMaximumFractionDigits(2);
+		if (!records.isEmpty()) {
+			for (Results r : records) {
+				double[] bound = r.getBound();
+				if (bound[0] < ymin)
+					ymin = bound[0];
+				if (bound[1] > ymax)
+					ymax = bound[1];
+			}
+		}
 	}
 
 	void keepResults() {
@@ -158,18 +176,20 @@ abstract class Graph extends JPanel {
 		g2.drawString(yAxisLabel, 16, (height + yAxisLabelWidth) / 2);
 		g2.rotate(Math.PI / 2, 16, (height + yAxisLabelWidth) / 2);
 
-		if (hasRecords())
+		if (hasRecords()) {
 			drawRecords(g2);
+		} else {
+			ymin = 0;
+			ymax = 1;
+		}
 
 		if (data.isEmpty()) {
 			g2.setColor(Color.LIGHT_GRAY);
 			g2.setFont(new Font("Arial", Font.PLAIN, 20));
-			String info = "No current data";
+			String info = "No new data";
 			int infoWidth = g2.getFontMetrics().stringWidth(info);
 			g2.drawString(info, (width - infoWidth) / 2, height / 2);
 		} else {
-			ymax = 1;
-			ymin = 0;
 			for (String key : data.keySet()) {
 				List<Double> list = data.get(key);
 				if (!list.isEmpty()) {
@@ -203,7 +223,6 @@ abstract class Graph extends JPanel {
 
 	void drawRecords(Graphics2D g2) {
 
-		g2.setColor(Color.LIGHT_GRAY);
 		double dataX, dataY;
 		Path2D.Float path = new Path2D.Float();
 		for (Results r : records) {
@@ -215,11 +234,16 @@ abstract class Graph extends JPanel {
 				for (int i = 0; i < list.size(); i++) {
 					dataX = left + dx * i;
 					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
-					if (i == 0)
+					if (i == 0) {
 						path.moveTo(dataX, dataY);
-					else
+						g2.setColor(Color.GRAY);
+						g2.drawString(Integer.toString(r.getID()), (int) dataX - 8, (int) dataY + 5);
+					} else {
 						path.lineTo(dataX, dataY);
+					}
 				}
+				Color c = colors.get(key);
+				g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 128));
 				g2.setStroke(thin);
 				g2.draw(path);
 			}
