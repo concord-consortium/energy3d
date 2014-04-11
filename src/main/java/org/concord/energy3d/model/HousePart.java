@@ -1,12 +1,19 @@
 package org.concord.energy3d.model;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.GrayFilter;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -629,43 +636,64 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
-		final boolean isSolarColorMap = !(this instanceof Tree) && SceneManager.getInstance().isSolarColorMap();
-		if (isSolarColorMap && textureCleared.get(mesh) == Boolean.TRUE)
-			return;
-		if (isSolarColorMap)
+
+		if (SceneManager.getInstance().isSolarColorMap()) {
+			if (textureCleared.get(mesh) == Boolean.TRUE)
+				return;
 			textureCleared.put(mesh, Boolean.TRUE);
-		else if (!textureCleared.isEmpty())
+		} else if (!textureCleared.isEmpty())
 			textureCleared.clear();
 
-		if (isFrozen() || isSolarColorMap) {
-			mesh.clearRenderState(StateType.Texture);
-			mesh.setDefaultColor(Scene.GRAY);
-		} else if (textureMode == TextureMode.None || getTextureFileName() == null) {
-			mesh.clearRenderState(StateType.Texture);
-			mesh.setDefaultColor(defaultColor);
-		} else {
+		if (this instanceof Tree) { // special treatment
 			final TextureState ts = new TextureState();
-			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor);
+			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, isFrozen());
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
+		} else {
+			if (isFrozen() || SceneManager.getInstance().isSolarColorMap()) {
+				mesh.clearRenderState(StateType.Texture);
+				mesh.setDefaultColor(Scene.GRAY);
+			} else if (textureMode == TextureMode.None || getTextureFileName() == null) {
+				mesh.clearRenderState(StateType.Texture);
+				mesh.setDefaultColor(defaultColor);
+			} else {
+				final TextureState ts = new TextureState();
+				final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, false);
+				ts.setTexture(texture);
+				mesh.setRenderState(ts);
+			}
 		}
+
 	}
 
-	private Texture getTexture(final String filename, final boolean isTrasparent, final ReadOnlyColorRGBA defaultColor) {
+	private Texture getTexture(final String filename, final boolean isTrasparent, final ReadOnlyColorRGBA defaultColor, boolean disabled) {
 		final Texture texture = TextureManager.load(filename, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
-		if (isTrasparent) {
+		if (isTrasparent || disabled) {
 			final Color color = new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue());
 			final Image image = texture.getImage();
 			final ByteBuffer data = image.getData(0);
-			for (int y = 0; y < image.getHeight(); y++)
+			byte alpha, red, green, blue, gray;
+			for (int y = 0; y < image.getHeight(); y++) {
 				for (int x = 0; x < image.getWidth(); x++) {
-					final byte alpha = data.get((y * image.getWidth() + x) * 4 + 3);
-					if (alpha == 0) {
-						data.put((y * image.getWidth() + x) * 4, (byte) color.getRed());
-						data.put((y * image.getWidth() + x) * 4 + 1, (byte) color.getGreen());
-						data.put((y * image.getWidth() + x) * 4 + 2, (byte) color.getBlue());
+					final int i = (y * image.getWidth() + x) * 4;
+					alpha = data.get(i + 3);
+					if (alpha == 0) { // when it is transparent, I want to put the default color of the part
+						data.put(i, (byte) color.getRed());
+						data.put(i + 1, (byte) color.getGreen());
+						data.put(i + 2, (byte) color.getBlue());
+					}
+					if (disabled) {
+						red = data.get(i);
+						green = data.get(i + 1);
+						blue = data.get(i + 2);
+						gray = (byte) Math.min(red, green);
+						gray = (byte) Math.min(blue, gray);
+						data.put(i, gray);
+						data.put(i + 1, gray);
+						data.put(i + 2, gray);
 					}
 				}
+			}
 			texture.setImage(image);
 		}
 		return texture;

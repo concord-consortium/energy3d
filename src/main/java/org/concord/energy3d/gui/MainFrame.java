@@ -137,8 +137,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem roofColorMenuItem;
 	private JMenuItem importColladaMenuItem;
 	private JMenuItem saveAsImageMenuItem;
-	private JMenuItem freezeMenuItem;
-	private JMenuItem unfreezeMenuItem;
+	private JMenuItem lockMenuItem;
+	private JMenuItem unlockMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
 	private final JFileChooser fileChooser;
@@ -326,8 +326,8 @@ public class MainFrame extends JFrame {
 			appMenuBar.add(getFileMenu());
 			appMenuBar.add(getEditMenu());
 			appMenuBar.add(getViewMenu());
-			appMenuBar.add(getAnalysisMenu());
 			appMenuBar.add(getCameraMenu());
+			appMenuBar.add(getAnalysisMenu());
 			appMenuBar.add(getHelpMenu());
 		}
 		return appMenuBar;
@@ -1115,8 +1115,8 @@ public class MainFrame extends JFrame {
 			editMenu.add(getRemoveAllRoofsMenuItem());
 			editMenu.addSeparator();
 			if (!Config.isRestrictMode()) {
-				editMenu.add(getFreezeMenuItem());
-				editMenu.add(getUnfreezeMenuItem());
+				editMenu.add(getLockMenuItem());
+				editMenu.add(getUnlockMenuItem());
 			}
 			editMenu.addSeparator();
 			editMenu.add(getNoteCheckBoxMenuItem());
@@ -1657,30 +1657,30 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private JMenuItem getFreezeMenuItem() {
-		if (freezeMenuItem == null) {
-			freezeMenuItem = new JMenuItem("Freeze");
-			freezeMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getLockMenuItem() {
+		if (lockMenuItem == null) {
+			lockMenuItem = new JMenuItem("Lock");
+			lockMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setFreeze(true);
 				}
 			});
 		}
-		return freezeMenuItem;
+		return lockMenuItem;
 	}
 
-	private JMenuItem getUnfreezeMenuItem() {
-		if (unfreezeMenuItem == null) {
-			unfreezeMenuItem = new JMenuItem("Unfreeze");
-			unfreezeMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getUnlockMenuItem() {
+		if (unlockMenuItem == null) {
+			unlockMenuItem = new JMenuItem("Unlock");
+			unlockMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setFreeze(false);
 				}
 			});
 		}
-		return unfreezeMenuItem;
+		return unlockMenuItem;
 	}
 
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {
