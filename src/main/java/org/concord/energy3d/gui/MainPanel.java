@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -609,9 +611,9 @@ public class MainPanel extends JPanel {
 			solarButton.setToolTipText("Calculate energy of the day");
 			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
 			solarButton.addMouseListener(refreshUponMouseExit);
-			solarButton.addActionListener(new ActionListener() {
+			solarButton.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
+				public void itemStateChanged(ItemEvent arg0) {
 					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}

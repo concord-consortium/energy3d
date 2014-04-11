@@ -1,7 +1,9 @@
 package org.concord.energy3d.util;
 
+import java.awt.event.ItemListener;
 import java.util.List;
 
+import javax.swing.AbstractButton;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
@@ -221,6 +223,17 @@ public class Util {
 	}
 
 	public static void reportError(Throwable e) {
-		JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured! Please notify us of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);		
+		JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured! Please notify us of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
 	}
+
+	/** This method sets the selection state of a button visually without invoking its ItemListeners */
+	public static void selectSilently(AbstractButton button, boolean selected) {
+		ItemListener[] itemListeners = button.getItemListeners();
+		for (ItemListener x : itemListeners)
+			button.removeItemListener(x);
+		button.setSelected(selected);
+		for (ItemListener x : itemListeners)
+			button.addItemListener(x);
+	}
+
 }

@@ -38,6 +38,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.Util;
 
 /**
  * This calculates and visualizes the seasonal trend and the yearly sum of all energy items for any selected part or building.
@@ -202,7 +203,7 @@ public class SeasonalAnalysis {
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				MainPanel.getInstance().getSolarButton().setSelected(true);
+				Util.selectSilently(MainPanel.getInstance().getSolarButton(), true);
 				graph.clearData();
 				runAnalysis();
 			}
