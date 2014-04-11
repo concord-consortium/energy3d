@@ -84,7 +84,6 @@ public class Foundation extends HousePart {
 		mesh = new Box("Foundation", new Vector3(), new Vector3());
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new BoundingBox());
-		updateTextureAndColor();
 		root.attachChild(mesh);
 
 		irradiationMesh = new Mesh("Foundation (Irradiation)");
@@ -123,6 +122,8 @@ public class Foundation extends HousePart {
 		buildingLabel.setFontScale(0.75);
 		buildingLabel.setVisible(false);
 		root.attachChild(buildingLabel);
+
+		updateTextureAndColor();
 	}
 
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
@@ -656,6 +657,7 @@ public class Foundation extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
+		irradiationMesh.setVisible(false);
 		updateTextureAndColor(mesh, Scene.getInstance().getFoundationColor());
 	}
 
@@ -829,6 +831,7 @@ public class Foundation extends HousePart {
 
 	@Override
 	public Mesh getIrradiationMesh() {
+		irradiationMesh.setVisible(true);
 		return irradiationMesh;
 	}
 
