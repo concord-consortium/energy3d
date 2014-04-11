@@ -1,5 +1,19 @@
 package org.concord.energy3d.simulation;
 
+import static java.util.Calendar.APRIL;
+import static java.util.Calendar.AUGUST;
+import static java.util.Calendar.DECEMBER;
+import static java.util.Calendar.FEBRUARY;
+import static java.util.Calendar.JANUARY;
+import static java.util.Calendar.JULY;
+import static java.util.Calendar.JUNE;
+import static java.util.Calendar.MARCH;
+import static java.util.Calendar.MAY;
+import static java.util.Calendar.MONTH;
+import static java.util.Calendar.NOVEMBER;
+import static java.util.Calendar.OCTOBER;
+import static java.util.Calendar.SEPTEMBER;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -22,12 +36,10 @@ import javax.swing.JPanel;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import static java.util.Calendar.*;
-
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -42,22 +54,22 @@ import org.concord.energy3d.util.Util;
 
 /**
  * This calculates and visualizes the seasonal trend and the yearly sum of all energy items for any selected part or building.
- * 
+ *
  * For fast feedback, the sum is based on adding the energy items computed for the currently selected day of each month and then that number can be multiplied by 365/12.
- * 
+ *
  * @author Charles Xie
- * 
+ *
  */
 
 public class SeasonalAnalysis {
 
 	private final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
-	private Graph graph;
+	private final Graph graph;
 	private volatile boolean analysisStopped;
 
 	public SeasonalAnalysis() {
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		graph = selectedPart instanceof Foundation ? new BuildingEnergyGraph() : new PartEnergyGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
 		graph.setBackground(Color.white);
@@ -66,19 +78,20 @@ public class SeasonalAnalysis {
 	private void runAnalysis() {
 		EnergyPanel.getInstance().disableActions(true);
 		Heliodon.getInstance().getCalander().set(MONTH, JANUARY);
-		EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalander().getTime());
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
-				for (int m : MONTHS) {
+				for (final int m : MONTHS) {
 					if (!analysisStopped) {
 						Heliodon.getInstance().getCalander().set(MONTH, m);
 						try {
 							EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
-						} catch (Exception e) {
+						} catch (final Exception e) {
 							e.printStackTrace();
 						}
 						updateGraph();
 						EventQueue.invokeLater(new Runnable() {
+							@Override
 							public void run() {
 								EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalander().getTime());
 							}
@@ -99,14 +112,14 @@ public class SeasonalAnalysis {
 	}
 
 	private void updateGraph() {
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Foundation) {
-			Foundation selectedBuilding = (Foundation) selectedPart;
-			double window = selectedBuilding.getPassiveSolarToday();
-			double solarPanel = selectedBuilding.getPhotovoltaicToday();
-			double heater = selectedBuilding.getHeatingToday();
-			double ac = selectedBuilding.getCoolingToday();
-			double net = selectedBuilding.getTotalEnergyToday();
+			final Foundation selectedBuilding = (Foundation) selectedPart;
+			final double window = selectedBuilding.getPassiveSolarToday();
+			final double solarPanel = selectedBuilding.getPhotovoltaicToday();
+			final double heater = selectedBuilding.getHeatingToday();
+			final double ac = selectedBuilding.getCoolingToday();
+			final double net = selectedBuilding.getTotalEnergyToday();
 			// System.out.println(window + ", " + solarPanel + ", " + heater + ", " + ac + ", " + net);
 			graph.addData("Windows", window);
 			graph.addData("Solar Panels", solarPanel);
@@ -114,22 +127,22 @@ public class SeasonalAnalysis {
 			graph.addData("AC", ac);
 			graph.addData("Net", net);
 		} else if (selectedPart instanceof Window) {
-			double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
+			final double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
 			graph.addData("Solar", solar);
-			double[] loss = selectedPart.getHeatLoss();
+			final double[] loss = selectedPart.getHeatLoss();
 			double sum = 0;
-			for (double x : loss)
+			for (final double x : loss)
 				sum += x;
 			graph.addData("Heat Loss", sum);
 		} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
-			double[] loss = selectedPart.getHeatLoss();
+			final double[] loss = selectedPart.getHeatLoss();
 			double sum = 0;
-			for (double x : loss)
+			for (final double x : loss)
 				sum += x;
 			graph.addData("Heat Loss", sum);
 		} else if (selectedPart instanceof SolarPanel) {
-			SolarPanel solarPanel = (SolarPanel) selectedPart;
-			double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
+			final SolarPanel solarPanel = (SolarPanel) selectedPart;
+			final double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
 			graph.addData("Solar", solar);
 		}
 		graph.repaint();
@@ -137,40 +150,40 @@ public class SeasonalAnalysis {
 
 	private void createDialog() {
 
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String title = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 		title = title.replaceAll("Foundation", "Building");
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Seasonal Analysis: " + title, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-		JMenuBar menuBar = new JMenuBar();
+		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
 
 		final JMenuItem miClear = new JMenuItem("Clear Previous Results");
 		final JMenuItem miView = new JMenuItem("View Raw Data");
 
-		JMenu menu = new JMenu("Options");
+		final JMenu menu = new JMenu("Options");
 		menu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
 			@Override
-			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
 				miClear.setEnabled(graph.hasRecords());
 				miView.setEnabled(graph.hasData());
 			}
 
 			@Override
-			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
 			}
 
 			@Override
-			public void popupMenuCanceled(PopupMenuEvent e) {
+			public void popupMenuCanceled(final PopupMenuEvent e) {
 			}
 		});
 		menuBar.add(menu);
 
 		miClear.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				int i = JOptionPane.showConfirmDialog(dialog, "Are you sure that you want to clear all the previous results\nrelated to the selected object?", "Confirmation", JOptionPane.YES_NO_OPTION);
+			public void actionPerformed(final ActionEvent e) {
+				final int i = JOptionPane.showConfirmDialog(dialog, "Are you sure that you want to clear all the previous results\nrelated to the selected object?", "Confirmation", JOptionPane.YES_NO_OPTION);
 				if (i != JOptionPane.YES_OPTION)
 					return;
 				graph.clearRecords();
@@ -181,28 +194,28 @@ public class SeasonalAnalysis {
 
 		miView.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				viewRawData(dialog);
 			}
 		});
 		menu.add(miView);
 
-		JPanel contentPane = new JPanel(new BorderLayout());
+		final JPanel contentPane = new JPanel(new BorderLayout());
 		dialog.setContentPane(contentPane);
 
-		JPanel panel = new JPanel(new BorderLayout());
+		final JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		contentPane.add(panel, BorderLayout.CENTER);
 
 		panel.add(graph, BorderLayout.CENTER);
 
-		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 
 		JButton button = new JButton("Run");
 		button.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				Util.selectSilently(MainPanel.getInstance().getSolarButton(), true);
 				graph.clearData();
 				runAnalysis();
@@ -213,10 +226,10 @@ public class SeasonalAnalysis {
 		button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				stopAnalysis();
 				if (graph.hasData()) {
-					Object[] options = { "Yes", "No" };
+					final Object[] options = { "Yes", "No" };
 					if (JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]) == JOptionPane.YES_OPTION)
 						graph.keepResults();
 				}
@@ -227,7 +240,7 @@ public class SeasonalAnalysis {
 
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e) {
+			public void windowClosing(final WindowEvent e) {
 				stopAnalysis();
 				dialog.dispose();
 			}
@@ -239,12 +252,12 @@ public class SeasonalAnalysis {
 
 	}
 
-	private void viewRawData(JDialog parent) {
+	private void viewRawData(final JDialog parent) {
 		String[] header = null;
 		if (graph instanceof BuildingEnergyGraph) {
 			header = new String[] { "Month", "Windows", "Solar Panels", "Heater", "AC", "Net" };
 		} else {
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof SolarPanel) {
 				header = new String[] { "Month", "Solar" };
 			} else if (selectedPart instanceof Window) {
@@ -255,13 +268,13 @@ public class SeasonalAnalysis {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Problem in finding data.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		int m = header.length;
-		int n = graph.getLength();
-		Object[][] column = new Object[n][m + 1];
+		final int m = header.length;
+		final int n = graph.getLength();
+		final Object[][] column = new Object[n][m + 1];
 		for (int i = 0; i < n; i++)
 			column[i][0] = (i + 1);
 		for (int j = 1; j < header.length; j++) {
-			List<Double> list = graph.getData(header[j]);
+			final List<Double> list = graph.getData(header[j]);
 			for (int i = 0; i < n; i++)
 				column[i][j] = list.get(i);
 		}

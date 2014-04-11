@@ -467,13 +467,13 @@ public class EnergyPanel extends JPanel {
 		solarPanelEfficiencyComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10", "20", "30", "40" }));
 		solarPanelEfficiencyComboBox.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				// validate the input
-				String s = (String) solarPanelEfficiencyComboBox.getSelectedItem();
+				final String s = (String) solarPanelEfficiencyComboBox.getSelectedItem();
 				double eff = 10;
 				try {
 					eff = Float.parseFloat(s);
-				} catch (NumberFormatException ex) {
+				} catch (final NumberFormatException ex) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be a number between 10-50.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -813,6 +813,9 @@ public class EnergyPanel extends JPanel {
 			System.out.println("EnergyPanel.computeNow()");
 			progressBar.setValue(0);
 			progressBar.setStringPainted(false);
+
+			computeEnergy();
+
 			if (updateRadiation != UpdateRadiation.NEVER) {
 				if (updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn))) {
 					alreadyRenderedHeatmap = true;
@@ -836,7 +839,6 @@ public class EnergyPanel extends JPanel {
 					SceneManager.getInstance().refresh();
 				}
 			}
-			computeEnergy();
 			updatePartEnergy();
 			for (final HousePart tree : Scene.getInstance().getParts())
 				if (tree instanceof Tree)
@@ -1008,7 +1010,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	/** Currently this applies only to the date spinner when it is set programmatically (not by the user) */
-	public void disableActions(boolean b) {
+	public void disableActions(final boolean b) {
 		disableActions = b;
 	}
 

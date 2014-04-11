@@ -309,7 +309,7 @@ public class SolarIrradiation {
 				for (final Spatial spatial : collidables)
 					PickingUtil.findPick(spatial, pickRay, pickResults, false);
 				if (pickResults.getNumber() == 0)
-					onLand[row][col] += dot / airMass;				
+					onLand[row][col] += dot / airMass;
 			}
 		}
 	}
