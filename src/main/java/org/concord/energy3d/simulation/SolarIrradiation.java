@@ -138,12 +138,6 @@ public class SolarIrradiation {
 	}
 
 	private void computeOnMesh(final int minute, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
-		/* needed in order to prevent picking collision with neighboring wall at wall edge */
-		final double OFFSET = 0.1;
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
-		final double zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
-		final double airMass = 1 / (Math.cos(zenithAngle) + 0.50572 * Math.pow(96.07995 - zenithAngle / Math.PI * 180.0, -1.6364));
-
 		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
 
@@ -215,9 +209,14 @@ public class SolarIrradiation {
 				}
 		}
 
+		/* needed in order to prevent picking collision with neighboring wall at wall edge */
+		final double OFFSET = 0.1;
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+		final double airMass = computeAirMass(directionTowardSun);
+		final double dot = normal.dot(directionTowardSun);
+
 		final ReadOnlyVector3 u = p2.subtract(origin, null).normalizeLocal();
 		final ReadOnlyVector3 v = p1.subtract(origin, null).normalizeLocal();
-		final double dot = normal.dot(directionTowardSun);
 		for (int col = 0; col < cols; col++) {
 			final ReadOnlyVector3 pU = u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(origin);
 			final double w = (col == cols - 1) ? p2.distance(pU) : solarStep;
@@ -266,6 +265,12 @@ public class SolarIrradiation {
 		}
 	}
 
+	public double computeAirMass(final ReadOnlyVector3 directionTowardSun) {
+		final double zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
+		final double airMass = 1 / (Math.cos(zenithAngle) + 0.50572 * Math.pow(96.07995 - zenithAngle / Math.PI * 180.0, -1.6364));
+		return airMass;
+	}
+
 	private void updateTextureCoords(final Mesh drawMesh, final ReadOnlyVector3 origin, final ReadOnlyVector3 uDir, final ReadOnlyVector3 vDir, final int rows, final int cols) {
 		final ReadOnlyVector3 o = origin;
 		final ReadOnlyVector3 u = uDir.multiply(roundToPowerOfTwo(cols) * getSolarStep(), null);
@@ -285,6 +290,8 @@ public class SolarIrradiation {
 	}
 
 	private void computeOnLand(final ReadOnlyVector3 directionTowardSun) {
+		final double dot = directionTowardSun.dot(Vector3.UNIT_Z);
+		final double airMass = computeAirMass(directionTowardSun);
 		final double step = this.solarStep * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
@@ -302,7 +309,7 @@ public class SolarIrradiation {
 				for (final Spatial spatial : collidables)
 					PickingUtil.findPick(spatial, pickRay, pickResults, false);
 				if (pickResults.getNumber() == 0)
-					onLand[row][col] += directionTowardSun.dot(Vector3.UNIT_Z);
+					onLand[row][col] += dot / airMass;				
 			}
 		}
 	}
