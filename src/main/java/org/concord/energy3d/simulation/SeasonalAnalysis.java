@@ -63,9 +63,11 @@ public class SeasonalAnalysis {
 	}
 
 	private void runAnalysis() {
+		EnergyPanel.getInstance().disableActions(true);
+		Heliodon.getInstance().getCalander().set(MONTH, JANUARY);
+		EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalander().getTime());
 		new Thread(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().disableActions(true);
 				for (int m : MONTHS) {
 					if (!analysisStopped) {
 						Heliodon.getInstance().getCalander().set(MONTH, m);
@@ -104,7 +106,7 @@ public class SeasonalAnalysis {
 			double heater = selectedBuilding.getHeatingToday();
 			double ac = selectedBuilding.getCoolingToday();
 			double net = selectedBuilding.getTotalEnergyToday();
-			// System.out.println(month + ", " + window + ", " + solarPanel + ", " + heater + ", " + ac + ", " + net);
+			// System.out.println(window + ", " + solarPanel + ", " + heater + ", " + ac + ", " + net);
 			graph.addData("Windows", window);
 			graph.addData("Solar Panels", solarPanel);
 			graph.addData("Heater", heater);

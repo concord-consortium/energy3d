@@ -90,7 +90,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem firstPersonMenuItem = null;
 	private JMenuItem resetCameraMenuItem = null;
 	private JMenuItem saveasMenuItem;
-	private JMenu sceneMenu;
+	private JMenu viewMenu;
 	private JMenu simulationMenu;
 	private JMenu unitsMenu;
 	private JRadioButtonMenuItem metersMenuItem;
@@ -848,9 +848,9 @@ public class MainFrame extends JFrame {
 	}
 
 	private JMenu getSceneMenu() {
-		if (sceneMenu == null) {
-			sceneMenu = new JMenu("Scene");
-			sceneMenu.addMenuListener(new MenuListener() {
+		if (viewMenu == null) {
+			viewMenu = new JMenu("View");
+			viewMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 				}
@@ -866,7 +866,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
-			sceneMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+			viewMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
 				@Override
 				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 					axesMenuItem.setSelected(SceneManager.getInstance().areAxesShown());
@@ -881,34 +881,22 @@ public class MainFrame extends JFrame {
 				public void popupMenuCanceled(PopupMenuEvent e) {
 				}
 			});
-			sceneMenu.add(getNoTextureMenuItem());
-			sceneMenu.add(getSimpleTextureMenuItem());
-			sceneMenu.add(getFullTextureMenuItem());
-			sceneMenu.add(getColorMenu());
-			sceneMenu.addSeparator();
-			sceneMenu.add(getUnitsMenu());
-			sceneMenu.add(getRescaleMenuItem());
-			sceneMenu.addSeparator();
-			sceneMenu.add(getRoofOverhangLengthMenuItem());
-			sceneMenu.addSeparator();
-			sceneMenu.add(getGridsMenuItem());
-			sceneMenu.add(getSnapMenuItem());
-			sceneMenu.addSeparator();
-			sceneMenu.add(getAxesMenuItem());
-			sceneMenu.add(getShadeMenuItem());
-			sceneMenu.add(getShadowMenuItem());
-			sceneMenu.add(getBuildingLabelsMenuItem());
-			sceneMenu.addSeparator();
-			sceneMenu.add(getAnnotationsInwardMenuItem());
-			sceneMenu.add(getWallThicknessMenuItem());
-			sceneMenu.add(getRemoveAllRoofsMenuItem());
-			if (!Config.isRestrictMode()) {
-				sceneMenu.add(getFreezeMenuItem());
-				sceneMenu.add(getUnfreezeMenuItem());
-			}
+			viewMenu.add(getUnitsMenu());
+			viewMenu.addSeparator();
+			viewMenu.add(getNoTextureMenuItem());
+			viewMenu.add(getSimpleTextureMenuItem());
+			viewMenu.add(getFullTextureMenuItem());
+			viewMenu.add(getColorMenu());
+			viewMenu.addSeparator();
+			viewMenu.add(getAxesMenuItem());
+			viewMenu.add(getShadeMenuItem());
+			viewMenu.add(getShadowMenuItem());
+			viewMenu.add(getBuildingLabelsMenuItem());
+			viewMenu.add(getAnnotationsInwardMenuItem());
+			viewMenu.add(getWallThicknessMenuItem());
 
 		}
-		return sceneMenu;
+		return viewMenu;
 	}
 
 	private JMenu getUnitsMenu() {
@@ -1117,6 +1105,19 @@ public class MainFrame extends JFrame {
 			});
 			editMenu.add(getUndoMenuItem());
 			editMenu.add(getRedoMenuItem());
+			editMenu.addSeparator();
+			editMenu.add(getRescaleMenuItem());
+			editMenu.addSeparator();
+			editMenu.add(getGridsMenuItem());
+			editMenu.add(getSnapMenuItem());
+			editMenu.addSeparator();
+			editMenu.add(getRoofOverhangLengthMenuItem());
+			editMenu.add(getRemoveAllRoofsMenuItem());
+			editMenu.addSeparator();
+			if (!Config.isRestrictMode()) {
+				editMenu.add(getFreezeMenuItem());
+				editMenu.add(getUnfreezeMenuItem());
+			}
 			editMenu.addSeparator();
 			editMenu.add(getNoteCheckBoxMenuItem());
 		}
@@ -1685,6 +1686,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {
 		if (noteCheckBoxMenuItem == null) {
 			noteCheckBoxMenuItem = new JCheckBoxMenuItem("Show Note");
+			noteCheckBoxMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
 			noteCheckBoxMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

@@ -459,7 +459,7 @@ public class EnergyPanel extends JPanel {
 		otherParametersPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Other Parameters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		dataPanel.add(otherParametersPanel);
 
-		final JLabel solarPanelEfficiencyLabel = new JLabel("Solar Panel Efficiency (%): ");
+		final JLabel solarPanelEfficiencyLabel = new JLabel("Solar Panel Efficiency: ");
 		otherParametersPanel.add(solarPanelEfficiencyLabel);
 
 		solarPanelEfficiencyComboBox = new WideComboBox();
@@ -485,6 +485,7 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		otherParametersPanel.add(solarPanelEfficiencyComboBox);
+		otherParametersPanel.add(new JLabel("%"));
 
 		heatMapPanel = new JPanel(new BorderLayout());
 		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -858,7 +859,6 @@ public class EnergyPanel extends JPanel {
 	private void computeEnergy() {
 		if (autoCheckBox.isSelected())
 			updateOutsideTemperature();
-
 		HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone(), (Integer) insideTemperatureSpinner.getValue());
 	}
 
