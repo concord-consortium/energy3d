@@ -91,7 +91,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem resetCameraMenuItem = null;
 	private JMenuItem saveasMenuItem;
 	private JMenu viewMenu;
-	private JMenu simulationMenu;
+	private JMenu analysisMenu;
 	private JMenu unitsMenu;
 	private JRadioButtonMenuItem metersMenuItem;
 	private JRadioButtonMenuItem centimetersMenuItem;
@@ -325,8 +325,8 @@ public class MainFrame extends JFrame {
 			appMenuBar = new JMenuBar();
 			appMenuBar.add(getFileMenu());
 			appMenuBar.add(getEditMenu());
-			appMenuBar.add(getSceneMenu());
-			appMenuBar.add(getSimulationMenu());
+			appMenuBar.add(getViewMenu());
+			appMenuBar.add(getAnalysisMenu());
 			appMenuBar.add(getCameraMenu());
 			appMenuBar.add(getHelpMenu());
 		}
@@ -817,10 +817,10 @@ public class MainFrame extends JFrame {
 		return saveasMenuItem;
 	}
 
-	private JMenu getSimulationMenu() {
-		if (simulationMenu == null) {
-			simulationMenu = new JMenu("Simulation");
-			simulationMenu.addMenuListener(new MenuListener() {
+	private JMenu getAnalysisMenu() {
+		if (analysisMenu == null) {
+			analysisMenu = new JMenu("Analysis");
+			analysisMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 				}
@@ -836,18 +836,18 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
-			simulationMenu.add(getSeasonalAnalysisMenuItem());
-			simulationMenu.add(getDailyAnalysisMenuItem());
-			simulationMenu.addSeparator();
-			simulationMenu.add(getSimulationSettingsMenuItem());
+			analysisMenu.add(getSeasonalAnalysisMenuItem());
+			analysisMenu.add(getDailyAnalysisMenuItem());
 			if (!Config.isRestrictMode()) {
-				simulationMenu.add(getKeepHeatmapOnMenuItem());
+				analysisMenu.addSeparator();
+				analysisMenu.add(getSimulationSettingsMenuItem());
+				analysisMenu.add(getKeepHeatmapOnMenuItem());
 			}
 		}
-		return simulationMenu;
+		return analysisMenu;
 	}
 
-	private JMenu getSceneMenu() {
+	private JMenu getViewMenu() {
 		if (viewMenu == null) {
 			viewMenu = new JMenu("View");
 			viewMenu.addMenuListener(new MenuListener() {
