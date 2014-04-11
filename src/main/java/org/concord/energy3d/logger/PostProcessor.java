@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -26,7 +25,7 @@ import com.ardor3d.util.GameTaskQueue;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public class PostProcessor {
 
@@ -94,7 +93,7 @@ public class PostProcessor {
 							Scene.openNow(files[i].toURI().toURL());
 							Scene.initSceneNow();
 							Scene.initEnergy();
-							EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
+							EnergyPanel.getInstance().computeNow();
 							SceneManager.getInstance().refresh();
 							update.run();
 							sleep(SLEEP);

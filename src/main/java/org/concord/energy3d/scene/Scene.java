@@ -753,7 +753,7 @@ public class Scene implements Serializable {
 		return solarPanelEfficiency * 0.01;
 	}
 
-	public void setSolarPanelEfficiency(double solarPanelEfficiency) {
+	public void setSolarPanelEfficiency(final double solarPanelEfficiency) {
 		this.solarPanelEfficiency = solarPanelEfficiency;
 	}
 
@@ -761,7 +761,7 @@ public class Scene implements Serializable {
 		return windowSolarHeatingRate;
 	}
 
-	public void setWindowSolarHeatingRate(double windowSolarHeatingRate) {
+	public void setWindowSolarHeatingRate(final double windowSolarHeatingRate) {
 		this.windowSolarHeatingRate = windowSolarHeatingRate;
 	}
 

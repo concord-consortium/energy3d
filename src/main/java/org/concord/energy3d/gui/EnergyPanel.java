@@ -788,7 +788,25 @@ public class EnergyPanel extends JPanel {
 						computeRequest = false;
 						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
 						try {
-							computeNow(EnergyPanel.this.updateRadiation);
+							if (EnergyPanel.this.updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn))) {
+								alreadyRenderedHeatmap = true;
+								computeNow();
+							} else {
+								if (SceneManager.getInstance().isSolarColorMap())
+								MainPanel.getInstance().getSolarButton().setSelected(false);
+
+								int numberOfHouses = 0;
+								for (final HousePart part : Scene.getInstance().getParts()) {
+									if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
+										numberOfHouses++;
+									if (numberOfHouses >= 2)
+										break;
+								}
+								for (final HousePart part : Scene.getInstance().getParts())
+									if (part instanceof Foundation)
+										((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
+//								SceneManager.getInstance().refresh();
+							}
 						} catch (final Throwable e) {
 							e.printStackTrace();
 							Util.reportError(e);
@@ -808,49 +826,48 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	public void computeNow(final UpdateRadiation updateRadiation) {
+	public void computeNow() {
 		try {
 			System.out.println("EnergyPanel.computeNow()");
 			progressBar.setValue(0);
 			progressBar.setStringPainted(false);
 
-			computeEnergy();
+			if (autoCheckBox.isSelected())
+				updateOutsideTemperature();
+			HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone(), (Integer) insideTemperatureSpinner.getValue());
 
-			if (updateRadiation != UpdateRadiation.NEVER) {
-				if (updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn))) {
-					alreadyRenderedHeatmap = true;
+//			if (updateRadiation != UpdateRadiation.NEVER) {
+//				if (updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn))) {
+//					alreadyRenderedHeatmap = true;
 					SolarIrradiation.getInstance().compute();
 					notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Solar energy calculation completed", 0, 1));
-					progressBar.setValue(0);
-					progressBar.setStringPainted(false);
-				} else {
-					if (SceneManager.getInstance().isSolarColorMap())
-						MainPanel.getInstance().getSolarButton().setSelected(false);
-					int numberOfHouses = 0;
-					for (final HousePart part : Scene.getInstance().getParts()) {
-						if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
-							numberOfHouses++;
-						if (numberOfHouses >= 2)
-							break;
-					}
-					for (final HousePart part : Scene.getInstance().getParts())
-						if (part instanceof Foundation)
-							((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
-					SceneManager.getInstance().refresh();
-				}
-			}
+//				} else {
+//					if (SceneManager.getInstance().isSolarColorMap())
+//						MainPanel.getInstance().getSolarButton().setSelected(false);
+//					int numberOfHouses = 0;
+//					for (final HousePart part : Scene.getInstance().getParts()) {
+//						if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
+//							numberOfHouses++;
+//						if (numberOfHouses >= 2)
+//							break;
+//					}
+//					for (final HousePart part : Scene.getInstance().getParts())
+//						if (part instanceof Foundation)
+//							((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
+//					SceneManager.getInstance().refresh();
+//				}
+//			}
 			updatePartEnergy();
-			for (final HousePart tree : Scene.getInstance().getParts())
-				if (tree instanceof Tree)
-					tree.updateTextureAndColor();
-			SceneManager.getInstance().refresh();
+
+			progressBar.setValue(100);
+//			for (final HousePart tree : Scene.getInstance().getParts())
+//				if (tree instanceof Tree)
+//					tree.updateTextureAndColor();
+//			SceneManager.getInstance().refresh();
 		} catch (final CancellationException e) {
 			System.out.println("Energy compute cancelled.");
 		}
 
-		// catch (final RuntimeException e) {
-		// e.printStackTrace();
-		// }
 	}
 
 	// TODO: There should be a better way to do this.
@@ -858,21 +875,11 @@ public class EnergyPanel extends JPanel {
 		compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 
-	private void computeEnergy() {
-		if (autoCheckBox.isSelected())
-			updateOutsideTemperature();
-		HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone(), (Integer) insideTemperatureSpinner.getValue());
-	}
-
 	private void updateOutsideTemperature() {
 		if (cityComboBox.getSelectedItem().equals(""))
 			outsideTemperatureSpinner.setValue(15);
-		else {
-			// final double[] temperature = CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander(), (String) cityComboBox.getSelectedItem());
-			// final double avgTemperature = (temperature[0] + temperature[1]) / 2.0;
-			// outsideTemperatureSpinner.setValue((int) Math.round(avgTemperature));
+		else
 			outsideTemperatureSpinner.setValue(Math.round(CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander())));
-		}
 	}
 
 	public JSpinner getDateSpinner() {

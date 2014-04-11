@@ -37,7 +37,6 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
@@ -85,7 +84,7 @@ public class SeasonalAnalysis {
 					if (!analysisStopped) {
 						Heliodon.getInstance().getCalander().set(MONTH, m);
 						try {
-							EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
+							EnergyPanel.getInstance().computeNow();
 						} catch (final Exception e) {
 							e.printStackTrace();
 						}
