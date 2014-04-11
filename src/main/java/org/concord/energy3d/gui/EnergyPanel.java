@@ -795,7 +795,7 @@ public class EnergyPanel extends JPanel {
 								computeNow();
 							} else {
 								if (SceneManager.getInstance().isSolarColorMap())
-								MainPanel.getInstance().getSolarButton().setSelected(false);
+									MainPanel.getInstance().getSolarButton().setSelected(false);
 
 								int numberOfHouses = 0;
 								for (final HousePart part : Scene.getInstance().getParts()) {
@@ -807,7 +807,7 @@ public class EnergyPanel extends JPanel {
 								for (final HousePart part : Scene.getInstance().getParts())
 									if (part instanceof Foundation)
 										((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
-//								SceneManager.getInstance().refresh();
+								// SceneManager.getInstance().refresh();
 							}
 						} catch (final Throwable e) {
 							e.printStackTrace();
@@ -838,34 +838,34 @@ public class EnergyPanel extends JPanel {
 				updateOutsideTemperature();
 			HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone(), (Integer) insideTemperatureSpinner.getValue());
 
-//			if (updateRadiation != UpdateRadiation.NEVER) {
-//				if (updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn))) {
-//					alreadyRenderedHeatmap = true;
-					SolarIrradiation.getInstance().compute();
-					notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Solar energy calculation completed", 0, 1));
-//				} else {
-//					if (SceneManager.getInstance().isSolarColorMap())
-//						MainPanel.getInstance().getSolarButton().setSelected(false);
-//					int numberOfHouses = 0;
-//					for (final HousePart part : Scene.getInstance().getParts()) {
-//						if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
-//							numberOfHouses++;
-//						if (numberOfHouses >= 2)
-//							break;
-//					}
-//					for (final HousePart part : Scene.getInstance().getParts())
-//						if (part instanceof Foundation)
-//							((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
-//					SceneManager.getInstance().refresh();
-//				}
-//			}
+			// if (updateRadiation != UpdateRadiation.NEVER) {
+			// if (updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn))) {
+			// alreadyRenderedHeatmap = true;
+			SolarIrradiation.getInstance().compute();
+			notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Solar energy calculation completed", 0, 1));
+			// } else {
+			// if (SceneManager.getInstance().isSolarColorMap())
+			// MainPanel.getInstance().getSolarButton().setSelected(false);
+			// int numberOfHouses = 0;
+			// for (final HousePart part : Scene.getInstance().getParts()) {
+			// if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
+			// numberOfHouses++;
+			// if (numberOfHouses >= 2)
+			// break;
+			// }
+			// for (final HousePart part : Scene.getInstance().getParts())
+			// if (part instanceof Foundation)
+			// ((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
+			// SceneManager.getInstance().refresh();
+			// }
+			// }
 			updatePartEnergy();
 
 			progressBar.setValue(100);
-//			for (final HousePart tree : Scene.getInstance().getParts())
-//				if (tree instanceof Tree)
-//					tree.updateTextureAndColor();
-//			SceneManager.getInstance().refresh();
+			// for (final HousePart tree : Scene.getInstance().getParts())
+			// if (tree instanceof Tree)
+			// tree.updateTextureAndColor();
+			// SceneManager.getInstance().refresh();
 		} catch (final CancellationException e) {
 			System.out.println("Energy compute cancelled.");
 		}
@@ -893,8 +893,13 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void progress() {
-		progressBar.setStringPainted(progressBar.getValue() > 0);
-		progressBar.setValue(progressBar.getValue() + 1);
+		if (progressBar.getValue() < 100) {
+			progressBar.setStringPainted(progressBar.getValue() > 0);
+			progressBar.setValue(progressBar.getValue() + 1);
+		} else {
+			progressBar.setStringPainted(false);
+			progressBar.setValue(0);
+		}
 	}
 
 	public void setLatitude(final int latitude) {

@@ -53,11 +53,11 @@ import org.concord.energy3d.util.Util;
 
 /**
  * This calculates and visualizes the seasonal trend and the yearly sum of all energy items for any selected part or building.
- *
+ * 
  * For fast feedback, the sum is based on adding the energy items computed for the currently selected day of each month and then that number can be multiplied by 365/12.
- *
+ * 
  * @author Charles Xie
- *
+ * 
  */
 
 public class SeasonalAnalysis {
@@ -76,7 +76,7 @@ public class SeasonalAnalysis {
 
 	private void runAnalysis() {
 		EnergyPanel.getInstance().disableActions(true);
-		Heliodon.getInstance().getCalander().set(MONTH, JANUARY);
+		// Heliodon.getInstance().getCalander().set(MONTH, JANUARY);
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -98,6 +98,7 @@ public class SeasonalAnalysis {
 					}
 				}
 				EnergyPanel.getInstance().disableActions(false);
+				EnergyPanel.getInstance().progress();
 			}
 		}, "Seasonal Analysis").start();
 	}
