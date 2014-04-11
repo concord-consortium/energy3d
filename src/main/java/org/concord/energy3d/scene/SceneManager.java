@@ -451,7 +451,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				compass.setTranslation(-1, -0.7, 2);
 				cameraNode.attachChild(compass);
 				Scene.getInstance().updateEditShapes();
-				Tree.loadModel();
 				return null;
 			}
 		});

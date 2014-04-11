@@ -186,8 +186,10 @@ public class EnergyPanel extends JPanel {
 				final Heliodon heliodon = Heliodon.getInstance();
 				if (heliodon != null)
 					heliodon.setDate((Date) dateSpinner.getValue());
+				System.out.println(dateSpinner.getValue());
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);
+				Scene.getInstance().redrawAllNow();
 			}
 		});
 		final GridBagConstraints gbc_dateSpinner = new GridBagConstraints();

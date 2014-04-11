@@ -248,6 +248,7 @@ public class Scene implements Serializable {
 		if (instance.calendar != null) {
 			energyPanel.getDateSpinner().setValue(instance.calendar.getTime());
 			energyPanel.getTimeSpinner().setValue(instance.calendar.getTime());
+			Heliodon.getInstance().setDate(instance.calendar.getTime());
 			energyPanel.setLatitude(instance.latitude);
 			energyPanel.getCityComboBox().setSelectedItem(instance.city);
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);

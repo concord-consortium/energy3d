@@ -1,9 +1,6 @@
 package org.concord.energy3d.model;
 
-import java.io.IOException;
 import java.util.Calendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -12,10 +9,6 @@ import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
-import com.ardor3d.extension.model.collada.jdom.ColladaAnimUtils;
-import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
-import com.ardor3d.extension.model.collada.jdom.ColladaMaterialUtils;
-import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -29,8 +22,6 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.ResourceSource;
 
 public class Tree extends HousePart {
 	private static final long serialVersionUID = 1L;
@@ -43,31 +34,6 @@ public class Tree extends HousePart {
 	private transient Node collisionRoot;
 	private transient Sphere sphere;
 	private final int treeType;
-
-	public static void loadModel() {
-		new Thread() {
-			@Override
-			public void run() {
-				System.out.print("Loading tree model...");
-				Thread.yield();
-				if (isBillboard) {
-				} else {
-					final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "tree3.dae");
-					final ColladaImporter colladaImporter = new ColladaImporter();
-					Logger.getLogger(ColladaAnimUtils.class.getName()).setLevel(Level.SEVERE);
-					Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
-					ColladaStorage storage;
-					try {
-						storage = colladaImporter.load(source);
-						treeModel = storage.getScene();
-					} catch (final IOException e) {
-						e.printStackTrace();
-					}
-				}
-				System.out.println("done");
-			}
-		}.start();
-	}
 
 	public Tree(final int treeType) {
 		super(1, 1, 1);

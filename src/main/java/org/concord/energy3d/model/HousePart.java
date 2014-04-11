@@ -1,19 +1,12 @@
 package org.concord.energy3d.model;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.awt.image.FilteredImageSource;
-import java.awt.image.ImageFilter;
-import java.awt.image.ImageProducer;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.GrayFilter;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -636,7 +629,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
-
+		
 		if (SceneManager.getInstance().isSolarColorMap()) {
 			if (textureCleared.get(mesh) == Boolean.TRUE)
 				return;
