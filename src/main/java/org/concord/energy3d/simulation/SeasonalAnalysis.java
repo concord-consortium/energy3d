@@ -76,7 +76,6 @@ public class SeasonalAnalysis {
 
 	private void runAnalysis() {
 		EnergyPanel.getInstance().disableActions(true);
-		// Heliodon.getInstance().getCalander().set(MONTH, JANUARY);
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -89,7 +88,6 @@ public class SeasonalAnalysis {
 							e.printStackTrace();
 						}
 						updateGraph();
-						Scene.getInstance().redrawAllNow();
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {

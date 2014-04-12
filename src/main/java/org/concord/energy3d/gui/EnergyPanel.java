@@ -188,7 +188,7 @@ public class EnergyPanel extends JPanel {
 					heliodon.setDate((Date) dateSpinner.getValue());
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);
-				Scene.getInstance().redrawAllNow();
+				Scene.getInstance().redrawAllNow(); // XIE: 4/11: This needs to be called for trees to have the right seasonal texture
 			}
 		});
 		final GridBagConstraints gbc_dateSpinner = new GridBagConstraints();
@@ -860,11 +860,14 @@ public class EnergyPanel extends JPanel {
 			// }
 			updatePartEnergy();
 
+			// XIE: This needs to be called for trees to change texture when the month changes
+			for (final HousePart p : Scene.getInstance().getParts())
+				if (p instanceof Tree)
+					p.updateTextureAndColor();
+			//SceneManager.getInstance().refresh();
+
 			progressBar.setValue(100);
-			// for (final HousePart tree : Scene.getInstance().getParts())
-			// if (tree instanceof Tree)
-			// tree.updateTextureAndColor();
-			// SceneManager.getInstance().refresh();
+
 		} catch (final CancellationException e) {
 			System.out.println("Energy compute cancelled.");
 		}
