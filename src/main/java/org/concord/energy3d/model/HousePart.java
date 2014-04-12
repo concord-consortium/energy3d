@@ -639,7 +639,7 @@ public abstract class HousePart implements Serializable {
 
 		if (this instanceof Tree) { // special treatment
 			final TextureState ts = new TextureState();
-			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, isFrozen());
+			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
 		} else {
@@ -651,7 +651,7 @@ public abstract class HousePart implements Serializable {
 				mesh.setDefaultColor(defaultColor);
 			} else {
 				final TextureState ts = new TextureState();
-				final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, false);
+				final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor);
 				ts.setTexture(texture);
 				mesh.setRenderState(ts);
 			}
@@ -659,13 +659,13 @@ public abstract class HousePart implements Serializable {
 
 	}
 
-	private Texture getTexture(final String filename, final boolean isTransparent, final ReadOnlyColorRGBA defaultColor, boolean disabled) {
+	private Texture getTexture(final String filename, final boolean isTransparent, final ReadOnlyColorRGBA defaultColor) {
 		final Texture texture = TextureManager.load(filename, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
-		if (isTransparent || disabled) {
+		if (isTransparent) {
 			final Color color = new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue());
 			final Image image = texture.getImage();
 			final ByteBuffer data = image.getData(0);
-			byte alpha, red, green, blue, gray;
+			byte alpha; // red, green, blue, gray;
 			int i;
 			for (int y = 0; y < image.getHeight(); y++) {
 				for (int x = 0; x < image.getWidth(); x++) {
@@ -676,16 +676,16 @@ public abstract class HousePart implements Serializable {
 						data.put(i + 1, (byte) color.getGreen());
 						data.put(i + 2, (byte) color.getBlue());
 					}
-					if (disabled) {
-						red = data.get(i);
-						green = data.get(i + 1);
-						blue = data.get(i + 2);
-						gray = (byte) Math.min(red, green);
-						gray = (byte) Math.min(blue, gray);
-						data.put(i, gray);
-						data.put(i + 1, gray);
-						data.put(i + 2, gray);
-					}
+					// if (disabled) {
+					// red = data.get(i);
+					// green = data.get(i + 1);
+					// blue = data.get(i + 2);
+					// gray = (byte) Math.min(red, green);
+					// gray = (byte) Math.min(blue, gray);
+					// data.put(i, gray);
+					// data.put(i + 1, gray);
+					// data.put(i + 2, gray);
+					// }
 				}
 			}
 			texture.setImage(image);

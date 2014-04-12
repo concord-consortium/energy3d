@@ -42,7 +42,7 @@ class DataViewer {
 				ActionEvent ae = new ActionEvent(table, ActionEvent.ACTION_PERFORMED, "copy");
 				if (ae != null) {
 					table.getActionMap().get(ae.getActionCommand()).actionPerformed(ae);
-					JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent(parent), "The data is now ready for pasting.", "Copy Data", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(parent, "The data is now ready for pasting.", "Copy Data", JOptionPane.INFORMATION_MESSAGE);
 					table.clearSelection();
 				}
 			}

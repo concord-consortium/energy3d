@@ -142,16 +142,17 @@ public class Tree extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		if (treeType == SHORT) {
-			if (isShedded())
-				return "tree_shedded.png";
+		switch (treeType) {
+		case TALL:
+			if (isFrozen())
+				return isShedded() ? "tree_tall_shedded_gray.png" : "tree_tall_gray.png";
 			else
-				return "tree.png";
-		} else {
-			if (isShedded())
-				return "tree_tall_shedded.png";
+				return isShedded() ? "tree_tall_shedded.png" : "tree_tall.png";
+		default:
+			if (isFrozen())
+				return isShedded() ? "tree_shedded_gray.png" : "tree_gray.png";
 			else
-				return "tree_tall.png";
+				return isShedded() ? "tree_shedded.png" : "tree.png";
 		}
 	}
 
