@@ -89,6 +89,7 @@ public class SeasonalAnalysis {
 							e.printStackTrace();
 						}
 						updateGraph();
+						Scene.getInstance().redrawAllNow();
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
