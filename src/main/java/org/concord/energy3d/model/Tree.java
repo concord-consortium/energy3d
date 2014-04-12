@@ -27,9 +27,6 @@ public class Tree extends HousePart {
 	private static final long serialVersionUID = 1L;
 	public static final int SHORT = 0;
 	public static final int TALL = 1;
-	private static Spatial treeModel;
-	private static boolean isBillboard = true;
-	private transient Spatial model;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
 	private transient Sphere sphere;
@@ -46,62 +43,59 @@ public class Tree extends HousePart {
 		super.init();
 		relativeToHorizontal = true;
 
-		if (!isBillboard) {
-			model = treeModel.makeCopy(true);
-			root.attachChild(model);
+		final double height = treeType == SHORT ? 30 : 60;
+		mesh = new Quad("Tree Quad", 30, height);
+		mesh.setModelBound(new BoundingBox());
+		mesh.updateModelBound();
+		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
+		mesh.setTranslation(0, 0, height / 2.0);
+
+		final BlendState bs = new BlendState();
+		bs.setEnabled(true);
+		bs.setBlendEnabled(false);
+		bs.setTestEnabled(true);
+		bs.setTestFunction(TestFunction.GreaterThan);
+		bs.setReference(0.7f);
+		mesh.setRenderState(bs);
+		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+
+		billboard = new BillboardNode("Billboard");
+		billboard.setAlignment(BillboardAlignment.AxialZ);
+		billboard.attachChild(mesh);
+		root.attachChild(billboard);
+
+		sphere = new Sphere("Tree Sphere", 10, 10, 14);
+		sphere.setModelBound(new BoundingSphere());
+		sphere.updateModelBound();
+		final Cylinder cylinder = new Cylinder("Tree Cylinder", 10, 10, 1, 20);
+		cylinder.setModelBound(new BoundingBox());
+		cylinder.updateModelBound();
+
+		if (treeType == SHORT) {
+			sphere.setScale(1, 1, 0.7);
+			sphere.setTranslation(0, 0, 19);
+			cylinder.setTranslation(0, 0, 10);
 		} else {
-			final double height = treeType == SHORT ? 30 : 60;
-			mesh = new Quad("Tree Quad", 30, height);
-			mesh.setModelBound(new BoundingBox());
-			mesh.updateModelBound();
-			mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-			mesh.setTranslation(0, 0, height / 2.0);
-
-			final BlendState bs = new BlendState();
-			bs.setEnabled(true);
-			bs.setBlendEnabled(false);
-			bs.setTestEnabled(true);
-			bs.setTestFunction(TestFunction.GreaterThan);
-			bs.setReference(0.7f);
-			mesh.setRenderState(bs);
-			mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-
-			billboard = new BillboardNode("Billboard");
-			billboard.setAlignment(BillboardAlignment.AxialZ);
-			billboard.attachChild(mesh);
-			root.attachChild(billboard);
-
-			sphere = new Sphere("Tree Sphere", 10, 10, 14);
-			sphere.setModelBound(new BoundingSphere());
-			sphere.updateModelBound();
-			final Cylinder cylinder = new Cylinder("Tree Cylinder", 10, 10, 1, 20);
-			cylinder.setModelBound(new BoundingBox());
-			cylinder.updateModelBound();
-
-			if (treeType == SHORT) {
-				sphere.setScale(1, 1, 0.7);
-				sphere.setTranslation(0, 0, 19);
-				cylinder.setTranslation(0, 0, 10);
-			} else {
-				sphere.setScale(1, 1, 1.8);
-				sphere.setTranslation(0, 0, 33);
-				cylinder.setScale(1, 1, 2);
-				cylinder.setTranslation(0, 0, 20);
-			}
-
-			collisionRoot = new Node("Tree Collision Root");
-			collisionRoot.attachChild(sphere);
-			collisionRoot.attachChild(cylinder);
-			if (points.size() > 0)
-				collisionRoot.setTranslation(getAbsPoint(0));
-			collisionRoot.updateWorldBound(true);
-			collisionRoot.getSceneHints().setCullHint(CullHint.Always);
-			root.attachChild(collisionRoot);
-
-			sphere.setUserData(new UserData(this));
-			cylinder.setUserData(new UserData(this, 0, true));
+			sphere.setScale(1, 1, 1.8);
+			sphere.setTranslation(0, 0, 33);
+			cylinder.setScale(1, 1, 2);
+			cylinder.setTranslation(0, 0, 20);
 		}
+
+		collisionRoot = new Node("Tree Collision Root");
+		collisionRoot.attachChild(sphere);
+		collisionRoot.attachChild(cylinder);
+		if (points.size() > 0)
+			collisionRoot.setTranslation(getAbsPoint(0));
+		collisionRoot.updateWorldBound(true);
+		collisionRoot.getSceneHints().setCullHint(CullHint.Always);
+		root.attachChild(collisionRoot);
+
+		sphere.setUserData(new UserData(this));
+		cylinder.setUserData(new UserData(this, 0, true));
+
 		updateTextureAndColor();
+
 	}
 
 	@Override
@@ -139,14 +133,11 @@ public class Tree extends HousePart {
 
 	@Override
 	protected void drawMesh() {
-		if (isBillboard) {
-			billboard.setTranslation(getAbsPoint(0));
-			collisionRoot.setTranslation(getAbsPoint(0));
-			final double scale = 1 / (Scene.getInstance().getAnnotationScale() / 0.2);
-			billboard.setScale(scale);
-			collisionRoot.setScale(scale);
-		} else
-			model.setTranslation(getAbsPoint(0));
+		billboard.setTranslation(getAbsPoint(0));
+		collisionRoot.setTranslation(getAbsPoint(0));
+		final double scale = 1 / (Scene.getInstance().getAnnotationScale() / 0.2);
+		billboard.setScale(scale);
+		collisionRoot.setScale(scale);
 	}
 
 	@Override
@@ -171,8 +162,7 @@ public class Tree extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		if (isBillboard)
-			updateTextureAndColor(mesh, Scene.getInstance().getWallColor(), TextureMode.Full);
+		updateTextureAndColor(mesh, Scene.getInstance().getWallColor(), TextureMode.Full);
 	}
 
 	@Override

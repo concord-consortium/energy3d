@@ -629,7 +629,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
-		
+
 		if (SceneManager.getInstance().isSolarColorMap()) {
 			if (textureCleared.get(mesh) == Boolean.TRUE)
 				return;
@@ -659,16 +659,17 @@ public abstract class HousePart implements Serializable {
 
 	}
 
-	private Texture getTexture(final String filename, final boolean isTrasparent, final ReadOnlyColorRGBA defaultColor, boolean disabled) {
+	private Texture getTexture(final String filename, final boolean isTransparent, final ReadOnlyColorRGBA defaultColor, boolean disabled) {
 		final Texture texture = TextureManager.load(filename, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
-		if (isTrasparent || disabled) {
+		if (isTransparent || disabled) {
 			final Color color = new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue());
 			final Image image = texture.getImage();
 			final ByteBuffer data = image.getData(0);
 			byte alpha, red, green, blue, gray;
+			int i;
 			for (int y = 0; y < image.getHeight(); y++) {
 				for (int x = 0; x < image.getWidth(); x++) {
-					final int i = (y * image.getWidth() + x) * 4;
+					i = (y * image.getWidth() + x) * 4;
 					alpha = data.get(i + 3);
 					if (alpha == 0) { // when it is transparent, I want to put the default color of the part
 						data.put(i, (byte) color.getRed());
