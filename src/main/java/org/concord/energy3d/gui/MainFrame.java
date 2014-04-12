@@ -28,6 +28,7 @@ import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
@@ -137,8 +138,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem roofColorMenuItem;
 	private JMenuItem importColladaMenuItem;
 	private JMenuItem saveAsImageMenuItem;
-	private JMenuItem lockMenuItem;
-	private JMenuItem unlockMenuItem;
+	private JMenuItem lockAllMenuItem;
+	private JMenuItem unlockAllMenuItem;
+	private JMenuItem lockSelectionMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
 	private final JFileChooser fileChooser;
@@ -774,9 +776,19 @@ public class MainFrame extends JFrame {
 		if (aboutDialog == null) {
 			aboutDialog = new JDialog(this);
 			aboutDialog.setTitle("About");
-			final JPanel p = new JPanel(new BorderLayout());
+			final JPanel p = new JPanel(new BorderLayout(10, 10));
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + Config.VERSION + "<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grants #0918449 and #1348530.</html>"), BorderLayout.CENTER);
+			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + Config.VERSION + "<hr><h3>Credit:</h3>This program is brought to you by two scientists at the Concord Consortium:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grants #0918449 and #1348530.</html>"), BorderLayout.CENTER);
+			JButton button = new JButton("Close");
+			button.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					aboutDialog.dispose();
+				}
+			});
+			JPanel p2 = new JPanel();
+			p2.add(button);
+			p.add(p2, BorderLayout.SOUTH);
 			aboutDialog.setContentPane(p);
 			aboutDialog.pack();
 		}
@@ -1103,6 +1115,20 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
+			editMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+				@Override
+				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+					lockSelectionMenuItem.setEnabled(SceneManager.getInstance().getSelectedPart() != null);
+				}
+
+				@Override
+				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				}
+
+				@Override
+				public void popupMenuCanceled(PopupMenuEvent e) {
+				}
+			});
 			editMenu.add(getUndoMenuItem());
 			editMenu.add(getRedoMenuItem());
 			editMenu.addSeparator();
@@ -1115,8 +1141,9 @@ public class MainFrame extends JFrame {
 			editMenu.add(getRemoveAllRoofsMenuItem());
 			editMenu.addSeparator();
 			if (!Config.isRestrictMode()) {
-				editMenu.add(getLockMenuItem());
-				editMenu.add(getUnlockMenuItem());
+				editMenu.add(getLockSelectionMenuItem());
+				editMenu.add(getLockAllMenuItem());
+				editMenu.add(getUnlockAllMenuItem());
 			}
 			editMenu.addSeparator();
 			editMenu.add(getNoteCheckBoxMenuItem());
@@ -1657,30 +1684,43 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private JMenuItem getLockMenuItem() {
-		if (lockMenuItem == null) {
-			lockMenuItem = new JMenuItem("Lock");
-			lockMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getLockAllMenuItem() {
+		if (lockAllMenuItem == null) {
+			lockAllMenuItem = new JMenuItem("Lock All");
+			lockAllMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setFreeze(true);
+					Scene.getInstance().lockAll(true);
 				}
 			});
 		}
-		return lockMenuItem;
+		return lockAllMenuItem;
 	}
 
-	private JMenuItem getUnlockMenuItem() {
-		if (unlockMenuItem == null) {
-			unlockMenuItem = new JMenuItem("Unlock");
-			unlockMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getUnlockAllMenuItem() {
+		if (unlockAllMenuItem == null) {
+			unlockAllMenuItem = new JMenuItem("Unlock All");
+			unlockAllMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setFreeze(false);
+					Scene.getInstance().lockAll(false);
 				}
 			});
 		}
-		return unlockMenuItem;
+		return unlockAllMenuItem;
+	}
+
+	private JMenuItem getLockSelectionMenuItem() {
+		if (lockSelectionMenuItem == null) {
+			lockSelectionMenuItem = new JMenuItem("Lock Selection");
+			lockSelectionMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().lockSelection(true);
+				}
+			});
+		}
+		return lockSelectionMenuItem;
 	}
 
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {

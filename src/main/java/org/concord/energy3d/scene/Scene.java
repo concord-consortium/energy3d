@@ -737,9 +737,27 @@ public class Scene implements Serializable {
 			part.updateEditShapes();
 	}
 
-	public void setFreeze(final boolean freeze) {
+	public void lockAll(final boolean freeze) {
 		for (final HousePart part : parts)
 			part.setFreeze(freeze);
+		if (freeze)
+			SceneManager.getInstance().hideAllEditPoints();
+		redrawAll();
+	}
+
+	public void lockSelection(boolean freeze) {
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart == null)
+			return;
+		selectedPart.setFreeze(freeze);
+		HousePart foundation = selectedPart.getTopContainer();
+		if (foundation != null) {
+			foundation.setFreeze(freeze);
+			for (HousePart p : parts) {
+				if (p.getTopContainer() == foundation)
+					p.setFreeze(freeze);
+			}
+		}
 		if (freeze)
 			SceneManager.getInstance().hideAllEditPoints();
 		redrawAll();
