@@ -28,6 +28,9 @@ class PartEnergyGraph extends Graph {
 
 		for (String key : data.keySet()) {
 
+			if (isDataHidden(key))
+				continue;
+
 			List<Double> list = data.get(key);
 
 			if (!list.isEmpty()) {
@@ -75,13 +78,13 @@ class PartEnergyGraph extends Graph {
 		int x0 = getWidth() - 100 - right;
 		int y0 = top - 10;
 		String s = "Solar";
-		if (data.containsKey(s)) {
+		if (data.containsKey(s) && !isDataHidden(s)) {
 			drawCircle(g2, x0, y0, 8, colors.get(s));
 			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 		s = "Heat Loss";
-		if (data.containsKey(s)) {
+		if (data.containsKey(s) && !isDataHidden(s)) {
 			y0 += 14;
 			drawSquare(g2, x0, y0, 8, colors.get(s));
 			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);

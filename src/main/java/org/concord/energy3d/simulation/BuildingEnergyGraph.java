@@ -26,6 +26,9 @@ class BuildingEnergyGraph extends Graph {
 
 		for (String key : data.keySet()) {
 
+			if (isDataHidden(key))
+				continue;
+
 			List<Double> list = data.get(key);
 
 			if (!list.isEmpty()) {
@@ -80,28 +83,38 @@ class BuildingEnergyGraph extends Graph {
 
 		String s = "Windows";
 		int y0 = top - 10;
-		drawSquare(g2, x0, y0, 8, colors.get(s));
-		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		if (!isDataHidden(s)) {
+			drawSquare(g2, x0, y0, 8, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
 
 		s = "Solar Panels";
 		y0 += 12;
-		drawSquare(g2, x0, y0, 8, colors.get(s));
-		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		if (!isDataHidden(s)) {
+			drawSquare(g2, x0, y0, 8, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
 
 		s = "Heater";
 		y0 += 12;
-		drawSquare(g2, x0, y0, 8, colors.get(s));
-		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		if (!isDataHidden(s)) {
+			drawSquare(g2, x0, y0, 8, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
 
 		s = "AC";
 		y0 += 12;
-		drawSquare(g2, x0, y0, 8, colors.get(s));
-		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		if (!isDataHidden(s)) {
+			drawSquare(g2, x0, y0, 8, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
 
 		s = "Net";
 		y0 += 12;
-		drawCircle(g2, x0, y0, 8, colors.get(s));
-		g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		if (!isDataHidden(s)) {
+			drawCircle(g2, x0, y0, 8, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
 
 	}
 

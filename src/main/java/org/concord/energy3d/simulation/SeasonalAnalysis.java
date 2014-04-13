@@ -21,12 +21,16 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -161,7 +165,7 @@ public class SeasonalAnalysis {
 		final JMenuItem miClear = new JMenuItem("Clear Previous Results");
 		final JMenuItem miView = new JMenuItem("View Raw Data");
 
-		final JMenu menu = new JMenu("Options");
+		JMenu menu = new JMenu("Options");
 		menu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
 			@Override
 			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
@@ -198,6 +202,37 @@ public class SeasonalAnalysis {
 			}
 		});
 		menu.add(miView);
+
+		final JMenu showMenu = new JMenu("Show");
+		showMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+				showMenu.removeAll();
+				Set<String> dataNames = graph.getDataNames();
+				if (!dataNames.isEmpty()) {
+					for (final String name : dataNames) {
+						final JCheckBoxMenuItem mi = new JCheckBoxMenuItem(name, !graph.isDataHidden(name));
+						mi.addItemListener(new ItemListener() {
+							@Override
+							public void itemStateChanged(ItemEvent e) {
+								graph.hideData(name, !mi.isSelected());
+								graph.repaint();
+							}
+						});
+						showMenu.add(mi);
+					}
+				}
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+			}
+
+			@Override
+			public void popupMenuCanceled(final PopupMenuEvent e) {
+			}
+		});
+		menuBar.add(showMenu);
 
 		final JPanel contentPane = new JPanel(new BorderLayout());
 		dialog.setContentPane(contentPane);

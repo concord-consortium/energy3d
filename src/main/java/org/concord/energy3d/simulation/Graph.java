@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JPanel;
 
@@ -32,6 +33,7 @@ abstract class Graph extends JPanel {
 	BasicStroke thin = new BasicStroke(1);
 	BasicStroke thick = new BasicStroke(2);
 	Map<String, List<Double>> data;
+	Map<String, Boolean> hideData;
 	static List<Results> records;
 	double xmin = 0;
 	double xmax = 11;
@@ -61,6 +63,7 @@ abstract class Graph extends JPanel {
 	Graph() {
 		super();
 		data = new HashMap<String, List<Double>>();
+		hideData = new HashMap<String, Boolean>();
 		twoDecimals = new DecimalFormat();
 		twoDecimals.setMaximumFractionDigits(2);
 		if (!records.isEmpty()) {
@@ -96,6 +99,10 @@ abstract class Graph extends JPanel {
 		this.xmax = xmax;
 	}
 
+	Set<String> getDataNames() {
+		return data.keySet();
+	}
+
 	void addData(String name, double d) {
 		List<Double> list = data.get(name);
 		if (list == null) {
@@ -103,6 +110,15 @@ abstract class Graph extends JPanel {
 			data.put(name, list);
 		}
 		list.add(d);
+	}
+
+	void hideData(String name, boolean hidden) {
+		hideData.put(name, hidden);
+	}
+
+	boolean isDataHidden(String name) {
+		Boolean b = hideData.get(name);
+		return b != null ? b : false;
 	}
 
 	List<Double> getData(String name) {
@@ -117,10 +133,6 @@ abstract class Graph extends JPanel {
 		for (double a : x)
 			sum += a;
 		return sum;
-	}
-
-	int getChannel() {
-		return data.size();
 	}
 
 	int getLength() {
@@ -229,6 +241,8 @@ abstract class Graph extends JPanel {
 
 			Map<String, List<Double>> x = r.getData();
 			for (String key : x.keySet()) {
+				if (isDataHidden(key))
+					continue;
 				List<Double> list = x.get(key);
 				path.reset();
 				for (int i = 0; i < list.size(); i++) {
