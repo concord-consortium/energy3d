@@ -42,8 +42,10 @@ public class HeatLoad {
 		final double[] outsideTemperatureRange;
 
 		final int timeStep = SolarIrradiation.getInstance().getTimeStep();
-		for (final HousePart part : Scene.getInstance().getParts())
-			part.setHeatLoss(new double[1440 / timeStep]);
+		synchronized (Scene.getInstance().getParts()) {
+			for (final HousePart part : Scene.getInstance().getParts())
+				part.setHeatLoss(new double[1440 / timeStep]);
+		}
 
 		if (EnergyPanel.getInstance().getCityComboBox().getSelectedItem().equals(""))
 			return;

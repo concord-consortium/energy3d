@@ -46,13 +46,15 @@ public class SelectUtil {
 		if (typesOfHousePart == null)
 			PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
 		else
-			for (final HousePart housePart : Scene.getInstance().getParts())
-				if (!housePart.isFrozen())
-					for (final Class<?> typeOfHousePart : typesOfHousePart)
-						if (typeOfHousePart == null)
-							PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
-						else if (typeOfHousePart.isInstance(housePart))
-							PickingUtil.findPick(housePart.getRoot(), pickRay, pickResults, false);
+			synchronized (Scene.getInstance().getParts()) {
+				for (final HousePart housePart : Scene.getInstance().getParts())
+					if (!housePart.isFrozen())
+						for (final Class<?> typeOfHousePart : typesOfHousePart)
+							if (typeOfHousePart == null)
+								PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
+							else if (typeOfHousePart.isInstance(housePart))
+								PickingUtil.findPick(housePart.getRoot(), pickRay, pickResults, false);
+			}
 
 		return getPickResult(pickRay);
 	}

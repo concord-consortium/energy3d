@@ -227,8 +227,10 @@ public class Scene implements Serializable {
 		root.attachChild(treesRoot);
 
 		if (url != null) {
-			for (final HousePart housePart : instance.getParts())
-				(housePart instanceof Tree ? treesRoot : originalHouseRoot).attachChild(housePart.getRoot());
+			synchronized (instance.getParts()) {
+				for (final HousePart housePart : instance.getParts())
+					(housePart instanceof Tree ? treesRoot : originalHouseRoot).attachChild(housePart.getRoot());
+			}
 			System.out.println("done");
 			/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
 			instance.redrawAllNow();
@@ -307,10 +309,12 @@ public class Scene implements Serializable {
 			instance.upgradeSceneToNewVersion();
 
 			if (url != null) {
-				for (final HousePart housePart : instance.getParts()) {
-					housePart.setId(max + housePart.getId());
-					Scene.getInstance().parts.add(housePart);
-					originalHouseRoot.attachChild(housePart.getRoot());
+				synchronized (instance.getParts()) {
+					for (final HousePart housePart : instance.getParts()) {
+						housePart.setId(max + housePart.getId());
+						Scene.getInstance().parts.add(housePart);
+						originalHouseRoot.attachChild(housePart.getRoot());
+					}
 				}
 				redrawAll = true;
 				System.out.println("done");
@@ -536,8 +540,10 @@ public class Scene implements Serializable {
 
 	public static void setDrawAnnotationsInside(final boolean drawAnnotationsInside) {
 		Scene.drawAnnotationsInside = drawAnnotationsInside;
-		for (final HousePart part : getInstance().getParts())
-			part.drawAnnotations();
+		synchronized (instance.getParts()) {
+			for (final HousePart part : instance.getParts())
+				part.drawAnnotations();
+		}
 		if (PrintController.getInstance().getPrintParts() != null)
 			for (final HousePart part : PrintController.getInstance().getPrintParts())
 				part.drawAnnotations();

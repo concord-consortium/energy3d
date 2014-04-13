@@ -69,8 +69,10 @@ public class SolarIrradiation {
 		initCollidables();
 		onMesh.clear();
 		textureCoordsAlreadyComputed.clear();
-		for (final HousePart part : Scene.getInstance().getParts())
-			part.setSolarPotential(new double[1440 / timeStep]);
+		synchronized (Scene.getInstance().getParts()) {
+			for (final HousePart part : Scene.getInstance().getParts())
+				part.setSolarPotential(new double[1440 / timeStep]);
+		}
 		onLand = null;
 		maxValue = 1;
 		computeToday((Calendar) Heliodon.getInstance().getCalander().clone());
@@ -80,25 +82,27 @@ public class SolarIrradiation {
 	private void initCollidables() {
 		collidables.clear();
 		// collidables.add(Scene.getRoot());
-		for (final HousePart part : Scene.getInstance().getParts()) {
-//			if (part instanceof Foundation)
-//				collidables.add(part.getMesh());
-//			else if (part instanceof Wall)
-//				collidables.add(((Wall) part).getInvisibleMesh());
-//			else if (part instanceof SolarPanel)
-//				collidables.add(((SolarPanel) part).getSurroundMesh());
-//			else if (part instanceof Tree)
-//				collidables.add(((Tree) part).getCollisionRoot());
-//			else if (part instanceof Roof)
-//				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
-//					collidables.add(((Node) roofPart).getChild(0));
+		synchronized (Scene.getInstance().getParts()) {
+			for (final HousePart part : Scene.getInstance().getParts()) {
+				// if (part instanceof Foundation)
+				// collidables.add(part.getMesh());
+				// else if (part instanceof Wall)
+				// collidables.add(((Wall) part).getInvisibleMesh());
+				// else if (part instanceof SolarPanel)
+				// collidables.add(((SolarPanel) part).getSurroundMesh());
+				// else if (part instanceof Tree)
+				// collidables.add(((Tree) part).getCollisionRoot());
+				// else if (part instanceof Roof)
+				// for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
+				// collidables.add(((Node) roofPart).getChild(0));
 
-			if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Tree)
-				collidables.add(part.getIrradiationCollisionSpatial());
-			else if (part instanceof Roof)
-				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
-					collidables.add(((Node) roofPart).getChild(0));
+				if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Tree)
+					collidables.add(part.getIrradiationCollisionSpatial());
+				else if (part instanceof Roof)
+					for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
+						collidables.add(((Node) roofPart).getChild(0));
 
+			}
 		}
 	}
 
@@ -108,25 +112,27 @@ public class SolarIrradiation {
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		for (int minute = 0; minute < 1440; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
-//			 final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
+			// final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
-				for (final HousePart part : Scene.getInstance().getParts()) {
-					if (part.isDrawCompleted())
-						if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel) {
-							final ReadOnlyVector3 faceDirection = part.getFaceDirection();
-							if (faceDirection.dot(directionTowardSun) > 0)
-//								computeOnMesh(minute, directionTowardSun, part, part.getMesh(), part instanceof Wall ? ((Wall) part).getInvisibleMesh() : part.getMesh(), faceDirection, true);
-								computeOnMesh(minute, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), faceDirection, true);
-						} else if (part instanceof Roof) {
-							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-								final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
-								if (faceDirection.dot(directionTowardSun) > 0) {
-									final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-									computeOnMesh(minute, directionTowardSun, part, mesh, mesh, faceDirection, false);
+				synchronized (Scene.getInstance().getParts()) {
+					for (final HousePart part : Scene.getInstance().getParts()) {
+						if (part.isDrawCompleted())
+							if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel) {
+								final ReadOnlyVector3 faceDirection = part.getFaceDirection();
+								if (faceDirection.dot(directionTowardSun) > 0)
+									// computeOnMesh(minute, directionTowardSun, part, part.getMesh(), part instanceof Wall ? ((Wall) part).getInvisibleMesh() : part.getMesh(), faceDirection, true);
+									computeOnMesh(minute, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), faceDirection, true);
+							} else if (part instanceof Roof) {
+								for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
+									final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
+									if (faceDirection.dot(directionTowardSun) > 0) {
+										final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+										computeOnMesh(minute, directionTowardSun, part, mesh, mesh, faceDirection, false);
+									}
 								}
 							}
-						}
+					}
 				}
 				computeOnLand(directionTowardSun);
 			}
@@ -316,74 +322,76 @@ public class SolarIrradiation {
 
 	private void updateValueOnAllHouses() {
 		applyTexture(SceneManager.getInstance().getSolarLand(), onLand, maxValue);
-		for (final HousePart part : Scene.getInstance().getParts())
-			if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel)
-//				applyTexture(part.getMesh(), onMesh.get(part.getMesh()), maxValue);
-				applyTexture(part.getIrradiationMesh(), onMesh.get(part.getIrradiationMesh()), maxValue);
-			else if (part instanceof Roof)
-				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-					final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-					applyTexture(mesh, onMesh.get(mesh), maxValue);
-				}
-
-		/* subtract window potential from wall potential */
-		for (final HousePart wall : Scene.getInstance().getParts()) {
-			if (wall instanceof Wall) {
-				final double[] wallSolarPotentials = wall.getSolarPotential();
-				for (final HousePart window : wall.getChildren()) {
-					final double[] windowSolarPotentials = window.getSolarPotential();
-					for (int i = 0; i < wallSolarPotentials.length; i++)
-						wallSolarPotentials[i] -= windowSolarPotentials[i];
-				}
-			}
-		}
-
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation) {
-				final Foundation foundation = (Foundation) part;
-				final double[] heatLoss = foundation.getHeatLoss();
-				final double[] passiveSolar = new double[heatLoss.length];
-				final double[] photovoltaic = new double[heatLoss.length];
-				double solarPotentialTotal = 0.0;
-				for (final HousePart houseChild : Scene.getInstance().getParts())
-					if (houseChild.getTopContainer() == foundation) {
-						houseChild.setSolarPotentialToday(0.0);
-						for (int i = 0; i < houseChild.getSolarPotential().length; i++) {
-							solarPotentialTotal += houseChild.getSolarPotential()[i];
-							houseChild.setSolarPotentialToday(houseChild.getSolarPotentialToday() + houseChild.getSolarPotential()[i]);
-							if (houseChild.isWall() || houseChild.isDoor() || houseChild.isWindow() || houseChild.isRoof())
-								heatLoss[i] += houseChild.getHeatLoss()[i];
-							if (houseChild.isWindow())
-								passiveSolar[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getWindowSolarHeatingRate();
-							else if (houseChild.isSolarPanel())
-								photovoltaic[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
-						}
+		synchronized (Scene.getInstance().getParts()) {
+			for (final HousePart part : Scene.getInstance().getParts())
+				if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel)
+					// applyTexture(part.getMesh(), onMesh.get(part.getMesh()), maxValue);
+					applyTexture(part.getIrradiationMesh(), onMesh.get(part.getIrradiationMesh()), maxValue);
+				else if (part instanceof Roof)
+					for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
+						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+						applyTexture(mesh, onMesh.get(mesh), maxValue);
 					}
 
-				double heatingTotal = 0.0;
-				double coolingTotal = 0.0;
-				double passiveSolarTotal = 0.0;
-				double photovoltaicTotal = 0.0;
-				for (int i = 0; i < heatLoss.length; i++) {
-					if (heatLoss[i] < 0)
-						heatLoss[i] -= passiveSolar[i];
-					else
-						heatLoss[i] = Math.max(0, heatLoss[i] - passiveSolar[i]);
-					if (heatLoss[i] > 0)
-						heatingTotal += heatLoss[i];
-					else
-						coolingTotal -= heatLoss[i];
-					passiveSolarTotal += passiveSolar[i];
-					photovoltaicTotal += photovoltaic[i];
+			/* subtract window potential from wall potential */
+			for (final HousePart wall : Scene.getInstance().getParts()) {
+				if (wall instanceof Wall) {
+					final double[] wallSolarPotentials = wall.getSolarPotential();
+					for (final HousePart window : wall.getChildren()) {
+						final double[] windowSolarPotentials = window.getSolarPotential();
+						for (int i = 0; i < wallSolarPotentials.length; i++)
+							wallSolarPotentials[i] -= windowSolarPotentials[i];
+					}
 				}
+			}
 
-				foundation.setSolarPotentialToday(solarPotentialTotal);
-				foundation.setSolarLabelValue(solarPotentialTotal);
-				foundation.setPassiveSolarToday(passiveSolarTotal);
-				foundation.setPhotovoltaicToday(photovoltaicTotal);
-				foundation.setHeatingToday(heatingTotal);
-				foundation.setCoolingToday(coolingTotal);
-				foundation.setTotalEnergyToday(heatingTotal + coolingTotal - photovoltaicTotal);
+			for (final HousePart part : Scene.getInstance().getParts()) {
+				if (part instanceof Foundation) {
+					final Foundation foundation = (Foundation) part;
+					final double[] heatLoss = foundation.getHeatLoss();
+					final double[] passiveSolar = new double[heatLoss.length];
+					final double[] photovoltaic = new double[heatLoss.length];
+					double solarPotentialTotal = 0.0;
+					for (final HousePart houseChild : Scene.getInstance().getParts())
+						if (houseChild.getTopContainer() == foundation) {
+							houseChild.setSolarPotentialToday(0.0);
+							for (int i = 0; i < houseChild.getSolarPotential().length; i++) {
+								solarPotentialTotal += houseChild.getSolarPotential()[i];
+								houseChild.setSolarPotentialToday(houseChild.getSolarPotentialToday() + houseChild.getSolarPotential()[i]);
+								if (houseChild.isWall() || houseChild.isDoor() || houseChild.isWindow() || houseChild.isRoof())
+									heatLoss[i] += houseChild.getHeatLoss()[i];
+								if (houseChild.isWindow())
+									passiveSolar[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getWindowSolarHeatingRate();
+								else if (houseChild.isSolarPanel())
+									photovoltaic[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
+							}
+						}
+
+					double heatingTotal = 0.0;
+					double coolingTotal = 0.0;
+					double passiveSolarTotal = 0.0;
+					double photovoltaicTotal = 0.0;
+					for (int i = 0; i < heatLoss.length; i++) {
+						if (heatLoss[i] < 0)
+							heatLoss[i] -= passiveSolar[i];
+						else
+							heatLoss[i] = Math.max(0, heatLoss[i] - passiveSolar[i]);
+						if (heatLoss[i] > 0)
+							heatingTotal += heatLoss[i];
+						else
+							coolingTotal -= heatLoss[i];
+						passiveSolarTotal += passiveSolar[i];
+						photovoltaicTotal += photovoltaic[i];
+					}
+
+					foundation.setSolarPotentialToday(solarPotentialTotal);
+					foundation.setSolarLabelValue(solarPotentialTotal);
+					foundation.setPassiveSolarToday(passiveSolarTotal);
+					foundation.setPhotovoltaicToday(photovoltaicTotal);
+					foundation.setHeatingToday(heatingTotal);
+					foundation.setCoolingToday(coolingTotal);
+					foundation.setTotalEnergyToday(heatingTotal + coolingTotal - photovoltaicTotal);
+				}
 			}
 		}
 

@@ -25,7 +25,7 @@ import com.ardor3d.util.GameTaskQueue;
 
 /**
  * @author Charles Xie
- *
+ * 
  */
 public class PostProcessor {
 
@@ -110,42 +110,48 @@ public class PostProcessor {
 						int doorCount = 0;
 						if (buildings0 == null) {
 							buildings0 = new ArrayList<Building>();
-							for (final HousePart x : parts) {
-								final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
-								final Building b = new Building(bid);
-								if (!buildings0.contains(b))
-									buildings0.add(b);
+							synchronized (parts) {
+								for (final HousePart x : parts) {
+									final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
+									final Building b = new Building(bid);
+									if (!buildings0.contains(b))
+										buildings0.add(b);
+								}
 							}
 						}
-						for (final HousePart x : parts) {
-							// count the pieces by categories
-							if (x instanceof Window)
-								windowCount++;
-							else if (x instanceof Foundation)
-								foundationCount++;
-							else if (x instanceof Roof)
-								roofCount++;
-							else if (x instanceof Floor)
-								floorCount++;
-							else if (x instanceof Door)
-								doorCount++;
-							else if (x instanceof Wall) {
-								wallCount++;
-								final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
-								final Building b = new Building(bid);
-								if (!buildings.contains(b) && !buildings0.contains(b))
-									buildings.add(b);
+						synchronized (parts) {
+							for (final HousePart x : parts) {
+								// count the pieces by categories
+								if (x instanceof Window)
+									windowCount++;
+								else if (x instanceof Foundation)
+									foundationCount++;
+								else if (x instanceof Roof)
+									roofCount++;
+								else if (x instanceof Floor)
+									floorCount++;
+								else if (x instanceof Door)
+									doorCount++;
+								else if (x instanceof Wall) {
+									wallCount++;
+									final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
+									final Building b = new Building(bid);
+									if (!buildings.contains(b) && !buildings0.contains(b))
+										buildings.add(b);
+								}
 							}
 						}
 						// scan again to compute building properties
-						for (final HousePart x : parts) {
-							final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
-							final Building b = getBuilding(buildings, bid);
-							if (b != null) {
-								if (x instanceof Window)
-									b.windowCount++;
-								else if (x instanceof Wall)
-									b.addWall((Wall) x);
+						synchronized (parts) {
+							for (final HousePart x : parts) {
+								final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
+								final Building b = getBuilding(buildings, bid);
+								if (b != null) {
+									if (x instanceof Window)
+										b.windowCount++;
+									else if (x instanceof Wall)
+										b.addWall((Wall) x);
+								}
 							}
 						}
 						if (total0 == -1)

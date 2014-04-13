@@ -797,15 +797,17 @@ public class EnergyPanel extends JPanel {
 									MainPanel.getInstance().getSolarButton().setSelected(false);
 
 								int numberOfHouses = 0;
-								for (final HousePart part : Scene.getInstance().getParts()) {
-									if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
-										numberOfHouses++;
-									if (numberOfHouses >= 2)
-										break;
+								synchronized (Scene.getInstance().getParts()) { // XIE: This needs to be synchronized to avoid concurrent modification exceptions
+									for (final HousePart part : Scene.getInstance().getParts()) {
+										if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
+											numberOfHouses++;
+										if (numberOfHouses >= 2)
+											break;
+									}
+									for (final HousePart part : Scene.getInstance().getParts())
+										if (part instanceof Foundation)
+											((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
 								}
-								for (final HousePart part : Scene.getInstance().getParts())
-									if (part instanceof Foundation)
-										((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
 								// SceneManager.getInstance().refresh();
 							}
 						} catch (final Throwable e) {
@@ -861,10 +863,12 @@ public class EnergyPanel extends JPanel {
 			updatePartEnergy();
 
 			// XIE: This needs to be called for trees to change texture when the month changes
-			for (final HousePart p : Scene.getInstance().getParts())
-				if (p instanceof Tree)
-					p.updateTextureAndColor();
-			//SceneManager.getInstance().refresh();
+			synchronized (Scene.getInstance().getParts()) {
+				for (final HousePart p : Scene.getInstance().getParts())
+					if (p instanceof Tree)
+						p.updateTextureAndColor();
+			}
+			// SceneManager.getInstance().refresh();
 
 			progressBar.setValue(100);
 
