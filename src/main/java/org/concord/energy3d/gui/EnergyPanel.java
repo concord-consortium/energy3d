@@ -868,7 +868,7 @@ public class EnergyPanel extends JPanel {
 					if (p instanceof Tree)
 						p.updateTextureAndColor();
 			}
-			// SceneManager.getInstance().refresh();
+			SceneManager.getInstance().refresh();
 
 			progressBar.setValue(100);
 
@@ -902,7 +902,7 @@ public class EnergyPanel extends JPanel {
 		if (progressBar.getValue() < 100) {
 			progressBar.setStringPainted(progressBar.getValue() > 0);
 			progressBar.setValue(progressBar.getValue() + 1);
-		} else {
+		} else { // progress() can be called once after it reaches 100% to reset
 			progressBar.setStringPainted(false);
 			progressBar.setValue(0);
 		}
