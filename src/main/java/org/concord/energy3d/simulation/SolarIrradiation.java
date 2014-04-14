@@ -426,6 +426,7 @@ public class SolarIrradiation {
 		texture.setImage(image);
 		final TextureState textureState = new TextureState();
 		textureState.setTexture(texture);
+		mesh.setDefaultColor(Scene.GRAY);
 		mesh.setRenderState(textureState);
 	}
 
