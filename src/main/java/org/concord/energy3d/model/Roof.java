@@ -530,7 +530,7 @@ public abstract class Roof extends HousePart {
 		final Vector3 op = new Vector3();
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			final ReadOnlyVector3 p = wallUpperPoints.get(i);
-			op.set(wallNormals.get(i)).multiplyLocal(Scene.getInstance().getOverhangLength());			
+			op.set(wallNormals.get(i)).multiplyLocal(Scene.getInstance().getOverhangLength());
 			wallUpperPoints.set(i, p.add(op, null));
 		}
 	}
@@ -613,14 +613,14 @@ public abstract class Roof extends HousePart {
 			if (gableWalls.size() == 1) {
 				final ReadOnlyVector2 p2D = Util.snapToPolygon(editPoint, wallPoints, wallNormals);
 				editPoint.setX(p2D.getX());
-				editPoint.setY(p2D.getY());				
+				editPoint.setY(p2D.getY());
 			} else if (gableWalls.size() > 1) {
 				final Vector3 p0 = gableWalls.get(0).getAbsPoint(0);
 				final Wall secondWall = gableWalls.get(1);
 				final ReadOnlyVector3 cornerPoint;
 				final int cornerIndex;
 				if (Util.isEqual(p0, secondWall.getAbsPoint(0)) || Util.isEqual(p0, secondWall.getAbsPoint(2)))
-					cornerIndex = 0;		
+					cornerIndex = 0;
 				else
 					cornerIndex = 1;
 				cornerPoint = wallPoints.get(cornerIndex).subtract(wallNormals.get(cornerIndex).multiply(0.01, null), null);
@@ -880,7 +880,7 @@ public abstract class Roof extends HousePart {
 			draw();
 			drawWalls();
 		}
-		
+
 		drawChildren();
 
 		if (container != null)
@@ -911,9 +911,5 @@ public abstract class Roof extends HousePart {
 		/* if wallUpperPoints is null then it has not been drawn yet so we assume wallUpperPoints size is okay otherwise all roofs would be invalid at init time */
 		return container != null && (wallUpperPoints == null || wallUpperPoints.size() >= 3);
 	}
-	
-	@Override
-	public boolean isRoof() {
-		return true;
-	}
+
 }

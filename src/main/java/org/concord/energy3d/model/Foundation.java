@@ -786,11 +786,6 @@ public class Foundation extends HousePart {
 
 	}
 
-	@Override
-	public boolean isFoundation() {
-		return true;
-	}
-
 	public double getPassiveSolarToday() {
 		return passiveSolarToday;
 	}

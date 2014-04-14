@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
@@ -49,16 +50,14 @@ import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarIrradiation {
-
-	private int timeStep = 15;
 	private static SolarIrradiation instance = new SolarIrradiation();
-
 	private final Map<Mesh, double[][]> onMesh = new HashMap<Mesh, double[][]>();
 	private final Map<Mesh, Boolean> textureCoordsAlreadyComputed = new HashMap<Mesh, Boolean>();
 	private final List<Spatial> collidables = new ArrayList<Spatial>();
 	private double[][] onLand;
-	private long maxValue;
+	private int timeStep = 15;
 	private double solarStep = 2.0;
+	private long maxValue;
 
 	public static SolarIrradiation getInstance() {
 		return instance;
@@ -81,27 +80,13 @@ public class SolarIrradiation {
 
 	private void initCollidables() {
 		collidables.clear();
-		// collidables.add(Scene.getRoot());
 		synchronized (Scene.getInstance().getParts()) {
 			for (final HousePart part : Scene.getInstance().getParts()) {
-				// if (part instanceof Foundation)
-				// collidables.add(part.getMesh());
-				// else if (part instanceof Wall)
-				// collidables.add(((Wall) part).getInvisibleMesh());
-				// else if (part instanceof SolarPanel)
-				// collidables.add(((SolarPanel) part).getSurroundMesh());
-				// else if (part instanceof Tree)
-				// collidables.add(((Tree) part).getCollisionRoot());
-				// else if (part instanceof Roof)
-				// for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
-				// collidables.add(((Node) roofPart).getChild(0));
-
 				if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Tree)
 					collidables.add(part.getIrradiationCollisionSpatial());
 				else if (part instanceof Roof)
 					for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
 						collidables.add(((Node) roofPart).getChild(0));
-
 			}
 		}
 	}
@@ -358,11 +343,11 @@ public class SolarIrradiation {
 							for (int i = 0; i < houseChild.getSolarPotential().length; i++) {
 								solarPotentialTotal += houseChild.getSolarPotential()[i];
 								houseChild.setSolarPotentialToday(houseChild.getSolarPotentialToday() + houseChild.getSolarPotential()[i]);
-								if (houseChild.isWall() || houseChild.isDoor() || houseChild.isWindow() || houseChild.isRoof())
+								if (houseChild instanceof Wall || houseChild instanceof Door || houseChild instanceof Window || houseChild instanceof Roof)
 									heatLoss[i] += houseChild.getHeatLoss()[i];
-								if (houseChild.isWindow())
+								if (houseChild instanceof Window)
 									passiveSolar[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getWindowSolarHeatingRate();
-								else if (houseChild.isSolarPanel())
+								else if (houseChild instanceof SolarPanel)
 									photovoltaic[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
 							}
 						}

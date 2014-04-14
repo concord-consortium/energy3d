@@ -123,9 +123,5 @@ public class Door extends HousePart {
 		else
 			return super.getAbsPoint(index);
 	}
-	
-	@Override
-	public boolean isDoor() {
-		return true;
-	}
+
 }

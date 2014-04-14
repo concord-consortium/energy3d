@@ -88,7 +88,6 @@ public class PrintController implements Updater {
 	public void init() {
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void update(final ReadOnlyTimer globalTimer) {
 		if (isPrintPreview)
@@ -97,7 +96,7 @@ public class PrintController implements Updater {
 		if (isFinished())
 			return;
 
-		final Spatial originalHouseRoot = Scene.getInstance().getOriginalHouseRoot();
+		final Spatial originalHouseRoot = Scene.getOriginalHouseRoot();
 		if (init) {
 			init = false;
 			finish = false;
@@ -247,7 +246,7 @@ public class PrintController implements Updater {
 	}
 
 	public void print() {
-		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
+		Scene.getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
 		final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
 		final int resolutionHeight = 2;
 		final Dimension newSize;
@@ -277,7 +276,7 @@ public class PrintController implements Updater {
 		final Printout printout = new Printout(pageFormat, newSize, pageWidth, pageHeight, printCenters);
 		print(0, printout, 0, 0, pageWidth, pageHeight);
 
-		Scene.getInstance().getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
+		Scene.getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Inherit);
 
 		canvas.setSize(orgCanvasSize);
 		canvas.validate();
@@ -323,7 +322,7 @@ public class PrintController implements Updater {
 	public void rotate() {
 		if (SceneManager.getInstance().isRotationAnimationOn()) {
 			angle += 0.01;
-			Scene.getInstance().getOriginalHouseRoot().setRotation(new Matrix3().fromAngles(0, 0, angle));
+			Scene.getOriginalHouseRoot().setRotation(new Matrix3().fromAngles(0, 0, angle));
 		}
 	}
 
@@ -418,7 +417,7 @@ public class PrintController implements Updater {
 		for (final ArrayList<Spatial> page : pages) {
 			final Vector3 upperLeftCorner = new Vector3();
 			double x, z;
-			final BoundingBox boundingBox = (BoundingBox) new BoundingBox().merge(Scene.getInstance().getOriginalHouseRoot().getWorldBound());
+			final BoundingBox boundingBox = (BoundingBox) new BoundingBox().merge(Scene.getOriginalHouseRoot().getWorldBound());
 			final double minXDistance = boundingBox.getXExtent() + pageWidth / 2.0;
 			final double minYDistance = boundingBox.getZExtent();
 			do {
@@ -552,7 +551,7 @@ public class PrintController implements Updater {
 		final double pageHeight = getPageHeight() + SPACE_BETWEEN_PAGES;
 		final double w = cols * (getPageWidth() + SPACE_BETWEEN_PAGES);
 		final double h = rows * pageHeight;
-		return Scene.getInstance().getOriginalHouseRoot().getWorldBound().getCenter().add(0, -Math.max(w, h), h / 2, null);
+		return Scene.getOriginalHouseRoot().getWorldBound().getCenter().add(0, -Math.max(w, h), h / 2, null);
 	}
 
 	public void pageSetup() {
