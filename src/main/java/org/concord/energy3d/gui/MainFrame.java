@@ -905,7 +905,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getShadowMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
-			viewMenu.add(getWallThicknessMenuItem());
+			// viewMenu.add(getWallThicknessMenuItem());
 
 		}
 		return viewMenu;
