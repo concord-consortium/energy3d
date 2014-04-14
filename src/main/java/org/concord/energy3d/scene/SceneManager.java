@@ -723,8 +723,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				for (final HousePart part : Scene.getInstance().getParts())
 					System.out.println(part);
 				System.out.println("---- Scene: ------------------------");
-				System.out.println("size = " + Scene.getInstance().getOriginalHouseRoot().getNumberOfChildren());
-				for (final Spatial mesh : Scene.getInstance().getOriginalHouseRoot().getChildren()) {
+				System.out.println("size = " + Scene.getOriginalHouseRoot().getNumberOfChildren());
+				for (final Spatial mesh : Scene.getOriginalHouseRoot().getChildren()) {
 					System.out.println(mesh);
 				}
 			}
@@ -993,7 +993,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return selectedHousePart;
 	}
 
-	public void setSelectedPart(HousePart p) {
+	public void setSelectedPart(final HousePart p) {
 		selectedHousePart = p;
 		if (selectedHousePart != null)
 			selectedHousePart.setEditPointsVisible(true);
@@ -1440,7 +1440,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 	}
 
-	public void showAxes(boolean b) {
+	public void showAxes(final boolean b) {
 		if (b)
 			backgroundRoot.attachChild(axes);
 		else
@@ -1451,7 +1451,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return backgroundRoot.hasChild(axes);
 	}
 
-	public void showBuildingLabels(boolean b) {
+	public void showBuildingLabels(final boolean b) {
 		showBuildingLabels = b;
 		synchronized (Scene.getInstance().getParts()) {
 			for (final HousePart part : Scene.getInstance().getParts()) {

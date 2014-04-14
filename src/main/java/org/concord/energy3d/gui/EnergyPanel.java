@@ -127,13 +127,6 @@ public class EnergyPanel extends JPanel {
 	private JLabel lblHeight_1;
 	private JTextField partHeightTextField;
 
-	private static class EnergyAmount {
-		double solar;
-		double solarPanel;
-		double heating;
-		double cooling;
-	}
-
 	public static EnergyPanel getInstance() {
 		return instance;
 	}
