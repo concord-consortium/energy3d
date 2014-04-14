@@ -184,6 +184,7 @@ public class Scene implements Serializable {
 
 		MainPanel.getInstance().getHeliodonButton().setSelected(false);
 		MainPanel.getInstance().getSunAnimButton().setSelected(false);
+		MainPanel.getInstance().getSolarButton().setSelected(false);
 		Wall.resetDefaultWallHeight();
 
 		if (url == null) {
@@ -751,15 +752,15 @@ public class Scene implements Serializable {
 		redrawAll();
 	}
 
-	public void lockSelection(boolean freeze) {
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+	public void lockSelection(final boolean freeze) {
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart == null)
 			return;
 		selectedPart.setFreeze(freeze);
-		HousePart foundation = selectedPart.getTopContainer();
+		final HousePart foundation = selectedPart.getTopContainer();
 		if (foundation != null) {
 			foundation.setFreeze(freeze);
-			for (HousePart p : parts) {
+			for (final HousePart p : parts) {
 				if (p.getTopContainer() == foundation)
 					p.setFreeze(freeze);
 			}
