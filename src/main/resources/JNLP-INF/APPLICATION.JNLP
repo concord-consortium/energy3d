@@ -23,7 +23,6 @@
 		<jar href="energy3d.jar" main="true" />
 		<jar href="resources/guava-13.0.1.jar" />
 		<jar href="resources/jdom2-2.0.4.jar" />
-		<jar href="resources/jfxrt.jar" />
 
 		<jar href="resources/jogl/jogl-all-2.0.2-rc20130404.jar" />
 		<jar href="resources/jogl/gluegen-rt-2.0.2-rc20130404.jar" />
