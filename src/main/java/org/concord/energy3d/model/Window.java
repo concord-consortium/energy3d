@@ -132,7 +132,7 @@ public class Window extends HousePart {
 		p = getAbsPoint(3);
 		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
-		
+
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 
@@ -309,14 +309,10 @@ public class Window extends HousePart {
 	protected String getTextureFileName() {
 		return null;
 	}
-	
+
 	@Override
 	public ReadOnlyVector3 getFaceDirection() {
 		return container.getFaceDirection();
 	}
-	
-	@Override
-	public boolean isWindow() {
-		return true;
-	}
+
 }

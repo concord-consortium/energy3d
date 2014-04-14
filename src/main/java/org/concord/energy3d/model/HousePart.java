@@ -661,7 +661,7 @@ public abstract class HousePart implements Serializable {
 
 	}
 
-	private Texture getTexture(final String filename, final boolean isTransparent, final ReadOnlyColorRGBA defaultColor, boolean grayout) {
+	private Texture getTexture(final String filename, final boolean isTransparent, final ReadOnlyColorRGBA defaultColor, final boolean grayout) {
 		Texture texture = TextureManager.load(filename, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true);
 		if (isTransparent) {
 			final Color color = new Color(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue());
@@ -683,7 +683,7 @@ public abstract class HousePart implements Serializable {
 			texture.setImage(image);
 		}
 		if (grayout) {
-			Texture grayoutTexture = cachedGrayTextures.get(filename + ":grayout");
+			final Texture grayoutTexture = cachedGrayTextures.get(filename + ":grayout");
 			if (grayoutTexture != null)
 				return grayoutTexture;
 			final Image image = texture.getImage();
@@ -693,8 +693,8 @@ public abstract class HousePart implements Serializable {
 			grayImage.setWidth(image.getWidth());
 			grayImage.setHeight(image.getHeight());
 			grayImage.setMipMapByteSizes(image.getMipMapByteSizes());
-			ByteBuffer data = image.getData(0);
-			ByteBuffer grayData = ByteBuffer.allocate(data.capacity());
+			final ByteBuffer data = image.getData(0);
+			final ByteBuffer grayData = ByteBuffer.allocate(data.capacity());
 			byte alpha, red, green, blue, gray;
 			int i;
 			for (int y = 0; y < image.getHeight(); y++) {
@@ -833,34 +833,6 @@ public abstract class HousePart implements Serializable {
 			mesh.clearRenderState(StateType.Offset);
 			mesh.setDefaultColor(ColorRGBA.WHITE);
 		}
-	}
-
-	public boolean isFoundation() {
-		return false;
-	}
-
-	public boolean isWall() {
-		return false;
-	}
-
-	public boolean isDoor() {
-		return false;
-	}
-
-	public boolean isWindow() {
-		return false;
-	}
-
-	public boolean isRoof() {
-		return false;
-	}
-
-	public boolean isFloor() {
-		return false;
-	}
-
-	public boolean isSolarPanel() {
-		return false;
 	}
 
 	public void setSolarPotential(final double solarPotential[]) {
