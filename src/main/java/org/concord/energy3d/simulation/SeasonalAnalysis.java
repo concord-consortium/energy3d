@@ -19,6 +19,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -70,6 +71,7 @@ public class SeasonalAnalysis {
 
 	private final Graph graph;
 	private volatile boolean analysisStopped;
+	private static Point windowLocation = new Point();
 
 	public SeasonalAnalysis() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -267,6 +269,7 @@ public class SeasonalAnalysis {
 					if (JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]) == JOptionPane.YES_OPTION)
 						graph.keepResults();
 				}
+				windowLocation.setLocation(dialog.getLocationOnScreen());
 				dialog.dispose();
 			}
 		});
@@ -276,12 +279,16 @@ public class SeasonalAnalysis {
 			@Override
 			public void windowClosing(final WindowEvent e) {
 				stopAnalysis();
+				windowLocation.setLocation(dialog.getLocationOnScreen());
 				dialog.dispose();
 			}
 		});
 
 		dialog.pack();
-		dialog.setLocationRelativeTo(MainFrame.getInstance());
+		if (windowLocation.x > 0 && windowLocation.y > 0)
+			dialog.setLocation(windowLocation);
+		else
+			dialog.setLocationRelativeTo(MainFrame.getInstance());
 		dialog.setVisible(true);
 
 	}
