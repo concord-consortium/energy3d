@@ -88,6 +88,8 @@ public abstract class HousePart implements Serializable {
 	private boolean firstPointInserted = false;
 	private boolean freeze;
 
+	private static Map<String, Texture> cachedGrayTextures = new HashMap<String, Texture>();
+
 	static {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
 		offsetState.setFactor(1f);
@@ -681,6 +683,9 @@ public abstract class HousePart implements Serializable {
 			texture.setImage(image);
 		}
 		if (grayout) {
+			Texture grayoutTexture = cachedGrayTextures.get(filename + ":grayout");
+			if (grayoutTexture != null)
+				return grayoutTexture;
 			final Image image = texture.getImage();
 			final Image grayImage = new Image(); // make a copy
 			grayImage.setDataFormat(image.getDataFormat());
@@ -709,6 +714,7 @@ public abstract class HousePart implements Serializable {
 			}
 			grayImage.addData(grayData);
 			texture = TextureManager.loadFromImage(grayImage, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat);
+			cachedGrayTextures.put(filename + ":grayout", texture);
 		}
 		return texture;
 	}
