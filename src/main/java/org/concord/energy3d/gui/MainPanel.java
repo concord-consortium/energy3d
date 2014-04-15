@@ -613,7 +613,7 @@ public class MainPanel extends JPanel {
 			solarButton.addMouseListener(refreshUponMouseExit);
 			solarButton.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(ItemEvent arg0) {
+				public void itemStateChanged(ItemEvent e) {
 					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}

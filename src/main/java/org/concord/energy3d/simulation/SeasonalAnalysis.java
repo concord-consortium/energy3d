@@ -77,6 +77,7 @@ public abstract class SeasonalAnalysis {
 
 	void runSeasonalAnalysis() {
 		Util.selectSilently(MainPanel.getInstance().getSolarButton(), true);
+		SceneManager.getInstance().setSolarColorMapWithoutUpdate(true);
 		graph.clearData();
 		SceneManager.getInstance().getSolarLand().setVisible(true);
 		EnergyPanel.getInstance().disableActions(true);

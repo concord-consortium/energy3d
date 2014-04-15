@@ -53,7 +53,6 @@ import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -1081,8 +1080,8 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					if (selectedPart instanceof Tree || selectedPart instanceof Roof) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy density analysis is not applicable to a tree or a roof.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
+					if (selectedPart instanceof Tree) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy density analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
 					new EnergyDensityAnalysis().show("Seasonal Energy Density");
