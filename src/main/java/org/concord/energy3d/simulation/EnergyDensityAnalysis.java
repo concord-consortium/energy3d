@@ -21,6 +21,7 @@ public class EnergyDensityAnalysis extends SeasonalAnalysis {
 
 	public EnergyDensityAnalysis() {
 		super();
+		graph.yAxisLabel = "Energy Density (kWh/m\u00B2)";
 	}
 
 	@Override

@@ -1062,7 +1062,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					new EnergyAnalysis().show();
+					new EnergyAnalysis().show("Seasonal Energy");
 				}
 			});
 		}
@@ -1085,7 +1085,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy density analysis is not applicable to a tree or a roof.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					new EnergyDensityAnalysis().show();
+					new EnergyDensityAnalysis().show("Seasonal Energy Density");
 				}
 			});
 		}

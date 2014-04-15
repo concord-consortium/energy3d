@@ -24,7 +24,7 @@ public class EnergyAnalysis extends SeasonalAnalysis {
 	public EnergyAnalysis() {
 		super();
 	}
-
+	
 	@Override
 	void updateGraph() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();

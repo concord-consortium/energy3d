@@ -105,12 +105,12 @@ public abstract class SeasonalAnalysis {
 		}, SeasonalAnalysis.this.getClass().getName()).start();
 	}
 
-	public void show() {
+	public void show(String title) {
 
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		String title = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+		String s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 		title = title.replaceAll("Foundation", "Building");
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Seasonal Analysis: " + title, true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), title + ": " + s, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		final JMenuBar menuBar = new JMenuBar();
