@@ -1036,7 +1036,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getSeasonalEnergyAnalysisMenuItem() {
 		if (seasonalEnergyAnalysisMenuItem == null) {
 			seasonalEnergyAnalysisMenuItem = new JMenuItem("Run Seasonal Energy Analysis...");
-			seasonalEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
+			seasonalEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F4"));
 			seasonalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1072,7 +1072,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getSeasonalEnergyDensityAnalysisMenuItem() {
 		if (seasonalEnergyDensityAnalysisMenuItem == null) {
 			seasonalEnergyDensityAnalysisMenuItem = new JMenuItem("Run Seasonal Energy Density Analysis...");
-			seasonalEnergyDensityAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F8"));
+			seasonalEnergyDensityAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
 			seasonalEnergyDensityAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1095,7 +1095,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getDailyAnalysisMenuItem() {
 		if (dailyAnalysisMenuItem == null) {
 			dailyAnalysisMenuItem = new JMenuItem("Run Daily Energy Analysis...");
-			dailyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F9"));
+			dailyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F6"));
 			dailyAnalysisMenuItem.setEnabled(false);
 			dailyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
@@ -1755,7 +1755,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {
 		if (noteCheckBoxMenuItem == null) {
 			noteCheckBoxMenuItem = new JCheckBoxMenuItem("Show Note");
-			noteCheckBoxMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
+			noteCheckBoxMenuItem.setAccelerator(KeyStroke.getKeyStroke("F3"));
 			noteCheckBoxMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

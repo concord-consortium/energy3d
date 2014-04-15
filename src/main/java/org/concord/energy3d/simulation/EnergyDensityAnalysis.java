@@ -1,6 +1,7 @@
 package org.concord.energy3d.simulation;
 
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
@@ -45,6 +46,10 @@ public class EnergyDensityAnalysis extends SeasonalAnalysis {
 			for (final double x : loss)
 				sum += x;
 			graph.addData("Heat Loss", sum / area);
+		} else if (selectedPart instanceof Foundation) {
+			double area = selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale(); // width
+			area *= selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale(); // height
+			graph.addData("Solar", selectedPart.getSolarPotentialToday() / area);
 		} else if (selectedPart instanceof SolarPanel) {
 			final SolarPanel solarPanel = (SolarPanel) selectedPart;
 			final double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
