@@ -102,7 +102,7 @@ public class Scene implements Serializable {
 	private String windowUFactor;
 	private String roofUFactor;
 	private double solarPanelEfficiency;
-	private double windowSolarHeatingRate = 0.5;
+	private double windowSolarHeatingRate;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 

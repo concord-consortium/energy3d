@@ -962,7 +962,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		heliodonControl = selected;
 		Heliodon.getInstance().setVisible(selected);
 		enableDisableRotationControl();
-		EnergyPanel.getInstance().compute(UpdateRadiation.NEVER);
+		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 
 	}
 

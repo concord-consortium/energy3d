@@ -101,10 +101,10 @@ public abstract class SeasonalAnalysis {
 					}
 				}
 				EnergyPanel.getInstance().disableActions(false);
-				EnergyPanel.getInstance().progress();
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
+						EnergyPanel.getInstance().progress();
 						runButton.setEnabled(true);
 					}
 				});

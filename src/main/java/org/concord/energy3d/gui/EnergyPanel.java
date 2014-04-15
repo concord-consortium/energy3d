@@ -68,7 +68,7 @@ public class EnergyPanel extends JPanel {
 	private static boolean keepHeatmapOn = false;
 
 	public enum UpdateRadiation {
-		ALWAYS, NEVER, ONLY_IF_SLECTED_IN_GUI
+		ALWAYS, ONLY_IF_SLECTED_IN_GUI
 	};
 
 	private final JComboBox<String> wallsComboBox;
@@ -77,7 +77,6 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox<String> roofsComboBox;
 	private final JComboBox<String> cityComboBox;
 	private final JComboBox<String> solarPanelEfficiencyComboBox;
-	private final JCheckBox autoCheckBox;
 	private final JTextField heatingTodayTextField;
 	private final JTextField coolingTodayTextField;
 	private final JTextField totalTodayTextField;
@@ -237,7 +236,7 @@ public class EnergyPanel extends JPanel {
 				final Heliodon heliodon = Heliodon.getInstance();
 				if (heliodon != null)
 					heliodon.setTime((Date) timeSpinner.getValue());
-				compute(UpdateRadiation.NEVER);
+				updateOutsideTemperature();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().changeSkyTexture();
 			}
@@ -294,7 +293,7 @@ public class EnergyPanel extends JPanel {
 		insideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				compute(UpdateRadiation.NEVER);
+				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
 		insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
@@ -321,32 +320,13 @@ public class EnergyPanel extends JPanel {
 			public void stateChanged(final ChangeEvent e) {
 				if (disableActions)
 					return;
-				if (thread == null)
-					compute(UpdateRadiation.NEVER);
+				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
 		final GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
 		gbc_outsideTemperatureSpinner.gridx = 4;
 		gbc_outsideTemperatureSpinner.gridy = 0;
 		temperaturePanel.add(outsideTemperatureSpinner, gbc_outsideTemperatureSpinner);
-
-		autoCheckBox = new JCheckBox("Auto");
-		autoCheckBox.setToolTipText("Automatically set the outside temperature based on historic average of the selected city");
-		autoCheckBox.setSelected(true);
-		autoCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final boolean selected = autoCheckBox.isSelected();
-				outsideTemperatureSpinner.setEnabled(!selected);
-				if (selected)
-					updateOutsideTemperature();
-				compute(UpdateRadiation.NEVER);
-			}
-		});
-		final GridBagConstraints gbc_autoCheckBox = new GridBagConstraints();
-		gbc_autoCheckBox.gridx = 5;
-		gbc_autoCheckBox.gridy = 0;
-		temperaturePanel.add(autoCheckBox, gbc_autoCheckBox);
 
 		final JPanel uFactorPanel = new JPanel();
 		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -368,7 +348,7 @@ public class EnergyPanel extends JPanel {
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				compute(UpdateRadiation.NEVER);
+				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
@@ -391,7 +371,7 @@ public class EnergyPanel extends JPanel {
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				compute(UpdateRadiation.NEVER);
+				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
@@ -414,7 +394,7 @@ public class EnergyPanel extends JPanel {
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				compute(UpdateRadiation.NEVER);
+				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
@@ -437,7 +417,7 @@ public class EnergyPanel extends JPanel {
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				compute(UpdateRadiation.NEVER);
+				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
@@ -770,6 +750,7 @@ public class EnergyPanel extends JPanel {
 	public void compute(final UpdateRadiation updateRadiation) {
 		if (!computeEnabled)
 			return;
+		updateOutsideTemperature(); // TODO: There got to be a better way to do this
 		this.updateRadiation = updateRadiation;
 		if (thread != null && thread.isAlive())
 			computeRequest = true;
@@ -826,8 +807,7 @@ public class EnergyPanel extends JPanel {
 			progressBar.setValue(0);
 			progressBar.setStringPainted(false);
 
-			if (autoCheckBox.isSelected())
-				updateOutsideTemperature();
+			updateOutsideTemperature();
 			HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone(), (Integer) insideTemperatureSpinner.getValue());
 
 			SolarIrradiation.getInstance().compute();
