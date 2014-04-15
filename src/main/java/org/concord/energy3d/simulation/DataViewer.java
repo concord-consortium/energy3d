@@ -1,9 +1,9 @@
 package org.concord.energy3d.simulation;
 
 import java.awt.BorderLayout;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -12,6 +12,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.model.Window;
+import org.concord.energy3d.scene.SceneManager;
 
 /**
  * @author Charles Xie
@@ -23,7 +31,7 @@ class DataViewer {
 	}
 
 	@SuppressWarnings("serial")
-	static void showDataWindow(String title, Object[][] column, String[] header, final Window parent) {
+	private static void showDataWindow(String title, Object[][] column, String[] header, final java.awt.Window parent) {
 		final JDialog dataWindow = new JDialog(JOptionPane.getFrameForComponent(parent), title, true);
 		dataWindow.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		final JTable table = new JTable(column, header);
@@ -59,6 +67,37 @@ class DataViewer {
 		dataWindow.pack();
 		dataWindow.setLocationRelativeTo(parent);
 		dataWindow.setVisible(true);
+	}
+
+	static void viewRawData(final JDialog parent, Graph graph) {
+		String[] header = null;
+		if (graph instanceof BuildingEnergyGraph) {
+			header = new String[] { "Month", "Windows", "Solar Panels", "Heater", "AC", "Net" };
+		} else {
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof SolarPanel) {
+				header = new String[] { "Month", "Solar" };
+			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof) {
+				header = new String[] { "Month", "Heat Loss" };
+			} else if (selectedPart instanceof Window) {
+				header = new String[] { "Month", "Solar", "Heat Loss" };
+			}
+		}
+		if (header == null) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Problem in finding data.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		final int m = header.length;
+		final int n = graph.getLength();
+		final Object[][] column = new Object[n][m + 1];
+		for (int i = 0; i < n; i++)
+			column[i][0] = (i + 1);
+		for (int j = 1; j < header.length; j++) {
+			final List<Double> list = graph.getData(header[j]);
+			for (int i = 0; i < n; i++)
+				column[i][j] = list.get(i);
+		}
+		showDataWindow("Data", column, header, parent);
 	}
 
 }

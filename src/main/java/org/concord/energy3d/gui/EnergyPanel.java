@@ -941,8 +941,8 @@ public class EnergyPanel extends JPanel {
 				partWidthTextField.setText(twoDecimals.format(SolarPanel.WIDTH));
 				partHeightTextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
 			} else {
-				partWidthTextField.setText(twoDecimals.format((selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2))) * Scene.getInstance().getAnnotationScale()));
-				partHeightTextField.setText(twoDecimals.format((selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1))) * Scene.getInstance().getAnnotationScale()));
+				partWidthTextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale()));
+				partHeightTextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale()));
 			}
 		} else {
 			partWidthTextField.setText("");

@@ -53,6 +53,7 @@ import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -62,7 +63,8 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
-import org.concord.energy3d.simulation.SeasonalAnalysis;
+import org.concord.energy3d.simulation.EnergyAnalysis;
+import org.concord.energy3d.simulation.EnergyDensityAnalysis;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Printout;
@@ -100,7 +102,8 @@ public class MainFrame extends JFrame {
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JMenuItem rescaleMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
-	private JMenuItem seasonalAnalysisMenuItem;
+	private JMenuItem seasonalEnergyAnalysisMenuItem;
+	private JMenuItem seasonalEnergyDensityAnalysisMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
@@ -848,7 +851,8 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
-			analysisMenu.add(getSeasonalAnalysisMenuItem());
+			analysisMenu.add(getSeasonalEnergyAnalysisMenuItem());
+			analysisMenu.add(getSeasonalEnergyDensityAnalysisMenuItem());
 			analysisMenu.add(getDailyAnalysisMenuItem());
 			if (!Config.isRestrictMode()) {
 				analysisMenu.addSeparator();
@@ -1029,11 +1033,11 @@ public class MainFrame extends JFrame {
 		return simulationSettingsMenuItem;
 	}
 
-	private JMenuItem getSeasonalAnalysisMenuItem() {
-		if (seasonalAnalysisMenuItem == null) {
-			seasonalAnalysisMenuItem = new JMenuItem("Run Seasonal Analysis...");
-			seasonalAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
-			seasonalAnalysisMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getSeasonalEnergyAnalysisMenuItem() {
+		if (seasonalEnergyAnalysisMenuItem == null) {
+			seasonalEnergyAnalysisMenuItem = new JMenuItem("Run Seasonal Energy Analysis...");
+			seasonalEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
+			seasonalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -1058,17 +1062,40 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					new SeasonalAnalysis().show();
+					new EnergyAnalysis().show();
 				}
 			});
 		}
-		return seasonalAnalysisMenuItem;
+		return seasonalEnergyAnalysisMenuItem;
+	}
+
+	private JMenuItem getSeasonalEnergyDensityAnalysisMenuItem() {
+		if (seasonalEnergyDensityAnalysisMenuItem == null) {
+			seasonalEnergyDensityAnalysisMenuItem = new JMenuItem("Run Seasonal Energy Density Analysis...");
+			seasonalEnergyDensityAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F8"));
+			seasonalEnergyDensityAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					if (selectedPart instanceof Tree || selectedPart instanceof Roof) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy density analysis is not applicable to a tree or a roof.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					new EnergyDensityAnalysis().show();
+				}
+			});
+		}
+		return seasonalEnergyDensityAnalysisMenuItem;
 	}
 
 	private JMenuItem getDailyAnalysisMenuItem() {
 		if (dailyAnalysisMenuItem == null) {
-			dailyAnalysisMenuItem = new JMenuItem("Run Daily Analysis...");
-			dailyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F8"));
+			dailyAnalysisMenuItem = new JMenuItem("Run Daily Energy Analysis...");
+			dailyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F9"));
 			dailyAnalysisMenuItem.setEnabled(false);
 			dailyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
