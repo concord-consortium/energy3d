@@ -37,7 +37,7 @@ public class EnergyDensityAnalysis extends SeasonalAnalysis {
 			double sum = 0;
 			for (final double x : loss)
 				sum += x;
-			graph.addData("Heat Loss", sum / area);
+			graph.addData("Heat Gain", -sum / area);
 		} else if (selectedPart instanceof Wall || selectedPart instanceof Door) {
 			double area = selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale(); // width
 			area *= selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale(); // height
@@ -45,7 +45,7 @@ public class EnergyDensityAnalysis extends SeasonalAnalysis {
 			double sum = 0;
 			for (final double x : loss)
 				sum += x;
-			graph.addData("Heat Loss", sum / area);
+			graph.addData("Heat Gain", -sum / area);
 		} else if (selectedPart instanceof Foundation) {
 			double area = selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale(); // width
 			area *= selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale(); // height

@@ -60,6 +60,7 @@ public abstract class SeasonalAnalysis {
 	Graph graph;
 	volatile boolean analysisStopped;
 	static Point windowLocation = new Point();
+	private JButton runButton;
 
 	SeasonalAnalysis() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -101,6 +102,12 @@ public abstract class SeasonalAnalysis {
 				}
 				EnergyPanel.getInstance().disableActions(false);
 				EnergyPanel.getInstance().progress();
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						runButton.setEnabled(true);
+					}
+				});
 			}
 		}, SeasonalAnalysis.this.getClass().getName()).start();
 	}
@@ -200,16 +207,17 @@ public abstract class SeasonalAnalysis {
 		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 
-		JButton button = new JButton("Run");
-		button.addActionListener(new ActionListener() {
+		runButton = new JButton("Run");
+		runButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				runButton.setEnabled(false);
 				runSeasonalAnalysis();
 			}
 		});
-		buttonPanel.add(button);
+		buttonPanel.add(runButton);
 
-		button = new JButton("Close");
+		JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {

@@ -52,7 +52,7 @@ abstract class Graph extends JPanel {
 		records = new ArrayList<Results>();
 		colors = new HashMap<String, Color>();
 		colors.put("Solar", Color.ORANGE);
-		colors.put("Heat Loss", Color.GRAY);
+		colors.put("Heat Gain", Color.GRAY);
 		colors.put("Windows", colors.get("Solar"));
 		colors.put("Solar Panels", Color.GREEN.darker());
 		colors.put("Heater", Color.RED);

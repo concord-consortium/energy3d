@@ -24,7 +24,7 @@ public class EnergyAnalysis extends SeasonalAnalysis {
 	public EnergyAnalysis() {
 		super();
 	}
-	
+
 	@Override
 	void updateGraph() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -48,13 +48,13 @@ public class EnergyAnalysis extends SeasonalAnalysis {
 			double sum = 0;
 			for (final double x : loss)
 				sum += x;
-			graph.addData("Heat Loss", sum);
+			graph.addData("Heat Gain", -sum);
 		} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
 			final double[] loss = selectedPart.getHeatLoss();
 			double sum = 0;
 			for (final double x : loss)
 				sum += x;
-			graph.addData("Heat Loss", sum);
+			graph.addData("Heat Gain", -sum);
 		} else if (selectedPart instanceof SolarPanel) {
 			final SolarPanel solarPanel = (SolarPanel) selectedPart;
 			final double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();

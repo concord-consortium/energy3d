@@ -78,9 +78,9 @@ class DataViewer {
 			if (selectedPart instanceof SolarPanel) {
 				header = new String[] { "Month", "Solar" };
 			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof) {
-				header = new String[] { "Month", "Heat Loss" };
+				header = new String[] { "Month", "Heat Gain" };
 			} else if (selectedPart instanceof Window) {
-				header = new String[] { "Month", "Solar", "Heat Loss" };
+				header = new String[] { "Month", "Solar", "Heat Gain" };
 			}
 		}
 		if (header == null) {
