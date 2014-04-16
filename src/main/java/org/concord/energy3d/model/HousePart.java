@@ -631,20 +631,19 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
-
-		if (SceneManager.getInstance().isSolarColorMap()) {
-			if (textureCleared.get(mesh) == Boolean.TRUE)
-				return;
-			textureCleared.put(mesh, Boolean.TRUE);
-		} else if (!textureCleared.isEmpty())
-			textureCleared.clear();
-
-		if (this instanceof Tree) { // special treatment
+		if (this instanceof Tree) { // special treatment because the same mesh of a tree has two textures (shed or not)
 			final TextureState ts = new TextureState();
 			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, isFrozen());
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
 		} else {
+			if (SceneManager.getInstance().isSolarColorMap()) {
+				if (textureCleared.get(mesh) == Boolean.TRUE)
+					return;
+				textureCleared.put(mesh, Boolean.TRUE);
+			} else if (!textureCleared.isEmpty())
+				textureCleared.clear();
+
 			if (isFrozen() || SceneManager.getInstance().isSolarColorMap()) {
 				mesh.clearRenderState(StateType.Texture);
 				mesh.setDefaultColor(Scene.GRAY);
@@ -658,7 +657,6 @@ public abstract class HousePart implements Serializable {
 				mesh.setRenderState(ts);
 			}
 		}
-
 	}
 
 	private Texture getTexture(final String filename, final boolean isTransparent, final ReadOnlyColorRGBA defaultColor, final boolean grayout) {
