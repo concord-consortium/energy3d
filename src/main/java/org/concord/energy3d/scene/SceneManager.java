@@ -1147,6 +1147,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
 				((Foundation) selectedHousePart).move(d, houseMovePoints);
 			}
+		} else if (houseMoveStartPoint != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Window) {
+			final Wall wall = (Wall) selectedHousePart.getContainer();
+			final PickedHousePart pick = SelectUtil.pickPart(x, y, wall.getRoot());
+			if (pick != null) {
+				final Vector3 d = pick.getPoint().subtractLocal(houseMoveStartPoint);
+				((Window) selectedHousePart).move(d, houseMovePoints);
+			}
 		} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
 			final PickedHousePart selectHousePart = SelectUtil.selectHousePart(x, y, false);
 			pick = selectHousePart == null ? null : selectHousePart.getUserData();
@@ -1266,17 +1273,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								while (selectedHousePart.getContainer() != null)
 									selectedHousePart = selectedHousePart.getContainer();
 							}
-							if (selectedHousePart instanceof Foundation) {
-								cameraControl.setLeftMouseButtonEnabled(false);
-								houseMoveStartPoint = selectHousePart.getPoint();
-								invisibleFloor.setTranslation(0, 0, houseMoveStartPoint.getZ());
-								final ArrayList<Vector3> points = selectedHousePart.getPoints();
-								houseMovePoints = new ArrayList<Vector3>(points.size());
-								for (final Vector3 p : points)
-									houseMovePoints.add(p.clone());
-							} else
+							else
 								selectedHousePart = null;
 						}
+						if (selectedHousePart instanceof Foundation || selectedHousePart instanceof Window) {
+							cameraControl.setLeftMouseButtonEnabled(false);
+							houseMoveStartPoint = selectHousePart.getPoint();
+							invisibleFloor.setTranslation(0, 0, houseMoveStartPoint.getZ());
+							final ArrayList<Vector3> points = selectedHousePart.getPoints();
+							houseMovePoints = new ArrayList<Vector3>(points.size());
+							for (final Vector3 p : points)
+								houseMovePoints.add(p.clone());
+						} 
 
 						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
 							previousSelectedHousePart.setEditPointsVisible(false);

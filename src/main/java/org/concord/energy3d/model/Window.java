@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Annotation;
@@ -315,4 +316,22 @@ public class Window extends HousePart {
 		return container.getFaceDirection();
 	}
 
+	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
+		System.out.println(d);
+		final List<Vector3> orgPoints = new ArrayList<Vector3>(houseMovePoints.size());
+		for (int i = 0; i < points.size(); i++)
+			orgPoints.add(points.get(i));
+
+		final Vector3 d_rel = toRelative(getAbsPoint(0).subtract(d, null)).subtractLocal(points.get(0)).negateLocal();
+		for (int i = 0; i < points.size(); i++) {
+			final Vector3 newP = houseMovePoints.get(i).add(d_rel, null);
+			points.set(i, newP);
+			if (i == points.size() - 1 && false) {
+				for (int j = 0; j < points.size(); j++)
+					points.set(j, orgPoints.get(j));
+				return;
+			}
+		}
+		Scene.getInstance().redrawAll();
+	}	
 }
