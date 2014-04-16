@@ -23,7 +23,6 @@ import java.util.concurrent.CancellationException;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -293,6 +292,8 @@ public class EnergyPanel extends JPanel {
 		insideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
+				if (disableActions)
+					return;
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
@@ -808,7 +809,7 @@ public class EnergyPanel extends JPanel {
 			progressBar.setStringPainted(false);
 
 			updateOutsideTemperature();
-			HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalander().clone(), (Integer) insideTemperatureSpinner.getValue());
+			HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), (Integer) insideTemperatureSpinner.getValue());
 
 			SolarIrradiation.getInstance().compute();
 			notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Solar energy calculation completed", 0, 1));
@@ -837,9 +838,9 @@ public class EnergyPanel extends JPanel {
 
 	private void updateOutsideTemperature() {
 		if (cityComboBox.getSelectedItem().equals(""))
-			outsideTemperatureSpinner.setValue(15);
+			outsideTemperatureSpinner.setValue(20);
 		else
-			outsideTemperatureSpinner.setValue(Math.round(CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander())));
+			outsideTemperatureSpinner.setValue(Math.round(CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalender())));
 	}
 
 	public JSpinner getDateSpinner() {

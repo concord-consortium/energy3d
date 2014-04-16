@@ -74,7 +74,7 @@ public class SolarIrradiation {
 		}
 		onLand = null;
 		maxValue = 1;
-		computeToday((Calendar) Heliodon.getInstance().getCalander().clone());
+		computeToday((Calendar) Heliodon.getInstance().getCalender().clone());
 		updateValueOnAllHouses();
 	}
 

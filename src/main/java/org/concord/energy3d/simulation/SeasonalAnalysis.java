@@ -86,7 +86,7 @@ public abstract class SeasonalAnalysis {
 			public void run() {
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
-						Heliodon.getInstance().getCalander().set(Calendar.MONTH, m);
+						Heliodon.getInstance().getCalender().set(Calendar.MONTH, m);
 						try {
 							EnergyPanel.getInstance().computeNow();
 						} catch (final Exception e) {
@@ -96,7 +96,7 @@ public abstract class SeasonalAnalysis {
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
-								EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalander().getTime());
+								EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalender().getTime());
 							}
 						});
 					}
