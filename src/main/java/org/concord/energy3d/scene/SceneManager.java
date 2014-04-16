@@ -1431,8 +1431,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setSolarColorMap(final boolean solarColorMap) {
-		this.solarColorMap = solarColorMap;
-		solarLand.setVisible(solarColorMap);
+		setSolarColorMapWithoutUpdate(solarColorMap);
 		getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {

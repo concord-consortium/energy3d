@@ -838,7 +838,7 @@ public class EnergyPanel extends JPanel {
 
 	private void updateOutsideTemperature() {
 		if (cityComboBox.getSelectedItem().equals(""))
-			outsideTemperatureSpinner.setValue(20);
+			outsideTemperatureSpinner.setValue(15);
 		else
 			outsideTemperatureSpinner.setValue(Math.round(CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalender())));
 	}

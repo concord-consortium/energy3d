@@ -132,9 +132,7 @@ public class Scene implements Serializable {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-
 		final Foundation foundation = new Foundation(xLength, yLength);
-
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
@@ -142,6 +140,7 @@ public class Scene implements Serializable {
 				return null;
 			}
 		});
+		EnergyPanel.getInstance().updatePartEnergy();
 	}
 
 	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
@@ -218,6 +217,7 @@ public class Scene implements Serializable {
 		if (cameraControl != null)
 			cameraControl.reset();
 		SceneManager.getInstance().hideAllEditPoints();
+		EnergyPanel.getInstance().updatePartEnergy();
 	}
 
 	public static void initSceneNow() {
