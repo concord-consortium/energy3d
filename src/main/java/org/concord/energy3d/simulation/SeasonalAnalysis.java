@@ -14,8 +14,6 @@ import static java.util.Calendar.OCTOBER;
 import static java.util.Calendar.SEPTEMBER;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Point;
@@ -43,7 +41,6 @@ import javax.swing.event.PopupMenuListener;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
-import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
@@ -63,10 +60,6 @@ public abstract class SeasonalAnalysis {
 	private JButton runButton;
 
 	SeasonalAnalysis() {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		graph = selectedPart instanceof Foundation ? new BuildingEnergyGraph() : new PartEnergyGraph();
-		graph.setPreferredSize(new Dimension(600, 400));
-		graph.setBackground(Color.white);
 	}
 
 	void stopAnalysis() {

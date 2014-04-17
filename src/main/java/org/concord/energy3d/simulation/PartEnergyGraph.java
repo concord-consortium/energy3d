@@ -58,7 +58,7 @@ class PartEnergyGraph extends Graph {
 					dataX = left + dx * i;
 					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
 					if ("Solar".equals(key)) {
-						drawCircle(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+						drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
 					} else if ("Heat Gain".equals(key)) {
 						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					}
@@ -79,7 +79,7 @@ class PartEnergyGraph extends Graph {
 		int y0 = top - 10;
 		String s = "Solar";
 		if (data.containsKey(s) && !isDataHidden(s)) {
-			drawCircle(g2, x0, y0, 8, colors.get(s));
+			drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));
 			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 

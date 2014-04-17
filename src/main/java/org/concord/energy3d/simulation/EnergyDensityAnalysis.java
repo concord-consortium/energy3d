@@ -1,5 +1,8 @@
 package org.concord.energy3d.simulation;
 
+import java.awt.Color;
+import java.awt.Dimension;
+
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -23,6 +26,9 @@ public class EnergyDensityAnalysis extends SeasonalAnalysis {
 
 	public EnergyDensityAnalysis() {
 		super();
+		graph = new PartEnergyGraph();
+		graph.setPreferredSize(new Dimension(600, 400));
+		graph.setBackground(Color.white);
 		graph.yAxisLabel = "Energy Density (kWh/m\u00B2)";
 	}
 

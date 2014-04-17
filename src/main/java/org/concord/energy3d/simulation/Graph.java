@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
 import java.text.DecimalFormat;
@@ -57,7 +58,7 @@ abstract class Graph extends JPanel {
 		colors.put("Solar Panels", Color.GREEN.darker());
 		colors.put("Heater", Color.RED);
 		colors.put("AC", Color.BLUE);
-		colors.put("Net", Color.WHITE);
+		colors.put("Net", Color.MAGENTA);
 	}
 
 	Graph() {
@@ -278,19 +279,31 @@ abstract class Graph extends JPanel {
 		g2.drawString(yLabel, left / 2 - 5 - yLabelWidth, yValue + 4);
 	}
 
-	static void drawCircle(Graphics g, int x, int y, int d, Color c) {
+	static void drawCircle(Graphics g, int upperLeftX, int upperLeftY, int d, Color c) {
 		g.setColor(c);
-		g.fillOval(x, y, d, d);
+		g.fillOval(upperLeftX, upperLeftY, d, d);
 		g.setColor(Color.BLACK);
-		g.drawOval(x, y, d, d);
+		g.drawOval(upperLeftX, upperLeftY, d, d);
 
 	}
 
-	static void drawSquare(Graphics g, int x, int y, int a, Color c) {
+	static void drawSquare(Graphics g, int upperLeftX, int upperLeftY, int a, Color c) {
 		g.setColor(c);
-		g.fillRect(x, y, a, a);
+		g.fillRect(upperLeftX, upperLeftY, a, a);
 		g.setColor(Color.BLACK);
-		g.drawRect(x, y, a, a);
+		g.drawRect(upperLeftX, upperLeftY, a, a);
+	}
+
+	static void drawDiamond(Graphics g, int x, int y, int a, Color c) {
+		g.setColor(c);
+		Polygon p = new Polygon();
+		p.addPoint(x, y - a);
+		p.addPoint(x + a, y);
+		p.addPoint(x, y + a);
+		p.addPoint(x - a, y);
+		g.fillPolygon(p);
+		g.setColor(Color.BLACK);
+		g.drawPolygon(p);
 	}
 
 }
