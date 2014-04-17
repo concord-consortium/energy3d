@@ -110,7 +110,7 @@ public abstract class SeasonalAnalysis {
 
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-		title = title.replaceAll("Foundation", "Building");
+		s = s.replaceAll("Foundation", "Building");
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), title + ": " + s, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
@@ -195,16 +195,37 @@ public abstract class SeasonalAnalysis {
 			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
 				showRunsMenu.removeAll();
 				if (!Graph.records.isEmpty()) {
+					JMenuItem mi = new JMenuItem("Show All");
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							for (Results r : Graph.records)
+								graph.hideRun(r.getID(), false);
+							graph.repaint();
+						}
+					});
+					showRunsMenu.add(mi);
+					mi = new JMenuItem("Hide All");
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							for (Results r : Graph.records)
+								graph.hideRun(r.getID(), true);
+							graph.repaint();
+						}
+					});
+					showRunsMenu.add(mi);
+					showRunsMenu.addSeparator();
 					for (final Results r : Graph.records) {
-						final JCheckBoxMenuItem mi = new JCheckBoxMenuItem(Integer.toString(r.getID()), !graph.isRunHidden(r.getID()));
-						mi.addItemListener(new ItemListener() {
+						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(Integer.toString(r.getID()), !graph.isRunHidden(r.getID()));
+						cbmi.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(final ItemEvent e) {
-								graph.hideRun(r.getID(), !mi.isSelected());
+								graph.hideRun(r.getID(), !cbmi.isSelected());
 								graph.repaint();
 							}
 						});
-						showRunsMenu.add(mi);
+						showRunsMenu.add(cbmi);
 					}
 				}
 			}
