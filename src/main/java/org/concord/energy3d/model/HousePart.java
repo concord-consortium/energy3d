@@ -26,6 +26,7 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -330,12 +331,38 @@ public abstract class HousePart implements Serializable {
 	protected Vector3 toRelative(final ReadOnlyVector3 org, final HousePart container) {
 		if (container == null)
 			return new Vector3(org);
-		final Vector3 origin = container.getAbsPoint(0);
-		final Vector3 p = org.subtract(origin, null);
-		final Vector3 wallx = container.getAbsPoint(2).subtract(origin, null);
-		final Vector3 wally = container.getAbsPoint(1).subtract(origin, null);
-		final Vector3 pointOnWall = new Vector3(Util.isZero(wallx.getX()) ? p.getY() / wallx.getY() : p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY() : org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
-		return pointOnWall;
+		final Vector3 p0 = container.getAbsPoint(0);
+		final Vector3 origin = p0;
+//		final Vector3 p = org.subtract(origin, null);
+		final Vector3 u = container.getAbsPoint(2).subtract(origin, null);
+		final Vector3 v = container.getAbsPoint(1).subtract(origin, null);
+//		if (Util.isZero(u.getX())) {
+//			final Vector3 tmp = u;
+//			u = v;
+//			v = tmp;
+//		}
+//		final Vector3 pointOnWall = new Vector3(Util.isZero(wallx.getX()) ? p.getY() / wallx.getY() : p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY() : org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
+
+//		relativeToHorizontal = Util.isZero(v.getZ());
+
+		final Vector2 u2 = new Vector2(u.getX(), u.getY());
+		final Vector2 v2;
+		final Vector3 p1 = container.getAbsPoint(1);
+		final Vector3 p2 = container.getAbsPoint(2);
+		final Vector2 p_2d = new Vector2(org.getX(), org.getY());
+		final Vector2 p0_2d = new Vector2(p0.getX(), p0.getY());
+		final double uScale = Util.projectPointOnLineScale(p_2d, p0_2d, new Vector2(p2.getX(), p2.getY()));
+		final double vScale;
+		if (relativeToHorizontal)
+			vScale = Util.projectPointOnLineScale(p_2d, p0_2d, new Vector2(p1.getX(), p1.getY()));
+		else
+			vScale = Util.projectPointOnLineScale(new Vector2(0, org.getZ()), new Vector2(0, p0.getZ()), new Vector2(0, p1.getZ()));
+
+		if (relativeToHorizontal)
+			return new Vector3(uScale, vScale, org.getZ());
+		else
+			return new Vector3(uScale, org.getY(), vScale);
+//		return pointOnWall;
 	}
 
 	protected Vector3 toAbsolute(final ReadOnlyVector3 p) {
