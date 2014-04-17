@@ -35,6 +35,7 @@ abstract class Graph extends JPanel {
 	BasicStroke thick = new BasicStroke(2);
 	Map<String, List<Double>> data;
 	Map<String, Boolean> hideData;
+	Map<Integer, Boolean> hideRuns;
 	static List<Results> records;
 	double xmin = 0;
 	double xmax = 11;
@@ -65,17 +66,9 @@ abstract class Graph extends JPanel {
 		super();
 		data = new HashMap<String, List<Double>>();
 		hideData = new HashMap<String, Boolean>();
+		hideRuns = new HashMap<Integer, Boolean>();
 		twoDecimals = new DecimalFormat();
 		twoDecimals.setMaximumFractionDigits(2);
-		if (!records.isEmpty()) {
-			for (Results r : records) {
-				double[] bound = r.getBound();
-				if (bound[0] < ymin)
-					ymin = bound[0];
-				if (bound[1] > ymax)
-					ymax = bound[1];
-			}
-		}
 	}
 
 	void keepResults() {
@@ -86,6 +79,15 @@ abstract class Graph extends JPanel {
 
 	boolean hasRecords() {
 		return !records.isEmpty();
+	}
+
+	private boolean areRecordsShown() {
+		for (Results r : records) {
+			Boolean x = hideRuns.get(r.getID());
+			if (x == null || x == Boolean.FALSE)
+				return true;
+		}
+		return false;
 	}
 
 	void clearRecords() {
@@ -119,6 +121,15 @@ abstract class Graph extends JPanel {
 
 	boolean isDataHidden(String name) {
 		Boolean b = hideData.get(name);
+		return b != null ? b : false;
+	}
+
+	void hideRun(int id, boolean hidden) {
+		hideRuns.put(id, hidden);
+	}
+
+	boolean isRunHidden(int id) {
+		Boolean b = hideRuns.get(id);
 		return b != null ? b : false;
 	}
 
@@ -189,7 +200,9 @@ abstract class Graph extends JPanel {
 		g2.drawString(yAxisLabel, 16, (height + yAxisLabelWidth) / 2);
 		g2.rotate(Math.PI / 2, 16, (height + yAxisLabelWidth) / 2);
 
-		if (hasRecords()) {
+		boolean showRecords = hasRecords() && areRecordsShown();
+		if (showRecords) {
+			recalculateBounds();
 			drawRecords(g2);
 		} else {
 			ymin = 0;
@@ -203,19 +216,8 @@ abstract class Graph extends JPanel {
 			int infoWidth = g2.getFontMetrics().stringWidth(info);
 			g2.drawString(info, (width - infoWidth) / 2, height / 2);
 		} else {
-			for (String key : data.keySet()) {
-				List<Double> list = data.get(key);
-				if (!list.isEmpty()) {
-					double max = Collections.max(list);
-					double min = Collections.min(list);
-					if (max > ymax)
-						ymax = max;
-					if (min < ymin)
-						ymin = min;
-				}
-			}
-			dx = (float) (getWidth() - left - right) / (float) (xmax - xmin);
-			dy = (float) (getHeight() - top - bottom) / (float) (ymax - ymin);
+			if (!showRecords)
+				recalculateBounds();
 			int digits = String.valueOf(Math.round(ymax - ymin)).length() - 1;
 			digits = (int) Math.pow(10, digits);
 			int i1 = (int) Math.round(ymin / digits) - 2;
@@ -234,11 +236,41 @@ abstract class Graph extends JPanel {
 
 	}
 
+	private void recalculateBounds() {
+		if (!records.isEmpty()) {
+			for (Results r : records) {
+				if (isRunHidden(r.getID()))
+					continue;
+				double[] bound = r.getBound();
+				if (bound[0] < ymin)
+					ymin = bound[0];
+				if (bound[1] > ymax)
+					ymax = bound[1];
+			}
+		}
+		for (String key : data.keySet()) {
+			List<Double> list = data.get(key);
+			if (!list.isEmpty()) {
+				double max = Collections.max(list);
+				double min = Collections.min(list);
+				if (max > ymax)
+					ymax = max;
+				if (min < ymin)
+					ymin = min;
+			}
+		}
+		dx = (float) (getWidth() - left - right) / (float) (xmax - xmin);
+		dy = (float) (getHeight() - top - bottom) / (float) (ymax - ymin);
+	}
+
 	void drawRecords(Graphics2D g2) {
 
 		double dataX, dataY;
 		Path2D.Float path = new Path2D.Float();
 		for (Results r : records) {
+
+			if (isRunHidden(r.getID()))
+				continue;
 
 			Map<String, List<Double>> x = r.getData();
 			for (String key : x.keySet()) {

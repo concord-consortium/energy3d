@@ -158,11 +158,11 @@ public abstract class SeasonalAnalysis {
 		});
 		menu.add(miView);
 
-		final JMenu showMenu = new JMenu("Show");
-		showMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+		final JMenu showTypeMenu = new JMenu("Types");
+		showTypeMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
 			@Override
 			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
-				showMenu.removeAll();
+				showTypeMenu.removeAll();
 				final Set<String> dataNames = graph.getDataNames();
 				if (!dataNames.isEmpty()) {
 					for (final String name : dataNames) {
@@ -174,7 +174,7 @@ public abstract class SeasonalAnalysis {
 								graph.repaint();
 							}
 						});
-						showMenu.add(mi);
+						showTypeMenu.add(mi);
 					}
 				}
 			}
@@ -187,7 +187,37 @@ public abstract class SeasonalAnalysis {
 			public void popupMenuCanceled(final PopupMenuEvent e) {
 			}
 		});
-		menuBar.add(showMenu);
+		menuBar.add(showTypeMenu);
+
+		final JMenu showRunsMenu = new JMenu("Runs");
+		showRunsMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+				showRunsMenu.removeAll();
+				if (!Graph.records.isEmpty()) {
+					for (final Results r : Graph.records) {
+						final JCheckBoxMenuItem mi = new JCheckBoxMenuItem(Integer.toString(r.getID()), !graph.isRunHidden(r.getID()));
+						mi.addItemListener(new ItemListener() {
+							@Override
+							public void itemStateChanged(final ItemEvent e) {
+								graph.hideRun(r.getID(), !mi.isSelected());
+								graph.repaint();
+							}
+						});
+						showRunsMenu.add(mi);
+					}
+				}
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+			}
+
+			@Override
+			public void popupMenuCanceled(final PopupMenuEvent e) {
+			}
+		});
+		menuBar.add(showRunsMenu);
 
 		final JPanel contentPane = new JPanel(new BorderLayout());
 		dialog.setContentPane(contentPane);

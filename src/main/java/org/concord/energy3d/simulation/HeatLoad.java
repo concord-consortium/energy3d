@@ -52,26 +52,28 @@ public class HeatLoad {
 		else
 			outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 
-		for (int minute = 0; minute < 1440; minute += timeStep) {
-			for (final HousePart part : Scene.getInstance().getParts()) {
-				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
-				final double deltaT = insideTemperature - outsideTemperature;
-				if (part.isDrawCompleted()) {
-					final double uFactor;
-					if (part instanceof Wall)
-						uFactor = wallUFactor;
-					else if (part instanceof Door)
-						uFactor = doorUFactor;
-					else if (part instanceof Window)
-						uFactor = windowUFactor;
-					else if (part instanceof Roof)
-						uFactor = roofUFactor;
-					else
-						continue;
-					double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
-					if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
-						heatloss = 0;
-					part.getHeatLoss()[minute / timeStep] += heatloss;
+		synchronized (Scene.getInstance().getParts()) { // without this, it sometimes throws ConcurrentModificationException and causes refresh to fail
+			for (int minute = 0; minute < 1440; minute += timeStep) {
+				for (final HousePart part : Scene.getInstance().getParts()) {
+					final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
+					final double deltaT = insideTemperature - outsideTemperature;
+					if (part.isDrawCompleted()) {
+						final double uFactor;
+						if (part instanceof Wall)
+							uFactor = wallUFactor;
+						else if (part instanceof Door)
+							uFactor = doorUFactor;
+						else if (part instanceof Window)
+							uFactor = windowUFactor;
+						else if (part instanceof Roof)
+							uFactor = roofUFactor;
+						else
+							continue;
+						double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
+						if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
+							heatloss = 0;
+						part.getHeatLoss()[minute / timeStep] += heatloss;
+					}
 				}
 			}
 		}
