@@ -680,7 +680,8 @@ public class Heliodon {
 			sunRegion.getSceneHints().setCullHint(CullHint.Always);
 	}
 
-	public Calendar getCalander() {
+	public Calendar getCalender() {
 		return calendar;
 	}
+
 }

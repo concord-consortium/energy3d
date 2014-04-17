@@ -614,8 +614,8 @@ public class MainPanel extends JPanel {
 			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
 			solarButton.addMouseListener(refreshUponMouseExit);
 			solarButton.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent arg0) {
+				@Override				
+				public void itemStateChanged(ItemEvent e) {
 					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}

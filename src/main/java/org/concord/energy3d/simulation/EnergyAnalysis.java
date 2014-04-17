@@ -1,5 +1,8 @@
 package org.concord.energy3d.simulation;
 
+import java.awt.Color;
+import java.awt.Dimension;
+
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -23,24 +26,31 @@ public class EnergyAnalysis extends SeasonalAnalysis {
 
 	public EnergyAnalysis() {
 		super();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		graph = selectedPart instanceof Foundation ? new BuildingEnergyGraph() : new PartEnergyGraph();
+		graph.setPreferredSize(new Dimension(600, 400));
+		graph.setBackground(Color.white);
 	}
 
 	@Override
 	void updateGraph() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Foundation) {
-			final Foundation selectedBuilding = (Foundation) selectedPart;
-			final double window = selectedBuilding.getPassiveSolarToday();
-			final double solarPanel = selectedBuilding.getPhotovoltaicToday();
-			final double heater = selectedBuilding.getHeatingToday();
-			final double ac = selectedBuilding.getCoolingToday();
-			final double net = selectedBuilding.getTotalEnergyToday();
-			// System.out.println(window + ", " + solarPanel + ", " + heater + ", " + ac + ", " + net);
-			graph.addData("Windows", window);
-			graph.addData("Solar Panels", solarPanel);
-			graph.addData("Heater", heater);
-			graph.addData("AC", ac);
-			graph.addData("Net", net);
+			if (graph instanceof BuildingEnergyGraph) {
+				final Foundation selectedBuilding = (Foundation) selectedPart;
+				final double window = selectedBuilding.getPassiveSolarToday();
+				final double solarPanel = selectedBuilding.getPhotovoltaicToday();
+				final double heater = selectedBuilding.getHeatingToday();
+				final double ac = selectedBuilding.getCoolingToday();
+				final double net = selectedBuilding.getTotalEnergyToday();
+				graph.addData("Windows", window);
+				graph.addData("Solar Panels", solarPanel);
+				graph.addData("Heater", heater);
+				graph.addData("AC", ac);
+				graph.addData("Net", net);
+			} else {
+				graph.addData("Solar", selectedPart.getSolarPotentialToday());
+			}
 		} else if (selectedPart instanceof Window) {
 			final double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
 			graph.addData("Solar", solar);

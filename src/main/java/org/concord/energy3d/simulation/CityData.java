@@ -97,7 +97,7 @@ public class CityData {
 	}
 
 	public double computeOutsideTemperature(final Calendar now) {
-		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalander(), (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalender(), (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 		return computeOutsideTemperatureRange(outsideTemperatureRange, now.get(Calendar.MINUTE) + now.get(Calendar.HOUR_OF_DAY) * 60);
 	}
 

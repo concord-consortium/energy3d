@@ -151,7 +151,7 @@ public class Tree extends HousePart {
 	}
 
 	private boolean isShedded() {
-		final int month = Heliodon.getInstance().getCalander().get(Calendar.MONTH);
+		final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
 		return month > 10 || month < 4;
 	}
 

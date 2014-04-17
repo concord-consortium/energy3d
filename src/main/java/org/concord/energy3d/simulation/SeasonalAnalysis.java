@@ -14,8 +14,6 @@ import static java.util.Calendar.OCTOBER;
 import static java.util.Calendar.SEPTEMBER;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Point;
@@ -43,7 +41,6 @@ import javax.swing.event.PopupMenuListener;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
-import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
@@ -63,10 +60,6 @@ public abstract class SeasonalAnalysis {
 	private JButton runButton;
 
 	SeasonalAnalysis() {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		graph = selectedPart instanceof Foundation ? new BuildingEnergyGraph() : new PartEnergyGraph();
-		graph.setPreferredSize(new Dimension(600, 400));
-		graph.setBackground(Color.white);
 	}
 
 	void stopAnalysis() {
@@ -77,6 +70,7 @@ public abstract class SeasonalAnalysis {
 
 	void runSeasonalAnalysis() {
 		Util.selectSilently(MainPanel.getInstance().getSolarButton(), true);
+		SceneManager.getInstance().setSolarColorMapWithoutUpdate(true);
 		graph.clearData();
 		SceneManager.getInstance().getSolarLand().setVisible(true);
 		EnergyPanel.getInstance().disableActions(true);
@@ -85,7 +79,7 @@ public abstract class SeasonalAnalysis {
 			public void run() {
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
-						Heliodon.getInstance().getCalander().set(Calendar.MONTH, m);
+						Heliodon.getInstance().getCalender().set(Calendar.MONTH, m);
 						try {
 							EnergyPanel.getInstance().computeNow();
 						} catch (final Exception e) {
@@ -95,7 +89,7 @@ public abstract class SeasonalAnalysis {
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
-								EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalander().getTime());
+								EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalender().getTime());
 							}
 						});
 					}
@@ -164,11 +158,11 @@ public abstract class SeasonalAnalysis {
 		});
 		menu.add(miView);
 
-		final JMenu showMenu = new JMenu("Show");
-		showMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+		final JMenu showTypeMenu = new JMenu("Types");
+		showTypeMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
 			@Override
 			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
-				showMenu.removeAll();
+				showTypeMenu.removeAll();
 				final Set<String> dataNames = graph.getDataNames();
 				if (!dataNames.isEmpty()) {
 					for (final String name : dataNames) {
@@ -180,7 +174,7 @@ public abstract class SeasonalAnalysis {
 								graph.repaint();
 							}
 						});
-						showMenu.add(mi);
+						showTypeMenu.add(mi);
 					}
 				}
 			}
@@ -193,7 +187,37 @@ public abstract class SeasonalAnalysis {
 			public void popupMenuCanceled(final PopupMenuEvent e) {
 			}
 		});
-		menuBar.add(showMenu);
+		menuBar.add(showTypeMenu);
+
+		final JMenu showRunsMenu = new JMenu("Runs");
+		showRunsMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+				showRunsMenu.removeAll();
+				if (!Graph.records.isEmpty()) {
+					for (final Results r : Graph.records) {
+						final JCheckBoxMenuItem mi = new JCheckBoxMenuItem(Integer.toString(r.getID()), !graph.isRunHidden(r.getID()));
+						mi.addItemListener(new ItemListener() {
+							@Override
+							public void itemStateChanged(final ItemEvent e) {
+								graph.hideRun(r.getID(), !mi.isSelected());
+								graph.repaint();
+							}
+						});
+						showRunsMenu.add(mi);
+					}
+				}
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+			}
+
+			@Override
+			public void popupMenuCanceled(final PopupMenuEvent e) {
+			}
+		});
+		menuBar.add(showRunsMenu);
 
 		final JPanel contentPane = new JPanel(new BorderLayout());
 		dialog.setContentPane(contentPane);

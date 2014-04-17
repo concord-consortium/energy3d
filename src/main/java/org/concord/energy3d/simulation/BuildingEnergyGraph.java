@@ -56,7 +56,7 @@ class BuildingEnergyGraph extends Graph {
 					dataX = left + dx * i;
 					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
 					if ("Windows".equals(key)) {
-						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+						drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
 					} else if ("Solar Panels".equals(key)) {
 						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					} else if ("Heater".equals(key)) {
@@ -84,7 +84,7 @@ class BuildingEnergyGraph extends Graph {
 		String s = "Windows";
 		int y0 = top - 10;
 		if (!isDataHidden(s)) {
-			drawSquare(g2, x0, y0, 8, colors.get(s));
+			drawDiamond(g2, x0 + 4, y0 + 3, 5, colors.get(s));
 			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 

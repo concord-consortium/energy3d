@@ -1,8 +1,12 @@
 package org.concord.energy3d.simulation;
 
+import java.awt.Color;
+import java.awt.Dimension;
+
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -22,6 +26,9 @@ public class EnergyDensityAnalysis extends SeasonalAnalysis {
 
 	public EnergyDensityAnalysis() {
 		super();
+		graph = new PartEnergyGraph();
+		graph.setPreferredSize(new Dimension(600, 400));
+		graph.setBackground(Color.white);
 		graph.yAxisLabel = "Energy Density (kWh/m\u00B2)";
 	}
 
@@ -29,8 +36,7 @@ public class EnergyDensityAnalysis extends SeasonalAnalysis {
 	void updateGraph() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Window) {
-			double area = selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale(); // width
-			area *= selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale(); // height
+			final double area = selectedPart.computeArea();
 			final double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
 			graph.addData("Solar", solar / area);
 			final double[] loss = selectedPart.getHeatLoss();
@@ -38,18 +44,15 @@ public class EnergyDensityAnalysis extends SeasonalAnalysis {
 			for (final double x : loss)
 				sum += x;
 			graph.addData("Heat Gain", -sum / area);
-		} else if (selectedPart instanceof Wall || selectedPart instanceof Door) {
-			double area = selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale(); // width
-			area *= selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale(); // height
+		} else if (selectedPart instanceof Wall || selectedPart instanceof Door || selectedPart instanceof Roof) {
+			double area = selectedPart.computeArea();
 			final double[] loss = selectedPart.getHeatLoss();
 			double sum = 0;
 			for (final double x : loss)
 				sum += x;
 			graph.addData("Heat Gain", -sum / area);
 		} else if (selectedPart instanceof Foundation) {
-			double area = selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale(); // width
-			area *= selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale(); // height
-			graph.addData("Solar", selectedPart.getSolarPotentialToday() / area);
+			graph.addData("Solar", selectedPart.getSolarPotentialToday() / selectedPart.computeArea());
 		} else if (selectedPart instanceof SolarPanel) {
 			final SolarPanel solarPanel = (SolarPanel) selectedPart;
 			final double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();

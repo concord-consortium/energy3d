@@ -123,7 +123,7 @@ public class Scene implements Serializable {
 	}
 
 	public static void newFile() {
-		newFile(40, 30);
+		newFile(80, 60); // by default, the foundation is 16 meters x 12 meters (192 square meters seem right for a house)
 	}
 
 	private static void newFile(final double xLength, final double yLength) {
@@ -132,9 +132,7 @@ public class Scene implements Serializable {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-
 		final Foundation foundation = new Foundation(xLength, yLength);
-
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
@@ -142,6 +140,7 @@ public class Scene implements Serializable {
 				return null;
 			}
 		});
+		EnergyPanel.getInstance().updatePartEnergy();
 	}
 
 	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
@@ -218,6 +217,7 @@ public class Scene implements Serializable {
 		if (cameraControl != null)
 			cameraControl.reset();
 		SceneManager.getInstance().hideAllEditPoints();
+		EnergyPanel.getInstance().updatePartEnergy();
 	}
 
 	public static void initSceneNow() {
@@ -398,7 +398,7 @@ public class Scene implements Serializable {
 
 				instance.hideAxes = !SceneManager.getInstance().areAxesShown();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsShown();
-				instance.calendar = Heliodon.getInstance().getCalander();
+				instance.calendar = Heliodon.getInstance().getCalender();
 				instance.latitude = EnergyPanel.getInstance().getLatitude();
 				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();

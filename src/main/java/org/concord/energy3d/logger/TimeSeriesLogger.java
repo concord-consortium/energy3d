@@ -218,7 +218,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (sceneManager.isSunAnim()) {
 			line += separator + "\"SunAnimation\": true";
 		} else {
-			final Calendar heliodonCalendar = Heliodon.getInstance().getCalander();
+			final Calendar heliodonCalendar = Heliodon.getInstance().getCalender();
 			final String heliodonTime = "\"Time\": \"" + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "\"";
 			if (!heliodonTime.equals(oldHeliodonTime)) {
 				if (!sceneManager.isSunAnim()) // don't log time if sun path is animated
