@@ -34,6 +34,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -406,8 +407,9 @@ public class MainPanel extends JPanel {
 			resizeButton.addActionListener(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(Operation.RESIZE);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+//					SceneManager.getInstance().setOperation(Operation.RESIZE);
+//					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					((Foundation) SceneManager.getInstance().getSelectedPart()).rotate();
 				}
 			});
 		}
@@ -613,7 +615,7 @@ public class MainPanel extends JPanel {
 			solarButton.addMouseListener(refreshUponMouseExit);
 			solarButton.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(ItemEvent arg0) {
+				public void itemStateChanged(final ItemEvent arg0) {
 					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -742,12 +744,12 @@ public class MainPanel extends JPanel {
 			treeArrowButton = new JButton();
 			treeArrowButton.setIcon(new Icon() {
 				@Override
-				public void paintIcon(Component c, Graphics g, int x, int y) {
+				public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
 					g.setColor(Color.BLACK);
-					int x2 = getIconWidth() / 2;
-					int y2 = getIconHeight() / 2;
-					int[] vx = new int[] { 2, getIconWidth() - 2, x2 };
-					int[] vy = new int[] { y2 - 2, y2 - 2, y2 + 4 };
+					final int x2 = getIconWidth() / 2;
+					final int y2 = getIconHeight() / 2;
+					final int[] vx = new int[] { 2, getIconWidth() - 2, x2 };
+					final int[] vy = new int[] { y2 - 2, y2 - 2, y2 + 4 };
 					g.fillPolygon(vx, vy, vx.length);
 				}
 
@@ -764,7 +766,7 @@ public class MainPanel extends JPanel {
 			treeArrowButton.setMaximumSize(new Dimension(12, treeButton.getMaximumSize().height));
 			treeArrowButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent arg0) {
+				public void actionPerformed(final ActionEvent arg0) {
 					treeMenu.show(getTreeButton(), 0, getTreeButton().getHeight());
 				}
 			});
