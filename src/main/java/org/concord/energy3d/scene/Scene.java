@@ -123,7 +123,7 @@ public class Scene implements Serializable {
 	}
 
 	public static void newFile() {
-		newFile(40, 30);
+		newFile(80, 60); // by default, the foundation is 16 meters x 12 meters (192 square meters seem right for a house)
 	}
 
 	private static void newFile(final double xLength, final double yLength) {

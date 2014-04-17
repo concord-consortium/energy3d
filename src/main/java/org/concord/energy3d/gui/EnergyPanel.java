@@ -909,6 +909,8 @@ public class EnergyPanel extends JPanel {
 		final boolean iradiationEnabled = MainPanel.getInstance().getSolarButton().isSelected();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 
+		lblHeight_1.setText(selectedPart instanceof Foundation ? "Length:" : "Height:");
+
 		((TitledBorder) partPanel.getBorder()).setTitle("Part" + (selectedPart == null ? "" : (" - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1))));
 		partPanel.repaint();
 
