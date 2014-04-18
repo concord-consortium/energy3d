@@ -835,16 +835,13 @@ public class Foundation extends HousePart {
 	public void rotate() {
 		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, Math.PI / 4.0);
 		final ReadOnlyVector3 center = toRelative(getCenter().clone());
-		for (final HousePart part : Scene.getInstance().getParts())
-//			if (part == this || (part instanceof Wall && part.getTopContainer() == this))
-			if (part == this)
-				for (int i = 0; i < part.points.size(); i++) {
-					final Vector3 p = part.getAbsPoint(i);
-					final Vector3 op = p.subtract(center, null);
-					matrix.applyPost(op, op);
-					op.add(center, p);
-					part.points.get(i).set(part.toRelative(p));
-				}
+		for (int i = 0; i < points.size(); i++) {
+			final Vector3 p = getAbsPoint(i);
+			final Vector3 op = p.subtract(center, null);
+			matrix.applyPost(op, op);
+			op.add(center, p);
+			points.get(i).set(toRelative(p));
+		}
 		Scene.getInstance().redrawAll();
 	}
 
