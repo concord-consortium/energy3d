@@ -87,7 +87,6 @@ public abstract class Roof extends HousePart {
 	@Override
 	protected void init() {
 		super.init();
-		relativeToHorizontal = true;
 		orgCenters = new HashMap<Node, ReadOnlyVector3>();
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
@@ -650,7 +649,7 @@ public abstract class Roof extends HousePart {
 				editPoint.setX(cornerPoint.getX());
 				editPoint.setY(cornerPoint.getY());
 			}
-			points.get(editPointIndex).set(toRelative(editPoint, container.getContainer()));
+			points.get(editPointIndex).set(toRelative(editPoint));
 		}
 	}
 
@@ -787,11 +786,6 @@ public abstract class Roof extends HousePart {
 		}
 		drawAnnotations();
 		root.updateWorldBound(true);
-	}
-
-	@Override
-	public Vector3 getAbsPoint(final int index) {
-		return toAbsolute(points.get(index), container == null ? null : container.getContainer());
 	}
 
 	@Override

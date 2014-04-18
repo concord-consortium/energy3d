@@ -85,7 +85,6 @@ public class Wall extends HousePart {
 	@Override
 	protected void init() {
 		super.init();
-		relativeToHorizontal = true;
 		wallThickness = 0.5;
 		neighbors = new Snap[2];
 		if (thicknessNormal != null)
@@ -1209,5 +1208,10 @@ public class Wall extends HousePart {
 	@Override
 	public Mesh getIrradiationCollisionSpatial() {
 		return invisibleMesh;
+	}
+
+	@Override
+	protected boolean isHorizontal() {
+		return false;
 	}
 }

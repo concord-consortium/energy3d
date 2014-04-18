@@ -71,7 +71,6 @@ public abstract class HousePart implements Serializable {
 	protected transient Mesh gridsMesh;
 	protected transient Vector3 flattenCenter;
 	protected transient double orgHeight;
-	protected transient boolean relativeToHorizontal;
 	private transient boolean isPrintVertical;
 	private transient Map<Mesh, Boolean> textureCleared;
 	private transient double[] solarPotential;
@@ -143,7 +142,6 @@ public abstract class HousePart implements Serializable {
 
 	/* if an attribute is transient but is always needed then it should be set to default here */
 	protected void init() {
-		relativeToHorizontal = false;
 		orgHeight = height;
 		flattenCenter = new Vector3();
 		isPrintVertical = false;
@@ -324,62 +322,47 @@ public abstract class HousePart implements Serializable {
 		return picked;
 	}
 
-	protected Vector3 toRelative(final Vector3 org) {
-		return toRelative(org, container);
+	protected boolean isHorizontal() {
+		return true;
 	}
 
-	protected Vector3 toRelative(final ReadOnlyVector3 org, final HousePart container) {
+	protected Vector3 toRelative(final ReadOnlyVector3 p) {
+		final HousePart container = getContainerRelative();
 		if (container == null)
-			return new Vector3(org);
+			return new Vector3(p);
+
 		final Vector3 p0 = container.getAbsPoint(0);
-		final Vector3 origin = p0;
-//		final Vector3 p = org.subtract(origin, null);
-		final Vector3 u = container.getAbsPoint(2).subtract(origin, null);
-		final Vector3 v = container.getAbsPoint(1).subtract(origin, null);
-//		if (Util.isZero(u.getX())) {
-//			final Vector3 tmp = u;
-//			u = v;
-//			v = tmp;
-//		}
-//		final Vector3 pointOnWall = new Vector3(Util.isZero(wallx.getX()) ? p.getY() / wallx.getY() : p.getX() / wallx.getX(), (relativeToHorizontal) ? p.getY() / wally.getY() : org.getY(), (relativeToHorizontal) ? org.getZ() : p.getZ() / wally.getZ());
-
-//		relativeToHorizontal = Util.isZero(v.getZ());
-
-		final Vector2 u2 = new Vector2(u.getX(), u.getY());
-		final Vector2 v2;
 		final Vector3 p1 = container.getAbsPoint(1);
 		final Vector3 p2 = container.getAbsPoint(2);
-		final Vector2 p_2d = new Vector2(org.getX(), org.getY());
+		final Vector2 p_2d = new Vector2(p.getX(), p.getY());
 		final Vector2 p0_2d = new Vector2(p0.getX(), p0.getY());
 		final double uScale = Util.projectPointOnLineScale(p_2d, p0_2d, new Vector2(p2.getX(), p2.getY()));
 		final double vScale;
-		if (relativeToHorizontal)
+		final boolean relativeToHorizontal = getContainerRelative().isHorizontal();
+		if (relativeToHorizontal) {
 			vScale = Util.projectPointOnLineScale(p_2d, p0_2d, new Vector2(p1.getX(), p1.getY()));
-		else
-			vScale = Util.projectPointOnLineScale(new Vector2(0, org.getZ()), new Vector2(0, p0.getZ()), new Vector2(0, p1.getZ()));
-
-		if (relativeToHorizontal)
-			return new Vector3(uScale, vScale, org.getZ());
-		else
-			return new Vector3(uScale, org.getY(), vScale);
-//		return pointOnWall;
+			return new Vector3(uScale, vScale, p.getZ());
+		} else {
+			vScale = Util.projectPointOnLineScale(new Vector2(0, p.getZ()), new Vector2(0, p0.getZ()), new Vector2(0, p1.getZ()));
+			return new Vector3(uScale, 0.0, vScale);
+		}
 	}
 
 	protected Vector3 toAbsolute(final ReadOnlyVector3 p) {
-		return toAbsolute(p, container);
-	}
-
-	protected Vector3 toAbsolute(final ReadOnlyVector3 p, final HousePart container) {
+		final HousePart container = getContainerRelative();
 		if (container == null)
 			return new Vector3(p);
-		final ReadOnlyVector3 origin = container.getAbsPoint(0);
-		ReadOnlyVector3 width = container.getAbsPoint(2).subtract(origin, null);
-		if (Util.isZero(width.length()))
-			width = new Vector3(MathUtils.ZERO_TOLERANCE, 0, 0);
-		ReadOnlyVector3 height = container.getAbsPoint(1).subtract(origin, null);
-		if (Util.isZero(height.length()))
-			height = new Vector3(0, relativeToHorizontal ? MathUtils.ZERO_TOLERANCE : 0, relativeToHorizontal ? 0 : MathUtils.ZERO_TOLERANCE);
-		final Vector3 pointOnSpace = origin.add(width.multiply(p.getX(), null), null).add(height.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
+
+		final ReadOnlyVector3 p0 = container.getAbsPoint(0);
+		ReadOnlyVector3 u = container.getAbsPoint(2).subtract(p0, null);
+		if (Util.isZero(u.length()))
+			u = new Vector3(MathUtils.ZERO_TOLERANCE, 0, 0);
+		ReadOnlyVector3 v = container.getAbsPoint(1).subtract(p0, null);
+
+		final boolean relativeToHorizontal = getContainerRelative().isHorizontal();
+		if (Util.isZero(v.length()))
+			v = new Vector3(0, relativeToHorizontal ? MathUtils.ZERO_TOLERANCE : 0, relativeToHorizontal ? 0 : MathUtils.ZERO_TOLERANCE);
+		final Vector3 pointOnSpace = p0.add(u.multiply(p.getX(), null), null).add(v.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
 		if (relativeToHorizontal)
 			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
 		/* do not round the result, otherwise neighboring walls won't have exact same edit points */
@@ -397,7 +380,7 @@ public abstract class HousePart implements Serializable {
 				newP.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
 			else {
 				final ReadOnlyVector3 origin;
-				if (relativeToHorizontal) {
+				if (getContainerRelative().isHorizontal()) {
 					final ReadOnlyVector3 center;
 					if (this instanceof Roof)
 						center = getCenter().multiply(1, 1, 0, null);
@@ -745,6 +728,10 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public HousePart getContainer() {
+		return container;
+	}
+
+	protected HousePart getContainerRelative() {
 		return container;
 	}
 

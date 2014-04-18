@@ -46,7 +46,6 @@ public class Floor extends HousePart {
 	@Override
 	protected void init() {
 		super.init();
-		relativeToHorizontal = true;
 		mesh = new Mesh("Floor");
 		root.attachChild(mesh);
 
@@ -104,7 +103,7 @@ public class Floor extends HousePart {
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 2.0 : 10.0;
 		MeshLib.fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints), null, true, new TPoint(0, 0, 0), new TPoint(scale, 0, 0), new TPoint(0, scale, 0));
 		drawWireframe();
-		points.get(0).set(toRelative(getCenter(), container.getContainer()));
+		points.get(0).set(toRelative(getCenter()));
 		updateEditShapes();
 	}
 
@@ -190,11 +189,6 @@ public class Floor extends HousePart {
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 		root.updateWorldTransform(true);
 		super.flatten(flattenTime);
-	}
-
-	@Override
-	public Vector3 getAbsPoint(final int index) {
-		return toAbsolute(points.get(index), container == null ? null : container.getContainer());
 	}
 
 	@Override

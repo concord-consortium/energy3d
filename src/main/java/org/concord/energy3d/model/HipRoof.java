@@ -34,7 +34,7 @@ public class HipRoof extends Roof {
 			final Vector3 p = Util.closestPoint(getAbsPoint(editPointIndex), Vector3.UNIT_Y, x, y);
 			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
 			if (insideWallsPolygon(p))
-				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
+				points.get(editPointIndex).set(toRelative(p));
 		}
 		postEdit(editState);
 	}
@@ -54,19 +54,19 @@ public class HipRoof extends Roof {
 		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
-			points.get(0).set(toRelative(center, container.getContainer()));
+			points.get(0).set(toRelative(center));
 			if (editPointIndex == -1) {
 				Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(0, -50, 0, null));
 				if (point1 == null)
 					point1 = center.clone();
 				point1.addLocal(0, 2, 0);
-				points.get(1).set(toRelative(point1, container.getContainer()));
+				points.get(1).set(toRelative(point1));
 
 				Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(0, 50, 0, null));
 				if (point2 == null)
 					point2 = center.clone();
 				point2.addLocal(0, -2, 0);
-				points.get(2).set(toRelative(point2, container.getContainer()));
+				points.get(2).set(toRelative(point2));
 			}
 			computeHeight(wallUpperPoints);
 			applyHeight();

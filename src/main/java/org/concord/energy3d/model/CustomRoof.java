@@ -44,7 +44,7 @@ public class CustomRoof extends Roof {
 			if (pickRay.intersectsPlane(new Plane(Vector3.UNIT_Z, points.get(0).getZ()), p)) {
 				snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
 				snapToWallsPolygon(p);
-				points.get(editPointIndex).set(toRelative(p, container.getContainer()));
+				points.get(editPointIndex).set(toRelative(p));
 			}
 		}
 		postEdit(editState);
@@ -68,7 +68,7 @@ public class CustomRoof extends Roof {
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
 			points.clear();
-			points.add(toRelative(getCenter(), container.getContainer()));
+			points.add(toRelative(getCenter()));
 			// add or update edit points
 			final int n = wallUpperPoints.size();
 			for (int i = 0; i < n; i++) {
@@ -82,7 +82,7 @@ public class CustomRoof extends Roof {
 					final ReadOnlyVector3 normal = wall.getFaceDirection();
 					v.addLocal(normal.multiply(0.2, null).negateLocal());
 				}
-				v.set(toRelative(v, container.getContainer()));
+				v.set(toRelative(v));
 				points.add(v);
 			}
 

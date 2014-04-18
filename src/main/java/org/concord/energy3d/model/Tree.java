@@ -41,7 +41,6 @@ public class Tree extends HousePart {
 	@Override
 	protected void init() {
 		super.init();
-		relativeToHorizontal = true;
 
 		final double height = treeType == SHORT ? 30 : 60;
 		mesh = new Quad("Tree Quad", 30, height);

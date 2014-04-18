@@ -72,6 +72,7 @@ public class Window extends HousePart {
 			p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
 			p = toRelative(p);
+			toAbsolute(p);
 			p = enforceContraints(p);
 		} else
 			return;
@@ -333,5 +334,5 @@ public class Window extends HousePart {
 			}
 		}
 		Scene.getInstance().redrawAll();
-	}	
+	}
 }

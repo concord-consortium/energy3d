@@ -44,7 +44,7 @@ public class PyramidRoof extends Roof {
 		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
-			points.get(0).set(toRelative(center, container.getContainer()));
+			points.get(0).set(toRelative(center));
 			computeHeight(wallUpperPoints);
 			applyHeight();
 		} else {

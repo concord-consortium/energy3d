@@ -39,7 +39,6 @@ public class SolarPanel extends HousePart {
 	@Override
 	protected void init() {
 		super.init();
-		updateRelativeToHorizontalFlag();
 
 		mesh = new Mesh("SolarPanel");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -65,33 +64,22 @@ public class SolarPanel extends HousePart {
 		updateTextureAndColor();
 	}
 
-	private void updateRelativeToHorizontalFlag() {
-		if (container != null)
-			relativeToHorizontal = container instanceof Roof;
-	}
-
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
 		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class });
-		updateRelativeToHorizontalFlag();
 		if (picked != null) {
 			final Vector3 p = picked.getPoint();
 			if (container instanceof Wall)
 				snapToGrid(p, getAbsPoint(0), getGridSize());
 			else
 				getTopContainer().snapToGrid(p, getAbsPoint(0), getGridSize());
-			points.get(0).set(toRelative(p, getContainerRelative()));
+			points.get(0).set(toRelative(p));
 		}
 		if (container != null) {
 			draw();
 			setEditPointsVisible(true);
 			setHighlight(!isDrawable());
 		}
-	}
-
-	@Override
-	public Vector3 getAbsPoint(final int index) {
-		return toAbsolute(points.get(index), getContainerRelative());
 	}
 
 	@Override
@@ -215,7 +203,8 @@ public class SolarPanel extends HousePart {
 		return area;
 	}
 
-	private HousePart getContainerRelative() {
+	@Override
+	protected HousePart getContainerRelative() {
 		if (container instanceof Wall)
 			return container;
 		else
