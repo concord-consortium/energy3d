@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,7 +16,6 @@ import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -42,6 +40,7 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.util.Config;
 
 public class MainPanel extends JPanel {
+
 	private static final long serialVersionUID = 1L;
 	private static final MainPanel instance = new MainPanel();
 	private MainFrame mainFrame;
@@ -55,15 +54,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton lightButton = null;
 	private JToggleButton rotAnimButton = null;
 	private JToggleButton floorButton = null;
-	private JToggleButton roofHipButton = null;
 	private JToggleButton resizeButton = null;
 	private JToggleButton heliodonButton = null;
 	private JToggleButton sunAnimButton = null;
 	private JToggleButton annotationToggleButton;
 	private JToggleButton previewButton = null;
-	private JToggleButton roofCustomButton = null;
 	private JToggleButton zoomButton = null;
-	private JToggleButton roofGableButton = null;
 	private JSplitPane energyCanvasNoteSplitPane;
 	private EnergyPanel energyPanel;
 	private JPanel canvasPanel;
@@ -75,9 +71,12 @@ public class MainPanel extends JPanel {
 	private JToggleButton solarPanelButton;
 	private JToggleButton treeButton;
 	private JButton treeArrowButton;
+	private JButton roofArrowButton;
 	private int defaultDividerSize = -1;
 	private final JPopupMenu treeMenu;
+	private final JPopupMenu roofMenu;
 	private Operation treeCommand = SceneManager.Operation.DRAW_TREE;
+	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
 		@Override
@@ -86,9 +85,9 @@ public class MainPanel extends JPanel {
 		}
 	};
 
-	java.awt.event.MouseAdapter operationStickAndRefreshUponExit = new java.awt.event.MouseAdapter() {
+	MouseAdapter operationStickAndRefreshUponExit = new MouseAdapter() {
 		@Override
-		public void mouseClicked(final java.awt.event.MouseEvent e) {
+		public void mouseClicked(final MouseEvent e) {
 			if (e.getClickCount() > 1)
 				SceneManager.getInstance().setOperationStick(true);
 		}
@@ -134,6 +133,51 @@ public class MainPanel extends JPanel {
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		initialize();
+
+		// create roof menu
+		final JCheckBoxMenuItem pyramidRoofMenu = new JCheckBoxMenuItem("Pyramid Roof", new ImageIcon(getClass().getResource("icons/roof_pyramid.png")), true);
+		final JCheckBoxMenuItem hipRoofMenu = new JCheckBoxMenuItem("Hip Roof", new ImageIcon(getClass().getResource("icons/roof_hip.png")));
+		final JCheckBoxMenuItem customRoofMenu = new JCheckBoxMenuItem("Custom Roof", new ImageIcon(getClass().getResource("icons/roof_custom.png")));
+		final JCheckBoxMenuItem gableRoofMenu = new JCheckBoxMenuItem("Gable Roof", new ImageIcon(getClass().getResource("icons/roof_gable.png")));
+		final ActionListener roofAction = new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
+				roofButton.setIcon(selected.getIcon());
+				if (selected == pyramidRoofMenu) {
+					roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
+					roofButton.setToolTipText("Draw pyramid roof");
+				} else if (selected == hipRoofMenu) {
+					roofCommand = SceneManager.Operation.DRAW_ROOF_HIP;
+					roofButton.setToolTipText("Draw hip roof");
+				} else if (selected == customRoofMenu) {
+					roofCommand = SceneManager.Operation.DRAW_ROOF_CUSTOM;
+					roofButton.setToolTipText("Draw custom roof");
+				} else {
+					roofCommand = Operation.DRAW_ROOF_GABLE;
+					roofButton.setToolTipText("Convert to gable roof");
+				}
+				SceneManager.getInstance().setOperation(roofCommand);
+				roofButton.setSelected(true);
+				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+			}
+		};
+		pyramidRoofMenu.addActionListener(roofAction);
+		hipRoofMenu.addActionListener(roofAction);
+		customRoofMenu.addActionListener(roofAction);
+		gableRoofMenu.addActionListener(roofAction);
+		roofMenu = new JPopupMenu();
+		roofMenu.add(pyramidRoofMenu);
+		roofMenu.add(hipRoofMenu);
+		roofMenu.add(customRoofMenu);
+		roofMenu.add(gableRoofMenu);
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(pyramidRoofMenu);
+		bg.add(hipRoofMenu);
+		bg.add(customRoofMenu);
+		bg.add(gableRoofMenu);
+
+		// create tree menu
 		final JCheckBoxMenuItem shortTreeMenu = new JCheckBoxMenuItem("Short Tree", new ImageIcon(getClass().getResource("icons/tree.png")), true);
 		final JCheckBoxMenuItem tallTreeMenu = new JCheckBoxMenuItem("Tall Tree", new ImageIcon(getClass().getResource("icons/tree_tall.png")));
 		final ActionListener treeAction = new ActionListener() {
@@ -141,12 +185,15 @@ public class MainPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
 				treeButton.setIcon(selected.getIcon());
-				if (selected == shortTreeMenu)
+				if (selected == shortTreeMenu) {
 					treeCommand = SceneManager.Operation.DRAW_TREE;
-				else
+					treeButton.setToolTipText("Insert tree");
+				} else {
 					treeCommand = SceneManager.Operation.DRAW_TREE_TALL;
+					treeButton.setToolTipText("Insert tall tree");
+				}
 				SceneManager.getInstance().setOperation(treeCommand);
-				getTreeButton().setSelected(true);
+				treeButton.setSelected(true);
 				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 			}
 		};
@@ -155,9 +202,10 @@ public class MainPanel extends JPanel {
 		treeMenu = new JPopupMenu();
 		treeMenu.add(shortTreeMenu);
 		treeMenu.add(tallTreeMenu);
-		final ButtonGroup bg = new ButtonGroup();
+		bg = new ButtonGroup();
 		bg.add(shortTreeMenu);
 		bg.add(tallTreeMenu);
+
 		System.out.println("done");
 	}
 
@@ -185,11 +233,9 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getWallButton());
 			appToolbar.add(getDoorButton());
 			appToolbar.add(getWindowButton());
-			appToolbar.add(getRoofButton());
-			appToolbar.add(getRoofHipButton());
-			appToolbar.add(getRoofCustomButton());
-			appToolbar.add(getRoofGableButton());
 			appToolbar.add(getFloorButton());
+			appToolbar.add(getRoofButton());
+			appToolbar.add(getRoofArrowButton());
 			appToolbar.add(getSolarPanelButton());
 			appToolbar.add(getTreeButton());
 			appToolbar.add(getTreeArrowButton());
@@ -208,10 +254,7 @@ public class MainPanel extends JPanel {
 			bg.add(doorButton);
 			bg.add(windowButton);
 			bg.add(roofButton);
-			bg.add(roofHipButton);
-			bg.add(roofCustomButton);
 			bg.add(floorButton);
-			bg.add(roofGableButton);
 			bg.add(solarPanelButton);
 			bg.add(treeButton);
 		}
@@ -225,9 +268,9 @@ public class MainPanel extends JPanel {
 			selectButton.setSelected(true);
 			selectButton.setToolTipText("Select");
 			selectButton.setIcon(new ImageIcon(MainPanel.class.getResource("icons/select.png")));
-			selectButton.addActionListener(new java.awt.event.ActionListener() {
+			selectButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -241,9 +284,9 @@ public class MainPanel extends JPanel {
 			wallButton = new JToggleButton();
 			wallButton.setIcon(new ImageIcon(getClass().getResource("icons/wall.png")));
 			wallButton.setToolTipText("Draw wall");
-			wallButton.addActionListener(new java.awt.event.ActionListener() {
+			wallButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -259,9 +302,9 @@ public class MainPanel extends JPanel {
 			doorButton.setText("");
 			doorButton.setToolTipText("Draw door");
 			doorButton.setIcon(new ImageIcon(getClass().getResource("icons/door.png")));
-			doorButton.addActionListener(new java.awt.event.ActionListener() {
+			doorButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -271,31 +314,14 @@ public class MainPanel extends JPanel {
 		return doorButton;
 	}
 
-	private JToggleButton getRoofButton() {
-		if (roofButton == null) {
-			roofButton = new JToggleButton();
-			roofButton.setIcon(new ImageIcon(getClass().getResource("icons/roof_pyramid.png")));
-			roofButton.setToolTipText("Draw pyramid roof");
-			roofButton.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_PYRAMID);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-				}
-			});
-			roofButton.addMouseListener(operationStickAndRefreshUponExit);
-		}
-		return roofButton;
-	}
-
 	private JToggleButton getWindowButton() {
 		if (windowButton == null) {
 			windowButton = new JToggleButton();
 			windowButton.setIcon(new ImageIcon(getClass().getResource("icons/window.png")));
 			windowButton.setToolTipText("Draw window");
-			windowButton.addActionListener(new java.awt.event.ActionListener() {
+			windowButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -310,9 +336,9 @@ public class MainPanel extends JPanel {
 			platformButton = new JToggleButton();
 			platformButton.setIcon(new ImageIcon(getClass().getResource("icons/foundation.png")));
 			platformButton.setToolTipText("Draw platform");
-			platformButton.addActionListener(new java.awt.event.ActionListener() {
+			platformButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -328,9 +354,9 @@ public class MainPanel extends JPanel {
 			lightButton.addMouseListener(refreshUponMouseExit);
 			lightButton.setIcon(new ImageIcon(getClass().getResource("icons/shadow.png")));
 			lightButton.setToolTipText("Show shadows");
-			lightButton.addActionListener(new java.awt.event.ActionListener() {
+			lightButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					if (mainFrame != null) {
 						mainFrame.getShadeMenuItem().setSelected(lightButton.isSelected());
 						mainFrame.getShadowMenuItem().setSelected(lightButton.isSelected());
@@ -353,9 +379,9 @@ public class MainPanel extends JPanel {
 			rotAnimButton.addMouseListener(refreshUponMouseExit);
 			rotAnimButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate.png")));
 			rotAnimButton.setToolTipText("Spin view");
-			rotAnimButton.addActionListener(new java.awt.event.ActionListener() {
+			rotAnimButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().toggleRotation();
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -369,9 +395,9 @@ public class MainPanel extends JPanel {
 			floorButton = new JToggleButton();
 			floorButton.setIcon(new ImageIcon(getClass().getResource("icons/floor.png")));
 			floorButton.setToolTipText("Draw floor");
-			floorButton.addActionListener(new java.awt.event.ActionListener() {
+			floorButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -381,34 +407,17 @@ public class MainPanel extends JPanel {
 		return floorButton;
 	}
 
-	private JToggleButton getRoofHipButton() {
-		if (roofHipButton == null) {
-			roofHipButton = new JToggleButton();
-			roofHipButton.setIcon(new ImageIcon(getClass().getResource("icons/roof_hip.png")));
-			roofHipButton.setToolTipText("Draw hip roof");
-			roofHipButton.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_HIP);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-				}
-			});
-			roofHipButton.addMouseListener(operationStickAndRefreshUponExit);
-		}
-		return roofHipButton;
-	}
-
 	private JToggleButton getResizeButton() {
 		if (resizeButton == null) {
 			resizeButton = new JToggleButton();
 			resizeButton.addMouseListener(refreshUponMouseExit);
 			resizeButton.setIcon(new ImageIcon(getClass().getResource("icons/resize.png")));
 			resizeButton.setToolTipText("Resize or move a building");
-			resizeButton.addActionListener(new java.awt.event.ActionListener() {
+			resizeButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
-//					SceneManager.getInstance().setOperation(Operation.RESIZE);
-//					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+				public void actionPerformed(final ActionEvent e) {
+					// SceneManager.getInstance().setOperation(Operation.RESIZE);
+					// ((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					((Foundation) SceneManager.getInstance().getSelectedPart()).rotate();
 				}
 			});
@@ -422,9 +431,9 @@ public class MainPanel extends JPanel {
 			heliodonButton.addMouseListener(refreshUponMouseExit);
 			heliodonButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_heliodon.png")));
 			heliodonButton.setToolTipText("Show heliodon");
-			heliodonButton.addItemListener(new java.awt.event.ItemListener() {
+			heliodonButton.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(final java.awt.event.ItemEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setHeliodonControl(heliodonButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
@@ -442,9 +451,9 @@ public class MainPanel extends JPanel {
 			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_anim.png")));
 			sunAnimButton.setEnabled(false);
 			sunAnimButton.setToolTipText("Animate sun path");
-			sunAnimButton.addItemListener(new java.awt.event.ItemListener() {
+			sunAnimButton.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(final java.awt.event.ItemEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setSunAnim(sunAnimButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -460,9 +469,9 @@ public class MainPanel extends JPanel {
 			previewButton.setIcon(new ImageIcon(getClass().getResource("icons/print_preview.png")));
 			previewButton.setToolTipText("Preview printable parts");
 			// must be ItemListner to be triggered when selection is changed by code
-			previewButton.addItemListener(new java.awt.event.ItemListener() {
+			previewButton.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(final java.awt.event.ItemEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					if (mainFrame != null) {
 						mainFrame.getPreviewMenuItem().setSelected(previewButton.isSelected());
 						mainFrame.getEditMenu().setEnabled(!previewButton.isSelected());
@@ -475,23 +484,6 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return previewButton;
-	}
-
-	private JToggleButton getRoofCustomButton() {
-		if (roofCustomButton == null) {
-			roofCustomButton = new JToggleButton();
-			roofCustomButton.setIcon(new ImageIcon(getClass().getResource("icons/roof_custom.png")));
-			roofCustomButton.setToolTipText("Draw custom roof");
-			roofCustomButton.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_ROOF_CUSTOM);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-				}
-			});
-			roofCustomButton.addMouseListener(operationStickAndRefreshUponExit);
-		}
-		return roofCustomButton;
 	}
 
 	public void deselect() {
@@ -524,9 +516,9 @@ public class MainPanel extends JPanel {
 			zoomButton.addMouseListener(refreshUponMouseExit);
 			zoomButton.setIcon(new ImageIcon(getClass().getResource("icons/zoom.png")));
 			zoomButton.setToolTipText("Zoom");
-			zoomButton.addItemListener(new java.awt.event.ItemListener() {
+			zoomButton.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(final java.awt.event.ItemEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 					SceneManager.getInstance().setZoomLock(zoomButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
@@ -534,23 +526,6 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return zoomButton;
-	}
-
-	private JToggleButton getRoofGableButton() {
-		if (roofGableButton == null) {
-			roofGableButton = new JToggleButton();
-			roofGableButton.setIcon(new ImageIcon(getClass().getResource("icons/roof_gable.png")));
-			roofGableButton.setToolTipText("Convert to gable roof");
-			roofGableButton.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent e) {
-					SceneManager.getInstance().setOperation(Operation.DRAW_ROOF_GABLE);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-				}
-			});
-			roofGableButton.addMouseListener(operationStickAndRefreshUponExit);
-		}
-		return roofGableButton;
 	}
 
 	public void setToolbarEnabled(final boolean enabled) {
@@ -614,7 +589,7 @@ public class MainPanel extends JPanel {
 			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
 			solarButton.addMouseListener(refreshUponMouseExit);
 			solarButton.addItemListener(new ItemListener() {
-				@Override				
+				@Override
 				public void itemStateChanged(ItemEvent e) {
 					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
@@ -742,38 +717,54 @@ public class MainPanel extends JPanel {
 	private JButton getTreeArrowButton() {
 		if (treeArrowButton == null) {
 			treeArrowButton = new JButton();
-			treeArrowButton.setIcon(new Icon() {
-				@Override
-				public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
-					g.setColor(Color.BLACK);
-					final int x2 = getIconWidth() / 2;
-					final int y2 = getIconHeight() / 2;
-					final int[] vx = new int[] { 2, getIconWidth() - 2, x2 };
-					final int[] vy = new int[] { y2 - 2, y2 - 2, y2 + 4 };
-					g.fillPolygon(vx, vy, vx.length);
-				}
-
-				@Override
-				public int getIconWidth() {
-					return treeArrowButton.getWidth();
-				}
-
-				@Override
-				public int getIconHeight() {
-					return treeArrowButton.getHeight();
-				}
-			});
-			treeArrowButton.setMaximumSize(new Dimension(12, treeButton.getMaximumSize().height));
+			Dimension d = new Dimension(12, treeButton.getMaximumSize().height);
+			treeArrowButton.setMaximumSize(d);
+			treeArrowButton.setIcon(new ArrowIcon(d.width, d.height, Color.BLACK));
 			treeArrowButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(final ActionEvent arg0) {
-					treeMenu.show(getTreeButton(), 0, getTreeButton().getHeight());
+				public void actionPerformed(final ActionEvent e) {
+					treeMenu.show(treeButton, 0, treeButton.getHeight());
 				}
 			});
 			treeArrowButton.setBorder(BorderFactory.createEmptyBorder());
 			treeArrowButton.setFocusPainted(false);
 		}
 		return treeArrowButton;
+	}
+
+	private JToggleButton getRoofButton() {
+		if (roofButton == null) {
+			roofButton = new JToggleButton();
+			roofButton.setIcon(new ImageIcon(getClass().getResource("icons/roof_pyramid.png")));
+			roofButton.setToolTipText("Draw pyramid roof");
+			roofButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().setOperation(roofCommand);
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+				}
+			});
+			roofButton.addMouseListener(operationStickAndRefreshUponExit);
+		}
+		return roofButton;
+	}
+
+	private JButton getRoofArrowButton() {
+		if (roofArrowButton == null) {
+			roofArrowButton = new JButton();
+			Dimension d = new Dimension(12, roofButton.getMaximumSize().height);
+			roofArrowButton.setMaximumSize(d);
+			roofArrowButton.setIcon(new ArrowIcon(d.width, d.height, Color.BLACK));
+			roofArrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					roofMenu.show(roofButton, 0, roofButton.getHeight());
+				}
+			});
+			roofArrowButton.setBorder(BorderFactory.createEmptyBorder());
+			roofArrowButton.setFocusPainted(false);
+		}
+		return roofArrowButton;
 	}
 
 }
