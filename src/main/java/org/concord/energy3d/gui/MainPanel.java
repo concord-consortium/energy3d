@@ -59,6 +59,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton annotationToggleButton;
 	private JToggleButton previewButton = null;
 	private JToggleButton zoomButton = null;
+	private JToggleButton noteButton;
 	private JSplitPane energyCanvasNoteSplitPane;
 	private EnergyPanel energyPanel;
 	private JPanel canvasPanel;
@@ -260,6 +261,7 @@ public class MainPanel extends JPanel {
 			appToolbar.addSeparator();
 			appToolbar.add(getAnnotationToggleButton());
 			appToolbar.add(getPreviewButton());
+			appToolbar.add(getNoteButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getPlatformButton());
 			appToolbar.add(getWallButton());
@@ -676,6 +678,10 @@ public class MainPanel extends JPanel {
 	public void setNoteVisible(final boolean visible) {
 		setSplitComponentVisible(visible, getCanvasNoteSplitPane(), noteScrollPane);
 	}
+	
+	public boolean isNoteVisible() {
+		return noteTextArea.isShowing();
+	}
 
 	private void setSplitComponentVisible(final boolean visible, final JSplitPane splitPane, final Component component) {
 		getCanvasNoteSplitPane().getSize();
@@ -814,6 +820,23 @@ public class MainPanel extends JPanel {
 			buildingOperationArrowButton.setFocusPainted(false);
 		}
 		return buildingOperationArrowButton;
+	}
+
+	public JToggleButton getNoteButton() {
+		if (noteButton == null) {
+			noteButton = new JToggleButton();
+			noteButton.setToolTipText("Show note");
+			noteButton.setIcon(new ImageIcon(MainPanel.class.getResource("icons/note.png")));
+			noteButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					MainPanel.getInstance().setNoteVisible(noteButton.isSelected());
+					if (noteButton.isSelected())
+						getNoteTextArea().requestFocusInWindow();
+				}
+			});
+		}
+		return noteButton;
 	}
 
 }

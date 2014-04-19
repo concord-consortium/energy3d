@@ -1,5 +1,6 @@
 package org.concord.energy3d.util;
 
+import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.util.List;
 
@@ -226,14 +227,19 @@ public class Util {
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured! Please notify us of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
 	}
 
-	/** This method sets the selection state of a button visually without invoking its ItemListeners */
+	/** This method sets the selection state of a button visually without invoking its ItemListeners and ActionListeners */
 	public static void selectSilently(AbstractButton button, boolean selected) {
 		ItemListener[] itemListeners = button.getItemListeners();
+		ActionListener[] actionListeners = button.getActionListeners();
 		for (ItemListener x : itemListeners)
 			button.removeItemListener(x);
+		for (ActionListener x : actionListeners)
+			button.removeActionListener(x);
 		button.setSelected(selected);
 		for (ItemListener x : itemListeners)
 			button.addItemListener(x);
+		for (ActionListener x : actionListeners)
+			button.addActionListener(x);
 	}
 
 }

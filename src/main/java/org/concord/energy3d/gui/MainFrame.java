@@ -67,6 +67,7 @@ import org.concord.energy3d.simulation.EnergyDensityAnalysis;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Printout;
+import org.concord.energy3d.util.Util;
 
 import com.apple.eawt.Application;
 import com.apple.eawt.ApplicationAdapter;
@@ -1147,6 +1148,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 					lockSelectionMenuItem.setEnabled(SceneManager.getInstance().getSelectedPart() != null);
+					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
 				}
 
 				@Override
@@ -1759,6 +1761,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					MainPanel.getInstance().setNoteVisible(noteCheckBoxMenuItem.isSelected());
+					Util.selectSilently(MainPanel.getInstance().getNoteButton(), noteCheckBoxMenuItem.isSelected());
 				}
 			});
 		}
