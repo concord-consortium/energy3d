@@ -1,6 +1,7 @@
 package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -51,6 +52,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.CityData;
+import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.util.Util;
@@ -90,6 +92,7 @@ public class EnergyPanel extends JPanel {
 	private final JPanel heatMapPanel;
 	private final JSlider colorMapSlider;
 	private final JProgressBar progressBar;
+	private final ColorBar costBar;
 
 	private Thread thread;
 	private boolean computeRequest;
@@ -746,6 +749,16 @@ public class EnergyPanel extends JPanel {
 		panel_8.add(partHeightTextField);
 		partHeightTextField.setColumns(10);
 
+		// cost for the selected building
+
+		JPanel costPanel = new JPanel(new BorderLayout());
+		costPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		buildingPanel.add(costPanel);
+		costBar = new ColorBar(Color.WHITE, Color.GRAY);
+		costBar.setPreferredSize(new Dimension(200, 16));
+		costBar.setMaximum(Cost.getInstance().getBudget());
+		costPanel.add(costBar, BorderLayout.CENTER);
+
 	}
 
 	public void compute(final UpdateRadiation updateRadiation) {
@@ -984,6 +997,22 @@ public class EnergyPanel extends JPanel {
 
 	}
 
+	public void updateCost() {
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final Foundation selectedBuilding;
+		if (selectedPart == null)
+			selectedBuilding = null;
+		else if (selectedPart instanceof Foundation)
+			selectedBuilding = (Foundation) selectedPart;
+		else
+			selectedBuilding = (Foundation) selectedPart.getTopContainer();
+		int n = 0;
+		if (selectedBuilding != null)
+			n = Cost.getInstance().getBuildingCost(selectedBuilding);
+		costBar.setValue(n);
+		costBar.repaint();
+	}
+
 	/** Currently this applies only to the date spinner when it is set programmatically (not by the user) */
 	public void disableActions(final boolean b) {
 		disableActions = b;
@@ -1015,6 +1044,10 @@ public class EnergyPanel extends JPanel {
 
 	public JComboBox<String> getSolarPanelEfficiencyComboBox() {
 		return solarPanelEfficiencyComboBox;
+	}
+
+	public ColorBar getCostBar() {
+		return costBar;
 	}
 
 }
