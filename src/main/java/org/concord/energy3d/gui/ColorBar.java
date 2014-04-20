@@ -16,24 +16,24 @@ import javax.swing.JPanel;
  * @author Charles Xie
  * 
  */
-class ColorBar extends JPanel {
+public class ColorBar extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private float value = 50000.0f;
+	private float value = 0.0f;
 	private float maximum = 100000.0f;
 
-	ColorBar(Color background, Color foreground) {
+	public ColorBar(Color background, Color foreground) {
 		super();
 		setBackground(background);
 		setForeground(foreground);
 	}
 
-	void setValue(float value) {
+	public void setValue(float value) {
 		this.value = value;
 	}
 
-	void setMaximum(float maximum) {
+	public void setMaximum(float maximum) {
 		this.maximum = maximum;
 	}
 

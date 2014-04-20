@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -93,6 +94,7 @@ public class EnergyPanel extends JPanel {
 	private final JSlider colorMapSlider;
 	private final JProgressBar progressBar;
 	private final ColorBar costBar;
+	private final JPanel costPanel;
 
 	private Thread thread;
 	private boolean computeRequest;
@@ -143,7 +145,7 @@ public class EnergyPanel extends JPanel {
 		add(new JScrollPane(dataPanel), BorderLayout.CENTER);
 
 		final JPanel timeAndLocationPanel = new JPanel();
-		timeAndLocationPanel.setBorder(new TitledBorder(null, "Time & Location", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		timeAndLocationPanel.setBorder(new TitledBorder(null, "Time & Location", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(timeAndLocationPanel);
 		final GridBagLayout gbl_panel_3 = new GridBagLayout();
 		timeAndLocationPanel.setLayout(gbl_panel_3);
@@ -278,7 +280,7 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, timeAndLocationPanel.getPreferredSize().height));
 
 		final JPanel temperaturePanel = new JPanel();
-		temperaturePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		temperaturePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(temperaturePanel);
 		final GridBagLayout gbl_temperaturePanel = new GridBagLayout();
 		temperaturePanel.setLayout(gbl_temperaturePanel);
@@ -333,7 +335,7 @@ public class EnergyPanel extends JPanel {
 		temperaturePanel.add(outsideTemperatureSpinner, gbc_outsideTemperatureSpinner);
 
 		final JPanel uFactorPanel = new JPanel();
-		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(uFactorPanel);
 		final GridBagLayout gbl_uFactorPanel = new GridBagLayout();
 		uFactorPanel.setLayout(gbl_uFactorPanel);
@@ -433,7 +435,7 @@ public class EnergyPanel extends JPanel {
 
 		final JPanel otherParametersPanel = new JPanel();
 		otherParametersPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, otherParametersPanel.getPreferredSize().height));
-		otherParametersPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Other Parameters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		otherParametersPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Other Parameters", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(otherParametersPanel);
 
 		final JLabel solarPanelEfficiencyLabel = new JLabel("Solar Panel Efficiency: ");
@@ -465,7 +467,7 @@ public class EnergyPanel extends JPanel {
 		otherParametersPanel.add(new JLabel("%"));
 
 		heatMapPanel = new JPanel(new BorderLayout());
-		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(heatMapPanel);
 
 		colorMapSlider = new MySlider();
@@ -488,11 +490,11 @@ public class EnergyPanel extends JPanel {
 		heatMapPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, heatMapPanel.getPreferredSize().height));
 
 		partPanel = new JPanel();
-		partPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		partPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(partPanel);
 
 		buildingPanel = new JPanel();
-		buildingPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Building", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		buildingPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Building", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
 
@@ -602,7 +604,7 @@ public class EnergyPanel extends JPanel {
 
 		final JPanel energyTodayPanel = new JPanel();
 		buildingPanel.add(energyTodayPanel);
-		energyTodayPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy Today (kWh)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		energyTodayPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy Today (kWh)", TitledBorder.LEADING, TitledBorder.TOP));
 		final GridBagLayout gbl_panel_1 = new GridBagLayout();
 		energyTodayPanel.setLayout(gbl_panel_1);
 
@@ -751,8 +753,8 @@ public class EnergyPanel extends JPanel {
 
 		// cost for the selected building
 
-		JPanel costPanel = new JPanel(new BorderLayout());
-		costPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		costPanel = new JPanel(new BorderLayout());
+		costPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP));
 		buildingPanel.add(costPanel);
 		costBar = new ColorBar(Color.WHITE, Color.GRAY);
 		costBar.setPreferredSize(new Dimension(200, 16));
@@ -1046,8 +1048,10 @@ public class EnergyPanel extends JPanel {
 		return solarPanelEfficiencyComboBox;
 	}
 
-	public ColorBar getCostBar() {
-		return costBar;
+	public void setBudget(int budget) {
+		costPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost (Maximum: $" + budget + ")", TitledBorder.LEADING, TitledBorder.TOP));
+		costBar.setMaximum(budget);
+		costBar.repaint();
 	}
 
 }

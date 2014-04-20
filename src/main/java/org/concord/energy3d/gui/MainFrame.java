@@ -46,8 +46,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.PostProcessor;
@@ -878,23 +876,10 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					mainPanel.getSelectButton().setSelected(true);
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-				}
-			});
-			viewMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
-				@Override
-				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 					axesMenuItem.setSelected(SceneManager.getInstance().areAxesShown());
 					buildingLabelsMenuItem.setSelected(SceneManager.getInstance().areBuildingLabelsShown());
-				}
-
-				@Override
-				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				}
-
-				@Override
-				public void popupMenuCanceled(PopupMenuEvent e) {
+					mainPanel.getSelectButton().setSelected(true);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
 			viewMenu.add(getUnitsMenu());
@@ -1140,23 +1125,10 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					mainPanel.getSelectButton().setSelected(true);
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-				}
-			});
-			editMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
-				@Override
-				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 					lockSelectionMenuItem.setEnabled(SceneManager.getInstance().getSelectedPart() != null);
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
-				}
-
-				@Override
-				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				}
-
-				@Override
-				public void popupMenuCanceled(PopupMenuEvent e) {
+					mainPanel.getSelectButton().setSelected(true);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
 			editMenu.add(getUndoMenuItem());

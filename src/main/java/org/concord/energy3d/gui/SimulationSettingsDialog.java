@@ -17,6 +17,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.SolarIrradiation;
 
 class SimulationSettingsDialog extends JDialog {
@@ -32,9 +33,16 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel contentPanel = new JPanel(new GridLayout(2, 2));
+		final JPanel contentPanel = new JPanel(new GridLayout(3, 2));
 		contentPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
+
+		// set the budget limit
+		contentPanel.add(new JLabel("Budget: "));
+
+		final JTextField budgetTextField = new JTextField(FORMAT1.format(Cost.getInstance().getBudget()));
+		contentPanel.add(budgetTextField);
+		budgetTextField.setColumns(10);
 
 		// set the grid size ("solar step")
 		contentPanel.add(new JLabel("Irradiation Grid Cell Size: "));
@@ -60,15 +68,21 @@ class SimulationSettingsDialog extends JDialog {
 			public void actionPerformed(final ActionEvent e) {
 				double cellSize;
 				int timeStep;
+				int budget;
 				try {
 					cellSize = Double.parseDouble(cellSizeTextField.getText());
 					timeStep = (int) Double.parseDouble(timeStepTextField.getText());
+					budget = (int) Double.parseDouble(budgetTextField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				// range check
+				if (budget <= 1000) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Your budget is too low to construct a building.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				if (cellSize < 0.1 || cellSize > 4) {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Cell size must be in 0.1-4.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -77,6 +91,7 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Time step must be in 5-30.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				Cost.getInstance().setBudget(budget);
 				SolarIrradiation.getInstance().setSolarStep(cellSize);
 				SolarIrradiation.getInstance().setTimeStep(timeStep);
 				Scene.getInstance().setEdited(true);

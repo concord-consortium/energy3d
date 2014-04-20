@@ -28,6 +28,7 @@ public class Cost {
 
 	public void setBudget(int budget) {
 		this.budget = budget;
+		EnergyPanel.getInstance().setBudget(budget);
 	}
 
 	public int getBudget() {
