@@ -1,7 +1,9 @@
 package org.concord.energy3d.util;
 
+import java.awt.Desktop;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
+import java.net.URI;
 import java.util.List;
 
 import javax.swing.AbstractButton;
@@ -225,6 +227,27 @@ public class Util {
 
 	public static void reportError(Throwable e) {
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured! Please notify us of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
+	}
+
+	public final static void openBrowser(final String url) {
+		if (Desktop.isDesktopSupported()) {
+			try {
+				Desktop.getDesktop().browse(new URI(url));
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			final String os = System.getProperty("os.name");
+			try {
+				if (os.startsWith("Windows")) {
+					Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+				} else if (os.startsWith("Mac OS")) {
+					Runtime.getRuntime().exec(new String[] { "open", url });
+				}
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/** This method sets the selection state of a button visually without invoking its ItemListeners and ActionListeners */

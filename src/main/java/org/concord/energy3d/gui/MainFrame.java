@@ -2,7 +2,6 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -20,7 +19,6 @@ import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
@@ -703,7 +701,7 @@ public class MainFrame extends JFrame {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					openBrowser("http://energy.concord.org/energy3d/models.html");
+					Util.openBrowser("http://energy.concord.org/energy3d/models.html");
 				}
 			});
 			helpMenu.add(mi);
@@ -711,7 +709,7 @@ public class MainFrame extends JFrame {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					openBrowser("http://energy.concord.org/energy3d");
+					Util.openBrowser("http://energy.concord.org/energy3d");
 				}
 			});
 			helpMenu.add(mi);
@@ -719,7 +717,7 @@ public class MainFrame extends JFrame {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					openBrowser("http://energy.concord.org/energy3d/contact.html");
+					Util.openBrowser("http://energy.concord.org/energy3d/contact.html");
 				}
 			});
 			helpMenu.add(mi);
@@ -727,27 +725,6 @@ public class MainFrame extends JFrame {
 				helpMenu.add(getAboutMenuItem());
 		}
 		return helpMenu;
-	}
-
-	public final static void openBrowser(final String url) {
-		if (Desktop.isDesktopSupported()) {
-			try {
-				Desktop.getDesktop().browse(new URI(url));
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			final String os = System.getProperty("os.name");
-			try {
-				if (os.startsWith("Windows")) {
-					Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
-				} else if (os.startsWith("Mac OS")) {
-					Runtime.getRuntime().exec(new String[] { "open", url });
-				}
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	private void showAbout() {

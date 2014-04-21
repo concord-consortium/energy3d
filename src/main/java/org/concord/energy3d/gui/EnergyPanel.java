@@ -1049,7 +1049,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void setBudget(int budget) {
-		costPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost (Maximum: $" + budget + ")", TitledBorder.LEADING, TitledBorder.TOP));
+		costPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Construction Cost (Maximum: $" + budget + ")", TitledBorder.LEADING, TitledBorder.TOP));
 		costBar.setMaximum(budget);
 		costBar.repaint();
 	}
