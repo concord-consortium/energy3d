@@ -21,13 +21,13 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -39,7 +39,7 @@ public class Foundation extends HousePart {
 	private transient ArrayList<Vector3> orgPoints;
 	private transient Mesh boundingMesh;
 	private transient Mesh wireframeMesh;
-	private transient Mesh irradiationMesh;
+	private transient Mesh surroundMesh;
 	private transient BMText buildingLabel;
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
@@ -81,21 +81,26 @@ public class Foundation extends HousePart {
 		super.init();
 		resizeHouseMode = false;
 
-		mesh = new Box("Foundation", new Vector3(), new Vector3());
+		final CullState cullState = new CullState();
+		cullState.setCullFace(Face.Back);
+
+		mesh = new Mesh("Foundation");
+		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
+		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(6));
+		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
+		mesh.setRenderState(cullState);
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new BoundingBox());
 		root.attachChild(mesh);
 
-		irradiationMesh = new Mesh("Foundation (Irradiation)");
-		irradiationMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-		irradiationMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(6));
-		irradiationMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
-		final CullState cullState = new CullState();
-		cullState.setCullFace(Face.Back);
-		irradiationMesh.setRenderState(cullState);
-		irradiationMesh.setRenderState(offsetState);
-		irradiationMesh.setModelBound(new BoundingBox());
-		root.attachChild(irradiationMesh);
+		surroundMesh = new Mesh("Foundation (Surround)");
+		surroundMesh.getMeshData().setIndexMode(IndexMode.Quads);
+		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(16));
+		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(16));
+		surroundMesh.setRenderState(cullState);
+		surroundMesh.setRenderState(offsetState);
+		surroundMesh.setModelBound(new BoundingBox());
+		root.attachChild(surroundMesh);
 
 		boundingMesh = new Line("Foundation (Bounding)");
 		boundingMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(24));
@@ -416,49 +421,103 @@ public class Foundation extends HousePart {
 			scanChildrenHeight();
 		final boolean drawable = points.size() == 8;
 		if (drawable) {
-			((Box) mesh).setData(points.get(0), points.get(3).add(0, 0, height, null));
-			mesh.updateModelBound();
-
-			final FloatBuffer vertexBuffer = irradiationMesh.getMeshData().getVertexBuffer();
-			vertexBuffer.rewind();
-			ReadOnlyVector3 p;
-			p = getAbsPoint(0);
-			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-			p = getAbsPoint(2);
-			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-			p = getAbsPoint(1);
-			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-			p = getAbsPoint(1);
-			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-			p = getAbsPoint(2);
-			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-			p = getAbsPoint(3);
-			vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-
-			final ReadOnlyVector3 normal = Vector3.UNIT_Z;
-			final FloatBuffer normalBuffer = irradiationMesh.getMeshData().getNormalBuffer();
-			normalBuffer.rewind();
-			for (int i = 0; i < 6; i++)
-				normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
-
-			final FloatBuffer textureBuffer = irradiationMesh.getMeshData().getTextureBuffer(0);
-			textureBuffer.rewind();
-			textureBuffer.put(0).put(0);
-			textureBuffer.put(1).put(0);
-			textureBuffer.put(0).put(1);
-			textureBuffer.put(0).put(1);
-			textureBuffer.put(1).put(0);
-			textureBuffer.put(1).put(1);
-
-			irradiationMesh.updateModelBound();
-
-			CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
-			CollisionTreeManager.INSTANCE.updateCollisionTree(irradiationMesh);
-
+			drawTopMesh();
+			drawSurroundMesh();
 			drawWireframe(boundingMesh, points.get(7).getZf());
 			drawWireframe(wireframeMesh, (float) height);
 			updateSolarLabelPosition();
 		}
+	}
+
+	public void drawSurroundMesh() {
+		final FloatBuffer vertexBuffer = surroundMesh.getMeshData().getVertexBuffer();
+		vertexBuffer.rewind();
+		ReadOnlyVector3 p;
+		final Vector3 p0 = getAbsPoint(0);
+		final Vector3 p1 = getAbsPoint(1);
+		final Vector3 p2 = getAbsPoint(2);
+		final Vector3 p3 = getAbsPoint(3);
+		p = p0;
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
+		p = p2;
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
+		p = p3;
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
+		p = p1;
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
+		p = p0;
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+
+		final FloatBuffer normalBuffer = surroundMesh.getMeshData().getNormalBuffer();
+		normalBuffer.rewind();
+		final ReadOnlyVector3 n1 = p2.subtract(p0, null).normalizeLocal().crossLocal(Vector3.UNIT_Z);
+		final ReadOnlyVector3 n2 = p3.subtract(p2, null).normalizeLocal().crossLocal(Vector3.UNIT_Z);
+		ReadOnlyVector3 normal;
+		normal = n1;
+		for (int i = 0; i < 4; i++)
+			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		normal = n2;
+		for (int i = 0; i < 4; i++)
+			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		normal = n1.negate(null);
+		for (int i = 0; i < 4; i++)
+			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		normal = n2.negate(null);
+		for (int i = 0; i < 4; i++)
+			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+
+		surroundMesh.updateModelBound();
+		CollisionTreeManager.INSTANCE.updateCollisionTree(surroundMesh);
+	}
+
+	public void drawTopMesh() {
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		vertexBuffer.rewind();
+		ReadOnlyVector3 p;
+		final Vector3 p0 = getAbsPoint(0);
+		final Vector3 p1 = getAbsPoint(1);
+		final Vector3 p2 = getAbsPoint(2);
+		final Vector3 p3 = getAbsPoint(3);
+		p = p0;
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		p = p2;
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		p = p1;
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		p = p2;
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		p = p3;
+		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+
+		final ReadOnlyVector3 normal = Vector3.UNIT_Z;
+		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
+		normalBuffer.rewind();
+		for (int i = 0; i < 6; i++)
+			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+
+		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
+		textureBuffer.rewind();
+		textureBuffer.put(0).put(0);
+		textureBuffer.put(1).put(0);
+		textureBuffer.put(0).put(1);
+		textureBuffer.put(0).put(1);
+		textureBuffer.put(1).put(0);
+		textureBuffer.put(1).put(1);
+
+		mesh.updateModelBound();
+		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 	}
 
 	private void drawWireframe(final Mesh mesh, final float height) {
@@ -659,7 +718,7 @@ public class Foundation extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		irradiationMesh.setVisible(false);
+		surroundMesh.setDefaultColor(Scene.getInstance().getTextureMode() == TextureMode.Full ? ColorRGBA.GRAY : Scene.getInstance().getFoundationColor());
 		updateTextureAndColor(mesh, Scene.getInstance().getFoundationColor());
 	}
 
@@ -824,12 +883,6 @@ public class Foundation extends HousePart {
 
 	public void setTotalEnergyToday(final double totalEnergyToday) {
 		this.totalEnergyToday = totalEnergyToday;
-	}
-
-	@Override
-	public Mesh getIrradiationMesh() {
-		irradiationMesh.setVisible(true);
-		return irradiationMesh;
 	}
 
 	public void rotate() {

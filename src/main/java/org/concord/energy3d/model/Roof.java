@@ -937,4 +937,9 @@ public abstract class Roof extends HousePart {
 		return container != null && (wallUpperPoints == null || wallUpperPoints.size() >= 3);
 	}
 
+	@Override
+	protected HousePart getContainerRelative() {
+		return getTopContainer();
+	}
+
 }

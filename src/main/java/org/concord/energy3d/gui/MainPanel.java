@@ -32,6 +32,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -606,7 +607,7 @@ public class MainPanel extends JPanel {
 			solarButton.addMouseListener(refreshUponMouseExit);
 			solarButton.addItemListener(new ItemListener() {
 				@Override
-				public void itemStateChanged(ItemEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -678,7 +679,7 @@ public class MainPanel extends JPanel {
 	public void setNoteVisible(final boolean visible) {
 		setSplitComponentVisible(visible, getCanvasNoteSplitPane(), noteScrollPane);
 	}
-	
+
 	public boolean isNoteVisible() {
 		return noteTextArea.isShowing();
 	}
@@ -737,7 +738,7 @@ public class MainPanel extends JPanel {
 	private JButton getTreeArrowButton() {
 		if (treeArrowButton == null) {
 			treeArrowButton = new JButton();
-			Dimension d = new Dimension(12, treeButton.getMaximumSize().height);
+			final Dimension d = new Dimension(12, treeButton.getMaximumSize().height);
 			treeArrowButton.setMaximumSize(d);
 			treeArrowButton.setIcon(new ArrowIcon(d.width, d.height, Color.BLACK));
 			treeArrowButton.addActionListener(new ActionListener() {
@@ -772,7 +773,7 @@ public class MainPanel extends JPanel {
 	private JButton getRoofArrowButton() {
 		if (roofArrowButton == null) {
 			roofArrowButton = new JButton();
-			Dimension d = new Dimension(12, roofButton.getMaximumSize().height);
+			final Dimension d = new Dimension(12, roofButton.getMaximumSize().height);
 			roofArrowButton.setMaximumSize(d);
 			roofArrowButton.setIcon(new ArrowIcon(d.width, d.height, Color.BLACK));
 			roofArrowButton.addActionListener(new ActionListener() {
@@ -796,7 +797,10 @@ public class MainPanel extends JPanel {
 			buildingOperationButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(buildingOperationCommand);
+					if (buildingOperationCommand == Operation.ROTATE)
+						((Foundation) SceneManager.getInstance().getSelectedPart()).rotate();
+					else
+						SceneManager.getInstance().setOperation(buildingOperationCommand);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
@@ -807,7 +811,7 @@ public class MainPanel extends JPanel {
 	private JButton getBuildingOperationArrowButton() {
 		if (buildingOperationArrowButton == null) {
 			buildingOperationArrowButton = new JButton();
-			Dimension d = new Dimension(12, buildingOperationButton.getMaximumSize().height);
+			final Dimension d = new Dimension(12, buildingOperationButton.getMaximumSize().height);
 			buildingOperationArrowButton.setMaximumSize(d);
 			buildingOperationArrowButton.setIcon(new ArrowIcon(d.width, d.height, Color.BLACK));
 			buildingOperationArrowButton.addActionListener(new ActionListener() {

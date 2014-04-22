@@ -19,6 +19,7 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.extension.BillboardNode;
 import com.ardor3d.scenegraph.extension.BillboardNode.BillboardAlignment;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
@@ -48,6 +49,7 @@ public class Tree extends HousePart {
 		mesh.updateModelBound();
 		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
 		mesh.setTranslation(0, 0, height / 2.0);
+		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 
 		final BlendState bs = new BlendState();
 		bs.setEnabled(true);

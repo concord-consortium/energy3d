@@ -1270,13 +1270,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (operation == Operation.RESIZE && selectedHousePart != null) {
 							if (!(selectedHousePart instanceof Foundation)) {
 								selectedHousePart.setEditPointsVisible(false);
-								while (selectedHousePart.getContainer() != null)
-									selectedHousePart = selectedHousePart.getContainer();
+								selectedHousePart = selectedHousePart.getTopContainer();
 							}
-							else
-								selectedHousePart = null;
 						}
-						if (selectedHousePart instanceof Foundation || selectedHousePart instanceof Window) {
+						if (selectedHousePart instanceof Window || (operation == Operation.RESIZE && selectedHousePart instanceof Foundation)) {
 							cameraControl.setLeftMouseButtonEnabled(false);
 							houseMoveStartPoint = selectHousePart.getPoint();
 							invisibleFloor.setTranslation(0, 0, houseMoveStartPoint.getZ());
@@ -1284,7 +1281,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							houseMovePoints = new ArrayList<Vector3>(points.size());
 							for (final Vector3 p : points)
 								houseMovePoints.add(p.clone());
-						} 
+						}
 
 						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
 							previousSelectedHousePart.setEditPointsVisible(false);
