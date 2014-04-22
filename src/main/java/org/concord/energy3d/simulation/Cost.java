@@ -25,7 +25,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 /**
- * Calculate the cost.
+ * Calculate the cost (the prices are fictitious).
  * 
  * @author Charles Xie
  * 
@@ -163,13 +163,12 @@ public class Cost {
 			}
 		}
 
-		float sum = wallSum + windowSum + roofSum + doorSum + solarPanelSum;
-		float[] percents = new float[] { wallSum / sum, windowSum / sum, roofSum / sum, doorSum / sum, solarPanelSum / sum };
-		Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.PINK, Color.GREEN };
+		float[] data = new float[] { wallSum, windowSum, roofSum, doorSum, solarPanelSum };
 		String[] legends = new String[] { "Walls", "Windows", "Roof", "Doors", "Solar Panels" };
+		Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.PINK, Color.GREEN };
 
 		// show them in a popup window
-		PieChart pie = new PieChart(percents, colors, legends);
+		PieChart pie = new PieChart(data, colors, legends, "$");
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Construction Costs by Category", true);

@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Arc2D;
 import java.text.NumberFormat;
 
@@ -22,23 +24,41 @@ class PieChart extends JComponent {
 
 	private static final long serialVersionUID = 1L;
 	private NumberFormat format;
-	private float[] percents;
+	private float[] data;
 	private Color[] colors;
 	private String[] legends;
-	private Arc2D[] arcs;
-	private Rectangle bound;
+	private float sum;
+	private float[] percents;
+	private Arc2D.Float[] arcs;
+	private String unit;
 
-	public PieChart(float[] p, Color[] c, String[] s) {
+	public PieChart(float[] data, Color[] colors, String[] legends, String unit) {
 		setPreferredSize(new Dimension(400, 300));
 		format = NumberFormat.getNumberInstance();
 		format.setMaximumFractionDigits(1);
-		bound = new Rectangle(20, 20, 80, 80);
-		percents = p;
-		colors = c;
-		legends = s;
-		arcs = new Arc2D.Float[p.length];
-		for (int i = 0; i < arcs.length; i++)
+		this.data = data;
+		this.colors = colors;
+		this.legends = legends;
+		this.unit = unit;
+		for (float x : data)
+			sum += x;
+		percents = new float[data.length];
+		arcs = new Arc2D.Float[data.length];
+		for (int i = 0; i < percents.length; i++) {
+			percents[i] = data[i] / sum;
 			arcs[i] = new Arc2D.Float();
+		}
+		addMouseMotionListener(new MouseMotionAdapter() {
+			public void mouseMoved(MouseEvent e) {
+				for (int i = 0; i < arcs.length; i++) {
+					if (arcs[i].contains(e.getX(), e.getY())) {
+						setToolTipText(PieChart.this.legends[i] + ": " + PieChart.this.unit + (int) PieChart.this.data[i]);
+						return;
+					}
+				}
+				setToolTipText("Hover mouse over the pie chart to view the numbers");
+			}
+		});
 	}
 
 	public void paintComponent(Graphics g) {
@@ -59,7 +79,7 @@ class PieChart extends JComponent {
 		g2.fillRect(0, 0, width, height);
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
 
-		bound.setRect(width / 20, height / 10, width / 2, width / 2);
+		Rectangle bound = new Rectangle(width / 20, height / 10, width / 2, width / 2);
 		int r = bound.x + bound.width + 20;
 		int s = bound.y + 10;
 
@@ -88,6 +108,10 @@ class PieChart extends JComponent {
 			g2.drawString(format.format(percents[i] * 100.0) + "%", r + legendX2, s + 10 + i * 20);
 			t += percents[i] * 360.0f;
 		}
+
+		g2.setFont(new Font("Arial", Font.PLAIN | Font.BOLD, 11));
+		String total = "Total: " + unit + (int) sum;
+		g2.drawString(total, (width - fm.stringWidth(total)) / 2, height - 20);
 
 	}
 

@@ -61,7 +61,7 @@ public class ColorBar extends JPanel {
 
 		if (value / maximum > 0.001) {
 			g2.setFont(new Font("Arial", Font.PLAIN, 10));
-			g2.setColor(getForeground().darker());
+			g2.setColor(Color.BLACK);
 			String s = "$" + value;
 			FontMetrics fm = g2.getFontMetrics();
 			g2.drawString(s, (width - fm.stringWidth(s)) / 2, (fm.getAscent() + (height - (fm.getAscent() + fm.getDescent())) / 2));
