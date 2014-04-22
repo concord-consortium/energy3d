@@ -143,6 +143,7 @@ public class Scene implements Serializable {
 			}
 		});
 		EnergyPanel.getInstance().updatePartEnergy();
+		EnergyPanel.getInstance().updateCost();
 	}
 
 	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
@@ -220,6 +221,7 @@ public class Scene implements Serializable {
 			cameraControl.reset();
 		SceneManager.getInstance().hideAllEditPoints();
 		EnergyPanel.getInstance().updatePartEnergy();
+		EnergyPanel.getInstance().updateCost();
 	}
 
 	public static void initSceneNow() {
