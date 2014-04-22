@@ -53,6 +53,12 @@ public class MainApplication {
 		EnergyPanel.getInstance().addPropertyChangeListener(logger);
 		logger.start();
 		SnapshotLogger.start(20, logger);
+
+		// detect if the app is launched via webstart just checking its class loader: SystemClassLoader or JnlpClassLoader.
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if (cl.equals(ClassLoader.getSystemClassLoader()))
+			UpdateAnnouncer.showMessage();
+
 	}
 
 	public static void setupLibraryPath() {

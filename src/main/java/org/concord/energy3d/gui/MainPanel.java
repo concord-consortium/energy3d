@@ -382,7 +382,7 @@ public class MainPanel extends JPanel {
 		return platformButton;
 	}
 
-	private JToggleButton getLightButton() {
+	public JToggleButton getLightButton() {
 		if (lightButton == null) {
 			lightButton = new JToggleButton();
 			lightButton.addMouseListener(refreshUponMouseExit);

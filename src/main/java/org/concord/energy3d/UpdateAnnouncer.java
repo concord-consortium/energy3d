@@ -13,7 +13,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.util.Util;
 
 /**
- * This reminds the user who launches Energy3D from energy3d.jar that an update is available. 
+ * This reminds the user who launches Energy3D from energy3d.jar that an update is available.
  * 
  * We must update both energy3d.jar and energy3d.zip at the same time. The same energy3d.jar must be used in the zip folder.
  * 
@@ -26,7 +26,7 @@ final class UpdateAnnouncer {
 
 	static void showMessage() {
 		String s = getJarLocation();
-		if (!s.endsWith(".jar"))
+		if (!s.endsWith("energy3d.jar"))
 			return;
 		if (new File(s).lastModified() >= checkTimeStamp(HOME + "energy3d.jar"))
 			return;
