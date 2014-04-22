@@ -885,8 +885,8 @@ public class Foundation extends HousePart {
 		this.totalEnergyToday = totalEnergyToday;
 	}
 
-	public void rotate() {
-		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, Math.PI / 4.0);
+	public void rotate(double angle) {
+		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, angle);
 		final ReadOnlyVector3 center = toRelative(getCenter().clone());
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 p = getAbsPoint(i);

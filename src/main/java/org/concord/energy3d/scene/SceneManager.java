@@ -1475,4 +1475,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return showBuildingLabels;
 	}
 
+	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
+	public void rotateBuilding(double angle) {
+		if (selectedHousePart != null) {
+			if (selectedHousePart instanceof Foundation)
+				((Foundation) selectedHousePart).rotate(angle);
+			else
+				selectedHousePart.getTopContainer().rotate(angle);
+		}
+	}
+
 }

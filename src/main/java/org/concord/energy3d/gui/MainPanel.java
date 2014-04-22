@@ -19,6 +19,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -32,7 +33,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -55,7 +55,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton lightButton = null;
 	private JToggleButton spinAnimationButton = null;
 	private JToggleButton floorButton = null;
-	private JToggleButton buildingOperationButton = null;
+	private JToggleButton resizeButton = null;
 	private JToggleButton heliodonButton = null;
 	private JToggleButton sunAnimButton = null;
 	private JToggleButton annotationToggleButton;
@@ -72,16 +72,15 @@ public class MainPanel extends JPanel {
 	private JTextArea noteTextArea;
 	private JToggleButton solarPanelButton;
 	private JToggleButton treeButton;
+	private JButton rotateCWButton, rotateCCWButton;
 	private JButton treeArrowButton;
 	private JButton roofArrowButton;
-	private JButton buildingOperationArrowButton;
 	private int defaultDividerSize = -1;
 	private final JPopupMenu treeMenu;
 	private final JPopupMenu roofMenu;
-	private final JPopupMenu buildingOperationMenu;
 	private Operation treeCommand = SceneManager.Operation.DRAW_TREE;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
-	private Operation buildingOperationCommand = SceneManager.Operation.RESIZE;
+	private double buildingRotationAngle = Math.PI / 18;
 
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
 		@Override
@@ -139,36 +138,6 @@ public class MainPanel extends JPanel {
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		initialize();
 
-		// create building operation menu
-		final JCheckBoxMenuItem resizeMenu = new JCheckBoxMenuItem("Resize Building", new ImageIcon(getClass().getResource("icons/resize.png")), true);
-		final JCheckBoxMenuItem rotateMenu = new JCheckBoxMenuItem("Rotate Building", new ImageIcon(getClass().getResource("icons/rotate.png")));
-		final ActionListener buildingOperationAction = new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
-				buildingOperationButton.setIcon(selected.getIcon());
-				if (selected == resizeMenu) {
-					buildingOperationCommand = SceneManager.Operation.RESIZE;
-					buildingOperationButton.setToolTipText("Resize or move a building");
-					SceneManager.getInstance().setOperation(buildingOperationCommand);
-				} else {
-					buildingOperationCommand = SceneManager.Operation.ROTATE;
-					buildingOperationButton.setToolTipText("Rotate a building");
-				}
-//				SceneManager.getInstance().setOperation(buildingOperationCommand);
-				buildingOperationButton.setSelected(true);
-				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-			}
-		};
-		resizeMenu.addActionListener(buildingOperationAction);
-		rotateMenu.addActionListener(buildingOperationAction);
-		buildingOperationMenu = new JPopupMenu();
-		buildingOperationMenu.add(resizeMenu);
-		buildingOperationMenu.add(rotateMenu);
-		ButtonGroup bg = new ButtonGroup();
-		bg.add(resizeMenu);
-		bg.add(rotateMenu);
-
 		// create roof menu
 		final JCheckBoxMenuItem pyramidRoofMenu = new JCheckBoxMenuItem("Pyramid Roof", new ImageIcon(getClass().getResource("icons/roof_pyramid.png")), true);
 		final JCheckBoxMenuItem hipRoofMenu = new JCheckBoxMenuItem("Hip Roof", new ImageIcon(getClass().getResource("icons/roof_hip.png")));
@@ -206,7 +175,7 @@ public class MainPanel extends JPanel {
 		roofMenu.add(hipRoofMenu);
 		roofMenu.add(customRoofMenu);
 		roofMenu.add(gableRoofMenu);
-		bg = new ButtonGroup();
+		ButtonGroup bg = new ButtonGroup();
 		bg.add(pyramidRoofMenu);
 		bg.add(hipRoofMenu);
 		bg.add(customRoofMenu);
@@ -257,9 +226,10 @@ public class MainPanel extends JPanel {
 			appToolbar = new JToolBar();
 			appToolbar.setFloatable(false);
 			appToolbar.add(getSelectButton());
-			appToolbar.add(getBuildingOperationButton());
-			appToolbar.add(getBuildingOperationArrowButton());
 			appToolbar.add(getZoomButton());
+			appToolbar.add(getResizeButton());
+			appToolbar.add(getRotateCWButton());
+			appToolbar.add(getRotateCCWButton());
 			appToolbar.add(getSpinAnimationButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getAnnotationToggleButton());
@@ -285,7 +255,7 @@ public class MainPanel extends JPanel {
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
 			bg.add(zoomButton);
-			bg.add(buildingOperationButton);
+			bg.add(resizeButton);
 			bg.add(platformButton);
 			bg.add(wallButton);
 			bg.add(doorButton);
@@ -790,47 +760,93 @@ public class MainPanel extends JPanel {
 		return roofArrowButton;
 	}
 
-	private JToggleButton getBuildingOperationButton() {
-		if (buildingOperationButton == null) {
-			buildingOperationButton = new JToggleButton();
-			buildingOperationButton.addMouseListener(refreshUponMouseExit);
-			buildingOperationButton.setIcon(new ImageIcon(getClass().getResource("icons/resize.png")));
-			buildingOperationButton.setToolTipText("Resize or move a building");
-			buildingOperationButton.addActionListener(new ActionListener() {
+	private JToggleButton getResizeButton() {
+		if (resizeButton == null) {
+			resizeButton = new JToggleButton();
+			resizeButton.addMouseListener(refreshUponMouseExit);
+			resizeButton.setIcon(new ImageIcon(getClass().getResource("icons/resize.png")));
+			resizeButton.setToolTipText("Resize or move a building");
+			resizeButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (buildingOperationCommand == Operation.ROTATE) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart != null)
-							if (selectedPart instanceof Foundation)
-								((Foundation) selectedPart).rotate();
-							else
-								selectedPart.getTopContainer().rotate();
-					} else
-						SceneManager.getInstance().setOperation(buildingOperationCommand);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.RESIZE);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
-		return buildingOperationButton;
+		return resizeButton;
 	}
 
-	private JButton getBuildingOperationArrowButton() {
-		if (buildingOperationArrowButton == null) {
-			buildingOperationArrowButton = new JButton();
-			final Dimension d = new Dimension(12, buildingOperationButton.getMaximumSize().height);
-			buildingOperationArrowButton.setMaximumSize(d);
-			buildingOperationArrowButton.setIcon(new ArrowIcon(d.width, d.height, Color.BLACK));
-			buildingOperationArrowButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					buildingOperationMenu.show(buildingOperationButton, 0, buildingOperationButton.getHeight());
+	private JButton getRotateCWButton() {
+		if (rotateCWButton == null) {
+			rotateCWButton = new JButton();
+			rotateCWButton.addMouseListener(refreshUponMouseExit);
+			rotateCWButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
+			rotateCWButton.setToolTipText("Rotate a building clockwisely");
+			rotateCWButton.addMouseListener(new MouseAdapter() {
+				private boolean mousePressed = false;
+
+				public void mousePressed(MouseEvent e) {
+					mousePressed = true;
+					new Thread() {
+						public void run() {
+							while (mousePressed) {
+								SceneManager.getInstance().rotateBuilding(-buildingRotationAngle);
+								try {
+									Thread.sleep(200);
+								} catch (InterruptedException e) {
+								}
+							}
+						}
+
+					}.start();
+				}
+
+				public void mouseReleased(MouseEvent e) {
+					mousePressed = false;
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null)
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No building is selected for rotation.", "No Building", JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
-			buildingOperationArrowButton.setBorder(BorderFactory.createEmptyBorder());
-			buildingOperationArrowButton.setFocusPainted(false);
 		}
-		return buildingOperationArrowButton;
+		return rotateCWButton;
+	}
+
+	private JButton getRotateCCWButton() {
+		if (rotateCCWButton == null) {
+			rotateCCWButton = new JButton();
+			rotateCCWButton.addMouseListener(refreshUponMouseExit);
+			rotateCCWButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_ccw.png")));
+			rotateCCWButton.setToolTipText("Rotate a building counter-clockwisely");
+			rotateCCWButton.addMouseListener(new MouseAdapter() {
+				private boolean mousePressed = false;
+
+				public void mousePressed(MouseEvent e) {
+					mousePressed = true;
+					new Thread() {
+						public void run() {
+							while (mousePressed) {
+								SceneManager.getInstance().rotateBuilding(buildingRotationAngle);
+								try {
+									Thread.sleep(200);
+								} catch (InterruptedException e) {
+								}
+							}
+						}
+
+					}.start();
+				}
+
+				public void mouseReleased(MouseEvent e) {
+					mousePressed = false;
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null)
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No building is selected for rotation.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
+		}
+		return rotateCCWButton;
 	}
 
 	public JToggleButton getNoteButton() {
