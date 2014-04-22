@@ -822,7 +822,7 @@ public abstract class HousePart implements Serializable {
 		this.id = id;
 	}
 
-	public HousePart getTopContainer() {
+	public Foundation getTopContainer() {
 		HousePart c = this.getContainer();
 		if (c == null)
 			return null;
@@ -831,7 +831,7 @@ public abstract class HousePart implements Serializable {
 			x = c;
 			c = c.getContainer();
 		}
-		return x;
+		return (Foundation) x;
 	}
 
 	public void setHighlight(final boolean highlight) {
