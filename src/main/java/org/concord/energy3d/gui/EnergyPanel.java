@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
@@ -396,7 +398,7 @@ public class EnergyPanel extends JPanel {
 
 		windowsComboBox = new WideComboBox();
 		windowsComboBox.setEditable(true);
-		windowsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "1.22", "0.70 (Double Pane)", "0.15 (Triple Pane)" }));
+		windowsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "1.22", "0.35 (Double Pane)", "0.15 (Triple Pane)" }));
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -759,6 +761,12 @@ public class EnergyPanel extends JPanel {
 		costBar = new ColorBar(Color.WHITE, Color.GRAY);
 		costBar.setPreferredSize(new Dimension(200, 16));
 		costBar.setMaximum(Cost.getInstance().getBudget());
+		costBar.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() > 1) 
+					Cost.getInstance().show();
+			}
+		});
 		costPanel.add(costBar, BorderLayout.CENTER);
 
 	}

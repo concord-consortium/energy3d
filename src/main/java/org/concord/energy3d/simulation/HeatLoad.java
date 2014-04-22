@@ -79,7 +79,7 @@ public class HeatLoad {
 		}
 	}
 
-	private double parseUFactor(final JComboBox<String> comboBox) {
+	public static double parseUFactor(final JComboBox<String> comboBox) {
 		final String valueStr = comboBox.getSelectedItem().toString();
 		final int indexOfSpace = valueStr.indexOf(' ');
 		return Double.parseDouble(valueStr.substring(0, indexOfSpace != -1 ? indexOfSpace : valueStr.length()));
