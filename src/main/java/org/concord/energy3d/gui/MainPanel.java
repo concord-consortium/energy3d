@@ -33,6 +33,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -149,11 +150,12 @@ public class MainPanel extends JPanel {
 				if (selected == resizeMenu) {
 					buildingOperationCommand = SceneManager.Operation.RESIZE;
 					buildingOperationButton.setToolTipText("Resize or move a building");
+					SceneManager.getInstance().setOperation(buildingOperationCommand);
 				} else {
 					buildingOperationCommand = SceneManager.Operation.ROTATE;
 					buildingOperationButton.setToolTipText("Rotate a building");
 				}
-				SceneManager.getInstance().setOperation(buildingOperationCommand);
+//				SceneManager.getInstance().setOperation(buildingOperationCommand);
 				buildingOperationButton.setSelected(true);
 				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 			}
@@ -797,9 +799,14 @@ public class MainPanel extends JPanel {
 			buildingOperationButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (buildingOperationCommand == Operation.ROTATE)
-						((Foundation) SceneManager.getInstance().getSelectedPart()).rotate();
-					else
+					if (buildingOperationCommand == Operation.ROTATE) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart != null)
+							if (selectedPart instanceof Foundation)
+								((Foundation) selectedPart).rotate();
+							else
+								selectedPart.getTopContainer().rotate();
+					} else
 						SceneManager.getInstance().setOperation(buildingOperationCommand);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}

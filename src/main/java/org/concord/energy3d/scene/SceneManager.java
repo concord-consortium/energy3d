@@ -1252,7 +1252,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() {
 				if (zoomLock)
 					return null;
-				if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.DRAW_ROOF_GABLE) {
+				if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.ROTATE || operation == Operation.DRAW_ROOF_GABLE) {
 					if (selectedHousePart == null || selectedHousePart.isDrawCompleted()) {
 						final HousePart previousSelectedHousePart = selectedHousePart;
 						final PickedHousePart selectHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
