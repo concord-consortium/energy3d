@@ -379,24 +379,7 @@ public abstract class HousePart implements Serializable {
 			if (container == null)
 				newP.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
 			else {
-				final ReadOnlyVector3 origin;
 				final Vector3 p0 = container.getAbsPoint(0);
-				final boolean isHorizontal = getContainerRelative().isHorizontal();
-				if (isHorizontal) {
-					final ReadOnlyVector3 center;
-					if (this instanceof Roof)
-						center = getCenter().multiply(1, 1, 0, null);
-					else
-						center = container.getCenter();
-
-					if (snapToZ)
-						/* a dirty way of solving problem with foundation height of 1.0 which does not fit in the grid by shifting the grid upward by 1.0 */
-						origin = this instanceof Wall ? center.add(0, 0, points.get(0).getZ(), null) : center;
-					else
-						origin = center.add(0, 0, p.getZ(), null);
-				} else
-					origin = p0;
-
 				final Vector3 p1 = container.getAbsPoint(1);
 				final Vector3 p2 = container.getAbsPoint(2);
 				final ReadOnlyVector3 u = p2.subtract(p0, null);
@@ -406,10 +389,9 @@ public abstract class HousePart implements Serializable {
 				final double uScaleRounded = Math.round(u.length() * uScale / gridSize) * gridSize;
 				final double vScaleRounded = Math.round(v.length() * vScale / gridSize) * gridSize;
 				newP.set(p0).addLocal(u.normalize(null).multiplyLocal(uScaleRounded)).addLocal(v.normalize(null).multiplyLocal(vScaleRounded));
-				if (isHorizontal)
+				if (getContainerRelative().isHorizontal())
 					newP.setZ(p.getZ());
 			}
-
 			if (newP.distance(p) < previous.distance(p) * 0.40)
 				p.set(newP);
 			else
