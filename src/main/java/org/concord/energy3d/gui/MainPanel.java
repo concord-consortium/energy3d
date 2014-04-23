@@ -48,13 +48,11 @@ public class MainPanel extends JPanel {
 	private JToolBar appToolbar = null;
 	private JToggleButton selectButton = null;
 	private JToggleButton wallButton = null;
-	private JToggleButton doorButton = null;
 	private JToggleButton roofButton = null;
 	private JToggleButton windowButton = null;
 	private JToggleButton platformButton = null;
 	private JToggleButton lightButton = null;
 	private JToggleButton spinAnimationButton = null;
-	private JToggleButton floorButton = null;
 	private JToggleButton resizeButton = null;
 	private JToggleButton heliodonButton = null;
 	private JToggleButton sunAnimButton = null;
@@ -72,14 +70,18 @@ public class MainPanel extends JPanel {
 	private JTextArea noteTextArea;
 	private JToggleButton solarPanelButton;
 	private JToggleButton treeButton;
-	private JButton rotateCWButton, rotateCCWButton;
+	private JToggleButton miscButton;
+	private JButton rotateCWButton;
 	private JButton treeArrowButton;
 	private JButton roofArrowButton;
+	private JButton miscArrowButton;
 	private int defaultDividerSize = -1;
 	private final JPopupMenu treeMenu;
 	private final JPopupMenu roofMenu;
+	private final JPopupMenu miscMenu;
 	private Operation treeCommand = SceneManager.Operation.DRAW_TREE;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
+	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
 	private double buildingRotationAngle = Math.PI / 18;
 
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
@@ -210,6 +212,35 @@ public class MainPanel extends JPanel {
 		bg.add(shortTreeMenu);
 		bg.add(tallTreeMenu);
 
+		// create misc menu
+		final JCheckBoxMenuItem doorMenu = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
+		final JCheckBoxMenuItem floorMenu = new JCheckBoxMenuItem("Floor", new ImageIcon(getClass().getResource("icons/floor.png")));
+		final ActionListener miscAction = new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
+				miscButton.setIcon(selected.getIcon());
+				if (selected == doorMenu) {
+					miscCommand = SceneManager.Operation.DRAW_DOOR;
+					miscButton.setToolTipText("Draw door");
+				} else {
+					miscCommand = SceneManager.Operation.DRAW_FLOOR;
+					miscButton.setToolTipText("Draw floor");
+				}
+				SceneManager.getInstance().setOperation(miscCommand);
+				miscButton.setSelected(true);
+				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+			}
+		};
+		doorMenu.addActionListener(miscAction);
+		floorMenu.addActionListener(miscAction);
+		miscMenu = new JPopupMenu();
+		miscMenu.add(doorMenu);
+		miscMenu.add(floorMenu);
+		bg = new ButtonGroup();
+		bg.add(doorMenu);
+		bg.add(floorMenu);
+
 		System.out.println("done");
 	}
 
@@ -229,7 +260,6 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getZoomButton());
 			appToolbar.add(getResizeButton());
 			appToolbar.add(getRotateCWButton());
-			appToolbar.add(getRotateCCWButton());
 			appToolbar.add(getSpinAnimationButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getAnnotationToggleButton());
@@ -238,12 +268,12 @@ public class MainPanel extends JPanel {
 			appToolbar.addSeparator();
 			appToolbar.add(getPlatformButton());
 			appToolbar.add(getWallButton());
-			appToolbar.add(getDoorButton());
 			appToolbar.add(getWindowButton());
-			appToolbar.add(getFloorButton());
+			appToolbar.add(getSolarPanelButton());
 			appToolbar.add(getRoofButton());
 			appToolbar.add(getRoofArrowButton());
-			appToolbar.add(getSolarPanelButton());
+			appToolbar.add(getMiscButton());
+			appToolbar.add(getMiscArrowButton());
 			appToolbar.add(getTreeButton());
 			appToolbar.add(getTreeArrowButton());
 			appToolbar.addSeparator();
@@ -258,12 +288,11 @@ public class MainPanel extends JPanel {
 			bg.add(resizeButton);
 			bg.add(platformButton);
 			bg.add(wallButton);
-			bg.add(doorButton);
 			bg.add(windowButton);
 			bg.add(roofButton);
-			bg.add(floorButton);
 			bg.add(solarPanelButton);
 			bg.add(treeButton);
+			bg.add(miscButton);
 		}
 		return appToolbar;
 	}
@@ -303,22 +332,40 @@ public class MainPanel extends JPanel {
 		return wallButton;
 	}
 
-	private JToggleButton getDoorButton() {
-		if (doorButton == null) {
-			doorButton = new JToggleButton();
-			doorButton.setText("");
-			doorButton.setToolTipText("Draw door");
-			doorButton.setIcon(new ImageIcon(getClass().getResource("icons/door.png")));
-			doorButton.addActionListener(new ActionListener() {
+	private JToggleButton getMiscButton() {
+		if (miscButton == null) {
+			miscButton = new JToggleButton();
+			miscButton.setText("");
+			miscButton.setToolTipText("Draw door");
+			miscButton.setIcon(new ImageIcon(getClass().getResource("icons/door.png")));
+			miscButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_DOOR);
+					SceneManager.getInstance().setOperation(miscCommand);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			doorButton.addMouseListener(operationStickAndRefreshUponExit);
+			miscButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
-		return doorButton;
+		return miscButton;
+	}
+
+	private JButton getMiscArrowButton() {
+		if (miscArrowButton == null) {
+			miscArrowButton = new JButton();
+			final Dimension d = new Dimension(12, miscButton.getMaximumSize().height);
+			miscArrowButton.setMaximumSize(d);
+			miscArrowButton.setIcon(new ArrowIcon(d.width, d.height, Color.BLACK));
+			miscArrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					miscMenu.show(miscButton, 0, miscButton.getHeight());
+				}
+			});
+			miscArrowButton.setBorder(BorderFactory.createEmptyBorder());
+			miscArrowButton.setFocusPainted(false);
+		}
+		return miscArrowButton;
 	}
 
 	private JToggleButton getWindowButton() {
@@ -395,23 +442,6 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return spinAnimationButton;
-	}
-
-	private JToggleButton getFloorButton() {
-		if (floorButton == null) {
-			floorButton = new JToggleButton();
-			floorButton.setIcon(new ImageIcon(getClass().getResource("icons/floor.png")));
-			floorButton.setToolTipText("Draw floor");
-			floorButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FLOOR);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-				}
-			});
-			floorButton.addMouseListener(operationStickAndRefreshUponExit);
-		}
-		return floorButton;
 	}
 
 	public JToggleButton getHeliodonButton() {
@@ -782,18 +812,18 @@ public class MainPanel extends JPanel {
 			rotateCWButton = new JButton();
 			rotateCWButton.addMouseListener(refreshUponMouseExit);
 			rotateCWButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
-			rotateCWButton.setToolTipText("Rotate a building clockwisely");
+			rotateCWButton.setToolTipText("<html>Rotate a building clockwisely; <br>Hold down the SHIFT key and press this button to rotate counter-clockwisely.</html>");
 			rotateCWButton.addMouseListener(new MouseAdapter() {
 				private boolean mousePressed = false;
 
-				public void mousePressed(MouseEvent e) {
+				public void mousePressed(final MouseEvent e) {
 					mousePressed = true;
 					new Thread() {
 						public void run() {
 							while (mousePressed) {
-								SceneManager.getInstance().rotateBuilding(-buildingRotationAngle);
+								SceneManager.getInstance().rotateBuilding(e.isShiftDown() ? buildingRotationAngle : -buildingRotationAngle);
 								try {
-									Thread.sleep(200);
+									Thread.sleep(100);
 								} catch (InterruptedException e) {
 								}
 							}
@@ -811,42 +841,6 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return rotateCWButton;
-	}
-
-	private JButton getRotateCCWButton() {
-		if (rotateCCWButton == null) {
-			rotateCCWButton = new JButton();
-			rotateCCWButton.addMouseListener(refreshUponMouseExit);
-			rotateCCWButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_ccw.png")));
-			rotateCCWButton.setToolTipText("Rotate a building counter-clockwisely");
-			rotateCCWButton.addMouseListener(new MouseAdapter() {
-				private boolean mousePressed = false;
-
-				public void mousePressed(MouseEvent e) {
-					mousePressed = true;
-					new Thread() {
-						public void run() {
-							while (mousePressed) {
-								SceneManager.getInstance().rotateBuilding(buildingRotationAngle);
-								try {
-									Thread.sleep(200);
-								} catch (InterruptedException e) {
-								}
-							}
-						}
-
-					}.start();
-				}
-
-				public void mouseReleased(MouseEvent e) {
-					mousePressed = false;
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null)
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No building is selected for rotation.", "No Building", JOptionPane.INFORMATION_MESSAGE);
-				}
-			});
-		}
-		return rotateCCWButton;
 	}
 
 	public JToggleButton getNoteButton() {
