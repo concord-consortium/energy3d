@@ -145,22 +145,22 @@ public class MainPanel extends JPanel {
 		initialize();
 
 		// create roof menu
-		final JCheckBoxMenuItem pyramidRoofMenu = new JCheckBoxMenuItem("Pyramid Roof", new ImageIcon(getClass().getResource("icons/roof_pyramid.png")), true);
-		final JCheckBoxMenuItem hipRoofMenu = new JCheckBoxMenuItem("Hip Roof", new ImageIcon(getClass().getResource("icons/roof_hip.png")));
-		final JCheckBoxMenuItem customRoofMenu = new JCheckBoxMenuItem("Custom Roof", new ImageIcon(getClass().getResource("icons/roof_custom.png")));
-		final JCheckBoxMenuItem gableRoofMenu = new JCheckBoxMenuItem("Gable Roof", new ImageIcon(getClass().getResource("icons/roof_gable.png")));
+		final JCheckBoxMenuItem miPyramidRoof = new JCheckBoxMenuItem("Pyramid Roof", new ImageIcon(getClass().getResource("icons/roof_pyramid.png")), true);
+		final JCheckBoxMenuItem miHipRoof = new JCheckBoxMenuItem("Hip Roof", new ImageIcon(getClass().getResource("icons/roof_hip.png")));
+		final JCheckBoxMenuItem miCustomRoof = new JCheckBoxMenuItem("Custom Roof", new ImageIcon(getClass().getResource("icons/roof_custom.png")));
+		final JCheckBoxMenuItem miGableRoof = new JCheckBoxMenuItem("Gable Roof", new ImageIcon(getClass().getResource("icons/roof_gable.png")));
 		final ActionListener roofAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
 				roofButton.setIcon(selected.getIcon());
-				if (selected == pyramidRoofMenu) {
+				if (selected == miPyramidRoof) {
 					roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 					roofButton.setToolTipText("Draw pyramid roof");
-				} else if (selected == hipRoofMenu) {
+				} else if (selected == miHipRoof) {
 					roofCommand = SceneManager.Operation.DRAW_ROOF_HIP;
 					roofButton.setToolTipText("Draw hip roof");
-				} else if (selected == customRoofMenu) {
+				} else if (selected == miCustomRoof) {
 					roofCommand = SceneManager.Operation.DRAW_ROOF_CUSTOM;
 					roofButton.setToolTipText("Draw custom roof");
 				} else {
@@ -172,30 +172,30 @@ public class MainPanel extends JPanel {
 				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 			}
 		};
-		pyramidRoofMenu.addActionListener(roofAction);
-		hipRoofMenu.addActionListener(roofAction);
-		customRoofMenu.addActionListener(roofAction);
-		gableRoofMenu.addActionListener(roofAction);
+		miPyramidRoof.addActionListener(roofAction);
+		miHipRoof.addActionListener(roofAction);
+		miCustomRoof.addActionListener(roofAction);
+		miGableRoof.addActionListener(roofAction);
 		roofMenu = new JPopupMenu();
-		roofMenu.add(pyramidRoofMenu);
-		roofMenu.add(hipRoofMenu);
-		roofMenu.add(customRoofMenu);
-		roofMenu.add(gableRoofMenu);
+		roofMenu.add(miPyramidRoof);
+		roofMenu.add(miHipRoof);
+		roofMenu.add(miCustomRoof);
+		roofMenu.add(miGableRoof);
 		ButtonGroup bg = new ButtonGroup();
-		bg.add(pyramidRoofMenu);
-		bg.add(hipRoofMenu);
-		bg.add(customRoofMenu);
-		bg.add(gableRoofMenu);
+		bg.add(miPyramidRoof);
+		bg.add(miHipRoof);
+		bg.add(miCustomRoof);
+		bg.add(miGableRoof);
 
 		// create tree menu
-		final JCheckBoxMenuItem shortTreeMenu = new JCheckBoxMenuItem("Short Tree", new ImageIcon(getClass().getResource("icons/tree.png")), true);
-		final JCheckBoxMenuItem tallTreeMenu = new JCheckBoxMenuItem("Tall Tree", new ImageIcon(getClass().getResource("icons/tree_tall.png")));
+		final JCheckBoxMenuItem miShortTree = new JCheckBoxMenuItem("Short Tree", new ImageIcon(getClass().getResource("icons/tree.png")), true);
+		final JCheckBoxMenuItem miTallTree = new JCheckBoxMenuItem("Tall Tree", new ImageIcon(getClass().getResource("icons/tree_tall.png")));
 		final ActionListener treeAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
 				treeButton.setIcon(selected.getIcon());
-				if (selected == shortTreeMenu) {
+				if (selected == miShortTree) {
 					treeCommand = SceneManager.Operation.DRAW_TREE;
 					treeButton.setToolTipText("Insert tree");
 				} else {
@@ -207,24 +207,24 @@ public class MainPanel extends JPanel {
 				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 			}
 		};
-		shortTreeMenu.addActionListener(treeAction);
-		tallTreeMenu.addActionListener(treeAction);
+		miShortTree.addActionListener(treeAction);
+		miTallTree.addActionListener(treeAction);
 		treeMenu = new JPopupMenu();
-		treeMenu.add(shortTreeMenu);
-		treeMenu.add(tallTreeMenu);
+		treeMenu.add(miShortTree);
+		treeMenu.add(miTallTree);
 		bg = new ButtonGroup();
-		bg.add(shortTreeMenu);
-		bg.add(tallTreeMenu);
+		bg.add(miShortTree);
+		bg.add(miTallTree);
 
 		// create misc menu
-		final JCheckBoxMenuItem doorMenu = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
-		final JCheckBoxMenuItem floorMenu = new JCheckBoxMenuItem("Floor", new ImageIcon(getClass().getResource("icons/floor.png")));
+		final JCheckBoxMenuItem miDoor = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
+		final JCheckBoxMenuItem miFloor = new JCheckBoxMenuItem("Floor", new ImageIcon(getClass().getResource("icons/floor.png")));
 		final ActionListener miscAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
 				miscButton.setIcon(selected.getIcon());
-				if (selected == doorMenu) {
+				if (selected == miDoor) {
 					miscCommand = SceneManager.Operation.DRAW_DOOR;
 					miscButton.setToolTipText("Draw door");
 				} else {
@@ -236,14 +236,14 @@ public class MainPanel extends JPanel {
 				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 			}
 		};
-		doorMenu.addActionListener(miscAction);
-		floorMenu.addActionListener(miscAction);
+		miDoor.addActionListener(miscAction);
+		miFloor.addActionListener(miscAction);
 		miscMenu = new JPopupMenu();
-		miscMenu.add(doorMenu);
-		miscMenu.add(floorMenu);
+		miscMenu.add(miDoor);
+		miscMenu.add(miFloor);
 		bg = new ButtonGroup();
-		bg.add(doorMenu);
-		bg.add(floorMenu);
+		bg.add(miDoor);
+		bg.add(miFloor);
 
 		System.out.println("done");
 	}

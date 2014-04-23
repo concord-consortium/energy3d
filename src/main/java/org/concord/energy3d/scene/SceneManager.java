@@ -798,10 +798,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Camera camera = getCamera();
 		cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
-		ReadOnlyVector3 loc = new Vector3(10, -50, 30);
+		ReadOnlyVector3 loc = new Vector3(10, -80, 20);
 		ReadOnlyVector3 up = new Vector3(0, 0, 1);
 		// ReadOnlyVector3 up = new Vector3(0, 1, 0);
-		ReadOnlyVector3 lookAt = new Vector3(0, 0, 10);
+		ReadOnlyVector3 lookAt = new Vector3(0, 0, 0);
 
 		setCompassVisible(viewMode == ViewMode.NORMAL);
 
