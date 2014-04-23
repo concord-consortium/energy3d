@@ -9,10 +9,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -71,7 +74,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton solarPanelButton;
 	private JToggleButton treeButton;
 	private JToggleButton miscButton;
-	private JButton rotateCWButton;
+	private JButton rotateButton;
 	private JButton treeArrowButton;
 	private JButton roofArrowButton;
 	private JButton miscArrowButton;
@@ -82,7 +85,8 @@ public class MainPanel extends JPanel {
 	private Operation treeCommand = SceneManager.Operation.DRAW_TREE;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
-	private double buildingRotationAngle = Math.PI / 18;
+	private double buildingRotationAngleAbsolute = Math.PI / 18;
+	private double buildingRotationAngle = -buildingRotationAngleAbsolute;
 
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
 		@Override
@@ -259,7 +263,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getSelectButton());
 			appToolbar.add(getZoomButton());
 			appToolbar.add(getResizeButton());
-			appToolbar.add(getRotateCWButton());
+			appToolbar.add(getRotateButton());
 			appToolbar.add(getSpinAnimationButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getAnnotationToggleButton());
@@ -807,13 +811,26 @@ public class MainPanel extends JPanel {
 		return resizeButton;
 	}
 
-	private JButton getRotateCWButton() {
-		if (rotateCWButton == null) {
-			rotateCWButton = new JButton();
-			rotateCWButton.addMouseListener(refreshUponMouseExit);
-			rotateCWButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
-			rotateCWButton.setToolTipText("<html>Rotate a building clockwisely; <br>Hold down the SHIFT key and press this button to rotate counter-clockwisely.</html>");
-			rotateCWButton.addMouseListener(new MouseAdapter() {
+	private JButton getRotateButton() {
+		if (rotateButton == null) {
+			rotateButton = new JButton();
+			rotateButton.addMouseListener(refreshUponMouseExit);
+			rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
+			rotateButton.setToolTipText("<html>Rotate a building clockwisely; <br>Hold down the SHIFT key and press this button to rotate counter-clockwisely.</html>");
+			rotateButton.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/" + (e.isShiftDown() ? "rotate_ccw.png" : "rotate_cw.png"))));
+					buildingRotationAngle = e.isShiftDown() ? buildingRotationAngleAbsolute : -buildingRotationAngleAbsolute;
+				}
+
+				@Override
+				public void keyReleased(KeyEvent e) {
+					buildingRotationAngle = -buildingRotationAngleAbsolute;
+					rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
+				}
+			});
+			rotateButton.addMouseListener(new MouseAdapter() {
 				private boolean mousePressed = false;
 
 				public void mousePressed(final MouseEvent e) {
@@ -821,7 +838,13 @@ public class MainPanel extends JPanel {
 					new Thread() {
 						public void run() {
 							while (mousePressed) {
-								SceneManager.getInstance().rotateBuilding(e.isShiftDown() ? buildingRotationAngle : -buildingRotationAngle);
+								SceneManager.getTaskManager().update(new Callable<Object>() {
+									@Override
+									public Object call() throws Exception {
+										SceneManager.getInstance().rotateBuilding(buildingRotationAngle);
+										return null;
+									}
+								});
 								try {
 									Thread.sleep(100);
 								} catch (InterruptedException e) {
@@ -840,7 +863,7 @@ public class MainPanel extends JPanel {
 				}
 			});
 		}
-		return rotateCWButton;
+		return rotateButton;
 	}
 
 	public JToggleButton getNoteButton() {
