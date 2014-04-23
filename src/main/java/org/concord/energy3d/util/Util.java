@@ -151,6 +151,14 @@ public class Util {
 		return t;
 	}
 
+	public static double projectPointOnLineScale3D(final ReadOnlyVector3 point, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2) {
+		final boolean isHorizontal = Util.isZero(p2.subtract(p1, null).normalizeLocal().getZ());
+		if (isHorizontal)
+			return Util.projectPointOnLineScale(new Vector2(point.getX(), point.getY()), new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()));
+		else
+			return Util.projectPointOnLineScale(new Vector2(0, point.getZ()), new Vector2(0, p1.getZ()), new Vector2(0, p2.getZ()));
+	}
+
 	public static Vector2 snapToPolygon(final ReadOnlyVector3 point, final List<ReadOnlyVector3> polygon, final List<ReadOnlyVector3> wallNormals) {
 		final Vector2 p = new Vector2(point.getX(), point.getY());
 		final Vector2 l1 = new Vector2();
@@ -225,7 +233,7 @@ public class Util {
 		return Math.abs(x) < MathUtils.ZERO_TOLERANCE;
 	}
 
-	public static void reportError(Throwable e) {
+	public static void reportError(final Throwable e) {
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured! Please notify us of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
 	}
 
@@ -251,17 +259,17 @@ public class Util {
 	}
 
 	/** This method sets the selection state of a button visually without invoking its ItemListeners and ActionListeners */
-	public static void selectSilently(AbstractButton button, boolean selected) {
-		ItemListener[] itemListeners = button.getItemListeners();
-		ActionListener[] actionListeners = button.getActionListeners();
-		for (ItemListener x : itemListeners)
+	public static void selectSilently(final AbstractButton button, final boolean selected) {
+		final ItemListener[] itemListeners = button.getItemListeners();
+		final ActionListener[] actionListeners = button.getActionListeners();
+		for (final ItemListener x : itemListeners)
 			button.removeItemListener(x);
-		for (ActionListener x : actionListeners)
+		for (final ActionListener x : actionListeners)
 			button.removeActionListener(x);
 		button.setSelected(selected);
-		for (ItemListener x : itemListeners)
+		for (final ItemListener x : itemListeners)
 			button.addItemListener(x);
-		for (ActionListener x : actionListeners)
+		for (final ActionListener x : actionListeners)
 			button.addActionListener(x);
 	}
 
