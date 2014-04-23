@@ -38,7 +38,7 @@ public class MainApplication {
 		Scene.getInstance();
 		new Thread(scene, "Energy 3D Application").start();
 
-		if (!Config.isMac() && args.length > 1 && !args[args.length - 1].startsWith("-"))
+		if (args.length > 1 && !args[args.length - 1].startsWith("-"))
 			mainFrame.open(args[args.length - 1]);
 
 		/* initialize data logging */
