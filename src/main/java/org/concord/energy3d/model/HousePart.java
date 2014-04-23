@@ -380,7 +380,9 @@ public abstract class HousePart implements Serializable {
 				newP.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
 			else {
 				final ReadOnlyVector3 origin;
-				if (getContainerRelative().isHorizontal()) {
+				final Vector3 p0 = container.getAbsPoint(0);
+				final boolean isHorizontal = getContainerRelative().isHorizontal();
+				if (isHorizontal) {
 					final ReadOnlyVector3 center;
 					if (this instanceof Roof)
 						center = getCenter().multiply(1, 1, 0, null);
@@ -393,25 +395,25 @@ public abstract class HousePart implements Serializable {
 					else
 						origin = center.add(0, 0, p.getZ(), null);
 				} else
-					origin = container.getAbsPoint(0);
+					origin = p0;
 
-				final ReadOnlyVector3 originToP = p.subtract(origin, null);
-				final ReadOnlyVector3 horizontalDir = new Vector3(originToP.getX(), snapToZ ? originToP.getY() : 0, 0);
-				final double snapedHorizontalLength = Math.round(horizontalDir.length() / gridSize) * gridSize;
-				final ReadOnlyVector3 u = horizontalDir.normalize(null).multiplyLocal(snapedHorizontalLength);
-
-				final ReadOnlyVector3 verticalDir = new Vector3(0, snapToZ ? 0 : originToP.getY(), snapToZ ? originToP.getZ() : 0);
-				final double snapedVerticalLength = Math.round(verticalDir.length() / gridSize) * gridSize;
-				final ReadOnlyVector3 v = verticalDir.normalize(null).multiplyLocal(snapedVerticalLength);
-				newP.set(origin).addLocal(u).addLocal(v);
+				final Vector3 p1 = container.getAbsPoint(1);
+				final Vector3 p2 = container.getAbsPoint(2);
+				final ReadOnlyVector3 u = p2.subtract(p0, null);
+				final ReadOnlyVector3 v = p1.subtract(p0, null);
+				final double uScale = Util.projectPointOnLineScale3D(p, p0, p2);
+				final double vScale = Util.projectPointOnLineScale3D(p, p0, p1);
+				final double uScaleRounded = Math.round(u.length() * uScale / gridSize) * gridSize;
+				final double vScaleRounded = Math.round(v.length() * vScale / gridSize) * gridSize;
+				newP.set(p0).addLocal(u.normalize(null).multiplyLocal(uScaleRounded)).addLocal(v.normalize(null).multiplyLocal(vScaleRounded));
+				if (isHorizontal)
+					newP.setZ(p.getZ());
 			}
 
-			for (int xyz = 0; xyz < 3; xyz++)
-				if (Math.abs(newP.getValue(xyz) - p.getValue(xyz)) < Math.abs(newP.getValue(xyz) - previous.getValue(xyz)) * 0.40)
-					p.setValue(xyz, newP.getValue(xyz));
-				else
-					p.setValue(xyz, previous.getValue(xyz));
-
+			if (newP.distance(p) < previous.distance(p) * 0.40)
+				p.set(newP);
+			else
+				p.set(previous);
 		}
 	}
 
