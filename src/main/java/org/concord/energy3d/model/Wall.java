@@ -95,7 +95,7 @@ public class Wall extends HousePart {
 		// mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		// mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
-		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+//		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new BoundingBox());
 		root.attachChild(mesh);
@@ -1202,11 +1202,6 @@ public class Wall extends HousePart {
 	}
 
 	public Mesh getInvisibleMesh() {
-		return invisibleMesh;
-	}
-
-	@Override
-	public Mesh getIrradiationCollisionSpatial() {
 		return invisibleMesh;
 	}
 
