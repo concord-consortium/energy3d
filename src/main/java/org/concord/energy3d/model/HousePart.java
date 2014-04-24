@@ -390,8 +390,8 @@ public abstract class HousePart implements Serializable {
 				final Vector3 p2 = container.getAbsPoint(2);
 				final ReadOnlyVector3 u = p2.subtract(p0, null);
 				final ReadOnlyVector3 v = p1.subtract(p0, null);
-				final double uScale = Util.projectPointOnLineScale3D(p, p0, p2);
-				final double vScale = Util.projectPointOnLineScale3D(p, p0, p1);
+				final double uScale = Util.projectPointOnLineScale(p, p0, p2);
+				final double vScale = Util.projectPointOnLineScale(p, p0, p1);
 				final double uScaleRounded = Math.round(u.length() * uScale / gridSize) * gridSize;
 				final double vScaleRounded = Math.round(v.length() * vScale / gridSize) * gridSize;
 				newP.set(p0).addLocal(u.normalize(null).multiplyLocal(uScaleRounded)).addLocal(v.normalize(null).multiplyLocal(vScaleRounded));
@@ -766,7 +766,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public boolean isDrawable() {
-		return points.size() >= 4 && !Util.isEqual(getAbsPoint(2), getAbsPoint(0)) && !Util.isEqual(getAbsPoint(1), getAbsPoint(0));
+		return points.size() >= 4 && getAbsPoint(0).distance(getAbsPoint(2)) >= getGridSize() && getAbsPoint(0).distance(getAbsPoint(1)) >= getGridSize();
 	}
 
 	public void setPrintVertical(final boolean isVertical) {

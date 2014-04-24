@@ -22,8 +22,6 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
@@ -53,6 +51,10 @@ public class Foundation extends HousePart {
 	private transient double heatingToday;
 	private transient double coolingToday;
 	private transient double totalEnergyToday;
+	private transient Vector3 prevP0;
+	private transient Vector3 prevP1;
+	private transient Vector3 prevP2;
+	private transient Vector3 prevP3;
 
 	static {
 		format.setGroupingUsed(true);
@@ -81,14 +83,10 @@ public class Foundation extends HousePart {
 		super.init();
 		resizeHouseMode = false;
 
-		final CullState cullState = new CullState();
-		cullState.setCullFace(Face.Back);
-
 		mesh = new Mesh("Foundation");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
-		mesh.setRenderState(cullState);
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new BoundingBox());
 		root.attachChild(mesh);
@@ -97,7 +95,6 @@ public class Foundation extends HousePart {
 		surroundMesh.getMeshData().setIndexMode(IndexMode.Quads);
 		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(16));
 		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(16));
-		surroundMesh.setRenderState(cullState);
 		surroundMesh.setRenderState(offsetState);
 		surroundMesh.setModelBound(new BoundingBox());
 		root.attachChild(surroundMesh);
@@ -128,6 +125,7 @@ public class Foundation extends HousePart {
 		buildingLabel.setVisible(false);
 		root.attachChild(buildingLabel);
 
+		savePrevPoints();
 		updateTextureAndColor();
 	}
 
@@ -222,19 +220,27 @@ public class Foundation extends HousePart {
 				p = ensureNotTooSmall(p, index);
 			else
 				p = ensureIncludesChildren(p, index);
-			points.get(index).set(p);
 		}
 		if (!isFirstPointInserted()) {
-			points.get(1).set(p);
-			points.get(2).set(p);
-			points.get(3).set(p);
+			points.get(index).set(p);
+			points.get(1).set(p.add(0, 0.1, 0, null));
+			points.get(2).set(p.add(0.1, 0, 0, null));
+			points.get(3).set(p.add(0.1, 0.1, 0, null));
+			savePrevPoints();
 		} else {
-			if (index == 0 || index == 3) {
-				points.get(1).set(points.get(0).getX(), points.get(3).getY(), 0);
-				points.get(2).set(points.get(3).getX(), points.get(0).getY(), 0);
-			} else if (index == 1 || index == 2) {
-				points.get(0).set(points.get(1).getX(), points.get(2).getY(), 0);
-				points.get(3).set(points.get(2).getX(), points.get(1).getY(), 0);
+			points.get(index).set(p);
+			if (index == 0) {
+				points.get(1).set(Util.projectPointOnLine(p, prevP3, prevP1, false));
+				points.get(2).set(Util.projectPointOnLine(p, prevP3, prevP2, false));
+			} else if (index == 3) {
+				points.get(1).set(Util.projectPointOnLine(p, prevP0, prevP1, false));
+				points.get(2).set(Util.projectPointOnLine(p, prevP0, prevP2, false));
+			} else if (index == 1) {
+				points.get(0).set(Util.projectPointOnLine(p, prevP2, prevP0, false));
+				points.get(3).set(Util.projectPointOnLine(p, prevP2, prevP3, false));
+			} else if (index == 2) {
+				points.get(0).set(Util.projectPointOnLine(p, prevP1, prevP0, false));
+				points.get(3).set(Util.projectPointOnLine(p, prevP1, prevP3, false));
 			} else {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
@@ -255,6 +261,15 @@ public class Foundation extends HousePart {
 			drawChildren();
 		draw();
 		setEditPointsVisible(true);
+	}
+
+	public void savePrevPoints() {
+		if (points.size() >= 4) {
+			prevP0 = getAbsPoint(0);
+			prevP1 = getAbsPoint(1);
+			prevP2 = getAbsPoint(2);
+			prevP3 = getAbsPoint(3);
+		}
 	}
 
 	@Override
@@ -688,6 +703,7 @@ public class Foundation extends HousePart {
 				maxY = Math.max(p2.getY(), maxY);
 			}
 		}
+		savePrevPoints();
 	}
 
 	public void prepareForNotResizing() {
@@ -885,7 +901,7 @@ public class Foundation extends HousePart {
 		this.totalEnergyToday = totalEnergyToday;
 	}
 
-	public void rotate(double angle) {
+	public void rotate(final double angle) {
 		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, angle);
 		final ReadOnlyVector3 center = toRelative(getCenter().clone());
 		for (int i = 0; i < points.size(); i++) {
