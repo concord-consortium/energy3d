@@ -52,7 +52,7 @@ public class EnergySeasonalAnalysis extends SeasonalAnalysis {
 				graph.addData("Solar", selectedPart.getSolarPotentialToday());
 			}
 		} else if (selectedPart instanceof Window) {
-			final double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
+			final double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatGainCoefficient();
 			graph.addData("Solar", solar);
 			final double[] loss = selectedPart.getHeatLoss();
 			double sum = 0;

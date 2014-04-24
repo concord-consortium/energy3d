@@ -104,7 +104,7 @@ public class Scene implements Serializable {
 	private String windowUFactor;
 	private String roofUFactor;
 	private double solarPanelEfficiency;
-	private double windowSolarHeatingRate;
+	private double windowSolarHeatGainCoefficient; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -275,7 +275,7 @@ public class Scene implements Serializable {
 		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
 		SolarIrradiation.getInstance().setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
 		SolarIrradiation.getInstance().setTimeStep(instance.timeStep == 0 ? 15 : instance.timeStep);
-		Scene.getInstance().setWindowSolarHeatingRate(instance.windowSolarHeatingRate < 0.000001 ? 0.5 : instance.windowSolarHeatingRate);
+		Scene.getInstance().setWindowSolarHeatGainCoefficient(instance.windowSolarHeatGainCoefficient < 0.000001 ? 0.5 : instance.windowSolarHeatGainCoefficient);
 		Scene.getInstance().setEdited(false);
 	}
 
@@ -789,12 +789,12 @@ public class Scene implements Serializable {
 		this.solarPanelEfficiency = solarPanelEfficiency;
 	}
 
-	public double getWindowSolarHeatingRate() {
-		return windowSolarHeatingRate;
+	public double getWindowSolarHeatGainCoefficient() {
+		return windowSolarHeatGainCoefficient;
 	}
 
-	public void setWindowSolarHeatingRate(final double windowSolarHeatingRate) {
-		this.windowSolarHeatingRate = windowSolarHeatingRate;
+	public void setWindowSolarHeatGainCoefficient(final double windowSolarHeatGainCoefficient) {
+		this.windowSolarHeatGainCoefficient = windowSolarHeatGainCoefficient;
 	}
 
 }

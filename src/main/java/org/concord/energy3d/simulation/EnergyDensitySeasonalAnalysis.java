@@ -37,7 +37,7 @@ public class EnergyDensitySeasonalAnalysis extends SeasonalAnalysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Window) {
 			final double area = selectedPart.computeArea();
-			final double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatingRate();
+			final double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatGainCoefficient();
 			graph.addData("Solar", solar / area);
 			final double[] loss = selectedPart.getHeatLoss();
 			double sum = 0;
