@@ -20,8 +20,6 @@ import java.util.Set;
 import javax.swing.JPanel;
 
 /**
- * Time graph (e.g., 24 hours or 12 months)
- * 
  * @author Charles Xie
  * 
  */
@@ -36,7 +34,6 @@ abstract class Graph extends JPanel {
 	Map<String, List<Double>> data;
 	Map<String, Boolean> hideData;
 	Map<Integer, Boolean> hideRuns;
-	static List<Results> records;
 	double xmin = 0;
 	double xmax = 11;
 	double ymin = 0;
@@ -51,7 +48,6 @@ abstract class Graph extends JPanel {
 	static Map<String, Color> colors;
 
 	static {
-		records = new ArrayList<Results>();
 		colors = new HashMap<String, Color>();
 		colors.put("Solar", Color.ORANGE);
 		colors.put("Heat Gain", Color.GRAY);
@@ -71,18 +67,27 @@ abstract class Graph extends JPanel {
 		twoDecimals.setMaximumFractionDigits(2);
 	}
 
+	/* keep the records by their class types */
+	private List<Results> getRecords() {
+		if (this instanceof DailyGraph)
+			return DailyGraph.records;
+		if (this instanceof AngularGraph)
+			return AngularGraph.records;
+		return SeasonalGraph.records;
+	}
+
 	void keepResults() {
 		if (data.isEmpty())
 			return;
-		records.add(new Results(data));
+		getRecords().add(new Results(data));
 	}
 
 	boolean hasRecords() {
-		return !records.isEmpty();
+		return !getRecords().isEmpty();
 	}
 
 	private boolean areRecordsShown() {
-		for (Results r : records) {
+		for (Results r : getRecords()) {
 			Boolean x = hideRuns.get(r.getID());
 			if (x == null || x == Boolean.FALSE)
 				return true;
@@ -91,7 +96,7 @@ abstract class Graph extends JPanel {
 	}
 
 	void clearRecords() {
-		records.clear();
+		getRecords().clear();
 	}
 
 	void setMinimum(float xmin) {
@@ -166,6 +171,10 @@ abstract class Graph extends JPanel {
 		data.clear();
 	}
 
+	abstract double getXAxisLabelScalingFactor();
+
+	abstract String getXAxisUnit();
+
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		update(g);
@@ -189,7 +198,7 @@ abstract class Graph extends JPanel {
 		g2.setColor(Color.BLACK);
 		float tickWidth = (float) (width - left - right) / (float) (numberOfTicks - 1);
 		for (int i = 0; i < numberOfTicks; i++) {
-			String s = "" + (i + 1);
+			String s = Math.round((i + 1) * getXAxisLabelScalingFactor()) + getXAxisUnit();
 			int sWidth = g2.getFontMetrics().stringWidth(s);
 			g2.drawString(s, left + tickWidth * i - sWidth / 2, height - bottom / 2 + 16);
 		}
@@ -237,8 +246,8 @@ abstract class Graph extends JPanel {
 	}
 
 	private void recalculateBounds() {
-		if (!records.isEmpty()) {
-			for (Results r : records) {
+		if (!getRecords().isEmpty()) {
+			for (Results r : getRecords()) {
 				if (isRunHidden(r.getID()))
 					continue;
 				double[] bound = r.getBound();
@@ -267,7 +276,7 @@ abstract class Graph extends JPanel {
 
 		double dataX, dataY;
 		Path2D.Float path = new Path2D.Float();
-		for (Results r : records) {
+		for (Results r : getRecords()) {
 
 			if (isRunHidden(r.getID()))
 				continue;
@@ -301,6 +310,170 @@ abstract class Graph extends JPanel {
 	abstract void drawLegends(Graphics2D g2);
 
 	abstract void drawCurves(Graphics2D g2);
+
+	void drawBuildingCurves(Graphics2D g2) {
+
+		for (String key : data.keySet()) {
+
+			if (isDataHidden(key))
+				continue;
+
+			List<Double> list = data.get(key);
+
+			if (!list.isEmpty()) {
+
+				if (Collections.max(list) == Collections.min(list))
+					continue;
+
+				g2.setColor(Color.BLACK);
+				double dataX, dataY;
+				Path2D.Float path = new Path2D.Float();
+				for (int i = 0; i < list.size(); i++) {
+					dataX = left + dx * i;
+					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+					if (i == 0)
+						path.moveTo(dataX, dataY);
+					else
+						path.lineTo(dataX, dataY);
+				}
+				g2.setStroke("Net".equals(key) ? thick : dashed);
+				g2.draw(path);
+
+				g2.setStroke(thin);
+				Color c = colors.get(key);
+				for (int i = 0; i < list.size(); i++) {
+					dataX = left + dx * i;
+					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+					if ("Windows".equals(key)) {
+						drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
+					} else if ("Solar Panels".equals(key)) {
+						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+					} else if ("Heater".equals(key)) {
+						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+					} else if ("AC".equals(key)) {
+						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+					} else if ("Net".equals(key)) {
+						drawCircle(g2, (int) Math.round(dataX - symbolSize / 2 + 1), (int) Math.round(dataY - symbolSize / 2 + 1), symbolSize - 2, c);
+					}
+				}
+
+			}
+
+		}
+
+	}
+
+	void drawBuildingLegends(Graphics2D g2) {
+
+		g2.setFont(new Font("Arial", Font.PLAIN, 10));
+		g2.setStroke(thin);
+		int x0 = getWidth() - 100 - right;
+
+		String s = "Windows";
+		int y0 = top - 10;
+		if (!isDataHidden(s)) {
+			drawDiamond(g2, x0 + 4, y0 + 3, 5, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
+
+		s = "Solar Panels";
+		y0 += 12;
+		if (!isDataHidden(s)) {
+			drawSquare(g2, x0, y0, 8, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
+
+		s = "Heater";
+		y0 += 12;
+		if (!isDataHidden(s)) {
+			drawSquare(g2, x0, y0, 8, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
+
+		s = "AC";
+		y0 += 12;
+		if (!isDataHidden(s)) {
+			drawSquare(g2, x0, y0, 8, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
+
+		s = "Net";
+		y0 += 12;
+		if (!isDataHidden(s)) {
+			drawCircle(g2, x0, y0, 8, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
+
+	}
+
+	void drawPartCurves(Graphics2D g2) {
+
+		Path2D.Float path = new Path2D.Float();
+
+		for (String key : data.keySet()) {
+
+			if (isDataHidden(key))
+				continue;
+
+			List<Double> list = data.get(key);
+
+			if (!list.isEmpty()) {
+
+				if (Collections.max(list) == Collections.min(list))
+					continue;
+
+				g2.setColor(Color.BLACK);
+				path.reset();
+				double dataX, dataY;
+				for (int i = 0; i < list.size(); i++) {
+					dataX = left + dx * i;
+					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+					if (i == 0)
+						path.moveTo(dataX, dataY);
+					else
+						path.lineTo(dataX, dataY);
+				}
+				g2.setStroke(thin);
+				g2.draw(path);
+
+				g2.setStroke(thin);
+				Color c = colors.get(key);
+				for (int i = 0; i < list.size(); i++) {
+					dataX = left + dx * i;
+					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+					if ("Solar".equals(key)) {
+						drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
+					} else if ("Heat Gain".equals(key)) {
+						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+					}
+				}
+
+			}
+
+		}
+
+	}
+
+	void drawPartLegends(Graphics2D g2) {
+
+		g2.setFont(new Font("Arial", Font.PLAIN, 10));
+		g2.setStroke(thin);
+		int x0 = getWidth() - 100 - right;
+		int y0 = top - 10;
+		String s = "Solar";
+		if (data.containsKey(s) && !isDataHidden(s)) {
+			drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
+
+		s = "Heat Gain";
+		if (data.containsKey(s) && !isDataHidden(s)) {
+			y0 += 14;
+			drawSquare(g2, x0, y0, 8, colors.get(s));
+			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+		}
+
+	}
 
 	void drawHorizontalLine(Graphics2D g2, int yValue, String yLabel) {
 		g2.setStroke(thin);

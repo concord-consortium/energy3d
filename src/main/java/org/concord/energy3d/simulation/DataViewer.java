@@ -71,9 +71,9 @@ class DataViewer {
 
 	static void viewRawData(final JDialog parent, Graph graph) {
 		String[] header = null;
-		if (graph instanceof BuildingEnergyGraph) {
+		if (graph instanceof BuildingEnergySeasonalGraph) {
 			header = new String[] { "Month", "Windows", "Solar Panels", "Heater", "AC", "Net" };
-		} else {
+		} else if (graph instanceof PartEnergySeasonalGraph) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof SolarPanel) {
 				header = new String[] { "Month", "Solar" };
@@ -81,6 +81,17 @@ class DataViewer {
 				header = new String[] { "Month", "Heat Gain" };
 			} else if (selectedPart instanceof Window) {
 				header = new String[] { "Month", "Solar", "Heat Gain" };
+			}
+		} else if (graph instanceof BuildingEnergyAngularGraph) {
+			header = new String[] { "Degree", "Windows", "Solar Panels", "Heater", "AC", "Net" };
+		} else if (graph instanceof PartEnergyAngularGraph) {
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof SolarPanel) {
+				header = new String[] { "Degree", "Solar" };
+			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof) {
+				header = new String[] { "Degree", "Heat Gain" };
+			} else if (selectedPart instanceof Window) {
+				header = new String[] { "Degree", "Solar", "Heat Gain" };
 			}
 		}
 		if (header == null) {

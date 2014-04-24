@@ -22,11 +22,11 @@ import org.concord.energy3d.scene.SceneManager;
  * 
  */
 
-public class EnergyDensityAnalysis extends SeasonalAnalysis {
+public class EnergyDensitySeasonalAnalysis extends SeasonalAnalysis {
 
-	public EnergyDensityAnalysis() {
+	public EnergyDensitySeasonalAnalysis() {
 		super();
-		graph = new PartEnergyGraph();
+		graph = new PartEnergySeasonalGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
 		graph.setBackground(Color.white);
 		graph.yAxisLabel = "Energy Density (kWh/m\u00B2)";

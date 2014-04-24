@@ -22,12 +22,12 @@ import org.concord.energy3d.scene.SceneManager;
  * 
  */
 
-public class EnergyAnalysis extends SeasonalAnalysis {
+public class EnergySeasonalAnalysis extends SeasonalAnalysis {
 
-	public EnergyAnalysis() {
+	public EnergySeasonalAnalysis() {
 		super();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		graph = selectedPart instanceof Foundation ? new BuildingEnergyGraph() : new PartEnergyGraph();
+		graph = selectedPart instanceof Foundation ? new BuildingEnergySeasonalGraph() : new PartEnergySeasonalGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
 		graph.setBackground(Color.white);
 	}
@@ -36,7 +36,7 @@ public class EnergyAnalysis extends SeasonalAnalysis {
 	void updateGraph() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Foundation) {
-			if (graph instanceof BuildingEnergyGraph) {
+			if (graph instanceof BuildingEnergySeasonalGraph) {
 				final Foundation selectedBuilding = (Foundation) selectedPart;
 				final double window = selectedBuilding.getPassiveSolarToday();
 				final double solarPanel = selectedBuilding.getPhotovoltaicToday();

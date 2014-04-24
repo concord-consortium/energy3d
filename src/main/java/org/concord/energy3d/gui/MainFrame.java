@@ -59,8 +59,9 @@ import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.simulation.Cost;
-import org.concord.energy3d.simulation.EnergyAnalysis;
-import org.concord.energy3d.simulation.EnergyDensityAnalysis;
+import org.concord.energy3d.simulation.EnergyAngularAnalysis;
+import org.concord.energy3d.simulation.EnergySeasonalAnalysis;
+import org.concord.energy3d.simulation.EnergyDensitySeasonalAnalysis;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Printout;
@@ -101,6 +102,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem seasonalEnergyAnalysisMenuItem;
 	private JMenuItem seasonalEnergyDensityAnalysisMenuItem;
+	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem constructionCostAnalysisMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
@@ -831,6 +833,7 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getSeasonalEnergyAnalysisMenuItem());
 			analysisMenu.add(getSeasonalEnergyDensityAnalysisMenuItem());
 			analysisMenu.add(getDailyAnalysisMenuItem());
+			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
 			if (!Config.isRestrictMode()) {
 				analysisMenu.addSeparator();
@@ -1028,7 +1031,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					new EnergyAnalysis().show("Seasonal Energy");
+					new EnergySeasonalAnalysis().show("Seasonal Energy");
 				}
 			});
 		}
@@ -1051,7 +1054,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy density analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					new EnergyDensityAnalysis().show("Seasonal Energy Density");
+					new EnergyDensitySeasonalAnalysis().show("Seasonal Energy Density");
 				}
 			});
 		}
@@ -1077,10 +1080,46 @@ public class MainFrame extends JFrame {
 		return dailyAnalysisMenuItem;
 	}
 
+	private JMenuItem getOrientationalEnergyAnalysisMenuItem() {
+		if (orientationalEnergyAnalysisMenuItem == null) {
+			orientationalEnergyAnalysisMenuItem = new JMenuItem("Run Orientational Energy Analysis...");
+			orientationalEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
+			orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null) {
+						int count = 0;
+						HousePart hp = null;
+						synchronized (Scene.getInstance().getParts()) {
+							for (HousePart x : Scene.getInstance().getParts()) {
+								if (x instanceof Foundation) {
+									count++;
+									hp = x;
+								}
+							}
+						}
+						if (count == 1) {
+							SceneManager.getInstance().setSelectedPart(hp);
+						} else {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}
+					} else if (selectedPart instanceof Tree) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					new EnergyAngularAnalysis().show("Orientation");
+				}
+			});
+		}
+		return orientationalEnergyAnalysisMenuItem;
+	}
+
 	private JMenuItem getConstructionCostAnalysisMenuItem() {
 		if (constructionCostAnalysisMenuItem == null) {
 			constructionCostAnalysisMenuItem = new JMenuItem("Run Construction Cost Analysis...");
-			constructionCostAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
+			constructionCostAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F8"));
 			constructionCostAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

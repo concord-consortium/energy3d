@@ -34,8 +34,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
@@ -51,11 +51,6 @@ public abstract class SeasonalAnalysis extends Analysis {
 
 	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
-	private JButton runButton;
-
-	SeasonalAnalysis() {
-	}
-
 	void runAnalysis() {
 		super.runAnalysis(new Runnable() {
 			@Override
@@ -63,12 +58,7 @@ public abstract class SeasonalAnalysis extends Analysis {
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
 						Heliodon.getInstance().getCalender().set(Calendar.MONTH, m);
-						try {
-							EnergyPanel.getInstance().computeNow();
-						} catch (final Exception e) {
-							e.printStackTrace();
-						}
-						updateGraph();
+						compute();
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
@@ -77,12 +67,10 @@ public abstract class SeasonalAnalysis extends Analysis {
 						});
 					}
 				}
-				EnergyPanel.getInstance().disableActions(false);
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						EnergyPanel.getInstance().progress();
-						runButton.setEnabled(true);
+						onCompletion();
 					}
 				});
 			}
@@ -104,19 +92,19 @@ public abstract class SeasonalAnalysis extends Analysis {
 		final JMenuItem miView = new JMenuItem("View Raw Data");
 
 		final JMenu menu = new JMenu("Options");
-		menu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+		menu.addMenuListener(new MenuListener() {
 			@Override
-			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+			public void menuSelected(MenuEvent e) {
 				miClear.setEnabled(graph.hasRecords());
 				miView.setEnabled(graph.hasData());
 			}
 
 			@Override
-			public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+			public void menuDeselected(MenuEvent e) {
 			}
 
 			@Override
-			public void popupMenuCanceled(final PopupMenuEvent e) {
+			public void menuCanceled(MenuEvent e) {
 			}
 		});
 		menuBar.add(menu);
@@ -142,9 +130,9 @@ public abstract class SeasonalAnalysis extends Analysis {
 		menu.add(miView);
 
 		final JMenu showTypeMenu = new JMenu("Types");
-		showTypeMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+		showTypeMenu.addMenuListener(new MenuListener() {
 			@Override
-			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+			public void menuSelected(MenuEvent e) {
 				showTypeMenu.removeAll();
 				final Set<String> dataNames = graph.getDataNames();
 				if (!dataNames.isEmpty()) {
@@ -163,26 +151,26 @@ public abstract class SeasonalAnalysis extends Analysis {
 			}
 
 			@Override
-			public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+			public void menuDeselected(MenuEvent e) {
 			}
 
 			@Override
-			public void popupMenuCanceled(final PopupMenuEvent e) {
+			public void menuCanceled(MenuEvent e) {
 			}
 		});
 		menuBar.add(showTypeMenu);
 
 		final JMenu showRunsMenu = new JMenu("Runs");
-		showRunsMenu.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+		showRunsMenu.addMenuListener(new MenuListener() {
 			@Override
-			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+			public void menuSelected(MenuEvent e) {
 				showRunsMenu.removeAll();
-				if (!Graph.records.isEmpty()) {
+				if (!SeasonalGraph.records.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							for (Results r : Graph.records)
+							for (Results r : SeasonalGraph.records)
 								graph.hideRun(r.getID(), false);
 							graph.repaint();
 						}
@@ -192,14 +180,14 @@ public abstract class SeasonalAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							for (Results r : Graph.records)
+							for (Results r : SeasonalGraph.records)
 								graph.hideRun(r.getID(), true);
 							graph.repaint();
 						}
 					});
 					showRunsMenu.add(mi);
 					showRunsMenu.addSeparator();
-					for (final Results r : Graph.records) {
+					for (final Results r : SeasonalGraph.records) {
 						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(Integer.toString(r.getID()), !graph.isRunHidden(r.getID()));
 						cbmi.addItemListener(new ItemListener() {
 							@Override
@@ -214,11 +202,11 @@ public abstract class SeasonalAnalysis extends Analysis {
 			}
 
 			@Override
-			public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+			public void menuDeselected(MenuEvent e) {
 			}
 
 			@Override
-			public void popupMenuCanceled(final PopupMenuEvent e) {
+			public void menuCanceled(MenuEvent e) {
 			}
 		});
 		menuBar.add(showRunsMenu);

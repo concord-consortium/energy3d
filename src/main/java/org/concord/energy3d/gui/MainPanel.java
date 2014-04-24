@@ -36,6 +36,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -834,6 +835,7 @@ public class MainPanel extends JPanel {
 				private boolean mousePressed = false;
 
 				public void mousePressed(final MouseEvent e) {
+					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					mousePressed = true;
 					new Thread() {
 						public void run() {
