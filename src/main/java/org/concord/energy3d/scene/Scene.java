@@ -270,12 +270,16 @@ public class Scene implements Serializable {
 			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
 		if (instance.roofUFactor != null)
 			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
-		if (instance.solarPanelEfficiency < 0.001)
+		if (instance.solarPanelEfficiency < 0.000001)
 			instance.solarPanelEfficiency = 10;
+		if (instance.windowSolarHeatGainCoefficient < 0.000001) // not set
+			instance.windowSolarHeatGainCoefficient = 50;
+		else if (instance.windowSolarHeatGainCoefficient < 1)
+			instance.windowSolarHeatGainCoefficient *= 100; // backward compatibility (when SHGC < 1)
 		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
+		energyPanel.getWindowSHGCComboBox().setSelectedItem(Double.toString(instance.windowSolarHeatGainCoefficient));
 		SolarIrradiation.getInstance().setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
 		SolarIrradiation.getInstance().setTimeStep(instance.timeStep == 0 ? 15 : instance.timeStep);
-		Scene.getInstance().setWindowSolarHeatGainCoefficient(instance.windowSolarHeatGainCoefficient < 0.000001 ? 0.5 : instance.windowSolarHeatGainCoefficient);
 		Scene.getInstance().setEdited(false);
 	}
 
@@ -789,8 +793,9 @@ public class Scene implements Serializable {
 		this.solarPanelEfficiency = solarPanelEfficiency;
 	}
 
-	public double getWindowSolarHeatGainCoefficient() {
-		return windowSolarHeatGainCoefficient;
+	/** @return the window SHGC (not in percentage) */
+	public double getWindowSolarHeatGainCoefficientNotPercentage() {
+		return windowSolarHeatGainCoefficient * 0.01;
 	}
 
 	public void setWindowSolarHeatGainCoefficient(final double windowSolarHeatGainCoefficient) {

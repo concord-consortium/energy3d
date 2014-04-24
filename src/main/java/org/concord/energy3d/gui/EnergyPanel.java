@@ -81,6 +81,7 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox<String> roofsComboBox;
 	private final JComboBox<String> cityComboBox;
 	private final JComboBox<String> solarPanelEfficiencyComboBox;
+	private final JComboBox<String> windowSHGCComboBox;
 	private final JTextField heatingTodayTextField;
 	private final JTextField coolingTodayTextField;
 	private final JTextField totalTodayTextField;
@@ -429,17 +430,43 @@ public class EnergyPanel extends JPanel {
 
 		uFactorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, uFactorPanel.getPreferredSize().height));
 
-		final JPanel otherParametersPanel = new JPanel();
-		otherParametersPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, otherParametersPanel.getPreferredSize().height));
-		otherParametersPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Other Parameters", TitledBorder.LEADING, TitledBorder.TOP));
-		dataPanel.add(otherParametersPanel);
+		final JPanel solarConversionPercentagePanel = new JPanel();
+		solarConversionPercentagePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, solarConversionPercentagePanel.getPreferredSize().height));
+		solarConversionPercentagePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Solar Conversion (%)", TitledBorder.LEADING, TitledBorder.TOP));
+		dataPanel.add(solarConversionPercentagePanel);
 
-		final JLabel solarPanelEfficiencyLabel = new JLabel("Solar Panel Efficiency: ");
-		otherParametersPanel.add(solarPanelEfficiencyLabel);
+		solarConversionPercentagePanel.add(new JLabel("Window (SHGC): "));
+
+		windowSHGCComboBox = new WideComboBox();
+		windowSHGCComboBox.setEditable(true);
+		windowSHGCComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "25", "50", "80" }));
+		windowSHGCComboBox.setSelectedIndex(1);
+		windowSHGCComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				// validate the input
+				final String s = (String) windowSHGCComboBox.getSelectedItem();
+				double eff = 50;
+				try {
+					eff = Float.parseFloat(s);
+				} catch (final NumberFormatException ex) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be 25-80.", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (eff < 25 || eff > 80) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be 25-80.", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				Scene.getInstance().setWindowSolarHeatGainCoefficient(eff);
+			}
+		});
+		solarConversionPercentagePanel.add(windowSHGCComboBox);
+
+		solarConversionPercentagePanel.add(new JLabel("Solar Panel: "));
 
 		solarPanelEfficiencyComboBox = new WideComboBox();
 		solarPanelEfficiencyComboBox.setEditable(true);
-		solarPanelEfficiencyComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10", "20", "30", "40" }));
+		solarPanelEfficiencyComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10", "20", "30" }));
 		solarPanelEfficiencyComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -449,18 +476,17 @@ public class EnergyPanel extends JPanel {
 				try {
 					eff = Float.parseFloat(s);
 				} catch (final NumberFormatException ex) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be a number between 10-50.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be 10-50.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				if (eff < 10 || eff > 50) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be a number between 10-50.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be 10-50.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				Scene.getInstance().setSolarPanelEfficiency(eff);
 			}
 		});
-		otherParametersPanel.add(solarPanelEfficiencyComboBox);
-		otherParametersPanel.add(new JLabel("%"));
+		solarConversionPercentagePanel.add(solarPanelEfficiencyComboBox);
 
 		heatMapPanel = new JPanel(new BorderLayout());
 		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP));
@@ -493,7 +519,7 @@ public class EnergyPanel extends JPanel {
 		buildingPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Building", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
-		
+
 		// geometry info for the selected building
 
 		geometryPanel = new JPanel();
@@ -1027,6 +1053,10 @@ public class EnergyPanel extends JPanel {
 
 	public JComboBox<String> getSolarPanelEfficiencyComboBox() {
 		return solarPanelEfficiencyComboBox;
+	}
+
+	public JComboBox<String> getWindowSHGCComboBox() {
+		return windowSHGCComboBox;
 	}
 
 	public void setBudget(int budget) {
