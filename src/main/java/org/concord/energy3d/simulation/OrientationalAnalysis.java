@@ -1,18 +1,5 @@
 package org.concord.energy3d.simulation;
 
-import static java.util.Calendar.APRIL;
-import static java.util.Calendar.AUGUST;
-import static java.util.Calendar.DECEMBER;
-import static java.util.Calendar.FEBRUARY;
-import static java.util.Calendar.JANUARY;
-import static java.util.Calendar.JULY;
-import static java.util.Calendar.JUNE;
-import static java.util.Calendar.MARCH;
-import static java.util.Calendar.MAY;
-import static java.util.Calendar.NOVEMBER;
-import static java.util.Calendar.OCTOBER;
-import static java.util.Calendar.SEPTEMBER;
-
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -22,7 +9,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Calendar;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -41,40 +27,37 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.shapes.Heliodon;
 
 /**
  * @author Charles Xie
  * 
  */
-public abstract class SeasonalAnalysis extends Analysis {
 
-	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
+public class OrientationalAnalysis extends Analysis {
 
+	private int nRotation = 12;
 	private JButton runButton;
 
-	SeasonalAnalysis() {
+	OrientationalAnalysis() {
+	}
+
+	void updateGraph() {
+
 	}
 
 	void runAnalysis() {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
-				for (final int m : MONTHS) {
+				for (int i = 0; i < nRotation; i++) {
 					if (!analysisStopped) {
-						Heliodon.getInstance().getCalender().set(Calendar.MONTH, m);
 						try {
+							SceneManager.getInstance().rotateBuilding(2.0 * Math.PI / nRotation);
 							EnergyPanel.getInstance().computeNow();
 						} catch (final Exception e) {
 							e.printStackTrace();
 						}
 						updateGraph();
-						EventQueue.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalender().getTime());
-							}
-						});
 					}
 				}
 				EnergyPanel.getInstance().disableActions(false);
