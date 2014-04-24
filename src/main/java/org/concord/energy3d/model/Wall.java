@@ -376,6 +376,7 @@ public class Wall extends HousePart {
 
 		/* draw invisibleMesh */
 		drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
+		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 		CollisionTreeManager.INSTANCE.updateCollisionTree(invisibleMesh);
 
 		if (!isFrozen()) {
