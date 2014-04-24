@@ -50,7 +50,7 @@ public abstract class AngularAnalysis extends Analysis {
 							}
 						});
 						try {
-							Thread.sleep(200);
+							Thread.sleep(500);
 						} catch (InterruptedException e) {
 						}
 						compute();

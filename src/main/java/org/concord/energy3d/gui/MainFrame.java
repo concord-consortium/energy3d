@@ -1119,7 +1119,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getConstructionCostAnalysisMenuItem() {
 		if (constructionCostAnalysisMenuItem == null) {
 			constructionCostAnalysisMenuItem = new JMenuItem("Run Construction Cost Analysis...");
-			constructionCostAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F8"));
+			// constructionCostAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F8"));
 			constructionCostAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

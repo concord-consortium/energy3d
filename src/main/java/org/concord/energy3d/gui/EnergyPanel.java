@@ -109,11 +109,6 @@ public class EnergyPanel extends JPanel {
 	private JLabel partEnergyLabel;
 	private JTextField partEnergyTextField;
 	private JPanel buildingPanel;
-	private JLabel solarPotentialKWhLabel;
-	private JLabel lblSolarPotentialEnergy;
-	private JTextField houseSolarPotentialTextField;
-	private JLabel lblNewLabel;
-	private JPanel panel;
 	private JPanel geometryPanel;
 	private JLabel lblPosition;
 	private JTextField positionTextField;
@@ -125,8 +120,7 @@ public class EnergyPanel extends JPanel {
 	private JTextField volumnTextField;
 	private JTextField passiveSolarTextField;
 	private JTextField photovoltaicTextField;
-	private JPanel panel_6;
-	private JPanel panel_8;
+	private JPanel partPropertiesPanel;
 	private JLabel lblWidth;
 	private JTextField partWidthTextField;
 	private JLabel lblHeight_1;
@@ -499,20 +493,8 @@ public class EnergyPanel extends JPanel {
 		buildingPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Building", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
-
-		panel = new JPanel();
-		buildingPanel.add(panel);
-
-		lblSolarPotentialEnergy = new JLabel("Solar Potential:");
-		panel.add(lblSolarPotentialEnergy);
-
-		houseSolarPotentialTextField = new JTextField();
-		houseSolarPotentialTextField.setEditable(false);
-		panel.add(houseSolarPotentialTextField);
-		houseSolarPotentialTextField.setColumns(10);
-
-		lblNewLabel = new JLabel("kWh");
-		panel.add(lblNewLabel);
+		
+		// geometry info for the selected building
 
 		geometryPanel = new JPanel();
 		buildingPanel.add(geometryPanel);
@@ -522,7 +504,7 @@ public class EnergyPanel extends JPanel {
 		lblPosition = new JLabel("Position:");
 		final GridBagConstraints gbc_lblPosition = new GridBagConstraints();
 		gbc_lblPosition.anchor = GridBagConstraints.EAST;
-		gbc_lblPosition.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPosition.insets = new Insets(0, 5, 5, 5);
 		gbc_lblPosition.gridx = 0;
 		gbc_lblPosition.gridy = 0;
 		geometryPanel.add(lblPosition, gbc_lblPosition);
@@ -537,7 +519,7 @@ public class EnergyPanel extends JPanel {
 		gbc_positionTextField.gridx = 1;
 		gbc_positionTextField.gridy = 0;
 		geometryPanel.add(positionTextField, gbc_positionTextField);
-		positionTextField.setColumns(10);
+		positionTextField.setColumns(8);
 
 		lblHeight = new JLabel("Height:");
 		final GridBagConstraints gbc_lblHeight = new GridBagConstraints();
@@ -557,7 +539,7 @@ public class EnergyPanel extends JPanel {
 		gbc_heightTextField.gridx = 3;
 		gbc_heightTextField.gridy = 0;
 		geometryPanel.add(heightTextField, gbc_heightTextField);
-		heightTextField.setColumns(10);
+		heightTextField.setColumns(5);
 
 		lblArea = new JLabel("Area:");
 		final GridBagConstraints gbc_lblArea = new GridBagConstraints();
@@ -575,7 +557,7 @@ public class EnergyPanel extends JPanel {
 		gbc_areaTextField.gridx = 1;
 		gbc_areaTextField.gridy = 1;
 		geometryPanel.add(areaTextField, gbc_areaTextField);
-		areaTextField.setColumns(10);
+		areaTextField.setColumns(5);
 
 		lblVolume = new JLabel("Volume:");
 		final GridBagConstraints gbc_lblVolume = new GridBagConstraints();
@@ -593,7 +575,23 @@ public class EnergyPanel extends JPanel {
 		gbc_volumnTextField.gridx = 3;
 		gbc_volumnTextField.gridy = 1;
 		geometryPanel.add(volumnTextField, gbc_volumnTextField);
-		volumnTextField.setColumns(10);
+		volumnTextField.setColumns(5);
+
+		// cost for the selected building
+
+		costPanel = new JPanel(new BorderLayout());
+		costPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP));
+		buildingPanel.add(costPanel);
+		costBar = new ColorBar(Color.WHITE, Color.GRAY);
+		costBar.setPreferredSize(new Dimension(200, 16));
+		costBar.setMaximum(Cost.getInstance().getBudget());
+		costBar.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() > 1)
+					Cost.getInstance().show();
+			}
+		});
+		costPanel.add(costBar, BorderLayout.CENTER);
 
 		final Component verticalGlue = Box.createVerticalGlue();
 		dataPanel.add(verticalGlue);
@@ -720,54 +718,32 @@ public class EnergyPanel extends JPanel {
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
 		partPanel.setLayout(new BoxLayout(partPanel, BoxLayout.Y_AXIS));
 
-		panel_6 = new JPanel();
-		partPanel.add(panel_6);
-
-		partEnergyLabel = new JLabel("Solar Potential:");
-		panel_6.add(partEnergyLabel);
-
-		partEnergyTextField = new JTextField();
-		panel_6.add(partEnergyTextField);
-		partEnergyTextField.setEditable(false);
-		partEnergyTextField.setColumns(10);
-
-		solarPotentialKWhLabel = new JLabel("kWh");
-		panel_6.add(solarPotentialKWhLabel);
-
-		panel_8 = new JPanel();
-		partPanel.add(panel_8);
+		partPropertiesPanel = new JPanel();
+		partPanel.add(partPropertiesPanel);
 
 		lblWidth = new JLabel("Width:");
-		panel_8.add(lblWidth);
+		partPropertiesPanel.add(lblWidth);
 
 		partWidthTextField = new JTextField();
 		partWidthTextField.setEditable(false);
-		panel_8.add(partWidthTextField);
-		partWidthTextField.setColumns(10);
+		partPropertiesPanel.add(partWidthTextField);
+		partWidthTextField.setColumns(3);
 
 		lblHeight_1 = new JLabel("Height:");
-		panel_8.add(lblHeight_1);
+		partPropertiesPanel.add(lblHeight_1);
 
 		partHeightTextField = new JTextField();
 		partHeightTextField.setEditable(false);
-		panel_8.add(partHeightTextField);
-		partHeightTextField.setColumns(10);
+		partPropertiesPanel.add(partHeightTextField);
+		partHeightTextField.setColumns(3);
 
-		// cost for the selected building
+		partEnergyLabel = new JLabel("Insolation:");
+		partPropertiesPanel.add(partEnergyLabel);
 
-		costPanel = new JPanel(new BorderLayout());
-		costPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP));
-		buildingPanel.add(costPanel);
-		costBar = new ColorBar(Color.WHITE, Color.GRAY);
-		costBar.setPreferredSize(new Dimension(200, 16));
-		costBar.setMaximum(Cost.getInstance().getBudget());
-		costBar.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() > 1) 
-					Cost.getInstance().show();
-			}
-		});
-		costPanel.add(costBar, BorderLayout.CENTER);
+		partEnergyTextField = new JTextField();
+		partPropertiesPanel.add(partEnergyTextField);
+		partEnergyTextField.setEditable(false);
+		partEnergyTextField.setColumns(5);
 
 	}
 
@@ -965,14 +941,12 @@ public class EnergyPanel extends JPanel {
 
 		if (selectedBuilding != null) {
 			if (iradiationEnabled) {
-				houseSolarPotentialTextField.setText(twoDecimals.format(selectedBuilding.getSolarPotentialToday()));
 				passiveSolarTextField.setText(twoDecimals.format(selectedBuilding.getPassiveSolarToday()));
 				photovoltaicTextField.setText(twoDecimals.format(selectedBuilding.getPhotovoltaicToday()));
 				heatingTodayTextField.setText(twoDecimals.format(selectedBuilding.getHeatingToday()));
 				coolingTodayTextField.setText(twoDecimals.format(selectedBuilding.getCoolingToday()));
 				totalTodayTextField.setText(twoDecimals.format(selectedBuilding.getTotalEnergyToday()));
 			} else {
-				houseSolarPotentialTextField.setText("");
 				passiveSolarTextField.setText("");
 				photovoltaicTextField.setText("");
 				heatingTodayTextField.setText("");
@@ -992,7 +966,6 @@ public class EnergyPanel extends JPanel {
 				volumnTextField.setText("");
 			}
 		} else {
-			houseSolarPotentialTextField.setText("");
 			passiveSolarTextField.setText("");
 			photovoltaicTextField.setText("");
 			heatingTodayTextField.setText("");
