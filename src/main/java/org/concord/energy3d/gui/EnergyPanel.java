@@ -643,6 +643,7 @@ public class EnergyPanel extends JPanel {
 		energyTodayPanel.setLayout(gbl_panel_1);
 
 		final JLabel sunLabel = new JLabel("Windows");
+		sunLabel.setToolTipText("Energy gained through windows");
 		sunLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_sunLabel = new GridBagConstraints();
 		gbc_sunLabel.fill = GridBagConstraints.HORIZONTAL;
