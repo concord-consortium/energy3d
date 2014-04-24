@@ -378,7 +378,13 @@ public abstract class HousePart implements Serializable {
 			final Vector3 newP = new Vector3();
 			if (container == null)
 				newP.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
-			else {
+			else if (snapToZ) {
+				final double baseZ = getAbsPoint(0).getZ();
+				final double vScale = Util.projectPointOnLineScale(new Vector2(0, p.getZ()), new Vector2(), new Vector2(0, 1)) - baseZ;
+				final double vScaleRounded = Math.round(vScale / gridSize) * gridSize;
+				newP.set(p);
+				newP.setZ(baseZ + vScaleRounded);
+			} else {
 				final Vector3 p0 = container.getAbsPoint(0);
 				final Vector3 p1 = container.getAbsPoint(1);
 				final Vector3 p2 = container.getAbsPoint(2);
