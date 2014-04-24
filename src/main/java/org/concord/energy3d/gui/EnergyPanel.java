@@ -142,6 +142,7 @@ public class EnergyPanel extends JPanel {
 		add(new JScrollPane(dataPanel), BorderLayout.CENTER);
 
 		final JPanel timeAndLocationPanel = new JPanel();
+		timeAndLocationPanel.setToolTipText("<html>The outside temperature and the sun path<br>differ from time to time and from location to location.</html>");
 		timeAndLocationPanel.setBorder(new TitledBorder(null, "Time & Location", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(timeAndLocationPanel);
 		final GridBagLayout gbl_panel_3 = new GridBagLayout();
@@ -277,6 +278,7 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, timeAndLocationPanel.getPreferredSize().height));
 
 		final JPanel temperaturePanel = new JPanel();
+		temperaturePanel.setToolTipText("<html>Temperature difference between inside and outside<br>drives heat transfer across.</html>");
 		temperaturePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(temperaturePanel);
 		final GridBagLayout gbl_temperaturePanel = new GridBagLayout();
@@ -332,6 +334,7 @@ public class EnergyPanel extends JPanel {
 		temperaturePanel.add(outsideTemperatureSpinner, gbc_outsideTemperatureSpinner);
 
 		final JPanel uFactorPanel = new JPanel();
+		uFactorPanel.setToolTipText("<html><b>U-factor</b><br>measures how well a building element conducts heat.</html>");
 		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(uFactorPanel);
 		final GridBagLayout gbl_uFactorPanel = new GridBagLayout();
@@ -435,7 +438,9 @@ public class EnergyPanel extends JPanel {
 		solarConversionPercentagePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Solar Conversion (%)", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(solarConversionPercentagePanel);
 
-		solarConversionPercentagePanel.add(new JLabel("Window (SHGC): "));
+		JLabel labelSHGC = new JLabel("Window (SHGC): ");
+		labelSHGC.setToolTipText("<html><b>SHGC - Solar heat gain coefficient</b><br>measures the fraction of solar energy transmitted through a window.</html>");
+		solarConversionPercentagePanel.add(labelSHGC);
 
 		windowSHGCComboBox = new WideComboBox();
 		windowSHGCComboBox.setEditable(true);
@@ -462,7 +467,9 @@ public class EnergyPanel extends JPanel {
 		});
 		solarConversionPercentagePanel.add(windowSHGCComboBox);
 
-		solarConversionPercentagePanel.add(new JLabel("Solar Panel: "));
+		JLabel labelPV = new JLabel("Solar Panel: ");
+		labelPV.setToolTipText("<html><b>Solar photovoltaic efficiency</b><br>measures the fraction of solar energy converted into electricity by a solar panel.</html>");
+		solarConversionPercentagePanel.add(labelPV);
 
 		solarPanelEfficiencyComboBox = new WideComboBox();
 		solarPanelEfficiencyComboBox.setEditable(true);
@@ -493,6 +500,7 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(heatMapPanel);
 
 		colorMapSlider = new MySlider();
+		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the heat map.</html>");
 		colorMapSlider.setMinimum(10);
 		colorMapSlider.setMaximum(90);
 		colorMapSlider.setMinimumSize(colorMapSlider.getPreferredSize());
