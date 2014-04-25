@@ -653,6 +653,7 @@ public class EnergyPanel extends JPanel {
 		energyTodayPanel.add(sunLabel, gbc_sunLabel);
 
 		final JLabel solarLabel = new JLabel("Solar Panels");
+		solarLabel.setToolTipText("Energy harvested from solar panels");
 		solarLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_solarLabel = new GridBagConstraints();
 		gbc_solarLabel.fill = GridBagConstraints.HORIZONTAL;
