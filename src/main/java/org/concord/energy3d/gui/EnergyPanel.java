@@ -135,7 +135,7 @@ public class EnergyPanel extends JPanel {
 
 		twoDecimals.setMaximumFractionDigits(2);
 		noDecimals.setMaximumFractionDigits(0);
-
+		
 		setLayout(new BorderLayout());
 		final JPanel dataPanel = new JPanel();
 		dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
@@ -643,7 +643,7 @@ public class EnergyPanel extends JPanel {
 		energyTodayPanel.setLayout(gbl_panel_1);
 
 		final JLabel sunLabel = new JLabel("Windows");
-		sunLabel.setToolTipText("Energy gained through windows");
+		sunLabel.setToolTipText("Renewable energy gained through windows");
 		sunLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_sunLabel = new GridBagConstraints();
 		gbc_sunLabel.fill = GridBagConstraints.HORIZONTAL;
@@ -653,7 +653,7 @@ public class EnergyPanel extends JPanel {
 		energyTodayPanel.add(sunLabel, gbc_sunLabel);
 
 		final JLabel solarLabel = new JLabel("Solar Panels");
-		solarLabel.setToolTipText("Energy harvested from solar panels");
+		solarLabel.setToolTipText("Renewable energy harvested from solar panels");
 		solarLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_solarLabel = new GridBagConstraints();
 		gbc_solarLabel.fill = GridBagConstraints.HORIZONTAL;
@@ -663,7 +663,7 @@ public class EnergyPanel extends JPanel {
 		energyTodayPanel.add(solarLabel, gbc_solarLabel);
 
 		final JLabel heatingLabel = new JLabel("Heater");
-		heatingLabel.setToolTipText("Energy used to heat the building");
+		heatingLabel.setToolTipText("Nonrenewable energy for heating the building");
 		heatingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_heatingLabel = new GridBagConstraints();
 		gbc_heatingLabel.fill = GridBagConstraints.HORIZONTAL;
@@ -673,6 +673,7 @@ public class EnergyPanel extends JPanel {
 		energyTodayPanel.add(heatingLabel, gbc_heatingLabel);
 
 		final JLabel coolingLabel = new JLabel("AC");
+		coolingLabel.setToolTipText("Nonrenewable energy for cooling the building");
 		coolingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_coolingLabel = new GridBagConstraints();
 		gbc_coolingLabel.fill = GridBagConstraints.HORIZONTAL;
@@ -682,6 +683,7 @@ public class EnergyPanel extends JPanel {
 		energyTodayPanel.add(coolingLabel, gbc_coolingLabel);
 
 		final JLabel totalLabel = new JLabel("Net");
+		totalLabel.setToolTipText("<html>Net energy cost for this building<br>(Negative if the energy it generates exceeds the energy it consumes.</html>");
 		totalLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_totalLabel = new GridBagConstraints();
 		gbc_totalLabel.fill = GridBagConstraints.HORIZONTAL;
