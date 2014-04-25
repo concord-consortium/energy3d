@@ -663,6 +663,7 @@ public class EnergyPanel extends JPanel {
 		energyTodayPanel.add(solarLabel, gbc_solarLabel);
 
 		final JLabel heatingLabel = new JLabel("Heater");
+		heatingLabel.setToolTipText("Energy used to heat the building");
 		heatingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		final GridBagConstraints gbc_heatingLabel = new GridBagConstraints();
 		gbc_heatingLabel.fill = GridBagConstraints.HORIZONTAL;
