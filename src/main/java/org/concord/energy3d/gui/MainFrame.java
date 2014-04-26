@@ -1123,35 +1123,7 @@ public class MainFrame extends JFrame {
 			constructionCostAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null) {
-						int count = 0;
-						HousePart hp = null;
-						synchronized (Scene.getInstance().getParts()) {
-							for (HousePart x : Scene.getInstance().getParts()) {
-								if (x instanceof Foundation) {
-									count++;
-									hp = x;
-								}
-							}
-						}
-						if (count == 1) {
-							if (hp.getChildren().isEmpty()) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
-								return;
-							} else {
-								SceneManager.getInstance().setSelectedPart(hp);
-								EnergyPanel.getInstance().updateCost();
-							}
-						} else {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-							return;
-						}
-					} else if (selectedPart instanceof Tree) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Cost analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					Cost.getInstance().show();
+					Cost.getInstance().showGraph();
 				}
 			});
 		}

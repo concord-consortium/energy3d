@@ -33,7 +33,7 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel contentPanel = new JPanel(new GridLayout(3, 2));
+		final JPanel contentPanel = new JPanel(new GridLayout(3, 3, 8, 8));
 		contentPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 
@@ -42,21 +42,27 @@ class SimulationSettingsDialog extends JDialog {
 
 		final JTextField budgetTextField = new JTextField(FORMAT1.format(Cost.getInstance().getBudget()));
 		contentPanel.add(budgetTextField);
-		budgetTextField.setColumns(10);
+		budgetTextField.setColumns(6);
+
+		contentPanel.add(new JLabel("Dollars"));
 
 		// set the grid size ("solar step")
 		contentPanel.add(new JLabel("Irradiation Grid Cell Size: "));
 
 		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(SolarIrradiation.getInstance().getSolarStep()));
 		contentPanel.add(cellSizeTextField);
-		cellSizeTextField.setColumns(10);
+		cellSizeTextField.setColumns(6);
+
+		contentPanel.add(new JLabel("Internal unit"));
 
 		// set the time step
 		contentPanel.add(new JLabel("Time Step: "));
 
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(SolarIrradiation.getInstance().getTimeStep()));
 		contentPanel.add(timeStepTextField);
-		timeStepTextField.setColumns(10);
+		timeStepTextField.setColumns(6);
+
+		contentPanel.add(new JLabel("Minutes"));
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
