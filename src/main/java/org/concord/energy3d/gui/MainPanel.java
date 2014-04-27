@@ -44,6 +44,7 @@ import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
+import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.util.Config;
 
 public class MainPanel extends JPanel {
@@ -859,6 +860,7 @@ public class MainPanel extends JPanel {
 				public void mousePressed(final MouseEvent e) {
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					mousePressed = true;
+					SceneManager.getInstance().resetBuildingRotationAngleRecorded();
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart == null || selectedPart instanceof Tree) {
 						int count = 0;
@@ -887,7 +889,7 @@ public class MainPanel extends JPanel {
 								SceneManager.getTaskManager().update(new Callable<Object>() {
 									@Override
 									public Object call() throws Exception {
-										SceneManager.getInstance().rotateBuilding(buildingRotationAngle);
+										SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true);
 										return null;
 									}
 								});
@@ -904,8 +906,11 @@ public class MainPanel extends JPanel {
 				public void mouseReleased(MouseEvent e) {
 					mousePressed = false;
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null)
+					if (!(selectedPart instanceof Foundation)) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No building is selected for rotation.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand((Foundation) selectedPart));
 				}
 			});
 		}

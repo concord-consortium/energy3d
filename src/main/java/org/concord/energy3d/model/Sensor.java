@@ -197,7 +197,7 @@ public class Sensor extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return WIDTH / Scene.getInstance().getAnnotationScale() / 5.0;
+		return WIDTH / Scene.getInstance().getAnnotationScale() / 2.5;
 	}
 
 	@Override

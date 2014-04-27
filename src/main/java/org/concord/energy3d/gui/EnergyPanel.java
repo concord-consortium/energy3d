@@ -990,6 +990,7 @@ public class EnergyPanel extends JPanel {
 			partPropertiesPanel.remove(partProperty4Label);
 			partPropertiesPanel.remove(partProperty4TextField);
 		}
+		partPropertiesPanel.revalidate();
 
 		((TitledBorder) partPanel.getBorder()).setTitle("Part" + (selectedPart == null ? "" : (" - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1))));
 		partPanel.repaint();
@@ -1087,6 +1088,11 @@ public class EnergyPanel extends JPanel {
 			n = Cost.getInstance().getBuildingCost(selectedBuilding);
 		costBar.setValue(n);
 		costBar.repaint();
+	}
+
+	public void update() {
+		updatePartEnergy();
+		updateCost();
 	}
 
 	/** Currently this applies only to the date spinner when it is set programmatically (not by the user) */

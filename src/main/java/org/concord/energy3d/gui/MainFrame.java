@@ -1197,6 +1197,8 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().deselect();
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().undo();
+					SceneManager.getInstance().refresh();
+					EnergyPanel.getInstance().update();
 				}
 			});
 		}
@@ -1214,6 +1216,8 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().deselect();
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().redo();
+					SceneManager.getInstance().refresh();
+					EnergyPanel.getInstance().update();
 				}
 			});
 		}

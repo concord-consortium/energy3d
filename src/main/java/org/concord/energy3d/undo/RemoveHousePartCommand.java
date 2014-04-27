@@ -8,6 +8,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 @SuppressWarnings("serial")
 public class RemoveHousePartCommand extends AbstractUndoableEdit {
@@ -37,6 +38,7 @@ public class RemoveHousePartCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		Scene.getInstance().add(housePart, true);
+		SceneManager.getInstance().setSelectedPart(housePart);
 		EnergyPanel.getInstance().clearIrradiationHeatMap();
 	}
 

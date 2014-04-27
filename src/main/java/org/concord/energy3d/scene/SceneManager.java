@@ -197,6 +197,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean showBuildingLabels = false;
 	private Mesh sky;
 	private TextureState daySkyState, nightSkyState;
+	private double buildingRotationAngleRecorded;
 
 	private ArrayList<Runnable> shutdownHooks;
 
@@ -997,6 +998,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setSelectedPart(final HousePart p) {
+		if (p == null && selectedHousePart != null)
+			selectedHousePart.setEditPointsVisible(false);
 		selectedHousePart = p;
 		if (selectedHousePart != null)
 			selectedHousePart.setEditPointsVisible(true);
@@ -1478,13 +1481,30 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return showBuildingLabels;
 	}
 
+	public void resetBuildingRotationAngleRecorded() {
+		buildingRotationAngleRecorded = 0;
+	}
+
+	public void undoOrRedoBuildingRotation(final Foundation foundation, final boolean undo) {
+		setSelectedPart(foundation);
+		taskManager.update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				rotateBuilding(undo ? -buildingRotationAngleRecorded : buildingRotationAngleRecorded, false);
+				return null;
+			}
+		});
+	}
+
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
-	public void rotateBuilding(double angle) {
+	public void rotateBuilding(double angle, boolean keepRecord) {
 		if (selectedHousePart != null) {
 			if (selectedHousePart instanceof Foundation)
 				((Foundation) selectedHousePart).rotate(angle);
 			else
 				selectedHousePart.getTopContainer().rotate(angle);
+			if (keepRecord)
+				buildingRotationAngleRecorded += angle;
 		}
 	}
 
