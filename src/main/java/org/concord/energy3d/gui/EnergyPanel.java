@@ -49,6 +49,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
@@ -969,6 +970,9 @@ public class EnergyPanel extends JPanel {
 
 		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof Tree)) {
 			if (selectedPart instanceof SolarPanel) {
+				partWidthTextField.setText(twoDecimals.format(SolarPanel.WIDTH));
+				partHeightTextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
+			} else if (selectedPart instanceof Sensor) {
 				partWidthTextField.setText(twoDecimals.format(SolarPanel.WIDTH));
 				partHeightTextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
 			} else {

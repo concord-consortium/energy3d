@@ -37,7 +37,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -837,6 +839,28 @@ public class MainPanel extends JPanel {
 				public void mousePressed(final MouseEvent e) {
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					mousePressed = true;
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null || selectedPart instanceof Tree) {
+						int count = 0;
+						HousePart hp = null;
+						synchronized (Scene.getInstance().getParts()) {
+							for (HousePart x : Scene.getInstance().getParts()) {
+								if (x instanceof Foundation) {
+									count++;
+									hp = x;
+								}
+							}
+						}
+						if (count == 1) {
+							SceneManager.getInstance().setSelectedPart(hp);
+							SceneManager.getInstance().refresh();
+							EnergyPanel.getInstance().updateCost();
+							EnergyPanel.getInstance().updatePartEnergy();
+						} else {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}
+					}
 					new Thread() {
 						public void run() {
 							while (mousePressed) {
