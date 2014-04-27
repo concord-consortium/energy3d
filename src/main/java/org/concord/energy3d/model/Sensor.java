@@ -107,7 +107,7 @@ public class Sensor extends HousePart {
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		area = WIDTH * HEIGHT;
-		surround.setData(Vector3.ZERO, WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.1);
+		surround.setData(Vector3.ZERO, WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.02); // last arg sets close to zero so the sensor doesn't cast shadow
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();

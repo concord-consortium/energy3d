@@ -110,8 +110,6 @@ public class EnergyPanel extends JPanel {
 	private boolean computeEnabled = true;
 	private final List<PropertyChangeListener> propertyChangeListeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
 	private JPanel partPanel;
-	private JLabel partProperty3Label;
-	private JTextField partProperty3TextField;
 	private JPanel buildingPanel;
 	private JPanel geometryPanel;
 	private JLabel lblPosition;
@@ -126,9 +124,13 @@ public class EnergyPanel extends JPanel {
 	private JTextField solarPanelTextField;
 	private JPanel partPropertiesPanel;
 	private JLabel partProperty1Label;
-	private JTextField partProperty1TextField;
 	private JLabel partProperty2Label;
+	private JLabel partProperty3Label;
+	private JLabel partProperty4Label;
+	private JTextField partProperty1TextField;
 	private JTextField partProperty2TextField;
+	private JTextField partProperty3TextField;
+	private JTextField partProperty4TextField;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -793,14 +795,17 @@ public class EnergyPanel extends JPanel {
 		partProperty2TextField.setColumns(4);
 
 		partProperty3Label = new JLabel("Insolation:");
-		partProperty3Label.setToolTipText("The solar radiation energy on this part");
 		partPropertiesPanel.add(partProperty3Label);
 
 		partProperty3TextField = new JTextField();
-		partProperty3TextField.setToolTipText(partProperty3Label.getToolTipText());
-		partPropertiesPanel.add(partProperty3TextField);
 		partProperty3TextField.setEditable(false);
-		partProperty3TextField.setColumns(6);
+		partPropertiesPanel.add(partProperty3TextField);
+		partProperty3TextField.setColumns(4);
+
+		partProperty4Label = new JLabel();
+		partProperty4TextField = new JTextField();
+		partProperty4TextField.setEditable(false);
+		partProperty4TextField.setColumns(4);
 
 	}
 
@@ -969,14 +974,21 @@ public class EnergyPanel extends JPanel {
 			partProperty1Label.setText("Width:");
 			partProperty2Label.setText("Length:");
 			partProperty3Label.setText("Insolation:");
+			partPropertiesPanel.remove(partProperty4Label);
+			partPropertiesPanel.remove(partProperty4TextField);
 		} else if (selectedPart instanceof Sensor) {
 			partProperty1Label.setText("X:");
 			partProperty2Label.setText("Y:");
 			partProperty3Label.setText("Z:");
+			partProperty4Label.setText("Data:");
+			partPropertiesPanel.add(partProperty4Label);
+			partPropertiesPanel.add(partProperty4TextField);
 		} else {
 			partProperty1Label.setText("Width:");
 			partProperty2Label.setText("Height:");
 			partProperty3Label.setText("Insolation:");
+			partPropertiesPanel.remove(partProperty4Label);
+			partPropertiesPanel.remove(partProperty4TextField);
 		}
 
 		((TitledBorder) partPanel.getBorder()).setTitle("Part" + (selectedPart == null ? "" : (" - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1))));
@@ -985,9 +997,12 @@ public class EnergyPanel extends JPanel {
 		if (!iradiationEnabled || selectedPart == null || selectedPart instanceof Door || selectedPart instanceof Foundation)
 			partProperty3TextField.setText("");
 		else {
-			if (selectedPart instanceof Sensor)
-				partProperty3TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.computeArea()));
-			else
+			if (selectedPart instanceof Sensor) {
+				String light = twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.computeArea());
+				String heatFlux = twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.computeArea());
+				partProperty4TextField.setText(light + ", " + heatFlux);
+				partProperty4TextField.setToolTipText("Light sensor: " + light + ", heat flux sensor: " + heatFlux);
+			} else
 				partProperty3TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
 		}
 

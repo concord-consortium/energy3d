@@ -733,7 +733,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getSensorButton() {
 		if (sensorButton == null) {
 			sensorButton = new JToggleButton("");
-			sensorButton.setToolTipText("Add sensor device");
+			sensorButton.setToolTipText("Add sensor module");
 			sensorButton.setIcon(new ImageIcon(getClass().getResource("icons/sensor.png")));
 			sensorButton.addActionListener(new ActionListener() {
 				@Override
