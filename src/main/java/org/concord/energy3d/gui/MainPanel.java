@@ -910,7 +910,7 @@ public class MainPanel extends JPanel {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No building is selected for rotation.", "No Building", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
-					SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand((Foundation) selectedPart));
+					SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand((Foundation) selectedPart, SceneManager.getInstance().getBuildingRotationAngleRecorded()));
 				}
 			});
 		}

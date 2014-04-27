@@ -1485,12 +1485,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		buildingRotationAngleRecorded = 0;
 	}
 
-	public void undoOrRedoBuildingRotation(final Foundation foundation, final boolean undo) {
+	public double getBuildingRotationAngleRecorded() {
+		return buildingRotationAngleRecorded;
+	}
+
+	public void undoOrRedoBuildingRotation(final Foundation foundation, final double rotationAngle, final boolean undo) {
 		setSelectedPart(foundation);
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				rotateBuilding(undo ? -buildingRotationAngleRecorded : buildingRotationAngleRecorded, false);
+				rotateBuilding(undo ? -rotationAngle : rotationAngle, false);
 				return null;
 			}
 		});

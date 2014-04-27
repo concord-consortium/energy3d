@@ -13,9 +13,11 @@ import org.concord.energy3d.scene.SceneManager;
 public class RotateBuildingCommand extends AbstractUndoableEdit {
 
 	private final Foundation foundation;
+	private final double rotationAngle;
 
-	public RotateBuildingCommand(final Foundation foundation) {
+	public RotateBuildingCommand(final Foundation foundation, double rotationAngle) {
 		this.foundation = foundation;
+		this.rotationAngle = rotationAngle;
 	}
 
 	// for action logging
@@ -23,17 +25,21 @@ public class RotateBuildingCommand extends AbstractUndoableEdit {
 		return foundation;
 	}
 
+	public double getRotationAngle() {
+		return rotationAngle;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		SceneManager.getInstance().undoOrRedoBuildingRotation(foundation, true);
+		SceneManager.getInstance().undoOrRedoBuildingRotation(foundation, rotationAngle, true);
 		EnergyPanel.getInstance().clearIrradiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		SceneManager.getInstance().undoOrRedoBuildingRotation(foundation, false);
+		SceneManager.getInstance().undoOrRedoBuildingRotation(foundation, rotationAngle, false);
 		EnergyPanel.getInstance().clearIrradiationHeatMap();
 	}
 
