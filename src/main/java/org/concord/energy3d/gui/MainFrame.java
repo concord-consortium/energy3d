@@ -1043,6 +1043,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getSensorMenuItem() {
 		if (sensorMenuItem == null) {
 			sensorMenuItem = new JMenuItem("Collect Sensor Data...");
+			sensorMenuItem.setAccelerator(KeyStroke.getKeyStroke("F9"));
 			sensorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1056,7 +1057,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem getDailyAnalysisMenuItem() {
 		if (dailyAnalysisMenuItem == null) {
 			dailyAnalysisMenuItem = new JMenuItem("Run Daily Energy Analysis...");
-			dailyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
 			dailyAnalysisMenuItem.setEnabled(false);
 			dailyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
@@ -1075,7 +1075,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getOrientationalEnergyAnalysisMenuItem() {
 		if (orientationalEnergyAnalysisMenuItem == null) {
 			orientationalEnergyAnalysisMenuItem = new JMenuItem("Run Orientational Energy Analysis...");
-			orientationalEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F6"));
+			orientationalEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
 			orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
