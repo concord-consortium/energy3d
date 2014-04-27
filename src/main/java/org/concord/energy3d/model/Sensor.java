@@ -29,23 +29,15 @@ public class Sensor extends HousePart {
 
 	public static final double WIDTH = 0.15;
 	public static final double HEIGHT = 0.1;
-	public static final int LIGHT_SENSOR = 0;
-	public static final int HEAT_FLUX_SENSOR = 1;
 	private transient ReadOnlyVector3 normal;
 	private transient double area;
 	private transient Mesh wireframeMesh;
 	private transient Box surround;
-	private int sensorType;
 
-	public Sensor(int sensorType) {
+	public Sensor() {
 		super(1, 1, 0.0);
-		this.sensorType = sensorType;
 	}
 	
-	public final int getSensorType() {
-		return sensorType;
-	}
-
 	@Override
 	protected void init() {
 		super.init();

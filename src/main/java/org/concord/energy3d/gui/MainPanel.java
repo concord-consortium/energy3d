@@ -76,6 +76,7 @@ public class MainPanel extends JPanel {
 	private JTextArea noteTextArea;
 	private JToggleButton solarPanelButton;
 	private JToggleButton treeButton;
+	private JToggleButton sensorButton;
 	private JToggleButton miscButton;
 	private JButton rotateButton;
 	private JButton treeArrowButton;
@@ -277,6 +278,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getWallButton());
 			appToolbar.add(getWindowButton());
 			appToolbar.add(getSolarPanelButton());
+			appToolbar.add(getSensorButton());
 			appToolbar.add(getRoofButton());
 			appToolbar.add(getRoofArrowButton());
 			appToolbar.add(getMiscButton());
@@ -298,6 +300,7 @@ public class MainPanel extends JPanel {
 			bg.add(windowButton);
 			bg.add(roofButton);
 			bg.add(solarPanelButton);
+			bg.add(sensorButton);
 			bg.add(treeButton);
 			bg.add(miscButton);
 		}
@@ -725,6 +728,23 @@ public class MainPanel extends JPanel {
 			solarPanelButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
 		return solarPanelButton;
+	}
+
+	private JToggleButton getSensorButton() {
+		if (sensorButton == null) {
+			sensorButton = new JToggleButton("");
+			sensorButton.setToolTipText("Add sensor device");
+			sensorButton.setIcon(new ImageIcon(getClass().getResource("icons/sensor.png")));
+			sensorButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_SENSOR);
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+				}
+			});
+			sensorButton.addMouseListener(operationStickAndRefreshUponExit);
+		}
+		return sensorButton;
 	}
 
 	private JToggleButton getTreeButton() {

@@ -27,6 +27,9 @@ abstract class Graph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	static final byte DEFAULT = 0;
+	static final byte SENSOR = 1;
+
 	int top = 50, right = 50, bottom = 80, left = 90;
 	BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 2f }, 0.0f);
 	BasicStroke thin = new BasicStroke(1);
@@ -45,6 +48,7 @@ abstract class Graph extends JPanel {
 	String xAxisLabel = "Month";
 	String yAxisLabel = "Energy (kWh)";
 	DecimalFormat twoDecimals;
+	byte type = DEFAULT;
 	static Map<String, Color> colors;
 
 	static {
@@ -437,14 +441,26 @@ abstract class Graph extends JPanel {
 				g2.draw(path);
 
 				g2.setStroke(thin);
-				Color c = colors.get(key);
-				for (int i = 0; i < list.size(); i++) {
-					dataX = left + dx * i;
-					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
-					if ("Solar".equals(key)) {
-						drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
-					} else if ("Heat Gain".equals(key)) {
-						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+				switch (type) {
+				case SENSOR:
+					for (int i = 0; i < list.size(); i++) {
+						dataX = left + dx * i;
+						dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+						if (key.startsWith("Light"))
+							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get("Solar"));
+						else if (key.startsWith("Heat Flux"))
+							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get("Heat Gain"));
+					}
+					break;
+				default:
+					Color c = colors.get(key);
+					for (int i = 0; i < list.size(); i++) {
+						dataX = left + dx * i;
+						dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+						if ("Solar".equals(key))
+							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
+						else if ("Heat Gain".equals(key))
+							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					}
 				}
 
@@ -460,6 +476,7 @@ abstract class Graph extends JPanel {
 		g2.setStroke(thin);
 		int x0 = getWidth() - 100 - right;
 		int y0 = top - 10;
+
 		String s = "Solar";
 		if (data.containsKey(s) && !isDataHidden(s)) {
 			drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));

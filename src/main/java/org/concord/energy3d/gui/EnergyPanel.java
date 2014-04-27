@@ -965,16 +965,20 @@ public class EnergyPanel extends JPanel {
 
 		if (!iradiationEnabled || selectedPart == null || selectedPart instanceof Foundation || selectedPart instanceof Door)
 			partInsolationTextField.setText("");
-		else
-			partInsolationTextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
+		else {
+			if (selectedPart instanceof Sensor)
+				partInsolationTextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.computeArea()));
+			else
+				partInsolationTextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
+		}
 
 		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof Tree)) {
 			if (selectedPart instanceof SolarPanel) {
 				partWidthTextField.setText(twoDecimals.format(SolarPanel.WIDTH));
 				partHeightTextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
 			} else if (selectedPart instanceof Sensor) {
-				partWidthTextField.setText(twoDecimals.format(SolarPanel.WIDTH));
-				partHeightTextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
+				partWidthTextField.setText(twoDecimals.format(Sensor.WIDTH));
+				partHeightTextField.setText(twoDecimals.format(Sensor.HEIGHT));
 			} else {
 				partWidthTextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale()));
 				partHeightTextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale()));

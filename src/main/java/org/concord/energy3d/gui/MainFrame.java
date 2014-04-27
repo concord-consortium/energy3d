@@ -61,7 +61,7 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergySeasonalAnalysis;
-import org.concord.energy3d.simulation.EnergyDensitySeasonalAnalysis;
+import org.concord.energy3d.simulation.SeasonalSensorData;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Printout;
@@ -101,7 +101,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem rescaleMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem seasonalEnergyAnalysisMenuItem;
-	private JMenuItem seasonalEnergyDensityAnalysisMenuItem;
+	private JMenuItem sensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem constructionCostAnalysisMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
@@ -830,11 +830,13 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
+			analysisMenu.add(getConstructionCostAnalysisMenuItem());
+			analysisMenu.addSeparator();
 			analysisMenu.add(getSeasonalEnergyAnalysisMenuItem());
-			analysisMenu.add(getSeasonalEnergyDensityAnalysisMenuItem());
 			analysisMenu.add(getDailyAnalysisMenuItem());
 			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
-			analysisMenu.add(getConstructionCostAnalysisMenuItem());
+			analysisMenu.addSeparator();
+			analysisMenu.add(getSensorMenuItem());
 			if (!Config.isRestrictMode()) {
 				analysisMenu.addSeparator();
 				analysisMenu.add(getSimulationSettingsMenuItem());
@@ -1038,33 +1040,23 @@ public class MainFrame extends JFrame {
 		return seasonalEnergyAnalysisMenuItem;
 	}
 
-	private JMenuItem getSeasonalEnergyDensityAnalysisMenuItem() {
-		if (seasonalEnergyDensityAnalysisMenuItem == null) {
-			seasonalEnergyDensityAnalysisMenuItem = new JMenuItem("Run Seasonal Energy Density Analysis...");
-			seasonalEnergyDensityAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
-			seasonalEnergyDensityAnalysisMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getSensorMenuItem() {
+		if (sensorMenuItem == null) {
+			sensorMenuItem = new JMenuItem("Collect Sensor Data...");
+			sensorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					if (selectedPart instanceof Tree) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy density analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					new EnergyDensitySeasonalAnalysis().show("Seasonal Energy Density");
+					new SeasonalSensorData().show("Sensor Data");
 				}
 			});
 		}
-		return seasonalEnergyDensityAnalysisMenuItem;
+		return sensorMenuItem;
 	}
 
 	private JMenuItem getDailyAnalysisMenuItem() {
 		if (dailyAnalysisMenuItem == null) {
 			dailyAnalysisMenuItem = new JMenuItem("Run Daily Energy Analysis...");
-			dailyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F6"));
+			dailyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
 			dailyAnalysisMenuItem.setEnabled(false);
 			dailyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
@@ -1083,7 +1075,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getOrientationalEnergyAnalysisMenuItem() {
 		if (orientationalEnergyAnalysisMenuItem == null) {
 			orientationalEnergyAnalysisMenuItem = new JMenuItem("Run Orientational Energy Analysis...");
-			orientationalEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
+			orientationalEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F6"));
 			orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1118,7 +1110,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getConstructionCostAnalysisMenuItem() {
 		if (constructionCostAnalysisMenuItem == null) {
-			constructionCostAnalysisMenuItem = new JMenuItem("Run Construction Cost Analysis...");
+			constructionCostAnalysisMenuItem = new JMenuItem("Show Construction Costs...");
 			// constructionCostAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F8"));
 			constructionCostAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override

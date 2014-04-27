@@ -14,6 +14,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
@@ -82,7 +83,7 @@ public class SolarIrradiation {
 		collidables.clear();
 		synchronized (Scene.getInstance().getParts()) {
 			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Tree)
+				if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor)
 					collidables.add(part.getIrradiationCollisionSpatial());
 				else if (part instanceof Roof)
 					for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
@@ -103,7 +104,7 @@ public class SolarIrradiation {
 				synchronized (Scene.getInstance().getParts()) {
 					for (final HousePart part : Scene.getInstance().getParts()) {
 						if (part.isDrawCompleted())
-							if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel) {
+							if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel || part instanceof Sensor) {
 								final ReadOnlyVector3 faceDirection = part.getFaceDirection();
 								if (faceDirection.dot(directionTowardSun) > 0)
 									// computeOnMesh(minute, directionTowardSun, part, part.getMesh(), part instanceof Wall ? ((Wall) part).getInvisibleMesh() : part.getMesh(), faceDirection, true);
@@ -309,7 +310,7 @@ public class SolarIrradiation {
 		applyTexture(SceneManager.getInstance().getSolarLand(), onLand, maxValue);
 		synchronized (Scene.getInstance().getParts()) {
 			for (final HousePart part : Scene.getInstance().getParts())
-				if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel)
+				if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel || part instanceof Sensor)
 					// applyTexture(part.getMesh(), onMesh.get(part.getMesh()), maxValue);
 					applyTexture(part.getIrradiationMesh(), onMesh.get(part.getIrradiationMesh()), maxValue);
 				else if (part instanceof Roof)
@@ -349,6 +350,8 @@ public class SolarIrradiation {
 									passiveSolar[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getWindowSolarHeatGainCoefficientNotPercentage();
 								else if (houseChild instanceof SolarPanel)
 									photovoltaic[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
+								else if (houseChild instanceof Sensor)
+									photovoltaic[i] += houseChild.getSolarPotential()[i];
 							}
 						}
 
