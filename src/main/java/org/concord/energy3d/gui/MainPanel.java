@@ -893,24 +893,24 @@ public class MainPanel extends JPanel {
 										return null;
 									}
 								});
+								int partCount = Scene.getInstance().getParts().size();
 								try {
-									Thread.sleep(100);
+									Thread.sleep(100 + partCount * 5); // give it enough time for the above call to complete (the more parts it has, the more time it needs)
 								} catch (InterruptedException e) {
 								}
 							}
+							HousePart hp = SceneManager.getInstance().getSelectedPart();
+							if (hp instanceof Foundation)
+								SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand((Foundation) hp, SceneManager.getInstance().getBuildingRotationAngleRecorded()));
 						}
-
 					}.start();
 				}
 
 				public void mouseReleased(MouseEvent e) {
 					mousePressed = false;
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Foundation)) {
+					if (selectedPart == null)
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No building is selected for rotation.", "No Building", JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand((Foundation) selectedPart, SceneManager.getInstance().getBuildingRotationAngleRecorded()));
 				}
 			});
 		}
