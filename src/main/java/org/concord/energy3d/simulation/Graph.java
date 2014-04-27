@@ -484,12 +484,12 @@ abstract class Graph extends JPanel {
 
 		switch (type) {
 		case SENSOR:
-			x0 -= 100;
+			x0 -= 50;
 			drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get("Solar"));
-			g2.drawString("Light Sensor", x0 + 14, y0 + 8);
+			g2.drawString("Light", x0 + 14, y0 + 8);
 			y0 += 14;
 			drawSquare(g2, x0, y0, 8, colors.get("Heat Gain"));
-			g2.drawString("Heat Flux Sensor", x0 + 14, y0 + 8);
+			g2.drawString("Heat Flux", x0 + 14, y0 + 8);
 			break;
 		default:
 			x0 -= 100;

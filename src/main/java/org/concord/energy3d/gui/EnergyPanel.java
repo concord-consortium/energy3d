@@ -358,6 +358,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				updateCost();
 			}
 		});
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
@@ -376,11 +377,12 @@ public class EnergyPanel extends JPanel {
 
 		doorsComboBox = new WideComboBox();
 		doorsComboBox.setEditable(true);
-		doorsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "1.14 ", "1.20 (Steel)", "0.64 (Wood)" }));
+		doorsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.8 ", "1.2 (Steel)", "0.4 (Wood)" }));
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				updateCost();
 			}
 		});
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
@@ -404,6 +406,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				updateCost();
 			}
 		});
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
@@ -427,6 +430,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				updateCost();
 			}
 		});
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
@@ -466,6 +470,7 @@ public class EnergyPanel extends JPanel {
 					return;
 				}
 				Scene.getInstance().setWindowSolarHeatGainCoefficient(eff);
+				updateCost();
 			}
 		});
 		solarConversionPercentagePanel.add(windowSHGCComboBox);
@@ -494,6 +499,7 @@ public class EnergyPanel extends JPanel {
 					return;
 				}
 				Scene.getInstance().setSolarPanelEfficiency(eff);
+				updateCost();
 			}
 		});
 		solarConversionPercentagePanel.add(solarPanelEfficiencyComboBox);
