@@ -446,6 +446,11 @@ abstract class Graph extends JPanel {
 					for (int i = 0; i < list.size(); i++) {
 						dataX = left + dx * i;
 						dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+						if (i == 0) {
+							int pound = key.indexOf("#");
+							String s = key.substring(pound);
+							g2.drawString(s, (int) dataX - 28, (int) dataY + 5);
+						}
 						if (key.startsWith("Light"))
 							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get("Solar"));
 						else if (key.startsWith("Heat Flux"))
@@ -474,20 +479,31 @@ abstract class Graph extends JPanel {
 
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
 		g2.setStroke(thin);
-		int x0 = getWidth() - 100 - right;
+		int x0 = getWidth() - right;
 		int y0 = top - 10;
 
-		String s = "Solar";
-		if (data.containsKey(s) && !isDataHidden(s)) {
-			drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));
-			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
-		}
-
-		s = "Heat Gain";
-		if (data.containsKey(s) && !isDataHidden(s)) {
+		switch (type) {
+		case SENSOR:
+			x0 -= 100;
+			drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get("Solar"));
+			g2.drawString("Light Sensor", x0 + 14, y0 + 8);
 			y0 += 14;
-			drawSquare(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+			drawSquare(g2, x0, y0, 8, colors.get("Heat Gain"));
+			g2.drawString("Heat Flux Sensor", x0 + 14, y0 + 8);
+			break;
+		default:
+			x0 -= 100;
+			String s = "Solar";
+			if (data.containsKey(s) && !isDataHidden(s)) {
+				drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));
+				g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+			}
+			s = "Heat Gain";
+			if (data.containsKey(s) && !isDataHidden(s)) {
+				y0 += 14;
+				drawSquare(g2, x0, y0, 8, colors.get(s));
+				g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+			}
 		}
 
 	}

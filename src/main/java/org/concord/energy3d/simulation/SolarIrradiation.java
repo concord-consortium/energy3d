@@ -350,8 +350,6 @@ public class SolarIrradiation {
 									passiveSolar[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getWindowSolarHeatGainCoefficientNotPercentage();
 								else if (houseChild instanceof SolarPanel)
 									photovoltaic[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
-								else if (houseChild instanceof Sensor)
-									photovoltaic[i] += houseChild.getSolarPotential()[i];
 							}
 						}
 

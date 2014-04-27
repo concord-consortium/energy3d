@@ -10,6 +10,7 @@ import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -67,7 +68,14 @@ public class HeatLoad {
 							uFactor = windowUFactor;
 						else if (part instanceof Roof)
 							uFactor = roofUFactor;
-						else
+						else if (part instanceof Sensor) {
+							if (part.getContainer() instanceof Wall)
+								uFactor = wallUFactor;
+							else if (part.getContainer() instanceof Roof)
+								uFactor = roofUFactor;
+							else
+								continue;
+						} else
 							continue;
 						double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
 						if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
