@@ -68,7 +68,8 @@ public class Sensor extends HousePart {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
-		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class });
+		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class});
+		// final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class, Foundation.class });
 		if (picked != null) {
 			final Vector3 p = picked.getPoint();
 			if (container instanceof Wall)
