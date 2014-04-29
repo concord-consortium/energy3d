@@ -19,6 +19,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -117,7 +118,9 @@ public class Cost {
 		if (part instanceof SolarPanel) {
 			double efficiency = Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
 			int price;
-			if (efficiency > 30)
+			if (efficiency >= 30)
+				price = 350;
+			else if (efficiency > 25)
 				price = 300;
 			else if (efficiency > 20)
 				price = 250;
@@ -128,7 +131,36 @@ public class Cost {
 		return 0;
 	}
 
-	public void show() {
+	public void showGraph() {
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart == null || selectedPart instanceof Tree) {
+			int count = 0;
+			HousePart hp = null;
+			synchronized (Scene.getInstance().getParts()) {
+				for (HousePart x : Scene.getInstance().getParts()) {
+					if (x instanceof Foundation) {
+						count++;
+						hp = x;
+					}
+				}
+			}
+			if (count == 1) {
+				SceneManager.getInstance().setSelectedPart(hp);
+				SceneManager.getInstance().refresh();
+				EnergyPanel.getInstance().updateCost();
+			} else {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+		}
+		if (SceneManager.getInstance().getSelectedPart().getChildren().isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		show();
+	}
+
+	private void show() {
 
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		final Foundation selectedBuilding;

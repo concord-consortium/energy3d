@@ -49,6 +49,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
@@ -62,6 +63,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class EnergyPanel extends JPanel {
 
@@ -108,8 +110,6 @@ public class EnergyPanel extends JPanel {
 	private boolean computeEnabled = true;
 	private final List<PropertyChangeListener> propertyChangeListeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
 	private JPanel partPanel;
-	private JLabel partInsolationLabel;
-	private JTextField partInsolationTextField;
 	private JPanel buildingPanel;
 	private JPanel geometryPanel;
 	private JLabel lblPosition;
@@ -123,10 +123,14 @@ public class EnergyPanel extends JPanel {
 	private JTextField windowTextField;
 	private JTextField solarPanelTextField;
 	private JPanel partPropertiesPanel;
-	private JLabel lblWidth;
-	private JTextField partWidthTextField;
-	private JLabel lblHeight_1;
-	private JTextField partHeightTextField;
+	private JLabel partProperty1Label;
+	private JLabel partProperty2Label;
+	private JLabel partProperty3Label;
+	private JLabel partProperty4Label;
+	private JTextField partProperty1TextField;
+	private JTextField partProperty2TextField;
+	private JTextField partProperty3TextField;
+	private JTextField partProperty4TextField;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -356,6 +360,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				updateCost();
 			}
 		});
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
@@ -374,11 +379,12 @@ public class EnergyPanel extends JPanel {
 
 		doorsComboBox = new WideComboBox();
 		doorsComboBox.setEditable(true);
-		doorsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "1.14 ", "1.20 (Steel)", "0.64 (Wood)" }));
+		doorsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.8 ", "1.2 (Steel)", "0.4 (Wood)" }));
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				updateCost();
 			}
 		});
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
@@ -402,6 +408,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				updateCost();
 			}
 		});
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
@@ -425,6 +432,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				updateCost();
 			}
 		});
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
@@ -464,6 +472,7 @@ public class EnergyPanel extends JPanel {
 					return;
 				}
 				Scene.getInstance().setWindowSolarHeatGainCoefficient(eff);
+				updateCost();
 			}
 		});
 		solarConversionPercentagePanel.add(windowSHGCComboBox);
@@ -492,6 +501,7 @@ public class EnergyPanel extends JPanel {
 					return;
 				}
 				Scene.getInstance().setSolarPanelEfficiency(eff);
+				updateCost();
 			}
 		});
 		solarConversionPercentagePanel.add(solarPanelEfficiencyComboBox);
@@ -625,7 +635,7 @@ public class EnergyPanel extends JPanel {
 		costBar.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() > 1)
-					Cost.getInstance().show();
+					Cost.getInstance().showGraph();
 			}
 		});
 		costPanel.add(costBar, BorderLayout.CENTER);
@@ -768,31 +778,34 @@ public class EnergyPanel extends JPanel {
 		partPropertiesPanel = new JPanel();
 		partPanel.add(partPropertiesPanel);
 
-		lblWidth = new JLabel("Width:");
-		partPropertiesPanel.add(lblWidth);
+		partProperty1Label = new JLabel("Width:");
+		partPropertiesPanel.add(partProperty1Label);
 
-		partWidthTextField = new JTextField();
-		partWidthTextField.setEditable(false);
-		partPropertiesPanel.add(partWidthTextField);
-		partWidthTextField.setColumns(3);
+		partProperty1TextField = new JTextField();
+		partProperty1TextField.setEditable(false);
+		partPropertiesPanel.add(partProperty1TextField);
+		partProperty1TextField.setColumns(4);
 
-		lblHeight_1 = new JLabel("Height:");
-		partPropertiesPanel.add(lblHeight_1);
+		partProperty2Label = new JLabel("Height:");
+		partPropertiesPanel.add(partProperty2Label);
 
-		partHeightTextField = new JTextField();
-		partHeightTextField.setEditable(false);
-		partPropertiesPanel.add(partHeightTextField);
-		partHeightTextField.setColumns(3);
+		partProperty2TextField = new JTextField();
+		partProperty2TextField.setEditable(false);
+		partPropertiesPanel.add(partProperty2TextField);
+		partProperty2TextField.setColumns(4);
 
-		partInsolationLabel = new JLabel("Insolation:");
-		partInsolationLabel.setToolTipText("The solar radiation energy on this part");
-		partPropertiesPanel.add(partInsolationLabel);
+		partProperty3Label = new JLabel("Insolation:");
+		partPropertiesPanel.add(partProperty3Label);
 
-		partInsolationTextField = new JTextField();
-		partInsolationTextField.setToolTipText(partInsolationLabel.getToolTipText());
-		partPropertiesPanel.add(partInsolationTextField);
-		partInsolationTextField.setEditable(false);
-		partInsolationTextField.setColumns(6);
+		partProperty3TextField = new JTextField();
+		partProperty3TextField.setEditable(false);
+		partPropertiesPanel.add(partProperty3TextField);
+		partProperty3TextField.setColumns(4);
+
+		partProperty4Label = new JLabel();
+		partProperty4TextField = new JTextField();
+		partProperty4TextField.setEditable(false);
+		partProperty4TextField.setColumns(4);
 
 	}
 
@@ -957,27 +970,59 @@ public class EnergyPanel extends JPanel {
 		final boolean iradiationEnabled = MainPanel.getInstance().getSolarButton().isSelected();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 
-		lblHeight_1.setText(selectedPart instanceof Foundation ? "Length:" : "Height:");
+		if (selectedPart instanceof Foundation) {
+			partProperty1Label.setText("Width:");
+			partProperty2Label.setText("Length:");
+			partProperty3Label.setText("Insolation:");
+			partPropertiesPanel.remove(partProperty4Label);
+			partPropertiesPanel.remove(partProperty4TextField);
+		} else if (selectedPart instanceof Sensor) {
+			partProperty1Label.setText("X:");
+			partProperty2Label.setText("Y:");
+			partProperty3Label.setText("Z:");
+			partProperty4Label.setText("Data:");
+			partPropertiesPanel.add(partProperty4Label);
+			partPropertiesPanel.add(partProperty4TextField);
+		} else {
+			partProperty1Label.setText("Width:");
+			partProperty2Label.setText("Height:");
+			partProperty3Label.setText("Insolation:");
+			partPropertiesPanel.remove(partProperty4Label);
+			partPropertiesPanel.remove(partProperty4TextField);
+		}
+		partPropertiesPanel.revalidate();
 
 		((TitledBorder) partPanel.getBorder()).setTitle("Part" + (selectedPart == null ? "" : (" - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1))));
 		partPanel.repaint();
 
-		if (!iradiationEnabled || selectedPart == null || selectedPart instanceof Foundation || selectedPart instanceof Door)
-			partInsolationTextField.setText("");
-		else
-			partInsolationTextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
+		if (!iradiationEnabled || selectedPart == null || selectedPart instanceof Door || selectedPart instanceof Foundation)
+			partProperty3TextField.setText("");
+		else {
+			if (selectedPart instanceof Sensor) {
+				String light = twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.computeArea());
+				String heatFlux = twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.computeArea());
+				partProperty4TextField.setText(light + ", " + heatFlux);
+				partProperty4TextField.setToolTipText("Light sensor: " + light + ", heat flux sensor: " + heatFlux);
+			} else
+				partProperty3TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
+		}
 
 		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof Tree)) {
 			if (selectedPart instanceof SolarPanel) {
-				partWidthTextField.setText(twoDecimals.format(SolarPanel.WIDTH));
-				partHeightTextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
+				partProperty1TextField.setText(twoDecimals.format(SolarPanel.WIDTH));
+				partProperty2TextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
+			} else if (selectedPart instanceof Sensor) {
+				ReadOnlyVector3 v = ((Sensor) selectedPart).getAbsPoint(0);
+				partProperty1TextField.setText(twoDecimals.format(v.getX() * Scene.getInstance().getAnnotationScale()));
+				partProperty2TextField.setText(twoDecimals.format(v.getY() * Scene.getInstance().getAnnotationScale()));
+				partProperty3TextField.setText(twoDecimals.format(v.getZ() * Scene.getInstance().getAnnotationScale()));
 			} else {
-				partWidthTextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale()));
-				partHeightTextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale()));
+				partProperty1TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale()));
+				partProperty2TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale()));
 			}
 		} else {
-			partWidthTextField.setText("");
-			partHeightTextField.setText("");
+			partProperty1TextField.setText("");
+			partProperty2TextField.setText("");
 		}
 
 		final Foundation selectedBuilding;
@@ -1043,6 +1088,11 @@ public class EnergyPanel extends JPanel {
 			n = Cost.getInstance().getBuildingCost(selectedBuilding);
 		costBar.setValue(n);
 		costBar.repaint();
+	}
+
+	public void update() {
+		updatePartEnergy();
+		updateCost();
 	}
 
 	/** Currently this applies only to the date spinner when it is set programmatically (not by the user) */

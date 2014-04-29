@@ -1,5 +1,6 @@
 package org.concord.energy3d.simulation;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import javax.swing.JComboBox;
@@ -10,9 +11,13 @@ import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.util.Util;
+
+import com.ardor3d.math.Vector3;
 
 public class HeatLoad {
 
@@ -67,7 +72,20 @@ public class HeatLoad {
 							uFactor = windowUFactor;
 						else if (part instanceof Roof)
 							uFactor = roofUFactor;
-						else
+						else if (part instanceof Sensor) {
+							if (part.getContainer() instanceof Wall) {
+								HousePart x = insideChild(part.getPoints().get(0), part.getContainer());
+								if (x instanceof Window)
+									uFactor = windowUFactor;
+								else if (x instanceof Door)
+									uFactor = doorUFactor;
+								else
+									uFactor = wallUFactor;
+							} else if (part.getContainer() instanceof Roof)
+								uFactor = roofUFactor;
+							else
+								continue;
+						} else
 							continue;
 						double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
 						if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
@@ -77,6 +95,34 @@ public class HeatLoad {
 				}
 			}
 		}
+	}
+
+	private static HousePart insideChild(Vector3 point, HousePart parent) {
+		for (HousePart x : parent.getChildren())
+			if (insideRectangle(point, x.getPoints()))
+				return x;
+		return null;
+	}
+
+	// Note: this assumes y = 0 in all Vector3
+	private static boolean insideRectangle(Vector3 point, ArrayList<Vector3> rect) {
+		double x = point.getX();
+		double y = point.getZ();
+		double xmin = Double.MAX_VALUE;
+		double xmax = -Double.MAX_VALUE;
+		double ymin = Double.MAX_VALUE;
+		double ymax = -Double.MAX_VALUE;
+		for (Vector3 v : rect) {
+			if (xmin > v.getX())
+				xmin = v.getX();
+			if (xmax < v.getX())
+				xmax = v.getX();
+			if (ymin > v.getZ())
+				ymin = v.getZ();
+			if (ymax < v.getZ())
+				ymax = v.getZ();
+		}
+		return x > xmin && x < xmax && y > ymin && y < ymax;
 	}
 
 	public static double parseUFactor(final JComboBox<String> comboBox) {

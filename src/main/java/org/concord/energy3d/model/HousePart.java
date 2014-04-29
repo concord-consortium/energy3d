@@ -853,6 +853,15 @@ public abstract class HousePart implements Serializable {
 		return heatLoss;
 	}
 
+	public double getTotalHeatLoss() {
+		if (heatLoss == null)
+			return 0;
+		double sum = 0;
+		for (double x : heatLoss)
+			sum += x;
+		return sum;
+	}
+
 	public double getSolarPotentialToday() {
 		return solarPotentialToday;
 	}

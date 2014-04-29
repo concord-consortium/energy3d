@@ -29,6 +29,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.PyramidRoof;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.UserData;
@@ -133,7 +134,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_TREE, DRAW_TREE_TALL
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_TREE, DRAW_TREE_TALL
 	}
 
 	public enum CameraMode {
@@ -196,6 +197,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean showBuildingLabels = false;
 	private Mesh sky;
 	private TextureState daySkyState, nightSkyState;
+	private double buildingRotationAngleRecorded;
 
 	private ArrayList<Runnable> shutdownHooks;
 
@@ -631,7 +633,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final MouseState prevMouseState = firstClickState.getCurrent().getMouseState();
 						final ReadOnlyVector2 p1 = new Vector2(prevMouseState.getX(), prevMouseState.getY());
 						final ReadOnlyVector2 p2 = new Vector2(mouseState.getX(), mouseState.getY());
-						if (selectedHousePart instanceof Roof || selectedHousePart instanceof Floor || selectedHousePart instanceof SolarPanel || selectedHousePart instanceof Tree || p1.distance(p2) > 10) {
+						if (selectedHousePart instanceof Roof || selectedHousePart instanceof Floor || selectedHousePart instanceof SolarPanel || selectedHousePart instanceof Sensor || selectedHousePart instanceof Tree || p1.distance(p2) > 10) {
 							firstClickState = null;
 							mouseReleased(inputStates.getCurrent().getMouseState());
 						}
@@ -926,6 +928,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Floor();
 		else if (operation == Operation.DRAW_SOLAR_PANEL)
 			drawn = new SolarPanel();
+		else if (operation == Operation.DRAW_SENSOR)
+			drawn = new Sensor();
 		else if (operation == Operation.DRAW_FOUNDATION) {
 			drawn = new Foundation();
 			setGridsVisible(true);
@@ -994,6 +998,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setSelectedPart(final HousePart p) {
+		if (p == null && selectedHousePart != null)
+			selectedHousePart.setEditPointsVisible(false);
 		selectedHousePart = p;
 		if (selectedHousePart != null)
 			selectedHousePart.setEditPointsVisible(true);
@@ -1475,13 +1481,34 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return showBuildingLabels;
 	}
 
+	public void resetBuildingRotationAngleRecorded() {
+		buildingRotationAngleRecorded = 0;
+	}
+
+	public double getBuildingRotationAngleRecorded() {
+		return buildingRotationAngleRecorded;
+	}
+
+	public void undoOrRedoBuildingRotation(final Foundation foundation, final double rotationAngle, final boolean undo) {
+		setSelectedPart(foundation);
+		taskManager.update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				rotateBuilding(undo ? -rotationAngle : rotationAngle, false);
+				return null;
+			}
+		});
+	}
+
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
-	public void rotateBuilding(double angle) {
+	public void rotateBuilding(double angle, boolean keepRecord) {
 		if (selectedHousePart != null) {
 			if (selectedHousePart instanceof Foundation)
 				((Foundation) selectedHousePart).rotate(angle);
 			else
 				selectedHousePart.getTopContainer().rotate(angle);
+			if (keepRecord)
+				buildingRotationAngleRecorded += angle;
 		}
 	}
 

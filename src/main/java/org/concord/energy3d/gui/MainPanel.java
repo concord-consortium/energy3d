@@ -37,11 +37,14 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
+import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.util.Config;
 
 public class MainPanel extends JPanel {
@@ -74,6 +77,7 @@ public class MainPanel extends JPanel {
 	private JTextArea noteTextArea;
 	private JToggleButton solarPanelButton;
 	private JToggleButton treeButton;
+	private JToggleButton sensorButton;
 	private JToggleButton miscButton;
 	private JButton rotateButton;
 	private JButton treeArrowButton;
@@ -275,6 +279,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getWallButton());
 			appToolbar.add(getWindowButton());
 			appToolbar.add(getSolarPanelButton());
+			appToolbar.add(getSensorButton());
 			appToolbar.add(getRoofButton());
 			appToolbar.add(getRoofArrowButton());
 			appToolbar.add(getMiscButton());
@@ -296,6 +301,7 @@ public class MainPanel extends JPanel {
 			bg.add(windowButton);
 			bg.add(roofButton);
 			bg.add(solarPanelButton);
+			bg.add(sensorButton);
 			bg.add(treeButton);
 			bg.add(miscButton);
 		}
@@ -725,6 +731,23 @@ public class MainPanel extends JPanel {
 		return solarPanelButton;
 	}
 
+	private JToggleButton getSensorButton() {
+		if (sensorButton == null) {
+			sensorButton = new JToggleButton("");
+			sensorButton.setToolTipText("Add sensor module");
+			sensorButton.setIcon(new ImageIcon(getClass().getResource("icons/sensor.png")));
+			sensorButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_SENSOR);
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+				}
+			});
+			sensorButton.addMouseListener(operationStickAndRefreshUponExit);
+		}
+		return sensorButton;
+	}
+
 	private JToggleButton getTreeButton() {
 		if (treeButton == null) {
 			treeButton = new JToggleButton();
@@ -837,23 +860,49 @@ public class MainPanel extends JPanel {
 				public void mousePressed(final MouseEvent e) {
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					mousePressed = true;
+					SceneManager.getInstance().resetBuildingRotationAngleRecorded();
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null || selectedPart instanceof Tree) {
+						int count = 0;
+						HousePart hp = null;
+						synchronized (Scene.getInstance().getParts()) {
+							for (HousePart x : Scene.getInstance().getParts()) {
+								if (x instanceof Foundation) {
+									count++;
+									hp = x;
+								}
+							}
+						}
+						if (count == 1) {
+							SceneManager.getInstance().setSelectedPart(hp);
+							SceneManager.getInstance().refresh();
+							EnergyPanel.getInstance().updateCost();
+							EnergyPanel.getInstance().updatePartEnergy();
+						} else {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}
+					}
 					new Thread() {
 						public void run() {
 							while (mousePressed) {
 								SceneManager.getTaskManager().update(new Callable<Object>() {
 									@Override
 									public Object call() throws Exception {
-										SceneManager.getInstance().rotateBuilding(buildingRotationAngle);
+										SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true);
 										return null;
 									}
 								});
+								int partCount = Scene.getInstance().getParts().size();
 								try {
-									Thread.sleep(100);
+									Thread.sleep(100 + partCount * 5); // give it enough time for the above call to complete (the more parts it has, the more time it needs)
 								} catch (InterruptedException e) {
 								}
 							}
+							HousePart hp = SceneManager.getInstance().getSelectedPart();
+							if (hp instanceof Foundation)
+								SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand((Foundation) hp, SceneManager.getInstance().getBuildingRotationAngleRecorded()));
 						}
-
 					}.start();
 				}
 
