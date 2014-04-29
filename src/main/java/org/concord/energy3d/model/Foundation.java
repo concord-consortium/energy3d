@@ -35,13 +35,13 @@ public class Foundation extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static DecimalFormat format = new DecimalFormat();
 	private transient ArrayList<Vector3> orgPoints;
+	private transient ArrayList<Vector2> floorVertices;
 	private transient Mesh boundingMesh;
 	private transient Mesh wireframeMesh;
 	private transient Mesh surroundMesh;
 	private transient BMText buildingLabel;
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
-	private transient boolean resizeHouseMode = false;
 	private transient double minX;
 	private transient double minY;
 	private transient double maxX;
@@ -51,10 +51,8 @@ public class Foundation extends HousePart {
 	private transient double heatingToday;
 	private transient double coolingToday;
 	private transient double totalEnergyToday;
-	private transient Vector3 prevP0;
-	private transient Vector3 prevP1;
-	private transient Vector3 prevP2;
-	private transient Vector3 prevP3;
+	private transient boolean resizeHouseMode = false;
+	private transient boolean useOrgPoints = false;
 
 	static {
 		format.setGroupingUsed(true);
@@ -125,7 +123,6 @@ public class Foundation extends HousePart {
 		buildingLabel.setVisible(false);
 		root.attachChild(buildingLabel);
 
-		savePrevPoints();
 		updateTextureAndColor();
 	}
 
@@ -211,36 +208,105 @@ public class Foundation extends HousePart {
 				index = 0;
 		}
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, (Spatial) null);
-		Vector3 p = points.get(index);
+		Vector3 p = points.get(index).clone();
 		if (pick != null && index < 4) {
 			p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
-			p = ensureDistanceFromOtherFoundations(p, index);
-			if (resizeHouseMode)
-				p = ensureNotTooSmall(p, index);
-			else
-				p = ensureIncludesChildren(p, index);
 		}
 		if (!isFirstPointInserted()) {
 			points.get(index).set(p);
 			points.get(1).set(p.add(0, 0.1, 0, null));
 			points.get(2).set(p.add(0.1, 0, 0, null));
 			points.get(3).set(p.add(0.1, 0.1, 0, null));
-			savePrevPoints();
 		} else {
-			points.get(index).set(p);
-			if (index == 0) {
-				points.get(1).set(Util.projectPointOnLine(p, prevP3, prevP1, false));
-				points.get(2).set(Util.projectPointOnLine(p, prevP3, prevP2, false));
-			} else if (index == 3) {
-				points.get(1).set(Util.projectPointOnLine(p, prevP0, prevP1, false));
-				points.get(2).set(Util.projectPointOnLine(p, prevP0, prevP2, false));
-			} else if (index == 1) {
-				points.get(0).set(Util.projectPointOnLine(p, prevP2, prevP0, false));
-				points.get(3).set(Util.projectPointOnLine(p, prevP2, prevP3, false));
-			} else if (index == 2) {
-				points.get(0).set(Util.projectPointOnLine(p, prevP1, prevP0, false));
-				points.get(3).set(Util.projectPointOnLine(p, prevP1, prevP3, false));
+			if (index < 4) {
+				useOrgPoints = true;
+				final List<Vector2> insidePoints = new ArrayList<Vector2>(children.size() * 2);
+				for (final HousePart part : children) {
+					final Vector3 p0 = part.getAbsPoint(0);
+					final Vector3 p2 = part.getAbsPoint(2);
+					insidePoints.add(new Vector2(p0.getX(), p0.getY()));
+					insidePoints.add(new Vector2(p2.getX(), p2.getY()));
+				}
+
+				double uScaleMin = Double.MAX_VALUE;
+				double uScaleMax = -Double.MAX_VALUE;
+				double vScaleMin = Double.MAX_VALUE;
+				double vScaleMax = -Double.MAX_VALUE;
+				for (final Vector2 insidePoint : insidePoints) {
+					final double uScale = Util.projectPointOnLineScale(insidePoint, new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
+					if (uScaleMin > uScale)
+						uScaleMin = uScale;
+					if (uScaleMax < uScale)
+						uScaleMax = uScale;
+					final double vScale = Util.projectPointOnLineScale(insidePoint, new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
+					if (vScaleMin > vScale)
+						vScaleMin = vScale;
+					if (vScaleMax < vScale)
+						vScaleMax = vScale;
+				}
+
+				final double uScaleP = Util.projectPointOnLineScale(new Vector2(p.getX(), p.getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
+				final double vScaleP = Util.projectPointOnLineScale(new Vector2(p.getX(), p.getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
+				final double uScaleP0 = Util.projectPointOnLineScale(new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
+				final double uScaleP2 = Util.projectPointOnLineScale(new Vector2(points.get(2).getX(), points.get(2).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
+				final double vScaleP0 = Util.projectPointOnLineScale(new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
+				final double vScaleP1 = Util.projectPointOnLineScale(new Vector2(points.get(1).getX(), points.get(1).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
+				final boolean isOnRight = uScaleP2 >= uScaleP0 && (index == 2 || index == 3);
+				final boolean isOnTop = vScaleP1 >= vScaleP0 && (index == 1 || index == 3);
+
+				final double uScale;
+				if (isOnRight && uScaleP < uScaleMax)
+					uScale = uScaleMax;
+				else if (!isOnRight && uScaleP > uScaleMin)
+					uScale = uScaleMin;
+				else
+					uScale = uScaleP;
+
+				final double vScale;
+				if (isOnTop && vScaleP < vScaleMax)
+					vScale = vScaleMax;
+				else if (!isOnTop && vScaleP > vScaleMin)
+					vScale = vScaleMin;
+				else
+					vScale = vScaleP;
+
+				final Vector3 u = points.get(2).subtract(points.get(0), null);
+				final Vector3 v = points.get(1).subtract(points.get(0), null);
+				p.set(points.get(0)).addLocal(u.multiplyLocal(uScale)).addLocal(v.multiplyLocal(vScale));
+
+				final int oppositeIndex;
+				if (index == 0)
+					oppositeIndex = 3;
+				else if (index == 1)
+					oppositeIndex = 2;
+				else if (index == 2)
+					oppositeIndex = 1;
+				else
+					oppositeIndex = 0;
+
+				if (!Util.isEqual(p.getX(), points.get(oppositeIndex).getX()) && !Util.isEqual(p.getY(), points.get(oppositeIndex).getY())) {
+					points.get(index).set(p);
+					if (index == 0) {
+						points.get(1).set(Util.projectPointOnLine(p, points.get(3), points.get(1), false));
+						points.get(2).set(Util.projectPointOnLine(p, points.get(3), points.get(2), false));
+					} else if (index == 3) {
+						points.get(1).set(Util.projectPointOnLine(p, points.get(0), points.get(1), false));
+						points.get(2).set(Util.projectPointOnLine(p, points.get(0), points.get(2), false));
+					} else if (index == 1) {
+						points.get(0).set(Util.projectPointOnLine(p, points.get(2), points.get(0), false));
+						points.get(3).set(Util.projectPointOnLine(p, points.get(2), points.get(3), false));
+					} else if (index == 2) {
+						points.get(0).set(Util.projectPointOnLine(p, points.get(1), points.get(0), false));
+						points.get(3).set(Util.projectPointOnLine(p, points.get(1), points.get(3), false));
+					}
+				}
+				useOrgPoints = false;
+				// p = ensureDistanceFromOtherFoundations(p, index);
+				// if (resizeHouseMode)
+				// p = ensureNotTooSmall(p, index);
+				// else
+				// p = ensureIncludesChildren(p, index);
 			} else {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
@@ -261,15 +327,6 @@ public class Foundation extends HousePart {
 			drawChildren();
 		draw();
 		setEditPointsVisible(true);
-	}
-
-	public void savePrevPoints() {
-		if (points.size() >= 4) {
-			prevP0 = getAbsPoint(0);
-			prevP1 = getAbsPoint(1);
-			prevP2 = getAbsPoint(2);
-			prevP3 = getAbsPoint(3);
-		}
 	}
 
 	@Override
@@ -685,7 +742,7 @@ public class Foundation extends HousePart {
 			editPoint -= 4;
 		super.setEditPoint(editPoint);
 		if (!resizeHouseMode) {
-			prepareForNotResizing();
+			saveOrgPoints();
 			minX = Double.MAX_VALUE;
 			minY = Double.MAX_VALUE;
 			maxX = -Double.MAX_VALUE;
@@ -703,10 +760,9 @@ public class Foundation extends HousePart {
 				maxY = Math.max(p2.getY(), maxY);
 			}
 		}
-		savePrevPoints();
 	}
 
-	public void prepareForNotResizing() {
+	public void saveOrgPoints() {
 		orgPoints = new ArrayList<Vector3>(4);
 		for (int i = 0; i < 4; i++)
 			orgPoints.add(points.get(i).clone());
@@ -772,8 +828,6 @@ public class Foundation extends HousePart {
 		}
 		Scene.getInstance().redrawAll();
 	}
-
-	private ArrayList<Vector2> floorVertices;
 
 	private void initFloor() {
 		if (floorVertices == null)
@@ -912,6 +966,14 @@ public class Foundation extends HousePart {
 			points.get(i).set(toRelative(p));
 		}
 		Scene.getInstance().redrawAll();
+	}
+
+	@Override
+	public Vector3 getAbsPoint(final int index) {
+		if (useOrgPoints && orgPoints != null)
+			return super.toAbsolute(orgPoints.get(index));
+		else
+			return super.getAbsPoint(index);
 	}
 
 }

@@ -32,7 +32,7 @@ public class EditFoundationCommand extends EditHousePartCommand {
 	public void undo() throws CannotUndoException {
 		foundation.setResizeHouseMode(isResizeMode);
 		if (!isResizeMode)
-			foundation.prepareForNotResizing();
+			foundation.saveOrgPoints();
 		super.undo();
 		try {
 			foundation.complete();
@@ -47,7 +47,7 @@ public class EditFoundationCommand extends EditHousePartCommand {
 	public void redo() throws CannotRedoException {
 		foundation.setResizeHouseMode(isResizeMode);
 		if (!isResizeMode)
-			foundation.prepareForNotResizing();
+			foundation.saveOrgPoints();
 		super.redo();
 		try {
 			foundation.complete();
