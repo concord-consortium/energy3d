@@ -200,19 +200,20 @@ public class Foundation extends HousePart {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
-		int index = editPointIndex;
-		if (index == -1) {
-			if (isFirstPointInserted())
-				index = 3;
-			else
-				index = 0;
-		}
+		final int index;
+		if (editPointIndex == -1)
+			index = isFirstPointInserted() ? 3 : 0;
+		else
+			index = editPointIndex;
+		
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, (Spatial) null);
-		Vector3 p = points.get(index).clone();
+		final Vector3 p;
 		if (pick != null && index < 4) {
 			p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
-		}
+		} else
+			p = points.get(index).clone();
+		
 		if (!isFirstPointInserted()) {
 			points.get(index).set(p);
 			points.get(1).set(p.add(0, 0.1, 0, null));
@@ -220,60 +221,8 @@ public class Foundation extends HousePart {
 			points.get(3).set(p.add(0.1, 0.1, 0, null));
 		} else {
 			if (index < 4) {
-				useOrgPoints = true;
-				final List<Vector2> insidePoints = new ArrayList<Vector2>(children.size() * 2);
-				for (final HousePart part : children) {
-					final Vector3 p0 = part.getAbsPoint(0);
-					final Vector3 p2 = part.getAbsPoint(2);
-					insidePoints.add(new Vector2(p0.getX(), p0.getY()));
-					insidePoints.add(new Vector2(p2.getX(), p2.getY()));
-				}
-
-				double uScaleMin = Double.MAX_VALUE;
-				double uScaleMax = -Double.MAX_VALUE;
-				double vScaleMin = Double.MAX_VALUE;
-				double vScaleMax = -Double.MAX_VALUE;
-				for (final Vector2 insidePoint : insidePoints) {
-					final double uScale = Util.projectPointOnLineScale(insidePoint, new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
-					if (uScaleMin > uScale)
-						uScaleMin = uScale;
-					if (uScaleMax < uScale)
-						uScaleMax = uScale;
-					final double vScale = Util.projectPointOnLineScale(insidePoint, new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
-					if (vScaleMin > vScale)
-						vScaleMin = vScale;
-					if (vScaleMax < vScale)
-						vScaleMax = vScale;
-				}
-
-				final double uScaleP = Util.projectPointOnLineScale(new Vector2(p.getX(), p.getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
-				final double vScaleP = Util.projectPointOnLineScale(new Vector2(p.getX(), p.getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
-				final double uScaleP0 = Util.projectPointOnLineScale(new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
-				final double uScaleP2 = Util.projectPointOnLineScale(new Vector2(points.get(2).getX(), points.get(2).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
-				final double vScaleP0 = Util.projectPointOnLineScale(new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
-				final double vScaleP1 = Util.projectPointOnLineScale(new Vector2(points.get(1).getX(), points.get(1).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
-				final boolean isOnRight = uScaleP2 >= uScaleP0 && (index == 2 || index == 3);
-				final boolean isOnTop = vScaleP1 >= vScaleP0 && (index == 1 || index == 3);
-
-				final double uScale;
-				if (isOnRight && uScaleP < uScaleMax)
-					uScale = uScaleMax;
-				else if (!isOnRight && uScaleP > uScaleMin)
-					uScale = uScaleMin;
-				else
-					uScale = uScaleP;
-
-				final double vScale;
-				if (isOnTop && vScaleP < vScaleMax)
-					vScale = vScaleMax;
-				else if (!isOnTop && vScaleP > vScaleMin)
-					vScale = vScaleMin;
-				else
-					vScale = vScaleP;
-
-				final Vector3 u = points.get(2).subtract(points.get(0), null);
-				final Vector3 v = points.get(1).subtract(points.get(0), null);
-				p.set(points.get(0)).addLocal(u.multiplyLocal(uScale)).addLocal(v.multiplyLocal(vScale));
+				if (!resizeHouseMode)
+					ensureIncludesChildren(p, index);
 
 				final int oppositeIndex;
 				if (index == 0)
@@ -300,13 +249,12 @@ public class Foundation extends HousePart {
 						points.get(0).set(Util.projectPointOnLine(p, points.get(1), points.get(0), false));
 						points.get(3).set(Util.projectPointOnLine(p, points.get(1), points.get(3), false));
 					}
-				}
-				useOrgPoints = false;
+				}				
 				// p = ensureDistanceFromOtherFoundations(p, index);
 				// if (resizeHouseMode)
 				// p = ensureNotTooSmall(p, index);
 				// else
-				// p = ensureIncludesChildren(p, index);
+//				 p = ensureIncludesChildren(p, index);
 			} else {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
@@ -375,27 +323,65 @@ public class Foundation extends HousePart {
 			points.get(i + 4).set(points.get(i)).setZ(Math.max(height, newBoundingHeight + height));
 	}
 
-	private Vector3 ensureIncludesChildren(final Vector3 p, final int index) {
+	private void ensureIncludesChildren(final Vector3 p, final int index) {
 		if (children.isEmpty())
-			return p;
+			return;
 
-		if (((index == 0 || index == 1) && points.get(0).getX() < points.get(2).getX()) || ((index == 2 || index == 3) && points.get(2).getX() < points.get(0).getX())) {
-			if (p.getX() > minX)
-				p.setX(minX);
-		} else {
-			if (p.getX() < maxX)
-				p.setX(maxX);
+		useOrgPoints = true;
+		final List<Vector2> insidePoints = new ArrayList<Vector2>(children.size() * 2);
+		for (final HousePart part : children) {
+			final Vector3 p0 = part.getAbsPoint(0);
+			final Vector3 p2 = part.getAbsPoint(2);
+			insidePoints.add(new Vector2(p0.getX(), p0.getY()));
+			insidePoints.add(new Vector2(p2.getX(), p2.getY()));
+		}
+		useOrgPoints = false;
+
+		double uScaleMin = Double.MAX_VALUE;
+		double uScaleMax = -Double.MAX_VALUE;
+		double vScaleMin = Double.MAX_VALUE;
+		double vScaleMax = -Double.MAX_VALUE;
+		for (final Vector2 insidePoint : insidePoints) {
+			final double uScale = Util.projectPointOnLineScale(insidePoint, new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
+			if (uScaleMin > uScale)
+				uScaleMin = uScale;
+			if (uScaleMax < uScale)
+				uScaleMax = uScale;
+			final double vScale = Util.projectPointOnLineScale(insidePoint, new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
+			if (vScaleMin > vScale)
+				vScaleMin = vScale;
+			if (vScaleMax < vScale)
+				vScaleMax = vScale;
 		}
 
-		if (((index == 0 || index == 2) && points.get(0).getY() < points.get(1).getY()) || ((index == 1 || index == 3) && points.get(1).getY() < points.get(0).getY())) {
-			if (p.getY() > minY)
-				p.setY(minY);
-		} else {
-			if (p.getY() < maxY)
-				p.setY(maxY);
-		}
+		final double uScaleP = Util.projectPointOnLineScale(new Vector2(p.getX(), p.getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
+		final double vScaleP = Util.projectPointOnLineScale(new Vector2(p.getX(), p.getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
+		final double uScaleP0 = Util.projectPointOnLineScale(new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
+		final double uScaleP2 = Util.projectPointOnLineScale(new Vector2(points.get(2).getX(), points.get(2).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
+		final double vScaleP0 = Util.projectPointOnLineScale(new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
+		final double vScaleP1 = Util.projectPointOnLineScale(new Vector2(points.get(1).getX(), points.get(1).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
+		final boolean isOnRight = uScaleP2 >= uScaleP0 && (index == 2 || index == 3);
+		final boolean isOnTop = vScaleP1 >= vScaleP0 && (index == 1 || index == 3);
 
-		return p;
+		final double uScale;
+		if (isOnRight && uScaleP < uScaleMax)
+			uScale = uScaleMax;
+		else if (!isOnRight && uScaleP > uScaleMin)
+			uScale = uScaleMin;
+		else
+			uScale = uScaleP;
+
+		final double vScale;
+		if (isOnTop && vScaleP < vScaleMax)
+			vScale = vScaleMax;
+		else if (!isOnTop && vScaleP > vScaleMin)
+			vScale = vScaleMin;
+		else
+			vScale = vScaleP;
+
+		final Vector3 u = points.get(2).subtract(points.get(0), null);
+		final Vector3 v = points.get(1).subtract(points.get(0), null);
+		p.set(points.get(0)).addLocal(u.multiplyLocal(uScale)).addLocal(v.multiplyLocal(vScale));
 	}
 
 	private Vector3 ensureDistanceFromOtherFoundations(final Vector3 p, final int index) {
