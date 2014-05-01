@@ -31,7 +31,8 @@ public class HipRoof extends Roof {
 			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ());
 		} else if (editPointIndex == 1 || editPointIndex == 2) {
-			final Vector3 p = Util.closestPoint(getAbsPoint(editPointIndex), Vector3.UNIT_Y, x, y);
+			final Vector3 dir = getContainerRelative().getAbsPoint(1).subtractLocal(getContainerRelative().getAbsPoint(0));
+			final Vector3 p = Util.closestPoint(getAbsPoint(editPointIndex), dir, x, y);
 			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
 			if (insideWallsPolygon(p))
 				points.get(editPointIndex).set(toRelative(p));
@@ -56,16 +57,17 @@ public class HipRoof extends Roof {
 			recalculateEditPoints = false;
 			points.get(0).set(toRelative(center));
 			if (editPointIndex == -1) {
-				Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(0, -50, 0, null));
+				final Vector3 dir = getContainerRelative().getAbsPoint(1).subtractLocal(getContainerRelative().getAbsPoint(0)).normalizeLocal();
+				Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(dir.multiply(-50, null), null));
 				if (point1 == null)
 					point1 = center.clone();
-				point1.addLocal(0, 2, 0);
+				point1.addLocal(dir.multiply(2, null));
 				points.get(1).set(toRelative(point1));
 
-				Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(0, 50, 0, null));
+				Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(dir.multiply(50, null), null));
 				if (point2 == null)
 					point2 = center.clone();
-				point2.addLocal(0, -2, 0);
+				point2.addLocal(dir.multiply(-2, null));
 				points.get(2).set(toRelative(point2));
 			}
 			computeHeight(wallUpperPoints);
