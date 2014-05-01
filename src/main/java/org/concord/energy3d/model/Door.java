@@ -46,7 +46,7 @@ public class Door extends HousePart {
 				final Vector3 wallFirstPoint = container.getAbsPoint(0);
 				final Vector3 wallx = container.getAbsPoint(2).subtract(wallFirstPoint, null);
 				p = Util.closestPoint(wallFirstPoint, wallx, x, y);
-				snapToGrid(p, getAbsPoint(editPointIndex == -1 ? points.size() - 2 : editPointIndex), getGridSize());
+				snapToGrid(p, getAbsPoint(editPointIndex == -1 ? points.size() - 2 : editPointIndex), getGridSize(), false);
 
 				final int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				points.set(index, toRelative(p));

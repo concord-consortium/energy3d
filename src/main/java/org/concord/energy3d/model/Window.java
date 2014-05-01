@@ -70,7 +70,7 @@ public class Window extends HousePart {
 		Vector3 p = points.get(index);
 		if (pick != null) {
 			p = pick.getPoint();
-			snapToGrid(p, getAbsPoint(index), getGridSize());
+			snapToGrid(p, getAbsPoint(index), getGridSize(), false);
 			p = toRelative(p);
 			toAbsolute(p);
 			p = enforceContraints(p);
