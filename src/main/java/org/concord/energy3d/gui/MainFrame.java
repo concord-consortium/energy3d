@@ -1074,7 +1074,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getOrientationalEnergyAnalysisMenuItem() {
 		if (orientationalEnergyAnalysisMenuItem == null) {
-			orientationalEnergyAnalysisMenuItem = new JMenuItem("Run Orientational Energy Analysis...");
+			orientationalEnergyAnalysisMenuItem = new JMenuItem("Run Orientation Analysis...");
 			orientationalEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
 			orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
@@ -1372,16 +1372,19 @@ public class MainFrame extends JFrame {
 
 	private JCheckBoxMenuItem getTopViewCheckBoxMenuItem() {
 		if (topViewCheckBoxMenuItem == null) {
-			topViewCheckBoxMenuItem = new JCheckBoxMenuItem("Top View");
+			topViewCheckBoxMenuItem = new JCheckBoxMenuItem("2D Top View");
+			topViewCheckBoxMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
 			topViewCheckBoxMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final boolean isTopView = topViewCheckBoxMenuItem.isSelected();
-					if (isTopView)
+					if (isTopView) {
 						Scene.saveCameraLocation();
-					SceneManager.getInstance().resetCamera(isTopView ? ViewMode.TOP_VIEW : ViewMode.NORMAL);
-					if (!isTopView)
+						SceneManager.getInstance().resetCamera(ViewMode.TOP_VIEW);
+					} else {
 						Scene.loadCameraLocation();
+						SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+					}
 					SceneManager.getInstance().refresh();
 				}
 			});

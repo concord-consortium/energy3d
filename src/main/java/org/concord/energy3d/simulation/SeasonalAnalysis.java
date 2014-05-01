@@ -139,16 +139,37 @@ public abstract class SeasonalAnalysis extends Analysis {
 				showTypeMenu.removeAll();
 				final Set<String> dataNames = graph.getDataNames();
 				if (!dataNames.isEmpty()) {
+					JMenuItem mi = new JMenuItem("Show All");
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							for (String name : dataNames)
+								graph.hideData(name, false);
+							graph.repaint();
+						}
+					});
+					showTypeMenu.add(mi);
+					mi = new JMenuItem("Hide All");
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							for (String name : dataNames)
+								graph.hideData(name, true);
+							graph.repaint();
+						}
+					});
+					showTypeMenu.add(mi);
+					showTypeMenu.addSeparator();
 					for (final String name : dataNames) {
-						final JCheckBoxMenuItem mi = new JCheckBoxMenuItem(name, !graph.isDataHidden(name));
-						mi.addItemListener(new ItemListener() {
+						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(name, !graph.isDataHidden(name));
+						cbmi.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(final ItemEvent e) {
-								graph.hideData(name, !mi.isSelected());
+								graph.hideData(name, !cbmi.isSelected());
 								graph.repaint();
 							}
 						});
-						showTypeMenu.add(mi);
+						showTypeMenu.add(cbmi);
 					}
 				}
 			}
