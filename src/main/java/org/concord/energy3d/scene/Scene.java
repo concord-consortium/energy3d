@@ -22,6 +22,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
@@ -782,6 +783,15 @@ public class Scene implements Serializable {
 
 	public long nextID() {
 		return ++idCounter;
+	}
+
+	public boolean hasSensor() {
+		synchronized (instance.parts) {
+			for (final HousePart housePart : instance.parts)
+				if (housePart instanceof Sensor)
+					return true;
+		}
+		return false;
 	}
 
 	/** @return the solar panel efficiency (not in percentage) */
