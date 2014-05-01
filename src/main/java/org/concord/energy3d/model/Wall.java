@@ -330,7 +330,7 @@ public class Wall extends HousePart {
 			final Vector3 p0 = selectedHousePart.getAbsPoint(0);
 			final Vector3 p2 = selectedHousePart.getAbsPoint(2);
 			for (final HousePart part : selectedHousePart.getContainer().getChildren())
-				if (part != selectedHousePart && part.isDrawCompleted()) {
+				if (part != selectedHousePart && part instanceof Wall && part.isDrawCompleted()) {
 					final Vector3 q0 = part.getAbsPoint(0);
 					final Vector3 q2 = part.getAbsPoint(2);
 					if ((p0.equals(q0) && p2.equals(q2)) || (p2.equals(q0) && p0.equals(q2)))

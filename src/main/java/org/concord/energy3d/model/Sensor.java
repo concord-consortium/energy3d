@@ -37,7 +37,7 @@ public class Sensor extends HousePart {
 	public Sensor() {
 		super(1, 1, 0.0);
 	}
-	
+
 	@Override
 	protected void init() {
 		super.init();
@@ -68,14 +68,10 @@ public class Sensor extends HousePart {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
-		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class});
-		// final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class, Foundation.class });
+		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class, Foundation.class });
 		if (picked != null) {
 			final Vector3 p = picked.getPoint();
-			if (container instanceof Wall)
-				snapToGrid(p, getAbsPoint(0), getGridSize());
-			else
-				getTopContainer().snapToGrid(p, getAbsPoint(0), getGridSize());
+			snapToGrid(p, getAbsPoint(0), getGridSize(), false);
 			points.get(0).set(toRelative(p));
 		}
 		if (container != null) {
