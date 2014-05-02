@@ -317,22 +317,23 @@ public class Window extends HousePart {
 		return container.getFaceDirection();
 	}
 
-	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
-		System.out.println(d);
-		final List<Vector3> orgPoints = new ArrayList<Vector3>(houseMovePoints.size());
-		for (int i = 0; i < points.size(); i++)
-			orgPoints.add(points.get(i));
-
-		final Vector3 d_rel = toRelative(getAbsPoint(0).subtract(d, null)).subtractLocal(points.get(0)).negateLocal();
+	public void move(final Vector3 d, final ArrayList<Vector3> houseMoveStartPoints) {
+		final List<Vector3> newPoints = new ArrayList<Vector3>(houseMoveStartPoints.size());
+		final ReadOnlyVector3 d_rel = toRelative(getAbsPoint(0).subtract(d, null)).subtractLocal(points.get(0)).negateLocal();
+		boolean isOutsideWall = false;
 		for (int i = 0; i < points.size(); i++) {
-			final Vector3 newP = houseMovePoints.get(i).add(d_rel, null);
-			points.set(i, newP);
-			if (i == points.size() - 1 && false) {
-				for (int j = 0; j < points.size(); j++)
-					points.set(j, orgPoints.get(j));
-				return;
+			final Vector3 newP = houseMoveStartPoints.get(i).add(d_rel, null);
+			if (newP.getX() <= 0 || newP.getX() >= 1.0 || newP.getZ() <= 0 || newP.getZ() >= 1.0) {
+				isOutsideWall = true;
+				break;
 			}
+			newPoints.add(newP);
 		}
+
+		if (!isOutsideWall)
+			for (int i = 0; i < points.size(); i++)
+				points.get(i).set(newPoints.get(i));
+
 		Scene.getInstance().redrawAll();
 	}
 }
