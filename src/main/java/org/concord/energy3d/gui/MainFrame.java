@@ -1033,6 +1033,10 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
+					if (SceneManager.getInstance().getSelectedPart().getChildren().isEmpty()) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
 					new EnergySeasonalAnalysis().show("Seasonal Energy");
 				}
 			});
@@ -1047,7 +1051,10 @@ public class MainFrame extends JFrame {
 			sensorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					new SeasonalSensorData().show("Sensor Data");
+					if (Scene.getInstance().hasSensor())
+						new SeasonalSensorData().show("Sensor Data");
+					else
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no sensor.", "No sensor", JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 		}
@@ -1099,6 +1106,10 @@ public class MainFrame extends JFrame {
 						}
 					} else if (selectedPart instanceof Tree) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					if (SceneManager.getInstance().getSelectedPart().getChildren().isEmpty()) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
 					new EnergyAngularAnalysis().show("Orientation");
