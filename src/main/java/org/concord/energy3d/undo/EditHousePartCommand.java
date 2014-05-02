@@ -19,7 +19,7 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	private final double orgHeight;
 	private ArrayList<Vector3> newPoints;
 	private double newHeight;
-
+	protected final int editPoint;
 
 	public EditHousePartCommand(final HousePart housePart) {
 		this.housePart = housePart;
@@ -27,6 +27,7 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 		orgPoints = new ArrayList<Vector3>(housePart.getPoints().size());
 		for (final Vector3 p : housePart.getPoints())
 			orgPoints.add(p.clone());
+		this.editPoint = housePart.getEditPoint();
 	}
 
 	// for action logging
