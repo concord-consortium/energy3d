@@ -318,21 +318,20 @@ public class Window extends HousePart {
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMoveStartPoints) {
-		final List<Vector3> newPoints = new ArrayList<Vector3>(houseMoveStartPoints.size());
+		final List<Vector3> orgPoints = new ArrayList<Vector3>(points.size());
+		for (int i = 0; i < points.size(); i++)
+			orgPoints.add(points.get(i));
+
+		final Wall wall = (Wall) container;
 		final ReadOnlyVector3 d_rel = toRelative(getAbsPoint(0).subtract(d, null)).subtractLocal(points.get(0)).negateLocal();
-		boolean isOutsideWall = false;
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 newP = houseMoveStartPoints.get(i).add(d_rel, null);
-			if (newP.getX() <= 0 || newP.getX() >= 1.0 || newP.getZ() <= 0 || newP.getZ() >= 1.0) {
-				isOutsideWall = true;
-				break;
-			}
-			newPoints.add(newP);
+			points.set(i, newP);
 		}
 
-		if (!isOutsideWall)
+		if (!wall.fits(this))
 			for (int i = 0; i < points.size(); i++)
-				points.get(i).set(newPoints.get(i));
+				points.set(i, orgPoints.get(i));
 
 		Scene.getInstance().redrawAll();
 	}
