@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -148,7 +149,7 @@ public class PostProcessor {
 								final Building b = getBuilding(buildings, bid);
 								if (b != null) {
 									if (x instanceof Window)
-										b.windowCount++;
+										b.setWindowCount(b.getWindowCount() + 1);
 									else if (x instanceof Wall)
 										b.addWall((Wall) x);
 								}
@@ -224,7 +225,7 @@ public class PostProcessor {
 
 	private static Building getBuilding(final ArrayList<Building> buildings, final int id) {
 		for (final Building x : buildings) {
-			if (x.id == id)
+			if (x.getID() == id)
 				return x;
 		}
 		return null;

@@ -1,11 +1,16 @@
 package org.concord.energy3d.simulation;
 
 import java.awt.Point;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.model.Building;
+import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
@@ -52,6 +57,16 @@ public abstract class Analysis {
 		SceneManager.getInstance().setSolarColorMapWithoutUpdate(true);
 		graph.clearData();
 		SceneManager.getInstance().getSolarLand().setVisible(true);
+	}
+
+	public static boolean isBuildingClosed(Foundation foundation) {
+		Building b = new Building((int) foundation.getId());
+		ArrayList<HousePart> children = foundation.getChildren();
+		for (HousePart x : children) {
+			if (x instanceof Wall)
+				b.addWall((Wall) x);
+		}
+		return b.isComplete();
 	}
 
 }

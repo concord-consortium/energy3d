@@ -21,6 +21,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.MyPlainDocument;
+import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
@@ -134,7 +135,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (!buildings.isEmpty()) {
 			result = "[";
 			for (Building b : buildings)
-				result += "{\"#" + b.id + "\": " + b.getSolarEnergy() + "}, ";
+				result += "{\"#" + b.getID() + "\": " + b.getSolarEnergy() + "}, ";
 			result = result.trim().substring(0, result.length() - 2);
 			result += "]";
 		}

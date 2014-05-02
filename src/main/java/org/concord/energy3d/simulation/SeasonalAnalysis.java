@@ -39,7 +39,9 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 
@@ -79,11 +81,24 @@ public abstract class SeasonalAnalysis extends Analysis {
 
 	public void show(String title) {
 
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		if (selectedPart != null) {
 			s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-			s = s.replaceAll("Foundation", "Building");
+			if (selectedPart instanceof Foundation) {
+				s = s.replaceAll("Foundation", "Building");
+				if (selectedPart.getChildren().isEmpty()) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+					return;
+				}
+				if (!isBuildingClosed((Foundation) selectedPart)) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "The selected building has not been completed.", "Incomplete Building", JOptionPane.INFORMATION_MESSAGE);
+					return;
+				}
+			} else if (selectedPart instanceof Tree) {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -290,5 +305,4 @@ public abstract class SeasonalAnalysis extends Analysis {
 		dialog.setVisible(true);
 
 	}
-
 }

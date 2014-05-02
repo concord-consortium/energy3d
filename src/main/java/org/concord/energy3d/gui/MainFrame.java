@@ -1025,17 +1025,11 @@ public class MainFrame extends JFrame {
 						}
 						if (count == 1) {
 							SceneManager.getInstance().setSelectedPart(hp);
+							selectedPart = hp;
 						} else {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 							return;
 						}
-					} else if (selectedPart instanceof Tree) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					if (SceneManager.getInstance().getSelectedPart().getChildren().isEmpty()) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
-						return;
 					}
 					new EnergySeasonalAnalysis().show("Seasonal Energy");
 				}
@@ -1104,13 +1098,6 @@ public class MainFrame extends JFrame {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 							return;
 						}
-					} else if (selectedPart instanceof Tree) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					if (SceneManager.getInstance().getSelectedPart().getChildren().isEmpty()) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
-						return;
 					}
 					new EnergyAngularAnalysis().show("Orientation");
 				}

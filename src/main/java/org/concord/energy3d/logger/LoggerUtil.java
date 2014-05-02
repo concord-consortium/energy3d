@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
@@ -59,24 +60,8 @@ class LoggerUtil {
 	static Object getBuildingId(final HousePart p) {
 		if (p == null)
 			return null;
-		final HousePart x = getTopContainer(p);
-		if (x == null)
-			return null;
-		return x.getId();
-	}
-
-	static HousePart getTopContainer(final HousePart p) {
-		if (p == null)
-			return null;
-		HousePart c = p.getContainer();
-		if (c == null)
-			return p;
-		HousePart x = null;
-		while (c != null) {
-			x = c;
-			c = c.getContainer();
-		}
-		return x;
+		final HousePart x = p.getTopContainer();
+		return x == null ? null : x.getId();
 	}
 
 	static Object getInfo(final HousePart p) {
