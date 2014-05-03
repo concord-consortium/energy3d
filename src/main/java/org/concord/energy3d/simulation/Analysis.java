@@ -59,14 +59,14 @@ public abstract class Analysis {
 		SceneManager.getInstance().getSolarLand().setVisible(true);
 	}
 
-	public static boolean isBuildingClosed(Foundation foundation) {
+	public static boolean isBuildingComplete(Foundation foundation) {
 		Building b = new Building((int) foundation.getId());
 		ArrayList<HousePart> children = foundation.getChildren();
 		for (HousePart x : children) {
 			if (x instanceof Wall)
 				b.addWall((Wall) x);
 		}
-		return b.isComplete();
+		return b.isWallComplete();
 	}
 
 }

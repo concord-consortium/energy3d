@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -33,36 +34,37 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel contentPanel = new JPanel(new GridLayout(3, 3, 8, 8));
-		contentPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		final JPanel panel = new JPanel(new GridLayout(4, 3, 8, 8));
+		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+		getContentPane().add(panel, BorderLayout.CENTER);
 
 		// set the budget limit
-		contentPanel.add(new JLabel("Budget: "));
-
+		panel.add(new JLabel("Budget: "));
 		final JTextField budgetTextField = new JTextField(FORMAT1.format(Cost.getInstance().getBudget()));
-		contentPanel.add(budgetTextField);
+		panel.add(budgetTextField);
 		budgetTextField.setColumns(6);
-
-		contentPanel.add(new JLabel("Dollars"));
+		panel.add(new JLabel("Dollars"));
 
 		// set the grid size ("solar step")
-		contentPanel.add(new JLabel("Irradiation Grid Cell Size: "));
-
+		panel.add(new JLabel("Irradiation Grid Cell Size: "));
 		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(SolarIrradiation.getInstance().getSolarStep()));
-		contentPanel.add(cellSizeTextField);
+		panel.add(cellSizeTextField);
 		cellSizeTextField.setColumns(6);
-
-		contentPanel.add(new JLabel("Internal unit"));
+		panel.add(new JLabel("Internal unit"));
 
 		// set the time step
-		contentPanel.add(new JLabel("Time Step: "));
-
+		panel.add(new JLabel("Time Step: "));
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(SolarIrradiation.getInstance().getTimeStep()));
-		contentPanel.add(timeStepTextField);
+		panel.add(timeStepTextField);
 		timeStepTextField.setColumns(6);
+		panel.add(new JLabel("Minutes"));
 
-		contentPanel.add(new JLabel("Minutes"));
+		// choose air mass
+		panel.add(new JLabel("Air Mass: "));
+		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
+		airMassComboBox.setSelectedIndex(SolarIrradiation.getInstance().getAirMassSelection() + 1);
+		panel.add(airMassComboBox);
+		panel.add(new JLabel("Dimensionless"));
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -100,6 +102,7 @@ class SimulationSettingsDialog extends JDialog {
 				Cost.getInstance().setBudget(budget);
 				SolarIrradiation.getInstance().setSolarStep(cellSize);
 				SolarIrradiation.getInstance().setTimeStep(timeStep);
+				SolarIrradiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				SimulationSettingsDialog.this.dispose();

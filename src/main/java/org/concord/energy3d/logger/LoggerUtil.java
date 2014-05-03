@@ -88,7 +88,7 @@ class LoggerUtil {
 					if (x instanceof Wall)
 						b.addWall((Wall) x);
 				}
-				if (b.isComplete()) {
+				if (b.isWallComplete()) {
 					s += ", " + b.getGeometryJson();
 				}
 			}

@@ -91,7 +91,7 @@ public abstract class SeasonalAnalysis extends Analysis {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
-				if (!isBuildingClosed((Foundation) selectedPart)) {
+				if (!isBuildingComplete((Foundation) selectedPart)) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "The selected building has not been completed.", "Incomplete Building", JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}

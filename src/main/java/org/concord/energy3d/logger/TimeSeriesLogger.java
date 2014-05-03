@@ -126,7 +126,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 						if (x instanceof Wall)
 							b.addWall((Wall) x);
 					}
-					if (b.isComplete() && !buildings.contains(b)) {
+					if (b.isWallComplete() && !buildings.contains(b)) {
 						buildings.add(b);
 					}
 				}

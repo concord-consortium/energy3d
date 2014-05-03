@@ -51,6 +51,11 @@ import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarIrradiation {
+
+	public final static int AIR_MASS_NONE = -1;
+	public final static int AIR_MASS_KASTEN_YOUNG = 0;
+	public final static int AIR_MASS_SPHERE_MODEL = 1;
+
 	private static SolarIrradiation instance = new SolarIrradiation();
 	private final Map<Mesh, double[][]> onMesh = new HashMap<Mesh, double[][]>();
 	private final Map<Mesh, Boolean> textureCoordsAlreadyComputed = new HashMap<Mesh, Boolean>();
@@ -59,6 +64,7 @@ public class SolarIrradiation {
 	private int timeStep = 15;
 	private double solarStep = 2.0;
 	private long maxValue;
+	private int airMassSelection = AIR_MASS_KASTEN_YOUNG;
 
 	public static SolarIrradiation getInstance() {
 		return instance;
@@ -258,9 +264,18 @@ public class SolarIrradiation {
 	}
 
 	public double computeAirMass(final ReadOnlyVector3 directionTowardSun) {
-		final double zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
-		final double airMass = 1 / (Math.cos(zenithAngle) + 0.50572 * Math.pow(96.07995 - zenithAngle / Math.PI * 180.0, -1.6364));
-		return airMass;
+		switch (airMassSelection) {
+		case AIR_MASS_NONE:
+			return 1;
+		case AIR_MASS_SPHERE_MODEL:
+			double zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
+			double cos = Math.cos(zenithAngle);
+			double r = 708;
+			return Math.sqrt(r * r * cos * cos + 2 * r + 1) - r * cos;
+		default:
+			zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
+			return 1 / (Math.cos(zenithAngle) + 0.50572 * Math.pow(96.07995 - zenithAngle / Math.PI * 180.0, -1.6364));
+		}
 	}
 
 	private void updateTextureCoords(final Mesh drawMesh, final ReadOnlyVector3 origin, final ReadOnlyVector3 uDir, final ReadOnlyVector3 vDir, final int rows, final int cols) {
@@ -469,6 +484,14 @@ public class SolarIrradiation {
 
 	public int getTimeStep() {
 		return timeStep;
+	}
+
+	public void setAirMassSelection(int selection) {
+		airMassSelection = selection;
+	}
+
+	public int getAirMassSelection() {
+		return airMassSelection;
 	}
 
 }

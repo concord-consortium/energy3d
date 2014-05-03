@@ -139,7 +139,7 @@ public class Building {
 		return id;
 	}
 
-	public boolean isComplete() {
+	public boolean isWallComplete() {
 		exploreWallNeighbors();
 		return walls.size() == floorVertices.size() && !walls.isEmpty();
 	}
@@ -170,7 +170,7 @@ public class Building {
 
 	String toJson() {
 		String s = "\"ID\": " + id;
-		if (isComplete()) {
+		if (isWallComplete()) {
 			s += ", \"WallCount\": " + walls.size();
 			if (windowCount > 0)
 				s += ", \"WindowCount\": " + windowCount;
@@ -185,7 +185,7 @@ public class Building {
 	@Override
 	public String toString() {
 		String s = "(ID=" + id;
-		if (isComplete()) {
+		if (isWallComplete()) {
 			s += " #wall=" + walls.size();
 			if (windowCount > 0)
 				s += " #window=" + windowCount;
