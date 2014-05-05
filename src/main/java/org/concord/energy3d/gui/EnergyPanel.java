@@ -824,7 +824,7 @@ public class EnergyPanel extends JPanel {
 					do {
 						computeRequest = false;
 						Scene.getInstance().updateAllTextures();
-						clearAlreadyRendered();
+//						clearAlreadyRendered();
 
 						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
 						try {
