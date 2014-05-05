@@ -205,7 +205,7 @@ public class Foundation extends HousePart {
 			index = isFirstPointInserted() ? 3 : 0;
 		else
 			index = editPointIndex;
-		
+
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, (Spatial) null);
 		final Vector3 p;
 		if (pick != null && index < 4) {
@@ -213,7 +213,7 @@ public class Foundation extends HousePart {
 			snapToGrid(p, getAbsPoint(index), getGridSize());
 		} else
 			p = points.get(index).clone();
-		
+
 		if (!isFirstPointInserted()) {
 			points.get(index).set(p);
 			points.get(1).set(p.add(0, 0.1, 0, null));
@@ -249,7 +249,7 @@ public class Foundation extends HousePart {
 						points.get(0).set(Util.projectPointOnLine(p, points.get(1), points.get(0), false));
 						points.get(3).set(Util.projectPointOnLine(p, points.get(1), points.get(3), false));
 					}
-				}				
+				}
 				// p = ensureDistanceFromOtherFoundations(p, index);
 				// if (resizeHouseMode)
 				// p = ensureNotTooSmall(p, index);
@@ -687,7 +687,7 @@ public class Foundation extends HousePart {
 	}
 
 	private double scanChildrenHeight(final HousePart part) {
-		double maxHeight = 0;
+		double maxHeight = height;
 		if (part instanceof Wall || part instanceof Roof) {
 			for (int i = 0; i < part.points.size(); i++) {
 				final ReadOnlyVector3 p = part.getAbsPoint(i);
