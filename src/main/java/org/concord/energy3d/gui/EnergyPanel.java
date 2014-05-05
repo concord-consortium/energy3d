@@ -823,7 +823,7 @@ public class EnergyPanel extends JPanel {
 				public void run() {
 					do {
 						computeRequest = false;
-						Scene.getInstance().updateAllTextures();
+//						Scene.getInstance().updateAllTextures();
 //						clearAlreadyRendered();
 
 						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
@@ -832,10 +832,8 @@ public class EnergyPanel extends JPanel {
 								alreadyRenderedHeatmap = true;
 								computeNow();
 							} else {
-								if (SceneManager.getInstance().isSolarColorMap()) {
+								if (SceneManager.getInstance().isSolarColorMap())
 									MainPanel.getInstance().getSolarButton().setSelected(false);
-									Scene.getInstance().redrawAll();
-								}
 
 								int numberOfHouses = 0;
 								synchronized (Scene.getInstance().getParts()) { // XIE: This needs to be synchronized to avoid concurrent modification exceptions
@@ -849,6 +847,7 @@ public class EnergyPanel extends JPanel {
 										if (part instanceof Foundation)
 											((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
 								}
+								Scene.getInstance().redrawAll();
 							}
 							SceneManager.getInstance().getSolarLand().setVisible(SceneManager.getInstance().isSolarColorMap());
 						} catch (final Throwable e) {
