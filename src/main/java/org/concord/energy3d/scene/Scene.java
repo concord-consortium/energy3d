@@ -591,6 +591,13 @@ public class Scene implements Serializable {
 		redrawAll = false;
 	}
 
+	public void updateAllTextures() {
+		System.out.println("updateAllTextures()");
+		for (final HousePart part : parts)
+			part.updateTextureAndColor();
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setUnit(final Unit unit) {
 		Scene.unit = unit;
 		redrawAll = true;

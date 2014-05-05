@@ -1439,21 +1439,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setSolarColorMapWithoutUpdate(final boolean solarColorMap) {
 		this.solarColorMap = solarColorMap;
-		solarLand.setVisible(solarColorMap);
+//		solarLand.setVisible(solarColorMap);
 	}
 
 	public void setSolarColorMap(final boolean solarColorMap) {
 		setSolarColorMapWithoutUpdate(solarColorMap);
-		getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				Scene.getInstance().redrawAllNow();
-				if (solarColorMap)
-					EnergyPanel.getInstance().clearAlreadyRendered();
+//		getTaskManager().update(new Callable<Object>() {
+//			@Override
+//			public Object call() throws Exception {
+//				Scene.getInstance().redrawAllNow();
+//				if (solarColorMap)
+//					EnergyPanel.getInstance().clearAlreadyRendered();
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				return null;
-			}
-		});
+//				return null;
+//			}
+//		});
 	}
 
 	public void showAxes(final boolean b) {
@@ -1501,7 +1501,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
-	public void rotateBuilding(double angle, boolean keepRecord) {
+	public void rotateBuilding(final double angle, final boolean keepRecord) {
 		if (selectedHousePart != null) {
 			if (selectedHousePart instanceof Foundation)
 				((Foundation) selectedHousePart).rotate(angle);

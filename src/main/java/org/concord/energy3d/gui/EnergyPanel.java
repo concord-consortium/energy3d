@@ -447,7 +447,7 @@ public class EnergyPanel extends JPanel {
 		solarConversionPercentagePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Solar Conversion (%)", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(solarConversionPercentagePanel);
 
-		JLabel labelSHGC = new JLabel("Window (SHGC): ");
+		final JLabel labelSHGC = new JLabel("Window (SHGC): ");
 		labelSHGC.setToolTipText("<html><b>SHGC - Solar heat gain coefficient</b><br>measures the fraction of solar energy transmitted through a window.</html>");
 		solarConversionPercentagePanel.add(labelSHGC);
 
@@ -477,7 +477,7 @@ public class EnergyPanel extends JPanel {
 		});
 		solarConversionPercentagePanel.add(windowSHGCComboBox);
 
-		JLabel labelPV = new JLabel("Solar Panel: ");
+		final JLabel labelPV = new JLabel("Solar Panel: ");
 		labelPV.setToolTipText("<html><b>Solar photovoltaic efficiency</b><br>measures the fraction of solar energy converted into electricity by a solar panel.</html>");
 		solarConversionPercentagePanel.add(labelPV);
 
@@ -633,7 +633,8 @@ public class EnergyPanel extends JPanel {
 		costBar.setPreferredSize(new Dimension(200, 16));
 		costBar.setMaximum(Cost.getInstance().getBudget());
 		costBar.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() > 1)
 					Cost.getInstance().showGraph();
 			}
@@ -822,6 +823,9 @@ public class EnergyPanel extends JPanel {
 				public void run() {
 					do {
 						computeRequest = false;
+						Scene.getInstance().updateAllTextures();
+						clearAlreadyRendered();
+
 						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
 						try {
 							if (EnergyPanel.this.updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn))) {
@@ -844,6 +848,8 @@ public class EnergyPanel extends JPanel {
 											((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
 								}
 							}
+							SceneManager.getInstance().getSolarLand().setVisible(SceneManager.getInstance().isSolarColorMap());
+							SceneManager.getInstance().refresh();
 						} catch (final Throwable e) {
 							e.printStackTrace();
 							Util.reportError(e);
@@ -999,8 +1005,8 @@ public class EnergyPanel extends JPanel {
 			partProperty3TextField.setText("");
 		else {
 			if (selectedPart instanceof Sensor) {
-				String light = twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.computeArea());
-				String heatFlux = twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.computeArea());
+				final String light = twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.computeArea());
+				final String heatFlux = twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.computeArea());
 				partProperty4TextField.setText(light + ", " + heatFlux);
 				partProperty4TextField.setToolTipText("Light sensor: " + light + ", heat flux sensor: " + heatFlux);
 			} else
@@ -1012,7 +1018,7 @@ public class EnergyPanel extends JPanel {
 				partProperty1TextField.setText(twoDecimals.format(SolarPanel.WIDTH));
 				partProperty2TextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
 			} else if (selectedPart instanceof Sensor) {
-				ReadOnlyVector3 v = ((Sensor) selectedPart).getAbsPoint(0);
+				final ReadOnlyVector3 v = ((Sensor) selectedPart).getAbsPoint(0);
 				partProperty1TextField.setText(twoDecimals.format(v.getX() * Scene.getInstance().getAnnotationScale()));
 				partProperty2TextField.setText(twoDecimals.format(v.getY() * Scene.getInstance().getAnnotationScale()));
 				partProperty3TextField.setText(twoDecimals.format(v.getZ() * Scene.getInstance().getAnnotationScale()));
@@ -1031,7 +1037,7 @@ public class EnergyPanel extends JPanel {
 		else if (selectedPart instanceof Foundation)
 			selectedBuilding = (Foundation) selectedPart;
 		else
-			selectedBuilding = (Foundation) selectedPart.getTopContainer();
+			selectedBuilding = selectedPart.getTopContainer();
 
 		if (selectedBuilding != null) {
 			if (iradiationEnabled) {
@@ -1082,7 +1088,7 @@ public class EnergyPanel extends JPanel {
 		else if (selectedPart instanceof Foundation)
 			selectedBuilding = (Foundation) selectedPart;
 		else
-			selectedBuilding = (Foundation) selectedPart.getTopContainer();
+			selectedBuilding = selectedPart.getTopContainer();
 		int n = 0;
 		if (selectedBuilding != null)
 			n = Cost.getInstance().getBuildingCost(selectedBuilding);
@@ -1132,7 +1138,7 @@ public class EnergyPanel extends JPanel {
 		return windowSHGCComboBox;
 	}
 
-	public void setBudget(int budget) {
+	public void setBudget(final int budget) {
 		costPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Construction Cost (Maximum: $" + budget + ")", TitledBorder.LEADING, TitledBorder.TOP));
 		costBar.setMaximum(budget);
 		costBar.repaint();
