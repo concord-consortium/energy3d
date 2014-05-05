@@ -857,7 +857,7 @@ public abstract class HousePart implements Serializable {
 		if (heatLoss == null)
 			return 0;
 		double sum = 0;
-		for (double x : heatLoss)
+		for (final double x : heatLoss)
 			sum += x;
 		return sum;
 	}
@@ -880,6 +880,10 @@ public abstract class HousePart implements Serializable {
 
 	public Spatial getIrradiationCollisionSpatial() {
 		return getIrradiationMesh();
+	}
+
+	public Spatial getEditPointsRoot() {
+		return pointsRoot;
 	}
 
 }

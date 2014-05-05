@@ -52,8 +52,13 @@ public class SelectUtil {
 						for (final Class<?> typeOfHousePart : typesOfHousePart)
 							if (typeOfHousePart == null)
 								PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
-							else if (typeOfHousePart.isInstance(housePart))
-								PickingUtil.findPick(housePart.getRoot(), pickRay, pickResults, false);
+							else if (typeOfHousePart.isInstance(housePart)) {
+								if (housePart instanceof Wall) {
+									PickingUtil.findPick(((Wall) housePart).getInvisibleMesh(), pickRay, pickResults, false);
+									PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
+								} else
+									PickingUtil.findPick(housePart.getRoot(), pickRay, pickResults, false);
+							}
 			}
 
 		return getPickResult(pickRay);
