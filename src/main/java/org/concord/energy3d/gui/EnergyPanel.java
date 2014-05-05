@@ -832,8 +832,10 @@ public class EnergyPanel extends JPanel {
 								alreadyRenderedHeatmap = true;
 								computeNow();
 							} else {
-								if (SceneManager.getInstance().isSolarColorMap())
+								if (SceneManager.getInstance().isSolarColorMap()) {
 									MainPanel.getInstance().getSolarButton().setSelected(false);
+									Scene.getInstance().redrawAll();
+								}
 
 								int numberOfHouses = 0;
 								synchronized (Scene.getInstance().getParts()) { // XIE: This needs to be synchronized to avoid concurrent modification exceptions
@@ -849,7 +851,6 @@ public class EnergyPanel extends JPanel {
 								}
 							}
 							SceneManager.getInstance().getSolarLand().setVisible(SceneManager.getInstance().isSolarColorMap());
-							SceneManager.getInstance().refresh();
 						} catch (final Throwable e) {
 							e.printStackTrace();
 							Util.reportError(e);
