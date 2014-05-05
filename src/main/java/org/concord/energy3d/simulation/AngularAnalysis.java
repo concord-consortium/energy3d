@@ -79,8 +79,8 @@ public abstract class AngularAnalysis extends Analysis {
 				return;
 			}
 			if (!isBuildingComplete((Foundation) selectedPart)) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "The selected building has not been completed.", "Incomplete Building", JOptionPane.INFORMATION_MESSAGE);
-				return;
+				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "The selected building has not been completed.\nAre you sure to continue?", "Incomplete Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+					return;
 			}
 		} else if (selectedPart instanceof Tree) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
