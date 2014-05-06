@@ -17,11 +17,11 @@ import org.concord.energy3d.scene.Scene;
  * 
  */
 
-public class SeasonalSensorData extends SeasonalAnalysis {
+public class AnnualSensorData extends AnnualAnalysis {
 
-	public SeasonalSensorData() {
+	public AnnualSensorData() {
 		super();
-		graph = new PartEnergySeasonalGraph();
+		graph = new PartEnergyAnnualGraph();
 		graph.type = Graph.SENSOR;
 		graph.setPreferredSize(new Dimension(600, 400));
 		graph.setBackground(Color.white);

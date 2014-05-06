@@ -49,7 +49,7 @@ import org.concord.energy3d.shapes.Heliodon;
  * @author Charles Xie
  * 
  */
-public abstract class SeasonalAnalysis extends Analysis {
+public abstract class AnnualAnalysis extends Analysis {
 
 	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
@@ -204,12 +204,12 @@ public abstract class SeasonalAnalysis extends Analysis {
 			@Override
 			public void menuSelected(MenuEvent e) {
 				showRunsMenu.removeAll();
-				if (!SeasonalGraph.records.isEmpty()) {
+				if (!AnnualGraph.records.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							for (Results r : SeasonalGraph.records)
+							for (Results r : AnnualGraph.records)
 								graph.hideRun(r.getID(), false);
 							graph.repaint();
 						}
@@ -219,14 +219,14 @@ public abstract class SeasonalAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							for (Results r : SeasonalGraph.records)
+							for (Results r : AnnualGraph.records)
 								graph.hideRun(r.getID(), true);
 							graph.repaint();
 						}
 					});
 					showRunsMenu.add(mi);
 					showRunsMenu.addSeparator();
-					for (final Results r : SeasonalGraph.records) {
+					for (final Results r : AnnualGraph.records) {
 						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(Integer.toString(r.getID()), !graph.isRunHidden(r.getID()));
 						cbmi.addItemListener(new ItemListener() {
 							@Override

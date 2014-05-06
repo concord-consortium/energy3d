@@ -35,6 +35,12 @@ public class Building {
 		return id;
 	}
 
+	public HousePart getRoof() {
+		if (walls.isEmpty())
+			return null;
+		return walls.get(0).getRoof();
+	}
+
 	public void setWindowCount(int n) {
 		windowCount = n;
 	}

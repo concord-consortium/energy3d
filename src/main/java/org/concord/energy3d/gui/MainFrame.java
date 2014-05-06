@@ -60,8 +60,8 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
-import org.concord.energy3d.simulation.EnergySeasonalAnalysis;
-import org.concord.energy3d.simulation.SeasonalSensorData;
+import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
+import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Printout;
@@ -100,7 +100,7 @@ public class MainFrame extends JFrame {
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JMenuItem rescaleMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
-	private JMenuItem seasonalEnergyAnalysisMenuItem;
+	private JMenuItem annualEnergyAnalysisMenuItem;
 	private JMenuItem sensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem constructionCostAnalysisMenuItem;
@@ -832,7 +832,7 @@ public class MainFrame extends JFrame {
 			});
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
 			analysisMenu.addSeparator();
-			analysisMenu.add(getSeasonalEnergyAnalysisMenuItem());
+			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
 			analysisMenu.add(getDailyAnalysisMenuItem());
 			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			analysisMenu.addSeparator();
@@ -1004,11 +1004,11 @@ public class MainFrame extends JFrame {
 		return simulationSettingsMenuItem;
 	}
 
-	private JMenuItem getSeasonalEnergyAnalysisMenuItem() {
-		if (seasonalEnergyAnalysisMenuItem == null) {
-			seasonalEnergyAnalysisMenuItem = new JMenuItem("Run Seasonal Energy Analysis...");
-			seasonalEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F4"));
-			seasonalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getAnnualEnergyAnalysisMenuItem() {
+		if (annualEnergyAnalysisMenuItem == null) {
+			annualEnergyAnalysisMenuItem = new JMenuItem("Run Annual Energy Analysis...");
+			annualEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F4"));
+			annualEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -1031,11 +1031,11 @@ public class MainFrame extends JFrame {
 							return;
 						}
 					}
-					new EnergySeasonalAnalysis().show("Seasonal Energy");
+					new EnergyAnnualAnalysis().show("Annual Energy");
 				}
 			});
 		}
-		return seasonalEnergyAnalysisMenuItem;
+		return annualEnergyAnalysisMenuItem;
 	}
 
 	private JMenuItem getSensorMenuItem() {
@@ -1046,7 +1046,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (Scene.getInstance().hasSensor())
-						new SeasonalSensorData().show("Sensor Data");
+						new AnnualSensorData().show("Sensor Data");
 					else
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no sensor.", "No sensor", JOptionPane.INFORMATION_MESSAGE);
 				}
