@@ -1295,7 +1295,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 						if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
 							selectedHousePart.setEditPointsVisible(true);
-							if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE) {
+							if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedHousePart instanceof Window) {
 								selectedHousePart.setGridsVisible(true);
 								if (selectedHousePart instanceof Foundation)
 									editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart, !pick.isEditPoint());
@@ -1328,7 +1328,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (selectedHousePart != null)
 					selectedHousePart.setGridsVisible(false);
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || (operation == Operation.RESIZE && houseMoveStartPoint != null))) {
+//					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || (operation == Operation.RESIZE && houseMoveStartPoint != null))) {
+					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || houseMoveStartPoint != null)) {
 						if (selectedHousePart.isDrawable())
 							selectedHousePart.complete();
 						else {
