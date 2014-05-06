@@ -66,7 +66,9 @@ public abstract class Analysis {
 			if (x instanceof Wall)
 				b.addWall((Wall) x);
 		}
-		return b.isWallComplete();
+		if (!b.isWallComplete())
+			return false;
+		return b.getRoof() != null;
 	}
 
 }

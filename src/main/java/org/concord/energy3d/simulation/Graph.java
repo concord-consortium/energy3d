@@ -77,7 +77,7 @@ abstract class Graph extends JPanel {
 			return DailyGraph.records;
 		if (this instanceof AngularGraph)
 			return AngularGraph.records;
-		return SeasonalGraph.records;
+		return AnnualGraph.records;
 	}
 
 	void keepResults() {
