@@ -1165,18 +1165,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			pick = selectHousePart == null ? null : selectHousePart.getUserData();
 			final HousePart housePart = pick == null ? null : pick.getHousePart();
 			if (pick != null) {
-				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && hoveredHousePart != housePart)
-					hoveredHousePart.setEditPointsVisible(false);
+//				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && hoveredHousePart != housePart)
+//					hoveredHousePart.setEditPointsVisible(false);
 				hoveredHousePart = housePart;
 				if (hoveredHousePart.isFrozen())
 					hoveredHousePart = null;
-				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && !PrintController.getInstance().isPrintPreview() && operation != Operation.RESIZE)
-					hoveredHousePart.setEditPointsVisible(true);
+//				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && !PrintController.getInstance().isPrintPreview() && operation != Operation.RESIZE)
+//					hoveredHousePart.setEditPointsVisible(true);
 				if (pick.getIndex() != -1)
 					lastSelectedEditPointMouseState = mouseState;
 			} else {
-				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart)
-					hoveredHousePart.setEditPointsVisible(false);
+//				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart)
+//					hoveredHousePart.setEditPointsVisible(false);
 				hoveredHousePart = null;
 			}
 		}
