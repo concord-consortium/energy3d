@@ -1270,8 +1270,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (selectedHousePart != null && selectedHousePart.isFrozen())
 							selectedHousePart = null;
 						System.out.print("Clicked on: " + pick);
-						if (pick != null && pick.isEditPoint())
+						if (pick != null && pick.isEditPoint()) {
 							cameraControl.setLeftMouseButtonEnabled(false);
+							EnergyPanel.getInstance().cancel();
+						}
 
 						if (operation == Operation.RESIZE && selectedHousePart != null) {
 							if (!(selectedHousePart instanceof Foundation)) {
@@ -1330,9 +1332,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 //					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || (operation == Operation.RESIZE && houseMoveStartPoint != null))) {
 					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || houseMoveStartPoint != null)) {
-						if (selectedHousePart.isDrawable())
+						if (selectedHousePart.isDrawable()) {
 							selectedHousePart.complete();
-						else {
+							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+						} else {
 							editHousePartCommand.undo();
 							selectedHousePart.setHighlight(false);
 							// selectedHousePart.reset();
@@ -1373,6 +1376,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						selectedHousePart = null;
 						if (operationStick)
 							operationFlag = true;
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 					if (!operationFlag) {
 						MainPanel.getInstance().deselect();

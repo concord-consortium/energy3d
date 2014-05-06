@@ -753,8 +753,8 @@ public class Scene implements Serializable {
 		this.edited = edited;
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();
-		if (edited && recomputeEnergy)
-			EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+//		if (edited && recomputeEnergy)
+//			EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 
 	public void updateEditShapes() {

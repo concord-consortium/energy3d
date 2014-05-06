@@ -219,7 +219,7 @@ public class SolarIrradiation {
 			final ReadOnlyVector3 pU = u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(origin);
 			final double w = (col == cols - 1) ? p2.distance(pU) : solarStep;
 			for (int row = 0; row < rows; row++) {
-				if (EnergyPanel.getInstance().isComputeRequest())
+				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
 				if (solar[row][col] == -1)
 					continue;
@@ -269,8 +269,8 @@ public class SolarIrradiation {
 			return 1;
 		case AIR_MASS_SPHERE_MODEL:
 			double zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
-			double cos = Math.cos(zenithAngle);
-			double r = 708;
+			final double cos = Math.cos(zenithAngle);
+			final double r = 708;
 			return Math.sqrt(r * r * cos * cos + 2 * r + 1) - r * cos;
 		default:
 			zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
@@ -308,7 +308,7 @@ public class SolarIrradiation {
 		for (int col = 0; col < cols; col++) {
 			p.setX((col - cols / 2) * step + step / 2.0);
 			for (int row = 0; row < rows; row++) {
-				if (EnergyPanel.getInstance().isComputeRequest())
+				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
 				p.setY((row - rows / 2) * step + step / 2.0);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
@@ -486,7 +486,7 @@ public class SolarIrradiation {
 		return timeStep;
 	}
 
-	public void setAirMassSelection(int selection) {
+	public void setAirMassSelection(final int selection) {
 		airMassSelection = selection;
 	}
 

@@ -73,6 +73,15 @@ public class EnergyPanel extends JPanel {
 	private final DecimalFormat twoDecimals = new DecimalFormat();
 	private final DecimalFormat noDecimals = new DecimalFormat();
 	private static boolean keepHeatmapOn = false;
+	private Thread thread;
+	private boolean computeRequest;
+	private boolean cancel;
+	private boolean disableActions = false;
+	private boolean alreadyRenderedHeatmap = false;
+	private UpdateRadiation updateRadiation;
+	private boolean computeEnabled = true;
+	private final List<PropertyChangeListener> propertyChangeListeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
+
 
 	public enum UpdateRadiation {
 		ALWAYS, ONLY_IF_SLECTED_IN_GUI
@@ -101,14 +110,6 @@ public class EnergyPanel extends JPanel {
 	private final JProgressBar progressBar;
 	private final ColorBar costBar;
 	private final JPanel costPanel;
-
-	private Thread thread;
-	private boolean computeRequest;
-	private boolean disableActions = false;
-	private boolean alreadyRenderedHeatmap = false;
-	private UpdateRadiation updateRadiation;
-	private boolean computeEnabled = true;
-	private final List<PropertyChangeListener> propertyChangeListeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
 	private JPanel partPanel;
 	private JPanel buildingPanel;
 	private JPanel geometryPanel;
@@ -823,33 +824,19 @@ public class EnergyPanel extends JPanel {
 				public void run() {
 					do {
 						computeRequest = false;
-//						Scene.getInstance().updateAllTextures();
-//						clearAlreadyRendered();
-
+						cancel = false;
 						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
 						try {
-							if (EnergyPanel.this.updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn))) {
+							final boolean doCompute = EnergyPanel.this.updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn));
+							if (doCompute) {
 								alreadyRenderedHeatmap = true;
 								computeNow();
-							} else {
-								if (SceneManager.getInstance().isSolarColorMap())
-									MainPanel.getInstance().getSolarButton().setSelected(false);
-
-								int numberOfHouses = 0;
-								synchronized (Scene.getInstance().getParts()) { // XIE: This needs to be synchronized to avoid concurrent modification exceptions
-									for (final HousePart part : Scene.getInstance().getParts()) {
-										if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
-											numberOfHouses++;
-										if (numberOfHouses >= 2)
-											break;
-									}
-									for (final HousePart part : Scene.getInstance().getParts())
-										if (part instanceof Foundation)
-											((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
-								}
-								Scene.getInstance().redrawAll();
-							}
-							SceneManager.getInstance().getSolarLand().setVisible(SceneManager.getInstance().isSolarColorMap());
+								if (cancel)
+									turnOffCompute();
+								else
+									SceneManager.getInstance().getSolarLand().setVisible(true);
+							} else
+								turnOffCompute();
 						} catch (final Throwable e) {
 							e.printStackTrace();
 							Util.reportError(e);
@@ -1106,8 +1093,12 @@ public class EnergyPanel extends JPanel {
 		disableActions = b;
 	}
 
-	public boolean isComputeRequest() {
-		return computeRequest;
+	public boolean isCancelled() {
+		return cancel || computeRequest;
+	}
+
+	public void cancel() {
+		cancel = true;
 	}
 
 	public JComboBox<String> getWallsComboBox() {
@@ -1142,6 +1133,26 @@ public class EnergyPanel extends JPanel {
 		costPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Construction Cost (Maximum: $" + budget + ")", TitledBorder.LEADING, TitledBorder.TOP));
 		costBar.setMaximum(budget);
 		costBar.repaint();
+	}
+
+	public void turnOffCompute() {
+		if (SceneManager.getInstance().isSolarColorMap())
+			MainPanel.getInstance().getSolarButton().setSelected(false);
+
+		int numberOfHouses = 0;
+		synchronized (Scene.getInstance().getParts()) { // XIE: This needs to be synchronized to avoid concurrent modification exceptions
+			for (final HousePart part : Scene.getInstance().getParts()) {
+				if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
+					numberOfHouses++;
+				if (numberOfHouses >= 2)
+					break;
+			}
+			for (final HousePart part : Scene.getInstance().getParts())
+				if (part instanceof Foundation)
+					((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
+		}
+		SceneManager.getInstance().getSolarLand().setVisible(false);
+		Scene.getInstance().redrawAll();
 	}
 
 }
