@@ -66,11 +66,11 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	}
 
 	public void saveNewPoints() {
-		if (newPoints == null) {
+//		if (newPoints == null) {
 			newHeight = housePart.getHeight();
 			newPoints = new ArrayList<Vector3>(housePart.getPoints().size());
 			for (final Vector3 p : housePart.getPoints())
 				newPoints.add(p.clone());
-		}
+//		}
 	}
 }

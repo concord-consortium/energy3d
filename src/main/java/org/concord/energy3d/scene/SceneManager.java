@@ -1144,6 +1144,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return;
 		final int x = mouseState.getX();
 		final int y = mouseState.getY();
+		
+		if (editHousePartCommand != null && editHousePartCommand.isReallyEdited())
+			EnergyPanel.getInstance().cancel();
 
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
@@ -1272,7 +1275,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						System.out.print("Clicked on: " + pick);
 						if (pick != null && pick.isEditPoint()) {
 							cameraControl.setLeftMouseButtonEnabled(false);
-							EnergyPanel.getInstance().cancel();
+//							EnergyPanel.getInstance().cancel();
 						}
 
 						if (operation == Operation.RESIZE && selectedHousePart != null) {
@@ -1334,7 +1337,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || houseMoveStartPoint != null)) {
 						if (selectedHousePart.isDrawable()) {
 							selectedHousePart.complete();
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							System.out.println(editHousePartCommand.isReallyEdited());
+							if (editHousePartCommand.isReallyEdited())
+								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						} else {
 							editHousePartCommand.undo();
 							selectedHousePart.setHighlight(false);
