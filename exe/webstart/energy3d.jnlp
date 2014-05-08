@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp codebase="http://energy.concord.org/energy3d-2/" href="energy3d.jnlp">
+<jnlp codebase="http://energy.concord.org/energy3d/" href="energy3d.jnlp">
 	<information>
 		<title>Energy3D</title>
 		<vendor>The Concord Consortium</vendor>
 		<homepage href="http://energy.concord.org/energy3d" />
 		<description>Energy3D</description>
 		<description kind="short">An educational CAD tool for designing houses and analyzing their cooling and heating energy flow.</description>
-		<icon href="resources/icon.gif" />
-		<icon kind="splash" href="resources/splash.png" /> 
+		<icon href="resources/icon.png" />
+		<icon kind="splash" href="resources/splash.png" />
+		<update check="background" /> 
 		<offline-allowed/>
 		<association extensions="ng3" mime-type="application/energy3d"/>
-	    <shortcut>
+		<shortcut>
 			<desktop/>
-	    </shortcut>
+		</shortcut>
 	</information>
 	<security>
 		<all-permissions/>
@@ -21,8 +22,10 @@
 		<j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+" />
 		<jar href="energy3d.jar" main="true" />
 		<jar href="resources/guava-13.0.1.jar" />
-		<jar href="resources/jdom2-2.0.4.jar" />		
-
+		<jar href="resources/jdom2-2.0.4.jar" />
+		<jar href="resources/poly2tri-core-0.1.1-SNAPSHOT.jar" />
+		<jar href="resources/poly2tri-ardor3d-0.1.1-SNAPSHOT.jar" />
+		<jar href="resources/slf4j-api-1.7.7.jar" />
 		<jar href="resources/jogl/jogl-all-2.0.2-rc20130404.jar" />
 		<jar href="resources/jogl/gluegen-rt-2.0.2-rc20130404.jar" />
 	</resources>
