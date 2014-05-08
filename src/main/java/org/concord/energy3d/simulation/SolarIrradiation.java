@@ -102,9 +102,20 @@ public class SolarIrradiation {
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
+		final ReadOnlyVector3[] sunLocations = new ReadOnlyVector3[1440 / timeStep];
+		int totalSteps = 0;
 		for (int minute = 0; minute < 1440; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
 			// final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
+			sunLocations[minute / timeStep] = sunLocation;
+			if (sunLocation.getZ() > 0)
+				totalSteps++;
+			today.add(Calendar.MINUTE, timeStep);
+		}
+		totalSteps -= 2;
+		int step = 1;
+		for (int minute = 0; minute < 1440; minute += timeStep) {
+			final ReadOnlyVector3 sunLocation = sunLocations[minute / timeStep];
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 				synchronized (Scene.getInstance().getParts()) {
@@ -113,7 +124,6 @@ public class SolarIrradiation {
 							if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel || part instanceof Sensor) {
 								final ReadOnlyVector3 faceDirection = part.getFaceDirection();
 								if (faceDirection.dot(directionTowardSun) > 0)
-									// computeOnMesh(minute, directionTowardSun, part, part.getMesh(), part instanceof Wall ? ((Wall) part).getInvisibleMesh() : part.getMesh(), faceDirection, true);
 									computeOnMesh(minute, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), faceDirection, true);
 							} else if (part instanceof Roof) {
 								for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
@@ -127,10 +137,10 @@ public class SolarIrradiation {
 					}
 				}
 				computeOnLand(directionTowardSun);
+				EnergyPanel.getInstance().progress(100 * step / totalSteps);
+				step++;
 			}
 			maxValue++;
-			today.add(Calendar.MINUTE, timeStep);
-			EnergyPanel.getInstance().progress();
 		}
 		maxValue *= (100 - EnergyPanel.getInstance().getColorMapSlider().getValue()) / 100.0;
 	}

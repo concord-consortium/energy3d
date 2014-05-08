@@ -841,13 +841,7 @@ public class EnergyPanel extends JPanel {
 							e.printStackTrace();
 							Util.reportError(e);
 						}
-						try {
-							Thread.sleep(500);
-						} catch (final InterruptedException e) {
-							e.printStackTrace();
-						}
-						progressBar.setValue(0);
-						progressBar.setStringPainted(false);
+						progress(0);
 					} while (computeRequest);
 					thread = null;
 				}
@@ -905,13 +899,13 @@ public class EnergyPanel extends JPanel {
 		return timeSpinner;
 	}
 
-	public void progress() {
-		if (progressBar.getValue() < 100) {
-			progressBar.setStringPainted(progressBar.getValue() > 0);
-			progressBar.setValue(progressBar.getValue() + 1);
-		} else { // progress() can be called once after it reaches 100% to reset
-			progressBar.setStringPainted(false);
+	public void progress(final int percentage) {
+		if (percentage == 0) {
 			progressBar.setValue(0);
+			progressBar.setStringPainted(false);
+		} else {
+			progressBar.setValue(percentage);
+			progressBar.setStringPainted(true);
 		}
 	}
 

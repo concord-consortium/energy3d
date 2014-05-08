@@ -16,7 +16,7 @@ import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public abstract class Analysis {
 
@@ -29,7 +29,7 @@ public abstract class Analysis {
 		analysisStopped = true;
 	}
 
-	void runAnalysis(Runnable task) {
+	void runAnalysis(final Runnable task) {
 		onStart();
 		new Thread(task, getClass().getName()).start();
 	}
@@ -47,7 +47,7 @@ public abstract class Analysis {
 
 	void onCompletion() {
 		EnergyPanel.getInstance().disableActions(false);
-		EnergyPanel.getInstance().progress();
+		EnergyPanel.getInstance().progress(0);
 		runButton.setEnabled(true);
 	}
 
@@ -59,10 +59,10 @@ public abstract class Analysis {
 		SceneManager.getInstance().getSolarLand().setVisible(true);
 	}
 
-	public static boolean isBuildingComplete(Foundation foundation) {
-		Building b = new Building((int) foundation.getId());
-		ArrayList<HousePart> children = foundation.getChildren();
-		for (HousePart x : children) {
+	public static boolean isBuildingComplete(final Foundation foundation) {
+		final Building b = new Building((int) foundation.getId());
+		final ArrayList<HousePart> children = foundation.getChildren();
+		for (final HousePart x : children) {
 			if (x instanceof Wall)
 				b.addWall((Wall) x);
 		}
