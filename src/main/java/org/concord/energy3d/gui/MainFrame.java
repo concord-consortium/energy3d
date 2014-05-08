@@ -49,7 +49,6 @@ import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -58,10 +57,10 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
+import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
-import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Printout;
@@ -114,7 +113,6 @@ public class MainFrame extends JFrame {
 	private JMenu helpMenu = null;
 	private JMenuItem aboutMenuItem = null;
 	private JDialog aboutDialog = null;
-	private JCheckBoxMenuItem wallThicknessMenuItem = null;
 	private MainPanel mainPanel = null;
 	private JCheckBoxMenuItem annotationsInwardMenuItem;
 	private JMenu editMenu;
@@ -761,34 +759,20 @@ public class MainFrame extends JFrame {
 			final JPanel p = new JPanel(new BorderLayout(10, 10));
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
 			p.add(new JLabel("<html><h2>Energy3D</h2><br>Version: " + Config.VERSION + "<hr><h3>Credit:</h3>This program is brought to you by two scientists at the Concord Consortium:<ul><li>Dr. Saeid Nourian, Lead Developer<li>Dr. Charles Xie, Co-developer</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this project is provided by the National<br>Science Foundation under grants #0918449, #1304485, and #1348530.</html>"), BorderLayout.CENTER);
-			JButton button = new JButton("Thanks!");
+			final JButton button = new JButton("Thanks!");
 			button.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent arg0) {
+				public void actionPerformed(final ActionEvent arg0) {
 					aboutDialog.dispose();
 				}
 			});
-			JPanel p2 = new JPanel();
+			final JPanel p2 = new JPanel();
 			p2.add(button);
 			p.add(p2, BorderLayout.SOUTH);
 			aboutDialog.setContentPane(p);
 			aboutDialog.pack();
 		}
 		return aboutDialog;
-	}
-
-	private JCheckBoxMenuItem getWallThicknessMenuItem() {
-		if (wallThicknessMenuItem == null) {
-			wallThicknessMenuItem = new JCheckBoxMenuItem();
-			wallThicknessMenuItem.setText("Draw Wall Thickness");
-			wallThicknessMenuItem.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					Scene.getInstance().setDrawThickness(wallThicknessMenuItem.isSelected());
-				}
-			});
-		}
-		return wallThicknessMenuItem;
 	}
 
 	public void deselect() {
@@ -1016,7 +1000,7 @@ public class MainFrame extends JFrame {
 						int count = 0;
 						HousePart hp = null;
 						synchronized (Scene.getInstance().getParts()) {
-							for (HousePart x : Scene.getInstance().getParts()) {
+							for (final HousePart x : Scene.getInstance().getParts()) {
 								if (x instanceof Foundation) {
 									count++;
 									hp = x;
@@ -1062,7 +1046,7 @@ public class MainFrame extends JFrame {
 			dailyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart == null) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No selection", JOptionPane.INFORMATION_MESSAGE);
 						return;
@@ -1080,12 +1064,12 @@ public class MainFrame extends JFrame {
 			orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart == null) {
 						int count = 0;
 						HousePart hp = null;
 						synchronized (Scene.getInstance().getParts()) {
-							for (HousePart x : Scene.getInstance().getParts()) {
+							for (final HousePart x : Scene.getInstance().getParts()) {
 								if (x instanceof Foundation) {
 									count++;
 									hp = x;

@@ -15,7 +15,6 @@ import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.Vector3;
 
@@ -74,7 +73,7 @@ public class HeatLoad {
 							uFactor = roofUFactor;
 						else if (part instanceof Sensor) {
 							if (part.getContainer() instanceof Wall) {
-								HousePart x = insideChild(part.getPoints().get(0), part.getContainer());
+								final HousePart x = insideChild(part.getPoints().get(0), part.getContainer());
 								if (x instanceof Window)
 									uFactor = windowUFactor;
 								else if (x instanceof Door)
@@ -97,22 +96,22 @@ public class HeatLoad {
 		}
 	}
 
-	private static HousePart insideChild(Vector3 point, HousePart parent) {
-		for (HousePart x : parent.getChildren())
+	private static HousePart insideChild(final Vector3 point, final HousePart parent) {
+		for (final HousePart x : parent.getChildren())
 			if (insideRectangle(point, x.getPoints()))
 				return x;
 		return null;
 	}
 
 	// Note: this assumes y = 0 in all Vector3
-	private static boolean insideRectangle(Vector3 point, ArrayList<Vector3> rect) {
-		double x = point.getX();
-		double y = point.getZ();
+	private static boolean insideRectangle(final Vector3 point, final ArrayList<Vector3> rect) {
+		final double x = point.getX();
+		final double y = point.getZ();
 		double xmin = Double.MAX_VALUE;
 		double xmax = -Double.MAX_VALUE;
 		double ymin = Double.MAX_VALUE;
 		double ymax = -Double.MAX_VALUE;
-		for (Vector3 v : rect) {
+		for (final Vector3 v : rect) {
 			if (xmin > v.getX())
 				xmin = v.getX();
 			if (xmax < v.getX())
