@@ -369,39 +369,40 @@ abstract class Graph extends JPanel {
 		g2.setStroke(thin);
 		int x0 = getWidth() - 100 - right;
 
+		boolean isAngularGraph = this instanceof AngularGraph;
 		String s = "Windows";
 		int y0 = top - 10;
 		if (!isDataHidden(s)) {
 			drawDiamond(g2, x0 + 4, y0 + 3, 5, colors.get(s));
-			g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 		s = "Solar Panels";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 		s = "Heater";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 		s = "AC";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 		s = "Net";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawCircle(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 	}
@@ -490,15 +491,16 @@ abstract class Graph extends JPanel {
 		default:
 			x0 -= 100;
 			String s = "Solar";
+			boolean isAngularGraph = this instanceof AngularGraph;
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));
-				g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+				g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 			}
 			s = "Heat Gain";
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				y0 += 14;
 				drawSquare(g2, x0, y0, 8, colors.get(s));
-				g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+				g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 			}
 		}
 
