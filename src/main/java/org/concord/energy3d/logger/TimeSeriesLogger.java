@@ -228,7 +228,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			}
 		}
 		if (sceneManager.isRotationAnimationOn()) {
-			line += separator + "\"RotationAnimation\": true";
+			line += separator + "\"SpinAnimation\": true";
 		} else {
 			final Camera camera = SceneManager.getInstance().getCamera();
 			if (camera != null) {

@@ -9,7 +9,6 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +46,6 @@ abstract class Graph extends JPanel {
 	int numberOfTicks = 12;
 	String xAxisLabel = "Month";
 	String yAxisLabel = "Energy (kWh)";
-	DecimalFormat twoDecimals;
 	byte type = DEFAULT;
 	static Map<String, Color> colors;
 
@@ -67,8 +65,6 @@ abstract class Graph extends JPanel {
 		data = new HashMap<String, List<Double>>();
 		hideData = new HashMap<String, Boolean>();
 		hideRuns = new HashMap<Integer, Boolean>();
-		twoDecimals = new DecimalFormat();
-		twoDecimals.setMaximumFractionDigits(2);
 	}
 
 	/* keep the records by their class types */
@@ -153,7 +149,7 @@ abstract class Graph extends JPanel {
 		double sum = 0;
 		for (double a : x)
 			sum += a;
-		return sum;
+		return sum * 365.0 / 12.0;
 	}
 
 	int getLength() {
@@ -377,35 +373,35 @@ abstract class Graph extends JPanel {
 		int y0 = top - 10;
 		if (!isDataHidden(s)) {
 			drawDiamond(g2, x0 + 4, y0 + 3, 5, colors.get(s));
-			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 		s = "Solar Panels";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 		s = "Heater";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 		s = "AC";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 		s = "Net";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawCircle(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
 	}
@@ -496,13 +492,13 @@ abstract class Graph extends JPanel {
 			String s = "Solar";
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));
-				g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+				g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 			}
 			s = "Heat Gain";
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				y0 += 14;
 				drawSquare(g2, x0, y0, 8, colors.get(s));
-				g2.drawString(s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+				g2.drawString(s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 			}
 		}
 
