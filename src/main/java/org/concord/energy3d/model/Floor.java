@@ -7,9 +7,9 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.MeshLib;
+import org.concord.energy3d.util.PolygonWithHoles;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
-import org.poly2tri.geometry.polygon.Polygon;
 import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.point.TPoint;
 
@@ -81,14 +81,10 @@ public class Floor extends HousePart {
 		setEditPointsVisible(container != null);
 	}
 
-	private Polygon makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {
-		double maxY = wallUpperPoints.get(0).getY();
-		for (final PolygonPoint p : wallUpperPoints) {
+	private PolygonWithHoles makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {
+		for (final PolygonPoint p : wallUpperPoints)
 			p.set(p.getX(), p.getY(), height);
-			if (p.getY() > maxY)
-				maxY = p.getY();
-		}
-		return new Polygon(wallUpperPoints);
+		return new PolygonWithHoles(wallUpperPoints);
 	}
 
 	@Override

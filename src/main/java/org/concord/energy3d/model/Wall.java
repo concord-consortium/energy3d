@@ -10,17 +10,17 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.MeshLib;
+import org.concord.energy3d.util.PolygonWithHoles;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.geometry.polygon.Polygon;
+import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.geometry.primitives.Point;
 import org.poly2tri.transform.coordinate.AnyToXYTransform;
 import org.poly2tri.transform.coordinate.XYToAnyTransform;
-import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.point.ardor3d.ArdorVector3Point;
-import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
@@ -389,17 +389,24 @@ public class Wall extends HousePart {
 	}
 
 	private void drawPolygon(final List<List<Vector3>> wallAndWindowsPoints, final Mesh mesh, final boolean drawHoles, final boolean normal, final boolean texture) {
-		final Polygon polygon = new Polygon(ArdorVector3PolygonPoint.toPoints((ArrayList<Vector3>) wallAndWindowsPoints.get(0)));
-		if (drawHoles)
-			for (int i = 1; i < wallAndWindowsPoints.size(); i++)
-				polygon.addHole(new Polygon(ArdorVector3PolygonPoint.toPoints((ArrayList<Vector3>) wallAndWindowsPoints.get(i))));
-
-		for (final TriangulationPoint tp : polygon.getPoints())
+		final List<PolygonPoint> polygonPoints = new ArrayList<PolygonPoint>(wallAndWindowsPoints.get(0).size());
+		for (final Vector3 p : wallAndWindowsPoints.get(0)) {
+			final PolygonPoint tp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 			toXY.transform(tp);
-		if (polygon.getHoles() != null)
-			for (final Polygon hole : polygon.getHoles())
-				for (final TriangulationPoint tp : hole.getPoints())
+			polygonPoints.add(tp);
+		}
+		final PolygonWithHoles polygon = new PolygonWithHoles(polygonPoints);
+		if (drawHoles) {
+			for (int i = 1; i < wallAndWindowsPoints.size(); i++) {
+				final List<PolygonPoint> holePoints = new ArrayList<PolygonPoint>(wallAndWindowsPoints.get(i).size());
+				for (final Vector3 p : wallAndWindowsPoints.get(i)) {
+					final PolygonPoint tp = new PolygonPoint(p.getX(), p.getY(), p.getZ());
 					toXY.transform(tp);
+					holePoints.add(tp);
+				}
+				polygon.addHole(new Polygon(holePoints));
+			}
+		}
 
 		if (texture) {
 			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 1.0 : 8.0;

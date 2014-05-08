@@ -17,6 +17,7 @@ import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.undo.MakeGableCommand;
 import org.concord.energy3d.util.MeshLib;
+import org.concord.energy3d.util.PolygonWithHoles;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 import org.poly2tri.Poly2Tri;
@@ -128,7 +129,7 @@ public abstract class Roof extends HousePart {
 		applyOverhang(wallUpperPoints, wallNormals);
 		processRoofEditPoints(wallUpperPoints);
 		computeGableEditPoints();
-		final Polygon polygon = makePolygon(wallUpperPoints);
+		final PolygonWithHoles polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
 		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
 		MeshLib.groupByPlanner(mesh, roofPartsRoot);
@@ -341,11 +342,11 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-	private Polygon makePolygon(final List<ReadOnlyVector3> wallUpperPoints) {
+	private PolygonWithHoles makePolygon(final List<ReadOnlyVector3> wallUpperPoints) {
 		final List<PolygonPoint> polygonPoints = new ArrayList<PolygonPoint>(wallUpperPoints.size());
 		for (final ReadOnlyVector3 p : wallUpperPoints)
 			polygonPoints.add(new PolygonPoint(p.getX(), p.getY(), p.getZ()));
-		return new Polygon(polygonPoints);
+		return new PolygonWithHoles(polygonPoints);
 	}
 
 	protected abstract Polygon applySteinerPoint(final Polygon polygon);

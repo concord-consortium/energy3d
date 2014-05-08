@@ -359,7 +359,7 @@ public class MeshLib {
 		return Math.abs(p1.subtract(p2, null).normalizeLocal().smallestAngleBetween(p3.subtract(p1, null).normalizeLocal())) > Math.PI - Math.PI / 180.0;
 	}
 
-	public static void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v) {
+	public static void fillMeshWithPolygon(final Mesh mesh, final PolygonWithHoles polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v) {
 		/* round all points */
 		for (final Point p : polygon.getPoints())
 			p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
