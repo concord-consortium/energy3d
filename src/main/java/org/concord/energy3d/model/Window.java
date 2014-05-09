@@ -333,6 +333,8 @@ public class Window extends HousePart {
 			for (int i = 0; i < points.size(); i++)
 				points.set(i, orgPoints.get(i));
 
-		Scene.getInstance().redrawAll();
+//		Scene.getInstance().redrawAll();
+		draw();
+		container.draw();
 	}
 }
