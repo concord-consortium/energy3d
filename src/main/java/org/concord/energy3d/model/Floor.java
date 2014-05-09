@@ -209,4 +209,8 @@ public class Floor extends HousePart {
 		updateTextureAndColor(mesh, Scene.getInstance().getFloorColor());
 	}
 
+	@Override
+	protected HousePart getContainerRelative() {
+		return getTopContainer();
+	}
 }
