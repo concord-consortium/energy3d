@@ -14,6 +14,7 @@ import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.point.TPoint;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -98,6 +99,7 @@ public class Floor extends HousePart {
 		mesh.getSceneHints().setCullHint(CullHint.Inherit);
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 2.0 : 10.0;
 		MeshLib.fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints), null, true, new TPoint(0, 0, 0), new TPoint(scale, 0, 0), new TPoint(0, scale, 0));
+		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 		drawWireframe();
 		points.get(0).set(toRelative(getCenter()));
 		updateEditShapes();
