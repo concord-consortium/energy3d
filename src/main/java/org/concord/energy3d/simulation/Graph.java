@@ -399,9 +399,10 @@ abstract class Graph extends JPanel {
 		}
 
 		s = "Net";
-		y0 += 12;
+		y0 += 13;
 		if (!isDataHidden(s)) {
 			drawCircle(g2, x0, y0, 8, colors.get(s));
+			g2.setFont(new Font("Arial", Font.BOLD, 11));
 			g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
 		}
 
