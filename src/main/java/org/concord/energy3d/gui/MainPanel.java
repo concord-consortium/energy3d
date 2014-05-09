@@ -858,7 +858,7 @@ public class MainPanel extends JPanel {
 				private boolean mousePressed = false;
 
 				public void mousePressed(final MouseEvent e) {
-					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					solarButton.setSelected(false);
 					mousePressed = true;
 					SceneManager.getInstance().resetBuildingRotationAngleRecorded();
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
