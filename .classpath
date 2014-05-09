@@ -7,20 +7,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry including="**/*.java" kind="src" path="src/main/resources"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-animation"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-awt"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-effects"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-jogl"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-lwjgl"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-math"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-savable"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-collada"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
@@ -28,5 +14,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="exe/poly2tri/poly2tri-ardor3d-0.1.1-SNAPSHOT.jar" sourcepath="exe/poly2tri/poly2tri-ardor3d-0.1.1-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="lib" path="exe/poly2tri/poly2tri-core-0.1.1-SNAPSHOT.jar" sourcepath="exe/poly2tri/poly2tri-core-0.1.1-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
