@@ -53,10 +53,14 @@ public class ColorBar extends JPanel {
 		int height = dim.height;
 		g2.setColor(getBackground());
 		g2.fillRect(1, 1, width - 3, height - 3);
+		g2.setColor(Color.GREEN.darker());
+		g2.fillRect(Math.round(0.9f * width), 1, Math.round(0.1f * width), height - 2);
 		g2.setColor(value <= maximum ? getForeground() : Color.YELLOW);
 		g2.fillRect(1, 1, Math.round(value * width / maximum), height);
 		g2.setColor(getBackground().darker());
 		g2.drawRect(0, 0, width - 1, height - 1);
+		g2.setColor(Color.BLACK);
+		g2.fillRect(Math.round(value * width / maximum), 1, 1, height - 2);
 
 		if (value / maximum > 0.001) {
 			g2.setFont(new Font("Arial", Font.PLAIN, 10));

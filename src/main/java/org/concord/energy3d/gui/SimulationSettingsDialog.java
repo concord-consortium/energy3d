@@ -40,7 +40,7 @@ class SimulationSettingsDialog extends JDialog {
 
 		// set the budget limit
 		panel.add(new JLabel("Budget: "));
-		final JTextField budgetTextField = new JTextField(FORMAT1.format(Cost.getInstance().getBudget()));
+		final JTextField budgetTextField = new JTextField(FORMAT1.format(Cost.getInstance().getMaximumBudget()));
 		panel.add(budgetTextField);
 		budgetTextField.setColumns(6);
 		panel.add(new JLabel("Dollars"));
@@ -99,7 +99,7 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Time step must be in 5-30.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				Cost.getInstance().setBudget(budget);
+				Cost.getInstance().setMaximumBudget(budget);
 				SolarIrradiation.getInstance().setSolarStep(cellSize);
 				SolarIrradiation.getInstance().setTimeStep(timeStep);
 				SolarIrradiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);

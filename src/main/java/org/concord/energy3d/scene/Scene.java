@@ -261,7 +261,7 @@ public class Scene implements Serializable {
 			energyPanel.getCityComboBox().setSelectedItem(instance.city);
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
-		Cost.getInstance().setBudget(instance.budget == 0 ? 100000 : instance.budget);
+		Cost.getInstance().setMaximumBudget(instance.budget == 0 ? 100000 : instance.budget);
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
 		if (instance.windowUFactor != null)
 			energyPanel.getWindowsComboBox().setSelectedItem(instance.windowUFactor);
@@ -406,7 +406,7 @@ public class Scene implements Serializable {
 				// save camera to file
 				saveCameraLocation();
 
-				instance.budget = Cost.getInstance().getBudget();
+				instance.budget = Cost.getInstance().getMaximumBudget();
 				instance.hideAxes = !SceneManager.getInstance().areAxesShown();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsShown();
 				instance.calendar = Heliodon.getInstance().getCalender();

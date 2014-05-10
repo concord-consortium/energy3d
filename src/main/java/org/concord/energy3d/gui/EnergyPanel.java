@@ -632,7 +632,7 @@ public class EnergyPanel extends JPanel {
 		costBar = new ColorBar(Color.WHITE, Color.GRAY);
 		costBar.setToolTipText(costPanel.getToolTipText());
 		costBar.setPreferredSize(new Dimension(200, 16));
-		costBar.setMaximum(Cost.getInstance().getBudget());
+		costBar.setMaximum(Cost.getInstance().getMaximumBudget());
 		costBar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent e) {
@@ -1123,7 +1123,7 @@ public class EnergyPanel extends JPanel {
 		return windowSHGCComboBox;
 	}
 
-	public void setBudget(final int budget) {
+	public void setMaximumBudget(final int budget) {
 		costPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Construction Cost (Maximum: $" + budget + ")", TitledBorder.LEADING, TitledBorder.TOP));
 		costBar.setMaximum(budget);
 		costBar.repaint();
