@@ -86,7 +86,7 @@ public class MainPanel extends JPanel {
 	private final JPopupMenu treeMenu;
 	private final JPopupMenu roofMenu;
 	private final JPopupMenu miscMenu;
-	private Operation treeCommand = SceneManager.Operation.DRAW_TYPE_1_TREE;
+	private Operation treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
 	private double buildingRotationAngleAbsolute = Math.PI / 18;
@@ -192,23 +192,27 @@ public class MainPanel extends JPanel {
 		bg.add(miGableRoof);
 
 		// create tree menu
-		final JCheckBoxMenuItem miTree1 = new JCheckBoxMenuItem("Type 1", new ImageIcon(getClass().getResource("icons/tree1.png")), true);
-		final JCheckBoxMenuItem miTree2 = new JCheckBoxMenuItem("Type 2", new ImageIcon(getClass().getResource("icons/tree2.png")));
-		final JCheckBoxMenuItem miTree3 = new JCheckBoxMenuItem("Type 3", new ImageIcon(getClass().getResource("icons/tree3.png")));
+		final JCheckBoxMenuItem miTree1 = new JCheckBoxMenuItem("Dogwood", new ImageIcon(getClass().getResource("icons/dogwood.png")), true);
+		final JCheckBoxMenuItem miTree2 = new JCheckBoxMenuItem("Oak", new ImageIcon(getClass().getResource("icons/oak.png")));
+		final JCheckBoxMenuItem miTree3 = new JCheckBoxMenuItem("Maple", new ImageIcon(getClass().getResource("icons/maple.png")));
+		final JCheckBoxMenuItem miTree4 = new JCheckBoxMenuItem("Pine", new ImageIcon(getClass().getResource("icons/pine.png")));
 		final ActionListener treeAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
 				treeButton.setIcon(selected.getIcon());
 				if (selected == miTree1) {
-					treeCommand = SceneManager.Operation.DRAW_TYPE_1_TREE;
-					treeButton.setToolTipText("Insert type-1 tree");
+					treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
+					treeButton.setToolTipText("Insert a dogwood tree");
 				} else if (selected == miTree2) {
-					treeCommand = SceneManager.Operation.DRAW_TYPE_2_TREE;
-					treeButton.setToolTipText("Insert type-2 tree");
+					treeCommand = SceneManager.Operation.DRAW_OAK;
+					treeButton.setToolTipText("Insert an oak tree");
+				} else if (selected == miTree3) {
+					treeCommand = SceneManager.Operation.DRAW_MAPLE;
+					treeButton.setToolTipText("Insert an oak tree");
 				} else {
-					treeCommand = SceneManager.Operation.DRAW_TYPE_3_TREE;
-					treeButton.setToolTipText("Insert type-3 tree");
+					treeCommand = SceneManager.Operation.DRAW_PINE;
+					treeButton.setToolTipText("Insert a pine tree");
 				}
 				SceneManager.getInstance().setOperation(treeCommand);
 				treeButton.setSelected(true);
@@ -218,14 +222,17 @@ public class MainPanel extends JPanel {
 		miTree1.addActionListener(treeAction);
 		miTree2.addActionListener(treeAction);
 		miTree3.addActionListener(treeAction);
+		miTree4.addActionListener(treeAction);
 		treeMenu = new JPopupMenu();
 		treeMenu.add(miTree1);
 		treeMenu.add(miTree2);
-		// treeMenu.add(miTree3);
+		treeMenu.add(miTree3);
+		treeMenu.add(miTree4);
 		bg = new ButtonGroup();
 		bg.add(miTree1);
 		bg.add(miTree2);
 		bg.add(miTree3);
+		bg.add(miTree4);
 
 		// create misc menu
 		final JCheckBoxMenuItem miDoor = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
@@ -757,8 +764,8 @@ public class MainPanel extends JPanel {
 	private JToggleButton getTreeButton() {
 		if (treeButton == null) {
 			treeButton = new JToggleButton();
-			treeButton.setToolTipText("Insert type-1 tree");
-			treeButton.setIcon(new ImageIcon(getClass().getResource("icons/tree1.png")));
+			treeButton.setToolTipText("Insert a dogwood tree");
+			treeButton.setIcon(new ImageIcon(getClass().getResource("icons/dogwood.png")));
 			treeButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

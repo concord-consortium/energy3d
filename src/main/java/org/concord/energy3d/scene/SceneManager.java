@@ -134,7 +134,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_TYPE_1_TREE, DRAW_TYPE_2_TREE, DRAW_TYPE_3_TREE
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_OAK, DRAW_MAPLE, DRAW_PINE
 	}
 
 	public enum CameraMode {
@@ -933,14 +933,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else if (operation == Operation.DRAW_FOUNDATION) {
 			drawn = new Foundation();
 			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_TYPE_1_TREE) {
-			drawn = new Tree(Tree.TYPE1);
+		} else if (operation == Operation.DRAW_DOGWOOD) {
+			drawn = new Tree(Tree.DOGWOOD);
 			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_TYPE_2_TREE) {
-			drawn = new Tree(Tree.TYPE2);
+		} else if (operation == Operation.DRAW_OAK) {
+			drawn = new Tree(Tree.OAK);
 			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_TYPE_3_TREE) {
-			drawn = new Tree(Tree.TYPE3);
+		} else if (operation == Operation.DRAW_MAPLE) {
+			drawn = new Tree(Tree.MAPLE);
+			setGridsVisible(true);
+		} else if (operation == Operation.DRAW_PINE) {
+			drawn = new Tree(Tree.PINE);
 			setGridsVisible(true);
 		} else
 			return null;

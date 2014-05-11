@@ -27,9 +27,10 @@ import com.ardor3d.scenegraph.shape.Sphere;
 public class Tree extends HousePart {
 
 	private static final long serialVersionUID = 1L;
-	public static final int TYPE1 = 0;
-	public static final int TYPE2 = 1;
-	public static final int TYPE3 = 2;
+	public static final int DOGWOOD = 0;
+	public static final int OAK = 1;
+	public static final int MAPLE = 2;
+	public static final int PINE = 3;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
 	private transient Sphere sphere;
@@ -47,11 +48,14 @@ public class Tree extends HousePart {
 
 		final double height;
 		switch (treeType) {
-		case TYPE2:
+		case OAK:
 			height = 60;
 			break;
-		case TYPE3:
+		case MAPLE:
 			height = 45;
+			break;
+		case PINE:
+			height = 50;
 			break;
 		default:
 			height = 30;
@@ -85,15 +89,20 @@ public class Tree extends HousePart {
 		cylinder.updateModelBound();
 
 		switch (treeType) {
-		case TYPE2:
+		case OAK:
 			sphere.setScale(1, 1, 1.8);
 			sphere.setTranslation(0, 0, 33);
 			cylinder.setScale(1, 1, 2);
 			cylinder.setTranslation(0, 0, 20);
 			break;
-		case TYPE3:
+		case MAPLE:
 			sphere.setScale(1, 1, 1.2);
 			sphere.setTranslation(0, 0, 20);
+			cylinder.setTranslation(0, 0, 15);
+			break;
+		case PINE:
+			sphere.setScale(1, 1, 2);
+			sphere.setTranslation(0, 0, 30);
 			cylinder.setTranslation(0, 0, 15);
 			break;
 		default:
@@ -164,16 +173,20 @@ public class Tree extends HousePart {
 	@Override
 	protected String getTextureFileName() {
 		switch (treeType) {
-		case TYPE2:
-			return isShedded() ? "tree2_shedded.png" : "tree2.png";
-		case TYPE3:
-			return isShedded() ? "tree3_shedded.png" : "tree3.png";
+		case OAK:
+			return isShedded() ? "oak_shedded.png" : "oak.png";
+		case MAPLE:
+			return isShedded() ? "maple_shedded.png" : "maple.png";
+		case PINE:
+			return "pine.png";
 		default:
-			return isShedded() ? "tree1_shedded.png" : "tree1.png";
+			return isShedded() ? "dogwood_shedded.png" : "dogwood.png";
 		}
 	}
 
 	private boolean isShedded() {
+		if (treeType == PINE)
+			return false;
 		final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
 		return month > 10 || month < 4;
 	}
