@@ -192,10 +192,10 @@ public class MainPanel extends JPanel {
 		bg.add(miGableRoof);
 
 		// create tree menu
-		final JCheckBoxMenuItem miTree1 = new JCheckBoxMenuItem("Dogwood", new ImageIcon(getClass().getResource("icons/dogwood.png")), true);
-		final JCheckBoxMenuItem miTree2 = new JCheckBoxMenuItem("Oak", new ImageIcon(getClass().getResource("icons/oak.png")));
-		final JCheckBoxMenuItem miTree3 = new JCheckBoxMenuItem("Maple", new ImageIcon(getClass().getResource("icons/maple.png")));
-		final JCheckBoxMenuItem miTree4 = new JCheckBoxMenuItem("Pine", new ImageIcon(getClass().getResource("icons/pine.png")));
+		final JCheckBoxMenuItem miTree1 = new JCheckBoxMenuItem("Dogwood (Deciduous)", new ImageIcon(getClass().getResource("icons/dogwood.png")), true);
+		final JCheckBoxMenuItem miTree2 = new JCheckBoxMenuItem("Oak (Deciduous)", new ImageIcon(getClass().getResource("icons/oak.png")));
+		final JCheckBoxMenuItem miTree3 = new JCheckBoxMenuItem("Maple (Deciduous)", new ImageIcon(getClass().getResource("icons/maple.png")));
+		final JCheckBoxMenuItem miTree4 = new JCheckBoxMenuItem("Pine (Evergreen)", new ImageIcon(getClass().getResource("icons/pine.png")));
 		final ActionListener treeAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -203,16 +203,16 @@ public class MainPanel extends JPanel {
 				treeButton.setIcon(selected.getIcon());
 				if (selected == miTree1) {
 					treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
-					treeButton.setToolTipText("Insert a dogwood tree");
+					treeButton.setToolTipText("Insert a dogwood tree (deciduous)");
 				} else if (selected == miTree2) {
 					treeCommand = SceneManager.Operation.DRAW_OAK;
-					treeButton.setToolTipText("Insert an oak tree");
+					treeButton.setToolTipText("Insert an oak tree (deciduous)");
 				} else if (selected == miTree3) {
 					treeCommand = SceneManager.Operation.DRAW_MAPLE;
-					treeButton.setToolTipText("Insert an oak tree");
+					treeButton.setToolTipText("Insert an oak tree (deciduous)");
 				} else {
 					treeCommand = SceneManager.Operation.DRAW_PINE;
-					treeButton.setToolTipText("Insert a pine tree");
+					treeButton.setToolTipText("Insert a pine tree (evergreen)");
 				}
 				SceneManager.getInstance().setOperation(treeCommand);
 				treeButton.setSelected(true);

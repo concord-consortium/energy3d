@@ -451,7 +451,7 @@ public class EnergyPanel extends JPanel {
 
 		windowSHGCComboBox = new WideComboBox();
 		windowSHGCComboBox.setEditable(true);
-		windowSHGCComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "25", "50", "80" }));
+		windowSHGCComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "25.0", "50.0", "80.0" }));
 		windowSHGCComboBox.setSelectedIndex(1);
 		windowSHGCComboBox.addActionListener(new ActionListener() {
 			@Override
@@ -481,7 +481,7 @@ public class EnergyPanel extends JPanel {
 
 		solarPanelEfficiencyComboBox = new WideComboBox();
 		solarPanelEfficiencyComboBox.setEditable(true);
-		solarPanelEfficiencyComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10", "20", "30" }));
+		solarPanelEfficiencyComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10.0", "20.0", "30.0" }));
 		solarPanelEfficiencyComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
