@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -1430,6 +1431,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
 					Scene.getInstance().remove(selectedHousePart, true);
 					selectedHousePart = null;
+					EventQueue.invokeLater(new Runnable() {
+						public void run() {
+							MainPanel.getInstance().getSolarButton().setSelected(false);
+						}
+					});
 					return null;
 				}
 			});

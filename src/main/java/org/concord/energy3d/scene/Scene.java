@@ -1,5 +1,6 @@
 package org.concord.energy3d.scene;
 
+import java.awt.EventQueue;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileOutputStream;
@@ -336,6 +337,11 @@ public class Scene implements Serializable {
 			SceneManager.getInstance().getUndoManager().die();
 			if (!Config.isApplet())
 				MainFrame.getInstance().refreshUndoRedo();
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					MainPanel.getInstance().getSolarButton().setSelected(false);
+				}
+			});
 		}
 	}
 
