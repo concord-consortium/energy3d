@@ -28,6 +28,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.undo.AddHousePartCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
@@ -63,6 +64,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
 	private volatile boolean solarCalculationFinished = false;
+	private volatile boolean analysisFinished = false;
 	private ArrayList<Building> buildings = new ArrayList<Building>();
 
 	public TimeSeriesLogger(final int logInterval, final int saveInterval, final SceneManager sceneManager) {
@@ -184,76 +186,101 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				type2Action = true;
 			}
 		}
+
 		String line = "\"File\": \"" + filename + "\"";
-		if (action != null) {
-			line += separator + "\"" + action + "\": " + (type2Action ? "null" : LoggerUtil.getInfo(actedHousePart));
-		}
+		if (EnergyPanel.getInstance().getDisableActionsRequester() != null) {
 
-		// toggle actions
-		if (sceneManager.isHeliodonControlEnabled()) {
-			line += separator + "\"Heliodon\": true";
-		}
-		if (sceneManager.isSolarColorMap()) {
-			line += separator + "\"SolarMap\": true";
-			if (solarCalculationFinished) {
-				String result = getBuildingSolarEnergies();
-				if (result.length() > 0) {
-					line += separator + "\"SolarEnergy\": " + result;
-				}
-				solarCalculationFinished = false;
-			}
-		}
-		if (sceneManager.isShadowEnabled()) {
-			line += separator + "\"Shadow\": true";
-		}
-		if (Scene.getInstance().isAnnotationsVisible()) {
-			line += separator + "\"Annotation\": true";
-		}
-
-		// continuous actions
-		final String heliodonLatitude = "\"Latitude\": " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI);
-		if (!heliodonLatitude.equals(oldHeliodonLatitude)) {
-			line += separator + heliodonLatitude;
-			oldHeliodonLatitude = heliodonLatitude;
-		}
-		if (sceneManager.isSunAnim()) {
-			line += separator + "\"SunAnimation\": true";
-		} else {
-			final Calendar heliodonCalendar = Heliodon.getInstance().getCalender();
-			final String heliodonTime = "\"Time\": \"" + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "\"";
-			if (!heliodonTime.equals(oldHeliodonTime)) {
-				if (!sceneManager.isSunAnim()) // don't log time if sun path is animated
-					line += separator + heliodonTime;
-				oldHeliodonTime = heliodonTime;
-			}
-		}
-		if (sceneManager.isRotationAnimationOn()) {
-			line += separator + "\"SpinAnimation\": true";
-		} else {
-			final Camera camera = SceneManager.getInstance().getCamera();
-			if (camera != null) {
-				final ReadOnlyVector3 location = camera.getLocation();
-				final ReadOnlyVector3 direction = camera.getDirection();
-				String cameraPosition = "\"Position\": {\"x\": " + LoggerUtil.FORMAT.format(location.getX());
-				cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(location.getY());
-				cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(location.getZ());
-				cameraPosition += "}, \"Direction\": {\"x\": " + LoggerUtil.FORMAT.format(direction.getX());
-				cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(direction.getY());
-				cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
-				if (!cameraPosition.equals(oldCameraPosition)) {
-					if (!sceneManager.isRotationAnimationOn()) // don't log camera if the view is being spun
-						line += separator + "\"Camera\": {" + cameraPosition + "}";
-					oldCameraPosition = cameraPosition;
+			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			String part = null;
+			if (selectedPart != null)
+				part = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+			Object requester = EnergyPanel.getInstance().getDisableActionsRequester();
+			line += separator + "\"" + requester.getClass().getSimpleName() + "\": {";
+			if (part != null) {
+				line += "\"Object\": \"" + part + "\"";
+				if (requester instanceof EnergyAnnualAnalysis) {
+					if (selectedPart instanceof Foundation) {
+					}
 				}
 			}
-		}
+			line += "}";
 
-		if (noteEditedFlag) {
-			if (noteString.length() > 0) {
-				line += separator + "\"Note\": \"" + noteString + "\"";
-				noteString = "";
+		} else {
+
+			if (action != null) {
+				line += separator + "\"" + action + "\": " + (type2Action ? "null" : LoggerUtil.getInfo(actedHousePart));
 			}
-			noteEditedFlag = false;
+
+			// toggle actions
+			if (sceneManager.isHeliodonControlEnabled()) {
+				line += separator + "\"Heliodon\": true";
+			}
+			if (sceneManager.isSolarColorMap()) {
+				line += separator + "\"SolarMap\": true";
+				if (solarCalculationFinished) {
+					String result = getBuildingSolarEnergies();
+					if (result.length() > 0) {
+						line += separator + "\"SolarEnergy\": " + result;
+					}
+					solarCalculationFinished = false;
+				}
+			}
+			if (sceneManager.isShadowEnabled()) {
+				line += separator + "\"Shadow\": true";
+			}
+			if (!SceneManager.getInstance().areAxesShown()) {
+				line += separator + "\"Axes\": false";
+			}
+			if (Scene.getInstance().isAnnotationsVisible()) {
+				line += separator + "\"Annotation\": true";
+			}
+
+			// continuous actions
+			final String heliodonLatitude = "\"Latitude\": " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI);
+			if (!heliodonLatitude.equals(oldHeliodonLatitude)) {
+				line += separator + heliodonLatitude;
+				oldHeliodonLatitude = heliodonLatitude;
+			}
+			if (sceneManager.isSunAnim()) {
+				line += separator + "\"SunAnimation\": true";
+			} else {
+				final Calendar heliodonCalendar = Heliodon.getInstance().getCalender();
+				final String heliodonTime = "\"Time\": \"" + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "\"";
+				if (!heliodonTime.equals(oldHeliodonTime)) {
+					if (!sceneManager.isSunAnim()) // don't log time if sun path is animated
+						line += separator + heliodonTime;
+					oldHeliodonTime = heliodonTime;
+				}
+			}
+			if (sceneManager.isRotationAnimationOn()) {
+				line += separator + "\"SpinAnimation\": true";
+			} else {
+				final Camera camera = SceneManager.getInstance().getCamera();
+				if (camera != null) {
+					final ReadOnlyVector3 location = camera.getLocation();
+					final ReadOnlyVector3 direction = camera.getDirection();
+					String cameraPosition = "\"Position\": {\"x\": " + LoggerUtil.FORMAT.format(location.getX());
+					cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(location.getY());
+					cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(location.getZ());
+					cameraPosition += "}, \"Direction\": {\"x\": " + LoggerUtil.FORMAT.format(direction.getX());
+					cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(direction.getY());
+					cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
+					if (!cameraPosition.equals(oldCameraPosition)) {
+						if (!sceneManager.isRotationAnimationOn()) // don't log camera if the view is being spun
+							line += separator + "\"Camera\": {" + cameraPosition + "}";
+						oldCameraPosition = cameraPosition;
+					}
+				}
+			}
+
+			if (noteEditedFlag) {
+				if (noteString.length() > 0) {
+					line += separator + "\"Note\": \"" + noteString + "\"";
+					noteString = "";
+				}
+				noteEditedFlag = false;
+			}
+
 		}
 
 		if (!line.trim().endsWith(".ng3\"")) {

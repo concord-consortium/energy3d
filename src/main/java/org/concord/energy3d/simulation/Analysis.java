@@ -16,7 +16,7 @@ import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- *
+ * 
  */
 public abstract class Analysis {
 
@@ -24,6 +24,10 @@ public abstract class Analysis {
 	volatile boolean analysisStopped;
 	static Point windowLocation = new Point();
 	JButton runButton;
+
+	public double getResult(String name) {
+		return graph.getSum(name);
+	}
 
 	void stopAnalysis() {
 		analysisStopped = true;
@@ -46,13 +50,13 @@ public abstract class Analysis {
 	abstract void updateGraph();
 
 	void onCompletion() {
-		EnergyPanel.getInstance().disableActions(false);
+		EnergyPanel.getInstance().requestDisableActions(null);
 		EnergyPanel.getInstance().progress(0);
 		runButton.setEnabled(true);
 	}
 
 	private void onStart() {
-		EnergyPanel.getInstance().disableActions(true);
+		EnergyPanel.getInstance().requestDisableActions(this);
 		Util.selectSilently(MainPanel.getInstance().getSolarButton(), true);
 		SceneManager.getInstance().setSolarColorMapWithoutUpdate(true);
 		graph.clearData();

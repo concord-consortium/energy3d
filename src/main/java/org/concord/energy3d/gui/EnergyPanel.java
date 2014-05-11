@@ -76,7 +76,7 @@ public class EnergyPanel extends JPanel {
 	private Thread thread;
 	private boolean computeRequest;
 	private boolean cancel;
-	private boolean disableActions = false;
+	private Object disableActionsRequester;
 	private boolean alreadyRenderedHeatmap = false;
 	private UpdateRadiation updateRadiation;
 	private boolean computeEnabled = true;
@@ -179,14 +179,14 @@ public class EnergyPanel extends JPanel {
 					firstCall = false;
 					return;
 				}
-				if (disableActions)
-					return;
-				final Heliodon heliodon = Heliodon.getInstance();
-				if (heliodon != null)
-					heliodon.setDate((Date) dateSpinner.getValue());
-				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				Scene.getInstance().setEdited(true);
-				Scene.getInstance().redrawAllNow(); // XIE: 4/11: This needs to be called for trees to have the right seasonal texture
+				if (disableActionsRequester == null) {
+					final Heliodon heliodon = Heliodon.getInstance();
+					if (heliodon != null)
+						heliodon.setDate((Date) dateSpinner.getValue());
+					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setEdited(true);
+					Scene.getInstance().redrawAllNow(); // XIE: 4/11: This needs to be called for trees to have the right seasonal texture
+				}
 			}
 		});
 		final GridBagConstraints gbc_dateSpinner = new GridBagConstraints();
@@ -301,9 +301,8 @@ public class EnergyPanel extends JPanel {
 		insideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				if (disableActions)
-					return;
-				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				if (disableActionsRequester == null)
+					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
 		insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
@@ -328,9 +327,8 @@ public class EnergyPanel extends JPanel {
 		outsideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				if (disableActions)
-					return;
-				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				if (disableActionsRequester == null)
+					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 			}
 		});
 		final GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
@@ -626,7 +624,7 @@ public class EnergyPanel extends JPanel {
 
 		costPanel = new JPanel(new BorderLayout());
 		costPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP));
-		costPanel.setToolTipText("<html>The money needed if the selected building were to be constructed<br><b>Not to exceed the budget limit.</b></html>");
+		costPanel.setToolTipText("<html>Total construction cost for the selected building<br><b>Must be within the green range.</b></html>");
 		buildingPanel.add(costPanel);
 		costBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		costBar.setToolTipText(costPanel.getToolTipText());
@@ -1081,9 +1079,13 @@ public class EnergyPanel extends JPanel {
 		updateCost();
 	}
 
-	/** Currently this applies only to the date spinner when it is set programmatically (not by the user) */
-	public void disableActions(final boolean b) {
-		disableActions = b;
+	/** Apply this when the UI is set programmatically (not by the user) */
+	public void requestDisableActions(Object requester) {
+		disableActionsRequester = requester;
+	}
+
+	public Object getDisableActionsRequester() {
+		return disableActionsRequester;
 	}
 
 	public boolean isCancelled() {

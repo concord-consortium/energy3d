@@ -132,6 +132,7 @@ public class Cost {
 	}
 
 	public void showGraph() {
+		EnergyPanel.getInstance().requestDisableActions(this);
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart == null || selectedPart instanceof Tree) {
 			int count = 0;
@@ -158,6 +159,7 @@ public class Cost {
 			return;
 		}
 		show();
+		EnergyPanel.getInstance().requestDisableActions(null);
 	}
 
 	private void show() {
