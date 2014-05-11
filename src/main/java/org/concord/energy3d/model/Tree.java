@@ -205,4 +205,17 @@ public class Tree extends HousePart {
 		return collisionRoot;
 	}
 
+	public String getTreeType() {
+		switch (treeType) {
+		case OAK:
+			return "Oak";
+		case MAPLE:
+			return "Maple";
+		case PINE:
+			return "Pine";
+		default:
+			return "Dogwood";
+		}
+	}
+
 }

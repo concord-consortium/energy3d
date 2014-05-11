@@ -8,6 +8,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 
 import com.ardor3d.math.Vector3;
@@ -57,6 +58,8 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
+		if (housePart instanceof Tree)
+			return "Move " + ((Tree) housePart).getTreeType();
 		return "Edit " + housePart.getClass().getSimpleName();
 	}
 
