@@ -82,7 +82,6 @@ public class EnergyPanel extends JPanel {
 	private boolean computeEnabled = true;
 	private final List<PropertyChangeListener> propertyChangeListeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
 
-
 	public enum UpdateRadiation {
 		ALWAYS, ONLY_IF_SLECTED_IN_GUI
 	};
@@ -629,7 +628,7 @@ public class EnergyPanel extends JPanel {
 		costPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP));
 		costPanel.setToolTipText("<html>The money needed if the selected building were to be constructed<br><b>Not to exceed the budget limit.</b></html>");
 		buildingPanel.add(costPanel);
-		costBar = new ColorBar(Color.WHITE, Color.GRAY);
+		costBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		costBar.setToolTipText(costPanel.getToolTipText());
 		costBar.setPreferredSize(new Dimension(200, 16));
 		costBar.setMaximum(Cost.getInstance().getMaximumBudget());

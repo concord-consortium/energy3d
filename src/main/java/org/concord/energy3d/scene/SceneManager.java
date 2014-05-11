@@ -134,7 +134,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_TREE, DRAW_TREE_TALL
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_TYPE_1_TREE, DRAW_TYPE_2_TREE, DRAW_TYPE_3_TREE
 	}
 
 	public enum CameraMode {
@@ -933,11 +933,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else if (operation == Operation.DRAW_FOUNDATION) {
 			drawn = new Foundation();
 			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_TREE) {
-			drawn = new Tree(Tree.SHORT);
+		} else if (operation == Operation.DRAW_TYPE_1_TREE) {
+			drawn = new Tree(Tree.TYPE1);
 			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_TREE_TALL) {
-			drawn = new Tree(Tree.TALL);
+		} else if (operation == Operation.DRAW_TYPE_2_TREE) {
+			drawn = new Tree(Tree.TYPE2);
+			setGridsVisible(true);
+		} else if (operation == Operation.DRAW_TYPE_3_TREE) {
+			drawn = new Tree(Tree.TYPE3);
 			setGridsVisible(true);
 		} else
 			return null;
@@ -1144,7 +1147,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return;
 		final int x = mouseState.getX();
 		final int y = mouseState.getY();
-		
+
 		if (editHousePartCommand != null && editHousePartCommand.isReallyEdited())
 			EnergyPanel.getInstance().cancel();
 
@@ -1168,18 +1171,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			pick = selectHousePart == null ? null : selectHousePart.getUserData();
 			final HousePart housePart = pick == null ? null : pick.getHousePart();
 			if (pick != null) {
-//				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && hoveredHousePart != housePart)
-//					hoveredHousePart.setEditPointsVisible(false);
+				// if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && hoveredHousePart != housePart)
+				// hoveredHousePart.setEditPointsVisible(false);
 				hoveredHousePart = housePart;
 				if (hoveredHousePart.isFrozen())
 					hoveredHousePart = null;
-//				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && !PrintController.getInstance().isPrintPreview() && operation != Operation.RESIZE)
-//					hoveredHousePart.setEditPointsVisible(true);
+				// if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && !PrintController.getInstance().isPrintPreview() && operation != Operation.RESIZE)
+				// hoveredHousePart.setEditPointsVisible(true);
 				if (pick.getIndex() != -1)
 					lastSelectedEditPointMouseState = mouseState;
 			} else {
-//				if (hoveredHousePart != null && hoveredHousePart != selectedHousePart)
-//					hoveredHousePart.setEditPointsVisible(false);
+				// if (hoveredHousePart != null && hoveredHousePart != selectedHousePart)
+				// hoveredHousePart.setEditPointsVisible(false);
 				hoveredHousePart = null;
 			}
 		}
@@ -1275,7 +1278,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						System.out.print("Clicked on: " + pick);
 						if (pick != null && pick.isEditPoint()) {
 							cameraControl.setLeftMouseButtonEnabled(false);
-//							EnergyPanel.getInstance().cancel();
+							// EnergyPanel.getInstance().cancel();
 						}
 
 						if (operation == Operation.RESIZE && selectedHousePart != null) {
@@ -1333,7 +1336,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (selectedHousePart != null)
 					selectedHousePart.setGridsVisible(false);
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-//					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || (operation == Operation.RESIZE && houseMoveStartPoint != null))) {
+					// if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || (operation == Operation.RESIZE && houseMoveStartPoint != null))) {
 					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || houseMoveStartPoint != null)) {
 						if (selectedHousePart.isDrawable()) {
 							selectedHousePart.complete();
@@ -1449,21 +1452,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setSolarColorMapWithoutUpdate(final boolean solarColorMap) {
 		this.solarColorMap = solarColorMap;
-//		solarLand.setVisible(solarColorMap);
+		// solarLand.setVisible(solarColorMap);
 	}
 
 	public void setSolarColorMap(final boolean solarColorMap) {
 		setSolarColorMapWithoutUpdate(solarColorMap);
-//		getTaskManager().update(new Callable<Object>() {
-//			@Override
-//			public Object call() throws Exception {
-//				Scene.getInstance().redrawAllNow();
-//				if (solarColorMap)
-					EnergyPanel.getInstance().clearAlreadyRendered();
-				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-//				return null;
-//			}
-//		});
+		// getTaskManager().update(new Callable<Object>() {
+		// @Override
+		// public Object call() throws Exception {
+		// Scene.getInstance().redrawAllNow();
+		// if (solarColorMap)
+		EnergyPanel.getInstance().clearAlreadyRendered();
+		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+		// return null;
+		// }
+		// });
 	}
 
 	public void showAxes(final boolean b) {

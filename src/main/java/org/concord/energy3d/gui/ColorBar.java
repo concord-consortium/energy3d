@@ -16,7 +16,7 @@ import javax.swing.JPanel;
  * @author Charles Xie
  * 
  */
-public class ColorBar extends JPanel {
+class ColorBar extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -65,7 +65,7 @@ public class ColorBar extends JPanel {
 		if (value / maximum > 0.001) {
 			g2.setFont(new Font("Arial", Font.PLAIN, 10));
 			g2.setColor(Color.BLACK);
-			String s = "$" + value;
+			String s = "$" + (int) value;
 			FontMetrics fm = g2.getFontMetrics();
 			g2.drawString(s, (width - fm.stringWidth(s)) / 2, (fm.getAscent() + (height - (fm.getAscent() + fm.getDescent())) / 2));
 		}

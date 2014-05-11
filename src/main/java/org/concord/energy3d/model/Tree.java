@@ -25,9 +25,11 @@ import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
 
 public class Tree extends HousePart {
+
 	private static final long serialVersionUID = 1L;
-	public static final int SHORT = 0;
-	public static final int TALL = 1;
+	public static final int TYPE1 = 0;
+	public static final int TYPE2 = 1;
+	public static final int TYPE3 = 2;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
 	private transient Sphere sphere;
@@ -43,7 +45,17 @@ public class Tree extends HousePart {
 	protected void init() {
 		super.init();
 
-		final double height = treeType == SHORT ? 30 : 60;
+		final double height;
+		switch (treeType) {
+		case TYPE2:
+			height = 60;
+			break;
+		case TYPE3:
+			height = 45;
+			break;
+		default:
+			height = 30;
+		}
 		mesh = new Quad("Tree Quad", 30, height);
 		mesh.setModelBound(new BoundingBox());
 		mesh.updateModelBound();
@@ -72,15 +84,23 @@ public class Tree extends HousePart {
 		cylinder.setModelBound(new BoundingBox());
 		cylinder.updateModelBound();
 
-		if (treeType == SHORT) {
-			sphere.setScale(1, 1, 0.7);
-			sphere.setTranslation(0, 0, 19);
-			cylinder.setTranslation(0, 0, 10);
-		} else {
+		switch (treeType) {
+		case TYPE2:
 			sphere.setScale(1, 1, 1.8);
 			sphere.setTranslation(0, 0, 33);
 			cylinder.setScale(1, 1, 2);
 			cylinder.setTranslation(0, 0, 20);
+			break;
+		case TYPE3:
+			sphere.setScale(1, 1, 1.2);
+			sphere.setTranslation(0, 0, 20);
+			cylinder.setTranslation(0, 0, 15);
+			break;
+		default:
+			sphere.setScale(1, 1, 0.7);
+			sphere.setTranslation(0, 0, 19);
+			cylinder.setTranslation(0, 0, 10);
+			break;
 		}
 
 		collisionRoot = new Node("Tree Collision Root");
@@ -144,10 +164,12 @@ public class Tree extends HousePart {
 	@Override
 	protected String getTextureFileName() {
 		switch (treeType) {
-		case TALL:
-			return isShedded() ? "tree_tall_shedded.png" : "tree_tall.png";
+		case TYPE2:
+			return isShedded() ? "tree2_shedded.png" : "tree2.png";
+		case TYPE3:
+			return isShedded() ? "tree3_shedded.png" : "tree3.png";
 		default:
-			return isShedded() ? "tree_shedded.png" : "tree.png";
+			return isShedded() ? "tree1_shedded.png" : "tree1.png";
 		}
 	}
 
