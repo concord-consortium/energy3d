@@ -62,6 +62,13 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private String oldHeliodonLatitude = null;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
+	private Object oldRoomTemperature = null;
+	private String oldWallUFactor = null;
+	private String oldWindowUFactor = null;
+	private String oldDoorUFactor = null;
+	private String oldRoofUFactor = null;
+	private String oldSolarPanelYield = null;
+	private String oldShgc = null;
 	private String noteString = "";
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
@@ -273,6 +280,41 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			if (!heliodonLatitude.equals(oldHeliodonLatitude)) {
 				line += separator + heliodonLatitude;
 				oldHeliodonLatitude = heliodonLatitude;
+			}
+			final String roomTemperature = "\"RoomTemperature\": " + EnergyPanel.getInstance().getInsideTemperatureSpinner().getValue();
+			if (!roomTemperature.equals(oldRoomTemperature)) {
+				line += separator + roomTemperature;
+				oldRoomTemperature = roomTemperature;
+			}
+			final String wallUFactor = "\"WallUFactor\": \"" + EnergyPanel.getInstance().getWallsComboBox().getSelectedItem() + "\"";
+			if (!wallUFactor.equals(oldWallUFactor)) {
+				line += separator + wallUFactor;
+				oldWallUFactor = wallUFactor;
+			}
+			final String windowUFactor = "\"WindowUFactor\": \"" + EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem() + "\"";
+			if (!windowUFactor.equals(oldWindowUFactor)) {
+				line += separator + windowUFactor;
+				oldWindowUFactor = windowUFactor;
+			}
+			final String doorUFactor = "\"DoorUFactor\": \"" + EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem() + "\"";
+			if (!doorUFactor.equals(oldDoorUFactor)) {
+				line += separator + doorUFactor;
+				oldDoorUFactor = doorUFactor;
+			}
+			final String roofUFactor = "\"RoofUFactor\": \"" + EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem() + "\"";
+			if (!roofUFactor.equals(oldRoofUFactor)) {
+				line += separator + roofUFactor;
+				oldRoofUFactor = roofUFactor;
+			}
+			final String solarPanelYield = "\"SolarPanelYield\": \"" + EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem() + "\"";
+			if (!solarPanelYield.equals(oldSolarPanelYield)) {
+				line += separator + solarPanelYield;
+				oldSolarPanelYield = solarPanelYield;
+			}
+			final String shgc = "\"SHGC\": \"" + EnergyPanel.getInstance().getWindowSHGCComboBox().getSelectedItem() + "\"";
+			if (!shgc.equals(oldShgc)) {
+				line += separator + shgc;
+				oldShgc = shgc;
 			}
 			if (SceneManager.getInstance().isSunAnim()) {
 				line += separator + "\"SunAnimation\": true";

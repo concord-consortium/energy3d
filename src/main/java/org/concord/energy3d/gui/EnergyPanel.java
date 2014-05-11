@@ -353,7 +353,7 @@ public class EnergyPanel extends JPanel {
 
 		wallsComboBox = new WideComboBox();
 		wallsComboBox.setEditable(true);
-		wallsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.28 ", "0.67 (Concrete 8\")", "0.41 (Masonary Brick 8\")", "0.04 (Flat Metal 8\" Fiberglass Insulation)" }));
+		wallsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.28 ", "0.67 (Concrete)", "0.41 (Masonary Brick)", "0.04 (Flat Metal Fiberglass Insulation)" }));
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -425,7 +425,7 @@ public class EnergyPanel extends JPanel {
 
 		roofsComboBox = new WideComboBox();
 		roofsComboBox.setEditable(true);
-		roofsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.14 ", "0.23 (Concrete 3\")", "0.11 (Flat Metal 3\" Fiberglass Insulation)", "0.10 (Wood 3\" Fiberglass Insulation)" }));
+		roofsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.14 ", "0.23 (Concrete)", "0.11 (Flat Metal Fiberglass Insulation)", "0.10 (Wood Fiberglass Insulation)" }));
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -894,6 +894,10 @@ public class EnergyPanel extends JPanel {
 
 	public JSpinner getTimeSpinner() {
 		return timeSpinner;
+	}
+
+	public JSpinner getInsideTemperatureSpinner() {
+		return insideTemperatureSpinner;
 	}
 
 	public void progress(final int percentage) {
