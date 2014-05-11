@@ -3,6 +3,7 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -1393,6 +1394,11 @@ public class MainFrame extends JFrame {
 								else {
 									Scene.getInstance().setOverhangLength(val / Scene.getInstance().getAnnotationScale());
 									Scene.getInstance().redrawAll();
+									EventQueue.invokeLater(new Runnable() {
+										public void run() {
+											MainPanel.getInstance().getSolarButton().setSelected(false);
+										}
+									});
 									break;
 								}
 							} catch (final NumberFormatException e1) {
@@ -1775,6 +1781,11 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().removeAllRoofs();
+					EventQueue.invokeLater(new Runnable() {
+						public void run() {
+							MainPanel.getInstance().getSolarButton().setSelected(false);
+						}
+					});
 				}
 			});
 		}
