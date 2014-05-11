@@ -29,6 +29,10 @@ public abstract class Analysis {
 		return graph.getSum(name);
 	}
 
+	public int getNumberOfDataPoints() {
+		return graph.getLength();
+	}
+
 	void stopAnalysis() {
 		analysisStopped = true;
 	}

@@ -28,6 +28,9 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.AnnualSensorData;
+import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.undo.AddHousePartCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
@@ -50,7 +53,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private int logInterval = 2; // in seconds
 	private int saveInterval = 1; // save every N valid actions
 	private File file;
-	private final SceneManager sceneManager;
 	private UndoableEdit lastEdit;
 	private final UndoManager undoManager;
 	private HousePart actedHousePart;
@@ -64,14 +66,15 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
 	private volatile boolean solarCalculationFinished = false;
-	private volatile boolean analysisFinished = false;
 	private ArrayList<Building> buildings = new ArrayList<Building>();
+	private Object analysisRequester;
+	private Object analysisRequesterCopy;
+	private HousePart analyzedPart;
 
-	public TimeSeriesLogger(final int logInterval, final int saveInterval, final SceneManager sceneManager) {
+	public TimeSeriesLogger(final int logInterval, final int saveInterval) {
 		this.logInterval = logInterval;
 		this.saveInterval = saveInterval;
-		this.sceneManager = sceneManager;
-		undoManager = sceneManager.getUndoManager();
+		undoManager = SceneManager.getInstance().getUndoManager();
 		lastEdit = undoManager.lastEdit();
 		final Document noteAreaDoc = MainPanel.getInstance().getNoteTextArea().getDocument();
 		noteAreaDoc.addDocumentListener(new DocumentListener() {
@@ -188,34 +191,64 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		}
 
 		String line = "\"File\": \"" + filename + "\"";
-		if (EnergyPanel.getInstance().getDisableActionsRequester() != null) {
+		analysisRequester = EnergyPanel.getInstance().getDisableActionsRequester();
+		if (analysisRequester != null) {
 
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			String part = null;
-			if (selectedPart != null)
-				part = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-			Object requester = EnergyPanel.getInstance().getDisableActionsRequester();
-			line += separator + "\"" + requester.getClass().getSimpleName() + "\": {";
-			if (part != null) {
-				line += "\"Object\": \"" + part + "\"";
-				if (requester instanceof EnergyAnnualAnalysis) {
-					if (selectedPart instanceof Foundation) {
-					}
-				}
-			}
-			line += "}";
+			analysisRequesterCopy = analysisRequester;
+			analyzedPart = SceneManager.getInstance().getSelectedPart();
+			if (analyzedPart == null) // this analysis requires no selection
+				line += separator + "\"" + analysisRequester.getClass().getSimpleName() + "\": {}";
 
 		} else {
+
+			if (analysisRequesterCopy != null && analyzedPart != null) { // this analysis is completed, now record some results
+				String part = analyzedPart.toString().substring(0, analyzedPart.toString().indexOf(')') + 1);
+				line += separator + "\"" + analysisRequesterCopy.getClass().getSimpleName() + "\": {";
+				line += "\"Object\": \"" + part + "\"";
+				if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
+					EnergyAnnualAnalysis eaa = (EnergyAnnualAnalysis) analysisRequesterCopy;
+					line += ", \"Calculated Months\": " + eaa.getNumberOfDataPoints();
+					if (analyzedPart instanceof Foundation) {
+						String name = "Net";
+						line += ", \"" + name + "\": " + eaa.getResult(name);
+						name = "AC";
+						line += ", \"" + name + "\": " + eaa.getResult(name);
+						name = "Heater";
+						line += ", \"" + name + "\": " + eaa.getResult(name);
+						name = "Windows";
+						line += ", \"" + name + "\": " + eaa.getResult(name);
+						name = "Solar Panels";
+						line += ", \"" + name + "\": " + eaa.getResult(name);
+					} else {
+						String name = "Solar";
+						line += ", \"" + name + "\": " + eaa.getResult(name);
+						name = "Heat Gain";
+						line += ", \"" + name + "\": " + eaa.getResult(name);
+					}
+				} else if (analysisRequesterCopy instanceof EnergyAngularAnalysis) {
+					EnergyAngularAnalysis eaa = (EnergyAngularAnalysis) analysisRequesterCopy;
+					line += ", \"Calculated Angles\": " + eaa.getNumberOfDataPoints();
+				} else if (analysisRequesterCopy instanceof AnnualSensorData) {
+					AnnualSensorData asd = (AnnualSensorData) analysisRequesterCopy;
+					line += ", \"Calculated Months\": " + asd.getNumberOfDataPoints();
+				} else if (analysisRequesterCopy instanceof Cost) {
+					Cost cost = (Cost) analysisRequesterCopy;
+					line += ", \"Cost\": " + cost.getTotalCost();
+				}
+				line += "}";
+				analyzedPart = null;
+				analysisRequesterCopy = null;
+			}
 
 			if (action != null) {
 				line += separator + "\"" + action + "\": " + (type2Action ? "null" : LoggerUtil.getInfo(actedHousePart));
 			}
 
 			// toggle actions
-			if (sceneManager.isHeliodonControlEnabled()) {
+			if (SceneManager.getInstance().isHeliodonControlEnabled()) {
 				line += separator + "\"Heliodon\": true";
 			}
-			if (sceneManager.isSolarColorMap()) {
+			if (SceneManager.getInstance().isSolarColorMap()) {
 				line += separator + "\"SolarMap\": true";
 				if (solarCalculationFinished) {
 					String result = getBuildingSolarEnergies();
@@ -225,7 +258,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					solarCalculationFinished = false;
 				}
 			}
-			if (sceneManager.isShadowEnabled()) {
+			if (SceneManager.getInstance().isShadowEnabled()) {
 				line += separator + "\"Shadow\": true";
 			}
 			if (!SceneManager.getInstance().areAxesShown()) {
@@ -241,18 +274,18 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				line += separator + heliodonLatitude;
 				oldHeliodonLatitude = heliodonLatitude;
 			}
-			if (sceneManager.isSunAnim()) {
+			if (SceneManager.getInstance().isSunAnim()) {
 				line += separator + "\"SunAnimation\": true";
 			} else {
 				final Calendar heliodonCalendar = Heliodon.getInstance().getCalender();
 				final String heliodonTime = "\"Time\": \"" + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "\"";
 				if (!heliodonTime.equals(oldHeliodonTime)) {
-					if (!sceneManager.isSunAnim()) // don't log time if sun path is animated
+					if (!SceneManager.getInstance().isSunAnim()) // don't log time if sun path is animated
 						line += separator + heliodonTime;
 					oldHeliodonTime = heliodonTime;
 				}
 			}
-			if (sceneManager.isRotationAnimationOn()) {
+			if (SceneManager.getInstance().isRotationAnimationOn()) {
 				line += separator + "\"SpinAnimation\": true";
 			} else {
 				final Camera camera = SceneManager.getInstance().getCamera();
@@ -266,7 +299,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(direction.getY());
 					cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
 					if (!cameraPosition.equals(oldCameraPosition)) {
-						if (!sceneManager.isRotationAnimationOn()) // don't log camera if the view is being spun
+						if (!SceneManager.getInstance().isRotationAnimationOn()) // don't log camera if the view is being spun
 							line += separator + "\"Camera\": {" + cameraPosition + "}";
 						oldCameraPosition = cameraPosition;
 					}

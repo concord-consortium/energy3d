@@ -42,7 +42,7 @@ public class MainApplication {
 			mainFrame.open(args[args.length - 1]);
 
 		/* initialize data logging */
-		final TimeSeriesLogger logger = new TimeSeriesLogger(2, 20, scene);
+		final TimeSeriesLogger logger = new TimeSeriesLogger(1, 20);
 		scene.addShutdownHook(new Runnable() {
 			@Override
 			public void run() {
