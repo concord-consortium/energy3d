@@ -33,7 +33,6 @@ import org.concord.energy3d.scene.SceneManager;
  */
 public class Cost {
 
-	private int maximumBudget = 100000;
 	private static Cost instance = new Cost();
 
 	private Cost() {
@@ -41,15 +40,6 @@ public class Cost {
 
 	public static Cost getInstance() {
 		return instance;
-	}
-
-	public void setMaximumBudget(int maximumBudget) {
-		this.maximumBudget = maximumBudget;
-		EnergyPanel.getInstance().setMaximumBudget(maximumBudget);
-	}
-
-	public int getMaximumBudget() {
-		return maximumBudget;
 	}
 
 	public int getTotalCost() {

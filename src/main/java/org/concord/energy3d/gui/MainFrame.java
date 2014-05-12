@@ -143,6 +143,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem lockAllMenuItem;
 	private JMenuItem unlockAllMenuItem;
 	private JMenuItem lockSelectionMenuItem;
+	private JMenuItem specificationsMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
 	private final JFileChooser fileChooser;
@@ -1155,6 +1156,8 @@ public class MainFrame extends JFrame {
 				editMenu.add(getLockSelectionMenuItem());
 				editMenu.add(getLockAllMenuItem());
 				editMenu.add(getUnlockAllMenuItem());
+				editMenu.addSeparator();
+				editMenu.add(getSpecificationsMenuItem());
 			}
 			editMenu.addSeparator();
 			editMenu.add(getNoteCheckBoxMenuItem());
@@ -1744,6 +1747,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return lockSelectionMenuItem;
+	}
+
+	private JMenuItem getSpecificationsMenuItem() {
+		if (specificationsMenuItem == null) {
+			specificationsMenuItem = new JMenuItem("Specifications");
+			specificationsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new SpecsDialog().setVisible(true);
+				}
+			});
+		}
+		return specificationsMenuItem;
 	}
 
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {

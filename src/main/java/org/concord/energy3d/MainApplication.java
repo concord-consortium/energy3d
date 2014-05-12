@@ -9,6 +9,7 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.UpdateAnnouncer;
 import org.concord.energy3d.util.Config.RenderMode;
 
 public class MainApplication {

@@ -59,6 +59,7 @@ import org.concord.energy3d.simulation.CityData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.SolarIrradiation;
+import org.concord.energy3d.util.Specifications;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
@@ -107,19 +108,10 @@ public class EnergyPanel extends JPanel {
 	private final JPanel heatMapPanel;
 	private final JSlider colorMapSlider;
 	private final JProgressBar progressBar;
-	private final ColorBar costBar;
-	private final JPanel costPanel;
+	private final ColorBar costBar, heightBar, areaBar;
+	private final JPanel costPanel, heightPanel, areaPanel;
 	private JPanel partPanel;
 	private JPanel buildingPanel;
-	private JPanel geometryPanel;
-	private JLabel lblPosition;
-	private JTextField positionTextField;
-	private JLabel lblArea;
-	private JTextField areaTextField;
-	private JLabel lblHeight;
-	private JTextField heightTextField;
-	private JLabel lblVolume;
-	private JTextField volumnTextField;
 	private JTextField windowTextField;
 	private JTextField solarPanelTextField;
 	private JPanel partPropertiesPanel;
@@ -537,99 +529,48 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
 
-		// geometry info for the selected building
+		// area for the selected building
 
-		geometryPanel = new JPanel();
-		buildingPanel.add(geometryPanel);
-		final GridBagLayout gbl_panel_2 = new GridBagLayout();
-		geometryPanel.setLayout(gbl_panel_2);
+		areaPanel = new JPanel(new BorderLayout());
+		areaPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Area (\u33A1)", TitledBorder.LEADING, TitledBorder.TOP));
+		areaPanel.setToolTipText("<html>The area of the selected building<br><b>Must be within the specified range.</b></html>");
+		buildingPanel.add(areaPanel);
+		areaBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		areaBar.setUnit("");
+		areaBar.setUnitPrefix(false);
+		areaBar.setVerticalLineRepresentation(false);
+		areaBar.setDecimalDigits(1);
+		areaBar.setToolTipText(areaPanel.getToolTipText());
+		areaBar.setPreferredSize(new Dimension(200, 16));
+		areaBar.setMaximum(Specifications.getInstance().getMaximumArea());
+		areaPanel.add(areaBar, BorderLayout.CENTER);
 
-		lblPosition = new JLabel("Position:");
-		final GridBagConstraints gbc_lblPosition = new GridBagConstraints();
-		gbc_lblPosition.anchor = GridBagConstraints.EAST;
-		gbc_lblPosition.insets = new Insets(0, 5, 5, 5);
-		gbc_lblPosition.gridx = 0;
-		gbc_lblPosition.gridy = 0;
-		geometryPanel.add(lblPosition, gbc_lblPosition);
+		// height for the selected building
 
-		positionTextField = new JTextField();
-		positionTextField.setEditable(false);
-		final GridBagConstraints gbc_positionTextField = new GridBagConstraints();
-		gbc_positionTextField.weightx = 1.0;
-		gbc_positionTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_positionTextField.anchor = GridBagConstraints.NORTH;
-		gbc_positionTextField.insets = new Insets(0, 0, 5, 5);
-		gbc_positionTextField.gridx = 1;
-		gbc_positionTextField.gridy = 0;
-		geometryPanel.add(positionTextField, gbc_positionTextField);
-		positionTextField.setColumns(8);
-
-		lblHeight = new JLabel("Height:");
-		final GridBagConstraints gbc_lblHeight = new GridBagConstraints();
-		gbc_lblHeight.anchor = GridBagConstraints.EAST;
-		gbc_lblHeight.insets = new Insets(0, 0, 5, 5);
-		gbc_lblHeight.gridx = 2;
-		gbc_lblHeight.gridy = 0;
-		geometryPanel.add(lblHeight, gbc_lblHeight);
-
-		heightTextField = new JTextField();
-		heightTextField.setEditable(false);
-		final GridBagConstraints gbc_heightTextField = new GridBagConstraints();
-		gbc_heightTextField.weightx = 1.0;
-		gbc_heightTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_heightTextField.insets = new Insets(0, 0, 5, 0);
-		gbc_heightTextField.anchor = GridBagConstraints.NORTH;
-		gbc_heightTextField.gridx = 3;
-		gbc_heightTextField.gridy = 0;
-		geometryPanel.add(heightTextField, gbc_heightTextField);
-		heightTextField.setColumns(5);
-
-		lblArea = new JLabel("Area:");
-		final GridBagConstraints gbc_lblArea = new GridBagConstraints();
-		gbc_lblArea.anchor = GridBagConstraints.EAST;
-		gbc_lblArea.insets = new Insets(0, 0, 10, 5);
-		gbc_lblArea.gridx = 0;
-		gbc_lblArea.gridy = 1;
-		geometryPanel.add(lblArea, gbc_lblArea);
-
-		areaTextField = new JTextField();
-		areaTextField.setEditable(false);
-		final GridBagConstraints gbc_areaTextField = new GridBagConstraints();
-		gbc_areaTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_areaTextField.insets = new Insets(0, 0, 10, 5);
-		gbc_areaTextField.gridx = 1;
-		gbc_areaTextField.gridy = 1;
-		geometryPanel.add(areaTextField, gbc_areaTextField);
-		areaTextField.setColumns(5);
-
-		lblVolume = new JLabel("Volume:");
-		final GridBagConstraints gbc_lblVolume = new GridBagConstraints();
-		gbc_lblVolume.anchor = GridBagConstraints.EAST;
-		gbc_lblVolume.insets = new Insets(0, 0, 10, 5);
-		gbc_lblVolume.gridx = 2;
-		gbc_lblVolume.gridy = 1;
-		geometryPanel.add(lblVolume, gbc_lblVolume);
-
-		volumnTextField = new JTextField();
-		volumnTextField.setEditable(false);
-		final GridBagConstraints gbc_volumnTextField = new GridBagConstraints();
-		gbc_volumnTextField.insets = new Insets(0, 0, 10, 0);
-		gbc_volumnTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_volumnTextField.gridx = 3;
-		gbc_volumnTextField.gridy = 1;
-		geometryPanel.add(volumnTextField, gbc_volumnTextField);
-		volumnTextField.setColumns(5);
+		heightPanel = new JPanel(new BorderLayout());
+		heightPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Height (m)", TitledBorder.LEADING, TitledBorder.TOP));
+		heightPanel.setToolTipText("<html>The height of the selected building<br><b>Must be within the specified range.</b></html>");
+		buildingPanel.add(heightPanel);
+		heightBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		heightBar.setUnit("");
+		heightBar.setUnitPrefix(false);
+		heightBar.setVerticalLineRepresentation(false);
+		heightBar.setDecimalDigits(1);
+		heightBar.setToolTipText(heightPanel.getToolTipText());
+		heightBar.setPreferredSize(new Dimension(200, 16));
+		heightBar.setMaximum(Specifications.getInstance().getMaximumHeight());
+		heightPanel.add(heightBar, BorderLayout.CENTER);
 
 		// cost for the selected building
 
 		costPanel = new JPanel(new BorderLayout());
 		costPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP));
-		costPanel.setToolTipText("<html>Total construction cost for the selected building<br><b>Must be within the green range.</b></html>");
+		costPanel.setToolTipText("<html>The total construction cost for the selected building<br><b>Must not exceed the limit.</b></html>");
 		buildingPanel.add(costPanel);
 		costBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		costBar.setToolTipText(costPanel.getToolTipText());
 		costBar.setPreferredSize(new Dimension(200, 16));
-		costBar.setMaximum(Cost.getInstance().getMaximumBudget());
+		costBar.setMaximum(Specifications.getInstance().getMaximumBudget());
 		costBar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent e) {
@@ -1037,15 +978,11 @@ public class EnergyPanel extends JPanel {
 			}
 			final double[] buildingGeometry = selectedBuilding.getBuildingGeometry();
 			if (buildingGeometry != null) {
-				positionTextField.setText("(" + twoDecimals.format(buildingGeometry[3]) + ", " + twoDecimals.format(buildingGeometry[4]) + ")");
-				heightTextField.setText(twoDecimals.format(buildingGeometry[0]));
-				areaTextField.setText(twoDecimals.format(buildingGeometry[1]));
-				volumnTextField.setText(twoDecimals.format(buildingGeometry[2]));
+				heightBar.setValue((float) buildingGeometry[0]);
+				areaBar.setValue((float) buildingGeometry[1]);
 			} else {
-				positionTextField.setText("");
-				heightTextField.setText("");
-				areaTextField.setText("");
-				volumnTextField.setText("");
+				heightBar.setValue(0);
+				areaBar.setValue(0);
 			}
 		} else {
 			windowTextField.setText("");
@@ -1053,12 +990,12 @@ public class EnergyPanel extends JPanel {
 			heatingTextField.setText("");
 			coolingTextField.setText("");
 			netEnergyTextField.setText("");
-
-			positionTextField.setText("");
-			heightTextField.setText("");
-			areaTextField.setText("");
-			volumnTextField.setText("");
+			heightBar.setValue(0);
+			areaBar.setValue(0);
 		}
+
+		heightBar.repaint();
+		areaBar.repaint();
 
 	}
 
@@ -1128,10 +1065,24 @@ public class EnergyPanel extends JPanel {
 		return windowSHGCComboBox;
 	}
 
-	public void setMaximumBudget(final int budget) {
-		costPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Construction Cost (Maximum: $" + budget + ")", TitledBorder.LEADING, TitledBorder.TOP));
-		costBar.setMaximum(budget);
+	public void updateCostBar() {
+		costPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Construction Cost (\u2264 $" + noDecimals.format(Specifications.getInstance().getMaximumBudget()) + ")", TitledBorder.LEADING, TitledBorder.TOP));
+		costBar.setMaximum(Specifications.getInstance().getMaximumBudget());
 		costBar.repaint();
+	}
+
+	public void updateAreaBar() {
+		areaPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Area (" + twoDecimals.format(Specifications.getInstance().getMinimumArea()) + " - " + twoDecimals.format(Specifications.getInstance().getMaximumArea()) + "\u33A1)", TitledBorder.LEADING, TitledBorder.TOP));
+		areaBar.setMinimum(Specifications.getInstance().getMinimumArea());
+		areaBar.setMaximum(Specifications.getInstance().getMaximumArea());
+		areaBar.repaint();
+	}
+
+	public void updateHeightBar() {
+		heightPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Height (" + twoDecimals.format(Specifications.getInstance().getMinimumHeight()) + " - " + twoDecimals.format(Specifications.getInstance().getMaximumHeight()) + "m)", TitledBorder.LEADING, TitledBorder.TOP));
+		heightBar.setMinimum(Specifications.getInstance().getMinimumHeight());
+		heightBar.setMaximum(Specifications.getInstance().getMaximumHeight());
+		heightBar.repaint();
 	}
 
 	public void turnOffCompute() {

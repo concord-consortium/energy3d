@@ -253,7 +253,7 @@ public class Foundation extends HousePart {
 				// if (resizeHouseMode)
 				// p = ensureNotTooSmall(p, index);
 				// else
-//				 p = ensureIncludesChildren(p, index);
+				// p = ensureIncludesChildren(p, index);
 			} else {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
@@ -294,28 +294,28 @@ public class Foundation extends HousePart {
 			collectChildren(child, children);
 	}
 
-//	private Vector3 ensureNotTooSmall(final Vector3 p, final int index) {
-//		final double MIN_LENGHT = getGridSize();
-//		final double x2 = getAbsPoint(index == 0 || index == 1 ? 2 : 0).getX();
-//		if (getAbsPoint(index).getX() > x2) {
-//			if (p.getX() - x2 < MIN_LENGHT)
-//				p.setX(x2 + MIN_LENGHT);
-//		} else {
-//			if (x2 - p.getX() < MIN_LENGHT)
-//				p.setX(x2 - MIN_LENGHT);
-//		}
-//
-//		final double y2 = getAbsPoint(index == 0 || index == 2 ? 1 : 0).getY();
-//		if (getAbsPoint(index).getY() > y2) {
-//			if (p.getY() - y2 < MIN_LENGHT)
-//				p.setY(y2 + MIN_LENGHT);
-//		} else {
-//			if (y2 - p.getY() < MIN_LENGHT)
-//				p.setY(y2 - MIN_LENGHT);
-//		}
-//
-//		return p;
-//	}
+	// private Vector3 ensureNotTooSmall(final Vector3 p, final int index) {
+	// final double MIN_LENGHT = getGridSize();
+	// final double x2 = getAbsPoint(index == 0 || index == 1 ? 2 : 0).getX();
+	// if (getAbsPoint(index).getX() > x2) {
+	// if (p.getX() - x2 < MIN_LENGHT)
+	// p.setX(x2 + MIN_LENGHT);
+	// } else {
+	// if (x2 - p.getX() < MIN_LENGHT)
+	// p.setX(x2 - MIN_LENGHT);
+	// }
+	//
+	// final double y2 = getAbsPoint(index == 0 || index == 2 ? 1 : 0).getY();
+	// if (getAbsPoint(index).getY() > y2) {
+	// if (p.getY() - y2 < MIN_LENGHT)
+	// p.setY(y2 + MIN_LENGHT);
+	// } else {
+	// if (y2 - p.getY() < MIN_LENGHT)
+	// p.setY(y2 - MIN_LENGHT);
+	// }
+	//
+	// return p;
+	// }
 
 	private void syncUpperPoints() {
 		for (int i = 0; i < 4; i++)
@@ -859,13 +859,7 @@ public class Foundation extends HousePart {
 			return null;
 
 		final double scale = Scene.getInstance().getAnnotationScale();
-		double height = Double.MAX_VALUE;
-		for (final HousePart w : children) {
-			final double h = w.getHeight();
-			if (height > h)
-				height = h;
-		}
-		height *= scale;
+		double height = boundingHeight * scale;
 
 		double area = 0;
 		Vector2 v1, v2;

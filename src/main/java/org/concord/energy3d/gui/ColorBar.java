@@ -7,6 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.text.DecimalFormat;
 
 import javax.swing.JPanel;
 
@@ -20,20 +21,46 @@ class ColorBar extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private float value = 0.0f;
-	private float maximum = 100000.0f;
+	private double value = 0.0;
+	private double minimum = Double.NaN;
+	private double maximum = 100000.0;
+	private String unit = "$";
+	private boolean unitPrefix = true;
+	private boolean verticalLineRepresentation = true;
+	private DecimalFormat decimalFormat = new DecimalFormat();
 
 	public ColorBar(Color background, Color foreground) {
 		super();
 		setBackground(background);
 		setForeground(foreground);
+		setDecimalDigits(0);
+	}
+
+	public void setDecimalDigits(int n) {
+		decimalFormat.setMaximumFractionDigits(n);
+	}
+
+	public void setUnitPrefix(boolean b) {
+		unitPrefix = b;
+	}
+
+	public void setVerticalLineRepresentation(boolean b) {
+		verticalLineRepresentation = b;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
 	}
 
 	public void setValue(float value) {
 		this.value = value;
 	}
 
-	public void setMaximum(float maximum) {
+	public void setMinimum(double minimum) {
+		this.minimum = minimum;
+	}
+
+	public void setMaximum(double maximum) {
 		this.maximum = maximum;
 	}
 
@@ -53,19 +80,39 @@ class ColorBar extends JPanel {
 		int height = dim.height;
 		g2.setColor(getBackground());
 		g2.fillRect(1, 1, width - 3, height - 3);
-		g2.setColor(Color.GREEN.darker());
-		g2.fillRect(Math.round(0.9f * width), 1, Math.round(0.1f * width), height - 2);
-		g2.setColor(value <= maximum ? getForeground() : Color.YELLOW);
-		g2.fillRect(1, 1, Math.round(value * width / maximum), height);
+		if (value > maximum) {
+			g2.setColor(Color.YELLOW);
+		} else if (!Double.isNaN(minimum) && value < minimum) {
+			g2.setColor(Color.YELLOW);
+		} else {
+			g2.setColor(getForeground());
+		}
+		double max = maximum + (Double.isNaN(minimum) ? 0 : minimum);
+		g2.fillRect(1, 1, (int) Math.round(value * width / max), height);
 		g2.setColor(getBackground().darker());
 		g2.drawRect(0, 0, width - 1, height - 1);
-		g2.setColor(Color.BLACK);
-		g2.fillRect(Math.round(value * width / maximum), 1, 1, height - 2);
+		if (verticalLineRepresentation) {
+			g2.setColor(Color.RED);
+			g2.fillRect((int) Math.round(maximum * width / max), 1, 2, height - 2);
+			if (!Double.isNaN(minimum))
+				g2.fillRect((int) Math.round(minimum * width / max), 1, 2, height - 2);
+		} else {
+			g2.setColor(new Color(0xCD5C5C));
+			int x1 = 0;
+			if (!Double.isNaN(minimum)) {
+				x1 = (int) Math.round(minimum * width / max);
+				g2.fillRect(0, height - 4, x1, 4);
+			}
+			int x2 = (int) Math.round(maximum * width / max);
+			g2.fillRect(x2, height - 4, width - x2, 4);
+			g2.setColor(new Color(0x32CD32));
+			g2.fillRect(x1, height - 4, x2 - x1, 4);
+		}
 
-		if (value / maximum > 0.001) {
-			g2.setFont(new Font("Arial", Font.PLAIN, 10));
+		if (value / maximum > 0.0001) {
+			g2.setFont(new Font(null, Font.PLAIN, 10));
 			g2.setColor(Color.BLACK);
-			String s = "$" + (int) value;
+			String s = unitPrefix ? unit + decimalFormat.format(value) : decimalFormat.format(value) + unit;
 			FontMetrics fm = g2.getFontMetrics();
 			g2.drawString(s, (width - fm.stringWidth(s)) / 2, (fm.getAscent() + (height - (fm.getAscent() + fm.getDescent())) / 2));
 		}

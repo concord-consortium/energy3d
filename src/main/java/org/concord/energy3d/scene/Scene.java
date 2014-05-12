@@ -29,10 +29,10 @@ import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.Specifications;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
@@ -100,6 +100,10 @@ public class Scene implements Serializable {
 	private double solarStep = 2.0;
 	private int timeStep = 15; // in minutes
 	private int budget = 100000; // in US dollars
+	private double minimumArea = 100;
+	private double maximumArea = 150;
+	private double minimumHeight = 8;
+	private double maximumHeight = 10;
 	private boolean cleanup = false;
 	private String wallUFactor;
 	private String doorUFactor;
@@ -262,7 +266,11 @@ public class Scene implements Serializable {
 			energyPanel.getCityComboBox().setSelectedItem(instance.city);
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
-		Cost.getInstance().setMaximumBudget(instance.budget == 0 ? 100000 : instance.budget);
+		Specifications.getInstance().setMaximumBudget(instance.budget == 0 ? 100000 : instance.budget);
+		Specifications.getInstance().setMinimumArea(instance.minimumArea == 0 ? 100 : instance.minimumArea);
+		Specifications.getInstance().setMaximumArea(instance.maximumArea == 0 ? 150 : instance.maximumArea);
+		Specifications.getInstance().setMinimumHeight(instance.minimumHeight == 0 ? 8 : instance.minimumHeight);
+		Specifications.getInstance().setMaximumHeight(instance.maximumHeight == 0 ? 10 : instance.maximumHeight);
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
 		if (instance.windowUFactor != null)
 			energyPanel.getWindowsComboBox().setSelectedItem(instance.windowUFactor);
@@ -412,7 +420,11 @@ public class Scene implements Serializable {
 				// save camera to file
 				saveCameraLocation();
 
-				instance.budget = Cost.getInstance().getMaximumBudget();
+				instance.budget = Specifications.getInstance().getMaximumBudget();
+				instance.maximumArea = Specifications.getInstance().getMaximumArea();
+				instance.minimumArea = Specifications.getInstance().getMinimumArea();
+				instance.maximumHeight = Specifications.getInstance().getMaximumHeight();
+				instance.minimumHeight = Specifications.getInstance().getMinimumHeight();
 				instance.hideAxes = !SceneManager.getInstance().areAxesShown();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsShown();
 				instance.calendar = Heliodon.getInstance().getCalender();
@@ -759,8 +771,8 @@ public class Scene implements Serializable {
 		this.edited = edited;
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();
-//		if (edited && recomputeEnergy)
-//			EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+		// if (edited && recomputeEnergy)
+		// EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 
 	public void updateEditShapes() {
