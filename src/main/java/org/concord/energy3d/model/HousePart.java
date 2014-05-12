@@ -281,7 +281,7 @@ public abstract class HousePart implements Serializable {
 		if (!firstPointInserted || container == null)
 			picked = SelectUtil.pickPart(x, y, typesOfHousePart);
 		else
-			picked = SelectUtil.pickPart(x, y, container == null ? null : container.getRoot());
+			picked = SelectUtil.pickPart(x, y, container);
 
 		if (!firstPointInserted && picked != null) {
 			UserData userData = null;
@@ -884,6 +884,10 @@ public abstract class HousePart implements Serializable {
 
 	public Spatial getEditPointsRoot() {
 		return pointsRoot;
+	}
+
+	public Spatial getCollisionSpatial() {
+		return mesh;
 	}
 
 }

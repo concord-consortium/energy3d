@@ -18,7 +18,6 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Spatial;
 
 public class SelectUtil {
 	private static final PickResults pickResults = new PrimitivePickResults();
@@ -30,12 +29,37 @@ public class SelectUtil {
 		pickResults.setCheckDistance(true);
 	}
 
-	public static PickedHousePart pickPart(final int x, final int y, Spatial target) {
-		if (target == null)
-			target = SceneManager.getInstance().getLand();
+	public static PickedHousePart pickPart(final int x, final int y) {
 		pickResults.clear();
 		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
-		PickingUtil.findPick(target, pickRay, pickResults, false);
+
+		synchronized (Scene.getInstance().getParts()) {
+			for (final HousePart housePart : Scene.getInstance().getParts())
+				if (!housePart.isFrozen()) {
+					PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
+					PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
+				}
+		}
+
+		return getPickResult(pickRay);
+	}
+
+	public static PickedHousePart pickPart(final int x, final int y, final Mesh mesh) {
+		pickResults.clear();
+		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
+		PickingUtil.findPick(mesh, pickRay, pickResults, false);
+		return getPickResult(pickRay);
+	}
+
+	public static PickedHousePart pickPart(final int x, final int y, final HousePart housePart) {
+		pickResults.clear();
+		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
+		if (housePart == null)
+			PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
+		else {
+			PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
+			PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
+		}
 		return getPickResult(pickRay);
 	}
 
@@ -43,23 +67,17 @@ public class SelectUtil {
 		pickResults.clear();
 		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
 
-		if (typesOfHousePart == null)
-			PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
-		else
-			synchronized (Scene.getInstance().getParts()) {
-				for (final HousePart housePart : Scene.getInstance().getParts())
-					if (!housePart.isFrozen())
-						for (final Class<?> typeOfHousePart : typesOfHousePart)
-							if (typeOfHousePart == null)
-								PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
-							else if (typeOfHousePart.isInstance(housePart)) {
-								if (housePart instanceof Wall) {
-									PickingUtil.findPick(((Wall) housePart).getInvisibleMesh(), pickRay, pickResults, false);
-									PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
-								} else
-									PickingUtil.findPick(housePart.getRoot(), pickRay, pickResults, false);
-							}
-			}
+		synchronized (Scene.getInstance().getParts()) {
+			for (final Class<?> typeOfHousePart : typesOfHousePart)
+				if (typeOfHousePart == null)
+					PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
+				else
+					for (final HousePart housePart : Scene.getInstance().getParts())
+						if (!housePart.isFrozen() && typeOfHousePart.isInstance(housePart)) {
+							PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
+							PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
+						}
+		}
 
 		return getPickResult(pickRay);
 	}
@@ -123,7 +141,7 @@ public class SelectUtil {
 
 	public static PickedHousePart selectHousePart(final int x, final int y, final boolean edit) {
 		final PickedHousePart pickedHousePart;
-		pickedHousePart = pickPart(x, y, Scene.getRoot());
+		pickedHousePart = pickPart(x, y);
 		UserData data = null;
 		if (pickedHousePart != null)
 			data = pickedHousePart.getUserData();

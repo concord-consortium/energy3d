@@ -91,9 +91,6 @@ public class Wall extends HousePart {
 			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
 
 		mesh = new Mesh("Wall");
-		// mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		// mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		// mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
 //		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		mesh.setRenderState(offsetState);
@@ -101,9 +98,6 @@ public class Wall extends HousePart {
 		root.attachChild(mesh);
 
 		backMesh = new Mesh("Wall (Back)");
-		// backMesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
-		// backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		// backMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
 		backMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
 		backMesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		backMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
@@ -135,9 +129,7 @@ public class Wall extends HousePart {
 		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		windowsSurroundMesh.setRenderState(offsetState);
-		/*
-		 * lets not use bounds for this mesh because when there are no windows its bounds is set to center 0,0,0 which shifts the overall bounds toward zero
-		 */
+		/* lets not use bounds for this mesh because when there are no windows its bounds is set to center 0,0,0 which shifts the overall bounds toward zero */
 		windowsSurroundMesh.setModelBound(null);
 		root.attachChild(windowsSurroundMesh);
 
@@ -218,7 +210,7 @@ public class Wall extends HousePart {
 	}
 
 	public Vector3 findClosestPointOnFoundation(final int x, final int y) {
-		final PickedHousePart floorPick = SelectUtil.pickPart(x, y, (Spatial) null);
+		final PickedHousePart floorPick = SelectUtil.pickPart(x, y, (HousePart) null);
 		if (floorPick != null) {
 			Vector3 p = floorPick.getPoint();
 			ReadOnlyVector3 closesPoint = container.points.get(0);
@@ -373,8 +365,6 @@ public class Wall extends HousePart {
 
 		drawWireframe(wallAndWindowsPoints);
 		drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
-
-		/* draw invisibleMesh */
 		drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 		CollisionTreeManager.INSTANCE.updateCollisionTree(invisibleMesh);
@@ -577,8 +567,7 @@ public class Wall extends HousePart {
 		enforceGablePointsRangeAndRemoveDuplicatedGablePoints(polygon.get(0));
 		extendToRoof(polygon.get(0));
 
-		// lower the z of back wall to ensure it doesn't stick up through the
-		// roof
+		/* lower the z of back wall to ensure it doesn't stick up through the roof */
 		if (roof != null)
 			for (final Vector3 p : polygon.get(0))
 				p.setZ(p.getZ() - 0.3);
@@ -713,8 +702,8 @@ public class Wall extends HousePart {
 		vertexBuffer.limit(vertexBuffer.position());
 		normalBuffer.limit(normalBuffer.position());
 		surroundMesh.getMeshData().updateVertexCount();
-		CollisionTreeManager.INSTANCE.updateCollisionTree(surroundMesh);
 		surroundMesh.updateModelBound();
+		CollisionTreeManager.INSTANCE.updateCollisionTree(surroundMesh);
 	}
 
 	protected void addSurroundQuad(final int i1, final int i2, final ReadOnlyVector3 n, final ReadOnlyVector3 thickness, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {
@@ -1225,5 +1214,10 @@ public class Wall extends HousePart {
 
 	public List<Vector3> getWallPolygonPoints() {
 		return wallAndWindowsPoints.get(0);
+	}
+
+	@Override
+	public Spatial getCollisionSpatial() {
+		return invisibleMesh;
 	}
 }

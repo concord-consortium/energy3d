@@ -943,4 +943,9 @@ public abstract class Roof extends HousePart {
 		return getTopContainer();
 	}
 
+	@Override
+	public Spatial getCollisionSpatial() {
+		return roofPartsRoot;
+	}
+
 }

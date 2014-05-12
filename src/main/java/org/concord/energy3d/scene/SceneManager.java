@@ -157,7 +157,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final BasicPassManager passManager = new BasicPassManager();
 	private final Mesh land = new Quad("Floor", 2000, 2000);
 	private final Mesh solarLand = new Quad("Floor", 256, 256);
-	private final Mesh invisibleFloor = new Quad("Floor", 2000, 2000);
+	private final Mesh houseMoveCollisionPlate = new Quad("Floor", 2000, 2000);
 	private final Mesh gridsMesh = new Line("Floor Grids");
 	private final LightState lightState = new LightState();
 	private final UndoManager undoManager = new UndoManager();
@@ -285,9 +285,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		backgroundRoot.attachChild(createLand());
 		solarLand.setVisible(false);
 		backgroundRoot.attachChild(solarLand);
-		invisibleFloor.setModelBound(new BoundingBox());
-		invisibleFloor.getSceneHints().setCullHint(CullHint.Always);
-		root.attachChild(invisibleFloor);
+		houseMoveCollisionPlate.setModelBound(new BoundingBox());
+		houseMoveCollisionPlate.getSceneHints().setCullHint(CullHint.Always);
+		root.attachChild(houseMoveCollisionPlate);
 		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
 		drawGrids(5);
 		backgroundRoot.attachChild(gridsMesh);
@@ -663,7 +663,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (pickResults.getNumber() > 0)
 							cameraControl.zoomAtPoint(pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0));
 					} else {
-						final PickedHousePart pickedHousePart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY(), root);
+						final PickedHousePart pickedHousePart = SelectUtil.pickPart(inputStates.getCurrent().getMouseState().getX(), inputStates.getCurrent().getMouseState().getY());
 						if (pickedHousePart != null)
 							cameraControl.zoomAtPoint(pickedHousePart.getPoint());
 					}
@@ -1158,14 +1158,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
 		} else if (houseMoveStartPoint != null && operation == Operation.RESIZE && selectedHousePart.isDrawCompleted()) {
-			final PickedHousePart pick = SelectUtil.pickPart(x, y, invisibleFloor);
+			final PickedHousePart pick = SelectUtil.pickPart(x, y, houseMoveCollisionPlate);
 			if (pick != null) {
 				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
 				((Foundation) selectedHousePart).move(d, houseMovePoints);
 			}
 		} else if (houseMoveStartPoint != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Window) {
 			final Wall wall = (Wall) selectedHousePart.getContainer();
-			final PickedHousePart pick = SelectUtil.pickPart(x, y, wall.getRoot());
+			final PickedHousePart pick = SelectUtil.pickPart(x, y, wall);
 			if (pick != null) {
 				final Vector3 d = pick.getPoint().subtractLocal(houseMoveStartPoint);
 				((Window) selectedHousePart).move(d, houseMovePoints);
@@ -1175,20 +1175,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			pick = selectHousePart == null ? null : selectHousePart.getUserData();
 			final HousePart housePart = pick == null ? null : pick.getHousePart();
 			if (pick != null) {
-				// if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && hoveredHousePart != housePart)
-				// hoveredHousePart.setEditPointsVisible(false);
 				hoveredHousePart = housePart;
 				if (hoveredHousePart.isFrozen())
 					hoveredHousePart = null;
-				// if (hoveredHousePart != null && hoveredHousePart != selectedHousePart && !PrintController.getInstance().isPrintPreview() && operation != Operation.RESIZE)
-				// hoveredHousePart.setEditPointsVisible(true);
 				if (pick.getIndex() != -1)
 					lastSelectedEditPointMouseState = mouseState;
-			} else {
-				// if (hoveredHousePart != null && hoveredHousePart != selectedHousePart)
-				// hoveredHousePart.setEditPointsVisible(false);
+			} else
 				hoveredHousePart = null;
-			}
 		}
 		mouseState = null;
 	}
@@ -1294,7 +1287,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (selectedHousePart instanceof Window || (operation == Operation.RESIZE && selectedHousePart instanceof Foundation)) {
 							cameraControl.setLeftMouseButtonEnabled(false);
 							houseMoveStartPoint = selectHousePart.getPoint();
-							invisibleFloor.setTranslation(0, 0, houseMoveStartPoint.getZ());
+							houseMoveCollisionPlate.setTranslation(0, 0, houseMoveStartPoint.getZ());
 							final ArrayList<Vector3> points = selectedHousePart.getPoints();
 							houseMovePoints = new ArrayList<Vector3>(points.size());
 							for (final Vector3 p : points)
@@ -1432,6 +1425,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					Scene.getInstance().remove(selectedHousePart, true);
 					selectedHousePart = null;
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							MainPanel.getInstance().getSolarButton().setSelected(false);
 						}

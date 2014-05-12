@@ -24,7 +24,6 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -206,7 +205,7 @@ public class Foundation extends HousePart {
 		else
 			index = editPointIndex;
 
-		final PickedHousePart pick = SelectUtil.pickPart(x, y, (Spatial) null);
+		final PickedHousePart pick = SelectUtil.pickPart(x, y, (HousePart) null);
 		final Vector3 p;
 		if (pick != null && index < 4) {
 			p = pick.getPoint();
