@@ -97,13 +97,13 @@ public class Tree extends HousePart {
 			break;
 		case MAPLE:
 			sphere.setScale(1, 1, 1.2);
-			sphere.setTranslation(0, 0, 20);
-			cylinder.setTranslation(0, 0, 15);
+			sphere.setTranslation(0, 0, 26);
+			cylinder.setTranslation(0, 0, 10);
 			break;
 		case PINE:
-			sphere.setScale(1, 1, 2);
-			sphere.setTranslation(0, 0, 30);
-			cylinder.setTranslation(0, 0, 15);
+			sphere.setScale(1, 1, 1.6);
+			sphere.setTranslation(0, 0, 24);
+			cylinder.setTranslation(0, 0, 10);
 			break;
 		default:
 			sphere.setScale(1, 1, 0.7);
