@@ -81,6 +81,7 @@ class SpecsDialog extends JDialog {
 
 		// set the budget limit
 		budgetCheckBox = new JCheckBox("Maximum Budget: ", Specifications.getInstance().isBudgetEnabled());
+		budgetCheckBox.setToolTipText("Select to apply a budget");
 		budgetTextField = new JTextField(FORMAT2.format(Specifications.getInstance().getMaximumBudget()), 6);
 		budgetLabel = new JLabel("Dollars");
 		panel.add(budgetCheckBox);
@@ -90,15 +91,14 @@ class SpecsDialog extends JDialog {
 		budgetCheckBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				boolean b = budgetCheckBox.isSelected();
-				Specifications.getInstance().setBudgetEnabled(b);
-				enableBudgetItems(b);
+				enableBudgetItems(budgetCheckBox.isSelected());
 			}
 		});
 		enableBudgetItems(Specifications.getInstance().isBudgetEnabled());
 
 		// set the minimum and maximum areas
 		minimumAreaCheckBox = new JCheckBox("Minimum Area: ", Specifications.getInstance().isAreaEnabled());
+		minimumAreaCheckBox.setToolTipText("Select to apply an area requirement");
 		minimumAreaTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMinimumArea()), 6);
 		minimumAreaLabel = new JLabel("\u33A1");
 		panel.add(minimumAreaCheckBox);
@@ -106,6 +106,7 @@ class SpecsDialog extends JDialog {
 		panel.add(minimumAreaLabel);
 
 		maximumAreaCheckBox = new JCheckBox("Maximum Area: ", Specifications.getInstance().isAreaEnabled());
+		maximumAreaCheckBox.setToolTipText(minimumAreaCheckBox.getToolTipText());
 		maximumAreaTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMaximumArea()), 6);
 		maximumAreaLabel = new JLabel("\u33A1");
 		panel.add(maximumAreaCheckBox);
@@ -117,7 +118,6 @@ class SpecsDialog extends JDialog {
 			public void itemStateChanged(ItemEvent e) {
 				boolean b = minimumAreaCheckBox.isSelected();
 				Util.selectSilently(maximumAreaCheckBox, b);
-				Specifications.getInstance().setAreaEnabled(b);
 				enableAreaItems(b);
 			}
 		});
@@ -126,7 +126,6 @@ class SpecsDialog extends JDialog {
 			public void itemStateChanged(ItemEvent e) {
 				boolean b = maximumAreaCheckBox.isSelected();
 				Util.selectSilently(minimumAreaCheckBox, b);
-				Specifications.getInstance().setAreaEnabled(b);
 				enableAreaItems(b);
 			}
 		});
@@ -134,6 +133,7 @@ class SpecsDialog extends JDialog {
 
 		// set the minimum and maximum heights
 		minimumHeightCheckBox = new JCheckBox("Minimum Height: ", Specifications.getInstance().isHeightEnabled());
+		minimumHeightCheckBox.setToolTipText("Select to apply a height requirement");
 		minimumHeightTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMinimumHeight()), 6);
 		minimumHeightLabel = new JLabel("m");
 		panel.add(minimumHeightCheckBox);
@@ -141,6 +141,7 @@ class SpecsDialog extends JDialog {
 		panel.add(minimumHeightLabel);
 
 		maximumHeightCheckBox = new JCheckBox("Maximum Height: ", Specifications.getInstance().isHeightEnabled());
+		maximumHeightCheckBox.setToolTipText(minimumHeightCheckBox.getToolTipText());
 		maximumHeightTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMaximumHeight()), 6);
 		maximumHeightLabel = new JLabel("m");
 		panel.add(maximumHeightCheckBox);
@@ -152,7 +153,6 @@ class SpecsDialog extends JDialog {
 			public void itemStateChanged(ItemEvent e) {
 				boolean b = minimumHeightCheckBox.isSelected();
 				Util.selectSilently(maximumHeightCheckBox, b);
-				Specifications.getInstance().setHeightEnabled(b);
 				enableHeightItems(b);
 			}
 		});
@@ -161,7 +161,6 @@ class SpecsDialog extends JDialog {
 			public void itemStateChanged(ItemEvent e) {
 				boolean b = maximumHeightCheckBox.isSelected();
 				Util.selectSilently(minimumHeightCheckBox, b);
-				Specifications.getInstance().setHeightEnabled(b);
 				enableHeightItems(b);
 			}
 		});
@@ -214,6 +213,9 @@ class SpecsDialog extends JDialog {
 				Specifications.getInstance().setMinimumArea(minimumArea);
 				Specifications.getInstance().setMaximumHeight(maximumHeight);
 				Specifications.getInstance().setMinimumHeight(minimumHeight);
+				Specifications.getInstance().setBudgetEnabled(budgetCheckBox.isSelected());
+				Specifications.getInstance().setAreaEnabled(minimumAreaCheckBox.isSelected());
+				Specifications.getInstance().setHeightEnabled(minimumHeightCheckBox.isSelected());
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				SpecsDialog.this.dispose();

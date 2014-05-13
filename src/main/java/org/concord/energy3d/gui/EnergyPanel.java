@@ -109,8 +109,8 @@ public class EnergyPanel extends JPanel {
 	private final JPanel heatMapPanel;
 	private final JSlider colorMapSlider;
 	private final JProgressBar progressBar;
-	private final ColorBar costBar, heightBar, areaBar;
-	private final JPanel costPanel, heightPanel, areaPanel;
+	private final ColorBar budgetBar, heightBar, areaBar;
+	private final JPanel budgetPanel, heightPanel, areaPanel;
 	private JPanel partPanel;
 	private JPanel buildingPanel;
 	private JTextField windowTextField;
@@ -567,22 +567,22 @@ public class EnergyPanel extends JPanel {
 
 		// cost for the selected building
 
-		costPanel = new JPanel(new BorderLayout());
-		costPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP));
-		costPanel.setToolTipText("<html>The total construction cost for the selected building<br><b>Must not exceed the limit.</b></html>");
-		buildingPanel.add(costPanel);
-		costBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
-		costBar.setToolTipText(costPanel.getToolTipText());
-		costBar.setPreferredSize(new Dimension(200, 16));
-		costBar.setMaximum(Specifications.getInstance().getMaximumBudget());
-		costBar.addMouseListener(new MouseAdapter() {
+		budgetPanel = new JPanel(new BorderLayout());
+		budgetPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP));
+		budgetPanel.setToolTipText("<html>The total construction cost for the selected building<br><b>Must not exceed the limit.</b></html>");
+		buildingPanel.add(budgetPanel);
+		budgetBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		budgetBar.setToolTipText(budgetPanel.getToolTipText());
+		budgetBar.setPreferredSize(new Dimension(200, 16));
+		budgetBar.setMaximum(Specifications.getInstance().getMaximumBudget());
+		budgetBar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() > 1)
 					Cost.getInstance().showGraph();
 			}
 		});
-		costPanel.add(costBar, BorderLayout.CENTER);
+		budgetPanel.add(budgetBar, BorderLayout.CENTER);
 
 		final Component verticalGlue = Box.createVerticalGlue();
 		dataPanel.add(verticalGlue);
@@ -1015,8 +1015,8 @@ public class EnergyPanel extends JPanel {
 		int n = 0;
 		if (selectedBuilding != null)
 			n = Cost.getInstance().getBuildingCost(selectedBuilding);
-		costBar.setValue(n);
-		costBar.repaint();
+		budgetBar.setValue(n);
+		budgetBar.repaint();
 	}
 
 	public void update() {
@@ -1069,21 +1069,35 @@ public class EnergyPanel extends JPanel {
 		return windowSHGCComboBox;
 	}
 
-	public void updateCostBar() {
-		costPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Construction Cost (\u2264 $" + noDecimals.format(Specifications.getInstance().getMaximumBudget()) + ")", TitledBorder.LEADING, TitledBorder.TOP));
-		costBar.setMaximum(Specifications.getInstance().getMaximumBudget());
-		costBar.repaint();
+	public void updateBudgetBar() {
+		String t = "Construction Cost (";
+		t += Specifications.getInstance().isBudgetEnabled() ? "\u2264 $" + noDecimals.format(Specifications.getInstance().getMaximumBudget()) : "$";
+		t += ")";
+		budgetPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
+		budgetBar.setEnabled(Specifications.getInstance().isBudgetEnabled());
+		budgetBar.setMaximum(Specifications.getInstance().getMaximumBudget());
+		budgetBar.repaint();
 	}
 
 	public void updateAreaBar() {
-		areaPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Area (" + twoDecimals.format(Specifications.getInstance().getMinimumArea()) + " - " + twoDecimals.format(Specifications.getInstance().getMaximumArea()) + "\u33A1)", TitledBorder.LEADING, TitledBorder.TOP));
+		String t = "Area (";
+		if (Specifications.getInstance().isAreaEnabled())
+			t += twoDecimals.format(Specifications.getInstance().getMinimumArea()) + " - " + twoDecimals.format(Specifications.getInstance().getMaximumArea());
+		t += "\u33A1)";
+		areaPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
+		areaBar.setEnabled(Specifications.getInstance().isAreaEnabled());
 		areaBar.setMinimum(Specifications.getInstance().getMinimumArea());
 		areaBar.setMaximum(Specifications.getInstance().getMaximumArea());
 		areaBar.repaint();
 	}
 
 	public void updateHeightBar() {
-		heightPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Height (" + twoDecimals.format(Specifications.getInstance().getMinimumHeight()) + " - " + twoDecimals.format(Specifications.getInstance().getMaximumHeight()) + "m)", TitledBorder.LEADING, TitledBorder.TOP));
+		String t = "Height (";
+		if (Specifications.getInstance().isHeightEnabled())
+			t += twoDecimals.format(Specifications.getInstance().getMinimumHeight()) + " - " + twoDecimals.format(Specifications.getInstance().getMaximumHeight());
+		t += "m)";
+		heightPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
+		heightBar.setEnabled(Specifications.getInstance().isHeightEnabled());
 		heightBar.setMinimum(Specifications.getInstance().getMinimumHeight());
 		heightBar.setMaximum(Specifications.getInstance().getMaximumHeight());
 		heightBar.repaint();

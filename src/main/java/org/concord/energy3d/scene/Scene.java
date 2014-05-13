@@ -104,6 +104,9 @@ public class Scene implements Serializable {
 	private double maximumArea = 150;
 	private double minimumHeight = 8;
 	private double maximumHeight = 10;
+	private boolean budgetEnabled;
+	private boolean areaEnabled;
+	private boolean heightEnabled;
 	private boolean cleanup = false;
 	private String wallUFactor;
 	private String doorUFactor;
@@ -271,6 +274,9 @@ public class Scene implements Serializable {
 		Specifications.getInstance().setMaximumArea(instance.maximumArea == 0 ? 150 : instance.maximumArea);
 		Specifications.getInstance().setMinimumHeight(instance.minimumHeight == 0 ? 8 : instance.minimumHeight);
 		Specifications.getInstance().setMaximumHeight(instance.maximumHeight == 0 ? 10 : instance.maximumHeight);
+		Specifications.getInstance().setBudgetEnabled(instance.budgetEnabled);
+		Specifications.getInstance().setAreaEnabled(instance.areaEnabled);
+		Specifications.getInstance().setHeightEnabled(instance.heightEnabled);
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
 		if (instance.windowUFactor != null)
 			energyPanel.getWindowsComboBox().setSelectedItem(instance.windowUFactor);
@@ -425,6 +431,9 @@ public class Scene implements Serializable {
 				instance.minimumArea = Specifications.getInstance().getMinimumArea();
 				instance.maximumHeight = Specifications.getInstance().getMaximumHeight();
 				instance.minimumHeight = Specifications.getInstance().getMinimumHeight();
+				instance.budgetEnabled = Specifications.getInstance().isBudgetEnabled();
+				instance.areaEnabled = Specifications.getInstance().isAreaEnabled();
+				instance.heightEnabled = Specifications.getInstance().isHeightEnabled();
 				instance.hideAxes = !SceneManager.getInstance().areAxesShown();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsShown();
 				instance.calendar = Heliodon.getInstance().getCalender();

@@ -80,33 +80,36 @@ class ColorBar extends JPanel {
 		int height = dim.height;
 		g2.setColor(getBackground());
 		g2.fillRect(1, 1, width - 3, height - 3);
-		if (value > maximum) {
-			g2.setColor(Color.YELLOW);
-		} else if (!Double.isNaN(minimum) && value < minimum) {
-			g2.setColor(Color.YELLOW);
-		} else {
-			g2.setColor(getForeground());
-		}
-		double max = maximum + (Double.isNaN(minimum) ? 0 : minimum);
-		g2.fillRect(1, 1, (int) Math.round(value * width / max), height);
 		g2.setColor(getBackground().darker());
 		g2.drawRect(0, 0, width - 1, height - 1);
-		if (verticalLineRepresentation) {
-			g2.setColor(Color.RED);
-			g2.fillRect((int) Math.round(maximum * width / max), 1, 2, height - 2);
-			if (!Double.isNaN(minimum))
-				g2.fillRect((int) Math.round(minimum * width / max), 1, 2, height - 2);
-		} else {
-			g2.setColor(new Color(0xCD5C5C));
-			int x1 = 0;
-			if (!Double.isNaN(minimum)) {
-				x1 = (int) Math.round(minimum * width / max);
-				g2.fillRect(0, height - 4, x1, 4);
+
+		if (isEnabled()) {
+			if (value > maximum) {
+				g2.setColor(Color.YELLOW);
+			} else if (!Double.isNaN(minimum) && value < minimum) {
+				g2.setColor(Color.YELLOW);
+			} else {
+				g2.setColor(getForeground());
 			}
-			int x2 = (int) Math.round(maximum * width / max);
-			g2.fillRect(x2, height - 4, width - x2, 4);
-			g2.setColor(new Color(0x32CD32));
-			g2.fillRect(x1, height - 4, x2 - x1, 4);
+			double max = maximum + (Double.isNaN(minimum) ? 0 : minimum);
+			g2.fillRect(1, 1, (int) Math.round(value * width / max), height);
+			if (verticalLineRepresentation) {
+				g2.setColor(Color.RED);
+				g2.fillRect((int) Math.round(maximum * width / max), 1, 2, height - 2);
+				if (!Double.isNaN(minimum))
+					g2.fillRect((int) Math.round(minimum * width / max), 1, 2, height - 2);
+			} else {
+				g2.setColor(new Color(0xCD5C5C));
+				int x1 = 0;
+				if (!Double.isNaN(minimum)) {
+					x1 = (int) Math.round(minimum * width / max);
+					g2.fillRect(0, height - 4, x1, 4);
+				}
+				int x2 = (int) Math.round(maximum * width / max);
+				g2.fillRect(x2, height - 4, width - x2, 4);
+				g2.setColor(new Color(0x32CD32));
+				g2.fillRect(x1, height - 4, x2 - x1, 4);
+			}
 		}
 
 		if (value / maximum > 0.0001) {

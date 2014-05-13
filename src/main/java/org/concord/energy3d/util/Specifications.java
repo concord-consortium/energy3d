@@ -31,6 +31,7 @@ public class Specifications {
 
 	public void setBudgetEnabled(boolean budgetEnabled) {
 		this.budgetEnabled = budgetEnabled;
+		EnergyPanel.getInstance().updateBudgetBar();
 	}
 
 	public boolean isBudgetEnabled() {
@@ -39,7 +40,7 @@ public class Specifications {
 
 	public void setMaximumBudget(int maximumBudget) {
 		this.maximumBudget = maximumBudget;
-		EnergyPanel.getInstance().updateCostBar();
+		EnergyPanel.getInstance().updateBudgetBar();
 	}
 
 	public int getMaximumBudget() {
@@ -48,6 +49,7 @@ public class Specifications {
 
 	public void setHeightEnabled(boolean heightEnabled) {
 		this.heightEnabled = heightEnabled;
+		EnergyPanel.getInstance().updateHeightBar();
 	}
 
 	public boolean isHeightEnabled() {
@@ -74,6 +76,7 @@ public class Specifications {
 
 	public void setAreaEnabled(boolean areaEnabled) {
 		this.areaEnabled = areaEnabled;
+		EnergyPanel.getInstance().updateAreaBar();
 	}
 
 	public boolean isAreaEnabled() {
