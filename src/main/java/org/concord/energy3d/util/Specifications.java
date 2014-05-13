@@ -12,6 +12,10 @@ public class Specifications {
 
 	private static Specifications instance = new Specifications();
 
+	private boolean budgetEnabled = true;
+	private boolean heightEnabled = false;
+	private boolean areaEnabled = false;
+
 	private int maximumBudget = 100000;
 	private double minimumHeight = 8;
 	private double maximumHeight = 10;
@@ -25,6 +29,14 @@ public class Specifications {
 		return instance;
 	}
 
+	public void setBudgetEnabled(boolean budgetEnabled) {
+		this.budgetEnabled = budgetEnabled;
+	}
+
+	public boolean isBudgetEnabled() {
+		return budgetEnabled;
+	}
+
 	public void setMaximumBudget(int maximumBudget) {
 		this.maximumBudget = maximumBudget;
 		EnergyPanel.getInstance().updateCostBar();
@@ -32,6 +44,14 @@ public class Specifications {
 
 	public int getMaximumBudget() {
 		return maximumBudget;
+	}
+
+	public void setHeightEnabled(boolean heightEnabled) {
+		this.heightEnabled = heightEnabled;
+	}
+
+	public boolean isHeightEnabled() {
+		return heightEnabled;
 	}
 
 	public void setMaximumHeight(double maximumHeight) {
@@ -50,6 +70,14 @@ public class Specifications {
 
 	public double getMinimumHeight() {
 		return minimumHeight;
+	}
+
+	public void setAreaEnabled(boolean areaEnabled) {
+		this.areaEnabled = areaEnabled;
+	}
+
+	public boolean isAreaEnabled() {
+		return areaEnabled;
 	}
 
 	public void setMaximumArea(double maximumArea) {

@@ -226,7 +226,7 @@ public class MainPanel extends JPanel {
 		treeMenu = new JPopupMenu();
 		treeMenu.add(miTree1);
 		treeMenu.add(miTree2);
-		// treeMenu.add(miTree3);
+		treeMenu.add(miTree3);
 		treeMenu.add(miTree4);
 		bg = new ButtonGroup();
 		bg.add(miTree1);

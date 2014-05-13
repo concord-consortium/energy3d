@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -529,19 +530,22 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
 
+		JPanel buildingSizePanel = new JPanel(new GridLayout(1, 2, 0, 0));
+		buildingPanel.add(buildingSizePanel);
+
 		// area for the selected building
 
 		areaPanel = new JPanel(new BorderLayout());
 		areaPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Area (\u33A1)", TitledBorder.LEADING, TitledBorder.TOP));
 		areaPanel.setToolTipText("<html>The area of the selected building<br><b>Must be within the specified range.</b></html>");
-		buildingPanel.add(areaPanel);
+		buildingSizePanel.add(areaPanel);
 		areaBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		areaBar.setUnit("");
 		areaBar.setUnitPrefix(false);
 		areaBar.setVerticalLineRepresentation(false);
 		areaBar.setDecimalDigits(1);
 		areaBar.setToolTipText(areaPanel.getToolTipText());
-		areaBar.setPreferredSize(new Dimension(200, 16));
+		areaBar.setPreferredSize(new Dimension(100, 16));
 		areaBar.setMaximum(Specifications.getInstance().getMaximumArea());
 		areaPanel.add(areaBar, BorderLayout.CENTER);
 
@@ -550,14 +554,14 @@ public class EnergyPanel extends JPanel {
 		heightPanel = new JPanel(new BorderLayout());
 		heightPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Height (m)", TitledBorder.LEADING, TitledBorder.TOP));
 		heightPanel.setToolTipText("<html>The height of the selected building<br><b>Must be within the specified range.</b></html>");
-		buildingPanel.add(heightPanel);
+		buildingSizePanel.add(heightPanel);
 		heightBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		heightBar.setUnit("");
 		heightBar.setUnitPrefix(false);
 		heightBar.setVerticalLineRepresentation(false);
 		heightBar.setDecimalDigits(1);
 		heightBar.setToolTipText(heightPanel.getToolTipText());
-		heightBar.setPreferredSize(new Dimension(200, 16));
+		heightBar.setPreferredSize(new Dimension(100, 16));
 		heightBar.setMaximum(Specifications.getInstance().getMaximumHeight());
 		heightPanel.add(heightBar, BorderLayout.CENTER);
 

@@ -5,9 +5,12 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -18,6 +21,7 @@ import javax.swing.border.EmptyBorder;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Specifications;
+import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
@@ -28,6 +32,41 @@ class SpecsDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private final static DecimalFormat FORMAT1 = new DecimalFormat("#0.##");
 	private final static DecimalFormat FORMAT2 = new DecimalFormat("##");
+
+	private final JCheckBox budgetCheckBox;
+	private final JTextField budgetTextField;
+	private final JLabel budgetLabel;
+	private final JCheckBox minimumAreaCheckBox;
+	private final JTextField minimumAreaTextField;
+	private final JLabel minimumAreaLabel;
+	private final JCheckBox maximumAreaCheckBox;
+	private final JTextField maximumAreaTextField;
+	private final JLabel maximumAreaLabel;
+	private final JCheckBox minimumHeightCheckBox;
+	private final JTextField minimumHeightTextField;
+	private final JLabel minimumHeightLabel;
+	private final JCheckBox maximumHeightCheckBox;
+	private final JTextField maximumHeightTextField;
+	private final JLabel maximumHeightLabel;
+
+	private void enableBudgetItems(boolean b) {
+		budgetTextField.setEnabled(b);
+		budgetLabel.setEnabled(b);
+	}
+
+	private void enableAreaItems(boolean b) {
+		minimumAreaTextField.setEnabled(b);
+		maximumAreaTextField.setEnabled(b);
+		minimumAreaLabel.setEnabled(b);
+		maximumAreaLabel.setEnabled(b);
+	}
+
+	private void enableHeightItems(boolean b) {
+		minimumHeightTextField.setEnabled(b);
+		maximumHeightTextField.setEnabled(b);
+		minimumHeightLabel.setEnabled(b);
+		maximumHeightLabel.setEnabled(b);
+	}
 
 	public SpecsDialog() {
 
@@ -41,39 +80,92 @@ class SpecsDialog extends JDialog {
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		// set the budget limit
-		panel.add(new JLabel("Maximum Budget: "));
-		final JTextField budgetTextField = new JTextField(FORMAT2.format(Specifications.getInstance().getMaximumBudget()));
+		budgetCheckBox = new JCheckBox("Maximum Budget: ", Specifications.getInstance().isBudgetEnabled());
+		budgetTextField = new JTextField(FORMAT2.format(Specifications.getInstance().getMaximumBudget()), 6);
+		budgetLabel = new JLabel("Dollars");
+		panel.add(budgetCheckBox);
 		panel.add(budgetTextField);
-		budgetTextField.setColumns(6);
-		panel.add(new JLabel("Dollars"));
+		panel.add(budgetLabel);
 
-		// set the minimum area
-		panel.add(new JLabel("Minimum Area: "));
-		final JTextField minimumAreaTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMinimumArea()));
+		budgetCheckBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = budgetCheckBox.isSelected();
+				Specifications.getInstance().setBudgetEnabled(b);
+				enableBudgetItems(b);
+			}
+		});
+		enableBudgetItems(Specifications.getInstance().isBudgetEnabled());
+
+		// set the minimum and maximum areas
+		minimumAreaCheckBox = new JCheckBox("Minimum Area: ", Specifications.getInstance().isAreaEnabled());
+		minimumAreaTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMinimumArea()), 6);
+		minimumAreaLabel = new JLabel("\u33A1");
+		panel.add(minimumAreaCheckBox);
 		panel.add(minimumAreaTextField);
-		minimumAreaTextField.setColumns(6);
-		panel.add(new JLabel("\u33A1"));
+		panel.add(minimumAreaLabel);
 
-		// set the maximum area
-		panel.add(new JLabel("Maximum Area: "));
-		final JTextField maximumAreaTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMaximumArea()));
+		maximumAreaCheckBox = new JCheckBox("Maximum Area: ", Specifications.getInstance().isAreaEnabled());
+		maximumAreaTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMaximumArea()), 6);
+		maximumAreaLabel = new JLabel("\u33A1");
+		panel.add(maximumAreaCheckBox);
 		panel.add(maximumAreaTextField);
-		maximumAreaTextField.setColumns(6);
-		panel.add(new JLabel("\u33A1"));
+		panel.add(maximumAreaLabel);
 
-		// set the minimum height
-		panel.add(new JLabel("Minimum Height: "));
-		final JTextField minimumHeightTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMinimumHeight()));
+		minimumAreaCheckBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = minimumAreaCheckBox.isSelected();
+				Util.selectSilently(maximumAreaCheckBox, b);
+				Specifications.getInstance().setAreaEnabled(b);
+				enableAreaItems(b);
+			}
+		});
+		maximumAreaCheckBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = maximumAreaCheckBox.isSelected();
+				Util.selectSilently(minimumAreaCheckBox, b);
+				Specifications.getInstance().setAreaEnabled(b);
+				enableAreaItems(b);
+			}
+		});
+		enableAreaItems(Specifications.getInstance().isAreaEnabled());
+
+		// set the minimum and maximum heights
+		minimumHeightCheckBox = new JCheckBox("Minimum Height: ", Specifications.getInstance().isHeightEnabled());
+		minimumHeightTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMinimumHeight()), 6);
+		minimumHeightLabel = new JLabel("m");
+		panel.add(minimumHeightCheckBox);
 		panel.add(minimumHeightTextField);
-		minimumHeightTextField.setColumns(6);
-		panel.add(new JLabel("m"));
+		panel.add(minimumHeightLabel);
 
-		// set the maximum height
-		panel.add(new JLabel("Maximum Height: "));
-		final JTextField maximumHeightTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMaximumHeight()));
+		maximumHeightCheckBox = new JCheckBox("Maximum Height: ", Specifications.getInstance().isHeightEnabled());
+		maximumHeightTextField = new JTextField(FORMAT1.format(Specifications.getInstance().getMaximumHeight()), 6);
+		maximumHeightLabel = new JLabel("m");
+		panel.add(maximumHeightCheckBox);
 		panel.add(maximumHeightTextField);
-		maximumHeightTextField.setColumns(6);
-		panel.add(new JLabel("m"));
+		panel.add(maximumHeightLabel);
+
+		minimumHeightCheckBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = minimumHeightCheckBox.isSelected();
+				Util.selectSilently(maximumHeightCheckBox, b);
+				Specifications.getInstance().setHeightEnabled(b);
+				enableHeightItems(b);
+			}
+		});
+		maximumHeightCheckBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = maximumHeightCheckBox.isSelected();
+				Util.selectSilently(minimumHeightCheckBox, b);
+				Specifications.getInstance().setHeightEnabled(b);
+				enableHeightItems(b);
+			}
+		});
+		enableHeightItems(Specifications.getInstance().isHeightEnabled());
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -105,8 +197,16 @@ class SpecsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Minimum or maximum area cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				if (minimumArea >= maximumArea) {
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Minimum area must be less than maximum area.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				if (minimumHeight < 0 || maximumHeight < 0) {
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Minimum or maximum height cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (minimumHeight >= maximumHeight) {
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Minimum height must be less than maximum height.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				Specifications.getInstance().setMaximumBudget(maximumBudget);
