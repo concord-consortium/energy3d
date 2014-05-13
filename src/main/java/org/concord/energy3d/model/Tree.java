@@ -197,12 +197,17 @@ public class Tree extends HousePart {
 	}
 
 	@Override
-	public Spatial getIrradiationCollisionSpatial() {
+	public Spatial getCollisionSpatial() {
 		sphere.removeFromParent();
 		if (!isShedded())
 			collisionRoot.attachChild(sphere);
 		collisionRoot.updateWorldBound(true);
 		return collisionRoot;
+	}
+
+	@Override
+	public Spatial getIrradiationCollisionSpatial() {
+		return getCollisionSpatial();
 	}
 
 	public String getTreeType() {

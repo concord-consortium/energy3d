@@ -178,7 +178,6 @@ public class EnergyPanel extends JPanel {
 						heliodon.setDate((Date) dateSpinner.getValue());
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().setEdited(true);
-					Scene.getInstance().redrawAllNow(); // XIE: 4/11: This needs to be called for trees to have the right seasonal texture
 				}
 			}
 		});
@@ -530,7 +529,7 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
 
-		JPanel buildingSizePanel = new JPanel(new GridLayout(1, 2, 0, 0));
+		final JPanel buildingSizePanel = new JPanel(new GridLayout(1, 2, 0, 0));
 		buildingPanel.add(buildingSizePanel);
 
 		// area for the selected building
@@ -1025,7 +1024,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	/** Apply this when the UI is set programmatically (not by the user) */
-	public void requestDisableActions(Object requester) {
+	public void requestDisableActions(final Object requester) {
 		disableActionsRequester = requester;
 	}
 
