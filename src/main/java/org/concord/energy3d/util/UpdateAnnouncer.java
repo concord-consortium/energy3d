@@ -29,7 +29,7 @@ public final class UpdateAnnouncer {
 			return;
 		if (new File(s).lastModified() >= checkTimeStamp(HOME + "energy3d.jar"))
 			return;
-		String msg = "An update is available. Do you want to download it now?";
+		String msg = "An update (V" + Config.VERSION + ") is available. Do you want to download it now?";
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), msg, "Update Energy3D", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 			Util.openBrowser(HOME + "update.html");
 			System.exit(0);
@@ -68,7 +68,7 @@ public final class UpdateAnnouncer {
 	}
 
 	/*
-	 * Mac OS X's Java 1.5.0_06 implementation returns things like : /Users/user/energy2d.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/.compatibility/14compatibility.jar
+	 * Mac OS X's Java 1.5.0_06 implementation returns things like : /Users/user/energy3d.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/.compatibility/14compatibility.jar
 	 */
 	private static String validateJarLocationOnMacOSX(String jarLocation) {
 		int i = jarLocation.indexOf(".jar:/");
