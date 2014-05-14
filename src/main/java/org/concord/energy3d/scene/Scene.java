@@ -352,6 +352,7 @@ public class Scene implements Serializable {
 			if (!Config.isApplet())
 				MainFrame.getInstance().refreshUndoRedo();
 			EventQueue.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					MainPanel.getInstance().getSolarButton().setSelected(false);
 				}

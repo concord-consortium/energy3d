@@ -198,6 +198,8 @@ public class Tree extends HousePart {
 
 	@Override
 	public Spatial getCollisionSpatial() {
+		if (sphere == null)
+			init();
 		sphere.removeFromParent();
 		if (!isShedded())
 			collisionRoot.attachChild(sphere);

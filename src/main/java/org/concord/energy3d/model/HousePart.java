@@ -13,6 +13,7 @@ import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
@@ -72,7 +73,6 @@ public abstract class HousePart implements Serializable {
 	protected transient Vector3 flattenCenter;
 	protected transient double orgHeight;
 	private transient boolean isPrintVertical;
-	private transient Map<Mesh, Boolean> textureCleared;
 	private transient double[] solarPotential;
 	private transient double[] heatLoss;
 	private transient double solarPotentialToday;
@@ -145,7 +145,6 @@ public abstract class HousePart implements Serializable {
 		orgHeight = height;
 		flattenCenter = new Vector3();
 		isPrintVertical = false;
-		textureCleared = new HashMap<Mesh, Boolean>();
 
 		if (id == 0)
 			id = Scene.getInstance().nextID();
@@ -638,13 +637,9 @@ public abstract class HousePart implements Serializable {
 			mesh.setRenderState(ts);
 		} else {
 			if (SceneManager.getInstance().isSolarColorMap()) {
-				if (textureCleared.get(mesh) == Boolean.TRUE)
-					return;
-				textureCleared.put(mesh, Boolean.TRUE);
-			} else if (!textureCleared.isEmpty())
-				textureCleared.clear();
-
-			if (isFrozen() || SceneManager.getInstance().isSolarColorMap()) {
+				if (this.isDrawable() && (this instanceof Foundation || this instanceof Wall || this instanceof Roof))
+					SolarIrradiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getFaceDirection());
+			} else if (isFrozen()) {
 				mesh.clearRenderState(StateType.Texture);
 				mesh.setDefaultColor(Scene.GRAY);
 			} else if (textureMode == TextureMode.None || getTextureFileName() == null) {
