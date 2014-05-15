@@ -859,7 +859,7 @@ public class Foundation extends HousePart {
 			return null;
 
 		final double scale = Scene.getInstance().getAnnotationScale();
-		double height = boundingHeight * scale;
+		final double height = boundingHeight * scale;
 
 		double area = 0;
 		Vector2 v1, v2;
@@ -944,7 +944,7 @@ public class Foundation extends HousePart {
 			op.add(center, p);
 			points.get(i).set(toRelative(p));
 		}
-		Scene.getInstance().redrawAll();
+//		Scene.getInstance().redrawAll();
 	}
 
 	@Override

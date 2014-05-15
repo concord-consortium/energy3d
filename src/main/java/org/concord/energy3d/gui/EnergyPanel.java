@@ -810,7 +810,7 @@ public class EnergyPanel extends JPanel {
 					if (p instanceof Tree)
 						p.updateTextureAndColor();
 			}
-			SceneManager.getInstance().refresh();
+//			SceneManager.getInstance().refresh();
 
 			progressBar.setValue(100);
 

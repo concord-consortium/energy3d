@@ -422,7 +422,7 @@ public class SolarIrradiation {
 			}
 		}
 
-		SceneManager.getInstance().refresh();
+//		SceneManager.getInstance().refresh();
 	}
 
 	private void applyTexture(final Mesh mesh) {

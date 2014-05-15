@@ -181,6 +181,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean operationStick = false;
 	private boolean operationFlag = false;
 	private boolean refresh = true;
+	private boolean refreshOnlyMode = false;
 	private boolean zoomLock = false;
 
 	public static final double SKY_RADIUS = 1000;
@@ -342,7 +343,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isUpdateTime = refreshTime != -1 && now <= refreshTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
-			if (refresh || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating())) {
+			if (refresh || !refreshOnlyMode && (isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating()))) {
 				if (now > refreshTime)
 					refreshTime = -1;
 				refresh = false;
@@ -354,6 +355,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						JOptionPane.showMessageDialog(MainPanel.getInstance(), "Your video card driver does not support shadows! Updating your video card drivers may fix this issue. Shadow rendering will be disabled now.", "Warning", JOptionPane.WARNING_MESSAGE);
 						shadowPass.setEnabled(false);
 					}
+				}
+				synchronized (Scene.getInstance()) {
+					Scene.getInstance().notifyAll();
 				}
 			} else
 				frameHandler.getTimer().update();
@@ -1226,6 +1230,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		refresh = true;
 	}
 
+	public void refreshNow() {
+		synchronized (Scene.getInstance()) {
+			refresh = true;
+			try {
+				Scene.getInstance().wait();
+			} catch (final InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	public void refresh(final double updateDurationInSeconds) {
 		refreshTime = frameHandler.getTimer().getTimeInSeconds() + updateDurationInSeconds;
 	}
@@ -1518,6 +1533,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
 	public void rotateBuilding(final double angle, final boolean keepRecord) {
+		System.out.println("rotateBuilding()");
 		if (selectedHousePart != null) {
 			if (selectedHousePart instanceof Foundation)
 				((Foundation) selectedHousePart).rotate(angle);
@@ -1526,6 +1542,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (keepRecord)
 				buildingRotationAngleRecorded += angle;
 		}
+	}
+
+	public boolean isRefreshOnlyMode() {
+		return refreshOnlyMode;
+	}
+
+	public void setRefreshOnlyMode(final boolean refreshOnlyMode) {
+		this.refreshOnlyMode = refreshOnlyMode;
 	}
 
 }

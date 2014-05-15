@@ -10,7 +10,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -28,11 +27,12 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Tree;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public abstract class AngularAnalysis extends Analysis {
 
@@ -42,22 +42,26 @@ public abstract class AngularAnalysis extends Analysis {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
+				SceneManager.getInstance().setRefreshOnlyMode(true);
 				for (int i = 0; i < nRotation; i++) {
 					if (!analysisStopped) {
-						SceneManager.getTaskManager().update(new Callable<Object>() {
-							@Override
-							public Object call() throws Exception {
+//						SceneManager.getTaskManager().update(new Callable<Object>() {
+//							@Override
+//							public Object call() throws Exception {
 								SceneManager.getInstance().rotateBuilding(2.0 * Math.PI / nRotation, false);
-								return null;
-							}
-						});
+								Scene.getInstance().redrawAllNow();
+//								return null;
+//							}
+//						});
 						try {
 							Thread.sleep(500);
-						} catch (InterruptedException e) {
+						} catch (final InterruptedException e) {
 						}
 						compute();
+						SceneManager.getInstance().refreshNow();
 					}
 				}
+				SceneManager.getInstance().setRefreshOnlyMode(true);
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -68,7 +72,7 @@ public abstract class AngularAnalysis extends Analysis {
 		});
 	}
 
-	public void show(String title) {
+	public void show(final String title) {
 
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
@@ -98,17 +102,17 @@ public abstract class AngularAnalysis extends Analysis {
 		final JMenu menu = new JMenu("Options");
 		menu.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
+			public void menuSelected(final MenuEvent e) {
 				miClear.setEnabled(graph.hasRecords());
 				miView.setEnabled(graph.hasData());
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 		menuBar.add(menu);
@@ -136,15 +140,15 @@ public abstract class AngularAnalysis extends Analysis {
 		final JMenu showTypeMenu = new JMenu("Types");
 		showTypeMenu.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
+			public void menuSelected(final MenuEvent e) {
 				showTypeMenu.removeAll();
 				final Set<String> dataNames = graph.getDataNames();
 				if (!dataNames.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (String name : dataNames)
+						public void actionPerformed(final ActionEvent e) {
+							for (final String name : dataNames)
 								graph.hideData(name, false);
 							graph.repaint();
 						}
@@ -153,8 +157,8 @@ public abstract class AngularAnalysis extends Analysis {
 					mi = new JMenuItem("Hide All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (String name : dataNames)
+						public void actionPerformed(final ActionEvent e) {
+							for (final String name : dataNames)
 								graph.hideData(name, true);
 							graph.repaint();
 						}
@@ -176,11 +180,11 @@ public abstract class AngularAnalysis extends Analysis {
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 		menuBar.add(showTypeMenu);
@@ -188,14 +192,14 @@ public abstract class AngularAnalysis extends Analysis {
 		final JMenu showRunsMenu = new JMenu("Runs");
 		showRunsMenu.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
+			public void menuSelected(final MenuEvent e) {
 				showRunsMenu.removeAll();
 				if (!AngularGraph.records.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (Results r : AngularGraph.records)
+						public void actionPerformed(final ActionEvent e) {
+							for (final Results r : AngularGraph.records)
 								graph.hideRun(r.getID(), false);
 							graph.repaint();
 						}
@@ -204,8 +208,8 @@ public abstract class AngularAnalysis extends Analysis {
 					mi = new JMenuItem("Hide All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (Results r : AngularGraph.records)
+						public void actionPerformed(final ActionEvent e) {
+							for (final Results r : AngularGraph.records)
 								graph.hideRun(r.getID(), true);
 							graph.repaint();
 						}
@@ -227,11 +231,11 @@ public abstract class AngularAnalysis extends Analysis {
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 		menuBar.add(showRunsMenu);
@@ -258,7 +262,7 @@ public abstract class AngularAnalysis extends Analysis {
 		});
 		buttonPanel.add(runButton);
 
-		JButton button = new JButton("Close");
+		final JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {

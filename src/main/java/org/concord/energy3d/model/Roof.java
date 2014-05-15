@@ -6,13 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 
 import javax.swing.undo.UndoManager;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.undo.MakeGableCommand;
@@ -177,9 +175,9 @@ public abstract class Roof extends HousePart {
 				}
 			}
 		} else
-			SceneManager.getTaskManager().update(new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
+//			SceneManager.getTaskManager().update(new Callable<Object>() {
+//				@Override
+//				public Object call() throws Exception {
 					synchronized (roofPartsRoot.getChildren()) { // To avoid ConcurrentModificationException
 						for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 							final Node roofPartNode = (Node) roofPart;
@@ -212,9 +210,9 @@ public abstract class Roof extends HousePart {
 						}
 					}
 					updateDashLinesColor();
-					return null;
-				}
-			});
+//					return null;
+//				}
+//			});
 	}
 
 	public void updateDashLinesColor() {
