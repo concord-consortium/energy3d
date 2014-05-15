@@ -16,7 +16,7 @@ import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public abstract class Analysis {
 
@@ -25,7 +25,7 @@ public abstract class Analysis {
 	static Point windowLocation = new Point();
 	JButton runButton;
 
-	public double getResult(String name) {
+	public double getResult(final String name) {
 		return graph.getSum(name);
 	}
 
@@ -45,6 +45,7 @@ public abstract class Analysis {
 	void compute() {
 		try {
 			EnergyPanel.getInstance().computeNow();
+			SceneManager.getInstance().refresh();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

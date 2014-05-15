@@ -58,7 +58,6 @@ public abstract class AngularAnalysis extends Analysis {
 						} catch (final InterruptedException e) {
 						}
 						compute();
-						SceneManager.getInstance().refreshNow();
 					}
 				}
 				SceneManager.getInstance().setRefreshOnlyMode(true);

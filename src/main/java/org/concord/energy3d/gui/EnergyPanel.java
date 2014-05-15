@@ -772,9 +772,10 @@ public class EnergyPanel extends JPanel {
 							if (doCompute) {
 								alreadyRenderedHeatmap = true;
 								computeNow();
-								if (!cancel)
+								if (!cancel) {
 									SceneManager.getInstance().getSolarLand().setVisible(true);
-								else if (!keepHeatmapOn)
+									SceneManager.getInstance().refresh();
+								} else if (!keepHeatmapOn)
 									turnOffCompute();
 							} else
 								turnOffCompute();

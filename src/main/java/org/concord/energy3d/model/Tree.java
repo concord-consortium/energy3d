@@ -14,12 +14,14 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.TestFunction;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.extension.BillboardNode;
 import com.ardor3d.scenegraph.extension.BillboardNode.BillboardAlignment;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.PickingHint;
+import com.ardor3d.scenegraph.shape.Cone;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
@@ -33,7 +35,7 @@ public class Tree extends HousePart {
 	public static final int PINE = 3;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
-	private transient Sphere sphere;
+	private transient Mesh sphere;
 	private final int treeType;
 
 	public Tree(final int treeType) {
@@ -81,7 +83,10 @@ public class Tree extends HousePart {
 		billboard.attachChild(mesh);
 		root.attachChild(billboard);
 
-		sphere = new Sphere("Tree Sphere", 10, 10, 14);
+		if (treeType == PINE)
+			sphere = new Cone("Tree Sphere", 2, 6, 15, 20, false);
+		else
+			sphere = new Sphere("Tree Sphere", 4, 6, 14);
 		sphere.setModelBound(new BoundingSphere());
 		sphere.updateModelBound();
 		final Cylinder cylinder = new Cylinder("Tree Cylinder", 10, 10, 1, 20);
@@ -101,8 +106,8 @@ public class Tree extends HousePart {
 			cylinder.setTranslation(0, 0, 10);
 			break;
 		case PINE:
-			sphere.setScale(1, 1, 1.6);
-			sphere.setTranslation(0, 0, 24);
+			sphere.setScale(1, 1, -2.3);
+			sphere.setTranslation(0, 0, 28);
 			cylinder.setTranslation(0, 0, 10);
 			break;
 		default:
