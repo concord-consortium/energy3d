@@ -45,7 +45,7 @@ public abstract class Analysis {
 	void compute() {
 		try {
 			EnergyPanel.getInstance().computeNow();
-			SceneManager.getInstance().refresh();
+			SceneManager.getInstance().refreshNow();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

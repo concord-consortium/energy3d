@@ -60,7 +60,7 @@ public abstract class AngularAnalysis extends Analysis {
 						compute();
 					}
 				}
-				SceneManager.getInstance().setRefreshOnlyMode(true);
+				SceneManager.getInstance().setRefreshOnlyMode(false);
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
