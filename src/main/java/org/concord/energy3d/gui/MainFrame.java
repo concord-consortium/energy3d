@@ -64,12 +64,10 @@ import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.Mac;
 import org.concord.energy3d.util.Printout;
 import org.concord.energy3d.util.Util;
 
-import com.apple.eawt.Application;
-import com.apple.eawt.ApplicationAdapter;
-import com.apple.eawt.ApplicationEvent;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -251,34 +249,8 @@ public class MainFrame extends JFrame {
 		if ((windowState & JFrame.ICONIFIED) == 0)
 			setExtendedState(windowState);
 
-		if (Config.isMac()) {
-			final Application anApp = new Application();
-			anApp.setEnabledPreferencesMenu(true);
-			anApp.addApplicationListener(new ApplicationAdapter() {
-				@Override
-				public void handleQuit(final ApplicationEvent e) {
-					e.setHandled(true);
-					exit();
-				}
-
-				@Override
-				public void handlePreferences(final ApplicationEvent e) {
-					e.setHandled(true);
-				}
-
-				@Override
-				public void handleAbout(final ApplicationEvent e) {
-					showAbout();
-					e.setHandled(true);
-				}
-
-				@Override
-				public void handleOpenFile(final ApplicationEvent e) {
-					open(e.getFilename());
-					e.setHandled(true);
-				}
-			});
-		}
+		if (Config.isMac())
+			Mac.init();
 
 		addComponentListener(new ComponentAdapter() {
 			@Override
@@ -731,7 +703,7 @@ public class MainFrame extends JFrame {
 		return helpMenu;
 	}
 
-	private void showAbout() {
+	public void showAbout() {
 		final JDialog aboutDialog = getAboutDialog();
 		final Dimension frameSize = MainFrame.this.getSize();
 		final Dimension dialogSize = aboutDialog.getSize();
@@ -1398,6 +1370,7 @@ public class MainFrame extends JFrame {
 									Scene.getInstance().setOverhangLength(val / Scene.getInstance().getAnnotationScale());
 									Scene.getInstance().redrawAll();
 									EventQueue.invokeLater(new Runnable() {
+										@Override
 										public void run() {
 											MainPanel.getInstance().getSolarButton().setSelected(false);
 										}
@@ -1625,7 +1598,7 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void exit() {
+	public void exit() {
 		if (Scene.getInstance().isEdited()) {
 			final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
 			if (save == JOptionPane.YES_OPTION) {
@@ -1798,6 +1771,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().removeAllRoofs();
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							MainPanel.getInstance().getSolarButton().setSelected(false);
 						}
