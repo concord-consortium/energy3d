@@ -1525,14 +1525,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				rotateBuilding(undo ? -rotationAngle : rotationAngle, false);
+				rotateBuilding(undo ? -rotationAngle : rotationAngle, false, true);
 				return null;
 			}
 		});
 	}
 
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
-	public void rotateBuilding(final double angle, final boolean keepRecord) {
+	public void rotateBuilding(final double angle, final boolean keepRecord, final boolean redraw) {
 		System.out.println("rotateBuilding()");
 		if (selectedHousePart != null) {
 			if (selectedHousePart instanceof Foundation)
@@ -1541,6 +1541,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				selectedHousePart.getTopContainer().rotate(angle);
 			if (keepRecord)
 				buildingRotationAngleRecorded += angle;
+			if (redraw)
+				Scene.getInstance().redrawAll();
 		}
 	}
 

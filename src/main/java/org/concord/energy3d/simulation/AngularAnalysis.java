@@ -48,7 +48,7 @@ public abstract class AngularAnalysis extends Analysis {
 //						SceneManager.getTaskManager().update(new Callable<Object>() {
 //							@Override
 //							public Object call() throws Exception {
-								SceneManager.getInstance().rotateBuilding(2.0 * Math.PI / nRotation, false);
+								SceneManager.getInstance().rotateBuilding(2.0 * Math.PI / nRotation, false, false);
 								Scene.getInstance().redrawAllNow();
 //								return null;
 //							}

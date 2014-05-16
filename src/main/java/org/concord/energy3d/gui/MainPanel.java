@@ -89,7 +89,7 @@ public class MainPanel extends JPanel {
 	private Operation treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
-	private double buildingRotationAngleAbsolute = Math.PI / 18;
+	private final double buildingRotationAngleAbsolute = Math.PI / 18;
 	private double buildingRotationAngle = -buildingRotationAngleAbsolute;
 
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
@@ -856,13 +856,13 @@ public class MainPanel extends JPanel {
 			rotateButton.setToolTipText("<html>Rotate a building clockwisely; <br>Hold down the SHIFT key and press this button to rotate counter-clockwisely.</html>");
 			rotateButton.addKeyListener(new KeyAdapter() {
 				@Override
-				public void keyPressed(KeyEvent e) {
+				public void keyPressed(final KeyEvent e) {
 					rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/" + (e.isShiftDown() ? "rotate_ccw.png" : "rotate_cw.png"))));
 					buildingRotationAngle = e.isShiftDown() ? buildingRotationAngleAbsolute : -buildingRotationAngleAbsolute;
 				}
 
 				@Override
-				public void keyReleased(KeyEvent e) {
+				public void keyReleased(final KeyEvent e) {
 					buildingRotationAngle = -buildingRotationAngleAbsolute;
 					rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
 				}
@@ -870,16 +870,17 @@ public class MainPanel extends JPanel {
 			rotateButton.addMouseListener(new MouseAdapter() {
 				private boolean mousePressed = false;
 
+				@Override
 				public void mousePressed(final MouseEvent e) {
 					solarButton.setSelected(false);
 					mousePressed = true;
 					SceneManager.getInstance().resetBuildingRotationAngleRecorded();
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart == null || selectedPart instanceof Tree) {
 						int count = 0;
 						HousePart hp = null;
 						synchronized (Scene.getInstance().getParts()) {
-							for (HousePart x : Scene.getInstance().getParts()) {
+							for (final HousePart x : Scene.getInstance().getParts()) {
 								if (x instanceof Foundation) {
 									count++;
 									hp = x;
@@ -897,31 +898,33 @@ public class MainPanel extends JPanel {
 						}
 					}
 					new Thread() {
+						@Override
 						public void run() {
 							while (mousePressed) {
 								SceneManager.getTaskManager().update(new Callable<Object>() {
 									@Override
 									public Object call() throws Exception {
-										SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true);
+										SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true, true);
 										return null;
 									}
 								});
-								int partCount = Scene.getInstance().getParts().size();
+								final int partCount = Scene.getInstance().getParts().size();
 								try {
 									Thread.sleep(100 + partCount * 5); // give it enough time for the above call to complete (the more parts it has, the more time it needs)
-								} catch (InterruptedException e) {
+								} catch (final InterruptedException e) {
 								}
 							}
-							HousePart hp = SceneManager.getInstance().getSelectedPart();
+							final HousePart hp = SceneManager.getInstance().getSelectedPart();
 							if (hp instanceof Foundation)
 								SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand((Foundation) hp, SceneManager.getInstance().getBuildingRotationAngleRecorded()));
 						}
 					}.start();
 				}
 
-				public void mouseReleased(MouseEvent e) {
+				@Override
+				public void mouseReleased(final MouseEvent e) {
 					mousePressed = false;
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart == null)
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No building is selected for rotation.", "No Building", JOptionPane.INFORMATION_MESSAGE);
 				}
