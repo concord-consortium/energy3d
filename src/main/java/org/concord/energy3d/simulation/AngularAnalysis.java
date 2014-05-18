@@ -32,27 +32,21 @@ import org.concord.energy3d.scene.SceneManager;
 
 /**
  * @author Charles Xie
- *
+ * 
  */
 public abstract class AngularAnalysis extends Analysis {
 
 	static int nRotation = 8;
 
-	void runAnalysis() {
+	private void runAnalysis() {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
 				SceneManager.getInstance().setRefreshOnlyMode(true);
 				for (int i = 0; i < nRotation; i++) {
 					if (!analysisStopped) {
-//						SceneManager.getTaskManager().update(new Callable<Object>() {
-//							@Override
-//							public Object call() throws Exception {
-								SceneManager.getInstance().rotateBuilding(2.0 * Math.PI / nRotation, false, false);
-								Scene.getInstance().redrawAllNow();
-//								return null;
-//							}
-//						});
+						SceneManager.getInstance().rotateBuilding(2.0 * Math.PI / nRotation, false, false);
+						Scene.getInstance().redrawAllNow();
 						try {
 							Thread.sleep(500);
 						} catch (final InterruptedException e) {

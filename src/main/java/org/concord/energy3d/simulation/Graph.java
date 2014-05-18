@@ -149,7 +149,6 @@ abstract class Graph extends JPanel {
 		double sum = 0;
 		for (double a : x)
 			sum += a;
-		//return sum;
 		return sum * 365.0 / 12.0;
 	}
 

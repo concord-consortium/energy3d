@@ -53,7 +53,7 @@ public abstract class AnnualAnalysis extends Analysis {
 
 	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
-	void runAnalysis() {
+	private void runAnalysis(final JDialog parent) {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
@@ -73,6 +73,10 @@ public abstract class AnnualAnalysis extends Analysis {
 					@Override
 					public void run() {
 						onCompletion();
+						if (graph instanceof BuildingEnergyAnnualGraph) {
+							int net = (int) Math.round(getResult("Net"));
+							JOptionPane.showMessageDialog(parent, "<html>The calculated annual net energy is " + net + " kWh.<br>For details, look at the graph.</html>", "Annual Net Energy", JOptionPane.INFORMATION_MESSAGE);
+						}
 					}
 				});
 			}
@@ -267,7 +271,7 @@ public abstract class AnnualAnalysis extends Analysis {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				runButton.setEnabled(false);
-				runAnalysis();
+				runAnalysis(dialog);
 			}
 		});
 		buttonPanel.add(runButton);
