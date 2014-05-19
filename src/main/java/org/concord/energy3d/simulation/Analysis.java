@@ -2,6 +2,8 @@ package org.concord.energy3d.simulation;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 
@@ -16,7 +18,7 @@ import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- *
+ * 
  */
 public abstract class Analysis {
 
@@ -27,6 +29,22 @@ public abstract class Analysis {
 
 	public double getResult(final String name) {
 		return graph.getSum(name);
+	}
+
+	public List<Double> getRecordedResults(final String name) {
+		List<Double> recordedResults = new ArrayList<Double>();
+		for (Results r : graph.getRecords()) {
+			Map<String, List<Double>> x = r.getData();
+			List<Double> list = x.get(name);
+			if (list != null) {
+				double sum = 0;
+				for (Double d : list) {
+					sum += d;
+				}
+				recordedResults.add(sum);
+			}
+		}
+		return recordedResults;
 	}
 
 	public int getNumberOfDataPoints() {

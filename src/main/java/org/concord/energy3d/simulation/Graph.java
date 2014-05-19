@@ -68,7 +68,7 @@ abstract class Graph extends JPanel {
 	}
 
 	/* keep the records by their class types */
-	private List<Results> getRecords() {
+	List<Results> getRecords() {
 		if (this instanceof DailyGraph)
 			return DailyGraph.records;
 		if (this instanceof AngularGraph)

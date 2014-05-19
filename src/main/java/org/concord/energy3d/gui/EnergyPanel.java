@@ -536,7 +536,7 @@ public class EnergyPanel extends JPanel {
 
 		areaPanel = new JPanel(new BorderLayout());
 		areaPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Area (\u33A1)", TitledBorder.LEADING, TitledBorder.TOP));
-		areaPanel.setToolTipText("<html>The area of the selected building<br><b>Must be within the specified range.</b></html>");
+		areaPanel.setToolTipText("<html>The area of the selected building<br><b>Must be within the specified range (if any).</b></html>");
 		buildingSizePanel.add(areaPanel);
 		areaBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		areaBar.setUnit("");
@@ -552,7 +552,7 @@ public class EnergyPanel extends JPanel {
 
 		heightPanel = new JPanel(new BorderLayout());
 		heightPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Height (m)", TitledBorder.LEADING, TitledBorder.TOP));
-		heightPanel.setToolTipText("<html>The height of the selected building<br><b>Must be within the specified range.</b></html>");
+		heightPanel.setToolTipText("<html>The height of the selected building<br><b>Must be within the specified range (if any).</b></html>");
 		buildingSizePanel.add(heightPanel);
 		heightBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		heightBar.setUnit("");
@@ -568,7 +568,7 @@ public class EnergyPanel extends JPanel {
 
 		budgetPanel = new JPanel(new BorderLayout());
 		budgetPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP));
-		budgetPanel.setToolTipText("<html>The total construction cost for the selected building<br><b>Must not exceed the limit.</b></html>");
+		budgetPanel.setToolTipText("<html>The total construction cost for the selected building<br><b>Must not exceed the limit (if specified).</b></html>");
 		buildingPanel.add(budgetPanel);
 		budgetBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		budgetBar.setToolTipText(budgetPanel.getToolTipText());

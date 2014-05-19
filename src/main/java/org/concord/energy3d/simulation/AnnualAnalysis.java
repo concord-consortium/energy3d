@@ -23,6 +23,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -75,7 +76,13 @@ public abstract class AnnualAnalysis extends Analysis {
 						onCompletion();
 						if (graph instanceof BuildingEnergyAnnualGraph) {
 							int net = (int) Math.round(getResult("Net"));
-							JOptionPane.showMessageDialog(parent, "<html>The calculated annual net energy is " + net + " kWh.<br>For details, look at the graph.</html>", "Annual Net Energy", JOptionPane.INFORMATION_MESSAGE);
+							String previousRuns = "";
+							List<Double> recordedResults = getRecordedResults("Net");
+							if (!recordedResults.isEmpty()) {
+								for (Double x : recordedResults)
+									previousRuns += Math.round(x * 365.0 / 12.0) + "kWh  ";
+							}
+							JOptionPane.showMessageDialog(parent, "<html>The calculated annual net energy is " + net + "kWh." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previous tests:<br>" + previousRuns) + "</html>", "Annual Net Energy", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}
 				});
