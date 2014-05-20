@@ -78,11 +78,12 @@ public abstract class AnnualAnalysis extends Analysis {
 							int net = (int) Math.round(getResult("Net"));
 							String previousRuns = "";
 							List<Double> recordedResults = getRecordedResults("Net");
-							if (!recordedResults.isEmpty()) {
-								for (Double x : recordedResults)
-									previousRuns += Math.round(x * 365.0 / 12.0) + "kWh  ";
+							int n = recordedResults.size();
+							if (n > 0) {
+								for (int i = n - 1; i >= 0; i--)
+									previousRuns += Math.round(recordedResults.get(i) * 365.0 / 12.0) + " kWh<br>";
 							}
-							JOptionPane.showMessageDialog(parent, "<html>The calculated annual net energy is " + net + "kWh." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previous tests:<br>" + previousRuns) + "</html>", "Annual Net Energy", JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(parent, "<html>The calculated annual net energy is <b>" + net + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Annual Net Energy", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}
 				});
