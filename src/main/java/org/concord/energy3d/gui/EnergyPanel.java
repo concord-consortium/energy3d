@@ -568,7 +568,7 @@ public class EnergyPanel extends JPanel {
 
 		budgetPanel = new JPanel(new BorderLayout());
 		budgetPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP));
-		budgetPanel.setToolTipText("<html>The total construction cost for the selected building<br><b>Must not exceed the limit (if specified).</b></html>");
+		budgetPanel.setToolTipText("<html>The total material cost for the selected building<br><b>Must not exceed the limit (if specified).</b></html>");
 		buildingPanel.add(budgetPanel);
 		budgetBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		budgetBar.setToolTipText(budgetPanel.getToolTipText());
@@ -1070,7 +1070,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateBudgetBar() {
-		String t = "Construction Cost (";
+		String t = "Cost (";
 		t += Specifications.getInstance().isBudgetEnabled() ? "\u2264 $" + noDecimals.format(Specifications.getInstance().getMaximumBudget()) : "$";
 		t += ")";
 		budgetPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));

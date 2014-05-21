@@ -175,6 +175,10 @@ abstract class Graph extends JPanel {
 
 	abstract String getXAxisUnit();
 
+	String getXAxisLabel(int i) {
+		return Math.round((i + 1) * getXAxisLabelScalingFactor()) + getXAxisUnit();
+	}
+
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		update(g);
@@ -198,7 +202,7 @@ abstract class Graph extends JPanel {
 		g2.setColor(Color.BLACK);
 		float tickWidth = (float) (width - left - right) / (float) (numberOfTicks - 1);
 		for (int i = 0; i < numberOfTicks; i++) {
-			String s = Math.round((i + 1) * getXAxisLabelScalingFactor()) + getXAxisUnit();
+			String s = getXAxisLabel(i);
 			int sWidth = g2.getFontMetrics().stringWidth(s);
 			g2.drawString(s, left + tickWidth * i - sWidth / 2, height - bottom / 2 + 16);
 		}
