@@ -100,20 +100,22 @@ public class Cost {
 			double uValue = HeatLoad.parseUFactor(EnergyPanel.getInstance().getDoorsComboBox());
 			int price;
 			if (uValue < 0.5)
-				price = 500;
+				price = 100;
 			else
-				price = 300;
-			return price;
+				price = 50;
+			return (int) (part.computeArea() * price);
 		}
 		if (part instanceof SolarPanel) {
 			double efficiency = Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
 			int price;
-			if (efficiency >= 30)
+			if (efficiency > 30)
 				price = 800;
 			else if (efficiency > 25)
 				price = 600;
 			else if (efficiency > 20)
 				price = 500;
+			else if (efficiency > 15)
+				price = 400;
 			else
 				price = 300;
 			return price;
@@ -195,7 +197,7 @@ public class Cost {
 		PieChart pie = new PieChart(data, colors, legends, "$");
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Construction Costs by Category", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Material Costs by Category", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.getContentPane().add(pie, BorderLayout.CENTER);
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

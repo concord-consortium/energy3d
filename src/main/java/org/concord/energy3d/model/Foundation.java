@@ -52,6 +52,7 @@ public class Foundation extends HousePart {
 	private transient double totalEnergyToday;
 	private transient boolean resizeHouseMode = false;
 	private transient boolean useOrgPoints = false;
+	private boolean lockEdit = false;
 
 	static {
 		format.setGroupingUsed(true);
@@ -199,6 +200,8 @@ public class Foundation extends HousePart {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		if (lockEdit && editPointIndex < 4)
+			return;
 		final int index;
 		if (editPointIndex == -1)
 			index = isFirstPointInserted() ? 3 : 0;
@@ -798,6 +801,8 @@ public class Foundation extends HousePart {
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
+		if (lockEdit)
+			return;
 		final List<Vector3> orgPoints = new ArrayList<Vector3>(houseMovePoints.size());
 		for (int i = 0; i < points.size(); i++)
 			orgPoints.add(points.get(i));
@@ -944,7 +949,7 @@ public class Foundation extends HousePart {
 			op.add(center, p);
 			points.get(i).set(toRelative(p));
 		}
-//		Scene.getInstance().redrawAll();
+		// Scene.getInstance().redrawAll();
 	}
 
 	@Override
@@ -953,6 +958,14 @@ public class Foundation extends HousePart {
 			return super.toAbsolute(orgPoints.get(index));
 		else
 			return super.getAbsPoint(index);
+	}
+
+	public void setLockEdit(boolean b) {
+		lockEdit = b;
+	}
+
+	public boolean getLockEdit() {
+		return lockEdit;
 	}
 
 }

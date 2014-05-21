@@ -101,7 +101,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem annualEnergyAnalysisMenuItem;
 	private JMenuItem sensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
-	private JMenuItem constructionCostAnalysisMenuItem;
+	private JMenuItem materialCostAnalysisMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
@@ -141,6 +141,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem lockAllMenuItem;
 	private JMenuItem unlockAllMenuItem;
 	private JMenuItem lockSelectionMenuItem;
+	private JCheckBoxMenuItem disableFoundationCheckBoxMenuItem;
 	private JMenuItem specificationsMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
@@ -788,7 +789,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
-			analysisMenu.add(getConstructionCostAnalysisMenuItem());
+			analysisMenu.add(getMaterialCostAnalysisMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
 			analysisMenu.add(getDailyAnalysisMenuItem());
@@ -1064,18 +1065,17 @@ public class MainFrame extends JFrame {
 		return orientationalEnergyAnalysisMenuItem;
 	}
 
-	private JMenuItem getConstructionCostAnalysisMenuItem() {
-		if (constructionCostAnalysisMenuItem == null) {
-			constructionCostAnalysisMenuItem = new JMenuItem("Show Construction Costs...");
-			// constructionCostAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F8"));
-			constructionCostAnalysisMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getMaterialCostAnalysisMenuItem() {
+		if (materialCostAnalysisMenuItem == null) {
+			materialCostAnalysisMenuItem = new JMenuItem("Show Material Costs...");
+			materialCostAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Cost.getInstance().showGraph();
 				}
 			});
 		}
-		return constructionCostAnalysisMenuItem;
+		return materialCostAnalysisMenuItem;
 	}
 
 	private JCheckBoxMenuItem getAnnotationsInwardMenuItem() {
@@ -1111,6 +1111,14 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
+					HousePart selected = SceneManager.getInstance().getSelectedPart();
+					if (selected instanceof Foundation) {
+						disableFoundationCheckBoxMenuItem.setEnabled(true);
+						Util.selectSilently(disableFoundationCheckBoxMenuItem, ((Foundation) selected).getLockEdit());
+					} else {
+						disableFoundationCheckBoxMenuItem.setEnabled(false);
+						Util.selectSilently(disableFoundationCheckBoxMenuItem, false);
+					}
 				}
 			});
 			editMenu.add(getUndoMenuItem());
@@ -1125,6 +1133,7 @@ public class MainFrame extends JFrame {
 			editMenu.add(getRemoveAllRoofsMenuItem());
 			editMenu.addSeparator();
 			if (!Config.isRestrictMode()) {
+				editMenu.add(getDisableFoundationCheckBoxMenuItem());
 				editMenu.add(getLockSelectionMenuItem());
 				editMenu.add(getLockAllMenuItem());
 				editMenu.add(getUnlockAllMenuItem());
@@ -1720,6 +1729,22 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return lockSelectionMenuItem;
+	}
+
+	private JCheckBoxMenuItem getDisableFoundationCheckBoxMenuItem() {
+		if (disableFoundationCheckBoxMenuItem == null) {
+			disableFoundationCheckBoxMenuItem = new JCheckBoxMenuItem("Disable Foundation Edits");
+			disableFoundationCheckBoxMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					HousePart selected = SceneManager.getInstance().getSelectedPart();
+					if (selected instanceof Foundation) {
+						((Foundation) selected).setLockEdit(disableFoundationCheckBoxMenuItem.isSelected());
+					}
+				}
+			});
+		}
+		return disableFoundationCheckBoxMenuItem;
 	}
 
 	private JMenuItem getSpecificationsMenuItem() {

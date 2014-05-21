@@ -12,7 +12,7 @@ import java.util.List;
 abstract class AnnualGraph extends Graph {
 
 	private static final long serialVersionUID = 1L;
-	private static final String[] MONTH = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+	private static final String[] THREE_LETTER_MONTH = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
 	static List<Results> records;
 
@@ -29,7 +29,7 @@ abstract class AnnualGraph extends Graph {
 	}
 
 	String getXAxisLabel(int i) {
-		return MONTH[i];
+		return THREE_LETTER_MONTH[i];
 	}
 
 	double getXAxisLabelScalingFactor() {
