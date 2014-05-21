@@ -43,11 +43,11 @@ public class MainApplication {
 			mainFrame.open(args[args.length - 1]);
 
 		/* initialize data logging */
-		final TimeSeriesLogger logger = new TimeSeriesLogger(1, 20);
+		final TimeSeriesLogger logger = new TimeSeriesLogger(1);
 		scene.addShutdownHook(new Runnable() {
 			@Override
 			public void run() {
-				logger.saveLog();
+				logger.closeLog();
 			}
 		});
 		Scene.getInstance().addPropertyChangeListener(logger);

@@ -51,13 +51,10 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	private final static String separator = ",   ";
 	private int logInterval = 2; // in seconds
-	private int saveInterval = 1; // save every N valid actions
 	private File file;
 	private UndoableEdit lastEdit;
 	private final UndoManager undoManager;
 	private HousePart actedHousePart;
-	private String content = "";
-	private int counter = 0;
 	private String oldHeliodonTime = null;
 	private String oldHeliodonLatitude = null;
 	private String oldLine = null;
@@ -77,10 +74,11 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private Object analysisRequester;
 	private Object analysisRequesterCopy;
 	private HousePart analyzedPart;
+	private PrintWriter writer;
+	private boolean firstLine = true;
 
-	public TimeSeriesLogger(final int logInterval, final int saveInterval) {
+	public TimeSeriesLogger(final int logInterval) {
 		this.logInterval = logInterval;
-		this.saveInterval = saveInterval;
 		undoManager = SceneManager.getInstance().getUndoManager();
 		lastEdit = undoManager.lastEdit();
 		final Document noteAreaDoc = MainPanel.getInstance().getNoteTextArea().getDocument();
@@ -360,29 +358,22 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 		if (!line.trim().endsWith(".ng3\"")) {
 			if (action != null || !line.equals(oldLine)) {
-				content += "{\"Timestamp\": \"" + timestamp + "\"" + separator + line + "},\n";
-				if (counter % saveInterval == 0) {
-					saveLog();
+				if (firstLine) {
+					firstLine = false;
+				} else {
+					writer.write(",\n");
 				}
+				writer.write("{\"Timestamp\": \"" + timestamp + "\"" + separator + line + "}");
+				writer.flush();
 				oldLine = line;
-				counter++;
 			}
 		}
 	}
 
-	public void saveLog() {
-		if (content == null || content.length() <= 0)
-			return;
-		PrintWriter writer = null;
-		try {
-			writer = new PrintWriter(file);
-			writer.write("{\n\"Activities\": [\n" + content.substring(0, content.length() - 2) + "\n]\n}");
-		} catch (final Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging: " + e.getMessage() + "\nPlease restart Energy3D.", "Logging Error", JOptionPane.ERROR_MESSAGE);
-		} finally {
-			if (writer != null)
-				writer.close();
+	public void closeLog() {
+		if (writer != null) {
+			writer.write("]\n}");
+			writer.close();
 		}
 	}
 
@@ -411,6 +402,13 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	public void start() {
 		final String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
 		file = new File(LoggerUtil.getLogFolder(), timestamp + ".json");
+		try {
+			writer = new PrintWriter(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), e.getMessage(), "Logger Error", JOptionPane.WARNING_MESSAGE);
+		}
+		writer.write("{\n\"Activities\": [\n");
 		final Thread t = new Thread("Time Series Logger") {
 			@Override
 			public void run() {
