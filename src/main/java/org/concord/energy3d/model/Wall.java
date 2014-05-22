@@ -1124,6 +1124,8 @@ public class Wall extends HousePart {
 	@Override
 	public void reset() {
 		super.reset();
+		if (root == null)
+			init();
 		thicknessNormal = null;
 		neighbors[0] = neighbors[1] = null;
 	}

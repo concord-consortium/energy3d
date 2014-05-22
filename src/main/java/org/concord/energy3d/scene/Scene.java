@@ -247,7 +247,7 @@ public class Scene implements Serializable {
 			}
 			System.out.println("done");
 			/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
-			instance.redrawAllNow();
+//			instance.redrawAllNow();
 		}
 
 		root.updateWorldBound(true);
