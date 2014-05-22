@@ -128,13 +128,13 @@ public class Cost {
 	private int getTreeCost(Tree tree) {
 		switch (tree.getTreeType()) {
 		case Tree.OAK:
-			return 2500;
-		case Tree.PINE:
 			return 2000;
-		case Tree.MAPLE:
+		case Tree.PINE:
 			return 1500;
-		default:
+		case Tree.MAPLE:
 			return 1000;
+		default:
+			return 500;
 		}
 	}
 
@@ -189,6 +189,7 @@ public class Cost {
 		int roofSum = 0;
 		int doorSum = 0;
 		int solarPanelSum = 0;
+		int treeSum = 0;
 		for (HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == selectedBuilding) {
 				if (p instanceof Wall)
@@ -202,11 +203,13 @@ public class Cost {
 				else if (p instanceof SolarPanel)
 					solarPanelSum += getPartCost(p);
 			}
+			if (p instanceof Tree && !p.isFrozen())
+				treeSum += getTreeCost((Tree) p);
 		}
 
-		float[] data = new float[] { wallSum, windowSum, roofSum, doorSum, solarPanelSum };
-		String[] legends = new String[] { "Walls", "Windows", "Roof", "Doors", "Solar Panels" };
-		Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.PINK, Color.GREEN };
+		float[] data = new float[] { wallSum, windowSum, roofSum, doorSum, solarPanelSum, treeSum };
+		String[] legends = new String[] { "Walls", "Windows", "Roof", "Doors", "Solar Panels", "Trees" };
+		Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.PINK, Color.YELLOW, Color.GREEN };
 
 		// show them in a popup window
 		PieChart pie = new PieChart(data, colors, legends, "$");
