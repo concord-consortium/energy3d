@@ -39,7 +39,7 @@ public class AddHousePartCommand extends AbstractUndoableEdit {
 	@Override
 	public String getPresentationName() {
 		if (housePart instanceof Tree)
-			return "Add " + ((Tree) housePart).getTreeType();
+			return "Add " + ((Tree) housePart).getTreeName();
 		return "Add " + housePart.getClass().getSimpleName();
 	}
 }

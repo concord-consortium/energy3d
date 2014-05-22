@@ -57,6 +57,8 @@ public class Cost {
 		for (HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == foundation) {
 				sum += getPartCost(p);
+			} else if (p instanceof Tree && !p.isFrozen()) {
+				sum += getTreeCost((Tree) p);
 			}
 		}
 		return sum;
@@ -121,6 +123,19 @@ public class Cost {
 			return price;
 		}
 		return 0;
+	}
+
+	private int getTreeCost(Tree tree) {
+		switch (tree.getTreeType()) {
+		case Tree.OAK:
+			return 2500;
+		case Tree.PINE:
+			return 2000;
+		case Tree.MAPLE:
+			return 1500;
+		default:
+			return 1000;
+		}
 	}
 
 	public void showGraph() {

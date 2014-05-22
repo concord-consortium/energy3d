@@ -217,7 +217,11 @@ public class Tree extends HousePart {
 		return getCollisionSpatial();
 	}
 
-	public String getTreeType() {
+	public int getTreeType() {
+		return treeType;
+	}
+
+	public String getTreeName() {
 		switch (treeType) {
 		case OAK:
 			return "Oak";

@@ -59,7 +59,7 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	@Override
 	public String getPresentationName() {
 		if (housePart instanceof Tree)
-			return "Move " + ((Tree) housePart).getTreeType();
+			return "Move " + ((Tree) housePart).getTreeName();
 		return "Edit " + housePart.getClass().getSimpleName();
 	}
 
