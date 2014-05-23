@@ -1432,6 +1432,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void deleteCurrentHousePart() {
+		if (selectedHousePart instanceof Foundation) {
+			if (((Foundation) selectedHousePart).getLockEdit())
+				return;
+		}
 		if (selectedHousePart != null)
 			taskManager.update(new Callable<Object>() {
 				@Override
