@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Seasonal graph (12 months)
+ * Annual graph (12 months)
  * 
  * @author Charles Xie
  * 

@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.JButton;
 
@@ -31,8 +32,8 @@ public abstract class Analysis {
 		return graph.getSum(name);
 	}
 
-	public List<Double> getRecordedResults(final String name) {
-		List<Double> recordedResults = new ArrayList<Double>();
+	public Map<String, Double> getRecordedResults(final String name) {
+		Map<String, Double> recordedResults = new TreeMap<String, Double>();
 		for (Results r : graph.getRecords()) {
 			Map<String, List<Double>> x = r.getData();
 			List<Double> list = x.get(name);
@@ -41,7 +42,7 @@ public abstract class Analysis {
 				for (Double d : list) {
 					sum += d;
 				}
-				recordedResults.add(sum);
+				recordedResults.put(r.getID() + " (file: " + r.getFileName() + ")", sum);
 			}
 		}
 		return recordedResults;
