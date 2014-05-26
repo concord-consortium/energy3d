@@ -75,6 +75,8 @@ public abstract class AnnualAnalysis extends Analysis {
 					public void run() {
 						onCompletion();
 						if (graph instanceof BuildingEnergyAnnualGraph) {
+							if (Heliodon.getInstance().getCalender().get(Calendar.MONTH) != Calendar.DECEMBER)
+								return; // annual calculation aborted
 							int net = (int) Math.round(getResult("Net"));
 							String previousRuns = "";
 							Map<String, Double> recordedResults = getRecordedResults("Net");
