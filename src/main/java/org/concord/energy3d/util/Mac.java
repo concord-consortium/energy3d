@@ -1,5 +1,7 @@
 package org.concord.energy3d.util;
 
+import java.awt.Toolkit;
+
 import org.concord.energy3d.gui.MainFrame;
 
 import com.apple.eawt.AboutHandler;
@@ -16,7 +18,7 @@ import com.apple.eawt.QuitResponse;
 public class Mac {
 	public static void init() {
 		final Application application = Application.getApplication();
-		application.setDockIconImage(MainFrame.getInstance().getIconImage());
+		application.setDockIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("icons/icon.png")));
 
 		application.setOpenFileHandler(new OpenFilesHandler() {
 			@Override

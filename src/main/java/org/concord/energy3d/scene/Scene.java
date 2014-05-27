@@ -195,7 +195,8 @@ public class Scene implements Serializable {
 
 		MainPanel.getInstance().getHeliodonButton().setSelected(false);
 		MainPanel.getInstance().getSunAnimButton().setSelected(false);
-		MainPanel.getInstance().getSolarButton().setSelected(false);
+//		MainPanel.getInstance().getSolarButton().setSelected(false);
+		SceneManager.getInstance().setSolarColorMapWithoutUpdate(false);
 		Wall.resetDefaultWallHeight();
 
 		if (url == null) {
@@ -255,6 +256,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().showAxes(!instance.hideAxes);
 		SceneManager.getInstance().showBuildingLabels(instance.showBuildingLabels);
 		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
+		MainPanel.getInstance().getSolarButton().setSelected(false);	// moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
 		SceneManager.getInstance().getUndoManager().die();
 		Scene.getInstance().setEdited(false);
 	}

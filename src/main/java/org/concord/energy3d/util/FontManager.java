@@ -1,7 +1,5 @@
 package org.concord.energy3d.util;
 
-import java.io.IOException;
-
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
@@ -10,7 +8,7 @@ public class FontManager {
 	private static final FontManager instance = new FontManager();
 	private final BMFont partNumberFont;
 	private final BMFont annotationFont;
-	
+
 	public static FontManager getInstance() {
 		return instance;
 	}
@@ -21,15 +19,15 @@ public class FontManager {
 		annotationFont = loadFont("SimpleFont.fnt");
 		System.out.println("done");
 	}
-	
+
 	private BMFont loadFont(final String file) {
 		final ResourceSource url = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, file);
 		try {
 			return new BMFont(url, true);
-		} catch (IOException e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return null;
-		}		
+		}
 	}
 
 	public BMFont getPartNumberFont() {
