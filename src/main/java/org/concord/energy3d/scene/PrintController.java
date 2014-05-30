@@ -133,11 +133,11 @@ public class PrintController implements Updater {
 					}
 				}
 
-				for (final HousePart part : printParts)
-					if (part.isPrintable()) {
-						part.flatten(1.0);
-						part.computeOrientedBoundingBox();
-					}
+//				for (final HousePart part : printParts)
+//					if (part.isPrintable()) {
+//						part.flatten(1.0);
+//						part.computeOrientedBoundingBox();
+//					}
 
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
 				computePageDimension();
@@ -432,7 +432,7 @@ public class PrintController implements Updater {
 			printCenters.add(upperLeftCorner);
 
 			for (final Spatial printSpatial : page)
-				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(upperLeftCorner);
+				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(upperLeftCorner.multiply(1, 0, 1, null));
 
 			final Box box = new Box("Page Boundary");
 			box.setData(upperLeftCorner.add(0, 1, 0, null), upperLeftCorner.add(pageWidth, 1.2, -pageHeight, null));

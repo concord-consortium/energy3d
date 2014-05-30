@@ -483,12 +483,13 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void computeOrientedBoundingBox() {
-		flattenCenter.set(0, 0, 0);
-		computeOrientedBoundingBox(mesh);
-		flattenCenter.set(mesh.getWorldBound().getCenter());
+//		flattenCenter.set(0, 0, 0);
+		final ReadOnlyVector3 center = computeOrientedBoundingBox(mesh);
+		flattenCenter.set(center);
+//		flattenCenter.set(mesh.getWorldBound().getCenter());
 	}
 
-	protected void computeOrientedBoundingBox(final Mesh mesh) {
+	protected ReadOnlyVector3 computeOrientedBoundingBox(final Mesh mesh) {
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		buf.rewind();
 		final FloatBuffer newbuf = BufferUtils.createFloatBuffer(buf.limit());
@@ -501,6 +502,7 @@ public abstract class HousePart implements Serializable {
 		boundingBox.computeFromPoints(newbuf);
 		boundingBox.transform(mesh.getWorldTransform().invert(null), mesh.getModelBound());
 		mesh.updateWorldBound(true);
+		return boundingBox.getCenter();
 	}
 
 	public void flattenInit() {

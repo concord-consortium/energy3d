@@ -860,10 +860,11 @@ public abstract class Roof extends HousePart {
 		roofPartPrintVerticalMap.put(roofPartNode, isVertical);
 		flattenQuadTriangle((Node) roofPartNode, 1.0);
 		roofPartNode.updateGeometricState(0);
-		orgCenters.put((Node) roofPartNode, null);
+//		orgCenters.put((Node) roofPartNode, null);
 		final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
-		computeOrientedBoundingBox(roofPartMesh);
-		orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
+		final ReadOnlyVector3 center = computeOrientedBoundingBox(roofPartMesh);
+//		orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
+		orgCenters.put((Node) roofPartNode, center);
 	}
 
 	protected void snapToWallsPolygon(final Vector3 p) {
