@@ -477,6 +477,19 @@ abstract class Graph extends JPanel {
 
 	}
 
+	boolean containsSensorType(String s) {
+		for (String key : data.keySet()) {
+			if (key.startsWith(s)) {
+				List<Double> val = data.get(key);
+				for (double x : val) {
+					if (x != 0)
+						return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	void drawPartLegends(Graphics2D g2) {
 
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
@@ -487,15 +500,21 @@ abstract class Graph extends JPanel {
 		switch (type) {
 		case SENSOR:
 			x0 -= 50;
-			drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get("Solar"));
-			g2.drawString("Light", x0 + 14, y0 + 8);
-			y0 += 14;
-			drawSquare(g2, x0, y0, 8, colors.get("Heat Gain"));
-			g2.drawString("Heat Flux", x0 + 14, y0 + 8);
+			String s = "Light";
+			if (containsSensorType(s)) {
+				drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get("Solar"));
+				g2.drawString(s, x0 + 14, y0 + 8);
+			}
+			s = "Heat Flux";
+			if (containsSensorType(s)) {
+				y0 += 14;
+				drawSquare(g2, x0, y0, 8, colors.get("Heat Gain"));
+				g2.drawString(s, x0 + 14, y0 + 8);
+			}
 			break;
 		default:
 			x0 -= 100;
-			String s = "Solar";
+			s = "Solar";
 			boolean isAngularGraph = this instanceof AngularGraph;
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));

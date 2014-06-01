@@ -100,20 +100,24 @@ public abstract class AnnualAnalysis extends Analysis {
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		if (selectedPart != null) {
-			s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-			if (selectedPart instanceof Foundation) {
-				s = s.replaceAll("Foundation", "Building");
-				if (selectedPart.getChildren().isEmpty()) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+			if (graph.type == Graph.SENSOR) {
+				SceneManager.getInstance().setSelectedPart(null);
+			} else {
+				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+				if (selectedPart instanceof Foundation) {
+					s = s.replaceAll("Foundation", "Building");
+					if (selectedPart.getChildren().isEmpty()) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					if (!isBuildingComplete((Foundation) selectedPart)) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "The selected building has not been completed.\nAre you sure to continue?", "Incomplete Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+							return;
+					}
+				} else if (selectedPart instanceof Tree) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
-				if (!isBuildingComplete((Foundation) selectedPart)) {
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "The selected building has not been completed.\nAre you sure to continue?", "Incomplete Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
-						return;
-				}
-			} else if (selectedPart instanceof Tree) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
-				return;
 			}
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s, true);

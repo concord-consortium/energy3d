@@ -42,7 +42,7 @@ public abstract class Analysis {
 				for (Double d : list) {
 					sum += d;
 				}
-				recordedResults.put(r.getID() + " (file: " + r.getFileName() + ")", sum);
+				recordedResults.put(r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")"), sum);
 			}
 		}
 		return recordedResults;

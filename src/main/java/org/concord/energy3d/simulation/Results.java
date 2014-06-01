@@ -17,16 +17,18 @@ class Results {
 
 	private static int n = 1;
 	private int id;
-	private String filename;
+	private String filename = null;
 	private Map<String, List<Double>> copy;
 
 	Results(Map<String, List<Double>> data) {
 		id = n;
 		copy = new HashMap<String, List<Double>>(data);
 		n++;
-		filename = Scene.getURL().getFile();
-		int i = filename.lastIndexOf("/");
-		filename = filename.substring(i + 1);
+		if (Scene.getURL() != null) {
+			filename = Scene.getURL().getFile();
+			int i = filename.lastIndexOf("/");
+			filename = filename.substring(i + 1);
+		}
 	}
 
 	String getFileName() {
