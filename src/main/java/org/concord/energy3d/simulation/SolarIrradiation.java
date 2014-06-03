@@ -52,6 +52,8 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarIrradiation {
 
+	public final static double SOLAR_CONSTANT = 1.361; // http://en.wikipedia.org/wiki/Solar_constant
+
 	public final static int AIR_MASS_NONE = -1;
 	public final static int AIR_MASS_KASTEN_YOUNG = 0;
 	public final static int AIR_MASS_SPHERE_MODEL = 1;
@@ -113,7 +115,6 @@ public class SolarIrradiation {
 		int totalSteps = 0;
 		for (int minute = 0; minute < 1440; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
-			// final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
 			sunLocations[minute / timeStep] = sunLocation;
 			if (sunLocation.getZ() > 0)
 				totalSteps++;
@@ -147,6 +148,7 @@ public class SolarIrradiation {
 		maxValue *= (100 - EnergyPanel.getInstance().getColorMapSlider().getValue()) / 100.0;
 	}
 
+	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
 	private void computeOnMesh(final int minute, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 		if (normal.dot(directionTowardSun) <= 0)
 			return;
@@ -158,8 +160,14 @@ public class SolarIrradiation {
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+		String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		int elevation = 0;
+		if (!"".equals(city))
+			elevation = CityData.getInstance().getCityAltitudes().get(city);
 		final double airMass = computeAirMass(directionTowardSun);
-		final double dot = normal.dot(directionTowardSun);
+		final double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * ((1.0 - 0.0014 * elevation) * Math.pow(0.7, Math.pow(airMass, 0.678)) + 0.0014 * elevation);
+		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
 
 		for (int col = 0; col < data.cols; col++) {
 			final ReadOnlyVector3 pU = data.u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(data.p0);
@@ -177,7 +185,7 @@ public class SolarIrradiation {
 					h = solarStep;
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
-//				 final PickResults pickResults = new BoundingPickResults();
+				// final PickResults pickResults = new BoundingPickResults();
 				boolean collision = false;
 				for (final Spatial spatial : collidables)
 					if (spatial != collisionMesh) {
@@ -189,9 +197,8 @@ public class SolarIrradiation {
 					}
 
 				if (!collision) {
-					data.solar[row][col] += dot / airMass;
-					final double annotationScale = Scene.getInstance().getAnnotationScale();
-					housePart.getSolarPotential()[minute / timeStep] += dot / airMass * w * h * annotationScale * annotationScale / 60 * timeStep;
+					data.solar[row][col] += dot;
+					housePart.getSolarPotential()[minute / timeStep] += dot * w * h * scaleFactor;
 				}
 			}
 		}
@@ -320,8 +327,7 @@ public class SolarIrradiation {
 	}
 
 	private void computeOnLand(final ReadOnlyVector3 directionTowardSun) {
-		final double dot = directionTowardSun.dot(Vector3.UNIT_Z);
-		final double airMass = computeAirMass(directionTowardSun);
+		final double dot = SOLAR_CONSTANT * directionTowardSun.dot(Vector3.UNIT_Z) / computeAirMass(directionTowardSun);
 		final double step = this.solarStep * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
@@ -343,7 +349,7 @@ public class SolarIrradiation {
 				for (final Spatial spatial : collidables)
 					PickingUtil.findPick(spatial, pickRay, pickResults, false);
 				if (pickResults.getNumber() == 0)
-					data.solar[row][col] += dot / airMass;
+					data.solar[row][col] += dot;
 			}
 		}
 	}
@@ -422,7 +428,7 @@ public class SolarIrradiation {
 			}
 		}
 
-//		SceneManager.getInstance().refresh();
+		// SceneManager.getInstance().refresh();
 	}
 
 	private void applyTexture(final Mesh mesh) {

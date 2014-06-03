@@ -10,6 +10,7 @@ import org.concord.energy3d.shapes.Heliodon;
 public class CityData {
 	private static final CityData instance = new CityData();
 	private final Map<String, Integer> cityLatitutes = new HashMap<String, Integer>();
+	private final Map<String, Integer> cityAltitudes = new HashMap<String, Integer>();
 	private final Map<String, int[]> avgMonthlyLowTemperatures = new HashMap<String, int[]>();
 	private final Map<String, int[]> avgMonthlyHighTemperatures = new HashMap<String, int[]>();
 	private final String[] cities;
@@ -19,7 +20,10 @@ public class CityData {
 	}
 
 	private CityData() {
+
 		cities = new String[] {"", "Moscow", "Ottawa", "Boston", "Beijing", "Washington DC", "Tehran", "Los Angeles", "Miami", "Mexico City", "Singapore", "Sydney", "Buenos Aires"};
+
+		// latitudes
 		cityLatitutes.put("Moscow", 55);
 		cityLatitutes.put("Ottawa", 45);
 		cityLatitutes.put("Boston", 42);
@@ -32,6 +36,22 @@ public class CityData {
 		cityLatitutes.put("Singapore", 1);
 		cityLatitutes.put("Sydney", -33);
 		cityLatitutes.put("Buenos Aires", -34);
+
+		// altitudes
+		cityAltitudes.put("Moscow", 151);
+		cityAltitudes.put("Ottawa", 114);
+		cityAltitudes.put("Boston", 2);
+		cityAltitudes.put("Beijing", 44);
+		cityAltitudes.put("Washington DC", 2);
+		cityAltitudes.put("Tehran", 1189);
+		cityAltitudes.put("Los Angeles", 71);
+		cityAltitudes.put("Miami", 2);
+		cityAltitudes.put("Mexico City", 2421);
+		cityAltitudes.put("Singapore", 2);
+		cityAltitudes.put("Sydney", 2);
+		cityAltitudes.put("Buenos Aires", 25);
+		
+		// low and high temperatures
 		avgMonthlyLowTemperatures.put("Boston", new int[] { -6, -4, -1, 5, 10, 16, 18, 18, 14, 8, 3, -2 });
 		avgMonthlyHighTemperatures.put("Boston", new int[] { 2, 4, 7, 13, 19, 24, 28, 27, 22, 16, 11, 5 });
 		avgMonthlyLowTemperatures.put("Moscow", new int[] { -14, -14, -9, 0, 6, 10, 13, 11, 6, 1, -5, -10 });
@@ -56,6 +76,7 @@ public class CityData {
 		avgMonthlyHighTemperatures.put("Sydney", new int[] { 26, 26, 25, 23, 20, 17, 17, 18, 20, 22, 23, 25 });
 		avgMonthlyLowTemperatures.put("Buenos Aires", new int[] { 20, 19, 18, 14, 11, 8, 8, 9, 11, 13, 16, 18 });
 		avgMonthlyHighTemperatures.put("Buenos Aires", new int[] { 28, 27, 25, 22, 18, 15, 14, 16, 18, 21, 24, 27 });
+
 	}
 
 	public double[] computeOutsideTemperature(final Calendar today, final String city) {
@@ -107,6 +128,10 @@ public class CityData {
 
 	public Map<String, Integer> getCityLatitutes() {
 		return cityLatitutes;
+	}
+
+	public Map<String, Integer> getCityAltitudes() {
+		return cityAltitudes;
 	}
 
 	public Map<String, int[]> getAvgMonthlyLowTemperatures() {

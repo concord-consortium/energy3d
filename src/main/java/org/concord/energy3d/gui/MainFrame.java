@@ -1139,8 +1139,8 @@ public class MainFrame extends JFrame {
 				editMenu.add(getUnlockAllMenuItem());
 				editMenu.addSeparator();
 				editMenu.add(getSpecificationsMenuItem());
+				editMenu.addSeparator();
 			}
-			editMenu.addSeparator();
 			editMenu.add(getNoteCheckBoxMenuItem());
 		}
 		return editMenu;
