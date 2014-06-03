@@ -21,7 +21,7 @@ public class CityData {
 
 	private CityData() {
 
-		cities = new String[] {"", "Moscow", "Ottawa", "Boston", "Beijing", "Washington DC", "Tehran", "Los Angeles", "Miami", "Mexico City", "Singapore", "Sydney", "Buenos Aires"};
+		cities = new String[] { "", "Moscow", "Ottawa", "Boston", "Beijing", "Washington DC", "Tehran", "Los Angeles", "Miami", "Mexico City", "Singapore", "Sydney", "Buenos Aires" };
 
 		// latitudes
 		cityLatitutes.put("Moscow", 55);
@@ -50,7 +50,7 @@ public class CityData {
 		cityAltitudes.put("Singapore", 2);
 		cityAltitudes.put("Sydney", 2);
 		cityAltitudes.put("Buenos Aires", 25);
-		
+
 		// low and high temperatures
 		avgMonthlyLowTemperatures.put("Boston", new int[] { -6, -4, -1, 5, 10, 16, 18, 18, 14, 8, 3, -2 });
 		avgMonthlyHighTemperatures.put("Boston", new int[] { 2, 4, 7, 13, 19, 24, 28, 27, 22, 16, 11, 5 });

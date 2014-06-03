@@ -64,7 +64,7 @@ public class SolarIrradiation {
 	private int timeStep = 15;
 	private double solarStep = 2.0;
 	private long maxValue;
-	private int airMassSelection = AIR_MASS_KASTEN_YOUNG;
+	private int airMassSelection = AIR_MASS_SPHERE_MODEL;
 
 	private class TextureData {
 		public Vector3 p0;
@@ -160,12 +160,8 @@ public class SolarIrradiation {
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
-		String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-		int elevation = 0;
-		if (!"".equals(city))
-			elevation = CityData.getInstance().getCityAltitudes().get(city);
 		final double airMass = computeAirMass(directionTowardSun);
-		final double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * ((1.0 - 0.0014 * elevation) * Math.pow(0.7, Math.pow(airMass, 0.678)) + 0.0014 * elevation);
+		final double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678));
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
 
@@ -292,18 +288,25 @@ public class SolarIrradiation {
 		return data;
 	}
 
+	// air mass calculation from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#At_higher_altitudes
 	public double computeAirMass(final ReadOnlyVector3 directionTowardSun) {
 		switch (airMassSelection) {
 		case AIR_MASS_NONE:
 			return 1;
-		case AIR_MASS_SPHERE_MODEL:
+		case AIR_MASS_KASTEN_YOUNG:
 			double zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
-			final double cos = Math.cos(zenithAngle);
-			final double r = 708;
-			return Math.sqrt(r * r * cos * cos + 2 * r + 1) - r * cos;
+			return 1 / (Math.cos(zenithAngle) + 0.50572 * Math.pow(96.07995 - zenithAngle / Math.PI * 180.0, -1.6364));
 		default:
 			zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
-			return 1 / (Math.cos(zenithAngle) + 0.50572 * Math.pow(96.07995 - zenithAngle / Math.PI * 180.0, -1.6364));
+			final double cos = Math.cos(zenithAngle);
+			final double r = 708;
+			String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+			if (!"".equals(city)) {
+				double c = CityData.getInstance().getCityAltitudes().get(city) / 9000.0;
+				return Math.sqrt((r + c) * (r + c) * cos * cos + (2 * r + 1 + c) * (1 - c)) - (r + c) * cos;
+			} else {
+				return Math.sqrt(r * r * cos * cos + 2 * r + 1) - r * cos;
+			}
 		}
 	}
 
