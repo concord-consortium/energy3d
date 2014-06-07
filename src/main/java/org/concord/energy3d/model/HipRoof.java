@@ -13,9 +13,11 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 public class HipRoof extends Roof {
 	private static final long serialVersionUID = 1L;
 	private transient boolean recalculateEditPoints;
+	private int type = 1; // 1 -- ridge in south-north direction; 2 -- ridget in west-east direction
 
-	public HipRoof() {
+	public HipRoof(int type) {
 		super(3);
+		this.type = type;
 	}
 
 	@Override
@@ -57,7 +59,7 @@ public class HipRoof extends Roof {
 			recalculateEditPoints = false;
 			points.get(0).set(toRelative(center));
 			if (editPointIndex == -1) {
-				final Vector3 dir = getContainerRelative().getAbsPoint(1).subtractLocal(getContainerRelative().getAbsPoint(0)).normalizeLocal();
+				final Vector3 dir = getContainerRelative().getAbsPoint(type).subtractLocal(getContainerRelative().getAbsPoint(0)).normalizeLocal();
 				Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(dir.multiply(-50, null), null));
 				if (point1 == null)
 					point1 = center.clone();

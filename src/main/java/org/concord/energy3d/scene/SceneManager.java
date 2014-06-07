@@ -135,7 +135,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_OAK, DRAW_MAPLE, DRAW_PINE
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_HIP2, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_OAK, DRAW_MAPLE, DRAW_PINE
 	}
 
 	public enum CameraMode {
@@ -926,7 +926,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else if (operation == Operation.DRAW_ROOF_PYRAMID)
 			drawn = new PyramidRoof();
 		else if (operation == Operation.DRAW_ROOF_HIP)
-			drawn = new HipRoof();
+			drawn = new HipRoof(1);
+		else if (operation == Operation.DRAW_ROOF_HIP2)
+			drawn = new HipRoof(2);
 		else if (operation == Operation.DRAW_ROOF_CUSTOM)
 			drawn = new CustomRoof();
 		else if (operation == Operation.DRAW_FLOOR)

@@ -150,7 +150,8 @@ public class MainPanel extends JPanel {
 
 		// create roof menu
 		final JCheckBoxMenuItem miPyramidRoof = new JCheckBoxMenuItem("Pyramid Roof", new ImageIcon(getClass().getResource("icons/roof_pyramid.png")), true);
-		final JCheckBoxMenuItem miHipRoof = new JCheckBoxMenuItem("Hip Roof", new ImageIcon(getClass().getResource("icons/roof_hip.png")));
+		final JCheckBoxMenuItem miHipRoof1 = new JCheckBoxMenuItem("Hip Roof", new ImageIcon(getClass().getResource("icons/roof_hip.png")));
+		final JCheckBoxMenuItem miHipRoof2 = new JCheckBoxMenuItem("Hip Roof (90\u00B0 Rotation)", new ImageIcon(getClass().getResource("icons/roof_hip2.png")));
 		final JCheckBoxMenuItem miCustomRoof = new JCheckBoxMenuItem("Custom Roof", new ImageIcon(getClass().getResource("icons/roof_custom.png")));
 		final JCheckBoxMenuItem miGableRoof = new JCheckBoxMenuItem("Gable Roof", new ImageIcon(getClass().getResource("icons/roof_gable.png")));
 		final ActionListener roofAction = new ActionListener() {
@@ -161,9 +162,12 @@ public class MainPanel extends JPanel {
 				if (selected == miPyramidRoof) {
 					roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 					roofButton.setToolTipText("Draw pyramid roof");
-				} else if (selected == miHipRoof) {
+				} else if (selected == miHipRoof1) {
 					roofCommand = SceneManager.Operation.DRAW_ROOF_HIP;
 					roofButton.setToolTipText("Draw hip roof");
+				} else if (selected == miHipRoof2) {
+					roofCommand = SceneManager.Operation.DRAW_ROOF_HIP2;
+					roofButton.setToolTipText("Draw hip roof (90\u00B0 rotation)");
 				} else if (selected == miCustomRoof) {
 					roofCommand = SceneManager.Operation.DRAW_ROOF_CUSTOM;
 					roofButton.setToolTipText("Draw custom roof");
@@ -177,17 +181,20 @@ public class MainPanel extends JPanel {
 			}
 		};
 		miPyramidRoof.addActionListener(roofAction);
-		miHipRoof.addActionListener(roofAction);
+		miHipRoof1.addActionListener(roofAction);
+		miHipRoof2.addActionListener(roofAction);
 		miCustomRoof.addActionListener(roofAction);
 		miGableRoof.addActionListener(roofAction);
 		roofMenu = new JPopupMenu();
 		roofMenu.add(miPyramidRoof);
-		roofMenu.add(miHipRoof);
+		roofMenu.add(miHipRoof1);
+		roofMenu.add(miHipRoof2);
 		roofMenu.add(miCustomRoof);
 		roofMenu.add(miGableRoof);
 		ButtonGroup bg = new ButtonGroup();
 		bg.add(miPyramidRoof);
-		bg.add(miHipRoof);
+		bg.add(miHipRoof1);
+		bg.add(miHipRoof2);
 		bg.add(miCustomRoof);
 		bg.add(miGableRoof);
 
