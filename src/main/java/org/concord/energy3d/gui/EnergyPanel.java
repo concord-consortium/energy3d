@@ -473,7 +473,7 @@ public class EnergyPanel extends JPanel {
 
 		solarPanelEfficiencyComboBox = new WideComboBox();
 		solarPanelEfficiencyComboBox.setEditable(true);
-		solarPanelEfficiencyComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10.0", "20.0", "30.0" }));
+		solarPanelEfficiencyComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "10.0", "15.0", "20.0" }));
 		solarPanelEfficiencyComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -483,11 +483,11 @@ public class EnergyPanel extends JPanel {
 				try {
 					eff = Float.parseFloat(s);
 				} catch (final NumberFormatException ex) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be 10-30.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be 10-20.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (eff < 10 || eff > 30) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be 10-30.", "Error", JOptionPane.ERROR_MESSAGE);
+				if (eff < 10 || eff > 20) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be 10-20.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				Scene.getInstance().setSolarPanelEfficiency(eff);

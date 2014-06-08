@@ -200,15 +200,21 @@ abstract class Graph extends JPanel {
 		g2.drawRect(left / 2, top / 2, width - (left + right) / 2, height - (top + bottom) / 2);
 
 		g2.setColor(Color.BLACK);
+		g2.setStroke(thin);
+		g2.setFont(new Font("Arial", Font.PLAIN, 8));
 		float tickWidth = (float) (width - left - right) / (float) (numberOfTicks - 1);
+		float xTick;
 		for (int i = 0; i < numberOfTicks; i++) {
 			String s = getXAxisLabel(i);
 			int sWidth = g2.getFontMetrics().stringWidth(s);
-			g2.drawString(s, left + tickWidth * i - sWidth / 2, height - bottom / 2 + 16);
+			xTick = left + tickWidth * i;
+			g2.drawString(s, xTick - sWidth / 2, height - bottom / 2 + 16);
+			g2.drawLine((int) xTick, height - bottom / 2, (int) xTick, height - bottom / 2 - 4);
 		}
+		g2.setFont(new Font("Arial", Font.PLAIN, 10));
 		int xAxisLabelWidth = g2.getFontMetrics().stringWidth(xAxisLabel);
 		int yAxisLabelWidth = g2.getFontMetrics().stringWidth(yAxisLabel);
-		g2.drawString(xAxisLabel, (width - xAxisLabelWidth) / 2, height - 10);
+		g2.drawString(xAxisLabel, (width - xAxisLabelWidth) / 2, height - 8);
 		g2.rotate(-Math.PI / 2, 16, (height + yAxisLabelWidth) / 2);
 		g2.drawString(yAxisLabel, 16, (height + yAxisLabelWidth) / 2);
 		g2.rotate(Math.PI / 2, 16, (height + yAxisLabelWidth) / 2);

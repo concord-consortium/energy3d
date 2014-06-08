@@ -110,13 +110,13 @@ public class Cost {
 		if (part instanceof SolarPanel) {
 			double efficiency = Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
 			int price;
-			if (efficiency > 30)
+			if (efficiency >= 20)
+				price = 1000;
+			else if (efficiency >= 17.5)
 				price = 800;
-			else if (efficiency > 25)
+			else if (efficiency >= 15)
 				price = 600;
-			else if (efficiency > 20)
-				price = 500;
-			else if (efficiency > 15)
+			else if (efficiency >= 12.5)
 				price = 400;
 			else
 				price = 300;
