@@ -635,6 +635,7 @@ public abstract class HousePart implements Serializable {
 		if (this instanceof Tree) { // special treatment because the same mesh of a tree has two textures (shed or not)
 			final TextureState ts = new TextureState();
 			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, isFrozen());
+//			texture.setWrap(WrapMode.Clamp);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
 		} else {

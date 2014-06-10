@@ -17,6 +17,7 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
+import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -115,6 +116,8 @@ public class SolarIrradiation {
 		int totalSteps = 0;
 		for (int minute = 0; minute < 1440; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
+//			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
+//			timeStep = 1440;
 			sunLocations[minute / timeStep] = sunLocation;
 			if (sunLocation.getZ() > 0)
 				totalSteps++;
@@ -129,8 +132,11 @@ public class SolarIrradiation {
 				synchronized (Scene.getInstance().getParts()) {
 					for (final HousePart part : Scene.getInstance().getParts()) {
 						if (part.isDrawCompleted())
-							if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel || part instanceof Sensor)
+							if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof Sensor)
+//							if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof Sensor || part instanceof SolarPanel)
 								computeOnMesh(minute, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
+							else if (part instanceof SolarPanel)
+								computeOnMeshSolarPanel(minute, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
 							else if (part instanceof Roof)
 								for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 									final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
@@ -199,6 +205,60 @@ public class SolarIrradiation {
 			}
 		}
 
+	}
+
+	private void computeOnMeshSolarPanel(final int minute, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
+		if (normal.dot(directionTowardSun) <= 0)
+			return;
+
+		TextureData data = onMesh.get(drawMesh);
+		if (data == null)
+			data = initMeshTextureDataSolarPanel(drawMesh, collisionMesh, normal);
+
+		final double OFFSET = 3;
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+		final double airMass = computeAirMass(directionTowardSun);
+		final double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678));
+		final double annotationScale = Scene.getInstance().getAnnotationScale();
+//		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
+		final double scaleFactor = 1.0 / 60 * timeStep;
+		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
+
+		for (int col = 0; col < data.cols; col++) {
+			for (int row = 0; row < data.rows; row++) {
+				if (EnergyPanel.getInstance().isCancelled())
+					throw new CancellationException();
+				final int index;
+				if (row == 0 && col == 0)
+					index = 1 * 3;
+				else if (row == 0 && col == 1)
+					index = 0 * 3;
+				else if (row == 1 && col == 0)
+					index = 2 * 3;
+				else
+					index = 4 * 3;
+				final Vector3 point = new Vector3(vertexBuffer.get(index), vertexBuffer.get(index + 1), vertexBuffer.get(index + 2));
+				System.out.println(point);
+				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(point).addLocal(offset);
+				final Ray3 pickRay = new Ray3(p, directionTowardSun);
+				final PickResults pickResults = new PrimitivePickResults();
+				// final PickResults pickResults = new BoundingPickResults();
+				boolean collision = false;
+				for (final Spatial spatial : collidables)
+					if (spatial != collisionMesh) {
+						PickingUtil.findPick(spatial, pickRay, pickResults, false);
+						if (pickResults.getNumber() != 0) {
+							collision = true;
+							break;
+						}
+					}
+
+				if (!collision) {
+					data.solar[row][col] += dot;
+					housePart.getSolarPotential()[minute / timeStep] += dot * SolarPanel.WIDTH * SolarPanel.HEIGHT / 4.0 * scaleFactor;
+				}
+			}
+		}
 	}
 
 	public void initMeshTextureData(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
@@ -288,6 +348,18 @@ public class SolarIrradiation {
 		return data;
 	}
 
+	private TextureData initMeshTextureDataSolarPanel(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
+		final TextureData data = new TextureData();
+
+		data.rows = 4;
+		data.cols = 4;
+		if (data.solar == null)
+			data.solar = new double[roundToPowerOfTwo(data.rows)][roundToPowerOfTwo(data.cols)];
+
+		onMesh.put(drawMesh, data);
+		return data;
+	}
+
 	// air mass calculation from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#At_higher_altitudes
 	public double computeAirMass(final ReadOnlyVector3 directionTowardSun) {
 		switch (airMassSelection) {
@@ -300,9 +372,9 @@ public class SolarIrradiation {
 			zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
 			final double cos = Math.cos(zenithAngle);
 			final double r = 708;
-			String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+			final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 			if (!"".equals(city)) {
-				double c = CityData.getInstance().getCityAltitudes().get(city) / 9000.0;
+				final double c = CityData.getInstance().getCityAltitudes().get(city) / 9000.0;
 				return Math.sqrt((r + c) * (r + c) * cos * cos + (2 * r + 1 + c) * (1 - c)) - (r + c) * cos;
 			} else {
 				return Math.sqrt(r * r * cos * cos + 2 * r + 1) - r * cos;
@@ -441,6 +513,17 @@ public class SolarIrradiation {
 		}
 
 		final double[][] solarData = onMesh.get(mesh).solar;
+		if (mesh.getUserData() != null && ((UserData) mesh.getUserData()).getHousePart() instanceof SolarPanel) {
+			solarData[3][0] = solarData[2][0] = solarData[1][0];
+			solarData[3][1] = solarData[2][1] = solarData[1][0];
+			solarData[3][2] = solarData[2][2] = solarData[1][1];
+			solarData[3][3] = solarData[2][3] = solarData[1][1];
+
+			solarData[0][2] = solarData[1][2] = solarData[0][1];
+			solarData[0][3] = solarData[1][3] = solarData[0][1];
+			solarData[0][0] = solarData[1][0] = solarData[0][0];
+			solarData[0][1] = solarData[1][1] = solarData[0][0];
+		}
 
 		fillBlanksWithNeighboringValues(solarData);
 
@@ -458,6 +541,7 @@ public class SolarIrradiation {
 		final Texture2D texture = new Texture2D();
 		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
 		texture.setImage(image);
+//		texture.setWrap(WrapMode.Clamp);
 		final TextureState textureState = new TextureState();
 		textureState.setTexture(texture);
 		mesh.setDefaultColor(Scene.GRAY);
