@@ -116,8 +116,8 @@ public class SolarIrradiation {
 		int totalSteps = 0;
 		for (int minute = 0; minute < 1440; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
-//			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
-//			timeStep = 1440;
+			// final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
+			// timeStep = 1440;
 			sunLocations[minute / timeStep] = sunLocation;
 			if (sunLocation.getZ() > 0)
 				totalSteps++;
@@ -133,7 +133,7 @@ public class SolarIrradiation {
 					for (final HousePart part : Scene.getInstance().getParts()) {
 						if (part.isDrawCompleted())
 							if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof Sensor)
-//							if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof Sensor || part instanceof SolarPanel)
+								// if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof Sensor || part instanceof SolarPanel)
 								computeOnMesh(minute, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
 							else if (part instanceof SolarPanel)
 								computeOnMeshSolarPanel(minute, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
@@ -220,7 +220,7 @@ public class SolarIrradiation {
 		final double airMass = computeAirMass(directionTowardSun);
 		final double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678));
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-//		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
+		// final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
 		final double scaleFactor = 1.0 / 60 * timeStep;
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
@@ -238,7 +238,7 @@ public class SolarIrradiation {
 				else
 					index = 4 * 3;
 				final Vector3 point = new Vector3(vertexBuffer.get(index), vertexBuffer.get(index + 1), vertexBuffer.get(index + 2));
-				//System.out.println(point);
+				// System.out.println(point);
 				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(point).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
@@ -394,10 +394,12 @@ public class SolarIrradiation {
 		while (vertexBuffer.hasRemaining()) {
 			final ReadOnlyVector3 p = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
 			final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
-			final float uScale = (float) (uP.distance(o) / u.length());
 			final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
-			final float vScale = (float) (vP.distance(o) / v.length());
-			textureBuffer.put(uScale).put(vScale);
+			if (uP != null && vP != null) {
+				final float uScale = (float) (uP.distance(o) / u.length());
+				final float vScale = (float) (vP.distance(o) / v.length());
+				textureBuffer.put(uScale).put(vScale);
+			}
 		}
 	}
 
@@ -541,7 +543,7 @@ public class SolarIrradiation {
 		final Texture2D texture = new Texture2D();
 		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
 		texture.setImage(image);
-//		texture.setWrap(WrapMode.Clamp);
+		// texture.setWrap(WrapMode.Clamp);
 		final TextureState textureState = new TextureState();
 		textureState.setTexture(texture);
 		mesh.setDefaultColor(Scene.GRAY);
