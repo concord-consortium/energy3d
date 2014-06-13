@@ -238,7 +238,7 @@ public class SolarIrradiation {
 				else
 					index = 4 * 3;
 				final Vector3 point = new Vector3(vertexBuffer.get(index), vertexBuffer.get(index + 1), vertexBuffer.get(index + 2));
-				System.out.println(point);
+				//System.out.println(point);
 				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(point).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();

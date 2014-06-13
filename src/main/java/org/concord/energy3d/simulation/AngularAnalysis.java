@@ -38,7 +38,7 @@ public abstract class AngularAnalysis extends Analysis {
 
 	static int nRotation = 8;
 
-	private void runAnalysis() {
+	private void runAnalysis(final JDialog parent) {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
@@ -51,7 +51,16 @@ public abstract class AngularAnalysis extends Analysis {
 							Thread.sleep(500);
 						} catch (final InterruptedException e) {
 						}
-						compute();
+						final Throwable t = compute();
+						if (t != null) {
+							stopAnalysis();
+							EventQueue.invokeLater(new Runnable() {
+								public void run() {
+									JOptionPane.showMessageDialog(parent, "Angular analysis failed. Please restart the program.\n" + t.getMessage(), "Analysis Error", JOptionPane.ERROR_MESSAGE);
+								}
+							});
+							break;
+						}
 					}
 				}
 				SceneManager.getInstance().setRefreshOnlyMode(false);
@@ -250,7 +259,7 @@ public abstract class AngularAnalysis extends Analysis {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				runButton.setEnabled(false);
-				runAnalysis();
+				runAnalysis(dialog);
 			}
 		});
 		buttonPanel.add(runButton);

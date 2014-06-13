@@ -61,14 +61,21 @@ public abstract class Analysis {
 		new Thread(task, getClass().getName()).start();
 	}
 
-	void compute() {
+	// return the exception if unsuccessful
+	Throwable compute() {
 		try {
 			EnergyPanel.getInstance().computeNow();
+		} catch (final Throwable e) {
+			e.printStackTrace();
+			return e;
+		}
+		try {
 			SceneManager.getInstance().refreshNow();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		updateGraph();
+		return null;
 	}
 
 	abstract void updateGraph();

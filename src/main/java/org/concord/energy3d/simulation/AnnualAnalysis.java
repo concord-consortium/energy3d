@@ -61,7 +61,16 @@ public abstract class AnnualAnalysis extends Analysis {
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
 						Heliodon.getInstance().getCalender().set(Calendar.MONTH, m);
-						compute();
+						final Throwable t = compute();
+						if (t != null) {
+							stopAnalysis();
+							EventQueue.invokeLater(new Runnable() {
+								public void run() {
+									JOptionPane.showMessageDialog(parent, "Annual analysis failed. Please restart the program.\n" + t.getMessage(), "Analysis Error", JOptionPane.ERROR_MESSAGE);
+								}
+							});
+							break;
+						}
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
