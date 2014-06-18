@@ -486,8 +486,8 @@ public class EnergyPanel extends JPanel {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be 10-20.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (eff < 10 || eff > 20) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be 10-20.", "Error", JOptionPane.ERROR_MESSAGE);
+				if (eff < 10 || eff > 30) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be 10-30.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				Scene.getInstance().setSolarPanelEfficiency(eff);

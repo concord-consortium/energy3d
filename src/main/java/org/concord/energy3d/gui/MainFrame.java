@@ -47,6 +47,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -479,7 +480,7 @@ public class MainFrame extends JFrame {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						final File dir = fileChooser.getSelectedFile();
 						if (dir.isDirectory()) {
-							PostProcessor.open(dir.listFiles(new FilenameFilter() {
+							DesignReplay.play(dir.listFiles(new FilenameFilter() {
 								@Override
 								public boolean accept(final File dir, final String name) {
 									return name.endsWith(".ng3");

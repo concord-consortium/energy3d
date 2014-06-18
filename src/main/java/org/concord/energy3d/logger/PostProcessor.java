@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Building;
@@ -21,8 +20,6 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-
-import com.ardor3d.util.GameTaskQueue;
 
 /**
  * @author Charles Xie
@@ -229,77 +226,6 @@ public class PostProcessor {
 				return x;
 		}
 		return null;
-	}
-
-	public static void open(final File[] files, final Runnable update) {
-
-		new Thread() {
-			@Override
-			public void run() {
-				EnergyPanel.getInstance().setComputeEnabled(false);
-				final int n = files.length;
-				int i = -1;
-				while (i < n - 1) {
-					if (replaying) {
-						i++;
-						final int slash = files[i].toString().lastIndexOf(System.getProperty("file.separator"));
-						final String fileName = files[i].toString().substring(slash + 1).trim();
-						System.out.println("Play back " + i + " of " + n + ": " + fileName);
-						try {
-							Scene.openNow(files[i].toURI().toURL());
-							SceneManager.getTaskManager().update(new Callable<Object>() {
-								@Override
-								public Object call() throws Exception {
-									Scene.initSceneNow();
-									Scene.initEnergy();
-									return null;
-								}
-							});
-							//
-							// // Scene.initSceneNow();
-							// // Scene.initEnergy();
-							// // EnergyPanel.getInstance().computeNow(UpdateRadiation.ALWAYS);
-							SceneManager.getInstance().refresh();
-							while (SceneManager.getTaskManager().getQueue(GameTaskQueue.UPDATE).size() != 0)
-								sleep(10);
-							update.run();
-							sleep(SLEEP);
-						} catch (final Exception e) {
-							e.printStackTrace();
-						}
-						// if (i == n - 1) i = 0;
-					} else {
-						if (backward) {
-							if (i > 0) {
-								i--;
-								System.out.println("Play back " + i + " of " + n);
-								try {
-									Scene.open(files[i].toURI().toURL());
-									update.run();
-								} catch (final Exception e) {
-									e.printStackTrace();
-								}
-							}
-							backward = false;
-						} else if (forward) {
-							if (i < n - 1) {
-								i++;
-								System.out.println("Play back " + i + " of " + n);
-								try {
-									Scene.open(files[i].toURI().toURL());
-									update.run();
-								} catch (final Exception e) {
-									e.printStackTrace();
-								}
-							}
-							forward = false;
-							if (i == n - 1)
-								i = n - 2;
-						}
-					}
-				}
-			}
-		}.start();
 	}
 
 }
