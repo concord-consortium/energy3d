@@ -12,10 +12,7 @@ import org.concord.energy3d.scene.SceneManager;
  * @author Charles Xie
  * 
  */
-public class DesignReplay {
-
-	public static boolean replaying = true;
-	public static boolean backward, forward;
+public class DesignReplay extends PlayControl {
 
 	private final static int SLEEP = 200;
 

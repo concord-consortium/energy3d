@@ -25,10 +25,7 @@ import org.concord.energy3d.shapes.Heliodon;
  * @author Charles Xie
  * 
  */
-public class PostProcessor {
-
-	public static boolean replaying = true;
-	public static boolean backward, forward;
+public class PostProcessor extends PlayControl {
 
 	private final static int SLEEP = 200;
 	private final static DecimalFormat FORMAT_TWO_DIGITS = new DecimalFormat("00");

@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainPanel;
-import org.concord.energy3d.logger.PostProcessor;
+import org.concord.energy3d.logger.PlayControl;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -748,21 +748,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					PostProcessor.replaying = !PostProcessor.replaying;
+					PlayControl.replaying = !PlayControl.replaying;
 				}
 			}));
 			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (!PostProcessor.replaying)
-						PostProcessor.backward = true;
+					if (!PlayControl.replaying)
+						PlayControl.backward = true;
 				}
 			}));
 			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.RIGHT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (!PostProcessor.replaying)
-						PostProcessor.forward = true;
+					if (!PlayControl.replaying)
+						PlayControl.forward = true;
 				}
 			}));
 		}
