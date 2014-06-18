@@ -5,8 +5,11 @@ import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
@@ -14,7 +17,7 @@ import org.concord.energy3d.scene.SceneManager;
  */
 public class DesignReplay extends PlayControl {
 
-	private final static int SLEEP = 200;
+	private final static int SLEEP = 500;
 
 	private DesignReplay() {
 
@@ -24,9 +27,25 @@ public class DesignReplay extends PlayControl {
 		new Thread() {
 			@Override
 			public void run() {
+				Util.suppressReportError = true;
 				openFolder(files, update);
+				Util.suppressReportError = false;
 			}
 		}.start();
+	}
+
+	private static void updateEnergyPanel() {
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Foundation) {
+				SceneManager.getInstance().setSelectedPart(p);
+				break;
+			}
+		}
+		EnergyPanel.getInstance().updateCost();
+		EnergyPanel.getInstance().updateBudgetBar();
+		EnergyPanel.getInstance().updateAreaBar();
+		EnergyPanel.getInstance().updateHeightBar();
+		EnergyPanel.getInstance().updatePartEnergy();
 	}
 
 	private static void openFolder(final File[] files, final Runnable update) {
@@ -51,6 +70,7 @@ public class DesignReplay extends PlayControl {
 						}
 					});
 					update.run();
+					updateEnergyPanel();
 					Thread.sleep(SLEEP);
 				} catch (final Exception e) {
 					e.printStackTrace();
@@ -64,6 +84,7 @@ public class DesignReplay extends PlayControl {
 						try {
 							Scene.open(files[i].toURI().toURL());
 							update.run();
+							updateEnergyPanel();
 						} catch (final Exception e) {
 							e.printStackTrace();
 						}
@@ -76,6 +97,7 @@ public class DesignReplay extends PlayControl {
 						try {
 							Scene.open(files[i].toURI().toURL());
 							update.run();
+							updateEnergyPanel();
 						} catch (final Exception e) {
 							e.printStackTrace();
 						}

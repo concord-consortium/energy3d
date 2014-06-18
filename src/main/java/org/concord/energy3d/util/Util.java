@@ -153,7 +153,7 @@ public class Util {
 
 	/* This is automatically evaluated as either 2D projection on xy plane or 1D projection on z axis */
 	public static Vector3 projectPointOnLine(final ReadOnlyVector3 point, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final boolean limitToLineSegment) {
-//		return projectPointOnLine(new Vector2(point.getX(), point.getY()), new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()), false);
+		// return projectPointOnLine(new Vector2(point.getX(), point.getY()), new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()), false);
 		final double t = projectPointOnLineScale(point, p1, p2);
 		if (limitToLineSegment && t < 0.0)
 			return p1.clone();
@@ -246,8 +246,12 @@ public class Util {
 		return Math.abs(x) < MathUtils.ZERO_TOLERANCE;
 	}
 
+	// This is called by DesignReplay to suppress the error dialog when we replay a design process
+	public static boolean suppressReportError = false;
+
 	public static void reportError(final Throwable e) {
-		JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured! Please notify us of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
+		if (!suppressReportError)
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured! Please notify us of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	public final static void openBrowser(final String url) {
