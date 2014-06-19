@@ -41,7 +41,6 @@ public class PostProcessor extends PlayControl {
 		new Thread() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().setComputeEnabled(false);
 				final int n = files.length;
 				PrintWriter logWriter = null;
 				try {

@@ -17,7 +17,7 @@ import org.concord.energy3d.util.Util;
  */
 public class DesignReplay extends PlayControl {
 
-	private final static int SLEEP = 500;
+	private final static int SLEEP = 250;
 
 	private DesignReplay() {
 
