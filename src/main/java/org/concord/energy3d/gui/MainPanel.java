@@ -13,8 +13,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
@@ -111,22 +109,6 @@ public class MainPanel extends JPanel {
 			SceneManager.getInstance().refresh();
 		}
 	};
-
-	final static Map<String, Integer> cityLatitute = new HashMap<String, Integer>();
-	static {
-		cityLatitute.put("Moscow", 55);
-		cityLatitute.put("Ottawa", 45);
-		cityLatitute.put("Boston", 42);
-		cityLatitute.put("Beijing", 39);
-		cityLatitute.put("Washington DC", 38);
-		cityLatitute.put("Tehran", 35);
-		cityLatitute.put("Los Angeles", 34);
-		cityLatitute.put("Miami", 25);
-		cityLatitute.put("Mexico City", 19);
-		cityLatitute.put("Singapore", 1);
-		cityLatitute.put("Sydney", -33);
-		cityLatitute.put("Buenos Aires", -34);
-	}
 
 	public static MainPanel getInstance() {
 		return instance;

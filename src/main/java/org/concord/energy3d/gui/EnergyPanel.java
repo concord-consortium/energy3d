@@ -18,6 +18,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -130,7 +131,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private EnergyPanel() {
-		
+
 		twoDecimals.setMaximumFractionDigits(2);
 		noDecimals.setMaximumFractionDigits(0);
 
@@ -187,6 +188,7 @@ public class EnergyPanel extends JPanel {
 		gbc_dateSpinner.gridy = 0;
 		timeAndLocationPanel.add(dateSpinner, gbc_dateSpinner);
 
+		Arrays.sort(CityData.getInstance().getCities());
 		cityComboBox = new JComboBox<String>();
 		cityComboBox.setModel(new DefaultComboBoxModel<String>(CityData.getInstance().getCities()));
 		cityComboBox.setSelectedItem("Boston");
@@ -811,7 +813,7 @@ public class EnergyPanel extends JPanel {
 					if (p instanceof Tree)
 						p.updateTextureAndColor();
 			}
-//			SceneManager.getInstance().refresh();
+			// SceneManager.getInstance().refresh();
 
 			progressBar.setValue(100);
 
