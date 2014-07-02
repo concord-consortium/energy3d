@@ -231,6 +231,7 @@ public class MainFrame extends JFrame {
 		fileChooser.setFileFilter(ng3Filter);
 		colorChooser = new JColorChooser();
 		initialize();
+		this.setMinimumSize(new Dimension(800, 600));
 		System.out.println("done");
 	}
 
@@ -1112,7 +1113,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-					HousePart selected = SceneManager.getInstance().getSelectedPart();
+					final HousePart selected = SceneManager.getInstance().getSelectedPart();
 					if (selected instanceof Foundation) {
 						disableFoundationCheckBoxMenuItem.setEnabled(true);
 						Util.selectSilently(disableFoundationCheckBoxMenuItem, ((Foundation) selected).getLockEdit());
@@ -1738,7 +1739,7 @@ public class MainFrame extends JFrame {
 			disableFoundationCheckBoxMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					HousePart selected = SceneManager.getInstance().getSelectedPart();
+					final HousePart selected = SceneManager.getInstance().getSelectedPart();
 					if (selected instanceof Foundation) {
 						((Foundation) selected).setLockEdit(disableFoundationCheckBoxMenuItem.isSelected());
 					}
