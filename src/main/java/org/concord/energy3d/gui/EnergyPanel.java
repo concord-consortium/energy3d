@@ -130,7 +130,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private EnergyPanel() {
-
+		
 		twoDecimals.setMaximumFractionDigits(2);
 		noDecimals.setMaximumFractionDigits(0);
 
