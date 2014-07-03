@@ -220,13 +220,10 @@ public class SolarIrradiation {
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 		final double airMass = computeAirMass(directionTowardSun);
 		final double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678));
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		// final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
-		final double scaleFactor = 1.0 / 60 * timeStep;
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
-		for (int col = 0; col < data.cols; col++) {
-			for (int row = 0; row < data.rows; row++) {
+		for (int col = 0; col < 2; col++) {
+			for (int row = 0; row < 2; row++) {
 				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
 				final int index;
@@ -239,11 +236,9 @@ public class SolarIrradiation {
 				else
 					index = 4 * 3;
 				final Vector3 point = new Vector3(vertexBuffer.get(index), vertexBuffer.get(index + 1), vertexBuffer.get(index + 2));
-				// System.out.println(point);
 				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(point).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
-				// final PickResults pickResults = new BoundingPickResults();
 				boolean collision = false;
 				for (final Spatial spatial : collidables)
 					if (spatial != collisionMesh) {
@@ -256,7 +251,7 @@ public class SolarIrradiation {
 
 				if (!collision) {
 					data.solar[row][col] += dot;
-					housePart.getSolarPotential()[minute / timeStep] += dot * SolarPanel.WIDTH * SolarPanel.HEIGHT / 4.0 * scaleFactor;
+					housePart.getSolarPotential()[minute / timeStep] += dot * SolarPanel.WIDTH * SolarPanel.HEIGHT / 4.0 / 60.0 * timeStep;
 				}
 			}
 		}
