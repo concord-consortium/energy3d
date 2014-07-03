@@ -188,22 +188,32 @@ public class EnergyPanel extends JPanel {
 		gbc_dateSpinner.gridy = 0;
 		timeAndLocationPanel.add(dateSpinner, gbc_dateSpinner);
 
+		final ChangeListener latitudeChangeListener = new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				cityComboBox.setSelectedItem("");
+			}
+		};
+
 		Arrays.sort(CityData.getInstance().getCities());
 		cityComboBox = new JComboBox<String>();
 		cityComboBox.setModel(new DefaultComboBoxModel<String>(CityData.getInstance().getCities()));
 		cityComboBox.setSelectedItem("Boston");
 		cityComboBox.setMaximumRowCount(15);
-		cityComboBox.addActionListener(new java.awt.event.ActionListener() {
+		cityComboBox.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(final java.awt.event.ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				if (cityComboBox.getSelectedItem().equals(""))
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				else {
-					final Integer newLatitude = CityData.getInstance().getCityLatitutes().get(cityComboBox.getSelectedItem());
+					final Integer newLatitude = CityData.getInstance().getCityLatitutes().get(cityComboBox.getSelectedItem()).intValue();
 					if (newLatitude.equals(latitudeSpinner.getValue()))
 						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					else
+					else {
+						latitudeSpinner.removeChangeListener(latitudeChangeListener);
 						latitudeSpinner.setValue(newLatitude);
+						latitudeSpinner.addChangeListener(latitudeChangeListener);
+					}
 				}
 				Scene.getInstance().setEdited(true);
 			}
@@ -258,11 +268,10 @@ public class EnergyPanel extends JPanel {
 
 		latitudeSpinner = new JSpinner();
 		latitudeSpinner.setModel(new SpinnerNumberModel(Heliodon.DEFAULT_LATITUDE, -90, 90, 1));
+		latitudeSpinner.addChangeListener(latitudeChangeListener);
 		latitudeSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				if (!cityComboBox.getSelectedItem().equals("") && !CityData.getInstance().getCityLatitutes().values().contains(latitudeSpinner.getValue()))
-					cityComboBox.setSelectedItem("");
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);

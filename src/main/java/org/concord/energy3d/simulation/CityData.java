@@ -1,5 +1,9 @@
 package org.concord.energy3d.simulation;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,8 +13,8 @@ import org.concord.energy3d.shapes.Heliodon;
 
 public class CityData {
 	private static final CityData instance = new CityData();
-	private final Map<String, Integer> cityLatitutes = new HashMap<String, Integer>();
-	private final Map<String, Integer> cityAltitudes = new HashMap<String, Integer>();
+	private final Map<String, Float> cityLatitutes = new HashMap<String, Float>();
+	private final Map<String, Float> cityAltitudes = new HashMap<String, Float>();
 	private final Map<String, int[]> avgMonthlyLowTemperatures = new HashMap<String, int[]>();
 	private final Map<String, int[]> avgMonthlyHighTemperatures = new HashMap<String, int[]>();
 	private final String[] cities;
@@ -21,61 +25,44 @@ public class CityData {
 
 	private CityData() {
 
-		cities = new String[] { "", "Moscow", "Ottawa", "Boston", "Beijing", "Washington DC", "Tehran", "Los Angeles", "Miami", "Mexico City", "Singapore", "Sydney", "Buenos Aires" };
+		Map<String, String> data = new HashMap<String, String>();
+		InputStream is = null;
+		try {
+			is = getClass().getResourceAsStream("cities/data.txt");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				data.put(line.substring(0, 20).trim(), line.substring(20).trim());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 
-		// latitudes
-		cityLatitutes.put("Moscow", 55);
-		cityLatitutes.put("Ottawa", 45);
-		cityLatitutes.put("Boston", 42);
-		cityLatitutes.put("Beijing", 39);
-		cityLatitutes.put("Washington DC", 38);
-		cityLatitutes.put("Tehran", 35);
-		cityLatitutes.put("Los Angeles", 34);
-		cityLatitutes.put("Miami", 25);
-		cityLatitutes.put("Mexico City", 19);
-		cityLatitutes.put("Singapore", 1);
-		cityLatitutes.put("Sydney", -33);
-		cityLatitutes.put("Buenos Aires", -34);
-
-		// altitudes
-		cityAltitudes.put("Moscow", 151);
-		cityAltitudes.put("Ottawa", 114);
-		cityAltitudes.put("Boston", 2);
-		cityAltitudes.put("Beijing", 44);
-		cityAltitudes.put("Washington DC", 2);
-		cityAltitudes.put("Tehran", 1189);
-		cityAltitudes.put("Los Angeles", 71);
-		cityAltitudes.put("Miami", 2);
-		cityAltitudes.put("Mexico City", 2421);
-		cityAltitudes.put("Singapore", 2);
-		cityAltitudes.put("Sydney", 2);
-		cityAltitudes.put("Buenos Aires", 25);
-
-		// low and high temperatures
-		avgMonthlyLowTemperatures.put("Boston", new int[] { -6, -4, -1, 5, 10, 16, 18, 18, 14, 8, 3, -2 });
-		avgMonthlyHighTemperatures.put("Boston", new int[] { 2, 4, 7, 13, 19, 24, 28, 27, 22, 16, 11, 5 });
-		avgMonthlyLowTemperatures.put("Moscow", new int[] { -14, -14, -9, 0, 6, 10, 13, 11, 6, 1, -5, -10 });
-		avgMonthlyHighTemperatures.put("Moscow", new int[] { -7, -6, 0, 9, 17, 22, 24, 22, 16, 8, 0, -5 });
-		avgMonthlyLowTemperatures.put("Ottawa", new int[] { -16, -14, -7, 1, 7, 12, 15, 14, 9, 3, -2, -11 });
-		avgMonthlyHighTemperatures.put("Ottawa", new int[] { -7, -5, 2, 11, 18, 23, 26, 24, 19, 13, 4, -4 });
-		avgMonthlyLowTemperatures.put("Beijing", new int[] { -9, -7, -1, 7, 13, 18, 21, 20, 14, 7, -1, -7 });
-		avgMonthlyHighTemperatures.put("Beijing", new int[] { 1, 4, 11, 19, 26, 30, 31, 29, 26, 19, 10, 3 });
-		avgMonthlyLowTemperatures.put("Washington DC", new int[] { -2, -1, 3, 8, 13, 19, 22, 21, 17, 11, 5, 1 });
-		avgMonthlyHighTemperatures.put("Washington DC", new int[] { 6, 8, 13, 19, 24, 29, 32, 31, 27, 30, 14, 8 });
-		avgMonthlyLowTemperatures.put("Tehran", new int[] { 1, 3, 7, 13, 17, 22, 25, 25, 21, 15, 8, 3 });
-		avgMonthlyHighTemperatures.put("Tehran", new int[] { 8, 11, 16, 23, 28, 34, 37, 36, 32, 25, 16, 10 });
-		avgMonthlyLowTemperatures.put("Los Angeles", new int[] { 9, 9, 11, 12, 14, 16, 18, 18, 17, 15, 11, 8 });
-		avgMonthlyHighTemperatures.put("Los Angeles", new int[] { 20, 21, 21, 23, 23, 26, 28, 29, 28, 26, 23, 20 });
-		avgMonthlyLowTemperatures.put("Miami", new int[] { 16, 17, 18, 21, 23, 25, 26, 26, 26, 24, 21, 18 });
-		avgMonthlyHighTemperatures.put("Miami", new int[] { 23, 24, 24, 26, 28, 31, 31, 32, 31, 29, 26, 24 });
-		avgMonthlyLowTemperatures.put("Mexico City", new int[] { 6, 7, 9, 11, 12, 12, 12, 12, 12, 10, 8, 7 });
-		avgMonthlyHighTemperatures.put("Mexico City", new int[] { 21, 23, 25, 26, 26, 24, 23, 23, 23, 22, 22, 21 });
-		avgMonthlyLowTemperatures.put("Singapore", new int[] { 23, 23, 24, 24, 24, 24, 24, 24, 24, 24, 23, 23 });
-		avgMonthlyHighTemperatures.put("Singapore", new int[] { 29, 31, 31, 32, 31, 31, 31, 31, 31, 31, 30, 29 });
-		avgMonthlyLowTemperatures.put("Sydney", new int[] { 19, 19, 18, 15, 12, 9, 8, 8, 11, 14, 16, 18 });
-		avgMonthlyHighTemperatures.put("Sydney", new int[] { 26, 26, 25, 23, 20, 17, 17, 18, 20, 22, 23, 25 });
-		avgMonthlyLowTemperatures.put("Buenos Aires", new int[] { 20, 19, 18, 14, 11, 8, 8, 9, 11, 13, 16, 18 });
-		avgMonthlyHighTemperatures.put("Buenos Aires", new int[] { 28, 27, 25, 22, 18, 15, 14, 16, 18, 21, 24, 27 });
+		cities = new String[data.size() + 1];
+		cities[0] = "";
+		int i = 1;
+		for (String s : data.keySet()) {
+			cities[i++] = s;
+			String[] t = data.get(s).split(",");
+			cityLatitutes.put(s, Float.parseFloat(t[0].trim()));
+			cityAltitudes.put(s, Float.parseFloat(t[1].trim()));
+			int[] los = new int[12];
+			int[] his = new int[12];
+			for (int k = 0; k < 12; k++) {
+				los[k] = Integer.parseInt(t[2 + 2 * k].trim());
+				his[k] = Integer.parseInt(t[3 + 2 * k].trim());
+			}
+			avgMonthlyLowTemperatures.put(s, los);
+			avgMonthlyHighTemperatures.put(s, his);
+		}
 
 	}
 
@@ -126,11 +113,11 @@ public class CityData {
 		return cities;
 	}
 
-	public Map<String, Integer> getCityLatitutes() {
+	public Map<String, Float> getCityLatitutes() {
 		return cityLatitutes;
 	}
 
-	public Map<String, Integer> getCityAltitudes() {
+	public Map<String, Float> getCityAltitudes() {
 		return cityAltitudes;
 	}
 
