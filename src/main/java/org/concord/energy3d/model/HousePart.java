@@ -653,6 +653,7 @@ public abstract class HousePart implements Serializable {
 				final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, false);
 				ts.setTexture(texture);
 				mesh.setRenderState(ts);
+				mesh.setDefaultColor(ColorRGBA.WHITE);
 			}
 		}
 	}

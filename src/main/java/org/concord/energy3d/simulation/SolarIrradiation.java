@@ -44,6 +44,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -511,6 +512,7 @@ public class SolarIrradiation {
 	private void applyTexture(final Mesh mesh) {
 		if (onMesh.get(mesh) == null) {
 			mesh.setDefaultColor(ColorRGBA.BLUE);
+			mesh.clearRenderState(StateType.Texture);
 			return;
 		}
 
