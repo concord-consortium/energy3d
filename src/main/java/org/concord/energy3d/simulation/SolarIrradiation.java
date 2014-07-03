@@ -449,9 +449,11 @@ public class SolarIrradiation {
 				if (wall instanceof Wall) {
 					final double[] wallSolarPotentials = wall.getSolarPotential();
 					for (final HousePart window : wall.getChildren()) {
-						final double[] windowSolarPotentials = window.getSolarPotential();
-						for (int i = 0; i < wallSolarPotentials.length; i++)
-							wallSolarPotentials[i] -= windowSolarPotentials[i];
+						if (window instanceof Window) {
+							final double[] windowSolarPotentials = window.getSolarPotential();
+							for (int i = 0; i < wallSolarPotentials.length; i++)
+								wallSolarPotentials[i] -= windowSolarPotentials[i];
+						}
 					}
 				}
 			}
