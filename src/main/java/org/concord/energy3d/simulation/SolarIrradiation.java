@@ -170,7 +170,14 @@ public class SolarIrradiation {
 		final double airMass = computeAirMass(directionTowardSun);
 		final double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678));
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
+		double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
+		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		final int[] sunshinePercentages = CityData.getInstance().getSunshinePercentages().get(city);
+		if (sunshinePercentages != null) {
+			Calendar cal = Heliodon.getInstance().getCalender();
+			int i = cal.get(Calendar.MONTH) - Calendar.JANUARY;
+			scaleFactor *= 0.01 * sunshinePercentages[i];
+		}
 
 		for (int col = 0; col < data.cols; col++) {
 			final ReadOnlyVector3 pU = data.u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(data.p0);
@@ -370,7 +377,7 @@ public class SolarIrradiation {
 			final double r = 708;
 			final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 			if (!"".equals(city)) {
-				final double c = CityData.getInstance().getCityAltitudes().get(city) / 9000.0;
+				final double c = CityData.getInstance().getAltitudes().get(city) / 9000.0;
 				return Math.sqrt((r + c) * (r + c) * cos * cos + (2 * r + 1 + c) * (1 - c)) - (r + c) * cos;
 			} else {
 				return Math.sqrt(r * r * cos * cos + 2 * r + 1) - r * cos;

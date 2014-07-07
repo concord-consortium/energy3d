@@ -12,11 +12,13 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.shapes.Heliodon;
 
 public class CityData {
+
 	private static final CityData instance = new CityData();
-	private final Map<String, Float> cityLatitutes = new HashMap<String, Float>();
-	private final Map<String, Float> cityAltitudes = new HashMap<String, Float>();
+	private final Map<String, Float> latitutes = new HashMap<String, Float>();
+	private final Map<String, Float> altitudes = new HashMap<String, Float>();
 	private final Map<String, int[]> avgMonthlyLowTemperatures = new HashMap<String, int[]>();
 	private final Map<String, int[]> avgMonthlyHighTemperatures = new HashMap<String, int[]>();
+	private final Map<String, int[]> sunshinePercentages = new HashMap<String, int[]>();
 	private final String[] cities;
 
 	public static CityData getInstance() {
@@ -32,7 +34,7 @@ public class CityData {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			String line;
 			while ((line = reader.readLine()) != null) {
-				data.put(line.substring(0, 20).trim(), line.substring(20).trim());
+				data.put(line.substring(0, 25).trim(), line.substring(20).trim());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -52,8 +54,8 @@ public class CityData {
 		for (String s : data.keySet()) {
 			cities[i++] = s;
 			String[] t = data.get(s).split(",");
-			cityLatitutes.put(s, Float.parseFloat(t[0].trim()));
-			cityAltitudes.put(s, Float.parseFloat(t[1].trim()));
+			latitutes.put(s, Float.parseFloat(t[0].trim()));
+			altitudes.put(s, Float.parseFloat(t[1].trim()));
 			int[] los = new int[12];
 			int[] his = new int[12];
 			for (int k = 0; k < 12; k++) {
@@ -62,6 +64,13 @@ public class CityData {
 			}
 			avgMonthlyLowTemperatures.put(s, los);
 			avgMonthlyHighTemperatures.put(s, his);
+			if (t.length > 26) {
+				int[] sunshine = new int[12];
+				for (int k = 0; k < 12; k++) {
+					sunshine[k] = Integer.parseInt(t[26 + k].trim());
+				}
+				sunshinePercentages.put(s, sunshine);
+			}
 		}
 
 	}
@@ -113,12 +122,16 @@ public class CityData {
 		return cities;
 	}
 
-	public Map<String, Float> getCityLatitutes() {
-		return cityLatitutes;
+	public Map<String, Float> getLatitutes() {
+		return latitutes;
 	}
 
-	public Map<String, Float> getCityAltitudes() {
-		return cityAltitudes;
+	public Map<String, Float> getAltitudes() {
+		return altitudes;
+	}
+
+	public Map<String, int[]> getSunshinePercentages() {
+		return sunshinePercentages;
 	}
 
 	public Map<String, int[]> getAvgMonthlyLowTemperatures() {

@@ -206,7 +206,7 @@ public class EnergyPanel extends JPanel {
 				if (cityComboBox.getSelectedItem().equals(""))
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				else {
-					final Integer newLatitude = CityData.getInstance().getCityLatitutes().get(cityComboBox.getSelectedItem()).intValue();
+					final Integer newLatitude = CityData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).intValue();
 					if (newLatitude.equals(latitudeSpinner.getValue()))
 						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					else {
