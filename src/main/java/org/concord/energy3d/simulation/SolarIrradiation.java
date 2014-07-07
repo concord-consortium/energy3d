@@ -168,15 +168,14 @@ public class SolarIrradiation {
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 		final double airMass = computeAirMass(directionTowardSun);
-		final double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678));
+		double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678));
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
+		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		final int[] sunshinePercentages = CityData.getInstance().getSunshinePercentages().get(city);
 		if (sunshinePercentages != null) {
 			Calendar cal = Heliodon.getInstance().getCalender();
-			int i = cal.get(Calendar.MONTH) - Calendar.JANUARY;
-			scaleFactor *= 0.01 * sunshinePercentages[i];
+			dot *= 0.01 * sunshinePercentages[cal.get(Calendar.MONTH) - Calendar.JANUARY];
 		}
 
 		for (int col = 0; col < data.cols; col++) {
@@ -226,7 +225,13 @@ public class SolarIrradiation {
 		final double OFFSET = 3;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 		final double airMass = computeAirMass(directionTowardSun);
-		final double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678));
+		double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678));
+		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		final int[] sunshinePercentages = CityData.getInstance().getSunshinePercentages().get(city);
+		if (sunshinePercentages != null) {
+			Calendar cal = Heliodon.getInstance().getCalender();
+			dot *= 0.01 * sunshinePercentages[cal.get(Calendar.MONTH) - Calendar.JANUARY];
+		}
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
 		for (int col = 0; col < 2; col++) {
@@ -407,7 +412,13 @@ public class SolarIrradiation {
 	}
 
 	private void computeOnLand(final ReadOnlyVector3 directionTowardSun) {
-		final double dot = SOLAR_CONSTANT * directionTowardSun.dot(Vector3.UNIT_Z) / computeAirMass(directionTowardSun);
+		double dot = SOLAR_CONSTANT * directionTowardSun.dot(Vector3.UNIT_Z) / computeAirMass(directionTowardSun);
+		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		final int[] sunshinePercentages = CityData.getInstance().getSunshinePercentages().get(city);
+		if (sunshinePercentages != null) {
+			Calendar cal = Heliodon.getInstance().getCalender();
+			dot *= 0.01 * sunshinePercentages[cal.get(Calendar.MONTH) - Calendar.JANUARY];
+		}
 		final double step = this.solarStep * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
