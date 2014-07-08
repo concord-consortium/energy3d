@@ -16,9 +16,9 @@ public class CityData {
 	private static final CityData instance = new CityData();
 	private final Map<String, Float> latitutes = new HashMap<String, Float>();
 	private final Map<String, Float> altitudes = new HashMap<String, Float>();
-	private final Map<String, int[]> avgMonthlyLowTemperatures = new HashMap<String, int[]>();
-	private final Map<String, int[]> avgMonthlyHighTemperatures = new HashMap<String, int[]>();
-	private final Map<String, int[]> sunshinePercentages = new HashMap<String, int[]>();
+	private final Map<String, int[]> lowTemperatures = new HashMap<String, int[]>();
+	private final Map<String, int[]> highTemperatures = new HashMap<String, int[]>();
+	private final Map<String, int[]> sunshineHours = new HashMap<String, int[]>();
 	private final String[] cities;
 
 	public static CityData getInstance() {
@@ -62,14 +62,14 @@ public class CityData {
 				los[k] = Integer.parseInt(t[2 + 2 * k].trim());
 				his[k] = Integer.parseInt(t[3 + 2 * k].trim());
 			}
-			avgMonthlyLowTemperatures.put(s, los);
-			avgMonthlyHighTemperatures.put(s, his);
+			lowTemperatures.put(s, los);
+			highTemperatures.put(s, his);
 			if (t.length > 26) {
 				int[] sunshine = new int[12];
 				for (int k = 0; k < 12; k++) {
 					sunshine[k] = Integer.parseInt(t[26 + k].trim());
 				}
-				sunshinePercentages.put(s, sunshine);
+				sunshineHours.put(s, sunshine);
 			}
 		}
 
@@ -100,8 +100,8 @@ public class CityData {
 			portion = (double) (day - halfMonth) / totalDaysOfMonth;
 		}
 
-		final int[] monthlyLowTemperatures = avgMonthlyLowTemperatures.get(city);
-		final int[] monthlyHighTemperatures = avgMonthlyHighTemperatures.get(city);
+		final int[] monthlyLowTemperatures = lowTemperatures.get(city);
+		final int[] monthlyHighTemperatures = highTemperatures.get(city);
 		final int monthFromIndex = monthFrom.get(Calendar.MONTH);
 		final int monthToIndex = monthTo.get(Calendar.MONTH);
 		outsideTemperature[0] = monthlyLowTemperatures[monthFromIndex] + (monthlyLowTemperatures[monthToIndex] - monthlyLowTemperatures[monthFromIndex]) * portion;
@@ -130,16 +130,16 @@ public class CityData {
 		return altitudes;
 	}
 
-	public Map<String, int[]> getSunshinePercentages() {
-		return sunshinePercentages;
+	public Map<String, int[]> getSunshineHours() {
+		return sunshineHours;
 	}
 
-	public Map<String, int[]> getAvgMonthlyLowTemperatures() {
-		return avgMonthlyLowTemperatures;
+	public Map<String, int[]> getLowTemperatures() {
+		return lowTemperatures;
 	}
 
-	public Map<String, int[]> getAvgMonthlyHighTemperatures() {
-		return avgMonthlyHighTemperatures;
+	public Map<String, int[]> getHighTemperatures() {
+		return highTemperatures;
 	}
 
 }

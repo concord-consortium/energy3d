@@ -117,14 +117,18 @@ public class SolarIrradiation {
 		int totalSteps = 0;
 		for (int minute = 0; minute < 1440; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
-			// final ReadOnlyVector3 sunLocation = Heliodon.getInstance().getSunLocation();
-			// timeStep = 1440;
 			sunLocations[minute / timeStep] = sunLocation;
 			if (sunLocation.getZ() > 0)
 				totalSteps++;
 			today.add(Calendar.MINUTE, timeStep);
 		}
 		totalSteps -= 2;
+		double dayLength = totalSteps * timeStep / 60.0;
+		double sunshinePercentage = 1.0;
+		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		final int[] sunshineHours = CityData.getInstance().getSunshineHours().get(city);
+		if (sunshineHours != null)
+			sunshinePercentage = sunshineHours[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] / (dayLength * 30);
 		int step = 1;
 		for (int minute = 0; minute < 1440; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = sunLocations[minute / timeStep];
@@ -134,18 +138,18 @@ public class SolarIrradiation {
 					for (final HousePart part : Scene.getInstance().getParts()) {
 						if (part.isDrawCompleted())
 							if (part instanceof Foundation || part instanceof Wall || part instanceof Window)
-								computeOnMesh(minute, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
+								computeOnMesh(minute, sunshinePercentage, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
 							else if (part instanceof SolarPanel || part instanceof Sensor)
-								computeOnMesh2(minute, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
+								computeOnMesh2(minute, sunshinePercentage, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
 							else if (part instanceof Roof)
 								for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 									final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
 									final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-									computeOnMesh(minute, directionTowardSun, part, mesh, mesh, faceDirection, false);
+									computeOnMesh(minute, sunshinePercentage, directionTowardSun, part, mesh, mesh, faceDirection, false);
 								}
 					}
 				}
-				computeOnLand(directionTowardSun);
+				computeOnLand(sunshinePercentage, directionTowardSun);
 				EnergyPanel.getInstance().progress(100 * step / totalSteps);
 				step++;
 			}
@@ -155,7 +159,7 @@ public class SolarIrradiation {
 	}
 
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
-	private void computeOnMesh(final int minute, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
+	private void computeOnMesh(final int minute, final double sunshinePercentage, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 		if (normal.dot(directionTowardSun) <= 0)
 			return;
 
@@ -167,13 +171,9 @@ public class SolarIrradiation {
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 		final double airMass = computeAirMass(directionTowardSun);
-		double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678));
+		double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678)) * sunshinePercentage;
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
-		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-		final int[] sunshinePercentages = CityData.getInstance().getSunshinePercentages().get(city);
-		if (sunshinePercentages != null)
-			dot *= 0.01 * sunshinePercentages[Heliodon.getInstance().getCalender().get(Calendar.MONTH)];
 
 		for (int col = 0; col < data.cols; col++) {
 			final ReadOnlyVector3 pU = data.u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(data.p0);
@@ -211,7 +211,7 @@ public class SolarIrradiation {
 
 	}
 
-	private void computeOnMesh2(final int minute, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
+	private void computeOnMesh2(final int minute, final double sunshinePercentage, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 		if (normal.dot(directionTowardSun) <= 0)
 			return;
 
@@ -222,11 +222,7 @@ public class SolarIrradiation {
 		final double OFFSET = 3;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 		final double airMass = computeAirMass(directionTowardSun);
-		double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678));
-		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-		final int[] sunshinePercentages = CityData.getInstance().getSunshinePercentages().get(city);
-		if (sunshinePercentages != null)
-			dot *= 0.01 * sunshinePercentages[Heliodon.getInstance().getCalender().get(Calendar.MONTH)];
+		double dot = 1.1 * normal.dot(directionTowardSun) * SOLAR_CONSTANT * Math.pow(0.7, Math.pow(airMass, 0.678)) * sunshinePercentage;
 
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
@@ -412,12 +408,8 @@ public class SolarIrradiation {
 		}
 	}
 
-	private void computeOnLand(final ReadOnlyVector3 directionTowardSun) {
-		double dot = SOLAR_CONSTANT * directionTowardSun.dot(Vector3.UNIT_Z) / computeAirMass(directionTowardSun);
-		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-		final int[] sunshinePercentages = CityData.getInstance().getSunshinePercentages().get(city);
-		if (sunshinePercentages != null)
-			dot *= 0.01 * sunshinePercentages[Heliodon.getInstance().getCalender().get(Calendar.MONTH)];
+	private void computeOnLand(final double sunshinePercentage, final ReadOnlyVector3 directionTowardSun) {
+		double dot = SOLAR_CONSTANT * directionTowardSun.dot(Vector3.UNIT_Z) / computeAirMass(directionTowardSun) * sunshinePercentage;
 		final double step = this.solarStep * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
