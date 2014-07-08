@@ -3,6 +3,7 @@ package org.concord.energy3d.simulation;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -16,9 +17,11 @@ import javax.swing.table.DefaultTableModel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 /**
@@ -81,6 +84,23 @@ class DataViewer {
 				header = new String[] { "Month", "Heat Gain" };
 			} else if (selectedPart instanceof Window) {
 				header = new String[] { "Month", "Solar", "Heat Gain" };
+			}
+			if (graph.type == Graph.SENSOR) {
+				List<HousePart> parts = Scene.getInstance().getParts();
+				List<String> sensorList = new ArrayList<String>();
+				for (HousePart p : parts) {
+					if (p instanceof Sensor) {
+						Sensor sensor = (Sensor) p;
+						sensorList.add("Light: #" + sensor.getId());
+						sensorList.add("Heat Flux: #" + sensor.getId());
+					}
+				}
+				if (!sensorList.isEmpty()) {
+					header = new String[1 + sensorList.size()];
+					header[0] = "Month";
+					for (int i = 1; i < header.length; i++)
+						header[i] = sensorList.get(i - 1);
+				}
 			}
 		} else if (graph instanceof BuildingEnergyAngularGraph) {
 			header = new String[] { "Degree", "Windows", "Solar Panels", "Heater", "AC", "Net" };
