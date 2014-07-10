@@ -216,6 +216,9 @@ public class EnergyPanel extends JPanel {
 					}
 				}
 				Scene.getInstance().setEdited(true);
+				if (CityData.getInstance().getSunshineHours().get(cityComboBox.getSelectedItem()) == null) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No sunshine data is found for " + cityComboBox.getSelectedItem() + ".\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
+				}
 			}
 		});
 

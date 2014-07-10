@@ -29,12 +29,13 @@ public class CityData {
 
 		Map<String, String> data = new HashMap<String, String>();
 		InputStream is = null;
+		final int cut = 29;
 		try {
 			is = getClass().getResourceAsStream("cities/data.txt");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			String line;
 			while ((line = reader.readLine()) != null) {
-				data.put(line.substring(0, 25).trim(), line.substring(20).trim());
+				data.put(line.substring(0, cut).trim(), line.substring(cut).trim());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

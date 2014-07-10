@@ -126,9 +126,11 @@ public class SolarIrradiation {
 		double dayLength = totalSteps * timeStep / 60.0;
 		double sunshinePercentage = 1.0;
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-		final int[] sunshineHours = CityData.getInstance().getSunshineHours().get(city);
-		if (sunshineHours != null)
-			sunshinePercentage = sunshineHours[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] / (dayLength * 30);
+		if (!city.equals("")) {
+			final int[] sunshineHours = CityData.getInstance().getSunshineHours().get(city);
+			if (sunshineHours != null)
+				sunshinePercentage = sunshineHours[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] / (dayLength * 30);
+		}
 		int step = 1;
 		for (int minute = 0; minute < 1440; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = sunLocations[minute / timeStep];
