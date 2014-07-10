@@ -198,7 +198,7 @@ public class EnergyPanel extends JPanel {
 		Arrays.sort(CityData.getInstance().getCities());
 		cityComboBox = new JComboBox<String>();
 		cityComboBox.setModel(new DefaultComboBoxModel<String>(CityData.getInstance().getCities()));
-		cityComboBox.setSelectedItem("Boston");
+		cityComboBox.setSelectedItem("Boston, MA");
 		cityComboBox.setMaximumRowCount(15);
 		cityComboBox.addActionListener(new ActionListener() {
 			@Override
