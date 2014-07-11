@@ -268,8 +268,7 @@ public class Scene implements Serializable {
 			energyPanel.getTimeSpinner().setValue(instance.calendar.getTime());
 			Heliodon.getInstance().setDate(instance.calendar.getTime());
 			energyPanel.setLatitude(instance.latitude);
-			energyPanel.getCityComboBox().setSelectedItem(instance.city);
-			energyPanel.getCityComboBox().repaint(); // sometimes the selection doesn't refresh the combo box
+			energyPanel.setCity(instance.city);
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
 		Specifications.getInstance().setMaximumBudget(instance.budget == 0 ? 100000 : instance.budget);

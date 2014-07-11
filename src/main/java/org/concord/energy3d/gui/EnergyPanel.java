@@ -125,6 +125,7 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty2TextField;
 	private JTextField partProperty3TextField;
 	private JTextField partProperty4TextField;
+	private ChangeListener latitudeChangeListener;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -188,7 +189,7 @@ public class EnergyPanel extends JPanel {
 		gbc_dateSpinner.gridy = 0;
 		timeAndLocationPanel.add(dateSpinner, gbc_dateSpinner);
 
-		final ChangeListener latitudeChangeListener = new ChangeListener() {
+		latitudeChangeListener = new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				cityComboBox.setSelectedItem("");
@@ -203,22 +204,20 @@ public class EnergyPanel extends JPanel {
 		cityComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				if (cityComboBox.getSelectedItem().equals(""))
+				String city = (String) cityComboBox.getSelectedItem();
+				if (city.equals("")) {
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				else {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
+				} else {
 					final Integer newLatitude = CityData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).intValue();
 					if (newLatitude.equals(latitudeSpinner.getValue()))
 						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					else {
-						latitudeSpinner.removeChangeListener(latitudeChangeListener);
-						latitudeSpinner.setValue(newLatitude);
-						latitudeSpinner.addChangeListener(latitudeChangeListener);
-					}
+					else
+						setLatitude(newLatitude);
+					if (CityData.getInstance().getSunshineHours().get(city) == null)
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No sunshine data is found for " + city + ".\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
 				}
 				Scene.getInstance().setEdited(true);
-				if (CityData.getInstance().getSunshineHours().get(cityComboBox.getSelectedItem()) == null) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No sunshine data is found for " + cityComboBox.getSelectedItem() + ".\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
-				}
 			}
 		});
 
@@ -869,8 +868,15 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
+	public void setCity(String city) {
+		cityComboBox.setSelectedItem(city);
+		cityComboBox.repaint(); // in some cases, this must be called in order to update the view
+	}
+
 	public void setLatitude(final int latitude) {
+		latitudeSpinner.removeChangeListener(latitudeChangeListener);
 		latitudeSpinner.setValue(latitude);
+		latitudeSpinner.addChangeListener(latitudeChangeListener);
 	}
 
 	public int getLatitude() {
