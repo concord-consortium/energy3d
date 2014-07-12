@@ -157,7 +157,7 @@ public class SolarIrradiation {
 			}
 			maxValue++;
 		}
-		maxValue *= (100 - EnergyPanel.getInstance().getColorMapSlider().getValue()) / 100.0;
+		maxValue *= 1 - 0.01 * EnergyPanel.getInstance().getColorMapSlider().getValue();
 	}
 
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
@@ -234,13 +234,13 @@ public class SolarIrradiation {
 					throw new CancellationException();
 				final int index;
 				if (row == 0 && col == 0)
-					index = 1 * 3;
+					index = 3;
 				else if (row == 0 && col == 1)
-					index = 0 * 3;
+					index = 0;
 				else if (row == 1 && col == 0)
-					index = 2 * 3;
+					index = 6;
 				else
-					index = 4 * 3;
+					index = 12;
 				final Vector3 point = new Vector3(vertexBuffer.get(index), vertexBuffer.get(index + 1), vertexBuffer.get(index + 2));
 				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(point).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
@@ -262,7 +262,7 @@ public class SolarIrradiation {
 						area = SolarPanel.WIDTH * SolarPanel.HEIGHT;
 					else if (housePart instanceof Sensor)
 						area = Sensor.WIDTH * Sensor.HEIGHT;
-					housePart.getSolarPotential()[minute / timeStep] += dot * area / 4.0 / 60.0 * timeStep;
+					housePart.getSolarPotential()[minute / timeStep] += dot * area / 240.0 * timeStep;
 				}
 			}
 		}

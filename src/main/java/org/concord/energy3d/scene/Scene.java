@@ -195,7 +195,7 @@ public class Scene implements Serializable {
 
 		MainPanel.getInstance().getHeliodonButton().setSelected(false);
 		MainPanel.getInstance().getSunAnimButton().setSelected(false);
-//		MainPanel.getInstance().getSolarButton().setSelected(false);
+		// MainPanel.getInstance().getSolarButton().setSelected(false);
 		SceneManager.getInstance().setSolarColorMapWithoutUpdate(false);
 		Wall.resetDefaultWallHeight();
 
@@ -248,7 +248,7 @@ public class Scene implements Serializable {
 			}
 			System.out.println("done");
 			/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
-//			instance.redrawAllNow();
+			// instance.redrawAllNow();
 		}
 
 		root.updateWorldBound(true);
@@ -256,7 +256,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().showAxes(!instance.hideAxes);
 		SceneManager.getInstance().showBuildingLabels(instance.showBuildingLabels);
 		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
-		MainPanel.getInstance().getSolarButton().setSelected(false);	// moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
+		MainPanel.getInstance().getSolarButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
 		SceneManager.getInstance().getUndoManager().die();
 		Scene.getInstance().setEdited(false);
 	}
@@ -268,6 +268,8 @@ public class Scene implements Serializable {
 			energyPanel.getTimeSpinner().setValue(instance.calendar.getTime());
 			Heliodon.getInstance().setDate(instance.calendar.getTime());
 			energyPanel.setLatitude(instance.latitude);
+			if ("Boston".equals(instance.city))
+				instance.city = "Boston, MA";
 			energyPanel.setCity(instance.city);
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
