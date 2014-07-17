@@ -114,6 +114,7 @@ public class Scene implements Serializable {
 	private String roofUFactor;
 	private double solarPanelEfficiency;
 	private double windowSolarHeatGainCoefficient; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
+	private double backgroundAlbedo = 0.3;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -290,6 +291,8 @@ public class Scene implements Serializable {
 			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
 		if (instance.roofUFactor != null)
 			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
+		if (instance.backgroundAlbedo < 0.000001)
+			instance.backgroundAlbedo = 0.3;
 		if (instance.solarPanelEfficiency < 0.000001)
 			instance.solarPanelEfficiency = 10;
 		if (instance.windowSolarHeatGainCoefficient < 0.000001) // not set
@@ -849,6 +852,14 @@ public class Scene implements Serializable {
 
 	public void setWindowSolarHeatGainCoefficient(final double windowSolarHeatGainCoefficient) {
 		this.windowSolarHeatGainCoefficient = windowSolarHeatGainCoefficient;
+	}
+
+	public void setBackgroundAlbedo(double backgroundAlbedo) {
+		this.backgroundAlbedo = backgroundAlbedo;
+	}
+
+	public double getBackgroundAlbedo() {
+		return backgroundAlbedo;
 	}
 
 }

@@ -70,8 +70,6 @@ public class SolarIrradiation {
 	private double solarStep = 2.0;
 	private long maxValue;
 	private int airMassSelection = AIR_MASS_SPHERE_MODEL;
-	private final static double AIR_MASS_DIFFUSE_FACTOR = 1;
-	private double groundAlbedo = 0.3;
 
 	private class TextureData {
 		public Vector3 p0;
@@ -171,14 +169,7 @@ public class SolarIrradiation {
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 
-		// TODO: Compute the view factors for the roof
-		double viewFactorWithSky = 1;
-		double viewFactorWithGround = 0;
-		if (housePart instanceof Wall || housePart instanceof Window) { // tilt angle = 90 degree
-			viewFactorWithSky = 0.5;
-			viewFactorWithGround = 0.5;
-		}
-		double radiation = calculateSolarRadiation(directionTowardSun, normal, dayLength, viewFactorWithSky, viewFactorWithGround);
+		double radiation = calculateSolarRadiation(directionTowardSun, normal, dayLength);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
@@ -230,14 +221,7 @@ public class SolarIrradiation {
 		final double OFFSET = 3;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 
-		// TODO: Compute the view factors of the roof
-		double viewFactorWithSky = 1;
-		double viewFactorWithGround = 0;
-		if (housePart.getContainer() instanceof Wall || housePart.getContainer() instanceof Window) {
-			viewFactorWithSky = 0.5;
-			viewFactorWithGround = 0.5;
-		}
-		double radiation = calculateSolarRadiation(directionTowardSun, normal, dayLength, viewFactorWithSky, viewFactorWithGround);
+		double radiation = calculateSolarRadiation(directionTowardSun, normal, dayLength);
 
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
@@ -432,7 +416,7 @@ public class SolarIrradiation {
 		return SOLAR_CONSTANT * er;
 	}
 
-	private double calculateSolarRadiation(final ReadOnlyVector3 directionTowardSun, final ReadOnlyVector3 normal, double dayLength, double viewFactorWithSky, double viewFactorWithGround) {
+	private double calculateSolarRadiation(final ReadOnlyVector3 directionTowardSun, final ReadOnlyVector3 normal, double dayLength) {
 		double sunshinePercentage = 1.0;
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		if (!city.equals("")) {
@@ -441,24 +425,27 @@ public class SolarIrradiation {
 				sunshinePercentage = sunshineHours[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] / (dayLength * 30);
 		}
 		double airMass = computeAirMass(directionTowardSun);
-		double x = getExtraterrestrialRadiation() * AIR_MASS_DIFFUSE_FACTOR * Math.pow(0.7, Math.pow(airMass, 0.678)) * sunshinePercentage;
+		double x = getExtraterrestrialRadiation() * Math.pow(0.7, Math.pow(airMass, 0.678)) * sunshinePercentage; // don't use the 1.1 prefactor as we consider diffuse radiation in the ASHRAE model
 		double result = directionTowardSun.dot(normal) * x;
 		if (result < 0)
 			result = 0;
+		double cos = normal.dot(Vector3.UNIT_Z);
+		double viewFactorWithSky = 0.5 * (1 + cos);
+		double viewFactorWithGround = 0.5 * (1 - cos);
 		if (viewFactorWithSky > 0 || viewFactorWithGround > 0) {
 			double direct = directionTowardSun.dot(Vector3.UNIT_Z) * x;
 			if (viewFactorWithSky > 0) {// diffuse irradiance from the sky
 				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * direct;
 			}
 			if (viewFactorWithGround > 0) {// short-wave reflection from the ground
-				result += groundAlbedo * viewFactorWithGround * direct;
+				result += Scene.getInstance().getBackgroundAlbedo() * viewFactorWithGround * direct;
 			}
 		}
 		return result;
 	}
 
 	private void computeOnLand(final double dayLength, final ReadOnlyVector3 directionTowardSun) {
-		double dot = calculateSolarRadiation(directionTowardSun, Vector3.UNIT_Z, dayLength, 1, 0);
+		double dot = calculateSolarRadiation(directionTowardSun, Vector3.UNIT_Z, dayLength);
 		final double step = solarStep * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;

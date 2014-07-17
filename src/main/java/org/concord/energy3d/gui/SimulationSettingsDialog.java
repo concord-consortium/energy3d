@@ -37,7 +37,7 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(3, 3, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(4, 3, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -62,6 +62,13 @@ class SimulationSettingsDialog extends JDialog {
 		panel.add(airMassComboBox);
 		panel.add(new JLabel("Dimensionless"));
 
+		// set the ground albedo
+		panel.add(new JLabel("Background Albedo: "));
+		final JTextField albedoTextField = new JTextField(FORMAT1.format(Scene.getInstance().getBackgroundAlbedo()));
+		panel.add(albedoTextField);
+		albedoTextField.setColumns(6);
+		panel.add(new JLabel("Dimensionless (between 0 and 1)"));
+
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
@@ -72,9 +79,11 @@ class SimulationSettingsDialog extends JDialog {
 			public void actionPerformed(final ActionEvent e) {
 				double cellSize;
 				int timeStep;
+				double albedo;
 				try {
 					cellSize = Double.parseDouble(cellSizeTextField.getText());
 					timeStep = (int) Double.parseDouble(timeStepTextField.getText());
+					albedo = Double.parseDouble(albedoTextField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
@@ -89,9 +98,14 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Time step must be in 5-30.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				if (albedo < 0 || albedo > 1) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Background albedo must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				SolarIrradiation.getInstance().setSolarStep(cellSize);
 				SolarIrradiation.getInstance().setTimeStep(timeStep);
 				SolarIrradiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
+				Scene.getInstance().setBackgroundAlbedo(albedo);
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				SimulationSettingsDialog.this.dispose();
