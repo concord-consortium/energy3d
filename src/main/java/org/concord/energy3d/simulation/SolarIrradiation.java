@@ -161,8 +161,7 @@ public class SolarIrradiation {
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
 	private void computeOnMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 
-		if (normal.dot(directionTowardSun) <= 0)
-			return;
+		// if (normal.dot(directionTowardSun) <= 0) return; // defer this call to calculateSolarRadiation because we have diffuse and reflected radiation
 
 		TextureData data = onMesh.get(drawMesh);
 		if (data == null)
@@ -179,7 +178,7 @@ public class SolarIrradiation {
 			viewFactorWithSky = 0.5;
 			viewFactorWithGround = 0.5;
 		}
-		double radiation = calculateSolarRadiation(computeAirMass(directionTowardSun), normal.dot(directionTowardSun), dayLength, viewFactorWithSky, viewFactorWithGround);
+		double radiation = calculateSolarRadiation(directionTowardSun, normal, dayLength, viewFactorWithSky, viewFactorWithGround);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
@@ -222,8 +221,7 @@ public class SolarIrradiation {
 
 	private void computeOnMesh2(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 
-		if (normal.dot(directionTowardSun) <= 0)
-			return;
+		// if (normal.dot(directionTowardSun) < 0) return; // defer this call to calculateSolarRadiation because we have diffuse and reflected radiation
 
 		TextureData data = onMesh.get(drawMesh);
 		if (data == null)
@@ -239,7 +237,7 @@ public class SolarIrradiation {
 			viewFactorWithSky = 0.5;
 			viewFactorWithGround = 0.5;
 		}
-		double radiation = calculateSolarRadiation(computeAirMass(directionTowardSun), normal.dot(directionTowardSun), dayLength, viewFactorWithSky, viewFactorWithGround);
+		double radiation = calculateSolarRadiation(directionTowardSun, normal, dayLength, viewFactorWithSky, viewFactorWithGround);
 
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
@@ -434,7 +432,7 @@ public class SolarIrradiation {
 		return SOLAR_CONSTANT * er;
 	}
 
-	private double calculateSolarRadiation(double airMass, double dotProduct, double dayLength, double viewFactorWithSky, double viewFactorWithGround) {
+	private double calculateSolarRadiation(final ReadOnlyVector3 directionTowardSun, final ReadOnlyVector3 normal, double dayLength, double viewFactorWithSky, double viewFactorWithGround) {
 		double sunshinePercentage = 1.0;
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		if (!city.equals("")) {
@@ -442,16 +440,25 @@ public class SolarIrradiation {
 			if (sunshineHours != null)
 				sunshinePercentage = sunshineHours[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] / (dayLength * 30);
 		}
-		double result = dotProduct * getExtraterrestrialRadiation() * AIR_MASS_DIFFUSE_FACTOR * Math.pow(0.7, Math.pow(airMass, 0.678)) * sunshinePercentage;
-		if (viewFactorWithSky > 0) // diffuse irradiance from the sky
-			result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * result;
-		if (viewFactorWithGround > 0) // short-wave reflection from the ground
-			result += groundAlbedo * viewFactorWithGround * result;
+		double airMass = computeAirMass(directionTowardSun);
+		double x = getExtraterrestrialRadiation() * AIR_MASS_DIFFUSE_FACTOR * Math.pow(0.7, Math.pow(airMass, 0.678)) * sunshinePercentage;
+		double result = directionTowardSun.dot(normal) * x;
+		if (result < 0)
+			result = 0;
+		if (viewFactorWithSky > 0 || viewFactorWithGround > 0) {
+			double direct = directionTowardSun.dot(Vector3.UNIT_Z) * x;
+			if (viewFactorWithSky > 0) {// diffuse irradiance from the sky
+				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * direct;
+			}
+			if (viewFactorWithGround > 0) {// short-wave reflection from the ground
+				result += groundAlbedo * viewFactorWithGround * direct;
+			}
+		}
 		return result;
 	}
 
 	private void computeOnLand(final double dayLength, final ReadOnlyVector3 directionTowardSun) {
-		double dot = calculateSolarRadiation(computeAirMass(directionTowardSun), directionTowardSun.dot(Vector3.UNIT_Z), dayLength, 1, 0);
+		double dot = calculateSolarRadiation(directionTowardSun, Vector3.UNIT_Z, dayLength, 1, 0);
 		final double step = solarStep * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
