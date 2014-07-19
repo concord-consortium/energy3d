@@ -358,7 +358,7 @@ public class EnergyPanel extends JPanel {
 
 		wallsComboBox = new WideComboBox();
 		wallsComboBox.setEditable(true);
-		wallsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.25 (masonry)", "0.22 (wood frame)", "0.08 (2x4 w/cellulose/fiberglass)", "0.06 (2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)", "0.05 (2x6 w/cellulose/fiberglass)", "0.04 (2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)" }));
+		wallsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.25 (masonry)", "0.22 (wood frame)", "0.08 (R13, 2x4 w/cellulose/fiberglass)", "0.06 (R18, 2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)", "0.05 (R20, 2x6 w/cellulose/fiberglass)", "0.04 (R25, 2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)" }));
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -382,7 +382,7 @@ public class EnergyPanel extends JPanel {
 
 		roofsComboBox = new WideComboBox();
 		roofsComboBox.setEditable(true);
-		roofsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.29 (old house)", "0.05 (R-22 cellulose/fiberglass)", "0.03 (R-38 cellulose/fiberglass)", "0.02 (R-50 cellulose/fiberglass)" }));
+		roofsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.29 (old house)", "0.05 (R22, cellulose/fiberglass)", "0.03 (R38, cellulose/fiberglass)", "0.02 (R50, cellulose/fiberglass)" }));
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
