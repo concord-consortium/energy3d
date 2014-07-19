@@ -358,7 +358,7 @@ public class EnergyPanel extends JPanel {
 
 		wallsComboBox = new WideComboBox();
 		wallsComboBox.setEditable(true);
-		wallsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.28 ", "0.67 (Concrete)", "0.41 (Masonary Brick)", "0.04 (Flat Metal Fiberglass Insulation)" }));
+		wallsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.25 (masonry)", "0.22 (wood frame)", "0.08 (2x4 w/cellulose/fiberglass)", "0.06 (2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)", "0.05 (2x6 w/cellulose/fiberglass)", "0.04 (2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)" }));
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -372,29 +372,28 @@ public class EnergyPanel extends JPanel {
 		gbc_wallsComboBox.gridy = 0;
 		uFactorPanel.add(wallsComboBox, gbc_wallsComboBox);
 
-		final JLabel doorsLabel = new JLabel("Doors:");
-		final GridBagConstraints gbc_doorsLabel = new GridBagConstraints();
-		gbc_doorsLabel.anchor = GridBagConstraints.EAST;
-		gbc_doorsLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_doorsLabel.gridx = 2;
-		gbc_doorsLabel.gridy = 0;
-		uFactorPanel.add(doorsLabel, gbc_doorsLabel);
+		final JLabel roofsLabel = new JLabel("Roofs:");
+		final GridBagConstraints gbc_roofsLabel = new GridBagConstraints();
+		gbc_roofsLabel.anchor = GridBagConstraints.EAST;
+		gbc_roofsLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_roofsLabel.gridx = 2;
+		gbc_roofsLabel.gridy = 0;
+		uFactorPanel.add(roofsLabel, gbc_roofsLabel);
 
-		doorsComboBox = new WideComboBox();
-		doorsComboBox.setEditable(true);
-		doorsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.8 ", "1.2 (Steel)", "0.4 (Wood)" }));
-		doorsComboBox.addActionListener(new ActionListener() {
+		roofsComboBox = new WideComboBox();
+		roofsComboBox.setEditable(true);
+		roofsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.29 (old house)", "0.05 (R-22 cellulose/fiberglass)", "0.03 (R-38 cellulose/fiberglass)", "0.02 (R-50 cellulose/fiberglass)" }));
+		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
 			}
 		});
-		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
-		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
-		gbc_doorsComboBox.gridx = 3;
-		gbc_doorsComboBox.gridy = 0;
-		uFactorPanel.add(doorsComboBox, gbc_doorsComboBox);
+		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
+		gbc_roofsComboBox.gridx = 3;
+		gbc_roofsComboBox.gridy = 0;
+		uFactorPanel.add(roofsComboBox, gbc_roofsComboBox);
 
 		final JLabel windowsLabel = new JLabel("Windows:");
 		final GridBagConstraints gbc_windowsLabel = new GridBagConstraints();
@@ -406,7 +405,7 @@ public class EnergyPanel extends JPanel {
 
 		windowsComboBox = new WideComboBox();
 		windowsComboBox.setEditable(true);
-		windowsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "1.0", "0.35 (Double Pane)", "0.15 (Triple Pane)" }));
+		windowsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "1.20 (single pane)", "0.55 (double pane)", "0.35 (double pane, low-e)", "0.15 (triple pane)" }));
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -420,28 +419,29 @@ public class EnergyPanel extends JPanel {
 		gbc_windowsComboBox.gridy = 1;
 		uFactorPanel.add(windowsComboBox, gbc_windowsComboBox);
 
-		final JLabel roofsLabel = new JLabel("Roofs:");
-		final GridBagConstraints gbc_roofsLabel = new GridBagConstraints();
-		gbc_roofsLabel.anchor = GridBagConstraints.EAST;
-		gbc_roofsLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_roofsLabel.gridx = 2;
-		gbc_roofsLabel.gridy = 1;
-		uFactorPanel.add(roofsLabel, gbc_roofsLabel);
+		final JLabel doorsLabel = new JLabel("Doors:");
+		final GridBagConstraints gbc_doorsLabel = new GridBagConstraints();
+		gbc_doorsLabel.anchor = GridBagConstraints.EAST;
+		gbc_doorsLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_doorsLabel.gridx = 2;
+		gbc_doorsLabel.gridy = 1;
+		uFactorPanel.add(doorsLabel, gbc_doorsLabel);
 
-		roofsComboBox = new WideComboBox();
-		roofsComboBox.setEditable(true);
-		roofsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.14 ", "0.23 (Concrete)", "0.11 (Flat Metal Fiberglass Insulation)", "0.10 (Wood Fiberglass Insulation)" }));
-		roofsComboBox.addActionListener(new ActionListener() {
+		doorsComboBox = new WideComboBox();
+		doorsComboBox.setEditable(true);
+		doorsComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "0.50 (wood)", "0.35 (insulated)" }));
+		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
 			}
 		});
-		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
-		gbc_roofsComboBox.gridx = 3;
-		gbc_roofsComboBox.gridy = 1;
-		uFactorPanel.add(roofsComboBox, gbc_roofsComboBox);
+		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
+		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
+		gbc_doorsComboBox.gridx = 3;
+		gbc_doorsComboBox.gridy = 1;
+		uFactorPanel.add(doorsComboBox, gbc_doorsComboBox);
 
 		uFactorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, uFactorPanel.getPreferredSize().height));
 

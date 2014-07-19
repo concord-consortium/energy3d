@@ -67,7 +67,7 @@ class SimulationSettingsDialog extends JDialog {
 		final JTextField albedoTextField = new JTextField(FORMAT1.format(Scene.getInstance().getBackgroundAlbedo()));
 		panel.add(albedoTextField);
 		albedoTextField.setColumns(6);
-		panel.add(new JLabel("Dimensionless (between 0 and 1)"));
+		panel.add(new JLabel("Dimensionless [0-1]"));
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
