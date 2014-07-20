@@ -368,7 +368,7 @@ public class MainPanel extends JPanel {
 			miscArrowButton = new JButton();
 			final Dimension d = new Dimension(12, miscButton.getMaximumSize().height);
 			miscArrowButton.setMaximumSize(d);
-			miscArrowButton.setIcon(new ArrowIcon(d.width, d.height, Color.BLACK));
+			miscArrowButton.setIcon(new Symbol.Arrow(Color.BLACK, d.width, d.height));
 			miscArrowButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -772,7 +772,7 @@ public class MainPanel extends JPanel {
 			treeArrowButton = new JButton();
 			final Dimension d = new Dimension(12, treeButton.getMaximumSize().height);
 			treeArrowButton.setMaximumSize(d);
-			treeArrowButton.setIcon(new ArrowIcon(d.width, d.height, Color.BLACK));
+			treeArrowButton.setIcon(new Symbol.Arrow(Color.BLACK, d.width, d.height));
 			treeArrowButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -807,7 +807,7 @@ public class MainPanel extends JPanel {
 			roofArrowButton = new JButton();
 			final Dimension d = new Dimension(12, roofButton.getMaximumSize().height);
 			roofArrowButton.setMaximumSize(d);
-			roofArrowButton.setIcon(new ArrowIcon(d.width, d.height, Color.BLACK));
+			roofArrowButton.setIcon(new Symbol.Arrow(Color.BLACK, d.width, d.height));
 			roofArrowButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

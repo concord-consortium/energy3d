@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 
 import javax.swing.BorderFactory;
@@ -100,7 +101,8 @@ public class EnergyPanel extends JPanel {
 	private final JTextField coolingTextField;
 	private final JTextField netEnergyTextField;
 	private final JSpinner insideTemperatureSpinner;
-	private final JSpinner outsideTemperatureSpinner;
+	private final JTextField outsideTemperatureField;
+	private final JTextField sunshineHoursField;
 	private final JLabel dateLabel;
 	private final JLabel timeLabel;
 	private final JSpinner dateSpinner;
@@ -249,7 +251,7 @@ public class EnergyPanel extends JPanel {
 				final Heliodon heliodon = Heliodon.getInstance();
 				if (heliodon != null)
 					heliodon.setTime((Date) timeSpinner.getValue());
-				updateOutsideTemperature();
+				updateWeatherData();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().changeSkyTexture();
 			}
@@ -287,19 +289,17 @@ public class EnergyPanel extends JPanel {
 
 		timeAndLocationPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, timeAndLocationPanel.getPreferredSize().height));
 
-		final JPanel temperaturePanel = new JPanel();
-		temperaturePanel.setToolTipText("<html>Temperature difference drives heat transfer<br>between inside and outside.</html>");
-		temperaturePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Temperature \u00B0C", TitledBorder.LEADING, TitledBorder.TOP));
-		dataPanel.add(temperaturePanel);
+		final JPanel conditionPanel = new JPanel();
+		conditionPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Conditions", TitledBorder.LEADING, TitledBorder.TOP));
+		dataPanel.add(conditionPanel);
 		final GridBagLayout gbl_temperaturePanel = new GridBagLayout();
-		temperaturePanel.setLayout(gbl_temperaturePanel);
+		conditionPanel.setLayout(gbl_temperaturePanel);
 
-		final JLabel insideTemperatureLabel = new JLabel("Inside: ");
-		insideTemperatureLabel.setToolTipText("");
+		final JLabel insideTemperatureLabel = new JLabel("Room \u00B0C: ");
 		final GridBagConstraints gbc_insideTemperatureLabel = new GridBagConstraints();
 		gbc_insideTemperatureLabel.gridx = 1;
 		gbc_insideTemperatureLabel.gridy = 0;
-		temperaturePanel.add(insideTemperatureLabel, gbc_insideTemperatureLabel);
+		conditionPanel.add(insideTemperatureLabel, gbc_insideTemperatureLabel);
 
 		insideTemperatureSpinner = new JSpinner();
 		insideTemperatureSpinner.setToolTipText("Thermostat temperature setting for the inside of the house");
@@ -314,32 +314,37 @@ public class EnergyPanel extends JPanel {
 		final GridBagConstraints gbc_insideTemperatureSpinner = new GridBagConstraints();
 		gbc_insideTemperatureSpinner.gridx = 2;
 		gbc_insideTemperatureSpinner.gridy = 0;
-		temperaturePanel.add(insideTemperatureSpinner, gbc_insideTemperatureSpinner);
+		conditionPanel.add(insideTemperatureSpinner, gbc_insideTemperatureSpinner);
 
 		final JLabel outsideTemperatureLabel = new JLabel(" Outside: ");
-		outsideTemperatureLabel.setToolTipText("");
 		final GridBagConstraints gbc_outsideTemperatureLabel = new GridBagConstraints();
 		gbc_outsideTemperatureLabel.gridx = 3;
 		gbc_outsideTemperatureLabel.gridy = 0;
-		temperaturePanel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
+		conditionPanel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
 
-		temperaturePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, temperaturePanel.getPreferredSize().height));
+		conditionPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, conditionPanel.getPreferredSize().height));
 
-		outsideTemperatureSpinner = new JSpinner();
-		outsideTemperatureSpinner.setToolTipText("Outside temperature at this time and day");
-		outsideTemperatureSpinner.setEnabled(false);
-		outsideTemperatureSpinner.setModel(new SpinnerNumberModel(10, -70, 60, 1));
-		outsideTemperatureSpinner.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(final ChangeEvent e) {
-				if (disableActionsRequester == null)
-					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-			}
-		});
-		final GridBagConstraints gbc_outsideTemperatureSpinner = new GridBagConstraints();
-		gbc_outsideTemperatureSpinner.gridx = 4;
-		gbc_outsideTemperatureSpinner.gridy = 0;
-		temperaturePanel.add(outsideTemperatureSpinner, gbc_outsideTemperatureSpinner);
+		outsideTemperatureField = new JTextField(4);
+		outsideTemperatureField.setToolTipText("Outside temperature at this time and day");
+		outsideTemperatureField.setEnabled(false);
+		final GridBagConstraints gbc_outsideTemperatureField = new GridBagConstraints();
+		gbc_outsideTemperatureField.gridx = 4;
+		gbc_outsideTemperatureField.gridy = 0;
+		conditionPanel.add(outsideTemperatureField, gbc_outsideTemperatureField);
+
+		JLabel sunshineLabel = new JLabel(" Sunshine: ");
+		final GridBagConstraints gbc_sunshineLabel = new GridBagConstraints();
+		gbc_sunshineLabel.gridx = 5;
+		gbc_sunshineLabel.gridy = 0;
+		conditionPanel.add(sunshineLabel, gbc_sunshineLabel);
+
+		sunshineHoursField = new JTextField(4);
+		sunshineHoursField.setToolTipText("Average sunshine hours in this month");
+		sunshineHoursField.setEnabled(false);
+		final GridBagConstraints gbc_sunshineHoursField = new GridBagConstraints();
+		gbc_sunshineHoursField.gridx = 6;
+		gbc_sunshineHoursField.gridy = 0;
+		conditionPanel.add(sunshineHoursField, gbc_sunshineHoursField);
 
 		final JPanel uFactorPanel = new JPanel();
 		uFactorPanel.setToolTipText("<html><b>U-factor</b><br>measures how well a building element conducts heat.</html>");
@@ -768,7 +773,7 @@ public class EnergyPanel extends JPanel {
 	public void compute(final UpdateRadiation updateRadiation) {
 		if (!computeEnabled)
 			return;
-		updateOutsideTemperature(); // TODO: There got to be a better way to do this
+		updateWeatherData(); // TODO: There got to be a better way to do this
 		this.updateRadiation = updateRadiation;
 		if (thread != null && thread.isAlive())
 			computeRequest = true;
@@ -811,7 +816,7 @@ public class EnergyPanel extends JPanel {
 			progressBar.setValue(0);
 			progressBar.setStringPainted(false);
 
-			updateOutsideTemperature();
+			updateWeatherData();
 			HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), (Integer) insideTemperatureSpinner.getValue());
 
 			SolarIrradiation.getInstance().compute();
@@ -839,11 +844,18 @@ public class EnergyPanel extends JPanel {
 		compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 
-	private void updateOutsideTemperature() {
-		if (cityComboBox.getSelectedItem().equals(""))
-			outsideTemperatureSpinner.setValue(15);
-		else
-			outsideTemperatureSpinner.setValue(Math.round(CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalender())));
+	private void updateWeatherData() {
+		String city = (String) cityComboBox.getSelectedItem();
+		if (city.equals("")) {
+			outsideTemperatureField.setText("15\u00B0C");
+			sunshineHoursField.setText("10");
+		} else {
+			Calendar c = Heliodon.getInstance().getCalender();
+			outsideTemperatureField.setText(Math.round(CityData.getInstance().computeOutsideTemperature(c)) + "\u00B0C");
+			Map<String, int[]> sunshineHours = CityData.getInstance().getSunshineHours();
+			int month = c.get(Calendar.MONTH);
+			sunshineHoursField.setText(Math.round(sunshineHours.get(city)[month] / 30.0) + "hrs");
+		}
 	}
 
 	public JSpinner getDateSpinner() {
