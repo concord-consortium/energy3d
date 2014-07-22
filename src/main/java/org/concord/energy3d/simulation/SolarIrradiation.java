@@ -484,12 +484,13 @@ public class SolarIrradiation {
 		double viewFactorWithSky = 0.5 * (1 + cos);
 		double viewFactorWithGround = 0.5 * (1 - cos);
 		if (viewFactorWithSky > 0 || viewFactorWithGround > 0) {
-			double horizontalRadiation = directionTowardSun.dot(Vector3.UNIT_Z) * peakRadiation;
+			//double r = directionTowardSun.dot(Vector3.UNIT_Z) * peakRadiation;
+			double r = peakRadiation;
 			if (viewFactorWithSky > 0) { // diffuse irradiance from the sky
-				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * horizontalRadiation;
+				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * r;
 			}
 			if (viewFactorWithGround > 0) { // short-wave reflection from the ground
-				result += Scene.getInstance().getBackgroundAlbedo() * viewFactorWithGround * horizontalRadiation;
+				result += Scene.getInstance().getBackgroundAlbedo() * viewFactorWithGround * r;
 			}
 		}
 		return result;
