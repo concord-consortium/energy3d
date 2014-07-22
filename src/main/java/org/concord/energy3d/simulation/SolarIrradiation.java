@@ -70,6 +70,7 @@ public class SolarIrradiation {
 	private double solarStep = 2.0;
 	private long maxValue;
 	private int airMassSelection = AIR_MASS_SPHERE_MODEL;
+	private double peakRadiation;
 
 	private class TextureData {
 		public Vector3 p0;
@@ -156,10 +157,37 @@ public class SolarIrradiation {
 		maxValue *= 1 - 0.01 * EnergyPanel.getInstance().getColorMapSlider().getValue();
 	}
 
+	private void computeOnLand(final double dayLength, final ReadOnlyVector3 directionTowardSun) {
+		calculatePeakRadiation(directionTowardSun, dayLength);
+		double radiation = calculateDirectRadiation(directionTowardSun, Vector3.UNIT_Z) + calculateDiffuseAndReflectedRadiation(directionTowardSun, Vector3.UNIT_Z);
+		final double step = solarStep * 4;
+		final int rows = (int) (256 / step);
+		final int cols = rows;
+		TextureData data = onMesh.get(SceneManager.getInstance().getSolarLand());
+		if (data == null) {
+			data = new TextureData();
+			data.solar = new double[rows][cols];
+			onMesh.put(SceneManager.getInstance().getSolarLand(), data);
+		}
+		final Vector3 p = new Vector3();
+		for (int col = 0; col < cols; col++) {
+			p.setX((col - cols / 2) * step + step / 2.0);
+			for (int row = 0; row < rows; row++) {
+				if (EnergyPanel.getInstance().isCancelled())
+					throw new CancellationException();
+				p.setY((row - rows / 2) * step + step / 2.0);
+				final Ray3 pickRay = new Ray3(p, directionTowardSun);
+				final PickResults pickResults = new PrimitivePickResults();
+				for (final Spatial spatial : collidables)
+					PickingUtil.findPick(spatial, pickRay, pickResults, false);
+				if (pickResults.getNumber() == 0)
+					data.solar[row][col] += radiation;
+			}
+		}
+	}
+
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
 	private void computeOnMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
-
-		// if (normal.dot(directionTowardSun) <= 0) return; // defer this call to calculateSolarRadiation because we have diffuse and reflected radiation
 
 		TextureData data = onMesh.get(drawMesh);
 		if (data == null)
@@ -169,7 +197,12 @@ public class SolarIrradiation {
 		final double OFFSET = 0.1;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 
-		double radiation = calculateSolarRadiation(directionTowardSun, normal, dayLength);
+		calculatePeakRadiation(directionTowardSun, dayLength);
+		double dot = normal.dot(directionTowardSun);
+		double directRadiation = 0;
+		if (dot > 0)
+			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
+		double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
@@ -190,29 +223,29 @@ public class SolarIrradiation {
 					h = solarStep;
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
-				// final PickResults pickResults = new BoundingPickResults();
-				boolean collision = false;
-				for (final Spatial spatial : collidables)
-					if (spatial != collisionMesh) {
-						PickingUtil.findPick(spatial, pickRay, pickResults, false);
-						if (pickResults.getNumber() != 0) {
-							collision = true;
-							break;
+				double radiation = indirectRadiation;
+				if (dot > 0) {
+					boolean collision = false;
+					for (final Spatial spatial : collidables) {
+						if (spatial != collisionMesh) {
+							PickingUtil.findPick(spatial, pickRay, pickResults, false);
+							if (pickResults.getNumber() != 0) {
+								collision = true;
+								break;
+							}
 						}
 					}
-
-				if (!collision) {
-					data.solar[row][col] += radiation;
-					housePart.getSolarPotential()[minute / timeStep] += radiation * w * h * scaleFactor;
+					if (!collision)
+						radiation += directRadiation;
 				}
+				data.solar[row][col] += radiation;
+				housePart.getSolarPotential()[minute / timeStep] += radiation * w * h * scaleFactor;
 			}
 		}
 
 	}
 
 	private void computeOnMesh2(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
-
-		// if (normal.dot(directionTowardSun) < 0) return; // defer this call to calculateSolarRadiation because we have diffuse and reflected radiation
 
 		TextureData data = onMesh.get(drawMesh);
 		if (data == null)
@@ -221,7 +254,12 @@ public class SolarIrradiation {
 		final double OFFSET = 3;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 
-		double radiation = calculateSolarRadiation(directionTowardSun, normal, dayLength);
+		calculatePeakRadiation(directionTowardSun, dayLength);
+		double dot = normal.dot(directionTowardSun);
+		double directRadiation = 0;
+		if (dot > 0)
+			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
+		double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
@@ -242,26 +280,32 @@ public class SolarIrradiation {
 				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(point).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
-				boolean collision = false;
-				for (final Spatial spatial : collidables)
-					if (spatial != collisionMesh) {
-						PickingUtil.findPick(spatial, pickRay, pickResults, false);
-						if (pickResults.getNumber() != 0) {
-							collision = true;
-							break;
+				double radiation = indirectRadiation;
+				if (dot > 0) {
+					boolean collision = false;
+					for (final Spatial spatial : collidables) {
+						if (spatial != collisionMesh) {
+							PickingUtil.findPick(spatial, pickRay, pickResults, false);
+							if (pickResults.getNumber() != 0) {
+								collision = true;
+								break;
+							}
 						}
 					}
-
-				if (!collision) {
-					data.solar[row][col] += radiation;
-					double area = 1;
-					if (housePart instanceof SolarPanel)
-						area = SolarPanel.WIDTH * SolarPanel.HEIGHT;
-					else if (housePart instanceof Sensor)
-						area = Sensor.WIDTH * Sensor.HEIGHT;
-					housePart.getSolarPotential()[minute / timeStep] += radiation * area / 240.0 * timeStep;
+					if (!collision)
+						radiation += directRadiation;
 				}
+
+				data.solar[row][col] += radiation;
+				double area = 1;
+				if (housePart instanceof SolarPanel)
+					area = SolarPanel.WIDTH * SolarPanel.HEIGHT;
+				else if (housePart instanceof Sensor)
+					area = Sensor.WIDTH * Sensor.HEIGHT;
+				housePart.getSolarPotential()[minute / timeStep] += radiation * area / 240.0 * timeStep;
+
 			}
+
 		}
 
 	}
@@ -416,7 +460,8 @@ public class SolarIrradiation {
 		return SOLAR_CONSTANT * er;
 	}
 
-	private double calculateSolarRadiation(final ReadOnlyVector3 directionTowardSun, final ReadOnlyVector3 normal, double dayLength) {
+	// Reused peak solar radiation value. Must be called once and only once before calling calculateDirectRadiation and calculateDiffusionAndReflection
+	private void calculatePeakRadiation(final ReadOnlyVector3 directionTowardSun, double dayLength) {
 		double sunshinePercentage = 1.0;
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		if (!city.equals("")) {
@@ -424,52 +469,30 @@ public class SolarIrradiation {
 			if (sunshineHours != null)
 				sunshinePercentage = sunshineHours[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] / (dayLength * 30);
 		}
-		double airMass = computeAirMass(directionTowardSun);
-		double x = getExtraterrestrialRadiation() * Math.pow(0.7, Math.pow(airMass, 0.678)) * sunshinePercentage; // don't use the 1.1 prefactor as we consider diffuse radiation in the ASHRAE model
-		double result = directionTowardSun.dot(normal) * x;
-		if (result < 0)
-			result = 0;
+		// don't use the 1.1 prefactor as we consider diffuse radiation in the ASHRAE model
+		peakRadiation = getExtraterrestrialRadiation() * Math.pow(0.7, Math.pow(computeAirMass(directionTowardSun), 0.678)) * sunshinePercentage;
+	}
+
+	private double calculateDirectRadiation(final ReadOnlyVector3 directionTowardSun, final ReadOnlyVector3 normal) {
+		double result = directionTowardSun.dot(normal) * peakRadiation;
+		return result < 0 ? 0 : result;
+	}
+
+	private double calculateDiffuseAndReflectedRadiation(final ReadOnlyVector3 directionTowardSun, final ReadOnlyVector3 normal) {
+		double result = 0;
 		double cos = normal.dot(Vector3.UNIT_Z);
 		double viewFactorWithSky = 0.5 * (1 + cos);
 		double viewFactorWithGround = 0.5 * (1 - cos);
 		if (viewFactorWithSky > 0 || viewFactorWithGround > 0) {
-			double direct = directionTowardSun.dot(Vector3.UNIT_Z) * x;
-			if (viewFactorWithSky > 0) {// diffuse irradiance from the sky
-				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * direct;
+			double horizontalRadiation = directionTowardSun.dot(Vector3.UNIT_Z) * peakRadiation;
+			if (viewFactorWithSky > 0) { // diffuse irradiance from the sky
+				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * horizontalRadiation;
 			}
-			if (viewFactorWithGround > 0) {// short-wave reflection from the ground
-				result += Scene.getInstance().getBackgroundAlbedo() * viewFactorWithGround * direct;
+			if (viewFactorWithGround > 0) { // short-wave reflection from the ground
+				result += Scene.getInstance().getBackgroundAlbedo() * viewFactorWithGround * horizontalRadiation;
 			}
 		}
 		return result;
-	}
-
-	private void computeOnLand(final double dayLength, final ReadOnlyVector3 directionTowardSun) {
-		double dot = calculateSolarRadiation(directionTowardSun, Vector3.UNIT_Z, dayLength);
-		final double step = solarStep * 4;
-		final int rows = (int) (256 / step);
-		final int cols = rows;
-		TextureData data = onMesh.get(SceneManager.getInstance().getSolarLand());
-		if (data == null) {
-			data = new TextureData();
-			data.solar = new double[rows][cols];
-			onMesh.put(SceneManager.getInstance().getSolarLand(), data);
-		}
-		final Vector3 p = new Vector3();
-		for (int col = 0; col < cols; col++) {
-			p.setX((col - cols / 2) * step + step / 2.0);
-			for (int row = 0; row < rows; row++) {
-				if (EnergyPanel.getInstance().isCancelled())
-					throw new CancellationException();
-				p.setY((row - rows / 2) * step + step / 2.0);
-				final Ray3 pickRay = new Ray3(p, directionTowardSun);
-				final PickResults pickResults = new PrimitivePickResults();
-				for (final Spatial spatial : collidables)
-					PickingUtil.findPick(spatial, pickRay, pickResults, false);
-				if (pickResults.getNumber() == 0)
-					data.solar[row][col] += dot;
-			}
-		}
 	}
 
 	private void updateValueOnAllHouses() {
