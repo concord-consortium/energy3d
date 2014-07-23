@@ -178,6 +178,7 @@ public class Scene implements Serializable {
 			@Override
 			public Object call() throws Exception {
 				initSceneNow();
+				instance.redrawAllNow();	// needed in case Heliodon is on and needs to be drawn with correct size
 				initEnergy();
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				return null;
@@ -854,7 +855,7 @@ public class Scene implements Serializable {
 		this.windowSolarHeatGainCoefficient = windowSolarHeatGainCoefficient;
 	}
 
-	public void setBackgroundAlbedo(double backgroundAlbedo) {
+	public void setBackgroundAlbedo(final double backgroundAlbedo) {
 		this.backgroundAlbedo = backgroundAlbedo;
 	}
 
