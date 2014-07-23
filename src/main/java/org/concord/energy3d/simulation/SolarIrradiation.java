@@ -478,19 +478,18 @@ public class SolarIrradiation {
 		return result < 0 ? 0 : result;
 	}
 
+	// see: http://www.physics.arizona.edu/~cronin/Solar/References/Irradiance%20Models%20and%20Data/WOC01.pdf
 	private double calculateDiffuseAndReflectedRadiation(final ReadOnlyVector3 directionTowardSun, final ReadOnlyVector3 normal) {
 		double result = 0;
 		double cos = normal.dot(Vector3.UNIT_Z);
 		double viewFactorWithSky = 0.5 * (1 + cos);
 		double viewFactorWithGround = 0.5 * (1 - cos);
 		if (viewFactorWithSky > 0 || viewFactorWithGround > 0) {
-			//double r = directionTowardSun.dot(Vector3.UNIT_Z) * peakRadiation;
-			double r = peakRadiation;
 			if (viewFactorWithSky > 0) { // diffuse irradiance from the sky
-				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * r;
+				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * peakRadiation;
 			}
 			if (viewFactorWithGround > 0) { // short-wave reflection from the ground
-				result += Scene.getInstance().getBackgroundAlbedo() * viewFactorWithGround * r;
+				result += Scene.getInstance().getBackgroundAlbedo() * viewFactorWithGround * peakRadiation;
 			}
 		}
 		return result;
