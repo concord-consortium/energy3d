@@ -72,7 +72,7 @@ class ScaleDialog extends JDialog {
 			contentPanel.add(scaleByMeasurementRadioButton, gbc_scaleByMeasurementRadioButton);
 		}
 		{
-			currentLegthLabel = new JLabel("Current Legth");
+			currentLegthLabel = new JLabel("Current length");
 			final GridBagConstraints gbc_currentLegthLabel = new GridBagConstraints();
 			gbc_currentLegthLabel.insets = new Insets(0, 0, 5, 5);
 			gbc_currentLegthLabel.anchor = GridBagConstraints.EAST;
@@ -91,7 +91,7 @@ class ScaleDialog extends JDialog {
 			currentTextField.setColumns(10);
 		}
 		{
-			newLegthLabel = new JLabel("New Legth");
+			newLegthLabel = new JLabel("New length");
 			final GridBagConstraints gbc_newLegthLabel = new GridBagConstraints();
 			gbc_newLegthLabel.anchor = GridBagConstraints.EAST;
 			gbc_newLegthLabel.insets = new Insets(0, 0, 5, 5);
