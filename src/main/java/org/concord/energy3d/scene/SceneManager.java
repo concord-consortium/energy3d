@@ -513,7 +513,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		final int cols = (int) (width.length() / gridSize);
 
-		for (int col = 0; col < cols / 2 + 1; col++) {
+		for (int col = 1; col < cols / 2 + 1; col++) {
 			for (int neg = -1; neg <= 1; neg += 2) {
 				final ReadOnlyVector3 lineP1 = width.normalize(null).multiplyLocal(neg * col * gridSize).addLocal(pMiddle).subtractLocal(height.multiply(0.5, null));
 				points.add(lineP1);
@@ -526,7 +526,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		final int rows = (int) (height.length() / gridSize);
 
-		for (int row = 0; row < rows / 2 + 1; row++) {
+		for (int row = 1; row < rows / 2 + 1; row++) {
 			for (int neg = -1; neg <= 1; neg += 2) {
 				final ReadOnlyVector3 lineP1 = height.normalize(null).multiplyLocal(neg * row * gridSize).addLocal(pMiddle).subtractLocal(width.multiply(0.5, null));
 				points.add(lineP1);
