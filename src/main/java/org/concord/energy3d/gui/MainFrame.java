@@ -65,6 +65,7 @@ import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Mac;
 import org.concord.energy3d.util.Printout;
 import org.concord.energy3d.util.Util;
@@ -220,18 +221,18 @@ public class MainFrame extends JFrame {
 		super();
 		System.out.print("Initiating GUI...");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icons/icon.png")));
-		final String directoryPath = Preferences.userNodeForPackage(MainApplication.class).get("dir", null);
-		fileChooser = new JFileChooser(directoryPath);
-		if (!Config.isWebStart() && directoryPath == null) {
-			final File dir = new File(System.getProperties().getProperty("user.dir") + "/Energy3D Projects");
-			fileChooser.setCurrentDirectory(dir);
-		}
+		Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+		final String directoryPath = pref.get("dir", null);
+		fileChooser = new FileChooser(directoryPath);
+		if (!Config.isWebStart() && directoryPath == null)
+			fileChooser.setCurrentDirectory(new File(System.getProperties().getProperty("user.dir")));
+
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.setFileFilter(ng3Filter);
 		colorChooser = new JColorChooser();
 		initialize();
-		this.setMinimumSize(new Dimension(800, 600));
+		setMinimumSize(new Dimension(800, 600));
 		System.out.println("done");
 	}
 
@@ -244,11 +245,12 @@ public class MainFrame extends JFrame {
 		setContentPane(getMainPanel());
 
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setSize(Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_width", Math.max(900, MainPanel.getInstance().getAppToolbar().getPreferredSize().width)), screenSize.width), Math.min(Preferences.userNodeForPackage(MainApplication.class).getInt("window_size_height", 600), screenSize.height));
-		this.setLocation((int) (screenSize.getWidth() - this.getSize().getWidth()) / 2, (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2);
-		this.setLocation(Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_x", (int) (screenSize.getWidth() - this.getSize().getWidth()) / 2), Preferences.userNodeForPackage(MainApplication.class).getInt("window_location_y", (int) (screenSize.getHeight() - this.getSize().getHeight()) / 2));
-		this.setLocation(MathUtils.clamp(this.getLocation().x, 0, screenSize.width - this.getSize().width), MathUtils.clamp(this.getLocation().y, 0, screenSize.height - this.getSize().height));
-		final int windowState = Preferences.userNodeForPackage(MainApplication.class).getInt("window_state", JFrame.NORMAL);
+		final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+		this.setSize(Math.min(pref.getInt("window_size_width", Math.max(900, MainPanel.getInstance().getAppToolbar().getPreferredSize().width)), screenSize.width), Math.min(pref.getInt("window_size_height", 600), screenSize.height));
+		this.setLocation((int) (screenSize.getWidth() - getSize().getWidth()) / 2, (int) (screenSize.getHeight() - getSize().getHeight()) / 2);
+		this.setLocation(pref.getInt("window_location_x", (int) (screenSize.getWidth() - getSize().getWidth()) / 2), pref.getInt("window_location_y", (int) (screenSize.getHeight() - getSize().getHeight()) / 2));
+		this.setLocation(MathUtils.clamp(getLocation().x, 0, screenSize.width - getSize().width), MathUtils.clamp(getLocation().y, 0, screenSize.height - getSize().height));
+		final int windowState = pref.getInt("window_state", JFrame.NORMAL);
 		if ((windowState & JFrame.ICONIFIED) == 0)
 			setExtendedState(windowState);
 
@@ -259,16 +261,16 @@ public class MainFrame extends JFrame {
 			@Override
 			public void componentMoved(final ComponentEvent e) {
 				if (MainFrame.this.getExtendedState() == 0) {
-					Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_x", e.getComponent().getLocation().x);
-					Preferences.userNodeForPackage(MainApplication.class).putInt("window_location_y", e.getComponent().getLocation().y);
+					pref.putInt("window_location_x", e.getComponent().getLocation().x);
+					pref.putInt("window_location_y", e.getComponent().getLocation().y);
 				}
 			}
 
 			@Override
 			public void componentResized(final ComponentEvent e) {
 				if (MainFrame.this.getExtendedState() == 0) {
-					Preferences.userNodeForPackage(MainApplication.class).putInt("window_size_width", e.getComponent().getSize().width);
-					Preferences.userNodeForPackage(MainApplication.class).putInt("window_size_height", e.getComponent().getSize().height);
+					pref.putInt("window_size_width", e.getComponent().getSize().width);
+					pref.putInt("window_size_height", e.getComponent().getSize().height);
 				}
 			}
 		});
@@ -276,7 +278,7 @@ public class MainFrame extends JFrame {
 		addWindowStateListener(new WindowStateListener() {
 			@Override
 			public void windowStateChanged(final WindowEvent e) {
-				Preferences.userNodeForPackage(MainApplication.class).putInt("window_state", e.getNewState());
+				pref.putInt("window_state", e.getNewState());
 				SceneManager.getInstance().refresh();
 			}
 		});
