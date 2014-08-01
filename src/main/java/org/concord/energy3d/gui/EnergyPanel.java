@@ -51,6 +51,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
@@ -972,7 +973,7 @@ public class EnergyPanel extends JPanel {
 				partProperty3TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
 		}
 
-		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof Tree)) {
+		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof Tree || selectedPart instanceof Human)) {
 			if (selectedPart instanceof SolarPanel) {
 				partProperty1TextField.setText(twoDecimals.format(SolarPanel.WIDTH));
 				partProperty2TextField.setText(twoDecimals.format(SolarPanel.HEIGHT));

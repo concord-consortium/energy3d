@@ -27,6 +27,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HipRoof;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.PyramidRoof;
 import org.concord.energy3d.model.Roof;
@@ -135,7 +136,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_HIP2, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_OAK, DRAW_MAPLE, DRAW_PINE
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_HIP2, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_OAK, DRAW_MAPLE, DRAW_PINE, DRAW_JANE, DRAW_JENNY, DRAW_JACK, DRAW_JOHN
 	}
 
 	public enum CameraMode {
@@ -638,7 +639,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final MouseState prevMouseState = firstClickState.getCurrent().getMouseState();
 						final ReadOnlyVector2 p1 = new Vector2(prevMouseState.getX(), prevMouseState.getY());
 						final ReadOnlyVector2 p2 = new Vector2(mouseState.getX(), mouseState.getY());
-						if (selectedHousePart instanceof Roof || selectedHousePart instanceof Floor || selectedHousePart instanceof SolarPanel || selectedHousePart instanceof Sensor || selectedHousePart instanceof Tree || p1.distance(p2) > 10) {
+						if (selectedHousePart instanceof Roof || selectedHousePart instanceof Floor || selectedHousePart instanceof SolarPanel || selectedHousePart instanceof Sensor || selectedHousePart instanceof Tree || selectedHousePart instanceof Human || p1.distance(p2) > 10) {
 							firstClickState = null;
 							mouseReleased(inputStates.getCurrent().getMouseState());
 						}
@@ -950,6 +951,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			setGridsVisible(true);
 		} else if (operation == Operation.DRAW_PINE) {
 			drawn = new Tree(Tree.PINE);
+			setGridsVisible(true);
+		} else if (operation == Operation.DRAW_JANE) {
+			drawn = new Human(Human.JANE);
+			setGridsVisible(true);
+		} else if (operation == Operation.DRAW_JENNY) {
+			drawn = new Human(Human.JENNY);
+			setGridsVisible(true);
+		} else if (operation == Operation.DRAW_JACK) {
+			drawn = new Human(Human.JACK);
+			setGridsVisible(true);
+		} else if (operation == Operation.DRAW_JOHN) {
+			drawn = new Human(Human.JOHN);
 			setGridsVisible(true);
 		} else
 			return null;

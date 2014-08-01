@@ -8,6 +8,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 
@@ -28,7 +29,7 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 		orgPoints = new ArrayList<Vector3>(housePart.getPoints().size());
 		for (final Vector3 p : housePart.getPoints())
 			orgPoints.add(p.clone());
-		this.editPoint = housePart.getEditPoint();
+		editPoint = housePart.getEditPoint();
 	}
 
 	// for action logging
@@ -60,6 +61,8 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	public String getPresentationName() {
 		if (housePart instanceof Tree)
 			return "Move " + ((Tree) housePart).getTreeName();
+		if (housePart instanceof Human)
+			return "Move " + ((Human) housePart).getHumanName();
 		return "Edit " + housePart.getClass().getSimpleName();
 	}
 
@@ -69,11 +72,11 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	}
 
 	public void saveNewPoints() {
-//		if (newPoints == null) {
-			newHeight = housePart.getHeight();
-			newPoints = new ArrayList<Vector3>(housePart.getPoints().size());
-			for (final Vector3 p : housePart.getPoints())
-				newPoints.add(p.clone());
-//		}
+		// if (newPoints == null) {
+		newHeight = housePart.getHeight();
+		newPoints = new ArrayList<Vector3>(housePart.getPoints().size());
+		for (final Vector3 p : housePart.getPoints())
+			newPoints.add(p.clone());
+		// }
 	}
 }

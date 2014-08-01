@@ -22,6 +22,7 @@ import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Snap;
@@ -178,7 +179,7 @@ public class Scene implements Serializable {
 			@Override
 			public Object call() throws Exception {
 				initSceneNow();
-				instance.redrawAllNow();	// needed in case Heliodon is on and needs to be drawn with correct size
+				instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
 				initEnergy();
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				return null;
@@ -500,7 +501,11 @@ public class Scene implements Serializable {
 
 	private void addTree(final HousePart housePart) {
 		System.out.println("Adding: " + housePart);
-		(housePart instanceof Tree ? treesRoot : originalHouseRoot).attachChild(housePart.getRoot());
+		if (housePart instanceof Tree || housePart instanceof Human) {
+			treesRoot.attachChild(housePart.getRoot());
+		} else {
+			originalHouseRoot.attachChild(housePart.getRoot());
+		}
 		parts.add(housePart);
 		for (final HousePart child : housePart.getChildren())
 			addTree(child);
