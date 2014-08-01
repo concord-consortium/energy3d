@@ -10,23 +10,17 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.TestFunction;
-import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.extension.BillboardNode;
 import com.ardor3d.scenegraph.extension.BillboardNode.BillboardAlignment;
-import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.shape.Quad;
 
 public class Human extends HousePart {
-
 	private static final long serialVersionUID = 1L;
 	public static final int JANE = 0;
 	public static final int JENNY = 1;
 	public static final int JACK = 2;
 	public static final int JOHN = 3;
 	private transient BillboardNode billboard;
-	private transient Node collisionRoot;
 	private final int humanType;
 
 	public Human(final int humanType) {
@@ -67,7 +61,7 @@ public class Human extends HousePart {
 		mesh.updateModelBound();
 		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
 		mesh.setTranslation(0, width / 2, height / 2 + 1); // foundation height = 1
-		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		mesh.setUserData(new UserData(this, 0, true));
 
 		final BlendState bs = new BlendState();
 		bs.setEnabled(true);
@@ -83,15 +77,7 @@ public class Human extends HousePart {
 		billboard.attachChild(mesh);
 		root.attachChild(billboard);
 
-		collisionRoot = new Node("Tree Collision Root");
-		if (points.size() > 0)
-			collisionRoot.setTranslation(getAbsPoint(0));
-		collisionRoot.updateWorldBound(true);
-		collisionRoot.getSceneHints().setCullHint(CullHint.Always);
-		root.attachChild(collisionRoot);
-
 		updateTextureAndColor();
-
 	}
 
 	@Override
@@ -130,10 +116,8 @@ public class Human extends HousePart {
 	@Override
 	protected void drawMesh() {
 		billboard.setTranslation(getAbsPoint(0));
-		collisionRoot.setTranslation(getAbsPoint(0));
 		final double scale = 1 / (Scene.getInstance().getAnnotationScale() / 0.2);
 		billboard.setScale(scale);
-		collisionRoot.setScale(scale);
 	}
 
 	@Override
@@ -155,12 +139,6 @@ public class Human extends HousePart {
 	@Override
 	public void updateTextureAndColor() {
 		updateTextureAndColor(mesh, Scene.getInstance().getWallColor(), TextureMode.Full);
-	}
-
-	@Override
-	public Spatial getCollisionSpatial() {
-		collisionRoot.updateWorldBound(true);
-		return collisionRoot;
 	}
 
 	public int getHumanType() {
