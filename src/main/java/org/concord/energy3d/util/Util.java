@@ -275,6 +275,20 @@ public class Util {
 		}
 	}
 
+	/** return the file name of this path */
+	public static String getFileName(String path) {
+		if (path == null)
+			return null;
+		int i = path.lastIndexOf("/");
+		if (i == -1)
+			i = path.lastIndexOf("\\");
+		if (i == -1)
+			i = path.lastIndexOf(System.getProperty("file.separator"));
+		if (i == -1)
+			return path;
+		return path.substring(i + 1, path.length());
+	}
+
 	/** This method sets the selection state of a button visually without invoking its ItemListeners and ActionListeners */
 	public static void selectSilently(final AbstractButton button, final boolean selected) {
 		final ItemListener[] itemListeners = button.getItemListeners();

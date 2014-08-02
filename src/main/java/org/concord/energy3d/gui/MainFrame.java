@@ -21,6 +21,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
 
@@ -30,6 +32,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -41,10 +44,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.filechooser.FileFilter;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.DesignReplay;
@@ -79,6 +84,8 @@ public class MainFrame extends JFrame {
 	private static final MainFrame instance = new MainFrame();
 	private JMenuBar appMenuBar = null;
 	private JMenu fileMenu = null;
+	private int fileMenuItemCount;
+	private List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
 	private JMenuItem newMenuItem = null;
 	private JMenuItem openMenuItem = null;
 	private JMenuItem openFolderMenuItem = null;
@@ -147,7 +154,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem specificationsMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
-	private final JFileChooser fileChooser;
+	private final FileChooser fileChooser;
 	private final JColorChooser colorChooser;
 	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
@@ -155,7 +162,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem keepHeatmapOnMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
 
-	private static class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
+	private static class ExtensionFileFilter extends FileFilter {
 		String description;
 		String extensions[];
 
@@ -226,6 +233,10 @@ public class MainFrame extends JFrame {
 		fileChooser = new FileChooser(directoryPath);
 		if (!Config.isWebStart() && directoryPath == null)
 			fileChooser.setCurrentDirectory(new File(System.getProperties().getProperty("user.dir")));
+		fileChooser.addRecentFile(pref.get("Recent File 0", null));
+		fileChooser.addRecentFile(pref.get("Recent File 1", null));
+		fileChooser.addRecentFile(pref.get("Recent File 2", null));
+		fileChooser.addRecentFile(pref.get("Recent File 3", null));
 
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		fileChooser.addChoosableFileFilter(ng3Filter);
@@ -331,33 +342,74 @@ public class MainFrame extends JFrame {
 				@Override
 				public void menuSelected(final MenuEvent e) {
 					MainFrame.getInstance().deselect();
+					if (!recentFileMenuItems.isEmpty()) {
+						for (JComponent x : recentFileMenuItems)
+							fileMenu.remove(x);
+					}
+					String[] recentFiles = fileChooser.getRecentFiles();
+					if (recentFiles != null) {
+						int n = recentFiles.length;
+						if (n > 0) {
+							for (int i = 0; i < n; i++) {
+								JMenuItem x = new JMenuItem((i + 1) + "  " + Util.getFileName(recentFiles[i]));
+								x.setToolTipText(recentFiles[i]);
+								final File rf = new File(recentFiles[i]);
+								x.addActionListener(new ActionListener() {
+									public void actionPerformed(ActionEvent e) {
+										new Thread() {
+											@Override
+											public void run() {
+												try {
+													Scene.open(rf.toURI().toURL());
+													updateTitleBar();
+													fileChooser.rememberFile(rf.getPath());
+												} catch (final Throwable err) {
+													showUnexpectedErrorMessage(err);
+												}
+											}
+										}.start();
+									}
+								});
+								fileMenu.insert(x, fileMenuItemCount + i);
+								recentFileMenuItems.add(x);
+							}
+							JSeparator s = new JSeparator();
+							fileMenu.add(s, fileMenuItemCount + n);
+							recentFileMenuItems.add(s);
+						}
+					}
 				}
 			});
 			fileMenu.setText("File");
-			fileMenu.add(getNewMenuItem());
-			fileMenu.add(getOpenMenuItem());
-			fileMenu.add(getSaveMenuItem());
-			fileMenu.add(getSaveasMenuItem());
-			fileMenu.add(getSaveAsImageMenuItem());
-			fileMenu.addSeparator();
-			fileMenu.add(getImportMenuItem());
-			fileMenu.add(getImportColladaMenuItem());
-			fileMenu.addSeparator();
+			addItemToFileMenu(getNewMenuItem());
+			addItemToFileMenu(getOpenMenuItem());
+			addItemToFileMenu(getSaveMenuItem());
+			addItemToFileMenu(getSaveasMenuItem());
+			addItemToFileMenu(getSaveAsImageMenuItem());
+			addItemToFileMenu(new JSeparator());
+			addItemToFileMenu(getImportMenuItem());
+			addItemToFileMenu(getImportColladaMenuItem());
+			addItemToFileMenu(new JSeparator());
 			if (!Config.isRestrictMode()) {
-				fileMenu.add(getOpenFolderMenuItem());
-				fileMenu.add(getAnalyzeFolderMenuItem());
-				fileMenu.addSeparator();
+				addItemToFileMenu(getOpenFolderMenuItem());
+				addItemToFileMenu(getAnalyzeFolderMenuItem());
+				addItemToFileMenu(new JSeparator());
 			}
-			fileMenu.add(getScaleToFitRadioButtonMenuItem());
-			fileMenu.add(getExactSizeRadioButtonMenuItem());
-			fileMenu.addSeparator();
-			fileMenu.add(getPageSetupMenuItem());
-			fileMenu.add(getPreviewMenuItem());
-			fileMenu.add(getPrintMenuItem());
-			fileMenu.addSeparator();
+			addItemToFileMenu(getScaleToFitRadioButtonMenuItem());
+			addItemToFileMenu(getExactSizeRadioButtonMenuItem());
+			addItemToFileMenu(new JSeparator());
+			addItemToFileMenu(getPageSetupMenuItem());
+			addItemToFileMenu(getPreviewMenuItem());
+			addItemToFileMenu(getPrintMenuItem());
+			addItemToFileMenu(new JSeparator());
 			fileMenu.add(getExitMenuItem());
 		}
 		return fileMenu;
+	}
+
+	private void addItemToFileMenu(JComponent c) {
+		fileMenu.add(c);
+		fileMenuItemCount++;
 	}
 
 	private JMenuItem getNewMenuItem() {
@@ -421,6 +473,7 @@ public class MainFrame extends JFrame {
 					try {
 						Scene.open(file.toURI().toURL());
 						updateTitleBar();
+						fileChooser.rememberFile(file.getPath());
 					} catch (final Throwable err) {
 						showUnexpectedErrorMessage(err);
 					}
@@ -1216,6 +1269,7 @@ public class MainFrame extends JFrame {
 				if (doIt) {
 					Scene.save(file.toURI().toURL(), true);
 					updateTitleBar();
+					fileChooser.rememberFile(file.getPath());
 				}
 			} catch (final Throwable err) {
 				err.printStackTrace();
@@ -1612,6 +1666,15 @@ public class MainFrame extends JFrame {
 	}
 
 	public void exit() {
+		String[] recentFiles = fileChooser.getRecentFiles();
+		if (recentFiles != null) {
+			int n = recentFiles.length;
+			if (n > 0) {
+				Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+				for (int i = 0; i < n; i++)
+					pref.put("Recent File " + i, recentFiles[n - i - 1]);
+			}
+		}
 		if (Scene.getInstance().isEdited()) {
 			final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
 			if (save == JOptionPane.YES_OPTION) {

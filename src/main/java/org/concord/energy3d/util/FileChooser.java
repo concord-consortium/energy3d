@@ -64,7 +64,8 @@ public class FileChooser extends JFileChooser {
 	}
 
 	public void addRecentFile(String fileName) {
-		recentFiles.add(fileName);
+		if (fileName != null)
+			recentFiles.add(fileName);
 	}
 
 	public String[] getRecentFiles() {
