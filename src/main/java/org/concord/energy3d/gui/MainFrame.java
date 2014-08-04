@@ -1657,6 +1657,7 @@ public class MainFrame extends JFrame {
 				public Object call() throws Exception {
 					Scene.open(new File(filename).toURI().toURL());
 					updateTitleBar();
+					fileChooser.rememberFile(filename);
 					return null;
 				}
 			});
