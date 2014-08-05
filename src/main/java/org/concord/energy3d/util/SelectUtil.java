@@ -140,8 +140,7 @@ public class SelectUtil {
 	}
 
 	public static PickedHousePart selectHousePart(final int x, final int y, final boolean edit) {
-		final PickedHousePart pickedHousePart;
-		pickedHousePart = pickPart(x, y);
+		final PickedHousePart pickedHousePart = pickPart(x, y);
 		UserData data = null;
 		if (pickedHousePart != null)
 			data = pickedHousePart.getUserData();

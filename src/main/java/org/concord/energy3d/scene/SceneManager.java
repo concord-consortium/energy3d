@@ -611,7 +611,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private void initMouse() {
 
-		if (!Config.isHeliodonMode())
+		if (!Config.isHeliodonMode()) {
+
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -622,11 +623,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						firstClickState = null;
 						mouseReleased(inputStates.getCurrent().getMouseState());
 					}
-
 				}
 			}));
 
-		if (!Config.isHeliodonMode())
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -646,6 +645,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 				}
 			}));
+
+			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.RIGHT), new TriggerAction() {
+				@Override
+				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+					mouseRightClicked(inputStates.getCurrent().getMouseState());
+				}
+			}));
+
+		}
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 			@Override
@@ -1283,6 +1291,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return cameraControl;
 	}
 
+	private void mouseRightClicked(final MouseState mouseState) {
+		if (operation == Operation.SELECT) {
+			final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
+			final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
+			selectedHousePart = pick == null ? null : pick.getHousePart();
+			System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);
+		}
+	}
+
 	private void mousePressed(final MouseState mouseState) {
 		refresh = true;
 		taskManager.update(new Callable<Object>() {
@@ -1301,7 +1318,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							selectedHousePart = pick.getHousePart();
 						if (selectedHousePart != null && selectedHousePart.isFrozen())
 							selectedHousePart = null;
-						System.out.print("Clicked on: " + pick);
+						System.out.println("Clicked on: " + pick);
 						if (pick != null && pick.isEditPoint()) {
 							cameraControl.setLeftMouseButtonEnabled(false);
 							// EnergyPanel.getInstance().cancel();
