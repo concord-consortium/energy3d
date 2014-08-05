@@ -250,17 +250,16 @@ public class MainFrame extends JFrame {
 	private void initialize() {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setTitle("Energy3D v" + Config.VERSION);
+		setTitle("Energy3D V" + Config.VERSION);
 
 		setJMenuBar(getAppMenuBar());
 		setContentPane(getMainPanel());
 
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
-		this.setSize(Math.min(pref.getInt("window_size_width", Math.max(900, MainPanel.getInstance().getAppToolbar().getPreferredSize().width)), screenSize.width), Math.min(pref.getInt("window_size_height", 600), screenSize.height));
-		this.setLocation((int) (screenSize.getWidth() - getSize().getWidth()) / 2, (int) (screenSize.getHeight() - getSize().getHeight()) / 2);
-		this.setLocation(pref.getInt("window_location_x", (int) (screenSize.getWidth() - getSize().getWidth()) / 2), pref.getInt("window_location_y", (int) (screenSize.getHeight() - getSize().getHeight()) / 2));
-		this.setLocation(MathUtils.clamp(getLocation().x, 0, screenSize.width - getSize().width), MathUtils.clamp(getLocation().y, 0, screenSize.height - getSize().height));
+		setSize(Math.min(pref.getInt("window_size_width", Math.max(900, MainPanel.getInstance().getAppToolbar().getPreferredSize().width)), screenSize.width), Math.min(pref.getInt("window_size_height", 600), screenSize.height));
+		setLocation(pref.getInt("window_location_x", (int) (screenSize.getWidth() - getSize().getWidth()) / 2), pref.getInt("window_location_y", (int) (screenSize.getHeight() - getSize().getHeight()) / 2));
+		setLocation(MathUtils.clamp(getLocation().x, 0, screenSize.width - getSize().width), MathUtils.clamp(getLocation().y, 0, screenSize.height - getSize().height));
 		final int windowState = pref.getInt("window_state", JFrame.NORMAL);
 		if ((windowState & JFrame.ICONIFIED) == 0)
 			setExtendedState(windowState);

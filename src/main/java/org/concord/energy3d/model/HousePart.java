@@ -483,10 +483,10 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void computeOrientedBoundingBox() {
-//		flattenCenter.set(0, 0, 0);
+		// flattenCenter.set(0, 0, 0);
 		final ReadOnlyVector3 center = computeOrientedBoundingBox(mesh);
 		flattenCenter.set(center);
-//		flattenCenter.set(mesh.getWorldBound().getCenter());
+		// flattenCenter.set(mesh.getWorldBound().getCenter());
 	}
 
 	protected ReadOnlyVector3 computeOrientedBoundingBox(final Mesh mesh) {
@@ -635,7 +635,7 @@ public abstract class HousePart implements Serializable {
 		if (this instanceof Tree) { // special treatment because the same mesh of a tree has two textures (shed or not)
 			final TextureState ts = new TextureState();
 			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, isFrozen());
-//			texture.setWrap(WrapMode.Clamp);
+			// texture.setWrap(WrapMode.Clamp);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
 		} else {

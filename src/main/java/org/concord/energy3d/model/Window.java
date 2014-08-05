@@ -24,9 +24,17 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
+
+	public static final int EMPTY = -1;
+	public static final int SMALL_PANES = 0;
+	public static final int MEDIUM_PANES = 1;
+	public static final int LARGE_PANES = 2;
+
 	private static final long serialVersionUID = 1L;
 	private transient BMText label1;
 	private transient Line bars;
+
+	private int style = SMALL_PANES;
 
 	public Window() {
 		super(2, 4, 30.0);
@@ -37,9 +45,9 @@ public class Window extends HousePart {
 		label1 = Annotation.makeNewLabel();
 		super.init();
 		mesh = new Mesh("Window");
-//		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
+		// mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-//		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
+		// mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.setModelBound(new BoundingBox());
 		mesh.getSceneHints().setCullHint(CullHint.Always);
 
@@ -111,37 +119,39 @@ public class Window extends HousePart {
 
 	@Override
 	protected void drawMesh() {
+
+
 		if (points.size() < 4)
 			return;
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
-//		for (int i = 0; i < points.size(); i++) {
-//			final ReadOnlyVector3 p = getAbsPoint(i);
-//			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-//		}
+		// for (int i = 0; i < points.size(); i++) {
+		// final ReadOnlyVector3 p = getAbsPoint(i);
+		// vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		// }
 		{
-		ReadOnlyVector3 p;
-		p = getAbsPoint(0);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		p = getAbsPoint(2);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		p = getAbsPoint(1);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		p = getAbsPoint(2);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		p = getAbsPoint(3);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			ReadOnlyVector3 p;
+			p = getAbsPoint(0);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = getAbsPoint(2);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = getAbsPoint(1);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = getAbsPoint(2);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = getAbsPoint(3);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 
-		final double divisionLength = 3.0;
-		if (isFrozen() || Util.isEqual(getAbsPoint(2), getAbsPoint(0)) || Util.isEqual(getAbsPoint(1), getAbsPoint(0)))
+		if (style == EMPTY || isFrozen() || Util.isEqual(getAbsPoint(2), getAbsPoint(0)) || Util.isEqual(getAbsPoint(1), getAbsPoint(0)))
 			bars.getSceneHints().setCullHint(CullHint.Always);
 		else {
+			final double divisionLength = 3.0 + style * 3.0;
 			bars.getSceneHints().setCullHint(CullHint.Inherit);
 			final Vector3 halfThickness = ((Wall) container).getThicknessNormal().multiply(0.5, null);
 			FloatBuffer barsVertices = bars.getMeshData().getVertexBuffer();
@@ -333,8 +343,17 @@ public class Window extends HousePart {
 			for (int i = 0; i < points.size(); i++)
 				points.set(i, orgPoints.get(i));
 
-//		Scene.getInstance().redrawAll();
+		// Scene.getInstance().redrawAll();
 		draw();
 		container.draw();
 	}
+
+	public void setStyle(int style) {
+		this.style = style;
+	}
+
+	public int getStyle() {
+		return style;
+	}
+
 }
