@@ -55,7 +55,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton roofButton = null;
 	private JToggleButton windowButton = null;
 	private JToggleButton platformButton = null;
-	private JToggleButton lightButton = null;
+	private JToggleButton shadowButton = null;
 	private JToggleButton spinAnimationButton = null;
 	private JToggleButton resizeButton = null;
 	private JToggleButton heliodonButton = null;
@@ -317,7 +317,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getTreeButton());
 			appToolbar.add(getTreeArrowButton());
 			appToolbar.addSeparator();
-			appToolbar.add(getLightButton());
+			appToolbar.add(getShadowButton());
 			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimButton());
 			appToolbar.add(getSolarButton());
@@ -443,21 +443,21 @@ public class MainPanel extends JPanel {
 		return platformButton;
 	}
 
-	public JToggleButton getLightButton() {
-		if (lightButton == null) {
-			lightButton = new JToggleButton();
-			lightButton.addMouseListener(refreshUponMouseExit);
-			lightButton.setIcon(new ImageIcon(getClass().getResource("icons/shadow.png")));
-			lightButton.setToolTipText("Show shadows");
-			lightButton.addActionListener(new ActionListener() {
+	public JToggleButton getShadowButton() {
+		if (shadowButton == null) {
+			shadowButton = new JToggleButton();
+			shadowButton.addMouseListener(refreshUponMouseExit);
+			shadowButton.setIcon(new ImageIcon(getClass().getResource("icons/shadow.png")));
+			shadowButton.setToolTipText("Show shadows");
+			shadowButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (mainFrame != null) {
-						mainFrame.getShadeMenuItem().setSelected(lightButton.isSelected());
-						mainFrame.getShadowMenuItem().setSelected(lightButton.isSelected());
+						// mainFrame.getShadeMenuItem().setSelected(shadowButton.isSelected()); // shading in the shadow mode doesn't look good
+						mainFrame.getShadowMenuItem().setSelected(shadowButton.isSelected());
 					} else {
-						SceneManager.getInstance().setShading(lightButton.isSelected());
-						SceneManager.getInstance().setShadow(lightButton.isSelected());
+						// SceneManager.getInstance().setShading(shadowButton.isSelected());
+						SceneManager.getInstance().setShadow(shadowButton.isSelected());
 					}
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
@@ -465,7 +465,7 @@ public class MainPanel extends JPanel {
 				}
 			});
 		}
-		return lightButton;
+		return shadowButton;
 	}
 
 	private JToggleButton getSpinAnimationButton() {
@@ -591,7 +591,7 @@ public class MainPanel extends JPanel {
 	public void setToolbarEnabled(final boolean enabled) {
 		for (final Component c : getAppToolbar().getComponents()) {
 			if (c != getPreviewButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinAnimationButton()) {
-				if (!enabled || c != getSunAnimButton() || getLightButton().isSelected() || getHeliodonButton().isSelected())
+				if (!enabled || c != getSunAnimButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected())
 					c.setEnabled(enabled);
 			}
 		}
@@ -736,7 +736,7 @@ public class MainPanel extends JPanel {
 	}
 
 	private void disableSunAnim() {
-		final boolean enableSunAnim = lightButton.isSelected() || heliodonButton.isSelected();
+		final boolean enableSunAnim = shadowButton.isSelected() || heliodonButton.isSelected();
 		sunAnimButton.setEnabled(enableSunAnim);
 		if (!enableSunAnim && sunAnimButton.isSelected()) {
 			sunAnimButton.setSelected(false);

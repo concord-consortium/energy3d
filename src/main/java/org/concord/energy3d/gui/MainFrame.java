@@ -943,7 +943,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setShadow(shadowMenuItem.isSelected());
-					Util.selectSilently(MainPanel.getInstance().getLightButton(), shadowMenuItem.isSelected());
+					Util.selectSilently(MainPanel.getInstance().getShadowButton(), shadowMenuItem.isSelected());
 				}
 			});
 		}

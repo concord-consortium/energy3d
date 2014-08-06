@@ -1092,7 +1092,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setShadow(final boolean shadow) {
-		shadowPass.setEnabled(shadow);
+		taskManager.update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				shadowPass.setEnabled(shadow);
+				root.updateWorldRenderStates(true);
+				return null;
+			}
+		});
 	}
 
 	public CameraNode getCameraNode() {
