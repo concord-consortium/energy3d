@@ -33,7 +33,6 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
@@ -65,7 +64,6 @@ public class Wall extends HousePart {
 	private transient Snap[] neighbors;
 	private transient Vector3 thicknessNormal;
 	private boolean isShortWall;
-	private ReadOnlyColorRGBA color;
 
 	public static void resetDefaultWallHeight() {
 		userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
@@ -1140,16 +1138,7 @@ public class Wall extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, color == null ? Scene.getInstance().getWallColor() : color);
-	}
-
-	/** set the custom color of this wall */
-	public void setColor(ReadOnlyColorRGBA color) {
-		this.color = color;
-	}
-
-	public ReadOnlyColorRGBA getColor() {
-		return color;
+		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getWallColor() : getColor());
 	}
 
 	public void connectedWalls() {

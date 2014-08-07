@@ -4,7 +4,11 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -14,11 +18,11 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class ChangeColorTextureCommand extends AbstractUndoableEdit {
 	private static final long serialVersionUID = 1L;
-	private final ReadOnlyColorRGBA orgFoundationColor;
-	private ReadOnlyColorRGBA orgWallColor = null;
-	private final ReadOnlyColorRGBA orgDoorColor;
-	private final ReadOnlyColorRGBA orgFloorColor;
-	private final ReadOnlyColorRGBA orgRoofColor;
+	private ReadOnlyColorRGBA orgFoundationColor;
+	private ReadOnlyColorRGBA orgWallColor;
+	private ReadOnlyColorRGBA orgDoorColor;
+	private ReadOnlyColorRGBA orgFloorColor;
+	private ReadOnlyColorRGBA orgRoofColor;
 	private final TextureMode orgTextureMode;
 	private ReadOnlyColorRGBA newFoundationColor;
 	private ReadOnlyColorRGBA newWallColor;
@@ -29,21 +33,26 @@ public class ChangeColorTextureCommand extends AbstractUndoableEdit {
 	private HousePart selectedPart;
 
 	public ChangeColorTextureCommand() {
-		selectedPart = SceneManager.getInstance().getSelectedPart();
 		orgFoundationColor = Scene.getInstance().getFoundationColor();
-
 		orgWallColor = Scene.getInstance().getWallColor();
-		if (selectedPart instanceof Wall) {
-			ReadOnlyColorRGBA c = ((Wall) selectedPart).getColor();
-			if (c != null)
-				orgWallColor = c;
-		}
-
 		orgDoorColor = Scene.getInstance().getDoorColor();
 		orgFloorColor = Scene.getInstance().getFloorColor();
 		orgRoofColor = Scene.getInstance().getRoofColor();
 		orgTextureMode = Scene.getInstance().getTextureMode();
-
+		selectedPart = SceneManager.getInstance().getSelectedPart();
+		ReadOnlyColorRGBA c = selectedPart == null ? null : selectedPart.getColor();
+		if (c != null) {
+			if (selectedPart instanceof Foundation)
+				orgFoundationColor = c;
+			else if (selectedPart instanceof Wall)
+				orgWallColor = c;
+			else if (selectedPart instanceof Door)
+				orgDoorColor = c;
+			else if (selectedPart instanceof Floor)
+				orgFloorColor = c;
+			else if (selectedPart instanceof Roof)
+				orgRoofColor = c;
+		}
 	}
 
 	@Override
@@ -51,43 +60,77 @@ public class ChangeColorTextureCommand extends AbstractUndoableEdit {
 		super.undo();
 		if (newFoundationColor == null) {
 			newFoundationColor = Scene.getInstance().getFoundationColor();
-
 			newWallColor = Scene.getInstance().getWallColor();
-			if (selectedPart instanceof Wall) {
-				ReadOnlyColorRGBA c = ((Wall) selectedPart).getColor();
-				if (c != null)
-					newWallColor = c;
-			}
-
 			newDoorColor = Scene.getInstance().getDoorColor();
 			newFloorColor = Scene.getInstance().getFloorColor();
 			newRoofColor = Scene.getInstance().getRoofColor();
 			newTextureMode = Scene.getInstance().getTextureMode();
+			ReadOnlyColorRGBA c = selectedPart == null ? null : selectedPart.getColor();
+			if (c != null) {
+				if (selectedPart instanceof Foundation)
+					newFoundationColor = c;
+				else if (selectedPart instanceof Wall)
+					newWallColor = c;
+				else if (selectedPart instanceof Door)
+					newDoorColor = c;
+				else if (selectedPart instanceof Floor)
+					newFloorColor = c;
+				else if (selectedPart instanceof Roof)
+					newRoofColor = c;
+			}
 		}
 		Scene.getInstance().setFoundationColor(orgFoundationColor);
 		setWallColor(orgWallColor);
-		Scene.getInstance().setDoorColor(orgDoorColor);
-		Scene.getInstance().setFloorColor(orgFloorColor);
-		Scene.getInstance().setRoofColor(orgRoofColor);
+		setDoorColor(orgDoorColor);
+		setFloorColor(orgFloorColor);
+		setRoofColor(orgRoofColor);
 		Scene.getInstance().setTextureMode(orgTextureMode);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setFoundationColor(newFoundationColor);
+		setFoundationColor(newFoundationColor);
 		setWallColor(newWallColor);
-		Scene.getInstance().setDoorColor(newDoorColor);
-		Scene.getInstance().setFloorColor(newFloorColor);
-		Scene.getInstance().setRoofColor(newRoofColor);
+		setDoorColor(newDoorColor);
+		setFloorColor(newFloorColor);
+		setRoofColor(newRoofColor);
 		Scene.getInstance().setTextureMode(newTextureMode);
+	}
+
+	private void setFoundationColor(ReadOnlyColorRGBA c) {
+		if (selectedPart instanceof Foundation)
+			selectedPart.setColor(c);
+		else
+			Scene.getInstance().setFoundationColor(c);
 	}
 
 	private void setWallColor(ReadOnlyColorRGBA c) {
 		if (selectedPart instanceof Wall)
-			((Wall) selectedPart).setColor(c);
+			selectedPart.setColor(c);
 		else
 			Scene.getInstance().setWallColor(c);
+	}
+
+	private void setDoorColor(ReadOnlyColorRGBA c) {
+		if (selectedPart instanceof Door)
+			selectedPart.setColor(c);
+		else
+			Scene.getInstance().setDoorColor(c);
+	}
+
+	private void setFloorColor(ReadOnlyColorRGBA c) {
+		if (selectedPart instanceof Floor)
+			selectedPart.setColor(c);
+		else
+			Scene.getInstance().setFloorColor(c);
+	}
+
+	private void setRoofColor(ReadOnlyColorRGBA c) {
+		if (selectedPart instanceof Roof)
+			selectedPart.setColor(c);
+		else
+			Scene.getInstance().setRoofColor(c);
 	}
 
 	@Override

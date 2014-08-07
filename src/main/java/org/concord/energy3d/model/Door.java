@@ -108,7 +108,7 @@ public class Door extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, Scene.getInstance().getDoorColor(), Scene.getInstance().getTextureMode() == TextureMode.None ? TextureMode.Simple : Scene.getInstance().getTextureMode());
+		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDoorColor() : getColor(), Scene.getInstance().getTextureMode() == TextureMode.None ? TextureMode.Simple : Scene.getInstance().getTextureMode());
 	}
 
 	@Override

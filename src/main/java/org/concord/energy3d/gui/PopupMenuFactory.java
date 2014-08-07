@@ -16,6 +16,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -31,6 +32,7 @@ public class PopupMenuFactory {
 
 	private static JPopupMenu popupMenuForWindow;
 	private static JPopupMenu popupMenuForWall;
+	private static JPopupMenu popupMenuForRoof;
 
 	private PopupMenuFactory() {
 	}
@@ -41,6 +43,8 @@ public class PopupMenuFactory {
 			return getPopupMenuForWindow();
 		if (selectedPart instanceof Wall)
 			return getPopupMenuForWall();
+		if (selectedPart instanceof Roof)
+			return getPopupMenuForRoof();
 		return null;
 	}
 
@@ -230,6 +234,56 @@ public class PopupMenuFactory {
 		}
 
 		return popupMenuForWall;
+
+	}
+
+	private static JPopupMenu getPopupMenuForRoof() {
+
+		if (popupMenuForRoof == null) {
+
+			popupMenuForRoof = new JPopupMenu();
+			popupMenuForRoof.setInvoker(MainPanel.getInstance().getCanvasPanel());
+
+			final JMenuItem miInfo = new JMenuItem();
+			miInfo.setEnabled(false);
+			final JMenuItem miColor = new JMenuItem("Color");
+			miColor.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Roof) {
+						MainFrame.getInstance().showColorDialogForHousePart(Operation.DRAW_ROOF_PYRAMID);
+					}
+				}
+			});
+
+			popupMenuForRoof.addPopupMenuListener(new PopupMenuListener() {
+
+				@Override
+				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null)
+						return;
+					String s = selectedPart.toString();
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1));
+				}
+
+				@Override
+				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				}
+
+				@Override
+				public void popupMenuCanceled(PopupMenuEvent e) {
+				}
+
+			});
+
+			popupMenuForRoof.add(miInfo);
+			popupMenuForRoof.add(miColor);
+
+		}
+
+		return popupMenuForRoof;
 
 	}
 

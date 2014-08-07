@@ -87,6 +87,7 @@ public abstract class HousePart implements Serializable {
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
+	private ReadOnlyColorRGBA color; // custom color
 
 	private static Map<String, Texture> cachedGrayTextures = new HashMap<String, Texture>();
 
@@ -118,6 +119,15 @@ public abstract class HousePart implements Serializable {
 
 	public static void setGridsHighlightedHousePart(final HousePart gridsHighlightedHousePart) {
 		HousePart.gridsHighlightedHousePart = gridsHighlightedHousePart;
+	}
+
+	/** set the custom color of this wall */
+	public void setColor(ReadOnlyColorRGBA color) {
+		this.color = color;
+	}
+
+	public ReadOnlyColorRGBA getColor() {
+		return color;
 	}
 
 	/* if an attribute is serializable or is not needed after deserialization then they are passed as parameters to constructor */

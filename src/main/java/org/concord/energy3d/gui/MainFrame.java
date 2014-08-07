@@ -54,8 +54,11 @@ import javax.swing.filechooser.FileFilter;
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PostProcessor;
+import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -1587,25 +1590,37 @@ public class MainFrame extends JFrame {
 				final float[] newColor = c.getComponents(null);
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				switch (operation) {
 				case DRAW_FOUNDATION:
-					Scene.getInstance().setFoundationColor(color);
+					if (selectedPart == null)
+						Scene.getInstance().setFoundationColor(color);
+					else if (selectedPart instanceof Foundation)
+						selectedPart.setColor(color);
 					break;
 				case DRAW_WALL:
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null) // set default wall color
+					if (selectedPart == null)
 						Scene.getInstance().setWallColor(color);
-					else if (selectedPart instanceof Wall) // set custom wall color
-						((Wall) selectedPart).setColor(color);
+					else if (selectedPart instanceof Wall)
+						selectedPart.setColor(color);
 					break;
 				case DRAW_DOOR:
-					Scene.getInstance().setDoorColor(color);
+					if (selectedPart == null)
+						Scene.getInstance().setDoorColor(color);
+					else if (selectedPart instanceof Door)
+						selectedPart.setColor(color);
 					break;
 				case DRAW_FLOOR:
-					Scene.getInstance().setFloorColor(color);
+					if (selectedPart == null)
+						Scene.getInstance().setFloorColor(color);
+					else if (selectedPart instanceof Floor)
+						selectedPart.setColor(color);
 					break;
 				case DRAW_ROOF_PYRAMID:
-					Scene.getInstance().setRoofColor(color);
+					if (selectedPart == null)
+						Scene.getInstance().setRoofColor(color);
+					else if (selectedPart instanceof Roof)
+						selectedPart.setColor(color);
 					break;
 				default:
 					break;

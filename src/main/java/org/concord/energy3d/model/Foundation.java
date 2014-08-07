@@ -778,7 +778,7 @@ public class Foundation extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		surroundMesh.setDefaultColor(Scene.getInstance().getTextureMode() == TextureMode.Full ? ColorRGBA.GRAY : Scene.getInstance().getFoundationColor());
+		surroundMesh.setDefaultColor(Scene.getInstance().getTextureMode() == TextureMode.Full ? ColorRGBA.GRAY : (getColor() == null ? Scene.getInstance().getFoundationColor() : getColor()));
 		updateTextureAndColor(mesh, Scene.getInstance().getFoundationColor());
 	}
 
