@@ -67,7 +67,7 @@ public class Scene implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
 	private static final Node originalHouseRoot = new Node("Original House Root");
-	private static final Node treesRoot = new Node("Trees Root");
+	private static final Node notReceivingShadowRoot = new Node("Trees Root");
 	private static final int currentVersion = 1;
 	private static Scene instance;
 	private static URL url = null;
@@ -240,14 +240,16 @@ public class Scene implements Serializable {
 	public static void initSceneNow() {
 		root.detachAllChildren();
 		originalHouseRoot.detachAllChildren();
-		treesRoot.detachAllChildren();
+		notReceivingShadowRoot.detachAllChildren();
 		root.attachChild(originalHouseRoot);
-		root.attachChild(treesRoot);
+		root.attachChild(notReceivingShadowRoot);
 
 		if (url != null) {
 			synchronized (instance.getParts()) {
-				for (final HousePart housePart : instance.getParts())
-					(housePart instanceof Tree ? treesRoot : originalHouseRoot).attachChild(housePart.getRoot());
+				for (final HousePart housePart : instance.getParts()) {
+					boolean b = housePart instanceof Tree || housePart instanceof Human;
+					(b ? notReceivingShadowRoot : originalHouseRoot).attachChild(housePart.getRoot());
+				}
 			}
 			System.out.println("done");
 			/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
@@ -492,23 +494,21 @@ public class Scene implements Serializable {
 		final HousePart container = housePart.getContainer();
 		if (container != null)
 			container.getChildren().add(housePart);
-		addTree(housePart);
-		// if (container != null)
-		// container.draw();
+		add(housePart);
 		if (redraw)
 			redrawAll();
 	}
 
-	private void addTree(final HousePart housePart) {
+	private void add(final HousePart housePart) {
 		System.out.println("Adding: " + housePart);
 		if (housePart instanceof Tree || housePart instanceof Human) {
-			treesRoot.attachChild(housePart.getRoot());
+			notReceivingShadowRoot.attachChild(housePart.getRoot());
 		} else {
 			originalHouseRoot.attachChild(housePart.getRoot());
 		}
 		parts.add(housePart);
 		for (final HousePart child : housePart.getChildren())
-			addTree(child);
+			add(child);
 	}
 
 	public void remove(final HousePart housePart, final boolean redraw) {
@@ -518,18 +518,16 @@ public class Scene implements Serializable {
 		final HousePart container = housePart.getContainer();
 		if (container != null)
 			container.getChildren().remove(housePart);
-		removeTree(housePart);
-		// if (container != null)
-		// container.draw();
+		removeChildren(housePart);
 		if (redraw)
 			redrawAll();
 	}
 
-	private void removeTree(final HousePart housePart) {
+	private void removeChildren(final HousePart housePart) {
 		System.out.println("Removing: " + housePart);
 		parts.remove(housePart); // this must happen before call to wall.delete()
 		for (final HousePart child : housePart.getChildren())
-			removeTree(child);
+			removeChildren(child);
 		// originalHouseRoot.detachChild(housePart.getRoot());
 		housePart.getRoot().removeFromParent();
 		housePart.delete();
@@ -550,8 +548,8 @@ public class Scene implements Serializable {
 		return originalHouseRoot;
 	}
 
-	public static Node getTreesRoot() {
-		return treesRoot;
+	public static Node getNotReceivingShadowRoot() {
+		return notReceivingShadowRoot;
 	}
 
 	public static URL getURL() {
