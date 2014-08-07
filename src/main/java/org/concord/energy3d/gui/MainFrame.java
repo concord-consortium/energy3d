@@ -359,18 +359,30 @@ public class MainFrame extends JFrame {
 								final File rf = new File(recentFiles[i]);
 								x.addActionListener(new ActionListener() {
 									public void actionPerformed(ActionEvent e) {
-										new Thread() {
-											@Override
-											public void run() {
-												try {
-													Scene.open(rf.toURI().toURL());
-													updateTitleBar();
-													fileChooser.rememberFile(rf.getPath());
-												} catch (final Throwable err) {
-													showUnexpectedErrorMessage(err);
+										boolean ok = false;
+										if (Scene.getInstance().isEdited()) {
+											final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+											if (save == JOptionPane.YES_OPTION) {
+												save();
+												if (!Scene.getInstance().isEdited())
+													ok = true;
+											} else if (save != JOptionPane.CANCEL_OPTION)
+												ok = true;
+										} else
+											ok = true;
+										if (ok)
+											new Thread() {
+												@Override
+												public void run() {
+													try {
+														Scene.open(rf.toURI().toURL());
+														updateTitleBar();
+														fileChooser.rememberFile(rf.getPath());
+													} catch (final Throwable err) {
+														showUnexpectedErrorMessage(err);
+													}
 												}
-											}
-										}.start();
+											}.start();
 									}
 								});
 								fileMenu.insert(x, fileMenuItemCount + i);
@@ -422,10 +434,23 @@ public class MainFrame extends JFrame {
 			newMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.newFile();
-					SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
-					SceneManager.getInstance().getCameraControl().reset();
-					updateTitleBar();
+					boolean ok = false;
+					if (Scene.getInstance().isEdited()) {
+						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+						if (save == JOptionPane.YES_OPTION) {
+							save();
+							if (!Scene.getInstance().isEdited())
+								ok = true;
+						} else if (save != JOptionPane.CANCEL_OPTION)
+							ok = true;
+					} else
+						ok = true;
+					if (ok) {
+						Scene.newFile();
+						SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+						SceneManager.getInstance().getCameraControl().reset();
+						updateTitleBar();
+					}
 				}
 			});
 		}
@@ -1628,6 +1653,7 @@ public class MainFrame extends JFrame {
 				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
 					PrintController.getInstance().restartAnimation();
+				Scene.getInstance().setEdited(true);
 			}
 		};
 		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());

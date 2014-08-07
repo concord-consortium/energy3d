@@ -663,7 +663,7 @@ public abstract class HousePart implements Serializable {
 				final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, false);
 				ts.setTexture(texture);
 				mesh.setRenderState(ts);
-				mesh.setDefaultColor(ColorRGBA.WHITE);
+				mesh.setDefaultColor(defaultColor != null ? defaultColor : ColorRGBA.WHITE);
 			}
 		}
 	}
@@ -680,7 +680,7 @@ public abstract class HousePart implements Serializable {
 				for (int x = 0; x < image.getWidth(); x++) {
 					i = (y * image.getWidth() + x) * 4;
 					alpha = data.get(i + 3);
-					if (alpha == 0) { // when it is transparent, I want to put the default color of the part
+					if (alpha == 0) { // when it is transparent, put the default color of the part
 						data.put(i, (byte) color.getRed());
 						data.put(i + 1, (byte) color.getGreen());
 						data.put(i + 2, (byte) color.getBlue());
