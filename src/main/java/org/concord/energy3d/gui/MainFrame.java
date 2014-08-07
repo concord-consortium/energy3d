@@ -46,7 +46,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
@@ -215,17 +214,6 @@ public class MainFrame extends JFrame {
 			mainPanel.setMainFrame(this);
 		}
 		return mainPanel;
-	}
-
-	public static void main(final String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				final MainFrame thisClass = new MainFrame();
-				thisClass.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-				thisClass.setVisible(true);
-			}
-		});
 	}
 
 	private MainFrame() {
@@ -1662,7 +1650,7 @@ public class MainFrame extends JFrame {
 			Scene.getInstance().setTextureMode(TextureMode.None);
 		}
 
-		final ReadOnlyColorRGBA color;
+		ReadOnlyColorRGBA color;
 		switch (operation) {
 		case DRAW_FOUNDATION:
 			color = Scene.getInstance().getFoundationColor();
@@ -1682,6 +1670,9 @@ public class MainFrame extends JFrame {
 		default:
 			color = ColorRGBA.WHITE;
 		}
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null && selectedPart.getColor() != null)
+			color = selectedPart.getColor();
 		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final JDialog colorDialog = JColorChooser.createDialog(MainFrame.this, "Select Default Color", true, colorChooser, actionListener, null);
 		colorDialog.setVisible(true);
