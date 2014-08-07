@@ -5,8 +5,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -17,20 +15,13 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.gui.PopupMenuFactory;
 import org.concord.energy3d.logger.PlayControl;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
@@ -214,7 +205,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private double buildingRotationAngleRecorded;
 
 	private ArrayList<Runnable> shutdownHooks;
-	private JPopupMenu popupMenu;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -1317,8 +1307,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			selectedHousePart = pick == null ? null : pick.getHousePart();
 			System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);
 			if (selectedHousePart != null) {
-				createPopupMenu();
-				popupMenu.show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
+				JPopupMenu popupMenu = PopupMenuFactory.getPopupMenu();
+				if (popupMenu != null)
+					popupMenu.show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
 			}
 		}
 	}
@@ -1610,137 +1601,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setRefreshOnlyMode(final boolean refreshOnlyMode) {
 		this.refreshOnlyMode = refreshOnlyMode;
-	}
-
-	// TODO: For now, just implement popup menu for configuring windows as a test
-	private void createPopupMenu() {
-
-		if (popupMenu != null)
-			return;
-
-		popupMenu = new JPopupMenu();
-
-		final JMenuItem miInfo = new JMenuItem();
-		miInfo.setEnabled(false);
-		final JMenu styleMenu = new JMenu("Style");
-
-		ButtonGroup styleButtonGroup = new ButtonGroup();
-
-		final JRadioButtonMenuItem miSmallPanes = new JRadioButtonMenuItem("Small Panes");
-		miSmallPanes.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (selectedHousePart instanceof Window) {
-					((Window) selectedHousePart).setStyle(Window.SMALL_PANES);
-					Scene.getInstance().redrawAll();
-					Scene.getInstance().setEdited(true);
-				}
-			}
-		});
-		styleButtonGroup.add(miSmallPanes);
-		styleMenu.add(miSmallPanes);
-
-		final JRadioButtonMenuItem miMediumPanes = new JRadioButtonMenuItem("Medium Panes");
-		miMediumPanes.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (selectedHousePart instanceof Window) {
-					((Window) selectedHousePart).setStyle(Window.MEDIUM_PANES);
-					Scene.getInstance().redrawAll();
-					Scene.getInstance().setEdited(true);
-				}
-			}
-		});
-		styleButtonGroup.add(miMediumPanes);
-		styleMenu.add(miMediumPanes);
-
-		final JRadioButtonMenuItem miLargePanes = new JRadioButtonMenuItem("Large Panes");
-		miLargePanes.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (selectedHousePart instanceof Window) {
-					((Window) selectedHousePart).setStyle(Window.LARGE_PANES);
-					Scene.getInstance().redrawAll();
-					Scene.getInstance().setEdited(true);
-				}
-			}
-		});
-		styleButtonGroup.add(miLargePanes);
-		styleMenu.add(miLargePanes);
-
-		final JRadioButtonMenuItem miEmpty = new JRadioButtonMenuItem("Empty");
-		miEmpty.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (selectedHousePart instanceof Window) {
-					((Window) selectedHousePart).setStyle(Window.EMPTY);
-					Scene.getInstance().redrawAll();
-					Scene.getInstance().setEdited(true);
-				}
-			}
-		});
-		styleButtonGroup.add(miEmpty);
-		styleMenu.add(miEmpty);
-
-		styleMenu.addMenuListener(new MenuListener() {
-
-			@Override
-			public void menuSelected(MenuEvent e) {
-				if (selectedHousePart instanceof Window) {
-					switch (((Window) selectedHousePart).getStyle()) {
-					case Window.SMALL_PANES:
-						miSmallPanes.setSelected(true);
-						break;
-					case Window.MEDIUM_PANES:
-						miMediumPanes.setSelected(true);
-						break;
-					case Window.LARGE_PANES:
-						miLargePanes.setSelected(true);
-						break;
-					case Window.EMPTY:
-						miEmpty.setSelected(true);
-						break;
-					}
-				}
-			}
-
-			@Override
-			public void menuDeselected(MenuEvent e) {
-			}
-
-			@Override
-			public void menuCanceled(MenuEvent e) {
-			}
-
-		});
-
-		styleMenu.add(miEmpty);
-
-		popupMenu.addPopupMenuListener(new PopupMenuListener() {
-
-			@Override
-			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-				if (selectedHousePart == null)
-					return;
-				String s = selectedHousePart.toString();
-				miInfo.setText(s.substring(0, s.indexOf(')') + 1));
-				styleMenu.setEnabled(selectedHousePart instanceof Window);
-			}
-
-			@Override
-			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-			}
-
-			@Override
-			public void popupMenuCanceled(PopupMenuEvent e) {
-			}
-
-		});
-		popupMenu.setInvoker(MainPanel.getInstance().getCanvasPanel());
-
-		popupMenu.add(miInfo);
-		popupMenu.add(styleMenu);
-
 	}
 
 }

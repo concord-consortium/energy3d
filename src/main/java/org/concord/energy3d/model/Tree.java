@@ -198,7 +198,7 @@ public class Tree extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, Scene.getInstance().getWallColor(), TextureMode.Full);
+		updateTextureAndColor(mesh, Scene.WHITE, TextureMode.Full);
 	}
 
 	@Override

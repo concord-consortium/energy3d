@@ -138,7 +138,7 @@ public class Human extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, Scene.getInstance().getWallColor(), TextureMode.Full);
+		updateTextureAndColor(mesh, Scene.WHITE, TextureMode.Full);
 	}
 
 	public int getHumanType() {

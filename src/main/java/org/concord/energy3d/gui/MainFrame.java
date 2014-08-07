@@ -56,6 +56,7 @@ import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -1578,7 +1579,7 @@ public class MainFrame extends JFrame {
 		return roofColorMenuItem;
 	}
 
-	private void showColorDialogForHousePart(final Operation operation) {
+	void showColorDialogForHousePart(final Operation operation) {
 		final ActionListener actionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -1591,7 +1592,11 @@ public class MainFrame extends JFrame {
 					Scene.getInstance().setFoundationColor(color);
 					break;
 				case DRAW_WALL:
-					Scene.getInstance().setWallColor(color);
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null) // set default wall color
+						Scene.getInstance().setWallColor(color);
+					else if (selectedPart instanceof Wall) // set custom wall color
+						((Wall) selectedPart).setColor(color);
 					break;
 				case DRAW_DOOR:
 					Scene.getInstance().setDoorColor(color);
@@ -1606,10 +1611,8 @@ public class MainFrame extends JFrame {
 					break;
 				}
 				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
-
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
 					PrintController.getInstance().restartAnimation();
-
 			}
 		};
 		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
@@ -1639,7 +1642,7 @@ public class MainFrame extends JFrame {
 			color = ColorRGBA.WHITE;
 		}
 		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
-		final JDialog colorDialog = JColorChooser.createDialog(MainFrame.this, "Select House Color", true, colorChooser, actionListener, null);
+		final JDialog colorDialog = JColorChooser.createDialog(MainFrame.this, "Select Default Color", true, colorChooser, actionListener, null);
 		colorDialog.setVisible(true);
 	}
 
