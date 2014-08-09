@@ -15,11 +15,14 @@ import com.ardor3d.scenegraph.extension.BillboardNode.BillboardAlignment;
 import com.ardor3d.scenegraph.shape.Quad;
 
 public class Human extends HousePart {
+
 	private static final long serialVersionUID = 1L;
 	public static final int JANE = 0;
-	public static final int JENNY = 1;
+	public static final int JENI = 1;
 	public static final int JACK = 2;
 	public static final int JOHN = 3;
+	public static final int JILL = 4;
+	public static final int JOSE = 5;
 	private transient BillboardNode billboard;
 	private final int humanType;
 
@@ -40,9 +43,13 @@ public class Human extends HousePart {
 			width = 2.5;
 			height = 8;
 			break;
-		case JENNY:
+		case JENI:
 			width = 3;
 			height = 9;
+			break;
+		case JILL:
+			width = 2.6;
+			height = 7;
 			break;
 		case JACK:
 			width = 2.8;
@@ -51,6 +58,10 @@ public class Human extends HousePart {
 		case JOHN:
 			width = 4;
 			height = 10;
+			break;
+		case JOSE:
+			width = 8;
+			height = 8;
 			break;
 		default:
 			width = 2.5;
@@ -125,12 +136,16 @@ public class Human extends HousePart {
 		switch (humanType) {
 		case JANE:
 			return "jane.png";
-		case JENNY:
+		case JENI:
 			return "jenny.png";
+		case JILL:
+			return "jill.png";
 		case JACK:
 			return "jack.png";
 		case JOHN:
 			return "john.png";
+		case JOSE:
+			return "jose.png";
 		default:
 			return "jane.png";
 		}
@@ -149,12 +164,16 @@ public class Human extends HousePart {
 		switch (humanType) {
 		case JANE:
 			return "Jane";
-		case JENNY:
-			return "Jenny";
+		case JENI:
+			return "Jeni";
+		case JILL:
+			return "Jill";
 		case JACK:
 			return "Jack";
 		case JOHN:
 			return "John";
+		case JOSE:
+			return "Jose";
 		default:
 			return "Unknown";
 		}

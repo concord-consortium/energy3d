@@ -135,7 +135,7 @@ public class MainPanel extends JPanel {
 		final JCheckBoxMenuItem miHipRoof1 = new JCheckBoxMenuItem("Hip Roof", new ImageIcon(getClass().getResource("icons/roof_hip.png")));
 		final JCheckBoxMenuItem miHipRoof2 = new JCheckBoxMenuItem("Hip Roof (90\u00B0 Rotation)", new ImageIcon(getClass().getResource("icons/roof_hip2.png")));
 		final JCheckBoxMenuItem miCustomRoof = new JCheckBoxMenuItem("Custom Roof", new ImageIcon(getClass().getResource("icons/roof_custom.png")));
-		final JCheckBoxMenuItem miGableRoof = new JCheckBoxMenuItem("Gable Roof", new ImageIcon(getClass().getResource("icons/roof_gable.png")));
+		final JCheckBoxMenuItem miGableRoof = new JCheckBoxMenuItem("Gable Conversion", new ImageIcon(getClass().getResource("icons/roof_gable.png")));
 		final ActionListener roofAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -172,6 +172,7 @@ public class MainPanel extends JPanel {
 		roofMenu.add(miHipRoof1);
 		roofMenu.add(miHipRoof2);
 		roofMenu.add(miCustomRoof);
+		roofMenu.addSeparator();
 		roofMenu.add(miGableRoof);
 		ButtonGroup bg = new ButtonGroup();
 		bg.add(miPyramidRoof);
@@ -227,9 +228,11 @@ public class MainPanel extends JPanel {
 		final JCheckBoxMenuItem miDoor = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
 		final JCheckBoxMenuItem miFloor = new JCheckBoxMenuItem("Floor", new ImageIcon(getClass().getResource("icons/floor.png")));
 		final JCheckBoxMenuItem miJane = new JCheckBoxMenuItem("Jane", new ImageIcon(getClass().getResource("icons/jane.png")), true);
-		final JCheckBoxMenuItem miJenny = new JCheckBoxMenuItem("Jenny", new ImageIcon(getClass().getResource("icons/jenny.png")), true);
+		final JCheckBoxMenuItem miJeni = new JCheckBoxMenuItem("Jeni", new ImageIcon(getClass().getResource("icons/jenny.png")), true);
+		final JCheckBoxMenuItem miJill = new JCheckBoxMenuItem("Jill", new ImageIcon(getClass().getResource("icons/jill.png")), true);
 		final JCheckBoxMenuItem miJack = new JCheckBoxMenuItem("Jack", new ImageIcon(getClass().getResource("icons/jack.png")), true);
 		final JCheckBoxMenuItem miJohn = new JCheckBoxMenuItem("John", new ImageIcon(getClass().getResource("icons/john.png")), true);
+		final JCheckBoxMenuItem miJose = new JCheckBoxMenuItem("Jose", new ImageIcon(getClass().getResource("icons/jose.png")), true);
 		final ActionListener miscAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -241,15 +244,21 @@ public class MainPanel extends JPanel {
 				} else if (selected == miJane) {
 					miscCommand = SceneManager.Operation.DRAW_JANE;
 					miscButton.setToolTipText("Draw Jane");
-				} else if (selected == miJenny) {
-					miscCommand = SceneManager.Operation.DRAW_JENNY;
-					miscButton.setToolTipText("Draw Jenny");
+				} else if (selected == miJeni) {
+					miscCommand = SceneManager.Operation.DRAW_JENI;
+					miscButton.setToolTipText("Draw Jeni");
+				} else if (selected == miJill) {
+					miscCommand = SceneManager.Operation.DRAW_JILL;
+					miscButton.setToolTipText("Draw Jill");
 				} else if (selected == miJack) {
 					miscCommand = SceneManager.Operation.DRAW_JACK;
 					miscButton.setToolTipText("Draw Jack");
 				} else if (selected == miJohn) {
 					miscCommand = SceneManager.Operation.DRAW_JOHN;
 					miscButton.setToolTipText("Draw John");
+				} else if (selected == miJose) {
+					miscCommand = SceneManager.Operation.DRAW_JOSE;
+					miscButton.setToolTipText("Draw Jose");
 				} else {
 					miscCommand = SceneManager.Operation.DRAW_FLOOR;
 					miscButton.setToolTipText("Draw floor");
@@ -262,23 +271,30 @@ public class MainPanel extends JPanel {
 		miDoor.addActionListener(miscAction);
 		miFloor.addActionListener(miscAction);
 		miJane.addActionListener(miscAction);
-		miJenny.addActionListener(miscAction);
+		miJeni.addActionListener(miscAction);
+		miJill.addActionListener(miscAction);
 		miJack.addActionListener(miscAction);
 		miJohn.addActionListener(miscAction);
+		miJose.addActionListener(miscAction);
 		miscMenu = new JPopupMenu();
 		miscMenu.add(miDoor);
 		miscMenu.add(miFloor);
+		miscMenu.addSeparator();
 		miscMenu.add(miJane);
-		miscMenu.add(miJenny);
+		miscMenu.add(miJeni);
+		miscMenu.add(miJill);
 		miscMenu.add(miJack);
 		miscMenu.add(miJohn);
+		miscMenu.add(miJose);
 		bg = new ButtonGroup();
 		bg.add(miDoor);
 		bg.add(miFloor);
 		bg.add(miJane);
-		bg.add(miJenny);
+		bg.add(miJeni);
+		bg.add(miJill);
 		bg.add(miJack);
 		bg.add(miJohn);
+		bg.add(miJose);
 
 		System.out.println("done");
 	}
