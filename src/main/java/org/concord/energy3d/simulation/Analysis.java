@@ -14,6 +14,7 @@ import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
@@ -75,6 +76,7 @@ public abstract class Analysis {
 			e.printStackTrace();
 		}
 		updateGraph();
+		Scene.getInstance().redrawAll();
 		return null;
 	}
 

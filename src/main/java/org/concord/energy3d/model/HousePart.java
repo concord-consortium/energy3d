@@ -74,7 +74,7 @@ public abstract class HousePart implements Serializable {
 	protected transient double orgHeight;
 	private transient boolean isPrintVertical;
 	private transient double[] solarPotential;
-	private transient double[] heatLoss;
+	transient double[] heatLoss;
 	private transient double solarPotentialToday;
 
 	protected final ArrayList<Vector3> points;

@@ -33,6 +33,7 @@ public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private transient BMText label1;
 	private transient Line bars;
+	private transient Line heatArrow;
 
 	private int style = SMALL_PANES;
 
@@ -63,6 +64,14 @@ public class Window extends HousePart {
 		Util.disablePickShadowLight(bars);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		root.attachChild(bars);
+
+		heatArrow = new Line("Heat Arrows");
+		heatArrow.setLineWidth(1);
+		heatArrow.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(heatArrow);
+		heatArrow.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
+		root.attachChild(heatArrow);
+
 	}
 
 	@Override
@@ -120,19 +129,13 @@ public class Window extends HousePart {
 	@Override
 	protected void drawMesh() {
 
-
 		if (points.size() < 4)
 			return;
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
-		// for (int i = 0; i < points.size(); i++) {
-		// final ReadOnlyVector3 p = getAbsPoint(i);
-		// vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		// }
 		{
-			ReadOnlyVector3 p;
-			p = getAbsPoint(0);
+			ReadOnlyVector3 p = getAbsPoint(0);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			p = getAbsPoint(2);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
@@ -144,7 +147,6 @@ public class Window extends HousePart {
 			p = getAbsPoint(3);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
-
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 
@@ -160,7 +162,6 @@ public class Window extends HousePart {
 			if (barsVertices.capacity() < (4 + rows + cols) * 6) {
 				barsVertices = BufferUtils.createVector3Buffer((4 + rows + cols) * 2);
 				bars.getMeshData().setVertexBuffer(barsVertices);
-				bars.getMeshData().setNormalBuffer(barsVertices);
 			} else {
 				barsVertices.rewind();
 				barsVertices.limit(barsVertices.capacity());
@@ -205,6 +206,37 @@ public class Window extends HousePart {
 			bars.getMeshData().updateVertexCount();
 			bars.updateModelBound();
 		}
+
+		heatArrow.getSceneHints().setCullHint(CullHint.Inherit);
+		FloatBuffer arrowsVertices = heatArrow.getMeshData().getVertexBuffer();
+		arrowsVertices.rewind();
+		final ReadOnlyVector3 ct = getCenter();
+		arrowsVertices.put(ct.getXf()).put(ct.getYf()).put(ct.getZf());
+		double dailyHeatLoss = 0;
+		if (heatLoss != null) {
+			for (final double x : heatLoss)
+				dailyHeatLoss += x;
+		}
+		final Vector3 p = new Vector3();
+		getFaceDirection().multiply(10 * Math.abs(dailyHeatLoss), p);
+		final Vector3 p2 = new Vector3();
+		ct.add(p, p2);
+		arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+		float arrowLength = 0.5f;
+		if (dailyHeatLoss > 0) {
+			arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+			arrowsVertices.put(p2.getXf() - arrowLength).put(p2.getYf() + arrowLength).put(p2.getZf());
+			arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+			arrowsVertices.put(p2.getXf() + arrowLength).put(p2.getYf() + arrowLength).put(p2.getZf());
+		} else {
+			arrowsVertices.put(ct.getXf()).put(ct.getYf()).put(ct.getZf());
+			arrowsVertices.put(ct.getXf() - arrowLength).put(ct.getYf() - arrowLength).put(ct.getZf());
+			arrowsVertices.put(ct.getXf()).put(ct.getYf()).put(ct.getZf());
+			arrowsVertices.put(ct.getXf() + arrowLength).put(ct.getYf() - arrowLength).put(ct.getZf());
+		}
+		heatArrow.getMeshData().updateVertexCount();
+		heatArrow.updateModelBound();
+
 	}
 
 	@Override

@@ -803,6 +803,7 @@ public class EnergyPanel extends JPanel {
 							Util.reportError(e);
 						}
 						progress(0);
+						Scene.getInstance().redrawAll();
 					} while (computeRequest);
 					thread = null;
 				}
