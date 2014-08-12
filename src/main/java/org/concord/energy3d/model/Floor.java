@@ -194,7 +194,7 @@ public class Floor extends HousePart {
 		wallUpperPoints = ((Floor) original).wallUpperPoints;
 		root.detachChild(wireframeMesh);
 		wireframeMesh = ((Floor) original).wireframeMesh.makeCopy(true);
-		wireframeMesh.setLineWidth(printWireframeThickness);
+		wireframeMesh.setLineWidth(printOutlineThickness);
 		root.attachChild(wireframeMesh);
 		super.setOriginal(original);
 	}

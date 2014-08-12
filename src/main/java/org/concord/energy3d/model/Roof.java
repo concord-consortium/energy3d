@@ -782,7 +782,7 @@ public abstract class Roof extends HousePart {
 			mesh.setUserData(new UserData(this, orgUserData.getIndex(), false));
 			roofPartsRoot.getChild(i).setUserData(originalRoof.roofPartsRoot.getChild(i).getUserData());
 			final Line wireframeMesh = (Line) ((Node) roofPartsRoot.getChild(i)).getChild(4);
-			wireframeMesh.setLineWidth(printWireframeThickness);
+			wireframeMesh.setLineWidth(printOutlineThickness);
 		}
 		drawAnnotations();
 		root.updateWorldBound(true);

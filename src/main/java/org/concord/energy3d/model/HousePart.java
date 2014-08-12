@@ -56,7 +56,7 @@ public abstract class HousePart implements Serializable {
 	private static final long serialVersionUID = 1L;
 	protected static final double SNAP_DISTANCE = 0.5;
 	protected static int printSequence;
-	protected static final float printWireframeThickness = 2f;
+	protected static final float printOutlineThickness = 2f;
 	private static HousePart gridsHighlightedHousePart;
 	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = true;
@@ -74,7 +74,7 @@ public abstract class HousePart implements Serializable {
 	protected transient double orgHeight;
 	private transient boolean isPrintVertical;
 	private transient double[] solarPotential;
-	private transient double[] heatLoss;
+	transient double[] heatLoss;
 	private transient double solarPotentialToday;
 
 	protected final ArrayList<Vector3> points;
@@ -89,7 +89,7 @@ public abstract class HousePart implements Serializable {
 	private boolean freeze;
 	private ReadOnlyColorRGBA color; // custom color
 
-	private transient Line heatArrows;
+	transient Line heatArrows;
 
 	private static Map<String, Texture> cachedGrayTextures = new HashMap<String, Texture>();
 
@@ -952,7 +952,7 @@ public abstract class HousePart implements Serializable {
 
 	}
 
-	private void drawArrow(Vector3 o, FloatBuffer arrowsVertices, double dailyHeatLoss) {
+	void drawArrow(Vector3 o, FloatBuffer arrowsVertices, double dailyHeatLoss) {
 
 		if (this instanceof Wall) {
 			Wall wall = (Wall) this;
@@ -999,4 +999,5 @@ public abstract class HousePart implements Serializable {
 		}
 
 	}
+
 }

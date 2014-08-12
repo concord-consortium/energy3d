@@ -1,5 +1,6 @@
 package org.concord.energy3d.model;
 
+import java.awt.geom.Path2D;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class Wall extends HousePart {
 	private transient Mesh surroundMesh;
 	private transient Mesh invisibleMesh;
 	private transient Mesh windowsSurroundMesh;
-	private transient Mesh wireframeMesh;
+	private transient Mesh outlineMesh;
 	private transient Roof roof;
 	private transient int visitStamp;
 	private transient Vector3 normal;
@@ -133,12 +134,12 @@ public class Wall extends HousePart {
 		windowsSurroundMesh.setModelBound(null);
 		root.attachChild(windowsSurroundMesh);
 
-		wireframeMesh = new Line("Wall (Wireframe)");
-		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
-		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-		wireframeMesh.setModelBound(new BoundingBox());
-		Util.disablePickShadowLight(wireframeMesh);
-		root.attachChild(wireframeMesh);
+		outlineMesh = new Line("Wall (Outline)");
+		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
+		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
+		outlineMesh.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(outlineMesh);
+		root.attachChild(outlineMesh);
 
 		updateTextureAndColor();
 
@@ -338,7 +339,7 @@ public class Wall extends HousePart {
 		backMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
 		surroundMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
 		windowsSurroundMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
-		wireframeMesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
+		outlineMesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
 
 		if (!isDrawable())
 			return;
@@ -363,7 +364,7 @@ public class Wall extends HousePart {
 			}
 		}
 
-		drawWireframe(wallAndWindowsPoints);
+		drawOutline(wallAndWindowsPoints);
 		drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
 		drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
@@ -376,7 +377,7 @@ public class Wall extends HousePart {
 		}
 
 		drawArrows();
-		
+
 		root.updateWorldBound(true);
 	}
 
@@ -416,24 +417,24 @@ public class Wall extends HousePart {
 			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, null, null, null);
 	}
 
-	private void drawWireframe(final List<List<Vector3>> wallAndWindowsPoints) {
+	private void drawOutline(final List<List<Vector3>> wallAndWindowsPoints) {
 		final List<Vector3> wallPolygonPoints = wallAndWindowsPoints.get(0);
-		FloatBuffer wireframeVertexBuffer = wireframeMesh.getMeshData().getVertexBuffer();
+		FloatBuffer outlineVertexBuffer = outlineMesh.getMeshData().getVertexBuffer();
 		final int requiredSize = 2 * (wallPolygonPoints.size() + (wallAndWindowsPoints.size() - 1) * 4);
-		if (wireframeVertexBuffer.capacity() / 3 < requiredSize) {
-			wireframeVertexBuffer = BufferUtils.createVector3Buffer(requiredSize);
-			wireframeMesh.getMeshData().setVertexBuffer(wireframeVertexBuffer);
+		if (outlineVertexBuffer.capacity() / 3 < requiredSize) {
+			outlineVertexBuffer = BufferUtils.createVector3Buffer(requiredSize);
+			outlineMesh.getMeshData().setVertexBuffer(outlineVertexBuffer);
 		} else {
-			wireframeVertexBuffer.rewind();
-			wireframeVertexBuffer.limit(wireframeVertexBuffer.capacity());
+			outlineVertexBuffer.rewind();
+			outlineVertexBuffer.limit(outlineVertexBuffer.capacity());
 		}
-		wireframeVertexBuffer.rewind();
+		outlineVertexBuffer.rewind();
 
 		ReadOnlyVector3 prev = wallPolygonPoints.get(wallPolygonPoints.size() - 1);
 		for (final ReadOnlyVector3 point : wallPolygonPoints) {
-			wireframeVertexBuffer.put(prev.getXf()).put(prev.getYf()).put(prev.getZf());
+			outlineVertexBuffer.put(prev.getXf()).put(prev.getYf()).put(prev.getZf());
 			prev = point;
-			wireframeVertexBuffer.put(point.getXf()).put(point.getYf()).put(point.getZf());
+			outlineVertexBuffer.put(point.getXf()).put(point.getYf()).put(point.getZf());
 		}
 
 		for (int i = 1; i < wallAndWindowsPoints.size(); i++) {
@@ -441,15 +442,15 @@ public class Wall extends HousePart {
 			prev = windowHolePoints.get(3);
 			for (int j = 0; j < 4; j++) {
 				final ReadOnlyVector3 point = windowHolePoints.get(j);
-				wireframeVertexBuffer.put(prev.getXf()).put(prev.getYf()).put(prev.getZf());
+				outlineVertexBuffer.put(prev.getXf()).put(prev.getYf()).put(prev.getZf());
 				prev = point;
-				wireframeVertexBuffer.put(point.getXf()).put(point.getYf()).put(point.getZf());
+				outlineVertexBuffer.put(point.getXf()).put(point.getYf()).put(point.getZf());
 			}
 		}
-		wireframeVertexBuffer.limit(wireframeVertexBuffer.position());
-		wireframeMesh.getMeshData().updateVertexCount();
-		wireframeMesh.updateModelBound();
-		wireframeMesh.setTranslation(getFaceDirection().multiply(0.001, null));
+		outlineVertexBuffer.limit(outlineVertexBuffer.position());
+		outlineMesh.getMeshData().updateVertexCount();
+		outlineMesh.updateModelBound();
+		outlineMesh.setTranslation(getFaceDirection().multiply(0.001, null));
 	}
 
 	public List<List<Vector3>> computeWallAndWindowPolygon(final boolean backMesh) {
@@ -1050,16 +1051,16 @@ public class Wall extends HousePart {
 		root.detachChild(backMesh);
 		root.detachChild(surroundMesh);
 		root.detachChild(windowsSurroundMesh);
-		root.detachChild(wireframeMesh);
+		root.detachChild(outlineMesh);
 		backMesh = originalWall.backMesh.makeCopy(true);
 		surroundMesh = originalWall.surroundMesh.makeCopy(true);
 		windowsSurroundMesh = originalWall.windowsSurroundMesh.makeCopy(true);
-		wireframeMesh = originalWall.wireframeMesh.makeCopy(true);
-		((Line) wireframeMesh).setLineWidth(printWireframeThickness);
+		outlineMesh = originalWall.outlineMesh.makeCopy(true);
+		((Line) outlineMesh).setLineWidth(printOutlineThickness);
 		root.attachChild(backMesh);
 		root.attachChild(surroundMesh);
 		root.attachChild(windowsSurroundMesh);
-		root.attachChild(wireframeMesh);
+		root.attachChild(outlineMesh);
 
 		final Mesh orgInvisibleMesh = originalWall.invisibleMesh;
 		invisibleMesh = orgInvisibleMesh.makeCopy(true);
@@ -1224,4 +1225,88 @@ public class Wall extends HousePart {
 	public Spatial getCollisionSpatial() {
 		return invisibleMesh;
 	}
+
+	@Override
+	void drawArrows() {
+
+		double zmax = -Double.MAX_VALUE;
+		List<Vector3> wallPolygonPoints = getWallPolygonPoints();
+		for (Vector3 a : wallPolygonPoints) {
+			if (a.getZ() > zmax)
+				zmax = a.getZ();
+		}
+
+		Path2D.Double path = new Path2D.Double();
+		path.moveTo(0, 0);
+		Vector3 v1 = new Vector3();
+		Vector3 v2 = new Vector3();
+		wallPolygonPoints.get(1).subtract(wallPolygonPoints.get(0), v1);
+		wallPolygonPoints.get(2).subtract(wallPolygonPoints.get(0), v2);
+		if (Util.isZero(v1.getX()) && Util.isZero(v2.getX())) {
+			path.moveTo(v1.getY(), v1.getZ());
+			path.lineTo(v2.getY(), v2.getZ());
+			for (int i = 3; i < wallPolygonPoints.size(); i++) {
+				wallPolygonPoints.get(i).subtract(wallPolygonPoints.get(0), v2);
+				path.lineTo(v2.getY(), v2.getZ());
+			}
+		} else if (Util.isZero(v1.getY()) && Util.isZero(v2.getY())) {
+			path.moveTo(v1.getX(), v1.getZ());
+			path.lineTo(v2.getX(), v2.getZ());
+			for (int i = 3; i < wallPolygonPoints.size(); i++) {
+				wallPolygonPoints.get(i).subtract(wallPolygonPoints.get(0), v2);
+				path.lineTo(v2.getX(), v2.getZ());
+			}
+		}
+		path.lineTo(0, 0);
+		path.closePath();
+
+		heatArrows.getSceneHints().setCullHint(CullHint.Inherit);
+		float arrowUnitArea = 2;
+
+		FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
+		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / arrowUnitArea);
+		final int rows = (int) Math.max(2, zmax / arrowUnitArea);
+		if (arrowsVertices.capacity() < rows * cols * 18) {
+			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+			heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
+		} else {
+			arrowsVertices.rewind();
+			arrowsVertices.limit(arrowsVertices.capacity());
+		}
+		arrowsVertices.rewind();
+		double dailyHeatLoss = 0;
+		if (heatLoss != null) {
+			for (final double x : heatLoss)
+				dailyHeatLoss += x;
+			dailyHeatLoss /= computeArea();
+		}
+
+		final ReadOnlyVector3 o = getAbsPoint(0);
+		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
+		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
+		Vector3 a = new Vector3();
+		double g, h;
+		for (int j = 0; j < cols; j++) {
+			h = j + 0.5;
+			for (int i = 0; i < rows; i++) {
+				g = i + 0.5;
+				a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+				a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+				a.setZ(o.getZ() + g * zmax / rows);
+				a.subtract(wallPolygonPoints.get(0), v1);
+				if (Util.isZero(v1.getX())) {
+					if (!path.contains(v1.getY(), v1.getZ()))
+						break;
+				} else if (Util.isZero(v1.getY())) {
+					if (!path.contains(v1.getX(), v1.getZ()))
+						break;
+				}
+				drawArrow(a, arrowsVertices, dailyHeatLoss);
+			}
+		}
+		heatArrows.getMeshData().updateVertexCount();
+		heatArrows.updateModelBound();
+
+	}
+
 }
