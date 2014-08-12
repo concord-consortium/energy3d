@@ -74,6 +74,11 @@ public class Door extends HousePart {
 	}
 
 	@Override
+	public ReadOnlyVector3 getFaceDirection() {
+		return container.getFaceDirection();
+	}
+
+	@Override
 	protected void drawMesh() {
 		if (points.size() < 4)
 			return;
@@ -98,7 +103,10 @@ public class Door extends HousePart {
 		textureBuffer.put(1).put(0);
 		textureBuffer.put(1).put(1);
 
+		drawArrows();
+
 		mesh.updateModelBound();
+
 	}
 
 	@Override

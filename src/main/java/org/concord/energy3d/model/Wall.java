@@ -375,6 +375,8 @@ public class Wall extends HousePart {
 			drawWindowsSurroundMesh(thicknessNormal);
 		}
 
+		drawArrows();
+		
 		root.updateWorldBound(true);
 	}
 

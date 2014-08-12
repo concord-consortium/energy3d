@@ -33,7 +33,6 @@ public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private transient BMText label1;
 	private transient Line bars;
-	private transient Line heatArrow;
 
 	private int style = SMALL_PANES;
 
@@ -64,13 +63,6 @@ public class Window extends HousePart {
 		Util.disablePickShadowLight(bars);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		root.attachChild(bars);
-
-		heatArrow = new Line("Heat Arrows");
-		heatArrow.setLineWidth(1);
-		heatArrow.setModelBound(new BoundingBox());
-		Util.disablePickShadowLight(heatArrow);
-		heatArrow.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-		root.attachChild(heatArrow);
 
 	}
 
@@ -209,67 +201,6 @@ public class Window extends HousePart {
 
 		drawArrows();
 
-	}
-
-	private void drawArrows() {
-
-		heatArrow.getSceneHints().setCullHint(CullHint.Inherit);
-		float arrowUnitArea = 2;
-
-		FloatBuffer arrowsVertices = heatArrow.getMeshData().getVertexBuffer();
-		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / arrowUnitArea);
-		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / arrowUnitArea);
-		if (arrowsVertices.capacity() < rows * cols * 18) {
-			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
-			heatArrow.getMeshData().setVertexBuffer(arrowsVertices);
-		} else {
-			arrowsVertices.rewind();
-			arrowsVertices.limit(arrowsVertices.capacity());
-		}
-		arrowsVertices.rewind();
-		double dailyHeatLoss = 0;
-		if (heatLoss != null) {
-			for (final double x : heatLoss)
-				dailyHeatLoss += x;
-		}
-
-		final ReadOnlyVector3 o = getAbsPoint(0);
-		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
-		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
-		Vector3 a = new Vector3();
-		double g, h;
-		for (int j = 0; j < cols; j++) {
-			h = j + 0.5;
-			for (int i = 0; i < rows; i++) {
-				g = i + 0.5;
-				a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
-				a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
-				a.setZ(o.getZ() + g * v.getZ() / rows + h * u.getZ() / cols);
-				drawArrow(a, arrowsVertices, dailyHeatLoss);
-			}
-		}
-		heatArrow.getMeshData().updateVertexCount();
-
-	}
-
-	private void drawArrow(Vector3 ct, FloatBuffer arrowsVertices, double dailyHeatLoss) {
-		arrowsVertices.put(ct.getXf()).put(ct.getYf()).put(ct.getZf());
-		final Vector3 p = new Vector3();
-		getFaceDirection().multiply(10 * Math.abs(dailyHeatLoss), p);
-		Vector3 p2 = new Vector3();
-		ct.add(p, p2);
-		arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-		if (dailyHeatLoss < 0)
-			p2.set(ct);
-		if (dailyHeatLoss != 0) {
-			float arrowLength = 0.5f;
-			arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-			arrowsVertices.put(p2.getXf() - arrowLength).put(p2.getYf() + arrowLength).put(p2.getZf());
-			arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-			arrowsVertices.put(p2.getXf() + arrowLength).put(p2.getYf() + arrowLength).put(p2.getZf());
-		}
-		heatArrow.getMeshData().updateVertexCount();
-		heatArrow.updateModelBound();
 	}
 
 	@Override
