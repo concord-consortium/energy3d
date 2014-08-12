@@ -953,6 +953,32 @@ public abstract class HousePart implements Serializable {
 	}
 
 	private void drawArrow(Vector3 o, FloatBuffer arrowsVertices, double dailyHeatLoss) {
+
+		if (this instanceof Wall) {
+			Wall wall = (Wall) this;
+			for (HousePart x : wall.children) {
+				if (x instanceof Window || x instanceof Door) {
+					Vector3 vo = x.toRelative(o);
+					double xmin = 2;
+					double zmin = 2;
+					double xmax = -2;
+					double zmax = -2;
+					for (Vector3 a : x.points) {
+						if (a.getX() > xmax)
+							xmax = a.getX();
+						if (a.getZ() > zmax)
+							zmax = a.getZ();
+						if (a.getX() < xmin)
+							xmin = a.getX();
+						if (a.getZ() < zmin)
+							zmin = a.getZ();
+					}
+					if (vo.getX() > xmin && vo.getZ() > zmin && vo.getX() < xmax && vo.getZ() < zmax)
+						return;
+				}
+			}
+		}
+
 		arrowsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		final Vector3 p = new Vector3();
 		getFaceDirection().multiply(100 * Math.abs(dailyHeatLoss), p);
@@ -971,6 +997,6 @@ public abstract class HousePart implements Serializable {
 			arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 			arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() - arrowLength * sin).put(p2.getZf() + arrowLength * 0.5f);
 		}
-	}
 
+	}
 }

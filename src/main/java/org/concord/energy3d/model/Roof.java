@@ -143,6 +143,7 @@ public abstract class Roof extends HousePart {
 		}
 		drawWireframe();
 		drawDashLines();
+		drawArrows();
 	}
 
 	protected void drawWalls() {
