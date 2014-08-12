@@ -207,36 +207,69 @@ public class Window extends HousePart {
 			bars.updateModelBound();
 		}
 
+		drawArrows();
+
+	}
+
+	private void drawArrows() {
+
 		heatArrow.getSceneHints().setCullHint(CullHint.Inherit);
+		float arrowUnitArea = 2;
+
 		FloatBuffer arrowsVertices = heatArrow.getMeshData().getVertexBuffer();
+		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / arrowUnitArea);
+		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / arrowUnitArea);
+		if (arrowsVertices.capacity() < rows * cols * 18) {
+			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+			heatArrow.getMeshData().setVertexBuffer(arrowsVertices);
+		} else {
+			arrowsVertices.rewind();
+			arrowsVertices.limit(arrowsVertices.capacity());
+		}
 		arrowsVertices.rewind();
-		final ReadOnlyVector3 ct = getCenter();
-		arrowsVertices.put(ct.getXf()).put(ct.getYf()).put(ct.getZf());
 		double dailyHeatLoss = 0;
 		if (heatLoss != null) {
 			for (final double x : heatLoss)
 				dailyHeatLoss += x;
 		}
+
+		final ReadOnlyVector3 o = getAbsPoint(0);
+		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
+		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
+		Vector3 a = new Vector3();
+		double g, h;
+		for (int j = 0; j < cols; j++) {
+			h = j + 0.5;
+			for (int i = 0; i < rows; i++) {
+				g = i + 0.5;
+				a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+				a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+				a.setZ(o.getZ() + g * v.getZ() / rows + h * u.getZ() / cols);
+				drawArrow(a, arrowsVertices, dailyHeatLoss);
+			}
+		}
+		heatArrow.getMeshData().updateVertexCount();
+
+	}
+
+	private void drawArrow(Vector3 ct, FloatBuffer arrowsVertices, double dailyHeatLoss) {
+		arrowsVertices.put(ct.getXf()).put(ct.getYf()).put(ct.getZf());
 		final Vector3 p = new Vector3();
 		getFaceDirection().multiply(10 * Math.abs(dailyHeatLoss), p);
-		final Vector3 p2 = new Vector3();
+		Vector3 p2 = new Vector3();
 		ct.add(p, p2);
 		arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-		float arrowLength = 0.5f;
-		if (dailyHeatLoss > 0) {
+		if (dailyHeatLoss < 0)
+			p2.set(ct);
+		if (dailyHeatLoss != 0) {
+			float arrowLength = 0.5f;
 			arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 			arrowsVertices.put(p2.getXf() - arrowLength).put(p2.getYf() + arrowLength).put(p2.getZf());
 			arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 			arrowsVertices.put(p2.getXf() + arrowLength).put(p2.getYf() + arrowLength).put(p2.getZf());
-		} else {
-			arrowsVertices.put(ct.getXf()).put(ct.getYf()).put(ct.getZf());
-			arrowsVertices.put(ct.getXf() - arrowLength).put(ct.getYf() - arrowLength).put(ct.getZf());
-			arrowsVertices.put(ct.getXf()).put(ct.getYf()).put(ct.getZf());
-			arrowsVertices.put(ct.getXf() + arrowLength).put(ct.getYf() - arrowLength).put(ct.getZf());
 		}
 		heatArrow.getMeshData().updateVertexCount();
 		heatArrow.updateModelBound();
-
 	}
 
 	@Override
