@@ -911,44 +911,52 @@ public abstract class HousePart implements Serializable {
 
 	void drawArrows() {
 
-		heatArrows.getSceneHints().setCullHint(CullHint.Inherit);
-		float arrowUnitArea = 2;
+		if (SceneManager.getInstance().isSolarColorMap()) {
 
-		FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
-		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / arrowUnitArea);
-		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / arrowUnitArea);
-		if (arrowsVertices.capacity() < rows * cols * 18) {
-			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
-			heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
-		} else {
-			arrowsVertices.rewind();
-			arrowsVertices.limit(arrowsVertices.capacity());
-		}
-		arrowsVertices.rewind();
-		double dailyHeatLoss = 0;
-		if (heatLoss != null) {
-			for (final double x : heatLoss)
-				dailyHeatLoss += x;
-			dailyHeatLoss /= computeArea();
-		}
+			heatArrows.getSceneHints().setCullHint(CullHint.Inherit);
+			float arrowUnitArea = 4;
 
-		final ReadOnlyVector3 o = getAbsPoint(0);
-		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
-		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
-		Vector3 a = new Vector3();
-		double g, h;
-		for (int j = 0; j < cols; j++) {
-			h = j + 0.5;
-			for (int i = 0; i < rows; i++) {
-				g = i + 0.5;
-				a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
-				a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
-				a.setZ(o.getZ() + g * v.getZ() / rows + h * u.getZ() / cols);
-				drawArrow(a, arrowsVertices, dailyHeatLoss);
+			FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
+			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / arrowUnitArea);
+			final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / arrowUnitArea);
+			if (arrowsVertices.capacity() < rows * cols * 18) {
+				arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+				heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
+			} else {
+				arrowsVertices.rewind();
+				arrowsVertices.limit(arrowsVertices.capacity());
 			}
+			arrowsVertices.rewind();
+			double dailyHeatLoss = 0;
+			if (heatLoss != null) {
+				for (final double x : heatLoss)
+					dailyHeatLoss += x;
+				dailyHeatLoss /= computeArea();
+			}
+
+			final ReadOnlyVector3 o = getAbsPoint(0);
+			final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
+			final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
+			Vector3 a = new Vector3();
+			double g, h;
+			for (int j = 0; j < cols; j++) {
+				h = j + 0.5;
+				for (int i = 0; i < rows; i++) {
+					g = i + 0.5;
+					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+					a.setZ(o.getZ() + g * v.getZ() / rows + h * u.getZ() / cols);
+					drawArrow(a, arrowsVertices, dailyHeatLoss);
+				}
+			}
+			heatArrows.getMeshData().updateVertexCount();
+			heatArrows.updateModelBound();
+
+		} else {
+
+			heatArrows.getSceneHints().setCullHint(CullHint.Always);
+
 		}
-		heatArrows.getMeshData().updateVertexCount();
-		heatArrows.updateModelBound();
 
 	}
 
@@ -981,7 +989,7 @@ public abstract class HousePart implements Serializable {
 
 		arrowsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		final Vector3 p = new Vector3();
-		getFaceDirection().multiply(100 * Math.abs(dailyHeatLoss), p);
+		getFaceDirection().multiply(Scene.getInstance().getHeatVectorLength() * Math.abs(dailyHeatLoss), p);
 		Vector3 p2 = new Vector3();
 		o.add(p, p2);
 		arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
@@ -990,12 +998,21 @@ public abstract class HousePart implements Serializable {
 		if (dailyHeatLoss != 0) {
 			float arrowLength = 0.5f;
 			p.normalizeLocal();
-			float cos = (float) (p.dot(Vector3.UNIT_X) * Math.signum(dailyHeatLoss));
-			float sin = (float) (p.dot(Vector3.UNIT_Y) * Math.signum(dailyHeatLoss));
-			arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-			arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() - arrowLength * sin).put(p2.getZf() - arrowLength * 0.5f);
-			arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-			arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() - arrowLength * sin).put(p2.getZf() + arrowLength * 0.5f);
+			if (this instanceof Roof) {
+				float cos = (float) (p.dot(Vector3.UNIT_X) * Math.signum(dailyHeatLoss));
+				float sin = (float) (p.dot(Vector3.UNIT_Z) * Math.signum(dailyHeatLoss));
+				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+				arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() - arrowLength * 0.5f).put(p2.getZf() - arrowLength * sin);
+				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+				arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() + arrowLength * 0.5f).put(p2.getZf() - arrowLength * sin);
+			} else {
+				float cos = (float) (p.dot(Vector3.UNIT_X) * Math.signum(dailyHeatLoss));
+				float sin = (float) (p.dot(Vector3.UNIT_Y) * Math.signum(dailyHeatLoss));
+				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+				arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() - arrowLength * sin).put(p2.getZf() - arrowLength * 0.5f);
+				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+				arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() - arrowLength * sin).put(p2.getZf() + arrowLength * 0.5f);
+			}
 		}
 
 	}

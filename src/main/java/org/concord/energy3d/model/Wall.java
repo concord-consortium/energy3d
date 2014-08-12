@@ -1229,83 +1229,91 @@ public class Wall extends HousePart {
 	@Override
 	void drawArrows() {
 
-		double zmax = -Double.MAX_VALUE;
-		List<Vector3> wallPolygonPoints = getWallPolygonPoints();
-		for (Vector3 a : wallPolygonPoints) {
-			if (a.getZ() > zmax)
-				zmax = a.getZ();
-		}
+		if (SceneManager.getInstance().isSolarColorMap()) {
 
-		Path2D.Double path = new Path2D.Double();
-		path.moveTo(0, 0);
-		Vector3 v1 = new Vector3();
-		Vector3 v2 = new Vector3();
-		wallPolygonPoints.get(1).subtract(wallPolygonPoints.get(0), v1);
-		wallPolygonPoints.get(2).subtract(wallPolygonPoints.get(0), v2);
-		if (Util.isZero(v1.getX()) && Util.isZero(v2.getX())) {
-			path.moveTo(v1.getY(), v1.getZ());
-			path.lineTo(v2.getY(), v2.getZ());
-			for (int i = 3; i < wallPolygonPoints.size(); i++) {
-				wallPolygonPoints.get(i).subtract(wallPolygonPoints.get(0), v2);
+			double zmax = -Double.MAX_VALUE;
+			List<Vector3> wallPolygonPoints = getWallPolygonPoints();
+			for (Vector3 a : wallPolygonPoints) {
+				if (a.getZ() > zmax)
+					zmax = a.getZ();
+			}
+
+			Path2D.Double path = new Path2D.Double();
+			path.moveTo(0, 0);
+			Vector3 v1 = new Vector3();
+			Vector3 v2 = new Vector3();
+			wallPolygonPoints.get(1).subtract(wallPolygonPoints.get(0), v1);
+			wallPolygonPoints.get(2).subtract(wallPolygonPoints.get(0), v2);
+			if (Util.isZero(v1.getX()) && Util.isZero(v2.getX())) {
+				path.moveTo(v1.getY(), v1.getZ());
 				path.lineTo(v2.getY(), v2.getZ());
-			}
-		} else if (Util.isZero(v1.getY()) && Util.isZero(v2.getY())) {
-			path.moveTo(v1.getX(), v1.getZ());
-			path.lineTo(v2.getX(), v2.getZ());
-			for (int i = 3; i < wallPolygonPoints.size(); i++) {
-				wallPolygonPoints.get(i).subtract(wallPolygonPoints.get(0), v2);
-				path.lineTo(v2.getX(), v2.getZ());
-			}
-		}
-		path.lineTo(0, 0);
-		path.closePath();
-
-		heatArrows.getSceneHints().setCullHint(CullHint.Inherit);
-		float arrowUnitArea = 2;
-
-		FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
-		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / arrowUnitArea);
-		final int rows = (int) Math.max(2, zmax / arrowUnitArea);
-		if (arrowsVertices.capacity() < rows * cols * 18) {
-			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
-			heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
-		} else {
-			arrowsVertices.rewind();
-			arrowsVertices.limit(arrowsVertices.capacity());
-		}
-		arrowsVertices.rewind();
-		double dailyHeatLoss = 0;
-		if (heatLoss != null) {
-			for (final double x : heatLoss)
-				dailyHeatLoss += x;
-			dailyHeatLoss /= computeArea();
-		}
-
-		final ReadOnlyVector3 o = getAbsPoint(0);
-		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
-		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
-		Vector3 a = new Vector3();
-		double g, h;
-		for (int j = 0; j < cols; j++) {
-			h = j + 0.5;
-			for (int i = 0; i < rows; i++) {
-				g = i + 0.5;
-				a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
-				a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
-				a.setZ(o.getZ() + g * zmax / rows);
-				a.subtract(wallPolygonPoints.get(0), v1);
-				if (Util.isZero(v1.getX())) {
-					if (!path.contains(v1.getY(), v1.getZ()))
-						break;
-				} else if (Util.isZero(v1.getY())) {
-					if (!path.contains(v1.getX(), v1.getZ()))
-						break;
+				for (int i = 3; i < wallPolygonPoints.size(); i++) {
+					wallPolygonPoints.get(i).subtract(wallPolygonPoints.get(0), v2);
+					path.lineTo(v2.getY(), v2.getZ());
 				}
-				drawArrow(a, arrowsVertices, dailyHeatLoss);
+			} else if (Util.isZero(v1.getY()) && Util.isZero(v2.getY())) {
+				path.moveTo(v1.getX(), v1.getZ());
+				path.lineTo(v2.getX(), v2.getZ());
+				for (int i = 3; i < wallPolygonPoints.size(); i++) {
+					wallPolygonPoints.get(i).subtract(wallPolygonPoints.get(0), v2);
+					path.lineTo(v2.getX(), v2.getZ());
+				}
 			}
+			path.lineTo(0, 0);
+			path.closePath();
+
+			heatArrows.getSceneHints().setCullHint(CullHint.Inherit);
+			float arrowUnitArea = 2;
+
+			FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
+			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / arrowUnitArea);
+			final int rows = (int) Math.max(2, zmax / arrowUnitArea);
+			if (arrowsVertices.capacity() < rows * cols * 18) {
+				arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+				heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
+			} else {
+				arrowsVertices.rewind();
+				arrowsVertices.limit(arrowsVertices.capacity());
+			}
+			arrowsVertices.rewind();
+			double dailyHeatLoss = 0;
+			if (heatLoss != null) {
+				for (final double x : heatLoss)
+					dailyHeatLoss += x;
+				dailyHeatLoss /= computeArea();
+			}
+
+			final ReadOnlyVector3 o = getAbsPoint(0);
+			final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
+			final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
+			Vector3 a = new Vector3();
+			double g, h;
+			for (int j = 0; j < cols; j++) {
+				h = j + 0.5;
+				for (int i = 0; i < rows; i++) {
+					g = i + 0.5;
+					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+					a.setZ(o.getZ() + g * zmax / rows);
+					a.subtract(wallPolygonPoints.get(0), v1);
+					if (Util.isZero(v1.getX())) {
+						if (!path.contains(v1.getY(), v1.getZ()))
+							break;
+					} else if (Util.isZero(v1.getY())) {
+						if (!path.contains(v1.getX(), v1.getZ()))
+							break;
+					}
+					drawArrow(a, arrowsVertices, dailyHeatLoss);
+				}
+			}
+			heatArrows.getMeshData().updateVertexCount();
+			heatArrows.updateModelBound();
+
+		} else {
+
+			heatArrows.getSceneHints().setCullHint(CullHint.Always);
+
 		}
-		heatArrows.getMeshData().updateVertexCount();
-		heatArrows.updateModelBound();
 
 	}
 

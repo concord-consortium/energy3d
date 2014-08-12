@@ -116,6 +116,7 @@ public class Scene implements Serializable {
 	private double solarPanelEfficiency;
 	private double windowSolarHeatGainCoefficient; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
 	private double backgroundAlbedo = 0.3;
+	private double heatVectorLength = 100;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -303,6 +304,8 @@ public class Scene implements Serializable {
 			instance.windowSolarHeatGainCoefficient = 50;
 		else if (instance.windowSolarHeatGainCoefficient < 1)
 			instance.windowSolarHeatGainCoefficient *= 100; // backward compatibility (when SHGC < 1)
+		if (instance.heatVectorLength < 0.000001)
+			instance.heatVectorLength = 100;
 		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
 		energyPanel.getWindowSHGCComboBox().setSelectedItem(Double.toString(instance.windowSolarHeatGainCoefficient));
 		SolarIrradiation.getInstance().setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
@@ -864,6 +867,14 @@ public class Scene implements Serializable {
 
 	public double getBackgroundAlbedo() {
 		return backgroundAlbedo;
+	}
+
+	public void setHeatVectorLength(double heatVectorLength) {
+		this.heatVectorLength = heatVectorLength;
+	}
+
+	public double getHeatVectorLength() {
+		return heatVectorLength;
 	}
 
 }

@@ -176,9 +176,6 @@ public abstract class Roof extends HousePart {
 				}
 			}
 		} else
-			// SceneManager.getTaskManager().update(new Callable<Object>() {
-			// @Override
-			// public Object call() throws Exception {
 			synchronized (roofPartsRoot.getChildren()) { // To avoid ConcurrentModificationException
 				for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 					final Node roofPartNode = (Node) roofPart;
@@ -211,9 +208,6 @@ public abstract class Roof extends HousePart {
 				}
 			}
 		updateDashLinesColor();
-		// return null;
-		// }
-		// });
 	}
 
 	public void updateDashLinesColor() {
@@ -302,11 +296,7 @@ public abstract class Roof extends HousePart {
 				if (currentWall.isFirstPointInserted()) {
 					walls.add(currentWall);
 					currentWall.setRoof(Roof.this);
-					final int pointIndex2;
-					if (nextSnap != null)
-						pointIndex2 = nextSnap.getSnapPointIndexOf(currentWall) + 1;
-					else
-						pointIndex2 = 0 + 1;
+					final int pointIndex2 = nextSnap != null ? nextSnap.getSnapPointIndexOf(currentWall) + 1 : 1;
 					final int pointIndex1 = pointIndex2 == 1 ? 3 : 1;
 					final Vector3 p1 = currentWall.getAbsPoint(pointIndex1);
 					final Vector3 p2 = currentWall.getAbsPoint(pointIndex2);
