@@ -984,7 +984,7 @@ public abstract class Roof extends HousePart {
 							if (b != null)
 								break;
 						}
-						if (b != null){
+						if (b != null) {
 							drawArrow(b, arrowsVertices, dailyHeatLoss);
 						}
 					} else {
