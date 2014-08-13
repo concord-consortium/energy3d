@@ -995,12 +995,15 @@ public abstract class HousePart implements Serializable {
 			p.normalizeLocal();
 			double sign = Math.signum(dailyHeatLoss);
 			if (this instanceof Roof) {
-				float cos = (float) (p.dot(Vector3.UNIT_X) * sign);
-				float sin = (float) (p.dot(Vector3.UNIT_Z) * sign);
+				float px = (float) (p.getX() * arrowLength * sign);
+				float py = (float) (p.getY() * arrowLength * sign);
+				float pz = (float) (p.getZ() * arrowLength * sign);
+				float yp = -pz;
+				float zp = py;
 				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-				arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() - arrowLength * 0.5f).put(p2.getZf() - arrowLength * sin);
+				arrowsVertices.put(p2.getXf() - px).put(p2.getYf() - py + yp * 0.25f).put(p2.getZf() - pz + zp * 0.25f);
 				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-				arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() + arrowLength * 0.5f).put(p2.getZf() - arrowLength * sin);
+				arrowsVertices.put(p2.getXf() - px).put(p2.getYf() - py - yp * 0.25f).put(p2.getZf() - pz - zp * 0.25f);
 			} else {
 				float cos = (float) (p.dot(Vector3.UNIT_X) * sign);
 				float sin = (float) (p.dot(Vector3.UNIT_Y) * sign);

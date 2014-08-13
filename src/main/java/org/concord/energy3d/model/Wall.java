@@ -1285,7 +1285,7 @@ public class Wall extends HousePart {
 			double g, h;
 			for (int j = 0; j < cols; j++) {
 				h = j + 0.5;
-				for (int i = 0; i < rows; i++) {
+				for (int i = 0; i < rows - 1; i++) {
 					g = i + 0.5;
 					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
 					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
