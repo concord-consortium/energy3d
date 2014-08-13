@@ -126,10 +126,7 @@ public class Door extends HousePart {
 
 	@Override
 	public Vector3 getAbsPoint(final int index) {
-		if (container != null)
-			return container.getRoot().getTransform().applyForward(super.getAbsPoint(index));
-		else
-			return super.getAbsPoint(index);
+		return container != null ? container.getRoot().getTransform().applyForward(super.getAbsPoint(index)) : super.getAbsPoint(index);
 	}
 
 }

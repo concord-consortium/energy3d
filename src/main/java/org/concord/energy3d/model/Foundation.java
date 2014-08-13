@@ -1,5 +1,6 @@
 package org.concord.energy3d.model;
 
+import java.awt.geom.Path2D;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -854,13 +855,39 @@ public class Foundation extends HousePart {
 			floorVertices.add(v2);
 	}
 
+	private Path2D.Double path;
+
+	public boolean insideBuilding(double x, double y, boolean init) {
+		if (init) {
+			initFloor();
+			final int n = floorVertices.size();
+			if (n <= 0 || children.size() != n) // not closed in the latter case
+				return false;
+			if (path == null)
+				path = new Path2D.Double();
+			else
+				path.reset();
+			Vector2 v = floorVertices.get(0);
+			path.moveTo(v.getX(), v.getY());
+			for (int i = 1; i < n; i++) {
+				v = floorVertices.get(i);
+				path.lineTo(v.getX(), v.getY());
+			}
+			v = floorVertices.get(0);
+			path.lineTo(v.getX(), v.getY());
+			path.closePath();
+		}
+		final int n = floorVertices.size();
+		if (n <= 0 || children.size() != n) // not closed in the latter case
+			return false;
+		return path != null ? path.contains(x, y) : false;
+	}
+
 	public double[] getBuildingGeometry() {
 
 		initFloor();
 		final int n = floorVertices.size();
-		if (n <= 0)
-			return null;
-		if (children.size() != floorVertices.size()) // not closed
+		if (n <= 0 || children.size() != n) // not closed in the latter case
 			return null;
 
 		final double scale = Scene.getInstance().getAnnotationScale();

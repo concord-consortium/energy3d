@@ -263,10 +263,7 @@ public abstract class Roof extends HousePart {
 		final double offset = 0.001;
 		final PickResults pickResults = new PrimitivePickResults();
 		PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults);
-		if (pickResults.getNumber() > 0) {
-			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(0, 0, offset, null);
-		} else
-			return null;
+		return pickResults.getNumber() > 0 ? pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(0, 0, offset, null) : null;
 	}
 
 	protected void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon) {
@@ -971,14 +968,30 @@ public abstract class Roof extends HousePart {
 			final ReadOnlyVector3 v = foundation.getAbsPoint(1).subtract(o, null);
 			Vector3 a = new Vector3();
 			double g, h;
+			boolean init = true;
 			for (int j = 0; j < cols; j++) {
 				h = j + 0.5;
 				for (int i = 0; i < rows; i++) {
 					g = i + 0.5;
 					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
 					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
-					a.setZ(o.getZ() + g * v.getZ() / rows + h * u.getZ() / cols);
-					drawArrow(a, arrowsVertices, dailyHeatLoss);
+					a.setZ(o.getZ());
+					if (foundation.insideBuilding(a.getX(), a.getY(), init)) {
+						ReadOnlyVector3 b = null;
+						for (final Spatial child : roofPartsRoot.getChildren()) {
+							final Mesh mesh = (Mesh) ((Node) child).getChild(0);
+							b = findRoofIntersection(mesh, a);
+							if (b != null)
+								break;
+						}
+						if (b != null){
+							drawArrow(b, arrowsVertices, dailyHeatLoss);
+						}
+					} else {
+						drawArrow(a, arrowsVertices, dailyHeatLoss);
+					}
+					if (init)
+						init = false;
 				}
 			}
 			heatArrows.getMeshData().updateVertexCount();

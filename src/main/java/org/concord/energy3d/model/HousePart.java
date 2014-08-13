@@ -960,7 +960,7 @@ public abstract class HousePart implements Serializable {
 
 	}
 
-	void drawArrow(Vector3 o, FloatBuffer arrowsVertices, double dailyHeatLoss) {
+	void drawArrow(ReadOnlyVector3 o, FloatBuffer arrowsVertices, double dailyHeatLoss) {
 
 		if (this instanceof Wall) {
 			Wall wall = (Wall) this;
