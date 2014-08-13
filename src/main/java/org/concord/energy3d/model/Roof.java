@@ -142,6 +142,7 @@ public abstract class Roof extends HousePart {
 				roofPartIndex++;
 			}
 		}
+		roofPartsRoot.updateWorldBound(true);
 		drawOutline();
 		drawDashLines();
 		drawArrows();
@@ -948,14 +949,8 @@ public abstract class Roof extends HousePart {
 			Foundation foundation = getTopContainer();
 			final int cols = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(2)) / arrowUnitArea);
 			final int rows = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(1)) / arrowUnitArea);
-			if (arrowsVertices.capacity() < rows * cols * 18) {
-				arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
-				heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
-			} else {
-				arrowsVertices.rewind();
-				arrowsVertices.limit(arrowsVertices.capacity());
-			}
-			arrowsVertices.rewind();
+			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+			heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
 			double dailyHeatLoss = 0;
 			if (heatLoss != null) {
 				for (final double x : heatLoss)
@@ -978,17 +973,17 @@ public abstract class Roof extends HousePart {
 					a.setZ(o.getZ());
 					if (foundation.insideBuilding(a.getX(), a.getY(), init)) {
 						ReadOnlyVector3 b = null;
+						Node node = null;
 						for (final Spatial child : roofPartsRoot.getChildren()) {
-							final Mesh mesh = (Mesh) ((Node) child).getChild(0);
-							b = findRoofIntersection(mesh, a);
+							node = (Node) child;
+							b = findRoofIntersection((Mesh) node.getChild(0), a);
 							if (b != null)
 								break;
 						}
-						if (b != null) {
-							drawArrow(b, arrowsVertices, dailyHeatLoss);
+						if (b != null && node != null) {
+							final ReadOnlyVector3 normal = (ReadOnlyVector3) node.getUserData();
+							drawArrow(b, normal, arrowsVertices, dailyHeatLoss);
 						}
-					} else {
-						drawArrow(a, arrowsVertices, dailyHeatLoss);
 					}
 					if (init)
 						init = false;

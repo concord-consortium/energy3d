@@ -1268,14 +1268,8 @@ public class Wall extends HousePart {
 			FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
 			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / arrowUnitArea);
 			final int rows = (int) Math.max(2, zmax / arrowUnitArea);
-			if (arrowsVertices.capacity() < rows * cols * 18) {
-				arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
-				heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
-			} else {
-				arrowsVertices.rewind();
-				arrowsVertices.limit(arrowsVertices.capacity());
-			}
-			arrowsVertices.rewind();
+			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+			heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
 			double dailyHeatLoss = 0;
 			if (heatLoss != null) {
 				for (final double x : heatLoss)
@@ -1286,6 +1280,7 @@ public class Wall extends HousePart {
 			final ReadOnlyVector3 o = getAbsPoint(0);
 			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
 			final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
+			final ReadOnlyVector3 normal = getFaceDirection();
 			Vector3 a = new Vector3();
 			double g, h;
 			for (int j = 0; j < cols; j++) {
@@ -1303,7 +1298,7 @@ public class Wall extends HousePart {
 						if (!path.contains(v1.getX(), v1.getZ()))
 							break;
 					}
-					drawArrow(a, arrowsVertices, dailyHeatLoss);
+					drawArrow(a, normal, arrowsVertices, dailyHeatLoss);
 				}
 			}
 			heatArrows.getMeshData().updateVertexCount();
