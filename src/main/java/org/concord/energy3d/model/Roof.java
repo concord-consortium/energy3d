@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import javax.swing.undo.UndoManager;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -141,7 +142,7 @@ public abstract class Roof extends HousePart {
 				roofPartIndex++;
 			}
 		}
-		drawWireframe();
+		drawOutline();
 		drawDashLines();
 		drawArrows();
 	}
@@ -460,25 +461,25 @@ public abstract class Roof extends HousePart {
 		}
 	}
 
-	protected void drawWireframe() {
+	protected void drawOutline() {
 		if (container == null)
 			return;
 		synchronized (roofPartsRoot.getChildren()) {
 			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 				final Node roofPartNode = (Node) roofPart;
-				final Mesh wireframeMesh = (Mesh) roofPartNode.getChild(4);
+				final Mesh outlineMesh = (Mesh) roofPartNode.getChild(4);
 
 				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeOutline(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
 				final int totalVertices = convexHull.size();
 
 				final FloatBuffer buf;
-				if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
-					buf = wireframeMesh.getMeshData().getVertexBuffer();
+				if (outlineMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
+					buf = outlineMesh.getMeshData().getVertexBuffer();
 					buf.limit(buf.capacity());
 					buf.rewind();
 				} else {
 					buf = BufferUtils.createVector3Buffer(totalVertices * 2);
-					wireframeMesh.getMeshData().setVertexBuffer(buf);
+					outlineMesh.getMeshData().setVertexBuffer(buf);
 				}
 
 				for (int i = 0; i < convexHull.size(); i++) {
@@ -489,8 +490,8 @@ public abstract class Roof extends HousePart {
 					buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 				}
 				buf.limit(buf.position());
-				wireframeMesh.getMeshData().updateVertexCount();
-				wireframeMesh.updateModelBound();
+				outlineMesh.getMeshData().updateVertexCount();
+				outlineMesh.updateModelBound();
 			}
 		}
 	}
@@ -771,8 +772,8 @@ public abstract class Roof extends HousePart {
 			final Mesh mesh = (Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(0);
 			mesh.setUserData(new UserData(this, orgUserData.getIndex(), false));
 			roofPartsRoot.getChild(i).setUserData(originalRoof.roofPartsRoot.getChild(i).getUserData());
-			final Line wireframeMesh = (Line) ((Node) roofPartsRoot.getChild(i)).getChild(4);
-			wireframeMesh.setLineWidth(printOutlineThickness);
+			final Line outlineMesh = (Line) ((Node) roofPartsRoot.getChild(i)).getChild(4);
+			outlineMesh.setLineWidth(printOutlineThickness);
 		}
 		drawAnnotations();
 		root.updateWorldBound(true);
@@ -936,6 +937,59 @@ public abstract class Roof extends HousePart {
 	@Override
 	public Spatial getCollisionSpatial() {
 		return roofPartsRoot;
+	}
+
+	@Override
+	void drawArrows() {
+
+		if (SceneManager.getInstance().isSolarColorMap()) {
+
+			heatArrows.getSceneHints().setCullHint(CullHint.Inherit);
+			float arrowUnitArea = 2;
+
+			FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
+			Foundation foundation = getTopContainer();
+			final int cols = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(2)) / arrowUnitArea);
+			final int rows = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(1)) / arrowUnitArea);
+			if (arrowsVertices.capacity() < rows * cols * 18) {
+				arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+				heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
+			} else {
+				arrowsVertices.rewind();
+				arrowsVertices.limit(arrowsVertices.capacity());
+			}
+			arrowsVertices.rewind();
+			double dailyHeatLoss = 0;
+			if (heatLoss != null) {
+				for (final double x : heatLoss)
+					dailyHeatLoss += x;
+				dailyHeatLoss /= computeArea();
+			}
+
+			final ReadOnlyVector3 o = foundation.getAbsPoint(0);
+			final ReadOnlyVector3 u = foundation.getAbsPoint(2).subtract(o, null);
+			final ReadOnlyVector3 v = foundation.getAbsPoint(1).subtract(o, null);
+			Vector3 a = new Vector3();
+			double g, h;
+			for (int j = 0; j < cols; j++) {
+				h = j + 0.5;
+				for (int i = 0; i < rows; i++) {
+					g = i + 0.5;
+					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+					a.setZ(o.getZ() + g * v.getZ() / rows + h * u.getZ() / cols);
+					drawArrow(a, arrowsVertices, dailyHeatLoss);
+				}
+			}
+			heatArrows.getMeshData().updateVertexCount();
+			heatArrows.updateModelBound();
+
+		} else {
+
+			heatArrows.getSceneHints().setCullHint(CullHint.Always);
+
+		}
+
 	}
 
 }

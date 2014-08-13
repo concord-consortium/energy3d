@@ -24,12 +24,13 @@ import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarPanel extends HousePart {
+
 	public static final double WIDTH = 0.7;
 	public static final double HEIGHT = 1.6;
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
 	private transient double area;
-	private transient Mesh wireframeMesh;
+	private transient Mesh outlineMesh;
 	private transient Box surround;
 
 	public SolarPanel() {
@@ -55,11 +56,11 @@ public class SolarPanel extends HousePart {
 		surround.setRenderState(offset);
 		root.attachChild(surround);
 
-		wireframeMesh = new Line("SolarPanel (Wireframe)");
-		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
-		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-		wireframeMesh.setModelBound(new OrientedBoundingBox());
-		root.attachChild(wireframeMesh);
+		outlineMesh = new Line("SolarPanel (Outline)");
+		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
+		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
+		outlineMesh.setModelBound(new OrientedBoundingBox());
+		root.attachChild(outlineMesh);
 
 		updateTextureAndColor();
 	}
@@ -111,38 +112,38 @@ public class SolarPanel extends HousePart {
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
-		final FloatBuffer wireframeBuffer = wireframeMesh.getMeshData().getVertexBuffer();
+		final FloatBuffer outlineBuffer = outlineMesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
-		wireframeBuffer.rewind();
+		outlineBuffer.rewind();
 		textureBuffer.rewind();
 		int i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(0);
-		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i += 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(0).put(0);
-		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i += 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(0).put(1);
 		textureBuffer.put(0).put(1);
-		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i += 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(1);
-		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(0);
-		wireframeBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 
 		mesh.updateModelBound();
-		wireframeMesh.updateModelBound();
+		outlineMesh.updateModelBound();
 
 		mesh.setTranslation(getAbsPoint(0));
 		if (normal != null) { // FIXME: Sometimes normal is null
@@ -155,18 +156,18 @@ public class SolarPanel extends HousePart {
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
 
-		wireframeMesh.setTranslation(mesh.getTranslation());
-		wireframeMesh.setRotation(mesh.getRotation());
+		outlineMesh.setTranslation(mesh.getTranslation());
+		outlineMesh.setRotation(mesh.getRotation());
 	}
 
 	@Override
 	public boolean isDrawable() {
-		if (this.mesh.getWorldBound() == null)
+		if (mesh.getWorldBound() == null)
 			return true;
-		final OrientedBoundingBox bound = (OrientedBoundingBox) this.mesh.getWorldBound().clone(null);
+		final OrientedBoundingBox bound = (OrientedBoundingBox) mesh.getWorldBound().clone(null);
 		bound.setExtent(bound.getExtent().divide(1.1, null));
-		for (final HousePart solarPanel : container.getChildren()) {
-			if (solarPanel != this && bound.intersects(solarPanel.mesh.getWorldBound())) {
+		for (final HousePart child : container.getChildren()) {
+			if (child != this && child instanceof SolarPanel && bound.intersects(child.mesh.getWorldBound())) {
 				return false;
 			}
 		}
@@ -205,10 +206,7 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	protected HousePart getContainerRelative() {
-		if (container instanceof Wall)
-			return container;
-		else
-			return getTopContainer();
+		return container instanceof Wall ? container : getTopContainer();
 	}
 
 }

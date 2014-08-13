@@ -36,7 +36,7 @@ public class Foundation extends HousePart {
 	private transient ArrayList<Vector3> orgPoints;
 	private transient ArrayList<Vector2> floorVertices;
 	private transient Mesh boundingMesh;
-	private transient Mesh wireframeMesh;
+	private transient Mesh outlineMesh;
 	private transient Mesh surroundMesh;
 	private transient BMText buildingLabel;
 	private transient double newBoundingHeight;
@@ -104,12 +104,12 @@ public class Foundation extends HousePart {
 		boundingMesh.getSceneHints().setCullHint(CullHint.Always);
 		root.attachChild(boundingMesh);
 
-		wireframeMesh = new Line("Foundation (wireframe)");
-		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(24));
-		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-		wireframeMesh.setModelBound(new BoundingBox());
-		Util.disablePickShadowLight(wireframeMesh);
-		root.attachChild(wireframeMesh);
+		outlineMesh = new Line("Foundation (Outline)");
+		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(24));
+		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
+		outlineMesh.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(outlineMesh);
+		root.attachChild(outlineMesh);
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -483,8 +483,8 @@ public class Foundation extends HousePart {
 		if (drawable) {
 			drawTopMesh();
 			drawSurroundMesh();
-			drawWireframe(boundingMesh, points.get(7).getZf());
-			drawWireframe(wireframeMesh, (float) height);
+			drawOutline(boundingMesh, points.get(7).getZf());
+			drawOutline(outlineMesh, (float) height);
 			updateSolarLabelPosition();
 		}
 	}
@@ -580,7 +580,7 @@ public class Foundation extends HousePart {
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 	}
 
-	private void drawWireframe(final Mesh mesh, final float height) {
+	private void drawOutline(final Mesh mesh, final float height) {
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		buf.rewind();
 		final Vector3 p0 = getAbsPoint(0);
@@ -588,32 +588,32 @@ public class Foundation extends HousePart {
 		final Vector3 p2 = getAbsPoint(2);
 		final Vector3 p3 = getAbsPoint(3);
 
-		putWireframePoint(buf, p0);
-		putWireframePoint(buf, p2);
-		putWireframePoint(buf, p2);
-		putWireframePoint(buf, p3);
-		putWireframePoint(buf, p3);
-		putWireframePoint(buf, p1);
-		putWireframePoint(buf, p1);
-		putWireframePoint(buf, p0);
+		putOutlinePoint(buf, p0);
+		putOutlinePoint(buf, p2);
+		putOutlinePoint(buf, p2);
+		putOutlinePoint(buf, p3);
+		putOutlinePoint(buf, p3);
+		putOutlinePoint(buf, p1);
+		putOutlinePoint(buf, p1);
+		putOutlinePoint(buf, p0);
 
-		putWireframePoint(buf, p0, height);
-		putWireframePoint(buf, p2, height);
-		putWireframePoint(buf, p2, height);
-		putWireframePoint(buf, p3, height);
-		putWireframePoint(buf, p3, height);
-		putWireframePoint(buf, p1, height);
-		putWireframePoint(buf, p1, height);
-		putWireframePoint(buf, p0, height);
+		putOutlinePoint(buf, p0, height);
+		putOutlinePoint(buf, p2, height);
+		putOutlinePoint(buf, p2, height);
+		putOutlinePoint(buf, p3, height);
+		putOutlinePoint(buf, p3, height);
+		putOutlinePoint(buf, p1, height);
+		putOutlinePoint(buf, p1, height);
+		putOutlinePoint(buf, p0, height);
 
-		putWireframePoint(buf, p0);
-		putWireframePoint(buf, p0, height);
-		putWireframePoint(buf, p2);
-		putWireframePoint(buf, p2, height);
-		putWireframePoint(buf, p3);
-		putWireframePoint(buf, p3, height);
-		putWireframePoint(buf, p1);
-		putWireframePoint(buf, p1, height);
+		putOutlinePoint(buf, p0);
+		putOutlinePoint(buf, p0, height);
+		putOutlinePoint(buf, p2);
+		putOutlinePoint(buf, p2, height);
+		putOutlinePoint(buf, p3);
+		putOutlinePoint(buf, p3, height);
+		putOutlinePoint(buf, p1);
+		putOutlinePoint(buf, p1, height);
 
 		mesh.updateModelBound();
 	}
@@ -662,11 +662,11 @@ public class Foundation extends HousePart {
 		gridsMesh.getMeshData().setVertexBuffer(buf);
 	}
 
-	private void putWireframePoint(final FloatBuffer buf, final Vector3 p) {
-		putWireframePoint(buf, p, 0);
+	private void putOutlinePoint(final FloatBuffer buf, final Vector3 p) {
+		putOutlinePoint(buf, p, 0);
 	}
 
-	private void putWireframePoint(final FloatBuffer buf, final Vector3 p, final float height) {
+	private void putOutlinePoint(final FloatBuffer buf, final Vector3 p, final float height) {
 		buf.put(p.getXf()).put(p.getYf()).put(p.getZf() + height);
 	}
 

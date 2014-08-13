@@ -935,8 +935,8 @@ public abstract class HousePart implements Serializable {
 			}
 
 			final ReadOnlyVector3 o = getAbsPoint(0);
-			final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
-			final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
+			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
+			final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
 			Vector3 a = new Vector3();
 			double g, h;
 			for (int j = 0; j < cols; j++) {

@@ -32,7 +32,7 @@ public class Floor extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private static final OffsetState offsetState = new OffsetState();
 	private transient ArrayList<PolygonPoint> wallUpperPoints;
-	private transient Line wireframeMesh;
+	private transient Line outlineMesh;
 
 	static {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
@@ -55,12 +55,12 @@ public class Floor extends HousePart {
 		mesh.setModelBound(new BoundingBox());
 		mesh.setRenderState(offsetState);
 
-		wireframeMesh = new Line("Floor (Wireframe)");
-		wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
-		wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-		wireframeMesh.setModelBound(new BoundingBox());
-		Util.disablePickShadowLight(wireframeMesh);
-		/* no need to attach because floor wireframe is only need in print preview */
+		outlineMesh = new Line("Floor (Outline)");
+		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
+		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
+		outlineMesh.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(outlineMesh);
+		/* no need to attach because floor outline is only need in print preview */
 
 		updateTextureAndColor();
 
@@ -100,7 +100,7 @@ public class Floor extends HousePart {
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 2.0 : 10.0;
 		MeshLib.fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints), null, true, new TPoint(0, 0, 0), new TPoint(scale, 0, 0), new TPoint(0, scale, 0));
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
-		drawWireframe();
+		drawOutline();
 		points.get(0).set(toRelative(getCenter()));
 		updateEditShapes();
 	}
@@ -147,7 +147,7 @@ public class Floor extends HousePart {
 		}
 	}
 
-	protected void drawWireframe() {
+	protected void drawOutline() {
 		if (container == null)
 			return;
 
@@ -155,13 +155,13 @@ public class Floor extends HousePart {
 		final int totalVertices = convexHull.size();
 
 		final FloatBuffer buf;
-		if (wireframeMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
-			buf = wireframeMesh.getMeshData().getVertexBuffer();
+		if (outlineMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
+			buf = outlineMesh.getMeshData().getVertexBuffer();
 			buf.limit(buf.capacity());
 			buf.rewind();
 		} else {
 			buf = BufferUtils.createVector3Buffer(totalVertices * 2);
-			wireframeMesh.getMeshData().setVertexBuffer(buf);
+			outlineMesh.getMeshData().setVertexBuffer(buf);
 		}
 
 		for (int i = 0; i < convexHull.size(); i++) {
@@ -172,9 +172,9 @@ public class Floor extends HousePart {
 			buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 		}
 		buf.limit(buf.position());
-		wireframeMesh.getMeshData().updateVertexCount();
-		wireframeMesh.updateModelBound();
-		wireframeMesh.setTranslation(getFaceDirection().multiply(0.001, null));
+		outlineMesh.getMeshData().updateVertexCount();
+		outlineMesh.updateModelBound();
+		outlineMesh.setTranslation(getFaceDirection().multiply(0.001, null));
 	}
 
 	@Override
@@ -192,10 +192,10 @@ public class Floor extends HousePart {
 	@Override
 	public void setOriginal(final HousePart original) {
 		wallUpperPoints = ((Floor) original).wallUpperPoints;
-		root.detachChild(wireframeMesh);
-		wireframeMesh = ((Floor) original).wireframeMesh.makeCopy(true);
-		wireframeMesh.setLineWidth(printOutlineThickness);
-		root.attachChild(wireframeMesh);
+		root.detachChild(outlineMesh);
+		outlineMesh = ((Floor) original).outlineMesh.makeCopy(true);
+		outlineMesh.setLineWidth(printOutlineThickness);
+		root.attachChild(outlineMesh);
 		super.setOriginal(original);
 	}
 
