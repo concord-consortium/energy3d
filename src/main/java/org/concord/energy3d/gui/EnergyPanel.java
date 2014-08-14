@@ -207,7 +207,7 @@ public class EnergyPanel extends JPanel {
 		cityComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				String city = (String) cityComboBox.getSelectedItem();
+				final String city = (String) cityComboBox.getSelectedItem();
 				if (city.equals("")) {
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -333,7 +333,7 @@ public class EnergyPanel extends JPanel {
 		gbc_outsideTemperatureField.gridy = 0;
 		conditionPanel.add(outsideTemperatureField, gbc_outsideTemperatureField);
 
-		JLabel sunshineLabel = new JLabel(" Sunshine: ");
+		final JLabel sunshineLabel = new JLabel(" Sunshine: ");
 		final GridBagConstraints gbc_sunshineLabel = new GridBagConstraints();
 		gbc_sunshineLabel.gridx = 5;
 		gbc_sunshineLabel.gridy = 0;
@@ -818,20 +818,19 @@ public class EnergyPanel extends JPanel {
 			progressBar.setValue(0);
 			progressBar.setStringPainted(false);
 
-			updateWeatherData();
-			HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), (Integer) insideTemperatureSpinner.getValue());
-
-			SolarIrradiation.getInstance().compute();
-			notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Solar energy calculation completed", 0, 1));
-			updatePartEnergy();
-
-			// XIE: This needs to be called for trees to change texture when the month changes
-			synchronized (Scene.getInstance().getParts()) {
-				for (final HousePart p : Scene.getInstance().getParts())
-					if (p instanceof Tree)
-						p.updateTextureAndColor();
+			synchronized (Scene.getInstance()) {
+				updateWeatherData();
+				HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), (Integer) insideTemperatureSpinner.getValue());
+				SolarIrradiation.getInstance().compute();
+				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Solar energy calculation completed", 0, 1));
+				updatePartEnergy();
+				// XIE: This needs to be called for trees to change texture when the month changes
+				synchronized (Scene.getInstance().getParts()) {
+					for (final HousePart p : Scene.getInstance().getParts())
+						if (p instanceof Tree)
+							p.updateTextureAndColor();
+				}
 			}
-			// SceneManager.getInstance().refresh();
 
 			progressBar.setValue(100);
 
@@ -847,15 +846,15 @@ public class EnergyPanel extends JPanel {
 	}
 
 	private void updateWeatherData() {
-		String city = (String) cityComboBox.getSelectedItem();
+		final String city = (String) cityComboBox.getSelectedItem();
 		if (city.equals("")) {
 			outsideTemperatureField.setText("15\u00B0C");
 			sunshineHoursField.setText("10");
 		} else {
-			Calendar c = Heliodon.getInstance().getCalender();
+			final Calendar c = Heliodon.getInstance().getCalender();
 			outsideTemperatureField.setText(Math.round(CityData.getInstance().computeOutsideTemperature(c)) + "\u00B0C");
-			Map<String, int[]> sunshineHours = CityData.getInstance().getSunshineHours();
-			int month = c.get(Calendar.MONTH);
+			final Map<String, int[]> sunshineHours = CityData.getInstance().getSunshineHours();
+			final int month = c.get(Calendar.MONTH);
 			sunshineHoursField.setText(Math.round(sunshineHours.get(city)[month] / 30.0) + "hrs");
 		}
 	}
@@ -882,7 +881,7 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	public void setCity(String city) {
+	public void setCity(final String city) {
 		cityComboBox.setSelectedItem(city);
 		cityComboBox.repaint(); // in some cases, this must be called in order to update the view
 	}

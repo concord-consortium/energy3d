@@ -352,7 +352,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					refreshTime = -1;
 				refresh = false;
 				try {
-					frameHandler.updateFrame();
+					synchronized (Scene.getInstance()) {
+						frameHandler.updateFrame();
+					}
 				} catch (final Throwable e) {
 					e.printStackTrace();
 					if (shadowPass.isEnabled()) {
@@ -1314,7 +1316,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			selectedHousePart = pick == null ? null : pick.getHousePart();
 			System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);
 			if (selectedHousePart != null) {
-				JPopupMenu popupMenu = PopupMenuFactory.getPopupMenu();
+				final JPopupMenu popupMenu = PopupMenuFactory.getPopupMenu();
 				if (popupMenu != null)
 					popupMenu.show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
 			}
@@ -1547,7 +1549,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return heatFlowArrows;
 	}
 
-	public void setHeatFlowArrows(boolean heatFlowArrows) {
+	public void setHeatFlowArrows(final boolean heatFlowArrows) {
 		this.heatFlowArrows = heatFlowArrows;
 	}
 
