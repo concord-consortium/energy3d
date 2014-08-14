@@ -1229,7 +1229,7 @@ public class Wall extends HousePart {
 	@Override
 	void drawArrows() {
 
-		if (SceneManager.getInstance().isSolarColorMap()) {
+		if (SceneManager.getInstance().getHeatFlowArrows()) {
 
 			double zmax = -Double.MAX_VALUE;
 			List<Vector3> wallPolygonPoints = getWallPolygonPoints();
@@ -1263,7 +1263,6 @@ public class Wall extends HousePart {
 			path.closePath();
 
 			heatArrows.getSceneHints().setCullHint(CullHint.Inherit);
-			float arrowUnitArea = 2;
 
 			FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
 			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / arrowUnitArea);

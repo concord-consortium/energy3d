@@ -668,6 +668,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
+					SceneManager.getInstance().setHeatFlowArrows(solarButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});

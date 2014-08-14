@@ -940,10 +940,9 @@ public abstract class Roof extends HousePart {
 	@Override
 	void drawArrows() {
 
-		if (SceneManager.getInstance().isSolarColorMap()) {
+		if (SceneManager.getInstance().getHeatFlowArrows()) {
 
 			heatArrows.getSceneHints().setCullHint(CullHint.Inherit);
-			float arrowUnitArea = 2;
 
 			FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
 			Foundation foundation = getTopContainer();

@@ -198,6 +198,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Vector3 houseMoveStartPoint;
 	private ArrayList<Vector3> houseMovePoints;
 	private boolean solarColorMap = false;
+	private boolean heatFlowArrows = false;
 	private Spatial axes;
 	private boolean showBuildingLabels = false;
 	private Mesh sky;
@@ -1519,7 +1520,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return canvas.getCanvasRenderer().getCamera();
 	}
 
-	public boolean isSolarColorMap() {
+	public boolean getSolarColorMap() {
 		return solarColorMap;
 	}
 
@@ -1540,6 +1541,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// return null;
 		// }
 		// });
+	}
+
+	public boolean getHeatFlowArrows() {
+		return heatFlowArrows;
+	}
+
+	public void setHeatFlowArrows(boolean heatFlowArrows) {
+		this.heatFlowArrows = heatFlowArrows;
 	}
 
 	public void showAxes(final boolean b) {

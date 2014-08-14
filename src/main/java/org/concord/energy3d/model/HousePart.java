@@ -90,6 +90,7 @@ public abstract class HousePart implements Serializable {
 	private ReadOnlyColorRGBA color; // custom color
 
 	transient Line heatArrows;
+	transient static float arrowUnitArea = 2;
 
 	private static Map<String, Texture> cachedGrayTextures = new HashMap<String, Texture>();
 
@@ -659,7 +660,7 @@ public abstract class HousePart implements Serializable {
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
 		} else {
-			if (SceneManager.getInstance().isSolarColorMap()) {
+			if (SceneManager.getInstance().getSolarColorMap()) {
 				if (this.isDrawable() && (this instanceof Foundation || this instanceof Wall || this instanceof Roof))
 					SolarIrradiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getFaceDirection());
 			} else if (isFrozen()) {
@@ -911,10 +912,9 @@ public abstract class HousePart implements Serializable {
 
 	void drawArrows() {
 
-		if (SceneManager.getInstance().isSolarColorMap()) {
+		if (SceneManager.getInstance().getHeatFlowArrows()) {
 
 			heatArrows.getSceneHints().setCullHint(CullHint.Inherit);
-			float arrowUnitArea = 4;
 
 			FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
 			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / arrowUnitArea);

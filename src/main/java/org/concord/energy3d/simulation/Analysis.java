@@ -91,6 +91,7 @@ public abstract class Analysis {
 	private void onStart() {
 		EnergyPanel.getInstance().requestDisableActions(this);
 		Util.selectSilently(MainPanel.getInstance().getSolarButton(), true);
+		SceneManager.getInstance().setHeatFlowArrows(true);
 		SceneManager.getInstance().setSolarColorMapWithoutUpdate(true);
 		graph.clearData();
 		SceneManager.getInstance().getSolarLand().setVisible(true);

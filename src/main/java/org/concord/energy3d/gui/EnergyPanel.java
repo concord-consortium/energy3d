@@ -528,7 +528,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				if (!colorMapSlider.getValueIsAdjusting()) {
-					compute(SceneManager.getInstance().isSolarColorMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					compute(SceneManager.getInstance().getSolarColorMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().setEdited(true, false);
 				}
 			}
@@ -787,7 +787,7 @@ public class EnergyPanel extends JPanel {
 						cancel = false;
 						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
 						try {
-							final boolean doCompute = EnergyPanel.this.updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().isSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn));
+							final boolean doCompute = EnergyPanel.this.updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn));
 							if (doCompute) {
 								alreadyRenderedHeatmap = true;
 								computeNow();
@@ -1138,7 +1138,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void turnOffCompute() {
-		if (SceneManager.getInstance().isSolarColorMap())
+		if (SceneManager.getInstance().getSolarColorMap())
 			MainPanel.getInstance().getSolarButton().setSelected(false);
 
 		int numberOfHouses = 0;
