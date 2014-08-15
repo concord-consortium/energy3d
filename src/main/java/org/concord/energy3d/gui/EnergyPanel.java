@@ -825,18 +825,16 @@ public class EnergyPanel extends JPanel {
 			progressBar.setValue(0);
 			progressBar.setStringPainted(false);
 
-			synchronized (Scene.getInstance()) {
+			synchronized (SceneManager.getInstance()) {
 				updateWeatherData();
 				HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), (Integer) insideTemperatureSpinner.getValue());
 				SolarIrradiation.getInstance().compute();
 				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Solar energy calculation completed", 0, 1));
 				updatePartEnergy();
 				// XIE: This needs to be called for trees to change texture when the month changes
-				synchronized (Scene.getInstance().getParts()) {
-					for (final HousePart p : Scene.getInstance().getParts())
-						if (p instanceof Tree)
-							p.updateTextureAndColor();
-				}
+				for (final HousePart p : Scene.getInstance().getParts())
+					if (p instanceof Tree)
+						p.updateTextureAndColor();
 			}
 
 			progressBar.setValue(100);

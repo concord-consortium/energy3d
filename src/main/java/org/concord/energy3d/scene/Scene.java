@@ -189,53 +189,57 @@ public class Scene implements Serializable {
 	}
 
 	public static void openNow(final URL file) throws Exception {
-		Scene.url = file;
 
-		if (PrintController.getInstance().isPrintPreview()) {
-			MainPanel.getInstance().getPreviewButton().setSelected(false);
-			while (!PrintController.getInstance().isFinished())
-				Thread.yield();
+		synchronized (SceneManager.getInstance()) {
+			Scene.url = file;
+
+			if (PrintController.getInstance().isPrintPreview()) {
+				MainPanel.getInstance().getPreviewButton().setSelected(false);
+				while (!PrintController.getInstance().isFinished())
+					Thread.yield();
+			}
+
+			MainPanel.getInstance().getHeliodonButton().setSelected(false);
+			MainPanel.getInstance().getSunAnimButton().setSelected(false);
+			// MainPanel.getInstance().getSolarButton().setSelected(false);
+			SceneManager.getInstance().setSolarColorMapWithoutUpdate(false);
+			Wall.resetDefaultWallHeight();
+
+			if (url == null) {
+				instance = new Scene();
+				System.out.println("done");
+			} else {
+				System.out.print("Opening..." + file + "...");
+				final ObjectInputStream in = new ObjectInputStream(file.openStream());
+				instance = (Scene) in.readObject();
+				in.close();
+
+				for (final HousePart part : instance.parts)
+					part.getRoot();
+
+				instance.upgradeSceneToNewVersion();
+				instance.cleanup();
+				loadCameraLocation();
+			}
+
+			if (!Config.isApplet()) {
+				if (instance.textureMode == TextureMode.None)
+					MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
+				else if (instance.textureMode == TextureMode.Simple)
+					MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
+				else
+					MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
+			}
+			MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
+
+			final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
+			if (cameraControl != null)
+				cameraControl.reset();
+			SceneManager.getInstance().hideAllEditPoints();
+			EnergyPanel.getInstance().updatePartEnergy();
+			EnergyPanel.getInstance().updateCost();
 		}
 
-		MainPanel.getInstance().getHeliodonButton().setSelected(false);
-		MainPanel.getInstance().getSunAnimButton().setSelected(false);
-		// MainPanel.getInstance().getSolarButton().setSelected(false);
-		SceneManager.getInstance().setSolarColorMapWithoutUpdate(false);
-		Wall.resetDefaultWallHeight();
-
-		if (url == null) {
-			instance = new Scene();
-			System.out.println("done");
-		} else {
-			System.out.print("Opening..." + file + "...");
-			final ObjectInputStream in = new ObjectInputStream(file.openStream());
-			instance = (Scene) in.readObject();
-			in.close();
-
-			for (final HousePart part : instance.parts)
-				part.getRoot();
-
-			instance.upgradeSceneToNewVersion();
-			instance.cleanup();
-			loadCameraLocation();
-		}
-
-		if (!Config.isApplet()) {
-			if (instance.textureMode == TextureMode.None)
-				MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
-			else if (instance.textureMode == TextureMode.Simple)
-				MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
-			else
-				MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
-		}
-		MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
-
-		final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
-		if (cameraControl != null)
-			cameraControl.reset();
-		SceneManager.getInstance().hideAllEditPoints();
-		EnergyPanel.getInstance().updatePartEnergy();
-		EnergyPanel.getInstance().updateCost();
 	}
 
 	public static void initSceneNow() {

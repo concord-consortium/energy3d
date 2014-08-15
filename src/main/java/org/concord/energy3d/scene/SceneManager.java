@@ -337,7 +337,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	@Override
-	public synchronized void run() {
+	public void run() {
 		frameHandler.init();
 		long frameStartTime;
 		final long msPerFrame = 1000 / 60;
@@ -353,7 +353,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					refreshTime = -1;
 				refresh = false;
 				try {
-					synchronized (Scene.getInstance()) {
+					synchronized (this) {
 						frameHandler.updateFrame();
 					}
 				} catch (final Throwable e) {
@@ -363,8 +363,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						shadowPass.setEnabled(false);
 					}
 				}
-				synchronized (Scene.getInstance()) {
-					Scene.getInstance().notifyAll();
+				synchronized (this) {
+					notifyAll();
 				}
 			} else
 				frameHandler.getTimer().update();
@@ -1271,14 +1271,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		refresh = true;
 	}
 
-	public void refreshNow() {
-		synchronized (Scene.getInstance()) {
-			refresh = true;
-			try {
-				Scene.getInstance().wait();
-			} catch (final InterruptedException e) {
-				e.printStackTrace();
-			}
+	public synchronized void refreshNow() {
+		refresh = true;
+		try {
+			wait();
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 

@@ -37,51 +37,26 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(4, 3, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(5, 3, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
-		// set the grid size ("solar step")
-		panel.add(new JLabel("Irradiation Grid Cell Size: "));
 		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(SolarIrradiation.getInstance().getSolarStep()));
-		panel.add(cellSizeTextField);
-		cellSizeTextField.setColumns(6);
-		panel.add(new JLabel("Internal unit"));
-
-		// set the time step
-		panel.add(new JLabel("Time Step: "));
+		final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(SolarIrradiation.getInstance().getTimeStep()));
-		panel.add(timeStepTextField);
-		timeStepTextField.setColumns(6);
-		panel.add(new JLabel("Minutes"));
-
-		// choose air mass
-		panel.add(new JLabel("Air Mass: "));
-		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
-		airMassComboBox.setSelectedIndex(SolarIrradiation.getInstance().getAirMassSelection() + 1);
-		panel.add(airMassComboBox);
-		panel.add(new JLabel("Dimensionless"));
-
-		// set the ground albedo
-		panel.add(new JLabel("Background Albedo: "));
 		final JTextField albedoTextField = new JTextField(FORMAT1.format(Scene.getInstance().getBackgroundAlbedo()));
-		panel.add(albedoTextField);
-		albedoTextField.setColumns(6);
-		panel.add(new JLabel("Dimensionless [0-1]"));
+		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
 
-		final JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-
-		final JButton okButton = new JButton("OK");
-		okButton.addActionListener(new ActionListener() {
+		ActionListener okListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				double cellSize;
 				int timeStep;
 				double albedo;
+				double heatVectorLength;
 				try {
 					cellSize = Double.parseDouble(cellSizeTextField.getText());
+					heatVectorLength = Double.parseDouble(heatVectorLengthTextField.getText());
 					timeStep = (int) Double.parseDouble(timeStepTextField.getText());
 					albedo = Double.parseDouble(albedoTextField.getText());
 				} catch (final NumberFormatException err) {
@@ -92,6 +67,10 @@ class SimulationSettingsDialog extends JDialog {
 				// range check
 				if (cellSize < 0.1 || cellSize > 4) {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Cell size must be in 0.1-4.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (heatVectorLength < 1000) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Heat arrow length must be greater than 1000.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				if (timeStep < 5 || timeStep > 30) {
@@ -105,12 +84,49 @@ class SimulationSettingsDialog extends JDialog {
 				SolarIrradiation.getInstance().setSolarStep(cellSize);
 				SolarIrradiation.getInstance().setTimeStep(timeStep);
 				SolarIrradiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
+				Scene.getInstance().setHeatVectorLength(heatVectorLength);
 				Scene.getInstance().setBackgroundAlbedo(albedo);
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				SimulationSettingsDialog.this.dispose();
 			}
-		});
+		};
+
+		// set the grid size ("solar step")
+		panel.add(new JLabel("Irradiation Grid Cell Size: "));
+		panel.add(cellSizeTextField);
+		cellSizeTextField.setColumns(6);
+		panel.add(new JLabel("Internal unit"));
+
+		// set the heat arrow length
+		panel.add(new JLabel("Heat Arrow Length: "));
+		panel.add(heatVectorLengthTextField);
+		panel.add(new JLabel("Internal unit"));
+
+		// set the time step
+		panel.add(new JLabel("Time Step: "));
+		panel.add(timeStepTextField);
+		timeStepTextField.setColumns(6);
+		panel.add(new JLabel("Minutes"));
+
+		// choose air mass
+		panel.add(new JLabel("Air Mass: "));
+		airMassComboBox.setSelectedIndex(SolarIrradiation.getInstance().getAirMassSelection() + 1);
+		panel.add(airMassComboBox);
+		panel.add(new JLabel("Dimensionless"));
+
+		// set the ground albedo
+		panel.add(new JLabel("Background Albedo: "));
+		panel.add(albedoTextField);
+		albedoTextField.setColumns(6);
+		panel.add(new JLabel("Dimensionless [0-1]"));
+
+		final JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
+		final JButton okButton = new JButton("OK");
+		okButton.addActionListener(okListener);
 		okButton.setActionCommand("OK");
 		buttonPanel.add(okButton);
 		getRootPane().setDefaultButton(okButton);

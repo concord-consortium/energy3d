@@ -923,7 +923,8 @@ public abstract class HousePart implements Serializable {
 				heatArrows.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
 				int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
-				heat = heatLoss[hourOfDay * 4] / computeArea();
+				heat = heatLoss[hourOfDay * 4] + heatLoss[hourOfDay * 4 + 1] + heatLoss[hourOfDay * 4 + 2] + heatLoss[hourOfDay * 4 + 3];
+				heat /= 4 * computeArea();
 				heatArrows.setDefaultColor(ColorRGBA.WHITE);
 			}
 		}
