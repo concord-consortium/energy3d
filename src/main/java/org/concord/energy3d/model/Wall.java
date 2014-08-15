@@ -1269,39 +1269,35 @@ public class Wall extends HousePart {
 			final int rows = (int) Math.max(2, zmax / arrowUnitArea);
 			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
 			heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
-			double dailyHeatLoss = 0;
-			if (heatLoss != null) {
-				for (final double x : heatLoss)
-					dailyHeatLoss += x;
-				dailyHeatLoss /= computeArea();
-			}
-
-			final ReadOnlyVector3 o = getAbsPoint(0);
-			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
-			final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
-			final ReadOnlyVector3 normal = getFaceDirection();
-			Vector3 a = new Vector3();
-			double g, h;
-			for (int j = 0; j < cols; j++) {
-				h = j + 0.5;
-				for (int i = 0; i < rows - 1; i++) {
-					g = i + 0.5;
-					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
-					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
-					a.setZ(o.getZ() + g * zmax / rows);
-					a.subtract(wallPolygonPoints.get(0), v1);
-					if (Util.isZero(v1.getX())) {
-						if (!path.contains(v1.getY(), v1.getZ()))
-							break;
-					} else if (Util.isZero(v1.getY())) {
-						if (!path.contains(v1.getX(), v1.getZ()))
-							break;
+			double heat = calculateHeatVector();
+			if (heat != 0) {
+				final ReadOnlyVector3 o = getAbsPoint(0);
+				final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
+				final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
+				final ReadOnlyVector3 normal = getFaceDirection();
+				Vector3 a = new Vector3();
+				double g, h;
+				for (int j = 0; j < cols; j++) {
+					h = j + 0.5;
+					for (int i = 0; i < rows - 1; i++) {
+						g = i + 0.5;
+						a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+						a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+						a.setZ(o.getZ() + g * zmax / rows);
+						a.subtract(wallPolygonPoints.get(0), v1);
+						if (Util.isZero(v1.getX())) {
+							if (!path.contains(v1.getY(), v1.getZ()))
+								break;
+						} else if (Util.isZero(v1.getY())) {
+							if (!path.contains(v1.getX(), v1.getZ()))
+								break;
+						}
+						drawArrow(a, normal, arrowsVertices, heat);
 					}
-					drawArrow(a, normal, arrowsVertices, dailyHeatLoss);
 				}
+				heatArrows.getMeshData().updateVertexCount();
+				heatArrows.updateModelBound();
 			}
-			heatArrows.getMeshData().updateVertexCount();
-			heatArrows.updateModelBound();
 
 		} else {
 

@@ -950,46 +950,42 @@ public abstract class Roof extends HousePart {
 			final int rows = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(1)) / arrowUnitArea);
 			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
 			heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
-			double dailyHeatLoss = 0;
-			if (heatLoss != null) {
-				for (final double x : heatLoss)
-					dailyHeatLoss += x;
-				dailyHeatLoss /= computeArea();
-			}
-
-			final ReadOnlyVector3 o = foundation.getAbsPoint(0);
-			final ReadOnlyVector3 u = foundation.getAbsPoint(2).subtract(o, null);
-			final ReadOnlyVector3 v = foundation.getAbsPoint(1).subtract(o, null);
-			Vector3 a = new Vector3();
-			double g, h;
-			boolean init = true;
-			for (int j = 0; j < cols; j++) {
-				h = j + 0.5;
-				for (int i = 0; i < rows; i++) {
-					g = i + 0.5;
-					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
-					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
-					a.setZ(o.getZ());
-					if (foundation.insideBuilding(a.getX(), a.getY(), init)) {
-						ReadOnlyVector3 b = null;
-						Node node = null;
-						for (final Spatial child : roofPartsRoot.getChildren()) {
-							node = (Node) child;
-							b = findRoofIntersection((Mesh) node.getChild(0), a);
-							if (b != null)
-								break;
+			double heat = calculateHeatVector();
+			if (heat != 0) {
+				final ReadOnlyVector3 o = foundation.getAbsPoint(0);
+				final ReadOnlyVector3 u = foundation.getAbsPoint(2).subtract(o, null);
+				final ReadOnlyVector3 v = foundation.getAbsPoint(1).subtract(o, null);
+				Vector3 a = new Vector3();
+				double g, h;
+				boolean init = true;
+				for (int j = 0; j < cols; j++) {
+					h = j + 0.5;
+					for (int i = 0; i < rows; i++) {
+						g = i + 0.5;
+						a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+						a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+						a.setZ(o.getZ());
+						if (foundation.insideBuilding(a.getX(), a.getY(), init)) {
+							ReadOnlyVector3 b = null;
+							Node node = null;
+							for (final Spatial child : roofPartsRoot.getChildren()) {
+								node = (Node) child;
+								b = findRoofIntersection((Mesh) node.getChild(0), a);
+								if (b != null)
+									break;
+							}
+							if (b != null && node != null) {
+								final ReadOnlyVector3 normal = (ReadOnlyVector3) node.getUserData();
+								drawArrow(b, normal, arrowsVertices, heat);
+							}
 						}
-						if (b != null && node != null) {
-							final ReadOnlyVector3 normal = (ReadOnlyVector3) node.getUserData();
-							drawArrow(b, normal, arrowsVertices, dailyHeatLoss);
-						}
+						if (init)
+							init = false;
 					}
-					if (init)
-						init = false;
 				}
+				heatArrows.getMeshData().updateVertexCount();
+				heatArrows.updateModelBound();
 			}
-			heatArrows.getMeshData().updateVertexCount();
-			heatArrows.updateModelBound();
 
 		} else {
 

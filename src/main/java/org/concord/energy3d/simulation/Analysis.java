@@ -20,7 +20,7 @@ import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- *
+ * 
  */
 public abstract class Analysis {
 
@@ -70,11 +70,6 @@ public abstract class Analysis {
 			e.printStackTrace();
 			return e;
 		}
-		try {
-			SceneManager.getInstance().refreshNow();
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
 		updateGraph();
 		Scene.getInstance().redrawAll();
 		SceneManager.getInstance().refreshNow();
@@ -90,6 +85,7 @@ public abstract class Analysis {
 	}
 
 	private void onStart() {
+		SceneManager.getInstance().setHeatFlowDaily(true);
 		EnergyPanel.getInstance().requestDisableActions(this);
 		Util.selectSilently(MainPanel.getInstance().getSolarButton(), true);
 		SceneManager.getInstance().setSolarColorMapWithoutUpdate(true);

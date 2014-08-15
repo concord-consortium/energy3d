@@ -199,6 +199,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private ArrayList<Vector3> houseMovePoints;
 	private boolean solarColorMap = false;
 	private boolean heatFlowArrows = false;
+	private boolean heatFlowDaily = true;
 	private Spatial axes;
 	private boolean showBuildingLabels = false;
 	private Mesh sky;
@@ -1542,6 +1543,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setHeatFlowArrows(final boolean heatFlowArrows) {
 		this.heatFlowArrows = heatFlowArrows;
+	}
+
+	public boolean getHeatFlowDaily() {
+		return heatFlowDaily;
+	}
+
+	public void setHeatFlowDaily(final boolean heatFlowDaily) {
+		this.heatFlowDaily = heatFlowDaily;
 	}
 
 	public void showAxes(final boolean b) {

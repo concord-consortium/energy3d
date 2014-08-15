@@ -259,6 +259,7 @@ public class EnergyPanel extends JPanel {
 					SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 				}
 				if (SceneManager.getInstance().getHeatFlowArrows()) { // for now, only heat flow arrows need to call redrawAll
+					SceneManager.getInstance().setHeatFlowDaily(false);
 					Scene.getInstance().redrawAll();
 				}
 			}
