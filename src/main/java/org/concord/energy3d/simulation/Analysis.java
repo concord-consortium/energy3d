@@ -20,7 +20,7 @@ import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public abstract class Analysis {
 
@@ -34,13 +34,13 @@ public abstract class Analysis {
 	}
 
 	public Map<String, Double> getRecordedResults(final String name) {
-		Map<String, Double> recordedResults = new TreeMap<String, Double>();
-		for (Results r : graph.getRecords()) {
-			Map<String, List<Double>> x = r.getData();
-			List<Double> list = x.get(name);
+		final Map<String, Double> recordedResults = new TreeMap<String, Double>();
+		for (final Results r : graph.getRecords()) {
+			final Map<String, List<Double>> x = r.getData();
+			final List<Double> list = x.get(name);
 			if (list != null) {
 				double sum = 0;
-				for (Double d : list) {
+				for (final Double d : list) {
 					sum += d;
 				}
 				recordedResults.put(r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")"), sum);
@@ -77,6 +77,7 @@ public abstract class Analysis {
 		}
 		updateGraph();
 		Scene.getInstance().redrawAll();
+		SceneManager.getInstance().refreshNow();
 		return null;
 	}
 
