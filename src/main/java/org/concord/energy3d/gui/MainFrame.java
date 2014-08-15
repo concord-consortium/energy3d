@@ -120,7 +120,6 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem heatArrowsMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
 	protected Object lastSelection;
-	private JCheckBoxMenuItem shadeMenuItem = null;
 	private JMenuItem exitMenuItem = null;
 	private JMenu helpMenu = null;
 	private JMenuItem aboutMenuItem = null;
@@ -715,20 +714,6 @@ public class MainFrame extends JFrame {
 		return resetCameraMenuItem;
 	}
 
-	public JCheckBoxMenuItem getShadeMenuItem() {
-		if (shadeMenuItem == null) {
-			shadeMenuItem = new JCheckBoxMenuItem();
-			shadeMenuItem.setText("Shade");
-			shadeMenuItem.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().setShading(shadeMenuItem.isSelected());
-				}
-			});
-		}
-		return shadeMenuItem;
-	}
-
 	private JMenuItem getExitMenuItem() {
 		if (exitMenuItem == null) {
 			exitMenuItem = new JMenuItem();
@@ -894,7 +879,6 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					shadeMenuItem.setSelected(SceneManager.getInstance().isShadingEnabled());
 					shadowMenuItem.setSelected(SceneManager.getInstance().isShadowEnabled());
 					axesMenuItem.setSelected(SceneManager.getInstance().areAxesShown());
 					buildingLabelsMenuItem.setSelected(SceneManager.getInstance().areBuildingLabelsShown());
@@ -911,7 +895,6 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getColorMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getAxesMenuItem());
-			viewMenu.add(getShadeMenuItem());
 			viewMenu.add(getShadowMenuItem());
 			viewMenu.add(getHeatArrowsMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());

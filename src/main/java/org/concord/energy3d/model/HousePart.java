@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.util.FontManager;
@@ -927,9 +929,10 @@ public abstract class HousePart implements Serializable {
 				for (final double x : heatLoss)
 					dailyHeatLoss += x;
 				dailyHeatLoss /= computeArea();
+				int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
+				dailyHeatLoss = heatLoss[hourOfDay * 4];
+				//System.out.println(dailyHeatLoss);
 			}
-			
-			System.out.println(dailyHeatLoss);
 
 			final ReadOnlyVector3 o = getAbsPoint(0);
 			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
