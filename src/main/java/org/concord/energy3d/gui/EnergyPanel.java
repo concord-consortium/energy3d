@@ -1144,19 +1144,16 @@ public class EnergyPanel extends JPanel {
 	public void turnOffCompute() {
 		if (SceneManager.getInstance().getSolarColorMap())
 			MainPanel.getInstance().getSolarButton().setSelected(false);
-
 		int numberOfHouses = 0;
-		synchronized (Scene.getInstance().getParts()) { // XIE: This needs to be synchronized to avoid concurrent modification exceptions
-			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
-					numberOfHouses++;
-				if (numberOfHouses >= 2)
-					break;
-			}
-			for (final HousePart part : Scene.getInstance().getParts())
-				if (part instanceof Foundation)
-					((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
+				numberOfHouses++;
+			if (numberOfHouses >= 2)
+				break;
 		}
+		for (final HousePart part : Scene.getInstance().getParts())
+			if (part instanceof Foundation)
+				((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
 		SceneManager.getInstance().getSolarLand().setVisible(false);
 		Scene.getInstance().redrawAll();
 	}

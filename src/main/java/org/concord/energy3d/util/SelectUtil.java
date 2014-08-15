@@ -32,15 +32,12 @@ public class SelectUtil {
 	public static PickedHousePart pickPart(final int x, final int y) {
 		pickResults.clear();
 		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
-
-		synchronized (Scene.getInstance().getParts()) {
-			for (final HousePart housePart : Scene.getInstance().getParts())
-				if (!housePart.isFrozen()) {
-					PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
-					PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
-				}
+		for (final HousePart housePart : Scene.getInstance().getParts()) {
+			if (!housePart.isFrozen()) {
+				PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
+				PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
+			}
 		}
-
 		return getPickResult(pickRay);
 	}
 
@@ -67,17 +64,15 @@ public class SelectUtil {
 		pickResults.clear();
 		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
 
-		synchronized (Scene.getInstance().getParts()) {
-			for (final Class<?> typeOfHousePart : typesOfHousePart)
-				if (typeOfHousePart == null)
-					PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
-				else
-					for (final HousePart housePart : Scene.getInstance().getParts())
-						if (!housePart.isFrozen() && typeOfHousePart.isInstance(housePart)) {
-							PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
-							PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
-						}
-		}
+		for (final Class<?> typeOfHousePart : typesOfHousePart)
+			if (typeOfHousePart == null)
+				PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
+			else
+				for (final HousePart housePart : Scene.getInstance().getParts())
+					if (!housePart.isFrozen() && typeOfHousePart.isInstance(housePart)) {
+						PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
+						PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
+					}
 
 		return getPickResult(pickRay);
 	}

@@ -1147,20 +1147,18 @@ public class Wall extends HousePart {
 	public void connectedWalls() {
 		if (!isDrawable() || (neighbors[0] != null && neighbors[1] != null))
 			return;
-		synchronized (Scene.getInstance().getParts()) {
-			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Wall && part != this && part.isDrawCompleted()) {
-					final Wall otherWall = (Wall) part;
-					for (int index = 0; index < 2; index++)
-						if (neighbors[index] == null)
-							for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
-								// if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
-								if (otherWall.neighbors[otherIndex] == null && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
-									setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
-									break;
-								}
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Wall && part != this && part.isDrawCompleted()) {
+				final Wall otherWall = (Wall) part;
+				for (int index = 0; index < 2; index++)
+					if (neighbors[index] == null)
+						for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
+							// if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
+							if (otherWall.neighbors[otherIndex] == null && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
+								setNeighbor(index * 2, new Snap(this, otherWall, index * 2, otherIndex * 2), true);
+								break;
 							}
-				}
+						}
 			}
 		}
 	}

@@ -798,11 +798,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void hideAllEditPoints() {
-		synchronized (Scene.getInstance().getParts()) {
-			for (final HousePart part : Scene.getInstance().getParts()) {
-				part.setEditPointsVisible(false);
-				part.setGridsVisible(false);
-			}
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			part.setEditPointsVisible(false);
+			part.setGridsVisible(false);
 		}
 		selectedHousePart = null;
 		refresh = true;
@@ -914,11 +912,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				Scene.getInstance().remove(selectedHousePart, true);
 		}
 
-		synchronized (Scene.getInstance().getParts()) {
-			for (final HousePart part : Scene.getInstance().getParts())
-				if (part instanceof Foundation)
-					((Foundation) part).setResizeHouseMode(operation == Operation.RESIZE);
-		}
+		for (final HousePart part : Scene.getInstance().getParts())
+			if (part instanceof Foundation)
+				((Foundation) part).setResizeHouseMode(operation == Operation.RESIZE);
 
 		if (viewMode != ViewMode.PRINT_PREVIEW)
 			Scene.getInstance().drawResizeBounds();
@@ -1564,11 +1560,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void showBuildingLabels(final boolean b) {
 		showBuildingLabels = b;
-		synchronized (Scene.getInstance().getParts()) {
-			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Foundation)
-					((Foundation) part).showBuildingLabel(b);
-			}
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation)
+				((Foundation) part).showBuildingLabel(b);
 		}
 	}
 

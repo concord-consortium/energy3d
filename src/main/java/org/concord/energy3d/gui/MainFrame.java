@@ -1049,12 +1049,10 @@ public class MainFrame extends JFrame {
 					if (selectedPart == null) {
 						int count = 0;
 						HousePart hp = null;
-						synchronized (Scene.getInstance().getParts()) {
-							for (final HousePart x : Scene.getInstance().getParts()) {
-								if (x instanceof Foundation) {
-									count++;
-									hp = x;
-								}
+						for (final HousePart x : Scene.getInstance().getParts()) {
+							if (x instanceof Foundation) {
+								count++;
+								hp = x;
 							}
 						}
 						if (count == 1) {
@@ -1118,12 +1116,10 @@ public class MainFrame extends JFrame {
 					if (selectedPart == null) {
 						int count = 0;
 						HousePart hp = null;
-						synchronized (Scene.getInstance().getParts()) {
-							for (final HousePart x : Scene.getInstance().getParts()) {
-								if (x instanceof Foundation) {
-									count++;
-									hp = x;
-								}
+						for (final HousePart x : Scene.getInstance().getParts()) {
+							if (x instanceof Foundation) {
+								count++;
+								hp = x;
 							}
 						}
 						if (count == 1) {

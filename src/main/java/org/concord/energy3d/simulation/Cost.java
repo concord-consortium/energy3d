@@ -144,12 +144,10 @@ public class Cost {
 		if (selectedPart == null || selectedPart instanceof Tree) {
 			int count = 0;
 			HousePart hp = null;
-			synchronized (Scene.getInstance().getParts()) {
-				for (HousePart x : Scene.getInstance().getParts()) {
-					if (x instanceof Foundation) {
-						count++;
-						hp = x;
-					}
+			for (HousePart x : Scene.getInstance().getParts()) {
+				if (x instanceof Foundation) {
+					count++;
+					hp = x;
 				}
 			}
 			if (count == 1) {

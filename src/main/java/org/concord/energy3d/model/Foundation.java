@@ -388,49 +388,47 @@ public class Foundation extends HousePart {
 	}
 
 	private Vector3 ensureDistanceFromOtherFoundations(final Vector3 p, final int index) {
-		synchronized (Scene.getInstance().getParts()) {
-			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Foundation && part != this) {
-					final Vector3 p0 = part.getAbsPoint(0);
-					final Vector3 p1 = part.getAbsPoint(1);
-					final Vector3 p2 = part.getAbsPoint(2);
-					final double minX = Math.min(p0.getX(), p2.getX()) - getGridSize();
-					final double maxX = Math.max(p0.getX(), p2.getX()) + getGridSize();
-					final double minY = Math.min(p0.getY(), p1.getY()) - getGridSize();
-					final double maxY = Math.max(p0.getY(), p1.getY()) + getGridSize();
-					if (isFirstPointInserted()) {
-						final double oppositeX = getAbsPoint(index == 0 || index == 1 ? 2 : 0).getX();
-						final double oppositeY = getAbsPoint(index == 0 || index == 2 ? 1 : 0).getY();
-						if (!(oppositeX <= minX && p.getX() <= minX || oppositeX >= maxX && p.getX() >= maxX || oppositeY <= minY && p.getY() <= minY || oppositeY >= maxY && p.getY() >= maxY)) {
-							return getAbsPoint(index);
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation && part != this) {
+				final Vector3 p0 = part.getAbsPoint(0);
+				final Vector3 p1 = part.getAbsPoint(1);
+				final Vector3 p2 = part.getAbsPoint(2);
+				final double minX = Math.min(p0.getX(), p2.getX()) - getGridSize();
+				final double maxX = Math.max(p0.getX(), p2.getX()) + getGridSize();
+				final double minY = Math.min(p0.getY(), p1.getY()) - getGridSize();
+				final double maxY = Math.max(p0.getY(), p1.getY()) + getGridSize();
+				if (isFirstPointInserted()) {
+					final double oppositeX = getAbsPoint(index == 0 || index == 1 ? 2 : 0).getX();
+					final double oppositeY = getAbsPoint(index == 0 || index == 2 ? 1 : 0).getY();
+					if (!(oppositeX <= minX && p.getX() <= minX || oppositeX >= maxX && p.getX() >= maxX || oppositeY <= minY && p.getY() <= minY || oppositeY >= maxY && p.getY() >= maxY)) {
+						return getAbsPoint(index);
+					}
+				} else {
+					if (p.getX() > minX && p.getX() < maxX && p.getY() > minY && p.getY() < maxY) {
+						double shortestDistance = Double.MAX_VALUE;
+						double distance;
+						final Vector3 newP = new Vector3();
+						distance = p.getX() - minX;
+						if (distance < shortestDistance) {
+							shortestDistance = distance;
+							newP.set(minX, p.getY(), p.getZ());
 						}
-					} else {
-						if (p.getX() > minX && p.getX() < maxX && p.getY() > minY && p.getY() < maxY) {
-							double shortestDistance = Double.MAX_VALUE;
-							double distance;
-							final Vector3 newP = new Vector3();
-							distance = p.getX() - minX;
-							if (distance < shortestDistance) {
-								shortestDistance = distance;
-								newP.set(minX, p.getY(), p.getZ());
-							}
-							distance = maxX - p.getX();
-							if (distance < shortestDistance) {
-								shortestDistance = distance;
-								newP.set(maxX, p.getY(), p.getZ());
-							}
-							distance = p.getY() - minY;
-							if (distance < shortestDistance) {
-								shortestDistance = distance;
-								newP.set(p.getX(), minY, p.getZ());
-							}
-							distance = maxY - p.getY();
-							if (distance < shortestDistance) {
-								shortestDistance = distance;
-								newP.set(p.getX(), maxY, p.getZ());
-							}
-							return newP;
+						distance = maxX - p.getX();
+						if (distance < shortestDistance) {
+							shortestDistance = distance;
+							newP.set(maxX, p.getY(), p.getZ());
 						}
+						distance = p.getY() - minY;
+						if (distance < shortestDistance) {
+							shortestDistance = distance;
+							newP.set(p.getX(), minY, p.getZ());
+						}
+						distance = maxY - p.getY();
+						if (distance < shortestDistance) {
+							shortestDistance = distance;
+							newP.set(p.getX(), maxY, p.getZ());
+						}
+						return newP;
 					}
 				}
 			}

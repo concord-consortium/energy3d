@@ -46,51 +46,47 @@ public class HeatLoad {
 		final double[] outsideTemperatureRange;
 
 		final int timeStep = SolarIrradiation.getInstance().getTimeStep();
-		synchronized (Scene.getInstance().getParts()) {
-			for (final HousePart part : Scene.getInstance().getParts())
-				part.setHeatLoss(new double[1440 / timeStep]);
-		}
+		for (final HousePart part : Scene.getInstance().getParts())
+			part.setHeatLoss(new double[1440 / timeStep]);
 
 		if (EnergyPanel.getInstance().getCityComboBox().getSelectedItem().equals(""))
 			return;
 		else
 			outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 
-		synchronized (Scene.getInstance().getParts()) { // without this, it sometimes throws ConcurrentModificationException and causes refresh to fail
-			for (int minute = 0; minute < 1440; minute += timeStep) {
-				for (final HousePart part : Scene.getInstance().getParts()) {
-					final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
-					final double deltaT = insideTemperature - outsideTemperature;
-					if (part.isDrawCompleted()) {
-						final double uFactor;
-						if (part instanceof Wall)
-							uFactor = wallUFactor;
-						else if (part instanceof Door)
-							uFactor = doorUFactor;
-						else if (part instanceof Window)
-							uFactor = windowUFactor;
-						else if (part instanceof Roof)
-							uFactor = roofUFactor;
-						else if (part instanceof Sensor) {
-							if (part.getContainer() instanceof Wall) {
-								final HousePart x = insideChild(part.getPoints().get(0), part.getContainer());
-								if (x instanceof Window)
-									uFactor = windowUFactor;
-								else if (x instanceof Door)
-									uFactor = doorUFactor;
-								else
-									uFactor = wallUFactor;
-							} else if (part.getContainer() instanceof Roof)
-								uFactor = roofUFactor;
+		for (int minute = 0; minute < 1440; minute += timeStep) {
+			for (final HousePart part : Scene.getInstance().getParts()) {
+				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
+				final double deltaT = insideTemperature - outsideTemperature;
+				if (part.isDrawCompleted()) {
+					final double uFactor;
+					if (part instanceof Wall)
+						uFactor = wallUFactor;
+					else if (part instanceof Door)
+						uFactor = doorUFactor;
+					else if (part instanceof Window)
+						uFactor = windowUFactor;
+					else if (part instanceof Roof)
+						uFactor = roofUFactor;
+					else if (part instanceof Sensor) {
+						if (part.getContainer() instanceof Wall) {
+							final HousePart x = insideChild(part.getPoints().get(0), part.getContainer());
+							if (x instanceof Window)
+								uFactor = windowUFactor;
+							else if (x instanceof Door)
+								uFactor = doorUFactor;
 							else
-								continue;
-						} else
+								uFactor = wallUFactor;
+						} else if (part.getContainer() instanceof Roof)
+							uFactor = roofUFactor;
+						else
 							continue;
-						double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
-						if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
-							heatloss = 0;
-						part.getHeatLoss()[minute / timeStep] += heatloss;
-					}
+					} else
+						continue;
+					double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
+					if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
+						heatloss = 0;
+					part.getHeatLoss()[minute / timeStep] += heatloss;
 				}
 			}
 		}
