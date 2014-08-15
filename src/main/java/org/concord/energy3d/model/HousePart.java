@@ -194,6 +194,7 @@ public abstract class HousePart implements Serializable {
 		heatArrows.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(heatArrows);
 		heatArrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
+		heatArrows.setDefaultColor(ColorRGBA.YELLOW);
 		root.attachChild(heatArrows);
 
 	}
@@ -927,6 +928,8 @@ public abstract class HousePart implements Serializable {
 					dailyHeatLoss += x;
 				dailyHeatLoss /= computeArea();
 			}
+			
+			System.out.println(dailyHeatLoss);
 
 			final ReadOnlyVector3 o = getAbsPoint(0);
 			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);

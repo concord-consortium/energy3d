@@ -117,6 +117,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
+	private JCheckBoxMenuItem heatArrowsMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
 	protected Object lastSelection;
 	private JCheckBoxMenuItem shadeMenuItem = null;
@@ -893,8 +894,11 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
+					shadeMenuItem.setSelected(SceneManager.getInstance().isShadingEnabled());
+					shadowMenuItem.setSelected(SceneManager.getInstance().isShadowEnabled());
 					axesMenuItem.setSelected(SceneManager.getInstance().areAxesShown());
 					buildingLabelsMenuItem.setSelected(SceneManager.getInstance().areBuildingLabelsShown());
+					heatArrowsMenuItem.setSelected(SceneManager.getInstance().getHeatFlowArrows());
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
@@ -909,6 +913,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadeMenuItem());
 			viewMenu.add(getShadowMenuItem());
+			viewMenu.add(getHeatArrowsMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
 			// viewMenu.add(getWallThicknessMenuItem());
@@ -938,6 +943,20 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return axesMenuItem;
+	}
+
+	public JCheckBoxMenuItem getHeatArrowsMenuItem() {
+		if (heatArrowsMenuItem == null) {
+			heatArrowsMenuItem = new JCheckBoxMenuItem("Heat Arrows", true);
+			heatArrowsMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					SceneManager.getInstance().setHeatFlowArrows(heatArrowsMenuItem.isSelected());
+					Scene.getInstance().redrawAll();
+				}
+			});
+		}
+		return heatArrowsMenuItem;
 	}
 
 	public JCheckBoxMenuItem getBuildingLabelsMenuItem() {

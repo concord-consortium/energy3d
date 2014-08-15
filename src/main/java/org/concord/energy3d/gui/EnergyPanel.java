@@ -255,6 +255,9 @@ public class EnergyPanel extends JPanel {
 				updateWeatherData();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().changeSkyTexture();
+				if (MainPanel.getInstance().getShadowButton().isSelected()) {
+					SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
+				}
 			}
 		});
 		final GridBagConstraints gbc_timeSpinner = new GridBagConstraints();

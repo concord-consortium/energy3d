@@ -41,6 +41,7 @@ import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.util.Config;
 
@@ -468,13 +469,11 @@ public class MainPanel extends JPanel {
 			shadowButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (mainFrame != null) {
-						// mainFrame.getShadeMenuItem().setSelected(shadowButton.isSelected()); // shading in the shadow mode doesn't look good
-						mainFrame.getShadowMenuItem().setSelected(shadowButton.isSelected());
-					} else {
-						// SceneManager.getInstance().setShading(shadowButton.isSelected());
-						SceneManager.getInstance().setShadow(shadowButton.isSelected());
-					}
+					if (SceneManager.getInstance().isSunAnim() || Heliodon.getInstance().isNightTime())
+						SceneManager.getInstance().setShading(shadowButton.isSelected());
+					else
+						SceneManager.getInstance().setShading(false);
+					SceneManager.getInstance().setShadow(shadowButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
 					// Scene.getInstance().setEdited(true, false); // shadow not saved -- make sense because it doesn't work on some machines
@@ -531,6 +530,8 @@ public class MainPanel extends JPanel {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setSunAnim(sunAnimButton.isSelected());
+					if (shadowButton.isSelected())
+						SceneManager.getInstance().setShading(true);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
