@@ -77,7 +77,7 @@ public class EnergyPanel extends JPanel {
 	private static final EnergyPanel instance = new EnergyPanel();
 	private final DecimalFormat twoDecimals = new DecimalFormat();
 	private final DecimalFormat noDecimals = new DecimalFormat();
-	private static boolean keepHeatmapOn = false;
+	private static boolean autoRecomputeEnergy = false;
 	private Thread thread;
 	private boolean computeRequest;
 	private boolean cancel;
@@ -258,8 +258,8 @@ public class EnergyPanel extends JPanel {
 				if (MainPanel.getInstance().getShadowButton().isSelected()) {
 					SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 				}
-				if (SceneManager.getInstance().getHeatFlowArrows()) { // for now, only heat flow arrows need to call redrawAll
-					SceneManager.getInstance().setHeatFlowDaily(false);
+				if (SceneManager.getInstance().getHeatFlux()) { // for now, only heat flow arrows need to call redrawAll
+					SceneManager.getInstance().setHeatFluxDaily(false);
 					Scene.getInstance().redrawAll();
 				}
 			}
@@ -794,14 +794,14 @@ public class EnergyPanel extends JPanel {
 						cancel = false;
 						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
 						try {
-							final boolean doCompute = EnergyPanel.this.updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarColorMap() && (!alreadyRenderedHeatmap || keepHeatmapOn));
+							final boolean doCompute = EnergyPanel.this.updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarColorMap() && (!alreadyRenderedHeatmap || autoRecomputeEnergy));
 							if (doCompute) {
 								alreadyRenderedHeatmap = true;
 								computeNow();
 								if (!cancel) {
 									SceneManager.getInstance().getSolarLand().setVisible(true);
 									SceneManager.getInstance().refresh();
-								} else if (!keepHeatmapOn)
+								} else if (!autoRecomputeEnergy)
 									turnOffCompute();
 							} else
 								turnOffCompute();
@@ -909,8 +909,8 @@ public class EnergyPanel extends JPanel {
 		alreadyRenderedHeatmap = false;
 	}
 
-	public static void setKeepHeatmapOn(final boolean on) {
-		keepHeatmapOn = on;
+	public static void setAutoRecomputeEnergy(final boolean on) {
+		autoRecomputeEnergy = on;
 	}
 
 	public void setComputeEnabled(final boolean computeEnabled) {

@@ -199,7 +199,7 @@ public class Window extends HousePart {
 			bars.updateModelBound();
 		}
 
-		drawArrows();
+		drawHeatFlux();
 
 	}
 

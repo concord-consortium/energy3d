@@ -145,7 +145,7 @@ public abstract class Roof extends HousePart {
 		roofPartsRoot.updateWorldBound(true);
 		drawOutline();
 		drawDashLines();
-		drawArrows();
+		drawHeatFlux();
 	}
 
 	protected void drawWalls() {
@@ -938,18 +938,18 @@ public abstract class Roof extends HousePart {
 	}
 
 	@Override
-	void drawArrows() {
+	void drawHeatFlux() {
 
-		if (SceneManager.getInstance().getHeatFlowArrows()) {
+		if (SceneManager.getInstance().getHeatFlux()) {
 
-			heatArrows.getSceneHints().setCullHint(CullHint.Inherit);
+			heatFlux.getSceneHints().setCullHint(CullHint.Inherit);
 
-			FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
+			FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
 			Foundation foundation = getTopContainer();
-			final int cols = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(2)) / arrowUnitArea);
-			final int rows = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(1)) / arrowUnitArea);
+			final int cols = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(2)) / heatFluxUnitArea);
+			final int rows = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(1)) / heatFluxUnitArea);
 			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
-			heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
+			heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
 			double heat = calculateHeatVector();
 			if (heat != 0) {
 				final ReadOnlyVector3 o = foundation.getAbsPoint(0);
@@ -983,13 +983,13 @@ public abstract class Roof extends HousePart {
 							init = false;
 					}
 				}
-				heatArrows.getMeshData().updateVertexCount();
-				heatArrows.updateModelBound();
+				heatFlux.getMeshData().updateVertexCount();
+				heatFlux.updateModelBound();
 			}
 
 		} else {
 
-			heatArrows.getSceneHints().setCullHint(CullHint.Always);
+			heatFlux.getSceneHints().setCullHint(CullHint.Always);
 
 		}
 

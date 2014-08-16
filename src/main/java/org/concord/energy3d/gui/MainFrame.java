@@ -117,7 +117,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
-	private JCheckBoxMenuItem heatArrowsMenuItem;
+	private JCheckBoxMenuItem heatFluxMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
 	protected Object lastSelection;
 	private JMenuItem exitMenuItem = null;
@@ -162,7 +162,7 @@ public class MainFrame extends JFrame {
 	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
 	private final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
-	private JCheckBoxMenuItem keepHeatmapOnMenuItem;
+	private JCheckBoxMenuItem autoRecomputeEnergyMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
 
 	private static class ExtensionFileFilter extends FileFilter {
@@ -858,7 +858,6 @@ public class MainFrame extends JFrame {
 			if (!Config.isRestrictMode()) {
 				analysisMenu.addSeparator();
 				analysisMenu.add(getSimulationSettingsMenuItem());
-				analysisMenu.add(getKeepHeatmapOnMenuItem());
 			}
 		}
 		return analysisMenu;
@@ -882,7 +881,7 @@ public class MainFrame extends JFrame {
 					shadowMenuItem.setSelected(SceneManager.getInstance().isShadowEnabled());
 					axesMenuItem.setSelected(SceneManager.getInstance().areAxesShown());
 					buildingLabelsMenuItem.setSelected(SceneManager.getInstance().areBuildingLabelsShown());
-					heatArrowsMenuItem.setSelected(SceneManager.getInstance().getHeatFlowArrows());
+					heatFluxMenuItem.setSelected(SceneManager.getInstance().getHeatFlux());
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
@@ -896,7 +895,7 @@ public class MainFrame extends JFrame {
 			viewMenu.addSeparator();
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
-			viewMenu.add(getHeatArrowsMenuItem());
+			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
 			// viewMenu.add(getWallThicknessMenuItem());
@@ -928,18 +927,18 @@ public class MainFrame extends JFrame {
 		return axesMenuItem;
 	}
 
-	public JCheckBoxMenuItem getHeatArrowsMenuItem() {
-		if (heatArrowsMenuItem == null) {
-			heatArrowsMenuItem = new JCheckBoxMenuItem("Heat Arrows", true);
-			heatArrowsMenuItem.addItemListener(new ItemListener() {
+	public JCheckBoxMenuItem getHeatFluxMenuItem() {
+		if (heatFluxMenuItem == null) {
+			heatFluxMenuItem = new JCheckBoxMenuItem("Heat Flux", true);
+			heatFluxMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().setHeatFlowArrows(heatArrowsMenuItem.isSelected());
+					SceneManager.getInstance().setHeatFlux(heatFluxMenuItem.isSelected());
 					Scene.getInstance().redrawAll();
 				}
 			});
 		}
-		return heatArrowsMenuItem;
+		return heatFluxMenuItem;
 	}
 
 	public JCheckBoxMenuItem getBuildingLabelsMenuItem() {
@@ -1199,6 +1198,9 @@ public class MainFrame extends JFrame {
 			editMenu.addSeparator();
 			editMenu.add(getGridsMenuItem());
 			editMenu.add(getSnapMenuItem());
+			if (!Config.isRestrictMode()) {
+				editMenu.add(getAutoRecomputeEnergyMenuItem());
+			}
 			editMenu.addSeparator();
 			editMenu.add(getRoofOverhangLengthMenuItem());
 			editMenu.add(getRemoveAllRoofsMenuItem());
@@ -1875,17 +1877,17 @@ public class MainFrame extends JFrame {
 		return noteCheckBoxMenuItem;
 	}
 
-	private JCheckBoxMenuItem getKeepHeatmapOnMenuItem() {
-		if (keepHeatmapOnMenuItem == null) {
-			keepHeatmapOnMenuItem = new JCheckBoxMenuItem("Keep Heat Map On");
-			keepHeatmapOnMenuItem.addItemListener(new ItemListener() {
+	private JCheckBoxMenuItem getAutoRecomputeEnergyMenuItem() {
+		if (autoRecomputeEnergyMenuItem == null) {
+			autoRecomputeEnergyMenuItem = new JCheckBoxMenuItem("Automatically Recalculte Energy");
+			autoRecomputeEnergyMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					EnergyPanel.setKeepHeatmapOn(keepHeatmapOnMenuItem.isSelected());
+					EnergyPanel.setAutoRecomputeEnergy(autoRecomputeEnergyMenuItem.isSelected());
 				}
 			});
 		}
-		return keepHeatmapOnMenuItem;
+		return autoRecomputeEnergyMenuItem;
 	}
 
 	private JMenuItem getRemoveAllRoofsMenuItem() {

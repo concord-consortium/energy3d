@@ -85,11 +85,11 @@ public abstract class Analysis {
 	}
 
 	private void onStart() {
-		SceneManager.getInstance().setHeatFlowDaily(true);
+		SceneManager.getInstance().setHeatFluxDaily(true);
 		EnergyPanel.getInstance().requestDisableActions(this);
 		Util.selectSilently(MainPanel.getInstance().getSolarButton(), true);
 		SceneManager.getInstance().setSolarColorMapWithoutUpdate(true);
-		SceneManager.getInstance().setHeatFlowArrows(true);
+		SceneManager.getInstance().setHeatFlux(true);
 		graph.clearData();
 		SceneManager.getInstance().getSolarLand().setVisible(true);
 	}

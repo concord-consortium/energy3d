@@ -91,8 +91,8 @@ public abstract class HousePart implements Serializable {
 	private boolean freeze;
 	private ReadOnlyColorRGBA color; // custom color
 
-	transient Line heatArrows;
-	transient static float arrowUnitArea = 2;
+	transient Line heatFlux;
+	transient static float heatFluxUnitArea = 2;
 
 	private static Map<String, Texture> cachedGrayTextures = new HashMap<String, Texture>();
 
@@ -191,13 +191,13 @@ public abstract class HousePart implements Serializable {
 		root.attachChild(gridsMesh);
 		setGridsVisible(false);
 
-		heatArrows = new Line("Heat Arrows");
-		heatArrows.setLineWidth(1);
-		heatArrows.setModelBound(new BoundingBox());
-		Util.disablePickShadowLight(heatArrows);
-		heatArrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-		heatArrows.setDefaultColor(ColorRGBA.YELLOW);
-		root.attachChild(heatArrows);
+		heatFlux = new Line("Heat Flux");
+		heatFlux.setLineWidth(1);
+		heatFlux.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(heatFlux);
+		heatFlux.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
+		heatFlux.setDefaultColor(ColorRGBA.YELLOW);
+		root.attachChild(heatFlux);
 
 	}
 
@@ -916,32 +916,32 @@ public abstract class HousePart implements Serializable {
 	double calculateHeatVector() {
 		double heat = 0;
 		if (heatLoss != null) {
-			if (SceneManager.getInstance().getHeatFlowDaily()) {
+			if (SceneManager.getInstance().isHeatFluxDaily()) {
 				for (final double x : heatLoss)
 					heat += x;
 				heat /= (computeArea() * heatLoss.length);
-				heatArrows.setDefaultColor(ColorRGBA.YELLOW);
+				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
 				int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
 				heat = heatLoss[hourOfDay * 4] + heatLoss[hourOfDay * 4 + 1] + heatLoss[hourOfDay * 4 + 2] + heatLoss[hourOfDay * 4 + 3];
 				heat /= 4 * computeArea();
-				heatArrows.setDefaultColor(ColorRGBA.WHITE);
+				heatFlux.setDefaultColor(ColorRGBA.WHITE);
 			}
 		}
 		return heat;
 	}
 
-	void drawArrows() {
+	void drawHeatFlux() {
 
-		if (SceneManager.getInstance().getHeatFlowArrows()) {
+		if (SceneManager.getInstance().getHeatFlux()) {
 
-			heatArrows.getSceneHints().setCullHint(CullHint.Inherit);
+			heatFlux.getSceneHints().setCullHint(CullHint.Inherit);
 
-			FloatBuffer arrowsVertices = heatArrows.getMeshData().getVertexBuffer();
-			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / arrowUnitArea);
-			final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / arrowUnitArea);
+			FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
+			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / heatFluxUnitArea);
+			final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / heatFluxUnitArea);
 			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
-			heatArrows.getMeshData().setVertexBuffer(arrowsVertices);
+			heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
 			double heat = calculateHeatVector();
 			if (heat != 0) {
 				final ReadOnlyVector3 o = getAbsPoint(0);
@@ -960,13 +960,13 @@ public abstract class HousePart implements Serializable {
 						drawArrow(a, normal, arrowsVertices, heat);
 					}
 				}
-				heatArrows.getMeshData().updateVertexCount();
-				heatArrows.updateModelBound();
+				heatFlux.getMeshData().updateVertexCount();
+				heatFlux.updateModelBound();
 			}
 
 		} else {
 
-			heatArrows.getSceneHints().setCullHint(CullHint.Always);
+			heatFlux.getSceneHints().setCullHint(CullHint.Always);
 
 		}
 
