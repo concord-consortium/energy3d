@@ -2,8 +2,6 @@ package org.concord.energy3d.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
@@ -75,9 +73,9 @@ public class PopupMenuFactory {
 			ButtonGroup styleButtonGroup = new ButtonGroup();
 
 			final JRadioButtonMenuItem miSmallPanes = new JRadioButtonMenuItem("Small Panes");
-			miSmallPanes.addItemListener(new ItemListener() {
+			miSmallPanes.addActionListener(new ActionListener() {
 				@Override
-				public void itemStateChanged(ItemEvent e) {
+				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
 						((Window) selectedPart).setStyle(Window.SMALL_PANES);
@@ -90,9 +88,9 @@ public class PopupMenuFactory {
 			styleMenu.add(miSmallPanes);
 
 			final JRadioButtonMenuItem miMediumPanes = new JRadioButtonMenuItem("Medium Panes");
-			miMediumPanes.addItemListener(new ItemListener() {
+			miMediumPanes.addActionListener(new ActionListener() {
 				@Override
-				public void itemStateChanged(ItemEvent e) {
+				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
 						((Window) selectedPart).setStyle(Window.MEDIUM_PANES);
@@ -105,9 +103,9 @@ public class PopupMenuFactory {
 			styleMenu.add(miMediumPanes);
 
 			final JRadioButtonMenuItem miLargePanes = new JRadioButtonMenuItem("Large Panes");
-			miLargePanes.addItemListener(new ItemListener() {
+			miLargePanes.addActionListener(new ActionListener() {
 				@Override
-				public void itemStateChanged(ItemEvent e) {
+				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
 						((Window) selectedPart).setStyle(Window.LARGE_PANES);
@@ -120,9 +118,9 @@ public class PopupMenuFactory {
 			styleMenu.add(miLargePanes);
 
 			final JRadioButtonMenuItem miEmpty = new JRadioButtonMenuItem("Empty");
-			miEmpty.addItemListener(new ItemListener() {
+			miEmpty.addActionListener(new ActionListener() {
 				@Override
-				public void itemStateChanged(ItemEvent e) {
+				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
 						((Window) selectedPart).setStyle(Window.EMPTY);
@@ -172,9 +170,9 @@ public class PopupMenuFactory {
 			ButtonGroup uFactorButtonGroup = new ButtonGroup();
 
 			final JRadioButtonMenuItem miUFactor1 = new JRadioButtonMenuItem("1.20 (single pane)");
-			miUFactor1.addItemListener(new ItemListener() {
+			miUFactor1.addActionListener(new ActionListener() {
 				@Override
-				public void itemStateChanged(ItemEvent e) {
+				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
 						selectedPart.setUFactor(1.2);
@@ -186,9 +184,9 @@ public class PopupMenuFactory {
 			uFactorMenu.add(miUFactor1);
 
 			final JRadioButtonMenuItem miUFactor2 = new JRadioButtonMenuItem("0.55 (double pane)");
-			miUFactor2.addItemListener(new ItemListener() {
+			miUFactor2.addActionListener(new ActionListener() {
 				@Override
-				public void itemStateChanged(ItemEvent e) {
+				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
 						selectedPart.setUFactor(0.55);
@@ -200,9 +198,9 @@ public class PopupMenuFactory {
 			uFactorMenu.add(miUFactor2);
 
 			final JRadioButtonMenuItem miUFactor3 = new JRadioButtonMenuItem("0.35 (double pane, low-e)");
-			miUFactor3.addItemListener(new ItemListener() {
+			miUFactor3.addActionListener(new ActionListener() {
 				@Override
-				public void itemStateChanged(ItemEvent e) {
+				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
 						selectedPart.setUFactor(0.35);
@@ -214,9 +212,9 @@ public class PopupMenuFactory {
 			uFactorMenu.add(miUFactor3);
 
 			final JRadioButtonMenuItem miUFactor4 = new JRadioButtonMenuItem("0.15 (triple pane)");
-			miUFactor4.addItemListener(new ItemListener() {
+			miUFactor4.addActionListener(new ActionListener() {
 				@Override
-				public void itemStateChanged(ItemEvent e) {
+				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
 						selectedPart.setUFactor(0.15);
@@ -234,18 +232,40 @@ public class PopupMenuFactory {
 
 				@Override
 				public void menuSelected(MenuEvent e) {
+					boolean b = false;
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						double windowUFactor = HeatLoad.parseUFactor(EnergyPanel.getInstance().getWindowsComboBox());
-						if (Util.isZero(selectedPart.getUFactor() - 1.2) || Util.isZero(windowUFactor - 1.2))
-							miUFactor1.setSelected(true);
-						else if (Util.isZero(selectedPart.getUFactor() - 0.55) || Util.isZero(windowUFactor - 0.55))
-							miUFactor2.setSelected(true);
-						else if (Util.isZero(selectedPart.getUFactor() - 0.35) || Util.isZero(windowUFactor - 0.35))
-							miUFactor3.setSelected(true);
-						else if (Util.isZero(selectedPart.getUFactor() - 0.15) || Util.isZero(windowUFactor - 0.15))
-							miUFactor4.setSelected(true);
-						else
+						if (Util.isZero(selectedPart.getUFactor() - 1.2)) {
+							Util.selectSilently(miUFactor1, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.55)) {
+							Util.selectSilently(miUFactor2, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.35)) {
+							Util.selectSilently(miUFactor3, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.15)) {
+							Util.selectSilently(miUFactor4, true);
+							b = true;
+						} else {
+							if (Util.isZero(selectedPart.getUFactor())) {
+								double defaultWindowUFactor = HeatLoad.parseUFactor(EnergyPanel.getInstance().getWindowsComboBox());
+								if (Util.isZero(defaultWindowUFactor - 1.2)) {
+									Util.selectSilently(miUFactor1, true);
+									b = true;
+								} else if (Util.isZero(defaultWindowUFactor - 0.55)) {
+									Util.selectSilently(miUFactor2, true);
+									b = true;
+								} else if (Util.isZero(defaultWindowUFactor - 0.35)) {
+									Util.selectSilently(miUFactor3, true);
+									b = true;
+								} else if (Util.isZero(defaultWindowUFactor - 0.15)) {
+									Util.selectSilently(miUFactor4, true);
+									b = true;
+								}
+							}
+						}
+						if (!b)
 							miUFactor5.setSelected(true);
 					}
 				}
@@ -312,6 +332,161 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu uFactorMenu = new JMenu("U-Factor");
+
+			ButtonGroup uFactorButtonGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem miUFactor1 = new JRadioButtonMenuItem("0.25 (masonry)");
+			miUFactor1.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						selectedPart.setUFactor(0.25);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor1);
+			uFactorMenu.add(miUFactor1);
+
+			final JRadioButtonMenuItem miUFactor2 = new JRadioButtonMenuItem("0.22 (wood frame)");
+			miUFactor2.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						selectedPart.setUFactor(0.22);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor2);
+			uFactorMenu.add(miUFactor2);
+
+			final JRadioButtonMenuItem miUFactor3 = new JRadioButtonMenuItem("0.08 (R13, 2x4 w/cellulose/fiberglass)");
+			miUFactor3.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						selectedPart.setUFactor(0.08);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor3);
+			uFactorMenu.add(miUFactor3);
+
+			final JRadioButtonMenuItem miUFactor4 = new JRadioButtonMenuItem("0.06 (R18, 2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)");
+			miUFactor4.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						selectedPart.setUFactor(0.06);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor4);
+			uFactorMenu.add(miUFactor4);
+
+			final JRadioButtonMenuItem miUFactor5 = new JRadioButtonMenuItem("0.05 (R20, 2x6 w/cellulose/fiberglass)");
+			miUFactor5.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						selectedPart.setUFactor(0.05);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor5);
+			uFactorMenu.add(miUFactor5);
+
+			final JRadioButtonMenuItem miUFactor6 = new JRadioButtonMenuItem("0.04 (R25, 2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)");
+			miUFactor6.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						selectedPart.setUFactor(0.04);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor6);
+			uFactorMenu.add(miUFactor6);
+
+			final JRadioButtonMenuItem miUFactor7 = new JRadioButtonMenuItem();
+			uFactorButtonGroup.add(miUFactor7);
+
+			uFactorMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(MenuEvent e) {
+					boolean b = false;
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						if (Util.isZero(selectedPart.getUFactor() - 0.25)) {
+							Util.selectSilently(miUFactor1, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.22)) {
+							Util.selectSilently(miUFactor2, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.08)) {
+							Util.selectSilently(miUFactor3, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.06)) {
+							Util.selectSilently(miUFactor4, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.05)) {
+							Util.selectSilently(miUFactor5, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.04)) {
+							Util.selectSilently(miUFactor6, true);
+							b = true;
+						} else {
+							if (Util.isZero(selectedPart.getUFactor())) {
+								double defaultWallUFactor = HeatLoad.parseUFactor(EnergyPanel.getInstance().getWallsComboBox());
+								if (Util.isZero(defaultWallUFactor - 0.25)) {
+									Util.selectSilently(miUFactor1, true);
+									b = true;
+								} else if (Util.isZero(defaultWallUFactor - 0.22)) {
+									Util.selectSilently(miUFactor2, true);
+									b = true;
+								} else if (Util.isZero(defaultWallUFactor - 0.08)) {
+									Util.selectSilently(miUFactor3, true);
+									b = true;
+								} else if (Util.isZero(defaultWallUFactor - 0.06)) {
+									Util.selectSilently(miUFactor4, true);
+									b = true;
+								} else if (Util.isZero(defaultWallUFactor - 0.05)) {
+									Util.selectSilently(miUFactor5, true);
+									b = true;
+								} else if (Util.isZero(defaultWallUFactor - 0.04)) {
+									Util.selectSilently(miUFactor6, true);
+									b = true;
+								}
+							}
+						}
+						if (!b)
+							miUFactor7.setSelected(true);
+					}
+				}
+
+				@Override
+				public void menuDeselected(MenuEvent e) {
+				}
+
+				@Override
+				public void menuCanceled(MenuEvent e) {
+				}
+
+			});
+
 			popupMenuForWall.addPopupMenuListener(new PopupMenuListener() {
 
 				@Override
@@ -335,6 +510,7 @@ public class PopupMenuFactory {
 
 			popupMenuForWall.add(miInfo);
 			popupMenuForWall.add(miColor);
+			popupMenuForWall.add(uFactorMenu);
 
 		}
 
