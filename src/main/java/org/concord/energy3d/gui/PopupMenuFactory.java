@@ -13,6 +13,7 @@ import javax.swing.event.MenuListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -177,6 +178,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Window) {
 						selectedPart.setUFactor(1.2);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -191,6 +193,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Window) {
 						selectedPart.setUFactor(0.55);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -205,6 +208,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Window) {
 						selectedPart.setUFactor(0.35);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -219,6 +223,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Window) {
 						selectedPart.setUFactor(0.15);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -344,6 +349,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Wall) {
 						selectedPart.setUFactor(0.25);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -358,6 +364,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Wall) {
 						selectedPart.setUFactor(0.22);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -372,6 +379,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Wall) {
 						selectedPart.setUFactor(0.08);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -386,6 +394,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Wall) {
 						selectedPart.setUFactor(0.06);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -400,6 +409,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Wall) {
 						selectedPart.setUFactor(0.05);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -414,6 +424,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Wall) {
 						selectedPart.setUFactor(0.04);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -550,6 +561,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Roof) {
 						selectedPart.setUFactor(0.29);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -564,6 +576,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Roof) {
 						selectedPart.setUFactor(0.05);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -578,6 +591,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Roof) {
 						selectedPart.setUFactor(0.03);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -592,6 +606,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Roof) {
 						selectedPart.setUFactor(0.02);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -716,6 +731,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Door) {
 						selectedPart.setUFactor(0.5);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
@@ -730,6 +746,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Door) {
 						selectedPart.setUFactor(0.35);
 						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 				}
 			});
