@@ -69,7 +69,7 @@ public class MainPanel extends JPanel {
 	private EnergyPanel energyPanel;
 	private JPanel canvasPanel;
 	private JToggleButton energyToggleButton;
-	private JToggleButton solarButton;
+	private JToggleButton energyViewButton;
 	private JSplitPane canvasNoteSplitPane;
 	private JScrollPane noteScrollPane;
 	private JTextArea noteTextArea;
@@ -337,7 +337,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getShadowButton());
 			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimButton());
-			appToolbar.add(getSolarButton());
+			appToolbar.add(getEnergyViewButton());
 			appToolbar.add(getEnergyToggleButton());
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
@@ -659,23 +659,23 @@ public class MainPanel extends JPanel {
 		return energyToggleButton;
 	}
 
-	public JToggleButton getSolarButton() {
-		if (solarButton == null) {
-			solarButton = new JToggleButton("");
-			solarButton.setToolTipText("Calculate energy of the day");
-			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
-			solarButton.addMouseListener(refreshUponMouseExit);
-			solarButton.addItemListener(new ItemListener() {
+	public JToggleButton getEnergyViewButton() {
+		if (energyViewButton == null) {
+			energyViewButton = new JToggleButton("");
+			energyViewButton.setToolTipText("Calculate energy of the day");
+			energyViewButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
+			energyViewButton.addMouseListener(refreshUponMouseExit);
+			energyViewButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setHeatFluxDaily(true);
-					SceneManager.getInstance().setSolarColorMap(solarButton.isSelected());
-					SceneManager.getInstance().setHeatFlux(solarButton.isSelected());
+					SceneManager.getInstance().setSolarColorMap(energyViewButton.isSelected());
+					SceneManager.getInstance().setHeatFlux(energyViewButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
-		return solarButton;
+		return energyViewButton;
 	}
 
 	private JSplitPane getCanvasNoteSplitPane() {
@@ -908,7 +908,7 @@ public class MainPanel extends JPanel {
 
 				@Override
 				public void mousePressed(final MouseEvent e) {
-					solarButton.setSelected(false);
+					energyViewButton.setSelected(false);
 					mousePressed = true;
 					SceneManager.getInstance().resetBuildingRotationAngleRecorded();
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();

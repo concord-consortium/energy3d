@@ -1495,7 +1495,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							MainPanel.getInstance().getSolarButton().setSelected(false);
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 						}
 					});
 					return null;

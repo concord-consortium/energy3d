@@ -938,7 +938,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updatePartEnergy() {
-		final boolean iradiationEnabled = MainPanel.getInstance().getSolarButton().isSelected();
+		final boolean iradiationEnabled = MainPanel.getInstance().getEnergyViewButton().isSelected();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 
 		if (selectedPart instanceof Foundation) {
@@ -1143,7 +1143,7 @@ public class EnergyPanel extends JPanel {
 
 	public void turnOffCompute() {
 		if (SceneManager.getInstance().getSolarColorMap())
-			MainPanel.getInstance().getSolarButton().setSelected(false);
+			MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 		int numberOfHouses = 0;
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())

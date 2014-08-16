@@ -265,7 +265,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().showAxes(!instance.hideAxes);
 		SceneManager.getInstance().showBuildingLabels(instance.showBuildingLabels);
 		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
-		MainPanel.getInstance().getSolarButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
+		MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
 		SceneManager.getInstance().getUndoManager().die();
 		Scene.getInstance().setEdited(false);
 	}
@@ -371,7 +371,7 @@ public class Scene implements Serializable {
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					MainPanel.getInstance().getSolarButton().setSelected(false);
+					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				}
 			});
 		}

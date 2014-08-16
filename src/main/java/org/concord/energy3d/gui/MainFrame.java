@@ -115,9 +115,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem materialCostAnalysisMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
+	private JCheckBoxMenuItem energyViewMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
-	private JCheckBoxMenuItem heatFluxMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
 	protected Object lastSelection;
 	private JMenuItem exitMenuItem = null;
@@ -400,7 +400,6 @@ public class MainFrame extends JFrame {
 			}
 			addItemToFileMenu(getScaleToFitRadioButtonMenuItem());
 			addItemToFileMenu(getExactSizeRadioButtonMenuItem());
-			addItemToFileMenu(new JSeparator());
 			addItemToFileMenu(getPageSetupMenuItem());
 			addItemToFileMenu(getPreviewMenuItem());
 			addItemToFileMenu(getPrintMenuItem());
@@ -878,10 +877,10 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					shadowMenuItem.setSelected(SceneManager.getInstance().isShadowEnabled());
-					axesMenuItem.setSelected(SceneManager.getInstance().areAxesShown());
-					buildingLabelsMenuItem.setSelected(SceneManager.getInstance().areBuildingLabelsShown());
-					heatFluxMenuItem.setSelected(SceneManager.getInstance().getHeatFlux());
+					Util.selectSilently(energyViewMenuItem, MainPanel.getInstance().getEnergyViewButton().isSelected());
+					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
+					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesShown());
+					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsShown());
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
@@ -893,9 +892,9 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getFullTextureMenuItem());
 			viewMenu.add(getColorMenu());
 			viewMenu.addSeparator();
+			viewMenu.add(getEnergyViewMenuItem());
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
-			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
 			// viewMenu.add(getWallThicknessMenuItem());
@@ -925,20 +924,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return axesMenuItem;
-	}
-
-	public JCheckBoxMenuItem getHeatFluxMenuItem() {
-		if (heatFluxMenuItem == null) {
-			heatFluxMenuItem = new JCheckBoxMenuItem("Heat Flux", true);
-			heatFluxMenuItem.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().setHeatFlux(heatFluxMenuItem.isSelected());
-					Scene.getInstance().redrawAll();
-				}
-			});
-		}
-		return heatFluxMenuItem;
 	}
 
 	public JCheckBoxMenuItem getBuildingLabelsMenuItem() {
@@ -1084,6 +1069,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return sensorMenuItem;
+	}
+
+	private JCheckBoxMenuItem getEnergyViewMenuItem() {
+		if (energyViewMenuItem == null) {
+			energyViewMenuItem = new JCheckBoxMenuItem("Energy");
+			energyViewMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					MainPanel.getInstance().getEnergyViewButton().doClick();
+				}
+			});
+		}
+		return energyViewMenuItem;
 	}
 
 	private JMenuItem getDailyAnalysisMenuItem() {
@@ -1455,7 +1453,7 @@ public class MainFrame extends JFrame {
 									EventQueue.invokeLater(new Runnable() {
 										@Override
 										public void run() {
-											MainPanel.getInstance().getSolarButton().setSelected(false);
+											MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 										}
 									});
 									break;
@@ -1900,7 +1898,7 @@ public class MainFrame extends JFrame {
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							MainPanel.getInstance().getSolarButton().setSelected(false);
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 						}
 					});
 				}
