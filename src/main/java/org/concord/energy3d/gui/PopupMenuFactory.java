@@ -538,6 +538,121 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu uFactorMenu = new JMenu("U-Factor");
+
+			ButtonGroup uFactorButtonGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem miUFactor1 = new JRadioButtonMenuItem("0.29 (old house)");
+			miUFactor1.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Roof) {
+						selectedPart.setUFactor(0.29);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor1);
+			uFactorMenu.add(miUFactor1);
+
+			final JRadioButtonMenuItem miUFactor2 = new JRadioButtonMenuItem("0.05 (R22, cellulose/fiberglass)");
+			miUFactor2.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Roof) {
+						selectedPart.setUFactor(0.05);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor2);
+			uFactorMenu.add(miUFactor2);
+
+			final JRadioButtonMenuItem miUFactor3 = new JRadioButtonMenuItem("0.03 (R38, cellulose/fiberglass)");
+			miUFactor3.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Roof) {
+						selectedPart.setUFactor(0.03);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor3);
+			uFactorMenu.add(miUFactor3);
+
+			final JRadioButtonMenuItem miUFactor4 = new JRadioButtonMenuItem("0.02 (R50, cellulose/fiberglass)");
+			miUFactor4.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Roof) {
+						selectedPart.setUFactor(0.02);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor4);
+			uFactorMenu.add(miUFactor4);
+
+			final JRadioButtonMenuItem miUFactor5 = new JRadioButtonMenuItem();
+			uFactorButtonGroup.add(miUFactor5);
+
+			uFactorMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(MenuEvent e) {
+					boolean b = false;
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Roof) {
+						if (Util.isZero(selectedPart.getUFactor() - 0.29)) {
+							Util.selectSilently(miUFactor1, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.05)) {
+							Util.selectSilently(miUFactor2, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.03)) {
+							Util.selectSilently(miUFactor3, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.02)) {
+							Util.selectSilently(miUFactor4, true);
+							b = true;
+						} else {
+							if (Util.isZero(selectedPart.getUFactor())) {
+								double defaultRoofUFactor = HeatLoad.parseUFactor(EnergyPanel.getInstance().getRoofsComboBox());
+								if (Util.isZero(defaultRoofUFactor - 0.29)) {
+									Util.selectSilently(miUFactor1, true);
+									b = true;
+								} else if (Util.isZero(defaultRoofUFactor - 0.05)) {
+									Util.selectSilently(miUFactor2, true);
+									b = true;
+								} else if (Util.isZero(defaultRoofUFactor - 0.03)) {
+									Util.selectSilently(miUFactor3, true);
+									b = true;
+								} else if (Util.isZero(defaultRoofUFactor - 0.02)) {
+									Util.selectSilently(miUFactor4, true);
+									b = true;
+								}
+							}
+						}
+						if (!b)
+							miUFactor5.setSelected(true);
+					}
+				}
+
+				@Override
+				public void menuDeselected(MenuEvent e) {
+				}
+
+				@Override
+				public void menuCanceled(MenuEvent e) {
+				}
+
+			});
+
 			popupMenuForRoof.addPopupMenuListener(new PopupMenuListener() {
 
 				@Override
@@ -561,6 +676,7 @@ public class PopupMenuFactory {
 
 			popupMenuForRoof.add(miInfo);
 			popupMenuForRoof.add(miColor);
+			popupMenuForRoof.add(uFactorMenu);
 
 		}
 
@@ -588,6 +704,81 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu uFactorMenu = new JMenu("U-Factor");
+
+			ButtonGroup uFactorButtonGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem miUFactor1 = new JRadioButtonMenuItem("0.50 (wood)");
+			miUFactor1.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Door) {
+						selectedPart.setUFactor(0.5);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor1);
+			uFactorMenu.add(miUFactor1);
+
+			final JRadioButtonMenuItem miUFactor2 = new JRadioButtonMenuItem("0.35 (insulated)");
+			miUFactor2.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Door) {
+						selectedPart.setUFactor(0.35);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor2);
+			uFactorMenu.add(miUFactor2);
+
+			final JRadioButtonMenuItem miUFactor3 = new JRadioButtonMenuItem();
+			uFactorButtonGroup.add(miUFactor3);
+
+			uFactorMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(MenuEvent e) {
+					boolean b = false;
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Door) {
+						if (Util.isZero(selectedPart.getUFactor() - 0.5)) {
+							Util.selectSilently(miUFactor1, true);
+							b = true;
+						} else if (Util.isZero(selectedPart.getUFactor() - 0.35)) {
+							Util.selectSilently(miUFactor2, true);
+							b = true;
+						} else {
+							if (Util.isZero(selectedPart.getUFactor())) {
+								double defaultDoorUFactor = HeatLoad.parseUFactor(EnergyPanel.getInstance().getDoorsComboBox());
+								if (Util.isZero(defaultDoorUFactor - 0.5)) {
+									Util.selectSilently(miUFactor1, true);
+									b = true;
+								} else if (Util.isZero(defaultDoorUFactor - 0.35)) {
+									Util.selectSilently(miUFactor2, true);
+									b = true;
+								}
+							}
+						}
+						if (!b)
+							miUFactor3.setSelected(true);
+					}
+				}
+
+				@Override
+				public void menuDeselected(MenuEvent e) {
+				}
+
+				@Override
+				public void menuCanceled(MenuEvent e) {
+				}
+
+			});
+
 			popupMenuForDoor.addPopupMenuListener(new PopupMenuListener() {
 
 				@Override
@@ -611,6 +802,7 @@ public class PopupMenuFactory {
 
 			popupMenuForDoor.add(miInfo);
 			popupMenuForDoor.add(miColor);
+			popupMenuForDoor.add(uFactorMenu);
 
 		}
 
