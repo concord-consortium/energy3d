@@ -51,6 +51,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
@@ -1767,7 +1768,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getExportLogMenuItem() {
 		if (exportLogMenuItem == null) {
-			exportLogMenuItem = new JMenuItem("Export Log...");
+			exportLogMenuItem = new JMenuItem("Export Log As Zip...");
 			exportLogMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1797,7 +1798,45 @@ public class MainFrame extends JFrame {
 					}
 				}
 				if (doIt) {
-					zipLog(file);
+					final File zipFile = file;
+					final JDialog dialog = new JDialog(this, true);
+					dialog.setTitle("Export log as a zip file");
+					dialog.setUndecorated(true);
+					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					JPanel panel = new JPanel(new BorderLayout(20, 20));
+					panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+					panel.setPreferredSize(new Dimension(400, 150));
+					dialog.setContentPane(panel);
+					final JLabel statusLabel = new JLabel();
+					statusLabel.setBorder(BorderFactory.createEtchedBorder());
+					panel.add(statusLabel, BorderLayout.CENTER);
+					JPanel buttonPanel = new JPanel();
+					panel.add(buttonPanel, BorderLayout.SOUTH);
+					final JButton closeButton = new JButton("Close");
+					closeButton.setEnabled(false);
+					closeButton.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							dialog.dispose();
+						}
+					});
+					buttonPanel.add(closeButton);
+					new SwingWorker<String, Object>() {
+						@Override
+						public String doInBackground() {
+							zipLog(zipFile);
+							return null;
+						}
+
+						@Override
+						protected void done() {
+							statusLabel.setText("<html>&nbsp;&nbsp;&nbsp;" + zipFile + " was created.<br><br>&nbsp;&nbsp;&nbsp;<b>Please send it to your teacher.</b></html>");
+							closeButton.setEnabled(true);
+						}
+					}.execute();
+					dialog.pack();
+					dialog.setLocationRelativeTo(this);
+					dialog.setVisible(true);
 				}
 			} catch (final Throwable err) {
 				err.printStackTrace();
@@ -1806,7 +1845,7 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void zipLog(File file) {
+	private String zipLog(File file) {
 
 		File logFolder = SnapshotLogger.getLogFolder();
 
@@ -1815,11 +1854,11 @@ public class MainFrame extends JFrame {
 			zos = new ZipOutputStream(new FileOutputStream(file, false));
 		} catch (IOException e) {
 			e.printStackTrace();
+			return e.getLocalizedMessage();
 		}
 
 		FileInputStream in = null;
 		int c;
-		boolean b = true;
 		try {
 			for (File f : logFolder.listFiles()) {
 				zos.putNextEntry(new ZipEntry(f.getName()));
@@ -1832,25 +1871,25 @@ public class MainFrame extends JFrame {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			b = false;
+			return e.getLocalizedMessage();
 		} finally {
 			try {
 				zos.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+				return e.getLocalizedMessage();
 			}
 			if (in != null) {
 				try {
 					in.close();
 				} catch (IOException e) {
 					e.printStackTrace();
+					return e.getLocalizedMessage();
 				}
 			}
 		}
 
-		if (b) {
-			System.out.println(file + " written");
-		}
+		return logFolder.list().length + " files written";
 
 	}
 
