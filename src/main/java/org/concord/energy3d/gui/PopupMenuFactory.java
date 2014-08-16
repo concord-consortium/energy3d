@@ -24,6 +24,8 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
+import org.concord.energy3d.simulation.HeatLoad;
+import org.concord.energy3d.util.Util;
 
 /**
  * Pop-up menus for customizing individual elements.
@@ -67,6 +69,7 @@ public class PopupMenuFactory {
 
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
+
 			final JMenu styleMenu = new JMenu("Style");
 
 			ButtonGroup styleButtonGroup = new ButtonGroup();
@@ -164,7 +167,98 @@ public class PopupMenuFactory {
 
 			});
 
-			styleMenu.add(miEmpty);
+			final JMenu uFactorMenu = new JMenu("U-Factor");
+
+			ButtonGroup uFactorButtonGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem miUFactor1 = new JRadioButtonMenuItem("1.20 (single pane)");
+			miUFactor1.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						selectedPart.setUFactor(1.2);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor1);
+			uFactorMenu.add(miUFactor1);
+
+			final JRadioButtonMenuItem miUFactor2 = new JRadioButtonMenuItem("0.55 (double pane)");
+			miUFactor2.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						selectedPart.setUFactor(0.55);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor2);
+			uFactorMenu.add(miUFactor2);
+
+			final JRadioButtonMenuItem miUFactor3 = new JRadioButtonMenuItem("0.35 (double pane, low-e)");
+			miUFactor3.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						selectedPart.setUFactor(0.35);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor3);
+			uFactorMenu.add(miUFactor3);
+
+			final JRadioButtonMenuItem miUFactor4 = new JRadioButtonMenuItem("0.15 (triple pane)");
+			miUFactor4.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						selectedPart.setUFactor(0.15);
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			uFactorButtonGroup.add(miUFactor4);
+			uFactorMenu.add(miUFactor4);
+
+			final JRadioButtonMenuItem miUFactor5 = new JRadioButtonMenuItem();
+			uFactorButtonGroup.add(miUFactor5);
+
+			uFactorMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(MenuEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						double windowUFactor = HeatLoad.parseUFactor(EnergyPanel.getInstance().getWindowsComboBox());
+						if (Util.isZero(selectedPart.getUFactor() - 1.2) || Util.isZero(windowUFactor - 1.2))
+							miUFactor1.setSelected(true);
+						else if (Util.isZero(selectedPart.getUFactor() - 0.55) || Util.isZero(windowUFactor - 0.55))
+							miUFactor2.setSelected(true);
+						else if (Util.isZero(selectedPart.getUFactor() - 0.35) || Util.isZero(windowUFactor - 0.35))
+							miUFactor3.setSelected(true);
+						else if (Util.isZero(selectedPart.getUFactor() - 0.15) || Util.isZero(windowUFactor - 0.15))
+							miUFactor4.setSelected(true);
+						else
+							miUFactor5.setSelected(true);
+					}
+				}
+
+				@Override
+				public void menuDeselected(MenuEvent e) {
+				}
+
+				@Override
+				public void menuCanceled(MenuEvent e) {
+				}
+
+			});
 
 			popupMenuForWindow.addPopupMenuListener(new PopupMenuListener() {
 
@@ -190,6 +284,7 @@ public class PopupMenuFactory {
 
 			popupMenuForWindow.add(miInfo);
 			popupMenuForWindow.add(styleMenu);
+			popupMenuForWindow.add(uFactorMenu);
 
 		}
 

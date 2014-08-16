@@ -90,6 +90,7 @@ public abstract class HousePart implements Serializable {
 	private boolean firstPointInserted = false;
 	private boolean freeze;
 	private ReadOnlyColorRGBA color; // custom color
+	private double uFactor = 0;
 
 	transient Line heatFlux;
 	transient static float heatFluxUnitArea = 2;
@@ -911,6 +912,14 @@ public abstract class HousePart implements Serializable {
 
 	public Spatial getCollisionSpatial() {
 		return mesh;
+	}
+
+	public void setUFactor(double uFactor) {
+		this.uFactor = uFactor;
+	}
+
+	public double getUFactor() {
+		return uFactor;
 	}
 
 	double calculateHeatVector() {

@@ -21,13 +21,38 @@ import com.ardor3d.math.Vector3;
 public class HeatLoad {
 
 	private final static HeatLoad instance = new HeatLoad();
+	private double wallUFactor, doorUFactor, windowUFactor, roofUFactor;
 
 	public static HeatLoad getInstance() {
 		return instance;
 	}
 
+	private double getUFactor(HousePart part) {
+		if (part instanceof Wall)
+			return part.getUFactor() < 0.000001 ? wallUFactor : part.getUFactor();
+		if (part instanceof Door)
+			return part.getUFactor() < 0.000001 ? doorUFactor : part.getUFactor();
+		if (part instanceof Roof)
+			return part.getUFactor() < 0.000001 ? roofUFactor : part.getUFactor();
+		if (part instanceof Window)
+			return part.getUFactor() < 0.000001 ? windowUFactor : part.getUFactor();
+		if (part instanceof Sensor) {
+			HousePart container = part.getContainer();
+			if (container instanceof Wall) {
+				final HousePart x = insideChild(part.getPoints().get(0), container);
+				if (x instanceof Window)
+					return x.getUFactor() < 0.000001 ? windowUFactor : x.getUFactor();
+				if (x instanceof Door)
+					return x.getUFactor() < 0.000001 ? doorUFactor : x.getUFactor();
+				return container.getUFactor() < 0.000001 ? wallUFactor : container.getUFactor();
+			} else if (container instanceof Roof) {
+				return container.getUFactor() < 0.000001 ? roofUFactor : container.getUFactor();
+			}
+		}
+		return part.getUFactor();
+	}
+
 	public void computeEnergyToday(final Calendar today, final double insideTemperature) {
-		final double wallUFactor, doorUFactor, windowUFactor, roofUFactor;
 		try {
 			wallUFactor = parseUFactor(EnergyPanel.getInstance().getWallsComboBox());
 			doorUFactor = parseUFactor(EnergyPanel.getInstance().getDoorsComboBox());
@@ -59,29 +84,8 @@ public class HeatLoad {
 				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
 				final double deltaT = insideTemperature - outsideTemperature;
 				if (part.isDrawCompleted()) {
-					final double uFactor;
-					if (part instanceof Wall)
-						uFactor = wallUFactor;
-					else if (part instanceof Door)
-						uFactor = doorUFactor;
-					else if (part instanceof Window)
-						uFactor = windowUFactor;
-					else if (part instanceof Roof)
-						uFactor = roofUFactor;
-					else if (part instanceof Sensor) {
-						if (part.getContainer() instanceof Wall) {
-							final HousePart x = insideChild(part.getPoints().get(0), part.getContainer());
-							if (x instanceof Window)
-								uFactor = windowUFactor;
-							else if (x instanceof Door)
-								uFactor = doorUFactor;
-							else
-								uFactor = wallUFactor;
-						} else if (part.getContainer() instanceof Roof)
-							uFactor = roofUFactor;
-						else
-							continue;
-					} else
+					double uFactor = getUFactor(part);
+					if (uFactor < 0.000001)
 						continue;
 					double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
 					if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
@@ -90,6 +94,7 @@ public class HeatLoad {
 				}
 			}
 		}
+
 	}
 
 	private static HousePart insideChild(final Vector3 point, final HousePart parent) {
