@@ -83,7 +83,6 @@ public class EnergyPanel extends JPanel {
 	private boolean cancel;
 	private Object disableActionsRequester;
 	private boolean alreadyRenderedHeatmap = false;
-	private UpdateRadiation updateRadiation;
 	private boolean computeEnabled = true;
 	private final List<PropertyChangeListener> propertyChangeListeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
 
@@ -782,7 +781,6 @@ public class EnergyPanel extends JPanel {
 		if (!computeEnabled)
 			return;
 		updateWeatherData(); // TODO: There got to be a better way to do this
-		this.updateRadiation = updateRadiation;
 		if (thread != null && thread.isAlive())
 			computeRequest = true;
 		else {
@@ -794,7 +792,7 @@ public class EnergyPanel extends JPanel {
 						cancel = false;
 						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
 						try {
-							final boolean doCompute = EnergyPanel.this.updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarColorMap() && (!alreadyRenderedHeatmap || autoRecomputeEnergy));
+							final boolean doCompute = updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarColorMap() && (!alreadyRenderedHeatmap || autoRecomputeEnergy));
 							if (doCompute) {
 								alreadyRenderedHeatmap = true;
 								computeNow();
@@ -1145,15 +1143,17 @@ public class EnergyPanel extends JPanel {
 		if (SceneManager.getInstance().getSolarColorMap())
 			MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 		int numberOfHouses = 0;
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
-				numberOfHouses++;
-			if (numberOfHouses >= 2)
-				break;
+		synchronized (SceneManager.getInstance()) {
+			for (final HousePart part : Scene.getInstance().getParts()) {
+				if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
+					numberOfHouses++;
+				if (numberOfHouses >= 2)
+					break;
+			}
+			for (final HousePart part : Scene.getInstance().getParts())
+				if (part instanceof Foundation)
+					((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
 		}
-		for (final HousePart part : Scene.getInstance().getParts())
-			if (part instanceof Foundation)
-				((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
 		SceneManager.getInstance().getSolarLand().setVisible(false);
 		Scene.getInstance().redrawAll();
 	}

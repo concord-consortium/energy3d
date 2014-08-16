@@ -19,12 +19,17 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -53,6 +58,7 @@ import javax.swing.filechooser.FileFilter;
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PostProcessor;
+import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -149,7 +155,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem floorColorMenuItem;
 	private JMenuItem roofColorMenuItem;
 	private JMenuItem importColladaMenuItem;
-	private JMenuItem saveAsImageMenuItem;
+	private JMenuItem exportImageMenuItem;
+	private JMenuItem exportLogMenuItem;
 	private JMenuItem lockAllMenuItem;
 	private JMenuItem unlockAllMenuItem;
 	private JMenuItem lockSelectionMenuItem;
@@ -162,6 +169,7 @@ public class MainFrame extends JFrame {
 	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
 	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
 	private final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
+	private final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
 	private JCheckBoxMenuItem autoRecomputeEnergyMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
 
@@ -388,8 +396,9 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getOpenMenuItem());
 			addItemToFileMenu(getSaveMenuItem());
 			addItemToFileMenu(getSaveasMenuItem());
-			addItemToFileMenu(getSaveAsImageMenuItem());
 			addItemToFileMenu(new JSeparator());
+			addItemToFileMenu(getExportImageMenuItem());
+			addItemToFileMenu(getExportLogMenuItem());
 			addItemToFileMenu(getImportMenuItem());
 			addItemToFileMenu(getImportColladaMenuItem());
 			addItemToFileMenu(new JSeparator());
@@ -473,6 +482,7 @@ public class MainFrame extends JFrame {
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
 		fileChooser.removeChoosableFileFilter(daeFilter);
+		fileChooser.removeChoosableFileFilter(zipFilter);
 		fileChooser.setFileFilter(ng3Filter);
 		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 			SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
@@ -511,6 +521,7 @@ public class MainFrame extends JFrame {
 					fileChooser.removeChoosableFileFilter(ng3Filter);
 					fileChooser.removeChoosableFileFilter(pngFilter);
 					fileChooser.removeChoosableFileFilter(daeFilter);
+					fileChooser.removeChoosableFileFilter(zipFilter);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						final File dir = fileChooser.getSelectedFile();
@@ -547,6 +558,7 @@ public class MainFrame extends JFrame {
 					fileChooser.removeChoosableFileFilter(ng3Filter);
 					fileChooser.removeChoosableFileFilter(pngFilter);
 					fileChooser.removeChoosableFileFilter(daeFilter);
+					fileChooser.removeChoosableFileFilter(zipFilter);
 					if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						final File dir = fileChooser.getSelectedFile();
@@ -1175,17 +1187,20 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					lockSelectionMenuItem.setEnabled(SceneManager.getInstance().getSelectedPart() != null);
+					if (lockSelectionMenuItem != null)
+						lockSelectionMenuItem.setEnabled(SceneManager.getInstance().getSelectedPart() != null);
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 					final HousePart selected = SceneManager.getInstance().getSelectedPart();
-					if (selected instanceof Foundation) {
-						disableFoundationCheckBoxMenuItem.setEnabled(true);
-						Util.selectSilently(disableFoundationCheckBoxMenuItem, ((Foundation) selected).getLockEdit());
-					} else {
-						disableFoundationCheckBoxMenuItem.setEnabled(false);
-						Util.selectSilently(disableFoundationCheckBoxMenuItem, false);
+					if (disableFoundationCheckBoxMenuItem != null) {
+						if (selected instanceof Foundation) {
+							disableFoundationCheckBoxMenuItem.setEnabled(true);
+							Util.selectSilently(disableFoundationCheckBoxMenuItem, ((Foundation) selected).getLockEdit());
+						} else {
+							disableFoundationCheckBoxMenuItem.setEnabled(false);
+							Util.selectSilently(disableFoundationCheckBoxMenuItem, false);
+						}
 					}
 				}
 			});
@@ -1267,6 +1282,7 @@ public class MainFrame extends JFrame {
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
 		fileChooser.removeChoosableFileFilter(daeFilter);
+		fileChooser.removeChoosableFileFilter(zipFilter);
 		fileChooser.setFileFilter(ng3Filter);
 		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
@@ -1297,6 +1313,7 @@ public class MainFrame extends JFrame {
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
 		fileChooser.removeChoosableFileFilter(daeFilter);
+		fileChooser.removeChoosableFileFilter(zipFilter);
 		fileChooser.setFileFilter(ng3Filter);
 		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
@@ -1313,6 +1330,7 @@ public class MainFrame extends JFrame {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.removeChoosableFileFilter(pngFilter);
 		fileChooser.removeChoosableFileFilter(ng3Filter);
+		fileChooser.removeChoosableFileFilter(zipFilter);
 		fileChooser.addChoosableFileFilter(daeFilter);
 		fileChooser.setFileFilter(daeFilter);
 		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
@@ -1747,26 +1765,116 @@ public class MainFrame extends JFrame {
 		return importColladaMenuItem;
 	}
 
-	private JMenuItem getSaveAsImageMenuItem() {
-		if (saveAsImageMenuItem == null) {
-			saveAsImageMenuItem = new JMenuItem("Save As Image...");
-			saveAsImageMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getExportLogMenuItem() {
+		if (exportLogMenuItem == null) {
+			exportLogMenuItem = new JMenuItem("Export Log...");
+			exportLogMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					saveAsImage();
+					exportLog();
 				}
 			});
 		}
-		return saveAsImageMenuItem;
+		return exportLogMenuItem;
 	}
 
-	private void saveAsImage() {
+	private void exportLog() {
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.addChoosableFileFilter(zipFilter);
+		fileChooser.removeChoosableFileFilter(pngFilter);
+		fileChooser.removeChoosableFileFilter(ng3Filter);
+		fileChooser.removeChoosableFileFilter(daeFilter);
+		fileChooser.setFileFilter(zipFilter);
+		if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+			try {
+				File file = fileChooser.getSelectedFile();
+				if (!file.getName().toLowerCase().endsWith(".zip"))
+					file = new File(file.toString() + ".zip");
+				boolean doIt = true;
+				if (file.exists()) {
+					if (JOptionPane.showConfirmDialog(this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+						doIt = false;
+					}
+				}
+				if (doIt) {
+					zipLog(file);
+				}
+			} catch (final Throwable err) {
+				err.printStackTrace();
+				JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
+	private void zipLog(File file) {
+
+		File logFolder = SnapshotLogger.getLogFolder();
+
+		ZipOutputStream zos = null;
+		try {
+			zos = new ZipOutputStream(new FileOutputStream(file, false));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		FileInputStream in = null;
+		int c;
+		boolean b = true;
+		try {
+			for (File f : logFolder.listFiles()) {
+				zos.putNextEntry(new ZipEntry(f.getName()));
+				in = new FileInputStream(f);
+				while ((c = in.read()) != -1)
+					zos.write(c);
+				in.close();
+				zos.flush();
+				zos.closeEntry();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			b = false;
+		} finally {
+			try {
+				zos.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		if (b) {
+			System.out.println(file + " written");
+		}
+
+	}
+
+	private JMenuItem getExportImageMenuItem() {
+		if (exportImageMenuItem == null) {
+			exportImageMenuItem = new JMenuItem("Export Scene As Image...");
+			exportImageMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					exportImage();
+				}
+			});
+		}
+		return exportImageMenuItem;
+	}
+
+	private void exportImage() {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(pngFilter);
 		fileChooser.removeChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(daeFilter);
+		fileChooser.removeChoosableFileFilter(zipFilter);
 		fileChooser.setFileFilter(pngFilter);
-		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+		if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 			System.out.print("Saving snapshot: ");
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 			try {
@@ -1776,7 +1884,7 @@ public class MainFrame extends JFrame {
 				System.out.print(file + "...");
 				boolean doIt = true;
 				if (file.exists()) {
-					if (JOptionPane.showConfirmDialog(MainFrame.this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+					if (JOptionPane.showConfirmDialog(this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
 						doIt = false;
 					}
 				}
@@ -1787,7 +1895,7 @@ public class MainFrame extends JFrame {
 				}
 			} catch (final Throwable err) {
 				err.printStackTrace();
-				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

@@ -90,8 +90,7 @@ public class MainApplication {
 		final String newLibraryPath = "." + pathSep + rendererNativePath + sep + OSPath + pathSep + orgLibraryPath;
 		System.setProperty("java.library.path", newLibraryPath);
 		System.out.println("Path = " + System.getProperty("java.library.path"));
-		// The following code is to empty the library path cache in order to
-		// force JVM to use the new library path above
+		// The following code is to empty the library path cache in order to force JVM to use the new library path above
 		java.lang.reflect.Field fieldSysPath;
 		try {
 			fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");

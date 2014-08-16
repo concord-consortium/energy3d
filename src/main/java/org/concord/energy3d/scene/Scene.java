@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -75,7 +76,7 @@ public class Scene implements Serializable {
 	private static boolean drawAnnotationsInside = false;
 	private static Unit unit = Unit.Meter;
 	private transient boolean edited = false;
-	private final List<HousePart> parts = new ArrayList<HousePart>();
+	private final List<HousePart> parts = Collections.synchronizedList(new ArrayList<HousePart>());
 	private TextureMode textureMode = TextureMode.Full;
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
@@ -190,6 +191,7 @@ public class Scene implements Serializable {
 	public static void openNow(final URL file) throws Exception {
 
 		synchronized (SceneManager.getInstance()) {
+
 			Scene.url = file;
 
 			if (PrintController.getInstance().isPrintPreview()) {
@@ -249,7 +251,7 @@ public class Scene implements Serializable {
 		root.attachChild(notReceivingShadowRoot);
 
 		if (url != null) {
-			synchronized (instance.getParts()) {
+			synchronized (instance.parts) {
 				for (final HousePart housePart : instance.getParts()) {
 					boolean b = housePart instanceof Tree || housePart instanceof Human;
 					(b ? notReceivingShadowRoot : originalHouseRoot).attachChild(housePart.getRoot());
@@ -838,8 +840,8 @@ public class Scene implements Serializable {
 	}
 
 	public boolean hasSensor() {
-		synchronized (instance.parts) {
-			for (final HousePart housePart : instance.parts)
+		synchronized (parts) {
+			for (final HousePart housePart : parts)
 				if (housePart instanceof Sensor)
 					return true;
 		}

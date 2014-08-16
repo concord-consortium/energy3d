@@ -18,6 +18,10 @@ public class SnapshotLogger {
 
 	private SnapshotLogger() {
 	}
+	
+	public static File getLogFolder() {
+		return LoggerUtil.getLogFolder();
+	}
 
 	public static void start(final int period, final TimeSeriesLogger logger) {
 		final Thread t = new Thread("Snapshots Logger") {
