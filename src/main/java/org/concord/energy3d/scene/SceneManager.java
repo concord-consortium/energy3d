@@ -1305,17 +1305,31 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void mouseRightClicked(final MouseState mouseState) {
-		if (operation == Operation.SELECT) {
-			final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
-			final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
-			selectedHousePart = pick == null ? null : pick.getHousePart();
-			System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);
-			if (selectedHousePart != null) {
-				final JPopupMenu popupMenu = PopupMenuFactory.getPopupMenu();
-				if (popupMenu != null)
-					popupMenu.show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
+		refresh = true;
+		taskManager.update(new Callable<Object>() {
+			@Override
+			public Object call() {
+				if (operation == Operation.SELECT) {
+					final HousePart previousSelectedHousePart = selectedHousePart;
+					final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
+					final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
+					selectedHousePart = pick == null ? null : pick.getHousePart();
+					System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);
+					if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
+						previousSelectedHousePart.setEditPointsVisible(false);
+						previousSelectedHousePart.setGridsVisible(false);
+					}
+					if (selectedHousePart != null) {
+						if (!PrintController.getInstance().isPrintPreview())
+							selectedHousePart.setEditPointsVisible(true);
+						final JPopupMenu popupMenu = PopupMenuFactory.getPopupMenu();
+						if (popupMenu != null)
+							popupMenu.show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
+					}
+				}
+				return null;
 			}
-		}
+		});
 	}
 
 	private void mousePressed(final MouseState mouseState) {
