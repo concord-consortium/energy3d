@@ -52,7 +52,8 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
 				graph.addData("Solar", selectedPart.getSolarPotentialToday());
 			}
 		} else if (selectedPart instanceof Window) {
-			final double solar = selectedPart.getSolarPotentialToday() * Scene.getInstance().getWindowSolarHeatGainCoefficientNotPercentage();
+			Window window = (Window) selectedPart;
+			final double solar = selectedPart.getSolarPotentialToday() * window.getSolarHeatGainCoefficientNotPercentage();
 			graph.addData("Solar", solar);
 			final double[] loss = selectedPart.getHeatLoss();
 			double sum = 0;

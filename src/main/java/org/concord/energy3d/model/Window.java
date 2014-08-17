@@ -34,6 +34,7 @@ public class Window extends HousePart {
 	private transient BMText label1;
 	private transient Line bars;
 
+	private double solarHeatGainCoefficient;
 	private int style = SMALL_PANES;
 
 	public Window() {
@@ -350,6 +351,14 @@ public class Window extends HousePart {
 
 	public int getStyle() {
 		return style;
+	}
+
+	public void setSolarHeatGainCoefficient(double shgc) {
+		solarHeatGainCoefficient = shgc;
+	}
+
+	public double getSolarHeatGainCoefficientNotPercentage() {
+		return Util.isZero(solarHeatGainCoefficient) ? Scene.getInstance().getWindowSolarHeatGainCoefficientNotPercentage() : solarHeatGainCoefficient * 0.01;
 	}
 
 }

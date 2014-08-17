@@ -285,6 +285,91 @@ public class PopupMenuFactory {
 
 			});
 
+			final JMenu shgcMenu = new JMenu("Solar Heat Gain Coefficient");
+
+			ButtonGroup shgcButtonGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem miShgc1 = new JRadioButtonMenuItem("25%");
+			miShgc1.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						((Window) selectedPart).setSolarHeatGainCoefficient(25);
+						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					}
+				}
+			});
+			shgcButtonGroup.add(miShgc1);
+			shgcMenu.add(miShgc1);
+
+			final JRadioButtonMenuItem miShgc2 = new JRadioButtonMenuItem("50%");
+			miShgc2.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						((Window) selectedPart).setSolarHeatGainCoefficient(50);
+						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					}
+				}
+			});
+			shgcButtonGroup.add(miShgc2);
+			shgcMenu.add(miShgc2);
+
+			final JRadioButtonMenuItem miShgc3 = new JRadioButtonMenuItem("80%");
+			miShgc3.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						((Window) selectedPart).setSolarHeatGainCoefficient(80);
+						Scene.getInstance().setEdited(true);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					}
+				}
+			});
+			shgcButtonGroup.add(miShgc3);
+			shgcMenu.add(miShgc3);
+
+			final JRadioButtonMenuItem miShgc4 = new JRadioButtonMenuItem();
+			shgcButtonGroup.add(miShgc4);
+
+			shgcMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(MenuEvent e) {
+					boolean b = false;
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						Window window = (Window) selectedPart;
+						if (Util.isZero(window.getSolarHeatGainCoefficientNotPercentage() - 0.25)) {
+							Util.selectSilently(miShgc1, true);
+							b = true;
+						} else if (Util.isZero(window.getSolarHeatGainCoefficientNotPercentage() - 0.5)) {
+							Util.selectSilently(miShgc2, true);
+							b = true;
+						} else if (Util.isZero(window.getSolarHeatGainCoefficientNotPercentage() - 0.8)) {
+							Util.selectSilently(miShgc3, true);
+							b = true;
+						}
+						if (!b)
+							miShgc4.setSelected(true);
+					}
+				}
+
+				@Override
+				public void menuDeselected(MenuEvent e) {
+				}
+
+				@Override
+				public void menuCanceled(MenuEvent e) {
+				}
+
+			});
+
 			popupMenuForWindow.addPopupMenuListener(new PopupMenuListener() {
 
 				@Override
@@ -310,6 +395,7 @@ public class PopupMenuFactory {
 			popupMenuForWindow.add(miInfo);
 			popupMenuForWindow.add(styleMenu);
 			popupMenuForWindow.add(uFactorMenu);
+			popupMenuForWindow.add(shgcMenu);
 
 		}
 
