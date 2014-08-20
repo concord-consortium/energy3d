@@ -68,20 +68,16 @@ public class HeatLoad {
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
 
-		final double[] outsideTemperatureRange;
-
-		final int timeStep = SolarIrradiation.getInstance().getTimeStep();
-		for (final HousePart part : Scene.getInstance().getParts())
-			part.setHeatLoss(new double[1440 / timeStep]);
-
 		if (EnergyPanel.getInstance().getCityComboBox().getSelectedItem().equals(""))
 			return;
-		else
-			outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 
+		final int timeStep = SolarIrradiation.getInstance().getTimeStep();
+		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 		for (int minute = 0; minute < 1440; minute += timeStep) {
 			for (final HousePart part : Scene.getInstance().getParts()) {
-				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
+				float absorption = part instanceof Window ? 0 : 1 - part.getAlbedo();
+				double solarHeat = part.getSolarPotential()[minute / timeStep] * absorption / part.getVolumetricHeatCapacity();
+				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute) + solarHeat;
 				final double deltaT = insideTemperature - outsideTemperature;
 				if (part.isDrawCompleted()) {
 					double uFactor = getUFactor(part);

@@ -95,7 +95,6 @@ public class SolarIrradiation {
 			part.setSolarPotential(new double[1440 / timeStep]);
 		maxValue = 1;
 		computeToday((Calendar) Heliodon.getInstance().getCalender().clone());
-		updateValueOnAllHouses();
 	}
 
 	private void initCollidables() {
@@ -164,6 +163,7 @@ public class SolarIrradiation {
 			onMesh.put(SceneManager.getInstance().getSolarLand(), data);
 		}
 		final Vector3 p = new Vector3();
+		double absorption = 1 - Scene.getInstance().getBackgroundAlbedo();
 		for (int col = 0; col < cols; col++) {
 			p.setX((col - cols / 2) * step + step / 2.0);
 			for (int row = 0; row < rows; row++) {
@@ -175,32 +175,9 @@ public class SolarIrradiation {
 				for (final Spatial spatial : collidables)
 					PickingUtil.findPick(spatial, pickRay, pickResults, false);
 				if (pickResults.getNumber() == 0)
-					data.solar[row][col] += radiation;
+					data.solar[row][col] += radiation * absorption;
 			}
 		}
-	}
-
-	private float getLightness(HousePart part) {
-		ReadOnlyColorRGBA color = null;
-		if (part.getColor() != null) {
-			color = part.getColor();
-		} else {
-			if (part instanceof Foundation)
-				color = Scene.getInstance().getFoundationColor();
-			else if (part instanceof Door)
-				color = Scene.getInstance().getDoorColor();
-			else if (part instanceof Roof)
-				color = Scene.getInstance().getRoofColor();
-			else if (part instanceof Wall)
-				color = Scene.getInstance().getWallColor();
-			else
-				color = ColorRGBA.WHITE;
-		}
-		float min = Math.min(color.getRed(), color.getGreen());
-		min = Math.min(min, color.getBlue());
-		float max = Math.max(color.getRed(), color.getGreen());
-		max = Math.max(max, color.getBlue());
-		return 0.5f * (min + max);
 	}
 
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
@@ -223,8 +200,7 @@ public class SolarIrradiation {
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
-
-		float darkness = 1 - getLightness(housePart); // at least 20% dark, hence 1.2
+		float absorption = housePart instanceof Window ? 1 : 1 - housePart.getAlbedo();
 
 		for (int col = 0; col < data.cols; col++) {
 			final ReadOnlyVector3 pU = data.u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(data.p0);
@@ -257,8 +233,8 @@ public class SolarIrradiation {
 					if (!collision)
 						radiation += directRadiation;
 				}
-				data.solar[row][col] += darkness * radiation;
-				housePart.getSolarPotential()[minute / timeStep] += darkness * radiation * w * h * scaleFactor;
+				data.solar[row][col] += absorption * radiation;
+				housePart.getSolarPotential()[minute / timeStep] += absorption * radiation * w * h * scaleFactor;
 			}
 		}
 
@@ -514,7 +490,7 @@ public class SolarIrradiation {
 		return result;
 	}
 
-	private void updateValueOnAllHouses() {
+	public void computeTotalEnergyForBuildings() {
 		applyTexture(SceneManager.getInstance().getSolarLand());
 		for (final HousePart part : Scene.getInstance().getParts())
 			if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel || part instanceof Sensor)

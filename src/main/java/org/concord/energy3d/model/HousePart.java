@@ -91,6 +91,7 @@ public abstract class HousePart implements Serializable {
 	private boolean freeze;
 	private ReadOnlyColorRGBA color; // custom color
 	private double uFactor = 0;
+	private double volumetricHeatCapacity = 1; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 
 	transient Line heatFlux;
 	transient static float heatFluxUnitArea = 2;
@@ -164,6 +165,8 @@ public abstract class HousePart implements Serializable {
 
 		if (id == 0)
 			id = Scene.getInstance().nextID();
+		if (volumetricHeatCapacity <= 0) // if not set in saved file
+			volumetricHeatCapacity = 1;
 
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");
@@ -920,6 +923,41 @@ public abstract class HousePart implements Serializable {
 
 	public double getUFactor() {
 		return uFactor;
+	}
+
+	public void setVolumetricHeatCapacity(double volumetricHeatCapacity) {
+		this.volumetricHeatCapacity = volumetricHeatCapacity;
+	}
+
+	public double getVolumetricHeatCapacity() {
+		return volumetricHeatCapacity;
+	}
+
+	/** use the lightness of color to approximate albedo */
+	public float getAlbedo() {
+		if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
+			return 0.2f;
+		}
+		ReadOnlyColorRGBA c = null;
+		if (color != null) {
+			c = color;
+		} else {
+			if (this instanceof Foundation)
+				c = Scene.getInstance().getFoundationColor();
+			else if (this instanceof Door)
+				c = Scene.getInstance().getDoorColor();
+			else if (this instanceof Roof)
+				c = Scene.getInstance().getRoofColor();
+			else if (this instanceof Wall)
+				c = Scene.getInstance().getWallColor();
+			else
+				c = ColorRGBA.WHITE;
+		}
+		float min = Math.min(c.getRed(), c.getGreen());
+		min = Math.min(min, c.getBlue());
+		float max = Math.max(c.getRed(), c.getGreen());
+		max = Math.max(max, c.getBlue());
+		return 0.5f * (min + max);
 	}
 
 	double calculateHeatVector() {
