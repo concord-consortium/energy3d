@@ -134,7 +134,7 @@ public class SolarIrradiation {
 						if (part instanceof Foundation || part instanceof Wall || part instanceof Window)
 							computeOnMesh(minute, dayLength, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
 						else if (part instanceof SolarPanel || part instanceof Sensor)
-							computeOnMesh2(minute, dayLength, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
+							computeOnMeshSolarPanel(minute, dayLength, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
 						else if (part instanceof Roof)
 							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 								final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
@@ -180,6 +180,29 @@ public class SolarIrradiation {
 		}
 	}
 
+	private float getLightness(HousePart part) {
+		ReadOnlyColorRGBA color = null;
+		if (part.getColor() != null) {
+			color = part.getColor();
+		} else {
+			if (part instanceof Foundation)
+				color = Scene.getInstance().getFoundationColor();
+			else if (part instanceof Door)
+				color = Scene.getInstance().getDoorColor();
+			else if (part instanceof Roof)
+				color = Scene.getInstance().getRoofColor();
+			else if (part instanceof Wall)
+				color = Scene.getInstance().getWallColor();
+			else
+				color = ColorRGBA.WHITE;
+		}
+		float min = Math.min(color.getRed(), color.getGreen());
+		min = Math.min(min, color.getBlue());
+		float max = Math.max(color.getRed(), color.getGreen());
+		max = Math.max(max, color.getBlue());
+		return 0.5f * (min + max);
+	}
+
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
 	private void computeOnMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 
@@ -200,6 +223,8 @@ public class SolarIrradiation {
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
+
+		float darkness = 1 - getLightness(housePart); // at least 20% dark, hence 1.2
 
 		for (int col = 0; col < data.cols; col++) {
 			final ReadOnlyVector3 pU = data.u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(data.p0);
@@ -232,14 +257,14 @@ public class SolarIrradiation {
 					if (!collision)
 						radiation += directRadiation;
 				}
-				data.solar[row][col] += radiation;
-				housePart.getSolarPotential()[minute / timeStep] += radiation * w * h * scaleFactor;
+				data.solar[row][col] += darkness * radiation;
+				housePart.getSolarPotential()[minute / timeStep] += darkness * radiation * w * h * scaleFactor;
 			}
 		}
 
 	}
 
-	private void computeOnMesh2(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
+	private void computeOnMeshSolarPanel(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 
 		TextureData data = onMesh.get(drawMesh);
 		if (data == null)

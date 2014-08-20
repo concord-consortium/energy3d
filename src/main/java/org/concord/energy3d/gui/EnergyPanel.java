@@ -527,8 +527,8 @@ public class EnergyPanel extends JPanel {
 
 		colorMapSlider = new MySlider();
 		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the heat map.</html>");
-		colorMapSlider.setMinimum(10);
-		colorMapSlider.setMaximum(90);
+		colorMapSlider.setMinimum(15);
+		colorMapSlider.setMaximum(95);
 		colorMapSlider.setMinimumSize(colorMapSlider.getPreferredSize());
 		colorMapSlider.addChangeListener(new ChangeListener() {
 			@Override

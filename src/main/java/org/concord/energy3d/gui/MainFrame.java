@@ -122,7 +122,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem materialCostAnalysisMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
-	private JCheckBoxMenuItem energyViewMenuItem;
+	private JCheckBoxMenuItem solarHeatMapMenuItem;
+	private JCheckBoxMenuItem heatFluxMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
@@ -890,7 +891,8 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(energyViewMenuItem, MainPanel.getInstance().getEnergyViewButton().isSelected());
+					Util.selectSilently(solarHeatMapMenuItem, SceneManager.getInstance().getSolarColorMap());
+					Util.selectSilently(heatFluxMenuItem, SceneManager.getInstance().getHeatFlux());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesShown());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsShown());
@@ -905,7 +907,8 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getFullTextureMenuItem());
 			viewMenu.add(getColorMenu());
 			viewMenu.addSeparator();
-			viewMenu.add(getEnergyViewMenuItem());
+			viewMenu.add(getSolarHeatMapMenuItem());
+			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
@@ -1084,17 +1087,34 @@ public class MainFrame extends JFrame {
 		return sensorMenuItem;
 	}
 
-	private JCheckBoxMenuItem getEnergyViewMenuItem() {
-		if (energyViewMenuItem == null) {
-			energyViewMenuItem = new JCheckBoxMenuItem("Energy");
-			energyViewMenuItem.addActionListener(new ActionListener() {
+	private JCheckBoxMenuItem getSolarHeatMapMenuItem() {
+		if (solarHeatMapMenuItem == null) {
+			solarHeatMapMenuItem = new JCheckBoxMenuItem("Solar Heat Map");
+			solarHeatMapMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					MainPanel.getInstance().getEnergyViewButton().doClick();
+					SceneManager.getInstance().setSolarColorMap(solarHeatMapMenuItem.isSelected());
+					Scene.getInstance().redrawAll();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}
-		return energyViewMenuItem;
+		return solarHeatMapMenuItem;
+	}
+
+	private JCheckBoxMenuItem getHeatFluxMenuItem() {
+		if (heatFluxMenuItem == null) {
+			heatFluxMenuItem = new JCheckBoxMenuItem("Heat Flux");
+			heatFluxMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().setHeatFlux(heatFluxMenuItem.isSelected());
+					Scene.getInstance().redrawAll();
+					SceneManager.getInstance().refresh();
+				}
+			});
+		}
+		return heatFluxMenuItem;
 	}
 
 	private JMenuItem getDailyAnalysisMenuItem() {
