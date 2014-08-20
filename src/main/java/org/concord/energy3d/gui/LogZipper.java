@@ -91,6 +91,7 @@ class LogZipper implements PropertyChangeListener {
 						count++;
 						setProgress(Math.round((float) count / (float) files.length * 100f));
 					}
+					setProgress(100);
 				} catch (IOException e) {
 					e.printStackTrace();
 					return null;
@@ -134,7 +135,6 @@ class LogZipper implements PropertyChangeListener {
 		if ("progress" == e.getPropertyName()) {
 			int progress = (Integer) e.getNewValue();
 			progressBar.setValue(progress);
-			System.out.println(progress);
 		}
 	}
 
