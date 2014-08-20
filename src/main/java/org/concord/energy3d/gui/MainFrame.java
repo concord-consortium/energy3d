@@ -19,17 +19,12 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -51,7 +46,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
-import javax.swing.SwingWorker;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
@@ -59,7 +53,6 @@ import javax.swing.filechooser.FileFilter;
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PostProcessor;
-import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -1792,125 +1785,34 @@ public class MainFrame extends JFrame {
 			exportLogMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					exportLog();
+					fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					fileChooser.addChoosableFileFilter(zipFilter);
+					fileChooser.removeChoosableFileFilter(pngFilter);
+					fileChooser.removeChoosableFileFilter(ng3Filter);
+					fileChooser.removeChoosableFileFilter(daeFilter);
+					fileChooser.setFileFilter(zipFilter);
+					if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+						try {
+							File file = fileChooser.getSelectedFile();
+							if (!file.getName().toLowerCase().endsWith(".zip"))
+								file = new File(file.toString() + ".zip");
+							boolean doIt = true;
+							if (file.exists()) {
+								if (JOptionPane.showConfirmDialog(MainFrame.this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+									doIt = false;
+								}
+							}
+							if (doIt)
+								new LogZipper(file).createDialog();
+						} catch (final Throwable err) {
+							err.printStackTrace();
+							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+						}
+					}
 				}
 			});
 		}
 		return exportLogMenuItem;
-	}
-
-	private void exportLog() {
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fileChooser.addChoosableFileFilter(zipFilter);
-		fileChooser.removeChoosableFileFilter(pngFilter);
-		fileChooser.removeChoosableFileFilter(ng3Filter);
-		fileChooser.removeChoosableFileFilter(daeFilter);
-		fileChooser.setFileFilter(zipFilter);
-		if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-			try {
-				File file = fileChooser.getSelectedFile();
-				if (!file.getName().toLowerCase().endsWith(".zip"))
-					file = new File(file.toString() + ".zip");
-				boolean doIt = true;
-				if (file.exists()) {
-					if (JOptionPane.showConfirmDialog(this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-						doIt = false;
-					}
-				}
-				if (doIt) {
-					final File zipFile = file;
-					final JDialog dialog = new JDialog(this, true);
-					dialog.setTitle("Export log as a zip file");
-					dialog.setUndecorated(true);
-					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-					JPanel panel = new JPanel(new BorderLayout(20, 20));
-					panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-					panel.setPreferredSize(new Dimension(400, 150));
-					dialog.setContentPane(panel);
-					final JLabel statusLabel = new JLabel();
-					statusLabel.setBorder(BorderFactory.createEtchedBorder());
-					panel.add(statusLabel, BorderLayout.CENTER);
-					JPanel buttonPanel = new JPanel();
-					panel.add(buttonPanel, BorderLayout.SOUTH);
-					final JButton closeButton = new JButton("Close");
-					closeButton.setEnabled(false);
-					closeButton.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							dialog.dispose();
-						}
-					});
-					buttonPanel.add(closeButton);
-					new SwingWorker<String, Object>() {
-						@Override
-						public String doInBackground() {
-							zipLog(zipFile);
-							return null;
-						}
-
-						@Override
-						protected void done() {
-							statusLabel.setText("<html>&nbsp;&nbsp;&nbsp;" + zipFile + " was created.<br><br>&nbsp;&nbsp;&nbsp;<b>Please send it to your teacher.</b></html>");
-							closeButton.setEnabled(true);
-						}
-					}.execute();
-					dialog.pack();
-					dialog.setLocationRelativeTo(this);
-					dialog.setVisible(true);
-				}
-			} catch (final Throwable err) {
-				err.printStackTrace();
-				JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-	}
-
-	private String zipLog(File file) {
-
-		File logFolder = SnapshotLogger.getLogFolder();
-
-		ZipOutputStream zos = null;
-		try {
-			zos = new ZipOutputStream(new FileOutputStream(file, false));
-		} catch (IOException e) {
-			e.printStackTrace();
-			return e.getLocalizedMessage();
-		}
-
-		FileInputStream in = null;
-		int c;
-		try {
-			for (File f : logFolder.listFiles()) {
-				zos.putNextEntry(new ZipEntry(f.getName()));
-				in = new FileInputStream(f);
-				while ((c = in.read()) != -1)
-					zos.write(c);
-				in.close();
-				zos.flush();
-				zos.closeEntry();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return e.getLocalizedMessage();
-		} finally {
-			try {
-				zos.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return e.getLocalizedMessage();
-			}
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-					return e.getLocalizedMessage();
-				}
-			}
-		}
-
-		return logFolder.list().length + " files written";
-
 	}
 
 	private JMenuItem getExportImageMenuItem() {
