@@ -1249,7 +1249,7 @@ public class Wall extends HousePart {
 					wallPolygonPoints.get(i).subtract(wallPolygonPoints.get(0), v2);
 					path.lineTo(v2.getY(), v2.getZ());
 				}
-			} else if (Util.isZero(v1.getY()) && Util.isZero(v2.getY())) {
+			} else { // always use the Y plane unless it is a X plane as above
 				path.moveTo(v1.getX(), v1.getZ());
 				path.lineTo(v2.getX(), v2.getZ());
 				for (int i = 3; i < wallPolygonPoints.size(); i++) {
@@ -1286,7 +1286,7 @@ public class Wall extends HousePart {
 						if (Util.isZero(v1.getX())) {
 							if (!path.contains(v1.getY(), v1.getZ()))
 								break;
-						} else if (Util.isZero(v1.getY())) {
+						} else {
 							if (!path.contains(v1.getX(), v1.getZ()))
 								break;
 						}

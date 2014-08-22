@@ -222,24 +222,23 @@ public class Scene implements Serializable {
 				instance.cleanup();
 				loadCameraLocation();
 			}
-
-			if (!Config.isApplet()) {
-				if (instance.textureMode == TextureMode.None)
-					MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
-				else if (instance.textureMode == TextureMode.Simple)
-					MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
-				else
-					MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
-			}
-			MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
-
+			SceneManager.getInstance().hideAllEditPoints();
 			final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
 			if (cameraControl != null)
 				cameraControl.reset();
-			SceneManager.getInstance().hideAllEditPoints();
-			EnergyPanel.getInstance().updatePartEnergy();
-			EnergyPanel.getInstance().updateCost();
 		}
+
+		if (!Config.isApplet()) {
+			if (instance.textureMode == TextureMode.None)
+				MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
+			else if (instance.textureMode == TextureMode.Simple)
+				MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
+			else
+				MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
+		}
+		MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
+		EnergyPanel.getInstance().updatePartEnergy();
+		EnergyPanel.getInstance().updateCost();
 
 	}
 
