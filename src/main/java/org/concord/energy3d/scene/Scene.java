@@ -190,15 +190,15 @@ public class Scene implements Serializable {
 
 	public static void openNow(final URL file) throws Exception {
 
+		if (PrintController.getInstance().isPrintPreview()) {
+			MainPanel.getInstance().getPreviewButton().setSelected(false);
+			while (!PrintController.getInstance().isFinished())
+				Thread.yield();
+		}
+
 		synchronized (SceneManager.getInstance()) {
 
 			Scene.url = file;
-
-			if (PrintController.getInstance().isPrintPreview()) {
-				MainPanel.getInstance().getPreviewButton().setSelected(false);
-				while (!PrintController.getInstance().isFinished())
-					Thread.yield();
-			}
 
 			MainPanel.getInstance().getHeliodonButton().setSelected(false);
 			MainPanel.getInstance().getSunAnimButton().setSelected(false);
