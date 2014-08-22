@@ -827,7 +827,7 @@ public class EnergyPanel extends JPanel {
 				updateWeatherData();
 				final int timeStep = SolarIrradiation.getInstance().getTimeStep();
 				for (final HousePart part : Scene.getInstance().getParts())
-					part.setHeatLoss(new double[1440 / timeStep]);
+					part.setHeatLoss(new double[SolarIrradiation.MINUTES_OF_DAY / timeStep]);
 				SolarIrradiation.getInstance().compute();
 				HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), (Integer) insideTemperatureSpinner.getValue());
 				SolarIrradiation.getInstance().computeTotalEnergyForBuildings();

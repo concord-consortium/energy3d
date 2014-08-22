@@ -55,6 +55,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class SolarIrradiation {
 
 	public final static double SOLAR_CONSTANT = 1.361; // in kW, see http://en.wikipedia.org/wiki/Solar_constant
+	public final static int MINUTES_OF_DAY = 1440;
 
 	// public final static double[] ASHRAE_C = new double[] { 0.058, 0.060, 0.071, 0.097, 0.121, 0.134, 0.136, 0.122, 0.092, 0.073, 0.063, 0.057 }; // http://www.physics.arizona.edu/~cronin/Solar/References/Irradiance%20Models%20and%20Data/WOC01.pdf
 	public final static double[] ASHRAE_C = new double[] { 0.103, 0.104, 0.109, 0.120, 0.130, 0.137, 0.138, 0.134, 0.121, 0.111, 0.106, 0.103 }; // revised C coefficients found from Iqbal's book
@@ -64,7 +65,7 @@ public class SolarIrradiation {
 	public final static int AIR_MASS_SPHERE_MODEL = 1;
 
 	private static SolarIrradiation instance = new SolarIrradiation();
-	private final Map<Mesh, TextureData> onMesh = new HashMap<Mesh, TextureData>();
+	private final Map<Mesh, MeshData> onMesh = new HashMap<Mesh, MeshData>();
 	private final List<Spatial> collidables = new ArrayList<Spatial>();
 	private int timeStep = 15;
 	private double solarStep = 2.0;
@@ -72,7 +73,7 @@ public class SolarIrradiation {
 	private int airMassSelection = AIR_MASS_SPHERE_MODEL;
 	private double peakRadiation;
 
-	private class TextureData {
+	private class MeshData {
 		public Vector3 p0;
 		public Vector3 p1;
 		public Vector3 p2;
@@ -80,7 +81,9 @@ public class SolarIrradiation {
 		public Vector3 v;
 		public int rows;
 		public int cols;
-		public double[][] solar;
+		public double[][] dailySolarIntensity;
+		public double[] solarPotential;
+		public double[] heatLoss;
 	}
 
 	public static SolarIrradiation getInstance() {
@@ -92,9 +95,19 @@ public class SolarIrradiation {
 		initCollidables();
 		onMesh.clear();
 		for (final HousePart part : Scene.getInstance().getParts())
-			part.setSolarPotential(new double[1440 / timeStep]);
+			part.setSolarPotential(new double[SolarIrradiation.MINUTES_OF_DAY / timeStep]);
 		maxValue = 1;
 		computeToday((Calendar) Heliodon.getInstance().getCalender().clone());
+	}
+
+	public double[] getSolarPotential(Mesh mesh) {
+		MeshData md = onMesh.get(mesh);
+		return md == null ? null : md.solarPotential;
+	}
+
+	public double[] getHeatLoss(Mesh mesh) {
+		MeshData md = onMesh.get(mesh);
+		return md == null ? null : md.heatLoss;
 	}
 
 	private void initCollidables() {
@@ -112,9 +125,9 @@ public class SolarIrradiation {
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
-		final ReadOnlyVector3[] sunLocations = new ReadOnlyVector3[1440 / timeStep];
+		final ReadOnlyVector3[] sunLocations = new ReadOnlyVector3[SolarIrradiation.MINUTES_OF_DAY / timeStep];
 		int totalSteps = 0;
-		for (int minute = 0; minute < 1440; minute += timeStep) {
+		for (int minute = 0; minute < SolarIrradiation.MINUTES_OF_DAY; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
 			sunLocations[minute / timeStep] = sunLocation;
 			if (sunLocation.getZ() > 0)
@@ -124,7 +137,7 @@ public class SolarIrradiation {
 		totalSteps -= 2;
 		double dayLength = totalSteps * timeStep / 60.0;
 		int step = 1;
-		for (int minute = 0; minute < 1440; minute += timeStep) {
+		for (int minute = 0; minute < SolarIrradiation.MINUTES_OF_DAY; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = sunLocations[minute / timeStep];
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
@@ -156,10 +169,10 @@ public class SolarIrradiation {
 		final double step = solarStep * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
-		TextureData data = onMesh.get(SceneManager.getInstance().getSolarLand());
+		MeshData data = onMesh.get(SceneManager.getInstance().getSolarLand());
 		if (data == null) {
-			data = new TextureData();
-			data.solar = new double[rows][cols];
+			data = new MeshData();
+			data.dailySolarIntensity = new double[rows][cols];
 			onMesh.put(SceneManager.getInstance().getSolarLand(), data);
 		}
 		final Vector3 p = new Vector3();
@@ -175,7 +188,7 @@ public class SolarIrradiation {
 				for (final Spatial spatial : collidables)
 					PickingUtil.findPick(spatial, pickRay, pickResults, false);
 				if (pickResults.getNumber() == 0)
-					data.solar[row][col] += radiation * absorption;
+					data.dailySolarIntensity[row][col] += radiation * absorption;
 			}
 		}
 	}
@@ -183,7 +196,7 @@ public class SolarIrradiation {
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
 	private void computeOnMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 
-		TextureData data = onMesh.get(drawMesh);
+		MeshData data = onMesh.get(drawMesh);
 		if (data == null)
 			data = initMeshTextureData(drawMesh, collisionMesh, normal, !(housePart instanceof Window));
 
@@ -202,13 +215,21 @@ public class SolarIrradiation {
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
 		float absorption = housePart instanceof Window ? 1 : 1 - housePart.getAlbedo();
 
+		if (housePart instanceof Roof) {
+			// for now, only store this for roofs that have different meshes
+			if (data.solarPotential == null) 
+				data.solarPotential = new double[MINUTES_OF_DAY / timeStep];
+			if (data.heatLoss == null)
+				data.heatLoss = new double[MINUTES_OF_DAY / timeStep];
+		}
+
 		for (int col = 0; col < data.cols; col++) {
 			final ReadOnlyVector3 pU = data.u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(data.p0);
 			final double w = (col == data.cols - 1) ? data.p2.distance(pU) : solarStep;
 			for (int row = 0; row < data.rows; row++) {
 				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
-				if (data.solar[row][col] == -1)
+				if (data.dailySolarIntensity[row][col] == -1)
 					continue;
 				final ReadOnlyVector3 p = data.v.multiply(solarStep / 2.0 + row * solarStep, null).addLocal(pU).add(offset, null);
 				final double h;
@@ -233,7 +254,9 @@ public class SolarIrradiation {
 					if (!collision)
 						radiation += directRadiation;
 				}
-				data.solar[row][col] += absorption * radiation;
+				data.dailySolarIntensity[row][col] += absorption * radiation;
+				if (data.solarPotential != null)
+					data.solarPotential[minute / timeStep] += absorption * radiation * w * h * scaleFactor;
 				housePart.getSolarPotential()[minute / timeStep] += absorption * radiation * w * h * scaleFactor;
 			}
 		}
@@ -242,7 +265,7 @@ public class SolarIrradiation {
 
 	private void computeOnMeshSolarPanel(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 
-		TextureData data = onMesh.get(drawMesh);
+		MeshData data = onMesh.get(drawMesh);
 		if (data == null)
 			data = initMeshTextureDataSolarPanel(drawMesh, collisionMesh, normal);
 
@@ -291,7 +314,7 @@ public class SolarIrradiation {
 						radiation += directRadiation;
 				}
 
-				data.solar[row][col] += radiation;
+				data.dailySolarIntensity[row][col] += radiation;
 				double area = 1;
 				if (housePart instanceof SolarPanel)
 					area = SolarPanel.WIDTH * SolarPanel.HEIGHT;
@@ -312,8 +335,8 @@ public class SolarIrradiation {
 		initMeshTextureData(drawMesh, collisionMesh, normal, true);
 	}
 
-	private TextureData initMeshTextureData(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean updateTexture) {
-		final TextureData data = new TextureData();
+	private MeshData initMeshTextureData(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean updateTexture) {
+		final MeshData data = new MeshData();
 
 		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
@@ -356,17 +379,17 @@ public class SolarIrradiation {
 
 		data.rows = (int) Math.ceil(data.p1.subtract(data.p0, null).length() / solarStep);
 		data.cols = (int) Math.ceil(data.p2.subtract(data.p0, null).length() / solarStep);
-		if (data.solar == null)
-			data.solar = new double[roundToPowerOfTwo(data.rows)][roundToPowerOfTwo(data.cols)];
+		if (data.dailySolarIntensity == null)
+			data.dailySolarIntensity = new double[roundToPowerOfTwo(data.rows)][roundToPowerOfTwo(data.cols)];
 
 		if (onMesh.get(drawMesh) == null) {
 			final ReadOnlyVector2 originXY = new Vector2(minX, minY);
 			final ReadOnlyVector2 uXY = new Vector2(maxX - minX, 0).normalizeLocal();
 			final ReadOnlyVector2 vXY = new Vector2(0, maxY - minY).normalizeLocal();
-			for (int row = 0; row < data.solar.length; row++)
-				for (int col = 0; col < data.solar[0].length; col++) {
+			for (int row = 0; row < data.dailySolarIntensity.length; row++)
+				for (int col = 0; col < data.dailySolarIntensity[0].length; col++) {
 					if (row >= data.rows || col >= data.cols)
-						data.solar[row][col] = -1;
+						data.dailySolarIntensity[row][col] = -1;
 					else {
 						final ReadOnlyVector2 p = originXY.add(uXY.multiply(col * solarStep, null), null).add(vXY.multiply(row * solarStep, null), null);
 						boolean isInside = false;
@@ -377,7 +400,7 @@ public class SolarIrradiation {
 							}
 						}
 						if (!isInside)
-							data.solar[row][col] = -1;
+							data.dailySolarIntensity[row][col] = -1;
 					}
 				}
 		}
@@ -392,20 +415,20 @@ public class SolarIrradiation {
 		return data;
 	}
 
-	private TextureData initMeshTextureDataSolarPanel(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
-		final TextureData data = new TextureData();
+	private MeshData initMeshTextureDataSolarPanel(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
+		final MeshData data = new MeshData();
 
 		data.rows = 4;
 		data.cols = 4;
-		if (data.solar == null)
-			data.solar = new double[roundToPowerOfTwo(data.rows)][roundToPowerOfTwo(data.cols)];
+		if (data.dailySolarIntensity == null)
+			data.dailySolarIntensity = new double[roundToPowerOfTwo(data.rows)][roundToPowerOfTwo(data.cols)];
 
 		onMesh.put(drawMesh, data);
 		return data;
 	}
 
 	private void updateTextureCoords(final Mesh drawMesh) {
-		final TextureData data = onMesh.get(drawMesh);
+		final MeshData data = onMesh.get(drawMesh);
 		final ReadOnlyVector3 o = data.p0;
 		final ReadOnlyVector3 u = data.u.multiply(roundToPowerOfTwo(data.cols) * getSolarStep(), null);
 		final ReadOnlyVector3 v = data.v.multiply(roundToPowerOfTwo(data.rows) * getSolarStep(), null);
@@ -572,7 +595,7 @@ public class SolarIrradiation {
 			return;
 		}
 
-		final double[][] solarData = onMesh.get(mesh).solar;
+		final double[][] solarData = onMesh.get(mesh).dailySolarIntensity;
 		if (mesh.getUserData() != null && ((UserData) mesh.getUserData()).getHousePart() instanceof SolarPanel) {
 			solarData[3][0] = solarData[2][0] = solarData[1][0];
 			solarData[3][1] = solarData[2][1] = solarData[1][0];

@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,9 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.AngleAnnotation;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.undo.MakeGableCommand;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.PolygonWithHoles;
@@ -906,17 +909,23 @@ public abstract class Roof extends HousePart {
 		synchronized (roofPartsRoot.getChildren()) {
 			for (final Spatial child : roofPartsRoot.getChildren()) {
 				final Mesh mesh = (Mesh) ((Node) child).getChild(0);
-				final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-				buf.rewind();
-				final double annotationScale = Scene.getInstance().getAnnotationScale();
-				while (buf.hasRemaining()) {
-					final Vector3 p1 = new Vector3(buf.get(), buf.get(), buf.get());
-					final Vector3 p2 = new Vector3(buf.get(), buf.get(), buf.get());
-					final Vector3 p3 = new Vector3(buf.get(), buf.get(), buf.get());
-					final double trigArea = p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;
-					area += trigArea;
-				}
+				area += computeArea(mesh);
 			}
+		}
+		return area;
+	}
+
+	public double computeArea(Mesh mesh) {
+		double area = 0.0;
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		buf.rewind();
+		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		while (buf.hasRemaining()) {
+			final Vector3 p1 = new Vector3(buf.get(), buf.get(), buf.get());
+			final Vector3 p2 = new Vector3(buf.get(), buf.get(), buf.get());
+			final Vector3 p3 = new Vector3(buf.get(), buf.get(), buf.get());
+			final double trigArea = p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;
+			area += trigArea;
 		}
 		return area;
 	}
@@ -937,6 +946,25 @@ public abstract class Roof extends HousePart {
 		return roofPartsRoot;
 	}
 
+	double calculateHeatVector(Mesh mesh) {
+		double heat = 0;
+		double[] heatLossArray = SolarIrradiation.getInstance().getHeatLoss(mesh);
+		if (heatLossArray != null) {
+			if (SceneManager.getInstance().isHeatFluxDaily()) {
+				for (final double x : heatLossArray)
+					heat += x;
+				heat /= (computeArea(mesh) * heatLoss.length);
+				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
+			} else {
+				int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
+				heat = heatLossArray[hourOfDay * 4] + heatLossArray[hourOfDay * 4 + 1] + heatLossArray[hourOfDay * 4 + 2] + heatLossArray[hourOfDay * 4 + 3];
+				heat /= 4 * computeArea(mesh);
+				heatFlux.setDefaultColor(ColorRGBA.WHITE);
+			}
+		}
+		return heat;
+	}
+
 	@Override
 	void drawHeatFlux() {
 
@@ -950,38 +978,39 @@ public abstract class Roof extends HousePart {
 			final int rows = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(1)) / heatFluxUnitArea);
 			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
 			heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
-			double heat = calculateHeatVector();
-			if (heat != 0) {
-				final ReadOnlyVector3 o = foundation.getAbsPoint(0);
-				final ReadOnlyVector3 u = foundation.getAbsPoint(2).subtract(o, null);
-				final ReadOnlyVector3 v = foundation.getAbsPoint(1).subtract(o, null);
-				Vector3 a = new Vector3();
-				double g, h;
-				boolean init = true;
-				for (int j = 0; j < cols; j++) {
-					h = j + 0.5;
-					for (int i = 0; i < rows; i++) {
-						g = i + 0.5;
-						a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
-						a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
-						a.setZ(o.getZ());
-						if (foundation.insideBuilding(a.getX(), a.getY(), init)) {
-							ReadOnlyVector3 b = null;
-							Node node = null;
-							for (final Spatial child : roofPartsRoot.getChildren()) {
-								node = (Node) child;
-								b = findRoofIntersection((Mesh) node.getChild(0), a);
-								if (b != null)
-									break;
-							}
-							if (b != null && node != null) {
-								final ReadOnlyVector3 normal = (ReadOnlyVector3) node.getUserData();
-								drawArrow(b, normal, arrowsVertices, heat);
-							}
+			final ReadOnlyVector3 o = foundation.getAbsPoint(0);
+			final ReadOnlyVector3 u = foundation.getAbsPoint(2).subtract(o, null);
+			final ReadOnlyVector3 v = foundation.getAbsPoint(1).subtract(o, null);
+			Vector3 a = new Vector3();
+			double g, h;
+			boolean init = true;
+			for (int j = 0; j < cols; j++) {
+				h = j + 0.5;
+				for (int i = 0; i < rows; i++) {
+					g = i + 0.5;
+					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+					a.setZ(o.getZ());
+					if (foundation.insideBuilding(a.getX(), a.getY(), init)) {
+						ReadOnlyVector3 b = null;
+						Node node = null;
+						Mesh mesh = null;
+						for (final Spatial child : roofPartsRoot.getChildren()) {
+							node = (Node) child;
+							mesh = (Mesh) node.getChild(0);
+							b = findRoofIntersection(mesh, a);
+							if (b != null)
+								break;
 						}
-						if (init)
-							init = false;
+						if (b != null) {
+							final ReadOnlyVector3 normal = (ReadOnlyVector3) node.getUserData();
+							double heat = calculateHeatVector(mesh);
+							System.out.println("************"+heat);
+							drawArrow(b, normal, arrowsVertices, heat);
+						}
 					}
+					if (init)
+						init = false;
 				}
 				heatFlux.getMeshData().updateVertexCount();
 				heatFlux.updateModelBound();

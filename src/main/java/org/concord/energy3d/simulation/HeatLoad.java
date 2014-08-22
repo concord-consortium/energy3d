@@ -17,6 +17,9 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 
 import com.ardor3d.math.Vector3;
+import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 
 public class HeatLoad {
 
@@ -73,12 +76,12 @@ public class HeatLoad {
 
 		final int timeStep = SolarIrradiation.getInstance().getTimeStep();
 		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
-		for (int minute = 0; minute < 1440; minute += timeStep) {
+		for (int minute = 0; minute < SolarIrradiation.MINUTES_OF_DAY; minute += timeStep) {
 			for (final HousePart part : Scene.getInstance().getParts()) {
+				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
 				float absorption = part instanceof Window ? 0 : 1 - part.getAlbedo();
 				double solarHeat = part.getSolarPotential()[minute / timeStep] * absorption / part.getVolumetricHeatCapacity();
-				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute) + solarHeat;
-				final double deltaT = insideTemperature - outsideTemperature;
+				double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 				if (part.isDrawCompleted()) {
 					double uFactor = getUFactor(part);
 					if (uFactor < 0.000001)
@@ -87,6 +90,28 @@ public class HeatLoad {
 					if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
 						heatloss = 0;
 					part.getHeatLoss()[minute / timeStep] += heatloss;
+				}
+				if (part instanceof Roof) { // need to compute piece by piece for a roof
+					Roof roof = (Roof) part;
+					for (final Spatial child : roof.getRoofPartsRoot().getChildren()) {
+						Mesh mesh = (Mesh) ((Node) child).getChild(0);
+						double[] solarPotential = SolarIrradiation.getInstance().getSolarPotential(mesh);
+						if (solarPotential != null) {
+							solarHeat = solarPotential[minute / timeStep] * absorption / part.getVolumetricHeatCapacity();
+							deltaT = insideTemperature - (outsideTemperature + solarHeat);
+							if (part.isDrawCompleted()) {
+								double uFactor = getUFactor(part);
+								if (uFactor < 0.000001)
+									continue;
+								double heatloss = roof.computeArea(mesh) * uFactor * deltaT / 1000.0 / 60 * timeStep;
+								if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
+									heatloss = 0;
+								double[] heatLossArray = SolarIrradiation.getInstance().getHeatLoss(mesh);
+								if (heatLossArray != null)
+									heatLossArray[minute / timeStep] += heatloss;
+							}
+						}
+					}
 				}
 			}
 		}

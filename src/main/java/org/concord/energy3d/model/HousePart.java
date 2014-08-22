@@ -864,7 +864,7 @@ public abstract class HousePart implements Serializable {
 		}
 	}
 
-	public void setSolarPotential(final double solarPotential[]) {
+	public void setSolarPotential(final double[] solarPotential) {
 		this.solarPotential = solarPotential;
 	}
 
