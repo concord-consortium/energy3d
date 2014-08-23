@@ -215,9 +215,8 @@ public class SolarIrradiation {
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
 		float absorption = housePart instanceof Window ? 1 : 1 - housePart.getAlbedo();
 
-		if (housePart instanceof Roof) {
-			// for now, only store this for roofs that have different meshes
-			if (data.solarPotential == null) 
+		if (housePart instanceof Roof) { // for now, only store this for roofs that have different meshes
+			if (data.solarPotential == null)
 				data.solarPotential = new double[MINUTES_OF_DAY / timeStep];
 			if (data.heatLoss == null)
 				data.heatLoss = new double[MINUTES_OF_DAY / timeStep];
@@ -329,9 +328,9 @@ public class SolarIrradiation {
 	}
 
 	public void initMeshTextureData(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
-		if (onMesh.get(drawMesh) == null)
-			drawMesh.setDefaultColor(ColorRGBA.BLUE);
-
+		if (onMesh.get(drawMesh) == null) {
+			drawMesh.setDefaultColor(ColorRGBA.BLACK);
+		}
 		initMeshTextureData(drawMesh, collisionMesh, normal, true);
 	}
 
@@ -409,7 +408,7 @@ public class SolarIrradiation {
 		data.v = data.p1.subtract(data.p0, null).normalizeLocal();
 
 		onMesh.put(drawMesh, data);
-
+		
 		if (updateTexture)
 			updateTextureCoords(drawMesh);
 		return data;

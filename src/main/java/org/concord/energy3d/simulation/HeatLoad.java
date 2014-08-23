@@ -104,8 +104,6 @@ public class HeatLoad {
 								if (uFactor < 0.000001)
 									continue;
 								double heatloss = roof.computeArea(mesh) * uFactor * deltaT / 1000.0 / 60 * timeStep;
-								if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
-									heatloss = 0;
 								double[] heatLossArray = SolarIrradiation.getInstance().getHeatLoss(mesh);
 								if (heatLossArray != null)
 									heatLossArray[minute / timeStep] += heatloss;

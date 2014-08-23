@@ -953,7 +953,8 @@ public abstract class Roof extends HousePart {
 			if (SceneManager.getInstance().isHeatFluxDaily()) {
 				for (final double x : heatLossArray)
 					heat += x;
-				heat /= (computeArea(mesh) * heatLoss.length);
+				//System.out.println(mesh+"************"+heat);
+				heat /= (computeArea(mesh) * heatLossArray.length);
 				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
 				int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
@@ -961,6 +962,8 @@ public abstract class Roof extends HousePart {
 				heat /= 4 * computeArea(mesh);
 				heatFlux.setDefaultColor(ColorRGBA.WHITE);
 			}
+		} else {
+			//System.out.println("^^^^^^^^^^"+mesh);
 		}
 		return heat;
 	}
@@ -1005,7 +1008,6 @@ public abstract class Roof extends HousePart {
 						if (b != null) {
 							final ReadOnlyVector3 normal = (ReadOnlyVector3) node.getUserData();
 							double heat = calculateHeatVector(mesh);
-							System.out.println("************"+heat);
 							drawArrow(b, normal, arrowsVertices, heat);
 						}
 					}

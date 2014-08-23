@@ -668,7 +668,7 @@ public abstract class HousePart implements Serializable {
 			mesh.setRenderState(ts);
 		} else {
 			if (SceneManager.getInstance().getSolarColorMap()) {
-				if (this.isDrawable() && (this instanceof Foundation || this instanceof Wall || this instanceof Roof))
+				if (isDrawable() && (this instanceof Foundation || this instanceof Wall || this instanceof Roof))
 					SolarIrradiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getFaceDirection());
 			} else if (isFrozen()) {
 				mesh.clearRenderState(StateType.Texture);
