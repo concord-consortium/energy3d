@@ -58,7 +58,9 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -112,6 +114,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem rescaleMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem annualEnergyAnalysisMenuItem;
+	private JMenuItem annualEnergyAnalysisForSelectionMenuItem;
 	private JMenuItem sensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem materialCostAnalysisMenuItem;
@@ -858,6 +861,7 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getMaterialCostAnalysisMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
+			analysisMenu.add(getAnnualEnergyAnalysisForSelectionMenuItem());
 			analysisMenu.add(getDailyAnalysisMenuItem());
 			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			analysisMenu.addSeparator();
@@ -1034,7 +1038,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getAnnualEnergyAnalysisMenuItem() {
 		if (annualEnergyAnalysisMenuItem == null) {
-			annualEnergyAnalysisMenuItem = new JMenuItem("Run Annual Energy Analysis...");
+			annualEnergyAnalysisMenuItem = new JMenuItem("Run Annual Energy Analysis for Building...");
 			annualEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F4"));
 			annualEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
@@ -1051,9 +1055,17 @@ public class MainFrame extends JFrame {
 						}
 						if (count == 1) {
 							SceneManager.getInstance().setSelectedPart(hp);
-							selectedPart = hp;
 						} else {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}
+					} else {
+						HousePart topContainer = selectedPart.getTopContainer();
+						if (topContainer instanceof Foundation) {
+							selectedPart.setEditPointsVisible(false);
+							SceneManager.getInstance().setSelectedPart(topContainer);
+						} else {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 							return;
 						}
 					}
@@ -1062,6 +1074,24 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return annualEnergyAnalysisMenuItem;
+	}
+
+	private JMenuItem getAnnualEnergyAnalysisForSelectionMenuItem() {
+		if (annualEnergyAnalysisForSelectionMenuItem == null) {
+			annualEnergyAnalysisForSelectionMenuItem = new JMenuItem("Run Annual Energy Analysis for Selected Part...");
+			annualEnergyAnalysisForSelectionMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel) {
+						new EnergyAnnualAnalysis().show("Annual Energy for Selected Part");
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+					}
+				}
+			});
+		}
+		return annualEnergyAnalysisForSelectionMenuItem;
 	}
 
 	private JMenuItem getSensorMenuItem() {

@@ -24,7 +24,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.simulation.HeatLoad;
-import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.util.Util;
 
 /**
