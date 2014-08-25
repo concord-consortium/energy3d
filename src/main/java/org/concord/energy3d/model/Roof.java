@@ -953,7 +953,6 @@ public abstract class Roof extends HousePart {
 			if (SceneManager.getInstance().isHeatFluxDaily()) {
 				for (final double x : heatLossArray)
 					heat += x;
-				//System.out.println(mesh+"************"+heat);
 				heat /= (computeArea(mesh) * heatLossArray.length);
 				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
@@ -962,8 +961,6 @@ public abstract class Roof extends HousePart {
 				heat /= 4 * computeArea(mesh);
 				heatFlux.setDefaultColor(ColorRGBA.WHITE);
 			}
-		} else {
-			//System.out.println("^^^^^^^^^^"+mesh);
 		}
 		return heat;
 	}

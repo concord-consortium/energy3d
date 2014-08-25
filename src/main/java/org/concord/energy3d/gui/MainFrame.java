@@ -71,6 +71,7 @@ import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
+import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
@@ -1102,7 +1103,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setHeatFlux(heatFluxMenuItem.isSelected());
-					Scene.getInstance().redrawAll();
+					SolarIrradiation.getInstance().drawHeatFlux();
 					SceneManager.getInstance().refresh();
 				}
 			});

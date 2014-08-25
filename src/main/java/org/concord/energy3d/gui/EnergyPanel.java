@@ -259,7 +259,8 @@ public class EnergyPanel extends JPanel {
 				}
 				if (SceneManager.getInstance().getHeatFlux()) { // for now, only heat flow arrows need to call redrawAll
 					SceneManager.getInstance().setHeatFluxDaily(false);
-					Scene.getInstance().redrawAll();
+					for (final HousePart part : Scene.getInstance().getParts())
+						part.drawHeatFlux();
 				}
 			}
 		});

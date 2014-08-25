@@ -512,6 +512,12 @@ public class SolarIrradiation {
 		return result;
 	}
 
+	public void drawHeatFlux() {
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			part.drawHeatFlux();
+		}
+	}
+
 	public void computeTotalEnergyForBuildings() {
 		applyTexture(SceneManager.getInstance().getSolarLand());
 		for (final HousePart part : Scene.getInstance().getParts()) {
