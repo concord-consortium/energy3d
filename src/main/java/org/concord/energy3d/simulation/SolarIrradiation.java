@@ -100,13 +100,13 @@ public class SolarIrradiation {
 		computeToday((Calendar) Heliodon.getInstance().getCalender().clone());
 	}
 
-	public double[] getSolarPotential(Mesh mesh) {
-		MeshData md = onMesh.get(mesh);
+	public double[] getSolarPotential(final Mesh mesh) {
+		final MeshData md = onMesh.get(mesh);
 		return md == null ? null : md.solarPotential;
 	}
 
-	public double[] getHeatLoss(Mesh mesh) {
-		MeshData md = onMesh.get(mesh);
+	public double[] getHeatLoss(final Mesh mesh) {
+		final MeshData md = onMesh.get(mesh);
 		return md == null ? null : md.heatLoss;
 	}
 
@@ -135,7 +135,7 @@ public class SolarIrradiation {
 			today.add(Calendar.MINUTE, timeStep);
 		}
 		totalSteps -= 2;
-		double dayLength = totalSteps * timeStep / 60.0;
+		final double dayLength = totalSteps * timeStep / 60.0;
 		int step = 1;
 		for (int minute = 0; minute < SolarIrradiation.MINUTES_OF_DAY; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = sunLocations[minute / timeStep];
@@ -165,7 +165,7 @@ public class SolarIrradiation {
 
 	private void computeOnLand(final double dayLength, final ReadOnlyVector3 directionTowardSun) {
 		calculatePeakRadiation(directionTowardSun, dayLength);
-		double radiation = calculateDirectRadiation(directionTowardSun, Vector3.UNIT_Z) + calculateDiffuseAndReflectedRadiation(directionTowardSun, Vector3.UNIT_Z);
+		final double radiation = calculateDirectRadiation(directionTowardSun, Vector3.UNIT_Z) + calculateDiffuseAndReflectedRadiation(directionTowardSun, Vector3.UNIT_Z);
 		final double step = solarStep * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
@@ -176,7 +176,7 @@ public class SolarIrradiation {
 			onMesh.put(SceneManager.getInstance().getSolarLand(), data);
 		}
 		final Vector3 p = new Vector3();
-		double absorption = 1 - Scene.getInstance().getBackgroundAlbedo();
+		final double absorption = 1 - Scene.getInstance().getBackgroundAlbedo();
 		for (int col = 0; col < cols; col++) {
 			p.setX((col - cols / 2) * step + step / 2.0);
 			for (int row = 0; row < rows; row++) {
@@ -205,15 +205,15 @@ public class SolarIrradiation {
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
-		double dot = normal.dot(directionTowardSun);
+		final double dot = normal.dot(directionTowardSun);
 		double directRadiation = 0;
 		if (dot > 0)
 			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
-		double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
+		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
-		float absorption = housePart instanceof Window ? 1 : 1 - housePart.getAlbedo();
+		final float absorption = housePart instanceof Window ? 1 : 1 - housePart.getAlbedo();
 
 		if (housePart instanceof Roof) { // for now, only store this for roofs that have different meshes
 			if (data.solarPotential == null)
@@ -272,11 +272,11 @@ public class SolarIrradiation {
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
-		double dot = normal.dot(directionTowardSun);
+		final double dot = normal.dot(directionTowardSun);
 		double directRadiation = 0;
 		if (dot > 0)
 			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
-		double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
+		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
@@ -408,7 +408,7 @@ public class SolarIrradiation {
 		data.v = data.p1.subtract(data.p0, null).normalizeLocal();
 
 		onMesh.put(drawMesh, data);
-		
+
 		if (updateTexture)
 			updateTextureCoords(drawMesh);
 		return data;
@@ -472,13 +472,13 @@ public class SolarIrradiation {
 	// Solar radiation incident outside the earth's atmosphere is called extraterrestrial radiation.
 	// http://pvpmc.org/modeling-steps/irradiance-and-weather-2/irradiance-and-insolation/extraterrestrial-radiation/
 	private static double getExtraterrestrialRadiation() {
-		double b = Math.PI * 2.0 * Heliodon.getInstance().getCalender().get(Calendar.DAY_OF_YEAR) / 365.0;
-		double er = 1.00011 + 0.034221 * Math.cos(b) + 0.00128 * Math.sin(b) + 0.000719 * Math.cos(2 * b) + 0.000077 * Math.sin(2 * b);
+		final double b = Math.PI * 2.0 * Heliodon.getInstance().getCalender().get(Calendar.DAY_OF_YEAR) / 365.0;
+		final double er = 1.00011 + 0.034221 * Math.cos(b) + 0.00128 * Math.sin(b) + 0.000719 * Math.cos(2 * b) + 0.000077 * Math.sin(2 * b);
 		return SOLAR_CONSTANT * er;
 	}
 
 	// Reused peak solar radiation value. Must be called once and only once before calling calculateDirectRadiation and calculateDiffusionAndReflection
-	private void calculatePeakRadiation(final ReadOnlyVector3 directionTowardSun, double dayLength) {
+	private void calculatePeakRadiation(final ReadOnlyVector3 directionTowardSun, final double dayLength) {
 		double sunshinePercentage = 1.0;
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		if (!city.equals("")) {
@@ -491,16 +491,16 @@ public class SolarIrradiation {
 	}
 
 	private double calculateDirectRadiation(final ReadOnlyVector3 directionTowardSun, final ReadOnlyVector3 normal) {
-		double result = directionTowardSun.dot(normal) * peakRadiation;
+		final double result = directionTowardSun.dot(normal) * peakRadiation;
 		return result < 0 ? 0 : result;
 	}
 
 	// see: http://www.physics.arizona.edu/~cronin/Solar/References/Irradiance%20Models%20and%20Data/WOC01.pdf
 	private double calculateDiffuseAndReflectedRadiation(final ReadOnlyVector3 directionTowardSun, final ReadOnlyVector3 normal) {
 		double result = 0;
-		double cos = normal.dot(Vector3.UNIT_Z);
-		double viewFactorWithSky = 0.5 * (1 + cos);
-		double viewFactorWithGround = 0.5 * (1 - cos);
+		final double cos = normal.dot(Vector3.UNIT_Z);
+		final double viewFactorWithSky = 0.5 * (1 + cos);
+		final double viewFactorWithGround = 0.5 * (1 - cos);
 		if (viewFactorWithSky > 0 || viewFactorWithGround > 0) {
 			if (viewFactorWithSky > 0) { // diffuse irradiance from the sky
 				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * peakRadiation;
@@ -514,7 +514,7 @@ public class SolarIrradiation {
 
 	public void computeTotalEnergyForBuildings() {
 		applyTexture(SceneManager.getInstance().getSolarLand());
-		for (final HousePart part : Scene.getInstance().getParts())
+		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel || part instanceof Sensor)
 				applyTexture(part.getIrradiationMesh());
 			else if (part instanceof Roof)
@@ -522,6 +522,8 @@ public class SolarIrradiation {
 					final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
 					applyTexture(mesh);
 				}
+			part.drawHeatFlux();
+		}
 
 		/* subtract window potential from wall potential */
 		for (final HousePart wall : Scene.getInstance().getParts()) {

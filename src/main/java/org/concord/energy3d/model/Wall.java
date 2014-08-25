@@ -1225,21 +1225,21 @@ public class Wall extends HousePart {
 	}
 
 	@Override
-	void drawHeatFlux() {
+	public void drawHeatFlux() {
 
 		if (SceneManager.getInstance().getHeatFlux()) {
 
 			double zmax = -Double.MAX_VALUE;
-			List<Vector3> wallPolygonPoints = getWallPolygonPoints();
-			for (Vector3 a : wallPolygonPoints) {
+			final List<Vector3> wallPolygonPoints = getWallPolygonPoints();
+			for (final Vector3 a : wallPolygonPoints) {
 				if (a.getZ() > zmax)
 					zmax = a.getZ();
 			}
 
-			Path2D.Double path = new Path2D.Double();
+			final Path2D.Double path = new Path2D.Double();
 			path.moveTo(0, 0);
-			Vector3 v1 = new Vector3();
-			Vector3 v2 = new Vector3();
+			final Vector3 v1 = new Vector3();
+			final Vector3 v2 = new Vector3();
 			wallPolygonPoints.get(1).subtract(wallPolygonPoints.get(0), v1);
 			wallPolygonPoints.get(2).subtract(wallPolygonPoints.get(0), v2);
 			if (Util.isZero(v1.getX()) && Util.isZero(v2.getX())) {
@@ -1267,13 +1267,13 @@ public class Wall extends HousePart {
 			final int rows = (int) Math.max(2, zmax / heatFluxUnitArea);
 			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
 			heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
-			double heat = calculateHeatVector();
+			final double heat = calculateHeatVector();
 			if (heat != 0) {
 				final ReadOnlyVector3 o = getAbsPoint(0);
 				final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
 				final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
 				final ReadOnlyVector3 normal = getFaceDirection();
-				Vector3 a = new Vector3();
+				final Vector3 a = new Vector3();
 				double g, h;
 				for (int j = 0; j < cols; j++) {
 					h = j + 0.5;

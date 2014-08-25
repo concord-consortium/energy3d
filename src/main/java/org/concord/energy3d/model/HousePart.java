@@ -129,7 +129,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	/** set the custom color of this wall */
-	public void setColor(ReadOnlyColorRGBA color) {
+	public void setColor(final ReadOnlyColorRGBA color) {
 		this.color = color;
 	}
 
@@ -917,7 +917,7 @@ public abstract class HousePart implements Serializable {
 		return mesh;
 	}
 
-	public void setUFactor(double uFactor) {
+	public void setUFactor(final double uFactor) {
 		this.uFactor = uFactor;
 	}
 
@@ -925,7 +925,7 @@ public abstract class HousePart implements Serializable {
 		return uFactor;
 	}
 
-	public void setVolumetricHeatCapacity(double volumetricHeatCapacity) {
+	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
 		this.volumetricHeatCapacity = volumetricHeatCapacity;
 	}
 
@@ -969,7 +969,7 @@ public abstract class HousePart implements Serializable {
 				heat /= (computeArea() * heatLoss.length);
 				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
-				int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
+				final int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
 				heat = heatLoss[hourOfDay * 4] + heatLoss[hourOfDay * 4 + 1] + heatLoss[hourOfDay * 4 + 2] + heatLoss[hourOfDay * 4 + 3];
 				heat /= 4 * computeArea();
 				heatFlux.setDefaultColor(ColorRGBA.WHITE);
@@ -978,7 +978,7 @@ public abstract class HousePart implements Serializable {
 		return heat;
 	}
 
-	void drawHeatFlux() {
+	public void drawHeatFlux() {
 
 		if (SceneManager.getInstance().getHeatFlux()) {
 
@@ -989,13 +989,13 @@ public abstract class HousePart implements Serializable {
 			final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / heatFluxUnitArea);
 			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
 			heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
-			double heat = calculateHeatVector();
+			final double heat = calculateHeatVector();
 			if (heat != 0) {
 				final ReadOnlyVector3 o = getAbsPoint(0);
 				final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
 				final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
 				final ReadOnlyVector3 normal = getFaceDirection();
-				Vector3 a = new Vector3();
+				final Vector3 a = new Vector3();
 				double g, h;
 				for (int j = 0; j < cols; j++) {
 					h = j + 0.5;
@@ -1019,18 +1019,18 @@ public abstract class HousePart implements Serializable {
 
 	}
 
-	void drawArrow(ReadOnlyVector3 o, ReadOnlyVector3 normal, FloatBuffer arrowsVertices, double heat) {
+	void drawArrow(final ReadOnlyVector3 o, final ReadOnlyVector3 normal, final FloatBuffer arrowsVertices, final double heat) {
 
 		if (this instanceof Wall) {
-			Wall wall = (Wall) this;
-			for (HousePart x : wall.children) {
+			final Wall wall = (Wall) this;
+			for (final HousePart x : wall.children) {
 				if (x instanceof Window || x instanceof Door) {
-					Vector3 vo = x.toRelative(o);
+					final Vector3 vo = x.toRelative(o);
 					double xmin = 2;
 					double zmin = 2;
 					double xmax = -2;
 					double zmax = -2;
-					for (Vector3 a : x.points) {
+					for (final Vector3 a : x.points) {
 						if (a.getX() > xmax)
 							xmax = a.getX();
 						if (a.getZ() > zmax)
@@ -1049,28 +1049,28 @@ public abstract class HousePart implements Serializable {
 		arrowsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		final Vector3 p = new Vector3();
 		normal.multiply(Scene.getInstance().getHeatVectorLength() * Math.abs(heat), p);
-		Vector3 p2 = new Vector3();
+		final Vector3 p2 = new Vector3();
 		o.add(p, p2);
 		arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 		if (heat < 0)
 			p2.set(o);
 		if (heat != 0) {
-			float arrowLength = 0.5f;
+			final float arrowLength = 0.5f;
 			p.normalizeLocal();
-			double sign = Math.signum(heat);
+			final double sign = Math.signum(heat);
 			if (this instanceof Roof) {
-				float px = (float) (p.getX() * arrowLength * sign);
-				float py = (float) (p.getY() * arrowLength * sign);
-				float pz = (float) (p.getZ() * arrowLength * sign);
-				float yp = -pz;
-				float zp = py;
+				final float px = (float) (p.getX() * arrowLength * sign);
+				final float py = (float) (p.getY() * arrowLength * sign);
+				final float pz = (float) (p.getZ() * arrowLength * sign);
+				final float yp = -pz;
+				final float zp = py;
 				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 				arrowsVertices.put(p2.getXf() - px).put(p2.getYf() - py + yp * 0.25f).put(p2.getZf() - pz + zp * 0.25f);
 				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 				arrowsVertices.put(p2.getXf() - px).put(p2.getYf() - py - yp * 0.25f).put(p2.getZf() - pz - zp * 0.25f);
 			} else {
-				float cos = (float) (p.dot(Vector3.UNIT_X) * sign);
-				float sin = (float) (p.dot(Vector3.UNIT_Y) * sign);
+				final float cos = (float) (p.dot(Vector3.UNIT_X) * sign);
+				final float sin = (float) (p.dot(Vector3.UNIT_Y) * sign);
 				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 				arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() - arrowLength * sin).put(p2.getZf() - arrowLength * 0.5f);
 				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());

@@ -11,8 +11,8 @@ import java.util.Map.Entry;
 import javax.swing.undo.UndoManager;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -915,7 +915,7 @@ public abstract class Roof extends HousePart {
 		return area;
 	}
 
-	public double computeArea(Mesh mesh) {
+	public double computeArea(final Mesh mesh) {
 		double area = 0.0;
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		buf.rewind();
@@ -946,9 +946,9 @@ public abstract class Roof extends HousePart {
 		return roofPartsRoot;
 	}
 
-	double calculateHeatVector(Mesh mesh) {
+	double calculateHeatVector(final Mesh mesh) {
 		double heat = 0;
-		double[] heatLossArray = SolarIrradiation.getInstance().getHeatLoss(mesh);
+		final double[] heatLossArray = SolarIrradiation.getInstance().getHeatLoss(mesh);
 		if (heatLossArray != null) {
 			if (SceneManager.getInstance().isHeatFluxDaily()) {
 				for (final double x : heatLossArray)
@@ -957,7 +957,7 @@ public abstract class Roof extends HousePart {
 				heat /= (computeArea(mesh) * heatLossArray.length);
 				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
-				int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
+				final int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
 				heat = heatLossArray[hourOfDay * 4] + heatLossArray[hourOfDay * 4 + 1] + heatLossArray[hourOfDay * 4 + 2] + heatLossArray[hourOfDay * 4 + 3];
 				heat /= 4 * computeArea(mesh);
 				heatFlux.setDefaultColor(ColorRGBA.WHITE);
@@ -969,14 +969,14 @@ public abstract class Roof extends HousePart {
 	}
 
 	@Override
-	void drawHeatFlux() {
+	public void drawHeatFlux() {
 
 		if (SceneManager.getInstance().getHeatFlux()) {
 
 			heatFlux.getSceneHints().setCullHint(CullHint.Inherit);
 
 			FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
-			Foundation foundation = getTopContainer();
+			final Foundation foundation = getTopContainer();
 			final int cols = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(2)) / heatFluxUnitArea);
 			final int rows = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(1)) / heatFluxUnitArea);
 			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
@@ -984,7 +984,7 @@ public abstract class Roof extends HousePart {
 			final ReadOnlyVector3 o = foundation.getAbsPoint(0);
 			final ReadOnlyVector3 u = foundation.getAbsPoint(2).subtract(o, null);
 			final ReadOnlyVector3 v = foundation.getAbsPoint(1).subtract(o, null);
-			Vector3 a = new Vector3();
+			final Vector3 a = new Vector3();
 			double g, h;
 			boolean init = true;
 			for (int j = 0; j < cols; j++) {
@@ -1007,7 +1007,7 @@ public abstract class Roof extends HousePart {
 						}
 						if (b != null) {
 							final ReadOnlyVector3 normal = (ReadOnlyVector3) node.getUserData();
-							double heat = calculateHeatVector(mesh);
+							final double heat = calculateHeatVector(mesh);
 							drawArrow(b, normal, arrowsVertices, heat);
 						}
 					}
