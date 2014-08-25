@@ -953,7 +953,7 @@ public abstract class Roof extends HousePart {
 			if (SceneManager.getInstance().isHeatFluxDaily()) {
 				for (final double x : heatLossArray)
 					heat += x;
-				heat /= (computeArea(mesh) * heatLossArray.length);
+				heat /= computeArea(mesh) * heatLossArray.length;
 				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
 				final int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);

@@ -76,7 +76,9 @@ public class HeatLoad {
 
 		final int timeStep = SolarIrradiation.getInstance().getTimeStep();
 		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+		int iMinute = 0;
 		for (int minute = 0; minute < SolarIrradiation.MINUTES_OF_DAY; minute += timeStep) {
+			iMinute = minute / timeStep;
 			for (final HousePart part : Scene.getInstance().getParts()) {
 				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
 				float absorption = part instanceof Window ? 0 : 1 - part.getAlbedo();
@@ -85,7 +87,7 @@ public class HeatLoad {
 					for (final Spatial child : roof.getRoofPartsRoot().getChildren()) {
 						Mesh mesh = (Mesh) ((Node) child).getChild(0);
 						double[] solarPotential = SolarIrradiation.getInstance().getSolarPotential(mesh);
-						double solarHeat = solarPotential != null ? solarPotential[minute / timeStep] * absorption / part.getVolumetricHeatCapacity() : 0;
+						double solarHeat = solarPotential != null ? solarPotential[iMinute] * absorption / part.getVolumetricHeatCapacity() : 0;
 						double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 						if (part.isDrawCompleted()) {
 							double uFactor = getUFactor(part);
@@ -94,14 +96,14 @@ public class HeatLoad {
 							double heatloss = roof.computeArea(mesh) * uFactor * deltaT / 1000.0 / 60 * timeStep;
 							if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
 								heatloss = 0;
-							part.getHeatLoss()[minute / timeStep] += heatloss;
+							roof.getHeatLoss()[iMinute] += heatloss;
 							double[] heatLossArray = SolarIrradiation.getInstance().getHeatLoss(mesh);
 							if (heatLossArray != null)
-								heatLossArray[minute / timeStep] += heatloss;
+								heatLossArray[iMinute] += heatloss;
 						}
 					}
 				} else {
-					double solarHeat = part.getSolarPotential()[minute / timeStep] * absorption / part.getVolumetricHeatCapacity();
+					double solarHeat = part.getSolarPotential()[iMinute] * absorption / part.getVolumetricHeatCapacity();
 					double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 					if (part.isDrawCompleted()) {
 						double uFactor = getUFactor(part);
@@ -110,7 +112,7 @@ public class HeatLoad {
 						double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
 						if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
 							heatloss = 0;
-						part.getHeatLoss()[minute / timeStep] += heatloss;
+						part.getHeatLoss()[iMinute] += heatloss;
 					}
 				}
 			}
