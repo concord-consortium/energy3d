@@ -635,6 +635,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+					if (Config.isMac()) {
+						KeyboardState ks = inputStates.getCurrent().getKeyboardState();
+						if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL)) {
+							mouseRightClicked(inputStates.getCurrent().getMouseState());
+							return;
+						}
+					}
 					// if editing object using select or resize then only mouse drag is allowed
 					if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 						firstClickState = null;
