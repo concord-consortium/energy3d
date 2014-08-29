@@ -934,6 +934,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().showAxes(axesMenuItem.isSelected());
+					Scene.getInstance().setEdited(true);
 				}
 			});
 		}
@@ -947,6 +948,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().showBuildingLabels(buildingLabelsMenuItem.isSelected());
+					Scene.getInstance().setEdited(true);
 				}
 			});
 		}
@@ -1519,6 +1521,7 @@ public class MainFrame extends JFrame {
 											MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 										}
 									});
+									Scene.getInstance().setEdited(true);
 									break;
 								}
 							} catch (final NumberFormatException e1) {
@@ -1541,6 +1544,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.None);
+					Scene.getInstance().setEdited(true);
 				}
 			});
 			buttonGroup_2.add(noTextureMenuItem);
@@ -1556,6 +1560,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Simple);
+					Scene.getInstance().setEdited(true);
 				}
 			});
 			buttonGroup_2.add(simpleTextureMenuItem);
@@ -1571,6 +1576,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Full);
+					Scene.getInstance().setEdited(true);
 				}
 			});
 			fullTextureMenuItem.setSelected(true);

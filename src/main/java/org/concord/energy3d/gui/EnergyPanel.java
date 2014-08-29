@@ -316,6 +316,7 @@ public class EnergyPanel extends JPanel {
 			public void stateChanged(final ChangeEvent e) {
 				if (disableActionsRequester == null)
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				Scene.getInstance().setEdited(true);
 			}
 		});
 		insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
@@ -377,6 +378,7 @@ public class EnergyPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
+				Scene.getInstance().setEdited(true);
 			}
 		});
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
@@ -401,6 +403,7 @@ public class EnergyPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
+				Scene.getInstance().setEdited(true);
 			}
 		});
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
@@ -424,6 +427,7 @@ public class EnergyPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
+				Scene.getInstance().setEdited(true);
 			}
 		});
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
@@ -448,6 +452,7 @@ public class EnergyPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
+				Scene.getInstance().setEdited(true);
 			}
 		});
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
@@ -489,6 +494,7 @@ public class EnergyPanel extends JPanel {
 				}
 				Scene.getInstance().setWindowSolarHeatGainCoefficient(eff);
 				updateCost();
+				Scene.getInstance().setEdited(true);
 			}
 		});
 		solarConversionPercentagePanel.add(windowSHGCComboBox);
@@ -518,6 +524,7 @@ public class EnergyPanel extends JPanel {
 				}
 				Scene.getInstance().setSolarPanelEfficiency(eff);
 				updateCost();
+				Scene.getInstance().setEdited(true);
 			}
 		});
 		solarConversionPercentagePanel.add(solarPanelEfficiencyComboBox);
