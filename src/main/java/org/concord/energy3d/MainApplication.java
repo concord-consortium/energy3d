@@ -32,19 +32,19 @@ public class MainApplication {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		final SceneManager scene = SceneManager.getInstance();
+		final SceneManager sceneManager = SceneManager.getInstance();
 		final MainFrame mainFrame = MainFrame.getInstance();
 		mainFrame.updateTitleBar();
 		mainFrame.setVisible(true);
 		Scene.getInstance();
-		new Thread(scene, "Energy 3D Application").start();
+		new Thread(sceneManager, "Energy 3D Application").start();
 
 		if (args.length > 1 && !args[args.length - 1].startsWith("-"))
 			mainFrame.open(args[args.length - 1]);
 
 		/* initialize data logging */
 		final TimeSeriesLogger logger = new TimeSeriesLogger(1);
-		scene.addShutdownHook(new Runnable() {
+		sceneManager.addShutdownHook(new Runnable() {
 			@Override
 			public void run() {
 				logger.closeLog();

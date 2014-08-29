@@ -993,9 +993,9 @@ public class Foundation extends HousePart {
 		return lockEdit;
 	}
 
-	// do not draw heat flux
+	@Override
 	public void drawHeatFlux() {
-		// this method is left empty on purpose
+		// this method is left empty on purpose -- don't draw heat flux
 	}
 
 }

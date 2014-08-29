@@ -29,7 +29,7 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		graph = selectedPart instanceof Foundation ? new BuildingEnergyAnnualGraph() : new PartEnergyAnnualGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
-		graph.setBackground(Color.white);
+		graph.setBackground(Color.WHITE);
 	}
 
 	@Override

@@ -213,4 +213,9 @@ public class Floor extends HousePart {
 	protected HousePart getContainerRelative() {
 		return getTopContainer();
 	}
+
+	@Override
+	public void drawHeatFlux() {
+	}
+
 }
