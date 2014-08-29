@@ -1058,12 +1058,14 @@ public class MainFrame extends JFrame {
 						if (count == 1) {
 							SceneManager.getInstance().setSelectedPart(hp);
 						} else {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 							return;
 						}
 					} else {
 						HousePart topContainer = selectedPart.getTopContainer();
-						if (topContainer instanceof Foundation) {
+						if (selectedPart instanceof Foundation) {
+							// do nothing
+						} else if (topContainer instanceof Foundation) {
 							selectedPart.setEditPointsVisible(false);
 							SceneManager.getInstance().setSelectedPart(topContainer);
 						} else {
