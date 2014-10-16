@@ -1199,7 +1199,7 @@ public class Wall extends HousePart {
 
 	@Override
 	public double computeArea() {
-		double area = super.computeArea();
+		double area = computeArea(mesh);
 		for (final HousePart child : children)
 			if (child instanceof Window || child instanceof Door)
 				area -= child.computeArea();
