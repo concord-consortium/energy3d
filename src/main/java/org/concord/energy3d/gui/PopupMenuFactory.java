@@ -418,7 +418,7 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						MainFrame.getInstance().showColorDialogForHousePart(Operation.DRAW_WALL);
+						MainFrame.getInstance().showColorDialogForIndividualPart(Operation.DRAW_WALL);
 					}
 				}
 			});
@@ -630,7 +630,7 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Roof) {
-						MainFrame.getInstance().showColorDialogForHousePart(Operation.DRAW_ROOF_PYRAMID);
+						MainFrame.getInstance().showColorDialogForIndividualPart(Operation.DRAW_ROOF_PYRAMID);
 					}
 				}
 			});
@@ -800,7 +800,7 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Door) {
-						MainFrame.getInstance().showColorDialogForHousePart(Operation.DRAW_DOOR);
+						MainFrame.getInstance().showColorDialogForIndividualPart(Operation.DRAW_DOOR);
 					}
 				}
 			});
@@ -928,7 +928,7 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						MainFrame.getInstance().showColorDialogForHousePart(Operation.DRAW_FOUNDATION);
+						MainFrame.getInstance().showColorDialogForIndividualPart(Operation.DRAW_FOUNDATION);
 					}
 				}
 			});

@@ -1045,35 +1045,8 @@ public class MainFrame extends JFrame {
 			annualEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null) {
-						int count = 0;
-						HousePart hp = null;
-						for (final HousePart x : Scene.getInstance().getParts()) {
-							if (x instanceof Foundation) {
-								count++;
-								hp = x;
-							}
-						}
-						if (count == 1) {
-							SceneManager.getInstance().setSelectedPart(hp);
-						} else {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-							return;
-						}
-					} else {
-						HousePart topContainer = selectedPart.getTopContainer();
-						if (selectedPart instanceof Foundation) {
-							// do nothing
-						} else if (topContainer instanceof Foundation) {
-							selectedPart.setEditPointsVisible(false);
-							SceneManager.getInstance().setSelectedPart(topContainer);
-						} else {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-							return;
-						}
-					}
-					new EnergyAnnualAnalysis().show("Annual Energy");
+					if (autoSelectBuilding() instanceof Foundation)
+						new EnergyAnnualAnalysis().show("Annual Energy");
 				}
 			});
 		}
@@ -1589,7 +1562,7 @@ public class MainFrame extends JFrame {
 
 	private JMenu getColorMenu() {
 		if (colorMenu == null) {
-			colorMenu = new JMenu("Color");
+			colorMenu = new JMenu("Building Colors");
 			colorMenu.add(getRoofColorMenuItem());
 			colorMenu.add(getFloorColorMenuItem());
 			colorMenu.add(getDoorColorMenuItem());
@@ -1605,7 +1578,7 @@ public class MainFrame extends JFrame {
 			platformColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForHousePart(Operation.DRAW_FOUNDATION);
+					showColorDialogForWholeHouse(Operation.DRAW_FOUNDATION);
 				}
 			});
 		}
@@ -1618,7 +1591,7 @@ public class MainFrame extends JFrame {
 			wallColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForHousePart(Operation.DRAW_WALL);
+					showColorDialogForWholeHouse(Operation.DRAW_WALL);
 				}
 			});
 		}
@@ -1631,7 +1604,7 @@ public class MainFrame extends JFrame {
 			doorColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForHousePart(Operation.DRAW_DOOR);
+					showColorDialogForWholeHouse(Operation.DRAW_DOOR);
 				}
 			});
 		}
@@ -1644,7 +1617,7 @@ public class MainFrame extends JFrame {
 			floorColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForHousePart(Operation.DRAW_FLOOR);
+					showColorDialogForWholeHouse(Operation.DRAW_FLOOR);
 				}
 			});
 		}
@@ -1657,14 +1630,47 @@ public class MainFrame extends JFrame {
 			roofColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForHousePart(Operation.DRAW_ROOF_PYRAMID);
+					showColorDialogForWholeHouse(Operation.DRAW_ROOF_PYRAMID);
 				}
 			});
 		}
 		return roofColorMenuItem;
 	}
 
-	void showColorDialogForHousePart(final Operation operation) {
+	private Foundation autoSelectBuilding() {
+		Foundation foundation = null;
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart == null) {
+			int count = 0;
+			HousePart hp = null;
+			for (final HousePart x : Scene.getInstance().getParts()) {
+				if (x instanceof Foundation) {
+					count++;
+					hp = x;
+				}
+			}
+			if (count == 1) {
+				SceneManager.getInstance().setSelectedPart(hp);
+				foundation = (Foundation) hp;
+			} else {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+			}
+		} else {
+			HousePart topContainer = selectedPart.getTopContainer();
+			if (selectedPart instanceof Foundation) {
+				foundation = (Foundation) selectedPart;
+			} else if (topContainer instanceof Foundation) {
+				selectedPart.setEditPointsVisible(false);
+				SceneManager.getInstance().setSelectedPart(topContainer);
+				foundation = (Foundation) topContainer;
+			} else {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+		return foundation;
+	}
+
+	void showColorDialogForIndividualPart(final Operation operation) {
 		final ActionListener actionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -1673,36 +1679,92 @@ public class MainFrame extends JFrame {
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
 				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart != null)
+					selectedPart.setColor(color);
+				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
+				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
+					PrintController.getInstance().restartAnimation();
+				Scene.getInstance().setEdited(true);
+			}
+		};
+		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
+		if (fullTextureMenuItem.isSelected()) {
+			noTextureMenuItem.setSelected(true);
+			Scene.getInstance().setTextureMode(TextureMode.None);
+		}
+
+		ReadOnlyColorRGBA color;
+		switch (operation) {
+		case DRAW_FOUNDATION:
+			color = Scene.getInstance().getFoundationColor();
+			break;
+		case DRAW_WALL:
+			color = Scene.getInstance().getWallColor();
+			break;
+		case DRAW_DOOR:
+			color = Scene.getInstance().getDoorColor();
+			break;
+		case DRAW_FLOOR:
+			color = Scene.getInstance().getFloorColor();
+			break;
+		case DRAW_ROOF_PYRAMID:
+			color = Scene.getInstance().getRoofColor();
+			break;
+		default:
+			color = ColorRGBA.WHITE;
+		}
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null && selectedPart.getColor() != null)
+			color = selectedPart.getColor();
+		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+		JColorChooser.createDialog(MainFrame.this, "Select Default Color", true, colorChooser, actionListener, null).setVisible(true);
+	}
+
+	private void showColorDialogForWholeHouse(final Operation operation) {
+		final Foundation foundation = autoSelectBuilding();
+		if (foundation == null)
+			return;
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>This will set color for all parts of the specified type for the selected building.<br>Do you want to continue?</html>", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.NO_OPTION)
+			return;
+		final ActionListener actionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final Color c = colorChooser.getColor();
+				final float[] newColor = c.getComponents(null);
+				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
+				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
 				switch (operation) {
 				case DRAW_FOUNDATION:
-					if (selectedPart == null)
-						Scene.getInstance().setFoundationColor(color);
-					else if (selectedPart instanceof Foundation)
-						selectedPart.setColor(color);
+					Scene.getInstance().setFoundationColor(color);
+					foundation.setColor(color);
 					break;
 				case DRAW_WALL:
-					if (selectedPart == null)
-						Scene.getInstance().setWallColor(color);
-					else if (selectedPart instanceof Wall)
-						selectedPart.setColor(color);
+					Scene.getInstance().setWallColor(color);
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof Wall && p.getTopContainer() == foundation)
+							p.setColor(color);
+					}
 					break;
 				case DRAW_DOOR:
-					if (selectedPart == null)
-						Scene.getInstance().setDoorColor(color);
-					else if (selectedPart instanceof Door)
-						selectedPart.setColor(color);
+					Scene.getInstance().setDoorColor(color);
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof Door && p.getTopContainer() == foundation)
+							p.setColor(color);
+					}
 					break;
 				case DRAW_FLOOR:
-					if (selectedPart == null)
-						Scene.getInstance().setFloorColor(color);
-					else if (selectedPart instanceof Floor)
-						selectedPart.setColor(color);
+					Scene.getInstance().setFloorColor(color);
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof Floor && p.getTopContainer() == foundation)
+							p.setColor(color);
+					}
 					break;
 				case DRAW_ROOF_PYRAMID:
-					if (selectedPart == null)
-						Scene.getInstance().setRoofColor(color);
-					else if (selectedPart instanceof Roof)
-						selectedPart.setColor(color);
+					Scene.getInstance().setRoofColor(color);
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof Roof && p.getTopContainer() == foundation)
+							p.setColor(color);
+					}
 					break;
 				default:
 					break;
@@ -1743,8 +1805,7 @@ public class MainFrame extends JFrame {
 		if (selectedPart != null && selectedPart.getColor() != null)
 			color = selectedPart.getColor();
 		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
-		final JDialog colorDialog = JColorChooser.createDialog(MainFrame.this, "Select Default Color", true, colorChooser, actionListener, null);
-		colorDialog.setVisible(true);
+		JColorChooser.createDialog(MainFrame.this, "Select Default Color", true, colorChooser, actionListener, null).setVisible(true);
 	}
 
 	public void showUnexpectedErrorMessage(final Throwable err) {
