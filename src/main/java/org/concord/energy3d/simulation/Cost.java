@@ -1,8 +1,11 @@
 package org.concord.energy3d.simulation;
 
+import static java.awt.GraphicsDevice.WindowTranslucency.TRANSLUCENT;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -215,6 +218,10 @@ public class Cost {
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Material Costs by Category", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		if (GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isWindowTranslucencySupported(TRANSLUCENT)) {
+			dialog.setUndecorated(true);
+			dialog.setOpacity(0.75f);
+		}
 		dialog.getContentPane().add(pie, BorderLayout.CENTER);
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		JButton button = new JButton("Close");
