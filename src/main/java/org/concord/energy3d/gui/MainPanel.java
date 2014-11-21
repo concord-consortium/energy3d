@@ -36,6 +36,7 @@ import javax.swing.event.DocumentListener;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -661,7 +662,8 @@ public class MainPanel extends JPanel {
 
 	private void autoSelectBuilding() {
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart == null) {
+		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
+			SceneManager.getInstance().setSelectedPart(null);
 			int count = 0;
 			HousePart hp = null;
 			for (final HousePart x : Scene.getInstance().getParts()) {
@@ -690,7 +692,8 @@ public class MainPanel extends JPanel {
 			energyViewButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					autoSelectBuilding();
+					if (energyViewButton.isSelected())
+						autoSelectBuilding();
 					SceneManager.getInstance().setHeatFluxDaily(true);
 					SceneManager.getInstance().setSolarColorMap(energyViewButton.isSelected());
 					SceneManager.getInstance().setHeatFlux(energyViewButton.isSelected());

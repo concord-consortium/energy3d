@@ -57,8 +57,10 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.PrintController;
@@ -1640,7 +1642,8 @@ public class MainFrame extends JFrame {
 	private Foundation autoSelectBuilding() {
 		Foundation foundation = null;
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart == null) {
+		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
+			SceneManager.getInstance().setSelectedPart(null);
 			int count = 0;
 			HousePart hp = null;
 			for (final HousePart x : Scene.getInstance().getParts()) {
