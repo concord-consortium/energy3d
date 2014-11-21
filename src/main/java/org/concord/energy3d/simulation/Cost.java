@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -166,11 +167,11 @@ public class Cost {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		show();
+		show(true);
 		EnergyPanel.getInstance().requestDisableActions(null);
 	}
 
-	private void show() {
+	private void show(boolean translucent) {
 
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		final Foundation selectedBuilding;
@@ -218,12 +219,21 @@ public class Cost {
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Material Costs by Category", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		if (GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isWindowTranslucencySupported(TRANSLUCENT)) {
+		if (translucent && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isWindowTranslucencySupported(TRANSLUCENT)) {
 			dialog.setUndecorated(true);
-			dialog.setOpacity(0.75f);
+			dialog.setOpacity(System.getProperty("os.name").startsWith("Mac") ? 0.5f : 0.75f);
 		}
 		dialog.getContentPane().add(pie, BorderLayout.CENTER);
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		final JCheckBox translucentCheckBox = new JCheckBox("Translucent", translucent);
+		translucentCheckBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dialog.dispose();
+				show(translucentCheckBox.isSelected());
+			}
+		});
+		buttonPanel.add(translucentCheckBox);
 		JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override
