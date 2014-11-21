@@ -659,6 +659,28 @@ public class MainPanel extends JPanel {
 		return energyToggleButton;
 	}
 
+	private void autoSelectBuilding() {
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart == null) {
+			int count = 0;
+			HousePart hp = null;
+			for (final HousePart x : Scene.getInstance().getParts()) {
+				if (x instanceof Foundation) {
+					count++;
+					hp = x;
+				}
+			}
+			if (count == 1)
+				SceneManager.getInstance().setSelectedPart(hp);
+		} else {
+			HousePart topContainer = selectedPart.getTopContainer();
+			if (topContainer instanceof Foundation) {
+				selectedPart.setEditPointsVisible(false);
+				SceneManager.getInstance().setSelectedPart(topContainer);
+			}
+		}
+	}
+
 	public JToggleButton getEnergyViewButton() {
 		if (energyViewButton == null) {
 			energyViewButton = new JToggleButton("");
@@ -668,6 +690,7 @@ public class MainPanel extends JPanel {
 			energyViewButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
+					autoSelectBuilding();
 					SceneManager.getInstance().setHeatFluxDaily(true);
 					SceneManager.getInstance().setSolarColorMap(energyViewButton.isSelected());
 					SceneManager.getInstance().setHeatFlux(energyViewButton.isSelected());
