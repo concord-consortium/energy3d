@@ -1047,7 +1047,7 @@ public class MainFrame extends JFrame {
 			annualEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (autoSelectBuilding() instanceof Foundation)
+					if (autoSelectBuilding(true) instanceof Foundation)
 						new EnergyAnnualAnalysis().show("Annual Energy");
 				}
 			});
@@ -1639,7 +1639,7 @@ public class MainFrame extends JFrame {
 		return roofColorMenuItem;
 	}
 
-	private Foundation autoSelectBuilding() {
+	Foundation autoSelectBuilding(boolean ask) {
 		Foundation foundation = null;
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
@@ -1656,7 +1656,8 @@ public class MainFrame extends JFrame {
 				SceneManager.getInstance().setSelectedPart(hp);
 				foundation = (Foundation) hp;
 			} else {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+				if (ask)
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 			}
 		} else {
 			HousePart topContainer = selectedPart.getTopContainer();
@@ -1667,7 +1668,8 @@ public class MainFrame extends JFrame {
 				SceneManager.getInstance().setSelectedPart(topContainer);
 				foundation = (Foundation) topContainer;
 			} else {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+				if (ask)
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 			}
 		}
 		return foundation;
@@ -1723,12 +1725,54 @@ public class MainFrame extends JFrame {
 		JColorChooser.createDialog(MainFrame.this, "Select Default Color", true, colorChooser, actionListener, null).setVisible(true);
 	}
 
+	private int countFloors(Foundation foundation) {
+		int n = 0;
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p.getTopContainer() == foundation && p instanceof Floor)
+				n++;
+		}
+		return n;
+	}
+
+	private int countDoors(Foundation foundation) {
+		int n = 0;
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p.getTopContainer() == foundation && p instanceof Door)
+				n++;
+		}
+		return n;
+	}
+
 	private void showColorDialogForWholeHouse(final Operation operation) {
-		final Foundation foundation = autoSelectBuilding();
+		final Foundation foundation = autoSelectBuilding(true);
 		if (foundation == null)
 			return;
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>This will set color for all parts of the specified type for the selected building.<br>Do you want to continue?</html>", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.NO_OPTION)
-			return;
+		switch (operation) {
+		case DRAW_WALL:
+			if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>This will set color for all walls of the selected building.<br>Do you want to continue?</html>", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.NO_OPTION)
+				return;
+			break;
+		case DRAW_DOOR:
+			if (countDoors(foundation) == 0) {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>There is no door for the selected building.</html>", "Message", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			} else if (countDoors(foundation) > 1) {
+				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>This will set color for all doors of the selected building.<br>Do you want to continue?</html>", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.NO_OPTION)
+					return;
+			}
+			break;
+		case DRAW_FLOOR:
+			if (countFloors(foundation) == 0) {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>There is no floor for the selected building.</html>", "Message", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			} else if (countFloors(foundation) > 1) {
+				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>This will set color for all floors of the selected building.<br>Do you want to continue?</html>", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.NO_OPTION)
+					return;
+			}
+			break;
+		default:
+			break;
+		}
 		final ActionListener actionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -1738,32 +1782,32 @@ public class MainFrame extends JFrame {
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
 				switch (operation) {
 				case DRAW_FOUNDATION:
-					Scene.getInstance().setFoundationColor(color);
+					// Scene.getInstance().setFoundationColor(color);
 					foundation.setColor(color);
 					break;
 				case DRAW_WALL:
-					Scene.getInstance().setWallColor(color);
+					// Scene.getInstance().setWallColor(color);
 					for (HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Wall && p.getTopContainer() == foundation)
 							p.setColor(color);
 					}
 					break;
 				case DRAW_DOOR:
-					Scene.getInstance().setDoorColor(color);
+					// Scene.getInstance().setDoorColor(color);
 					for (HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Door && p.getTopContainer() == foundation)
 							p.setColor(color);
 					}
 					break;
 				case DRAW_FLOOR:
-					Scene.getInstance().setFloorColor(color);
+					// Scene.getInstance().setFloorColor(color);
 					for (HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Floor && p.getTopContainer() == foundation)
 							p.setColor(color);
 					}
 					break;
 				case DRAW_ROOF_PYRAMID:
-					Scene.getInstance().setRoofColor(color);
+					// Scene.getInstance().setRoofColor(color);
 					for (HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Roof && p.getTopContainer() == foundation)
 							p.setColor(color);

@@ -36,7 +36,6 @@ import javax.swing.event.DocumentListener;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -660,29 +659,6 @@ public class MainPanel extends JPanel {
 		return energyToggleButton;
 	}
 
-	private void autoSelectBuilding() {
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
-			SceneManager.getInstance().setSelectedPart(null);
-			int count = 0;
-			HousePart hp = null;
-			for (final HousePart x : Scene.getInstance().getParts()) {
-				if (x instanceof Foundation) {
-					count++;
-					hp = x;
-				}
-			}
-			if (count == 1)
-				SceneManager.getInstance().setSelectedPart(hp);
-		} else {
-			HousePart topContainer = selectedPart.getTopContainer();
-			if (topContainer instanceof Foundation) {
-				selectedPart.setEditPointsVisible(false);
-				SceneManager.getInstance().setSelectedPart(topContainer);
-			}
-		}
-	}
-
 	public JToggleButton getEnergyViewButton() {
 		if (energyViewButton == null) {
 			energyViewButton = new JToggleButton("");
@@ -693,7 +669,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (energyViewButton.isSelected())
-						autoSelectBuilding();
+						MainFrame.getInstance().autoSelectBuilding(false);
 					SceneManager.getInstance().setHeatFluxDaily(true);
 					SceneManager.getInstance().setSolarColorMap(energyViewButton.isSelected());
 					SceneManager.getInstance().setHeatFlux(energyViewButton.isSelected());
