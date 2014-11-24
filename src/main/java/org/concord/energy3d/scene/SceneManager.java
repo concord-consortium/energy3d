@@ -1318,7 +1318,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() {
 				if (operation == Operation.SELECT) {
 					final HousePart previousSelectedHousePart = selectedHousePart;
-					final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
+					final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), false);
 					final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
 					selectedHousePart = pick == null ? null : pick.getHousePart();
 					System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);

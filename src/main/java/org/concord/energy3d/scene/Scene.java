@@ -292,14 +292,41 @@ public class Scene implements Serializable {
 		Specifications.getInstance().setAreaEnabled(instance.areaEnabled);
 		Specifications.getInstance().setHeightEnabled(instance.heightEnabled);
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
-		if (instance.windowUFactor != null)
+
+		// backward compatibility
+		if (instance.windowUFactor != null) {
+			double defaultWindowUFactor = parseValue(instance.windowUFactor);
+			for (HousePart p : Scene.getInstance().getParts()) {
+				if (p.getUFactor() <= 0 && p instanceof Window)
+					p.setUFactor(defaultWindowUFactor);
+			}
 			energyPanel.getWindowsComboBox().setSelectedItem(instance.windowUFactor);
-		if (instance.wallUFactor != null)
+		}
+		if (instance.wallUFactor != null) {
+			double defaultWallUFactor = parseValue(instance.wallUFactor);
+			for (HousePart p : Scene.getInstance().getParts()) {
+				if (p.getUFactor() <= 0 && p instanceof Wall)
+					p.setUFactor(defaultWallUFactor);
+			}
 			energyPanel.getWallsComboBox().setSelectedItem(instance.wallUFactor);
-		if (instance.doorUFactor != null)
+		}
+		if (instance.doorUFactor != null) {
+			double defaultDoorUFactor = parseValue(instance.doorUFactor);
+			for (HousePart p : Scene.getInstance().getParts()) {
+				if (p.getUFactor() <= 0 && p instanceof Door)
+					p.setUFactor(defaultDoorUFactor);
+			}
 			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
-		if (instance.roofUFactor != null)
+		}
+		if (instance.roofUFactor != null) {
+			double defaultRoofUFactor = parseValue(instance.roofUFactor);
+			for (HousePart p : Scene.getInstance().getParts()) {
+				if (p.getUFactor() <= 0 && p instanceof Roof)
+					p.setUFactor(defaultRoofUFactor);
+			}
 			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
+		}
+
 		if (instance.backgroundAlbedo < 0.000001)
 			instance.backgroundAlbedo = 0.3;
 		if (instance.solarPanelEfficiency < 0.000001)
@@ -315,6 +342,11 @@ public class Scene implements Serializable {
 		SolarIrradiation.getInstance().setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
 		SolarIrradiation.getInstance().setTimeStep(instance.timeStep == 0 ? 15 : instance.timeStep);
 		Scene.getInstance().setEdited(false);
+	}
+
+	private static double parseValue(final String s) {
+		final int indexOfSpace = s.indexOf(' ');
+		return Double.parseDouble(s.substring(0, indexOfSpace != -1 ? indexOfSpace : s.length()));
 	}
 
 	public static void loadCameraLocation() {
