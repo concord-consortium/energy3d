@@ -57,10 +57,10 @@ public class HeatLoad {
 
 	public void computeEnergyToday(final Calendar today, final double insideTemperature) {
 		try {
-			wallUFactor = parseUFactor(EnergyPanel.getInstance().getWallsComboBox());
-			doorUFactor = parseUFactor(EnergyPanel.getInstance().getDoorsComboBox());
-			windowUFactor = parseUFactor(EnergyPanel.getInstance().getWindowsComboBox());
-			roofUFactor = parseUFactor(EnergyPanel.getInstance().getRoofsComboBox());
+			wallUFactor = parseValue(EnergyPanel.getInstance().getWallsComboBox());
+			doorUFactor = parseValue(EnergyPanel.getInstance().getDoorsComboBox());
+			windowUFactor = parseValue(EnergyPanel.getInstance().getWindowsComboBox());
+			roofUFactor = parseValue(EnergyPanel.getInstance().getRoofsComboBox());
 		} catch (final Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(MainPanel.getInstance(), "Invalid U-Factor value: " + e.getMessage(), "Invalid U-Factor", JOptionPane.WARNING_MESSAGE);
@@ -148,7 +148,7 @@ public class HeatLoad {
 		return x > xmin && x < xmax && y > ymin && y < ymax;
 	}
 
-	public static double parseUFactor(final JComboBox<String> comboBox) {
+	public static double parseValue(final JComboBox<String> comboBox) {
 		final String valueStr = comboBox.getSelectedItem().toString();
 		final int indexOfSpace = valueStr.indexOf(' ');
 		return Double.parseDouble(valueStr.substring(0, indexOfSpace != -1 ? indexOfSpace : valueStr.length()));

@@ -32,9 +32,18 @@ public class SolarPanel extends HousePart {
 	private transient double area;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
+	private double efficiency = 0;
 
 	public SolarPanel() {
 		super(1, 1, 0.0);
+	}
+
+	public void setEfficiency(final double efficiency) {
+		this.efficiency = efficiency;
+	}
+
+	public double getEfficiency() {
+		return efficiency;
 	}
 
 	@Override

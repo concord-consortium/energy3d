@@ -18,6 +18,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -40,6 +41,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForRoof;
 	private static JPopupMenu popupMenuForDoor;
 	private static JPopupMenu popupMenuForFoundation;
+	private static JPopupMenu popupMenuForSolarPanel;
 
 	private PopupMenuFactory() {
 	}
@@ -56,6 +58,8 @@ public class PopupMenuFactory {
 			return getPopupMenuForDoor();
 		if (selectedPart instanceof Foundation)
 			return getPopupMenuForFoundation();
+		if (selectedPart instanceof SolarPanel)
+			return getPopupMenuForSolarPanel();
 		return null;
 	}
 
@@ -254,7 +258,7 @@ public class PopupMenuFactory {
 							b = true;
 						} else {
 							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultWindowUFactor = HeatLoad.parseUFactor(EnergyPanel.getInstance().getWindowsComboBox());
+								double defaultWindowUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWindowsComboBox());
 								if (Util.isZero(defaultWindowUFactor - 1.2)) {
 									Util.selectSilently(miUFactor1, true);
 									b = true;
@@ -547,7 +551,7 @@ public class PopupMenuFactory {
 							b = true;
 						} else {
 							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultWallUFactor = HeatLoad.parseUFactor(EnergyPanel.getInstance().getWallsComboBox());
+								double defaultWallUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
 								if (Util.isZero(defaultWallUFactor - 0.25)) {
 									Util.selectSilently(miUFactor1, true);
 									b = true;
@@ -723,7 +727,7 @@ public class PopupMenuFactory {
 							b = true;
 						} else {
 							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultRoofUFactor = HeatLoad.parseUFactor(EnergyPanel.getInstance().getRoofsComboBox());
+								double defaultRoofUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
 								if (Util.isZero(defaultRoofUFactor - 0.29)) {
 									Util.selectSilently(miUFactor1, true);
 									b = true;
@@ -857,7 +861,7 @@ public class PopupMenuFactory {
 							b = true;
 						} else {
 							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultDoorUFactor = HeatLoad.parseUFactor(EnergyPanel.getInstance().getDoorsComboBox());
+								double defaultDoorUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getDoorsComboBox());
 								if (Util.isZero(defaultDoorUFactor - 0.5)) {
 									Util.selectSilently(miUFactor1, true);
 									b = true;
@@ -960,6 +964,45 @@ public class PopupMenuFactory {
 		}
 
 		return popupMenuForFoundation;
+
+	}
+
+	private static JPopupMenu getPopupMenuForSolarPanel() {
+
+		if (popupMenuForSolarPanel == null) {
+
+			popupMenuForSolarPanel = new JPopupMenu();
+			popupMenuForSolarPanel.setInvoker(MainPanel.getInstance().getCanvasPanel());
+
+			final JMenuItem miInfo = new JMenuItem();
+			miInfo.setEnabled(false);
+
+			popupMenuForSolarPanel.addPopupMenuListener(new PopupMenuListener() {
+
+				@Override
+				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null)
+						return;
+					String s = selectedPart.toString();
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1));
+				}
+
+				@Override
+				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				}
+
+				@Override
+				public void popupMenuCanceled(PopupMenuEvent e) {
+				}
+
+			});
+
+			popupMenuForSolarPanel.add(miInfo);
+
+		}
+
+		return popupMenuForSolarPanel;
 
 	}
 

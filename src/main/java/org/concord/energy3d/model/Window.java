@@ -36,9 +36,18 @@ public class Window extends HousePart {
 
 	private double solarHeatGainCoefficient;
 	private int style = SMALL_PANES;
+	private double shgc = 0;
 
 	public Window() {
 		super(2, 4, 30.0);
+	}
+
+	public void setShgc(double shgc) {
+		this.shgc = shgc;
+	}
+
+	public double getShgc() {
+		return shgc;
 	}
 
 	@Override

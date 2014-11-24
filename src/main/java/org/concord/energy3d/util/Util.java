@@ -1,5 +1,7 @@
 package org.concord.energy3d.util;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -7,6 +9,7 @@ import java.net.URI;
 import java.util.List;
 
 import javax.swing.AbstractButton;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
@@ -302,6 +305,20 @@ public class Util {
 			button.addItemListener(x);
 		for (final ActionListener x : actionListeners)
 			button.addActionListener(x);
+	}
+
+	public static JButton getButtonSubComponent(Container container) {
+		if (container instanceof JButton) {
+			return (JButton) container;
+		} else {
+			Component[] components = container.getComponents();
+			for (Component component : components) {
+				if (component instanceof Container) {
+					return getButtonSubComponent((Container) component);
+				}
+			}
+		}
+		return null;
 	}
 
 }

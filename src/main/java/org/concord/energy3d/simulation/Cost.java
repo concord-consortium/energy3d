@@ -70,49 +70,59 @@ public class Cost {
 
 	private int getPartCost(HousePart part) {
 		if (part instanceof Wall) {
-			double uValue = HeatLoad.parseUFactor(EnergyPanel.getInstance().getWallsComboBox());
+			double uFactor = part.getUFactor();
+			if (uFactor == 0)
+				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
 			double price;
-			if (uValue < 0.05)
+			if (uFactor < 0.05)
 				price = 100;
-			else if (uValue < 0.2)
+			else if (uFactor < 0.2)
 				price = 90;
 			else
 				price = 80;
 			return (int) (part.computeArea() * price);
 		}
 		if (part instanceof Window) {
-			double uValue = HeatLoad.parseUFactor(EnergyPanel.getInstance().getWindowsComboBox());
+			double uFactor = part.getUFactor();
+			if (uFactor == 0)
+				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWindowsComboBox());
 			double price;
-			if (uValue <= 0.15) // triple pane
+			if (uFactor <= 0.15) // triple pane
 				price = 250;
-			else if (uValue < 0.4) // double pane
+			else if (uFactor < 0.4) // double pane
 				price = 200;
 			else
 				price = 150;
 			return (int) (part.computeArea() * price);
 		}
 		if (part instanceof Roof) {
-			double uValue = HeatLoad.parseUFactor(EnergyPanel.getInstance().getRoofsComboBox());
+			double uFactor = part.getUFactor();
+			if (uFactor == 0)
+				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
 			double price;
-			if (uValue < 0.05)
+			if (uFactor < 0.05)
 				price = 100;
-			else if (uValue < 0.2)
+			else if (uFactor < 0.2)
 				price = 90;
 			else
 				price = 80;
 			return (int) (part.computeArea() * price);
 		}
 		if (part instanceof Door) {
-			double uValue = HeatLoad.parseUFactor(EnergyPanel.getInstance().getDoorsComboBox());
+			double uFactor = part.getUFactor();
+			if (uFactor == 0)
+				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getDoorsComboBox());
 			int price;
-			if (uValue < 0.5)
+			if (uFactor < 0.5)
 				price = 100;
 			else
 				price = 50;
 			return (int) (part.computeArea() * price);
 		}
 		if (part instanceof SolarPanel) {
-			double efficiency = Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
+			double efficiency = ((SolarPanel) part).getEfficiency();
+			if (efficiency == 0)
+				Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
 			int price;
 			if (efficiency >= 20)
 				price = 1000;

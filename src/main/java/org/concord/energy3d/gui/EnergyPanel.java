@@ -30,6 +30,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -56,6 +57,8 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
+import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
@@ -128,6 +131,7 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty3TextField;
 	private JTextField partProperty4TextField;
 	private ChangeListener latitudeChangeListener;
+	private Foundation foundation;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -376,11 +380,25 @@ public class EnergyPanel extends JPanel {
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				double uFactor = HeatLoad.parseValue(wallsComboBox);
+				for (HousePart p : Scene.getInstance().getParts()) {
+					if (p instanceof Wall && p.getTopContainer() == foundation)
+						p.setUFactor(uFactor);
+				}
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
 				Scene.getInstance().setEdited(true);
 			}
 		});
+		JButton arrowButton = Util.getButtonSubComponent(wallsComboBox);
+		if (arrowButton != null) {
+			arrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					foundation = MainFrame.getInstance().autoSelectBuilding(true);
+				}
+			});
+		}
 		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
 		gbc_wallsComboBox.insets = new Insets(0, 0, 5, 5);
 		gbc_wallsComboBox.gridx = 1;
@@ -401,11 +419,25 @@ public class EnergyPanel extends JPanel {
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				double uFactor = HeatLoad.parseValue(roofsComboBox);
+				for (HousePart p : Scene.getInstance().getParts()) {
+					if (p instanceof Roof && p.getTopContainer() == foundation)
+						p.setUFactor(uFactor);
+				}
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
 				Scene.getInstance().setEdited(true);
 			}
 		});
+		arrowButton = Util.getButtonSubComponent(roofsComboBox);
+		if (arrowButton != null) {
+			arrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					foundation = MainFrame.getInstance().autoSelectBuilding(true);
+				}
+			});
+		}
 		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
 		gbc_roofsComboBox.gridx = 3;
 		gbc_roofsComboBox.gridy = 0;
@@ -425,11 +457,25 @@ public class EnergyPanel extends JPanel {
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				double uFactor = HeatLoad.parseValue(windowsComboBox);
+				for (HousePart p : Scene.getInstance().getParts()) {
+					if (p instanceof Window && p.getTopContainer() == foundation)
+						p.setUFactor(uFactor);
+				}
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
 				Scene.getInstance().setEdited(true);
 			}
 		});
+		arrowButton = Util.getButtonSubComponent(windowsComboBox);
+		if (arrowButton != null) {
+			arrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					foundation = MainFrame.getInstance().autoSelectBuilding(true);
+				}
+			});
+		}
 		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
 		gbc_windowsComboBox.insets = new Insets(0, 0, 0, 5);
 		gbc_windowsComboBox.gridx = 1;
@@ -450,11 +496,25 @@ public class EnergyPanel extends JPanel {
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				double uFactor = HeatLoad.parseValue(doorsComboBox);
+				for (HousePart p : Scene.getInstance().getParts()) {
+					if (p instanceof Door && p.getTopContainer() == foundation)
+						p.setUFactor(uFactor);
+				}
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
 				Scene.getInstance().setEdited(true);
 			}
 		});
+		arrowButton = Util.getButtonSubComponent(doorsComboBox);
+		if (arrowButton != null) {
+			arrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					foundation = MainFrame.getInstance().autoSelectBuilding(true);
+				}
+			});
+		}
 		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
 		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
 		gbc_doorsComboBox.gridx = 3;
@@ -481,22 +541,35 @@ public class EnergyPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				// validate the input
 				final String s = (String) windowSHGCComboBox.getSelectedItem();
-				double eff = 50;
+				double shgc = 50;
 				try {
-					eff = Float.parseFloat(s);
+					shgc = Float.parseFloat(s);
 				} catch (final NumberFormatException ex) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be 25-80.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (eff < 25 || eff > 80) {
+				if (shgc < 25 || shgc > 80) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be 25-80.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				Scene.getInstance().setWindowSolarHeatGainCoefficient(eff);
+				for (HousePart p : Scene.getInstance().getParts()) {
+					if (p instanceof Window && p.getTopContainer() == foundation)
+						((Window) p).setShgc(shgc);
+				}
+				Scene.getInstance().setWindowSolarHeatGainCoefficient(shgc);
 				updateCost();
 				Scene.getInstance().setEdited(true);
 			}
 		});
+		arrowButton = Util.getButtonSubComponent(windowSHGCComboBox);
+		if (arrowButton != null) {
+			arrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					foundation = MainFrame.getInstance().autoSelectBuilding(true);
+				}
+			});
+		}
 		solarConversionPercentagePanel.add(windowSHGCComboBox);
 
 		final JLabel labelPV = new JLabel("Solar Panel: ");
@@ -522,11 +595,24 @@ public class EnergyPanel extends JPanel {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be 10-30.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				for (HousePart p : Scene.getInstance().getParts()) {
+					if (p instanceof SolarPanel && p.getTopContainer() == foundation)
+						((SolarPanel) p).setEfficiency(eff);
+				}
 				Scene.getInstance().setSolarPanelEfficiency(eff);
 				updateCost();
 				Scene.getInstance().setEdited(true);
 			}
 		});
+		arrowButton = Util.getButtonSubComponent(solarPanelEfficiencyComboBox);
+		if (arrowButton != null) {
+			arrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					foundation = MainFrame.getInstance().autoSelectBuilding(true);
+				}
+			});
+		}
 		solarConversionPercentagePanel.add(solarPanelEfficiencyComboBox);
 
 		heatMapPanel = new JPanel(new BorderLayout());
