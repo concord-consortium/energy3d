@@ -26,6 +26,7 @@ import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Snap;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -327,24 +328,41 @@ public class Scene implements Serializable {
 			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
 		}
 
-		if (instance.backgroundAlbedo < 0.000001)
-			instance.backgroundAlbedo = 0.3;
 		if (instance.solarPanelEfficiency < 0.000001)
 			instance.solarPanelEfficiency = 10;
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel) {
+				SolarPanel sp = (SolarPanel) p;
+				if (sp.getEfficiency() <= 0)
+					sp.setEfficiency(instance.solarPanelEfficiency);
+			}
+		}
+		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
+
 		if (instance.windowSolarHeatGainCoefficient < 0.000001) // not set
 			instance.windowSolarHeatGainCoefficient = 50;
 		else if (instance.windowSolarHeatGainCoefficient < 1)
 			instance.windowSolarHeatGainCoefficient *= 100; // backward compatibility (when SHGC < 1)
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Window) {
+				Window w = (Window) p;
+				if (w.getShgc() <= 0)
+					w.setShgc(instance.windowSolarHeatGainCoefficient);
+			}
+		}
+		energyPanel.getWindowSHGCComboBox().setSelectedItem(Double.toString(instance.windowSolarHeatGainCoefficient));
+
+		if (instance.backgroundAlbedo < 0.000001)
+			instance.backgroundAlbedo = 0.3;
 		if (instance.heatVectorLength < 0.00001)
 			instance.heatVectorLength = 5000;
-		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
-		energyPanel.getWindowSHGCComboBox().setSelectedItem(Double.toString(instance.windowSolarHeatGainCoefficient));
 		SolarIrradiation.getInstance().setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
 		SolarIrradiation.getInstance().setTimeStep(instance.timeStep == 0 ? 15 : instance.timeStep);
 		Scene.getInstance().setEdited(false);
+
 	}
 
-	private static double parseValue(final String s) {
+	public static double parseValue(final String s) {
 		final int indexOfSpace = s.indexOf(' ');
 		return Double.parseDouble(s.substring(0, indexOfSpace != -1 ? indexOfSpace : s.length()));
 	}

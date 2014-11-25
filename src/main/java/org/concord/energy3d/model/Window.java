@@ -25,17 +25,17 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart {
 
-	public static final int EMPTY = -1;
-	public static final int SMALL_PANES = 0;
-	public static final int MEDIUM_PANES = 1;
-	public static final int LARGE_PANES = 2;
+	public static final int NO_MUNTIN_BAR = -1;
+	public static final int MORE_MUNTIN_BARS = 0;
+	public static final int MEDIUM_MUNTIN_BARS = 1;
+	public static final int LESS_MUNTIN_BARS = 2;
 
 	private static final long serialVersionUID = 1L;
 	private transient BMText label1;
 	private transient Line bars;
 
 	private double solarHeatGainCoefficient;
-	private int style = SMALL_PANES;
+	private int style = MORE_MUNTIN_BARS;
 	private double shgc = 0;
 
 	public Window() {
@@ -152,7 +152,7 @@ public class Window extends HousePart {
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 
-		if (style == EMPTY || isFrozen() || Util.isEqual(getAbsPoint(2), getAbsPoint(0)) || Util.isEqual(getAbsPoint(1), getAbsPoint(0)))
+		if (style == NO_MUNTIN_BAR || isFrozen() || Util.isEqual(getAbsPoint(2), getAbsPoint(0)) || Util.isEqual(getAbsPoint(1), getAbsPoint(0)))
 			bars.getSceneHints().setCullHint(CullHint.Always);
 		else {
 			final double divisionLength = 3.0 + style * 3.0;
