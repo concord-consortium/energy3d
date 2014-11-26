@@ -21,6 +21,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
@@ -155,7 +156,7 @@ public class Cost {
 	public void showGraph() {
 		EnergyPanel.getInstance().requestDisableActions(this);
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart == null || selectedPart instanceof Tree) {
+		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
 			int count = 0;
 			HousePart hp = null;
 			for (HousePart x : Scene.getInstance().getParts()) {
@@ -171,6 +172,13 @@ public class Cost {
 			} else {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 				return;
+			}
+		} else {
+			HousePart hp = selectedPart.getTopContainer();
+			if (hp != null) {
+				SceneManager.getInstance().setSelectedPart(hp);
+				SceneManager.getInstance().refresh();
+				EnergyPanel.getInstance().updateCost();
 			}
 		}
 		if (SceneManager.getInstance().getSelectedPart().getChildren().isEmpty()) {

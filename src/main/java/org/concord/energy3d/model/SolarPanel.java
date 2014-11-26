@@ -32,16 +32,19 @@ public class SolarPanel extends HousePart {
 	private transient double area;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
-	private double efficiency = 0;
+	private double efficiency = 0; // between 0 and 100
 
 	public SolarPanel() {
 		super(1, 1, 0.0);
+		efficiency = Scene.getInstance().getSolarPanelEfficiencyNotPercentage() * 100;
 	}
 
+	/** a percentage number between 0 and 100 */
 	public void setEfficiency(final double efficiency) {
 		this.efficiency = efficiency;
 	}
 
+	/** a percentage number between 0 and 100 */
 	public double getEfficiency() {
 		return efficiency;
 	}

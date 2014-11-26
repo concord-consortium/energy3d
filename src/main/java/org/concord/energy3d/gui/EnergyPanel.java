@@ -595,9 +595,15 @@ public class EnergyPanel extends JPanel {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be 10-30.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				for (HousePart p : Scene.getInstance().getParts()) {
-					if (p instanceof SolarPanel && p.getTopContainer() == foundation)
-						((SolarPanel) p).setEfficiency(eff);
+				if (foundation != null) {
+					int count = Scene.getInstance().countParts(foundation, SolarPanel.class);
+					if (count > 0)
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the efficiency of " + count + " existing solar panels<br>of the selected building (#" + foundation.getId() + ") to " + solarPanelEfficiencyComboBox.getSelectedItem() + "%?</html>", "Solar Panel Conversion Efficiency", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+							for (HousePart p : Scene.getInstance().getParts()) {
+								if (p instanceof SolarPanel && p.getTopContainer() == foundation)
+									((SolarPanel) p).setEfficiency(eff);
+							}
+						}
 				}
 				Scene.getInstance().setSolarPanelEfficiency(eff);
 				updateCost();

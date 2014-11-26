@@ -40,12 +40,15 @@ public class Window extends HousePart {
 
 	public Window() {
 		super(2, 4, 30.0);
+		shgc = Scene.getInstance().getWindowSolarHeatGainCoefficientNotPercentage() * 100;
 	}
 
+	/** a percentage number between 0 and 100 */
 	public void setShgc(double shgc) {
 		this.shgc = shgc;
 	}
 
+	/** a percentage number between 0 and 100 */
 	public double getShgc() {
 		return shgc;
 	}

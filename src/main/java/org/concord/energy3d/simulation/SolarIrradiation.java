@@ -560,10 +560,12 @@ public class SolarIrradiation {
 							houseChild.setSolarPotentialToday(houseChild.getSolarPotentialToday() + houseChild.getSolarPotential()[i]);
 							if (houseChild instanceof Wall || houseChild instanceof Door || houseChild instanceof Window || houseChild instanceof Roof)
 								heatLoss[i] += houseChild.getHeatLoss()[i];
-							if (houseChild instanceof Window)
+							if (houseChild instanceof Window) {
 								passiveSolar[i] += houseChild.getSolarPotential()[i] * ((Window) houseChild).getSolarHeatGainCoefficientNotPercentage();
-							else if (houseChild instanceof SolarPanel)
-								photovoltaic[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
+							} else if (houseChild instanceof SolarPanel) {
+								SolarPanel solarPanel = (SolarPanel) houseChild;
+								photovoltaic[i] += houseChild.getSolarPotential()[i] * (solarPanel.getEfficiency() <= 0 ? Scene.getInstance().getSolarPanelEfficiencyNotPercentage() : solarPanel.getEfficiency() * 0.01);
+							}
 						}
 					}
 

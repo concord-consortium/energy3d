@@ -68,7 +68,7 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
 			graph.addData("Heat Gain", -sum);
 		} else if (selectedPart instanceof SolarPanel) {
 			final SolarPanel solarPanel = (SolarPanel) selectedPart;
-			final double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
+			final double solar = solarPanel.getSolarPotentialToday() * (solarPanel.getEfficiency() <= 0 ? Scene.getInstance().getSolarPanelEfficiencyNotPercentage() : solarPanel.getEfficiency() * 0.01);
 			graph.addData("Solar", solar);
 		}
 		graph.repaint();

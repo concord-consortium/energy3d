@@ -931,4 +931,13 @@ public class Scene implements Serializable {
 		return heatVectorLength;
 	}
 
+	public int countParts(Foundation foundation, Class<?> clazz) {
+		int count = 0;
+		for (HousePart p : parts) {
+			if (p.getTopContainer() == foundation && clazz.isInstance(p))
+				count++;
+		}
+		return count;
+	}
+
 }
