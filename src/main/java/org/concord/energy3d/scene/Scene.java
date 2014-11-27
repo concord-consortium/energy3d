@@ -346,8 +346,8 @@ public class Scene implements Serializable {
 		for (HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Window) {
 				Window w = (Window) p;
-				if (w.getShgc() <= 0)
-					w.setShgc(instance.windowSolarHeatGainCoefficient);
+				if (w.getSolarHeatGainCoefficient() <= 0)
+					w.setSolarHeatGainCoefficient(instance.windowSolarHeatGainCoefficient);
 			}
 		}
 		energyPanel.getWindowSHGCComboBox().setSelectedItem(Double.toString(instance.windowSolarHeatGainCoefficient));

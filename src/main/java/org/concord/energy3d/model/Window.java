@@ -34,23 +34,12 @@ public class Window extends HousePart {
 	private transient BMText label1;
 	private transient Line bars;
 
-	private double solarHeatGainCoefficient;
+	private double solarHeatGainCoefficient; // a percentage number between 0 and 100
 	private int style = MORE_MUNTIN_BARS;
-	private double shgc = 0;
 
 	public Window() {
 		super(2, 4, 30.0);
-		shgc = Scene.getInstance().getWindowSolarHeatGainCoefficientNotPercentage() * 100;
-	}
-
-	/** a percentage number between 0 and 100 */
-	public void setShgc(double shgc) {
-		this.shgc = shgc;
-	}
-
-	/** a percentage number between 0 and 100 */
-	public double getShgc() {
-		return shgc;
+		solarHeatGainCoefficient = Scene.getInstance().getWindowSolarHeatGainCoefficientNotPercentage() * 100;
 	}
 
 	@Override
@@ -367,6 +356,10 @@ public class Window extends HousePart {
 
 	public void setSolarHeatGainCoefficient(double shgc) {
 		solarHeatGainCoefficient = shgc;
+	}
+
+	public double getSolarHeatGainCoefficient() {
+		return solarHeatGainCoefficient;
 	}
 
 	public double getSolarHeatGainCoefficientNotPercentage() {
