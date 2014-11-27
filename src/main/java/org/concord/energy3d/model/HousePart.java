@@ -89,7 +89,7 @@ public abstract class HousePart implements Serializable {
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
-	private ReadOnlyColorRGBA color; // custom color
+	private ReadOnlyColorRGBA color = ColorRGBA.WHITE; // custom color
 	private double uFactor = 0;
 	private double volumetricHeatCapacity = 1; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 

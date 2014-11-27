@@ -23,7 +23,6 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.util.Util;
 
@@ -345,10 +344,7 @@ public class PopupMenuFactory {
 			miColor.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						MainFrame.getInstance().showColorDialogForIndividualPart(Operation.DRAW_WALL);
-					}
+					MainFrame.getInstance().showColorDialogForIndividualPart();
 				}
 			});
 
@@ -469,10 +465,7 @@ public class PopupMenuFactory {
 			miColor.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Roof) {
-						MainFrame.getInstance().showColorDialogForIndividualPart(Operation.DRAW_ROOF_PYRAMID);
-					}
+					MainFrame.getInstance().showColorDialogForIndividualPart();
 				}
 			});
 
@@ -591,10 +584,7 @@ public class PopupMenuFactory {
 			miColor.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Door) {
-						MainFrame.getInstance().showColorDialogForIndividualPart(Operation.DRAW_DOOR);
-					}
+					MainFrame.getInstance().showColorDialogForIndividualPart();
 				}
 			});
 
@@ -711,10 +701,7 @@ public class PopupMenuFactory {
 			miColor.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Foundation) {
-						MainFrame.getInstance().showColorDialogForIndividualPart(Operation.DRAW_FOUNDATION);
-					}
+					MainFrame.getInstance().showColorDialogForIndividualPart();
 				}
 			});
 

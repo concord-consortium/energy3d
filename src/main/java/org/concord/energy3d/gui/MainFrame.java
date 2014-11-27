@@ -358,7 +358,7 @@ public class MainFrame extends JFrame {
 									public void actionPerformed(ActionEvent e) {
 										boolean ok = false;
 										if (Scene.getInstance().isEdited()) {
-											final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+											final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 											if (save == JOptionPane.YES_OPTION) {
 												save();
 												if (!Scene.getInstance().isEdited())
@@ -433,7 +433,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					boolean ok = false;
 					if (Scene.getInstance().isEdited()) {
-						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 						if (save == JOptionPane.YES_OPTION) {
 							save();
 							if (!Scene.getInstance().isEdited())
@@ -462,7 +462,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (Scene.getInstance().isEdited()) {
-						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 						if (save == JOptionPane.YES_OPTION) {
 							save();
 							if (!Scene.getInstance().isEdited())
@@ -515,7 +515,7 @@ public class MainFrame extends JFrame {
 			analyzeFolderMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION))
+					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE))
 						return;
 					SceneManager.getInstance().refresh(1);
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -552,7 +552,7 @@ public class MainFrame extends JFrame {
 			openFolderMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION))
+					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE))
 						return;
 					SceneManager.getInstance().refresh(1);
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -1316,7 +1316,7 @@ public class MainFrame extends JFrame {
 					file = new File(file.toString() + ".ng3");
 				boolean doIt = true;
 				if (file.exists()) {
-					if (JOptionPane.showConfirmDialog(MainFrame.this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+					if (JOptionPane.showConfirmDialog(this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 						doIt = false;
 					}
 				}
@@ -1675,7 +1675,18 @@ public class MainFrame extends JFrame {
 		return foundation;
 	}
 
-	void showColorDialogForIndividualPart(final Operation operation) {
+	void showColorDialogForIndividualPart() {
+		if (!noTextureMenuItem.isSelected()) { // when the user wants to set the color, automatically switch to no texture
+			if (JOptionPane.showConfirmDialog(this, "To set color for an individual part, we have to remove the texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+				return;
+			noTextureMenuItem.setSelected(true);
+			Scene.getInstance().setTextureMode(TextureMode.None);
+		}
+		ReadOnlyColorRGBA color = ColorRGBA.WHITE;
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null)
+			color = selectedPart.getColor();
+		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final ActionListener actionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -1684,45 +1695,17 @@ public class MainFrame extends JFrame {
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
 				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart != null)
+				if (selectedPart != null) {
 					selectedPart.setColor(color);
-				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
+					Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
+				}
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
 					PrintController.getInstance().restartAnimation();
 				Scene.getInstance().setEdited(true);
 			}
 		};
+		JColorChooser.createDialog(this, "Select Color", true, colorChooser, actionListener, null).setVisible(true);
 		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
-		if (fullTextureMenuItem.isSelected()) {
-			noTextureMenuItem.setSelected(true);
-			Scene.getInstance().setTextureMode(TextureMode.None);
-		}
-
-		ReadOnlyColorRGBA color;
-		switch (operation) {
-		case DRAW_FOUNDATION:
-			color = Scene.getInstance().getFoundationColor();
-			break;
-		case DRAW_WALL:
-			color = Scene.getInstance().getWallColor();
-			break;
-		case DRAW_DOOR:
-			color = Scene.getInstance().getDoorColor();
-			break;
-		case DRAW_FLOOR:
-			color = Scene.getInstance().getFloorColor();
-			break;
-		case DRAW_ROOF_PYRAMID:
-			color = Scene.getInstance().getRoofColor();
-			break;
-		default:
-			color = ColorRGBA.WHITE;
-		}
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart != null && selectedPart.getColor() != null)
-			color = selectedPart.getColor();
-		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
-		JColorChooser.createDialog(MainFrame.this, "Select Default Color", true, colorChooser, actionListener, null).setVisible(true);
 	}
 
 	private int countFloors(Foundation foundation) {
@@ -1744,6 +1727,12 @@ public class MainFrame extends JFrame {
 	}
 
 	private void showColorDialogForWholeHouse(final Operation operation) {
+		if (fullTextureMenuItem.isSelected()) { // when the user wants to set the color, remove the texture first
+			if (JOptionPane.showConfirmDialog(this, "To set colors for this building, we have to remove the full texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+				return;
+			noTextureMenuItem.setSelected(true);
+			Scene.getInstance().setTextureMode(TextureMode.None);
+		}
 		final Foundation foundation = autoSelectBuilding(true);
 		if (foundation == null)
 			return;
@@ -1773,6 +1762,28 @@ public class MainFrame extends JFrame {
 		default:
 			break;
 		}
+
+		ReadOnlyColorRGBA color;
+		switch (operation) {
+		case DRAW_FOUNDATION:
+			color = Scene.getInstance().getFoundationColor();
+			break;
+		case DRAW_WALL:
+			color = Scene.getInstance().getWallColor();
+			break;
+		case DRAW_DOOR:
+			color = Scene.getInstance().getDoorColor();
+			break;
+		case DRAW_FLOOR:
+			color = Scene.getInstance().getFloorColor();
+			break;
+		case DRAW_ROOF_PYRAMID:
+			color = Scene.getInstance().getRoofColor();
+			break;
+		default:
+			color = ColorRGBA.WHITE;
+		}
+		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final ActionListener actionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -1822,37 +1833,8 @@ public class MainFrame extends JFrame {
 				Scene.getInstance().setEdited(true);
 			}
 		};
+		JColorChooser.createDialog(this, "Select Color", true, colorChooser, actionListener, null).setVisible(true);
 		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
-		if (fullTextureMenuItem.isSelected()) {
-			noTextureMenuItem.setSelected(true);
-			Scene.getInstance().setTextureMode(TextureMode.None);
-		}
-
-		ReadOnlyColorRGBA color;
-		switch (operation) {
-		case DRAW_FOUNDATION:
-			color = Scene.getInstance().getFoundationColor();
-			break;
-		case DRAW_WALL:
-			color = Scene.getInstance().getWallColor();
-			break;
-		case DRAW_DOOR:
-			color = Scene.getInstance().getDoorColor();
-			break;
-		case DRAW_FLOOR:
-			color = Scene.getInstance().getFloorColor();
-			break;
-		case DRAW_ROOF_PYRAMID:
-			color = Scene.getInstance().getRoofColor();
-			break;
-		default:
-			color = ColorRGBA.WHITE;
-		}
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart != null && selectedPart.getColor() != null)
-			color = selectedPart.getColor();
-		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
-		JColorChooser.createDialog(MainFrame.this, "Select Default Color", true, colorChooser, actionListener, null).setVisible(true);
 	}
 
 	public void showUnexpectedErrorMessage(final Throwable err) {
@@ -1888,7 +1870,7 @@ public class MainFrame extends JFrame {
 			}
 		}
 		if (Scene.getInstance().isEdited()) {
-			final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+			final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if (save == JOptionPane.YES_OPTION) {
 				save();
 				if (!Scene.getInstance().isEdited())
@@ -1945,7 +1927,7 @@ public class MainFrame extends JFrame {
 								file = new File(file.toString() + ".zip");
 							boolean doIt = true;
 							if (file.exists()) {
-								if (JOptionPane.showConfirmDialog(MainFrame.this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+								if (JOptionPane.showConfirmDialog(MainFrame.this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 									doIt = false;
 								}
 							}
@@ -1992,7 +1974,7 @@ public class MainFrame extends JFrame {
 				System.out.print(file + "...");
 				boolean doIt = true;
 				if (file.exists()) {
-					if (JOptionPane.showConfirmDialog(this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+					if (JOptionPane.showConfirmDialog(this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 						doIt = false;
 					}
 				}
