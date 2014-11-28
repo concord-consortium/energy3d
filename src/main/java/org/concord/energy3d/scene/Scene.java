@@ -35,6 +35,7 @@ import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Specifications;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
@@ -328,36 +329,36 @@ public class Scene implements Serializable {
 			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
 		}
 
-		if (instance.solarPanelEfficiency < 0.000001)
+		if (Util.isZero(instance.solarPanelEfficiency))
 			instance.solarPanelEfficiency = 10;
 		for (HousePart p : instance.parts) {
 			if (p instanceof SolarPanel) {
 				SolarPanel sp = (SolarPanel) p;
-				if (sp.getEfficiency() <= 0)
+				if (Util.isZero(sp.getEfficiency()))
 					sp.setEfficiency(instance.solarPanelEfficiency);
 			}
 		}
 		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
 
-		if (instance.windowSolarHeatGainCoefficient < 0.000001) // not set
+		if (Util.isZero(instance.windowSolarHeatGainCoefficient)) // not set
 			instance.windowSolarHeatGainCoefficient = 50;
 		else if (instance.windowSolarHeatGainCoefficient < 1)
 			instance.windowSolarHeatGainCoefficient *= 100; // backward compatibility (when SHGC < 1)
 		for (HousePart p : instance.parts) {
 			if (p instanceof Window) {
 				Window w = (Window) p;
-				if (w.getSolarHeatGainCoefficient() <= 0)
+				if (Util.isZero(w.getSolarHeatGainCoefficient()))
 					w.setSolarHeatGainCoefficient(instance.windowSolarHeatGainCoefficient);
 			}
 		}
 		energyPanel.getWindowSHGCComboBox().setSelectedItem(Double.toString(instance.windowSolarHeatGainCoefficient));
 
-		if (instance.backgroundAlbedo < 0.000001)
+		if (Util.isZero(instance.backgroundAlbedo))
 			instance.backgroundAlbedo = 0.3;
-		if (instance.heatVectorLength < 0.00001)
+		if (Util.isZero(instance.heatVectorLength))
 			instance.heatVectorLength = 5000;
-		SolarIrradiation.getInstance().setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
-		SolarIrradiation.getInstance().setTimeStep(instance.timeStep == 0 ? 15 : instance.timeStep);
+		SolarIrradiation.getInstance().setSolarStep(Util.isZero(instance.solarStep) ? 2 : instance.solarStep);
+		SolarIrradiation.getInstance().setTimeStep(Util.isZero(instance.timeStep) ? 15 : instance.timeStep);
 		instance.setEdited(false);
 
 	}

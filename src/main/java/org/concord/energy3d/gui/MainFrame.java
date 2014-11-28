@@ -1565,11 +1565,11 @@ public class MainFrame extends JFrame {
 	private JMenu getColorMenu() {
 		if (colorMenu == null) {
 			colorMenu = new JMenu("Building Colors");
-			colorMenu.add(getRoofColorMenuItem());
-			colorMenu.add(getFloorColorMenuItem());
-			colorMenu.add(getDoorColorMenuItem());
 			colorMenu.add(getWallColorMenuItem());
+			colorMenu.add(getRoofColorMenuItem());
 			colorMenu.add(getPlatformColorMenuItem());
+			colorMenu.add(getDoorColorMenuItem());
+			colorMenu.add(getFloorColorMenuItem());
 		}
 		return colorMenu;
 	}

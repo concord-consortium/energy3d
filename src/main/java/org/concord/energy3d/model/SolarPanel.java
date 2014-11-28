@@ -49,6 +49,11 @@ public class SolarPanel extends HousePart {
 		return efficiency;
 	}
 
+	/** a number between 0 and 1 for calculation */
+	public double getEfficiencyNotPercentage() {
+		return Util.isZero(efficiency) ? Scene.getInstance().getSolarPanelEfficiencyNotPercentage() : efficiency * 0.01;
+	}
+
 	@Override
 	protected void init() {
 		super.init();

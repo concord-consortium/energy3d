@@ -30,26 +30,30 @@ public class HeatLoad {
 		return instance;
 	}
 
+	private static boolean isZero(double x) {
+		return Math.abs(x) < 0.000001;
+	}
+
 	private double getUFactor(HousePart part) {
 		if (part instanceof Wall)
-			return part.getUFactor() < 0.000001 ? wallUFactor : part.getUFactor();
+			return isZero(part.getUFactor()) ? wallUFactor : part.getUFactor();
 		if (part instanceof Door)
-			return part.getUFactor() < 0.000001 ? doorUFactor : part.getUFactor();
+			return isZero(part.getUFactor()) ? doorUFactor : part.getUFactor();
 		if (part instanceof Roof)
-			return part.getUFactor() < 0.000001 ? roofUFactor : part.getUFactor();
+			return isZero(part.getUFactor()) ? roofUFactor : part.getUFactor();
 		if (part instanceof Window)
-			return part.getUFactor() < 0.000001 ? windowUFactor : part.getUFactor();
+			return isZero(part.getUFactor()) ? windowUFactor : part.getUFactor();
 		if (part instanceof Sensor) {
 			HousePart container = part.getContainer();
 			if (container instanceof Wall) {
 				final HousePart x = insideChild(part.getPoints().get(0), container);
 				if (x instanceof Window)
-					return x.getUFactor() < 0.000001 ? windowUFactor : x.getUFactor();
+					return isZero(x.getUFactor()) ? windowUFactor : x.getUFactor();
 				if (x instanceof Door)
-					return x.getUFactor() < 0.000001 ? doorUFactor : x.getUFactor();
-				return container.getUFactor() < 0.000001 ? wallUFactor : container.getUFactor();
+					return isZero(x.getUFactor()) ? doorUFactor : x.getUFactor();
+				return isZero(container.getUFactor()) ? wallUFactor : container.getUFactor();
 			} else if (container instanceof Roof) {
-				return container.getUFactor() < 0.000001 ? roofUFactor : container.getUFactor();
+				return isZero(container.getUFactor()) ? roofUFactor : container.getUFactor();
 			}
 		}
 		return part.getUFactor();
@@ -91,7 +95,7 @@ public class HeatLoad {
 						double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 						if (part.isDrawCompleted()) {
 							double uFactor = getUFactor(part);
-							if (uFactor < 0.000001)
+							if (isZero(uFactor))
 								continue;
 							double heatloss = roof.computeArea(mesh) * uFactor * deltaT / 1000.0 / 60 * timeStep;
 							if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
@@ -107,7 +111,7 @@ public class HeatLoad {
 					double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 					if (part.isDrawCompleted()) {
 						double uFactor = getUFactor(part);
-						if (uFactor < 0.000001)
+						if (isZero(uFactor))
 							continue;
 						double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
 						if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
