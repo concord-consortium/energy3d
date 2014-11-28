@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
@@ -305,6 +306,21 @@ public class Util {
 			button.addItemListener(x);
 		for (final ActionListener x : actionListeners)
 			button.addActionListener(x);
+	}
+
+	/** This method sets the selection state of a combo box visually without invoking its ItemListeners and ActionListeners */
+	public static void selectSilently(final JComboBox<?> comboBox, final int selectedIndex) {
+		final ItemListener[] itemListeners = comboBox.getItemListeners();
+		final ActionListener[] actionListeners = comboBox.getActionListeners();
+		for (final ItemListener x : itemListeners)
+			comboBox.removeItemListener(x);
+		for (final ActionListener x : actionListeners)
+			comboBox.removeActionListener(x);
+		comboBox.setSelectedIndex(selectedIndex);
+		for (final ItemListener x : itemListeners)
+			comboBox.addItemListener(x);
+		for (final ActionListener x : actionListeners)
+			comboBox.addActionListener(x);
 	}
 
 	public static JButton getButtonSubComponent(Container container) {

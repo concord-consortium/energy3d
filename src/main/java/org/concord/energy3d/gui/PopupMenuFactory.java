@@ -189,7 +189,7 @@ public class PopupMenuFactory {
 					public void actionPerformed(ActionEvent e) {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Window) {
-							selectedPart.setUFactor(Scene.parseValue(miUFactor[i2].getText()));
+							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
@@ -207,7 +207,7 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
 						for (int i = 0; i < nUFactor; i++) {
-							if (Util.isZero(selectedPart.getUFactor() - Scene.parseValue(miUFactor[i].getText()))) {
+							if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(miUFactor[i].getText()))) {
 								Util.selectSilently(miUFactor[i], true);
 								b = true;
 								break;
@@ -217,7 +217,7 @@ public class PopupMenuFactory {
 							if (Util.isZero(selectedPart.getUFactor())) {
 								double defaultWindowUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWindowsComboBox());
 								for (int i = 0; i < nUFactor; i++) {
-									if (Util.isZero(defaultWindowUFactor - Scene.parseValue(miUFactor[i].getText()))) {
+									if (Util.isZero(defaultWindowUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
 										Util.selectSilently(miUFactor[i], true);
 										b = true;
 										break;
@@ -370,7 +370,7 @@ public class PopupMenuFactory {
 					public void actionPerformed(ActionEvent e) {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Wall) {
-							selectedPart.setUFactor(Scene.parseValue(miUFactor[i2].getText()));
+							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
@@ -388,7 +388,7 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
 						for (int i = 0; i < nUFactor; i++) {
-							if (Util.isZero(selectedPart.getUFactor() - Scene.parseValue(miUFactor[i].getText()))) {
+							if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(miUFactor[i].getText()))) {
 								Util.selectSilently(miUFactor[i], true);
 								b = true;
 								break;
@@ -398,7 +398,7 @@ public class PopupMenuFactory {
 							if (Util.isZero(selectedPart.getUFactor())) {
 								double defaultWallUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
 								for (int i = 0; i < nUFactor; i++) {
-									if (Util.isZero(defaultWallUFactor - Scene.parseValue(miUFactor[i].getText()))) {
+									if (Util.isZero(defaultWallUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
 										Util.selectSilently(miUFactor[i], true);
 										b = true;
 										break;
@@ -489,7 +489,7 @@ public class PopupMenuFactory {
 					public void actionPerformed(ActionEvent e) {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Roof) {
-							selectedPart.setUFactor(Scene.parseValue(miUFactor[i2].getText()));
+							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
@@ -507,7 +507,7 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Roof) {
 						for (int i = 0; i < nUFactor; i++) {
-							if (Util.isZero(selectedPart.getUFactor() - Scene.parseValue(miUFactor[i].getText()))) {
+							if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(miUFactor[i].getText()))) {
 								Util.selectSilently(miUFactor[i], true);
 								b = true;
 								break;
@@ -517,7 +517,7 @@ public class PopupMenuFactory {
 							if (Util.isZero(selectedPart.getUFactor())) {
 								double defaultRoofUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
 								for (int i = 0; i < nUFactor; i++) {
-									if (Util.isZero(defaultRoofUFactor - Scene.parseValue(miUFactor[i].getText()))) {
+									if (Util.isZero(defaultRoofUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
 										Util.selectSilently(miUFactor[i], true);
 										b = true;
 										break;
@@ -606,7 +606,7 @@ public class PopupMenuFactory {
 					public void actionPerformed(ActionEvent e) {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Door) {
-							selectedPart.setUFactor(Scene.parseValue(miUFactor[i2].getText()));
+							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
@@ -624,7 +624,7 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Door) {
 						for (int i = 0; i < nUFactor; i++) {
-							if (Util.isZero(selectedPart.getUFactor() - Scene.parseValue(miUFactor[i].getText()))) {
+							if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(miUFactor[i].getText()))) {
 								Util.selectSilently(miUFactor[i], true);
 								b = true;
 								break;
@@ -634,7 +634,7 @@ public class PopupMenuFactory {
 							if (Util.isZero(selectedPart.getUFactor())) {
 								double defaultDoorUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getDoorsComboBox());
 								for (int i = 0; i < nUFactor; i++) {
-									if (Util.isZero(defaultDoorUFactor - Scene.parseValue(miUFactor[i].getText()))) {
+									if (Util.isZero(defaultDoorUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
 										Util.selectSilently(miUFactor[i], true);
 										b = true;
 										break;

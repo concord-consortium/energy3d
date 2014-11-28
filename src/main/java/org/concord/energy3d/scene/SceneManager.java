@@ -1333,6 +1333,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (popupMenu != null)
 							popupMenu.show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
 					}
+					EnergyPanel.getInstance().updatePartProperties();
 				}
 				return null;
 			}
@@ -1474,6 +1475,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 				System.out.println("mouse released: " + selectedHousePart);
 				updateHeliodonAndAnnotationSize();
+				EnergyPanel.getInstance().updatePartProperties();
 				EnergyPanel.getInstance().updatePartEnergy();
 				EnergyPanel.getInstance().updateCost();
 				return null;

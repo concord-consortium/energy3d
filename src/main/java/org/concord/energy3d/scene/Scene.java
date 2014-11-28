@@ -296,32 +296,32 @@ public class Scene implements Serializable {
 
 		// backward compatibility
 		if (instance.windowUFactor != null) {
-			double defaultWindowUFactor = parseValue(instance.windowUFactor);
-			for (HousePart p : Scene.getInstance().getParts()) {
+			double defaultWindowUFactor = parsePropertyString(instance.windowUFactor);
+			for (HousePart p : instance.parts) {
 				if (p.getUFactor() <= 0 && p instanceof Window)
 					p.setUFactor(defaultWindowUFactor);
 			}
 			energyPanel.getWindowsComboBox().setSelectedItem(instance.windowUFactor);
 		}
 		if (instance.wallUFactor != null) {
-			double defaultWallUFactor = parseValue(instance.wallUFactor);
-			for (HousePart p : Scene.getInstance().getParts()) {
+			double defaultWallUFactor = parsePropertyString(instance.wallUFactor);
+			for (HousePart p : instance.parts) {
 				if (p.getUFactor() <= 0 && p instanceof Wall)
 					p.setUFactor(defaultWallUFactor);
 			}
 			energyPanel.getWallsComboBox().setSelectedItem(instance.wallUFactor);
 		}
 		if (instance.doorUFactor != null) {
-			double defaultDoorUFactor = parseValue(instance.doorUFactor);
-			for (HousePart p : Scene.getInstance().getParts()) {
+			double defaultDoorUFactor = parsePropertyString(instance.doorUFactor);
+			for (HousePart p : instance.parts) {
 				if (p.getUFactor() <= 0 && p instanceof Door)
 					p.setUFactor(defaultDoorUFactor);
 			}
 			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
 		}
 		if (instance.roofUFactor != null) {
-			double defaultRoofUFactor = parseValue(instance.roofUFactor);
-			for (HousePart p : Scene.getInstance().getParts()) {
+			double defaultRoofUFactor = parsePropertyString(instance.roofUFactor);
+			for (HousePart p : instance.parts) {
 				if (p.getUFactor() <= 0 && p instanceof Roof)
 					p.setUFactor(defaultRoofUFactor);
 			}
@@ -330,7 +330,7 @@ public class Scene implements Serializable {
 
 		if (instance.solarPanelEfficiency < 0.000001)
 			instance.solarPanelEfficiency = 10;
-		for (HousePart p : Scene.getInstance().getParts()) {
+		for (HousePart p : instance.parts) {
 			if (p instanceof SolarPanel) {
 				SolarPanel sp = (SolarPanel) p;
 				if (sp.getEfficiency() <= 0)
@@ -343,7 +343,7 @@ public class Scene implements Serializable {
 			instance.windowSolarHeatGainCoefficient = 50;
 		else if (instance.windowSolarHeatGainCoefficient < 1)
 			instance.windowSolarHeatGainCoefficient *= 100; // backward compatibility (when SHGC < 1)
-		for (HousePart p : Scene.getInstance().getParts()) {
+		for (HousePart p : instance.parts) {
 			if (p instanceof Window) {
 				Window w = (Window) p;
 				if (w.getSolarHeatGainCoefficient() <= 0)
@@ -358,11 +358,11 @@ public class Scene implements Serializable {
 			instance.heatVectorLength = 5000;
 		SolarIrradiation.getInstance().setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
 		SolarIrradiation.getInstance().setTimeStep(instance.timeStep == 0 ? 15 : instance.timeStep);
-		Scene.getInstance().setEdited(false);
+		instance.setEdited(false);
 
 	}
 
-	public static double parseValue(final String s) {
+	public static double parsePropertyString(final String s) {
 		final int indexOfSpace = s.indexOf(' ');
 		return Double.parseDouble(s.substring(0, indexOfSpace != -1 ? indexOfSpace : s.length()));
 	}
