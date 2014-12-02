@@ -173,16 +173,13 @@ public class PopupMenuFactory {
 
 			ButtonGroup uFactorButtonGroup = new ButtonGroup();
 
-			final int nUFactor = 4;
+			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_WINDOW.length;
 			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
-			miUFactor[0] = new JRadioButtonMenuItem("2.10 (single pane)");
-			miUFactor[1] = new JRadioButtonMenuItem("0.96 (double pane)");
-			miUFactor[2] = new JRadioButtonMenuItem("0.61 (double pane, low-e)");
-			miUFactor[3] = new JRadioButtonMenuItem("0.26 (triple pane)");
 			miUFactor[nUFactor] = new JRadioButtonMenuItem();
 			uFactorButtonGroup.add(miUFactor[nUFactor]);
 
 			for (int i = 0; i < nUFactor; i++) {
+				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_WINDOW[i]);
 				final int i2 = i;
 				miUFactor[i].addActionListener(new ActionListener() {
 					@Override
@@ -244,8 +241,10 @@ public class PopupMenuFactory {
 
 			ButtonGroup shgcButtonGroup = new ButtonGroup();
 
-			final int nShgc = 3;
-			final int[] shgcValues = new int[] { 25, 50, 80 };
+			final int nShgc = EnergyPanel.WINDOW_SHGC_CHOICES.length;
+			final int[] shgcValues = new int[nShgc];
+			for (int i = 0; i < nShgc; i++)
+				shgcValues[i] = Integer.parseInt(EnergyPanel.WINDOW_SHGC_CHOICES[i]);
 			final JRadioButtonMenuItem[] miShgc = new JRadioButtonMenuItem[nShgc + 1];
 
 			for (int i = 0; i < nShgc; i++) {
@@ -352,18 +351,13 @@ public class PopupMenuFactory {
 
 			ButtonGroup uFactorButtonGroup = new ButtonGroup();
 
-			final int nUFactor = 6;
+			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_WALL.length;
 			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
-			miUFactor[0] = new JRadioButtonMenuItem("0.44 (masonry)");
-			miUFactor[1] = new JRadioButtonMenuItem("0.39 (wood frame)");
-			miUFactor[2] = new JRadioButtonMenuItem("0.14 (R13, 2x4 w/cellulose/fiberglass)");
-			miUFactor[3] = new JRadioButtonMenuItem("0.11 (R18, 2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)");
-			miUFactor[4] = new JRadioButtonMenuItem("0.09 (R20, 2x6 w/cellulose/fiberglass)");
-			miUFactor[5] = new JRadioButtonMenuItem("0.07 (R25, 2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)");
 			miUFactor[nUFactor] = new JRadioButtonMenuItem();
 			uFactorButtonGroup.add(miUFactor[nUFactor]);
 
 			for (int i = 0; i < nUFactor; i++) {
+				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_WALL[i]);
 				final int i2 = i;
 				miUFactor[i].addActionListener(new ActionListener() {
 					@Override
@@ -473,16 +467,13 @@ public class PopupMenuFactory {
 
 			ButtonGroup uFactorButtonGroup = new ButtonGroup();
 
-			final int nUFactor = 4;
+			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_ROOF.length;
 			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
-			miUFactor[0] = new JRadioButtonMenuItem("0.51 (old house)");
-			miUFactor[1] = new JRadioButtonMenuItem("0.09 (R22, cellulose/fiberglass)");
-			miUFactor[2] = new JRadioButtonMenuItem("0.05 (R38, cellulose/fiberglass)");
-			miUFactor[3] = new JRadioButtonMenuItem("0.04 (R50, cellulose/fiberglass)");
 			miUFactor[nUFactor] = new JRadioButtonMenuItem();
 			uFactorButtonGroup.add(miUFactor[nUFactor]);
 
 			for (int i = 0; i < nUFactor; i++) {
+				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_ROOF[i]);
 				final int i2 = i;
 				miUFactor[i].addActionListener(new ActionListener() {
 					@Override
@@ -592,14 +583,13 @@ public class PopupMenuFactory {
 
 			ButtonGroup uFactorButtonGroup = new ButtonGroup();
 
-			final int nUFactor = 2;
+			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_DOOR.length;
 			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
-			miUFactor[0] = new JRadioButtonMenuItem("0.88 (wood)");
-			miUFactor[1] = new JRadioButtonMenuItem("0.61 (insulated)");
 			miUFactor[nUFactor] = new JRadioButtonMenuItem();
 			uFactorButtonGroup.add(miUFactor[nUFactor]);
 
 			for (int i = 0; i < nUFactor; i++) {
+				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_DOOR[i]);
 				final int i2 = i;
 				miUFactor[i].addActionListener(new ActionListener() {
 					@Override
@@ -770,8 +760,10 @@ public class PopupMenuFactory {
 
 			ButtonGroup efficiencyButtonGroup = new ButtonGroup();
 
-			final int nEfficiency = 3;
-			final int[] efficiencyValues = new int[] { 10, 15, 20 };
+			final int nEfficiency = EnergyPanel.SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES.length;
+			final int[] efficiencyValues = new int[nEfficiency];
+			for (int i = 0; i < nEfficiency; i++)
+				efficiencyValues[i] = Integer.parseInt(EnergyPanel.SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES[i]);
 			final JRadioButtonMenuItem[] miEfficiency = new JRadioButtonMenuItem[nEfficiency + 1];
 
 			for (int i = 0; i < nEfficiency; i++) {
