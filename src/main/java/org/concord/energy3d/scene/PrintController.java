@@ -400,17 +400,19 @@ public class PrintController implements Updater {
 		for (final ArrayList<Spatial> page : pages) {
 			final Vector3 upperLeftCorner = new Vector3();
 			double x, z;
-			final BoundingBox boundingBox = (BoundingBox) new BoundingBox().merge(Scene.getOriginalHouseRoot().getWorldBound());
-			final double minXDistance = boundingBox.getXExtent() + pageWidth / 2.0;
-			final double minYDistance = boundingBox.getZExtent();
+//			final BoundingBox boundingBox = (BoundingBox) new BoundingBox().merge(Scene.getOriginalHouseRoot().getWorldBound());
+			final BoundingBox originalHouseBoundingBox = (BoundingBox) Scene.getOriginalHouseRoot().getWorldBound().asType(Type.AABB);
+			final ReadOnlyVector3 originalHouseCenter = Scene.getOriginalHouseRoot().getWorldBound().getCenter();
+			final double minXDistance = originalHouseBoundingBox.getXExtent() + pageWidth / 2.0;
+			final double minYDistance = originalHouseBoundingBox.getZExtent();
 			do {
-				x = (pageNum % cols - cols / 2) * (pageWidth + SPACE_BETWEEN_PAGES) + boundingBox.getCenter().getX();
+				x = (pageNum % cols - cols / 2) * (pageWidth + SPACE_BETWEEN_PAGES) + originalHouseCenter.getX();
 				z = (pageNum / cols) * (pageHeight + SPACE_BETWEEN_PAGES);
 				upperLeftCorner.setX(x - pageWidth / 2.0);
 				upperLeftCorner.setZ(z + pageHeight);
-				upperLeftCorner.setY(boundingBox.getCenter().getY());
+				upperLeftCorner.setY(originalHouseCenter.getY());
 				pageNum++;
-			} while (Math.abs(x - boundingBox.getCenter().getX()) < minXDistance && Math.abs(z - boundingBox.getCenter().getZ()) < minYDistance);
+			} while (Math.abs(x - originalHouseCenter.getX()) < minXDistance && Math.abs(z - originalHouseCenter.getZ()) < minYDistance);
 
 			printCenters.add(upperLeftCorner);
 
@@ -469,7 +471,8 @@ public class PrintController implements Updater {
 		if (!isFitted) {
 			printPart.updateWorldBound(true);
 			final OrientedBoundingBox bounds = (OrientedBoundingBox) printPart.getWorldBound().asType(Type.OBB);
-			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getExtent().getX() + pageLeft, 0, -bounds.getExtent().getZ() - pageTop));
+			final double y = Scene.getOriginalHouseRoot().getWorldBound().getCenter().getY();
+			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getExtent().getX() + pageLeft, y, -bounds.getExtent().getZ() - pageTop));
 			final ArrayList<Spatial> page = new ArrayList<Spatial>();
 			page.add(printPart);
 			pages.add(page);

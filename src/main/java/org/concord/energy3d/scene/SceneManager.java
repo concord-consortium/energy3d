@@ -441,7 +441,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				shadowPass.setEnabled(false);
 			}
 		}
-		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
+//		 com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
 		taskManager.getQueue(GameTaskQueue.RENDER).execute(renderer);
 		return true;
 	}
@@ -1523,6 +1523,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
 		final ColladaStorage storage = colladaImporter.load(source);
 		newImport = storage.getScene();
+		newImport.setTranslation(0, 0, 30);
+//		newImport.setScale(0.01);
 		Scene.getRoot().attachChild(newImport);
 	}
 
