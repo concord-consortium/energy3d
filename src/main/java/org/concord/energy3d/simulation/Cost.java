@@ -1,13 +1,17 @@
 package org.concord.energy3d.simulation;
 
+import static java.awt.GraphicsDevice.WindowTranslucency.TRANSLUCENT;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -17,6 +21,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
@@ -66,49 +71,59 @@ public class Cost {
 
 	private int getPartCost(HousePart part) {
 		if (part instanceof Wall) {
-			double uValue = HeatLoad.parseUFactor(EnergyPanel.getInstance().getWallsComboBox());
+			double uFactor = part.getUFactor();
+			if (uFactor == 0)
+				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
 			double price;
-			if (uValue < 0.05)
+			if (uFactor < 0.05)
 				price = 100;
-			else if (uValue < 0.2)
+			else if (uFactor < 0.2)
 				price = 90;
 			else
 				price = 80;
 			return (int) (part.computeArea() * price);
 		}
 		if (part instanceof Window) {
-			double uValue = HeatLoad.parseUFactor(EnergyPanel.getInstance().getWindowsComboBox());
+			double uFactor = part.getUFactor();
+			if (uFactor == 0)
+				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWindowsComboBox());
 			double price;
-			if (uValue <= 0.15) // triple pane
+			if (uFactor <= 0.15) // triple pane
 				price = 250;
-			else if (uValue < 0.4) // double pane
+			else if (uFactor < 0.4) // double pane
 				price = 200;
 			else
 				price = 150;
 			return (int) (part.computeArea() * price);
 		}
 		if (part instanceof Roof) {
-			double uValue = HeatLoad.parseUFactor(EnergyPanel.getInstance().getRoofsComboBox());
+			double uFactor = part.getUFactor();
+			if (uFactor == 0)
+				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
 			double price;
-			if (uValue < 0.05)
+			if (uFactor < 0.05)
 				price = 100;
-			else if (uValue < 0.2)
+			else if (uFactor < 0.2)
 				price = 90;
 			else
 				price = 80;
 			return (int) (part.computeArea() * price);
 		}
 		if (part instanceof Door) {
-			double uValue = HeatLoad.parseUFactor(EnergyPanel.getInstance().getDoorsComboBox());
+			double uFactor = part.getUFactor();
+			if (uFactor == 0)
+				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getDoorsComboBox());
 			int price;
-			if (uValue < 0.5)
+			if (uFactor < 0.5)
 				price = 100;
 			else
 				price = 50;
 			return (int) (part.computeArea() * price);
 		}
 		if (part instanceof SolarPanel) {
-			double efficiency = Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
+			double efficiency = ((SolarPanel) part).getEfficiency();
+			if (efficiency == 0)
+				Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
 			int price;
 			if (efficiency >= 20)
 				price = 1000;
@@ -141,7 +156,7 @@ public class Cost {
 	public void showGraph() {
 		EnergyPanel.getInstance().requestDisableActions(this);
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart == null || selectedPart instanceof Tree) {
+		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
 			int count = 0;
 			HousePart hp = null;
 			for (HousePart x : Scene.getInstance().getParts()) {
@@ -158,16 +173,23 @@ public class Cost {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
+		} else {
+			HousePart hp = selectedPart.getTopContainer();
+			if (hp != null) {
+				SceneManager.getInstance().setSelectedPart(hp);
+				SceneManager.getInstance().refresh();
+				EnergyPanel.getInstance().updateCost();
+			}
 		}
 		if (SceneManager.getInstance().getSelectedPart().getChildren().isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		show();
+		show(true);
 		EnergyPanel.getInstance().requestDisableActions(null);
 	}
 
-	private void show() {
+	private void show(boolean translucent) {
 
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		final Foundation selectedBuilding;
@@ -215,8 +237,21 @@ public class Cost {
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Material Costs by Category", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		if (translucent && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isWindowTranslucencySupported(TRANSLUCENT)) {
+			dialog.setUndecorated(true);
+			dialog.setOpacity(System.getProperty("os.name").startsWith("Mac") ? 0.5f : 0.75f);
+		}
 		dialog.getContentPane().add(pie, BorderLayout.CENTER);
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		final JCheckBox translucentCheckBox = new JCheckBox("Translucent", translucent);
+		translucentCheckBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dialog.dispose();
+				show(translucentCheckBox.isSelected());
+			}
+		});
+		buttonPanel.add(translucentCheckBox);
 		JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override

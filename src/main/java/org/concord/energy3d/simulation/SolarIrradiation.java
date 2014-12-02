@@ -512,6 +512,12 @@ public class SolarIrradiation {
 		return result;
 	}
 
+	public void drawHeatFlux() {
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			part.drawHeatFlux();
+		}
+	}
+
 	public void computeTotalEnergyForBuildings() {
 		applyTexture(SceneManager.getInstance().getSolarLand());
 		for (final HousePart part : Scene.getInstance().getParts()) {
@@ -554,10 +560,13 @@ public class SolarIrradiation {
 							houseChild.setSolarPotentialToday(houseChild.getSolarPotentialToday() + houseChild.getSolarPotential()[i]);
 							if (houseChild instanceof Wall || houseChild instanceof Door || houseChild instanceof Window || houseChild instanceof Roof)
 								heatLoss[i] += houseChild.getHeatLoss()[i];
-							if (houseChild instanceof Window)
-								passiveSolar[i] += houseChild.getSolarPotential()[i] * ((Window) houseChild).getSolarHeatGainCoefficientNotPercentage();
-							else if (houseChild instanceof SolarPanel)
-								photovoltaic[i] += houseChild.getSolarPotential()[i] * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
+							if (houseChild instanceof Window) {
+								Window window = (Window) houseChild;
+								passiveSolar[i] += houseChild.getSolarPotential()[i] * window.getSolarHeatGainCoefficientNotPercentage();
+							} else if (houseChild instanceof SolarPanel) {
+								SolarPanel solarPanel = (SolarPanel) houseChild;
+								photovoltaic[i] += houseChild.getSolarPotential()[i] * solarPanel.getEfficiencyNotPercentage();
+							}
 						}
 					}
 

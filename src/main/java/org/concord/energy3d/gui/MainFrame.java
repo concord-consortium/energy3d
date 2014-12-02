@@ -57,8 +57,12 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -71,6 +75,7 @@ import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
+import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
@@ -111,6 +116,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem rescaleMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem annualEnergyAnalysisMenuItem;
+	private JMenuItem annualEnergyAnalysisForSelectionMenuItem;
 	private JMenuItem sensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem materialCostAnalysisMenuItem;
@@ -335,7 +341,7 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					MainFrame.getInstance().deselect();
+					MainFrame.this.deselect();
 					if (!recentFileMenuItems.isEmpty()) {
 						for (JComponent x : recentFileMenuItems)
 							fileMenu.remove(x);
@@ -352,7 +358,7 @@ public class MainFrame extends JFrame {
 									public void actionPerformed(ActionEvent e) {
 										boolean ok = false;
 										if (Scene.getInstance().isEdited()) {
-											final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+											final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 											if (save == JOptionPane.YES_OPTION) {
 												save();
 												if (!Scene.getInstance().isEdited())
@@ -427,7 +433,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					boolean ok = false;
 					if (Scene.getInstance().isEdited()) {
-						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 						if (save == JOptionPane.YES_OPTION) {
 							save();
 							if (!Scene.getInstance().isEdited())
@@ -456,7 +462,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (Scene.getInstance().isEdited()) {
-						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 						if (save == JOptionPane.YES_OPTION) {
 							save();
 							if (!Scene.getInstance().isEdited())
@@ -479,7 +485,7 @@ public class MainFrame extends JFrame {
 		fileChooser.removeChoosableFileFilter(daeFilter);
 		fileChooser.removeChoosableFileFilter(zipFilter);
 		fileChooser.setFileFilter(ng3Filter);
-		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+		if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 			final File file;
@@ -509,7 +515,7 @@ public class MainFrame extends JFrame {
 			analyzeFolderMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION))
+					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE))
 						return;
 					SceneManager.getInstance().refresh(1);
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -546,7 +552,7 @@ public class MainFrame extends JFrame {
 			openFolderMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION))
+					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE))
 						return;
 					SceneManager.getInstance().refresh(1);
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -608,7 +614,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					final PrintController printController = PrintController.getInstance();
 					if (!printController.isPrintPreview()) {
-						MainFrame.getInstance().getPreviewMenuItem().setSelected(true);
+						getPreviewMenuItem().setSelected(true);
 						new Thread() {
 							@Override
 							public void run() {
@@ -771,9 +777,9 @@ public class MainFrame extends JFrame {
 
 	public void showAbout() {
 		final JDialog aboutDialog = getAboutDialog();
-		final Dimension frameSize = MainFrame.this.getSize();
+		final Dimension frameSize = getSize();
 		final Dimension dialogSize = aboutDialog.getSize();
-		final Point location = MainFrame.this.getLocation();
+		final Point location = getLocation();
 		aboutDialog.setLocation((int) (location.getX() + frameSize.getWidth() / 2 - dialogSize.getWidth() / 2), (int) (location.getY() + frameSize.getHeight() / 2 - dialogSize.getHeight() / 2));
 		aboutDialog.setVisible(true);
 	}
@@ -857,6 +863,7 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getMaterialCostAnalysisMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
+			analysisMenu.add(getAnnualEnergyAnalysisForSelectionMenuItem());
 			analysisMenu.add(getDailyAnalysisMenuItem());
 			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			analysisMenu.addSeparator();
@@ -929,6 +936,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().showAxes(axesMenuItem.isSelected());
+					Scene.getInstance().setEdited(true);
 				}
 			});
 		}
@@ -942,6 +950,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().showBuildingLabels(buildingLabelsMenuItem.isSelected());
+					Scene.getInstance().setEdited(true);
 				}
 			});
 		}
@@ -1033,34 +1042,35 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getAnnualEnergyAnalysisMenuItem() {
 		if (annualEnergyAnalysisMenuItem == null) {
-			annualEnergyAnalysisMenuItem = new JMenuItem("Run Annual Energy Analysis...");
+			annualEnergyAnalysisMenuItem = new JMenuItem("Run Annual Energy Analysis for Building...");
 			annualEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F4"));
 			annualEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null) {
-						int count = 0;
-						HousePart hp = null;
-						for (final HousePart x : Scene.getInstance().getParts()) {
-							if (x instanceof Foundation) {
-								count++;
-								hp = x;
-							}
-						}
-						if (count == 1) {
-							SceneManager.getInstance().setSelectedPart(hp);
-							selectedPart = hp;
-						} else {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-							return;
-						}
-					}
-					new EnergyAnnualAnalysis().show("Annual Energy");
+					if (autoSelectBuilding(true) instanceof Foundation)
+						new EnergyAnnualAnalysis().show("Annual Energy");
 				}
 			});
 		}
 		return annualEnergyAnalysisMenuItem;
+	}
+
+	private JMenuItem getAnnualEnergyAnalysisForSelectionMenuItem() {
+		if (annualEnergyAnalysisForSelectionMenuItem == null) {
+			annualEnergyAnalysisForSelectionMenuItem = new JMenuItem("Run Annual Energy Analysis for Selected Part...");
+			annualEnergyAnalysisForSelectionMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel) {
+						new EnergyAnnualAnalysis().show("Annual Energy for Selected Part");
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.this, "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+					}
+				}
+			});
+		}
+		return annualEnergyAnalysisForSelectionMenuItem;
 	}
 
 	private JMenuItem getSensorMenuItem() {
@@ -1073,7 +1083,7 @@ public class MainFrame extends JFrame {
 					if (Scene.getInstance().hasSensor())
 						new AnnualSensorData().show("Sensor Data");
 					else
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no sensor.", "No sensor", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 		}
@@ -1102,7 +1112,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setHeatFlux(heatFluxMenuItem.isSelected());
-					Scene.getInstance().redrawAll();
+					SolarIrradiation.getInstance().drawHeatFlux();
 					SceneManager.getInstance().refresh();
 				}
 			});
@@ -1119,7 +1129,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart == null) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No selection", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.this, "You must select a building or a component first.", "No selection", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
 				}
@@ -1148,7 +1158,7 @@ public class MainFrame extends JFrame {
 						if (count == 1) {
 							SceneManager.getInstance().setSelectedPart(hp);
 						} else {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 							return;
 						}
 					}
@@ -1298,7 +1308,7 @@ public class MainFrame extends JFrame {
 		fileChooser.removeChoosableFileFilter(daeFilter);
 		fileChooser.removeChoosableFileFilter(zipFilter);
 		fileChooser.setFileFilter(ng3Filter);
-		if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+		if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 			try {
 				File file = fileChooser.getSelectedFile();
@@ -1306,7 +1316,7 @@ public class MainFrame extends JFrame {
 					file = new File(file.toString() + ".ng3");
 				boolean doIt = true;
 				if (file.exists()) {
-					if (JOptionPane.showConfirmDialog(MainFrame.this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+					if (JOptionPane.showConfirmDialog(this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 						doIt = false;
 					}
 				}
@@ -1317,7 +1327,7 @@ public class MainFrame extends JFrame {
 				}
 			} catch (final Throwable err) {
 				err.printStackTrace();
-				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -1329,13 +1339,13 @@ public class MainFrame extends JFrame {
 		fileChooser.removeChoosableFileFilter(daeFilter);
 		fileChooser.removeChoosableFileFilter(zipFilter);
 		fileChooser.setFileFilter(ng3Filter);
-		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+		if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 			try {
 				Scene.importFile(fileChooser.getSelectedFile().toURI().toURL());
 			} catch (final Throwable err) {
 				err.printStackTrace();
-				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -1347,13 +1357,13 @@ public class MainFrame extends JFrame {
 		fileChooser.removeChoosableFileFilter(zipFilter);
 		fileChooser.addChoosableFileFilter(daeFilter);
 		fileChooser.setFileFilter(daeFilter);
-		if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
+		if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 			try {
 				SceneManager.getInstance().newImport(fileChooser.getSelectedFile().toURI().toURL());
 			} catch (final Throwable err) {
 				err.printStackTrace();
-				JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -1488,6 +1498,7 @@ public class MainFrame extends JFrame {
 											MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 										}
 									});
+									Scene.getInstance().setEdited(true);
 									break;
 								}
 							} catch (final NumberFormatException e1) {
@@ -1510,6 +1521,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.None);
+					Scene.getInstance().setEdited(true);
 				}
 			});
 			buttonGroup_2.add(noTextureMenuItem);
@@ -1525,6 +1537,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Simple);
+					Scene.getInstance().setEdited(true);
 				}
 			});
 			buttonGroup_2.add(simpleTextureMenuItem);
@@ -1540,6 +1553,7 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Full);
+					Scene.getInstance().setEdited(true);
 				}
 			});
 			fullTextureMenuItem.setSelected(true);
@@ -1550,12 +1564,12 @@ public class MainFrame extends JFrame {
 
 	private JMenu getColorMenu() {
 		if (colorMenu == null) {
-			colorMenu = new JMenu("Color");
-			colorMenu.add(getRoofColorMenuItem());
-			colorMenu.add(getFloorColorMenuItem());
-			colorMenu.add(getDoorColorMenuItem());
+			colorMenu = new JMenu("Building Colors");
 			colorMenu.add(getWallColorMenuItem());
+			colorMenu.add(getRoofColorMenuItem());
 			colorMenu.add(getPlatformColorMenuItem());
+			colorMenu.add(getDoorColorMenuItem());
+			colorMenu.add(getFloorColorMenuItem());
 		}
 		return colorMenu;
 	}
@@ -1566,7 +1580,7 @@ public class MainFrame extends JFrame {
 			platformColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForHousePart(Operation.DRAW_FOUNDATION);
+					showColorDialogForWholeHouse(Operation.DRAW_FOUNDATION);
 				}
 			});
 		}
@@ -1579,7 +1593,7 @@ public class MainFrame extends JFrame {
 			wallColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForHousePart(Operation.DRAW_WALL);
+					showColorDialogForWholeHouse(Operation.DRAW_WALL);
 				}
 			});
 		}
@@ -1592,7 +1606,7 @@ public class MainFrame extends JFrame {
 			doorColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForHousePart(Operation.DRAW_DOOR);
+					showColorDialogForWholeHouse(Operation.DRAW_DOOR);
 				}
 			});
 		}
@@ -1605,7 +1619,7 @@ public class MainFrame extends JFrame {
 			floorColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForHousePart(Operation.DRAW_FLOOR);
+					showColorDialogForWholeHouse(Operation.DRAW_FLOOR);
 				}
 			});
 		}
@@ -1618,14 +1632,61 @@ public class MainFrame extends JFrame {
 			roofColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForHousePart(Operation.DRAW_ROOF_PYRAMID);
+					showColorDialogForWholeHouse(Operation.DRAW_ROOF_PYRAMID);
 				}
 			});
 		}
 		return roofColorMenuItem;
 	}
 
-	void showColorDialogForHousePart(final Operation operation) {
+	Foundation autoSelectBuilding(boolean ask) {
+		Foundation foundation = null;
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
+			SceneManager.getInstance().setSelectedPart(null);
+			int count = 0;
+			HousePart hp = null;
+			for (final HousePart x : Scene.getInstance().getParts()) {
+				if (x instanceof Foundation) {
+					count++;
+					hp = x;
+				}
+			}
+			if (count == 1) {
+				SceneManager.getInstance().setSelectedPart(hp);
+				foundation = (Foundation) hp;
+			} else {
+				if (ask)
+					JOptionPane.showMessageDialog(this, "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+			}
+		} else {
+			HousePart topContainer = selectedPart.getTopContainer();
+			if (selectedPart instanceof Foundation) {
+				foundation = (Foundation) selectedPart;
+			} else if (topContainer instanceof Foundation) {
+				selectedPart.setEditPointsVisible(false);
+				SceneManager.getInstance().setSelectedPart(topContainer);
+				foundation = (Foundation) topContainer;
+			} else {
+				if (ask)
+					JOptionPane.showMessageDialog(this, "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+		return foundation;
+	}
+
+	void showColorDialogForIndividualPart() {
+		if (!noTextureMenuItem.isSelected()) { // when the user wants to set the color, automatically switch to no texture
+			if (JOptionPane.showConfirmDialog(this, "To set color for an individual part, we have to remove the texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+				return;
+			noTextureMenuItem.setSelected(true);
+			Scene.getInstance().setTextureMode(TextureMode.None);
+		}
+		ReadOnlyColorRGBA color = ColorRGBA.WHITE;
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null)
+			color = selectedPart.getColor();
+		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final ActionListener actionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -1634,50 +1695,72 @@ public class MainFrame extends JFrame {
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
 				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				switch (operation) {
-				case DRAW_FOUNDATION:
-					if (selectedPart == null)
-						Scene.getInstance().setFoundationColor(color);
-					else if (selectedPart instanceof Foundation)
-						selectedPart.setColor(color);
-					break;
-				case DRAW_WALL:
-					if (selectedPart == null)
-						Scene.getInstance().setWallColor(color);
-					else if (selectedPart instanceof Wall)
-						selectedPart.setColor(color);
-					break;
-				case DRAW_DOOR:
-					if (selectedPart == null)
-						Scene.getInstance().setDoorColor(color);
-					else if (selectedPart instanceof Door)
-						selectedPart.setColor(color);
-					break;
-				case DRAW_FLOOR:
-					if (selectedPart == null)
-						Scene.getInstance().setFloorColor(color);
-					else if (selectedPart instanceof Floor)
-						selectedPart.setColor(color);
-					break;
-				case DRAW_ROOF_PYRAMID:
-					if (selectedPart == null)
-						Scene.getInstance().setRoofColor(color);
-					else if (selectedPart instanceof Roof)
-						selectedPart.setColor(color);
-					break;
-				default:
-					break;
+				if (selectedPart != null) {
+					selectedPart.setColor(color);
+					Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 				}
-				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
 					PrintController.getInstance().restartAnimation();
 				Scene.getInstance().setEdited(true);
 			}
 		};
+		JColorChooser.createDialog(this, "Select Color", true, colorChooser, actionListener, null).setVisible(true);
 		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
-		if (fullTextureMenuItem.isSelected()) {
+	}
+
+	private int countFloors(Foundation foundation) {
+		int n = 0;
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p.getTopContainer() == foundation && p instanceof Floor)
+				n++;
+		}
+		return n;
+	}
+
+	private int countDoors(Foundation foundation) {
+		int n = 0;
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p.getTopContainer() == foundation && p instanceof Door)
+				n++;
+		}
+		return n;
+	}
+
+	private void showColorDialogForWholeHouse(final Operation operation) {
+		if (fullTextureMenuItem.isSelected()) { // when the user wants to set the color, remove the texture first
+			if (JOptionPane.showConfirmDialog(this, "To set colors for this building, we have to remove the full texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+				return;
 			noTextureMenuItem.setSelected(true);
 			Scene.getInstance().setTextureMode(TextureMode.None);
+		}
+		final Foundation foundation = autoSelectBuilding(true);
+		if (foundation == null)
+			return;
+		switch (operation) {
+		case DRAW_WALL:
+			if (JOptionPane.showConfirmDialog(this, "<html>This will set color for all walls of the selected building.<br>Do you want to continue?</html>", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.NO_OPTION)
+				return;
+			break;
+		case DRAW_DOOR:
+			if (countDoors(foundation) == 0) {
+				JOptionPane.showMessageDialog(this, "<html>There is no door for the selected building.</html>", "Message", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			} else if (countDoors(foundation) > 1) {
+				if (JOptionPane.showConfirmDialog(this, "<html>This will set color for all doors of the selected building.<br>Do you want to continue?</html>", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.NO_OPTION)
+					return;
+			}
+			break;
+		case DRAW_FLOOR:
+			if (countFloors(foundation) == 0) {
+				JOptionPane.showMessageDialog(this, "<html>There is no floor for the selected building.</html>", "Message", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			} else if (countFloors(foundation) > 1) {
+				if (JOptionPane.showConfirmDialog(this, "<html>This will set color for all floors of the selected building.<br>Do you want to continue?</html>", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.NO_OPTION)
+					return;
+			}
+			break;
+		default:
+			break;
 		}
 
 		ReadOnlyColorRGBA color;
@@ -1700,12 +1783,58 @@ public class MainFrame extends JFrame {
 		default:
 			color = ColorRGBA.WHITE;
 		}
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart != null && selectedPart.getColor() != null)
-			color = selectedPart.getColor();
 		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
-		final JDialog colorDialog = JColorChooser.createDialog(MainFrame.this, "Select Default Color", true, colorChooser, actionListener, null);
-		colorDialog.setVisible(true);
+		final ActionListener actionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final Color c = colorChooser.getColor();
+				final float[] newColor = c.getComponents(null);
+				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
+				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
+				switch (operation) {
+				case DRAW_FOUNDATION:
+					// Scene.getInstance().setFoundationColor(color);
+					foundation.setColor(color);
+					break;
+				case DRAW_WALL:
+					// Scene.getInstance().setWallColor(color);
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof Wall && p.getTopContainer() == foundation)
+							p.setColor(color);
+					}
+					break;
+				case DRAW_DOOR:
+					// Scene.getInstance().setDoorColor(color);
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof Door && p.getTopContainer() == foundation)
+							p.setColor(color);
+					}
+					break;
+				case DRAW_FLOOR:
+					// Scene.getInstance().setFloorColor(color);
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof Floor && p.getTopContainer() == foundation)
+							p.setColor(color);
+					}
+					break;
+				case DRAW_ROOF_PYRAMID:
+					// Scene.getInstance().setRoofColor(color);
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof Roof && p.getTopContainer() == foundation)
+							p.setColor(color);
+					}
+					break;
+				default:
+					break;
+				}
+				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
+				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
+					PrintController.getInstance().restartAnimation();
+				Scene.getInstance().setEdited(true);
+			}
+		};
+		JColorChooser.createDialog(this, "Select Color", true, colorChooser, actionListener, null).setVisible(true);
+		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 	}
 
 	public void showUnexpectedErrorMessage(final Throwable err) {
@@ -1741,7 +1870,7 @@ public class MainFrame extends JFrame {
 			}
 		}
 		if (Scene.getInstance().isEdited()) {
-			final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+			final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if (save == JOptionPane.YES_OPTION) {
 				save();
 				if (!Scene.getInstance().isEdited())
@@ -1762,7 +1891,7 @@ public class MainFrame extends JFrame {
 			Scene.getInstance().setEdited(false, false);
 		} catch (final Throwable err) {
 			err.printStackTrace();
-			JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -1798,7 +1927,7 @@ public class MainFrame extends JFrame {
 								file = new File(file.toString() + ".zip");
 							boolean doIt = true;
 							if (file.exists()) {
-								if (JOptionPane.showConfirmDialog(MainFrame.this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+								if (JOptionPane.showConfirmDialog(MainFrame.this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 									doIt = false;
 								}
 							}
@@ -1845,7 +1974,7 @@ public class MainFrame extends JFrame {
 				System.out.print(file + "...");
 				boolean doIt = true;
 				if (file.exists()) {
-					if (JOptionPane.showConfirmDialog(this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+					if (JOptionPane.showConfirmDialog(this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 						doIt = false;
 					}
 				}

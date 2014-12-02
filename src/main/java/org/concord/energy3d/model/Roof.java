@@ -915,21 +915,6 @@ public abstract class Roof extends HousePart {
 		return area;
 	}
 
-	public double computeArea(final Mesh mesh) {
-		double area = 0.0;
-		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-		buf.rewind();
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		while (buf.hasRemaining()) {
-			final Vector3 p1 = new Vector3(buf.get(), buf.get(), buf.get());
-			final Vector3 p2 = new Vector3(buf.get(), buf.get(), buf.get());
-			final Vector3 p3 = new Vector3(buf.get(), buf.get(), buf.get());
-			final double trigArea = p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;
-			area += trigArea;
-		}
-		return area;
-	}
-
 	@Override
 	public boolean isDrawable() {
 		/* if wallUpperPoints is null then it has not been drawn yet so we assume wallUpperPoints size is okay otherwise all roofs would be invalid at init time */
@@ -953,8 +938,7 @@ public abstract class Roof extends HousePart {
 			if (SceneManager.getInstance().isHeatFluxDaily()) {
 				for (final double x : heatLossArray)
 					heat += x;
-				//System.out.println(mesh+"************"+heat);
-				heat /= (computeArea(mesh) * heatLossArray.length);
+				heat /= computeArea(mesh) * heatLossArray.length;
 				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
 				final int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
@@ -962,8 +946,6 @@ public abstract class Roof extends HousePart {
 				heat /= 4 * computeArea(mesh);
 				heatFlux.setDefaultColor(ColorRGBA.WHITE);
 			}
-		} else {
-			//System.out.println("^^^^^^^^^^"+mesh);
 		}
 		return heat;
 	}

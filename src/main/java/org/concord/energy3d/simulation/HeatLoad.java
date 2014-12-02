@@ -30,26 +30,30 @@ public class HeatLoad {
 		return instance;
 	}
 
+	private static boolean isZero(double x) {
+		return Math.abs(x) < 0.000001;
+	}
+
 	private double getUFactor(HousePart part) {
 		if (part instanceof Wall)
-			return part.getUFactor() < 0.000001 ? wallUFactor : part.getUFactor();
+			return isZero(part.getUFactor()) ? wallUFactor : part.getUFactor();
 		if (part instanceof Door)
-			return part.getUFactor() < 0.000001 ? doorUFactor : part.getUFactor();
+			return isZero(part.getUFactor()) ? doorUFactor : part.getUFactor();
 		if (part instanceof Roof)
-			return part.getUFactor() < 0.000001 ? roofUFactor : part.getUFactor();
+			return isZero(part.getUFactor()) ? roofUFactor : part.getUFactor();
 		if (part instanceof Window)
-			return part.getUFactor() < 0.000001 ? windowUFactor : part.getUFactor();
+			return isZero(part.getUFactor()) ? windowUFactor : part.getUFactor();
 		if (part instanceof Sensor) {
 			HousePart container = part.getContainer();
 			if (container instanceof Wall) {
 				final HousePart x = insideChild(part.getPoints().get(0), container);
 				if (x instanceof Window)
-					return x.getUFactor() < 0.000001 ? windowUFactor : x.getUFactor();
+					return isZero(x.getUFactor()) ? windowUFactor : x.getUFactor();
 				if (x instanceof Door)
-					return x.getUFactor() < 0.000001 ? doorUFactor : x.getUFactor();
-				return container.getUFactor() < 0.000001 ? wallUFactor : container.getUFactor();
+					return isZero(x.getUFactor()) ? doorUFactor : x.getUFactor();
+				return isZero(container.getUFactor()) ? wallUFactor : container.getUFactor();
 			} else if (container instanceof Roof) {
-				return container.getUFactor() < 0.000001 ? roofUFactor : container.getUFactor();
+				return isZero(container.getUFactor()) ? roofUFactor : container.getUFactor();
 			}
 		}
 		return part.getUFactor();
@@ -57,10 +61,10 @@ public class HeatLoad {
 
 	public void computeEnergyToday(final Calendar today, final double insideTemperature) {
 		try {
-			wallUFactor = parseUFactor(EnergyPanel.getInstance().getWallsComboBox());
-			doorUFactor = parseUFactor(EnergyPanel.getInstance().getDoorsComboBox());
-			windowUFactor = parseUFactor(EnergyPanel.getInstance().getWindowsComboBox());
-			roofUFactor = parseUFactor(EnergyPanel.getInstance().getRoofsComboBox());
+			wallUFactor = parseValue(EnergyPanel.getInstance().getWallsComboBox());
+			doorUFactor = parseValue(EnergyPanel.getInstance().getDoorsComboBox());
+			windowUFactor = parseValue(EnergyPanel.getInstance().getWindowsComboBox());
+			roofUFactor = parseValue(EnergyPanel.getInstance().getRoofsComboBox());
 		} catch (final Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(MainPanel.getInstance(), "Invalid U-Factor value: " + e.getMessage(), "Invalid U-Factor", JOptionPane.WARNING_MESSAGE);
@@ -76,39 +80,43 @@ public class HeatLoad {
 
 		final int timeStep = SolarIrradiation.getInstance().getTimeStep();
 		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+		int iMinute = 0;
 		for (int minute = 0; minute < SolarIrradiation.MINUTES_OF_DAY; minute += timeStep) {
+			iMinute = minute / timeStep;
 			for (final HousePart part : Scene.getInstance().getParts()) {
 				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
 				float absorption = part instanceof Window ? 0 : 1 - part.getAlbedo();
-				double solarHeat = part.getSolarPotential()[minute / timeStep] * absorption / part.getVolumetricHeatCapacity();
-				double deltaT = insideTemperature - (outsideTemperature + solarHeat);
-				if (part.isDrawCompleted()) {
-					double uFactor = getUFactor(part);
-					if (uFactor < 0.000001)
-						continue;
-					double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
-					if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
-						heatloss = 0;
-					part.getHeatLoss()[minute / timeStep] += heatloss;
-				}
 				if (part instanceof Roof) { // need to compute piece by piece for a roof
 					Roof roof = (Roof) part;
 					for (final Spatial child : roof.getRoofPartsRoot().getChildren()) {
 						Mesh mesh = (Mesh) ((Node) child).getChild(0);
 						double[] solarPotential = SolarIrradiation.getInstance().getSolarPotential(mesh);
-						if (solarPotential != null) {
-							solarHeat = solarPotential[minute / timeStep] * absorption / part.getVolumetricHeatCapacity();
-							deltaT = insideTemperature - (outsideTemperature + solarHeat);
-							if (part.isDrawCompleted()) {
-								double uFactor = getUFactor(part);
-								if (uFactor < 0.000001)
-									continue;
-								double heatloss = roof.computeArea(mesh) * uFactor * deltaT / 1000.0 / 60 * timeStep;
-								double[] heatLossArray = SolarIrradiation.getInstance().getHeatLoss(mesh);
-								if (heatLossArray != null)
-									heatLossArray[minute / timeStep] += heatloss;
-							}
+						double solarHeat = solarPotential != null ? solarPotential[iMinute] * absorption / part.getVolumetricHeatCapacity() : 0;
+						double deltaT = insideTemperature - (outsideTemperature + solarHeat);
+						if (part.isDrawCompleted()) {
+							double uFactor = getUFactor(part);
+							if (isZero(uFactor))
+								continue;
+							double heatloss = roof.computeArea(mesh) * uFactor * deltaT / 1000.0 / 60 * timeStep;
+							if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
+								heatloss = 0;
+							roof.getHeatLoss()[iMinute] += heatloss;
+							double[] heatLossArray = SolarIrradiation.getInstance().getHeatLoss(mesh);
+							if (heatLossArray != null)
+								heatLossArray[iMinute] += heatloss;
 						}
+					}
+				} else {
+					double solarHeat = part.getSolarPotential()[iMinute] * absorption / part.getVolumetricHeatCapacity();
+					double deltaT = insideTemperature - (outsideTemperature + solarHeat);
+					if (part.isDrawCompleted()) {
+						double uFactor = getUFactor(part);
+						if (isZero(uFactor))
+							continue;
+						double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
+						if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
+							heatloss = 0;
+						part.getHeatLoss()[iMinute] += heatloss;
 					}
 				}
 			}
@@ -144,7 +152,7 @@ public class HeatLoad {
 		return x > xmin && x < xmax && y > ymin && y < ymax;
 	}
 
-	public static double parseUFactor(final JComboBox<String> comboBox) {
+	public static double parseValue(final JComboBox<String> comboBox) {
 		final String valueStr = comboBox.getSelectedItem().toString();
 		final int indexOfSpace = valueStr.indexOf(' ');
 		return Double.parseDouble(valueStr.substring(0, indexOfSpace != -1 ? indexOfSpace : valueStr.length()));

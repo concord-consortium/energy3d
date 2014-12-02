@@ -1,5 +1,6 @@
 package org.concord.energy3d.simulation;
 
+import static java.awt.GraphicsDevice.WindowTranslucency.TRANSLUCENT;
 import static java.util.Calendar.APRIL;
 import static java.util.Calendar.AUGUST;
 import static java.util.Calendar.DECEMBER;
@@ -16,6 +17,7 @@ import static java.util.Calendar.SEPTEMBER;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -131,6 +133,10 @@ public abstract class AnnualAnalysis extends Analysis {
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		if (GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isWindowTranslucencySupported(TRANSLUCENT)) {
+			dialog.setUndecorated(true);
+			dialog.setOpacity(System.getProperty("os.name").startsWith("Mac") ? 0.5f : 0.75f);
+		}
 
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);

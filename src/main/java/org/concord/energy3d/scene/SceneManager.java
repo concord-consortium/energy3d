@@ -1523,8 +1523,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
 		final ColladaStorage storage = colladaImporter.load(source);
 		newImport = storage.getScene();
-		newImport.setTranslation(0, 0, 30);
-//		newImport.setScale(0.01);
+		// newImport.setTranslation(0, 0, 30);
+		// newImport.setScale(0.025);
 		Scene.getRoot().attachChild(newImport);
 	}
 

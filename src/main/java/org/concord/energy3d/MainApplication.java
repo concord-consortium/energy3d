@@ -1,5 +1,6 @@
 package org.concord.energy3d;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.gui.EnergyPanel;
@@ -17,6 +18,11 @@ public class MainApplication {
 	 * @wbp.parser.entryPoint
 	 */
 	public static void main(final String[] args) {
+		final String version = System.getProperty("java.version");
+		if (version.compareTo("1.7") < 0) {
+			JOptionPane.showMessageDialog(null, "Your current Java version is " + version + ". Version 1.7 or higher is required.");
+			System.exit(0);
+		}
 		if (System.getProperty("os.name").startsWith("Mac")) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Energy3D");
@@ -32,19 +38,19 @@ public class MainApplication {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		final SceneManager scene = SceneManager.getInstance();
+		final SceneManager sceneManager = SceneManager.getInstance();
 		final MainFrame mainFrame = MainFrame.getInstance();
 		mainFrame.updateTitleBar();
 		mainFrame.setVisible(true);
 		Scene.getInstance();
-		new Thread(scene, "Energy 3D Application").start();
+		new Thread(sceneManager, "Energy 3D Application").start();
 
 		if (args.length > 1 && !args[args.length - 1].startsWith("-"))
 			mainFrame.open(args[args.length - 1]);
 
 		/* initialize data logging */
 		final TimeSeriesLogger logger = new TimeSeriesLogger(1);
-		scene.addShutdownHook(new Runnable() {
+		sceneManager.addShutdownHook(new Runnable() {
 			@Override
 			public void run() {
 				logger.closeLog();

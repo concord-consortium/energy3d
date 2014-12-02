@@ -10,7 +10,6 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 /**
@@ -29,7 +28,7 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		graph = selectedPart instanceof Foundation ? new BuildingEnergyAnnualGraph() : new PartEnergyAnnualGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
-		graph.setBackground(Color.white);
+		graph.setBackground(Color.WHITE);
 	}
 
 	@Override
@@ -68,7 +67,7 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
 			graph.addData("Heat Gain", -sum);
 		} else if (selectedPart instanceof SolarPanel) {
 			final SolarPanel solarPanel = (SolarPanel) selectedPart;
-			final double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
+			final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getEfficiencyNotPercentage();
 			graph.addData("Solar", solar);
 		}
 		graph.repaint();

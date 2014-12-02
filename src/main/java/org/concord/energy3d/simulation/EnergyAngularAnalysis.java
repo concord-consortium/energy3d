@@ -10,7 +10,6 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 /**
@@ -66,7 +65,7 @@ public class EnergyAngularAnalysis extends AngularAnalysis {
 			graph.addData("Heat Gain", -sum);
 		} else if (selectedPart instanceof SolarPanel) {
 			final SolarPanel solarPanel = (SolarPanel) selectedPart;
-			final double solar = solarPanel.getSolarPotentialToday() * Scene.getInstance().getSolarPanelEfficiencyNotPercentage();
+			final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getEfficiencyNotPercentage();
 			graph.addData("Solar", solar);
 		}
 		graph.repaint();

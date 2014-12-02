@@ -26,6 +26,7 @@ import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Snap;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -34,6 +35,7 @@ import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Specifications;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
@@ -292,29 +294,78 @@ public class Scene implements Serializable {
 		Specifications.getInstance().setAreaEnabled(instance.areaEnabled);
 		Specifications.getInstance().setHeightEnabled(instance.heightEnabled);
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
-		if (instance.windowUFactor != null)
+
+		// backward compatibility
+		if (instance.windowUFactor != null) {
+			double defaultWindowUFactor = parsePropertyString(instance.windowUFactor);
+			for (HousePart p : instance.parts) {
+				if (p.getUFactor() <= 0 && p instanceof Window)
+					p.setUFactor(defaultWindowUFactor);
+			}
 			energyPanel.getWindowsComboBox().setSelectedItem(instance.windowUFactor);
-		if (instance.wallUFactor != null)
+		}
+		if (instance.wallUFactor != null) {
+			double defaultWallUFactor = parsePropertyString(instance.wallUFactor);
+			for (HousePart p : instance.parts) {
+				if (p.getUFactor() <= 0 && p instanceof Wall)
+					p.setUFactor(defaultWallUFactor);
+			}
 			energyPanel.getWallsComboBox().setSelectedItem(instance.wallUFactor);
-		if (instance.doorUFactor != null)
+		}
+		if (instance.doorUFactor != null) {
+			double defaultDoorUFactor = parsePropertyString(instance.doorUFactor);
+			for (HousePart p : instance.parts) {
+				if (p.getUFactor() <= 0 && p instanceof Door)
+					p.setUFactor(defaultDoorUFactor);
+			}
 			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
-		if (instance.roofUFactor != null)
+		}
+		if (instance.roofUFactor != null) {
+			double defaultRoofUFactor = parsePropertyString(instance.roofUFactor);
+			for (HousePart p : instance.parts) {
+				if (p.getUFactor() <= 0 && p instanceof Roof)
+					p.setUFactor(defaultRoofUFactor);
+			}
 			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
-		if (instance.backgroundAlbedo < 0.000001)
-			instance.backgroundAlbedo = 0.3;
-		if (instance.solarPanelEfficiency < 0.000001)
+		}
+
+		if (Util.isZero(instance.solarPanelEfficiency))
 			instance.solarPanelEfficiency = 10;
-		if (instance.windowSolarHeatGainCoefficient < 0.000001) // not set
+		for (HousePart p : instance.parts) {
+			if (p instanceof SolarPanel) {
+				SolarPanel sp = (SolarPanel) p;
+				if (Util.isZero(sp.getEfficiency()))
+					sp.setEfficiency(instance.solarPanelEfficiency);
+			}
+		}
+		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
+
+		if (Util.isZero(instance.windowSolarHeatGainCoefficient)) // not set
 			instance.windowSolarHeatGainCoefficient = 50;
 		else if (instance.windowSolarHeatGainCoefficient < 1)
 			instance.windowSolarHeatGainCoefficient *= 100; // backward compatibility (when SHGC < 1)
-		if (instance.heatVectorLength < 0.00001)
-			instance.heatVectorLength = 5000;
-		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
+		for (HousePart p : instance.parts) {
+			if (p instanceof Window) {
+				Window w = (Window) p;
+				if (Util.isZero(w.getSolarHeatGainCoefficient()))
+					w.setSolarHeatGainCoefficient(instance.windowSolarHeatGainCoefficient);
+			}
+		}
 		energyPanel.getWindowSHGCComboBox().setSelectedItem(Double.toString(instance.windowSolarHeatGainCoefficient));
-		SolarIrradiation.getInstance().setSolarStep(instance.solarStep < 0.000001 ? 2 : instance.solarStep);
-		SolarIrradiation.getInstance().setTimeStep(instance.timeStep == 0 ? 15 : instance.timeStep);
-		Scene.getInstance().setEdited(false);
+
+		if (Util.isZero(instance.backgroundAlbedo))
+			instance.backgroundAlbedo = 0.3;
+		if (Util.isZero(instance.heatVectorLength))
+			instance.heatVectorLength = 5000;
+		SolarIrradiation.getInstance().setSolarStep(Util.isZero(instance.solarStep) ? 2 : instance.solarStep);
+		SolarIrradiation.getInstance().setTimeStep(Util.isZero(instance.timeStep) ? 15 : instance.timeStep);
+		instance.setEdited(false);
+
+	}
+
+	public static double parsePropertyString(final String s) {
+		final int indexOfSpace = s.indexOf(' ');
+		return Double.parseDouble(s.substring(0, indexOfSpace != -1 ? indexOfSpace : s.length()));
 	}
 
 	public static void loadCameraLocation() {
@@ -879,6 +930,15 @@ public class Scene implements Serializable {
 
 	public double getHeatVectorLength() {
 		return heatVectorLength;
+	}
+
+	public int countParts(Foundation foundation, Class<?> clazz) {
+		int count = 0;
+		for (HousePart p : parts) {
+			if (p.getTopContainer() == foundation && clazz.isInstance(p))
+				count++;
+		}
+		return count;
 	}
 
 }

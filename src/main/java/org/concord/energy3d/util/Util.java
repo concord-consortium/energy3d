@@ -1,5 +1,7 @@
 package org.concord.energy3d.util;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -7,6 +9,8 @@ import java.net.URI;
 import java.util.List;
 
 import javax.swing.AbstractButton;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
@@ -302,6 +306,35 @@ public class Util {
 			button.addItemListener(x);
 		for (final ActionListener x : actionListeners)
 			button.addActionListener(x);
+	}
+
+	/** This method sets the selection state of a combo box visually without invoking its ItemListeners and ActionListeners */
+	public static void selectSilently(final JComboBox<?> comboBox, final int selectedIndex) {
+		final ItemListener[] itemListeners = comboBox.getItemListeners();
+		final ActionListener[] actionListeners = comboBox.getActionListeners();
+		for (final ItemListener x : itemListeners)
+			comboBox.removeItemListener(x);
+		for (final ActionListener x : actionListeners)
+			comboBox.removeActionListener(x);
+		comboBox.setSelectedIndex(selectedIndex);
+		for (final ItemListener x : itemListeners)
+			comboBox.addItemListener(x);
+		for (final ActionListener x : actionListeners)
+			comboBox.addActionListener(x);
+	}
+
+	public static JButton getButtonSubComponent(Container container) {
+		if (container instanceof JButton) {
+			return (JButton) container;
+		} else {
+			Component[] components = container.getComponents();
+			for (Component component : components) {
+				if (component instanceof Container) {
+					return getButtonSubComponent((Container) component);
+				}
+			}
+		}
+		return null;
 	}
 
 }

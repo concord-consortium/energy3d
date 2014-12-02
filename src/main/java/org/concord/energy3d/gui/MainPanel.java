@@ -668,6 +668,8 @@ public class MainPanel extends JPanel {
 			energyViewButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
+					if (energyViewButton.isSelected())
+						MainFrame.getInstance().autoSelectBuilding(false);
 					SceneManager.getInstance().setHeatFluxDaily(true);
 					SceneManager.getInstance().setSolarColorMap(energyViewButton.isSelected());
 					SceneManager.getInstance().setHeatFlux(energyViewButton.isSelected());
@@ -924,7 +926,6 @@ public class MainPanel extends JPanel {
 						if (count == 1) {
 							SceneManager.getInstance().setSelectedPart(hp);
 							SceneManager.getInstance().refresh();
-							EnergyPanel.getInstance().updateCost();
 							EnergyPanel.getInstance().updatePartEnergy();
 						} else {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
