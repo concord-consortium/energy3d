@@ -60,6 +60,8 @@ public abstract class Roof extends HousePart {
 	private transient List<ReadOnlyVector3> wallNormals;
 	private transient List<Wall> walls;
 	private transient HousePart previousContainer;
+	private transient double areaWithoutOverhang;
+	private transient Map<Mesh, Double> areaWithoutOverhangByPart;
 	private Map<Integer, List<Wall>> gableEditPointToWallMap = null;
 
 	protected class EditState {
@@ -128,15 +130,16 @@ public abstract class Roof extends HousePart {
 		}
 		roofPartsRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
-		applyOverhang(wallUpperPoints, wallNormals);
-		processRoofEditPoints(wallUpperPoints);
-		computeGableEditPoints();
-		final PolygonWithHoles polygon = makePolygon(wallUpperPoints);
-		applySteinerPoint(polygon);
-		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
-		MeshLib.groupByPlanner(mesh, roofPartsRoot);
-		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
-		hideGableRoofParts();
+		final double orgOverhang = Scene.getInstance().getOverhangLength();
+		Scene.getInstance().setOverhangLength(0);
+		try {
+			drawRoof();
+			computeAndSaveArea();
+		} finally {
+			Scene.getInstance().setOverhangLength(orgOverhang);
+		}
+		drawRoof();
+//		computeAndSaveArea();
 		int roofPartIndex = 0;
 		synchronized (roofPartsRoot.getChildren()) {
 			for (final Spatial child : roofPartsRoot.getChildren()) {
@@ -149,6 +152,19 @@ public abstract class Roof extends HousePart {
 		drawOutline();
 		drawDashLines();
 		drawHeatFlux();
+	}
+
+	public void drawRoof() {
+		applyOverhang(wallUpperPoints, wallNormals);
+		processRoofEditPoints(wallUpperPoints);
+		computeGableEditPoints();
+		final PolygonWithHoles polygon = makePolygon(wallUpperPoints);
+		applySteinerPoint(polygon);
+		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
+		MeshLib.groupByPlanner(mesh, roofPartsRoot);
+//		applyOverhang(wallUpperPoints, wallNormals);
+		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
+		hideGableRoofParts();
 	}
 
 	protected void drawWalls() {
@@ -905,14 +921,27 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	public double computeArea() {
+		return areaWithoutOverhang;
+	}
+
+	@Override
+	public double computeArea(final Mesh mesh) {
+		return areaWithoutOverhangByPart.get(mesh);
+	}
+
+	public void computeAndSaveArea() {
+		if (areaWithoutOverhangByPart == null)
+			areaWithoutOverhangByPart = new HashMap<Mesh, Double>();
 		double area = 0.0;
 		synchronized (roofPartsRoot.getChildren()) {
 			for (final Spatial child : roofPartsRoot.getChildren()) {
 				final Mesh mesh = (Mesh) ((Node) child).getChild(0);
-				area += computeArea(mesh);
+				final double partArea = super.computeArea(mesh);
+				areaWithoutOverhangByPart.put(mesh, partArea);
+				area += partArea;
 			}
 		}
-		return area;
+		areaWithoutOverhang = area;
 	}
 
 	@Override
@@ -1006,6 +1035,10 @@ public abstract class Roof extends HousePart {
 
 		}
 
+	}
+
+	public double getAreaWithoutOverhang() {
+		return areaWithoutOverhang;
 	}
 
 }

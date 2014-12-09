@@ -824,13 +824,11 @@ public class Wall extends HousePart {
 
 	@Override
 	public void flatten(final double flattenTime) {
-		thicknessNormal = getThicknessNormal();
-		final Vector3 n = thicknessNormal.normalize(null);
-		double angle = n.smallestAngleBetween(Vector3.UNIT_X);
-		angle -= Math.PI / 2;
+		final ReadOnlyVector3 n = getFaceDirection();
+		double angle = n.smallestAngleBetween(Vector3.NEG_UNIT_Y);
 
-		if (n.dot(Vector3.UNIT_Y) < 0)
-			angle = Math.PI - angle;
+		if (n.dot(Vector3.UNIT_X) < 0)
+			angle = -angle;
 
 		root.setRotation((new Matrix3().fromAngles(0, 0, -flattenTime * angle)));
 
@@ -1047,6 +1045,7 @@ public class Wall extends HousePart {
 	@Override
 	public void setOriginal(final HousePart original) {
 		final Wall originalWall = (Wall) original;
+		this.thicknessNormal = originalWall.getThicknessNormal();
 		root.detachChild(invisibleMesh);
 		root.detachChild(backMesh);
 		root.detachChild(surroundMesh);
