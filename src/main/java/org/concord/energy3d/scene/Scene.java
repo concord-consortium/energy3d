@@ -118,7 +118,7 @@ public class Scene implements Serializable {
 	private double solarPanelEfficiency;
 	private double windowSolarHeatGainCoefficient; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
 	private double backgroundAlbedo = 0.3;
-	private double heatVectorLength = 10000;
+	private double heatVectorLength = 2000;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 

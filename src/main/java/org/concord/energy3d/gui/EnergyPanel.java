@@ -76,12 +76,12 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 public class EnergyPanel extends JPanel {
 
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
-	private final static String[] U_FACTOR_CHOICES_WALL = { "0.44 (masonry)", "0.39 (wood frame)", "0.14 (R13, 2x4 w/cellulose/fiberglass)", "0.11 (R18, 2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)", "0.09 (R20, 2x6 w/cellulose/fiberglass)", "0.07 (R25, 2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)" };
-	private final static String[] U_FACTOR_CHOICES_ROOF = { "0.51 (old house)", "0.09 (R22, cellulose/fiberglass)", "0.05 (R38, cellulose/fiberglass)", "0.04 (R50, cellulose/fiberglass)" };
-	private final static String[] U_FACTOR_CHOICES_DOOR = { "0.88 (wood)", "0.61 (insulated)" };
-	private final static String[] U_FACTOR_CHOICES_WINDOW = { "2.10 (single pane)", "0.96 (double pane)", "0.61 (double pane, low-e)", "0.26 (triple pane)" };
-	private final static String[] WINDOW_SHGC_CHOICES = { "25.0", "50.0", "80.0" };
-	private final static String[] SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES = { "10.0", "15.0", "20.0" };
+	final static String[] U_FACTOR_CHOICES_WALL = { "1.42 (16\" brick masonry)", "0.44 (R13, 2x4 w/cellulose/fiberglass)", "0.32 (R18, 2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)", "0.28 (R20, 2x6 w/cellulose/fiberglass)", "0.23 (R25, 2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)" };
+	final static String[] U_FACTOR_CHOICES_ROOF = { "1.0 (old house)", "0.26 (R22, cellulose/fiberglass)", "0.15 (R38, cellulose/fiberglass)", "0.11 (R50, cellulose/fiberglass)" };
+	final static String[] U_FACTOR_CHOICES_DOOR = { "2.0 (wood)", "0.6 (insulated)" };
+	final static String[] U_FACTOR_CHOICES_WINDOW = { "5.91 (single pane, 3 mm glass)", "3.12 (double pane, 6 mm airspace)", "2.66 (double pane, 6 mm argon space)", "1.53 (double pane, 13 mm argon space)" };
+	final static String[] WINDOW_SHGC_CHOICES = { "25", "50", "80" };
+	final static String[] SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES = { "10", "15", "20" };
 
 	private static final long serialVersionUID = 1L;
 	private static final EnergyPanel instance = new EnergyPanel();
