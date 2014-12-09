@@ -93,7 +93,7 @@ public class MainFrame extends JFrame {
 	private JMenuBar appMenuBar = null;
 	private JMenu fileMenu = null;
 	private int fileMenuItemCount;
-	private List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
+	private final List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
 	private JMenuItem newMenuItem = null;
 	private JMenuItem openMenuItem = null;
 	private JMenuItem openFolderMenuItem = null;
@@ -229,7 +229,7 @@ public class MainFrame extends JFrame {
 		super();
 		System.out.print("Initiating GUI...");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icons/icon.png")));
-		Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+		final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
 		final String directoryPath = pref.get("dir", null);
 		fileChooser = new FileChooser(directoryPath);
 		if (!Config.isWebStart() && directoryPath == null)
@@ -343,19 +343,20 @@ public class MainFrame extends JFrame {
 				public void menuSelected(final MenuEvent e) {
 					MainFrame.this.deselect();
 					if (!recentFileMenuItems.isEmpty()) {
-						for (JComponent x : recentFileMenuItems)
+						for (final JComponent x : recentFileMenuItems)
 							fileMenu.remove(x);
 					}
-					String[] recentFiles = fileChooser.getRecentFiles();
+					final String[] recentFiles = fileChooser.getRecentFiles();
 					if (recentFiles != null) {
-						int n = recentFiles.length;
+						final int n = recentFiles.length;
 						if (n > 0) {
 							for (int i = 0; i < n; i++) {
-								JMenuItem x = new JMenuItem((i + 1) + "  " + Util.getFileName(recentFiles[i]));
+								final JMenuItem x = new JMenuItem((i + 1) + "  " + Util.getFileName(recentFiles[i]));
 								x.setToolTipText(recentFiles[i]);
 								final File rf = new File(recentFiles[i]);
 								x.addActionListener(new ActionListener() {
-									public void actionPerformed(ActionEvent e) {
+									@Override
+									public void actionPerformed(final ActionEvent e) {
 										boolean ok = false;
 										if (Scene.getInstance().isEdited()) {
 											final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -385,7 +386,7 @@ public class MainFrame extends JFrame {
 								fileMenu.insert(x, fileMenuItemCount + i);
 								recentFileMenuItems.add(x);
 							}
-							JSeparator s = new JSeparator();
+							final JSeparator s = new JSeparator();
 							fileMenu.add(s, fileMenuItemCount + n);
 							recentFileMenuItems.add(s);
 						}
@@ -419,7 +420,7 @@ public class MainFrame extends JFrame {
 		return fileMenu;
 	}
 
-	private void addItemToFileMenu(JComponent c) {
+	private void addItemToFileMenu(final JComponent c) {
 		fileMenu.add(c);
 		fileMenuItemCount++;
 	}
@@ -443,10 +444,19 @@ public class MainFrame extends JFrame {
 					} else
 						ok = true;
 					if (ok) {
-						Scene.newFile();
-						SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
-						SceneManager.getInstance().getCameraControl().reset();
-						updateTitleBar();
+						new Thread() {
+							@Override
+							public void run() {
+								try {
+									Scene.newFile();
+									SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+									SceneManager.getInstance().getCameraControl().reset();
+									updateTitleBar();
+								} catch (final Throwable err) {
+									showUnexpectedErrorMessage(err);
+								}
+							}
+						}.start();
 					}
 				}
 			});
@@ -1061,7 +1071,7 @@ public class MainFrame extends JFrame {
 			annualEnergyAnalysisForSelectionMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel) {
 						new EnergyAnnualAnalysis().show("Annual Energy for Selected Part");
 					} else {
@@ -1639,9 +1649,9 @@ public class MainFrame extends JFrame {
 		return roofColorMenuItem;
 	}
 
-	Foundation autoSelectBuilding(boolean ask) {
+	Foundation autoSelectBuilding(final boolean ask) {
 		Foundation foundation = null;
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
 			SceneManager.getInstance().setSelectedPart(null);
 			int count = 0;
@@ -1660,7 +1670,7 @@ public class MainFrame extends JFrame {
 					JOptionPane.showMessageDialog(this, "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 			}
 		} else {
-			HousePart topContainer = selectedPart.getTopContainer();
+			final HousePart topContainer = selectedPart.getTopContainer();
 			if (selectedPart instanceof Foundation) {
 				foundation = (Foundation) selectedPart;
 			} else if (topContainer instanceof Foundation) {
@@ -1683,7 +1693,7 @@ public class MainFrame extends JFrame {
 			Scene.getInstance().setTextureMode(TextureMode.None);
 		}
 		ReadOnlyColorRGBA color = ColorRGBA.WHITE;
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null)
 			color = selectedPart.getColor();
 		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
@@ -1694,7 +1704,7 @@ public class MainFrame extends JFrame {
 				final float[] newColor = c.getComponents(null);
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
-				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart != null) {
 					selectedPart.setColor(color);
 					Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
@@ -1708,18 +1718,18 @@ public class MainFrame extends JFrame {
 		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 	}
 
-	private int countFloors(Foundation foundation) {
+	private int countFloors(final Foundation foundation) {
 		int n = 0;
-		for (HousePart p : Scene.getInstance().getParts()) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == foundation && p instanceof Floor)
 				n++;
 		}
 		return n;
 	}
 
-	private int countDoors(Foundation foundation) {
+	private int countDoors(final Foundation foundation) {
 		int n = 0;
-		for (HousePart p : Scene.getInstance().getParts()) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == foundation && p instanceof Door)
 				n++;
 		}
@@ -1798,28 +1808,28 @@ public class MainFrame extends JFrame {
 					break;
 				case DRAW_WALL:
 					// Scene.getInstance().setWallColor(color);
-					for (HousePart p : Scene.getInstance().getParts()) {
+					for (final HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Wall && p.getTopContainer() == foundation)
 							p.setColor(color);
 					}
 					break;
 				case DRAW_DOOR:
 					// Scene.getInstance().setDoorColor(color);
-					for (HousePart p : Scene.getInstance().getParts()) {
+					for (final HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Door && p.getTopContainer() == foundation)
 							p.setColor(color);
 					}
 					break;
 				case DRAW_FLOOR:
 					// Scene.getInstance().setFloorColor(color);
-					for (HousePart p : Scene.getInstance().getParts()) {
+					for (final HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Floor && p.getTopContainer() == foundation)
 							p.setColor(color);
 					}
 					break;
 				case DRAW_ROOF_PYRAMID:
 					// Scene.getInstance().setRoofColor(color);
-					for (HousePart p : Scene.getInstance().getParts()) {
+					for (final HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Roof && p.getTopContainer() == foundation)
 							p.setColor(color);
 					}
@@ -1860,11 +1870,11 @@ public class MainFrame extends JFrame {
 	}
 
 	public void exit() {
-		String[] recentFiles = fileChooser.getRecentFiles();
+		final String[] recentFiles = fileChooser.getRecentFiles();
 		if (recentFiles != null) {
-			int n = recentFiles.length;
+			final int n = recentFiles.length;
 			if (n > 0) {
-				Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+				final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
 				for (int i = 0; i < n; i++)
 					pref.put("Recent File " + i, recentFiles[n - i - 1]);
 			}
