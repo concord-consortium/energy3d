@@ -371,27 +371,6 @@ public abstract class Roof extends HousePart {
 	}
 
 	@Override
-	public void flattenInit() {
-		flatten(1.0);
-		synchronized (roofPartsRoot.getChildren()) {
-			for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
-				roofPartNode.setTranslation(0, 0, 0);
-
-				final Mesh mesh = (Mesh) ((Node) roofPartNode).getChild(0);
-				// The following code is needed because the center of bounding box is not accurate. If oriented bounding box is usde then this code is no longer required.
-				final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-				buf.rewind();
-				final Vector3 p = new Vector3(buf.get(), buf.get(), buf.get());
-				roofPartNode.getTransform().applyForward(p);
-
-				final Vector3 orgCenter = new Vector3(roofPartNode.getWorldBound().getCenter());
-				orgCenter.setY(p.getY());
-				orgCenters.put((Node) roofPartNode, orgCenter);
-			}
-		}
-	}
-
-	@Override
 	public void flatten(final double flattenTime) {
 		synchronized (roofPartsRoot.getChildren()) {
 			for (final Spatial child : getRoofPartsRoot().getChildren()) {
@@ -869,10 +848,8 @@ public abstract class Roof extends HousePart {
 		roofPartPrintVerticalMap.put(roofPartNode, isVertical);
 		flattenQuadTriangle((Node) roofPartNode, 1.0);
 		roofPartNode.updateGeometricState(0);
-		// orgCenters.put((Node) roofPartNode, null);
 		final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
 		final ReadOnlyVector3 center = computeOrientedBoundingBox(roofPartMesh);
-		// orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
 		orgCenters.put((Node) roofPartNode, center);
 	}
 

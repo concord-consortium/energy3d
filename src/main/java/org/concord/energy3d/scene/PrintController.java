@@ -119,6 +119,7 @@ public class PrintController implements Updater {
 						printParts.add(printPart);
 						Scene.getRoot().attachChild(printPart.getRoot());
 						printPart.setOriginal(part);
+						printPart.flatten(1.0);
 					}
 				}
 
@@ -376,13 +377,13 @@ public class PrintController implements Updater {
 
 		pageLeft = pageFormat.getImageableX() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
 		pageRight = (pageFormat.getImageableX() + pageFormat.getImageableWidth()) * fromPageToWorldCoord - spaceBetweenParts / 2.0;
-		pageTop = pageFormat.getImageableY() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
+		pageTop = pageFormat.getImageableY() * fromPageToWorldCoord;
 		if (labelHeight == 0.0) {
 			final BMText label = Annotation.makeNewLabel();
 			label.setFontScale(0.5);
 			labelHeight = label.getHeight();
 		}
-		pageBottom = (pageFormat.getImageableY() + pageFormat.getImageableHeight()) * fromPageToWorldCoord - spaceBetweenParts / 2.0 - labelHeight;
+		pageBottom = (pageFormat.getImageableY() + pageFormat.getImageableHeight()) * fromPageToWorldCoord;
 
 		pageWidth = pageFormat.getWidth() * fromPageToWorldCoord;
 		pageHeight = pageFormat.getHeight() * fromPageToWorldCoord;

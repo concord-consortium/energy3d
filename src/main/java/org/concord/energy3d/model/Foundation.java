@@ -701,12 +701,6 @@ public class Foundation extends HousePart {
 	}
 
 	@Override
-	public void flattenInit() {
-		super.flattenInit();
-		flattenCenter.setY(0);
-	}
-
-	@Override
 	public void flatten(final double flattenTime) {
 		root.setRotation((new Matrix3().fromAngles(flattenTime * Math.PI / 2, 0, 0)));
 		super.flatten(flattenTime);
@@ -855,7 +849,7 @@ public class Foundation extends HousePart {
 
 	private Path2D.Double path;
 
-	public boolean insideBuilding(double x, double y, boolean init) {
+	public boolean insideBuilding(final double x, final double y, final boolean init) {
 		if (init) {
 			initFloor();
 			final int n = floorVertices.size();
@@ -985,7 +979,7 @@ public class Foundation extends HousePart {
 			return super.getAbsPoint(index);
 	}
 
-	public void setLockEdit(boolean b) {
+	public void setLockEdit(final boolean b) {
 		lockEdit = b;
 	}
 

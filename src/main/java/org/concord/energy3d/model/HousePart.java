@@ -511,10 +511,8 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void computeOrientedBoundingBox() {
-		// flattenCenter.set(0, 0, 0);
 		final ReadOnlyVector3 center = computeOrientedBoundingBox(mesh);
 		flattenCenter.set(center);
-		// flattenCenter.set(mesh.getWorldBound().getCenter());
 	}
 
 	protected ReadOnlyVector3 computeOrientedBoundingBox(final Mesh mesh) {
@@ -531,12 +529,6 @@ public abstract class HousePart implements Serializable {
 		boundingBox.transform(mesh.getWorldTransform().invert(null), mesh.getModelBound());
 		mesh.updateWorldBound(true);
 		return boundingBox.getCenter();
-	}
-
-	public void flattenInit() {
-		flattenCenter = new Vector3();
-		flatten(1.0);
-		flattenCenter = new Vector3(mesh.getWorldBound().getCenter());
 	}
 
 	protected ReadOnlyVector3 getCenter() {
