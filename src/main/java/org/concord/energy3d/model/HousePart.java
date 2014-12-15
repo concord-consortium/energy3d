@@ -819,15 +819,19 @@ public abstract class HousePart implements Serializable {
 		double area = 0.0;
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		buf.rewind();
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		while (buf.hasRemaining()) {
 			final Vector3 p1 = new Vector3(buf.get(), buf.get(), buf.get());
 			final Vector3 p2 = new Vector3(buf.get(), buf.get(), buf.get());
 			final Vector3 p3 = new Vector3(buf.get(), buf.get(), buf.get());
-			final double trigArea = p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;
+			final double trigArea = computeTriangleArea(p1, p2, p3);
 			area += trigArea;
 		}
 		return area;
+	}
+
+	public double computeTriangleArea(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
+		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		return p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;
 	}
 
 	public void setFreeze(final boolean freeze) {
