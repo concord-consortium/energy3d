@@ -473,8 +473,7 @@ public class PrintController implements Updater {
 		if (!isFitted) {
 			printPart.updateWorldBound(true);
 			final OrientedBoundingBox bounds = (OrientedBoundingBox) printPart.getWorldBound().asType(Type.OBB);
-			final double y = 0; //Scene.getOriginalHouseRoot().getWorldBound().getCenter().getY();
-			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getExtent().getX() + pageLeft, y, -bounds.getExtent().getZ() - pageTop));
+			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getExtent().getX() + pageLeft, 0, -bounds.getExtent().getZ() - pageTop));
 			final ArrayList<Spatial> page = new ArrayList<Spatial>();
 			page.add(printPart);
 			pages.add(page);
