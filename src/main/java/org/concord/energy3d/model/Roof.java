@@ -57,6 +57,7 @@ public abstract class Roof extends HousePart {
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
 	private transient List<ReadOnlyVector3> wallUpperPoints;
+	private transient List<ReadOnlyVector3> wallUpperPointsWithoutOverhang;
 	private transient List<ReadOnlyVector3> wallNormals;
 	private transient List<Wall> walls;
 	private transient HousePart previousContainer;
@@ -155,6 +156,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	public void drawRoof() {
+		wallUpperPointsWithoutOverhang = new ArrayList<ReadOnlyVector3>(wallUpperPoints);
 		applyOverhang(wallUpperPoints, wallNormals);
 		processRoofEditPoints(wallUpperPoints);
 		computeGableEditPoints();
@@ -223,8 +225,8 @@ public abstract class Roof extends HousePart {
 					if (result.isEmpty()) {
 						dashLinesMesh.setVisible(false);
 					} else {
-						if (result.get(0).distance(result.get(result.size() - 1)) < 0.5)
-							result.remove(result.size() - 1);
+						// if (result.get(0).distance(result.get(result.size() - 1)) < 0.5)
+						// result.remove(result.size() - 1);
 						dashLinesMesh.setVisible(true);
 						FloatBuffer vertexBuffer = dashLinesMesh.getMeshData().getVertexBuffer();
 						if (vertexBuffer == null || vertexBuffer.capacity() < result.size() * 3) {
@@ -240,21 +242,59 @@ public abstract class Roof extends HousePart {
 						dashLinesMesh.getMeshData().updateVertexCount();
 						dashLinesMesh.updateModelBound();
 
-						vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
-						vertexBuffer.rewind();
-						final Vector3 p = new Vector3();
-						ReadOnlyVector3 highPoint = null;
-						while (vertexBuffer.hasRemaining()) {
-							p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-							if (highPoint == null || highPoint.getZ() < p.getZ())
-								highPoint = new Vector3(p);
-						}
-						double area = 0;
+						/* compute area */
 						for (int i = 0; i < result.size(); i++)
 							System.out.println(result.get(i));
 
-						for (int i = 0; i < result.size() - 1; i++)
+						vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
+						vertexBuffer.rewind();
+						final Vector3 p = new Vector3();
+						double highPointZ = Double.NEGATIVE_INFINITY;
+						final List<ReadOnlyVector3> highPoints = new ArrayList<ReadOnlyVector3>();
+						final List<ReadOnlyVector3> lowPoints = new ArrayList<ReadOnlyVector3>();
+						while (vertexBuffer.hasRemaining()) {
+							p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+							if (Util.insidePolygon(p, wallUpperPointsWithoutOverhang) && p.getZ() >= highPointZ - MathUtils.ZERO_TOLERANCE) {
+								highPointZ = p.getZ();
+								highPoints.add(new Vector3(p));
+							} else
+								lowPoints.add(new Vector3(p));
+						}
+
+						ReadOnlyVector3 highPoint = null;
+
+						if (highPoints.size() <= 1)
+							highPoint = highPoints.get(0);
+						else {
+							double highestDistance = 0;
+							for (final ReadOnlyVector3 highP : highPoints)
+								for (final ReadOnlyVector3 lowP : lowPoints) {
+									final double distance = highP.distance(lowP);
+									if (distance > highestDistance) {
+										highestDistance = distance;
+										highPoint = highP;
+									}
+								}
+						}
+
+						double area = 0;
+						for (int i = 0; i < result.size() - 1; i += 2)
 							area += computeTriangleArea(result.get(i), result.get(i + 1), highPoint);
+
+						if (highPoints.size() > 1) {
+							ReadOnlyVector3 otherHighPoint = null;
+							double highestDistance = 0;
+							for (final ReadOnlyVector3 highP : highPoints)
+								if (highP != highPoint) {
+									final double distance = highP.distance(highPoint);
+									if (distance > highestDistance) {
+										highestDistance = distance;
+										otherHighPoint = highP;
+									}
+								}
+							if (otherHighPoint != null)
+								area += computeTriangleArea(result.get(result.size() - 1), highPoint, otherHighPoint);
+						}
 						// result.add(new Vector3(0, 0, 50));
 						// final Mesh mesh = new Mesh("Area Mesh");
 						// final PolygonWithHoles polygon = makePolygon(result);
@@ -296,11 +336,12 @@ public abstract class Roof extends HousePart {
 			final ReadOnlyVector3 currentStretchPoint = findRoofIntersection(roof, p);
 
 			if (currentStretchPoint != null && !firstInsert) {
-				if (result.isEmpty() || currentStretchPoint.distance(result.get(result.size() - 1)) > minDistance)
-					result.add(currentStretchPoint);
+				// if (result.isEmpty() || currentStretchPoint.distance(result.get(result.size() - 1)) > minDistance)
+				result.add(currentStretchPoint);
 				firstInsert = true;
 			} else if (currentStretchPoint == null) {
-				if (previousStretchPoint != null && previousStretchPoint.distance(result.get(result.size() - 1)) > minDistance)
+				// if (previousStretchPoint != null && previousStretchPoint.distance(result.get(result.size() - 1)) > minDistance)
+				if (previousStretchPoint != null)
 					result.add(previousStretchPoint);
 				direction = null;
 				firstInsert = false;
@@ -308,9 +349,11 @@ public abstract class Roof extends HousePart {
 				final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();
 				if (direction == null) {
 					direction = currentDirection;
-				} else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE && currentStretchPoint.distance(result.get(result.size() - 1)) > minDistance) {
-					direction = null;
+					// } else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE && currentStretchPoint.distance(result.get(result.size() - 1)) > minDistance) {
+				} else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE) {
 					result.add(currentStretchPoint);
+					result.add(currentStretchPoint);
+					direction = null;
 				}
 			}
 			previousStretchPoint = currentStretchPoint;
