@@ -97,6 +97,7 @@ public abstract class Roof extends HousePart {
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
 		roofPartPrintVerticalMap = new HashMap<Spatial, Boolean>();
+		areaWithoutOverhangByPart = new HashMap<Mesh, Double>();
 
 		roofPartsRoot = new Node("Roof Meshes Root");
 		root.attachChild(roofPartsRoot);
@@ -131,14 +132,21 @@ public abstract class Roof extends HousePart {
 		}
 		roofPartsRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
-		final double orgOverhang = Scene.getInstance().getOverhangLength();
-		Scene.getInstance().setOverhangLength(0);
-		try {
-			drawRoof();
-			computeAndSaveArea();
-		} finally {
-			Scene.getInstance().setOverhangLength(orgOverhang);
-		}
+		if (height == 0) {
+			final double orgOverhang = Scene.getInstance().getOverhangLength();
+			Scene.getInstance().setOverhangLength(0);
+			try {
+				drawRoof();
+				if (roofPartsRoot.getNumberOfChildren() == 1)
+					areaWithoutOverhang = super.computeArea((Mesh) ((Node) roofPartsRoot.getChild(0)).getChild(0));
+				else
+					areaWithoutOverhang = 0;
+			} finally {
+				Scene.getInstance().setOverhangLength(orgOverhang);
+			}
+		} else
+			areaWithoutOverhang = 0;
+
 		drawRoof();
 		// computeAndSaveArea();
 		int roofPartIndex = 0;
@@ -152,6 +160,7 @@ public abstract class Roof extends HousePart {
 		roofPartsRoot.updateWorldBound(true);
 		drawOutline();
 		drawDashLines();
+		computeAreaWithoutOverhang();
 		drawHeatFlux();
 	}
 
@@ -204,29 +213,10 @@ public abstract class Roof extends HousePart {
 					final Node roofPartNode = (Node) roofPart;
 					final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
 					final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
-					final ArrayList<ReadOnlyVector3> result = new ArrayList<ReadOnlyVector3>();
-					((Wall) container).visitNeighbors(new WallVisitor() {
-						@Override
-						public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
-							final int indexP1, indexP2;
-							if (nextSnap != null) {
-								indexP2 = nextSnap.getSnapPointIndexOf(currentWall);
-								indexP1 = indexP2 == 2 ? 0 : 2;
-							} else if (prevSnap != null) {
-								indexP1 = prevSnap.getSnapPointIndexOf(currentWall);
-								indexP2 = indexP1 == 2 ? 0 : 2;
-							} else {
-								indexP1 = 0;
-								indexP2 = 2;
-							}
-							stretchToRoof(result, roofPartMesh, currentWall.getAbsPoint(indexP1), currentWall.getAbsPoint(indexP2));
-						}
-					});
+					final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
 					if (result.isEmpty()) {
 						dashLinesMesh.setVisible(false);
 					} else {
-						// if (result.get(0).distance(result.get(result.size() - 1)) < 0.5)
-						// result.remove(result.size() - 1);
 						dashLinesMesh.setVisible(true);
 						FloatBuffer vertexBuffer = dashLinesMesh.getMeshData().getVertexBuffer();
 						if (vertexBuffer == null || vertexBuffer.capacity() < result.size() * 3) {
@@ -241,73 +231,110 @@ public abstract class Roof extends HousePart {
 
 						dashLinesMesh.getMeshData().updateVertexCount();
 						dashLinesMesh.updateModelBound();
-
-						/* compute area */
-						for (int i = 0; i < result.size(); i++)
-							System.out.println(result.get(i));
-
-						vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
-						vertexBuffer.rewind();
-						final Vector3 p = new Vector3();
-						double highPointZ = Double.NEGATIVE_INFINITY;
-						final List<ReadOnlyVector3> highPoints = new ArrayList<ReadOnlyVector3>();
-						final List<ReadOnlyVector3> lowPoints = new ArrayList<ReadOnlyVector3>();
-						while (vertexBuffer.hasRemaining()) {
-							p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-							if (Util.insidePolygon(p, wallUpperPointsWithoutOverhang) && p.getZ() >= highPointZ - MathUtils.ZERO_TOLERANCE) {
-								highPointZ = p.getZ();
-								highPoints.add(new Vector3(p));
-							} else
-								lowPoints.add(new Vector3(p));
-						}
-
-						ReadOnlyVector3 highPoint = null;
-
-						if (highPoints.size() <= 1)
-							highPoint = highPoints.get(0);
-						else {
-							double highestDistance = 0;
-							for (final ReadOnlyVector3 highP : highPoints)
-								for (final ReadOnlyVector3 lowP : lowPoints) {
-									final double distance = highP.distance(lowP);
-									if (distance > highestDistance) {
-										highestDistance = distance;
-										highPoint = highP;
-									}
-								}
-						}
-
-						double area = 0;
-						for (int i = 0; i < result.size() - 1; i += 2)
-							area += computeTriangleArea(result.get(i), result.get(i + 1), highPoint);
-
-						if (highPoints.size() > 1) {
-							ReadOnlyVector3 otherHighPoint = null;
-							double highestDistance = 0;
-							for (final ReadOnlyVector3 highP : highPoints)
-								if (highP != highPoint) {
-									final double distance = highP.distance(highPoint);
-									if (distance > highestDistance) {
-										highestDistance = distance;
-										otherHighPoint = highP;
-									}
-								}
-							if (otherHighPoint != null)
-								area += computeTriangleArea(result.get(result.size() - 1), highPoint, otherHighPoint);
-						}
-						// result.add(new Vector3(0, 0, 50));
-						// final Mesh mesh = new Mesh("Area Mesh");
-						// final PolygonWithHoles polygon = makePolygon(result);
-						// MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
-						// roofPartNode.attachChild(mesh);
-
-						System.out.println(area);
-						System.out.println(super.computeArea(roofPartMesh));
-
 					}
 				}
 			}
+
+		System.out.println("Total Area = " + areaWithoutOverhang);
+
 		updateDashLinesColor();
+	}
+
+	private void computeAreaWithoutOverhang() {
+		if (container == null || isFrozen())
+			return;
+
+		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+			final Node roofPartNode = (Node) roofPart;
+			final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
+			final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
+			if (!result.isEmpty()) {
+				/* compute area */
+				if (roofPartsRoot.getNumberOfChildren() > 1) {
+					for (int i = 0; i < result.size(); i++)
+						System.out.println(result.get(i));
+
+					final FloatBuffer vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
+					vertexBuffer.rewind();
+					final Vector3 p = new Vector3();
+					double highPointZ = Double.NEGATIVE_INFINITY;
+					final List<ReadOnlyVector3> highPoints = new ArrayList<ReadOnlyVector3>();
+					final List<ReadOnlyVector3> lowPoints = new ArrayList<ReadOnlyVector3>();
+					while (vertexBuffer.hasRemaining()) {
+						p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+						if (Util.insidePolygon(p, wallUpperPointsWithoutOverhang) && p.getZ() >= highPointZ - MathUtils.ZERO_TOLERANCE) {
+							highPointZ = p.getZ();
+							highPoints.add(new Vector3(p));
+						} else
+							lowPoints.add(new Vector3(p));
+					}
+
+					ReadOnlyVector3 highPoint = null;
+
+					if (highPoints.size() <= 1)
+						highPoint = highPoints.get(0);
+					else {
+						double highestDistance = 0;
+						for (final ReadOnlyVector3 highP : highPoints)
+							for (final ReadOnlyVector3 lowP : lowPoints) {
+								final double distance = highP.distance(lowP);
+								if (distance > highestDistance) {
+									highestDistance = distance;
+									highPoint = highP;
+								}
+							}
+					}
+
+					double area = 0;
+					for (int i = 0; i < result.size() - 1; i += 2)
+						area += computeTriangleArea(result.get(i), result.get(i + 1), highPoint);
+
+					if (highPoints.size() > 1) {
+						ReadOnlyVector3 otherHighPoint = null;
+						double highestDistance = 0;
+						for (final ReadOnlyVector3 highP : highPoints)
+							if (highP != highPoint) {
+								final double distance = highP.distance(highPoint);
+								if (distance > highestDistance) {
+									highestDistance = distance;
+									otherHighPoint = highP;
+								}
+							}
+						if (otherHighPoint != null)
+							area += computeTriangleArea(result.get(result.size() - 1), highPoint, otherHighPoint);
+					}
+
+					areaWithoutOverhangByPart.put(mesh, area);
+					areaWithoutOverhang += area;
+
+					System.out.println(area);
+					System.out.println(super.computeArea(roofPartMesh));
+				}
+			}
+		}
+		System.out.println("Total Area = " + areaWithoutOverhang);
+	}
+
+	public ArrayList<ReadOnlyVector3> computeDashPoints(final Mesh roofPartMesh) {
+		final ArrayList<ReadOnlyVector3> result = new ArrayList<ReadOnlyVector3>();
+		((Wall) container).visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
+				final int indexP1, indexP2;
+				if (nextSnap != null) {
+					indexP2 = nextSnap.getSnapPointIndexOf(currentWall);
+					indexP1 = indexP2 == 2 ? 0 : 2;
+				} else if (prevSnap != null) {
+					indexP1 = prevSnap.getSnapPointIndexOf(currentWall);
+					indexP2 = indexP1 == 2 ? 0 : 2;
+				} else {
+					indexP1 = 0;
+					indexP2 = 2;
+				}
+				stretchToRoof(result, roofPartMesh, currentWall.getAbsPoint(indexP1), currentWall.getAbsPoint(indexP2));
+			}
+		});
+		return result;
 	}
 
 	public void updateDashLinesColor() {
@@ -992,21 +1019,6 @@ public abstract class Roof extends HousePart {
 	@Override
 	public double computeArea(final Mesh mesh) {
 		return areaWithoutOverhangByPart.get(mesh);
-	}
-
-	public void computeAndSaveArea() {
-		if (areaWithoutOverhangByPart == null)
-			areaWithoutOverhangByPart = new HashMap<Mesh, Double>();
-		double area = 0.0;
-		synchronized (roofPartsRoot.getChildren()) {
-			for (final Spatial child : roofPartsRoot.getChildren()) {
-				final Mesh mesh = (Mesh) ((Node) child).getChild(0);
-				final double partArea = super.computeArea(mesh);
-				areaWithoutOverhangByPart.put(mesh, partArea);
-				area += partArea;
-			}
-		}
-		areaWithoutOverhang = area;
 	}
 
 	@Override
