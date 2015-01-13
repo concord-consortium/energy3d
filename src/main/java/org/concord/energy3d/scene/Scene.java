@@ -65,6 +65,7 @@ public class Scene implements Serializable {
 
 	public static final ReadOnlyColorRGBA WHITE = ColorRGBA.WHITE;
 	public static final ReadOnlyColorRGBA GRAY = ColorRGBA.LIGHT_GRAY;
+	public static final double OVERHANG_MIN = 0.01;
 
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
@@ -254,7 +255,7 @@ public class Scene implements Serializable {
 		if (url != null) {
 			synchronized (instance.parts) {
 				for (final HousePart housePart : instance.getParts()) {
-					boolean b = housePart instanceof Tree || housePart instanceof Human;
+					final boolean b = housePart instanceof Tree || housePart instanceof Human;
 					(b ? notReceivingShadowRoot : originalHouseRoot).attachChild(housePart.getRoot());
 				}
 			}
@@ -297,32 +298,32 @@ public class Scene implements Serializable {
 
 		// backward compatibility
 		if (instance.windowUFactor != null) {
-			double defaultWindowUFactor = parsePropertyString(instance.windowUFactor);
-			for (HousePart p : instance.parts) {
+			final double defaultWindowUFactor = parsePropertyString(instance.windowUFactor);
+			for (final HousePart p : instance.parts) {
 				if (p.getUFactor() <= 0 && p instanceof Window)
 					p.setUFactor(defaultWindowUFactor);
 			}
 			energyPanel.getWindowsComboBox().setSelectedItem(instance.windowUFactor);
 		}
 		if (instance.wallUFactor != null) {
-			double defaultWallUFactor = parsePropertyString(instance.wallUFactor);
-			for (HousePart p : instance.parts) {
+			final double defaultWallUFactor = parsePropertyString(instance.wallUFactor);
+			for (final HousePart p : instance.parts) {
 				if (p.getUFactor() <= 0 && p instanceof Wall)
 					p.setUFactor(defaultWallUFactor);
 			}
 			energyPanel.getWallsComboBox().setSelectedItem(instance.wallUFactor);
 		}
 		if (instance.doorUFactor != null) {
-			double defaultDoorUFactor = parsePropertyString(instance.doorUFactor);
-			for (HousePart p : instance.parts) {
+			final double defaultDoorUFactor = parsePropertyString(instance.doorUFactor);
+			for (final HousePart p : instance.parts) {
 				if (p.getUFactor() <= 0 && p instanceof Door)
 					p.setUFactor(defaultDoorUFactor);
 			}
 			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
 		}
 		if (instance.roofUFactor != null) {
-			double defaultRoofUFactor = parsePropertyString(instance.roofUFactor);
-			for (HousePart p : instance.parts) {
+			final double defaultRoofUFactor = parsePropertyString(instance.roofUFactor);
+			for (final HousePart p : instance.parts) {
 				if (p.getUFactor() <= 0 && p instanceof Roof)
 					p.setUFactor(defaultRoofUFactor);
 			}
@@ -331,9 +332,9 @@ public class Scene implements Serializable {
 
 		if (Util.isZero(instance.solarPanelEfficiency))
 			instance.solarPanelEfficiency = 10;
-		for (HousePart p : instance.parts) {
+		for (final HousePart p : instance.parts) {
 			if (p instanceof SolarPanel) {
-				SolarPanel sp = (SolarPanel) p;
+				final SolarPanel sp = (SolarPanel) p;
 				if (Util.isZero(sp.getEfficiency()))
 					sp.setEfficiency(instance.solarPanelEfficiency);
 			}
@@ -344,9 +345,9 @@ public class Scene implements Serializable {
 			instance.windowSolarHeatGainCoefficient = 50;
 		else if (instance.windowSolarHeatGainCoefficient < 1)
 			instance.windowSolarHeatGainCoefficient *= 100; // backward compatibility (when SHGC < 1)
-		for (HousePart p : instance.parts) {
+		for (final HousePart p : instance.parts) {
 			if (p instanceof Window) {
-				Window w = (Window) p;
+				final Window w = (Window) p;
 				if (Util.isZero(w.getSolarHeatGainCoefficient()))
 					w.setSolarHeatGainCoefficient(instance.windowSolarHeatGainCoefficient);
 			}
@@ -771,8 +772,8 @@ public class Scene implements Serializable {
 	}
 
 	public double getOverhangLength() {
-		if (overhangLength < 0.01)
-			return 0.01;
+		if (overhangLength < OVERHANG_MIN)
+			return OVERHANG_MIN;
 		else
 			return overhangLength;
 	}
@@ -924,7 +925,7 @@ public class Scene implements Serializable {
 		return backgroundAlbedo;
 	}
 
-	public void setHeatVectorLength(double heatVectorLength) {
+	public void setHeatVectorLength(final double heatVectorLength) {
 		this.heatVectorLength = heatVectorLength;
 	}
 
@@ -932,9 +933,9 @@ public class Scene implements Serializable {
 		return heatVectorLength;
 	}
 
-	public int countParts(Foundation foundation, Class<?> clazz) {
+	public int countParts(final Foundation foundation, final Class<?> clazz) {
 		int count = 0;
-		for (HousePart p : parts) {
+		for (final HousePart p : parts) {
 			if (p.getTopContainer() == foundation && clazz.isInstance(p))
 				count++;
 		}

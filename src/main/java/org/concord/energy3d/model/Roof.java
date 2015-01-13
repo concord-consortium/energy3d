@@ -234,9 +234,6 @@ public abstract class Roof extends HousePart {
 					}
 				}
 			}
-
-		System.out.println("Total Area = " + areaWithoutOverhang);
-
 		updateDashLinesColor();
 	}
 
@@ -247,68 +244,94 @@ public abstract class Roof extends HousePart {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 			final Node roofPartNode = (Node) roofPart;
 			final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
-			final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
-			if (!result.isEmpty()) {
-				/* compute area */
-				if (roofPartsRoot.getNumberOfChildren() > 1) {
-					for (int i = 0; i < result.size(); i++)
-						System.out.println(result.get(i));
-
-					final FloatBuffer vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
-					vertexBuffer.rewind();
-					final Vector3 p = new Vector3();
-					double highPointZ = Double.NEGATIVE_INFINITY;
-					final List<ReadOnlyVector3> highPoints = new ArrayList<ReadOnlyVector3>();
-					final List<ReadOnlyVector3> lowPoints = new ArrayList<ReadOnlyVector3>();
-					while (vertexBuffer.hasRemaining()) {
-						p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-						if (Util.insidePolygon(p, wallUpperPointsWithoutOverhang) && p.getZ() >= highPointZ - MathUtils.ZERO_TOLERANCE) {
-							highPointZ = p.getZ();
-							highPoints.add(new Vector3(p));
-						} else
-							lowPoints.add(new Vector3(p));
-					}
-
-					ReadOnlyVector3 highPoint = null;
-
-					if (highPoints.size() <= 1)
-						highPoint = highPoints.get(0);
-					else {
-						double highestDistance = 0;
-						for (final ReadOnlyVector3 highP : highPoints)
-							for (final ReadOnlyVector3 lowP : lowPoints) {
-								final double distance = highP.distance(lowP);
-								if (distance > highestDistance) {
-									highestDistance = distance;
-									highPoint = highP;
-								}
-							}
-					}
-
-					double area = 0;
-					for (int i = 0; i < result.size() - 1; i += 2)
-						area += computeTriangleArea(result.get(i), result.get(i + 1), highPoint);
-
-					if (highPoints.size() > 1) {
-						ReadOnlyVector3 otherHighPoint = null;
-						double highestDistance = 0;
-						for (final ReadOnlyVector3 highP : highPoints)
-							if (highP != highPoint) {
-								final double distance = highP.distance(highPoint);
-								if (distance > highestDistance) {
-									highestDistance = distance;
-									otherHighPoint = highP;
-								}
-							}
-						if (otherHighPoint != null)
-							area += computeTriangleArea(result.get(result.size() - 1), highPoint, otherHighPoint);
-					}
-
+			if (Scene.getInstance().getOverhangLength() <= Scene.OVERHANG_MIN) {
+				final double area = super.computeArea(roofPartMesh);
+				areaWithoutOverhangByPart.put(mesh, area);
+				areaWithoutOverhang += area;
+				System.out.println(area);
+			} else {
+				final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
+				if (result.isEmpty()) {
+					final double area = super.computeArea(roofPartMesh);
 					areaWithoutOverhangByPart.put(mesh, area);
 					areaWithoutOverhang += area;
-
 					System.out.println(area);
-					System.out.println(super.computeArea(roofPartMesh));
+				} else {
+					if (roofPartsRoot.getNumberOfChildren() > 1) {
+						final FloatBuffer vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
+						final Vector3 p = new Vector3();
+						double highPointZ = Double.NEGATIVE_INFINITY;
+						vertexBuffer.rewind();
+						while (vertexBuffer.hasRemaining()) {
+							p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+							if (p.getZ() > highPointZ)
+								highPointZ = p.getZ();
+						}
+
+						final List<ReadOnlyVector3> highPoints = new ArrayList<ReadOnlyVector3>();
+						final List<ReadOnlyVector3> lowPoints = new ArrayList<ReadOnlyVector3>();
+						vertexBuffer.rewind();
+						while (vertexBuffer.hasRemaining()) {
+							p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+							if (p.getZ() >= highPointZ - MathUtils.ZERO_TOLERANCE)
+								highPoints.add(new Vector3(p));
+							else
+								lowPoints.add(new Vector3(p));
+						}
+
+						ReadOnlyVector3 highPoint = null;
+
+						if (highPoints.size() < 2)
+							highPoint = highPoints.get(0);
+						else if (!lowPoints.isEmpty()) {
+							double highestDistance = 0;
+							for (final ReadOnlyVector3 highP1 : highPoints)
+								for (final ReadOnlyVector3 highP2 : highPoints)
+									if (highP1 != highP2) {
+										final double distance = highP1.distance(highP2);
+										if (distance > highestDistance) {
+											highestDistance = distance;
+											highPoint = highP1;
+										}
+									}
+						} else {
+							double highestDistance = 0;
+							for (final ReadOnlyVector3 highP : highPoints)
+								for (final ReadOnlyVector3 lowP : lowPoints) {
+									final double distance = highP.distance(lowP);
+									if (distance > highestDistance) {
+										highestDistance = distance;
+										highPoint = highP;
+									}
+								}
+						}
+
+						double area = 0;
+						for (int i = 0; i < result.size() - 1; i += 2)
+							area += computeTriangleArea(result.get(i), result.get(i + 1), highPoint);
+
+						if (highPoints.size() > 1) {
+							ReadOnlyVector3 otherHighPoint = null;
+							double highestDistance = 0;
+							for (final ReadOnlyVector3 highP : highPoints)
+								if (highP != highPoint) {
+									final double distance = highP.distance(highPoint);
+									if (distance > highestDistance) {
+										highestDistance = distance;
+										otherHighPoint = highP;
+									}
+								}
+							if (otherHighPoint != null)
+								area += computeTriangleArea(result.get(result.size() - 1), highPoint, otherHighPoint);
+						}
+
+						areaWithoutOverhangByPart.put(mesh, area);
+						areaWithoutOverhang += area;
+
+						System.out.println("------");
+						System.out.println(area);
+						System.out.println(super.computeArea(roofPartMesh));
+					}
 				}
 			}
 		}
