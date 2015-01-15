@@ -56,13 +56,12 @@ public abstract class Roof extends HousePart {
 	protected transient Node roofPartsRoot;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
+	private transient Map<Integer, Double> areaWithoutOverhangByPart;
 	private transient List<ReadOnlyVector3> wallUpperPoints;
-	private transient List<ReadOnlyVector3> wallUpperPointsWithoutOverhang;
 	private transient List<ReadOnlyVector3> wallNormals;
 	private transient List<Wall> walls;
 	private transient HousePart previousContainer;
 	private transient double areaWithoutOverhang;
-	private transient Map<Mesh, Double> areaWithoutOverhangByPart;
 	private Map<Integer, List<Wall>> gableEditPointToWallMap = null;
 
 	protected class EditState {
@@ -97,7 +96,6 @@ public abstract class Roof extends HousePart {
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
 		roofPartPrintVerticalMap = new HashMap<Spatial, Boolean>();
-		areaWithoutOverhangByPart = new HashMap<Mesh, Double>();
 
 		roofPartsRoot = new Node("Roof Meshes Root");
 		root.attachChild(roofPartsRoot);
@@ -132,23 +130,16 @@ public abstract class Roof extends HousePart {
 		}
 		roofPartsRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
-		if (height == 0) {
-			final double orgOverhang = Scene.getInstance().getOverhangLength();
-			Scene.getInstance().setOverhangLength(0);
-			try {
-				drawRoof();
-				if (roofPartsRoot.getNumberOfChildren() == 1)
-					areaWithoutOverhang = super.computeArea((Mesh) ((Node) roofPartsRoot.getChild(0)).getChild(0));
-				else
-					areaWithoutOverhang = 0;
-			} finally {
-				Scene.getInstance().setOverhangLength(orgOverhang);
-			}
-		} else
-			areaWithoutOverhang = 0;
+		final double orgOverhang = Scene.getInstance().getOverhangLength();
+		Scene.getInstance().setOverhangLength(0);
+		try {
+			drawRoof();
+			computeAndSaveArea();
+		} finally {
+			Scene.getInstance().setOverhangLength(orgOverhang);
+		}
 
 		drawRoof();
-		// computeAndSaveArea();
 		int roofPartIndex = 0;
 		synchronized (roofPartsRoot.getChildren()) {
 			for (final Spatial child : roofPartsRoot.getChildren()) {
@@ -160,12 +151,10 @@ public abstract class Roof extends HousePart {
 		roofPartsRoot.updateWorldBound(true);
 		drawOutline();
 		drawDashLines();
-		computeAreaWithoutOverhang();
 		drawHeatFlux();
 	}
 
 	public void drawRoof() {
-		wallUpperPointsWithoutOverhang = new ArrayList<ReadOnlyVector3>(wallUpperPoints);
 		applyOverhang(wallUpperPoints, wallNormals);
 		processRoofEditPoints(wallUpperPoints);
 		computeGableEditPoints();
@@ -173,7 +162,6 @@ public abstract class Roof extends HousePart {
 		applySteinerPoint(polygon);
 		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
 		MeshLib.groupByPlanner(mesh, roofPartsRoot);
-		// applyOverhang(wallUpperPoints, wallNormals);
 		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
 		hideGableRoofParts();
 	}
@@ -237,107 +225,6 @@ public abstract class Roof extends HousePart {
 		updateDashLinesColor();
 	}
 
-	private void computeAreaWithoutOverhang() {
-		if (container == null || isFrozen())
-			return;
-
-		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			final Node roofPartNode = (Node) roofPart;
-			final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
-			if (Scene.getInstance().getOverhangLength() <= Scene.OVERHANG_MIN) {
-				final double area = super.computeArea(roofPartMesh);
-				areaWithoutOverhangByPart.put(mesh, area);
-				areaWithoutOverhang += area;
-				System.out.println(area);
-			} else {
-				final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
-				if (result.isEmpty()) {
-					final double area = super.computeArea(roofPartMesh);
-					areaWithoutOverhangByPart.put(mesh, area);
-					areaWithoutOverhang += area;
-					System.out.println(area);
-				} else {
-					if (roofPartsRoot.getNumberOfChildren() > 1) {
-						final FloatBuffer vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
-						final Vector3 p = new Vector3();
-						double highPointZ = Double.NEGATIVE_INFINITY;
-						vertexBuffer.rewind();
-						while (vertexBuffer.hasRemaining()) {
-							p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-							if (p.getZ() > highPointZ)
-								highPointZ = p.getZ();
-						}
-
-						final List<ReadOnlyVector3> highPoints = new ArrayList<ReadOnlyVector3>();
-						final List<ReadOnlyVector3> lowPoints = new ArrayList<ReadOnlyVector3>();
-						vertexBuffer.rewind();
-						while (vertexBuffer.hasRemaining()) {
-							p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-							if (p.getZ() >= highPointZ - MathUtils.ZERO_TOLERANCE)
-								highPoints.add(new Vector3(p));
-							else
-								lowPoints.add(new Vector3(p));
-						}
-
-						ReadOnlyVector3 highPoint = null;
-
-						if (highPoints.size() < 2)
-							highPoint = highPoints.get(0);
-						else if (!lowPoints.isEmpty()) {
-							double highestDistance = 0;
-							for (final ReadOnlyVector3 highP1 : highPoints)
-								for (final ReadOnlyVector3 highP2 : highPoints)
-									if (highP1 != highP2) {
-										final double distance = highP1.distance(highP2);
-										if (distance > highestDistance) {
-											highestDistance = distance;
-											highPoint = highP1;
-										}
-									}
-						} else {
-							double highestDistance = 0;
-							for (final ReadOnlyVector3 highP : highPoints)
-								for (final ReadOnlyVector3 lowP : lowPoints) {
-									final double distance = highP.distance(lowP);
-									if (distance > highestDistance) {
-										highestDistance = distance;
-										highPoint = highP;
-									}
-								}
-						}
-
-						double area = 0;
-						for (int i = 0; i < result.size() - 1; i += 2)
-							area += computeTriangleArea(result.get(i), result.get(i + 1), highPoint);
-
-						if (highPoints.size() > 1) {
-							ReadOnlyVector3 otherHighPoint = null;
-							double highestDistance = 0;
-							for (final ReadOnlyVector3 highP : highPoints)
-								if (highP != highPoint) {
-									final double distance = highP.distance(highPoint);
-									if (distance > highestDistance) {
-										highestDistance = distance;
-										otherHighPoint = highP;
-									}
-								}
-							if (otherHighPoint != null)
-								area += computeTriangleArea(result.get(result.size() - 1), highPoint, otherHighPoint);
-						}
-
-						areaWithoutOverhangByPart.put(mesh, area);
-						areaWithoutOverhang += area;
-
-						System.out.println("------");
-						System.out.println(area);
-						System.out.println(super.computeArea(roofPartMesh));
-					}
-				}
-			}
-		}
-		System.out.println("Total Area = " + areaWithoutOverhang);
-	}
-
 	public ArrayList<ReadOnlyVector3> computeDashPoints(final Mesh roofPartMesh) {
 		final ArrayList<ReadOnlyVector3> result = new ArrayList<ReadOnlyVector3>();
 		((Wall) container).visitNeighbors(new WallVisitor() {
@@ -386,11 +273,9 @@ public abstract class Roof extends HousePart {
 			final ReadOnlyVector3 currentStretchPoint = findRoofIntersection(roof, p);
 
 			if (currentStretchPoint != null && !firstInsert) {
-				// if (result.isEmpty() || currentStretchPoint.distance(result.get(result.size() - 1)) > minDistance)
 				result.add(currentStretchPoint);
 				firstInsert = true;
 			} else if (currentStretchPoint == null) {
-				// if (previousStretchPoint != null && previousStretchPoint.distance(result.get(result.size() - 1)) > minDistance)
 				if (previousStretchPoint != null)
 					result.add(previousStretchPoint);
 				direction = null;
@@ -399,7 +284,6 @@ public abstract class Roof extends HousePart {
 				final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();
 				if (direction == null) {
 					direction = currentDirection;
-					// } else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE && currentStretchPoint.distance(result.get(result.size() - 1)) > minDistance) {
 				} else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE) {
 					result.add(currentStretchPoint);
 					result.add(currentStretchPoint);
@@ -1041,7 +925,21 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	public double computeArea(final Mesh mesh) {
-		return areaWithoutOverhangByPart.get(mesh);
+		return areaWithoutOverhangByPart.get(((UserData) mesh.getUserData()).getIndex());
+	}
+
+	public void computeAndSaveArea() {
+		if (areaWithoutOverhangByPart == null)
+			areaWithoutOverhangByPart = new HashMap<Integer, Double>();
+		areaWithoutOverhang = 0.0;
+		for (int i = 0; i < roofPartsRoot.getNumberOfChildren(); i++) {
+			final Mesh mesh = (Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(0);
+			final double partArea = super.computeArea(mesh);
+			areaWithoutOverhangByPart.put(i, partArea);
+			areaWithoutOverhang += partArea;
+			System.out.println(partArea);
+		}
+		System.out.println("Total Area = " + areaWithoutOverhang);
 	}
 
 	@Override
