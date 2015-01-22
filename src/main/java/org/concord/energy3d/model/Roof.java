@@ -59,7 +59,9 @@ public abstract class Roof extends HousePart {
 	private transient Map<Integer, Double> areaWithoutOverhangByPart;
 	private transient List<ReadOnlyVector3> wallUpperPoints;
 	private transient List<ReadOnlyVector3> wallNormals;
+	private transient List<FloatBuffer> meshPointsWithoutOverhang;
 	private transient List<Wall> walls;
+	private transient int[] areaMap;
 	private transient HousePart previousContainer;
 	private transient double areaWithoutOverhang;
 	private Map<Integer, List<Wall>> gableEditPointToWallMap = null;
@@ -132,6 +134,7 @@ public abstract class Roof extends HousePart {
 
 		final double orgOverhang = Scene.getInstance().getOverhangLength();
 		Scene.getInstance().setOverhangLength(0);
+		final ArrayList<ReadOnlyVector3> wallUpperPointsWithoutOverhang = new ArrayList<ReadOnlyVector3>(wallUpperPoints);
 		try {
 			drawRoof();
 			computeAndSaveArea();
@@ -139,7 +142,9 @@ public abstract class Roof extends HousePart {
 			Scene.getInstance().setOverhangLength(orgOverhang);
 		}
 
+		wallUpperPoints = wallUpperPointsWithoutOverhang;
 		drawRoof();
+		matchAreaParts();
 		int roofPartIndex = 0;
 		synchronized (roofPartsRoot.getChildren()) {
 			for (final Spatial child : roofPartsRoot.getChildren()) {
@@ -558,11 +563,9 @@ public abstract class Roof extends HousePart {
 	protected abstract void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints);
 
 	private void applyOverhang(final List<ReadOnlyVector3> wallUpperPoints, final List<ReadOnlyVector3> wallNormals) {
-		final Vector3 op = new Vector3();
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
-			final ReadOnlyVector3 p = wallUpperPoints.get(i);
-			op.set(wallNormals.get(i)).multiplyLocal(Scene.getInstance().getOverhangLength());
-			wallUpperPoints.set(i, p.add(op, null));
+			final Vector3 overhang = wallNormals.get(i).multiply(Scene.getInstance().getOverhangLength(), null);
+			wallUpperPoints.set(i, overhang.addLocal(wallUpperPoints.get(i)));
 		}
 	}
 
@@ -925,12 +928,14 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	public double computeArea(final Mesh mesh) {
-		return areaWithoutOverhangByPart.get(((UserData) mesh.getUserData()).getIndex());
+		return areaWithoutOverhangByPart.get(areaMap[((UserData) mesh.getUserData()).getIndex()]);
 	}
 
 	public void computeAndSaveArea() {
 		if (areaWithoutOverhangByPart == null)
 			areaWithoutOverhangByPart = new HashMap<Integer, Double>();
+		else
+			areaWithoutOverhangByPart.clear();
 		areaWithoutOverhang = 0.0;
 		for (int i = 0; i < roofPartsRoot.getNumberOfChildren(); i++) {
 			final Mesh mesh = (Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(0);
@@ -939,7 +944,54 @@ public abstract class Roof extends HousePart {
 			areaWithoutOverhang += partArea;
 			System.out.println(partArea);
 		}
+
+		if (meshPointsWithoutOverhang == null)
+			meshPointsWithoutOverhang = new ArrayList<FloatBuffer>();
+		else
+			meshPointsWithoutOverhang.clear();
+		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+			final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+			meshPointsWithoutOverhang.add(mesh.getMeshData().getVertexBuffer());
+		}
+
 		System.out.println("Total Area = " + areaWithoutOverhang);
+	}
+
+	public void matchAreaParts() {
+		areaMap = new int[roofPartsRoot.getNumberOfChildren()];
+		for (int i = 0; i < roofPartsRoot.getNumberOfChildren(); i++) {
+			double bestScore = Double.MAX_VALUE;
+			for (int j = 0; j < meshPointsWithoutOverhang.size(); j++) {
+				final FloatBuffer buf1 = ((Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(0)).getMeshData().getVertexBuffer();
+				final FloatBuffer buf2 = meshPointsWithoutOverhang.get(j);
+				buf1.rewind();
+				double matchScore = 0;
+				while (buf1.hasRemaining()) {
+					final Vector3 p1 = new Vector3(buf1.get(), buf1.get(), buf1.get());
+					buf2.rewind();
+					double closestDistance = Double.MAX_VALUE;
+					while (buf2.hasRemaining()) {
+						final Vector3 p2 = new Vector3(buf2.get(), buf2.get(), buf2.get());
+						final double distance = p1.distance(p2);
+						if (distance < closestDistance) {
+							closestDistance = distance;
+							if (Util.isZero(closestDistance))
+								break;
+						}
+					}
+					matchScore = Math.max(matchScore, closestDistance);
+				}
+				if (matchScore < bestScore) {
+					bestScore = matchScore;
+					areaMap[i] = j;
+				}
+			}
+			System.out.println(areaMap[i] + "\t" + bestScore);
+			// if (bestScore > 2 * Scene.getInstance().getOverhangLength())
+			// areaMap[i] = -1;
+		}
+		// for (final int i : areaMap)
+		// System.out.println(i);
 	}
 
 	@Override
