@@ -195,15 +195,19 @@ public class Util {
 				if (distance < shortestDistance) {
 					shortestDistance = distance;
 					closestPoint = pointOnLine;
-					if (l1.distanceSquared(closestPoint) <= l2.distanceSquared(pointOnLine))
-						closestNormal = wallNormals.get(i);
-					else
-						closestNormal = wallNormals.get((i + 1) % n);
+					if (wallNormals != null) {
+						if (l1.distanceSquared(closestPoint) <= l2.distanceSquared(pointOnLine))
+							closestNormal = wallNormals.get(i);
+						else
+							closestNormal = wallNormals.get((i + 1) % n);
+					}
 				}
 			}
 		}
 
-		closestPoint.addLocal(-closestNormal.getX() / 100.0, -closestNormal.getY() / 100.0);
+		if (wallNormals != null)
+			closestPoint.addLocal(-closestNormal.getX() / 100.0, -closestNormal.getY() / 100.0);
+
 		return closestPoint;
 	}
 
@@ -280,7 +284,7 @@ public class Util {
 	}
 
 	/** return the file name of this path */
-	public static String getFileName(String path) {
+	public static String getFileName(final String path) {
 		if (path == null)
 			return null;
 		int i = path.lastIndexOf("/");
@@ -323,12 +327,12 @@ public class Util {
 			comboBox.addActionListener(x);
 	}
 
-	public static JButton getButtonSubComponent(Container container) {
+	public static JButton getButtonSubComponent(final Container container) {
 		if (container instanceof JButton) {
 			return (JButton) container;
 		} else {
-			Component[] components = container.getComponents();
-			for (Component component : components) {
+			final Component[] components = container.getComponents();
+			for (final Component component : components) {
 				if (component instanceof Container) {
 					return getButtonSubComponent((Container) component);
 				}

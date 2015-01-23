@@ -61,6 +61,7 @@ public abstract class Roof extends HousePart {
 	private transient List<ReadOnlyVector3> wallNormals;
 	private transient List<FloatBuffer> meshPointsWithoutOverhang;
 	private transient List<Wall> walls;
+	private transient List<ReadOnlyVector3> wallUpperPointsWithoutOverhang;
 	private transient int[] areaMap;
 	private transient HousePart previousContainer;
 	private transient double areaWithoutOverhang;
@@ -132,14 +133,20 @@ public abstract class Roof extends HousePart {
 		}
 		roofPartsRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
+		final ArrayList<Vector3> orgPoints = new ArrayList<Vector3>(points.size());
+		for (final ReadOnlyVector3 p : points)
+			orgPoints.add(p.clone());
 		final double orgOverhang = Scene.getInstance().getOverhangLength();
 		Scene.getInstance().setOverhangLength(0);
-		final ArrayList<ReadOnlyVector3> wallUpperPointsWithoutOverhang = new ArrayList<ReadOnlyVector3>(wallUpperPoints);
+		wallUpperPointsWithoutOverhang = new ArrayList<ReadOnlyVector3>(wallUpperPoints);
 		try {
 			drawRoof();
 			computeAndSaveArea();
 		} finally {
 			Scene.getInstance().setOverhangLength(orgOverhang);
+			points.clear();
+			for (final Vector3 p : orgPoints)
+				points.add(p);
 		}
 
 		wallUpperPoints = wallUpperPointsWithoutOverhang;
@@ -163,6 +170,7 @@ public abstract class Roof extends HousePart {
 		applyOverhang(wallUpperPoints, wallNormals);
 		processRoofEditPoints(wallUpperPoints);
 		computeGableEditPoints();
+		ensureEditPointsInside();
 		final PolygonWithHoles polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
 		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
@@ -662,6 +670,35 @@ public abstract class Roof extends HousePart {
 				editPoint.setY(cornerPoint.getY());
 			}
 			points.get(editPointIndex).set(toRelative(editPoint));
+		}
+	}
+
+	private void ensureEditPointsInside() {
+		for (int i = 1; i < points.size(); i++) {
+			final Vector3 editPoint = getAbsPoint(i);
+			final Vector2 p = new Vector2(editPoint.getX(), editPoint.getY());
+
+			if (!insideWallsPolygon(editPoint)) {
+				double closestDistance = Double.MAX_VALUE;
+				int closestIndex = 0;
+				for (int j = 0; j < wallUpperPoints.size(); j++) {
+					final Vector2 l1 = new Vector2(wallUpperPoints.get(j).getX(), wallUpperPoints.get(j).getY());
+					final Vector2 l2 = new Vector2(wallUpperPoints.get((j + 1) % wallUpperPoints.size()).getX(), wallUpperPoints.get((j + 1) % wallUpperPoints.size()).getY());
+					final double distance = p.distance(l1) + p.distance(l2);
+					if (distance < closestDistance) {
+						closestDistance = distance;
+						closestIndex = j;
+					}
+				}
+				final List<ReadOnlyVector3> wallPoints = new ArrayList<ReadOnlyVector3>(2);
+				wallPoints.add(wallUpperPoints.get(closestIndex));
+				wallPoints.add(wallUpperPoints.get((closestIndex + 1) % wallUpperPoints.size()));
+				final ReadOnlyVector2 p2D = Util.snapToPolygon(editPoint, wallPoints, null);
+				editPoint.setX(p2D.getX());
+				editPoint.setY(p2D.getY());
+				editPoint.subtractLocal(walls.get(closestIndex).getFaceDirection().multiply(0.01, null));
+				points.get(i).set(toRelative(editPoint));
+			}
 		}
 	}
 
