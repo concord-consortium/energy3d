@@ -752,8 +752,8 @@ public abstract class HousePart implements Serializable {
 	public String toString() {
 		String s = this.getClass().getSimpleName() + "(" + id + ")";
 		for (int i = 0; i < points.size(); i += 2)
-			s += "\t" + Util.toString(getAbsPoint(i));
-		s += ("\teditPoint = " + editPointIndex);
+			s += "  " + Util.toString2D(getAbsPoint(i));
+		s += ("  editPoint=" + editPointIndex);
 		return s;
 	}
 
