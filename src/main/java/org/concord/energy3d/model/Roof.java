@@ -294,16 +294,12 @@ public abstract class Roof extends HousePart {
 							}
 						}
 						System.out.println("-S----" + ((UserData) roofPartMesh.getUserData()).getIndex());
-
-						final double annotationScale = Scene.getInstance().getAnnotationScale();
-						final double area = Util.GetPolygonPlane(result) * annotationScale * annotationScale;
 						result.add(result.get(0));
-						System.out.println(Util.area3D_Polygon(result.size() - 1, result, (ReadOnlyVector3) roofPart.getUserData()) * annotationScale * annotationScale);
+						final double annotationScale = Scene.getInstance().getAnnotationScale();
+						final double area = Util.area3D_Polygon(result, (ReadOnlyVector3) roofPart.getUserData()) * annotationScale * annotationScale;
 
 						System.out.println(area);
-						// System.out.println(computeArea(roofPartMesh));
 						System.out.println(super.computeArea(roofPartMesh));
-						// System.out.println(areaWithoutOverhangByPart.get(((UserData) mesh.getUserData()).getIndex()));
 
 						areaWithoutOverhangByPart.put(roofPartMesh, area);
 						areaWithoutOverhang += area;

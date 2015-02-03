@@ -349,10 +349,11 @@ public class Util {
 
 	// area3D_Polygon(): compute the area of a 3D planar polygon
 	// Input: int n = the number of vertices in the polygon
-	// Point* V = an array of n+1 points in a 2D plane with V[n]=V[0]
-	// Point N = a normal vector of the polygon's plane
+	// Point* points = an array of n+1 points in a 2D plane with V[n]=V[0]
+	// Point normal = a normal vector of the polygon's plane
 	// Return: the (float) area of the polygon
-	public static double area3D_Polygon(final int n, final ArrayList<ReadOnlyVector3> V, final ReadOnlyVector3 N) {
+	public static double area3D_Polygon(final ArrayList<ReadOnlyVector3> points, final ReadOnlyVector3 normal) {
+		final int n = points.size() - 1;
 		double area = 0;
 		double an, ax, ay, az; // abs value of normal and its coords
 		int coord; // coord to ignore: 1=x, 2=y, 3=z
@@ -362,9 +363,9 @@ public class Util {
 			return 0; // a degenerate polygon
 
 		// select largest abs coordinate to ignore for projection
-		ax = (N.getX() > 0 ? N.getX() : -N.getX()); // abs x-coord
-		ay = (N.getY() > 0 ? N.getY() : -N.getY()); // abs y-coord
-		az = (N.getZ() > 0 ? N.getZ() : -N.getZ()); // abs z-coord
+		ax = (normal.getX() > 0 ? normal.getX() : -normal.getX()); // abs x-coord
+		ay = (normal.getY() > 0 ? normal.getY() : -normal.getY()); // abs y-coord
+		az = (normal.getZ() > 0 ? normal.getZ() : -normal.getZ()); // abs z-coord
 
 		coord = 3; // ignore z-coord
 		if (ax > ay) {
@@ -377,26 +378,26 @@ public class Util {
 		switch (coord) {
 		case 1:
 			for (i = 1, j = 2, k = 0; i < n; i++, j++, k++)
-				area += (V.get(i).getY() * (V.get(j).getZ() - V.get(k).getZ()));
+				area += (points.get(i).getY() * (points.get(j).getZ() - points.get(k).getZ()));
 			break;
 		case 2:
 			for (i = 1, j = 2, k = 0; i < n; i++, j++, k++)
-				area += (V.get(i).getZ() * (V.get(j).getX() - V.get(k).getX()));
+				area += (points.get(i).getZ() * (points.get(j).getX() - points.get(k).getX()));
 			break;
 		case 3:
 			for (i = 1, j = 2, k = 0; i < n; i++, j++, k++)
-				area += (V.get(i).getX() * (V.get(j).getY() - V.get(k).getY()));
+				area += (points.get(i).getX() * (points.get(j).getY() - points.get(k).getY()));
 			break;
 		}
 		switch (coord) { // wrap-around term
 		case 1:
-			area += (V.get(n).getY() * (V.get(1).getZ() - V.get(n - 1).getZ()));
+			area += (points.get(n).getY() * (points.get(1).getZ() - points.get(n - 1).getZ()));
 			break;
 		case 2:
-			area += (V.get(n).getZ() * (V.get(1).getX() - V.get(n - 1).getX()));
+			area += (points.get(n).getZ() * (points.get(1).getX() - points.get(n - 1).getX()));
 			break;
 		case 3:
-			area += (V.get(n).getX() * (V.get(1).getY() - V.get(n - 1).getY()));
+			area += (points.get(n).getX() * (points.get(1).getY() - points.get(n - 1).getY()));
 			break;
 		}
 
@@ -404,78 +405,15 @@ public class Util {
 		an = Math.sqrt(ax * ax + ay * ay + az * az); // length of normal vector
 		switch (coord) {
 		case 1:
-			area *= (an / (2 * N.getX()));
+			area *= (an / (2 * normal.getX()));
 			break;
 		case 2:
-			area *= (an / (2 * N.getY()));
+			area *= (an / (2 * normal.getY()));
 			break;
 		case 3:
-			area *= (an / (2 * N.getZ()));
+			area *= (an / (2 * normal.getZ()));
 		}
-		return area;
-	}
-
-	public static double GetPolygonPlane(final List<ReadOnlyVector3> polygon) {
-
-		Vector3 normal = new Vector3();
-		double dist;
-		double area;
-
-		// normal = XYZ.Zero;
-		dist = area = 0.0;
-		final int n = (null == polygon) ? 0 : polygon.size();
-		boolean rc = (2 < n);
-		if (3 == n) {
-			final ReadOnlyVector3 a = polygon.get(0);
-			final ReadOnlyVector3 b = polygon.get(1);
-			final ReadOnlyVector3 c = polygon.get(2);
-			final ReadOnlyVector3 v = b.subtract(a, null);
-			normal = v.cross(c.subtract(a, null), null);
-			dist = normal.dot(a);
-		} else if (4 == n) {
-			final ReadOnlyVector3 a = polygon.get(0);
-			final ReadOnlyVector3 b = polygon.get(1);
-			final ReadOnlyVector3 c = polygon.get(2);
-			final ReadOnlyVector3 d = polygon.get(3);
-
-			normal.setX((c.getY() - a.getY()) * (d.getZ() - b.getZ()) + (c.getZ() - a.getZ()) * (b.getY() - d.getY()));
-			normal.setY((c.getZ() - a.getZ()) * (d.getX() - b.getX()) + (c.getX() - a.getX()) * (b.getZ() - d.getZ()));
-			normal.setZ((c.getX() - a.getX()) * (d.getY() - b.getY()) + (c.getY() - a.getY()) * (b.getX() - d.getX()));
-
-			dist = 0.25 * (normal.getX() * (a.getX() + b.getX() + c.getX() + d.getX()) + normal.getY() * (a.getY() + b.getY() + c.getY() + d.getY()) + normal.getZ() * (a.getZ() + b.getZ() + c.getZ() + d.getZ()));
-		} else if (4 < n) {
-			ReadOnlyVector3 a;
-			ReadOnlyVector3 b = polygon.get(n - 2);
-			ReadOnlyVector3 c = polygon.get(n - 1);
-			final Vector3 s = new Vector3();
-
-			for (int i = 0; i < n; ++i) {
-				a = b;
-				b = c;
-				c = polygon.get(i);
-
-				normal.setX(normal.getX() + b.getY() * (c.getZ() - a.getZ()));
-				normal.setY(normal.getY() + b.getZ() * (c.getX() - a.getX()));
-				normal.setZ(normal.getZ() + b.getX() * (c.getY() - a.getY()));
-
-				s.addLocal(c);
-			}
-			dist = s.dot(normal) / n;
-		}
-		if (rc) {
-			final double length = normal.length();
-			rc = !Util.isZero(length);
-			if (!rc)
-				throw new RuntimeException("ZERO");
-
-			if (rc) {
-				normal.multiplyLocal(length);
-				dist /= length;
-				area = 0.5 * length;
-			}
-		}
-		// return rc;
-		return area;
+		return Math.abs(area);
 	}
 
 }
