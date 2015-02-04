@@ -1197,12 +1197,20 @@ public class Wall extends HousePart {
 	}
 
 	@Override
-	public double computeArea() {
-		double area = computeArea(mesh);
+	protected void computeArea() {
+		area = Util.computeArea(mesh);
 		for (final HousePart child : children)
 			if (child instanceof Window || child instanceof Door)
-				area -= child.computeArea();
-		return area;
+				area -= child.getArea();
+	}
+
+	@Override
+	public double getArea() {
+		double areaWithoutWindows = area;
+		for (final HousePart child : children)
+			if (child instanceof Window || child instanceof Door)
+				areaWithoutWindows -= child.getArea();
+		return areaWithoutWindows;
 	}
 
 	public Mesh getInvisibleMesh() {

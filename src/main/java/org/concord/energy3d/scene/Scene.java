@@ -192,7 +192,6 @@ public class Scene implements Serializable {
 	}
 
 	public static void openNow(final URL file) throws Exception {
-
 		if (PrintController.getInstance().isPrintPreview()) {
 			MainPanel.getInstance().getPreviewButton().setSelected(false);
 			while (!PrintController.getInstance().isFinished())
@@ -200,7 +199,6 @@ public class Scene implements Serializable {
 		}
 
 		synchronized (SceneManager.getInstance()) {
-
 			Scene.url = file;
 
 			MainPanel.getInstance().getHeliodonButton().setSelected(false);
@@ -240,8 +238,15 @@ public class Scene implements Serializable {
 				MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
 		}
 		MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
-		EnergyPanel.getInstance().updatePartEnergy();
-		EnergyPanel.getInstance().updateCost();
+		EnergyPanel.getInstance().update();
+		MainFrame.getInstance().updateTitleBar();
+
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Foundation) {
+				SceneManager.getInstance().setSelectedPart(p);
+				break;
+			}
+		}
 
 	}
 

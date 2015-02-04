@@ -10,11 +10,11 @@ import org.concord.energy3d.scene.Scene;
 
 /**
  * This calculates and visualizes the seasonal trend and the yearly sum of a sensor (e.g., light sensor and heat flux sensor).
- * 
+ *
  * For fast feedback, only 12 days are calculated.
- * 
+ *
  * @author Charles Xie
- * 
+ *
  */
 
 public class AnnualSensorData extends AnnualAnalysis {
@@ -30,12 +30,11 @@ public class AnnualSensorData extends AnnualAnalysis {
 
 	@Override
 	void updateGraph() {
-
-		List<HousePart> parts = Scene.getInstance().getParts();
-		for (HousePart p : parts) {
+		final List<HousePart> parts = Scene.getInstance().getParts();
+		for (final HousePart p : parts) {
 			if (p instanceof Sensor) {
-				Sensor sensor = (Sensor) p;
-				final double area = sensor.computeArea();
+				final Sensor sensor = (Sensor) p;
+				final double area = sensor.getArea();
 				final double solar = sensor.getSolarPotentialToday();
 				graph.addData("Light: #" + sensor.getId(), solar / area);
 				final double[] loss = sensor.getHeatLoss();

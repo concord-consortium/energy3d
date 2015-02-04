@@ -32,9 +32,9 @@ import org.concord.energy3d.scene.SceneManager;
 
 /**
  * Calculate the cost (the prices are fictitious).
- * 
+ *
  * @author Charles Xie
- * 
+ *
  */
 public class Cost {
 
@@ -49,7 +49,7 @@ public class Cost {
 
 	public int getTotalCost() {
 		int sum = 0;
-		for (HousePart p : Scene.getInstance().getParts()) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.isFrozen())
 				continue;
 			sum += getPartCost(p);
@@ -57,9 +57,9 @@ public class Cost {
 		return sum;
 	}
 
-	public int getBuildingCost(Foundation foundation) {
+	public int getBuildingCost(final Foundation foundation) {
 		int sum = 0;
-		for (HousePart p : Scene.getInstance().getParts()) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == foundation) {
 				sum += getPartCost(p);
 			} else if (p instanceof Tree && !p.isFrozen()) {
@@ -69,7 +69,7 @@ public class Cost {
 		return sum;
 	}
 
-	private int getPartCost(HousePart part) {
+	private int getPartCost(final HousePart part) {
 		if (part instanceof Wall) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
@@ -81,7 +81,7 @@ public class Cost {
 				price = 90;
 			else
 				price = 80;
-			return (int) (part.computeArea() * price);
+			return (int) (part.getArea() * price);
 		}
 		if (part instanceof Window) {
 			double uFactor = part.getUFactor();
@@ -94,7 +94,7 @@ public class Cost {
 				price = 200;
 			else
 				price = 150;
-			return (int) (part.computeArea() * price);
+			return (int) (part.getArea() * price);
 		}
 		if (part instanceof Roof) {
 			double uFactor = part.getUFactor();
@@ -107,7 +107,7 @@ public class Cost {
 				price = 90;
 			else
 				price = 80;
-			return (int) (part.computeArea() * price);
+			return (int) (part.getArea() * price);
 		}
 		if (part instanceof Door) {
 			double uFactor = part.getUFactor();
@@ -118,10 +118,10 @@ public class Cost {
 				price = 100;
 			else
 				price = 50;
-			return (int) (part.computeArea() * price);
+			return (int) (part.getArea() * price);
 		}
 		if (part instanceof SolarPanel) {
-			double efficiency = ((SolarPanel) part).getEfficiency();
+			final double efficiency = ((SolarPanel) part).getEfficiency();
 			if (efficiency == 0)
 				Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
 			int price;
@@ -140,7 +140,7 @@ public class Cost {
 		return 0;
 	}
 
-	private int getTreeCost(Tree tree) {
+	private int getTreeCost(final Tree tree) {
 		switch (tree.getTreeType()) {
 		case Tree.OAK:
 			return 2000;
@@ -155,11 +155,11 @@ public class Cost {
 
 	public void showGraph() {
 		EnergyPanel.getInstance().requestDisableActions(this);
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
 			int count = 0;
 			HousePart hp = null;
-			for (HousePart x : Scene.getInstance().getParts()) {
+			for (final HousePart x : Scene.getInstance().getParts()) {
 				if (x instanceof Foundation) {
 					count++;
 					hp = x;
@@ -174,7 +174,7 @@ public class Cost {
 				return;
 			}
 		} else {
-			HousePart hp = selectedPart.getTopContainer();
+			final HousePart hp = selectedPart.getTopContainer();
 			if (hp != null) {
 				SceneManager.getInstance().setSelectedPart(hp);
 				SceneManager.getInstance().refresh();
@@ -189,7 +189,7 @@ public class Cost {
 		EnergyPanel.getInstance().requestDisableActions(null);
 	}
 
-	private void show(boolean translucent) {
+	private void show(final boolean translucent) {
 
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		final Foundation selectedBuilding;
@@ -198,7 +198,7 @@ public class Cost {
 		else if (selectedPart instanceof Foundation)
 			selectedBuilding = (Foundation) selectedPart;
 		else
-			selectedBuilding = (Foundation) selectedPart.getTopContainer();
+			selectedBuilding = selectedPart.getTopContainer();
 		if (selectedBuilding == null) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "No building is selected.", "No Building", JOptionPane.INFORMATION_MESSAGE);
 			return;
@@ -210,7 +210,7 @@ public class Cost {
 		int doorSum = 0;
 		int solarPanelSum = 0;
 		int treeSum = 0;
-		for (HousePart p : Scene.getInstance().getParts()) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == selectedBuilding) {
 				if (p instanceof Wall)
 					wallSum += getPartCost(p);
@@ -227,12 +227,12 @@ public class Cost {
 				treeSum += getTreeCost((Tree) p);
 		}
 
-		float[] data = new float[] { wallSum, windowSum, roofSum, doorSum, solarPanelSum, treeSum };
-		String[] legends = new String[] { "Walls", "Windows", "Roof", "Doors", "Solar Panels", "Trees" };
-		Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.PINK, Color.YELLOW, Color.GREEN };
+		final float[] data = new float[] { wallSum, windowSum, roofSum, doorSum, solarPanelSum, treeSum };
+		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Doors", "Solar Panels", "Trees" };
+		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.PINK, Color.YELLOW, Color.GREEN };
 
 		// show them in a popup window
-		PieChart pie = new PieChart(data, colors, legends, "$");
+		final PieChart pie = new PieChart(data, colors, legends, "$");
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Material Costs by Category", true);
@@ -242,20 +242,20 @@ public class Cost {
 			dialog.setOpacity(System.getProperty("os.name").startsWith("Mac") ? 0.5f : 0.75f);
 		}
 		dialog.getContentPane().add(pie, BorderLayout.CENTER);
-		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		final JCheckBox translucentCheckBox = new JCheckBox("Translucent", translucent);
 		translucentCheckBox.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				dialog.dispose();
 				show(translucentCheckBox.isSelected());
 			}
 		});
 		buttonPanel.add(translucentCheckBox);
-		JButton button = new JButton("Close");
+		final JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				dialog.dispose();
 			}
 		});

@@ -1352,7 +1352,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							selectedHousePart = null;
 						System.out.println("Clicked on: " + pick);
 						if (pick != null && pick.getHousePart() instanceof Roof)
-							System.out.println("Area: " + pick.getHousePart().computeArea((Mesh) ((Node) ((Roof) pick.getHousePart()).getRoofPartsRoot().getChild(pick.getIndex())).getChild(0)));
+							System.out.println("Area: " + ((Roof) pick.getHousePart()).getArea((Mesh) ((Node) ((Roof) pick.getHousePart()).getRoofPartsRoot().getChild(pick.getIndex())).getChild(0)));
 						if (pick != null && pick.isEditPoint()) {
 							cameraControl.setLeftMouseButtonEnabled(false);
 							// EnergyPanel.getInstance().cancel();

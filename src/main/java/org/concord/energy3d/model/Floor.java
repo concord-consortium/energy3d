@@ -218,4 +218,9 @@ public class Floor extends HousePart {
 	public void drawHeatFlux() {
 	}
 
+	@Override
+	protected void computeArea() {
+		area = 0.0;
+	}
+
 }

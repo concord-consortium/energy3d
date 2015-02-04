@@ -74,10 +74,11 @@ public abstract class HousePart implements Serializable {
 	protected transient Mesh gridsMesh;
 	protected transient Vector3 flattenCenter;
 	protected transient double orgHeight;
-	private transient boolean isPrintVertical;
+	protected transient double area;
 	private transient double[] solarPotential;
-	transient double[] heatLoss;
+	private transient double[] heatLoss;
 	private transient double solarPotentialToday;
+	private transient boolean isPrintVertical;
 
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
@@ -86,10 +87,10 @@ public abstract class HousePart implements Serializable {
 	protected long id;
 	protected int editPointIndex = -1;
 	protected boolean drawCompleted = false;
+	private ReadOnlyColorRGBA color = ColorRGBA.WHITE; // custom color
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
-	private ReadOnlyColorRGBA color = ColorRGBA.WHITE; // custom color
 	private double uFactor = 0;
 	private double volumetricHeatCapacity = 1; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 
@@ -464,6 +465,7 @@ public abstract class HousePart implements Serializable {
 				init();
 
 			drawMesh();
+			computeArea();
 			updateTextureAndColor();
 			updateEditShapes();
 			clearAnnotations();
@@ -804,35 +806,11 @@ public abstract class HousePart implements Serializable {
 		return true;
 	}
 
-	public double computeArea() {
-		if (!isDrawCompleted())
-			return 0.0;
-		final Vector3 p0 = getAbsPoint(0);
-		final Vector3 p1 = getAbsPoint(1);
-		final Vector3 p2 = getAbsPoint(2);
-		final double C = 100.0;
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		return Math.round(Math.round(p2.subtract(p0, null).length() * annotationScale * C) / C * Math.round(p1.subtract(p0, null).length() * annotationScale * C) / C * C) / C;
-	}
-
-	public double computeArea(final Mesh mesh) {
-		double area = 0.0;
-		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-		buf.rewind();
-		while (buf.hasRemaining()) {
-			final Vector3 p1 = new Vector3(buf.get(), buf.get(), buf.get());
-			final Vector3 p2 = new Vector3(buf.get(), buf.get(), buf.get());
-			final Vector3 p3 = new Vector3(buf.get(), buf.get(), buf.get());
-			final double trigArea = computeTriangleArea(p1, p2, p3);
-			area += trigArea;
-		}
+	public double getArea() {
 		return area;
 	}
 
-	public double computeTriangleArea(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		return p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;
-	}
+	protected abstract void computeArea();
 
 	public void setFreeze(final boolean freeze) {
 		this.freeze = freeze;
@@ -977,12 +955,12 @@ public abstract class HousePart implements Serializable {
 			if (SceneManager.getInstance().isHeatFluxDaily()) {
 				for (final double x : heatLoss)
 					heat += x;
-				heat /= (computeArea() * heatLoss.length);
+				heat /= (getArea() * heatLoss.length);
 				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
 				final int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
 				heat = heatLoss[hourOfDay * 4] + heatLoss[hourOfDay * 4 + 1] + heatLoss[hourOfDay * 4 + 2] + heatLoss[hourOfDay * 4 + 3];
-				heat /= 4 * computeArea();
+				heat /= 4 * getArea();
 				heatFlux.setDefaultColor(ColorRGBA.WHITE);
 			}
 		}

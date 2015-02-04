@@ -239,4 +239,9 @@ public class Tree extends HousePart {
 		// this method is left empty on purpose -- don't draw heat flux
 	}
 
+	@Override
+	protected void computeArea() {
+		area = 0.0;
+	}
+
 }

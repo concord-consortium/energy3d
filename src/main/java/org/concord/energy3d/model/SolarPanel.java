@@ -29,7 +29,6 @@ public class SolarPanel extends HousePart {
 	public static final double HEIGHT = 1.6;
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
-	private transient double area;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private double efficiency = 0; // between 0 and 100
@@ -122,7 +121,6 @@ public class SolarPanel extends HousePart {
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		area = WIDTH * HEIGHT;
 		surround.setData(Vector3.ZERO, WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.1);
 		surround.updateModelBound();
 
@@ -217,8 +215,8 @@ public class SolarPanel extends HousePart {
 	}
 
 	@Override
-	public double computeArea() {
-		return area;
+	protected void computeArea() {
+		area = WIDTH * HEIGHT;
 	}
 
 	@Override

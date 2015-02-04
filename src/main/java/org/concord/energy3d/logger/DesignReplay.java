@@ -5,15 +5,13 @@ import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
-import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public class DesignReplay extends PlayControl {
 
@@ -23,32 +21,18 @@ public class DesignReplay extends PlayControl {
 
 	}
 
-	public static void play(final File[] files, final Runnable update) {
+	public static void play(final File[] files) {
 		new Thread() {
 			@Override
 			public void run() {
 				Util.suppressReportError = true;
-				openFolder(files, update);
+				openFolder(files);
 				Util.suppressReportError = false;
 			}
 		}.start();
 	}
 
-	private static void updateEnergyPanel() {
-		for (HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Foundation) {
-				SceneManager.getInstance().setSelectedPart(p);
-				break;
-			}
-		}
-		EnergyPanel.getInstance().updateCost();
-		EnergyPanel.getInstance().updateBudgetBar();
-		EnergyPanel.getInstance().updateAreaBar();
-		EnergyPanel.getInstance().updateHeightBar();
-		EnergyPanel.getInstance().updatePartEnergy();
-	}
-
-	private static void openFolder(final File[] files, final Runnable update) {
+	private static void openFolder(final File[] files) {
 
 		final int n = files.length;
 		int i = -1;
@@ -69,8 +53,6 @@ public class DesignReplay extends PlayControl {
 							return null;
 						}
 					});
-					update.run();
-					updateEnergyPanel();
 					Thread.sleep(SLEEP);
 				} catch (final Exception e) {
 					e.printStackTrace();
@@ -83,8 +65,6 @@ public class DesignReplay extends PlayControl {
 						System.out.println("Play back " + i + " of " + n);
 						try {
 							Scene.open(files[i].toURI().toURL());
-							update.run();
-							updateEnergyPanel();
 						} catch (final Exception e) {
 							e.printStackTrace();
 						}
@@ -96,8 +76,6 @@ public class DesignReplay extends PlayControl {
 						System.out.println("Play back " + i + " of " + n);
 						try {
 							Scene.open(files[i].toURI().toURL());
-							update.run();
-							updateEnergyPanel();
 						} catch (final Exception e) {
 							e.printStackTrace();
 						}

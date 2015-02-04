@@ -30,7 +30,6 @@ public class Sensor extends HousePart {
 	public static final double WIDTH = 0.15;
 	public static final double HEIGHT = 0.1;
 	private transient ReadOnlyVector3 normal;
-	private transient double area;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 
@@ -103,7 +102,6 @@ public class Sensor extends HousePart {
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		area = WIDTH * HEIGHT;
 		surround.setData(Vector3.ZERO, WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.02); // last arg sets close to zero so the sensor doesn't cast shadow
 		surround.updateModelBound();
 
@@ -198,8 +196,8 @@ public class Sensor extends HousePart {
 	}
 
 	@Override
-	public double computeArea() {
-		return area;
+	protected void computeArea() {
+		area = WIDTH * HEIGHT;
 	}
 
 	@Override

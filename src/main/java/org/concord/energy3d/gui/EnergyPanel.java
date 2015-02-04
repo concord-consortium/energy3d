@@ -387,12 +387,12 @@ public class EnergyPanel extends JPanel {
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				double uFactor = HeatLoad.parseValue(wallsComboBox);
+				final double uFactor = HeatLoad.parseValue(wallsComboBox);
 				if (foundation != null) {
-					int count = Scene.getInstance().countParts(foundation, Wall.class);
+					final int count = Scene.getInstance().countParts(foundation, Wall.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factors of " + count + " existing walls of<br>the selected building (#" + foundation.getId() + ") to " + wallsComboBox.getSelectedItem() + "?</html>", "U-factor of Walls", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							for (HousePart p : Scene.getInstance().getParts()) {
+							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Wall && p.getTopContainer() == foundation)
 									((Wall) p).setUFactor(uFactor);
 							}
@@ -407,7 +407,7 @@ public class EnergyPanel extends JPanel {
 		if (arrowButton != null) {
 			arrowButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					foundation = MainFrame.getInstance().autoSelectBuilding(true);
 				}
 			});
@@ -432,12 +432,12 @@ public class EnergyPanel extends JPanel {
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				double uFactor = HeatLoad.parseValue(roofsComboBox);
+				final double uFactor = HeatLoad.parseValue(roofsComboBox);
 				if (foundation != null) {
-					int count = Scene.getInstance().countParts(foundation, Roof.class);
+					final int count = Scene.getInstance().countParts(foundation, Roof.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factor of the roof<br>of the selected building (#" + foundation.getId() + ") to " + roofsComboBox.getSelectedItem() + "?</html>", "U-factor of Roof", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							for (HousePart p : Scene.getInstance().getParts()) {
+							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Roof && p.getTopContainer() == foundation)
 									((Roof) p).setUFactor(uFactor);
 							}
@@ -452,7 +452,7 @@ public class EnergyPanel extends JPanel {
 		if (arrowButton != null) {
 			arrowButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					foundation = MainFrame.getInstance().autoSelectBuilding(true);
 				}
 			});
@@ -476,12 +476,12 @@ public class EnergyPanel extends JPanel {
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				double uFactor = HeatLoad.parseValue(windowsComboBox);
+				final double uFactor = HeatLoad.parseValue(windowsComboBox);
 				if (foundation != null) {
-					int count = Scene.getInstance().countParts(foundation, Window.class);
+					final int count = Scene.getInstance().countParts(foundation, Window.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factors of " + count + " existing windows of<br>the selected building (#" + foundation.getId() + ") to " + windowsComboBox.getSelectedItem() + "?</html>", "U-factor of Windows", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							for (HousePart p : Scene.getInstance().getParts()) {
+							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Window && p.getTopContainer() == foundation)
 									((Window) p).setUFactor(uFactor);
 							}
@@ -496,7 +496,7 @@ public class EnergyPanel extends JPanel {
 		if (arrowButton != null) {
 			arrowButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					foundation = MainFrame.getInstance().autoSelectBuilding(true);
 				}
 			});
@@ -521,12 +521,12 @@ public class EnergyPanel extends JPanel {
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				double uFactor = HeatLoad.parseValue(doorsComboBox);
+				final double uFactor = HeatLoad.parseValue(doorsComboBox);
 				if (foundation != null) {
-					int count = Scene.getInstance().countParts(foundation, Door.class);
+					final int count = Scene.getInstance().countParts(foundation, Door.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factors of " + count + " existing doors of<br>the selected building (#" + foundation.getId() + ") to " + doorsComboBox.getSelectedItem() + "?</html>", "U-factor of Doors", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							for (HousePart p : Scene.getInstance().getParts()) {
+							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Door && p.getTopContainer() == foundation)
 									((Door) p).setUFactor(uFactor);
 							}
@@ -541,7 +541,7 @@ public class EnergyPanel extends JPanel {
 		if (arrowButton != null) {
 			arrowButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					foundation = MainFrame.getInstance().autoSelectBuilding(true);
 				}
 			});
@@ -584,10 +584,10 @@ public class EnergyPanel extends JPanel {
 					return;
 				}
 				if (foundation != null) {
-					int count = Scene.getInstance().countParts(foundation, Window.class);
+					final int count = Scene.getInstance().countParts(foundation, Window.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the solar heat gain coefficient of " + count + " existing windows<br>of the selected building (#" + foundation.getId() + ") to " + windowSHGCComboBox.getSelectedItem() + "%?</html>", "Solar Heat Gain Coffficient of Windows", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							for (HousePart p : Scene.getInstance().getParts()) {
+							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Window && p.getTopContainer() == foundation)
 									((Window) p).setSolarHeatGainCoefficient(shgc);
 							}
@@ -602,7 +602,7 @@ public class EnergyPanel extends JPanel {
 		if (arrowButton != null) {
 			arrowButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					foundation = MainFrame.getInstance().autoSelectBuilding(true);
 				}
 			});
@@ -633,10 +633,10 @@ public class EnergyPanel extends JPanel {
 					return;
 				}
 				if (foundation != null) {
-					int count = Scene.getInstance().countParts(foundation, SolarPanel.class);
+					final int count = Scene.getInstance().countParts(foundation, SolarPanel.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the efficiency of " + count + " existing solar panels<br>of the selected building (#" + foundation.getId() + ") to " + solarPanelEfficiencyComboBox.getSelectedItem() + "%?</html>", "Solar Panel Conversion Efficiency", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							for (HousePart p : Scene.getInstance().getParts()) {
+							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof SolarPanel && p.getTopContainer() == foundation)
 									((SolarPanel) p).setEfficiency(eff);
 							}
@@ -651,7 +651,7 @@ public class EnergyPanel extends JPanel {
 		if (arrowButton != null) {
 			arrowButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					foundation = MainFrame.getInstance().autoSelectBuilding(true);
 				}
 			});
@@ -1076,29 +1076,29 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updatePartProperties() {
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Wall) {
-			int n = wallsComboBox.getItemCount();
+			final int n = wallsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
-				double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_WALL[i]);
+				final double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_WALL[i]);
 				if (Util.isZero(choice - selectedPart.getUFactor())) {
 					Util.selectSilently(wallsComboBox, i);
 					break;
 				}
 			}
 		} else if (selectedPart instanceof Roof) {
-			int n = roofsComboBox.getItemCount();
+			final int n = roofsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
-				double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_ROOF[i]);
+				final double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_ROOF[i]);
 				if (Util.isZero(choice - selectedPart.getUFactor())) {
 					Util.selectSilently(roofsComboBox, i);
 					break;
 				}
 			}
 		} else if (selectedPart instanceof Door) {
-			int n = doorsComboBox.getItemCount();
+			final int n = doorsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
-				double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_DOOR[i]);
+				final double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_DOOR[i]);
 				if (Util.isZero(choice - selectedPart.getUFactor())) {
 					Util.selectSilently(doorsComboBox, i);
 					break;
@@ -1107,7 +1107,7 @@ public class EnergyPanel extends JPanel {
 		} else if (selectedPart instanceof Window) {
 			int n = windowsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
-				double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_WINDOW[i]);
+				final double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_WINDOW[i]);
 				if (Util.isZero(choice - selectedPart.getUFactor())) {
 					Util.selectSilently(windowsComboBox, i);
 					break;
@@ -1115,16 +1115,16 @@ public class EnergyPanel extends JPanel {
 			}
 			n = windowSHGCComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
-				double choice = Scene.parsePropertyString(WINDOW_SHGC_CHOICES[i]);
+				final double choice = Scene.parsePropertyString(WINDOW_SHGC_CHOICES[i]);
 				if (Util.isZero(choice - ((Window) selectedPart).getSolarHeatGainCoefficient())) {
 					Util.selectSilently(windowSHGCComboBox, i);
 					break;
 				}
 			}
 		} else if (selectedPart instanceof SolarPanel) {
-			int n = solarPanelEfficiencyComboBox.getItemCount();
+			final int n = solarPanelEfficiencyComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
-				double choice = Scene.parsePropertyString(SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES[i]);
+				final double choice = Scene.parsePropertyString(SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES[i]);
 				if (Util.isZero(choice - ((SolarPanel) selectedPart).getEfficiency())) {
 					Util.selectSilently(solarPanelEfficiencyComboBox, i);
 					break;
@@ -1166,8 +1166,8 @@ public class EnergyPanel extends JPanel {
 			partProperty3TextField.setText("");
 		else {
 			if (selectedPart instanceof Sensor) {
-				final String light = twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.computeArea());
-				final String heatFlux = twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.computeArea());
+				final String light = twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.getArea());
+				final String heatFlux = twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.getArea());
 				partProperty4TextField.setText(light + ", " + heatFlux);
 				partProperty4TextField.setToolTipText("Light sensor: " + light + ", heat flux sensor: " + heatFlux);
 			} else
@@ -1254,8 +1254,11 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void update() {
-		updatePartEnergy();
 		updateCost();
+		updateBudgetBar();
+		updateAreaBar();
+		updateHeightBar();
+		updatePartEnergy();
 	}
 
 	/** Apply this when the UI is set programmatically (not by the user) */

@@ -6,6 +6,7 @@ import java.awt.Desktop;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.net.URI;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.bounding.BoundingVolume;
@@ -25,6 +27,7 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
@@ -414,6 +417,25 @@ public class Util {
 			area *= (an / (2 * normal.getZ()));
 		}
 		return Math.abs(area);
+	}
+
+	public static double computeArea(final Mesh mesh) {
+		double area = 0.0;
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		buf.rewind();
+		while (buf.hasRemaining()) {
+			final Vector3 p1 = new Vector3(buf.get(), buf.get(), buf.get());
+			final Vector3 p2 = new Vector3(buf.get(), buf.get(), buf.get());
+			final Vector3 p3 = new Vector3(buf.get(), buf.get(), buf.get());
+			final double trigArea = computeTriangleArea(p1, p2, p3);
+			area += trigArea;
+		}
+		return area;
+	}
+
+	private static double computeTriangleArea(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
+		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		return p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;
 	}
 
 }

@@ -97,7 +97,7 @@ public class HeatLoad {
 							final double uFactor = getUFactor(part);
 							if (isZero(uFactor))
 								continue;
-							double heatloss = roof.computeArea(mesh) * uFactor * deltaT / 1000.0 / 60 * timeStep;
+							double heatloss = roof.getArea(mesh) * uFactor * deltaT / 1000.0 / 60 * timeStep;
 							if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
 								heatloss = 0;
 							roof.getHeatLoss()[iMinute] += heatloss;
@@ -113,7 +113,7 @@ public class HeatLoad {
 						final double uFactor = getUFactor(part);
 						if (isZero(uFactor))
 							continue;
-						double heatloss = part.computeArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
+						double heatloss = part.getArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
 						if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
 							heatloss = 0;
 						part.getHeatLoss()[iMinute] += heatloss;

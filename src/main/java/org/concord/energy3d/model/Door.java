@@ -129,4 +129,17 @@ public class Door extends HousePart {
 		return container != null ? container.getRoot().getTransform().applyForward(super.getAbsPoint(index)) : super.getAbsPoint(index);
 	}
 
+	@Override
+	protected void computeArea() {
+		if (isDrawCompleted()) {
+			final Vector3 p0 = getAbsPoint(0);
+			final Vector3 p1 = getAbsPoint(1);
+			final Vector3 p2 = getAbsPoint(2);
+			final double C = 100.0;
+			final double annotationScale = Scene.getInstance().getAnnotationScale();
+			area = Math.round(Math.round(p2.subtract(p0, null).length() * annotationScale * C) / C * Math.round(p1.subtract(p0, null).length() * annotationScale * C) / C * C) / C;
+		} else
+			area = 0.0;
+	}
+
 }

@@ -508,7 +508,6 @@ public class MainFrame extends JFrame {
 				public void run() {
 					try {
 						Scene.open(file.toURI().toURL());
-						updateTitleBar();
 						fileChooser.rememberFile(file.getPath());
 					} catch (final Throwable err) {
 						showUnexpectedErrorMessage(err);
@@ -579,12 +578,7 @@ public class MainFrame extends JFrame {
 								public boolean accept(final File dir, final String name) {
 									return name.endsWith(".ng3");
 								}
-							}), new Runnable() {
-								@Override
-								public void run() {
-									updateTitleBar();
-								}
-							});
+							}));
 						}
 					}
 				}
@@ -1859,7 +1853,6 @@ public class MainFrame extends JFrame {
 				@Override
 				public Object call() throws Exception {
 					Scene.open(new File(filename).toURI().toURL());
-					updateTitleBar();
 					fileChooser.rememberFile(filename);
 					return null;
 				}
