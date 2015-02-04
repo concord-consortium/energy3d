@@ -1355,8 +1355,11 @@ public class EnergyPanel extends JPanel {
 				if (part instanceof Foundation)
 					((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
 		}
-		SceneManager.getInstance().getSolarLand().setVisible(false);
-		Scene.getInstance().redrawAll();
+
+		if (SceneManager.getInstance().getSolarLand().isVisible()) {
+			SceneManager.getInstance().getSolarLand().setVisible(false);
+			Scene.getInstance().redrawAll();
+		}
 	}
 
 }

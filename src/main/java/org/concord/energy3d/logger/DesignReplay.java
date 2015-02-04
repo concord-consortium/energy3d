@@ -48,6 +48,7 @@ public class DesignReplay extends PlayControl {
 						@Override
 						public Object call() throws Exception {
 							Scene.initSceneNow();
+							Scene.getInstance().redrawAllNow();
 							Scene.initEnergy();
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 							return null;
