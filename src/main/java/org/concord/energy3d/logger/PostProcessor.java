@@ -23,7 +23,7 @@ import org.concord.energy3d.shapes.Heliodon;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public class PostProcessor extends PlayControl {
 
@@ -88,6 +88,7 @@ public class PostProcessor extends PlayControl {
 							Scene.initSceneNow();
 							Scene.initEnergy();
 							EnergyPanel.getInstance().computeNow();
+							EnergyPanel.getInstance().update();
 							SceneManager.getInstance().refresh();
 							update.run();
 							sleep(SLEEP);

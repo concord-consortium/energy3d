@@ -186,6 +186,7 @@ public class Scene implements Serializable {
 				instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
 				initEnergy();
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				EnergyPanel.getInstance().update();
 				return null;
 			}
 		});
@@ -238,8 +239,6 @@ public class Scene implements Serializable {
 				MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
 		}
 		MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
-		EnergyPanel.getInstance().update();
-		MainFrame.getInstance().updateTitleBar();
 
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {
@@ -248,6 +247,7 @@ public class Scene implements Serializable {
 			}
 		}
 
+		MainFrame.getInstance().updateTitleBar();
 	}
 
 	public static void initSceneNow() {

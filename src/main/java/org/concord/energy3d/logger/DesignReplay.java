@@ -51,6 +51,7 @@ public class DesignReplay extends PlayControl {
 							Scene.getInstance().redrawAllNow();
 							Scene.initEnergy();
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							EnergyPanel.getInstance().update();
 							return null;
 						}
 					});
