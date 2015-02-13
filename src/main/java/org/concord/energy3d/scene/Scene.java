@@ -947,4 +947,11 @@ public class Scene implements Serializable {
 		return count;
 	}
 
+	// XIE: This needs to be called for trees to change texture when the month changes
+	public void setTreeLeaves() {
+		for (final HousePart p : Scene.getInstance().getParts())
+			if (p instanceof Tree)
+				p.updateTextureAndColor();
+	}
+
 }

@@ -192,10 +192,7 @@ public class EnergyPanel extends JPanel {
 					if (heliodon != null)
 						heliodon.setDate((Date) dateSpinner.getValue());
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					// XIE: This needs to be called for trees to change texture when the month changes
-					for (final HousePart p : Scene.getInstance().getParts())
-						if (p instanceof Tree)
-							p.updateTextureAndColor();
+					Scene.getInstance().setTreeLeaves();
 					Scene.getInstance().setEdited(true);
 				}
 			}
@@ -234,6 +231,7 @@ public class EnergyPanel extends JPanel {
 					if (CityData.getInstance().getSunshineHours().get(city) == null)
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No sunshine data is found for " + city + ".\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
 				}
+				Scene.getInstance().setTreeLeaves();
 				Scene.getInstance().setEdited(true);
 			}
 		});
@@ -973,10 +971,7 @@ public class EnergyPanel extends JPanel {
 				SolarIrradiation.getInstance().computeTotalEnergyForBuildings();
 				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Solar energy calculation completed", 0, 1));
 				updatePartEnergy();
-				// XIE: This needs to be called for trees to change texture when the month changes
-				for (final HousePart p : Scene.getInstance().getParts())
-					if (p instanceof Tree)
-						p.updateTextureAndColor();
+				Scene.getInstance().setTreeLeaves();
 			}
 
 			progressBar.setValue(100);
