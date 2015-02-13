@@ -194,8 +194,9 @@ public class Tree extends HousePart {
 		if (treeType == PINE)
 			return false;
 		final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
-		boolean northHemisphereWinter = month > 10 || month <= 4;
-		return EnergyPanel.getInstance().getLatitude() > 0 ? northHemisphereWinter : !northHemisphereWinter;
+		boolean northHemisphereWinter = month > 10 || month < 4;
+		boolean southHemisphereWinter = month > 4 && month < 10;
+		return EnergyPanel.getInstance().getLatitude() > 0 ? northHemisphereWinter : southHemisphereWinter;
 	}
 
 	@Override
