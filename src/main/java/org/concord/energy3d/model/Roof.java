@@ -1039,7 +1039,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	public double getArea(final Mesh mesh) {
-		return areaByPart.get(mesh);
+		return areaByPart != null ? areaByPart.get(mesh) : 0;
 	}
 
 	@Override
@@ -1080,7 +1080,7 @@ public abstract class Roof extends HousePart {
 	@Override
 	public void drawHeatFlux() {
 
-		if (SceneManager.getInstance().getHeatFlux()) {
+		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsShown()) {
 
 			heatFlux.getSceneHints().setCullHint(CullHint.Inherit);
 

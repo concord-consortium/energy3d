@@ -270,7 +270,7 @@ public class EnergyPanel extends JPanel {
 				if (MainPanel.getInstance().getShadowButton().isSelected()) {
 					SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 				}
-				if (SceneManager.getInstance().getHeatFlux()) { // for now, only heat flow arrows need to call redrawAll
+				if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsShown()) { // for now, only heat flow arrows need to call redrawAll
 					SceneManager.getInstance().setHeatFluxDaily(false);
 					for (final HousePart part : Scene.getInstance().getParts())
 						part.drawHeatFlux();

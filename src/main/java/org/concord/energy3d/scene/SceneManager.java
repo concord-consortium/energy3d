@@ -198,10 +198,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Vector3 houseMoveStartPoint;
 	private ArrayList<Vector3> houseMovePoints;
 	private boolean solarColorMap = false;
-	private boolean heatFlux = false;
 	private boolean heatFluxDaily = true;
 	private Spatial axes;
 	private boolean showBuildingLabels = false;
+	private boolean showHeatFlux = false;
 	private Mesh sky;
 	private TextureState daySkyState, nightSkyState;
 	private double buildingRotationAngleRecorded;
@@ -1547,14 +1547,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 
-	public boolean getHeatFlux() {
-		return heatFlux;
-	}
-
-	public void setHeatFlux(final boolean heatFlux) {
-		this.heatFlux = heatFlux;
-	}
-
 	public boolean isHeatFluxDaily() {
 		return heatFluxDaily;
 	}
@@ -1572,6 +1564,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public boolean areAxesShown() {
 		return backgroundRoot.hasChild(axes);
+	}
+
+	public void showHeatFluxVectors(final boolean b) {
+		showHeatFlux = b;
+	}
+
+	public boolean areHeatFluxVectorsShown() {
+		return showHeatFlux;
 	}
 
 	public void showBuildingLabels(final boolean b) {

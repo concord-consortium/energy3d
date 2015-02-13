@@ -672,7 +672,7 @@ public class MainPanel extends JPanel {
 						MainFrame.getInstance().autoSelectBuilding(false);
 					SceneManager.getInstance().setHeatFluxDaily(true);
 					SceneManager.getInstance().setSolarColorMap(energyViewButton.isSelected());
-					SceneManager.getInstance().setHeatFlux(energyViewButton.isSelected());
+					SceneManager.getInstance().showHeatFluxVectors(energyViewButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});

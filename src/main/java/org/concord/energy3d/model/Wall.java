@@ -1234,7 +1234,7 @@ public class Wall extends HousePart {
 	@Override
 	public void drawHeatFlux() {
 
-		if (SceneManager.getInstance().getHeatFlux()) {
+		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsShown()) {
 
 			double zmax = -Double.MAX_VALUE;
 			final List<Vector3> wallPolygonPoints = getWallPolygonPoints();

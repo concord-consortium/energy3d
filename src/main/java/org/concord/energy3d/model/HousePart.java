@@ -969,7 +969,7 @@ public abstract class HousePart implements Serializable {
 
 	public void drawHeatFlux() {
 
-		if (SceneManager.getInstance().getHeatFlux()) {
+		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsShown()) {
 
 			heatFlux.getSceneHints().setCullHint(CullHint.Inherit);
 

@@ -120,6 +120,7 @@ public class Scene implements Serializable {
 	private double windowSolarHeatGainCoefficient; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
 	private double backgroundAlbedo = 0.3;
 	private double heatVectorLength = 2000;
+	private boolean alwaysComputeHeatFluxVectors = false;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -241,7 +242,7 @@ public class Scene implements Serializable {
 		MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
 
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Foundation) {
+			if (p instanceof Foundation && !p.isFrozen()) {
 				SceneManager.getInstance().setSelectedPart(p);
 				break;
 			}
@@ -936,6 +937,14 @@ public class Scene implements Serializable {
 
 	public double getHeatVectorLength() {
 		return heatVectorLength;
+	}
+
+	public boolean getAlwaysComputeHeatFluxVectors() {
+		return alwaysComputeHeatFluxVectors;
+	}
+
+	public void setAlwaysComputeHeatFluxVectors(final boolean alwaysComputeHeatFluxVectors) {
+		this.alwaysComputeHeatFluxVectors = alwaysComputeHeatFluxVectors;
 	}
 
 	public int countParts(final Foundation foundation, final Class<?> clazz) {
