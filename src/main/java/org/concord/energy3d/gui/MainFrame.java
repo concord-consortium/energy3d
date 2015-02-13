@@ -122,7 +122,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem materialCostAnalysisMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem solarHeatMapMenuItem;
-	private JCheckBoxMenuItem alwaysComputeHeatFluxVectorsMenuItem;
+	private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
@@ -896,7 +896,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void menuSelected(final MenuEvent e) {
 					Util.selectSilently(solarHeatMapMenuItem, SceneManager.getInstance().getSolarColorMap());
-					Util.selectSilently(alwaysComputeHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
+					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesShown());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsShown());
@@ -1110,18 +1110,18 @@ public class MainFrame extends JFrame {
 	}
 
 	private JCheckBoxMenuItem getHeatFluxMenuItem() {
-		if (alwaysComputeHeatFluxVectorsMenuItem == null) {
-			alwaysComputeHeatFluxVectorsMenuItem = new JCheckBoxMenuItem("Always Compute Heat Flux");
-			alwaysComputeHeatFluxVectorsMenuItem.addActionListener(new ActionListener() {
+		if (showHeatFluxVectorsMenuItem == null) {
+			showHeatFluxVectorsMenuItem = new JCheckBoxMenuItem("Heat Flux Vectors");
+			showHeatFluxVectorsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setAlwaysComputeHeatFluxVectors(alwaysComputeHeatFluxVectorsMenuItem.isSelected());
+					Scene.getInstance().setAlwaysComputeHeatFluxVectors(showHeatFluxVectorsMenuItem.isSelected());
 					SolarIrradiation.getInstance().drawHeatFlux();
 					SceneManager.getInstance().refresh();
 				}
 			});
 		}
-		return alwaysComputeHeatFluxVectorsMenuItem;
+		return showHeatFluxVectorsMenuItem;
 	}
 
 	private JMenuItem getDailyAnalysisMenuItem() {

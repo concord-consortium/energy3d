@@ -780,8 +780,7 @@ public class Scene implements Serializable {
 	public double getOverhangLength() {
 		if (overhangLength < OVERHANG_MIN)
 			return OVERHANG_MIN;
-		else
-			return overhangLength;
+		return overhangLength;
 	}
 
 	public void setOverhangLength(final double overhangLength) {
@@ -791,8 +790,7 @@ public class Scene implements Serializable {
 	public ReadOnlyColorRGBA getFoundationColor() {
 		if (foundationColor == null)
 			return WHITE;
-		else
-			return foundationColor;
+		return foundationColor;
 	}
 
 	public void setFoundationColor(final ReadOnlyColorRGBA foundationColor) {
@@ -801,9 +799,8 @@ public class Scene implements Serializable {
 
 	public ReadOnlyColorRGBA getWallColor() {
 		if (wallColor == null)
-			return WHITE;
-		else
-			return wallColor;
+			return GRAY;
+		return wallColor;
 	}
 
 	public void setWallColor(final ReadOnlyColorRGBA wallColor) {
@@ -813,8 +810,7 @@ public class Scene implements Serializable {
 	public ReadOnlyColorRGBA getDoorColor() {
 		if (doorColor == null)
 			return WHITE;
-		else
-			return doorColor;
+		return doorColor;
 	}
 
 	public void setDoorColor(final ReadOnlyColorRGBA doorColor) {
@@ -824,8 +820,7 @@ public class Scene implements Serializable {
 	public ReadOnlyColorRGBA getFloorColor() {
 		if (floorColor == null)
 			return WHITE;
-		else
-			return floorColor;
+		return floorColor;
 	}
 
 	public void setFloorColor(final ReadOnlyColorRGBA floorColor) {
@@ -835,8 +830,7 @@ public class Scene implements Serializable {
 	public ReadOnlyColorRGBA getRoofColor() {
 		if (roofColor == null)
 			return WHITE;
-		else
-			return roofColor;
+		return roofColor;
 	}
 
 	public void setRoofColor(final ReadOnlyColorRGBA roofColor) {

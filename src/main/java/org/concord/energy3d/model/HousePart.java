@@ -204,6 +204,15 @@ public abstract class HousePart implements Serializable {
 		heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 		root.attachChild(heatFlux);
 
+		if (this instanceof Foundation)
+			color = Scene.getInstance().getFoundationColor();
+		else if (this instanceof Door)
+			color = Scene.getInstance().getDoorColor();
+		else if (this instanceof Roof)
+			color = Scene.getInstance().getRoofColor();
+		else if (this instanceof Wall)
+			color = Scene.getInstance().getWallColor();
+
 	}
 
 	public double getGridSize() {
@@ -465,7 +474,8 @@ public abstract class HousePart implements Serializable {
 				init();
 
 			drawMesh();
-			computeArea();
+			if (isDrawable())
+				computeArea();
 			updateTextureAndColor();
 			updateEditShapes();
 			clearAnnotations();
