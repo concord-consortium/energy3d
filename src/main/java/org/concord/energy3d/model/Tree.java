@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.util.Calendar;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.Heliodon;
@@ -193,7 +194,8 @@ public class Tree extends HousePart {
 		if (treeType == PINE)
 			return false;
 		final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
-		return month > 10 || month < 4;
+		boolean northHemisphereWinter = month > 10 || month <= 4;
+		return EnergyPanel.getInstance().getLatitude() > 0 ? northHemisphereWinter : !northHemisphereWinter;
 	}
 
 	@Override

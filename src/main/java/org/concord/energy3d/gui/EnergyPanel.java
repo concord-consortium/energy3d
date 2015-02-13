@@ -192,6 +192,10 @@ public class EnergyPanel extends JPanel {
 					if (heliodon != null)
 						heliodon.setDate((Date) dateSpinner.getValue());
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					// XIE: This needs to be called for trees to change texture when the month changes
+					for (final HousePart p : Scene.getInstance().getParts())
+						if (p instanceof Tree)
+							p.updateTextureAndColor();
 					Scene.getInstance().setEdited(true);
 				}
 			}
