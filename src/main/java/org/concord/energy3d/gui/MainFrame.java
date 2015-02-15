@@ -1119,8 +1119,8 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setOnlyAbsorptionInSolarMap(onlyAbsorptionInSolarMapMenuItem.isSelected());
-					Scene.getInstance().redrawAll();
-					SceneManager.getInstance().refresh();
+					if (SceneManager.getInstance().getSolarHeatMap())
+						SceneManager.getInstance().setSolarHeatMap(true);
 				}
 			});
 		}
