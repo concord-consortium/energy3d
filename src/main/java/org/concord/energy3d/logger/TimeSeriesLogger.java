@@ -253,7 +253,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			if (SceneManager.getInstance().isHeliodonControlEnabled()) {
 				line += separator + "\"Heliodon\": true";
 			}
-			if (SceneManager.getInstance().getSolarColorMap()) {
+			if (SceneManager.getInstance().getSolarHeatMap()) {
 				line += separator + "\"SolarMap\": true";
 				if (solarCalculationFinished) {
 					String result = getBuildingSolarEnergies();

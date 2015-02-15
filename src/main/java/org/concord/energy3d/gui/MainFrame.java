@@ -122,6 +122,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem materialCostAnalysisMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem solarHeatMapMenuItem;
+	private JCheckBoxMenuItem onlyAbsorptionInSolarMapMenuItem;
 	private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
@@ -139,7 +140,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem pageSetupMenuItem;
 	private JRadioButtonMenuItem scaleToFitRadioButtonMenuItem;
 	private JRadioButtonMenuItem exactSizeRadioButtonMenuItem;
-	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
+	private final ButtonGroup printSizeOptionBbuttonGroup = new ButtonGroup();
 	private JMenuItem importMenuItem;
 	private JCheckBoxMenuItem snapMenuItem;
 	private JCheckBoxMenuItem gridsMenuItem;
@@ -148,7 +149,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem noTextureMenuItem;
 	private JRadioButtonMenuItem simpleTextureMenuItem;
 	private JRadioButtonMenuItem fullTextureMenuItem;
-	private final ButtonGroup buttonGroup_2 = new ButtonGroup();
+	private final ButtonGroup textureButtonGroup = new ButtonGroup();
 	private JMenu colorMenu;
 	private JMenuItem platformColorMenuItem;
 	private JMenuItem wallColorMenuItem;
@@ -895,7 +896,8 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(solarHeatMapMenuItem, SceneManager.getInstance().getSolarColorMap());
+					Util.selectSilently(solarHeatMapMenuItem, SceneManager.getInstance().getSolarHeatMap());
+					Util.selectSilently(onlyAbsorptionInSolarMapMenuItem, Scene.getInstance().getOnlyAbsorptionInSolarMap());
 					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesShown());
@@ -912,6 +914,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getColorMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarHeatMapMenuItem());
+			viewMenu.add(getSolarAbsorptionMapMenuItem());
 			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
@@ -1100,13 +1103,28 @@ public class MainFrame extends JFrame {
 			solarHeatMapMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setSolarColorMap(solarHeatMapMenuItem.isSelected());
+					SceneManager.getInstance().setSolarHeatMap(solarHeatMapMenuItem.isSelected());
 					Scene.getInstance().redrawAll();
 					SceneManager.getInstance().refresh();
 				}
 			});
 		}
 		return solarHeatMapMenuItem;
+	}
+
+	private JCheckBoxMenuItem getSolarAbsorptionMapMenuItem() {
+		if (onlyAbsorptionInSolarMapMenuItem == null) {
+			onlyAbsorptionInSolarMapMenuItem = new JCheckBoxMenuItem("Show Only Absorption in Solar Heat Map");
+			onlyAbsorptionInSolarMapMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().setOnlyAbsorptionInSolarMap(onlyAbsorptionInSolarMapMenuItem.isSelected());
+					Scene.getInstance().redrawAll();
+					SceneManager.getInstance().refresh();
+				}
+			});
+		}
+		return onlyAbsorptionInSolarMapMenuItem;
 	}
 
 	private JCheckBoxMenuItem getHeatFluxMenuItem() {
@@ -1394,7 +1412,7 @@ public class MainFrame extends JFrame {
 					PrintController.getInstance().setScaleToFit(true);
 				}
 			});
-			buttonGroup_1.add(scaleToFitRadioButtonMenuItem);
+			printSizeOptionBbuttonGroup.add(scaleToFitRadioButtonMenuItem);
 			scaleToFitRadioButtonMenuItem.setSelected(true);
 		}
 		return scaleToFitRadioButtonMenuItem;
@@ -1409,7 +1427,7 @@ public class MainFrame extends JFrame {
 					PrintController.getInstance().setScaleToFit(false);
 				}
 			});
-			buttonGroup_1.add(exactSizeRadioButtonMenuItem);
+			printSizeOptionBbuttonGroup.add(exactSizeRadioButtonMenuItem);
 		}
 		return exactSizeRadioButtonMenuItem;
 	}
@@ -1528,7 +1546,7 @@ public class MainFrame extends JFrame {
 					Scene.getInstance().setEdited(true);
 				}
 			});
-			buttonGroup_2.add(noTextureMenuItem);
+			textureButtonGroup.add(noTextureMenuItem);
 		}
 		return noTextureMenuItem;
 	}
@@ -1544,7 +1562,7 @@ public class MainFrame extends JFrame {
 					Scene.getInstance().setEdited(true);
 				}
 			});
-			buttonGroup_2.add(simpleTextureMenuItem);
+			textureButtonGroup.add(simpleTextureMenuItem);
 		}
 		return simpleTextureMenuItem;
 	}
@@ -1561,7 +1579,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 			fullTextureMenuItem.setSelected(true);
-			buttonGroup_2.add(fullTextureMenuItem);
+			textureButtonGroup.add(fullTextureMenuItem);
 		}
 		return fullTextureMenuItem;
 	}
@@ -1705,6 +1723,7 @@ public class MainFrame extends JFrame {
 				}
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
 					PrintController.getInstance().restartAnimation();
+				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				Scene.getInstance().setEdited(true);
 			}
 		};
@@ -1834,6 +1853,7 @@ public class MainFrame extends JFrame {
 				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
 					PrintController.getInstance().restartAnimation();
+				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				Scene.getInstance().setEdited(true);
 			}
 		};

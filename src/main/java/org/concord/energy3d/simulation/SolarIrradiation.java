@@ -213,7 +213,7 @@ public class SolarIrradiation {
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
-		final float absorption = housePart instanceof Window ? 1 : 1 - housePart.getAlbedo();
+		final float absorption = Scene.getInstance().getOnlyAbsorptionInSolarMap() ? (housePart instanceof Window ? 1 : 1 - housePart.getAlbedo()) : 1;
 
 		if (housePart instanceof Roof) { // for now, only store this for roofs that have different meshes
 			if (data.solarPotential == null)

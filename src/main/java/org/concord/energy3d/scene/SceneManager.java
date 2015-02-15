@@ -197,7 +197,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Node newImport;
 	private Vector3 houseMoveStartPoint;
 	private ArrayList<Vector3> houseMovePoints;
-	private boolean solarColorMap = false;
+	private boolean solarHeatMap = false;
 	private boolean heatFluxDaily = true;
 	private Spatial axes;
 	private boolean showBuildingLabels = false;
@@ -1533,16 +1533,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return canvas.getCanvasRenderer().getCamera();
 	}
 
-	public boolean getSolarColorMap() {
-		return solarColorMap;
+	public boolean getSolarHeatMap() {
+		return solarHeatMap;
 	}
 
-	public void setSolarColorMapWithoutUpdate(final boolean solarColorMap) {
-		this.solarColorMap = solarColorMap;
+	public void setSolarHeatMapWithoutUpdate(final boolean solarHeatMap) {
+		this.solarHeatMap = solarHeatMap;
 	}
 
-	public void setSolarColorMap(final boolean solarColorMap) {
-		setSolarColorMapWithoutUpdate(solarColorMap);
+	public void setSolarHeatMap(final boolean solarHeatMap) {
+		setSolarHeatMapWithoutUpdate(solarHeatMap);
 		EnergyPanel.getInstance().clearAlreadyRendered();
 		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}

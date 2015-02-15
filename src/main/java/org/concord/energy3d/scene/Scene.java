@@ -121,6 +121,7 @@ public class Scene implements Serializable {
 	private double backgroundAlbedo = 0.3;
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
+	private boolean fullEnergyInSolarMap = false;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -206,7 +207,7 @@ public class Scene implements Serializable {
 			MainPanel.getInstance().getHeliodonButton().setSelected(false);
 			MainPanel.getInstance().getSunAnimButton().setSelected(false);
 			// MainPanel.getInstance().getSolarButton().setSelected(false);
-			SceneManager.getInstance().setSolarColorMapWithoutUpdate(false);
+			SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
 			Wall.resetDefaultWallHeight();
 
 			if (url == null) {
@@ -939,6 +940,14 @@ public class Scene implements Serializable {
 
 	public void setAlwaysComputeHeatFluxVectors(final boolean alwaysComputeHeatFluxVectors) {
 		this.alwaysComputeHeatFluxVectors = alwaysComputeHeatFluxVectors;
+	}
+
+	public boolean getOnlyAbsorptionInSolarMap() {
+		return !fullEnergyInSolarMap;
+	}
+
+	public void setOnlyAbsorptionInSolarMap(boolean onlyAbsorptionInSolarMap) {
+		fullEnergyInSolarMap = !onlyAbsorptionInSolarMap;
 	}
 
 	public int countParts(final Foundation foundation, final Class<?> clazz) {

@@ -776,7 +776,7 @@ public class Foundation extends HousePart {
 	}
 
 	public void showBuildingLabel(final boolean b) {
-		buildingLabel.setVisible(b && SceneManager.getInstance().getSolarColorMap());
+		buildingLabel.setVisible(b && SceneManager.getInstance().getSolarHeatMap());
 	}
 
 	public void setSolarLabelValue(final double solarValue) {
