@@ -1473,7 +1473,7 @@ public class MainFrame extends JFrame {
 		return gridsMenuItem;
 	}
 
-	private JCheckBoxMenuItem getTopViewCheckBoxMenuItem() {
+	public JCheckBoxMenuItem getTopViewCheckBoxMenuItem() {
 		if (topViewCheckBoxMenuItem == null) {
 			topViewCheckBoxMenuItem = new JCheckBoxMenuItem("2D Top View");
 			topViewCheckBoxMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));

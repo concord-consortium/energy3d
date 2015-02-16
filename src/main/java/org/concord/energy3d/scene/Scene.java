@@ -30,6 +30,7 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.SolarIrradiation;
 import org.concord.energy3d.undo.SaveCommand;
@@ -189,6 +190,15 @@ public class Scene implements Serializable {
 				initEnergy();
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				EnergyPanel.getInstance().update();
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
+							MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
+							SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+							SceneManager.getInstance().resetCamera();
+						}
+					}
+				});
 				return null;
 			}
 		});

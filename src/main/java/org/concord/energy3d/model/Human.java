@@ -48,8 +48,8 @@ public class Human extends HousePart {
 			height = 9;
 			break;
 		case JILL:
-			width = 2.6;
-			height = 7;
+			width = 3;
+			height = 8;
 			break;
 		case JACK:
 			width = 2.8;
