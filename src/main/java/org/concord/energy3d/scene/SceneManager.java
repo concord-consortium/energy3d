@@ -622,6 +622,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+					if (Config.isMac()) {// control-click is mouse right-click on the Mac
+						final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
+						if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL)) {
+							mouseRightClicked(inputStates.getCurrent().getMouseState());
+							return;
+						}
+					}
 					if (firstClickState == null) {
 						firstClickState = inputStates;
 						mousePressed(inputStates.getCurrent().getMouseState());
