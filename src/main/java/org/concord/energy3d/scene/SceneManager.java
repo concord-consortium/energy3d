@@ -622,7 +622,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (Config.isMac()) {// control-click is mouse right-click on the Mac
+					if (Config.isMac()) { // control-click is mouse right-click on the Mac
 						final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
 						if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL)) {
 							mouseRightClicked(inputStates.getCurrent().getMouseState());
@@ -642,6 +642,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+					if (Config.isMac()) { // control-click is mouse right-click on the Mac, skip
+						final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
+						if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL))
+							return;
+					}
 					// if editing object using select or resize then only mouse drag is allowed
 					if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 						firstClickState = null;
@@ -680,6 +685,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.LEFT), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (Config.isMac()) { // control-click is mouse right-click on the Mac, skip
+					final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
+					if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL))
+						return;
+				}
 				if (!isTopView() && inputStates.getCurrent().getMouseState().getClickCount(MouseButton.LEFT) == 2) {
 					if (PrintController.getInstance().isPrintPreview()) {
 						final MouseState mouse = inputStates.getCurrent().getMouseState();
