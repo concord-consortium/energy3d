@@ -16,7 +16,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.shapes.SizeAnnotation;
-import org.concord.energy3d.simulation.SolarIrradiation;
+import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.undo.MakeGableCommand;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.PolygonWithHoles;
@@ -1060,7 +1060,7 @@ public abstract class Roof extends HousePart {
 
 	double calculateHeatVector(final Mesh mesh) {
 		double heat = 0;
-		final double[] heatLossArray = SolarIrradiation.getInstance().getHeatLoss(mesh);
+		final double[] heatLossArray = SolarRadiation.getInstance().getHeatLoss(mesh);
 		if (heatLossArray != null) {
 			if (SceneManager.getInstance().isHeatFluxDaily()) {
 				for (final double x : heatLossArray)

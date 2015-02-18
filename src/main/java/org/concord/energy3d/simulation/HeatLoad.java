@@ -78,10 +78,10 @@ public class HeatLoad {
 		if (EnergyPanel.getInstance().getCityComboBox().getSelectedItem().equals(""))
 			return;
 
-		final int timeStep = SolarIrradiation.getInstance().getTimeStep();
+		final int timeStep = SolarRadiation.getInstance().getTimeStep();
 		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 		int iMinute = 0;
-		for (int minute = 0; minute < SolarIrradiation.MINUTES_OF_DAY; minute += timeStep) {
+		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
 			iMinute = minute / timeStep;
 			for (final HousePart part : Scene.getInstance().getParts()) {
 				final double outsideTemperature = CityData.getInstance().computeOutsideTemperatureRange(outsideTemperatureRange, minute);
@@ -90,7 +90,7 @@ public class HeatLoad {
 					final Roof roof = (Roof) part;
 					for (final Spatial child : roof.getRoofPartsRoot().getChildren()) {
 						final Mesh mesh = (Mesh) ((Node) child).getChild(0);
-						final double[] solarPotential = SolarIrradiation.getInstance().getSolarPotential(mesh);
+						final double[] solarPotential = SolarRadiation.getInstance().getSolarPotential(mesh);
 						final double solarHeat = solarPotential != null ? solarPotential[iMinute] * absorption / part.getVolumetricHeatCapacity() : 0;
 						final double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 						if (part.isDrawCompleted()) {
@@ -101,7 +101,7 @@ public class HeatLoad {
 							if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
 								heatloss = 0;
 							roof.getHeatLoss()[iMinute] += heatloss;
-							final double[] heatLossArray = SolarIrradiation.getInstance().getHeatLoss(mesh);
+							final double[] heatLossArray = SolarRadiation.getInstance().getHeatLoss(mesh);
 							if (heatLossArray != null)
 								heatLossArray[iMinute] += heatloss;
 						}

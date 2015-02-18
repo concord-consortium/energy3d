@@ -32,7 +32,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.simulation.SolarIrradiation;
+import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Specifications;
@@ -375,8 +375,8 @@ public class Scene implements Serializable {
 			instance.backgroundAlbedo = 0.3;
 		if (Util.isZero(instance.heatVectorLength))
 			instance.heatVectorLength = 5000;
-		SolarIrradiation.getInstance().setSolarStep(Util.isZero(instance.solarStep) ? 2 : instance.solarStep);
-		SolarIrradiation.getInstance().setTimeStep(Util.isZero(instance.timeStep) ? 15 : instance.timeStep);
+		SolarRadiation.getInstance().setSolarStep(Util.isZero(instance.solarStep) ? 2 : instance.solarStep);
+		SolarRadiation.getInstance().setTimeStep(Util.isZero(instance.timeStep) ? 15 : instance.timeStep);
 		instance.setEdited(false);
 
 	}
@@ -530,8 +530,8 @@ public class Scene implements Serializable {
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
-				instance.solarStep = SolarIrradiation.getInstance().getSolarStep();
-				instance.timeStep = SolarIrradiation.getInstance().getTimeStep();
+				instance.solarStep = SolarRadiation.getInstance().getSolarStep();
+				instance.timeStep = SolarRadiation.getInstance().getTimeStep();
 				instance.wallUFactor = (String) EnergyPanel.getInstance().getWallsComboBox().getSelectedItem();
 				instance.windowUFactor = (String) EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem();
 				instance.doorUFactor = (String) EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem();

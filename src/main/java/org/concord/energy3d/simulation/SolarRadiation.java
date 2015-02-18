@@ -52,7 +52,7 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class SolarIrradiation {
+public class SolarRadiation {
 
 	public final static double SOLAR_CONSTANT = 1.361; // in kW, see http://en.wikipedia.org/wiki/Solar_constant
 	public final static int MINUTES_OF_DAY = 1440;
@@ -64,7 +64,7 @@ public class SolarIrradiation {
 	public final static int AIR_MASS_KASTEN_YOUNG = 0;
 	public final static int AIR_MASS_SPHERE_MODEL = 1;
 
-	private static SolarIrradiation instance = new SolarIrradiation();
+	private static SolarRadiation instance = new SolarRadiation();
 	private final Map<Mesh, MeshData> onMesh = new HashMap<Mesh, MeshData>();
 	private final List<Spatial> collidables = new ArrayList<Spatial>();
 	private int timeStep = 15;
@@ -86,16 +86,16 @@ public class SolarIrradiation {
 		public double[] heatLoss;
 	}
 
-	public static SolarIrradiation getInstance() {
+	public static SolarRadiation getInstance() {
 		return instance;
 	}
 
 	public void compute() {
-		System.out.println("computeIrradiation()");
+		System.out.println("computeSolarRadiation()");
 		initCollidables();
 		onMesh.clear();
 		for (final HousePart part : Scene.getInstance().getParts())
-			part.setSolarPotential(new double[SolarIrradiation.MINUTES_OF_DAY / timeStep]);
+			part.setSolarPotential(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
 		maxValue = 1;
 		computeToday((Calendar) Heliodon.getInstance().getCalender().clone());
 	}
@@ -114,7 +114,7 @@ public class SolarIrradiation {
 		collidables.clear();
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor)
-				collidables.add(part.getIrradiationCollisionSpatial());
+				collidables.add(part.getRadiationCollisionSpatial());
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
 					collidables.add(((Node) roofPart).getChild(0));
@@ -125,9 +125,9 @@ public class SolarIrradiation {
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
-		final ReadOnlyVector3[] sunLocations = new ReadOnlyVector3[SolarIrradiation.MINUTES_OF_DAY / timeStep];
+		final ReadOnlyVector3[] sunLocations = new ReadOnlyVector3[SolarRadiation.MINUTES_OF_DAY / timeStep];
 		int totalSteps = 0;
-		for (int minute = 0; minute < SolarIrradiation.MINUTES_OF_DAY; minute += timeStep) {
+		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
 			sunLocations[minute / timeStep] = sunLocation;
 			if (sunLocation.getZ() > 0)
@@ -137,16 +137,16 @@ public class SolarIrradiation {
 		totalSteps -= 2;
 		final double dayLength = totalSteps * timeStep / 60.0;
 		int step = 1;
-		for (int minute = 0; minute < SolarIrradiation.MINUTES_OF_DAY; minute += timeStep) {
+		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = sunLocations[minute / timeStep];
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (part.isDrawCompleted())
 						if (part instanceof Foundation || part instanceof Wall || part instanceof Window)
-							computeOnMesh(minute, dayLength, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
+							computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getFaceDirection(), true);
 						else if (part instanceof SolarPanel || part instanceof Sensor)
-							computeOnMeshSolarPanel(minute, dayLength, directionTowardSun, part, part.getIrradiationMesh(), (Mesh) part.getIrradiationCollisionSpatial(), part.getFaceDirection(), true);
+							computeOnMeshSolarPanel(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getFaceDirection(), true);
 						else if (part instanceof Roof)
 							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 								final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
@@ -522,7 +522,7 @@ public class SolarIrradiation {
 		applyTexture(SceneManager.getInstance().getSolarLand());
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel || part instanceof Sensor)
-				applyTexture(part.getIrradiationMesh());
+				applyTexture(part.getRadiationMesh());
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 					final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);

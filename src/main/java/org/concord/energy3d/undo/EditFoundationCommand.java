@@ -41,7 +41,7 @@ public class EditFoundationCommand extends EditHousePartCommand {
 			e.printStackTrace();
 		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
-		EnergyPanel.getInstance().clearIrradiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class EditFoundationCommand extends EditHousePartCommand {
 			e.printStackTrace();
 		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
-		EnergyPanel.getInstance().clearIrradiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override

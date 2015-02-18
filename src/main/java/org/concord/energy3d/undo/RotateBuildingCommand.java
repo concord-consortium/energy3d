@@ -33,14 +33,14 @@ public class RotateBuildingCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		SceneManager.getInstance().undoOrRedoBuildingRotation(foundation, rotationAngle, true);
-		EnergyPanel.getInstance().clearIrradiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		SceneManager.getInstance().undoOrRedoBuildingRotation(foundation, rotationAngle, false);
-		EnergyPanel.getInstance().clearIrradiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override

@@ -216,7 +216,7 @@ public class Tree extends HousePart {
 	}
 
 	@Override
-	public Spatial getIrradiationCollisionSpatial() {
+	public Spatial getRadiationCollisionSpatial() {
 		return getCollisionSpatial();
 	}
 

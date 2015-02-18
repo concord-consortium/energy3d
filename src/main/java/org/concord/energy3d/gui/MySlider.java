@@ -6,7 +6,7 @@ import java.awt.Graphics;
 
 import javax.swing.JSlider;
 
-import org.concord.energy3d.simulation.SolarIrradiation;
+import org.concord.energy3d.simulation.SolarRadiation;
 
 import com.ardor3d.math.ColorRGBA;
 
@@ -29,7 +29,7 @@ class MySlider extends JSlider {
 		final Dimension size = getSize();
 		final int y1 = 2 * size.height / 3;
 		for (int x = 0; x < size.width - STEP; x += STEP) {
-			final ColorRGBA color = SolarIrradiation.getInstance().computeColor(x, size.width);
+			final ColorRGBA color = SolarRadiation.getInstance().computeColor(x, size.width);
 			g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 			g.fillRect(x, 0, x + STEP, y1);
 		}

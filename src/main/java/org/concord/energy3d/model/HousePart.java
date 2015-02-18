@@ -15,7 +15,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.shapes.SizeAnnotation;
-import org.concord.energy3d.simulation.SolarIrradiation;
+import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
@@ -673,7 +673,7 @@ public abstract class HousePart implements Serializable {
 		} else {
 			if (SceneManager.getInstance().getSolarHeatMap()) {
 				if (isDrawable() && (this instanceof Foundation || this instanceof Wall || this instanceof Roof))
-					SolarIrradiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getFaceDirection());
+					SolarRadiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getFaceDirection());
 			} else if (isFrozen()) {
 				mesh.clearRenderState(StateType.Texture);
 				mesh.setDefaultColor(Scene.GRAY);
@@ -896,16 +896,12 @@ public abstract class HousePart implements Serializable {
 		this.solarPotentialToday = solarPotentialToday;
 	}
 
-	public boolean isIrradiation() {
-		return true;
-	}
-
-	public Mesh getIrradiationMesh() {
+	public Mesh getRadiationMesh() {
 		return mesh;
 	}
 
-	public Spatial getIrradiationCollisionSpatial() {
-		return getIrradiationMesh();
+	public Spatial getRadiationCollisionSpatial() {
+		return getRadiationMesh();
 	}
 
 	public Spatial getEditPointsRoot() {

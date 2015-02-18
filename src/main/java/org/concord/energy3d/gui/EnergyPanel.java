@@ -65,7 +65,7 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.CityData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.HeatLoad;
-import org.concord.energy3d.simulation.SolarIrradiation;
+import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.util.Specifications;
 import org.concord.energy3d.util.Util;
 
@@ -963,12 +963,12 @@ public class EnergyPanel extends JPanel {
 
 			synchronized (SceneManager.getInstance()) {
 				updateWeatherData();
-				final int timeStep = SolarIrradiation.getInstance().getTimeStep();
+				final int timeStep = SolarRadiation.getInstance().getTimeStep();
 				for (final HousePart part : Scene.getInstance().getParts())
-					part.setHeatLoss(new double[SolarIrradiation.MINUTES_OF_DAY / timeStep]);
-				SolarIrradiation.getInstance().compute();
+					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
+				SolarRadiation.getInstance().compute();
 				HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), (Integer) insideTemperatureSpinner.getValue());
-				SolarIrradiation.getInstance().computeTotalEnergyForBuildings();
+				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Solar energy calculation completed", 0, 1));
 				updatePartEnergy();
 				Scene.getInstance().setTreeLeaves();
@@ -983,7 +983,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	// TODO: There should be a better way to do this.
-	public void clearIrradiationHeatMap() {
+	public void clearRadiationHeatMap() {
 		compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 

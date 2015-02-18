@@ -44,7 +44,7 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 		for (int i = 0; i < orgPoints.size(); i++)
 			housePart.getPoints().set(i, orgPoints.get(i).clone());
 		Scene.getInstance().redrawAll();
-		EnergyPanel.getInstance().clearIrradiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 		for (int i = 0; i < newPoints.size(); i++)
 			housePart.getPoints().set(i, newPoints.get(i).clone());
 		Scene.getInstance().redrawAll();
-		EnergyPanel.getInstance().clearIrradiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override

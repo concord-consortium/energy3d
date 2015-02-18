@@ -27,14 +27,14 @@ public class AddHousePartCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		Scene.getInstance().remove(housePart, true);
-		EnergyPanel.getInstance().clearIrradiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		Scene.getInstance().add(housePart, true);
-		EnergyPanel.getInstance().clearIrradiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override

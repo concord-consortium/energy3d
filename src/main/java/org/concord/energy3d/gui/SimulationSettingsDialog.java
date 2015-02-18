@@ -18,7 +18,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.simulation.SolarIrradiation;
+import org.concord.energy3d.simulation.SolarRadiation;
 
 /**
  * @author Charles Xie
@@ -41,9 +41,9 @@ class SimulationSettingsDialog extends JDialog {
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
-		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(SolarIrradiation.getInstance().getSolarStep()));
+		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(SolarRadiation.getInstance().getSolarStep()));
 		final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
-		final JTextField timeStepTextField = new JTextField(FORMAT2.format(SolarIrradiation.getInstance().getTimeStep()));
+		final JTextField timeStepTextField = new JTextField(FORMAT2.format(SolarRadiation.getInstance().getTimeStep()));
 		final JTextField albedoTextField = new JTextField(FORMAT1.format(Scene.getInstance().getBackgroundAlbedo()));
 		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
 
@@ -81,9 +81,9 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Background albedo must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				SolarIrradiation.getInstance().setSolarStep(cellSize);
-				SolarIrradiation.getInstance().setTimeStep(timeStep);
-				SolarIrradiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
+				SolarRadiation.getInstance().setSolarStep(cellSize);
+				SolarRadiation.getInstance().setTimeStep(timeStep);
+				SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
 				Scene.getInstance().setHeatVectorLength(heatVectorLength);
 				Scene.getInstance().setBackgroundAlbedo(albedo);
 				Scene.getInstance().setEdited(true);
@@ -93,7 +93,7 @@ class SimulationSettingsDialog extends JDialog {
 		};
 
 		// set the grid size ("solar step")
-		panel.add(new JLabel("Irradiation Grid Cell Size: "));
+		panel.add(new JLabel("Radiation Grid Cell Size: "));
 		panel.add(cellSizeTextField);
 		cellSizeTextField.setColumns(6);
 		panel.add(new JLabel("Internal unit"));
@@ -111,7 +111,7 @@ class SimulationSettingsDialog extends JDialog {
 
 		// choose air mass
 		panel.add(new JLabel("Air Mass: "));
-		airMassComboBox.setSelectedIndex(SolarIrradiation.getInstance().getAirMassSelection() + 1);
+		airMassComboBox.setSelectedIndex(SolarRadiation.getInstance().getAirMassSelection() + 1);
 		panel.add(airMassComboBox);
 		panel.add(new JLabel("Dimensionless"));
 
