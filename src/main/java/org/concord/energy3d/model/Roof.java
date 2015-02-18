@@ -1039,7 +1039,12 @@ public abstract class Roof extends HousePart {
 	}
 
 	public double getArea(final Mesh mesh) {
-		return areaByPart != null ? areaByPart.get(mesh) : 0;
+		if (areaByPart == null)
+			return 0;
+		Double d = areaByPart.get(mesh);
+		if (d == null)
+			return 0;
+		return d;
 	}
 
 	@Override
