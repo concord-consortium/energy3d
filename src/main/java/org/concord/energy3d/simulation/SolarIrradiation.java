@@ -470,7 +470,7 @@ public class SolarIrradiation {
 	}
 
 	// Solar radiation incident outside the earth's atmosphere is called extraterrestrial radiation.
-	// http://pvpmc.org/modeling-steps/irradiance-and-weather-2/irradiance-and-insolation/extraterrestrial-radiation/
+	// https://pvpmc.sandia.gov/modeling-steps/1-weather-design-inputs/irradiance-and-insolation-2/extraterrestrial-radiation/
 	private static double getExtraterrestrialRadiation() {
 		final double b = Math.PI * 2.0 * Heliodon.getInstance().getCalender().get(Calendar.DAY_OF_YEAR) / 365.0;
 		final double er = 1.00011 + 0.034221 * Math.cos(b) + 0.00128 * Math.sin(b) + 0.000719 * Math.cos(2 * b) + 0.000077 * Math.sin(2 * b);

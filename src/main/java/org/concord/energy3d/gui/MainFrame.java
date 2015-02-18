@@ -1544,6 +1544,8 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.None);
 					Scene.getInstance().setEdited(true);
+					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
+						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				}
 			});
 			textureButtonGroup.add(noTextureMenuItem);
@@ -1560,6 +1562,8 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Simple);
 					Scene.getInstance().setEdited(true);
+					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
+						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				}
 			});
 			textureButtonGroup.add(simpleTextureMenuItem);
@@ -1576,6 +1580,8 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Full);
 					Scene.getInstance().setEdited(true);
+					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
+						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				}
 			});
 			fullTextureMenuItem.setSelected(true);
