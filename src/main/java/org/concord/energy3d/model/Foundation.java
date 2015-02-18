@@ -210,7 +210,7 @@ public class Foundation extends HousePart {
 			index = editPointIndex;
 
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, (HousePart) null);
-		final Vector3 p;
+		Vector3 p;
 		if (pick != null && index < 4) {
 			p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
@@ -224,6 +224,7 @@ public class Foundation extends HousePart {
 			points.get(3).set(p.add(0.1, 0.1, 0, null));
 		} else {
 			if (index < 4) {
+				p = ensureDistanceFromOtherFoundations(p, index);
 				if (!resizeHouseMode)
 					ensureIncludesChildren(p, index);
 
@@ -393,10 +394,11 @@ public class Foundation extends HousePart {
 				final Vector3 p0 = part.getAbsPoint(0);
 				final Vector3 p1 = part.getAbsPoint(1);
 				final Vector3 p2 = part.getAbsPoint(2);
-				final double minX = Math.min(p0.getX(), p2.getX()) - getGridSize();
-				final double maxX = Math.max(p0.getX(), p2.getX()) + getGridSize();
-				final double minY = Math.min(p0.getY(), p1.getY()) - getGridSize();
-				final double maxY = Math.max(p0.getY(), p1.getY()) + getGridSize();
+				final double minDistance = 0;
+				final double minX = Math.min(p0.getX(), p2.getX()) - minDistance;
+				final double maxX = Math.max(p0.getX(), p2.getX()) + minDistance;
+				final double minY = Math.min(p0.getY(), p1.getY()) - minDistance;
+				final double maxY = Math.max(p0.getY(), p1.getY()) + minDistance;
 				if (isFirstPointInserted()) {
 					final double oppositeX = getAbsPoint(index == 0 || index == 1 ? 2 : 0).getX();
 					final double oppositeY = getAbsPoint(index == 0 || index == 2 ? 1 : 0).getY();
