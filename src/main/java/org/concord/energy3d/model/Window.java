@@ -200,9 +200,6 @@ public class Window extends HousePart {
 			bars.getMeshData().updateVertexCount();
 			bars.updateModelBound();
 		}
-
-		drawHeatFlux();
-
 	}
 
 	@Override

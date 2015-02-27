@@ -975,48 +975,37 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void drawHeatFlux() {
-
-		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsShown()) {
-
-			heatFlux.getSceneHints().setCullHint(CullHint.Inherit);
-
-			FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
-			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / heatFluxUnitArea);
-			final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / heatFluxUnitArea);
-			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
-			heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
-			final double heat = calculateHeatVector();
-			if (heat != 0) {
-				final ReadOnlyVector3 o = getAbsPoint(0);
-				final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
-				final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
-				final ReadOnlyVector3 normal = getFaceDirection();
-				final Vector3 a = new Vector3();
-				double g, h;
-				for (int j = 0; j < cols; j++) {
-					h = j + 0.5;
-					for (int i = 0; i < rows; i++) {
-						g = i + 0.5;
-						a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
-						a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
-						a.setZ(o.getZ() + g * v.getZ() / rows + h * u.getZ() / cols);
-						drawArrow(a, normal, arrowsVertices, heat);
-					}
+		FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
+		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / heatFluxUnitArea);
+		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / heatFluxUnitArea);
+		arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+		heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
+		final double heat = calculateHeatVector();
+		if (heat != 0) {
+			final ReadOnlyVector3 o = getAbsPoint(0);
+			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
+			final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
+			final ReadOnlyVector3 normal = getFaceDirection();
+			final Vector3 a = new Vector3();
+			double g, h;
+			for (int j = 0; j < cols; j++) {
+				h = j + 0.5;
+				for (int i = 0; i < rows; i++) {
+					g = i + 0.5;
+					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+					a.setZ(o.getZ() + g * v.getZ() / rows + h * u.getZ() / cols);
+					drawArrow(a, normal, arrowsVertices, heat);
 				}
-				heatFlux.getMeshData().updateVertexCount();
-				heatFlux.updateModelBound();
 			}
-
-		} else {
-
-			heatFlux.getSceneHints().setCullHint(CullHint.Always);
-
+			heatFlux.getMeshData().updateVertexCount();
+			heatFlux.updateModelBound();
 		}
 
+		updateHeatFluxVisibility();
 	}
 
-	void drawArrow(final ReadOnlyVector3 o, final ReadOnlyVector3 normal, final FloatBuffer arrowsVertices, final double heat) {
-
+	protected void drawArrow(final ReadOnlyVector3 o, final ReadOnlyVector3 normal, final FloatBuffer arrowsVertices, final double heat) {
 		if (this instanceof Wall) {
 			final Wall wall = (Wall) this;
 			for (final HousePart x : wall.children) {
@@ -1073,7 +1062,10 @@ public abstract class HousePart implements Serializable {
 				arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() - arrowLength * sin).put(p2.getZf() + arrowLength * 0.5f);
 			}
 		}
+	}
 
+	public void updateHeatFluxVisibility() {
+		heatFlux.setVisible(Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsShown());
 	}
 
 }

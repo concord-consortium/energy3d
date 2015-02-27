@@ -75,7 +75,6 @@ import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
-import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.undo.ChangeColorTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
@@ -1104,8 +1103,6 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setSolarHeatMap(solarHeatMapMenuItem.isSelected());
-					Scene.getInstance().redrawAll();
-					SceneManager.getInstance().refresh();
 					Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), solarHeatMapMenuItem.isSelected());
 				}
 			});
@@ -1135,8 +1132,6 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setAlwaysComputeHeatFluxVectors(showHeatFluxVectorsMenuItem.isSelected());
-					SolarRadiation.getInstance().drawHeatFlux();
-					SceneManager.getInstance().refresh();
 				}
 			});
 		}

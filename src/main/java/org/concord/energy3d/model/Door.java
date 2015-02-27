@@ -103,10 +103,7 @@ public class Door extends HousePart {
 		textureBuffer.put(1).put(0);
 		textureBuffer.put(1).put(1);
 
-		drawHeatFlux();
-
 		mesh.updateModelBound();
-
 	}
 
 	@Override

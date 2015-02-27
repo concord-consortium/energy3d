@@ -1233,83 +1233,75 @@ public class Wall extends HousePart {
 
 	@Override
 	public void drawHeatFlux() {
-
-		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsShown()) {
-
-			double zmax = -Double.MAX_VALUE;
-			final List<Vector3> wallPolygonPoints = getWallPolygonPoints();
-			for (final Vector3 a : wallPolygonPoints) {
-				if (a.getZ() > zmax)
-					zmax = a.getZ();
-			}
-
-			final Path2D.Double path = new Path2D.Double();
-			path.moveTo(0, 0);
-			final Vector3 v1 = new Vector3();
-			final Vector3 v2 = new Vector3();
-			wallPolygonPoints.get(1).subtract(wallPolygonPoints.get(0), v1);
-			wallPolygonPoints.get(2).subtract(wallPolygonPoints.get(0), v2);
-			if (Util.isZero(v1.getX()) && Util.isZero(v2.getX())) {
-				path.moveTo(v1.getY(), v1.getZ());
-				path.lineTo(v2.getY(), v2.getZ());
-				for (int i = 3; i < wallPolygonPoints.size(); i++) {
-					wallPolygonPoints.get(i).subtract(wallPolygonPoints.get(0), v2);
-					path.lineTo(v2.getY(), v2.getZ());
-				}
-			} else { // always use the Y plane unless it is a X plane as above
-				path.moveTo(v1.getX(), v1.getZ());
-				path.lineTo(v2.getX(), v2.getZ());
-				for (int i = 3; i < wallPolygonPoints.size(); i++) {
-					wallPolygonPoints.get(i).subtract(wallPolygonPoints.get(0), v2);
-					path.lineTo(v2.getX(), v2.getZ());
-				}
-			}
-			path.lineTo(0, 0);
-			path.closePath();
-
-			heatFlux.getSceneHints().setCullHint(CullHint.Inherit);
-
-			FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
-			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / heatFluxUnitArea);
-			final int rows = (int) Math.max(2, zmax / heatFluxUnitArea);
-			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
-			heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
-			final double heat = calculateHeatVector();
-			if (heat != 0) {
-				final ReadOnlyVector3 o = getAbsPoint(0);
-				final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
-				final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
-				final ReadOnlyVector3 normal = getFaceDirection();
-				final Vector3 a = new Vector3();
-				double g, h;
-				for (int j = 0; j < cols; j++) {
-					h = j + 0.5;
-					for (int i = 0; i < rows - 1; i++) {
-						g = i + 0.5;
-						a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
-						a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
-						a.setZ(o.getZ() + g * zmax / rows);
-						a.subtract(wallPolygonPoints.get(0), v1);
-						if (Util.isZero(v1.getX())) {
-							if (!path.contains(v1.getY(), v1.getZ()))
-								break;
-						} else {
-							if (!path.contains(v1.getX(), v1.getZ()))
-								break;
-						}
-						drawArrow(a, normal, arrowsVertices, heat);
-					}
-				}
-				heatFlux.getMeshData().updateVertexCount();
-				heatFlux.updateModelBound();
-			}
-
-		} else {
-
-			heatFlux.getSceneHints().setCullHint(CullHint.Always);
-
+		double zmax = -Double.MAX_VALUE;
+		final List<Vector3> wallPolygonPoints = getWallPolygonPoints();
+		for (final Vector3 a : wallPolygonPoints) {
+			if (a.getZ() > zmax)
+				zmax = a.getZ();
 		}
 
+		final Path2D.Double path = new Path2D.Double();
+		path.moveTo(0, 0);
+		final Vector3 v1 = new Vector3();
+		final Vector3 v2 = new Vector3();
+		wallPolygonPoints.get(1).subtract(wallPolygonPoints.get(0), v1);
+		wallPolygonPoints.get(2).subtract(wallPolygonPoints.get(0), v2);
+		if (Util.isZero(v1.getX()) && Util.isZero(v2.getX())) {
+			path.moveTo(v1.getY(), v1.getZ());
+			path.lineTo(v2.getY(), v2.getZ());
+			for (int i = 3; i < wallPolygonPoints.size(); i++) {
+				wallPolygonPoints.get(i).subtract(wallPolygonPoints.get(0), v2);
+				path.lineTo(v2.getY(), v2.getZ());
+			}
+		} else { // always use the Y plane unless it is a X plane as above
+			path.moveTo(v1.getX(), v1.getZ());
+			path.lineTo(v2.getX(), v2.getZ());
+			for (int i = 3; i < wallPolygonPoints.size(); i++) {
+				wallPolygonPoints.get(i).subtract(wallPolygonPoints.get(0), v2);
+				path.lineTo(v2.getX(), v2.getZ());
+			}
+		}
+		path.lineTo(0, 0);
+		path.closePath();
+
+		heatFlux.getSceneHints().setCullHint(CullHint.Inherit);
+
+		FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
+		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / heatFluxUnitArea);
+		final int rows = (int) Math.max(2, zmax / heatFluxUnitArea);
+		arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+		heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
+		final double heat = calculateHeatVector();
+		if (heat != 0) {
+			final ReadOnlyVector3 o = getAbsPoint(0);
+			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
+			final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
+			final ReadOnlyVector3 normal = getFaceDirection();
+			final Vector3 a = new Vector3();
+			double g, h;
+			for (int j = 0; j < cols; j++) {
+				h = j + 0.5;
+				for (int i = 0; i < rows - 1; i++) {
+					g = i + 0.5;
+					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+					a.setZ(o.getZ() + g * zmax / rows);
+					a.subtract(wallPolygonPoints.get(0), v1);
+					if (Util.isZero(v1.getX())) {
+						if (!path.contains(v1.getY(), v1.getZ()))
+							break;
+					} else {
+						if (!path.contains(v1.getX(), v1.getZ()))
+							break;
+					}
+					drawArrow(a, normal, arrowsVertices, heat);
+				}
+			}
+			heatFlux.getMeshData().updateVertexCount();
+			heatFlux.updateModelBound();
+		}
+
+		updateHeatFluxVisibility();
 	}
 
 }

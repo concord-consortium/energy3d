@@ -98,6 +98,8 @@ public class SolarRadiation {
 			part.setSolarPotential(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
 		maxValue = 1;
 		computeToday((Calendar) Heliodon.getInstance().getCalender().clone());
+		for (final HousePart part : Scene.getInstance().getParts())
+			part.drawHeatFlux();
 	}
 
 	public double[] getSolarPotential(final Mesh mesh) {
@@ -512,12 +514,6 @@ public class SolarRadiation {
 		return result;
 	}
 
-	public void drawHeatFlux() {
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			part.drawHeatFlux();
-		}
-	}
-
 	public void computeTotalEnergyForBuildings() {
 		applyTexture(SceneManager.getInstance().getSolarLand());
 		for (final HousePart part : Scene.getInstance().getParts()) {
@@ -561,10 +557,10 @@ public class SolarRadiation {
 							if (houseChild instanceof Wall || houseChild instanceof Door || houseChild instanceof Window || houseChild instanceof Roof)
 								heatLoss[i] += houseChild.getHeatLoss()[i];
 							if (houseChild instanceof Window) {
-								Window window = (Window) houseChild;
+								final Window window = (Window) houseChild;
 								passiveSolar[i] += houseChild.getSolarPotential()[i] * window.getSolarHeatGainCoefficientNotPercentage();
 							} else if (houseChild instanceof SolarPanel) {
-								SolarPanel solarPanel = (SolarPanel) houseChild;
+								final SolarPanel solarPanel = (SolarPanel) houseChild;
 								photovoltaic[i] += houseChild.getSolarPotential()[i] * solarPanel.getEfficiencyNotPercentage();
 							}
 						}

@@ -191,6 +191,7 @@ public class Scene implements Serializable {
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				EnergyPanel.getInstance().update();
 				EventQueue.invokeLater(new Runnable() {
+					@Override
 					public void run() {
 						if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
 							MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
@@ -950,13 +951,15 @@ public class Scene implements Serializable {
 
 	public void setAlwaysComputeHeatFluxVectors(final boolean alwaysComputeHeatFluxVectors) {
 		this.alwaysComputeHeatFluxVectors = alwaysComputeHeatFluxVectors;
+		for (final HousePart part : Scene.getInstance().getParts())
+			part.updateHeatFluxVisibility();
 	}
 
 	public boolean getOnlyAbsorptionInSolarMap() {
 		return !fullEnergyInSolarMap;
 	}
 
-	public void setOnlyAbsorptionInSolarMap(boolean onlyAbsorptionInSolarMap) {
+	public void setOnlyAbsorptionInSolarMap(final boolean onlyAbsorptionInSolarMap) {
 		fullEnergyInSolarMap = !onlyAbsorptionInSolarMap;
 	}
 

@@ -146,7 +146,6 @@ public abstract class Roof extends HousePart {
 		roofPartsRoot.updateWorldBound(true);
 		drawOutline();
 		drawDashLines();
-		drawHeatFlux();
 	}
 
 	public void drawRoof() {
@@ -1041,7 +1040,7 @@ public abstract class Roof extends HousePart {
 	public double getArea(final Mesh mesh) {
 		if (areaByPart == null)
 			return 0;
-		Double d = areaByPart.get(mesh);
+		final Double d = areaByPart.get(mesh);
 		if (d == null)
 			return 0;
 		return d;
@@ -1084,60 +1083,50 @@ public abstract class Roof extends HousePart {
 
 	@Override
 	public void drawHeatFlux() {
-
-		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsShown()) {
-
-			heatFlux.getSceneHints().setCullHint(CullHint.Inherit);
-
-			FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
-			final Foundation foundation = getTopContainer();
-			final int cols = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(2)) / heatFluxUnitArea);
-			final int rows = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(1)) / heatFluxUnitArea);
-			arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
-			heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
-			final ReadOnlyVector3 o = foundation.getAbsPoint(0);
-			final ReadOnlyVector3 u = foundation.getAbsPoint(2).subtract(o, null);
-			final ReadOnlyVector3 v = foundation.getAbsPoint(1).subtract(o, null);
-			final Vector3 a = new Vector3();
-			double g, h;
-			boolean init = true;
-			for (int j = 0; j < cols; j++) {
-				h = j + 0.5;
-				for (int i = 0; i < rows; i++) {
-					g = i + 0.5;
-					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
-					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
-					a.setZ(o.getZ());
-					if (foundation.insideBuilding(a.getX(), a.getY(), init)) {
-						ReadOnlyVector3 b = null;
-						Node node = null;
-						Mesh mesh = null;
-						for (final Spatial child : roofPartsRoot.getChildren()) {
-							node = (Node) child;
-							mesh = (Mesh) node.getChild(0);
-							b = findRoofIntersection(mesh, a);
-							if (b != null)
-								break;
-						}
-						if (b != null) {
-							final ReadOnlyVector3 normal = (ReadOnlyVector3) node.getUserData();
-							final double heat = calculateHeatVector(mesh);
-							drawArrow(b, normal, arrowsVertices, heat);
-						}
+		FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
+		final Foundation foundation = getTopContainer();
+		final int cols = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(2)) / heatFluxUnitArea);
+		final int rows = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(1)) / heatFluxUnitArea);
+		arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+		heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
+		final ReadOnlyVector3 o = foundation.getAbsPoint(0);
+		final ReadOnlyVector3 u = foundation.getAbsPoint(2).subtract(o, null);
+		final ReadOnlyVector3 v = foundation.getAbsPoint(1).subtract(o, null);
+		final Vector3 a = new Vector3();
+		double g, h;
+		boolean init = true;
+		for (int j = 0; j < cols; j++) {
+			h = j + 0.5;
+			for (int i = 0; i < rows; i++) {
+				g = i + 0.5;
+				a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+				a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+				a.setZ(o.getZ());
+				if (foundation.insideBuilding(a.getX(), a.getY(), init)) {
+					ReadOnlyVector3 b = null;
+					Node node = null;
+					Mesh mesh = null;
+					for (final Spatial child : roofPartsRoot.getChildren()) {
+						node = (Node) child;
+						mesh = (Mesh) node.getChild(0);
+						b = findRoofIntersection(mesh, a);
+						if (b != null)
+							break;
 					}
-					if (init)
-						init = false;
+					if (b != null) {
+						final ReadOnlyVector3 normal = (ReadOnlyVector3) node.getUserData();
+						final double heat = calculateHeatVector(mesh);
+						drawArrow(b, normal, arrowsVertices, heat);
+					}
 				}
-				heatFlux.getMeshData().updateVertexCount();
-				heatFlux.updateModelBound();
+				if (init)
+					init = false;
 			}
-
-		} else {
-
-			heatFlux.getSceneHints().setCullHint(CullHint.Always);
-
+			heatFlux.getMeshData().updateVertexCount();
+			heatFlux.updateModelBound();
 		}
 
+		updateHeatFluxVisibility();
 	}
 
 	@Override

@@ -1585,6 +1585,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void showHeatFluxVectors(final boolean b) {
 		showHeatFlux = b;
+		for (final HousePart part : Scene.getInstance().getParts())
+			part.updateHeatFluxVisibility();
 	}
 
 	public boolean areHeatFluxVectorsShown() {
