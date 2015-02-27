@@ -38,7 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.concord.energy3d.gui.PropertiesPanel;
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -74,7 +74,7 @@ public abstract class AnnualAnalysis extends Analysis {
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
-								PropertiesPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalender().getTime());
+								EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalender().getTime());
 							}
 						});
 					}

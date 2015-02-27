@@ -1298,7 +1298,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().undo();
 					SceneManager.getInstance().refresh();
-					PropertiesPanel.getInstance().update();
+					EnergyPanel.getInstance().update();
 				}
 			});
 		}
@@ -1317,7 +1317,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().redo();
 					SceneManager.getInstance().refresh();
-					PropertiesPanel.getInstance().update();
+					EnergyPanel.getInstance().update();
 				}
 			});
 		}
@@ -2109,7 +2109,7 @@ public class MainFrame extends JFrame {
 			autoRecomputeEnergyMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					PropertiesPanel.setAutoRecomputeEnergy(autoRecomputeEnergyMenuItem.isSelected());
+					EnergyPanel.setAutoRecomputeEnergy(autoRecomputeEnergyMenuItem.isSelected());
 				}
 			});
 		}

@@ -73,7 +73,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
-public class PropertiesPanel extends JPanel {
+public class EnergyPanel extends JPanel {
 
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
 	final static String[] U_FACTOR_CHOICES_WALL = { "1.42 (16\" brick masonry)", "0.44 (R13, 2x4 w/cellulose/fiberglass)", "0.32 (R18, 2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)", "0.28 (R20, 2x6 w/cellulose/fiberglass)", "0.23 (R25, 2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)" };
@@ -84,7 +84,7 @@ public class PropertiesPanel extends JPanel {
 	final static String[] SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES = { "10", "15", "20" };
 
 	private static final long serialVersionUID = 1L;
-	private static final PropertiesPanel instance = new PropertiesPanel();
+	private static final EnergyPanel instance = new EnergyPanel();
 	private final DecimalFormat twoDecimals = new DecimalFormat();
 	private final DecimalFormat noDecimals = new DecimalFormat();
 	private static boolean autoRecomputeEnergy = false;
@@ -140,11 +140,11 @@ public class PropertiesPanel extends JPanel {
 	private ChangeListener latitudeChangeListener;
 	private Foundation foundation;
 
-	public static PropertiesPanel getInstance() {
+	public static EnergyPanel getInstance() {
 		return instance;
 	}
 
-	private PropertiesPanel() {
+	private EnergyPanel() {
 
 		twoDecimals.setMaximumFractionDigits(2);
 		noDecimals.setMaximumFractionDigits(0);
@@ -969,7 +969,7 @@ public class PropertiesPanel extends JPanel {
 				SolarRadiation.getInstance().compute();
 				HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), (Integer) insideTemperatureSpinner.getValue());
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
-				notifyPropertyChangeListeners(new PropertyChangeEvent(PropertiesPanel.this, "Energy calculation completed", 0, 1));
+				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Energy calculation completed", 0, 1));
 				updatePartEnergy();
 				Scene.getInstance().setTreeLeaves();
 			}

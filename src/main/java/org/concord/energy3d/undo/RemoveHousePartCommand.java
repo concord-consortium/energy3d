@@ -4,7 +4,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.concord.energy3d.gui.PropertiesPanel;
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -41,14 +41,14 @@ public class RemoveHousePartCommand extends AbstractUndoableEdit {
 		super.undo();
 		Scene.getInstance().add(housePart, true);
 		SceneManager.getInstance().setSelectedPart(housePart);
-		PropertiesPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		Scene.getInstance().remove(housePart, true);
-		PropertiesPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override

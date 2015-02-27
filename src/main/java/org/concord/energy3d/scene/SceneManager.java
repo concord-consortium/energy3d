@@ -18,8 +18,8 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
-import org.concord.energy3d.gui.PropertiesPanel;
-import org.concord.energy3d.gui.PropertiesPanel.UpdateRadiation;
+import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.PopupMenuFactory;
 import org.concord.energy3d.logger.PlayControl;
@@ -1024,7 +1024,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		heliodonControl = selected;
 		Heliodon.getInstance().setVisible(selected);
 		enableDisableRotationControl();
-		PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 
 	}
 
@@ -1211,7 +1211,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final int y = mouseState.getY();
 
 		if (editHousePartCommand != null && editHousePartCommand.isReallyEdited())
-			PropertiesPanel.getInstance().cancel();
+			EnergyPanel.getInstance().cancel();
 
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
@@ -1435,7 +1435,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (selectedHousePart.isDrawable()) {
 							selectedHousePart.complete();
 							if (editHousePartCommand.isReallyEdited())
-								PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						} else {
 							editHousePartCommand.undo();
 							selectedHousePart.setHighlight(false);
@@ -1477,7 +1477,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						selectedHousePart = null;
 						if (operationStick)
 							operationFlag = true;
-						PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 					if (!operationFlag) {
 						MainPanel.getInstance().deselect();
@@ -1485,8 +1485,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 				}
 				updateHeliodonAndAnnotationSize();
-				PropertiesPanel.getInstance().updatePartEnergy();
-				PropertiesPanel.getInstance().updateCost();
+				EnergyPanel.getInstance().updatePartEnergy();
+				EnergyPanel.getInstance().updateCost();
 				return null;
 			}
 		});
@@ -1560,8 +1560,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setSolarHeatMap(final boolean solarHeatMap) {
 		setSolarHeatMapWithoutUpdate(solarHeatMap);
-		PropertiesPanel.getInstance().clearAlreadyRendered();
-		PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+		EnergyPanel.getInstance().clearAlreadyRendered();
+		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 
 	public boolean isHeatFluxDaily() {

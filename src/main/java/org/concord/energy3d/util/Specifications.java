@@ -1,6 +1,6 @@
 package org.concord.energy3d.util;
 
-import org.concord.energy3d.gui.PropertiesPanel;
+import org.concord.energy3d.gui.EnergyPanel;
 
 /**
  * This class defines the design specifications.
@@ -31,7 +31,7 @@ public class Specifications {
 
 	public void setBudgetEnabled(boolean budgetEnabled) {
 		this.budgetEnabled = budgetEnabled;
-		PropertiesPanel.getInstance().updateBudgetBar();
+		EnergyPanel.getInstance().updateBudgetBar();
 	}
 
 	public boolean isBudgetEnabled() {
@@ -40,7 +40,7 @@ public class Specifications {
 
 	public void setMaximumBudget(int maximumBudget) {
 		this.maximumBudget = maximumBudget;
-		PropertiesPanel.getInstance().updateBudgetBar();
+		EnergyPanel.getInstance().updateBudgetBar();
 	}
 
 	public int getMaximumBudget() {
@@ -49,7 +49,7 @@ public class Specifications {
 
 	public void setHeightEnabled(boolean heightEnabled) {
 		this.heightEnabled = heightEnabled;
-		PropertiesPanel.getInstance().updateHeightBar();
+		EnergyPanel.getInstance().updateHeightBar();
 	}
 
 	public boolean isHeightEnabled() {
@@ -58,7 +58,7 @@ public class Specifications {
 
 	public void setMaximumHeight(double maximumHeight) {
 		this.maximumHeight = maximumHeight;
-		PropertiesPanel.getInstance().updateHeightBar();
+		EnergyPanel.getInstance().updateHeightBar();
 	}
 
 	public double getMaximumHeight() {
@@ -67,7 +67,7 @@ public class Specifications {
 
 	public void setMinimumHeight(double minimumHeight) {
 		this.minimumHeight = minimumHeight;
-		PropertiesPanel.getInstance().updateHeightBar();
+		EnergyPanel.getInstance().updateHeightBar();
 	}
 
 	public double getMinimumHeight() {
@@ -76,7 +76,7 @@ public class Specifications {
 
 	public void setAreaEnabled(boolean areaEnabled) {
 		this.areaEnabled = areaEnabled;
-		PropertiesPanel.getInstance().updateAreaBar();
+		EnergyPanel.getInstance().updateAreaBar();
 	}
 
 	public boolean isAreaEnabled() {
@@ -85,7 +85,7 @@ public class Specifications {
 
 	public void setMaximumArea(double maximumArea) {
 		this.maximumArea = maximumArea;
-		PropertiesPanel.getInstance().updateAreaBar();
+		EnergyPanel.getInstance().updateAreaBar();
 	}
 
 	public double getMaximumArea() {
@@ -94,7 +94,7 @@ public class Specifications {
 
 	public void setMinimumArea(double minimumArea) {
 		this.minimumArea = minimumArea;
-		PropertiesPanel.getInstance().updateAreaBar();
+		EnergyPanel.getInstance().updateAreaBar();
 	}
 
 	public double getMinimumArea() {

@@ -13,7 +13,7 @@ import javax.swing.event.MenuListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import org.concord.energy3d.gui.PropertiesPanel.UpdateRadiation;
+import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -173,13 +173,13 @@ public class PopupMenuFactory {
 
 			ButtonGroup uFactorButtonGroup = new ButtonGroup();
 
-			final int nUFactor = PropertiesPanel.U_FACTOR_CHOICES_WINDOW.length;
+			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_WINDOW.length;
 			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
 			miUFactor[nUFactor] = new JRadioButtonMenuItem();
 			uFactorButtonGroup.add(miUFactor[nUFactor]);
 
 			for (int i = 0; i < nUFactor; i++) {
-				miUFactor[i] = new JRadioButtonMenuItem(PropertiesPanel.U_FACTOR_CHOICES_WINDOW[i]);
+				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_WINDOW[i]);
 				final int i2 = i;
 				miUFactor[i].addActionListener(new ActionListener() {
 					@Override
@@ -188,7 +188,7 @@ public class PopupMenuFactory {
 						if (selectedPart instanceof Window) {
 							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
-							PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
 					}
 				});
@@ -212,7 +212,7 @@ public class PopupMenuFactory {
 						}
 						if (!b) {
 							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultWindowUFactor = HeatLoad.parseValue(PropertiesPanel.getInstance().getWindowsComboBox());
+								double defaultWindowUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWindowsComboBox());
 								for (int i = 0; i < nUFactor; i++) {
 									if (Util.isZero(defaultWindowUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
 										Util.selectSilently(miUFactor[i], true);
@@ -241,10 +241,10 @@ public class PopupMenuFactory {
 
 			ButtonGroup shgcButtonGroup = new ButtonGroup();
 
-			final int nShgc = PropertiesPanel.WINDOW_SHGC_CHOICES.length;
+			final int nShgc = EnergyPanel.WINDOW_SHGC_CHOICES.length;
 			final int[] shgcValues = new int[nShgc];
 			for (int i = 0; i < nShgc; i++)
-				shgcValues[i] = Integer.parseInt(PropertiesPanel.WINDOW_SHGC_CHOICES[i]);
+				shgcValues[i] = Integer.parseInt(EnergyPanel.WINDOW_SHGC_CHOICES[i]);
 			final JRadioButtonMenuItem[] miShgc = new JRadioButtonMenuItem[nShgc + 1];
 
 			for (int i = 0; i < nShgc; i++) {
@@ -257,7 +257,7 @@ public class PopupMenuFactory {
 						if (selectedPart instanceof Window) {
 							((Window) selectedPart).setSolarHeatGainCoefficient(shgcValues[i2]);
 							Scene.getInstance().setEdited(true);
-							PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
 					}
 				});
@@ -351,13 +351,13 @@ public class PopupMenuFactory {
 
 			ButtonGroup uFactorButtonGroup = new ButtonGroup();
 
-			final int nUFactor = PropertiesPanel.U_FACTOR_CHOICES_WALL.length;
+			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_WALL.length;
 			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
 			miUFactor[nUFactor] = new JRadioButtonMenuItem();
 			uFactorButtonGroup.add(miUFactor[nUFactor]);
 
 			for (int i = 0; i < nUFactor; i++) {
-				miUFactor[i] = new JRadioButtonMenuItem(PropertiesPanel.U_FACTOR_CHOICES_WALL[i]);
+				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_WALL[i]);
 				final int i2 = i;
 				miUFactor[i].addActionListener(new ActionListener() {
 					@Override
@@ -366,7 +366,7 @@ public class PopupMenuFactory {
 						if (selectedPart instanceof Wall) {
 							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
-							PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
 					}
 				});
@@ -390,7 +390,7 @@ public class PopupMenuFactory {
 						}
 						if (!b) {
 							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultWallUFactor = HeatLoad.parseValue(PropertiesPanel.getInstance().getWallsComboBox());
+								double defaultWallUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
 								for (int i = 0; i < nUFactor; i++) {
 									if (Util.isZero(defaultWallUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
 										Util.selectSilently(miUFactor[i], true);
@@ -467,13 +467,13 @@ public class PopupMenuFactory {
 
 			ButtonGroup uFactorButtonGroup = new ButtonGroup();
 
-			final int nUFactor = PropertiesPanel.U_FACTOR_CHOICES_ROOF.length;
+			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_ROOF.length;
 			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
 			miUFactor[nUFactor] = new JRadioButtonMenuItem();
 			uFactorButtonGroup.add(miUFactor[nUFactor]);
 
 			for (int i = 0; i < nUFactor; i++) {
-				miUFactor[i] = new JRadioButtonMenuItem(PropertiesPanel.U_FACTOR_CHOICES_ROOF[i]);
+				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_ROOF[i]);
 				final int i2 = i;
 				miUFactor[i].addActionListener(new ActionListener() {
 					@Override
@@ -482,7 +482,7 @@ public class PopupMenuFactory {
 						if (selectedPart instanceof Roof) {
 							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
-							PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
 					}
 				});
@@ -506,7 +506,7 @@ public class PopupMenuFactory {
 						}
 						if (!b) {
 							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultRoofUFactor = HeatLoad.parseValue(PropertiesPanel.getInstance().getRoofsComboBox());
+								double defaultRoofUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
 								for (int i = 0; i < nUFactor; i++) {
 									if (Util.isZero(defaultRoofUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
 										Util.selectSilently(miUFactor[i], true);
@@ -583,13 +583,13 @@ public class PopupMenuFactory {
 
 			ButtonGroup uFactorButtonGroup = new ButtonGroup();
 
-			final int nUFactor = PropertiesPanel.U_FACTOR_CHOICES_DOOR.length;
+			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_DOOR.length;
 			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
 			miUFactor[nUFactor] = new JRadioButtonMenuItem();
 			uFactorButtonGroup.add(miUFactor[nUFactor]);
 
 			for (int i = 0; i < nUFactor; i++) {
-				miUFactor[i] = new JRadioButtonMenuItem(PropertiesPanel.U_FACTOR_CHOICES_DOOR[i]);
+				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_DOOR[i]);
 				final int i2 = i;
 				miUFactor[i].addActionListener(new ActionListener() {
 					@Override
@@ -598,7 +598,7 @@ public class PopupMenuFactory {
 						if (selectedPart instanceof Door) {
 							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
-							PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
 					}
 				});
@@ -622,7 +622,7 @@ public class PopupMenuFactory {
 						}
 						if (!b) {
 							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultDoorUFactor = HeatLoad.parseValue(PropertiesPanel.getInstance().getDoorsComboBox());
+								double defaultDoorUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getDoorsComboBox());
 								for (int i = 0; i < nUFactor; i++) {
 									if (Util.isZero(defaultDoorUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
 										Util.selectSilently(miUFactor[i], true);
@@ -760,10 +760,10 @@ public class PopupMenuFactory {
 
 			ButtonGroup efficiencyButtonGroup = new ButtonGroup();
 
-			final int nEfficiency = PropertiesPanel.SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES.length;
+			final int nEfficiency = EnergyPanel.SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES.length;
 			final int[] efficiencyValues = new int[nEfficiency];
 			for (int i = 0; i < nEfficiency; i++)
-				efficiencyValues[i] = Integer.parseInt(PropertiesPanel.SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES[i]);
+				efficiencyValues[i] = Integer.parseInt(EnergyPanel.SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES[i]);
 			final JRadioButtonMenuItem[] miEfficiency = new JRadioButtonMenuItem[nEfficiency + 1];
 
 			for (int i = 0; i < nEfficiency; i++) {
@@ -776,7 +776,7 @@ public class PopupMenuFactory {
 						if (selectedPart instanceof SolarPanel) {
 							((SolarPanel) selectedPart).setEfficiency(efficiencyValues[i2]);
 							Scene.getInstance().setEdited(true);
-							PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
 					}
 				});

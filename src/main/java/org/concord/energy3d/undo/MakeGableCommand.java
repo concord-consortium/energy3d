@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.concord.energy3d.gui.PropertiesPanel;
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
 
@@ -29,14 +29,14 @@ public class MakeGableCommand extends EditHousePartCommand {
 		saveNewPoints();
 		roof.setGable(wall, false, false, roofPartMeshUpperPoints);
 		super.undo();
-		PropertiesPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		roof.setGable(wall, true, false, roofPartMeshUpperPoints);
 		super.redo();
-		PropertiesPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override

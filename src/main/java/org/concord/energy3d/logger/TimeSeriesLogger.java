@@ -17,7 +17,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoableEdit;
 
-import org.concord.energy3d.gui.PropertiesPanel;
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.MyPlainDocument;
@@ -196,7 +196,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		}
 
 		String line = "\"File\": \"" + filename + "\"";
-		analysisRequester = PropertiesPanel.getInstance().getDisableActionsRequester();
+		analysisRequester = EnergyPanel.getInstance().getDisableActionsRequester();
 		if (analysisRequester != null) {
 
 			analysisRequesterCopy = analysisRequester;
@@ -279,37 +279,37 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				line += separator + heliodonLatitude;
 				oldHeliodonLatitude = heliodonLatitude;
 			}
-			final String roomTemperature = "\"RoomTemperature\": " + PropertiesPanel.getInstance().getInsideTemperatureSpinner().getValue();
+			final String roomTemperature = "\"RoomTemperature\": " + EnergyPanel.getInstance().getInsideTemperatureSpinner().getValue();
 			if (!roomTemperature.equals(oldRoomTemperature)) {
 				line += separator + roomTemperature;
 				oldRoomTemperature = roomTemperature;
 			}
-			final String wallUFactor = "\"WallUFactor\": \"" + PropertiesPanel.getInstance().getWallsComboBox().getSelectedItem() + "\"";
+			final String wallUFactor = "\"WallUFactor\": \"" + EnergyPanel.getInstance().getWallsComboBox().getSelectedItem() + "\"";
 			if (!wallUFactor.equals(oldWallUFactor)) {
 				line += separator + wallUFactor;
 				oldWallUFactor = wallUFactor;
 			}
-			final String windowUFactor = "\"WindowUFactor\": \"" + PropertiesPanel.getInstance().getWindowsComboBox().getSelectedItem() + "\"";
+			final String windowUFactor = "\"WindowUFactor\": \"" + EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem() + "\"";
 			if (!windowUFactor.equals(oldWindowUFactor)) {
 				line += separator + windowUFactor;
 				oldWindowUFactor = windowUFactor;
 			}
-			final String doorUFactor = "\"DoorUFactor\": \"" + PropertiesPanel.getInstance().getDoorsComboBox().getSelectedItem() + "\"";
+			final String doorUFactor = "\"DoorUFactor\": \"" + EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem() + "\"";
 			if (!doorUFactor.equals(oldDoorUFactor)) {
 				line += separator + doorUFactor;
 				oldDoorUFactor = doorUFactor;
 			}
-			final String roofUFactor = "\"RoofUFactor\": \"" + PropertiesPanel.getInstance().getRoofsComboBox().getSelectedItem() + "\"";
+			final String roofUFactor = "\"RoofUFactor\": \"" + EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem() + "\"";
 			if (!roofUFactor.equals(oldRoofUFactor)) {
 				line += separator + roofUFactor;
 				oldRoofUFactor = roofUFactor;
 			}
-			final String solarPanelYield = "\"SolarPanelYield\": \"" + PropertiesPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem() + "\"";
+			final String solarPanelYield = "\"SolarPanelYield\": \"" + EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem() + "\"";
 			if (!solarPanelYield.equals(oldSolarPanelYield)) {
 				line += separator + solarPanelYield;
 				oldSolarPanelYield = solarPanelYield;
 			}
-			final String shgc = "\"SHGC\": \"" + PropertiesPanel.getInstance().getWindowSHGCComboBox().getSelectedItem() + "\"";
+			final String shgc = "\"SHGC\": \"" + EnergyPanel.getInstance().getWindowSHGCComboBox().getSelectedItem() + "\"";
 			if (!shgc.equals(oldShgc)) {
 				line += separator + shgc;
 				oldShgc = shgc;
@@ -385,7 +385,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				if (newValue.equals(Boolean.TRUE))
 					sceneEditedFlag = true;
 			}
-		} else if (evt.getSource() == PropertiesPanel.getInstance()) {
+		} else if (evt.getSource() == EnergyPanel.getInstance()) {
 			solarCalculationFinished = true;
 		}
 	}

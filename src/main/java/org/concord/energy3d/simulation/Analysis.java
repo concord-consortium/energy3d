@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 import javax.swing.JButton;
 
-import org.concord.energy3d.gui.PropertiesPanel;
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
@@ -64,7 +64,7 @@ public abstract class Analysis {
 	// return the exception if unsuccessful
 	Throwable compute() {
 		try {
-			PropertiesPanel.getInstance().computeNow();
+			EnergyPanel.getInstance().computeNow();
 		} catch (final Throwable e) {
 			e.printStackTrace();
 			return e;
@@ -77,14 +77,14 @@ public abstract class Analysis {
 	abstract void updateGraph();
 
 	void onCompletion() {
-		PropertiesPanel.getInstance().requestDisableActions(null);
-		PropertiesPanel.getInstance().progress(0);
+		EnergyPanel.getInstance().requestDisableActions(null);
+		EnergyPanel.getInstance().progress(0);
 		runButton.setEnabled(true);
 	}
 
 	private void onStart() {
 		SceneManager.getInstance().setHeatFluxDaily(true);
-		PropertiesPanel.getInstance().requestDisableActions(this);
+		EnergyPanel.getInstance().requestDisableActions(this);
 		Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), true);
 		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(true);
 		SceneManager.getInstance().showHeatFluxVectors(true);
