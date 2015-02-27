@@ -3,8 +3,8 @@ package org.concord.energy3d.logger;
 import java.io.File;
 import java.util.concurrent.Callable;
 
-import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.gui.PropertiesPanel;
+import org.concord.energy3d.gui.PropertiesPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
@@ -50,8 +50,8 @@ public class DesignReplay extends PlayControl {
 							Scene.initSceneNow();
 							Scene.getInstance().redrawAllNow();
 							Scene.initEnergy();
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-							EnergyPanel.getInstance().update();
+							PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							PropertiesPanel.getInstance().update();
 							return null;
 						}
 					});

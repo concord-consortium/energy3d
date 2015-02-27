@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 
-import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.PropertiesPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -155,12 +155,12 @@ public class SolarRadiation {
 							}
 				}
 				computeOnLand(dayLength, directionTowardSun);
-				EnergyPanel.getInstance().progress(100 * step / totalSteps);
+				PropertiesPanel.getInstance().progress(100 * step / totalSteps);
 				step++;
 			}
 			maxValue++;
 		}
-		maxValue *= 1 - 0.01 * EnergyPanel.getInstance().getColorMapSlider().getValue();
+		maxValue *= 1 - 0.01 * PropertiesPanel.getInstance().getColorMapSlider().getValue();
 	}
 
 	private void computeOnLand(final double dayLength, final ReadOnlyVector3 directionTowardSun) {
@@ -180,7 +180,7 @@ public class SolarRadiation {
 		for (int col = 0; col < cols; col++) {
 			p.setX((col - cols / 2) * step + step / 2.0);
 			for (int row = 0; row < rows; row++) {
-				if (EnergyPanel.getInstance().isCancelled())
+				if (PropertiesPanel.getInstance().isCancelled())
 					throw new CancellationException();
 				p.setY((row - rows / 2) * step + step / 2.0);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
@@ -226,7 +226,7 @@ public class SolarRadiation {
 			final ReadOnlyVector3 pU = data.u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(data.p0);
 			final double w = (col == data.cols - 1) ? data.p2.distance(pU) : solarStep;
 			for (int row = 0; row < data.rows; row++) {
-				if (EnergyPanel.getInstance().isCancelled())
+				if (PropertiesPanel.getInstance().isCancelled())
 					throw new CancellationException();
 				if (data.dailySolarIntensity[row][col] == -1)
 					continue;
@@ -282,7 +282,7 @@ public class SolarRadiation {
 
 		for (int col = 0; col < 2; col++) {
 			for (int row = 0; row < 2; row++) {
-				if (EnergyPanel.getInstance().isCancelled())
+				if (PropertiesPanel.getInstance().isCancelled())
 					throw new CancellationException();
 				final int index;
 				if (row == 0 && col == 0)
@@ -459,7 +459,7 @@ public class SolarRadiation {
 			zenithAngle = directionTowardSun.smallestAngleBetween(Vector3.UNIT_Z);
 			final double cos = Math.cos(zenithAngle);
 			final double r = 708;
-			final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+			final String city = (String) PropertiesPanel.getInstance().getCityComboBox().getSelectedItem();
 			if (!"".equals(city)) {
 				final double c = CityData.getInstance().getAltitudes().get(city) / 9000.0;
 				return Math.sqrt((r + c) * (r + c) * cos * cos + (2 * r + 1 + c) * (1 - c)) - (r + c) * cos;
@@ -480,7 +480,7 @@ public class SolarRadiation {
 	// Reused peak solar radiation value. Must be called once and only once before calling calculateDirectRadiation and calculateDiffusionAndReflection
 	private void calculatePeakRadiation(final ReadOnlyVector3 directionTowardSun, final double dayLength) {
 		double sunshinePercentage = 1.0;
-		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		final String city = (String) PropertiesPanel.getInstance().getCityComboBox().getSelectedItem();
 		if (!city.equals("")) {
 			final int[] sunshineHours = CityData.getInstance().getSunshineHours().get(city);
 			if (sunshineHours != null)
@@ -663,7 +663,7 @@ public class SolarRadiation {
 	}
 
 	public ColorRGBA computeColor(final double value, final long maxValue) {
-		final ReadOnlyColorRGBA[] colors = EnergyPanel.solarColors;
+		final ReadOnlyColorRGBA[] colors = PropertiesPanel.solarColors;
 		long valuePerColorRange = maxValue / (colors.length - 1);
 		final int colorIndex;
 		if (valuePerColorRange == 0) {

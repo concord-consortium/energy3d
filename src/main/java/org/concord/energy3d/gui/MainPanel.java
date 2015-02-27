@@ -65,10 +65,10 @@ public class MainPanel extends JPanel {
 	private JToggleButton previewButton = null;
 	private JToggleButton zoomButton = null;
 	private JToggleButton noteButton;
-	private JSplitPane energyCanvasNoteSplitPane;
-	private EnergyPanel energyPanel;
+	private JSplitPane propertiesCanvasNoteSplitPane;
+	private PropertiesPanel propertiesPanel;
 	private JPanel canvasPanel;
-	private JToggleButton energyToggleButton;
+	private JToggleButton propertyPanelToggleButton;
 	private JToggleButton energyViewButton;
 	private JSplitPane canvasNoteSplitPane;
 	private JScrollPane noteScrollPane;
@@ -305,7 +305,7 @@ public class MainPanel extends JPanel {
 		this.setSize(1000, 300);
 		setLayout(new BorderLayout());
 		this.add(getAppToolbar(), BorderLayout.NORTH);
-		this.add(getEnergyCanvasNoteSplitPane(), BorderLayout.CENTER);
+		this.add(getPropertiesCanvasNoteSplitPane(), BorderLayout.CENTER);
 	}
 
 	public JToolBar getAppToolbar() {
@@ -338,7 +338,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimButton());
 			appToolbar.add(getEnergyViewButton());
-			appToolbar.add(getEnergyToggleButton());
+			appToolbar.add(getPropertyPanelToggleButton());
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
 			bg.add(zoomButton);
@@ -614,23 +614,23 @@ public class MainPanel extends JPanel {
 		}
 	}
 
-	private JSplitPane getEnergyCanvasNoteSplitPane() {
-		if (energyCanvasNoteSplitPane == null) {
-			energyCanvasNoteSplitPane = new JSplitPane();
-			energyCanvasNoteSplitPane.setResizeWeight(1.0);
-			energyCanvasNoteSplitPane.setRightComponent(getEnergyPanel());
-			energyCanvasNoteSplitPane.setLeftComponent(getCanvasNoteSplitPane());
-			energyCanvasNoteSplitPane.setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
-			defaultDividerSize = energyCanvasNoteSplitPane.getDividerSize();
+	private JSplitPane getPropertiesCanvasNoteSplitPane() {
+		if (propertiesCanvasNoteSplitPane == null) {
+			propertiesCanvasNoteSplitPane = new JSplitPane();
+			propertiesCanvasNoteSplitPane.setResizeWeight(1.0);
+			propertiesCanvasNoteSplitPane.setRightComponent(getPropertiesPanel());
+			propertiesCanvasNoteSplitPane.setLeftComponent(getCanvasNoteSplitPane());
+			propertiesCanvasNoteSplitPane.setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
+			defaultDividerSize = propertiesCanvasNoteSplitPane.getDividerSize();
 		}
-		return energyCanvasNoteSplitPane;
+		return propertiesCanvasNoteSplitPane;
 	}
 
-	private EnergyPanel getEnergyPanel() {
-		if (energyPanel == null) {
-			energyPanel = EnergyPanel.getInstance();
+	private PropertiesPanel getPropertiesPanel() {
+		if (propertiesPanel == null) {
+			propertiesPanel = PropertiesPanel.getInstance();
 		}
-		return energyPanel;
+		return propertiesPanel;
 	}
 
 	public JPanel getCanvasPanel() {
@@ -641,22 +641,22 @@ public class MainPanel extends JPanel {
 		return canvasPanel;
 	}
 
-	private JToggleButton getEnergyToggleButton() {
-		if (energyToggleButton == null) {
-			energyToggleButton = new JToggleButton("");
-			energyToggleButton.setToolTipText("Show energy analysis");
-			energyToggleButton.setSelected(true);
-			energyToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/chart.png")));
-			energyToggleButton.addMouseListener(refreshUponMouseExit);
-			energyToggleButton.addActionListener(new ActionListener() {
+	private JToggleButton getPropertyPanelToggleButton() {
+		if (propertyPanelToggleButton == null) {
+			propertyPanelToggleButton = new JToggleButton("");
+			propertyPanelToggleButton.setToolTipText("Show properties panel");
+			propertyPanelToggleButton.setSelected(true);
+			propertyPanelToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/chart.png")));
+			propertyPanelToggleButton.addMouseListener(refreshUponMouseExit);
+			propertyPanelToggleButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					setSplitComponentVisible(energyToggleButton.isSelected(), getEnergyCanvasNoteSplitPane(), EnergyPanel.getInstance());
+					setSplitComponentVisible(propertyPanelToggleButton.isSelected(), getPropertiesCanvasNoteSplitPane(), PropertiesPanel.getInstance());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
-		return energyToggleButton;
+		return propertyPanelToggleButton;
 	}
 
 	public JToggleButton getEnergyViewButton() {
@@ -926,7 +926,7 @@ public class MainPanel extends JPanel {
 						if (count == 1) {
 							SceneManager.getInstance().setSelectedPart(hp);
 							SceneManager.getInstance().refresh();
-							EnergyPanel.getInstance().updatePartEnergy();
+							PropertiesPanel.getInstance().updatePartEnergy();
 						} else {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 							return;

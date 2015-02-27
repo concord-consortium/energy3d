@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.gui.PropertiesPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Specifications;
 import org.concord.energy3d.util.Util;
@@ -217,7 +217,7 @@ class SpecsDialog extends JDialog {
 				Specifications.getInstance().setAreaEnabled(minimumAreaCheckBox.isSelected());
 				Specifications.getInstance().setHeightEnabled(minimumHeightCheckBox.isSelected());
 				Scene.getInstance().setEdited(true);
-				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				SpecsDialog.this.dispose();
 			}
 		});

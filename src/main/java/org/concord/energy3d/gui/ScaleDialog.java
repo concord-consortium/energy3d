@@ -20,7 +20,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.gui.PropertiesPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 
 class ScaleDialog extends JDialog {
@@ -166,7 +166,7 @@ class ScaleDialog extends JDialog {
 							Scene.getInstance().setEdited(true);
 							ScaleDialog.this.dispose();
 							Scene.getInstance().redrawAll();
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						} catch (final NumberFormatException err) {
 							err.printStackTrace();
 							JOptionPane.showMessageDialog(ScaleDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);

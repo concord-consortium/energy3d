@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.PropertiesPanel;
 import org.concord.energy3d.shapes.Heliodon;
 
 public class CityData {
@@ -115,7 +115,7 @@ public class CityData {
 	}
 
 	public double computeOutsideTemperature(final Calendar now) {
-		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalender(), (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(Heliodon.getInstance().getCalender(), (String) PropertiesPanel.getInstance().getCityComboBox().getSelectedItem());
 		return computeOutsideTemperatureRange(outsideTemperatureRange, now.get(Calendar.MINUTE) + now.get(Calendar.HOUR_OF_DAY) * 60);
 	}
 

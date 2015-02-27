@@ -16,7 +16,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.PropertiesPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
@@ -73,7 +73,7 @@ public class Cost {
 		if (part instanceof Wall) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
-				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
+				uFactor = HeatLoad.parseValue(PropertiesPanel.getInstance().getWallsComboBox());
 			double price;
 			if (uFactor < 0.05)
 				price = 100;
@@ -86,7 +86,7 @@ public class Cost {
 		if (part instanceof Window) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
-				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWindowsComboBox());
+				uFactor = HeatLoad.parseValue(PropertiesPanel.getInstance().getWindowsComboBox());
 			double price;
 			if (uFactor <= 0.15) // triple pane
 				price = 250;
@@ -99,7 +99,7 @@ public class Cost {
 		if (part instanceof Roof) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
-				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
+				uFactor = HeatLoad.parseValue(PropertiesPanel.getInstance().getRoofsComboBox());
 			double price;
 			if (uFactor < 0.05)
 				price = 100;
@@ -112,7 +112,7 @@ public class Cost {
 		if (part instanceof Door) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
-				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getDoorsComboBox());
+				uFactor = HeatLoad.parseValue(PropertiesPanel.getInstance().getDoorsComboBox());
 			int price;
 			if (uFactor < 0.5)
 				price = 100;
@@ -123,7 +123,7 @@ public class Cost {
 		if (part instanceof SolarPanel) {
 			final double efficiency = ((SolarPanel) part).getEfficiency();
 			if (efficiency == 0)
-				Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
+				Double.parseDouble((String) PropertiesPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
 			int price;
 			if (efficiency >= 20)
 				price = 1000;
@@ -154,7 +154,7 @@ public class Cost {
 	}
 
 	public void showGraph() {
-		EnergyPanel.getInstance().requestDisableActions(this);
+		PropertiesPanel.getInstance().requestDisableActions(this);
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
 			int count = 0;
@@ -168,7 +168,7 @@ public class Cost {
 			if (count == 1) {
 				SceneManager.getInstance().setSelectedPart(hp);
 				SceneManager.getInstance().refresh();
-				EnergyPanel.getInstance().updateCost();
+				PropertiesPanel.getInstance().updateCost();
 			} else {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 				return;
@@ -178,7 +178,7 @@ public class Cost {
 			if (hp != null) {
 				SceneManager.getInstance().setSelectedPart(hp);
 				SceneManager.getInstance().refresh();
-				EnergyPanel.getInstance().updateCost();
+				PropertiesPanel.getInstance().updateCost();
 			}
 		}
 		if (SceneManager.getInstance().getSelectedPart().getChildren().isEmpty()) {
@@ -186,7 +186,7 @@ public class Cost {
 			return;
 		}
 		show(true);
-		EnergyPanel.getInstance().requestDisableActions(null);
+		PropertiesPanel.getInstance().requestDisableActions(null);
 	}
 
 	private void show(final boolean translucent) {

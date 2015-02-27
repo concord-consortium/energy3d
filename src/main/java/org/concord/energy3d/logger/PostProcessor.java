@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.PropertiesPanel;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -87,8 +87,8 @@ public class PostProcessor extends PlayControl {
 							Scene.openNow(files[i].toURI().toURL());
 							Scene.initSceneNow();
 							Scene.initEnergy();
-							EnergyPanel.getInstance().computeNow();
-							EnergyPanel.getInstance().update();
+							PropertiesPanel.getInstance().computeNow();
+							PropertiesPanel.getInstance().update();
 							SceneManager.getInstance().refresh();
 							update.run();
 							sleep(SLEEP);
@@ -212,7 +212,7 @@ public class PostProcessor extends PlayControl {
 					}
 				}
 				pw.close();
-				EnergyPanel.getInstance().setComputeEnabled(true);
+				PropertiesPanel.getInstance().setComputeEnabled(true);
 			}
 		}.start();
 	}

@@ -4,7 +4,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.PropertiesPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
@@ -33,14 +33,14 @@ public class RotateBuildingCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		SceneManager.getInstance().undoOrRedoBuildingRotation(foundation, rotationAngle, true);
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		PropertiesPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		SceneManager.getInstance().undoOrRedoBuildingRotation(foundation, rotationAngle, false);
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		PropertiesPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override

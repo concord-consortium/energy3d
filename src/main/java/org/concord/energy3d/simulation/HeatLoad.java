@@ -6,7 +6,7 @@ import java.util.Calendar;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
-import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.PropertiesPanel;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.HousePart;
@@ -61,10 +61,10 @@ public class HeatLoad {
 
 	public void computeEnergyToday(final Calendar today, final double insideTemperature) {
 		try {
-			wallUFactor = parseValue(EnergyPanel.getInstance().getWallsComboBox());
-			doorUFactor = parseValue(EnergyPanel.getInstance().getDoorsComboBox());
-			windowUFactor = parseValue(EnergyPanel.getInstance().getWindowsComboBox());
-			roofUFactor = parseValue(EnergyPanel.getInstance().getRoofsComboBox());
+			wallUFactor = parseValue(PropertiesPanel.getInstance().getWallsComboBox());
+			doorUFactor = parseValue(PropertiesPanel.getInstance().getDoorsComboBox());
+			windowUFactor = parseValue(PropertiesPanel.getInstance().getWindowsComboBox());
+			roofUFactor = parseValue(PropertiesPanel.getInstance().getRoofsComboBox());
 		} catch (final Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(MainPanel.getInstance(), "Invalid U-Factor value: " + e.getMessage(), "Invalid U-Factor", JOptionPane.WARNING_MESSAGE);
@@ -75,11 +75,11 @@ public class HeatLoad {
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
 
-		if (EnergyPanel.getInstance().getCityComboBox().getSelectedItem().equals(""))
+		if (PropertiesPanel.getInstance().getCityComboBox().getSelectedItem().equals(""))
 			return;
 
 		final int timeStep = SolarRadiation.getInstance().getTimeStep();
-		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) PropertiesPanel.getInstance().getCityComboBox().getSelectedItem());
 		int iMinute = 0;
 		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
 			iMinute = minute / timeStep;

@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.gui.PropertiesPanel;
+import org.concord.energy3d.gui.PropertiesPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
@@ -160,8 +160,8 @@ public class Scene implements Serializable {
 				return null;
 			}
 		});
-		EnergyPanel.getInstance().updatePartEnergy();
-		EnergyPanel.getInstance().updateCost();
+		PropertiesPanel.getInstance().updatePartEnergy();
+		PropertiesPanel.getInstance().updateCost();
 	}
 
 	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
@@ -188,8 +188,8 @@ public class Scene implements Serializable {
 				initSceneNow();
 				instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
 				initEnergy();
-				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				EnergyPanel.getInstance().update();
+				PropertiesPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				PropertiesPanel.getInstance().update();
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
@@ -292,7 +292,7 @@ public class Scene implements Serializable {
 	}
 
 	public static void initEnergy() {
-		final EnergyPanel energyPanel = EnergyPanel.getInstance();
+		final PropertiesPanel energyPanel = PropertiesPanel.getInstance();
 		if (instance.calendar != null) {
 			energyPanel.getDateSpinner().setValue(instance.calendar.getTime());
 			energyPanel.getTimeSpinner().setValue(instance.calendar.getTime());
@@ -525,18 +525,18 @@ public class Scene implements Serializable {
 				instance.hideAxes = !SceneManager.getInstance().areAxesShown();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsShown();
 				instance.calendar = Heliodon.getInstance().getCalender();
-				instance.latitude = EnergyPanel.getInstance().getLatitude();
-				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+				instance.latitude = PropertiesPanel.getInstance().getLatitude();
+				instance.city = (String) PropertiesPanel.getInstance().getCityComboBox().getSelectedItem();
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
-				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
+				instance.solarContrast = PropertiesPanel.getInstance().getColorMapSlider().getValue();
 				instance.solarStep = SolarRadiation.getInstance().getSolarStep();
 				instance.timeStep = SolarRadiation.getInstance().getTimeStep();
-				instance.wallUFactor = (String) EnergyPanel.getInstance().getWallsComboBox().getSelectedItem();
-				instance.windowUFactor = (String) EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem();
-				instance.doorUFactor = (String) EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem();
-				instance.roofUFactor = (String) EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem();
-				instance.solarPanelEfficiency = Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
+				instance.wallUFactor = (String) PropertiesPanel.getInstance().getWallsComboBox().getSelectedItem();
+				instance.windowUFactor = (String) PropertiesPanel.getInstance().getWindowsComboBox().getSelectedItem();
+				instance.doorUFactor = (String) PropertiesPanel.getInstance().getDoorsComboBox().getSelectedItem();
+				instance.roofUFactor = (String) PropertiesPanel.getInstance().getRoofsComboBox().getSelectedItem();
+				instance.solarPanelEfficiency = Double.parseDouble((String) PropertiesPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
 
 				if (setAsCurrentFile)
 					Scene.url = url;
