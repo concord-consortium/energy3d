@@ -284,22 +284,22 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				line += separator + roomTemperature;
 				oldRoomTemperature = roomTemperature;
 			}
-			final String wallUFactor = "\"WallUFactor\": \"" + EnergyPanel.getInstance().getWallsComboBox().getSelectedItem() + "\"";
+			final String wallUFactor = "\"WallUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getWallsComboBox().getSelectedItem()) + "\"";
 			if (!wallUFactor.equals(oldWallUFactor)) {
 				line += separator + wallUFactor;
 				oldWallUFactor = wallUFactor;
 			}
-			final String windowUFactor = "\"WindowUFactor\": \"" + EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem() + "\"";
+			final String windowUFactor = "\"WindowUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem()) + "\"";
 			if (!windowUFactor.equals(oldWindowUFactor)) {
 				line += separator + windowUFactor;
 				oldWindowUFactor = windowUFactor;
 			}
-			final String doorUFactor = "\"DoorUFactor\": \"" + EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem() + "\"";
+			final String doorUFactor = "\"DoorUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem()) + "\"";
 			if (!doorUFactor.equals(oldDoorUFactor)) {
 				line += separator + doorUFactor;
 				oldDoorUFactor = doorUFactor;
 			}
-			final String roofUFactor = "\"RoofUFactor\": \"" + EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem() + "\"";
+			final String roofUFactor = "\"RoofUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem()) + "\"";
 			if (!roofUFactor.equals(oldRoofUFactor)) {
 				line += separator + roofUFactor;
 				oldRoofUFactor = roofUFactor;
@@ -368,6 +368,10 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				oldLine = line;
 			}
 		}
+	}
+
+	private String encodeUFactorString(String uFactor) {
+		return uFactor.replace("\"", "\\\"");
 	}
 
 	public void closeLog() {
