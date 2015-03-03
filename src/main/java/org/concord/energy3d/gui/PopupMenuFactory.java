@@ -24,6 +24,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.HeatLoad;
+import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -365,6 +366,7 @@ public class PopupMenuFactory {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Wall) {
 							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
 							Scene.getInstance().setEdited(true);
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}

@@ -1729,11 +1729,14 @@ public class MainFrame extends JFrame {
 			noTextureMenuItem.setSelected(true);
 			Scene.getInstance().setTextureMode(TextureMode.None);
 		}
-		SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand());
-		ReadOnlyColorRGBA color = ColorRGBA.WHITE;
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart != null)
-			color = selectedPart.getColor();
+		if (selectedPart == null) {
+			JOptionPane.showMessageDialog(this, "<html>You must select a part.</html>", "Selection missing", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(selectedPart));
+		ReadOnlyColorRGBA color = ColorRGBA.WHITE;
+		color = selectedPart.getColor();
 		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final ActionListener actionListener = new ActionListener() {
 			@Override
@@ -1743,10 +1746,8 @@ public class MainFrame extends JFrame {
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart != null) {
-					selectedPart.setColor(color);
-					Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
-				}
+				selectedPart.setColor(color);
+				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
 					PrintController.getInstance().restartAnimation();
 				MainPanel.getInstance().getEnergyViewButton().setSelected(false);

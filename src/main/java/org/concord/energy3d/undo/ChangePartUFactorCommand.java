@@ -5,34 +5,29 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.scene.Scene;
 
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
-
-public class ChangePartColorCommand extends AbstractUndoableEdit {
+public class ChangePartUFactorCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private ReadOnlyColorRGBA orgColor, newColor;
+	private double orgUFactor, newUFactor;
 	private HousePart selectedPart;
 
-	public ChangePartColorCommand(HousePart selectedPart) {
+	public ChangePartUFactorCommand(HousePart selectedPart) {
 		this.selectedPart = selectedPart;
-		orgColor = selectedPart.getColor();
+		orgUFactor = selectedPart.getUFactor();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newColor = selectedPart.getColor();
-		selectedPart.setColor(orgColor);
-		Scene.getInstance().redrawAll();
+		newUFactor = selectedPart.getUFactor();
+		selectedPart.setUFactor(orgUFactor);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		selectedPart.setColor(newColor);
-		Scene.getInstance().redrawAll();
+		selectedPart.setUFactor(newUFactor);
 	}
 
 	// for action logging
@@ -42,7 +37,7 @@ public class ChangePartColorCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Color Change for Selected Part";
+		return "U-Factor Change for Selected Part";
 	}
 
 }
