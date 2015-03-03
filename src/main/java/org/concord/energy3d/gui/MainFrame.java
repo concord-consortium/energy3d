@@ -75,7 +75,9 @@ import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
-import org.concord.energy3d.undo.ChangeColorTextureCommand;
+import org.concord.energy3d.undo.ChangeBuildingColorCommand;
+import org.concord.energy3d.undo.ChangePartColorCommand;
+import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Mac;
@@ -1540,7 +1542,7 @@ public class MainFrame extends JFrame {
 			noTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.None);
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
@@ -1558,7 +1560,7 @@ public class MainFrame extends JFrame {
 			simpleTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Simple);
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
@@ -1576,7 +1578,7 @@ public class MainFrame extends JFrame {
 			fullTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeTextureCommand());
 					Scene.getInstance().setTextureMode(TextureMode.Full);
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
@@ -1607,7 +1609,7 @@ public class MainFrame extends JFrame {
 			platformColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForWholeHouse(Operation.DRAW_FOUNDATION);
+					showColorDialogForWholeBuilding(Operation.DRAW_FOUNDATION);
 				}
 			});
 		}
@@ -1620,7 +1622,7 @@ public class MainFrame extends JFrame {
 			wallColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForWholeHouse(Operation.DRAW_WALL);
+					showColorDialogForWholeBuilding(Operation.DRAW_WALL);
 				}
 			});
 		}
@@ -1633,7 +1635,7 @@ public class MainFrame extends JFrame {
 			doorColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForWholeHouse(Operation.DRAW_DOOR);
+					showColorDialogForWholeBuilding(Operation.DRAW_DOOR);
 				}
 			});
 		}
@@ -1646,7 +1648,7 @@ public class MainFrame extends JFrame {
 			floorColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForWholeHouse(Operation.DRAW_FLOOR);
+					showColorDialogForWholeBuilding(Operation.DRAW_FLOOR);
 				}
 			});
 		}
@@ -1659,7 +1661,7 @@ public class MainFrame extends JFrame {
 			roofColorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForWholeHouse(Operation.DRAW_ROOF_PYRAMID);
+					showColorDialogForWholeBuilding(Operation.DRAW_ROOF_PYRAMID);
 				}
 			});
 		}
@@ -1702,6 +1704,24 @@ public class MainFrame extends JFrame {
 		return foundation;
 	}
 
+	private int countFloors(final Foundation foundation) {
+		int n = 0;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p.getTopContainer() == foundation && p instanceof Floor)
+				n++;
+		}
+		return n;
+	}
+
+	private int countDoors(final Foundation foundation) {
+		int n = 0;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p.getTopContainer() == foundation && p instanceof Door)
+				n++;
+		}
+		return n;
+	}
+
 	void showColorDialogForIndividualPart() {
 		if (!noTextureMenuItem.isSelected()) { // when the user wants to set the color, automatically switch to no texture
 			if (JOptionPane.showConfirmDialog(this, "To set color for an individual part, we have to remove the texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
@@ -1709,7 +1729,7 @@ public class MainFrame extends JFrame {
 			noTextureMenuItem.setSelected(true);
 			Scene.getInstance().setTextureMode(TextureMode.None);
 		}
-		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
+		SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand());
 		ReadOnlyColorRGBA color = ColorRGBA.WHITE;
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null)
@@ -1736,25 +1756,7 @@ public class MainFrame extends JFrame {
 		JColorChooser.createDialog(this, "Select Color", true, colorChooser, actionListener, null).setVisible(true);
 	}
 
-	private int countFloors(final Foundation foundation) {
-		int n = 0;
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.getTopContainer() == foundation && p instanceof Floor)
-				n++;
-		}
-		return n;
-	}
-
-	private int countDoors(final Foundation foundation) {
-		int n = 0;
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.getTopContainer() == foundation && p instanceof Door)
-				n++;
-		}
-		return n;
-	}
-
-	private void showColorDialogForWholeHouse(final Operation operation) {
+	private void showColorDialogForWholeBuilding(final Operation operation) {
 		if (fullTextureMenuItem.isSelected()) { // when the user wants to set the color, remove the texture first
 			if (JOptionPane.showConfirmDialog(this, "To set colors for this building, we have to remove the full texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
 				return;
@@ -1791,26 +1793,8 @@ public class MainFrame extends JFrame {
 			break;
 		}
 
-		ReadOnlyColorRGBA color;
-		switch (operation) {
-		case DRAW_FOUNDATION:
-			color = Scene.getInstance().getFoundationColor();
-			break;
-		case DRAW_WALL:
-			color = Scene.getInstance().getWallColor();
-			break;
-		case DRAW_DOOR:
-			color = Scene.getInstance().getDoorColor();
-			break;
-		case DRAW_FLOOR:
-			color = Scene.getInstance().getFloorColor();
-			break;
-		case DRAW_ROOF_PYRAMID:
-			color = Scene.getInstance().getRoofColor();
-			break;
-		default:
-			color = ColorRGBA.WHITE;
-		}
+		SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingColorCommand(foundation, operation));
+		ReadOnlyColorRGBA color = Scene.getInstance().getPartColorForWholeBuilding(foundation, operation);
 		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final ActionListener actionListener = new ActionListener() {
 			@Override
@@ -1819,42 +1803,7 @@ public class MainFrame extends JFrame {
 				final float[] newColor = c.getComponents(null);
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
-				switch (operation) {
-				case DRAW_FOUNDATION:
-					// Scene.getInstance().setFoundationColor(color);
-					foundation.setColor(color);
-					break;
-				case DRAW_WALL:
-					// Scene.getInstance().setWallColor(color);
-					for (final HousePart p : Scene.getInstance().getParts()) {
-						if (p instanceof Wall && p.getTopContainer() == foundation)
-							p.setColor(color);
-					}
-					break;
-				case DRAW_DOOR:
-					// Scene.getInstance().setDoorColor(color);
-					for (final HousePart p : Scene.getInstance().getParts()) {
-						if (p instanceof Door && p.getTopContainer() == foundation)
-							p.setColor(color);
-					}
-					break;
-				case DRAW_FLOOR:
-					// Scene.getInstance().setFloorColor(color);
-					for (final HousePart p : Scene.getInstance().getParts()) {
-						if (p instanceof Floor && p.getTopContainer() == foundation)
-							p.setColor(color);
-					}
-					break;
-				case DRAW_ROOF_PYRAMID:
-					// Scene.getInstance().setRoofColor(color);
-					for (final HousePart p : Scene.getInstance().getParts()) {
-						if (p instanceof Roof && p.getTopContainer() == foundation)
-							p.setColor(color);
-					}
-					break;
-				default:
-					break;
-				}
+				Scene.getInstance().setPartColorForWholeBuilding(foundation, operation, color);
 				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
 					PrintController.getInstance().restartAnimation();
@@ -1863,7 +1812,6 @@ public class MainFrame extends JFrame {
 			}
 		};
 		JColorChooser.createDialog(this, "Select Color", true, colorChooser, actionListener, null).setVisible(true);
-		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 	}
 
 	public void showUnexpectedErrorMessage(final Throwable err) {

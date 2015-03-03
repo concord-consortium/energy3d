@@ -20,6 +20,7 @@ import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -30,6 +31,7 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.SolarRadiation;
@@ -799,54 +801,134 @@ public class Scene implements Serializable {
 		this.overhangLength = overhangLength;
 	}
 
+	/** get the default color for foundations */
 	public ReadOnlyColorRGBA getFoundationColor() {
 		if (foundationColor == null)
 			return WHITE;
 		return foundationColor;
 	}
 
+	/** set the default color for foundations */
 	public void setFoundationColor(final ReadOnlyColorRGBA foundationColor) {
 		this.foundationColor = foundationColor;
 	}
 
+	/** get the default color for walls */
 	public ReadOnlyColorRGBA getWallColor() {
 		if (wallColor == null)
 			return GRAY;
 		return wallColor;
 	}
 
+	/** set the default color for walls */
 	public void setWallColor(final ReadOnlyColorRGBA wallColor) {
 		this.wallColor = wallColor;
 	}
 
+	/** get the default color for doors */
 	public ReadOnlyColorRGBA getDoorColor() {
 		if (doorColor == null)
 			return WHITE;
 		return doorColor;
 	}
 
+	/** set the default color for doors */
 	public void setDoorColor(final ReadOnlyColorRGBA doorColor) {
 		this.doorColor = doorColor;
 	}
 
+	/** get the default color for floors */
 	public ReadOnlyColorRGBA getFloorColor() {
 		if (floorColor == null)
 			return WHITE;
 		return floorColor;
 	}
 
+	/** set the default color for floors */
 	public void setFloorColor(final ReadOnlyColorRGBA floorColor) {
 		this.floorColor = floorColor;
 	}
 
+	/** get the default color for roofs */
 	public ReadOnlyColorRGBA getRoofColor() {
 		if (roofColor == null)
 			return WHITE;
 		return roofColor;
 	}
 
+	/** set the default color for roofs */
 	public void setRoofColor(final ReadOnlyColorRGBA roofColor) {
 		this.roofColor = roofColor;
+	}
+
+	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
+	public void setPartColorForWholeBuilding(Foundation foundation, Operation operation, ReadOnlyColorRGBA color) {
+		switch (operation) {
+		case DRAW_FOUNDATION:
+			foundation.setColor(color);
+			break;
+		case DRAW_WALL:
+			for (final HousePart p : parts) {
+				if (p instanceof Wall && p.getTopContainer() == foundation)
+					p.setColor(color);
+			}
+			break;
+		case DRAW_DOOR:
+			for (final HousePart p : parts) {
+				if (p instanceof Door && p.getTopContainer() == foundation)
+					p.setColor(color);
+			}
+			break;
+		case DRAW_FLOOR:
+			for (final HousePart p : parts) {
+				if (p instanceof Floor && p.getTopContainer() == foundation)
+					p.setColor(color);
+			}
+			break;
+		case DRAW_ROOF_PYRAMID:
+			for (final HousePart p : parts) {
+				if (p instanceof Roof && p.getTopContainer() == foundation)
+					p.setColor(color);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
+	public ReadOnlyColorRGBA getPartColorForWholeBuilding(Foundation foundation, Operation operation) {
+		switch (operation) {
+		case DRAW_FOUNDATION:
+			return foundation.getColor();
+		case DRAW_WALL:
+			for (final HousePart p : parts) {
+				if (p instanceof Wall && p.getTopContainer() == foundation)
+					return p.getColor();
+			}
+			break;
+		case DRAW_DOOR:
+			for (final HousePart p : parts) {
+				if (p instanceof Door && p.getTopContainer() == foundation)
+					return p.getColor();
+			}
+			break;
+		case DRAW_FLOOR:
+			for (final HousePart p : parts) {
+				if (p instanceof Floor && p.getTopContainer() == foundation)
+					return p.getColor();
+			}
+			break;
+		case DRAW_ROOF_PYRAMID:
+			for (final HousePart p : parts) {
+				if (p instanceof Roof && p.getTopContainer() == foundation)
+					return p.getColor();
+			}
+			break;
+		default:
+			break;
+		}
+		return null;
 	}
 
 	public boolean isEdited() {
