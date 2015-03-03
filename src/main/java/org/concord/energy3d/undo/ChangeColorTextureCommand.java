@@ -17,6 +17,7 @@ import org.concord.energy3d.scene.SceneManager;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class ChangeColorTextureCommand extends AbstractUndoableEdit {
+
 	private static final long serialVersionUID = 1L;
 	private ReadOnlyColorRGBA orgFoundationColor;
 	private ReadOnlyColorRGBA orgWallColor;
@@ -133,8 +134,25 @@ public class ChangeColorTextureCommand extends AbstractUndoableEdit {
 			Scene.getInstance().setRoofColor(c);
 	}
 
+	// for action logging
+	public HousePart getHousePart() {
+		return selectedPart;
+	}
+
 	@Override
 	public String getPresentationName() {
+		if (orgTextureMode != newTextureMode)
+			return "Texture Change";
+		if (orgFoundationColor != newFoundationColor)
+			return "Foundation Color Change";
+		if (orgFloorColor != newFloorColor)
+			return "Floor Color Change";
+		if (orgWallColor != newWallColor)
+			return "Wall Color Change";
+		if (orgRoofColor != newRoofColor)
+			return "Roof Color Change";
+		if (orgDoorColor != newDoorColor)
+			return "Door Color Change";
 		return "Change Appearance";
 	}
 

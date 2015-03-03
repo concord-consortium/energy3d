@@ -653,6 +653,10 @@ public class Scene implements Serializable {
 		Scene.getInstance().updateRoofDashLinesColor();
 	}
 
+	public TextureMode getTextureMode() {
+		return textureMode;
+	}
+
 	public void setDrawThickness(final boolean draw) {
 		drawThickness = draw;
 		redrawAll = true;
@@ -733,10 +737,6 @@ public class Scene implements Serializable {
 		if (annotationScale == 0)
 			annotationScale = 10;
 		return annotationScale;
-	}
-
-	public TextureMode getTextureMode() {
-		return textureMode;
 	}
 
 	public void updateRoofDashLinesColor() {

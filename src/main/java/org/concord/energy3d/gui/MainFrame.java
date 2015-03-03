@@ -901,6 +901,9 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesShown());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsShown());
+					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
+					Util.selectSilently(simpleTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
+					Util.selectSilently(fullTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
@@ -1706,6 +1709,7 @@ public class MainFrame extends JFrame {
 			noTextureMenuItem.setSelected(true);
 			Scene.getInstance().setTextureMode(TextureMode.None);
 		}
+		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 		ReadOnlyColorRGBA color = ColorRGBA.WHITE;
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null)
@@ -1730,7 +1734,6 @@ public class MainFrame extends JFrame {
 			}
 		};
 		JColorChooser.createDialog(this, "Select Color", true, colorChooser, actionListener, null).setVisible(true);
-		SceneManager.getInstance().getUndoManager().addEdit(new ChangeColorTextureCommand());
 	}
 
 	private int countFloors(final Foundation foundation) {
