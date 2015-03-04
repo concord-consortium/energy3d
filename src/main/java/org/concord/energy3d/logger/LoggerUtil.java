@@ -68,7 +68,7 @@ class LoggerUtil {
 		if (p == null)
 			return null;
 		Object bid = getBuildingId(p);
-		String s = "{\"Building\": " + bid + ", \"ID\": " + p.getId();
+		String s = "{\"Type\": \"" + p.getClass().getSimpleName() + "\", \"Building\": " + bid + ", \"ID\": " + p.getId();
 		int n = p.getPoints().size();
 		if (n > 0) {
 			s += ", \"Coordinates\": [";

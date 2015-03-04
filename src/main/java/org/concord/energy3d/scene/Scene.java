@@ -931,6 +931,78 @@ public class Scene implements Serializable {
 		return null;
 	}
 
+	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
+	public void setPartUFactorForWholeBuilding(Foundation foundation, Operation operation, double uFactor) {
+		switch (operation) {
+		case DRAW_FOUNDATION:
+			foundation.setUFactor(uFactor);
+			break;
+		case DRAW_WALL:
+			for (final HousePart p : parts) {
+				if (p instanceof Wall && p.getTopContainer() == foundation)
+					p.setUFactor(uFactor);
+				;
+			}
+			break;
+		case DRAW_DOOR:
+			for (final HousePart p : parts) {
+				if (p instanceof Door && p.getTopContainer() == foundation)
+					p.setUFactor(uFactor);
+				;
+			}
+			break;
+		case DRAW_FLOOR:
+			for (final HousePart p : parts) {
+				if (p instanceof Floor && p.getTopContainer() == foundation)
+					p.setUFactor(uFactor);
+			}
+			break;
+		case DRAW_ROOF_PYRAMID:
+			for (final HousePart p : parts) {
+				if (p instanceof Roof && p.getTopContainer() == foundation)
+					p.setUFactor(uFactor);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
+	public double getPartUFactorForWholeBuilding(Foundation foundation, Operation operation) {
+		switch (operation) {
+		case DRAW_FOUNDATION:
+			return foundation.getUFactor();
+		case DRAW_WALL:
+			for (final HousePart p : parts) {
+				if (p instanceof Wall && p.getTopContainer() == foundation)
+					return p.getUFactor();
+			}
+			break;
+		case DRAW_DOOR:
+			for (final HousePart p : parts) {
+				if (p instanceof Door && p.getTopContainer() == foundation)
+					return p.getUFactor();
+			}
+			break;
+		case DRAW_FLOOR:
+			for (final HousePart p : parts) {
+				if (p instanceof Floor && p.getTopContainer() == foundation)
+					return p.getUFactor();
+			}
+			break;
+		case DRAW_ROOF_PYRAMID:
+			for (final HousePart p : parts) {
+				if (p instanceof Roof && p.getTopContainer() == foundation)
+					return p.getUFactor();
+			}
+			break;
+		default:
+			break;
+		}
+		return 0;
+	}
+
 	public boolean isEdited() {
 		return edited;
 	}

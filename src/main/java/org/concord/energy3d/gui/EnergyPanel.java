@@ -61,11 +61,14 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.CityData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.SolarRadiation;
+import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
+import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.util.Specifications;
 import org.concord.energy3d.util.Util;
 
@@ -394,6 +397,7 @@ public class EnergyPanel extends JPanel {
 					final int count = Scene.getInstance().countParts(foundation, Wall.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factors of " + count + " existing walls of<br>the selected building (#" + foundation.getId() + ") to " + wallsComboBox.getSelectedItem() + "?</html>", "U-factor of Walls", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_WALL));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Wall && p.getTopContainer() == foundation)
 									((Wall) p).setUFactor(uFactor);
@@ -439,6 +443,7 @@ public class EnergyPanel extends JPanel {
 					final int count = Scene.getInstance().countParts(foundation, Roof.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factor of the roof<br>of the selected building (#" + foundation.getId() + ") to " + roofsComboBox.getSelectedItem() + "?</html>", "U-factor of Roof", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_ROOF_PYRAMID));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Roof && p.getTopContainer() == foundation)
 									((Roof) p).setUFactor(uFactor);
@@ -483,6 +488,7 @@ public class EnergyPanel extends JPanel {
 					final int count = Scene.getInstance().countParts(foundation, Window.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factors of " + count + " existing windows of<br>the selected building (#" + foundation.getId() + ") to " + windowsComboBox.getSelectedItem() + "?</html>", "U-factor of Windows", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_WINDOW));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Window && p.getTopContainer() == foundation)
 									((Window) p).setUFactor(uFactor);
@@ -528,6 +534,7 @@ public class EnergyPanel extends JPanel {
 					final int count = Scene.getInstance().countParts(foundation, Door.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factors of " + count + " existing doors of<br>the selected building (#" + foundation.getId() + ") to " + doorsComboBox.getSelectedItem() + "?</html>", "U-factor of Doors", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_DOOR));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Door && p.getTopContainer() == foundation)
 									((Door) p).setUFactor(uFactor);

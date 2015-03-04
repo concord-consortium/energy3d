@@ -34,6 +34,9 @@ import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.undo.AddHousePartCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
+import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
+import org.concord.energy3d.undo.ChangePartColorCommand;
+import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.undo.SaveCommand;
@@ -174,6 +177,12 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				actedHousePart = ((EditHousePartCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof RemoveHousePartCommand) {
 				actedHousePart = ((RemoveHousePartCommand) lastEdit).getHousePart();
+			} else if (lastEdit instanceof ChangePartUFactorCommand) {
+				actedHousePart = ((ChangePartUFactorCommand) lastEdit).getHousePart();
+			} else if (lastEdit instanceof ChangeBuildingUFactorCommand) {
+				actedHousePart = ((ChangeBuildingUFactorCommand) lastEdit).getHousePart();
+			} else if (lastEdit instanceof ChangePartColorCommand) {
+				actedHousePart = ((ChangePartColorCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof ChangeBuildingColorCommand) {
 				actedHousePart = ((ChangeBuildingColorCommand) lastEdit).getHousePart();
 			}

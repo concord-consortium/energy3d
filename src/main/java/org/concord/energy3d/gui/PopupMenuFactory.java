@@ -187,6 +187,7 @@ public class PopupMenuFactory {
 					public void actionPerformed(ActionEvent e) {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Window) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
 							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -365,8 +366,8 @@ public class PopupMenuFactory {
 					public void actionPerformed(ActionEvent e) {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Wall) {
-							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
+							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
@@ -482,6 +483,7 @@ public class PopupMenuFactory {
 					public void actionPerformed(ActionEvent e) {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Roof) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
 							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -598,6 +600,7 @@ public class PopupMenuFactory {
 					public void actionPerformed(ActionEvent e) {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Door) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
 							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
 							Scene.getInstance().setEdited(true);
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
