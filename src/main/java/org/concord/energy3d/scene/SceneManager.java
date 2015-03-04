@@ -1331,6 +1331,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
 					final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
 					selectedHousePart = pick == null ? null : pick.getHousePart();
+					selectedHousePart.complete(); // to undo edit flag set by SelectUtil above
 					System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);
 					if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
 						previousSelectedHousePart.setEditPointsVisible(false);
