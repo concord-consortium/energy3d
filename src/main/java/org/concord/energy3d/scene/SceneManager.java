@@ -1434,7 +1434,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || houseMoveStartPoint != null)) {
 						if (selectedHousePart.isDrawable()) {
 							selectedHousePart.complete();
-							if (editHousePartCommand.isReallyEdited())
+							if (editHousePartCommand != null && editHousePartCommand.isReallyEdited())
 								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						} else {
 							editHousePartCommand.undo();

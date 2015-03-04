@@ -941,7 +941,12 @@ public class Scene implements Serializable {
 			for (final HousePart p : parts) {
 				if (p instanceof Wall && p.getTopContainer() == foundation)
 					p.setUFactor(uFactor);
-				;
+			}
+			break;
+		case DRAW_WINDOW:
+			for (final HousePart p : parts) {
+				if (p instanceof Window && p.getTopContainer() == foundation)
+					p.setUFactor(uFactor);
 			}
 			break;
 		case DRAW_DOOR:
@@ -979,6 +984,12 @@ public class Scene implements Serializable {
 					return p.getUFactor();
 			}
 			break;
+		case DRAW_WINDOW:
+			for (final HousePart p : parts) {
+				if (p instanceof Window && p.getTopContainer() == foundation)
+					return p.getUFactor();
+			}
+			break;
 		case DRAW_DOOR:
 			for (final HousePart p : parts) {
 				if (p instanceof Door && p.getTopContainer() == foundation)
@@ -999,6 +1010,36 @@ public class Scene implements Serializable {
 			break;
 		default:
 			break;
+		}
+		return 0;
+	}
+
+	public void setWindowShgcForWholeBuilding(Foundation foundation, double shgc) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getTopContainer() == foundation)
+				((Window) p).setSolarHeatGainCoefficient(shgc);
+		}
+	}
+
+	public double getWindowShgcForWholeBuilding(Foundation foundation) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getTopContainer() == foundation)
+				return ((Window) p).getSolarHeatGainCoefficient();
+		}
+		return 0;
+	}
+
+	public void setSolarPanelEfficiencyForWholeBuilding(Foundation foundation, double eff) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
+				((SolarPanel) p).setEfficiency(eff);
+		}
+	}
+
+	public double getSolarPanelEfficiencyForWholeBuilding(Foundation foundation) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
+				return ((SolarPanel) p).getEfficiency();
 		}
 		return 0;
 	}

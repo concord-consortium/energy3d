@@ -34,9 +34,13 @@ import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.undo.AddHousePartCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
+import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.undo.SaveCommand;
@@ -180,11 +184,19 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			} else if (lastEdit instanceof ChangePartUFactorCommand) {
 				actedHousePart = ((ChangePartUFactorCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof ChangeBuildingUFactorCommand) {
-				actedHousePart = ((ChangeBuildingUFactorCommand) lastEdit).getHousePart();
+				actedHousePart = ((ChangeBuildingUFactorCommand) lastEdit).getFoundation();
+			} else if (lastEdit instanceof ChangeSolarPanelEfficiencyCommand) {
+				actedHousePart = ((ChangeSolarPanelEfficiencyCommand) lastEdit).getSolarPanel();
+			} else if (lastEdit instanceof ChangeBuildingSolarPanelEfficiencyCommand) {
+				actedHousePart = ((ChangeBuildingSolarPanelEfficiencyCommand) lastEdit).getFoundation();
+			} else if (lastEdit instanceof ChangeWindowShgcCommand) {
+				actedHousePart = ((ChangeWindowShgcCommand) lastEdit).getWindow();
+			} else if (lastEdit instanceof ChangeBuildingWindowShgcCommand) {
+				actedHousePart = ((ChangeBuildingWindowShgcCommand) lastEdit).getFoundation();
 			} else if (lastEdit instanceof ChangePartColorCommand) {
 				actedHousePart = ((ChangePartColorCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof ChangeBuildingColorCommand) {
-				actedHousePart = ((ChangeBuildingColorCommand) lastEdit).getHousePart();
+				actedHousePart = ((ChangeBuildingColorCommand) lastEdit).getFoundation();
 			}
 		} else {
 			action = null;

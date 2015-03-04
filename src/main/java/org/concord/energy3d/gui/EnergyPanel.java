@@ -67,8 +67,9 @@ import org.concord.energy3d.simulation.CityData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.SolarRadiation;
+import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
-import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.util.Specifications;
 import org.concord.energy3d.util.Util;
 
@@ -596,6 +597,7 @@ public class EnergyPanel extends JPanel {
 					final int count = Scene.getInstance().countParts(foundation, Window.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the solar heat gain coefficient of " + count + " existing windows<br>of the selected building (#" + foundation.getId() + ") to " + windowSHGCComboBox.getSelectedItem() + "%?</html>", "Solar Heat Gain Coffficient of Windows", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingWindowShgcCommand(foundation));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Window && p.getTopContainer() == foundation)
 									((Window) p).setSolarHeatGainCoefficient(shgc);
@@ -645,6 +647,7 @@ public class EnergyPanel extends JPanel {
 					final int count = Scene.getInstance().countParts(foundation, SolarPanel.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the efficiency of " + count + " existing solar panels<br>of the selected building (#" + foundation.getId() + ") to " + solarPanelEfficiencyComboBox.getSelectedItem() + "%?</html>", "Solar Panel Conversion Efficiency", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingSolarPanelEfficiencyCommand(foundation));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof SolarPanel && p.getTopContainer() == foundation)
 									((SolarPanel) p).setEfficiency(eff);

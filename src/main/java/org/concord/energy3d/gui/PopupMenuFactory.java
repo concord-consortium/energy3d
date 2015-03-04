@@ -25,6 +25,8 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -257,7 +259,9 @@ public class PopupMenuFactory {
 					public void actionPerformed(ActionEvent e) {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Window) {
-							((Window) selectedPart).setSolarHeatGainCoefficient(shgcValues[i2]);
+							Window window = (Window) selectedPart;
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeWindowShgcCommand(window));
+							window.setSolarHeatGainCoefficient(shgcValues[i2]);
 							Scene.getInstance().setEdited(true);
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}
@@ -278,7 +282,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Window) {
 						Window window = (Window) selectedPart;
 						for (int i = 0; i < nShgc; i++) {
-							if (Util.isZero(window.getSolarHeatGainCoefficientNotPercentage() - shgcValues[i] * 0.01)) {
+							if (Util.isZero(window.getSolarHeatGainCoefficient() - shgcValues[i])) {
 								Util.selectSilently(miShgc[i], true);
 								b = true;
 								break;
@@ -779,7 +783,9 @@ public class PopupMenuFactory {
 					public void actionPerformed(ActionEvent e) {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof SolarPanel) {
-							((SolarPanel) selectedPart).setEfficiency(efficiencyValues[i2]);
+							SolarPanel sp = (SolarPanel) selectedPart;
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeSolarPanelEfficiencyCommand(sp));
+							sp.setEfficiency(efficiencyValues[i2]);
 							Scene.getInstance().setEdited(true);
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						}

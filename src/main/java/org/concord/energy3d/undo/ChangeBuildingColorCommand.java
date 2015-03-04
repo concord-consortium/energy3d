@@ -5,7 +5,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager.Operation;
 
@@ -40,7 +39,7 @@ public class ChangeBuildingColorCommand extends AbstractUndoableEdit {
 	}
 
 	// for action logging
-	public HousePart getHousePart() {
+	public Foundation getFoundation() {
 		return foundation;
 	}
 
