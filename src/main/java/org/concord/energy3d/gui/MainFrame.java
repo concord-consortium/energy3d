@@ -78,6 +78,8 @@ import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
+import org.concord.energy3d.undo.ShowAxesCommand;
+import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Mac;
@@ -946,6 +948,7 @@ public class MainFrame extends JFrame {
 			axesMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ShowAxesCommand());
 					SceneManager.getInstance().showAxes(axesMenuItem.isSelected());
 					Scene.getInstance().setEdited(true);
 				}
@@ -974,6 +977,7 @@ public class MainFrame extends JFrame {
 			shadowMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ShowShadowCommand());
 					SceneManager.getInstance().setShadow(shadowMenuItem.isSelected());
 					Util.selectSilently(MainPanel.getInstance().getShadowButton(), shadowMenuItem.isSelected());
 				}

@@ -44,6 +44,8 @@ import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.undo.SaveCommand;
+import org.concord.energy3d.undo.ShowAxesCommand;
+import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.UndoManager;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -63,6 +65,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private UndoableEdit lastEdit;
 	private final UndoManager undoManager;
 	private HousePart actedHousePart;
+	private Boolean selectionState;
 	private String oldHeliodonTime = null;
 	private String oldHeliodonLatitude = null;
 	private String oldLine = null;
@@ -162,6 +165,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	private void log() {
 
+		actedHousePart = null;
+		selectionState = null;
+
 		final String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
 		final URL url = Scene.getURL();
 		if (url == null) // no logging if not working on a saved file
@@ -197,6 +203,10 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				actedHousePart = ((ChangePartColorCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof ChangeBuildingColorCommand) {
 				actedHousePart = ((ChangeBuildingColorCommand) lastEdit).getFoundation();
+			} else if (lastEdit instanceof ShowAxesCommand) {
+				selectionState = SceneManager.getInstance().areAxesShown();
+			} else if (lastEdit instanceof ShowShadowCommand) {
+				selectionState = SceneManager.getInstance().isShadowEnabled();
 			}
 		} else {
 			action = null;
@@ -270,7 +280,18 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			}
 
 			if (action != null) {
-				line += separator + "\"" + action + "\": " + (type2Action ? "null" : LoggerUtil.getInfo(actedHousePart));
+				line += separator + "\"" + action + "\": ";
+				if (type2Action) {
+					line += "null";
+				} else {
+					if (actedHousePart != null) {
+						line += LoggerUtil.getInfo(actedHousePart);
+					} else if (selectionState != null) {
+						line += selectionState;
+					} else {
+						line += "null";
+					}
+				}
 			}
 
 			// toggle actions
@@ -286,12 +307,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					}
 					solarCalculationFinished = false;
 				}
-			}
-			if (SceneManager.getInstance().isShadowEnabled()) {
-				line += separator + "\"Shadow\": true";
-			}
-			if (!SceneManager.getInstance().areAxesShown()) {
-				line += separator + "\"Axes\": false";
 			}
 			if (Scene.getInstance().isAnnotationsVisible()) {
 				line += separator + "\"Annotation\": true";
