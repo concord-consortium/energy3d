@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -315,11 +316,14 @@ public class Scene implements Serializable {
 		Specifications.getInstance().setBudgetEnabled(instance.budgetEnabled);
 		Specifications.getInstance().setAreaEnabled(instance.areaEnabled);
 		Specifications.getInstance().setHeightEnabled(instance.heightEnabled);
-		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
+
+		if (Util.isZero(instance.solarContrast)) // if the solar map color contrast has not been set, set it to 50
+			instance.solarContrast = 50;
+		Util.setSilently(energyPanel.getColorMapSlider(), instance.solarContrast);
 
 		if (Util.isZero(instance.insideTemperature)) // if inside temperature has not been set, set it to 20
 			instance.insideTemperature = 20;
-		Util.setSilently(EnergyPanel.getInstance().getInsideTemperatureSpinner(), instance.insideTemperature);
+		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.insideTemperature);
 
 		// backward compatibility
 		if (instance.windowUFactor != null) {
@@ -1112,6 +1116,25 @@ public class Scene implements Serializable {
 		return false;
 	}
 
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setDate(Date date) {
+		if (calendar != null)
+			calendar.setTime(date);
+	}
+
+	public Date getDate() {
+		if (calendar != null)
+			return calendar.getTime();
+		return Heliodon.getInstance().getCalender().getTime();
+	}
+
 	public void setInsideTemperature(int insideTemperature) {
 		this.insideTemperature = insideTemperature;
 	}
@@ -1170,6 +1193,14 @@ public class Scene implements Serializable {
 
 	public void setOnlyAbsorptionInSolarMap(final boolean onlyAbsorptionInSolarMap) {
 		fullEnergyInSolarMap = !onlyAbsorptionInSolarMap;
+	}
+
+	public void setSolarHeatMapColorContrast(int solarContrast) {
+		this.solarContrast = solarContrast;
+	}
+
+	public int getSolarHeatMapColorContrast() {
+		return solarContrast;
 	}
 
 	public int countParts(final Foundation foundation, final Class<?> clazz) {

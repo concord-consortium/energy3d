@@ -39,9 +39,12 @@ import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
+import org.concord.energy3d.undo.ChangeCityCommand;
+import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
+import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ComputeEnergyCommand;
@@ -74,7 +77,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private final UndoManager undoManager;
 	private HousePart actedHousePart;
 	private Object stateValue;
-	private String oldHeliodonTime = null;
 	private String oldHeliodonLatitude = null;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
@@ -222,6 +224,13 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				stateValue = SceneManager.getInstance().getSolarHeatMap();
 			} else if (lastEdit instanceof ChangeInsideTemperatureCommand) {
 				stateValue = Scene.getInstance().getInsideTemperature();
+			} else if (lastEdit instanceof ChangeSolarHeatMapColorContrastCommand) {
+				stateValue = Scene.getInstance().getSolarHeatMapColorContrast();
+			} else if (lastEdit instanceof ChangeCityCommand) {
+				stateValue = "\"" + Scene.getInstance().getCity() + "\"";
+			} else if (lastEdit instanceof ChangeDateCommand) {
+				Calendar calendar = Heliodon.getInstance().getCalender();
+				stateValue = "\"" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "\"";
 			}
 		} else {
 			action = null;
@@ -325,16 +334,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			if (!heliodonLatitude.equals(oldHeliodonLatitude)) {
 				line += separator + heliodonLatitude;
 				oldHeliodonLatitude = heliodonLatitude;
-			}
-
-			if (!SceneManager.getInstance().isSunAnimation()) {
-				final Calendar heliodonCalendar = Heliodon.getInstance().getCalender();
-				final String heliodonTime = "\"Time\": \"" + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "\"";
-				if (!heliodonTime.equals(oldHeliodonTime)) {
-					if (!SceneManager.getInstance().isSunAnimation()) // don't log time if sun path is animated
-						line += separator + heliodonTime;
-					oldHeliodonTime = heliodonTime;
-				}
 			}
 
 			if (!SceneManager.getInstance().getSpinView()) {

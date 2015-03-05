@@ -71,7 +71,10 @@ import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
+import org.concord.energy3d.undo.ChangeCityCommand;
+import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
+import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.util.Specifications;
 import org.concord.energy3d.util.Util;
 
@@ -194,10 +197,12 @@ public class EnergyPanel extends JPanel {
 					return;
 				}
 				if (disableActionsRequester == null) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeDateCommand());
 					final Heliodon heliodon = Heliodon.getInstance();
 					if (heliodon != null)
 						heliodon.setDate((Date) dateSpinner.getValue());
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setDate((Date) dateSpinner.getValue());
 					Scene.getInstance().setTreeLeaves();
 					Scene.getInstance().setEdited(true);
 				}
@@ -224,6 +229,7 @@ public class EnergyPanel extends JPanel {
 		cityComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangeCityCommand());
 				final String city = (String) cityComboBox.getSelectedItem();
 				if (city.equals("")) {
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -237,6 +243,7 @@ public class EnergyPanel extends JPanel {
 					if (CityData.getInstance().getSunshineHours().get(city) == null)
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No sunshine data is found for " + city + ".\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
 				}
+				Scene.getInstance().setCity(city);
 				Scene.getInstance().setTreeLeaves();
 				Scene.getInstance().setEdited(true);
 			}
@@ -680,7 +687,7 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(heatMapPanel);
 
 		colorMapSlider = new MySlider();
-		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the heat map.</html>");
+		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the solar heat map.</html>");
 		colorMapSlider.setMinimum(15);
 		colorMapSlider.setMaximum(95);
 		colorMapSlider.setMinimumSize(colorMapSlider.getPreferredSize());
@@ -688,6 +695,8 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				if (!colorMapSlider.getValueIsAdjusting()) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeSolarHeatMapColorContrastCommand());
+					Scene.getInstance().setSolarHeatMapColorContrast(colorMapSlider.getValue());
 					compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().setEdited(true, false);
 				}
@@ -1022,6 +1031,10 @@ public class EnergyPanel extends JPanel {
 
 	public JSpinner getTimeSpinner() {
 		return timeSpinner;
+	}
+
+	public JSpinner getLatitudeSpinner() {
+		return latitudeSpinner;
 	}
 
 	public JSpinner getInsideTemperatureSpinner() {
