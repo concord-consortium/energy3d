@@ -43,6 +43,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AnimateSunCommand;
+import org.concord.energy3d.undo.ComputeEnergyCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowHeliodonCommand;
@@ -678,16 +679,21 @@ public class MainPanel extends JPanel {
 			energyViewButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ComputeEnergyCommand());
 					if (energyViewButton.isSelected())
 						MainFrame.getInstance().autoSelectBuilding(false);
-					SceneManager.getInstance().setHeatFluxDaily(true);
-					SceneManager.getInstance().setSolarHeatMap(energyViewButton.isSelected());
-					SceneManager.getInstance().showHeatFluxVectors(energyViewButton.isSelected());
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					computeEnergyView(energyViewButton.isSelected());
 				}
 			});
 		}
 		return energyViewButton;
+	}
+
+	public void computeEnergyView(boolean b) {
+		SceneManager.getInstance().setHeatFluxDaily(true);
+		SceneManager.getInstance().setSolarHeatMap(b);
+		SceneManager.getInstance().showHeatFluxVectors(b);
+		((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 	}
 
 	private JSplitPane getCanvasNoteSplitPane() {

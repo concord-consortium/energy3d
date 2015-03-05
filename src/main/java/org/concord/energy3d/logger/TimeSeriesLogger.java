@@ -42,6 +42,7 @@ import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
+import org.concord.energy3d.undo.ComputeEnergyCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.undo.SaveCommand;
@@ -75,12 +76,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private String oldLine = null;
 	private String oldCameraPosition = null;
 	private Object oldRoomTemperature = null;
-	private String oldWallUFactor = null;
-	private String oldWindowUFactor = null;
-	private String oldDoorUFactor = null;
-	private String oldRoofUFactor = null;
-	private String oldSolarPanelYield = null;
-	private String oldShgc = null;
 	private String noteString = "";
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
@@ -219,6 +214,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				selectionState = Scene.getInstance().areAnnotationsVisible();
 			} else if (lastEdit instanceof ShowHeliodonCommand) {
 				selectionState = SceneManager.getInstance().isHeliodonVisible();
+			} else if (lastEdit instanceof ComputeEnergyCommand) {
+				selectionState = SceneManager.getInstance().getSolarHeatMap();
 			}
 		} else {
 			action = null;
@@ -306,9 +303,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				}
 			}
 
-			// toggle actions
+			// record the daily solar radiation results
 			if (SceneManager.getInstance().getSolarHeatMap()) {
-				line += separator + "\"SolarMap\": true";
 				if (solarCalculationFinished) {
 					String result = getBuildingSolarEnergies();
 					if (result.length() > 0) {
@@ -328,36 +324,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			if (!roomTemperature.equals(oldRoomTemperature)) {
 				line += separator + roomTemperature;
 				oldRoomTemperature = roomTemperature;
-			}
-			final String wallUFactor = "\"WallUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getWallsComboBox().getSelectedItem()) + "\"";
-			if (!wallUFactor.equals(oldWallUFactor)) {
-				line += separator + wallUFactor;
-				oldWallUFactor = wallUFactor;
-			}
-			final String windowUFactor = "\"WindowUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem()) + "\"";
-			if (!windowUFactor.equals(oldWindowUFactor)) {
-				line += separator + windowUFactor;
-				oldWindowUFactor = windowUFactor;
-			}
-			final String doorUFactor = "\"DoorUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem()) + "\"";
-			if (!doorUFactor.equals(oldDoorUFactor)) {
-				line += separator + doorUFactor;
-				oldDoorUFactor = doorUFactor;
-			}
-			final String roofUFactor = "\"RoofUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem()) + "\"";
-			if (!roofUFactor.equals(oldRoofUFactor)) {
-				line += separator + roofUFactor;
-				oldRoofUFactor = roofUFactor;
-			}
-			final String solarPanelYield = "\"SolarPanelYield\": \"" + EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem() + "\"";
-			if (!solarPanelYield.equals(oldSolarPanelYield)) {
-				line += separator + solarPanelYield;
-				oldSolarPanelYield = solarPanelYield;
-			}
-			final String shgc = "\"SHGC\": \"" + EnergyPanel.getInstance().getWindowSHGCComboBox().getSelectedItem() + "\"";
-			if (!shgc.equals(oldShgc)) {
-				line += separator + shgc;
-				oldShgc = shgc;
 			}
 
 			if (!SceneManager.getInstance().isSunAnimation()) {
@@ -411,10 +377,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				oldLine = line;
 			}
 		}
-	}
-
-	private String encodeUFactorString(String uFactor) {
-		return uFactor.replace("\"", "\\\"");
 	}
 
 	public void closeLog() {
