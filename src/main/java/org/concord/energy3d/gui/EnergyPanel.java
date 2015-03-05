@@ -75,6 +75,7 @@ import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
+import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.util.Specifications;
 import org.concord.energy3d.util.Util;
 
@@ -199,10 +200,9 @@ public class EnergyPanel extends JPanel {
 				if (disableActionsRequester == null) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeDateCommand());
 					final Heliodon heliodon = Heliodon.getInstance();
-					if (heliodon != null)
-						heliodon.setDate((Date) dateSpinner.getValue());
+					heliodon.setDate((Date) dateSpinner.getValue());
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					Scene.getInstance().setDate((Date) dateSpinner.getValue());
+					Scene.getInstance().setDate(heliodon.getCalender().getTime());
 					Scene.getInstance().setTreeLeaves();
 					Scene.getInstance().setEdited(true);
 				}
@@ -274,9 +274,10 @@ public class EnergyPanel extends JPanel {
 					firstCall = false;
 					return;
 				}
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangeTimeCommand());
 				final Heliodon heliodon = Heliodon.getInstance();
-				if (heliodon != null)
-					heliodon.setTime((Date) timeSpinner.getValue());
+				heliodon.setTime((Date) timeSpinner.getValue());
+				Scene.getInstance().setDate(heliodon.getCalender().getTime());
 				updateWeatherData();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().changeSkyTexture();

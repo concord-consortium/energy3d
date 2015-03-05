@@ -299,9 +299,9 @@ public class Scene implements Serializable {
 	public static void initEnergy() {
 		final EnergyPanel energyPanel = EnergyPanel.getInstance();
 		if (instance.calendar != null) {
-			energyPanel.getDateSpinner().setValue(instance.calendar.getTime());
-			energyPanel.getTimeSpinner().setValue(instance.calendar.getTime());
 			Heliodon.getInstance().setDate(instance.calendar.getTime());
+			Util.setSilently(energyPanel.getDateSpinner(), instance.calendar.getTime());
+			Util.setSilently(energyPanel.getTimeSpinner(), instance.calendar.getTime());
 			energyPanel.setLatitude(instance.latitude);
 			if ("Boston".equals(instance.city) || "".equals(instance.city))
 				instance.city = "Boston, MA";

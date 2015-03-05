@@ -46,6 +46,7 @@ import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ComputeEnergyCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
@@ -231,6 +232,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			} else if (lastEdit instanceof ChangeDateCommand) {
 				Calendar calendar = Heliodon.getInstance().getCalender();
 				stateValue = "\"" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "\"";
+			} else if (lastEdit instanceof ChangeTimeCommand) {
+				Calendar calendar = Heliodon.getInstance().getCalender();
+				stateValue = "\"" + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" + calendar.get(Calendar.MINUTE) + "\"";
 			}
 		} else {
 			action = null;
