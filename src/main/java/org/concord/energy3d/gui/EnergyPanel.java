@@ -74,6 +74,7 @@ import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
+import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.util.Specifications;
@@ -229,12 +230,12 @@ public class EnergyPanel extends JPanel {
 		cityComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				SceneManager.getInstance().getUndoManager().addEdit(new ChangeCityCommand());
 				final String city = (String) cityComboBox.getSelectedItem();
 				if (city.equals("")) {
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
 				} else {
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeCityCommand());
 					final Integer newLatitude = CityData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).intValue();
 					if (newLatitude.equals(latitudeSpinner.getValue()))
 						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -311,6 +312,7 @@ public class EnergyPanel extends JPanel {
 		latitudeSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangeLatitudeCommand());
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);
@@ -1058,9 +1060,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void setLatitude(final int latitude) {
-		latitudeSpinner.removeChangeListener(latitudeChangeListener);
-		latitudeSpinner.setValue(latitude);
-		latitudeSpinner.addChangeListener(latitudeChangeListener);
+		Util.setSilently(latitudeSpinner, latitude);
 	}
 
 	public int getLatitude() {

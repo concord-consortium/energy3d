@@ -42,6 +42,7 @@ import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
+import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
@@ -78,7 +79,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private final UndoManager undoManager;
 	private HousePart actedHousePart;
 	private Object stateValue;
-	private String oldHeliodonLatitude = null;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
 	private String noteString = "";
@@ -227,6 +227,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				stateValue = Scene.getInstance().getInsideTemperature();
 			} else if (lastEdit instanceof ChangeSolarHeatMapColorContrastCommand) {
 				stateValue = Scene.getInstance().getSolarHeatMapColorContrast();
+			} else if (lastEdit instanceof ChangeLatitudeCommand) {
+				stateValue = Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI);
 			} else if (lastEdit instanceof ChangeCityCommand) {
 				stateValue = "\"" + Scene.getInstance().getCity() + "\"";
 			} else if (lastEdit instanceof ChangeDateCommand) {
@@ -331,13 +333,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					}
 					solarCalculationFinished = false;
 				}
-			}
-
-			// continuous actions
-			final String heliodonLatitude = "\"Latitude\": " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI);
-			if (!heliodonLatitude.equals(oldHeliodonLatitude)) {
-				line += separator + heliodonLatitude;
-				oldHeliodonLatitude = heliodonLatitude;
 			}
 
 			if (!SceneManager.getInstance().getSpinView()) {
