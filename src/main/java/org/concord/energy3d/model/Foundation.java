@@ -786,7 +786,7 @@ public class Foundation extends HousePart {
 		if (solarValue == -2)
 			buildingLabel.setVisible(false);
 		else {
-			buildingLabel.setVisible(SceneManager.getInstance().areBuildingLabelsShown());
+			buildingLabel.setVisible(SceneManager.getInstance().areBuildingLabelsVisible());
 			final String idLabel = "(#" + id + ")";
 			if (solarValue == -1 || solarValue == 0)
 				buildingLabel.setText(idLabel);

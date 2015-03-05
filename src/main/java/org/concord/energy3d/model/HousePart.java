@@ -1065,7 +1065,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void updateHeatFluxVisibility() {
-		heatFlux.setVisible(Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsShown());
+		heatFlux.setVisible(Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsVisible());
 	}
 
 }

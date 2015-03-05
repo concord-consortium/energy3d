@@ -14,6 +14,9 @@ import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.event.ChangeListener;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
@@ -334,6 +337,17 @@ public class Util {
 			comboBox.addItemListener(x);
 		for (final ActionListener x : actionListeners)
 			comboBox.addActionListener(x);
+	}
+
+	/** This method sets the value of a spinner visually without invoking its ChangeListeners */
+	public static void setSilently(final JSpinner spinner, final Object value) {
+		final ChangeListener[] changeListeners = spinner.getChangeListeners();
+		for (final ChangeListener x : changeListeners)
+			spinner.removeChangeListener(x);
+		spinner.setValue(value);
+		((DefaultEditor) spinner.getEditor()).getTextField().setText("" + value);
+		for (final ChangeListener x : changeListeners)
+			spinner.addChangeListener(x);
 	}
 
 	public static JButton getButtonSubComponent(final Container container) {

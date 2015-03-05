@@ -878,6 +878,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Scene.getInstance().updateEditShapes();
 	}
 
+	public ViewMode getViewMode() {
+		return viewMode;
+	}
+
 	private void resizeCamera() {
 		final BoundingVolume bounds = Scene.getRoot().getWorldBound();
 		if (bounds == null)
@@ -1252,10 +1256,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		mouseState = null;
 	}
 
-	public ViewMode getViewMode() {
-		return viewMode;
-	}
-
 	public void setMouseControlEnabled(final boolean enabled) {
 		mouseControlEnabled = enabled;
 		cameraControl.setMouseEnabled(enabled);
@@ -1588,17 +1588,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return backgroundRoot.hasChild(axes);
 	}
 
-	public void showHeatFluxVectors(final boolean b) {
+	public void setHeatFluxVectorsVisible(final boolean b) {
 		showHeatFlux = b;
 		for (final HousePart part : Scene.getInstance().getParts())
 			part.updateHeatFluxVisibility();
 	}
 
-	public boolean areHeatFluxVectorsShown() {
+	public boolean areHeatFluxVectorsVisible() {
 		return showHeatFlux;
 	}
 
-	public void showBuildingLabels(final boolean b) {
+	public void setBuildingLabelsVisible(final boolean b) {
 		showBuildingLabels = b;
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation)
@@ -1606,7 +1606,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 	}
 
-	public boolean areBuildingLabelsShown() {
+	public boolean areBuildingLabelsVisible() {
 		return showBuildingLabels;
 	}
 

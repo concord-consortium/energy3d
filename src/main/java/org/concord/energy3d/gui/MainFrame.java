@@ -80,6 +80,7 @@ import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
+import org.concord.energy3d.undo.TopViewCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Mac;
@@ -904,7 +905,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
-					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsShown());
+					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
 					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
 					Util.selectSilently(simpleTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
 					Util.selectSilently(fullTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
@@ -963,7 +964,7 @@ public class MainFrame extends JFrame {
 			buildingLabelsMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().showBuildingLabels(buildingLabelsMenuItem.isSelected());
+					SceneManager.getInstance().setBuildingLabelsVisible(buildingLabelsMenuItem.isSelected());
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -1485,6 +1486,7 @@ public class MainFrame extends JFrame {
 			topViewCheckBoxMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().getUndoManager().addEdit(new TopViewCommand());
 					final boolean isTopView = topViewCheckBoxMenuItem.isSelected();
 					if (isTopView) {
 						Scene.saveCameraLocation();

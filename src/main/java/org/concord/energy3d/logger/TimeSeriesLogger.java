@@ -27,6 +27,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
@@ -38,6 +39,7 @@ import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
+import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
@@ -51,6 +53,7 @@ import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeliodonCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.SpinViewCommand;
+import org.concord.energy3d.undo.TopViewCommand;
 import org.concord.energy3d.undo.UndoManager;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -70,12 +73,11 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private UndoableEdit lastEdit;
 	private final UndoManager undoManager;
 	private HousePart actedHousePart;
-	private Boolean selectionState;
+	private Object stateValue;
 	private String oldHeliodonTime = null;
 	private String oldHeliodonLatitude = null;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
-	private Object oldRoomTemperature = null;
 	private String noteString = "";
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
@@ -165,7 +167,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private void log() {
 
 		actedHousePart = null;
-		selectionState = null;
+		stateValue = null;
 
 		final String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
 		final URL url = Scene.getURL();
@@ -203,19 +205,23 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			} else if (lastEdit instanceof ChangeBuildingColorCommand) {
 				actedHousePart = ((ChangeBuildingColorCommand) lastEdit).getFoundation();
 			} else if (lastEdit instanceof AnimateSunCommand) {
-				selectionState = SceneManager.getInstance().isSunAnimation();
+				stateValue = SceneManager.getInstance().isSunAnimation();
 			} else if (lastEdit instanceof SpinViewCommand) {
-				selectionState = SceneManager.getInstance().getSpinView();
+				stateValue = SceneManager.getInstance().getSpinView();
 			} else if (lastEdit instanceof ShowAxesCommand) {
-				selectionState = SceneManager.getInstance().areAxesVisible();
+				stateValue = SceneManager.getInstance().areAxesVisible();
+			} else if (lastEdit instanceof TopViewCommand) {
+				stateValue = SceneManager.getInstance().getViewMode() == ViewMode.TOP_VIEW;
 			} else if (lastEdit instanceof ShowShadowCommand) {
-				selectionState = SceneManager.getInstance().isShadowEnabled();
+				stateValue = SceneManager.getInstance().isShadowEnabled();
 			} else if (lastEdit instanceof ShowAnnotationCommand) {
-				selectionState = Scene.getInstance().areAnnotationsVisible();
+				stateValue = Scene.getInstance().areAnnotationsVisible();
 			} else if (lastEdit instanceof ShowHeliodonCommand) {
-				selectionState = SceneManager.getInstance().isHeliodonVisible();
+				stateValue = SceneManager.getInstance().isHeliodonVisible();
 			} else if (lastEdit instanceof ComputeEnergyCommand) {
-				selectionState = SceneManager.getInstance().getSolarHeatMap();
+				stateValue = SceneManager.getInstance().getSolarHeatMap();
+			} else if (lastEdit instanceof ChangeInsideTemperatureCommand) {
+				stateValue = Scene.getInstance().getInsideTemperature();
 			}
 		} else {
 			action = null;
@@ -295,8 +301,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				} else {
 					if (actedHousePart != null) {
 						line += LoggerUtil.getInfo(actedHousePart);
-					} else if (selectionState != null) {
-						line += selectionState;
+					} else if (stateValue != null) {
+						line += stateValue;
 					} else {
 						line += "null";
 					}
@@ -319,11 +325,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			if (!heliodonLatitude.equals(oldHeliodonLatitude)) {
 				line += separator + heliodonLatitude;
 				oldHeliodonLatitude = heliodonLatitude;
-			}
-			final String roomTemperature = "\"RoomTemperature\": " + EnergyPanel.getInstance().getInsideTemperatureSpinner().getValue();
-			if (!roomTemperature.equals(oldRoomTemperature)) {
-				line += separator + roomTemperature;
-				oldRoomTemperature = roomTemperature;
 			}
 
 			if (!SceneManager.getInstance().isSunAnimation()) {

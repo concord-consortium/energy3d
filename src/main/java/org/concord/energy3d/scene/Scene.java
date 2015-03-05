@@ -125,6 +125,7 @@ public class Scene implements Serializable {
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
 	private boolean fullEnergyInSolarMap = false;
+	private int insideTemperature = 20;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -287,7 +288,7 @@ public class Scene implements Serializable {
 		root.updateWorldBound(true);
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 		SceneManager.getInstance().setAxesVisible(!instance.hideAxes);
-		SceneManager.getInstance().showBuildingLabels(instance.showBuildingLabels);
+		SceneManager.getInstance().setBuildingLabelsVisible(instance.showBuildingLabels);
 		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
 		MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
 		SceneManager.getInstance().getUndoManager().die();
@@ -315,6 +316,10 @@ public class Scene implements Serializable {
 		Specifications.getInstance().setAreaEnabled(instance.areaEnabled);
 		Specifications.getInstance().setHeightEnabled(instance.heightEnabled);
 		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
+
+		if (Util.isZero(instance.insideTemperature)) // if inside temperature has not been set, set it to 20
+			instance.insideTemperature = 20;
+		Util.setSilently(EnergyPanel.getInstance().getInsideTemperatureSpinner(), instance.insideTemperature);
 
 		// backward compatibility
 		if (instance.windowUFactor != null) {
@@ -526,10 +531,11 @@ public class Scene implements Serializable {
 				instance.areaEnabled = Specifications.getInstance().isAreaEnabled();
 				instance.heightEnabled = Specifications.getInstance().isHeightEnabled();
 				instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
-				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsShown();
+				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
 				instance.calendar = Heliodon.getInstance().getCalender();
 				instance.latitude = EnergyPanel.getInstance().getLatitude();
 				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+				instance.insideTemperature = (Integer) EnergyPanel.getInstance().getInsideTemperatureSpinner().getValue();
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
@@ -1104,6 +1110,14 @@ public class Scene implements Serializable {
 					return true;
 		}
 		return false;
+	}
+
+	public void setInsideTemperature(int insideTemperature) {
+		this.insideTemperature = insideTemperature;
+	}
+
+	public int getInsideTemperature() {
+		return insideTemperature;
 	}
 
 	/** @return the solar panel efficiency (not in percentage) */

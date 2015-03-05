@@ -692,7 +692,7 @@ public class MainPanel extends JPanel {
 	public void computeEnergyView(boolean b) {
 		SceneManager.getInstance().setHeatFluxDaily(true);
 		SceneManager.getInstance().setSolarHeatMap(b);
-		SceneManager.getInstance().showHeatFluxVectors(b);
+		SceneManager.getInstance().setHeatFluxVectorsVisible(b);
 		((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 	}
 

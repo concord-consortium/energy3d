@@ -39,6 +39,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
@@ -70,6 +71,7 @@ import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
+import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
 import org.concord.energy3d.util.Specifications;
 import org.concord.energy3d.util.Util;
 
@@ -274,7 +276,7 @@ public class EnergyPanel extends JPanel {
 				if (MainPanel.getInstance().getShadowButton().isSelected()) {
 					SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 				}
-				if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsShown()) { // for now, only heat flow arrows need to call redrawAll
+				if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsVisible()) { // for now, only heat flow arrows need to call redrawAll
 					SceneManager.getInstance().setHeatFluxDaily(false);
 					for (final HousePart part : Scene.getInstance().getParts())
 						part.drawHeatFlux();
@@ -331,12 +333,15 @@ public class EnergyPanel extends JPanel {
 		insideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangeInsideTemperatureCommand());
+				Scene.getInstance().setInsideTemperature((Integer) insideTemperatureSpinner.getValue());
 				if (disableActionsRequester == null)
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);
 			}
 		});
 		insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
+		((DefaultEditor) insideTemperatureSpinner.getEditor()).getTextField().setEditable(false);
 		final GridBagConstraints gbc_insideTemperatureSpinner = new GridBagConstraints();
 		gbc_insideTemperatureSpinner.gridx = 2;
 		gbc_insideTemperatureSpinner.gridy = 0;
@@ -977,7 +982,7 @@ public class EnergyPanel extends JPanel {
 				for (final HousePart part : Scene.getInstance().getParts())
 					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
 				SolarRadiation.getInstance().compute();
-				HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), (Integer) insideTemperatureSpinner.getValue());
+				HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), Scene.getInstance().getInsideTemperature());
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Energy calculation completed", 0, 1));
 				updatePartEnergy();
