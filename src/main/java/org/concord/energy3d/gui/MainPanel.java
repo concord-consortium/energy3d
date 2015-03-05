@@ -42,7 +42,12 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.undo.AnimateSunCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
+import org.concord.energy3d.undo.ShowAnnotationCommand;
+import org.concord.energy3d.undo.ShowHeliodonCommand;
+import org.concord.energy3d.undo.ShowShadowCommand;
+import org.concord.energy3d.undo.SpinViewCommand;
 import org.concord.energy3d.util.Config;
 
 public class MainPanel extends JPanel {
@@ -57,7 +62,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton windowButton = null;
 	private JToggleButton platformButton = null;
 	private JToggleButton shadowButton = null;
-	private JToggleButton spinAnimationButton = null;
+	private JToggleButton spinViewButton = null;
 	private JToggleButton resizeButton = null;
 	private JToggleButton heliodonButton = null;
 	private JToggleButton sunAnimButton = null;
@@ -316,7 +321,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getZoomButton());
 			appToolbar.add(getResizeButton());
 			appToolbar.add(getRotateButton());
-			appToolbar.add(getSpinAnimationButton());
+			appToolbar.add(getSpinViewButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getAnnotationToggleButton());
 			appToolbar.add(getPreviewButton());
@@ -336,7 +341,7 @@ public class MainPanel extends JPanel {
 			appToolbar.addSeparator();
 			appToolbar.add(getShadowButton());
 			appToolbar.add(getHeliodonButton());
-			appToolbar.add(getSunAnimButton());
+			appToolbar.add(getSunAnimationButton());
 			appToolbar.add(getEnergyViewButton());
 			appToolbar.add(getEnergyPanelToggleButton());
 			final ButtonGroup bg = new ButtonGroup();
@@ -469,7 +474,8 @@ public class MainPanel extends JPanel {
 			shadowButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (SceneManager.getInstance().isSunAnim() || Heliodon.getInstance().isNightTime())
+					SceneManager.getInstance().getUndoManager().addEdit(new ShowShadowCommand());
+					if (SceneManager.getInstance().isSunAnimation() || Heliodon.getInstance().isNightTime())
 						SceneManager.getInstance().setShading(shadowButton.isSelected());
 					else
 						SceneManager.getInstance().setShading(false);
@@ -483,21 +489,22 @@ public class MainPanel extends JPanel {
 		return shadowButton;
 	}
 
-	private JToggleButton getSpinAnimationButton() {
-		if (spinAnimationButton == null) {
-			spinAnimationButton = new JToggleButton();
-			spinAnimationButton.addMouseListener(refreshUponMouseExit);
-			spinAnimationButton.setIcon(new ImageIcon(getClass().getResource("icons/spin.png")));
-			spinAnimationButton.setToolTipText("Spin view");
-			spinAnimationButton.addActionListener(new ActionListener() {
+	public JToggleButton getSpinViewButton() {
+		if (spinViewButton == null) {
+			spinViewButton = new JToggleButton();
+			spinViewButton.addMouseListener(refreshUponMouseExit);
+			spinViewButton.setIcon(new ImageIcon(getClass().getResource("icons/spin.png")));
+			spinViewButton.setToolTipText("Spin view");
+			spinViewButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().toggleRotation();
+					SceneManager.getInstance().getUndoManager().addEdit(new SpinViewCommand());
+					SceneManager.getInstance().toggleSpinView();
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
 		}
-		return spinAnimationButton;
+		return spinViewButton;
 	}
 
 	public JToggleButton getHeliodonButton() {
@@ -509,7 +516,8 @@ public class MainPanel extends JPanel {
 			heliodonButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().setHeliodonControl(heliodonButton.isSelected());
+					SceneManager.getInstance().getUndoManager().addEdit(new ShowHeliodonCommand());
+					SceneManager.getInstance().setHeliodonVisible(heliodonButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
 					Scene.getInstance().setEdited(true, false);
@@ -519,7 +527,7 @@ public class MainPanel extends JPanel {
 		return heliodonButton;
 	}
 
-	public JToggleButton getSunAnimButton() {
+	public JToggleButton getSunAnimationButton() {
 		if (sunAnimButton == null) {
 			sunAnimButton = new JToggleButton();
 			sunAnimButton.addMouseListener(refreshUponMouseExit);
@@ -529,7 +537,8 @@ public class MainPanel extends JPanel {
 			sunAnimButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().setSunAnim(sunAnimButton.isSelected());
+					SceneManager.getInstance().getUndoManager().addEdit(new AnimateSunCommand());
+					SceneManager.getInstance().setSunAnimation(sunAnimButton.isSelected());
 					if (shadowButton.isSelected())
 						SceneManager.getInstance().setShading(true);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
@@ -578,6 +587,7 @@ public class MainPanel extends JPanel {
 			annotationToggleButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ShowAnnotationCommand());
 					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					Scene.getInstance().setEdited(true, false);
@@ -607,8 +617,8 @@ public class MainPanel extends JPanel {
 
 	public void setToolbarEnabled(final boolean enabled) {
 		for (final Component c : getAppToolbar().getComponents()) {
-			if (c != getPreviewButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinAnimationButton()) {
-				if (!enabled || c != getSunAnimButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected())
+			if (c != getPreviewButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinViewButton()) {
+				if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected())
 					c.setEnabled(enabled);
 			}
 		}
@@ -761,7 +771,7 @@ public class MainPanel extends JPanel {
 		sunAnimButton.setEnabled(enableSunAnim);
 		if (!enableSunAnim && sunAnimButton.isSelected()) {
 			sunAnimButton.setSelected(false);
-			SceneManager.getInstance().setSunAnim(false);
+			SceneManager.getInstance().setSunAnimation(false);
 		}
 	}
 

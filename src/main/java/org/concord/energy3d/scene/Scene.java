@@ -218,7 +218,7 @@ public class Scene implements Serializable {
 			Scene.url = file;
 
 			MainPanel.getInstance().getHeliodonButton().setSelected(false);
-			MainPanel.getInstance().getSunAnimButton().setSelected(false);
+			MainPanel.getInstance().getSunAnimationButton().setSelected(false);
 			// MainPanel.getInstance().getSolarButton().setSelected(false);
 			SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
 			Wall.resetDefaultWallHeight();
@@ -286,7 +286,7 @@ public class Scene implements Serializable {
 
 		root.updateWorldBound(true);
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-		SceneManager.getInstance().showAxes(!instance.hideAxes);
+		SceneManager.getInstance().setAxesVisible(!instance.hideAxes);
 		SceneManager.getInstance().showBuildingLabels(instance.showBuildingLabels);
 		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
 		MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
@@ -525,7 +525,7 @@ public class Scene implements Serializable {
 				instance.budgetEnabled = Specifications.getInstance().isBudgetEnabled();
 				instance.areaEnabled = Specifications.getInstance().isAreaEnabled();
 				instance.heightEnabled = Specifications.getInstance().isHeightEnabled();
-				instance.hideAxes = !SceneManager.getInstance().areAxesShown();
+				instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsShown();
 				instance.calendar = Heliodon.getInstance().getCalender();
 				instance.latitude = EnergyPanel.getInstance().getLatitude();
@@ -765,7 +765,7 @@ public class Scene implements Serializable {
 		return redrawAll;
 	}
 
-	public boolean isAnnotationsVisible() {
+	public boolean areAnnotationsVisible() {
 		return isAnnotationsVisible;
 	}
 

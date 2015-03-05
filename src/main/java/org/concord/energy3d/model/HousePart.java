@@ -177,7 +177,7 @@ public abstract class HousePart implements Serializable {
 		angleAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		labelsRoot = new Node("Labels");
 
-		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
+		setAnnotationsVisible(Scene.getInstance().areAnnotationsVisible());
 
 		// Set up a reusable pick results
 		for (int i = 0; i < points.size(); i++)

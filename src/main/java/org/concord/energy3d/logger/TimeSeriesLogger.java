@@ -33,6 +33,7 @@ import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.undo.AddHousePartCommand;
+import org.concord.energy3d.undo.AnimateSunCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
@@ -44,8 +45,11 @@ import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.undo.SaveCommand;
+import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
+import org.concord.energy3d.undo.ShowHeliodonCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
+import org.concord.energy3d.undo.SpinViewCommand;
 import org.concord.energy3d.undo.UndoManager;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -203,10 +207,18 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				actedHousePart = ((ChangePartColorCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof ChangeBuildingColorCommand) {
 				actedHousePart = ((ChangeBuildingColorCommand) lastEdit).getFoundation();
+			} else if (lastEdit instanceof AnimateSunCommand) {
+				selectionState = SceneManager.getInstance().isSunAnimation();
+			} else if (lastEdit instanceof SpinViewCommand) {
+				selectionState = SceneManager.getInstance().getSpinView();
 			} else if (lastEdit instanceof ShowAxesCommand) {
-				selectionState = SceneManager.getInstance().areAxesShown();
+				selectionState = SceneManager.getInstance().areAxesVisible();
 			} else if (lastEdit instanceof ShowShadowCommand) {
 				selectionState = SceneManager.getInstance().isShadowEnabled();
+			} else if (lastEdit instanceof ShowAnnotationCommand) {
+				selectionState = Scene.getInstance().areAnnotationsVisible();
+			} else if (lastEdit instanceof ShowHeliodonCommand) {
+				selectionState = SceneManager.getInstance().isHeliodonVisible();
 			}
 		} else {
 			action = null;
@@ -295,9 +307,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			}
 
 			// toggle actions
-			if (SceneManager.getInstance().isHeliodonControlEnabled()) {
-				line += separator + "\"Heliodon\": true";
-			}
 			if (SceneManager.getInstance().getSolarHeatMap()) {
 				line += separator + "\"SolarMap\": true";
 				if (solarCalculationFinished) {
@@ -307,9 +316,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					}
 					solarCalculationFinished = false;
 				}
-			}
-			if (Scene.getInstance().isAnnotationsVisible()) {
-				line += separator + "\"Annotation\": true";
 			}
 
 			// continuous actions
@@ -353,20 +359,18 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				line += separator + shgc;
 				oldShgc = shgc;
 			}
-			if (SceneManager.getInstance().isSunAnim()) {
-				line += separator + "\"SunAnimation\": true";
-			} else {
+
+			if (!SceneManager.getInstance().isSunAnimation()) {
 				final Calendar heliodonCalendar = Heliodon.getInstance().getCalender();
 				final String heliodonTime = "\"Time\": \"" + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "\"";
 				if (!heliodonTime.equals(oldHeliodonTime)) {
-					if (!SceneManager.getInstance().isSunAnim()) // don't log time if sun path is animated
+					if (!SceneManager.getInstance().isSunAnimation()) // don't log time if sun path is animated
 						line += separator + heliodonTime;
 					oldHeliodonTime = heliodonTime;
 				}
 			}
-			if (SceneManager.getInstance().isRotationAnimationOn()) {
-				line += separator + "\"SpinAnimation\": true";
-			} else {
+
+			if (!SceneManager.getInstance().getSpinView()) {
 				final Camera camera = SceneManager.getInstance().getCamera();
 				if (camera != null) {
 					final ReadOnlyVector3 location = camera.getLocation();
@@ -378,7 +382,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(direction.getY());
 					cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
 					if (!cameraPosition.equals(oldCameraPosition)) {
-						if (!SceneManager.getInstance().isRotationAnimationOn()) // don't log camera if the view is being spun
+						if (!SceneManager.getInstance().getSpinView()) // don't log camera if the view is being spun
 							line += separator + "\"Camera\": {" + cameraPosition + "}";
 						oldCameraPosition = cameraPosition;
 					}

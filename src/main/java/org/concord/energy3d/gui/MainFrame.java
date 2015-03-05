@@ -903,7 +903,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(onlyAbsorptionInSolarMapMenuItem, Scene.getInstance().getOnlyAbsorptionInSolarMap());
 					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
-					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesShown());
+					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsShown());
 					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
 					Util.selectSilently(simpleTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
@@ -949,7 +949,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ShowAxesCommand());
-					SceneManager.getInstance().showAxes(axesMenuItem.isSelected());
+					SceneManager.getInstance().setAxesVisible(axesMenuItem.isSelected());
 					Scene.getInstance().setEdited(true);
 				}
 			});

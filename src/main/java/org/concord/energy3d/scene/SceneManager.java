@@ -902,9 +902,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			camera.setFrustumPerspective(45.0, ratio, near, far);
 	}
 
-	public void toggleRotation() {
+	public void toggleSpinView() {
 		cameraControl.reset();
 		rotAnim = !rotAnim;
+	}
+
+	public boolean getSpinView() {
+		return rotAnim;
+	}
+
+	public void setSpinView(boolean spinView) {
+		rotAnim = spinView;
 	}
 
 	public void setOperation(final Operation operation) {
@@ -1020,7 +1028,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 	}
 
-	public void setHeliodonControl(final boolean selected) {
+	public void setHeliodonVisible(final boolean selected) {
 		heliodonControl = selected;
 		Heliodon.getInstance().setVisible(selected);
 		enableDisableRotationControl();
@@ -1028,11 +1036,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	}
 
-	public void setSunAnim(final boolean selected) {
+	public void setSunAnimation(final boolean selected) {
 		sunAnim = selected;
 	}
 
-	public boolean isSunAnim() {
+	public boolean isSunAnimation() {
 		return sunAnim;
 	}
 
@@ -1248,10 +1256,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return viewMode;
 	}
 
-	public boolean isRotationAnimationOn() {
-		return rotAnim;
-	}
-
 	public void setMouseControlEnabled(final boolean enabled) {
 		mouseControlEnabled = enabled;
 		cameraControl.setMouseEnabled(enabled);
@@ -1313,7 +1317,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return solarLand;
 	}
 
-	public boolean isHeliodonControlEnabled() {
+	public boolean isHeliodonVisible() {
 		return heliodonControl;
 	}
 
@@ -1573,14 +1577,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.heatFluxDaily = heatFluxDaily;
 	}
 
-	public void showAxes(final boolean b) {
+	public void setAxesVisible(final boolean b) {
 		if (b)
 			backgroundRoot.attachChild(axes);
 		else
 			backgroundRoot.detachChild(axes);
 	}
 
-	public boolean areAxesShown() {
+	public boolean areAxesVisible() {
 		return backgroundRoot.hasChild(axes);
 	}
 
