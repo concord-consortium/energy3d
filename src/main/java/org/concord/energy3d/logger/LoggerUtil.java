@@ -60,6 +60,8 @@ class LoggerUtil {
 	static Object getBuildingId(final HousePart p) {
 		if (p == null)
 			return null;
+		if (p instanceof Foundation)
+			return p.getId();
 		final HousePart x = p.getTopContainer();
 		return x == null ? null : x.getId();
 	}
@@ -68,7 +70,10 @@ class LoggerUtil {
 		if (p == null)
 			return null;
 		Object bid = getBuildingId(p);
-		String s = "{\"Type\": \"" + p.getClass().getSimpleName() + "\", \"Building\": " + bid + ", \"ID\": " + p.getId();
+		String s = "{\"Type\": \"" + p.getClass().getSimpleName() + "\",";
+		if (bid != null)
+			s += "\"Building\": " + bid + ", ";
+		s += "\"ID\": " + p.getId();
 		int n = p.getPoints().size();
 		if (n > 0) {
 			s += ", \"Coordinates\": [";

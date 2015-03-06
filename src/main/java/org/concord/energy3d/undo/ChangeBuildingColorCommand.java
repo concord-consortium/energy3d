@@ -43,6 +43,11 @@ public class ChangeBuildingColorCommand extends AbstractUndoableEdit {
 		return foundation;
 	}
 
+	// for action logging
+	public Operation getOperation() {
+		return operation;
+	}
+
 	@Override
 	public String getPresentationName() {
 		return "Color Change for Whole Building";

@@ -1740,13 +1740,14 @@ public class MainFrame extends JFrame {
 			JOptionPane.showMessageDialog(this, "<html>You must select a part.</html>", "Selection missing", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
-		SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(selectedPart));
 		ReadOnlyColorRGBA color = ColorRGBA.WHITE;
 		color = selectedPart.getColor();
-		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+		if (color != null)
+			colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final ActionListener actionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(selectedPart));
 				final Color c = colorChooser.getColor();
 				final float[] newColor = c.getComponents(null);
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
@@ -1800,12 +1801,13 @@ public class MainFrame extends JFrame {
 			break;
 		}
 
-		SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingColorCommand(foundation, operation));
 		ReadOnlyColorRGBA color = Scene.getInstance().getPartColorForWholeBuilding(foundation, operation);
-		colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+		if (color != null)
+			colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final ActionListener actionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingColorCommand(foundation, operation));
 				final Color c = colorChooser.getColor();
 				final float[] newColor = c.getComponents(null);
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
