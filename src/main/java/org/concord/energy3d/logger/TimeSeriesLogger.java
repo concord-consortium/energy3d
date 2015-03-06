@@ -28,6 +28,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
@@ -196,10 +197,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				actedHousePart = ((EditHousePartCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof RemoveHousePartCommand) {
 				actedHousePart = ((RemoveHousePartCommand) lastEdit).getHousePart();
-			} else if (lastEdit instanceof ChangePartUFactorCommand) {
-				actedHousePart = ((ChangePartUFactorCommand) lastEdit).getHousePart();
-			} else if (lastEdit instanceof ChangeBuildingUFactorCommand) {
-				actedHousePart = ((ChangeBuildingUFactorCommand) lastEdit).getFoundation();
 			} else if (lastEdit instanceof ChangeSolarPanelEfficiencyCommand) {
 				actedHousePart = ((ChangeSolarPanelEfficiencyCommand) lastEdit).getSolarPanel();
 			} else if (lastEdit instanceof ChangeBuildingSolarPanelEfficiencyCommand) {
@@ -208,6 +205,37 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				actedHousePart = ((ChangeWindowShgcCommand) lastEdit).getWindow();
 			} else if (lastEdit instanceof ChangeBuildingWindowShgcCommand) {
 				actedHousePart = ((ChangeBuildingWindowShgcCommand) lastEdit).getFoundation();
+			} else if (lastEdit instanceof ChangePartUFactorCommand) {
+				ChangePartUFactorCommand c = (ChangePartUFactorCommand) lastEdit;
+				HousePart p = c.getHousePart();
+				Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
+				String s = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
+				if (p instanceof Wall) {
+					s += ", \"Type\": \"Wall\"";
+				} else if (p instanceof Door) {
+					s += ", \"Type\": \"Door\"";
+				} else if (p instanceof Window) {
+					s += ", \"Type\": \"Window\"";
+				} else if (p instanceof Roof) {
+					s += ", \"Type\": \"Roof\"";
+				}
+				s += ", \"Value\": " + p.getUFactor() + "}";
+				stateValue = s;
+			} else if (lastEdit instanceof ChangeBuildingUFactorCommand) {
+				ChangeBuildingUFactorCommand c = (ChangeBuildingUFactorCommand) lastEdit;
+				String s = "{\"Building\":" + c.getFoundation().getId();
+				Operation o = c.getOperation();
+				if (o == Operation.DRAW_WALL) {
+					s += ", \"Type\": \"Wall\"";
+				} else if (o == Operation.DRAW_DOOR) {
+					s += ", \"Type\": \"Door\"";
+				} else if (o == Operation.DRAW_WINDOW) {
+					s += ", \"Type\": \"Window\"";
+				} else if (o == Operation.DRAW_ROOF_PYRAMID) {
+					s += ", \"Type\": \"Roof\"";
+				}
+				s += ", \"Value\": " + Scene.getInstance().getPartUFactorForWholeBuilding(c.getFoundation(), o) + "}";
+				stateValue = s;
 			} else if (lastEdit instanceof ChangePartColorCommand) {
 				ChangePartColorCommand c = (ChangePartColorCommand) lastEdit;
 				HousePart p = c.getHousePart();
