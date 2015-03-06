@@ -27,6 +27,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -198,13 +199,19 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			} else if (lastEdit instanceof RemoveHousePartCommand) {
 				actedHousePart = ((RemoveHousePartCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof ChangeSolarPanelEfficiencyCommand) {
-				actedHousePart = ((ChangeSolarPanelEfficiencyCommand) lastEdit).getSolarPanel();
+				ChangeSolarPanelEfficiencyCommand c = (ChangeSolarPanelEfficiencyCommand) lastEdit;
+				SolarPanel sp = c.getSolarPanel();
+				stateValue = "{\"Building\":" + sp.getTopContainer().getId() + ", \"ID\":" + sp.getId() + ", \"Value\": " + sp.getEfficiency() + "}";
 			} else if (lastEdit instanceof ChangeBuildingSolarPanelEfficiencyCommand) {
-				actedHousePart = ((ChangeBuildingSolarPanelEfficiencyCommand) lastEdit).getFoundation();
+				ChangeBuildingSolarPanelEfficiencyCommand c = (ChangeBuildingSolarPanelEfficiencyCommand) lastEdit;
+				stateValue = "{\"Building\":" + c.getFoundation().getId() + ", \"Value\": " + Scene.getInstance().getSolarPanelEfficiencyForWholeBuilding(c.getFoundation()) + "}";
 			} else if (lastEdit instanceof ChangeWindowShgcCommand) {
-				actedHousePart = ((ChangeWindowShgcCommand) lastEdit).getWindow();
+				ChangeWindowShgcCommand c = (ChangeWindowShgcCommand) lastEdit;
+				Window w = c.getWindow();
+				stateValue = "{\"Building\":" + w.getTopContainer().getId() + ", \"ID\":" + w.getId() + ", \"Value\": " + w.getSolarHeatGainCoefficient() + "}";
 			} else if (lastEdit instanceof ChangeBuildingWindowShgcCommand) {
-				actedHousePart = ((ChangeBuildingWindowShgcCommand) lastEdit).getFoundation();
+				ChangeBuildingWindowShgcCommand c = (ChangeBuildingWindowShgcCommand) lastEdit;
+				stateValue = "{\"Building\":" + c.getFoundation().getId() + ", \"Value\": " + Scene.getInstance().getWindowShgcForWholeBuilding(c.getFoundation()) + "}";
 			} else if (lastEdit instanceof ChangePartUFactorCommand) {
 				ChangePartUFactorCommand c = (ChangePartUFactorCommand) lastEdit;
 				HousePart p = c.getHousePart();
