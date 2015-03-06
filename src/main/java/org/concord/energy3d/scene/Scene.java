@@ -302,10 +302,11 @@ public class Scene implements Serializable {
 			Heliodon.getInstance().setDate(instance.calendar.getTime());
 			Util.setSilently(energyPanel.getDateSpinner(), instance.calendar.getTime());
 			Util.setSilently(energyPanel.getTimeSpinner(), instance.calendar.getTime());
-			energyPanel.setLatitude(instance.latitude);
+			energyPanel.setLatitude(instance.latitude); // already silent
 			if ("Boston".equals(instance.city) || "".equals(instance.city))
 				instance.city = "Boston, MA";
-			energyPanel.setCity(instance.city);
+			Util.selectSilently(energyPanel.getCityComboBox(), instance.city);
+			Scene.getInstance().setTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
 		Specifications.getInstance().setMaximumBudget(instance.budget == 0 ? 100000 : instance.budget);
@@ -325,7 +326,7 @@ public class Scene implements Serializable {
 			instance.insideTemperature = 20;
 		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.insideTemperature);
 
-		// backward compatibility
+		// TODO: Remove this backward compatibility soon
 		if (instance.windowUFactor != null) {
 			final double defaultWindowUFactor = parsePropertyString(instance.windowUFactor);
 			for (final HousePart p : instance.parts) {
@@ -364,11 +365,11 @@ public class Scene implements Serializable {
 		for (final HousePart p : instance.parts) {
 			if (p instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) p;
-				if (Util.isZero(sp.getEfficiency()))
+				if (Util.isZero(sp.getEfficiency())) // backward compatibility
 					sp.setEfficiency(instance.solarPanelEfficiency);
 			}
 		}
-		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
+		Util.selectSilently(energyPanel.getSolarPanelEfficiencyComboBox(), Double.toString(instance.solarPanelEfficiency));
 
 		if (Util.isZero(instance.windowSolarHeatGainCoefficient)) // not set
 			instance.windowSolarHeatGainCoefficient = 50;
@@ -377,11 +378,11 @@ public class Scene implements Serializable {
 		for (final HousePart p : instance.parts) {
 			if (p instanceof Window) {
 				final Window w = (Window) p;
-				if (Util.isZero(w.getSolarHeatGainCoefficient()))
+				if (Util.isZero(w.getSolarHeatGainCoefficient())) // backward compatibility
 					w.setSolarHeatGainCoefficient(instance.windowSolarHeatGainCoefficient);
 			}
 		}
-		energyPanel.getWindowSHGCComboBox().setSelectedItem(Double.toString(instance.windowSolarHeatGainCoefficient));
+		Util.selectSilently(energyPanel.getWindowSHGCComboBox(), Double.toString(instance.windowSolarHeatGainCoefficient));
 
 		if (Util.isZero(instance.backgroundAlbedo))
 			instance.backgroundAlbedo = 0.3;
