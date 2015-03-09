@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -125,6 +126,7 @@ public class Scene implements Serializable {
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
 	private boolean fullEnergyInSolarMap = false;
+	private int insideTemperature = 20;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -218,7 +220,7 @@ public class Scene implements Serializable {
 			Scene.url = file;
 
 			MainPanel.getInstance().getHeliodonButton().setSelected(false);
-			MainPanel.getInstance().getSunAnimButton().setSelected(false);
+			MainPanel.getInstance().getSunAnimationButton().setSelected(false);
 			// MainPanel.getInstance().getSolarButton().setSelected(false);
 			SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
 			Wall.resetDefaultWallHeight();
@@ -286,8 +288,8 @@ public class Scene implements Serializable {
 
 		root.updateWorldBound(true);
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-		SceneManager.getInstance().showAxes(!instance.hideAxes);
-		SceneManager.getInstance().showBuildingLabels(instance.showBuildingLabels);
+		SceneManager.getInstance().setAxesVisible(!instance.hideAxes);
+		SceneManager.getInstance().setBuildingLabelsVisible(instance.showBuildingLabels);
 		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
 		MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
 		SceneManager.getInstance().getUndoManager().die();
@@ -297,13 +299,14 @@ public class Scene implements Serializable {
 	public static void initEnergy() {
 		final EnergyPanel energyPanel = EnergyPanel.getInstance();
 		if (instance.calendar != null) {
-			energyPanel.getDateSpinner().setValue(instance.calendar.getTime());
-			energyPanel.getTimeSpinner().setValue(instance.calendar.getTime());
 			Heliodon.getInstance().setDate(instance.calendar.getTime());
-			energyPanel.setLatitude(instance.latitude);
+			Util.setSilently(energyPanel.getDateSpinner(), instance.calendar.getTime());
+			Util.setSilently(energyPanel.getTimeSpinner(), instance.calendar.getTime());
+			energyPanel.setLatitude(instance.latitude); // already silent
 			if ("Boston".equals(instance.city) || "".equals(instance.city))
 				instance.city = "Boston, MA";
-			energyPanel.setCity(instance.city);
+			Util.selectSilently(energyPanel.getCityComboBox(), instance.city);
+			Scene.getInstance().setTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
 		Specifications.getInstance().setMaximumBudget(instance.budget == 0 ? 100000 : instance.budget);
@@ -314,9 +317,16 @@ public class Scene implements Serializable {
 		Specifications.getInstance().setBudgetEnabled(instance.budgetEnabled);
 		Specifications.getInstance().setAreaEnabled(instance.areaEnabled);
 		Specifications.getInstance().setHeightEnabled(instance.heightEnabled);
-		energyPanel.getColorMapSlider().setValue(instance.solarContrast == 0 ? 50 : instance.solarContrast);
 
-		// backward compatibility
+		if (Util.isZero(instance.solarContrast)) // if the solar map color contrast has not been set, set it to 50
+			instance.solarContrast = 50;
+		Util.setSilently(energyPanel.getColorMapSlider(), instance.solarContrast);
+
+		if (Util.isZero(instance.insideTemperature)) // if inside temperature has not been set, set it to 20
+			instance.insideTemperature = 20;
+		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.insideTemperature);
+
+		// TODO: Remove this backward compatibility soon
 		if (instance.windowUFactor != null) {
 			final double defaultWindowUFactor = parsePropertyString(instance.windowUFactor);
 			for (final HousePart p : instance.parts) {
@@ -355,11 +365,11 @@ public class Scene implements Serializable {
 		for (final HousePart p : instance.parts) {
 			if (p instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) p;
-				if (Util.isZero(sp.getEfficiency()))
+				if (Util.isZero(sp.getEfficiency())) // backward compatibility
 					sp.setEfficiency(instance.solarPanelEfficiency);
 			}
 		}
-		energyPanel.getSolarPanelEfficiencyComboBox().setSelectedItem(Double.toString(instance.solarPanelEfficiency));
+		Util.selectSilently(energyPanel.getSolarPanelEfficiencyComboBox(), Double.toString(instance.solarPanelEfficiency));
 
 		if (Util.isZero(instance.windowSolarHeatGainCoefficient)) // not set
 			instance.windowSolarHeatGainCoefficient = 50;
@@ -368,11 +378,11 @@ public class Scene implements Serializable {
 		for (final HousePart p : instance.parts) {
 			if (p instanceof Window) {
 				final Window w = (Window) p;
-				if (Util.isZero(w.getSolarHeatGainCoefficient()))
+				if (Util.isZero(w.getSolarHeatGainCoefficient())) // backward compatibility
 					w.setSolarHeatGainCoefficient(instance.windowSolarHeatGainCoefficient);
 			}
 		}
-		energyPanel.getWindowSHGCComboBox().setSelectedItem(Double.toString(instance.windowSolarHeatGainCoefficient));
+		Util.selectSilently(energyPanel.getWindowSHGCComboBox(), Double.toString(instance.windowSolarHeatGainCoefficient));
 
 		if (Util.isZero(instance.backgroundAlbedo))
 			instance.backgroundAlbedo = 0.3;
@@ -525,11 +535,12 @@ public class Scene implements Serializable {
 				instance.budgetEnabled = Specifications.getInstance().isBudgetEnabled();
 				instance.areaEnabled = Specifications.getInstance().isAreaEnabled();
 				instance.heightEnabled = Specifications.getInstance().isHeightEnabled();
-				instance.hideAxes = !SceneManager.getInstance().areAxesShown();
-				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsShown();
+				instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
+				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
 				instance.calendar = Heliodon.getInstance().getCalender();
 				instance.latitude = EnergyPanel.getInstance().getLatitude();
 				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+				instance.insideTemperature = (Integer) EnergyPanel.getInstance().getInsideTemperatureSpinner().getValue();
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
@@ -765,7 +776,7 @@ public class Scene implements Serializable {
 		return redrawAll;
 	}
 
-	public boolean isAnnotationsVisible() {
+	public boolean areAnnotationsVisible() {
 		return isAnnotationsVisible;
 	}
 
@@ -1106,6 +1117,33 @@ public class Scene implements Serializable {
 		return false;
 	}
 
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setDate(Date date) {
+		if (calendar != null)
+			calendar.setTime(date);
+	}
+
+	public Date getDate() {
+		if (calendar != null)
+			return calendar.getTime();
+		return Heliodon.getInstance().getCalender().getTime();
+	}
+
+	public void setInsideTemperature(int insideTemperature) {
+		this.insideTemperature = insideTemperature;
+	}
+
+	public int getInsideTemperature() {
+		return insideTemperature;
+	}
+
 	/** @return the solar panel efficiency (not in percentage) */
 	public double getSolarPanelEfficiencyNotPercentage() {
 		return solarPanelEfficiency * 0.01;
@@ -1156,6 +1194,14 @@ public class Scene implements Serializable {
 
 	public void setOnlyAbsorptionInSolarMap(final boolean onlyAbsorptionInSolarMap) {
 		fullEnergyInSolarMap = !onlyAbsorptionInSolarMap;
+	}
+
+	public void setSolarHeatMapColorContrast(int solarContrast) {
+		this.solarContrast = solarContrast;
+	}
+
+	public int getSolarHeatMapColorContrast() {
+		return solarContrast;
 	}
 
 	public int countParts(final Foundation foundation, final Class<?> clazz) {

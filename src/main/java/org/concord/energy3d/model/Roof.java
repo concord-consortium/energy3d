@@ -157,7 +157,7 @@ public abstract class Roof extends HousePart {
 		applySteinerPoint(polygon);
 		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
 		MeshLib.groupByPlanner(mesh, roofPartsRoot);
-		setAnnotationsVisible(Scene.getInstance().isAnnotationsVisible());
+		setAnnotationsVisible(Scene.getInstance().areAnnotationsVisible());
 		hideGableRoofParts();
 	}
 

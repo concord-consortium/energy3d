@@ -289,7 +289,7 @@ public class PrintController implements Updater {
 		if (printPreview) {
 			shadingSelected = SceneManager.getInstance().isShadingEnabled();
 			shadowSelected = SceneManager.getInstance().isShadowEnabled();
-			heliodonSelected = SceneManager.getInstance().isHeliodonControlEnabled();
+			heliodonSelected = SceneManager.getInstance().isHeliodonVisible();
 			if (shadingSelected)
 				SceneManager.getInstance().setShading(false);
 			if (shadowSelected)
@@ -304,7 +304,7 @@ public class PrintController implements Updater {
 	}
 
 	public void rotate() {
-		if (SceneManager.getInstance().isRotationAnimationOn()) {
+		if (SceneManager.getInstance().getSpinView()) {
 			angle += 0.01;
 			Scene.getOriginalHouseRoot().setRotation(new Matrix3().fromAngles(0, 0, angle));
 		}
@@ -327,7 +327,7 @@ public class PrintController implements Updater {
 	}
 
 	private void computePageDimension() {
-		spaceBetweenParts = Scene.getInstance().isAnnotationsVisible() ? 3.0 : 0;
+		spaceBetweenParts = Scene.getInstance().areAnnotationsVisible() ? 3.0 : 0;
 		double fromPageToWorldCoord;
 		if (!isScaleToFit)
 			fromPageToWorldCoord = exactFromPageToWorldCoord / (Scene.getInstance().getAnnotationScale() / 10.0);

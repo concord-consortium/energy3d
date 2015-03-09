@@ -39,6 +39,11 @@ public class ChangeBuildingUFactorCommand extends AbstractUndoableEdit {
 		return foundation;
 	}
 
+	// for action logging
+	public Operation getOperation() {
+		return operation;
+	}
+
 	@Override
 	public String getPresentationName() {
 		return "U-Factor Change for Whole Building";

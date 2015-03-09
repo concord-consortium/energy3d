@@ -13,7 +13,12 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.event.ChangeListener;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
@@ -334,6 +339,51 @@ public class Util {
 			comboBox.addItemListener(x);
 		for (final ActionListener x : actionListeners)
 			comboBox.addActionListener(x);
+	}
+
+	/** This method sets the selection state of a combo box visually without invoking its ItemListeners and ActionListeners */
+	public static void selectSilently(final JComboBox<?> comboBox, final Object item) {
+		final ItemListener[] itemListeners = comboBox.getItemListeners();
+		final ActionListener[] actionListeners = comboBox.getActionListeners();
+		for (final ItemListener x : itemListeners)
+			comboBox.removeItemListener(x);
+		for (final ActionListener x : actionListeners)
+			comboBox.removeActionListener(x);
+		comboBox.setSelectedItem(item);
+		for (final ItemListener x : itemListeners)
+			comboBox.addItemListener(x);
+		for (final ActionListener x : actionListeners)
+			comboBox.addActionListener(x);
+	}
+
+	/** This method sets the value of a spinner visually without invoking its ChangeListeners */
+	public static void setSilently(final JSpinner spinner, final Object value) {
+		final ChangeListener[] changeListeners = spinner.getChangeListeners();
+		for (final ChangeListener x : changeListeners)
+			spinner.removeChangeListener(x);
+		spinner.setValue(value);
+		JComponent editor = spinner.getEditor();
+		if (editor instanceof JSpinner.DateEditor) {
+			JSpinner.DateEditor dateEditor = (JSpinner.DateEditor) editor;
+			dateEditor.getTextField().setText(dateEditor.getFormat().format(value));
+		} else if (editor instanceof JSpinner.NumberEditor) {
+			JSpinner.NumberEditor numberEditor = (JSpinner.NumberEditor) editor;
+			numberEditor.getTextField().setText(numberEditor.getFormat().format(value));
+		} else {
+			((DefaultEditor) spinner.getEditor()).getTextField().setText("" + value);
+		}
+		for (final ChangeListener x : changeListeners)
+			spinner.addChangeListener(x);
+	}
+
+	/** This method sets the value of a slider visually without invoking its ChangeListeners */
+	public static void setSilently(final JSlider slider, final int value) {
+		final ChangeListener[] changeListeners = slider.getChangeListeners();
+		for (final ChangeListener x : changeListeners)
+			slider.removeChangeListener(x);
+		slider.setValue(value);
+		for (final ChangeListener x : changeListeners)
+			slider.addChangeListener(x);
 	}
 
 	public static JButton getButtonSubComponent(final Container container) {

@@ -204,9 +204,9 @@ public class Heliodon {
 			calendar.set(Calendar.AM_PM, Calendar.PM);
 			calendar.set(Calendar.MINUTE, 0);
 			setTime(calendar.getTime());
-			EnergyPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
+			Util.setSilently(EnergyPanel.getInstance().getTimeSpinner(), calendar.getTime());
 		} else
-			EnergyPanel.getInstance().getTimeSpinner().setValue(timeAndDate);
+			Util.setSilently(EnergyPanel.getInstance().getTimeSpinner(), timeAndDate);
 
 		if (Config.isHeliodonMode())
 			setSunRegionAlwaysVisible(true);
@@ -362,7 +362,7 @@ public class Heliodon {
 				final double newHourAngle = (hourVertex - Math.floor(totalHourVertices / 2.0)) * Math.PI / 48.0;
 				final boolean hourAngleChanged = !Util.isEqual(newHourAngle, hourAngle);
 				if (hourAngleChanged)
-					setHourAngle(newHourAngle, false, true);
+					setHourAngle(newHourAngle, false, true, true);
 				if (declinationChanged || hourAngleChanged) {
 					setSunLocation(newSunLocation);
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -383,15 +383,22 @@ public class Heliodon {
 		return hourAngle;
 	}
 
-	public void setHourAngle(final double hourAngle, final boolean redrawHeliodon, final boolean updateGUI) {
+	public void setHourAngle(final double hourAngle, final boolean redrawHeliodon, final boolean updateGUI, final boolean undoable) {
 		this.hourAngle = toPlusMinusPIRange(hourAngle, -Math.PI, Math.PI);
 
 		final int minutes = (int) Math.round(this.hourAngle / Math.PI * 12 * 60 + 12 * 60);
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, minutes);
 
-		if (updateGUI)
-			EnergyPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
+		if (updateGUI) {
+			if (undoable) {
+				EnergyPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
+				EnergyPanel.getInstance().getDateSpinner().setValue(calendar.getTime());
+			} else {
+				Util.setSilently(EnergyPanel.getInstance().getTimeSpinner(), calendar.getTime());
+				Util.setSilently(EnergyPanel.getInstance().getDateSpinner(), calendar.getTime());
+			}
+		}
 
 		if (redrawHeliodon)
 			drawSun();
@@ -410,7 +417,7 @@ public class Heliodon {
 		if (updateGUI) {
 			// calendar must not be updated if this method is called from setDate() because this method can only computer 6 months of the year from declination angle
 			final double days = MathUtils.asin(this.declinationAngle / TILT_ANGLE) / MathUtils.TWO_PI * 365.25 - 284.0;
-			calendar.set(calendar.get(Calendar.YEAR), 0, (int) Math.round(days));	//
+			calendar.set(calendar.get(Calendar.YEAR), 0, (int) Math.round(days)); //
 			EnergyPanel.getInstance().getDateSpinner().setValue(calendar.getTime());
 		}
 
@@ -638,7 +645,7 @@ public class Heliodon {
 		timeCalendar.setTime(time);
 		calendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
 		calendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
-		setHourAngle(computeHourAngle(calendar), true, false);
+		setHourAngle(computeHourAngle(calendar), true, false, false);
 	}
 
 	private double computeHourAngle(final Calendar calendar) {

@@ -22,30 +22,52 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.MyPlainDocument;
 import org.concord.energy3d.model.Building;
+import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SceneManager.Operation;
+import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.undo.AddHousePartCommand;
+import org.concord.energy3d.undo.AnimateSunCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
+import org.concord.energy3d.undo.ChangeCityCommand;
+import org.concord.energy3d.undo.ChangeDateCommand;
+import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
+import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
+import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
+import org.concord.energy3d.undo.ComputeEnergyCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
 import org.concord.energy3d.undo.SaveCommand;
+import org.concord.energy3d.undo.ShowAnnotationCommand;
+import org.concord.energy3d.undo.ShowAxesCommand;
+import org.concord.energy3d.undo.ShowHeliodonCommand;
+import org.concord.energy3d.undo.ShowShadowCommand;
+import org.concord.energy3d.undo.SpinViewCommand;
+import org.concord.energy3d.undo.TopViewCommand;
 import org.concord.energy3d.undo.UndoManager;
 
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 
@@ -63,17 +85,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private UndoableEdit lastEdit;
 	private final UndoManager undoManager;
 	private HousePart actedHousePart;
-	private String oldHeliodonTime = null;
-	private String oldHeliodonLatitude = null;
+	private Object stateValue;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
-	private Object oldRoomTemperature = null;
-	private String oldWallUFactor = null;
-	private String oldWindowUFactor = null;
-	private String oldDoorUFactor = null;
-	private String oldRoofUFactor = null;
-	private String oldSolarPanelYield = null;
-	private String oldShgc = null;
 	private String noteString = "";
 	private boolean noteEditedFlag = false;
 	private boolean sceneEditedFlag = false;
@@ -162,6 +176,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	private void log() {
 
+		actedHousePart = null;
+		stateValue = null;
+
 		final String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
 		final URL url = Scene.getURL();
 		if (url == null) // no logging if not working on a saved file
@@ -181,22 +198,122 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				actedHousePart = ((EditHousePartCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof RemoveHousePartCommand) {
 				actedHousePart = ((RemoveHousePartCommand) lastEdit).getHousePart();
-			} else if (lastEdit instanceof ChangePartUFactorCommand) {
-				actedHousePart = ((ChangePartUFactorCommand) lastEdit).getHousePart();
-			} else if (lastEdit instanceof ChangeBuildingUFactorCommand) {
-				actedHousePart = ((ChangeBuildingUFactorCommand) lastEdit).getFoundation();
 			} else if (lastEdit instanceof ChangeSolarPanelEfficiencyCommand) {
-				actedHousePart = ((ChangeSolarPanelEfficiencyCommand) lastEdit).getSolarPanel();
+				ChangeSolarPanelEfficiencyCommand c = (ChangeSolarPanelEfficiencyCommand) lastEdit;
+				SolarPanel sp = c.getSolarPanel();
+				stateValue = "{\"Building\":" + sp.getTopContainer().getId() + ", \"ID\":" + sp.getId() + ", \"Value\": " + sp.getEfficiency() + "}";
 			} else if (lastEdit instanceof ChangeBuildingSolarPanelEfficiencyCommand) {
-				actedHousePart = ((ChangeBuildingSolarPanelEfficiencyCommand) lastEdit).getFoundation();
+				ChangeBuildingSolarPanelEfficiencyCommand c = (ChangeBuildingSolarPanelEfficiencyCommand) lastEdit;
+				stateValue = "{\"Building\":" + c.getFoundation().getId() + ", \"Value\": " + Scene.getInstance().getSolarPanelEfficiencyForWholeBuilding(c.getFoundation()) + "}";
 			} else if (lastEdit instanceof ChangeWindowShgcCommand) {
-				actedHousePart = ((ChangeWindowShgcCommand) lastEdit).getWindow();
+				ChangeWindowShgcCommand c = (ChangeWindowShgcCommand) lastEdit;
+				Window w = c.getWindow();
+				stateValue = "{\"Building\":" + w.getTopContainer().getId() + ", \"ID\":" + w.getId() + ", \"Value\": " + w.getSolarHeatGainCoefficient() + "}";
 			} else if (lastEdit instanceof ChangeBuildingWindowShgcCommand) {
-				actedHousePart = ((ChangeBuildingWindowShgcCommand) lastEdit).getFoundation();
+				ChangeBuildingWindowShgcCommand c = (ChangeBuildingWindowShgcCommand) lastEdit;
+				stateValue = "{\"Building\":" + c.getFoundation().getId() + ", \"Value\": " + Scene.getInstance().getWindowShgcForWholeBuilding(c.getFoundation()) + "}";
+			} else if (lastEdit instanceof ChangePartUFactorCommand) {
+				ChangePartUFactorCommand c = (ChangePartUFactorCommand) lastEdit;
+				HousePart p = c.getHousePart();
+				Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
+				String s = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
+				if (p instanceof Wall) {
+					s += ", \"Type\": \"Wall\"";
+				} else if (p instanceof Door) {
+					s += ", \"Type\": \"Door\"";
+				} else if (p instanceof Window) {
+					s += ", \"Type\": \"Window\"";
+				} else if (p instanceof Roof) {
+					s += ", \"Type\": \"Roof\"";
+				}
+				s += ", \"Value\": " + p.getUFactor() + "}";
+				stateValue = s;
+			} else if (lastEdit instanceof ChangeBuildingUFactorCommand) {
+				ChangeBuildingUFactorCommand c = (ChangeBuildingUFactorCommand) lastEdit;
+				String s = "{\"Building\":" + c.getFoundation().getId();
+				Operation o = c.getOperation();
+				if (o == Operation.DRAW_WALL) {
+					s += ", \"Type\": \"Wall\"";
+				} else if (o == Operation.DRAW_DOOR) {
+					s += ", \"Type\": \"Door\"";
+				} else if (o == Operation.DRAW_WINDOW) {
+					s += ", \"Type\": \"Window\"";
+				} else if (o == Operation.DRAW_ROOF_PYRAMID) {
+					s += ", \"Type\": \"Roof\"";
+				}
+				s += ", \"Value\": " + Scene.getInstance().getPartUFactorForWholeBuilding(c.getFoundation(), o) + "}";
+				stateValue = s;
 			} else if (lastEdit instanceof ChangePartColorCommand) {
-				actedHousePart = ((ChangePartColorCommand) lastEdit).getHousePart();
+				ChangePartColorCommand c = (ChangePartColorCommand) lastEdit;
+				HousePart p = c.getHousePart();
+				Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
+				String s = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
+				if (p instanceof Foundation) {
+					s += ", \"Type\": \"Foundation\"";
+				} else if (p instanceof Wall) {
+					s += ", \"Type\": \"Wall\"";
+				} else if (p instanceof Door) {
+					s += ", \"Type\": \"Door\"";
+				} else if (p instanceof Floor) {
+					s += ", \"Type\": \"Floor\"";
+				} else if (p instanceof Roof) {
+					s += ", \"Type\": \"Roof\"";
+				}
+				ReadOnlyColorRGBA color = p.getColor();
+				if (color != null)
+					s += ", \"Color\": \"" + String.format("#%02x%02x%02x", (int) Math.round(color.getRed() * 255), (int) Math.round(color.getGreen() * 255), (int) Math.round(color.getBlue() * 255)) + "\"";
+				s += "}";
+				stateValue = s;
 			} else if (lastEdit instanceof ChangeBuildingColorCommand) {
-				actedHousePart = ((ChangeBuildingColorCommand) lastEdit).getFoundation();
+				ChangeBuildingColorCommand c = (ChangeBuildingColorCommand) lastEdit;
+				String s = "{\"Building\":" + c.getFoundation().getId();
+				Operation o = c.getOperation();
+				if (o == Operation.DRAW_FOUNDATION) {
+					s += ", \"Type\": \"Foundation\"";
+				} else if (o == Operation.DRAW_WALL) {
+					s += ", \"Type\": \"Wall\"";
+				} else if (o == Operation.DRAW_DOOR) {
+					s += ", \"Type\": \"Door\"";
+				} else if (o == Operation.DRAW_FLOOR) {
+					s += ", \"Type\": \"Floor\"";
+				} else if (o == Operation.DRAW_ROOF_PYRAMID) {
+					s += ", \"Type\": \"Roof\"";
+				}
+				ReadOnlyColorRGBA color = Scene.getInstance().getPartColorForWholeBuilding(c.getFoundation(), o);
+				if (color != null)
+					s += ", \"Color\": \"" + String.format("#%02x%02x%02x", (int) Math.round(color.getRed() * 255), (int) Math.round(color.getGreen() * 255), (int) Math.round(color.getBlue() * 255)) + "\"";
+				s += "}";
+				stateValue = s;
+			} else if (lastEdit instanceof AnimateSunCommand) {
+				stateValue = SceneManager.getInstance().isSunAnimation();
+			} else if (lastEdit instanceof SpinViewCommand) {
+				stateValue = SceneManager.getInstance().getSpinView();
+			} else if (lastEdit instanceof ShowAxesCommand) {
+				stateValue = SceneManager.getInstance().areAxesVisible();
+			} else if (lastEdit instanceof TopViewCommand) {
+				stateValue = SceneManager.getInstance().getViewMode() == ViewMode.TOP_VIEW;
+			} else if (lastEdit instanceof ShowShadowCommand) {
+				stateValue = SceneManager.getInstance().isShadowEnabled();
+			} else if (lastEdit instanceof ShowAnnotationCommand) {
+				stateValue = Scene.getInstance().areAnnotationsVisible();
+			} else if (lastEdit instanceof ShowHeliodonCommand) {
+				stateValue = SceneManager.getInstance().isHeliodonVisible();
+			} else if (lastEdit instanceof ComputeEnergyCommand) {
+				stateValue = SceneManager.getInstance().getSolarHeatMap();
+			} else if (lastEdit instanceof ChangeInsideTemperatureCommand) {
+				stateValue = Scene.getInstance().getInsideTemperature();
+			} else if (lastEdit instanceof ChangeSolarHeatMapColorContrastCommand) {
+				stateValue = Scene.getInstance().getSolarHeatMapColorContrast();
+			} else if (lastEdit instanceof ChangeLatitudeCommand) {
+				stateValue = Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI);
+			} else if (lastEdit instanceof ChangeCityCommand) {
+				stateValue = "\"" + Scene.getInstance().getCity() + "\"";
+			} else if (lastEdit instanceof ChangeDateCommand) {
+				Calendar calendar = Heliodon.getInstance().getCalender();
+				stateValue = "\"" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "\"";
+			} else if (lastEdit instanceof ChangeTimeCommand) {
+				Calendar calendar = Heliodon.getInstance().getCalender();
+				stateValue = "\"" + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" + calendar.get(Calendar.MINUTE) + "\"";
 			}
 		} else {
 			action = null;
@@ -270,15 +387,22 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			}
 
 			if (action != null) {
-				line += separator + "\"" + action + "\": " + (type2Action ? "null" : LoggerUtil.getInfo(actedHousePart));
+				line += separator + "\"" + action + "\": ";
+				if (type2Action) {
+					line += "null";
+				} else {
+					if (actedHousePart != null) {
+						line += LoggerUtil.getInfo(actedHousePart);
+					} else if (stateValue != null) {
+						line += stateValue;
+					} else {
+						line += "null";
+					}
+				}
 			}
 
-			// toggle actions
-			if (SceneManager.getInstance().isHeliodonControlEnabled()) {
-				line += separator + "\"Heliodon\": true";
-			}
+			// record the daily solar radiation results
 			if (SceneManager.getInstance().getSolarHeatMap()) {
-				line += separator + "\"SolarMap\": true";
 				if (solarCalculationFinished) {
 					String result = getBuildingSolarEnergies();
 					if (result.length() > 0) {
@@ -287,71 +411,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					solarCalculationFinished = false;
 				}
 			}
-			if (SceneManager.getInstance().isShadowEnabled()) {
-				line += separator + "\"Shadow\": true";
-			}
-			if (!SceneManager.getInstance().areAxesShown()) {
-				line += separator + "\"Axes\": false";
-			}
-			if (Scene.getInstance().isAnnotationsVisible()) {
-				line += separator + "\"Annotation\": true";
-			}
 
-			// continuous actions
-			final String heliodonLatitude = "\"Latitude\": " + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI);
-			if (!heliodonLatitude.equals(oldHeliodonLatitude)) {
-				line += separator + heliodonLatitude;
-				oldHeliodonLatitude = heliodonLatitude;
-			}
-			final String roomTemperature = "\"RoomTemperature\": " + EnergyPanel.getInstance().getInsideTemperatureSpinner().getValue();
-			if (!roomTemperature.equals(oldRoomTemperature)) {
-				line += separator + roomTemperature;
-				oldRoomTemperature = roomTemperature;
-			}
-			final String wallUFactor = "\"WallUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getWallsComboBox().getSelectedItem()) + "\"";
-			if (!wallUFactor.equals(oldWallUFactor)) {
-				line += separator + wallUFactor;
-				oldWallUFactor = wallUFactor;
-			}
-			final String windowUFactor = "\"WindowUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem()) + "\"";
-			if (!windowUFactor.equals(oldWindowUFactor)) {
-				line += separator + windowUFactor;
-				oldWindowUFactor = windowUFactor;
-			}
-			final String doorUFactor = "\"DoorUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem()) + "\"";
-			if (!doorUFactor.equals(oldDoorUFactor)) {
-				line += separator + doorUFactor;
-				oldDoorUFactor = doorUFactor;
-			}
-			final String roofUFactor = "\"RoofUFactor\": \"" + encodeUFactorString((String) EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem()) + "\"";
-			if (!roofUFactor.equals(oldRoofUFactor)) {
-				line += separator + roofUFactor;
-				oldRoofUFactor = roofUFactor;
-			}
-			final String solarPanelYield = "\"SolarPanelYield\": \"" + EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem() + "\"";
-			if (!solarPanelYield.equals(oldSolarPanelYield)) {
-				line += separator + solarPanelYield;
-				oldSolarPanelYield = solarPanelYield;
-			}
-			final String shgc = "\"SHGC\": \"" + EnergyPanel.getInstance().getWindowSHGCComboBox().getSelectedItem() + "\"";
-			if (!shgc.equals(oldShgc)) {
-				line += separator + shgc;
-				oldShgc = shgc;
-			}
-			if (SceneManager.getInstance().isSunAnim()) {
-				line += separator + "\"SunAnimation\": true";
-			} else {
-				final Calendar heliodonCalendar = Heliodon.getInstance().getCalender();
-				final String heliodonTime = "\"Time\": \"" + (heliodonCalendar.get(Calendar.MONTH) + 1) + "/" + heliodonCalendar.get(Calendar.DAY_OF_MONTH) + ":" + heliodonCalendar.get(Calendar.HOUR_OF_DAY) + "\"";
-				if (!heliodonTime.equals(oldHeliodonTime)) {
-					if (!SceneManager.getInstance().isSunAnim()) // don't log time if sun path is animated
-						line += separator + heliodonTime;
-					oldHeliodonTime = heliodonTime;
-				}
-			}
-			if (SceneManager.getInstance().isRotationAnimationOn()) {
-				line += separator + "\"SpinAnimation\": true";
-			} else {
+			if (!SceneManager.getInstance().getSpinView()) {
 				final Camera camera = SceneManager.getInstance().getCamera();
 				if (camera != null) {
 					final ReadOnlyVector3 location = camera.getLocation();
@@ -363,7 +424,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(direction.getY());
 					cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
 					if (!cameraPosition.equals(oldCameraPosition)) {
-						if (!SceneManager.getInstance().isRotationAnimationOn()) // don't log camera if the view is being spun
+						if (!SceneManager.getInstance().getSpinView()) // don't log camera if the view is being spun
 							line += separator + "\"Camera\": {" + cameraPosition + "}";
 						oldCameraPosition = cameraPosition;
 					}
@@ -392,10 +453,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				oldLine = line;
 			}
 		}
-	}
-
-	private String encodeUFactorString(String uFactor) {
-		return uFactor.replace("\"", "\\\"");
 	}
 
 	public void closeLog() {

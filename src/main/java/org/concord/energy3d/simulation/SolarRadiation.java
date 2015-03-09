@@ -162,7 +162,7 @@ public class SolarRadiation {
 			}
 			maxValue++;
 		}
-		maxValue *= 1 - 0.01 * EnergyPanel.getInstance().getColorMapSlider().getValue();
+		maxValue *= 1 - 0.01 * Scene.getInstance().getSolarHeatMapColorContrast();
 	}
 
 	private void computeOnLand(final double dayLength, final ReadOnlyVector3 directionTowardSun) {

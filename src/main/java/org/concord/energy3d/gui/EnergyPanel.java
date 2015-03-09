@@ -39,6 +39,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
@@ -70,6 +71,12 @@ import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
+import org.concord.energy3d.undo.ChangeCityCommand;
+import org.concord.energy3d.undo.ChangeDateCommand;
+import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
+import org.concord.energy3d.undo.ChangeLatitudeCommand;
+import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
+import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.util.Specifications;
 import org.concord.energy3d.util.Util;
 
@@ -192,10 +199,11 @@ public class EnergyPanel extends JPanel {
 					return;
 				}
 				if (disableActionsRequester == null) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeDateCommand());
 					final Heliodon heliodon = Heliodon.getInstance();
-					if (heliodon != null)
-						heliodon.setDate((Date) dateSpinner.getValue());
+					heliodon.setDate((Date) dateSpinner.getValue());
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setDate(heliodon.getCalender().getTime());
 					Scene.getInstance().setTreeLeaves();
 					Scene.getInstance().setEdited(true);
 				}
@@ -227,6 +235,7 @@ public class EnergyPanel extends JPanel {
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
 				} else {
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeCityCommand());
 					final Integer newLatitude = CityData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).intValue();
 					if (newLatitude.equals(latitudeSpinner.getValue()))
 						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -235,6 +244,7 @@ public class EnergyPanel extends JPanel {
 					if (CityData.getInstance().getSunshineHours().get(city) == null)
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No sunshine data is found for " + city + ".\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
 				}
+				Scene.getInstance().setCity(city);
 				Scene.getInstance().setTreeLeaves();
 				Scene.getInstance().setEdited(true);
 			}
@@ -265,16 +275,17 @@ public class EnergyPanel extends JPanel {
 					firstCall = false;
 					return;
 				}
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangeTimeCommand());
 				final Heliodon heliodon = Heliodon.getInstance();
-				if (heliodon != null)
-					heliodon.setTime((Date) timeSpinner.getValue());
+				heliodon.setTime((Date) timeSpinner.getValue());
+				Scene.getInstance().setDate(heliodon.getCalender().getTime());
 				updateWeatherData();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().changeSkyTexture();
 				if (MainPanel.getInstance().getShadowButton().isSelected()) {
 					SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 				}
-				if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsShown()) { // for now, only heat flow arrows need to call redrawAll
+				if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsVisible()) { // for now, only heat flow arrows need to call redrawAll
 					SceneManager.getInstance().setHeatFluxDaily(false);
 					for (final HousePart part : Scene.getInstance().getParts())
 						part.drawHeatFlux();
@@ -301,6 +312,7 @@ public class EnergyPanel extends JPanel {
 		latitudeSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangeLatitudeCommand());
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);
@@ -331,12 +343,15 @@ public class EnergyPanel extends JPanel {
 		insideTemperatureSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangeInsideTemperatureCommand());
+				Scene.getInstance().setInsideTemperature((Integer) insideTemperatureSpinner.getValue());
 				if (disableActionsRequester == null)
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);
 			}
 		});
 		insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
+		((DefaultEditor) insideTemperatureSpinner.getEditor()).getTextField().setEditable(false);
 		final GridBagConstraints gbc_insideTemperatureSpinner = new GridBagConstraints();
 		gbc_insideTemperatureSpinner.gridx = 2;
 		gbc_insideTemperatureSpinner.gridy = 0;
@@ -675,7 +690,7 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(heatMapPanel);
 
 		colorMapSlider = new MySlider();
-		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the heat map.</html>");
+		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the solar heat map.</html>");
 		colorMapSlider.setMinimum(15);
 		colorMapSlider.setMaximum(95);
 		colorMapSlider.setMinimumSize(colorMapSlider.getPreferredSize());
@@ -683,6 +698,8 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				if (!colorMapSlider.getValueIsAdjusting()) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeSolarHeatMapColorContrastCommand());
+					Scene.getInstance().setSolarHeatMapColorContrast(colorMapSlider.getValue());
 					compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().setEdited(true, false);
 				}
@@ -977,7 +994,7 @@ public class EnergyPanel extends JPanel {
 				for (final HousePart part : Scene.getInstance().getParts())
 					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
 				SolarRadiation.getInstance().compute();
-				HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), (Integer) insideTemperatureSpinner.getValue());
+				HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), Scene.getInstance().getInsideTemperature());
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Energy calculation completed", 0, 1));
 				updatePartEnergy();
@@ -1019,6 +1036,10 @@ public class EnergyPanel extends JPanel {
 		return timeSpinner;
 	}
 
+	public JSpinner getLatitudeSpinner() {
+		return latitudeSpinner;
+	}
+
 	public JSpinner getInsideTemperatureSpinner() {
 		return insideTemperatureSpinner;
 	}
@@ -1039,9 +1060,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void setLatitude(final int latitude) {
-		latitudeSpinner.removeChangeListener(latitudeChangeListener);
-		latitudeSpinner.setValue(latitude);
-		latitudeSpinner.addChangeListener(latitudeChangeListener);
+		Util.setSilently(latitudeSpinner, latitude);
 	}
 
 	public int getLatitude() {
