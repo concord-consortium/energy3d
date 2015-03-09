@@ -118,6 +118,10 @@ public class SolarPanel extends HousePart {
 			}
 		} else
 			normal = container.getFaceDirection();
+
+		if (normal == null)
+			normal = Vector3.UNIT_Z;
+
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
@@ -161,12 +165,10 @@ public class SolarPanel extends HousePart {
 		outlineMesh.updateModelBound();
 
 		mesh.setTranslation(getAbsPoint(0));
-		if (normal != null) { // FIXME: Sometimes normal is null
-			if (Util.isEqual(normal, Vector3.UNIT_Z))
-				mesh.setRotation(new Matrix3());
-			else
-				mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
-		}
+		if (Util.isEqual(normal, Vector3.UNIT_Z))
+			mesh.setRotation(new Matrix3());
+		else
+			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
