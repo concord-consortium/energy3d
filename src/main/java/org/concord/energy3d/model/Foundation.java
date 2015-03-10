@@ -855,7 +855,12 @@ public class Foundation extends HousePart {
 		if (init) {
 			initFloor();
 			final int n = floorVertices.size();
-			if (n <= 0 || children.size() != n) // not closed in the latter case
+			int m = 0;
+			for (HousePart p : children) {
+				if (p instanceof Wall)
+					m++;
+			}
+			if (n <= 0 || m != n) // not closed in the latter case
 				return false;
 			if (path == null)
 				path = new Path2D.Double();
@@ -872,7 +877,12 @@ public class Foundation extends HousePart {
 			path.closePath();
 		}
 		final int n = floorVertices.size();
-		if (n <= 0 || children.size() != n) // not closed in the latter case
+		int m = 0;
+		for (HousePart p : children) {
+			if (p instanceof Wall)
+				m++;
+		}
+		if (n <= 0 || m != n) // not closed in the latter case
 			return false;
 		return path != null ? path.contains(x, y) : false;
 	}
@@ -881,7 +891,12 @@ public class Foundation extends HousePart {
 
 		initFloor();
 		final int n = floorVertices.size();
-		if (n <= 0 || children.size() != n) // not closed in the latter case
+		int m = 0;
+		for (HousePart p : children) {
+			if (p instanceof Wall)
+				m++;
+		}
+		if (n <= 0 || m != n) // not closed in the latter case
 			return null;
 
 		final double scale = Scene.getInstance().getAnnotationScale();
