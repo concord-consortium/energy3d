@@ -266,6 +266,9 @@ public class SolarRadiation {
 
 	private void computeOnMeshSolarPanel(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
 
+		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent. This is a temporary fix.
+			return;
+
 		MeshData data = onMesh.get(drawMesh);
 		if (data == null)
 			data = initMeshTextureDataSolarPanel(drawMesh, collisionMesh, normal);
