@@ -113,6 +113,8 @@ public class PrintController implements Updater {
 				}
 			} else {
 				printParts = new ArrayList<HousePart>(Scene.getInstance().getParts().size());
+				boolean orgSolarHeatMap = SceneManager.getInstance().getSolarHeatMap();
+				SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (part.isPrintable()) {
 						final HousePart printPart = (HousePart) ObjectCloner.deepCopy(part);
@@ -122,6 +124,8 @@ public class PrintController implements Updater {
 						printPart.flatten(1.0);
 					}
 				}
+				
+				SceneManager.getInstance().setSolarHeatMapWithoutUpdate(orgSolarHeatMap);
 
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
 				computePageDimension();
