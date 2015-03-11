@@ -158,6 +158,8 @@ public class Sensor extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
+		if (container == null)
+			return true;
 		if (mesh.getWorldBound() == null)
 			return true;
 		final OrientedBoundingBox bound = (OrientedBoundingBox) mesh.getWorldBound().clone(null);
