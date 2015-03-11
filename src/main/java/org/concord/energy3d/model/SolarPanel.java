@@ -179,6 +179,8 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
+		if (container == null) // FIXME: There is a chance that a solar panel can be left without a container
+			return true;
 		if (mesh.getWorldBound() == null)
 			return true;
 		final OrientedBoundingBox bound = (OrientedBoundingBox) mesh.getWorldBound().clone(null);
