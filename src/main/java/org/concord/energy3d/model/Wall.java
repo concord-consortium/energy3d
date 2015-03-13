@@ -1199,9 +1199,6 @@ public class Wall extends HousePart {
 	@Override
 	protected void computeArea() {
 		area = Util.computeArea(mesh);
-		for (final HousePart child : children)
-			if (child instanceof Window || child instanceof Door)
-				area -= child.getArea();
 	}
 
 	@Override
