@@ -271,6 +271,7 @@ public abstract class HousePart implements Serializable {
 	public void complete() {
 		drawCompleted = true;
 		orgHeight = height;
+		computeArea();
 	}
 
 	public boolean isDrawCompleted() {
