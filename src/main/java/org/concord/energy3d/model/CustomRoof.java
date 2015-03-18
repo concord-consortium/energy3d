@@ -55,7 +55,14 @@ public class CustomRoof extends Roof {
 		final ArrayList<Vector3> steinerPoints = new ArrayList<Vector3>(points.size());
 		for (int i = 1; i < points.size(); i++) {
 			final Vector3 p = getAbsPoint(i);
-			if (!steinerPoints.contains(p)) {
+			boolean found = false;
+			for (final Vector3 existingP : steinerPoints) {
+				if (Util.isEqual(p, existingP)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
 				steinerPoints.add(p);
 				polygon.addSteinerPoint(new ArdorVector3PolygonPoint(p));
 			}
