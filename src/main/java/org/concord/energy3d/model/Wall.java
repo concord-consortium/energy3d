@@ -1301,4 +1301,11 @@ public class Wall extends HousePart {
 		updateHeatFluxVisibility();
 	}
 
+	@Override
+	public void delete() {
+		if (roof != null) {
+			roof.remove(this);
+		}
+	}
+
 }

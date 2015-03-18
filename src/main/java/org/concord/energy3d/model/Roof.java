@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -104,6 +105,15 @@ public abstract class Roof extends HousePart {
 		mesh.setModelBound(null);
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.CYAN);
+
+		// cleanup
+		if (gableEditPointToWallMap != null)
+			for (final List<Wall> wallList : gableEditPointToWallMap.values()) {
+				final Iterator<Wall> walls = wallList.iterator();
+				while (walls.hasNext())
+					if (Scene.getInstance().getParts().indexOf(walls.next()) == -1)
+						walls.remove();
+			}
 	}
 
 	@Override
@@ -688,7 +698,8 @@ public abstract class Roof extends HousePart {
 				final ReadOnlyVector2 p2D = Util.snapToPolygon(editPoint, wallPoints, null);
 				editPoint.setX(p2D.getX());
 				editPoint.setY(p2D.getY());
-				editPoint.subtractLocal(walls.get(closestIndex).getFaceDirection().multiply(0.01, null));
+				if (closestIndex < walls.size())
+					editPoint.subtractLocal(walls.get(closestIndex).getFaceDirection().multiply(0.01, null));
 				points.get(i).set(toRelative(editPoint));
 			}
 		}
@@ -1134,6 +1145,12 @@ public abstract class Roof extends HousePart {
 		String s = this.getClass().getSimpleName() + "(" + id + ")";
 		s += ("  editPoint=" + editPointIndex);
 		return s;
+	}
+
+	public void remove(final Wall wall) {
+		if (gableEditPointToWallMap != null)
+			for (final List<Wall> wallList : gableEditPointToWallMap.values())
+				wallList.remove(wall);
 	}
 
 }
