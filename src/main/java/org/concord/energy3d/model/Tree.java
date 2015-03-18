@@ -123,6 +123,7 @@ public class Tree extends HousePart {
 		collisionRoot.attachChild(cylinder);
 		if (points.size() > 0)
 			collisionRoot.setTranslation(getAbsPoint(0));
+		collisionRoot.updateWorldTransform(true);
 		collisionRoot.updateWorldBound(true);
 		collisionRoot.getSceneHints().setCullHint(CullHint.Always);
 		root.attachChild(collisionRoot);
@@ -194,8 +195,8 @@ public class Tree extends HousePart {
 		if (treeType == PINE)
 			return false;
 		final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
-		boolean northHemisphereWinter = month > 10 || month < 4;
-		boolean southHemisphereWinter = month > 4 && month < 10;
+		final boolean northHemisphereWinter = month > 10 || month < 4;
+		final boolean southHemisphereWinter = month > 4 && month < 10;
 		return EnergyPanel.getInstance().getLatitude() > 0 ? northHemisphereWinter : southHemisphereWinter;
 	}
 
@@ -210,7 +211,7 @@ public class Tree extends HousePart {
 			init();
 		if (isShedded())
 			sphere.removeFromParent();
-		else 
+		else
 			collisionRoot.attachChild(sphere);
 		collisionRoot.updateWorldBound(true);
 		return collisionRoot;
