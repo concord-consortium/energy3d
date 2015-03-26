@@ -87,7 +87,7 @@ public abstract class HousePart implements Serializable {
 	protected long id;
 	protected int editPointIndex = -1;
 	protected boolean drawCompleted = false;
-	private ReadOnlyColorRGBA color = ColorRGBA.WHITE; // custom color
+	private ReadOnlyColorRGBA color = ColorRGBA.LIGHT_GRAY; // custom color
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
@@ -687,7 +687,7 @@ public abstract class HousePart implements Serializable {
 				final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, false);
 				ts.setTexture(texture);
 				mesh.setRenderState(ts);
-				mesh.setDefaultColor(defaultColor != null ? defaultColor : ColorRGBA.WHITE);
+				mesh.setDefaultColor(ColorRGBA.WHITE);
 			}
 		}
 	}
