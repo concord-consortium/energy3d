@@ -31,6 +31,7 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
@@ -53,6 +54,7 @@ import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ComputeEnergyCommand;
@@ -288,6 +290,14 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				stateValue = SceneManager.getInstance().isSunAnimation();
 			} else if (lastEdit instanceof SpinViewCommand) {
 				stateValue = SceneManager.getInstance().getSpinView();
+			} else if (lastEdit instanceof ChangeTextureCommand) {
+				TextureMode textureMode = Scene.getInstance().getTextureMode();
+				if (textureMode == TextureMode.Full)
+					stateValue = "\"Full\"";
+				else if (textureMode == TextureMode.Simple)
+					stateValue = "\"Simple\"";
+				else if (textureMode == TextureMode.None)
+					stateValue = "\"None\"";
 			} else if (lastEdit instanceof ShowAxesCommand) {
 				stateValue = SceneManager.getInstance().areAxesVisible();
 			} else if (lastEdit instanceof TopViewCommand) {
