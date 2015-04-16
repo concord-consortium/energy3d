@@ -206,6 +206,8 @@ public class Foundation extends HousePart {
 		final int index;
 		if (editPointIndex == -1)
 			index = isFirstPointInserted() ? 3 : 0;
+		else if (SceneManager.getInstance().isTopView() && editPointIndex > 3)
+			index = editPointIndex - 4;
 		else
 			index = editPointIndex;
 
@@ -254,11 +256,6 @@ public class Foundation extends HousePart {
 						points.get(3).set(Util.projectPointOnLine(p, points.get(1), points.get(3), false));
 					}
 				}
-				// p = ensureDistanceFromOtherFoundations(p, index);
-				// if (resizeHouseMode)
-				// p = ensureNotTooSmall(p, index);
-				// else
-				// p = ensureIncludesChildren(p, index);
 			} else {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
@@ -856,7 +853,7 @@ public class Foundation extends HousePart {
 			initFloor();
 			final int n = floorVertices.size();
 			int m = 0;
-			for (HousePart p : children) {
+			for (final HousePart p : children) {
 				if (p instanceof Wall)
 					m++;
 			}
@@ -878,7 +875,7 @@ public class Foundation extends HousePart {
 		}
 		final int n = floorVertices.size();
 		int m = 0;
-		for (HousePart p : children) {
+		for (final HousePart p : children) {
 			if (p instanceof Wall)
 				m++;
 		}
@@ -892,7 +889,7 @@ public class Foundation extends HousePart {
 		initFloor();
 		final int n = floorVertices.size();
 		int m = 0;
-		for (HousePart p : children) {
+		for (final HousePart p : children) {
 			if (p instanceof Wall)
 				m++;
 		}
