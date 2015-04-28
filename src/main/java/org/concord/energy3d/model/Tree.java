@@ -6,7 +6,6 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
@@ -138,10 +137,12 @@ public class Tree extends HousePart {
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
 		final int index = 0;
-		final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[] { Foundation.class, null });
+		final PickedHousePart pick = pickContainer(x, y, new Class<?>[] { Foundation.class, null }, true);
 		if (pick != null) {
 			final Vector3 p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
+			if (container != null)
+				p.setZ(container.height);
 			points.get(index).set(toRelative(p));
 		}
 		draw();
