@@ -13,7 +13,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.EnergyPanel;
@@ -32,9 +31,9 @@ import org.concord.energy3d.scene.SceneManager;
 
 /**
  * Calculate the cost (the prices are fictitious).
- *
+ * 
  * @author Charles Xie
- *
+ * 
  */
 public class Cost {
 
@@ -58,12 +57,25 @@ public class Cost {
 	}
 
 	public int getBuildingCost(final Foundation foundation) {
-		int sum = 0;
+		int buildingCount = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.getTopContainer() == foundation) {
-				sum += getPartCost(p);
-			} else if (p instanceof Tree && !p.isFrozen()) {
-				sum += getTreeCost((Tree) p);
+			if (p instanceof Foundation)
+				buildingCount++;
+		}
+		int sum = 0;
+		if (buildingCount == 1) {
+			for (final HousePart p : Scene.getInstance().getParts()) { // if there is only one building, trees are included in its cost
+				if (p.getTopContainer() == foundation) {
+					sum += getPartCost(p);
+				} else if (p instanceof Tree && !p.isFrozen()) {
+					sum += getTreeCost((Tree) p);
+				}
+			}
+		} else {
+			for (final HousePart p : Scene.getInstance().getParts()) {
+				if (p.getTopContainer() == foundation) {
+					sum += getPartCost(p);
+				}
 			}
 		}
 		return sum;
@@ -155,36 +167,6 @@ public class Cost {
 
 	public void showGraph() {
 		EnergyPanel.getInstance().requestDisableActions(this);
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
-			int count = 0;
-			HousePart hp = null;
-			for (final HousePart x : Scene.getInstance().getParts()) {
-				if (x instanceof Foundation) {
-					count++;
-					hp = x;
-				}
-			}
-			if (count == 1) {
-				SceneManager.getInstance().setSelectedPart(hp);
-				SceneManager.getInstance().refresh();
-				EnergyPanel.getInstance().updateCost();
-			} else {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}
-		} else {
-			final HousePart hp = selectedPart.getTopContainer();
-			if (hp != null) {
-				SceneManager.getInstance().setSelectedPart(hp);
-				SceneManager.getInstance().refresh();
-				EnergyPanel.getInstance().updateCost();
-			}
-		}
-		if (SceneManager.getInstance().getSelectedPart().getChildren().isEmpty()) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
 		show(true);
 		EnergyPanel.getInstance().requestDisableActions(null);
 	}
@@ -193,25 +175,46 @@ public class Cost {
 
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		final Foundation selectedBuilding;
-		if (selectedPart == null)
+		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
 			selectedBuilding = null;
-		else if (selectedPart instanceof Foundation)
+		} else if (selectedPart instanceof Foundation) {
 			selectedBuilding = (Foundation) selectedPart;
-		else
+		} else {
 			selectedBuilding = selectedPart.getTopContainer();
-		if (selectedBuilding == null) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "No building is selected.", "No Building", JOptionPane.INFORMATION_MESSAGE);
-			return;
+			selectedPart.setEditPointsVisible(false);
+			SceneManager.getInstance().setSelectedPart(selectedBuilding);
 		}
-
 		int wallSum = 0;
 		int windowSum = 0;
 		int roofSum = 0;
 		int doorSum = 0;
 		int solarPanelSum = 0;
 		int treeSum = 0;
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.getTopContainer() == selectedBuilding) {
+		String info;
+		if (selectedBuilding != null) {
+			info = "Building #" + selectedBuilding.getId();
+			for (final HousePart p : Scene.getInstance().getParts()) {
+				if (p.getTopContainer() == selectedBuilding) {
+					if (p instanceof Wall)
+						wallSum += getPartCost(p);
+					else if (p instanceof Window)
+						windowSum += getPartCost(p);
+					else if (p instanceof Roof)
+						roofSum += getPartCost(p);
+					else if (p instanceof Door)
+						doorSum += getPartCost(p);
+					else if (p instanceof SolarPanel)
+						solarPanelSum += getPartCost(p);
+				}
+			}
+		} else {
+			int buildingCount = 0;
+			for (final HousePart p : Scene.getInstance().getParts()) {
+				if (p instanceof Foundation)
+					buildingCount++;
+			}
+			info = buildingCount + " buildings";
+			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Wall)
 					wallSum += getPartCost(p);
 				else if (p instanceof Window)
@@ -222,9 +225,9 @@ public class Cost {
 					doorSum += getPartCost(p);
 				else if (p instanceof SolarPanel)
 					solarPanelSum += getPartCost(p);
+				else if (p instanceof Tree && !p.isFrozen())
+					treeSum += getTreeCost((Tree) p);
 			}
-			if (p instanceof Tree && !p.isFrozen())
-				treeSum += getTreeCost((Tree) p);
 		}
 
 		final float[] data = new float[] { wallSum, windowSum, roofSum, doorSum, solarPanelSum, treeSum };
@@ -232,7 +235,7 @@ public class Cost {
 		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.PINK, Color.YELLOW, Color.GREEN };
 
 		// show them in a popup window
-		final PieChart pie = new PieChart(data, colors, legends, "$");
+		final PieChart pie = new PieChart(data, colors, legends, "$", info);
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Material Costs by Category", true);
