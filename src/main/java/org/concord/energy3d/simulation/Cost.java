@@ -229,8 +229,20 @@ public class Cost {
 		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Doors", "Solar Panels", "Trees" };
 		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.PINK, Color.YELLOW, Color.GREEN };
 
+		String details = "";
+		int count = 0;
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Foundation) {
+				count++;
+				Foundation foundation = (Foundation) p;
+				details += "#" + foundation.getId() + ":$" + getBuildingCost(foundation) + "/";
+			}
+		}
+		if (count > 0)
+			details = details.substring(0, details.length() - 1);
+
 		// show them in a popup window
-		final PieChart pie = new PieChart(data, colors, legends, "$", info);
+		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null);
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Material Costs by Category", true);

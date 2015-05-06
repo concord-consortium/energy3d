@@ -32,8 +32,9 @@ class PieChart extends JComponent {
 	private Arc2D.Float[] arcs;
 	private String unit;
 	private String info;
+	private String details;
 
-	public PieChart(float[] data, Color[] colors, String[] legends, String unit, String info) {
+	public PieChart(float[] data, Color[] colors, String[] legends, String unit, String info, String details) {
 		setPreferredSize(new Dimension(400, 300));
 		format = NumberFormat.getNumberInstance();
 		format.setMaximumFractionDigits(1);
@@ -42,6 +43,7 @@ class PieChart extends JComponent {
 		this.legends = legends;
 		this.unit = unit;
 		this.info = info;
+		this.details = details;
 		for (float x : data)
 			sum += x;
 		percents = new float[data.length];
@@ -113,7 +115,11 @@ class PieChart extends JComponent {
 
 		g2.setFont(new Font("Arial", Font.PLAIN | Font.BOLD, 11));
 		String total = info + ", Total: " + unit + (int) sum;
-		g2.drawString(total, (width - fm.stringWidth(total)) / 2, height - 20);
+		g2.drawString(total, (width - fm.stringWidth(total)) / 2, height - 30);
+		if (details != null) {
+			g2.setFont(new Font("Arial", Font.PLAIN, 11));
+			g2.drawString(details, (width - fm.stringWidth(details)) / 2, height - 15);
+		}
 
 	}
 

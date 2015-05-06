@@ -57,21 +57,21 @@ class LoggerUtil {
 		return folder;
 	}
 
-	static Object getBuildingId(final HousePart p) {
+	static long getBuildingId(final HousePart p) {
 		if (p == null)
-			return null;
+			return -1;
 		if (p instanceof Foundation)
 			return p.getId();
 		final HousePart x = p.getTopContainer();
-		return x == null ? null : x.getId();
+		return x == null ? -1 : x.getId();
 	}
 
 	static Object getInfo(final HousePart p) {
 		if (p == null)
 			return null;
-		Object bid = getBuildingId(p);
+		long bid = getBuildingId(p);
 		String s = "{\"Type\": \"" + p.getClass().getSimpleName() + "\",";
-		if (bid != null)
+		if (bid != -1)
 			s += "\"Building\": " + bid + ", ";
 		s += "\"ID\": " + p.getId();
 		int n = p.getPoints().size();
@@ -85,7 +85,7 @@ class LoggerUtil {
 			}
 			s += "]";
 		}
-		if (bid != null && ((Long) bid).longValue() == p.getId()) {
+		if (bid != -1 && bid == p.getId()) {
 			if (p instanceof Foundation) {
 				Building b = new Building((int) p.getId());
 				ArrayList<HousePart> children = p.getChildren();
@@ -101,4 +101,5 @@ class LoggerUtil {
 		s += "}";
 		return s;
 	}
+
 }

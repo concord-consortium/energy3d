@@ -23,7 +23,7 @@ import org.concord.energy3d.shapes.Heliodon;
 
 /**
  * @author Charles Xie
- *
+ * 
  */
 public class PostProcessor extends PlayControl {
 
@@ -107,8 +107,7 @@ public class PostProcessor extends PlayControl {
 							buildings0 = new ArrayList<Building>();
 							synchronized (parts) {
 								for (final HousePart x : parts) {
-									final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
-									final Building b = new Building(bid);
+									final Building b = new Building((int) LoggerUtil.getBuildingId(x));
 									if (!buildings0.contains(b))
 										buildings0.add(b);
 								}
@@ -129,8 +128,7 @@ public class PostProcessor extends PlayControl {
 									doorCount++;
 								else if (x instanceof Wall) {
 									wallCount++;
-									final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
-									final Building b = new Building(bid);
+									final Building b = new Building((int) LoggerUtil.getBuildingId(x));
 									if (!buildings.contains(b) && !buildings0.contains(b))
 										buildings.add(b);
 								}
@@ -139,8 +137,7 @@ public class PostProcessor extends PlayControl {
 						// scan again to compute building properties
 						synchronized (parts) {
 							for (final HousePart x : parts) {
-								final int bid = ((Long) LoggerUtil.getBuildingId(x)).intValue();
-								final Building b = getBuilding(buildings, bid);
+								final Building b = getBuilding(buildings, (int) LoggerUtil.getBuildingId(x));
 								if (b != null) {
 									if (x instanceof Window)
 										b.setWindowCount(b.getWindowCount() + 1);
