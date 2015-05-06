@@ -1,17 +1,13 @@
 package org.concord.energy3d.simulation;
 
-import static java.awt.GraphicsDevice.WindowTranslucency.TRANSLUCENT;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
@@ -65,11 +61,8 @@ public class Cost {
 		int sum = 0;
 		if (buildingCount == 1) {
 			for (final HousePart p : Scene.getInstance().getParts()) { // if there is only one building, trees are included in its cost
-				if (p.getTopContainer() == foundation) {
+				if (p.getTopContainer() == foundation && !p.isFrozen())
 					sum += getPartCost(p);
-				} else if (p instanceof Tree && !p.isFrozen()) {
-					sum += getTreeCost((Tree) p);
-				}
 			}
 		} else {
 			for (final HousePart p : Scene.getInstance().getParts()) {
@@ -149,29 +142,31 @@ public class Cost {
 				price = 300;
 			return price;
 		}
-		return 0;
-	}
-
-	private int getTreeCost(final Tree tree) {
-		switch (tree.getTreeType()) {
-		case Tree.OAK:
-			return 2000;
-		case Tree.PINE:
-			return 1500;
-		case Tree.MAPLE:
-			return 1000;
-		default:
-			return 500;
+		if (part instanceof Tree) {
+			Tree tree = (Tree) part;
+			int price;
+			switch (tree.getTreeType()) {
+			case Tree.OAK:
+				price = 2000;
+			case Tree.PINE:
+				price = 1500;
+			case Tree.MAPLE:
+				price = 1000;
+			default:
+				price = 500;
+			}
+			return price;
 		}
+		return 0;
 	}
 
 	public void showGraph() {
 		EnergyPanel.getInstance().requestDisableActions(this);
-		show(true);
+		show();
 		EnergyPanel.getInstance().requestDisableActions(null);
 	}
 
-	private void show(final boolean translucent) {
+	private void show() {
 
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		final Foundation selectedBuilding;
@@ -226,7 +221,7 @@ public class Cost {
 				else if (p instanceof SolarPanel)
 					solarPanelSum += getPartCost(p);
 				else if (p instanceof Tree && !p.isFrozen())
-					treeSum += getTreeCost((Tree) p);
+					treeSum += getPartCost(p);
 			}
 		}
 
@@ -240,21 +235,8 @@ public class Cost {
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Material Costs by Category", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		if (translucent && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isWindowTranslucencySupported(TRANSLUCENT)) {
-			dialog.setUndecorated(true);
-			dialog.setOpacity(System.getProperty("os.name").startsWith("Mac") ? 0.5f : 0.75f);
-		}
 		dialog.getContentPane().add(pie, BorderLayout.CENTER);
 		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		final JCheckBox translucentCheckBox = new JCheckBox("Translucent", translucent);
-		translucentCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				dialog.dispose();
-				show(translucentCheckBox.isSelected());
-			}
-		});
-		buttonPanel.add(translucentCheckBox);
 		final JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override

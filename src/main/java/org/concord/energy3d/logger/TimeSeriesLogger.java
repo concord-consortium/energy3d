@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,8 +27,10 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -101,6 +104,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private HousePart analyzedPart;
 	private PrintWriter writer;
 	private boolean firstLine = true;
+	private final static DecimalFormat ENERGY_FORMAT = new DecimalFormat("######.##");
 
 	public TimeSeriesLogger(final int logInterval) {
 		this.logInterval = logInterval;
@@ -354,61 +358,66 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		analysisRequester = EnergyPanel.getInstance().getDisableActionsRequester();
 		if (analysisRequester != null) {
 
-			analysisRequesterCopy = analysisRequester;
 			analyzedPart = SceneManager.getInstance().getSelectedPart();
-			if (analyzedPart == null) // this analysis requires no selection
-				line += separator + "\"" + analysisRequester.getClass().getSimpleName() + "\": {}";
+			analysisRequesterCopy = analysisRequester;
 
 		} else {
 
-			if (analysisRequesterCopy != null && analyzedPart != null) { // this analysis is completed, now record some results
-				String part = analyzedPart.toString().substring(0, analyzedPart.toString().indexOf(')') + 1);
+			if (analysisRequesterCopy != null) { // this analysis is completed, now record some results
 				line += separator + "\"" + analysisRequesterCopy.getClass().getSimpleName() + "\": {";
-				if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
-					EnergyAnnualAnalysis eaa = (EnergyAnnualAnalysis) analysisRequesterCopy;
-					line += ", \"Calculated Months\": " + eaa.getNumberOfDataPoints();
-					if (analyzedPart instanceof Foundation) {
-						line += "\"Building\": \"" + analyzedPart.getId() + "\"";
-						String name = "Net";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-						name = "AC";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-						name = "Heater";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-						name = "Windows";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-						name = "Solar Panels";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-					} else {
-						line += "\"Object\": \"" + part + "\"";
-						String name = "Solar";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-						name = "Heat Gain";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-					}
-				} else if (analysisRequesterCopy instanceof EnergyAngularAnalysis) {
-					line += "\"Building\": \"" + LoggerUtil.getBuildingId(analyzedPart) + "\"";
-					EnergyAngularAnalysis eaa = (EnergyAngularAnalysis) analysisRequesterCopy;
-					line += ", \"Calculated Angles\": " + eaa.getNumberOfDataPoints();
-				} else if (analysisRequesterCopy instanceof AnnualSensorData) {
-					line += "\"Object\": \"" + part + "\"";
-					AnnualSensorData asd = (AnnualSensorData) analysisRequesterCopy;
-					line += ", \"Calculated Months\": " + asd.getNumberOfDataPoints();
-				} else if (analysisRequesterCopy instanceof Cost) {
-					Cost cost = (Cost) analysisRequesterCopy;
-					if (analyzedPart == null) {
-						line += "\"Amount\": " + cost.getTotalCost();
-					} else {
-						line += "\"Building\": \"" + LoggerUtil.getBuildingId(analyzedPart) + "\"";
+				if (analyzedPart != null) { // if something is selected
+					String part = analyzedPart.toString().substring(0, analyzedPart.toString().indexOf(')') + 1);
+					if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
+						EnergyAnnualAnalysis eaa = (EnergyAnnualAnalysis) analysisRequesterCopy;
+						line += "\"Calculated Months\": " + eaa.getNumberOfDataPoints();
 						if (analyzedPart instanceof Foundation) {
-							line += ", \"Amount\": " + cost.getBuildingCost((Foundation) analyzedPart);
+							line += ", \"Building\": \"" + analyzedPart.getId() + "\"";
+							String name = "Net";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+							name = "AC";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+							name = "Heater";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+							name = "Windows";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+							name = "Solar Panels";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
 						} else {
-							line += ", \"Amount\": " + cost.getBuildingCost(analyzedPart.getTopContainer());
+							line += ", \"Part\": \"" + part + "\"";
+							String name = "Solar";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+							name = "Heat Gain";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
 						}
+					} else if (analysisRequesterCopy instanceof EnergyAngularAnalysis) {
+						line += "\"Building\": \"" + LoggerUtil.getBuildingId(analyzedPart) + "\"";
+						EnergyAngularAnalysis eaa = (EnergyAngularAnalysis) analysisRequesterCopy;
+						line += ", \"Calculated Angles\": " + eaa.getNumberOfDataPoints();
+					} else if (analysisRequesterCopy instanceof AnnualSensorData) {
+						line += "\"Object\": \"" + part + "\"";
+						AnnualSensorData asd = (AnnualSensorData) analysisRequesterCopy;
+						line += ", \"Calculated Months\": " + asd.getNumberOfDataPoints();
+					} else if (analysisRequesterCopy instanceof Cost) {
+						Cost cost = (Cost) analysisRequesterCopy;
+						if (analyzedPart instanceof Tree || analyzedPart instanceof Human) {
+							line += "\"Amount\": " + cost.getTotalCost();
+						} else {
+							line += "\"Building\": " + LoggerUtil.getBuildingId(analyzedPart);
+							if (analyzedPart instanceof Foundation) {
+								line += ", \"Amount\": " + cost.getBuildingCost((Foundation) analyzedPart);
+							} else {
+								line += ", \"Amount\": " + cost.getBuildingCost(analyzedPart.getTopContainer());
+							}
+						}
+					}
+					analyzedPart = null;
+				} else { // if nothing is selected
+					if (analysisRequesterCopy instanceof Cost) {
+						Cost cost = (Cost) analysisRequesterCopy;
+						line += "\"Amount\": " + cost.getTotalCost();
 					}
 				}
 				line += "}";
-				analyzedPart = null;
 				analysisRequesterCopy = null;
 			}
 
