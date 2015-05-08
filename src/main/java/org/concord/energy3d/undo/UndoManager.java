@@ -13,7 +13,6 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 	private boolean undoFlag = false;
 	private boolean redoFlag = false;
 	private boolean saveFlag = false;
-	private String previousPresentationName;
 
 	@Override
 	public synchronized boolean addEdit(final UndoableEdit anEdit) {
@@ -26,7 +25,6 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 
 	@Override
 	public synchronized void undo() throws CannotUndoException {
-		previousPresentationName = getPresentationName();
 		super.undo();
 		SaveCommand.setGloabalSignificant(true);
 		if (editToBeUndone() instanceof SaveCommand)
@@ -41,7 +39,6 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 
 	@Override
 	public synchronized void redo() throws CannotRedoException {
-		previousPresentationName = getPresentationName();
 		super.redo();
 		SaveCommand.setGloabalSignificant(true);
 		if (editToBeUndone() instanceof SaveCommand)
@@ -90,10 +87,6 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 
 	public boolean getSaveFlag() {
 		return saveFlag;
-	}
-
-	public String getPreviousPresentationName() {
-		return previousPresentationName;
 	}
 
 	@Override
