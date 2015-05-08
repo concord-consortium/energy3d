@@ -6,8 +6,6 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Human;
-import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 
 @SuppressWarnings("serial")
@@ -39,10 +37,6 @@ public class AddHousePartCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		if (housePart instanceof Tree)
-			return "Add " + ((Tree) housePart).getTreeName();
-		if (housePart instanceof Human)
-			return "Add " + ((Human) housePart).getHumanName();
 		return "Add " + housePart.getClass().getSimpleName();
 	}
 }

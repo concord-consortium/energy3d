@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.util.Config;
 
@@ -70,7 +72,14 @@ class LoggerUtil {
 		if (p == null)
 			return null;
 		long bid = getBuildingId(p);
-		String s = "{\"Type\": \"" + p.getClass().getSimpleName() + "\",";
+		String s;
+		if (p instanceof Human) {
+			s = "{\"Name\": \"" + ((Human) p).getHumanName() + "\", ";
+		} else if (p instanceof Tree) {
+			s = "{\"Species\": \"" + ((Tree) p).getTreeName() + "\", ";
+		} else {
+			s = "{\"Type\": \"" + p.getClass().getSimpleName() + "\", ";
+		}
 		if (bid != -1)
 			s += "\"Building\": " + bid + ", ";
 		s += "\"ID\": " + p.getId();
