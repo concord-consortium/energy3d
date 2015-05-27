@@ -6,7 +6,6 @@ import java.text.DecimalFormat;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -33,7 +32,7 @@ public class SizeAnnotation extends Annotation {
 	public SizeAnnotation() {
 		super(new Line("Size annotation lines", BufferUtils.createVector3Buffer(8), null, null, null));
 		arrows.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-		arrows.setModelBound(new BoundingBox());
+		arrows.setModelBound(null);
 		Util.disablePickShadowLight(arrows);
 		setColor(ColorRGBA.BLACK);
 		attachChild(arrows);
@@ -100,7 +99,6 @@ public class SizeAnnotation extends Annotation {
 		label.updateWorldTransform(true);
 		label.updateWorldBound(true);
 
-
 		vertexBuffer.put(newFrom.getXf()).put(newFrom.getYf()).put(newFrom.getZf());
 		final double bankSpace = label.getWidth() * 0.70;
 		final double blankSpaceFactor = Math.max(0, body.length() - bankSpace) / body.length();
@@ -127,7 +125,7 @@ public class SizeAnnotation extends Annotation {
 		offset.multiplyLocal(0.5);
 		body.set(to).subtractLocal(from).normalizeLocal().multiplyLocal(0.5);
 
-		mesh.updateModelBound();;
+		mesh.updateModelBound();
 
 		vertexBuffer = arrows.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
@@ -159,14 +157,14 @@ public class SizeAnnotation extends Annotation {
 		arrows.setDefaultColor(color);
 	}
 
-    @Override
-    public Node makeCopy(final boolean shareGeometricData) {
-        // get copy of basic spatial info
-        final Node node = super.makeCopy(shareGeometricData);
-        // because the above code calls the constructor of this object (which adds 3 children) and then clones the node.children (which then adds extra 3 children) we need to undo the effect of last step
-        node.detachChildAt(5);
-        node.detachChildAt(4);
-        node.detachChildAt(3);
-        return node;
-    }
+	@Override
+	public Node makeCopy(final boolean shareGeometricData) {
+		// get copy of basic spatial info
+		final Node node = super.makeCopy(shareGeometricData);
+		// because the above code calls the constructor of this object (which adds 3 children) and then clones the node.children (which then adds extra 3 children) we need to undo the effect of last step
+		node.detachChildAt(5);
+		node.detachChildAt(4);
+		node.detachChildAt(3);
+		return node;
+	}
 }

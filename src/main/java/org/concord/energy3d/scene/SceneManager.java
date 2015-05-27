@@ -917,7 +917,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return rotAnim;
 	}
 
-	public void setSpinView(boolean spinView) {
+	public void setSpinView(final boolean spinView) {
 		rotAnim = spinView;
 	}
 

@@ -137,7 +137,7 @@ public class Wall extends HousePart {
 		outlineMesh = new Line("Wall (Outline)");
 		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
-		outlineMesh.setModelBound(new BoundingBox());
+		outlineMesh.setModelBound(null);
 		Util.disablePickShadowLight(outlineMesh);
 		root.attachChild(outlineMesh);
 

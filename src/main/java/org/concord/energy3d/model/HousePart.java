@@ -198,7 +198,7 @@ public abstract class HousePart implements Serializable {
 
 		heatFlux = new Line("Heat Flux");
 		heatFlux.setLineWidth(1);
-		heatFlux.setModelBound(new BoundingBox());
+		heatFlux.setModelBound(null);
 		Util.disablePickShadowLight(heatFlux);
 		heatFlux.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		heatFlux.setDefaultColor(ColorRGBA.YELLOW);
@@ -513,9 +513,10 @@ public abstract class HousePart implements Serializable {
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 p = getAbsPoint(i);
 			final Camera camera = SceneManager.getInstance().getCamera();
-			if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) // for Lwjgl
-				getEditPointShape(i).setScale(camera.getLocation().distance(p) / 10);
-			else
+			if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) {
+				final double distance = camera.getLocation().distance(p);
+				getEditPointShape(i).setScale(distance > 0.1 ? distance / 10 : 0.01);
+			} else
 				getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
 			getEditPointShape(i).setTranslation(p);
 		}

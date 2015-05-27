@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import org.concord.energy3d.scene.PrintController;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.image.ImageDataFormat;
@@ -81,7 +82,7 @@ public class Printout implements Printable, Pageable {
 		final Camera camera = Camera.getCurrentCamera();
 		final int width = camera.getWidth(), height = camera.getHeight();
 
-		final Vector3 cameraLocation = new Vector3(printCorner).addLocal(visibleSceneWidth / 2.0, -10.0, -visibleSceneHeight / 2.0);
+		final Vector3 cameraLocation = new Vector3(printCorner).addLocal(visibleSceneWidth / 2.0, Scene.getOriginalHouseRoot().getWorldBound().getCenter().getY() - 10, -visibleSceneHeight / 2.0);
 		final double pageToX = printCorner.getX() + PrintController.getInstance().getPageWidth() + visibleSceneWidth / 2.0;
 		final double pageToZ = printCorner.getZ() - PrintController.getInstance().getPageHeight() - visibleSceneHeight / 2.0;
 

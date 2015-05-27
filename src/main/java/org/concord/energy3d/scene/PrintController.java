@@ -113,7 +113,7 @@ public class PrintController implements Updater {
 				}
 			} else {
 				printParts = new ArrayList<HousePart>(Scene.getInstance().getParts().size());
-				boolean orgSolarHeatMap = SceneManager.getInstance().getSolarHeatMap();
+				final boolean orgSolarHeatMap = SceneManager.getInstance().getSolarHeatMap();
 				SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (part.isPrintable()) {
@@ -124,7 +124,7 @@ public class PrintController implements Updater {
 						printPart.flatten(1.0);
 					}
 				}
-				
+
 				SceneManager.getInstance().setSolarHeatMapWithoutUpdate(orgSolarHeatMap);
 
 				final ArrayList<ArrayList<Spatial>> pages = new ArrayList<ArrayList<Spatial>>();
@@ -381,7 +381,7 @@ public class PrintController implements Updater {
 
 		pageLeft = pageFormat.getImageableX() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
 		pageRight = (pageFormat.getImageableX() + pageFormat.getImageableWidth()) * fromPageToWorldCoord - spaceBetweenParts / 2.0;
-		pageTop = pageFormat.getImageableY() * fromPageToWorldCoord;
+		pageTop = pageFormat.getImageableY() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
 		if (labelHeight == 0.0) {
 			final BMText label = Annotation.makeNewLabel();
 			label.setFontScale(0.5);
@@ -405,7 +405,6 @@ public class PrintController implements Updater {
 		for (final ArrayList<Spatial> page : pages) {
 			final Vector3 upperLeftCorner = new Vector3();
 			double x, z;
-//			final BoundingBox boundingBox = (BoundingBox) new BoundingBox().merge(Scene.getOriginalHouseRoot().getWorldBound());
 			final BoundingBox originalHouseBoundingBox = (BoundingBox) Scene.getOriginalHouseRoot().getWorldBound().asType(Type.AABB);
 			final ReadOnlyVector3 originalHouseCenter = Scene.getOriginalHouseRoot().getWorldBound().getCenter();
 			final double minXDistance = originalHouseBoundingBox.getXExtent() + pageWidth / 2.0;
@@ -415,7 +414,6 @@ public class PrintController implements Updater {
 				z = (pageNum / cols) * (pageHeight + SPACE_BETWEEN_PAGES);
 				upperLeftCorner.setX(x - pageWidth / 2.0);
 				upperLeftCorner.setZ(z + pageHeight);
-				upperLeftCorner.setY(originalHouseCenter.getY());
 				pageNum++;
 			} while (Math.abs(x - originalHouseCenter.getX()) < minXDistance && Math.abs(z - originalHouseCenter.getZ()) < minYDistance);
 
@@ -425,7 +423,7 @@ public class PrintController implements Updater {
 				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(upperLeftCorner.multiply(1, 0, 1, null));
 
 			final Box box = new Box("Page Boundary");
-			final double y = -Scene.getOriginalHouseRoot().getWorldBound().getCenter().getY();
+			final double y = Scene.getOriginalHouseRoot().getWorldBound().getCenter().getY();
 			box.setData(upperLeftCorner.add(0, y + 1, 0, null), upperLeftCorner.add(pageWidth, y + 1.2, -pageHeight, null));
 			box.setModelBound(new BoundingBox());
 			box.updateModelBound();
@@ -477,7 +475,7 @@ public class PrintController implements Updater {
 		if (!isFitted) {
 			printPart.updateWorldBound(true);
 			final OrientedBoundingBox bounds = (OrientedBoundingBox) printPart.getWorldBound().asType(Type.OBB);
-			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getExtent().getX() + pageLeft, 0, -bounds.getExtent().getZ() - pageTop));
+			((UserData) printPart.getUserData()).setPrintCenter(new Vector3(bounds.getExtent().getX() + pageLeft, Scene.getOriginalHouseRoot().getWorldBound().getCenter().getY(), -bounds.getExtent().getZ() - pageTop));
 			final ArrayList<Spatial> page = new ArrayList<Spatial>();
 			page.add(printPart);
 			pages.add(page);
@@ -504,7 +502,7 @@ public class PrintController implements Updater {
 				else
 					tryCenter.setZ(MathUtils.clamp(tryCenter.getZ(), -pageBottom + printPartBound.getExtent().getZ(), -pageTop - printPartBound.getExtent().getZ()));
 
-				tryCenter.setY(0);
+				tryCenter.setY(Scene.getOriginalHouseRoot().getWorldBound().getCenter().getY());
 
 				boolean collision = false;
 				if (tryCenter.getX() - printPartBound.getExtent().getX() < pageLeft - MathUtils.ZERO_TOLERANCE || tryCenter.getX() + printPartBound.getExtent().getX() > pageRight + MathUtils.ZERO_TOLERANCE || tryCenter.getZ() + printPartBound.getExtent().getZ() > -pageTop + MathUtils.ZERO_TOLERANCE || tryCenter.getZ() - printPartBound.getExtent().getZ() < -pageBottom - MathUtils.ZERO_TOLERANCE)
