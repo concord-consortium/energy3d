@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,8 +27,10 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -60,6 +63,7 @@ import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ComputeEnergyCommand;
 import org.concord.energy3d.undo.EditHousePartCommand;
 import org.concord.energy3d.undo.RemoveHousePartCommand;
+import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
@@ -100,6 +104,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private HousePart analyzedPart;
 	private PrintWriter writer;
 	private boolean firstLine = true;
+	private final static DecimalFormat ENERGY_FORMAT = new DecimalFormat("######.##");
 
 	public TimeSeriesLogger(final int logInterval) {
 		this.logInterval = logInterval;
@@ -169,7 +174,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (!buildings.isEmpty()) {
 			result = "[";
 			for (Building b : buildings)
-				result += "{\"#" + b.getID() + "\": " + b.getSolarEnergy() + "}, ";
+				result += "{\"Building\": " + b.getID() + ", \"Daily\": " + b.getSolarEnergy() + "}, ";
 			result = result.trim().substring(0, result.length() - 2);
 			result += "]";
 		}
@@ -200,6 +205,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				actedHousePart = ((EditHousePartCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof RemoveHousePartCommand) {
 				actedHousePart = ((RemoveHousePartCommand) lastEdit).getHousePart();
+			} else if (lastEdit instanceof RotateBuildingCommand) {
+				RotateBuildingCommand c = (RotateBuildingCommand) lastEdit;
+				stateValue = "{\"Building\":" + c.getFoundation().getId() + ", \"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
 			} else if (lastEdit instanceof ChangeSolarPanelEfficiencyCommand) {
 				ChangeSolarPanelEfficiencyCommand c = (ChangeSolarPanelEfficiencyCommand) lastEdit;
 				SolarPanel sp = c.getSolarPanel();
@@ -328,21 +336,21 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		} else {
 			action = null;
 		}
-		boolean type2Action = false;
+		String type2Action = null;
 		if (action == null) {
 			if (undoManager.getUndoFlag()) {
 				action = "Undo";
 				undoManager.setUndoFlag(false);
-				type2Action = true;
+				type2Action = undoManager.getPresentationName();
 			} else if (undoManager.getRedoFlag()) {
 				action = "Redo";
 				undoManager.setRedoFlag(false);
-				type2Action = true;
+				type2Action = undoManager.getPresentationName();
 			}
 			if (undoManager.getSaveFlag()) {
 				action = "Save";
 				undoManager.setSaveFlag(false);
-				type2Action = true;
+				type2Action = Scene.getURL().toString() + "*";
 			}
 		}
 
@@ -350,56 +358,77 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		analysisRequester = EnergyPanel.getInstance().getDisableActionsRequester();
 		if (analysisRequester != null) {
 
-			analysisRequesterCopy = analysisRequester;
 			analyzedPart = SceneManager.getInstance().getSelectedPart();
-			if (analyzedPart == null) // this analysis requires no selection
-				line += separator + "\"" + analysisRequester.getClass().getSimpleName() + "\": {}";
+			analysisRequesterCopy = analysisRequester;
 
 		} else {
 
-			if (analysisRequesterCopy != null && analyzedPart != null) { // this analysis is completed, now record some results
-				String part = analyzedPart.toString().substring(0, analyzedPart.toString().indexOf(')') + 1);
-				line += separator + "\"" + analysisRequesterCopy.getClass().getSimpleName() + "\": {";
-				line += "\"Object\": \"" + part + "\"";
-				if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
-					EnergyAnnualAnalysis eaa = (EnergyAnnualAnalysis) analysisRequesterCopy;
-					line += ", \"Calculated Months\": " + eaa.getNumberOfDataPoints();
-					if (analyzedPart instanceof Foundation) {
-						String name = "Net";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-						name = "AC";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-						name = "Heater";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-						name = "Windows";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-						name = "Solar Panels";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-					} else {
-						String name = "Solar";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-						name = "Heat Gain";
-						line += ", \"" + name + "\": " + eaa.getResult(name);
-					}
-				} else if (analysisRequesterCopy instanceof EnergyAngularAnalysis) {
-					EnergyAngularAnalysis eaa = (EnergyAngularAnalysis) analysisRequesterCopy;
-					line += ", \"Calculated Angles\": " + eaa.getNumberOfDataPoints();
-				} else if (analysisRequesterCopy instanceof AnnualSensorData) {
+			if (analysisRequesterCopy != null) { // this analysis is completed, now record some results
+				line += separator + "\"" + analysisRequesterCopy.getClass().getSimpleName() + "\": ";
+				if (analysisRequesterCopy instanceof AnnualSensorData) {
 					AnnualSensorData asd = (AnnualSensorData) analysisRequesterCopy;
-					line += ", \"Calculated Months\": " + asd.getNumberOfDataPoints();
-				} else if (analysisRequesterCopy instanceof Cost) {
-					Cost cost = (Cost) analysisRequesterCopy;
-					line += ", \"Cost\": " + cost.getTotalCost();
+					line += "{\"Months\": " + asd.getNumberOfDataPoints() + "}";
+				} else {
+					if (analyzedPart != null && !(analyzedPart instanceof Tree) && !(analyzedPart instanceof Human)) { // if something analyzable is selected
+						line += "{";
+						String part = analyzedPart.toString().substring(0, analyzedPart.toString().indexOf(')') + 1);
+						if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
+							EnergyAnnualAnalysis eaa = (EnergyAnnualAnalysis) analysisRequesterCopy;
+							line += "\"Months\": " + eaa.getNumberOfDataPoints();
+							if (analyzedPart instanceof Foundation) {
+								line += ", \"Building\": " + analyzedPart.getId();
+								String name = "Net";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+								name = "AC";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+								name = "Heater";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+								name = "Windows";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+								name = "Solar Panels";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+							} else {
+								line += ", \"Part\": \"" + part + "\"";
+								String name = "Solar";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+								name = "Heat Gain";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+							}
+						} else if (analysisRequesterCopy instanceof EnergyAngularAnalysis) {
+							line += "\"Building\": " + LoggerUtil.getBuildingId(analyzedPart);
+							EnergyAngularAnalysis eaa = (EnergyAngularAnalysis) analysisRequesterCopy;
+							line += ", \"Angles\": " + eaa.getNumberOfDataPoints();
+						} else if (analysisRequesterCopy instanceof Cost) {
+							Cost cost = (Cost) analysisRequesterCopy;
+							line += "\"Building\": " + LoggerUtil.getBuildingId(analyzedPart);
+							line += ", \"Amount\": " + cost.getBuildingCost(analyzedPart instanceof Foundation ? (Foundation) analyzedPart : analyzedPart.getTopContainer());
+						}
+						analyzedPart = null;
+						line += "}";
+					} else { // if nothing analyzable is selected
+						if (analysisRequesterCopy instanceof Cost) {
+							line += "[";
+							Cost cost = (Cost) analysisRequesterCopy;
+							int count = 0;
+							for (HousePart p : Scene.getInstance().getParts()) {
+								if (p instanceof Foundation) {
+									count++;
+									line += "{\"Building\": " + LoggerUtil.getBuildingId(p) + ", \"Amount\": " + cost.getBuildingCost((Foundation) p) + "}, ";
+								}
+							}
+							if (count > 0)
+								line = line.substring(0, line.length() - 2);
+							line += "]";
+						}
+					}
 				}
-				line += "}";
-				analyzedPart = null;
 				analysisRequesterCopy = null;
 			}
 
 			if (action != null) {
 				line += separator + "\"" + action + "\": ";
-				if (type2Action) {
-					line += "null";
+				if (type2Action != null) {
+					line += "\"" + type2Action + "\"";
 				} else {
 					if (actedHousePart != null) {
 						line += LoggerUtil.getInfo(actedHousePart);
@@ -412,7 +441,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			}
 
 			// record the daily solar radiation results
-			if (SceneManager.getInstance().getSolarHeatMap()) {
+			if (SceneManager.getInstance().getSolarHeatMap() && SceneManager.getInstance().areBuildingLabelsVisible()) {
 				if (solarCalculationFinished) {
 					String result = getBuildingSolarEnergies();
 					if (result.length() > 0) {

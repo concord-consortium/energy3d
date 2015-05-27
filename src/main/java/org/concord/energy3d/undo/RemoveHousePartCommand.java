@@ -7,8 +7,6 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Human;
-import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
@@ -55,10 +53,6 @@ public class RemoveHousePartCommand extends AbstractUndoableEdit {
 	public String getPresentationName() {
 		if (housePart instanceof Foundation && !housePart.getChildren().isEmpty())
 			return "Remove Building";
-		if (housePart instanceof Tree)
-			return "Remove " + ((Tree) housePart).getTreeName();
-		if (housePart instanceof Human)
-			return "Remove " + ((Human) housePart).getHumanName();
 		return "Remove " + housePart.getClass().getSimpleName();
 	}
 

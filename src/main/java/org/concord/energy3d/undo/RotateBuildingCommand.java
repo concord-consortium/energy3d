@@ -21,7 +21,7 @@ public class RotateBuildingCommand extends AbstractUndoableEdit {
 	}
 
 	// for action logging
-	public HousePart getHFoundation() {
+	public HousePart getFoundation() {
 		return foundation;
 	}
 
