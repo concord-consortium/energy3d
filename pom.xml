@@ -4,15 +4,23 @@
 	<groupId>org.concord.energy3d</groupId>
 	<artifactId>energy3d</artifactId>
 	<version>1.0</version>
+	<packaging>jar</packaging>
+	
+	<name>Energy3D</name>
+	<url>http://energy.concord.org/energy3d/</url>
+	<organization>
+		<name>Concord Consortium</name>
+	</organization>	
+  	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
-		<finalName>${artifactId}</finalName>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>3.3</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -21,7 +29,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.6</version>
 				<configuration>
+					<forceCreation>true</forceCreation>
+					<outputDirectory>C:\exe\energy3d\</outputDirectory>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<manifest>
@@ -32,14 +43,13 @@
 							<Application-Name>Energy3D</Application-Name>
 							<Permissions>all-permissions</Permissions>
 						</manifestEntries>
-					</archive>
-					<outputDirectory>C:\exe\energy3d\</outputDirectory>
+					</archive>					
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jarsigner-plugin</artifactId>
-				<version>1.2</version>
+				<version>1.4</version>
 				<configuration>
 					<keystore>C:\exe\energy3d\cc-keystore</keystore>
 					<alias>concord</alias>
@@ -85,8 +95,4 @@
 			<version>2.0.5</version>
 		</dependency>
 	</dependencies>
-	<name>Energy3D</name>
-	<organization>
-		<name>Concord Consortium</name>
-	</organization>
 </project>
