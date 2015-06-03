@@ -14,6 +14,18 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="exe/poly2tri/poly2tri-ardor3d-0.1.1-SNAPSHOT.jar" sourcepath="exe/poly2tri/poly2tri-ardor3d-0.1.1-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="lib" path="exe/poly2tri/poly2tri-core-0.1.1-SNAPSHOT.jar" sourcepath="exe/poly2tri/poly2tri-core-0.1.1-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="exe/ardor3d/ardor3d-core-1.0-SNAPSHOT.jar" sourcepath="exe/ardor3d/ardor3d-core-1.0-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="exe/ardor3d/ardor3d-collada-1.0-SNAPSHOT.jar" sourcepath="exe/ardor3d/ardor3d-core-1.0-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="exe/ardor3d/ardor3d-math-1.0-SNAPSHOT.jar" sourcepath="exe/ardor3d/ardor3d-math-1.0-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="exe/ardor3d/ardor3d-savable-1.0-SNAPSHOT.jar" sourcepath="exe/ardor3d/ardor3d-savable-1.0-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="exe/ardor3d/ardor3d-jogl-1.0-SNAPSHOT.jar" sourcepath="exe/ardor3d/ardor3d-jogl-1.0-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="exe/jogl/jogl-all.jar"/>
+	<classpathentry kind="lib" path="exe/jogl/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="exe/ardor3d/ardor3d-awt-1.0-SNAPSHOT.jar" sourcepath="exe/ardor3d/ardor3d-awt-1.0-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="exe/ardor3d/ardor3d-effects-1.0-SNAPSHOT.jar" sourcepath="exe/ardor3d/ardor3d-effects-1.0-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="exe/ardor3d/ardor3d-animation-1.0-SNAPSHOT.jar" sourcepath="exe/ardor3d/ardor3d-animation-1.0-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="exe/jogl/gluegen-rt-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="exe/jogl/jogl-all-natives-windows-i586.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
