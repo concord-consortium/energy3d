@@ -700,15 +700,9 @@ public class MainPanel extends JPanel {
 		if (canvasNoteSplitPane == null) {
 			canvasNoteSplitPane = new JSplitPane();
 			canvasNoteSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-			if (Config.isMac()) {
-				canvasNoteSplitPane.setTopComponent(getNoteScrollPane());
-				canvasNoteSplitPane.setBottomComponent(getCanvasPanel());
-				canvasNoteSplitPane.setResizeWeight(0.4);
-			} else {
-				canvasNoteSplitPane.setTopComponent(getCanvasPanel());
-				canvasNoteSplitPane.setBottomComponent(getNoteScrollPane());
-				canvasNoteSplitPane.setResizeWeight(0.6);
-			}
+			canvasNoteSplitPane.setTopComponent(getCanvasPanel());
+			canvasNoteSplitPane.setBottomComponent(getNoteScrollPane());
+			canvasNoteSplitPane.setResizeWeight(0.6);
 			canvasNoteSplitPane.setDividerSize(0);
 			getNoteScrollPane().setVisible(false);
 		}

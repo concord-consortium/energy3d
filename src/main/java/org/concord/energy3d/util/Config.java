@@ -10,25 +10,9 @@ public class Config {
 	private static final boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac");
 	private static final boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("win");
 
-	// private static long startTime;
-
 	public static enum RenderMode {
 		NEWT, JOGL, LWJGL
 	};
-
-	// static {
-	// final Object renderer = JOptionPane.showInputDialog(null, "Which renderer?", null, JOptionPane.QUESTION_MESSAGE, null, new RenderMode[] {RenderMode.JOGL, RenderMode.LWJGL, RenderMode.NEWT}, RenderMode.JOGL);
-	// if (renderer != null)
-	// RENDER_MODE = (RenderMode) renderer;
-	// // startTime = System.nanoTime();
-	// }
-
-	// public static void printTimeUntilFirstRender() {
-	// if (startTime != 0) {
-	// System.out.println("Time until first render = " + (float)((System.nanoTime() - startTime) / 1000000000.0) + "s");
-	// startTime = 0;
-	// }
-	// }
 
 	public static MainApplet getApplet() {
 		return applet;
