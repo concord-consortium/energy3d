@@ -184,6 +184,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean operationStick = false;
 	private boolean operationFlag = false;
 	private boolean refresh = true;
+	private int refreshCount = 0;
 	private boolean refreshOnlyMode = false;
 	private boolean zoomLock = false;
 
@@ -348,10 +349,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isUpdateTime = refreshTime != -1 && now <= refreshTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
-			if (refresh || !refreshOnlyMode && (isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating()))) {
+			final boolean doRefresh = refresh || !refreshOnlyMode && (isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating()));
+			if (doRefresh || refreshCount > 0) {
 				if (now > refreshTime)
 					refreshTime = -1;
 				refresh = false;
+				if (doRefresh)
+					refreshCount = 2;
+				else
+					refreshCount--;
 				try {
 					synchronized (this) {
 						frameHandler.updateFrame();
