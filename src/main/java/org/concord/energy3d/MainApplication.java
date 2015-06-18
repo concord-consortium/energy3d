@@ -23,6 +23,9 @@ public class MainApplication {
 			JOptionPane.showMessageDialog(null, "Your current Java version is " + version + ". Version 1.6 or higher is required.");
 			System.exit(0);
 		}
+
+		System.setProperty("jogl.gljpanel.noglsl", "true");
+
 		if (System.getProperty("os.name").startsWith("Mac")) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Energy3D");

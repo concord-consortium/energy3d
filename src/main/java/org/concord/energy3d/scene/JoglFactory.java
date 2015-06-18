@@ -7,11 +7,14 @@ import com.ardor3d.input.awt.AwtFocusWrapper;
 import com.ardor3d.input.awt.AwtKeyboardWrapper;
 import com.ardor3d.input.awt.AwtMouseManager;
 import com.ardor3d.input.awt.AwtMouseWrapper;
+import com.ardor3d.renderer.TextureRendererFactory;
+import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
 
 public class JoglFactory extends RendererFactory {
 
 	public JoglFactory(final DisplaySettings settings, final SceneManager sceneManager) {
 		final JoglSwingCanvas canvas = new JoglSwingCanvas(settings, new JoglCanvasRenderer(sceneManager));
+		TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
 		mouseWrapper = new AwtMouseWrapper(canvas, new AwtMouseManager(canvas));
 		keyboardWrapper = new AwtKeyboardWrapper(canvas);
 		focusWrapper = new AwtFocusWrapper(canvas);
