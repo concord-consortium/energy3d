@@ -69,8 +69,8 @@ import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
+import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
@@ -239,8 +239,11 @@ public class EnergyPanel extends JPanel {
 					final Integer newLatitude = CityData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).intValue();
 					if (newLatitude.equals(latitudeSpinner.getValue()))
 						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					else
+					else {
 						setLatitude(newLatitude);
+						Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
+						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					}
 					if (CityData.getInstance().getSunshineHours().get(city) == null)
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No sunshine data is found for " + city + ".\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
 				}
