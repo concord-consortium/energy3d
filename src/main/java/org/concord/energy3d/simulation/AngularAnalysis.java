@@ -32,7 +32,7 @@ import org.concord.energy3d.scene.SceneManager;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public abstract class AngularAnalysis extends Analysis {
 
@@ -47,19 +47,20 @@ public abstract class AngularAnalysis extends Analysis {
 					if (!analysisStopped) {
 						SceneManager.getInstance().rotateBuilding(2.0 * Math.PI / nRotation, false, false);
 						Scene.getInstance().redrawAllNow();
-						try {
-							Thread.sleep(500);
-						} catch (final InterruptedException e) {
-						}
 						final Throwable t = compute();
 						if (t != null) {
 							stopAnalysis();
 							EventQueue.invokeLater(new Runnable() {
+								@Override
 								public void run() {
 									JOptionPane.showMessageDialog(parent, "Angular analysis failed. Please restart the program.\n" + t.getMessage(), "Analysis Error", JOptionPane.ERROR_MESSAGE);
 								}
 							});
 							break;
+						}
+						try {
+							Thread.sleep(500);
+						} catch (final InterruptedException e) {
 						}
 					}
 				}
@@ -94,10 +95,10 @@ public abstract class AngularAnalysis extends Analysis {
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), title + ": " + s, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//		if (GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isWindowTranslucencySupported(TRANSLUCENT)) {
-//			dialog.setUndecorated(true);
-//			dialog.setOpacity(System.getProperty("os.name").startsWith("Mac") ? 0.5f : 0.75f);
-//		}
+		// if (GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isWindowTranslucencySupported(TRANSLUCENT)) {
+		// dialog.setUndecorated(true);
+		// dialog.setOpacity(System.getProperty("os.name").startsWith("Mac") ? 0.5f : 0.75f);
+		// }
 
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
