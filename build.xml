@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
-
 	<property name="JAVA_HOME" value="C:\Program Files\Java\jdk1.8.0_45\" />
-
-	<path id="CLASSPATH">
-		<pathelement location="C:\Users\Saeid\.m2\repository\org\slf4j\slf4j-api\1.7.7\slf4j-api-1.7.7.jar" />
-		<pathelement location="C:\Users\Saeid\.m2\repository\com\yuvimasory\orange-extensions\1.3.0\orange-extensions-1.3.0.jar" />
-		<pathelement location="C:\Users\Saeid\.m2\repository\com\google\collections\google-collections\1.0\google-collections-1.0.jar" />
-		<pathelement location="C:\Users\Saeid\.m2\repository\org\jdom\jdom2\2.0.5\jdom2-2.0.5.jar" />
-		<fileset dir="exe">
-			<include name="**/*.jar" />
-		</fileset>
-		<fileset dir="exe/jogl">
-			<include name="**/*.jar" />
-		</fileset>
-		<fileset dir="exe/ardor3d">
-			<include name="**/*.jar" />
-		</fileset>
-		<fileset dir="exe/poly2tri">
-			<include name="**/*.jar" />
-		</fileset>
-		<pathelement path="classes" />
-	</path>
-
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="dist" />
+	
+	<condition property="os" value="windows-${os.arch}">
+		<os family="windows"/>
+	</condition>
+	<condition property="os" value="macosx-universal">
+		<os family="mac"/>
+	</condition>
+	<condition property="os" value="linux-${os.arch}">
+		<os family="unix"/>
+	</condition>
+	
+    <echo message="OS Name is:         ${os}" />
+    <echo message="OS Architecture is: ${os.arch}" />
+    <echo message="OS Version is:      ${os.version}" />
+	
+	<path id="CLASSPATH">
+		<fileset dir="exe">
+			<patternset id="non.source.jars">
+				<include name="*.jar" />
+				<include name="ardor3d/*.jar" />
+				<include name="poly2tri/*.jar" />
+				<exclude name="**/*-sources*"/>
+				<include name="jogl/jogl-all.jar" />
+				<include name="jogl/gluegen-rt.jar" />
+				<include name="jogl/*natives-${os}.jar" />
+			</patternset>
+		</fileset>
+		<pathelement path="classes" />
+	</path>
 
 	<target name="default" depends="clean,compile">
 
@@ -33,29 +40,28 @@
 
 		<fx:application id="energy3d" name="Energy3D" mainClass="org.concord.energy3d.MainApplication" />
 
-		<fx:resources id="appRes">
-			<fx:fileset dir="${build.dist.dir}" includes="energy3d.jar" />
-			<fx:fileset dir="exe" includes="**/*.jar" />
-			<fx:fileset dir="C:\Users\Saeid\.m2\repository\org\slf4j\slf4j-api\1.7.7" includes="slf4j-api-1.7.7.jar" />
-			<fx:fileset dir="C:\Users\Saeid\.m2\repository\com\yuvimasory\orange-extensions\1.3.0" includes="orange-extensions-1.3.0.jar" />
-			<fx:fileset dir="C:\Users\Saeid\.m2\repository\com\google\collections\google-collections\1.0" includes="google-collections-1.0.jar" />
-			<fx:fileset dir="C:\Users\Saeid\.m2\repository\org\jdom\jdom2\2.0.5" includes="jdom2-2.0.5.jar" />
-		</fx:resources>
-
 		<fx:jar destfile="${build.dist.dir}/energy3d.jar">
 			<fx:application refid="energy3d" />
-			<fx:resources refid="appRes" />
+			<fx:resources>
+				<fileset dir="exe">
+					<patternset refid="non.source.jars"/>
+				</fileset>				
+			</fx:resources>	
 			<fileset dir="${build.classes.dir}" />
 		</fx:jar>
-
-		<fx:deploy outdir="${build.dist.dir}" embedJNLP="true" outfile="energy3d" nativeBundles="all" verbose="false">
+		
+		<fx:deploy outdir="${build.dist.dir}" embedJNLP="true" outfile="energy3d" nativeBundles="exe" verbose="true">
 			<fx:application refId="energy3d" />
-			<fx:resources refid="appRes" />
+			<fx:resources>
+				<fx:fileset dir="${build.dist.dir}" includes="energy3d.jar" />
+				<fileset dir="exe">
+					<patternset refid="non.source.jars"/>
+				</fileset>
+			</fx:resources>
 			<fx:info title="Energy3D" vendor="Concord Consortium Inc." />
-			<fx:platform basedir="${JAVA_HOME}"/> 
+			<fx:platform basedir="${JAVA_HOME}"/>
 			<fx:preferences shortcut="true" install="false" menu="true"/>
 		</fx:deploy>
-
 	</target>
 
 	<target name="clean">
