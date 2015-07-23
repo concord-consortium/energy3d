@@ -1,0 +1,32 @@
+# The URL from which the client is downloaded
+appbase = http://energy.concord.org/energy3d/update/
+
+# UI Configuration
+ui.name = Energy3D
+ui.progress = 2, 2, 500, 22
+
+# Application jar files
+code = energy3d.jar
+code = a.mp4
+code = getdown-1.4.jar
+code = google-collections-1.0.jar
+code = jdom2-2.0.5.jar
+code = orange-extensions-1.3.0.jar
+code = slf4j-api-1.7.7.jar
+code = ardor3d/ardor3d-animation-1.0-SNAPSHOT.jar
+code = ardor3d/ardor3d-awt-1.0-SNAPSHOT.jar
+code = ardor3d/ardor3d-collada-1.0-SNAPSHOT.jar
+code = ardor3d/ardor3d-core-1.0-SNAPSHOT.jar
+code = ardor3d/ardor3d-effects-1.0-SNAPSHOT.jar
+code = ardor3d/ardor3d-jogl-1.0-SNAPSHOT.jar
+code = ardor3d/ardor3d-math-1.0-SNAPSHOT.jar
+code = ardor3d/ardor3d-savable-1.0-SNAPSHOT.jar
+code = jogl/gluegen-rt.jar
+code = jogl/jogl-all.jar
+code = jogl/gluegen-rt-natives-windows-amd64.jar
+code = jogl/jogl-all-natives-windows-amd64.jar
+code = poly2tri/poly2tri-ardor3d-0.1.1-SNAPSHOT.jar
+code = poly2tri/poly2tri-core-0.1.1-SNAPSHOT.jar
+
+# The main entry point for the application
+class = org.concord.energy3d.util.UpdateStub

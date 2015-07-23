@@ -28,19 +28,22 @@
 				<exclude name="**/*-sources*"/>
 				<include name="jogl/jogl-all.jar" />
 				<include name="jogl/gluegen-rt.jar" />
-				<include name="jogl/*natives-${os}.jar" />
+				<include name="jogl/*natives-${os}.jar" />				
 			</patternset>
 		</fileset>
 		<pathelement path="classes" />
 	</path>
+	
+	<target name="default" depends="clean,compile,deploy">
+		
+	</target>
 
-	<target name="default" depends="clean,compile">
-
+	<target name="deploy">		
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath=".:${JAVA_HOME}/lib/ant-javafx.jar" />
 
 		<fx:application id="energy3d" name="Energy3D" mainClass="org.concord.energy3d.MainApplication" />
 
-		<fx:jar destfile="${build.dist.dir}/energy3d.jar">
+		<fx:jar destfile="exe/energy3d.jar">
 			<fx:application refid="energy3d" />
 			<fx:resources>
 				<fileset dir="exe">
@@ -50,42 +53,43 @@
 			<fileset dir="${build.classes.dir}" />
 		</fx:jar>
 		
-		<fx:deploy outdir="${build.dist.dir}" embedJNLP="true" outfile="energy3d" nativeBundles="exe" verbose="true">
+		<taskdef name="digest" classname="com.threerings.getdown.tools.DigesterTask" classpath="exe/getdown-1.4.jar"/>
+		<digest appdir="exe"/>		
+		
+		<fx:deploy outdir="${build.dist.dir}" embedJNLP="true" outfile="energy3d" nativeBundles="image" verbose="false">
 			<fx:application refId="energy3d" />
 			<fx:resources>
 				<fx:fileset dir="${build.dist.dir}" includes="energy3d.jar" />
 				<fileset dir="exe">
 					<patternset refid="non.source.jars"/>
+					<include name="getdown.txt" />
+					<include name="digest.txt" />
+					<include name="a.mp4" />
 				</fileset>
 			</fx:resources>
 			<fx:info title="Energy3D" vendor="Concord Consortium Inc." />
 			<fx:platform basedir="${JAVA_HOME}"/>
 			<fx:preferences shortcut="true" install="false" menu="true"/>
-		</fx:deploy>
+		</fx:deploy>			
 	</target>
 
 	<target name="clean">
 		<mkdir dir="${build.classes.dir}" />
 		<mkdir dir="${build.dist.dir}" />
-
 		<delete>
 			<fileset dir="${build.classes.dir}" includes="**/*" />
 			<fileset dir="${build.dist.dir}" includes="**/*" />
 		</delete>
-
 	</target>
 
 	<target name="compile" depends="clean">
-
 		<javac includeantruntime="false" srcdir="${build.src.dir}" destdir="${build.classes.dir}" fork="yes" executable="${JAVA_HOME}/bin/javac" source="1.8" debug="on" classpathref="CLASSPATH">
 		</javac>
 
 		<!-- Copy resources to build.classes.dir -->
-
 		<copy todir="${build.classes.dir}">
 			<fileset dir="src/main/resources" />
 		</copy>
-
 	</target>
-
+	
 </project>

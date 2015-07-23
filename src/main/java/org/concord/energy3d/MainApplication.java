@@ -18,6 +18,7 @@ public class MainApplication {
 	 * @wbp.parser.entryPoint
 	 */
 	public static void main(final String[] args) {
+		JOptionPane.showMessageDialog(null, "Version 11");
 		final String version = System.getProperty("java.version");
 		if (version.compareTo("1.6") < 0) {
 			JOptionPane.showMessageDialog(null, "Your current Java version is " + version + ". Version 1.6 or higher is required.");
@@ -25,6 +26,7 @@ public class MainApplication {
 		}
 
 		System.setProperty("jogl.gljpanel.noglsl", "true");
+		System.setProperty("direct", "true");
 
 		if (System.getProperty("os.name").startsWith("Mac")) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");

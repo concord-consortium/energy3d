@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -20,6 +21,7 @@ import javax.swing.JPopupMenu;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.PopupMenuFactory;
 import org.concord.energy3d.logger.PlayControl;
@@ -51,6 +53,7 @@ import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Config.RenderMode;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
+import org.concord.energy3d.util.UpdateStub;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -134,6 +137,7 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.ardor3d.util.resource.URLResourceSource;
+import com.threerings.getdown.launcher.GetdownApp;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
@@ -1095,10 +1099,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void exit() {
-		if (shutdownHooks != null) { // e.g., save the log file before exit to ensure that the last segment is saved
-			for (final Runnable r : shutdownHooks)
-				r.run();
-		}
+		// if (shutdownHooks != null) { // e.g., save the log file before exit to ensure that the last segment is saved
+		// for (final Runnable r : shutdownHooks)
+		// r.run();
+		// }
 		// System.out.print("exit cleaning up...");
 		// this.exit = true;
 		// try {
@@ -1109,7 +1113,23 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		// }
 		// System.out.println("done");
 		System.out.println("exit.");
-		System.exit(0);
+		try {
+			System.out.println(new File(".").getCanonicalPath());
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		MainFrame.getInstance().setVisible(false);
+		new Thread() {
+			@Override
+			public void run() {
+				GetdownApp.main(new String[] { "." });
+				while (!UpdateStub.receivedCall)
+					Thread.yield();
+				UpdateStub.receivedCall = false;
+				System.exit(0);
+			};
+		}.start();
 	}
 
 	public void updatePrintPreviewScene(final boolean printPreview) {
