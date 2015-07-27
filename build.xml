@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
-	<property name="JAVA_HOME" value="C:\Program Files\Java\jdk1.8.0_45\" />
+<project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">	
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="dist" />
+	
+	<condition property="JAVA_HOME" value="C:\Program Files\Java\jdk1.8.0_45\">
+		<os family="windows"/>
+	</condition>
+	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home">
+		<os family="mac"/>
+	</condition>
+	<condition property="JAVA_HOME" value="">
+		<os family="unix"/>
+	</condition>	
 	
 	<condition property="os" value="windows-${os.arch}">
 		<os family="windows"/>
@@ -63,9 +72,9 @@
 			</fileset>
 		</fx:resources>		
 		
-		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="exe" verbose="false">
+		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="dmg" verbose="true">
 			<fx:application refId="app" />
-			<fx:info title="Energy3D" vendor="Concord Consortium Inc." />
+			<fx:info title="Energy3D" vendor="Concord Consortium Inc." copyright="© 2010-2015 Concord Consortium Inc." description="CAD software to design houses and analyze energy efficiency." />
 			<fx:preferences shortcut="true" install="false" menu="true"/>
 			<fx:platform basedir="${JAVA_HOME}"/>
 			<fx:resources refId="exe.resources" />
