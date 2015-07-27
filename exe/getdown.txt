@@ -7,7 +7,6 @@ ui.progress = 2, 2, 500, 22
 
 # Application jar files
 code = energy3d.jar
-code = a.mp4
 code = getdown-1.4.jar
 code = google-collections-1.0.jar
 code = jdom2-2.0.5.jar

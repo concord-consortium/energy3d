@@ -3,10 +3,7 @@
 [Setup]
 AppId={{energy3d}}
 AppName=Energy3D
-AppVersion=1.0
-AppVerName=Energy3D 1.0
 AppPublisher=Concord Consortium Inc.
-AppComments=Energy3D
 AppCopyright=Copyright (C) 2015
 AppPublisherURL=http://energy.concord.org/energy3d/
 ;AppSupportURL=http://java.com/
@@ -18,12 +15,11 @@ DisableProgramGroupPage=Yes
 DisableReadyPage=Yes
 DisableFinishedPage=Yes
 DisableWelcomePage=Yes
-DefaultGroupName=Concord Consortium Inc.
+DefaultGroupName={AppName}
 ;Optional License
 LicenseFile=
-;WinXP or above
-MinVersion=0,5.1 
-OutputBaseFilename=Energy3D-1.0
+;WinXP or above 
+OutputBaseFilename=Energy3D
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=lowest
@@ -34,7 +30,7 @@ WizardImageStretch=No
 WizardSmallImageFile=Energy3D-setup-icon.bmp   
 ArchitecturesInstallIn64BitMode=x64
 ChangesAssociations=Yes
-
+SignTool=mysgin
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

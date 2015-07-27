@@ -21,7 +21,7 @@
 	
 	<path id="CLASSPATH">
 		<fileset dir="exe">
-			<patternset id="non.source.jars">
+			<patternset id="jars.no.source">
 				<include name="*.jar" />
 				<include name="ardor3d/*.jar" />
 				<include name="poly2tri/*.jar" />
@@ -31,45 +31,44 @@
 				<include name="jogl/*natives-${os}.jar" />				
 			</patternset>
 		</fileset>
-		<pathelement path="classes" />
+		<pathelement path="${build.classes.dir}" />
 	</path>
 	
-	<target name="default" depends="clean,compile,deploy">
-		
-	</target>
+	<target name="default" depends="clean,compile,deploy"></target>
 
 	<target name="deploy">		
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath=".:${JAVA_HOME}/lib/ant-javafx.jar" />
 
-		<fx:application id="energy3d" name="Energy3D" mainClass="org.concord.energy3d.MainApplication" />
+		<fx:application id="app" name="Energy3D" mainClass="org.concord.energy3d.MainApplication" />
 
 		<fx:jar destfile="exe/energy3d.jar">
-			<fx:application refid="energy3d" />
+			<fx:application refid="app" />
 			<fx:resources>
 				<fileset dir="exe">
-					<patternset refid="non.source.jars"/>
+					<patternset refid="jars.no.source"/>
 				</fileset>				
 			</fx:resources>	
 			<fileset dir="${build.classes.dir}" />
 		</fx:jar>
 		
 		<taskdef name="digest" classname="com.threerings.getdown.tools.DigesterTask" classpath="exe/getdown-1.4.jar"/>
-		<digest appdir="exe"/>		
+		<digest appdir="exe"/>
 		
-		<fx:deploy outdir="${build.dist.dir}" embedJNLP="true" outfile="energy3d" nativeBundles="image" verbose="false">
-			<fx:application refId="energy3d" />
-			<fx:resources>
-				<fx:fileset dir="${build.dist.dir}" includes="energy3d.jar" />
-				<fileset dir="exe">
-					<patternset refid="non.source.jars"/>
-					<include name="getdown.txt" />
-					<include name="digest.txt" />
-					<include name="a.mp4" />
-				</fileset>
-			</fx:resources>
+		<fx:resources id="exe.resources">
+			<fx:fileset dir="${build.dist.dir}" includes="energy3d.jar" />
+			<fileset dir="exe">
+				<patternset refid="jars.no.source"/>
+				<include name="getdown.txt" />
+				<include name="digest.txt" />
+			</fileset>
+		</fx:resources>		
+		
+		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="exe" verbose="false">
+			<fx:application refId="app" />
 			<fx:info title="Energy3D" vendor="Concord Consortium Inc." />
-			<fx:platform basedir="${JAVA_HOME}"/>
 			<fx:preferences shortcut="true" install="false" menu="true"/>
+			<fx:platform basedir="${JAVA_HOME}"/>
+			<fx:resources refId="exe.resources" />
 		</fx:deploy>			
 	</target>
 
