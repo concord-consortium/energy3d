@@ -44,7 +44,7 @@
   <string>app</string>
   <key>JVMOptions</key>
   <array>
-
+    <string>-Djava.library.path=$APPDIR/Java/lib/jogl/native/mac-universal</string>
   </array>
   <key>JVMUserOptions</key>
     <dict>
