@@ -61,11 +61,13 @@
   <array>
 	<dict> 
       <key>LSIsAppleDefaultForType</key>
-      <true/>	 
+      <true/>
+      <key>CFBundleTypeName</key>
+      <string>NG3</string>
       <key>CFBundleTypeRole</key>          
       <string>Editor</string>
       <key>CFBundleTypeIconFile</key>
-      <string>Energy3D.icns</string>      
+      <string>Energy3D</string>      
       <key>CFBundleTypeExtensions</key>
       <array>
         <string>ng3</string>
