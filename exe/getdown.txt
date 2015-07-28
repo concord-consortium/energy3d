@@ -23,10 +23,11 @@ code = lib/jogl/gluegen-rt.jar
 code = lib/jogl/jogl-all.jar
 resource = [windows] lib/jogl/native/windows-64/gluegen-rt.dll
 resource = [windows] lib/jogl/native/windows-64/jogl_desktop.dll
-resource = [windows] lib/jogl/native/windows-64/jogl_mobile.dll
 resource = [windows] lib/jogl/native/windows-64/nativewindow_awt.dll
 resource = [windows] lib/jogl/native/windows-64/nativewindow_win32.dll
-resource = [windows] lib/jogl/native/windows-64/newt.dll
 resource = [mac os x] lib/jogl/native/mac-universal/libgluegen-rt.jnilib
+resource = [mac os x] lib/jogl/native/mac-universal/libjogl_desktop.jnilib
+resource = [mac os x] lib/jogl/native/mac-universal/libnativewindow_awt.jnilib
+resource = [mac os x] lib/jogl/native/mac-universal/libnativewindow_macosx.jnilib
 # The main entry point for the application
 class = org.concord.energy3d.util.UpdateStub
