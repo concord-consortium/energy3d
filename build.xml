@@ -14,13 +14,13 @@
 		<os family="unix"/>
 	</condition>	
 	
-	<condition property="os" value="windows-${os.arch}">
+	<condition property="os" value="windows-64">
 		<os family="windows"/>
 	</condition>
 	<condition property="os" value="macosx-universal">
 		<os family="mac"/>
 	</condition>
-	<condition property="os" value="linux-${os.arch}">
+	<condition property="os" value="linux-64">
 		<os family="unix"/>
 	</condition>
 	
@@ -31,13 +31,12 @@
 	<path id="CLASSPATH">
 		<fileset dir="exe">
 			<patternset id="jars.no.source">
-				<include name="*.jar" />
-				<include name="ardor3d/*.jar" />
-				<include name="poly2tri/*.jar" />
+				<include name="lib/*.jar" />
+				<include name="lib/ardor3d/*.jar" />
+				<include name="lib/poly2tri/*.jar" />
 				<exclude name="**/*-sources*"/>
-				<include name="jogl/jogl-all.jar" />
-				<include name="jogl/gluegen-rt.jar" />
-				<include name="jogl/*natives-${os}.jar" />				
+				<include name="lib/jogl/jogl-all.jar" />
+				<include name="lib/jogl/gluegen-rt.jar" />
 			</patternset>
 		</fileset>
 		<pathelement path="${build.classes.dir}" />
@@ -60,23 +59,26 @@
 			<fileset dir="${build.classes.dir}" />
 		</fx:jar>
 		
-		<taskdef name="digest" classname="com.threerings.getdown.tools.DigesterTask" classpath="exe/getdown-1.4.jar"/>
+		<taskdef name="digest" classname="com.threerings.getdown.tools.DigesterTask" classpath="exe/lib/getdown-1.4.jar"/>
 		<digest appdir="exe"/>
 		
 		<fx:resources id="exe.resources">
-			<fx:fileset dir="${build.dist.dir}" includes="energy3d.jar" />
+			<fx:fileset dir="exe" includes="energy3d.jar" />
 			<fileset dir="exe">
 				<patternset refid="jars.no.source"/>
 				<include name="getdown.txt" />
 				<include name="digest.txt" />
+				<include name="lib/jogl/native/${os}/*.*" />
 			</fileset>
 		</fx:resources>		
 		
-		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="dmg" verbose="true">
+		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="image" verbose="true">
 			<fx:application refId="app" />
 			<fx:info title="Energy3D" vendor="Concord Consortium Inc." copyright="© 2010-2015 Concord Consortium Inc." description="CAD software to design houses and analyze energy efficiency." />
 			<fx:preferences shortcut="true" install="false" menu="true"/>
-			<fx:platform basedir="${JAVA_HOME}"/>
+			<fx:platform basedir="${JAVA_HOME}">
+				<fx:property name="java.library.path" value="./lib/jogl/native/${os}"/>
+			</fx:platform>
 			<fx:resources refId="exe.resources" />
 		</fx:deploy>			
 	</target>

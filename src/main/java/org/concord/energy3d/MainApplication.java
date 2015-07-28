@@ -19,6 +19,7 @@ public class MainApplication {
 	 */
 	public static void main(final String[] args) {
 		final long t = System.nanoTime();
+		System.setProperty("jogamp.gluegen.UseTempJarCache", "false");
 		final String version = System.getProperty("java.version");
 		if (version.compareTo("1.6") < 0) {
 			JOptionPane.showMessageDialog(null, "Your current Java version is " + version + ". Version 1.6 or higher is required.");
@@ -33,10 +34,10 @@ public class MainApplication {
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Energy3D");
 		}
 		Config.setWebStart(System.getProperty("javawebstart.version", null) != null);
-		if (Config.isWebStart())
-			System.out.println("Application is lauched by webstart.");
-		else
-			setupLibraryPath();
+		// if (Config.isWebStart())
+		// System.out.println("Application is lauched by webstart.");
+		// else
+		// setupLibraryPath();
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
