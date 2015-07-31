@@ -49,10 +49,10 @@
 
 		<fx:application id="app" name="Energy3D" mainClass="org.concord.energy3d.MainApplication" />
 		
-		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="image" verbose="true">
+		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="exe" verbose="true">
 			<fx:application refId="app" />
 			<fx:info title="Energy3D" vendor="Concord Consortium Inc." copyright="© 2010-2015 Concord Consortium Inc." description="CAD software to design houses and analyze energy efficiency." />
-			<fx:preferences shortcut="true" install="false" menu="true"/>
+			<fx:preferences shortcut="true" menu="true"/>
 			<fx:platform basedir="${JAVA_HOME}">
 				<fx:property name="java.library.path" value="./lib/jogl/native/${os}"/>
 			</fx:platform>
