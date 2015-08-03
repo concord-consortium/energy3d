@@ -18,7 +18,6 @@ public class MainApplication {
 	 * @wbp.parser.entryPoint
 	 */
 	public static void main(final String[] args) {
-		final long t = System.nanoTime();
 		System.setProperty("jogamp.gluegen.UseTempJarCache", "false");
 		final String version = System.getProperty("java.version");
 		if (version.compareTo("1.6") < 0) {
@@ -76,9 +75,6 @@ public class MainApplication {
 			if (cl.equals(ClassLoader.getSystemClassLoader()))
 				UpdateAnnouncer.showMessage();
 		}
-
-		JOptionPane.showMessageDialog(null, (System.nanoTime() - t) / 1000000 / 1000.0);
-
 	}
 
 	public static void setupLibraryPath() {
