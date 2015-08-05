@@ -52,7 +52,7 @@
 		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="exe" verbose="true">
 			<fx:application refId="app" />
 			<fx:info title="Energy3D" vendor="Concord Consortium Inc." copyright="2010-2015 Concord Consortium Inc.">
-				<fx:association extension="ng3" mimetype="application/energy3d">
+				<fx:association extension="ng3" description="Energy3D File" mimetype="application/energy3d">
 				</fx:association>				
 			</fx:info>
 			<fx:preferences shortcut="true" menu="true"/>
