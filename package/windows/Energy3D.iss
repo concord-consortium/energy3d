@@ -9,7 +9,7 @@ AppVersion=4.8
 AppVerName=Energy3D 4.8
 AppPublisher=Concord Consortium Inc.
 AppComments=Energy3D
-AppCopyright=© 2010-2015 Concord Consortium Inc.
+AppCopyright=2010-2015 Concord Consortium Inc.
 AppPublisherURL=http://energy.concord.org/energy3d/
 ;AppSupportURL=http://java.com/
 ;AppUpdatesURL=http://java.com/
@@ -35,8 +35,14 @@ UninstallDisplayName=Energy3D
 WizardImageStretch=No
 WizardSmallImageFile=Energy3D-setup-icon.bmp   
 ArchitecturesInstallIn64BitMode=x64
-ChangesAssociations=Yes
+ChangesAssociations=yes
 SignTool=mysign
+
+[Registry]
+Root: HKCU; Subkey: "Software\Classes\.ng3"; ValueType: string; ValueName: ""; ValueData: "Energy3DFile"; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Classes\Mime\Database\Content Type\application/energy3d"; ValueType: string; ValueName: "Extension"; ValueData: ".ng3"; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Classes\Energy3DFile"; ValueType: string; ValueName: ""; ValueData: "null File"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\Energy3DFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Energy3D"" ""%1"""
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -48,12 +54,6 @@ Source: "Energy3D\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs crea
 [Icons]
 Name: "{group}\Energy3D"; Filename: "{app}\Energy3D.exe"; IconFilename: "{app}\Energy3D.ico"; Check: returnTrue()
 Name: "{commondesktop}\Energy3D"; Filename: "{app}\Energy3D.exe";  IconFilename: "{app}\Energy3D.ico"; Check: returnTrue()
-
-[Registry]
-Root: HKCU; Subkey: "Software\Classes\.ng3"; ValueType: string; ValueName: ""; ValueData: "Energy3DConcordConsortium"; Flags: uninsdeletevalue
-Root: HKCU; Subkey: "Software\Classes\Energy3DConcordConsortium"; ValueType: string; ValueName: ""; ValueData: "Energy3D File"; Flags: uninsdeletekey
-Root: HKCU; Subkey: "Software\Classes\Energy3DConcordConsortium\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Energy3D.exe,0"
-Root: HKCU; Subkey: "Software\Classes\Energy3DConcordConsortium\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Energy3D.exe"" ""%1"""
 
 [Run]
 Filename: "{app}\Energy3D.exe"; Description: "{cm:LaunchProgram,Energy3D}"; Flags: nowait postinstall skipifsilent; Check: returnTrue()
