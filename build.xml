@@ -91,7 +91,7 @@
 			<fileset dir="${build.classes.dir}" />
 		</fx:jar>
 		
-		<taskdef name="digest" classname="com.threerings.getdown.tools.DigesterTask" classpath="exe/lib/getdown-1.4.jar"/>
+		<taskdef name="digest" classname="com.threerings.getdown.tools.DigesterTask" classpath="exe/lib/getdown.jar"/>
 		<digest appdir="exe"/>			
 	</target>	
 

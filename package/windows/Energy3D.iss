@@ -3,7 +3,7 @@
 ;This file will be executed next to the application bundle image
 ;I.e. current directory will contain folder Energy3D with application files
 [Setup]
-AppId={{app}}
+AppId={{org.concord.energy3d}}
 AppName=Energy3D
 AppVersion=4.8
 AppVerName=Energy3D 4.8
@@ -41,8 +41,9 @@ SignTool=mysign
 [Registry]
 Root: HKCU; Subkey: "Software\Classes\.ng3"; ValueType: string; ValueName: ""; ValueData: "Energy3DFile"; Flags: uninsdeletevalue
 Root: HKCU; Subkey: "Software\Classes\Mime\Database\Content Type\application/energy3d"; ValueType: string; ValueName: "Extension"; ValueData: ".ng3"; Flags: uninsdeletevalue
-Root: HKCU; Subkey: "Software\Classes\Energy3DFile"; ValueType: string; ValueName: ""; ValueData: "null File"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\Energy3DFile"; ValueType: string; ValueName: ""; ValueData: "Energy3D File"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\Energy3DFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Energy3D"" ""%1"""
+
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -54,6 +55,7 @@ Source: "Energy3D\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs crea
 [Icons]
 Name: "{group}\Energy3D"; Filename: "{app}\Energy3D.exe"; IconFilename: "{app}\Energy3D.ico"; Check: returnTrue()
 Name: "{commondesktop}\Energy3D"; Filename: "{app}\Energy3D.exe";  IconFilename: "{app}\Energy3D.ico"; Check: returnTrue()
+
 
 [Run]
 Filename: "{app}\Energy3D.exe"; Description: "{cm:LaunchProgram,Energy3D}"; Flags: nowait postinstall skipifsilent; Check: returnTrue()
