@@ -388,22 +388,37 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected Vector3 toAbsolute(final ReadOnlyVector3 p) {
+		return toAbsolute(p, null);
+	}
+
+	protected Vector3 toAbsolute(final ReadOnlyVector3 p, final Vector3 result) {
 		final HousePart container = getContainerRelative();
 		if (container == null)
-			return new Vector3(p);
+			return result == null ? new Vector3(p) : result.set(p);
 
-		final ReadOnlyVector3 p0 = container.getAbsPoint(0);
-		ReadOnlyVector3 u = container.getAbsPoint(2).subtract(p0, null);
-		if (Util.isZero(u.length()))
-			u = new Vector3(MathUtils.ZERO_TOLERANCE, 0, 0);
-		ReadOnlyVector3 v = container.getAbsPoint(1).subtract(p0, null);
+		final Vector3 u = Vector3.fetchTempInstance();
+		final Vector3 v = Vector3.fetchTempInstance();
+		final Vector3 p0 = Vector3.fetchTempInstance();
 
-		final boolean relativeToHorizontal = getContainerRelative().isHorizontal();
-		if (Util.isZero(v.length()))
-			v = new Vector3(0, relativeToHorizontal ? MathUtils.ZERO_TOLERANCE : 0, relativeToHorizontal ? 0 : MathUtils.ZERO_TOLERANCE);
-		final Vector3 pointOnSpace = p0.add(u.multiply(p.getX(), null), null).add(v.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), null), null);
-		if (relativeToHorizontal)
-			pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
+		Vector3 pointOnSpace;
+		try {
+			container.getAbsPoint(0, p0);
+			container.getAbsPoint(2, u).subtract(p0, u);
+			if (Util.isZero(u.length()))
+				u.set(MathUtils.ZERO_TOLERANCE, 0, 0);
+			container.getAbsPoint(1, v).subtract(p0, v);
+
+			final boolean relativeToHorizontal = getContainerRelative().isHorizontal();
+			if (Util.isZero(v.length()))
+				v.set(0, relativeToHorizontal ? MathUtils.ZERO_TOLERANCE : 0, relativeToHorizontal ? 0 : MathUtils.ZERO_TOLERANCE);
+			pointOnSpace = p0.add(u.multiply(p.getX(), u), u).add(v.multiply((relativeToHorizontal) ? p.getY() : p.getZ(), v), result);
+			if (relativeToHorizontal)
+				pointOnSpace.setZ(pointOnSpace.getZ() + p.getZ());
+		} finally {
+			Vector3.releaseTempInstance(u);
+			Vector3.releaseTempInstance(v);
+			Vector3.releaseTempInstance(p0);
+		}
 		/* do not round the result, otherwise neighboring walls won't have exact same edit points */
 		return pointOnSpace;
 	}
@@ -510,15 +525,20 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void updateEditShapes() {
-		for (int i = 0; i < points.size(); i++) {
-			final Vector3 p = getAbsPoint(i);
-			final Camera camera = SceneManager.getInstance().getCamera();
-			if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) {
-				final double distance = camera.getLocation().distance(p);
-				getEditPointShape(i).setScale(distance > 0.1 ? distance / 10 : 0.01);
-			} else
-				getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
-			getEditPointShape(i).setTranslation(p);
+		final Vector3 p = Vector3.fetchTempInstance();
+		try {
+			for (int i = 0; i < points.size(); i++) {
+				getAbsPoint(i, p);
+				final Camera camera = SceneManager.getInstance().getCamera();
+				if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) {
+					final double distance = camera.getLocation().distance(p);
+					getEditPointShape(i).setScale(distance > 0.1 ? distance / 10 : 0.01);
+				} else
+					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
+				getEditPointShape(i).setTranslation(p);
+			}
+		} finally {
+			Vector3.releaseTempInstance(p);
 		}
 		/* remove remaining edit shapes */
 		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++)
@@ -777,7 +797,11 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public Vector3 getAbsPoint(final int index) {
-		return toAbsolute(points.get(index));
+		return toAbsolute(points.get(index), null);
+	}
+
+	public Vector3 getAbsPoint(final int index, final Vector3 result) {
+		return toAbsolute(points.get(index), result);
 	}
 
 	protected void drawChildren() {
