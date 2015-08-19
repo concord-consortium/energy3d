@@ -1,3 +1,3 @@
 In order to run Energy3D project in eclipse add the following JVM run parameter:
 
--Djava.library.path=./exe/lib/jogl/native/windows-64
+-Djava.library.path=./exe/lib/jogl/native/windows-64 -DrunInEclipse=true

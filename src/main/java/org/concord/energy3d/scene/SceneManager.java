@@ -1116,20 +1116,23 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		try {
 			System.out.println(new File(".").getCanonicalPath());
 		} catch (final IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		MainFrame.getInstance().setVisible(false);
-		new Thread() {
-			@Override
-			public void run() {
-				GetdownApp.main(new String[] { "." });
-				while (!UpdateStub.receivedCall)
-					Thread.yield();
-				UpdateStub.receivedCall = false;
-				System.exit(0);
-			};
-		}.start();
+		if (Config.isWebStart() || "true".equalsIgnoreCase(System.getProperty("runInEclipse")))
+			System.exit(0);
+		else {
+			MainFrame.getInstance().setVisible(false);
+			new Thread() {
+				@Override
+				public void run() {
+					GetdownApp.main(new String[] { "." });
+					while (!UpdateStub.receivedCall)
+						Thread.yield();
+					UpdateStub.receivedCall = false;
+					System.exit(0);
+				};
+			}.start();
+		}
 	}
 
 	public void updatePrintPreviewScene(final boolean printPreview) {

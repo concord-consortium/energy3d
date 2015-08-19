@@ -33,8 +33,8 @@ public class MainApplication {
 		Config.setWebStart(System.getProperty("javawebstart.version", null) != null);
 		if (!Config.isWebStart())
 			System.setProperty("jogamp.gluegen.UseTempJarCache", "false");
-		final boolean isExe = System.getProperty("java.library.path").indexOf("jogl") != -1;
-		if (!Config.isWebStart() && !isExe)
+		final boolean isJarOrEclipse = !Config.isWebStart() && !System.getProperty("java.library.path").contains("jogl");
+		if (isJarOrEclipse)
 			setupLibraryPath();
 
 		try {
