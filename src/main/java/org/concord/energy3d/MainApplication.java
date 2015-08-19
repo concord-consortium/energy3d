@@ -10,7 +10,6 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
-import org.concord.energy3d.util.Config.RenderMode;
 import org.concord.energy3d.util.UpdateAnnouncer;
 
 public class MainApplication {
@@ -18,7 +17,6 @@ public class MainApplication {
 	 * @wbp.parser.entryPoint
 	 */
 	public static void main(final String[] args) {
-		System.setProperty("jogamp.gluegen.UseTempJarCache", "false");
 		final String version = System.getProperty("java.version");
 		if (version.compareTo("1.6") < 0) {
 			JOptionPane.showMessageDialog(null, "Your current Java version is " + version + ". Version 1.6 or higher is required.");
@@ -33,10 +31,11 @@ public class MainApplication {
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Energy3D");
 		}
 		Config.setWebStart(System.getProperty("javawebstart.version", null) != null);
-		// if (Config.isWebStart())
-		// System.out.println("Application is lauched by webstart.");
-		// else
-		// setupLibraryPath();
+		if (!Config.isWebStart())
+			System.setProperty("jogamp.gluegen.UseTempJarCache", "false");
+		final boolean isExe = System.getProperty("java.library.path").indexOf("jogl") != -1;
+		if (!Config.isWebStart() && !isExe)
+			setupLibraryPath();
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -79,9 +78,6 @@ public class MainApplication {
 
 	public static void setupLibraryPath() {
 		System.out.println(System.getProperty("java.version") + ", " + System.getProperty("os.arch"));
-		final String orgLibraryPath = System.getProperty("java.library.path");
-		final String sep = System.getProperty("file.separator");
-		final String rendererNativePath = "." + sep + "lib" + sep + (Config.RENDER_MODE == RenderMode.LWJGL ? "lwjgl" : "jogl") + sep + "native";
 		final String OSPath;
 		final String os = System.getProperty("os.name").toLowerCase();
 		if (os.startsWith("windows")) {
@@ -101,8 +97,7 @@ public class MainApplication {
 		} else
 			throw new RuntimeException("Unknown OS: " + os);
 
-		final String pathSep = System.getProperty("path.separator");
-		final String newLibraryPath = "." + pathSep + rendererNativePath + sep + OSPath + pathSep + orgLibraryPath;
+		final String newLibraryPath = "./lib/jogl/native/" + OSPath;
 		System.setProperty("java.library.path", newLibraryPath);
 		System.out.println("Path = " + System.getProperty("java.library.path"));
 		// The following code is to empty the library path cache in order to force JVM to use the new library path above

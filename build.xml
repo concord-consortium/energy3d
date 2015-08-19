@@ -96,7 +96,7 @@
 	</target>	
 
 	<target name="compile" depends="clean">
-		<javac includeantruntime="false" srcdir="${build.src.dir}" destdir="${build.classes.dir}" fork="yes" executable="${JAVA_HOME}/bin/javac" source="1.8" debug="on" classpathref="CLASSPATH">
+		<javac includeantruntime="false" srcdir="${build.src.dir}" destdir="${build.classes.dir}" fork="yes" executable="${JAVA_HOME}/bin/javac" source="1.8" debug="off" classpathref="CLASSPATH">
 		</javac>
 
 		<!-- Copy resources to build.classes.dir -->

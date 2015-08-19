@@ -1,5 +1,6 @@
 # The URL from which the client is downloaded
 appbase = http://energy.concord.org/energy3d/update/
+allow_offline = true
 
 # UI Configuration
 ui.name = Energy3D
