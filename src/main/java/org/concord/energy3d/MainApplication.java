@@ -10,7 +10,6 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
-import org.concord.energy3d.util.UpdateAnnouncer;
 
 public class MainApplication {
 	/**
@@ -68,12 +67,6 @@ public class MainApplication {
 		logger.start();
 		SnapshotLogger.start(20, logger);
 
-		// detect if the app is launched via webstart just checking its class loader: SystemClassLoader or JnlpClassLoader.
-		if (!Config.isRestrictMode()) {
-			final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-			if (cl.equals(ClassLoader.getSystemClassLoader()))
-				UpdateAnnouncer.showMessage();
-		}
 	}
 
 	public static void setupLibraryPath() {
