@@ -1,99 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">	
+<project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="dist" />
-	
+
 	<condition property="JAVA_HOME" value="C:\Program Files\Java\jdk1.8.0_45\">
-		<os family="windows"/>
+		<os family="windows" />
 	</condition>
 	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home">
-		<os family="mac"/>
+		<os family="mac" />
 	</condition>
 	<condition property="JAVA_HOME" value="">
-		<os family="unix"/>
-	</condition>	
-	
+		<os family="unix" />
+	</condition>
+
 	<condition property="os" value="windows-64">
-		<os family="windows"/>
+		<os family="windows" />
 	</condition>
 	<condition property="os" value="mac-universal">
-		<os family="mac"/>
+		<os family="mac" />
 	</condition>
 	<condition property="os" value="linux-64">
-		<os family="unix"/>
+		<os family="unix" />
 	</condition>
-	
+
 	<condition property="bundle_type" value="exe">
-		<os family="windows"/>
+		<os family="windows" />
 	</condition>
 	<condition property="bundle_type" value="dmg">
-		<os family="mac"/>
+		<os family="mac" />
 	</condition>
 	<condition property="bundle_type" value="all">
-		<os family="unix"/>
-	</condition>	
-	
-    <echo message="OS Name is:         ${os}" />
-    <echo message="OS Architecture is: ${os.arch}" />
-    <echo message="OS Version is:      ${os.version}" />
-	
+		<os family="unix" />
+	</condition>
+
+	<echo message="OS Name is:         ${os}" />
+	<echo message="OS Architecture is: ${os.arch}" />
+	<echo message="OS Version is:      ${os.version}" />
+
 	<path id="CLASSPATH">
 		<fileset dir="exe">
 			<patternset id="jars.no.source">
 				<include name="lib/*.jar" />
 				<include name="lib/ardor3d/*.jar" />
 				<include name="lib/poly2tri/*.jar" />
-				<exclude name="**/*-sources*"/>
+				<exclude name="**/*-sources*" />
 				<include name="lib/jogl/jogl-all.jar" />
 				<include name="lib/jogl/gluegen-rt.jar" />
 			</patternset>
 		</fileset>
 		<pathelement path="${build.classes.dir}" />
 	</path>
-	
-	<target name="default" depends="clean,compile,jar,deploy"></target>
 
-	<target name="deploy">		
-		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath=".:${JAVA_HOME}/lib/ant-javafx.jar" />		
+	<target name="default" depends="clean,compile,jar,deploy">
+	</target>
+
+	<target name="deploy">
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath=".:${JAVA_HOME}/lib/ant-javafx.jar" />
 		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="${bundle_type}" verbose="false">
 			<fx:application name="Energy3D" mainClass="org.concord.energy3d.MainApplication" version="4.8" />
-			<fx:preferences shortcut="true" menu="true"/>
-			<fx:bundleArgument arg="win.menuGroup" value="Energy3D"/>
+			<fx:preferences shortcut="true" menu="true" />
+			<fx:bundleArgument arg="win.menuGroup" value="Energy3D" />
 			<fx:info title="Energy3D" vendor="Concord Consortium Inc." copyright="2010-2015 Concord Consortium Inc.">
 				<fx:association extension="ng3" description="Energy3D File" mimetype="application/energy3d">
-				</fx:association>				
-			</fx:info>			
+				</fx:association>
+			</fx:info>
 			<fx:platform basedir="${JAVA_HOME}">
-				<fx:property name="java.library.path" value="./lib/jogl/native/${os}"/>
+				<fx:property name="java.library.path" value="./lib/jogl/native/${os}" />
 			</fx:platform>
 			<fx:resources>
 				<fx:fileset dir="exe" includes="energy3d.jar" />
 				<fx:fileset dir="exe">
-					<patternset refid="jars.no.source"/>
+					<patternset refid="jars.no.source" />
 					<include name="getdown.txt" />
 					<include name="digest.txt" />
 					<include name="lib/jogl/native/${os}/*.*" />
 				</fx:fileset>
-			</fx:resources>			
-		</fx:deploy>			
+			</fx:resources>
+		</fx:deploy>
 	</target>
-	
-	<target name="jar">		
+
+	<target name="sign">
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath=".:${JAVA_HOME}/lib/ant-javafx.jar" />
+		<input message="secure-input:" addproperty="password" />
+		<fx:signjar destdir="exe/energy3d_signed" keyStore="C:\exe\energy3d\cc-keystore" storePass="${password}" alias="concord" keyPass="${password}" jar="exe/energy3d.jar">
+		</fx:signjar>
+	</target>
+
+	<target name="jar">
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath=".:${JAVA_HOME}/lib/ant-javafx.jar" />
 		<fx:jar destfile="exe/energy3d.jar">
 			<fx:application name="Energy3D" mainClass="org.concord.energy3d.MainApplication" version="4.8" />
 			<fx:resources>
 				<fx:fileset dir="exe">
-					<patternset refid="jars.no.source"/>
-				</fx:fileset>				
-			</fx:resources>	
+					<patternset refid="jars.no.source" />
+				</fx:fileset>
+			</fx:resources>
 			<fileset dir="${build.classes.dir}" />
+			<manifest>
+				<attribute name="Application-Name" value="Energy3D" />
+				<attribute name="Permissions" value="all-permissions" />
+			</manifest>
 		</fx:jar>
-		
-		<taskdef name="digest" classname="com.threerings.getdown.tools.DigesterTask" classpath="exe/lib/getdown.jar"/>
-		<digest appdir="exe"/>			
-	</target>	
+
+		<taskdef name="digest" classname="com.threerings.getdown.tools.DigesterTask" classpath="exe/lib/getdown.jar" />
+		<digest appdir="exe" />
+	</target>
 
 	<target name="compile" depends="clean">
 		<javac includeantruntime="false" srcdir="${build.src.dir}" destdir="${build.classes.dir}" fork="yes" executable="${JAVA_HOME}/bin/javac" source="1.8" debug="off" classpathref="CLASSPATH">
@@ -112,5 +124,5 @@
 			<fileset dir="${build.classes.dir}" includes="**/*" />
 			<fileset dir="${build.dist.dir}" includes="**/*" />
 		</delete>
-	</target>	
+	</target>
 </project>
