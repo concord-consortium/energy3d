@@ -56,7 +56,7 @@ class PieChart extends JComponent {
 			public void mouseMoved(MouseEvent e) {
 				for (int i = 0; i < arcs.length; i++) {
 					if (arcs[i].contains(e.getX(), e.getY())) {
-						setToolTipText(PieChart.this.legends[i] + ": " + PieChart.this.unit + (int) PieChart.this.data[i]);
+						setToolTipText(PieChart.this.legends[i] + ": " + PieChart.this.unit + Math.round(PieChart.this.data[i]));
 						return;
 					}
 				}

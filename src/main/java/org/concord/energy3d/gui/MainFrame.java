@@ -1199,7 +1199,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getMaterialCostAnalysisMenuItem() {
 		if (materialCostAnalysisMenuItem == null) {
-			materialCostAnalysisMenuItem = new JMenuItem("Show Material Costs...");
+			materialCostAnalysisMenuItem = new JMenuItem("Show Costs...");
 			materialCostAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

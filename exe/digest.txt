@@ -1,5 +1,5 @@
 getdown.txt = 91daa082c75bb32b0a90584daeeedbaf
-energy3d.jar = 2edabc59556ea6a9f37052ed8d7a6b2e
+energy3d.jar = 98be32275550852fd6a1911c010ddee6
 lib/getdown.jar = 64cdcedfa8b4c4bb556c8f8d18613209
 lib/google-collections.jar = c12ca99ba5671564fe7bf35a87eb6117
 lib/jdom2.jar = a448a5c3ed9a32b310ffa2de8aaeb3c5
@@ -23,4 +23,4 @@ lib/jogl/native/mac-universal/libgluegen-rt.jnilib = d7c49637412e9a2ee6785bbf6b1
 lib/jogl/native/mac-universal/libjogl_desktop.jnilib = e32430c14a812ecb12ecb33770683de0
 lib/jogl/native/mac-universal/libnativewindow_awt.jnilib = f8484fc537bf680a739cc19e0001c384
 lib/jogl/native/mac-universal/libnativewindow_macosx.jnilib = f6b46d66c5f697eaf400f25a81ef6778
-digest.txt = 3ef1a12358bc04471ea9c10e9b6cb047
+digest.txt = 0f49d5a6fda3d0b9ebb4534ea6da5d62

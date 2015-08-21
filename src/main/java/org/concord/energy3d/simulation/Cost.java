@@ -79,68 +79,35 @@ public class Cost {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
-			double price;
-			if (uFactor < 0.05)
-				price = 100;
-			else if (uFactor < 0.2)
-				price = 90;
-			else
-				price = 80;
-			return (int) (part.getArea() * price);
+			double unitPrice = 100 / uFactor;
+			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Window) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWindowsComboBox());
-			double price;
-			if (uFactor <= 0.15) // triple pane
-				price = 250;
-			else if (uFactor < 0.4) // double pane
-				price = 200;
-			else
-				price = 150;
-			return (int) (part.getArea() * price);
+			double unitPrice = 500 / uFactor;
+			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Roof) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
-			double price;
-			if (uFactor < 0.05)
-				price = 100;
-			else if (uFactor < 0.2)
-				price = 90;
-			else
-				price = 80;
-			return (int) (part.getArea() * price);
+			double unitPrice = 50 / uFactor;
+			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Door) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getDoorsComboBox());
-			int price;
-			if (uFactor < 0.5)
-				price = 100;
-			else
-				price = 50;
-			return (int) (part.getArea() * price);
+			double unitPrice = 100 / uFactor;
+			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof SolarPanel) {
 			final double efficiency = ((SolarPanel) part).getEfficiency();
 			if (efficiency == 0)
 				Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
-			int price;
-			if (efficiency >= 20)
-				price = 1000;
-			else if (efficiency >= 17.5)
-				price = 800;
-			else if (efficiency >= 15)
-				price = 600;
-			else if (efficiency >= 12.5)
-				price = 400;
-			else
-				price = 300;
-			return price;
+			return (int) efficiency * 50;
 		}
 		if (part instanceof Tree) {
 			Tree tree = (Tree) part;
@@ -245,7 +212,7 @@ public class Cost {
 		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null);
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Material Costs by Category", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Costs by Category", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.getContentPane().add(pie, BorderLayout.CENTER);
 		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
