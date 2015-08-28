@@ -46,13 +46,15 @@ public class MainApplication {
 		mainFrame.updateTitleBar();
 		mainFrame.setVisible(true);
 		Scene.getInstance();
-		new Thread(sceneManager, "Energy 3D Application").start();
+		new Thread(sceneManager, "Energy3D Application").start();
 
-		// if (args.length > 1 && !args[args.length - 1].startsWith("-"))
-		// mainFrame.open(args[args.length - 1]);
-
-		if (args.length > 0)
-			mainFrame.open(args[0]);
+		if (Config.isWebStart()) {
+			if (args.length > 1 && !args[args.length - 1].startsWith("-"))
+				mainFrame.open(args[args.length - 1]);
+		} else {
+			if (args.length > 0)
+				mainFrame.open(args[0]);
+		}
 
 		/* initialize data logging */
 		final TimeSeriesLogger logger = new TimeSeriesLogger(1);
