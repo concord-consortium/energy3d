@@ -19,6 +19,9 @@ import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.JTextComponent;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
@@ -384,6 +387,17 @@ public class Util {
 		slider.setValue(value);
 		for (final ChangeListener x : changeListeners)
 			slider.addChangeListener(x);
+	}
+
+	/** This method sets the text of a text component without invoking its DocumentListeners */
+	public static void setSilently(final JTextComponent tc, final String text) {
+		AbstractDocument doc = (AbstractDocument) tc.getDocument();
+		final DocumentListener[] documentListeners = doc.getDocumentListeners();
+		for (final DocumentListener x : documentListeners)
+			doc.removeDocumentListener(x);
+		tc.setText(text);
+		for (final DocumentListener x : documentListeners)
+			doc.addDocumentListener(x);
 	}
 
 	public static JButton getButtonSubComponent(final Container container) {

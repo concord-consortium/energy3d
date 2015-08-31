@@ -41,6 +41,10 @@ public class Config {
 		return isWebstart;
 	}
 
+	public static boolean isEclipse() {
+		return "true".equalsIgnoreCase(System.getProperty("runInEclipse"));
+	}
+
 	public static boolean isMac() {
 		return isMac;
 	}

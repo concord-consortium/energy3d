@@ -1099,10 +1099,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void exit() {
-		// if (shutdownHooks != null) { // e.g., save the log file before exit to ensure that the last segment is saved
-		// for (final Runnable r : shutdownHooks)
-		// r.run();
-		// }
+		if (shutdownHooks != null) { // e.g., save the log file before exit to ensure that the last segment is saved
+			for (final Runnable r : shutdownHooks)
+				r.run();
+		}
 		// System.out.print("exit cleaning up...");
 		// this.exit = true;
 		// try {
@@ -1118,7 +1118,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-		if (Config.isWebStart() || "true".equalsIgnoreCase(System.getProperty("runInEclipse")))
+		if (Config.isWebStart() || Config.isEclipse())
 			System.exit(0);
 		else {
 			MainFrame.getInstance().setVisible(false);

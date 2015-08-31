@@ -290,7 +290,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 		SceneManager.getInstance().setAxesVisible(!instance.hideAxes);
 		SceneManager.getInstance().setBuildingLabelsVisible(instance.showBuildingLabels);
-		MainPanel.getInstance().getNoteTextArea().setText(instance.note == null ? "" : instance.note);
+		Util.setSilently(MainPanel.getInstance().getNoteTextArea(), instance.note == null ? "" : instance.note);
 		MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
 		SceneManager.getInstance().getUndoManager().die();
 		Scene.getInstance().setEdited(false);
@@ -1144,7 +1144,9 @@ public class Scene implements Serializable {
 		return insideTemperature;
 	}
 
-	/** @return the solar panel efficiency (not in percentage) */
+	/**
+	 * @return the solar panel efficiency (not in percentage)
+	 */
 	public double getSolarPanelEfficiencyNotPercentage() {
 		return solarPanelEfficiency * 0.01;
 	}
@@ -1153,7 +1155,9 @@ public class Scene implements Serializable {
 		this.solarPanelEfficiency = solarPanelEfficiency;
 	}
 
-	/** @return the window SHGC (not in percentage) */
+	/**
+	 * @return the window SHGC (not in percentage)
+	 */
 	public double getWindowSolarHeatGainCoefficientNotPercentage() {
 		return windowSolarHeatGainCoefficient * 0.01;
 	}
