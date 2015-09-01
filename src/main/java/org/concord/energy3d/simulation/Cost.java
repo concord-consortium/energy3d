@@ -26,7 +26,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 /**
- * Calculate the cost (the prices are fictitious).
+ * Calculate the cost. The material and installation costs are partly based on http://www.homewyse.com, but should be considered as largely fictitious.
  * 
  * @author Charles Xie
  * 
@@ -79,28 +79,41 @@ public class Cost {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
-			double unitPrice = 100 / uFactor;
+			// According to http://www.homewyse.com/services/cost_to_insulate_your_home.html
+			// As of 2015, a 1000 square feet wall insulation will cost as high as $1500 to insulate in Boston.
+			// This translates into $16/m^2. We don't know what R-value this insulation will be. But let's assume it is R13 material that has a U-value of 0.44 W/m^2/C.
+			// Let's also assume that the insulation cost is inversely proportional to the U-value.
+			// The baseline cost for a wall is set to be $300/m^2, close to homewyse's estimates of masonry walls, interior framing, etc.
+			double unitPrice = 300 + 7 / uFactor;
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Window) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWindowsComboBox());
-			double unitPrice = 500 / uFactor;
+			// According to http://www.homewyse.com/costs/cost_of_double_pane_windows.html
+			// A storm window of about 1 m^2 costs about $500. A double-pane window of about 1 m^2 costs about $700.
+			double unitPrice = 500 + 600 / uFactor;
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Roof) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
-			double unitPrice = 50 / uFactor;
+			// According to http://www.homewyse.com/services/cost_to_insulate_attic.html
+			// As of 2015, a 1000 square feet attic insulation will cost as high as $3200 to insulate in Boston.
+			// This translates into $34/m^2. We don't know what R-value this insulation will be. But let's assume it is R22 material that has a U-value of 0.26 W/m^2/C.
+			// Let's also assume that the insulation cost is inversely proportional to the U-value.
+			// The baseline cost for a roof is set to be $100/m^2.
+			double unitPrice = 100 + 9 / uFactor;
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Door) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getDoorsComboBox());
-			double unitPrice = 100 / uFactor;
+			// According to http://www.homewyse.com/costs/cost_of_exterior_doors.html
+			double unitPrice = 500 + 100 / uFactor;
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof SolarPanel) {
