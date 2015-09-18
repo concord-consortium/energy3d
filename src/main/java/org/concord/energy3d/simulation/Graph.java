@@ -65,6 +65,7 @@ abstract class Graph extends JPanel {
 		data = new HashMap<String, List<Double>>();
 		hideData = new HashMap<String, Boolean>();
 		hideRuns = new HashMap<Integer, Boolean>();
+		hideData("Windows", true);
 	}
 
 	/* keep the records by their class types */
@@ -384,28 +385,28 @@ abstract class Graph extends JPanel {
 		int y0 = top - 10;
 		if (!isDataHidden(s)) {
 			drawDiamond(g2, x0 + 4, y0 + 3, 5, colors.get(s));
-			g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString("* " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 
 		s = "Solar Panels";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString("\u2212 " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 
 		s = "Heater";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString("\u002b " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 
 		s = "AC";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, 8, colors.get(s));
-			g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString("\u002b " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 
 		s = "Net";
@@ -413,7 +414,7 @@ abstract class Graph extends JPanel {
 		if (!isDataHidden(s)) {
 			drawCircle(g2, x0, y0, 8, colors.get(s));
 			g2.setFont(new Font("Arial", Font.BOLD, 11));
-			g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+			g2.drawString("\u003d " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 
 	}

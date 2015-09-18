@@ -24,10 +24,9 @@ public class MainApplication {
 	private static ArrayList<Runnable> shutdownHooks;
 
 	public static void main(final String[] args) {
-		
-		System.out.println(System.getProperty("user.home"));
 
 		File testFile = new File(System.getProperty("user.dir"), "test.txt");
+		// can't use File.canWrite() to check if we can write a file to this folder. So we have to walk extra miles as follows.
 		try {
 			testFile.createNewFile();
 			testFile.delete();
