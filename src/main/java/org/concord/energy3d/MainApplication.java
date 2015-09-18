@@ -1,5 +1,9 @@
 package org.concord.energy3d;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
@@ -10,12 +14,16 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.UpdateStub;
+
+import com.threerings.getdown.launcher.GetdownApp;
 
 public class MainApplication {
-	/**
-	 * @wbp.parser.entryPoint
-	 */
+
+	private static ArrayList<Runnable> shutdownHooks;
+
 	public static void main(final String[] args) {
+
 		final String version = System.getProperty("java.version");
 		if (version.compareTo("1.6") < 0) {
 			JOptionPane.showMessageDialog(null, "Your current Java version is " + version + ". Version 1.6 or higher is required.");
@@ -58,7 +66,7 @@ public class MainApplication {
 
 		/* initialize data logging */
 		final TimeSeriesLogger logger = new TimeSeriesLogger(1);
-		sceneManager.addShutdownHook(new Runnable() {
+		addShutdownHook(new Runnable() {
 			@Override
 			public void run() {
 				logger.closeLog();
@@ -69,6 +77,41 @@ public class MainApplication {
 		logger.start();
 		SnapshotLogger.start(20, logger);
 
+	}
+
+	public static void addShutdownHook(final Runnable r) {
+		if (shutdownHooks == null)
+			shutdownHooks = new ArrayList<Runnable>();
+		if (!shutdownHooks.contains(r))
+			shutdownHooks.add(r);
+	}
+
+	public static void exit() {
+		if (shutdownHooks != null) { // e.g., save the log file before exit to ensure that the last segment is saved
+			for (final Runnable r : shutdownHooks)
+				r.run();
+		}
+		System.out.println("exit.");
+		try {
+			System.out.println(new File(".").getCanonicalPath());
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+		if (Config.isWebStart() || Config.isEclipse())
+			System.exit(0);
+		else {
+			MainFrame.getInstance().setVisible(false);
+			new Thread() {
+				@Override
+				public void run() {
+					GetdownApp.main(new String[] { "." });
+					while (!UpdateStub.receivedCall)
+						Thread.yield();
+					UpdateStub.receivedCall = false;
+					System.exit(0);
+				};
+			}.start();
+		}
 	}
 
 	public static void setupLibraryPath() {

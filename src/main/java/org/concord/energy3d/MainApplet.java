@@ -89,6 +89,6 @@ public class MainApplet extends JApplet {
 
 	@Override
 	public void stop() {
-		SceneManager.getInstance().exit();
+		MainApplication.exit();
 	}
 }

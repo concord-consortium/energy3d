@@ -1859,11 +1859,13 @@ public class MainFrame extends JFrame {
 			if (save == JOptionPane.YES_OPTION) {
 				save();
 				if (!Scene.getInstance().isEdited())
-					SceneManager.getInstance().exit();
-			} else if (save != JOptionPane.CANCEL_OPTION)
-				SceneManager.getInstance().exit();
-		} else
-			SceneManager.getInstance().exit();
+					MainApplication.exit();
+			} else if (save != JOptionPane.CANCEL_OPTION) {
+				MainApplication.exit();
+			}
+		} else {
+			MainApplication.exit();
+		}
 	}
 
 	private void save() {
