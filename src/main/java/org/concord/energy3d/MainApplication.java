@@ -20,9 +20,20 @@ import com.threerings.getdown.launcher.GetdownApp;
 
 public class MainApplication {
 
+	public static boolean appDirectoryWritable = true;
 	private static ArrayList<Runnable> shutdownHooks;
 
 	public static void main(final String[] args) {
+		
+		System.out.println(System.getProperty("user.home"));
+
+		File testFile = new File(System.getProperty("user.dir"), "test.txt");
+		try {
+			testFile.createNewFile();
+			testFile.delete();
+		} catch (Throwable e) {
+			appDirectoryWritable = false;
+		}
 
 		final String version = System.getProperty("java.version");
 		if (version.compareTo("1.6") < 0) {
@@ -100,17 +111,21 @@ public class MainApplication {
 		if (Config.isWebStart() || Config.isEclipse())
 			System.exit(0);
 		else {
-			MainFrame.getInstance().setVisible(false);
-			new Thread() {
-				@Override
-				public void run() {
-					GetdownApp.main(new String[] { "." });
-					while (!UpdateStub.receivedCall)
-						Thread.yield();
-					UpdateStub.receivedCall = false;
-					System.exit(0);
-				};
-			}.start();
+			if (appDirectoryWritable) {
+				MainFrame.getInstance().setVisible(false);
+				new Thread() {
+					@Override
+					public void run() {
+						GetdownApp.main(new String[] { "." });
+						while (!UpdateStub.receivedCall)
+							Thread.yield();
+						UpdateStub.receivedCall = false;
+						System.exit(0);
+					};
+				}.start();
+			} else {
+				System.exit(0);
+			}
 		}
 	}
 

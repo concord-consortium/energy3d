@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -27,8 +28,8 @@ class LoggerUtil {
 	static File getLogFolder() {
 		if (folder != null)
 			return folder;
-		final String logPath;
-		if (Config.isWebStart()) {
+		if (Config.isWebStart() || !MainApplication.appDirectoryWritable) {
+			final String logPath;
 			final String rootPathRelative = File.separator + "Energy3D";
 			final String rootPathAbsolute;
 			if (Config.isWindows()) {
@@ -50,12 +51,13 @@ class LoggerUtil {
 					dir.mkdir();
 				logPath = rootPathAbsolute + File.separator + "log";
 			}
-		} else
-			logPath = "log";
-		final File folder = new File(logPath);
-		System.out.println("Log folder: " + folder.toString());
+			folder = new File(logPath);
+		} else {
+			folder = new File("log");
+		}
 		if (!folder.exists())
 			folder.mkdir();
+		System.out.println("Log folder: " + folder);
 		return folder;
 	}
 
