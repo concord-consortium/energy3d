@@ -1001,9 +1001,44 @@ public class Foundation extends HousePart {
 		return lockEdit;
 	}
 
+	/* Draw the heat flux through the floor area on the foundation */
 	@Override
 	public void drawHeatFlux() {
-		// this method is left empty on purpose -- don't draw heat flux
+
+		FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
+		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / heatFluxUnitArea);
+		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / heatFluxUnitArea);
+		arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
+		heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
+		final double heat = calculateHeatVector();
+		if (heat != 0) {
+			final ReadOnlyVector3 o = getAbsPoint(0);
+			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
+			final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
+			final ReadOnlyVector3 normal = getFaceDirection().negate(null);
+			final Vector3 a = new Vector3();
+			double g, h;
+			boolean init = true;
+			for (int j = 0; j < cols; j++) {
+				h = j + 0.5;
+				for (int i = 0; i < rows; i++) {
+					g = i + 0.5;
+					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
+					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
+					if (insideBuilding(a.getX(), a.getY(), init)) {
+						a.setZ(o.getZ());
+						drawArrow(a, normal, arrowsVertices, heat);
+					}
+					if (init)
+						init = false;
+				}
+			}
+			heatFlux.getMeshData().updateVertexCount();
+			heatFlux.updateModelBound();
+		}
+
+		updateHeatFluxVisibility();
+
 	}
 
 	@Override

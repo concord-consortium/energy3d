@@ -984,16 +984,23 @@ public abstract class HousePart implements Serializable {
 
 	double calculateHeatVector() {
 		double heat = 0;
+		double a;
+		if (this instanceof Foundation) {
+			double[] buildingGeometry = ((Foundation) this).getBuildingGeometry();
+			a = buildingGeometry != null ? buildingGeometry[1] : area;
+		} else {
+			a = area;
+		}
 		if (heatLoss != null) {
 			if (SceneManager.getInstance().isHeatFluxDaily()) {
 				for (final double x : heatLoss)
 					heat += x;
-				heat /= (getArea() * heatLoss.length);
+				heat /= a * heatLoss.length;
 				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
 				final int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
 				heat = heatLoss[hourOfDay * 4] + heatLoss[hourOfDay * 4 + 1] + heatLoss[hourOfDay * 4 + 2] + heatLoss[hourOfDay * 4 + 3];
-				heat /= 4 * getArea();
+				heat /= 4 * a;
 				heatFlux.setDefaultColor(ColorRGBA.WHITE);
 			}
 		}
@@ -1079,6 +1086,13 @@ public abstract class HousePart implements Serializable {
 				arrowsVertices.put(p2.getXf() - px).put(p2.getYf() - py + yp * 0.25f).put(p2.getZf() - pz + zp * 0.25f);
 				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 				arrowsVertices.put(p2.getXf() - px).put(p2.getYf() - py - yp * 0.25f).put(p2.getZf() - pz - zp * 0.25f);
+			} else if (this instanceof Foundation) {
+				final float cos = (float) (p.dot(Vector3.UNIT_X) * sign);
+				final float sin = (float) (p.dot(Vector3.UNIT_Z) * sign);
+				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+				arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() - arrowLength * 0.5f).put(p2.getZf() - arrowLength * sin);
+				arrowsVertices.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+				arrowsVertices.put(p2.getXf() - arrowLength * cos).put(p2.getYf() + arrowLength * 0.5f).put(p2.getZf() - arrowLength * sin);
 			} else {
 				final float cos = (float) (p.dot(Vector3.UNIT_X) * sign);
 				final float sin = (float) (p.dot(Vector3.UNIT_Y) * sign);

@@ -981,7 +981,6 @@ public abstract class Roof extends HousePart {
 				final double area = Util.computeArea(roofPartMesh);
 				areaByPart.put(roofPartMesh, area);
 				this.area += area;
-				// System.out.println(area);
 			} else {
 				final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
 				if (result.isEmpty()) {
@@ -994,55 +993,50 @@ public abstract class Roof extends HousePart {
 						area = 0;
 					areaByPart.put(roofPartMesh, area);
 					this.area += area;
-					// System.out.println(area);
 				} else {
-					if (roofPartsRoot.getNumberOfChildren() > 1) {
-						double highPointZ = Double.NEGATIVE_INFINITY;
-						vertexBuffer.rewind();
-						while (vertexBuffer.hasRemaining()) {
-							p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-							if (p.getZ() > highPointZ)
-								highPointZ = p.getZ();
-						}
-
-						final List<ReadOnlyVector3> highPoints = new ArrayList<ReadOnlyVector3>();
-						vertexBuffer.rewind();
-						while (vertexBuffer.hasRemaining()) {
-							p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-							if (p.getZ() >= highPointZ - MathUtils.ZERO_TOLERANCE && Util.insidePolygon(p, wallUpperPointsWithoutOverhang))
-								highPoints.add(new Vector3(p));
-						}
-
-						if (highPoints.size() == 1)
-							result.add(highPoints.get(0));
-						else {
-							final ReadOnlyVector3 lastPoint = result.get(result.size() - 1);
-							while (!highPoints.isEmpty()) {
-								double shortestDistance = Double.MAX_VALUE;
-								ReadOnlyVector3 nearestPoint = null;
-								for (final ReadOnlyVector3 hp : highPoints) {
-									final double distance = hp.distance(lastPoint);
-									if (distance < shortestDistance) {
-										shortestDistance = distance;
-										nearestPoint = hp;
-									}
-								}
-								result.add(nearestPoint);
-								highPoints.remove(nearestPoint);
-							}
-						}
-						result.add(result.get(0));
-						final double annotationScale = Scene.getInstance().getAnnotationScale();
-						final double area = Util.area3D_Polygon(result, (ReadOnlyVector3) roofPart.getUserData()) * annotationScale * annotationScale;
-
-						// System.out.println("-S----" + ((UserData) roofPartMesh.getUserData()).getIndex());
-						// System.out.println(area);
-						// System.out.println(Util.computeArea(roofPartMesh));
-
-						areaByPart.put(roofPartMesh, area);
-						this.area += area;
+					// if (roofPartsRoot.getNumberOfChildren() > 1) {
+					double highPointZ = Double.NEGATIVE_INFINITY;
+					vertexBuffer.rewind();
+					while (vertexBuffer.hasRemaining()) {
+						p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+						if (p.getZ() > highPointZ)
+							highPointZ = p.getZ();
 					}
+
+					final List<ReadOnlyVector3> highPoints = new ArrayList<ReadOnlyVector3>();
+					vertexBuffer.rewind();
+					while (vertexBuffer.hasRemaining()) {
+						p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+						if (p.getZ() >= highPointZ - MathUtils.ZERO_TOLERANCE && Util.insidePolygon(p, wallUpperPointsWithoutOverhang))
+							highPoints.add(new Vector3(p));
+					}
+
+					if (highPoints.size() == 1)
+						result.add(highPoints.get(0));
+					else {
+						final ReadOnlyVector3 lastPoint = result.get(result.size() - 1);
+						while (!highPoints.isEmpty()) {
+							double shortestDistance = Double.MAX_VALUE;
+							ReadOnlyVector3 nearestPoint = null;
+							for (final ReadOnlyVector3 hp : highPoints) {
+								final double distance = hp.distance(lastPoint);
+								if (distance < shortestDistance) {
+									shortestDistance = distance;
+									nearestPoint = hp;
+								}
+							}
+							result.add(nearestPoint);
+							highPoints.remove(nearestPoint);
+						}
+					}
+					result.add(result.get(0));
+					final double annotationScale = Scene.getInstance().getAnnotationScale();
+					final double area = Util.area3D_Polygon(result, (ReadOnlyVector3) roofPart.getUserData()) * annotationScale * annotationScale;
+
+					areaByPart.put(roofPartMesh, area);
+					this.area += area;
 				}
+				// }
 			}
 		}
 		// System.out.println("Total Area = " + this.area);

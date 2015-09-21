@@ -88,8 +88,8 @@ public class EnergyPanel extends JPanel {
 
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
 	final static String[] U_FACTOR_CHOICES_WALL = { "1.42 (R4, 16\" brick masonry)", "0.44 (R13, 2x4 w/cellulose/fiberglass)", "0.32 (R18, 2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)", "0.28 (R20, 2x6 w/cellulose/fiberglass)", "0.23 (R25, 2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)" };
-	final static String[] U_FACTOR_CHOICES_ROOF = { "1.0 (R6, old house)", "0.26 (R22, cellulose/fiberglass)", "0.15 (R38, cellulose/fiberglass)", "0.11 (R50, cellulose/fiberglass)" };
-	final static String[] U_FACTOR_CHOICES_FLOOR = { "2.0 (R3)", "0.6 (R10)" };
+	final static String[] U_FACTOR_CHOICES_ROOF = { "1.0 (R6, old house)", "0.26 (R22, cellulose/fiberglass)", "0.15 (R38, cellulose/fiberglass)", "0.11 (R50, cellulose/fiberglass)", "0.09 (R60, cellulose/fiberglass)" };
+	final static String[] U_FACTOR_CHOICES_FLOOR = { "0.44 (R13)", "0.30 (R19)", "0.19 (R30)", "0.15 (R38)" };
 	final static String[] U_FACTOR_CHOICES_DOOR = { "2.0 (R3, wood)", "0.6 (R10, insulated)" };
 	final static String[] U_FACTOR_CHOICES_WINDOW = { "5.91 (U1.0, single pane, 3 mm glass)", "3.12 (U0.55, double pane, 6 mm airspace)", "2.66 (U0.47, double pane, 6 mm argon space)", "1.53 (U0.27, triple pane, 13 mm argon space)" };
 	final static String[] WINDOW_SHGC_CHOICES = { "25", "50", "80" };
