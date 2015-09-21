@@ -41,10 +41,10 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.undo.AddHousePartCommand;
+import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
-import org.concord.energy3d.undo.EditHousePartCommand;
-import org.concord.energy3d.undo.RemoveHousePartCommand;
+import org.concord.energy3d.undo.EditPartCommand;
+import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.UndoManager;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
@@ -172,8 +172,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private ViewMode viewMode = ViewMode.NORMAL;
 	private CameraNode cameraNode;
 	private MouseState mouseState;
-	private AddHousePartCommand addHousePartCommand;
-	private EditHousePartCommand editHousePartCommand;
+	private AddPartCommand addHousePartCommand;
+	private EditPartCommand editHousePartCommand;
 	private UserData pick;
 	private TwoInputStates firstClickState;
 	private double refreshTime = -1;
@@ -1019,7 +1019,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return null;
 
 		Scene.getInstance().add(drawn, false);
-		addHousePartCommand = new AddHousePartCommand(drawn);
+		addHousePartCommand = new AddPartCommand(drawn);
 		return drawn;
 	}
 
@@ -1388,7 +1388,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (selectedHousePart instanceof Foundation)
 									editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart, !pick.isEditPoint());
 								else
-									editHousePartCommand = new EditHousePartCommand(selectedHousePart);
+									editHousePartCommand = new EditPartCommand(selectedHousePart);
 							}
 						}
 						SelectUtil.nextPickLayer();
@@ -1506,7 +1506,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			taskManager.update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
+					undoManager.addEdit(new RemovePartCommand(selectedHousePart));
 					Scene.getInstance().remove(selectedHousePart, true);
 					selectedHousePart = null;
 					EventQueue.invokeLater(new Runnable() {

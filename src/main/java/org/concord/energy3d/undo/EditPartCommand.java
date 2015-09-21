@@ -13,7 +13,8 @@ import org.concord.energy3d.scene.Scene;
 import com.ardor3d.math.Vector3;
 
 @SuppressWarnings("serial")
-public class EditHousePartCommand extends AbstractUndoableEdit {
+public class EditPartCommand extends AbstractUndoableEdit {
+
 	private final HousePart housePart;
 	protected final ArrayList<Vector3> orgPoints;
 	private final double orgHeight;
@@ -21,7 +22,7 @@ public class EditHousePartCommand extends AbstractUndoableEdit {
 	private double newHeight;
 	protected final int editPoint;
 
-	public EditHousePartCommand(final HousePart housePart) {
+	public EditPartCommand(final HousePart housePart) {
 		this.housePart = housePart;
 		orgHeight = housePart.getHeight();
 		orgPoints = new ArrayList<Vector3>(housePart.getPoints().size());

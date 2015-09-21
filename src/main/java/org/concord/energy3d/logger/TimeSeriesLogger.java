@@ -43,7 +43,7 @@ import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
-import org.concord.energy3d.undo.AddHousePartCommand;
+import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.AnimateSunCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
@@ -61,8 +61,8 @@ import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ComputeEnergyCommand;
-import org.concord.energy3d.undo.EditHousePartCommand;
-import org.concord.energy3d.undo.RemoveHousePartCommand;
+import org.concord.energy3d.undo.EditPartCommand;
+import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
@@ -90,7 +90,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private File file;
 	private UndoableEdit lastEdit;
 	private final UndoManager undoManager;
-	private HousePart actedHousePart;
+	private HousePart actedPart;
 	private Object stateValue;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
@@ -183,7 +183,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	private void log() {
 
-		actedHousePart = null;
+		actedPart = null;
 		stateValue = null;
 
 		final String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
@@ -199,12 +199,12 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		}
 		if (!(undoManager.lastEdit() instanceof SaveCommand) && undoManager.lastEdit() != lastEdit) {
 			lastEdit = undoManager.lastEdit();
-			if (lastEdit instanceof AddHousePartCommand) {
-				actedHousePart = ((AddHousePartCommand) lastEdit).getHousePart();
-			} else if (lastEdit instanceof EditHousePartCommand) {
-				actedHousePart = ((EditHousePartCommand) lastEdit).getHousePart();
-			} else if (lastEdit instanceof RemoveHousePartCommand) {
-				actedHousePart = ((RemoveHousePartCommand) lastEdit).getHousePart();
+			if (lastEdit instanceof AddPartCommand) {
+				actedPart = ((AddPartCommand) lastEdit).getHousePart();
+			} else if (lastEdit instanceof EditPartCommand) {
+				actedPart = ((EditPartCommand) lastEdit).getHousePart();
+			} else if (lastEdit instanceof RemovePartCommand) {
+				actedPart = ((RemovePartCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof RotateBuildingCommand) {
 				RotateBuildingCommand c = (RotateBuildingCommand) lastEdit;
 				stateValue = "{\"Building\":" + c.getFoundation().getId() + ", \"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
@@ -430,8 +430,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				if (type2Action != null) {
 					line += "\"" + type2Action + "\"";
 				} else {
-					if (actedHousePart != null) {
-						line += LoggerUtil.getInfo(actedHousePart);
+					if (actedPart != null) {
+						line += LoggerUtil.getInfo(actedPart);
 					} else if (stateValue != null) {
 						line += stateValue;
 					} else {

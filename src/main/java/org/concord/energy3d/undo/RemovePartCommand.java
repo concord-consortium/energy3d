@@ -11,15 +11,16 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 @SuppressWarnings("serial")
-public class RemoveHousePartCommand extends AbstractUndoableEdit {
+public class RemovePartCommand extends AbstractUndoableEdit {
+
 	private final HousePart housePart;
 	private final boolean isSignificant;
 
-	public RemoveHousePartCommand(final HousePart housePart) {
+	public RemovePartCommand(final HousePart housePart) {
 		this(housePart, true);
 	}
 
-	public RemoveHousePartCommand(final HousePart housePart, final boolean isSignificant) {
+	public RemovePartCommand(final HousePart housePart, final boolean isSignificant) {
 		this.housePart = housePart;
 		this.isSignificant = isSignificant;
 	}

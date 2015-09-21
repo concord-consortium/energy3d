@@ -9,10 +9,11 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 
 @SuppressWarnings("serial")
-public class AddHousePartCommand extends AbstractUndoableEdit {
+public class AddPartCommand extends AbstractUndoableEdit {
+
 	private final HousePart housePart;
 
-	public AddHousePartCommand(final HousePart housePart) {
+	public AddPartCommand(final HousePart housePart) {
 		this.housePart = housePart;
 	}
 
@@ -39,4 +40,5 @@ public class AddHousePartCommand extends AbstractUndoableEdit {
 	public String getPresentationName() {
 		return "Add " + housePart.getClass().getSimpleName();
 	}
+
 }

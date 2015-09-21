@@ -10,7 +10,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 
 @SuppressWarnings("serial")
-public class EditFoundationCommand extends EditHousePartCommand {
+public class EditFoundationCommand extends EditPartCommand {
 	private final Foundation foundation;
 	private final boolean isResizeMode;
 	private final boolean isMoveMode;

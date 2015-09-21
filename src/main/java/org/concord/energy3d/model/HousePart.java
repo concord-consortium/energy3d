@@ -53,7 +53,14 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
+/* 
+ * This class should have been called a more generic name than its current one. New classes that have nothing to do with a house have to inherit from this class 
+ * because of the binary serialization used to save state (hence its name cannot be changed). 
+ * 
+ */
+
 public abstract class HousePart implements Serializable {
+
 	public static final OffsetState offsetState = new OffsetState();
 	private static final long serialVersionUID = 1L;
 	protected static final double SNAP_DISTANCE = 0.5;

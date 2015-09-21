@@ -12,7 +12,8 @@ import org.concord.energy3d.model.Wall;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 @SuppressWarnings("serial")
-public class MakeGableCommand extends EditHousePartCommand {
+public class MakeGableCommand extends EditPartCommand {
+
 	private final Roof roof;
 	private final Wall wall;
 	private final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints;
@@ -43,4 +44,5 @@ public class MakeGableCommand extends EditHousePartCommand {
 	public String getPresentationName() {
 		return "Convert to Gable";
 	}
+
 }
