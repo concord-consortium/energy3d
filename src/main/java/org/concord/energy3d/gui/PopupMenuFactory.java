@@ -704,6 +704,76 @@ public class PopupMenuFactory {
 				}
 			});
 
+			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
+			final JMenu uFactorMenu = new JMenu("Floor U-Factor");
+
+			ButtonGroup uFactorButtonGroup = new ButtonGroup();
+
+			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_FLOOR.length;
+			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
+			miUFactor[nUFactor] = new JRadioButtonMenuItem();
+			uFactorButtonGroup.add(miUFactor[nUFactor]);
+
+			for (int i = 0; i < nUFactor; i++) {
+				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_FLOOR[i]);
+				final int i2 = i;
+				miUFactor[i].addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
+							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
+							Scene.getInstance().setEdited(true);
+							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+						}
+					}
+				});
+				uFactorButtonGroup.add(miUFactor[i]);
+				uFactorMenu.add(miUFactor[i]);
+			}
+
+			uFactorMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(MenuEvent e) {
+					boolean b = false;
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						for (int i = 0; i < nUFactor; i++) {
+							if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(miUFactor[i].getText()))) {
+								Util.selectSilently(miUFactor[i], true);
+								b = true;
+								break;
+							}
+						}
+						if (!b) {
+							if (Util.isZero(selectedPart.getUFactor())) {
+								double defaultFloorUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getFloorsComboBox());
+								for (int i = 0; i < nUFactor; i++) {
+									if (Util.isZero(defaultFloorUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
+										Util.selectSilently(miUFactor[i], true);
+										b = true;
+										break;
+									}
+								}
+							}
+							if (!b)
+								miUFactor[nUFactor].setSelected(true);
+						}
+					}
+				}
+
+				@Override
+				public void menuDeselected(MenuEvent e) {
+				}
+
+				@Override
+				public void menuCanceled(MenuEvent e) {
+				}
+
+			});
+
 			popupMenuForFoundation.addPopupMenuListener(new PopupMenuListener() {
 
 				@Override

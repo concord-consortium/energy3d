@@ -101,12 +101,29 @@ public class Cost {
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
 			// According to http://www.homewyse.com/services/cost_to_insulate_attic.html
-			// As of 2015, a 1000 square feet attic insulation will cost as high as $3200 to insulate in Boston.
-			// This translates into $34/m^2. We don't know what R-value this insulation will be. But let's assume it is R22 material that has a U-value of 0.26 W/m^2/C.
+			// As of 2015, a 1000 square feet of attic area costs as high as $3200 to insulate in Boston.
+			// This translates into $34/m^2. We don't know the R-value of this insulation. But let's assume it is R22 material that has a U-value of 0.26 W/m^2/C.
 			// Let's also assume that the insulation cost is inversely proportional to the U-value.
-			// The baseline cost for a roof is set to be $100/m^2.
+			// The baseline (that is, the structure without insulation) cost for a roof is set to be $100/m^2.
 			double unitPrice = 100 + 9 / uFactor;
 			return (int) (part.getArea() * unitPrice);
+		}
+		if (part instanceof Foundation) {
+			Foundation foundation = (Foundation) part;
+			double uFactor = foundation.getUFactor();
+			if (uFactor == 0)
+				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getFloorsComboBox());
+			// http://www.homewyse.com/costs/cost_of_floor_insulation.html
+			// As of 2015, a 1000 square feet of floor area costs as high as $3000 to insulate in Boston. This translates into $32/m^2.
+			// Now, we don't know what R-value this insulation is. But let's assume it is R25 material (minimum insulation recommended
+			// for zone 5 by energystar.gov) that has a U-value of 0.23 W/m^2/C.
+			// Let's also assume that the insulation cost is inversely proportional to the U-value.
+			// The baseline cost (that is, the structure without insulation) for floor is set to be $100/m^2.
+			double unitPrice = 100 + 8 / uFactor;
+			final double[] buildingGeometry = foundation.getBuildingGeometry();
+			if (buildingGeometry != null)
+				return (int) (buildingGeometry[1] * unitPrice);
+			return 0; // the building is incomplete yet, so we can assume the floor insulation isn't there yet
 		}
 		if (part instanceof Door) {
 			double uFactor = part.getUFactor();

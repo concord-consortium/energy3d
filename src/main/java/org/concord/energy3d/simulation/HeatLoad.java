@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -24,7 +25,7 @@ import com.ardor3d.scenegraph.Spatial;
 public class HeatLoad {
 
 	private final static HeatLoad instance = new HeatLoad();
-	private double wallUFactor, doorUFactor, windowUFactor, roofUFactor;
+	private double wallUFactor, doorUFactor, windowUFactor, roofUFactor, floorUFactor;
 
 	public static HeatLoad getInstance() {
 		return instance;
@@ -35,6 +36,8 @@ public class HeatLoad {
 	}
 
 	private double getUFactor(final HousePart part) {
+		if (part instanceof Foundation)
+			return isZero(part.getUFactor()) ? floorUFactor : part.getUFactor();
 		if (part instanceof Wall)
 			return isZero(part.getUFactor()) ? wallUFactor : part.getUFactor();
 		if (part instanceof Door)
@@ -52,9 +55,11 @@ public class HeatLoad {
 				if (x instanceof Door)
 					return isZero(x.getUFactor()) ? doorUFactor : x.getUFactor();
 				return isZero(container.getUFactor()) ? wallUFactor : container.getUFactor();
-			} else if (container instanceof Roof) {
-				return isZero(container.getUFactor()) ? roofUFactor : container.getUFactor();
 			}
+			if (container instanceof Roof)
+				return isZero(container.getUFactor()) ? roofUFactor : container.getUFactor();
+			if (container instanceof Foundation)
+				return isZero(container.getUFactor()) ? floorUFactor : container.getUFactor();
 		}
 		return part.getUFactor();
 	}
@@ -65,6 +70,7 @@ public class HeatLoad {
 			doorUFactor = parseValue(EnergyPanel.getInstance().getDoorsComboBox());
 			windowUFactor = parseValue(EnergyPanel.getInstance().getWindowsComboBox());
 			roofUFactor = parseValue(EnergyPanel.getInstance().getRoofsComboBox());
+			floorUFactor = parseValue(EnergyPanel.getInstance().getFloorsComboBox());
 		} catch (final Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(MainPanel.getInstance(), "Invalid U-Factor value: " + e.getMessage(), "Invalid U-Factor", JOptionPane.WARNING_MESSAGE);
@@ -113,7 +119,14 @@ public class HeatLoad {
 						final double uFactor = getUFactor(part);
 						if (isZero(uFactor))
 							continue;
-						double heatloss = part.getArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
+						double area = 0;
+						if (part instanceof Foundation) {
+							double[] buildingGeometry = ((Foundation) part).getBuildingGeometry();
+							area = buildingGeometry != null ? buildingGeometry[1] : part.getArea();
+						} else {
+							area = part.getArea();
+						}
+						double heatloss = area * uFactor * deltaT / 1000.0 / 60 * timeStep;
 						if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
 							heatloss = 0;
 						part.getHeatLoss()[iMinute] += heatloss;

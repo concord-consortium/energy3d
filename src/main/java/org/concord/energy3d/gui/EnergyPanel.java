@@ -89,6 +89,7 @@ public class EnergyPanel extends JPanel {
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
 	final static String[] U_FACTOR_CHOICES_WALL = { "1.42 (R4, 16\" brick masonry)", "0.44 (R13, 2x4 w/cellulose/fiberglass)", "0.32 (R18, 2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)", "0.28 (R20, 2x6 w/cellulose/fiberglass)", "0.23 (R25, 2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)" };
 	final static String[] U_FACTOR_CHOICES_ROOF = { "1.0 (R6, old house)", "0.26 (R22, cellulose/fiberglass)", "0.15 (R38, cellulose/fiberglass)", "0.11 (R50, cellulose/fiberglass)" };
+	final static String[] U_FACTOR_CHOICES_FLOOR = { "2.0 (R3)", "0.6 (R10)" };
 	final static String[] U_FACTOR_CHOICES_DOOR = { "2.0 (R3, wood)", "0.6 (R10, insulated)" };
 	final static String[] U_FACTOR_CHOICES_WINDOW = { "5.91 (U1.0, single pane, 3 mm glass)", "3.12 (U0.55, double pane, 6 mm airspace)", "2.66 (U0.47, double pane, 6 mm argon space)", "1.53 (U0.27, triple pane, 13 mm argon space)" };
 	final static String[] WINDOW_SHGC_CHOICES = { "25", "50", "80" };
@@ -112,6 +113,7 @@ public class EnergyPanel extends JPanel {
 	};
 
 	private final JComboBox<String> wallsComboBox;
+	private final JComboBox<String> floorsComboBox; // floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 	private final JComboBox<String> doorsComboBox;
 	private final JComboBox<String> windowsComboBox;
 	private final JComboBox<String> roofsComboBox;
@@ -534,13 +536,16 @@ public class EnergyPanel extends JPanel {
 		gbc_windowsComboBox.gridy = 1;
 		uFactorPanel.add(windowsComboBox, gbc_windowsComboBox);
 
-		final JLabel doorsLabel = new JLabel("Doors:");
-		final GridBagConstraints gbc_doorsLabel = new GridBagConstraints();
-		gbc_doorsLabel.anchor = GridBagConstraints.EAST;
-		gbc_doorsLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_doorsLabel.gridx = 2;
-		gbc_doorsLabel.gridy = 1;
-		uFactorPanel.add(doorsLabel, gbc_doorsLabel);
+		// Temporarily remove the door combobox from the GUI to save space for the more important floor combobox. When we revamp the GUI, we will put this back.
+		// For now, the U-value of a door can be changed using the pop-up menu of the door.
+
+		// final JLabel doorsLabel = new JLabel("Doors:");
+		// final GridBagConstraints gbc_doorsLabel = new GridBagConstraints();
+		// gbc_doorsLabel.anchor = GridBagConstraints.EAST;
+		// gbc_doorsLabel.insets = new Insets(0, 0, 5, 5);
+		// gbc_doorsLabel.gridx = 2;
+		// gbc_doorsLabel.gridy = 1;
+		// uFactorPanel.add(doorsLabel, gbc_doorsLabel);
 
 		doorsComboBox = new WideComboBox();
 		doorsComboBox.setEditable(true);
@@ -578,7 +583,45 @@ public class EnergyPanel extends JPanel {
 		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
 		gbc_doorsComboBox.gridx = 3;
 		gbc_doorsComboBox.gridy = 1;
-		uFactorPanel.add(doorsComboBox, gbc_doorsComboBox);
+		// uFactorPanel.add(doorsComboBox, gbc_doorsComboBox);
+
+		final JLabel floorsLabel = new JLabel("Floors:");
+		final GridBagConstraints gbc_floorLabel = new GridBagConstraints();
+		gbc_floorLabel.anchor = GridBagConstraints.EAST;
+		gbc_floorLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_floorLabel.gridx = 2;
+		gbc_floorLabel.gridy = 1;
+		uFactorPanel.add(floorsLabel, gbc_floorLabel);
+
+		floorsComboBox = new WideComboBox();
+		floorsComboBox.setEditable(true);
+		floorsComboBox.setModel(new DefaultComboBoxModel<String>(U_FACTOR_CHOICES_FLOOR));
+		floorsComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final double uFactor = HeatLoad.parseValue(floorsComboBox);
+				if (foundation != null) {
+					System.out.println(uFactor);
+				}
+				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				updateCost();
+				Scene.getInstance().setEdited(true);
+			}
+		});
+		arrowButton = Util.getButtonSubComponent(floorsComboBox);
+		if (arrowButton != null) {
+			arrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					foundation = MainFrame.getInstance().autoSelectBuilding(true);
+				}
+			});
+		}
+		final GridBagConstraints gbc_floorComboBox = new GridBagConstraints();
+		gbc_floorComboBox.insets = new Insets(0, 0, 5, 0);
+		gbc_floorComboBox.gridx = 3;
+		gbc_floorComboBox.gridy = 1;
+		uFactorPanel.add(floorsComboBox, gbc_floorComboBox);
 
 		uFactorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, uFactorPanel.getPreferredSize().height));
 
@@ -1135,6 +1178,15 @@ public class EnergyPanel extends JPanel {
 					break;
 				}
 			}
+		} else if (selectedPart instanceof Foundation) {
+			final int n = floorsComboBox.getItemCount();
+			for (int i = 0; i < n; i++) {
+				final double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_FLOOR[i]);
+				if (Util.isZero(choice - selectedPart.getUFactor())) {
+					Util.selectSilently(floorsComboBox, i);
+					break;
+				}
+			}
 		} else if (selectedPart instanceof Window) {
 			int n = windowsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
@@ -1315,6 +1367,10 @@ public class EnergyPanel extends JPanel {
 
 	public JComboBox<String> getDoorsComboBox() {
 		return doorsComboBox;
+	}
+
+	public JComboBox<String> getFloorsComboBox() {
+		return floorsComboBox;
 	}
 
 	public JComboBox<String> getWindowsComboBox() {

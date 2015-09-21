@@ -120,6 +120,7 @@ public class Scene implements Serializable {
 	private String doorUFactor;
 	private String windowUFactor;
 	private String roofUFactor;
+	private String floorUFactor; // floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 	private double solarPanelEfficiency;
 	private double windowSolarHeatGainCoefficient; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
 	private double backgroundAlbedo = 0.3;
@@ -351,6 +352,14 @@ public class Scene implements Serializable {
 			}
 			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
 		}
+		if (instance.floorUFactor != null) {
+			final double defaultFloorUFactor = parsePropertyString(instance.floorUFactor);
+			for (final HousePart p : instance.parts) {
+				if (p.getUFactor() <= 0 && p instanceof Foundation)
+					p.setUFactor(defaultFloorUFactor);
+			}
+			energyPanel.getFloorsComboBox().setSelectedItem(instance.floorUFactor);
+		}
 		if (instance.roofUFactor != null) {
 			final double defaultRoofUFactor = parsePropertyString(instance.roofUFactor);
 			for (final HousePart p : instance.parts) {
@@ -548,6 +557,7 @@ public class Scene implements Serializable {
 				instance.timeStep = SolarRadiation.getInstance().getTimeStep();
 				instance.wallUFactor = (String) EnergyPanel.getInstance().getWallsComboBox().getSelectedItem();
 				instance.windowUFactor = (String) EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem();
+				instance.floorUFactor = (String) EnergyPanel.getInstance().getFloorsComboBox().getSelectedItem();
 				instance.doorUFactor = (String) EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem();
 				instance.roofUFactor = (String) EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem();
 				instance.solarPanelEfficiency = Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
