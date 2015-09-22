@@ -27,8 +27,8 @@ public class Ground {
 	/** calculate the average floor temperature of a given day using the Kasuda formula: http://soilphysics.okstate.edu/software/SoilTemperature/document.pdf */
 	public double getFloorTemperature(int day) {
 		String city = Scene.getInstance().getCity();
-		int[] loTemp = CityData.getInstance().getLowTemperatures().get(city);
-		int[] hiTemp = CityData.getInstance().getHighTemperatures().get(city);
+		int[] loTemp = LocationData.getInstance().getLowTemperatures().get(city);
+		int[] hiTemp = LocationData.getInstance().getHighTemperatures().get(city);
 		double lo = 0;
 		for (int x : loTemp) {
 			lo += x;

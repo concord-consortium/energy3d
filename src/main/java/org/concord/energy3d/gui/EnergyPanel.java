@@ -64,10 +64,11 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.simulation.CityData;
+import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.SolarRadiation;
+import org.concord.energy3d.simulation.Weather;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
@@ -89,7 +90,7 @@ public class EnergyPanel extends JPanel {
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
 	final static String[] U_FACTOR_CHOICES_WALL = { "1.42 (R4, 16\" brick masonry)", "0.44 (R13, 2x4 w/cellulose/fiberglass)", "0.32 (R18, 2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)", "0.28 (R20, 2x6 w/cellulose/fiberglass)", "0.23 (R25, 2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)" };
 	final static String[] U_FACTOR_CHOICES_ROOF = { "1.0 (R6, old house)", "0.26 (R22, cellulose/fiberglass)", "0.15 (R38, cellulose/fiberglass)", "0.11 (R50, cellulose/fiberglass)", "0.09 (R60, cellulose/fiberglass)" };
-	final static String[] U_FACTOR_CHOICES_FLOOR = { "0.44 (R13)", "0.30 (R19)", "0.19 (R30)", "0.15 (R38)" };
+	final static String[] U_FACTOR_CHOICES_FLOOR = { "2.0 (R3)", "0.44 (R13)", "0.30 (R19)", "0.19 (R30)", "0.15 (R38)" };
 	final static String[] U_FACTOR_CHOICES_DOOR = { "2.0 (R3, wood)", "0.6 (R10, insulated)" };
 	final static String[] U_FACTOR_CHOICES_WINDOW = { "5.91 (U1.0, single pane, 3 mm glass)", "3.12 (U0.55, double pane, 6 mm airspace)", "2.66 (U0.47, double pane, 6 mm argon space)", "1.53 (U0.27, triple pane, 13 mm argon space)" };
 	final static String[] WINDOW_SHGC_CHOICES = { "25", "50", "80" };
@@ -224,9 +225,9 @@ public class EnergyPanel extends JPanel {
 			}
 		};
 
-		Arrays.sort(CityData.getInstance().getCities());
+		Arrays.sort(LocationData.getInstance().getCities());
 		cityComboBox = new JComboBox<String>();
-		cityComboBox.setModel(new DefaultComboBoxModel<String>(CityData.getInstance().getCities()));
+		cityComboBox.setModel(new DefaultComboBoxModel<String>(LocationData.getInstance().getCities()));
 		cityComboBox.setSelectedItem("Boston, MA");
 		cityComboBox.setMaximumRowCount(15);
 		cityComboBox.addActionListener(new ActionListener() {
@@ -238,7 +239,7 @@ public class EnergyPanel extends JPanel {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
 				} else {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeCityCommand());
-					final Integer newLatitude = CityData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).intValue();
+					final Integer newLatitude = LocationData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).intValue();
 					if (newLatitude.equals(latitudeSpinner.getValue()))
 						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					else {
@@ -246,7 +247,7 @@ public class EnergyPanel extends JPanel {
 						Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
-					if (CityData.getInstance().getSunshineHours().get(city) == null)
+					if (LocationData.getInstance().getSunshineHours().get(city) == null)
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No sunshine data is found for " + city + ".\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
 				}
 				Scene.getInstance().setCity(city);
@@ -601,7 +602,8 @@ public class EnergyPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				final double uFactor = HeatLoad.parseValue(floorsComboBox);
 				if (foundation != null) {
-					System.out.println(uFactor);
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_DOOR));
+					foundation.setUFactor(uFactor);
 				}
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
@@ -1066,10 +1068,9 @@ public class EnergyPanel extends JPanel {
 			outsideTemperatureField.setText("15\u00B0C");
 			sunshineHoursField.setText("10");
 		} else {
-			final Calendar c = Heliodon.getInstance().getCalender();
-			outsideTemperatureField.setText(Math.round(CityData.getInstance().computeOutsideTemperature(c)) + "\u00B0C");
-			final Map<String, int[]> sunshineHours = CityData.getInstance().getSunshineHours();
-			final int month = c.get(Calendar.MONTH);
+			outsideTemperatureField.setText(Math.round(Weather.getInstance().getCurrentOutsideTemperature()) + "\u00B0C");
+			final Map<String, int[]> sunshineHours = LocationData.getInstance().getSunshineHours();
+			final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
 			sunshineHoursField.setText(Math.round(sunshineHours.get(city)[month] / 30.0) + "hrs");
 		}
 	}

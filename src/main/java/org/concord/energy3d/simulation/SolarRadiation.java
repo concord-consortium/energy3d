@@ -466,7 +466,7 @@ public class SolarRadiation {
 			final double r = 708;
 			final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 			if (!"".equals(city)) {
-				final double c = CityData.getInstance().getAltitudes().get(city) / 9000.0;
+				final double c = LocationData.getInstance().getAltitudes().get(city) / 9000.0;
 				return Math.sqrt((r + c) * (r + c) * cos * cos + (2 * r + 1 + c) * (1 - c)) - (r + c) * cos;
 			} else {
 				return Math.sqrt(r * r * cos * cos + 2 * r + 1) - r * cos;
@@ -487,7 +487,7 @@ public class SolarRadiation {
 		double sunshinePercentage = 1.0;
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		if (!city.equals("")) {
-			final int[] sunshineHours = CityData.getInstance().getSunshineHours().get(city);
+			final int[] sunshineHours = LocationData.getInstance().getSunshineHours().get(city);
 			if (sunshineHours != null)
 				sunshinePercentage = sunshineHours[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] / (dayLength * 30);
 		}
