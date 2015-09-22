@@ -86,6 +86,7 @@ public class HeatLoad {
 
 		final int timeStep = SolarRadiation.getInstance().getTimeStep();
 		final double[] outsideTemperatureRange = CityData.getInstance().computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+		double groundTemperature = Ground.getInstance().getFloorTemperature(today.get(Calendar.DAY_OF_YEAR));
 		int iMinute = 0;
 		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
 			iMinute = minute / timeStep;
@@ -104,13 +105,27 @@ public class HeatLoad {
 							if (isZero(uFactor))
 								continue;
 							double heatloss = roof.getArea(mesh) * uFactor * deltaT / 1000.0 / 60 * timeStep;
-							if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
+							if (heatloss > 0 && outsideTemperatureRange[0] >= 15) // if outside is warmer than 15C, then there is no need to turn on the heater hence no heat loss
 								heatloss = 0;
 							roof.getHeatLoss()[iMinute] += heatloss;
 							final double[] heatLossArray = SolarRadiation.getInstance().getHeatLoss(mesh);
 							if (heatLossArray != null)
 								heatLossArray[iMinute] += heatloss;
 						}
+					}
+				} else if (part instanceof Foundation) {
+					double deltaT = insideTemperature - groundTemperature;
+					Foundation foundation = (Foundation) part;
+					if (foundation.isDrawCompleted()) {
+						final double uFactor = getUFactor(foundation);
+						if (isZero(uFactor))
+							continue;
+						double[] buildingGeometry = foundation.getBuildingGeometry();
+						double area = buildingGeometry != null ? buildingGeometry[1] : foundation.getArea();
+						double heatloss = area * uFactor * deltaT / 1000.0 / 60 * timeStep;
+						if (heatloss > 0 && outsideTemperatureRange[0] >= 15) // if outside is warmer than 15C, then there is no need to turn on the heater hence no heat loss
+							heatloss = 0;
+						foundation.getHeatLoss()[iMinute] += heatloss;
 					}
 				} else {
 					final double solarHeat = part.getSolarPotential()[iMinute] * absorption / part.getVolumetricHeatCapacity();
@@ -119,15 +134,8 @@ public class HeatLoad {
 						final double uFactor = getUFactor(part);
 						if (isZero(uFactor))
 							continue;
-						double area = 0;
-						if (part instanceof Foundation) {
-							double[] buildingGeometry = ((Foundation) part).getBuildingGeometry();
-							area = buildingGeometry != null ? buildingGeometry[1] : part.getArea();
-						} else {
-							area = part.getArea();
-						}
-						double heatloss = area * uFactor * deltaT / 1000.0 / 60 * timeStep;
-						if (heatloss > 0 && outsideTemperatureRange[0] >= 15)
+						double heatloss = part.getArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
+						if (heatloss > 0 && outsideTemperatureRange[0] >= 15) // if outside is warmer than 15C, then there is no need to turn on the heater hence no heat loss
 							heatloss = 0;
 						part.getHeatLoss()[iMinute] += heatloss;
 					}
