@@ -86,7 +86,6 @@ public class HeatLoad {
 
 		final int timeStep = SolarRadiation.getInstance().getTimeStep();
 		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
-		double groundTemperature = Ground.getInstance().getFloorTemperature(today.get(Calendar.DAY_OF_YEAR));
 		int iMinute = 0;
 		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
 			iMinute = minute / timeStep;
@@ -114,6 +113,7 @@ public class HeatLoad {
 						}
 					}
 				} else if (part instanceof Foundation) {
+					double groundTemperature = Ground.getInstance().getFloorTemperature(today.get(Calendar.DAY_OF_YEAR), minute, 0.5 * (outsideTemperatureRange[1] - outsideTemperatureRange[0]));
 					double deltaT = insideTemperature - groundTemperature;
 					Foundation foundation = (Foundation) part;
 					if (foundation.isDrawCompleted()) {
