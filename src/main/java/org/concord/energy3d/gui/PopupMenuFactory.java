@@ -797,6 +797,7 @@ public class PopupMenuFactory {
 
 			popupMenuForFoundation.add(miInfo);
 			popupMenuForFoundation.add(miColor);
+			popupMenuForFoundation.add(uFactorMenu);
 
 		}
 
