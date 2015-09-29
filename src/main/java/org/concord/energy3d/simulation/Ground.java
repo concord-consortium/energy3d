@@ -1,6 +1,6 @@
 package org.concord.energy3d.simulation;
 
-import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.gui.EnergyPanel;
 
 /**
  * The science of ground
@@ -27,7 +27,7 @@ public class Ground {
 
 	/** calculate the average floor temperature of a given day using the Kasuda formula: http://soilphysics.okstate.edu/software/SoilTemperature/document.pdf */
 	public double getFloorTemperature(int day) {
-		String city = Scene.getInstance().getCity();
+		String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		int[] loTemp = LocationData.getInstance().getLowTemperatures().get(city);
 		int[] hiTemp = LocationData.getInstance().getHighTemperatures().get(city);
 		double lo = 0;
