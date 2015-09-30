@@ -604,7 +604,7 @@ public class EnergyPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				final double uFactor = HeatLoad.parseValue(floorsComboBox);
 				if (foundation != null) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_DOOR));
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_FLOOR));
 					foundation.setUFactor(uFactor);
 				}
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);

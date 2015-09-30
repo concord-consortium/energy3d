@@ -55,6 +55,7 @@ import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
+import org.concord.energy3d.undo.ChangePartVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
@@ -235,8 +236,28 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					s += ", \"Type\": \"Window\"";
 				} else if (p instanceof Roof) {
 					s += ", \"Type\": \"Roof\"";
+				} else if (p instanceof Foundation) {
+					s += ", \"Type\": \"Floor\"";
 				}
 				s += ", \"Value\": " + p.getUFactor() + "}";
+				stateValue = s;
+			} else if (lastEdit instanceof ChangePartVolumetricHeatCapacityCommand) {
+				ChangePartVolumetricHeatCapacityCommand c = (ChangePartVolumetricHeatCapacityCommand) lastEdit;
+				HousePart p = c.getHousePart();
+				Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
+				String s = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
+				if (p instanceof Wall) {
+					s += ", \"Type\": \"Wall\"";
+				} else if (p instanceof Door) {
+					s += ", \"Type\": \"Door\"";
+				} else if (p instanceof Window) {
+					s += ", \"Type\": \"Window\"";
+				} else if (p instanceof Roof) {
+					s += ", \"Type\": \"Roof\"";
+				} else if (p instanceof Foundation) {
+					s += ", \"Type\": \"Floor\"";
+				}
+				s += ", \"Value\": " + p.getVolumetricHeatCapacity() + "}";
 				stateValue = s;
 			} else if (lastEdit instanceof ChangeBuildingUFactorCommand) {
 				ChangeBuildingUFactorCommand c = (ChangeBuildingUFactorCommand) lastEdit;
@@ -246,6 +267,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					s += ", \"Type\": \"Wall\"";
 				} else if (o == Operation.DRAW_DOOR) {
 					s += ", \"Type\": \"Door\"";
+				} else if (o == Operation.DRAW_FLOOR) {
+					s += ", \"Type\": \"Floor\"";
 				} else if (o == Operation.DRAW_WINDOW) {
 					s += ", \"Type\": \"Window\"";
 				} else if (o == Operation.DRAW_ROOF_PYRAMID) {

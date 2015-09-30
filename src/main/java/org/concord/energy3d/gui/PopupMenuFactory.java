@@ -27,6 +27,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
+import org.concord.energy3d.undo.ChangePartVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.util.Util;
@@ -40,12 +41,16 @@ import org.concord.energy3d.util.Util;
 
 public class PopupMenuFactory {
 
+	private final static int CHANGE_U_FACTOR = 0;
+	private final static int CHANGE_VOLUMETRIC_HEAT_CAPACITY = 1;
+
 	private static JPopupMenu popupMenuForWindow;
 	private static JPopupMenu popupMenuForWall;
 	private static JPopupMenu popupMenuForRoof;
 	private static JPopupMenu popupMenuForDoor;
 	private static JPopupMenu popupMenuForFoundation;
 	private static JPopupMenu popupMenuForSolarPanel;
+
 	private static Action colorAction = new AbstractAction("Color") {
 		private static final long serialVersionUID = 1L;
 
@@ -245,7 +250,7 @@ public class PopupMenuFactory {
 
 			popupMenuForWindow.add(miInfo);
 			popupMenuForWindow.add(muntinMenu);
-			popupMenuForWindow.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WINDOW, 0));
+			popupMenuForWindow.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WINDOW, CHANGE_U_FACTOR));
 			popupMenuForWindow.add(shgcMenu);
 
 		}
@@ -262,8 +267,8 @@ public class PopupMenuFactory {
 			miInfo.setEnabled(false);
 			popupMenuForWall.add(miInfo);
 			popupMenuForWall.add(colorAction);
-			popupMenuForWall.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WALL, 0));
-			popupMenuForWall.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_WALL, 1));
+			popupMenuForWall.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WALL, CHANGE_U_FACTOR));
+			popupMenuForWall.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_WALL, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
 		}
 
 		return popupMenuForWall;
@@ -278,8 +283,8 @@ public class PopupMenuFactory {
 			miInfo.setEnabled(false);
 			popupMenuForRoof.add(miInfo);
 			popupMenuForRoof.add(colorAction);
-			popupMenuForRoof.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_ROOF, 0));
-			popupMenuForRoof.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF, 1));
+			popupMenuForRoof.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_ROOF, CHANGE_U_FACTOR));
+			popupMenuForRoof.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
 		}
 
 		return popupMenuForRoof;
@@ -294,7 +299,7 @@ public class PopupMenuFactory {
 			miInfo.setEnabled(false);
 			popupMenuForDoor.add(miInfo);
 			popupMenuForDoor.add(colorAction);
-			popupMenuForDoor.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_DOOR, 0));
+			popupMenuForDoor.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_DOOR, CHANGE_U_FACTOR));
 		}
 
 		return popupMenuForDoor;
@@ -310,7 +315,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(miInfo);
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
-			popupMenuForFoundation.add(createPropertyMenu("Floor U-Factor", EnergyPanel.U_FACTOR_CHOICES_FLOOR, 0));
+			popupMenuForFoundation.add(createPropertyMenu("Floor U-Factor", EnergyPanel.U_FACTOR_CHOICES_FLOOR, CHANGE_U_FACTOR));
 		}
 
 		return popupMenuForFoundation;
@@ -444,12 +449,12 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					switch (type) {
-					case 0:
+					case CHANGE_U_FACTOR:
 						SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
 						selectedPart.setUFactor(Scene.parsePropertyString(mi[i2].getText()));
 						break;
-					case 1:
-						// SceneManager.getInstance().getUndoManager().addEdit(new ChangePartVolumetricHeatCapacityCommand(selectedPart));
+					case CHANGE_VOLUMETRIC_HEAT_CAPACITY:
+						SceneManager.getInstance().getUndoManager().addEdit(new ChangePartVolumetricHeatCapacityCommand(selectedPart));
 						selectedPart.setVolumetricHeatCapacity(Scene.parsePropertyString(mi[i2].getText()));
 						break;
 					}
@@ -468,7 +473,7 @@ public class PopupMenuFactory {
 				boolean b = false;
 				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				switch (type) {
-				case 0:
+				case CHANGE_U_FACTOR:
 					for (int i = 0; i < itemCount; i++) {
 						if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(mi[i].getText()))) {
 							Util.selectSilently(mi[i], true);
@@ -491,7 +496,7 @@ public class PopupMenuFactory {
 							mi[itemCount].setSelected(true);
 					}
 					break;
-				case 1:
+				case CHANGE_VOLUMETRIC_HEAT_CAPACITY:
 					for (int i = 0; i < itemCount; i++) {
 						if (Util.isZero(selectedPart.getVolumetricHeatCapacity() - Scene.parsePropertyString(mi[i].getText()))) {
 							Util.selectSilently(mi[i], true);
