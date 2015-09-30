@@ -25,7 +25,7 @@ public class Ground {
 	private Ground() {
 	}
 
-	/** calculate the average floor temperature of a given day using the Kasuda formula: http://soilphysics.okstate.edu/software/SoilTemperature/document.pdf */
+	/** calculate the average floor temperature of a given day using the Kusuda formula: http://soilphysics.okstate.edu/software/SoilTemperature/document.pdf */
 	public double getFloorTemperature(int day) {
 		String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		int[] loTemp = LocationData.getInstance().getLowTemperatures().get(city);

@@ -99,7 +99,7 @@ public abstract class HousePart implements Serializable {
 	private boolean firstPointInserted = false;
 	private boolean freeze;
 	private double uFactor = 0;
-	private double volumetricHeatCapacity = 1; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
+	private double volumetricHeatCapacity = 0.25; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 
 	transient Line heatFlux;
 	transient static float heatFluxUnitArea = 2;

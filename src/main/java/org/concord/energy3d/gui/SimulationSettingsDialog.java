@@ -37,7 +37,7 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(5, 3, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(6, 3, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -45,6 +45,7 @@ class SimulationSettingsDialog extends JDialog {
 		final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(SolarRadiation.getInstance().getTimeStep()));
 		final JTextField albedoTextField = new JTextField(FORMAT1.format(Scene.getInstance().getBackgroundAlbedo()));
+		final JTextField volumetricHeatCapacityTextField = new JTextField(FORMAT1.format(Scene.getInstance().getVolumetricHeatCapacity()));
 		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
 
 		ActionListener okListener = new ActionListener() {
@@ -53,12 +54,14 @@ class SimulationSettingsDialog extends JDialog {
 				double cellSize;
 				int timeStep;
 				double albedo;
+				double volumetricHeatCapacity;
 				double heatVectorLength;
 				try {
 					cellSize = Double.parseDouble(cellSizeTextField.getText());
 					heatVectorLength = Double.parseDouble(heatVectorLengthTextField.getText());
 					timeStep = (int) Double.parseDouble(timeStepTextField.getText());
 					albedo = Double.parseDouble(albedoTextField.getText());
+					volumetricHeatCapacity = Double.parseDouble(volumetricHeatCapacityTextField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
@@ -81,11 +84,16 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Background albedo must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				if (volumetricHeatCapacity <= 0) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Volumetric heat capacity cannot be zero or negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				SolarRadiation.getInstance().setSolarStep(cellSize);
 				SolarRadiation.getInstance().setTimeStep(timeStep);
 				SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
 				Scene.getInstance().setHeatVectorLength(heatVectorLength);
 				Scene.getInstance().setBackgroundAlbedo(albedo);
+				Scene.getInstance().setVolumetricHeatCapacity(volumetricHeatCapacity);
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				SimulationSettingsDialog.this.dispose();
@@ -120,6 +128,11 @@ class SimulationSettingsDialog extends JDialog {
 		panel.add(albedoTextField);
 		albedoTextField.setColumns(6);
 		panel.add(new JLabel("Dimensionless [0-1]"));
+
+		// set the default volumetric heat capacity
+		panel.add(new JLabel("Default Volumetric Heat Capacity: "));
+		panel.add(volumetricHeatCapacityTextField);
+		panel.add(new JLabel("<html>kWh/m<sup>3</sup>/C</html>"));
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
