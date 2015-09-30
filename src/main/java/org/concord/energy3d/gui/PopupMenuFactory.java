@@ -3,6 +3,8 @@ package org.concord.energy3d.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -44,6 +46,14 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForDoor;
 	private static JPopupMenu popupMenuForFoundation;
 	private static JPopupMenu popupMenuForSolarPanel;
+	private static Action colorAction = new AbstractAction("Color") {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			MainFrame.getInstance().showColorDialogForIndividualPart();
+		}
+	};
 
 	private PopupMenuFactory() {
 	}
@@ -69,8 +79,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForWindow == null) {
 
-			popupMenuForWindow = new JPopupMenu();
-			popupMenuForWindow.setInvoker(MainPanel.getInstance().getCanvasPanel());
+			popupMenuForWindow = createPopupMenu();
 
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
@@ -172,75 +181,6 @@ public class PopupMenuFactory {
 
 			});
 
-			final JMenu uFactorMenu = new JMenu("U-Factor");
-
-			ButtonGroup uFactorButtonGroup = new ButtonGroup();
-
-			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_WINDOW.length;
-			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
-			miUFactor[nUFactor] = new JRadioButtonMenuItem();
-			uFactorButtonGroup.add(miUFactor[nUFactor]);
-
-			for (int i = 0; i < nUFactor; i++) {
-				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_WINDOW[i]);
-				final int i2 = i;
-				miUFactor[i].addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Window) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
-							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
-							Scene.getInstance().setEdited(true);
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-						}
-					}
-				});
-				uFactorButtonGroup.add(miUFactor[i]);
-				uFactorMenu.add(miUFactor[i]);
-			}
-
-			uFactorMenu.addMenuListener(new MenuListener() {
-
-				@Override
-				public void menuSelected(MenuEvent e) {
-					boolean b = false;
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						for (int i = 0; i < nUFactor; i++) {
-							if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(miUFactor[i].getText()))) {
-								Util.selectSilently(miUFactor[i], true);
-								b = true;
-								break;
-							}
-						}
-						if (!b) {
-							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultWindowUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWindowsComboBox());
-								for (int i = 0; i < nUFactor; i++) {
-									if (Util.isZero(defaultWindowUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
-										Util.selectSilently(miUFactor[i], true);
-										b = true;
-										break;
-									}
-								}
-							}
-							if (!b)
-								miUFactor[nUFactor].setSelected(true);
-						}
-					}
-				}
-
-				@Override
-				public void menuDeselected(MenuEvent e) {
-				}
-
-				@Override
-				public void menuCanceled(MenuEvent e) {
-				}
-
-			});
-
 			final JMenu shgcMenu = new JMenu("Solar Heat Gain Coefficient");
 
 			ButtonGroup shgcButtonGroup = new ButtonGroup();
@@ -303,31 +243,9 @@ public class PopupMenuFactory {
 
 			});
 
-			popupMenuForWindow.addPopupMenuListener(new PopupMenuListener() {
-
-				@Override
-				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null)
-						return;
-					String s = selectedPart.toString();
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1));
-					muntinMenu.setEnabled(selectedPart instanceof Window);
-				}
-
-				@Override
-				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				}
-
-				@Override
-				public void popupMenuCanceled(PopupMenuEvent e) {
-				}
-
-			});
-
 			popupMenuForWindow.add(miInfo);
 			popupMenuForWindow.add(muntinMenu);
-			popupMenuForWindow.add(uFactorMenu);
+			popupMenuForWindow.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WINDOW, 0));
 			popupMenuForWindow.add(shgcMenu);
 
 		}
@@ -339,114 +257,13 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForWall() {
 
 		if (popupMenuForWall == null) {
-
-			popupMenuForWall = new JPopupMenu();
-			popupMenuForWall.setInvoker(MainPanel.getInstance().getCanvasPanel());
-
+			popupMenuForWall = createPopupMenu();
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
-			final JMenuItem miColor = new JMenuItem("Color");
-			miColor.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					MainFrame.getInstance().showColorDialogForIndividualPart();
-				}
-			});
-
-			final JMenu uFactorMenu = new JMenu("U-Factor");
-
-			ButtonGroup uFactorButtonGroup = new ButtonGroup();
-
-			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_WALL.length;
-			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
-			miUFactor[nUFactor] = new JRadioButtonMenuItem();
-			uFactorButtonGroup.add(miUFactor[nUFactor]);
-
-			for (int i = 0; i < nUFactor; i++) {
-				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_WALL[i]);
-				final int i2 = i;
-				miUFactor[i].addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Wall) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
-							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
-							Scene.getInstance().setEdited(true);
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-						}
-					}
-				});
-				uFactorButtonGroup.add(miUFactor[i]);
-				uFactorMenu.add(miUFactor[i]);
-			}
-
-			uFactorMenu.addMenuListener(new MenuListener() {
-
-				@Override
-				public void menuSelected(MenuEvent e) {
-					boolean b = false;
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						for (int i = 0; i < nUFactor; i++) {
-							if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(miUFactor[i].getText()))) {
-								Util.selectSilently(miUFactor[i], true);
-								b = true;
-								break;
-							}
-						}
-						if (!b) {
-							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultWallUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
-								for (int i = 0; i < nUFactor; i++) {
-									if (Util.isZero(defaultWallUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
-										Util.selectSilently(miUFactor[i], true);
-										b = true;
-										break;
-									}
-								}
-							}
-							if (!b)
-								miUFactor[nUFactor].setSelected(true);
-						}
-					}
-				}
-
-				@Override
-				public void menuDeselected(MenuEvent e) {
-				}
-
-				@Override
-				public void menuCanceled(MenuEvent e) {
-				}
-
-			});
-
-			popupMenuForWall.addPopupMenuListener(new PopupMenuListener() {
-
-				@Override
-				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null)
-						return;
-					String s = selectedPart.toString();
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1));
-				}
-
-				@Override
-				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				}
-
-				@Override
-				public void popupMenuCanceled(PopupMenuEvent e) {
-				}
-
-			});
-
 			popupMenuForWall.add(miInfo);
-			popupMenuForWall.add(miColor);
-			popupMenuForWall.add(uFactorMenu);
-
+			popupMenuForWall.add(colorAction);
+			popupMenuForWall.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WALL, 0));
+			popupMenuForWall.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_WALL, 1));
 		}
 
 		return popupMenuForWall;
@@ -456,114 +273,13 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForRoof() {
 
 		if (popupMenuForRoof == null) {
-
-			popupMenuForRoof = new JPopupMenu();
-			popupMenuForRoof.setInvoker(MainPanel.getInstance().getCanvasPanel());
-
+			popupMenuForRoof = createPopupMenu();
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
-			final JMenuItem miColor = new JMenuItem("Color");
-			miColor.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					MainFrame.getInstance().showColorDialogForIndividualPart();
-				}
-			});
-
-			final JMenu uFactorMenu = new JMenu("U-Factor");
-
-			ButtonGroup uFactorButtonGroup = new ButtonGroup();
-
-			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_ROOF.length;
-			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
-			miUFactor[nUFactor] = new JRadioButtonMenuItem();
-			uFactorButtonGroup.add(miUFactor[nUFactor]);
-
-			for (int i = 0; i < nUFactor; i++) {
-				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_ROOF[i]);
-				final int i2 = i;
-				miUFactor[i].addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Roof) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
-							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
-							Scene.getInstance().setEdited(true);
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-						}
-					}
-				});
-				uFactorButtonGroup.add(miUFactor[i]);
-				uFactorMenu.add(miUFactor[i]);
-			}
-
-			uFactorMenu.addMenuListener(new MenuListener() {
-
-				@Override
-				public void menuSelected(MenuEvent e) {
-					boolean b = false;
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Roof) {
-						for (int i = 0; i < nUFactor; i++) {
-							if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(miUFactor[i].getText()))) {
-								Util.selectSilently(miUFactor[i], true);
-								b = true;
-								break;
-							}
-						}
-						if (!b) {
-							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultRoofUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
-								for (int i = 0; i < nUFactor; i++) {
-									if (Util.isZero(defaultRoofUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
-										Util.selectSilently(miUFactor[i], true);
-										b = true;
-										break;
-									}
-								}
-							}
-							if (!b)
-								miUFactor[nUFactor].setSelected(true);
-						}
-					}
-				}
-
-				@Override
-				public void menuDeselected(MenuEvent e) {
-				}
-
-				@Override
-				public void menuCanceled(MenuEvent e) {
-				}
-
-			});
-
-			popupMenuForRoof.addPopupMenuListener(new PopupMenuListener() {
-
-				@Override
-				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null)
-						return;
-					String s = selectedPart.toString();
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1));
-				}
-
-				@Override
-				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				}
-
-				@Override
-				public void popupMenuCanceled(PopupMenuEvent e) {
-				}
-
-			});
-
 			popupMenuForRoof.add(miInfo);
-			popupMenuForRoof.add(miColor);
-			popupMenuForRoof.add(uFactorMenu);
-
+			popupMenuForRoof.add(colorAction);
+			popupMenuForRoof.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_ROOF, 0));
+			popupMenuForRoof.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF, 1));
 		}
 
 		return popupMenuForRoof;
@@ -573,114 +289,12 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForDoor() {
 
 		if (popupMenuForDoor == null) {
-
-			popupMenuForDoor = new JPopupMenu();
-			popupMenuForDoor.setInvoker(MainPanel.getInstance().getCanvasPanel());
-
+			popupMenuForDoor = createPopupMenu();
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
-			final JMenuItem miColor = new JMenuItem("Color");
-			miColor.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					MainFrame.getInstance().showColorDialogForIndividualPart();
-				}
-			});
-
-			final JMenu uFactorMenu = new JMenu("U-Factor");
-
-			ButtonGroup uFactorButtonGroup = new ButtonGroup();
-
-			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_DOOR.length;
-			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
-			miUFactor[nUFactor] = new JRadioButtonMenuItem();
-			uFactorButtonGroup.add(miUFactor[nUFactor]);
-
-			for (int i = 0; i < nUFactor; i++) {
-				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_DOOR[i]);
-				final int i2 = i;
-				miUFactor[i].addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Door) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
-							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
-							Scene.getInstance().setEdited(true);
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-						}
-					}
-				});
-				uFactorButtonGroup.add(miUFactor[i]);
-				uFactorMenu.add(miUFactor[i]);
-			}
-
-			uFactorMenu.addMenuListener(new MenuListener() {
-
-				@Override
-				public void menuSelected(MenuEvent e) {
-					boolean b = false;
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Door) {
-						for (int i = 0; i < nUFactor; i++) {
-							if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(miUFactor[i].getText()))) {
-								Util.selectSilently(miUFactor[i], true);
-								b = true;
-								break;
-							}
-						}
-						if (!b) {
-							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultDoorUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getDoorsComboBox());
-								for (int i = 0; i < nUFactor; i++) {
-									if (Util.isZero(defaultDoorUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
-										Util.selectSilently(miUFactor[i], true);
-										b = true;
-										break;
-									}
-								}
-							}
-							if (!b)
-								miUFactor[nUFactor].setSelected(true);
-						}
-					}
-				}
-
-				@Override
-				public void menuDeselected(MenuEvent e) {
-				}
-
-				@Override
-				public void menuCanceled(MenuEvent e) {
-				}
-
-			});
-
-			popupMenuForDoor.addPopupMenuListener(new PopupMenuListener() {
-
-				@Override
-				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null)
-						return;
-					String s = selectedPart.toString();
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1));
-				}
-
-				@Override
-				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				}
-
-				@Override
-				public void popupMenuCanceled(PopupMenuEvent e) {
-				}
-
-			});
-
 			popupMenuForDoor.add(miInfo);
-			popupMenuForDoor.add(miColor);
-			popupMenuForDoor.add(uFactorMenu);
-
+			popupMenuForDoor.add(colorAction);
+			popupMenuForDoor.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_DOOR, 0));
 		}
 
 		return popupMenuForDoor;
@@ -690,115 +304,13 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForFoundation() {
 
 		if (popupMenuForFoundation == null) {
-
-			popupMenuForFoundation = new JPopupMenu();
-			popupMenuForFoundation.setInvoker(MainPanel.getInstance().getCanvasPanel());
-
+			popupMenuForFoundation = createPopupMenu();
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
-			final JMenuItem miColor = new JMenuItem("Color");
-			miColor.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					MainFrame.getInstance().showColorDialogForIndividualPart();
-				}
-			});
-
-			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
-			final JMenu uFactorMenu = new JMenu("Floor U-Factor");
-
-			ButtonGroup uFactorButtonGroup = new ButtonGroup();
-
-			final int nUFactor = EnergyPanel.U_FACTOR_CHOICES_FLOOR.length;
-			final JRadioButtonMenuItem[] miUFactor = new JRadioButtonMenuItem[nUFactor + 1];
-			miUFactor[nUFactor] = new JRadioButtonMenuItem();
-			uFactorButtonGroup.add(miUFactor[nUFactor]);
-
-			for (int i = 0; i < nUFactor; i++) {
-				miUFactor[i] = new JRadioButtonMenuItem(EnergyPanel.U_FACTOR_CHOICES_FLOOR[i]);
-				final int i2 = i;
-				miUFactor[i].addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Foundation) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
-							selectedPart.setUFactor(Scene.parsePropertyString(miUFactor[i2].getText()));
-							Scene.getInstance().setEdited(true);
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-						}
-					}
-				});
-				uFactorButtonGroup.add(miUFactor[i]);
-				uFactorMenu.add(miUFactor[i]);
-			}
-
-			uFactorMenu.addMenuListener(new MenuListener() {
-
-				@Override
-				public void menuSelected(MenuEvent e) {
-					boolean b = false;
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Foundation) {
-						for (int i = 0; i < nUFactor; i++) {
-							if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(miUFactor[i].getText()))) {
-								Util.selectSilently(miUFactor[i], true);
-								b = true;
-								break;
-							}
-						}
-						if (!b) {
-							if (Util.isZero(selectedPart.getUFactor())) {
-								double defaultFloorUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getFloorsComboBox());
-								for (int i = 0; i < nUFactor; i++) {
-									if (Util.isZero(defaultFloorUFactor - Scene.parsePropertyString(miUFactor[i].getText()))) {
-										Util.selectSilently(miUFactor[i], true);
-										b = true;
-										break;
-									}
-								}
-							}
-							if (!b)
-								miUFactor[nUFactor].setSelected(true);
-						}
-					}
-				}
-
-				@Override
-				public void menuDeselected(MenuEvent e) {
-				}
-
-				@Override
-				public void menuCanceled(MenuEvent e) {
-				}
-
-			});
-
-			popupMenuForFoundation.addPopupMenuListener(new PopupMenuListener() {
-
-				@Override
-				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null)
-						return;
-					String s = selectedPart.toString();
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1));
-				}
-
-				@Override
-				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				}
-
-				@Override
-				public void popupMenuCanceled(PopupMenuEvent e) {
-				}
-
-			});
-
 			popupMenuForFoundation.add(miInfo);
-			popupMenuForFoundation.add(miColor);
-			popupMenuForFoundation.add(uFactorMenu);
-
+			popupMenuForFoundation.add(colorAction);
+			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
+			popupMenuForFoundation.add(createPropertyMenu("Floor U-Factor", EnergyPanel.U_FACTOR_CHOICES_FLOOR, 0));
 		}
 
 		return popupMenuForFoundation;
@@ -809,32 +321,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForSolarPanel == null) {
 
-			popupMenuForSolarPanel = new JPopupMenu();
-			popupMenuForSolarPanel.setInvoker(MainPanel.getInstance().getCanvasPanel());
-
-			final JMenuItem miInfo = new JMenuItem();
-			miInfo.setEnabled(false);
-
-			popupMenuForSolarPanel.addPopupMenuListener(new PopupMenuListener() {
-
-				@Override
-				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null)
-						return;
-					String s = selectedPart.toString();
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1));
-				}
-
-				@Override
-				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				}
-
-				@Override
-				public void popupMenuCanceled(PopupMenuEvent e) {
-				}
-
-			});
+			popupMenuForSolarPanel = createPopupMenu();
 
 			final JMenu efficiencyMenu = new JMenu("Energy Conversion Efficiency");
 
@@ -898,12 +385,149 @@ public class PopupMenuFactory {
 
 			});
 
+			final JMenuItem miInfo = new JMenuItem();
+			miInfo.setEnabled(false);
 			popupMenuForSolarPanel.add(miInfo);
 			popupMenuForSolarPanel.add(efficiencyMenu);
 
 		}
 
 		return popupMenuForSolarPanel;
+
+	}
+
+	private static JPopupMenu createPopupMenu() {
+
+		final JPopupMenu popupMenu = new JPopupMenu();
+		popupMenu.setInvoker(MainPanel.getInstance().getCanvasPanel());
+		popupMenu.addPopupMenuListener(new PopupMenuListener() {
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart == null)
+					return;
+				String s = selectedPart.toString();
+				((JMenuItem) popupMenu.getComponent(0)).setText(s.substring(0, s.indexOf(')') + 1));
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+			}
+
+		});
+
+		return popupMenu;
+
+	}
+
+	private static JMenu createPropertyMenu(final String title, final String[] items, final int type) {
+
+		final JMenu menu = new JMenu(title);
+
+		ButtonGroup buttonGroup = new ButtonGroup();
+
+		final int itemCount = items.length;
+		final JRadioButtonMenuItem[] mi = new JRadioButtonMenuItem[itemCount + 1];
+		mi[itemCount] = new JRadioButtonMenuItem();
+		buttonGroup.add(mi[itemCount]);
+
+		for (int i = 0; i < itemCount; i++) {
+			mi[i] = new JRadioButtonMenuItem(items[i]);
+			final int i2 = i;
+			mi[i].addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					switch (type) {
+					case 0:
+						SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
+						selectedPart.setUFactor(Scene.parsePropertyString(mi[i2].getText()));
+						break;
+					case 1:
+						// SceneManager.getInstance().getUndoManager().addEdit(new ChangePartVolumetricHeatCapacityCommand(selectedPart));
+						selectedPart.setVolumetricHeatCapacity(Scene.parsePropertyString(mi[i2].getText()));
+						break;
+					}
+					Scene.getInstance().setEdited(true);
+					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				}
+			});
+			buttonGroup.add(mi[i]);
+			menu.add(mi[i]);
+		}
+
+		menu.addMenuListener(new MenuListener() {
+
+			@Override
+			public void menuSelected(MenuEvent e) {
+				boolean b = false;
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				switch (type) {
+				case 0:
+					for (int i = 0; i < itemCount; i++) {
+						if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(mi[i].getText()))) {
+							Util.selectSilently(mi[i], true);
+							b = true;
+							break;
+						}
+					}
+					if (!b) {
+						if (Util.isZero(selectedPart.getUFactor())) {
+							double defaultWallUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
+							for (int i = 0; i < itemCount; i++) {
+								if (Util.isZero(defaultWallUFactor - Scene.parsePropertyString(mi[i].getText()))) {
+									Util.selectSilently(mi[i], true);
+									b = true;
+									break;
+								}
+							}
+						}
+						if (!b)
+							mi[itemCount].setSelected(true);
+					}
+					break;
+				case 1:
+					for (int i = 0; i < itemCount; i++) {
+						if (Util.isZero(selectedPart.getVolumetricHeatCapacity() - Scene.parsePropertyString(mi[i].getText()))) {
+							Util.selectSilently(mi[i], true);
+							b = true;
+							break;
+						}
+					}
+					if (!b) {
+						if (Util.isZero(selectedPart.getVolumetricHeatCapacity())) {
+							double defaultWallVolumetricHeatCapacity = 0.25;
+							for (int i = 0; i < itemCount; i++) {
+								if (Util.isZero(defaultWallVolumetricHeatCapacity - Scene.parsePropertyString(mi[i].getText()))) {
+									Util.selectSilently(mi[i], true);
+									b = true;
+									break;
+								}
+							}
+						}
+						if (!b)
+							mi[itemCount].setSelected(true);
+					}
+					break;
+				}
+			}
+
+			@Override
+			public void menuDeselected(MenuEvent e) {
+			}
+
+			@Override
+			public void menuCanceled(MenuEvent e) {
+			}
+
+		});
+
+		return menu;
 
 	}
 

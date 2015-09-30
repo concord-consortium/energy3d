@@ -99,7 +99,7 @@ public abstract class HousePart implements Serializable {
 	private boolean firstPointInserted = false;
 	private boolean freeze;
 	private double uFactor = 0;
-	private double volumetricHeatCapacity = 0.25; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
+	private double volumetricHeatCapacity = 0.25; // Default to oak wood, unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 
 	transient Line heatFlux;
 	transient static float heatFluxUnitArea = 2;
@@ -174,7 +174,7 @@ public abstract class HousePart implements Serializable {
 		if (id == 0)
 			id = Scene.getInstance().nextID();
 		if (volumetricHeatCapacity <= 0) // if not set in saved file
-			volumetricHeatCapacity = 1;
+			volumetricHeatCapacity = 0.25;
 
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");

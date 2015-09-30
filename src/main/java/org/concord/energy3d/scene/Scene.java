@@ -124,7 +124,7 @@ public class Scene implements Serializable {
 	private double solarPanelEfficiency;
 	private double windowSolarHeatGainCoefficient; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
 	private double backgroundAlbedo = 0.3;
-	private double volumetricHeatCapacity = 0.25; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
+	private double volumetricHeatCapacity = 0.25; // Default to oak wood, unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
 	private boolean fullEnergyInSolarMap = false;
