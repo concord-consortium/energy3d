@@ -130,9 +130,9 @@ class SimulationSettingsDialog extends JDialog {
 		panel.add(new JLabel("Dimensionless [0-1]"));
 
 		// set the default volumetric heat capacity
-		panel.add(new JLabel("Default Volumetric Heat Capacity: "));
+		panel.add(new JLabel("Volumetric Heat Capacity: "));
 		panel.add(volumetricHeatCapacityTextField);
-		panel.add(new JLabel("<html>kWh/m<sup>3</sup>/C</html>"));
+		panel.add(new JLabel("<html>kWh/(m<sup>3</sup>&times;C)</html>"));
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

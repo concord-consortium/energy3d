@@ -32,6 +32,7 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Foundation extends HousePart {
+
 	private static final long serialVersionUID = 1L;
 	private static DecimalFormat format = new DecimalFormat();
 	private transient ArrayList<Vector3> orgPoints;

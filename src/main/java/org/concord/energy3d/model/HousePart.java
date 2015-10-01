@@ -1005,9 +1005,8 @@ public abstract class HousePart implements Serializable {
 				heat /= a * heatLoss.length;
 				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
-				final int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
-				heat = heatLoss[hourOfDay * 4] + heatLoss[hourOfDay * 4 + 1] + heatLoss[hourOfDay * 4 + 2] + heatLoss[hourOfDay * 4 + 3];
-				heat /= 4 * a;
+				final int hourOfDay4 = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY) * 4;
+				heat = (heatLoss[hourOfDay4] + heatLoss[hourOfDay4 + 1] + heatLoss[hourOfDay4 + 2] + heatLoss[hourOfDay4 + 3]) / (4 * a);
 				heatFlux.setDefaultColor(ColorRGBA.WHITE);
 			}
 		}

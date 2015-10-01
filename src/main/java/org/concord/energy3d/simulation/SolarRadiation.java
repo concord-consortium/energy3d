@@ -544,17 +544,32 @@ public class SolarRadiation {
 			}
 		}
 
+		final Calendar today = Heliodon.getInstance().getCalender();
+		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, city);
+
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
 				final Foundation foundation = (Foundation) part;
-				final double[] heatLoss = foundation.getHeatLoss();
-				final double[] passiveSolar = new double[heatLoss.length];
-				final double[] photovoltaic = new double[heatLoss.length];
+				final int n = foundation.getHeatLoss().length;
+				final double[] heatLoss = new double[n];
+				final double[] passiveSolar = new double[n];
+				final double[] photovoltaic = new double[n];
+				for (int i = 0; i < n; i++) {
+					double groundHeatLoss = foundation.getHeatLoss()[i];
+					// In most cases, the inside temperature is always higher than the ground temperature. In this winter, this adds to heating load, but in the summer, this reduces cooling load.
+					// In other words, geothermal energy is good in hot conditions. This is similar to passive solar energy, which is good in the winter but bad in the summer.
+					if (groundHeatLoss > 0 && outsideTemperatureRange[0] >= HeatLoad.LOWEST_TEMPERATURE_OF_WARM_DAY) {
+						heatLoss[i] -= groundHeatLoss;
+					} else {
+						heatLoss[i] += groundHeatLoss;
+					}
+				}
 				double solarPotentialTotal = 0.0;
-				for (final HousePart houseChild : Scene.getInstance().getParts())
+				for (final HousePart houseChild : Scene.getInstance().getParts()) {
 					if (houseChild.getTopContainer() == foundation) {
 						houseChild.setSolarPotentialToday(0.0);
-						for (int i = 0; i < houseChild.getSolarPotential().length; i++) {
+						for (int i = 0; i < n; i++) {
 							solarPotentialTotal += houseChild.getSolarPotential()[i];
 							houseChild.setSolarPotentialToday(houseChild.getSolarPotentialToday() + houseChild.getSolarPotential()[i]);
 							if (houseChild instanceof Wall || houseChild instanceof Door || houseChild instanceof Window || houseChild instanceof Roof)
@@ -568,20 +583,23 @@ public class SolarRadiation {
 							}
 						}
 					}
+				}
 
 				double heatingTotal = 0.0;
 				double coolingTotal = 0.0;
 				double passiveSolarTotal = 0.0;
 				double photovoltaicTotal = 0.0;
-				for (int i = 0; i < heatLoss.length; i++) {
-					if (heatLoss[i] < 0)
+				for (int i = 0; i < n; i++) {
+					if (heatLoss[i] < 0) {
 						heatLoss[i] -= passiveSolar[i];
-					else
+					} else {
 						heatLoss[i] = Math.max(0, heatLoss[i] - passiveSolar[i]);
-					if (heatLoss[i] > 0)
+					}
+					if (heatLoss[i] > 0) {
 						heatingTotal += heatLoss[i];
-					else
+					} else {
 						coolingTotal -= heatLoss[i];
+					}
 					passiveSolarTotal += passiveSolar[i];
 					photovoltaicTotal += photovoltaic[i];
 				}
@@ -594,7 +612,9 @@ public class SolarRadiation {
 				foundation.setCoolingToday(coolingTotal);
 				foundation.setTotalEnergyToday(heatingTotal + coolingTotal - photovoltaicTotal);
 			}
+
 		}
+
 	}
 
 	private void applyTexture(final Mesh mesh) {

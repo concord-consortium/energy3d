@@ -24,6 +24,7 @@ import com.ardor3d.scenegraph.Spatial;
 
 public class HeatLoad {
 
+	public final static double LOWEST_TEMPERATURE_OF_WARM_DAY = 15;
 	private final static HeatLoad instance = new HeatLoad();
 	private double wallUFactor, doorUFactor, windowUFactor, roofUFactor, floorUFactor;
 
@@ -104,7 +105,8 @@ public class HeatLoad {
 							if (isZero(uFactor))
 								continue;
 							double heatloss = roof.getArea(mesh) * uFactor * deltaT / 1000.0 / 60 * timeStep;
-							if (heatloss > 0 && outsideTemperatureRange[0] >= 15) // if outside is warmer than 15C, then there is no need to turn on the heater hence no heat loss
+							// if the lowest outside temperature is high enough, there is no need to turn on the heater hence no heat loss
+							if (heatloss > 0 && outsideTemperatureRange[0] >= LOWEST_TEMPERATURE_OF_WARM_DAY)
 								heatloss = 0;
 							roof.getHeatLoss()[iMinute] += heatloss;
 							final double[] heatLossArray = SolarRadiation.getInstance().getHeatLoss(mesh);
@@ -123,8 +125,7 @@ public class HeatLoad {
 						double[] buildingGeometry = foundation.getBuildingGeometry();
 						double area = buildingGeometry != null ? buildingGeometry[1] : foundation.getArea();
 						double heatloss = area * uFactor * deltaT / 1000.0 / 60 * timeStep;
-						if (heatloss > 0 && outsideTemperatureRange[0] >= 15) // if outside is warmer than 15C, then there is no need to turn on the heater hence no heat loss
-							heatloss = 0;
+						// if (iMinute % 4 == 0) System.out.println((int) (iMinute / 4) + "=" + outsideTemperature + ", " + groundTemperature + ", " + deltaT + ", " + heatloss);
 						foundation.getHeatLoss()[iMinute] += heatloss;
 					}
 				} else {
@@ -135,7 +136,8 @@ public class HeatLoad {
 						if (isZero(uFactor))
 							continue;
 						double heatloss = part.getArea() * uFactor * deltaT / 1000.0 / 60 * timeStep;
-						if (heatloss > 0 && outsideTemperatureRange[0] >= 15) // if outside is warmer than 15C, then there is no need to turn on the heater hence no heat loss
+						// if outside is warm enough, there is no need to turn on the heater hence no heat loss
+						if (heatloss > 0 && outsideTemperatureRange[0] >= LOWEST_TEMPERATURE_OF_WARM_DAY)
 							heatloss = 0;
 						part.getHeatLoss()[iMinute] += heatloss;
 					}
