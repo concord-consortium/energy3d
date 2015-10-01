@@ -131,10 +131,6 @@ public abstract class AnnualAnalysis extends Analysis {
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		// if (GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isWindowTranslucencySupported(TRANSLUCENT)) {
-		// dialog.setUndecorated(true);
-		// dialog.setOpacity(System.getProperty("os.name").startsWith("Mac") ? 0.5f : 0.75f);
-		// }
 
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
@@ -259,8 +255,10 @@ public abstract class AnnualAnalysis extends Analysis {
 					});
 					showRunsMenu.add(mi);
 					showRunsMenu.addSeparator();
+					Map<String, Double> recordedResults = getRecordedResults("Net");
 					for (final Results r : AnnualGraph.records) {
-						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(Integer.toString(r.getID()), !graph.isRunHidden(r.getID()));
+						String key = r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")");
+						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(r.getID() + ":" + r.getFileName() + " - " + Math.round(recordedResults.get(key) * 365.0 / 12.0) + " kWh", !graph.isRunHidden(r.getID()));
 						cbmi.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(final ItemEvent e) {
