@@ -279,8 +279,8 @@ abstract class Graph extends JPanel {
 					ymin = min;
 			}
 		}
-		dx = (float) (getWidth() - left - right) / (float) (xmax - xmin);
-		dy = (float) (getHeight() - top - bottom) / (float) (ymax - ymin);
+		dx = (double) (getWidth() - left - right) / (xmax - xmin);
+		dy = (double) (getHeight() - top - bottom) / (ymax - ymin);
 	}
 
 	void drawRecords(Graphics2D g2) {
@@ -300,7 +300,7 @@ abstract class Graph extends JPanel {
 				path.reset();
 				for (int i = 0; i < list.size(); i++) {
 					dataX = left + dx * i;
-					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+					dataY = getHeight() - top - (list.get(i) - ymin) * dy;
 					if (i == 0) {
 						path.moveTo(dataX, dataY);
 						g2.setColor(Color.GRAY);
@@ -341,7 +341,7 @@ abstract class Graph extends JPanel {
 				Path2D.Float path = new Path2D.Float();
 				for (int i = 0; i < list.size(); i++) {
 					dataX = left + dx * i;
-					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+					dataY = getHeight() - top - (list.get(i) - ymin) * dy;
 					if (i == 0)
 						path.moveTo(dataX, dataY);
 					else
@@ -354,7 +354,7 @@ abstract class Graph extends JPanel {
 				Color c = colors.get(key);
 				for (int i = 0; i < list.size(); i++) {
 					dataX = left + dx * i;
-					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+					dataY = getHeight() - top - (list.get(i) - ymin) * dy;
 					if ("Windows".equals(key)) {
 						drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
 					} else if ("Solar Panels".equals(key)) {
@@ -440,11 +440,12 @@ abstract class Graph extends JPanel {
 				double dataX, dataY;
 				for (int i = 0; i < list.size(); i++) {
 					dataX = left + dx * i;
-					dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
-					if (i == 0)
+					dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+					if (i == 0) {
 						path.moveTo(dataX, dataY);
-					else
+					} else {
 						path.lineTo(dataX, dataY);
+					}
 				}
 				g2.setStroke(thin);
 				g2.draw(path);
@@ -454,7 +455,7 @@ abstract class Graph extends JPanel {
 				case SENSOR:
 					for (int i = 0; i < list.size(); i++) {
 						dataX = left + dx * i;
-						dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
 						if (i == 0) {
 							int pound = key.indexOf("#");
 							String s = key.substring(pound);
@@ -470,7 +471,7 @@ abstract class Graph extends JPanel {
 					Color c = colors.get(key);
 					for (int i = 0; i < list.size(); i++) {
 						dataX = left + dx * i;
-						dataY = (float) (getHeight() - top - (list.get(i) - ymin) * dy);
+						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
 						if ("Solar".equals(key))
 							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
 						else if ("Heat Gain".equals(key))

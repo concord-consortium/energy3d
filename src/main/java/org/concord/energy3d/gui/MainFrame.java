@@ -72,6 +72,7 @@ import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.simulation.AnnualSensorData;
+import org.concord.energy3d.simulation.AnnualTemperature;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
@@ -124,6 +125,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem sensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem materialCostAnalysisMenuItem;
+	private JMenuItem temperatureAnalysisMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem solarHeatMapMenuItem;
 	private JCheckBoxMenuItem onlyAbsorptionInSolarMapMenuItem;
@@ -871,6 +873,8 @@ public class MainFrame extends JFrame {
 			});
 			analysisMenu.add(getMaterialCostAnalysisMenuItem());
 			analysisMenu.addSeparator();
+			analysisMenu.add(getTemperatureAnalysisMenuItem());
+			analysisMenu.addSeparator();
 			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
 			analysisMenu.add(getAnnualEnergyAnalysisForSelectionMenuItem());
 			analysisMenu.add(getDailyAnalysisMenuItem());
@@ -1208,6 +1212,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return materialCostAnalysisMenuItem;
+	}
+
+	private JMenuItem getTemperatureAnalysisMenuItem() {
+		if (temperatureAnalysisMenuItem == null) {
+			temperatureAnalysisMenuItem = new JMenuItem("Show Annual Temperature Variations...");
+			temperatureAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new AnnualTemperature().show();
+				}
+			});
+		}
+		return temperatureAnalysisMenuItem;
 	}
 
 	private JCheckBoxMenuItem getAnnotationsInwardMenuItem() {

@@ -336,4 +336,5 @@ public abstract class AnnualAnalysis extends Analysis {
 		dialog.setVisible(true);
 
 	}
+
 }
