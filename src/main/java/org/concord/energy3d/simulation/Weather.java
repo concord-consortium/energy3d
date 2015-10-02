@@ -52,10 +52,15 @@ public class Weather {
 
 		final int[] monthlyLowTemperatures = LocationData.getInstance().getLowTemperatures().get(location);
 		final int[] monthlyHighTemperatures = LocationData.getInstance().getHighTemperatures().get(location);
-		final int monthFromIndex = monthFrom.get(Calendar.MONTH);
-		final int monthToIndex = monthTo.get(Calendar.MONTH);
-		outsideTemperature[0] = monthlyLowTemperatures[monthFromIndex] + (monthlyLowTemperatures[monthToIndex] - monthlyLowTemperatures[monthFromIndex]) * portion;
-		outsideTemperature[1] = monthlyHighTemperatures[monthFromIndex] + (monthlyHighTemperatures[monthToIndex] - monthlyHighTemperatures[monthFromIndex]) * portion;
+		if (monthlyHighTemperatures != null && monthlyLowTemperatures != null) {
+			final int monthFromIndex = monthFrom.get(Calendar.MONTH);
+			final int monthToIndex = monthTo.get(Calendar.MONTH);
+			outsideTemperature[0] = monthlyLowTemperatures[monthFromIndex] + (monthlyLowTemperatures[monthToIndex] - monthlyLowTemperatures[monthFromIndex]) * portion;
+			outsideTemperature[1] = monthlyHighTemperatures[monthFromIndex] + (monthlyHighTemperatures[monthToIndex] - monthlyHighTemperatures[monthFromIndex]) * portion;
+		} else {
+			outsideTemperature[0] = 0;
+			outsideTemperature[1] = 20;
+		}
 		return outsideTemperature;
 
 	}

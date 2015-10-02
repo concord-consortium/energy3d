@@ -238,7 +238,7 @@ public class EnergyPanel extends JPanel {
 				final String city = (String) cityComboBox.getSelectedItem();
 				if (city.equals("")) {
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nEnergy simulation will not be accurate.", "Warning", JOptionPane.WARNING_MESSAGE);
 				} else {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeCityCommand());
 					final Integer newLatitude = LocationData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).intValue();

@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
@@ -17,6 +18,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JPanel;
+
+import org.concord.energy3d.gui.EnergyPanel;
 
 /**
  * @author Charles Xie
@@ -253,6 +256,14 @@ abstract class Graph extends JPanel {
 		}
 
 		drawLegends(g2);
+
+		String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		if (!"".equals(city)) {
+			g2.setColor(Color.BLACK);
+			g2.setFont(new Font("Arial", Font.BOLD, 14));
+			FontMetrics fm = g2.getFontMetrics();
+			g2.drawString(city, (width - fm.stringWidth(city)) / 2, 20);
+		}
 
 	}
 
