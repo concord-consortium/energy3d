@@ -83,16 +83,18 @@ public class AnnualTemperature extends JPanel {
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		today.set(Calendar.DAY_OF_MONTH, 1);
 		int count = 0;
+		int lag = Ground.getInstance().getDailyLagInMinutes();
 		for (int m : AnnualAnalysis.MONTHS) {
 			today.set(Calendar.MONTH, m);
 			double[] r = Weather.computeOutsideTemperature(today, city);
 			lowestAirTemperature[count] = r[0];
 			highestAirTemperature[count] = r[1];
 			double amp = 0.5 * (r[1] - r[0]);
-			lowestGroundTemperatureSoil[count] = Ground.getInstance().getFloorTemperature(today.get(Calendar.DAY_OF_YEAR), Ground.getInstance().getDailyLagInMinutes(), amp, 1);
-			highestGroundTemperatureSoil[count] = Ground.getInstance().getFloorTemperature(today.get(Calendar.DAY_OF_YEAR), Ground.getInstance().getDailyLagInMinutes() + 720, amp, 1);
-			lowestGroundTemperatureDeep[count] = Ground.getInstance().getFloorTemperature(today.get(Calendar.DAY_OF_YEAR), Ground.getInstance().getDailyLagInMinutes(), amp, 50);
-			highestGroundTemperatureDeep[count] = Ground.getInstance().getFloorTemperature(today.get(Calendar.DAY_OF_YEAR), Ground.getInstance().getDailyLagInMinutes() + 720, amp, 50);
+			int day = today.get(Calendar.DAY_OF_YEAR);
+			lowestGroundTemperatureSoil[count] = Ground.getInstance().getFloorTemperature(day, lag, amp, 1); // (12 am + lag) is the coldest time
+			highestGroundTemperatureSoil[count] = Ground.getInstance().getFloorTemperature(day, lag + 720, amp, 1); // (12 pm + lag) is the hottest time
+			lowestGroundTemperatureDeep[count] = Ground.getInstance().getFloorTemperature(day, lag, amp, 50);
+			highestGroundTemperatureDeep[count] = Ground.getInstance().getFloorTemperature(day, lag + 720, amp, 50);
 			count++;
 		}
 
