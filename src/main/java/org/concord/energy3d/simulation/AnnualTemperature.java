@@ -91,10 +91,10 @@ public class AnnualTemperature extends JPanel {
 			highestAirTemperature[count] = r[1];
 			double amp = 0.5 * (r[1] - r[0]);
 			int day = today.get(Calendar.DAY_OF_YEAR);
-			lowestGroundTemperatureSoil[count] = Ground.getInstance().getFloorTemperature(day, lag, amp, 1); // (12 am + lag) is the coldest time
-			highestGroundTemperatureSoil[count] = Ground.getInstance().getFloorTemperature(day, lag + 720, amp, 1); // (12 pm + lag) is the hottest time
-			lowestGroundTemperatureDeep[count] = Ground.getInstance().getFloorTemperature(day, lag, amp, 50);
-			highestGroundTemperatureDeep[count] = Ground.getInstance().getFloorTemperature(day, lag + 720, amp, 50);
+			lowestGroundTemperatureSoil[count] = Ground.getInstance().getTemperatureMinuteOfDay(day, lag, amp, 1); // (12 am + lag) is the coldest time
+			highestGroundTemperatureSoil[count] = Ground.getInstance().getTemperatureMinuteOfDay(day, lag + 720, amp, 1); // (12 pm + lag) is the hottest time
+			lowestGroundTemperatureDeep[count] = Ground.getInstance().getTemperatureMinuteOfDay(day, lag, amp, 50);
+			highestGroundTemperatureDeep[count] = Ground.getInstance().getTemperatureMinuteOfDay(day, lag + 720, amp, 50);
 			count++;
 		}
 

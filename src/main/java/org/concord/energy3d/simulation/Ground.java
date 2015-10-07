@@ -34,12 +34,12 @@ public class Ground {
 		return dailyLagInMinutes;
 	}
 
-	public double getFloorTemperature(int day) {
-		return getFloorTemperature(day, defaultDepth);
+	public double getTemperatureOnDay(int day) {
+		return getTemperatureOnDay(day, defaultDepth);
 	}
 
 	/** calculate the average floor temperature of a given day using the Kusuda formula: http://soilphysics.okstate.edu/software/SoilTemperature/document.pdf */
-	public double getFloorTemperature(int day, double depth) {
+	public double getTemperatureOnDay(int day, double depth) {
 		String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		int[] loTemp = LocationData.getInstance().getLowTemperatures().get(city);
 		int[] hiTemp = LocationData.getInstance().getHighTemperatures().get(city);
@@ -65,12 +65,12 @@ public class Ground {
 		return ave - amp * Math.exp(-depth * Math.sqrt(OMEGA / thermalDiffusivity)) * Math.cos(Math.PI + 2 * OMEGA * (day - yearlyLagInDays - 0.5 * depth / Math.sqrt(OMEGA * thermalDiffusivity)));
 	}
 
-	public double getFloorTemperature(int day, int minute, double airTemperatrureFluctuationAmplitude) {
-		return getFloorTemperature(day) + Math.exp(-defaultDepth * Math.sqrt(OMEGA / thermalDiffusivity)) * airTemperatrureFluctuationAmplitude * Math.cos((1 - (minute - dailyLagInMinutes) / 720.0) * Math.PI);
+	public double getTemperatureMinuteOfDay(int day, int minute, double airTemperatrureFluctuationAmplitudeOfDay) {
+		return getTemperatureOnDay(day) + Math.exp(-defaultDepth * Math.sqrt(OMEGA / thermalDiffusivity)) * airTemperatrureFluctuationAmplitudeOfDay * Math.cos((1 - (minute - dailyLagInMinutes) / 720.0) * Math.PI);
 	}
 
-	public double getFloorTemperature(int day, int minute, double airTemperatrureFluctuationAmplitude, double depth) {
-		return getFloorTemperature(day, depth) + Math.exp(-depth * Math.sqrt(OMEGA / thermalDiffusivity)) * airTemperatrureFluctuationAmplitude * Math.cos((1 - (minute - dailyLagInMinutes) / 720.0) * Math.PI);
+	public double getTemperatureMinuteOfDay(int day, int minute, double airTemperatrureFluctuationAmplitudeOfDay, double depth) {
+		return getTemperatureOnDay(day, depth) + Math.exp(-depth * Math.sqrt(OMEGA / thermalDiffusivity)) * airTemperatrureFluctuationAmplitudeOfDay * Math.cos((1 - (minute - dailyLagInMinutes) / 720.0) * Math.PI);
 	}
 
 }

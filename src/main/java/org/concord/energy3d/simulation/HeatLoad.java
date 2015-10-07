@@ -116,7 +116,7 @@ public class HeatLoad {
 						}
 					}
 				} else if (part instanceof Foundation) {
-					double groundTemperature = Ground.getInstance().getFloorTemperature(today.get(Calendar.DAY_OF_YEAR), minute, 0.5 * (outsideTemperatureRange[1] - outsideTemperatureRange[0]));
+					double groundTemperature = Ground.getInstance().getTemperatureMinuteOfDay(today.get(Calendar.DAY_OF_YEAR), minute, 0.5 * (outsideTemperatureRange[1] - outsideTemperatureRange[0]));
 					double deltaT = insideTemperature - groundTemperature;
 					Foundation foundation = (Foundation) part;
 					if (foundation.isDrawCompleted()) {
