@@ -573,6 +573,24 @@ abstract class Graph extends JPanel {
 		g.drawRect(upperLeftX, upperLeftY, a, a);
 	}
 
+	static void drawTriangleUp(Graphics g, int upperLeftX, int upperLeftY, int a, Color c) {
+		int[] xPoints = new int[] { upperLeftX + a / 2, upperLeftX, upperLeftX + a };
+		int[] yPoints = new int[] { upperLeftY, upperLeftY + a, upperLeftY + a };
+		g.setColor(c);
+		g.fillPolygon(xPoints, yPoints, 3);
+		g.setColor(Color.BLACK);
+		g.drawPolygon(xPoints, yPoints, 3);
+	}
+
+	static void drawTriangleDown(Graphics g, int upperLeftX, int upperLeftY, int a, Color c) {
+		int[] xPoints = new int[] { upperLeftX, upperLeftX + a, upperLeftX + a / 2 };
+		int[] yPoints = new int[] { upperLeftY, upperLeftY, upperLeftY + a };
+		g.setColor(c);
+		g.fillPolygon(xPoints, yPoints, 3);
+		g.setColor(Color.BLACK);
+		g.drawPolygon(xPoints, yPoints, 3);
+	}
+
 	static void drawDiamond(Graphics g, int x, int y, int a, Color c) {
 		g.setColor(c);
 		Polygon p = new Polygon();
