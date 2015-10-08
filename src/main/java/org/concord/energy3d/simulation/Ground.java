@@ -17,8 +17,9 @@ public class Ground {
 	private static final double OMEGA_DAY = Math.PI / 720.0; // the daily cycle is 1440 minutes
 
 	private double thermalDiffusivity = 0.01; // the larger the thermal diffusivity is, the more the ground temperature is affected by air temperature
+	private double foundationDepth = 1;
+
 	private int yearlyLagInDays = 30;
-	private double defaultDepth = 1;
 	private int dailyLagInMinutes = 120;
 
 	public static Ground getInstance() {
@@ -26,6 +27,22 @@ public class Ground {
 	}
 
 	private Ground() {
+	}
+
+	public void setThermalDiffusivity(double thermalDiffusivity) {
+		this.thermalDiffusivity = thermalDiffusivity;
+	}
+
+	public double getThermalDiffusivity() {
+		return thermalDiffusivity;
+	}
+
+	public void setFoundationDepth(double foundationDepth) {
+		this.foundationDepth = foundationDepth;
+	}
+
+	public double getFoundationDepth() {
+		return foundationDepth;
 	}
 
 	public int getYearlyLagInDays() {
@@ -37,7 +54,7 @@ public class Ground {
 	}
 
 	public double getTemperatureOnDay(int day) {
-		return getTemperatureOnDay(day, defaultDepth);
+		return getTemperatureOnDay(day, foundationDepth);
 	}
 
 	/** calculate the average floor temperature of a given day using the Kusuda formula: http://soilphysics.okstate.edu/software/SoilTemperature/document.pdf */
@@ -69,7 +86,7 @@ public class Ground {
 	}
 
 	public double getTemperatureMinuteOfDay(int day, int minute, double airTemperatrureFluctuationAmplitudeOfDay) {
-		return getTemperatureOnDay(day) - Math.exp(-defaultDepth * Math.sqrt(OMEGA_DAY / (2.0 * thermalDiffusivity))) * airTemperatrureFluctuationAmplitudeOfDay * Math.cos(OMEGA_DAY * (minute - dailyLagInMinutes));
+		return getTemperatureOnDay(day) - Math.exp(-foundationDepth * Math.sqrt(OMEGA_DAY / (2.0 * thermalDiffusivity))) * airTemperatrureFluctuationAmplitudeOfDay * Math.cos(OMEGA_DAY * (minute - dailyLagInMinutes));
 	}
 
 	public double getTemperatureMinuteOfDay(int day, int minute, double airTemperatrureFluctuationAmplitudeOfDay, double depth) {

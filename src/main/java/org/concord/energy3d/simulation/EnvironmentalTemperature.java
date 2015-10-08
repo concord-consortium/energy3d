@@ -43,7 +43,7 @@ import org.concord.energy3d.util.Util;
  * 
  */
 
-public class AnnualTemperature extends JPanel {
+public class EnvironmentalTemperature extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private static final int CIRCLE = 0;
@@ -69,33 +69,51 @@ public class AnnualTemperature extends JPanel {
 	private double depth1 = 0.5;
 	private double depth2 = 1;
 	private double depth3 = 6;
+
 	private double[] lowestAirTemperature;
 	private double[] highestAirTemperature;
+	private double[] averageAirTemperature;
+
 	private double[] lowestGroundTemperature1;
 	private double[] highestGroundTemperature1;
+	private double[] averageGroundTemperature1;
+
 	private double[] lowestGroundTemperature2;
 	private double[] highestGroundTemperature2;
+	private double[] averageGroundTemperature2;
+
 	private double[] lowestGroundTemperature3;
 	private double[] highestGroundTemperature3;
+	private double[] averageGroundTemperature3;
 
+	private boolean showAverage = false;
 	private Map<double[], Boolean> hideData;
 
-	public AnnualTemperature() {
+	public EnvironmentalTemperature() {
 
 		super();
 		setPreferredSize(new Dimension(600, 400));
 		setBackground(Color.WHITE);
 
 		hideData = new HashMap<double[], Boolean>();
+
 		int n = AnnualAnalysis.MONTHS.length;
 		lowestAirTemperature = new double[n];
 		highestAirTemperature = new double[n];
+		averageAirTemperature = new double[n];
+
 		lowestGroundTemperature1 = new double[n];
 		highestGroundTemperature1 = new double[n];
+		averageGroundTemperature1 = new double[n];
+
 		lowestGroundTemperature2 = new double[n];
 		highestGroundTemperature2 = new double[n];
+		averageGroundTemperature2 = new double[n];
+
 		lowestGroundTemperature3 = new double[n];
 		highestGroundTemperature3 = new double[n];
+		averageGroundTemperature3 = new double[n];
+
 		hideData.put(lowestAirTemperature, false);
 		hideData.put(lowestGroundTemperature1, false);
 		hideData.put(lowestGroundTemperature2, false);
@@ -123,6 +141,13 @@ public class AnnualTemperature extends JPanel {
 			lowestGroundTemperature3[count] = Ground.getInstance().getTemperatureMinuteOfDay(day, lag, amp, depth3);
 			highestGroundTemperature3[count] = Ground.getInstance().getTemperatureMinuteOfDay(day, lag + 720, amp, depth3);
 			count++;
+		}
+
+		for (int i = 0; i < count; i++) {
+			averageAirTemperature[i] = 0.5 * (lowestAirTemperature[i] + highestAirTemperature[i]);
+			averageGroundTemperature1[i] = 0.5 * (lowestGroundTemperature1[i] + highestGroundTemperature1[i]);
+			averageGroundTemperature2[i] = 0.5 * (lowestGroundTemperature2[i] + highestGroundTemperature2[i]);
+			averageGroundTemperature3[i] = 0.5 * (lowestGroundTemperature3[i] + highestGroundTemperature3[i]);
 		}
 
 	}
@@ -179,20 +204,36 @@ public class AnnualTemperature extends JPanel {
 		}
 
 		if (!hideData.get(lowestAirTemperature)) {
-			drawCurve(g2, lowestAirTemperature, Color.BLUE, CIRCLE, thick);
-			drawCurve(g2, highestAirTemperature, Color.RED, CIRCLE, thick);
+			if (showAverage) {
+				drawCurve(g2, averageAirTemperature, Color.MAGENTA, CIRCLE, thick);
+			} else {
+				drawCurve(g2, lowestAirTemperature, Color.BLUE, CIRCLE, thick);
+				drawCurve(g2, highestAirTemperature, Color.RED, CIRCLE, thick);
+			}
 		}
 		if (!hideData.get(lowestGroundTemperature1)) {
-			drawCurve(g2, lowestGroundTemperature1, Color.BLUE, SQUARE, thick);
-			drawCurve(g2, highestGroundTemperature1, Color.RED, SQUARE, thick);
+			if (showAverage) {
+				drawCurve(g2, averageGroundTemperature1, Color.MAGENTA, SQUARE, thick);
+			} else {
+				drawCurve(g2, lowestGroundTemperature1, Color.BLUE, SQUARE, thick);
+				drawCurve(g2, highestGroundTemperature1, Color.RED, SQUARE, thick);
+			}
 		}
 		if (!hideData.get(lowestGroundTemperature2)) {
-			drawCurve(g2, lowestGroundTemperature2, Color.BLUE, DIAMOND, thick);
-			drawCurve(g2, highestGroundTemperature2, Color.RED, DIAMOND, thick);
+			if (showAverage) {
+				drawCurve(g2, averageGroundTemperature2, Color.MAGENTA, DIAMOND, thick);
+			} else {
+				drawCurve(g2, lowestGroundTemperature2, Color.BLUE, DIAMOND, thick);
+				drawCurve(g2, highestGroundTemperature2, Color.RED, DIAMOND, thick);
+			}
 		}
 		if (!hideData.get(lowestGroundTemperature3)) {
-			drawCurve(g2, lowestGroundTemperature3, Color.GRAY, -1, dashed);
-			drawCurve(g2, highestGroundTemperature3, Color.GRAY, -1, dashed);
+			if (showAverage) {
+				drawCurve(g2, averageGroundTemperature3, Color.MAGENTA, -1, dashed);
+			} else {
+				drawCurve(g2, lowestGroundTemperature3, Color.BLUE, -1, dashed);
+				drawCurve(g2, highestGroundTemperature3, Color.RED, -1, dashed);
+			}
 		}
 
 		drawLegends(g2);
@@ -211,61 +252,88 @@ public class AnnualTemperature extends JPanel {
 		int y0 = top - 10;
 
 		if (!hideData.get(lowestAirTemperature)) {
-			g2.setColor(Color.RED);
-			g2.setStroke(thick);
-			g2.drawLine(x0 - 7, y0 + 3, x0 + 13, y0 + 3);
-			g2.setStroke(thin);
-			Graph.drawCircle(g2, x0, y0, 6, Color.WHITE);
-			g2.drawString("Air (Highest)", x0 + 20, y0 + 8);
-			y0 += 14;
-
-			g2.setColor(Color.BLUE);
-			g2.setStroke(thick);
-			g2.drawLine(x0 - 7, y0 + 3, x0 + 13, y0 + 3);
-			g2.setStroke(thin);
-			Graph.drawCircle(g2, x0, y0, 6, Color.WHITE);
-			g2.drawString("Air (Lowest)", x0 + 20, y0 + 8);
-			y0 += 14;
+			if (showAverage) {
+				g2.setColor(Color.MAGENTA);
+				g2.setStroke(thick);
+				g2.drawLine(x0 - 7, y0 + 3, x0 + 13, y0 + 3);
+				g2.setStroke(thin);
+				Graph.drawCircle(g2, x0, y0, 6, Color.WHITE);
+				g2.drawString("Air (Average)", x0 + 20, y0 + 8);
+				y0 += 14;
+			} else {
+				g2.setColor(Color.RED);
+				g2.setStroke(thick);
+				g2.drawLine(x0 - 7, y0 + 3, x0 + 13, y0 + 3);
+				g2.setStroke(thin);
+				Graph.drawCircle(g2, x0, y0, 6, Color.WHITE);
+				g2.drawString("Air (Highest)", x0 + 20, y0 + 8);
+				y0 += 14;
+				g2.setColor(Color.BLUE);
+				g2.setStroke(thick);
+				g2.drawLine(x0 - 7, y0 + 3, x0 + 13, y0 + 3);
+				g2.setStroke(thin);
+				Graph.drawCircle(g2, x0, y0, 6, Color.WHITE);
+				g2.drawString("Air (Lowest)", x0 + 20, y0 + 8);
+				y0 += 14;
+			}
 		}
 
 		if (!hideData.get(lowestGroundTemperature1)) {
-			g2.setColor(Color.RED);
-			g2.setStroke(thick);
-			g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
-			g2.setStroke(thin);
-			Graph.drawDiamond(g2, x0 + 3, y0 + 4, 4, Color.WHITE);
-			g2.drawString("Ground (" + depth1 + "m deep, Highest)", x0 + 20, y0 + 8);
-			y0 += 14;
-
-			g2.setColor(Color.BLUE);
-			g2.setStroke(thick);
-			g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
-			g2.setStroke(thin);
-			Graph.drawDiamond(g2, x0 + 3, y0 + 4, 4, Color.WHITE);
-			g2.drawString("Ground (" + depth1 + "m deep, Lowest)", x0 + 20, y0 + 8);
-			y0 += 14;
+			if (showAverage) {
+				g2.setColor(Color.MAGENTA);
+				g2.setStroke(thick);
+				g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
+				g2.setStroke(thin);
+				Graph.drawDiamond(g2, x0 + 3, y0 + 4, 4, Color.WHITE);
+				g2.drawString("Ground (" + depth1 + "m deep, Average)", x0 + 20, y0 + 8);
+				y0 += 14;
+			} else {
+				g2.setColor(Color.RED);
+				g2.setStroke(thick);
+				g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
+				g2.setStroke(thin);
+				Graph.drawDiamond(g2, x0 + 3, y0 + 4, 4, Color.WHITE);
+				g2.drawString("Ground (" + depth1 + "m deep, Highest)", x0 + 20, y0 + 8);
+				y0 += 14;
+				g2.setColor(Color.BLUE);
+				g2.setStroke(thick);
+				g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
+				g2.setStroke(thin);
+				Graph.drawDiamond(g2, x0 + 3, y0 + 4, 4, Color.WHITE);
+				g2.drawString("Ground (" + depth1 + "m deep, Lowest)", x0 + 20, y0 + 8);
+				y0 += 14;
+			}
 		}
 
 		if (!hideData.get(lowestGroundTemperature2)) {
-			g2.setColor(Color.RED);
-			g2.setStroke(thick);
-			g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
-			g2.setStroke(thin);
-			Graph.drawSquare(g2, x0, y0, 6, Color.WHITE);
-			g2.drawString("Ground (" + depth2 + "m deep, Highest)", x0 + 20, y0 + 8);
-			y0 += 14;
-
-			g2.setColor(Color.BLUE);
-			g2.setStroke(thick);
-			g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
-			g2.setStroke(thin);
-			Graph.drawSquare(g2, x0, y0, 6, Color.WHITE);
-			g2.drawString("Ground (" + depth2 + "m deep, Lowest)", x0 + 20, y0 + 8);
-			y0 += 14;
+			if (showAverage) {
+				g2.setColor(Color.MAGENTA);
+				g2.setStroke(thick);
+				g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
+				g2.setStroke(thin);
+				Graph.drawSquare(g2, x0, y0, 6, Color.WHITE);
+				g2.drawString("Ground (" + depth2 + "m deep, Average)", x0 + 20, y0 + 8);
+				y0 += 14;
+			} else {
+				g2.setColor(Color.RED);
+				g2.setStroke(thick);
+				g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
+				g2.setStroke(thin);
+				Graph.drawSquare(g2, x0, y0, 6, Color.WHITE);
+				g2.drawString("Ground (" + depth2 + "m deep, Highest)", x0 + 20, y0 + 8);
+				y0 += 14;
+				g2.setColor(Color.BLUE);
+				g2.setStroke(thick);
+				g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
+				g2.setStroke(thin);
+				Graph.drawSquare(g2, x0, y0, 6, Color.WHITE);
+				g2.drawString("Ground (" + depth2 + "m deep, Lowest)", x0 + 20, y0 + 8);
+				y0 += 14;
+			}
 		}
 
 		if (!hideData.get(lowestGroundTemperature3)) {
-			g2.setColor(Color.GRAY);
+			g2.setColor(Color.MAGENTA);
 			g2.setStroke(dashed);
 			g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
 			g2.setColor(Color.BLACK);
@@ -336,7 +404,9 @@ public class AnnualTemperature extends JPanel {
 
 	public void show() {
 
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Temperature", true);
+		EnergyPanel.getInstance().requestDisableActions(this);
+
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Environmental Temperature", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		final JPanel contentPane = new JPanel(new BorderLayout());
@@ -347,22 +417,25 @@ public class AnnualTemperature extends JPanel {
 
 		final JCheckBoxMenuItem cbmiAirTemperature = new JCheckBoxMenuItem("Air Temperature");
 		Util.selectSilently(cbmiAirTemperature, !hideData.get(lowestAirTemperature));
-		final JCheckBoxMenuItem cbmiGroundTemperature1m = new JCheckBoxMenuItem("Ground Temperature (" + depth1 + "m)");
-		Util.selectSilently(cbmiGroundTemperature1m, !hideData.get(lowestGroundTemperature1));
-		final JCheckBoxMenuItem cbmiGroundTemperature5m = new JCheckBoxMenuItem("Ground Temperature (" + depth2 + "m)");
-		Util.selectSilently(cbmiGroundTemperature5m, !hideData.get(lowestGroundTemperature2));
-		final JCheckBoxMenuItem cbmiGroundTemperature50m = new JCheckBoxMenuItem("Ground Temperature (" + depth3 + "m)");
-		Util.selectSilently(cbmiGroundTemperature50m, !hideData.get(lowestGroundTemperature3));
+		final JCheckBoxMenuItem cbmiGroundTemperature1 = new JCheckBoxMenuItem("Ground Temperature (" + depth1 + "m)");
+		Util.selectSilently(cbmiGroundTemperature1, !hideData.get(lowestGroundTemperature1));
+		final JCheckBoxMenuItem cbmiGroundTemperature2 = new JCheckBoxMenuItem("Ground Temperature (" + depth2 + "m)");
+		Util.selectSilently(cbmiGroundTemperature2, !hideData.get(lowestGroundTemperature2));
+		final JCheckBoxMenuItem cbmiGroundTemperature3 = new JCheckBoxMenuItem("Ground Temperature (" + depth3 + "m)");
+		Util.selectSilently(cbmiGroundTemperature3, !hideData.get(lowestGroundTemperature3));
+		final JCheckBoxMenuItem cbmiShowAverage = new JCheckBoxMenuItem("Show Average");
+		Util.selectSilently(cbmiShowAverage, showAverage);
 
-		final JMenu menu = new JMenu("View");
-		menuBar.add(menu);
-		menu.addMenuListener(new MenuListener() {
+		final JMenu menuView = new JMenu("View");
+		menuBar.add(menuView);
+		menuView.addMenuListener(new MenuListener() {
 			@Override
 			public void menuSelected(MenuEvent e) {
-				cbmiAirTemperature.setSelected(!hideData.get(lowestAirTemperature));
-				cbmiGroundTemperature1m.setSelected(!hideData.get(lowestGroundTemperature1));
-				cbmiGroundTemperature5m.setSelected(!hideData.get(lowestGroundTemperature2));
-				cbmiGroundTemperature50m.setSelected(!hideData.get(lowestGroundTemperature3));
+				Util.selectSilently(cbmiAirTemperature, !hideData.get(lowestAirTemperature));
+				Util.selectSilently(cbmiGroundTemperature1, !hideData.get(lowestGroundTemperature1));
+				Util.selectSilently(cbmiGroundTemperature2, !hideData.get(lowestGroundTemperature2));
+				Util.selectSilently(cbmiGroundTemperature3, !hideData.get(lowestGroundTemperature3));
+				Util.selectSilently(cbmiShowAverage, showAverage);
 			}
 
 			@Override
@@ -379,40 +452,52 @@ public class AnnualTemperature extends JPanel {
 			public void itemStateChanged(final ItemEvent e) {
 				JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
 				hideData.put(lowestAirTemperature, !source.isSelected());
-				AnnualTemperature.this.repaint();
+				EnvironmentalTemperature.this.repaint();
 			}
 		});
-		menu.add(cbmiAirTemperature);
+		menuView.add(cbmiAirTemperature);
 
-		cbmiGroundTemperature1m.addItemListener(new ItemListener() {
+		cbmiGroundTemperature1.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
 				hideData.put(lowestGroundTemperature1, !source.isSelected());
-				AnnualTemperature.this.repaint();
+				EnvironmentalTemperature.this.repaint();
 			}
 		});
-		menu.add(cbmiGroundTemperature1m);
+		menuView.add(cbmiGroundTemperature1);
 
-		cbmiGroundTemperature5m.addItemListener(new ItemListener() {
+		cbmiGroundTemperature2.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
 				hideData.put(lowestGroundTemperature2, !source.isSelected());
-				AnnualTemperature.this.repaint();
+				EnvironmentalTemperature.this.repaint();
 			}
 		});
-		menu.add(cbmiGroundTemperature5m);
+		menuView.add(cbmiGroundTemperature2);
 
-		cbmiGroundTemperature50m.addItemListener(new ItemListener() {
+		cbmiGroundTemperature3.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
 				hideData.put(lowestGroundTemperature3, !source.isSelected());
-				AnnualTemperature.this.repaint();
+				EnvironmentalTemperature.this.repaint();
 			}
 		});
-		menu.add(cbmiGroundTemperature50m);
+		menuView.add(cbmiGroundTemperature3);
+
+		menuView.addSeparator();
+
+		cbmiShowAverage.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
+				showAverage = source.isSelected();
+				EnvironmentalTemperature.this.repaint();
+			}
+		});
+		menuView.add(cbmiShowAverage);
 
 		final JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createEtchedBorder());
@@ -442,6 +527,8 @@ public class AnnualTemperature extends JPanel {
 		dialog.pack();
 		dialog.setLocationRelativeTo(MainFrame.getInstance());
 		dialog.setVisible(true);
+
+		EnergyPanel.getInstance().requestDisableActions(null);
 
 	}
 

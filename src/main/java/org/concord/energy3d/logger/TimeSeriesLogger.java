@@ -40,6 +40,7 @@ import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualSensorData;
+import org.concord.energy3d.simulation.EnvironmentalTemperature;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
@@ -428,7 +429,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 						}
 						analyzedPart = null;
 						line += "}";
-					} else { // if nothing analyzable is selected
+					} else {
 						if (analysisRequesterCopy instanceof Cost) {
 							line += "[";
 							Cost cost = (Cost) analysisRequesterCopy;
@@ -442,6 +443,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 							if (count > 0)
 								line = line.substring(0, line.length() - 2);
 							line += "]";
+						} else if (analysisRequesterCopy instanceof EnvironmentalTemperature) {
+							line += "{}";
 						}
 					}
 				}

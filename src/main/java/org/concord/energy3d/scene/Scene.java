@@ -35,6 +35,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
@@ -125,6 +126,7 @@ public class Scene implements Serializable {
 	private double windowSolarHeatGainCoefficient; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
 	private double backgroundAlbedo = 0.3;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
+	private double groundThermalDiffusivity = 0.01; // unit: m^2/s
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
 	private boolean fullEnergyInSolarMap = false;
@@ -395,10 +397,13 @@ public class Scene implements Serializable {
 		Util.selectSilently(energyPanel.getWindowSHGCComboBox(), Double.toString(instance.windowSolarHeatGainCoefficient));
 		if (Util.isZero(instance.volumetricHeatCapacity))
 			instance.volumetricHeatCapacity = 0.5;
+		if (Util.isZero(instance.groundThermalDiffusivity))
+			instance.groundThermalDiffusivity = 0.01;
 		if (Util.isZero(instance.backgroundAlbedo))
 			instance.backgroundAlbedo = 0.3;
 		if (Util.isZero(instance.heatVectorLength))
 			instance.heatVectorLength = 5000;
+		Ground.getInstance().setThermalDiffusivity(instance.groundThermalDiffusivity);
 		SolarRadiation.getInstance().setSolarStep(Util.isZero(instance.solarStep) ? 2 : instance.solarStep);
 		SolarRadiation.getInstance().setTimeStep(Util.isZero(instance.timeStep) ? 15 : instance.timeStep);
 		instance.setEdited(false);
@@ -1194,6 +1199,14 @@ public class Scene implements Serializable {
 
 	public double getVolumetricHeatCapacity() {
 		return volumetricHeatCapacity;
+	}
+
+	public void setGroundThermalDiffusivity(final double groundThermalDiffusivity) {
+		this.groundThermalDiffusivity = groundThermalDiffusivity;
+	}
+
+	public double getGroundThermalDiffusivity() {
+		return groundThermalDiffusivity;
 	}
 
 	public void setHeatVectorLength(final double heatVectorLength) {

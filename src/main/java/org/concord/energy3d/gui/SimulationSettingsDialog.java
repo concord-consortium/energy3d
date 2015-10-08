@@ -37,7 +37,7 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(6, 3, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(7, 3, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -46,6 +46,7 @@ class SimulationSettingsDialog extends JDialog {
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(SolarRadiation.getInstance().getTimeStep()));
 		final JTextField albedoTextField = new JTextField(FORMAT1.format(Scene.getInstance().getBackgroundAlbedo()));
 		final JTextField volumetricHeatCapacityTextField = new JTextField(FORMAT1.format(Scene.getInstance().getVolumetricHeatCapacity()));
+		final JTextField groundThermalDiffusivityTextField = new JTextField(FORMAT1.format(Scene.getInstance().getGroundThermalDiffusivity()));
 		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
 
 		ActionListener okListener = new ActionListener() {
@@ -55,12 +56,14 @@ class SimulationSettingsDialog extends JDialog {
 				int timeStep;
 				double albedo;
 				double volumetricHeatCapacity;
+				double groundThermalDiffusivity;
 				double heatVectorLength;
 				try {
 					cellSize = Double.parseDouble(cellSizeTextField.getText());
 					heatVectorLength = Double.parseDouble(heatVectorLengthTextField.getText());
 					timeStep = (int) Double.parseDouble(timeStepTextField.getText());
 					albedo = Double.parseDouble(albedoTextField.getText());
+					groundThermalDiffusivity = Double.parseDouble(groundThermalDiffusivityTextField.getText());
 					volumetricHeatCapacity = Double.parseDouble(volumetricHeatCapacityTextField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
@@ -84,6 +87,10 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Background albedo must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				if (groundThermalDiffusivity <= 0) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Ground thermal diffusivity cannot be zero or negative. must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				if (volumetricHeatCapacity <= 0) {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Volumetric heat capacity cannot be zero or negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -94,6 +101,7 @@ class SimulationSettingsDialog extends JDialog {
 				Scene.getInstance().setHeatVectorLength(heatVectorLength);
 				Scene.getInstance().setBackgroundAlbedo(albedo);
 				Scene.getInstance().setVolumetricHeatCapacity(volumetricHeatCapacity);
+				Scene.getInstance().setGroundThermalDiffusivity(groundThermalDiffusivity);
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				SimulationSettingsDialog.this.dispose();
@@ -123,11 +131,17 @@ class SimulationSettingsDialog extends JDialog {
 		panel.add(airMassComboBox);
 		panel.add(new JLabel("Dimensionless"));
 
-		// set the ground albedo
+		// set the background albedo
 		panel.add(new JLabel("Background Albedo: "));
 		panel.add(albedoTextField);
 		albedoTextField.setColumns(6);
 		panel.add(new JLabel("Dimensionless [0-1]"));
+
+		// set the ground thermal diffusivity
+		panel.add(new JLabel("Ground Thermal Diffusivity: "));
+		panel.add(groundThermalDiffusivityTextField);
+		groundThermalDiffusivityTextField.setColumns(6);
+		panel.add(new JLabel("<html>m<sup>2</sup>/s</html>"));
 
 		// set the default volumetric heat capacity
 		panel.add(new JLabel("Volumetric Heat Capacity: "));

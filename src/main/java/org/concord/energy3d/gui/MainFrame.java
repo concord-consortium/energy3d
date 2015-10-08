@@ -72,7 +72,7 @@ import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.simulation.AnnualSensorData;
-import org.concord.energy3d.simulation.AnnualTemperature;
+import org.concord.energy3d.simulation.EnvironmentalTemperature;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
@@ -125,7 +125,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem sensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem materialCostAnalysisMenuItem;
-	private JMenuItem temperatureAnalysisMenuItem;
+	private JMenuItem environmentalTemperatureMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem solarHeatMapMenuItem;
 	private JCheckBoxMenuItem onlyAbsorptionInSolarMapMenuItem;
@@ -873,7 +873,7 @@ public class MainFrame extends JFrame {
 			});
 			analysisMenu.add(getMaterialCostAnalysisMenuItem());
 			analysisMenu.addSeparator();
-			analysisMenu.add(getTemperatureAnalysisMenuItem());
+			analysisMenu.add(getEnvironmentalTemperatureMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
 			analysisMenu.add(getAnnualEnergyAnalysisForSelectionMenuItem());
@@ -1229,10 +1229,10 @@ public class MainFrame extends JFrame {
 		return materialCostAnalysisMenuItem;
 	}
 
-	private JMenuItem getTemperatureAnalysisMenuItem() {
-		if (temperatureAnalysisMenuItem == null) {
-			temperatureAnalysisMenuItem = new JMenuItem("Show Annual Temperature Variations...");
-			temperatureAnalysisMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getEnvironmentalTemperatureMenuItem() {
+		if (environmentalTemperatureMenuItem == null) {
+			environmentalTemperatureMenuItem = new JMenuItem("Show Annual Environmental Temperature...");
+			environmentalTemperatureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
@@ -1240,11 +1240,11 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					new AnnualTemperature().show();
+					new EnvironmentalTemperature().show();
 				}
 			});
 		}
-		return temperatureAnalysisMenuItem;
+		return environmentalTemperatureMenuItem;
 	}
 
 	private JCheckBoxMenuItem getAnnotationsInwardMenuItem() {
