@@ -64,6 +64,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
+import com.ardor3d.framework.jogl.JoglSwingCanvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.awt.AWTImageLoader;
@@ -435,7 +436,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (cameraNode == null) {
 			initCamera();
 			return false;
-		}
+		}		
+		float[] f = new float[2]; 
+		((JoglSwingCanvas)canvas).getRequestedSurfaceScale(f);
 		passManager.renderPasses(renderer);
 		try {
 			if (!Heliodon.getInstance().isNightTime())

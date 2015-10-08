@@ -4,7 +4,7 @@
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="dist" />
 
-	<condition property="JAVA_HOME" value="C:\Program Files\Java\jdk1.8.0_45\">
+	<condition property="JAVA_HOME" value="C:\Program Files\Java\jdk1.8.0_60\">
 		<os family="windows" />
 	</condition>
 	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home">
@@ -52,7 +52,7 @@
 		<pathelement path="${build.classes.dir}" />
 	</path>
 
-	<target name="default" depends="clean,compile,jar,deploy">
+	<target name="default" depends="jar,deploy">
 	</target>
 
 	<target name="deploy">
@@ -87,7 +87,7 @@
 		</fx:signjar>
 	</target>
 
-	<target name="jar">
+	<target name="jar" depends="compile">
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath=".:${JAVA_HOME}/lib/ant-javafx.jar" />
 		<fx:jar destfile="exe/energy3d.jar">
 			<fx:application name="Energy3D" mainClass="org.concord.energy3d.MainApplication" version="4.8" />
