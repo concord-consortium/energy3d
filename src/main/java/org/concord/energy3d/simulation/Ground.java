@@ -13,8 +13,10 @@ public class Ground {
 
 	private static final Ground instance = new Ground();
 
-	private static final double OMEGA = Math.PI / 365;
-	private double thermalDiffusivity = 0.1; // the larger the thermal diffusivity is, the more the ground temperature is affected by air temperature
+	private static final double OMEGA_YEAR = Math.PI / 182.5; // the annual cycle is 365 days
+	private static final double OMEGA_DAY = Math.PI / 720.0; // the daily cycle is 1440 minutes
+
+	private double thermalDiffusivity = 0.01; // the larger the thermal diffusivity is, the more the ground temperature is affected by air temperature
 	private int yearlyLagInDays = 30;
 	private double defaultDepth = 1;
 	private int dailyLagInMinutes = 120;
@@ -60,17 +62,18 @@ public class Ground {
 		}
 		ave /= 2 * n;
 		amp = 0.25 * (hiMax - hiMin + loMax - loMin);
+		double d2 = depth * Math.sqrt(OMEGA_YEAR / (2.0 * thermalDiffusivity));
 		if (LocationData.getInstance().getLatitutes().get(city) > 0)
-			return ave - amp * Math.exp(-depth * Math.sqrt(OMEGA / thermalDiffusivity)) * Math.cos(2 * OMEGA * (day - yearlyLagInDays - 0.5 * depth / Math.sqrt(OMEGA * thermalDiffusivity)));
-		return ave - amp * Math.exp(-depth * Math.sqrt(OMEGA / thermalDiffusivity)) * Math.cos(Math.PI + 2 * OMEGA * (day - yearlyLagInDays - 0.5 * depth / Math.sqrt(OMEGA * thermalDiffusivity)));
+			return ave - amp * Math.exp(-d2) * Math.cos(OMEGA_YEAR * (day - yearlyLagInDays) - d2);
+		return ave - amp * Math.exp(-d2) * Math.cos(Math.PI + OMEGA_YEAR * (day - yearlyLagInDays) - d2);
 	}
 
 	public double getTemperatureMinuteOfDay(int day, int minute, double airTemperatrureFluctuationAmplitudeOfDay) {
-		return getTemperatureOnDay(day) + Math.exp(-defaultDepth * Math.sqrt(OMEGA / thermalDiffusivity)) * airTemperatrureFluctuationAmplitudeOfDay * Math.cos((1 - (minute - dailyLagInMinutes) / 720.0) * Math.PI);
+		return getTemperatureOnDay(day) - Math.exp(-defaultDepth * Math.sqrt(OMEGA_DAY / (2.0 * thermalDiffusivity))) * airTemperatrureFluctuationAmplitudeOfDay * Math.cos(OMEGA_DAY * (minute - dailyLagInMinutes));
 	}
 
 	public double getTemperatureMinuteOfDay(int day, int minute, double airTemperatrureFluctuationAmplitudeOfDay, double depth) {
-		return getTemperatureOnDay(day, depth) + Math.exp(-depth * Math.sqrt(OMEGA / thermalDiffusivity)) * airTemperatrureFluctuationAmplitudeOfDay * Math.cos((1 - (minute - dailyLagInMinutes) / 720.0) * Math.PI);
+		return getTemperatureOnDay(day, depth) - Math.exp(-depth * Math.sqrt(OMEGA_DAY / (2.0 * thermalDiffusivity))) * airTemperatrureFluctuationAmplitudeOfDay * Math.cos(OMEGA_DAY * (minute - dailyLagInMinutes));
 	}
 
 }
