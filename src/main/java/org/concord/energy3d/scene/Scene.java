@@ -304,6 +304,7 @@ public class Scene implements Serializable {
 		final EnergyPanel energyPanel = EnergyPanel.getInstance();
 		if (instance.calendar != null) {
 			Heliodon.getInstance().setDate(instance.calendar.getTime());
+			Heliodon.getInstance().setTime(instance.calendar.getTime());
 			Util.setSilently(energyPanel.getDateSpinner(), instance.calendar.getTime());
 			Util.setSilently(energyPanel.getTimeSpinner(), instance.calendar.getTime());
 			energyPanel.setLatitude(instance.latitude); // already silent

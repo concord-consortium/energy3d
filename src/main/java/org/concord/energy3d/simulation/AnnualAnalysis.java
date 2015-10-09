@@ -258,7 +258,8 @@ public abstract class AnnualAnalysis extends Analysis {
 					Map<String, Double> recordedResults = getRecordedResults("Net");
 					for (final Results r : AnnualGraph.records) {
 						String key = r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")");
-						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(r.getID() + ":" + r.getFileName() + " - " + Math.round(recordedResults.get(key) * 365.0 / 12.0) + " kWh", !graph.isRunHidden(r.getID()));
+						Double result = recordedResults.get(key);
+						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(r.getID() + ":" + r.getFileName() + (result == null ? "" : " - " + Math.round(recordedResults.get(key) * 365.0 / 12.0) + " kWh"), !graph.isRunHidden(r.getID()));
 						cbmi.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(final ItemEvent e) {
