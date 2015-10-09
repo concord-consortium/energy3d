@@ -54,19 +54,21 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 	private int top = 50, right = 50, bottom = 80, left = 90;
 	private double xmin = 0;
-	private double xmax = 24;
+	private double xmax = 23;
 	private double ymin = 1000;
 	private double ymax = -1000;
 	private double dx;
 	private double dy;
+	private double xNow;
 	private int symbolSize = 8;
-	private int numberOfTicks = 25;
+	private int numberOfTicks = 24;
 	private String xAxisLabel = "Hour";
 	private String yAxisLabel = "Temperature (\u00b0C)";
 	private BasicStroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 2f }, 0.0f);
 	private BasicStroke thin = new BasicStroke(1);
 	private BasicStroke thick = new BasicStroke(2);
 	private String city;
+	private Calendar today;
 
 	private double lowestAirTemperature;
 	private double highestAirTemperature;
@@ -86,9 +88,9 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 		hideData = new HashMap<double[], Boolean>();
 
-		depth = new double[] { 0.5, 1, 2, 6 };
-		symbol = new int[] { CIRCLE, DIAMOND, SQUARE, -1 };
-		stroke = new BasicStroke[] { thick, thick, thick, dashed };
+		depth = new double[] { 0, 0.5, 1, 2, 6 };
+		symbol = new int[] { -1, CIRCLE, DIAMOND, SQUARE, -1 };
+		stroke = new BasicStroke[] { thick, thick, thick, thick, dashed };
 		int m = depth.length;
 		groundTemperature = new double[m][24];
 
@@ -96,7 +98,8 @@ public class DailyEnvironmentalTemperature extends JPanel {
 			hideData.put(groundTemperature[i], false);
 
 		city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-		Calendar today = Heliodon.getInstance().getCalender();
+		today = Heliodon.getInstance().getCalender();
+		xNow = today.get(Calendar.HOUR_OF_DAY) + (double) today.get(Calendar.MINUTE) / 60.0;
 		int day = today.get(Calendar.DAY_OF_YEAR);
 		double[] r = Weather.computeOutsideTemperature(today, city);
 		lowestAirTemperature = r[0];
@@ -104,7 +107,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		double amp = 0.5 * (highestAirTemperature - lowestAirTemperature);
 		for (int h = 0; h < 24; h++) {
 			for (int i = 0; i < m; i++) {
-				groundTemperature[i][h] = Ground.getInstance().getTemperatureMinuteOfDay(day, h * 60, amp, depth[i]);
+				groundTemperature[i][h] = i == 0 ? Weather.getInstance().getOutsideTemperatureAtMinute(highestAirTemperature, lowestAirTemperature, h * 60) : Ground.getInstance().getTemperatureMinuteOfDay(day, h * 60, amp, depth[i]);
 			}
 		}
 
@@ -171,7 +174,12 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 		g2.setFont(new Font("Arial", Font.BOLD, 14));
 		FontMetrics fm = g2.getFontMetrics();
-		g2.drawString(city, (width - fm.stringWidth(city)) / 2, 20);
+		g2.drawString(city + " - " + (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.DAY_OF_MONTH), (width - fm.stringWidth(city)) / 2, 20);
+
+		g2.setColor(Color.LIGHT_GRAY);
+		g2.setStroke(thin);
+		int xTodayLine = (int) Math.round(left + dx * xNow);
+		g2.drawLine(xTodayLine, top / 2, xTodayLine, height - bottom / 2);
 
 	}
 
@@ -189,7 +197,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 				g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
 				g2.setStroke(thin);
 				drawSymbol(g2, symbol[i], x0, y0);
-				g2.drawString("Ground (" + depth[i] + "m deep)", x0 + 20, y0 + 8);
+				g2.drawString(i == 0 ? "Air" : "Ground (" + depth[i] + "m deep)", x0 + 20, y0 + 8);
 				y0 += 14;
 			}
 		}
@@ -278,8 +286,22 @@ public class DailyEnvironmentalTemperature extends JPanel {
 	}
 
 	private void calculateBounds() {
+		if (ymin > lowestAirTemperature)
+			ymin = lowestAirTemperature;
+		if (ymax < highestAirTemperature)
+			ymax = highestAirTemperature;
+		double t;
+		for (int i = 0; i < groundTemperature.length; i++) {
+			for (int j = 0; j < groundTemperature[i].length; j++) {
+				t = groundTemperature[i][j];
+				if (t < ymin)
+					ymin = t;
+				if (t > ymax)
+					ymax = t;
+			}
+		}
 		dx = (double) (getWidth() - left - right) / (xmax - xmin);
-		dy = (double) (getHeight() - top - bottom) / (highestAirTemperature - lowestAirTemperature);
+		dy = (double) (getHeight() - top - bottom) / (ymax - ymin);
 	}
 
 	public void show() {

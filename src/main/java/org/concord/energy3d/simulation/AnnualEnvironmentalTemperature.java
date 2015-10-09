@@ -59,6 +59,7 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 	private double ymax = -1000;
 	private double dx;
 	private double dy;
+	private double xToday;
 	private int symbolSize = 8;
 	private int numberOfTicks = 12;
 	private String xAxisLabel = "Month";
@@ -110,6 +111,7 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 
 		city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		Calendar today = (Calendar) Heliodon.getInstance().getCalender().clone();
+		xToday = today.get(Calendar.MONTH) + ((double) (today.get(Calendar.DAY_OF_MONTH) - 1) / (double) today.getActualMaximum(Calendar.DAY_OF_MONTH));
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
@@ -213,6 +215,11 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 		g2.setFont(new Font("Arial", Font.BOLD, 14));
 		FontMetrics fm = g2.getFontMetrics();
 		g2.drawString(city, (width - fm.stringWidth(city)) / 2, 20);
+
+		g2.setColor(Color.LIGHT_GRAY);
+		g2.setStroke(thin);
+		int xTodayLine = (int) Math.round(left + dx * xToday);
+		g2.drawLine(xTodayLine, top / 2, xTodayLine, height - bottom / 2);
 
 	}
 

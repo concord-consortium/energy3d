@@ -15,6 +15,8 @@ import org.concord.energy3d.shapes.Heliodon;
 public class Weather {
 
 	private static final Weather instance = new Weather();
+	private static final double OMEGA_DAY = Math.PI / 720.0; // the daily cycle is 1440 minutes
+	private int dailyLagInMinutes = 120;
 
 	public static Weather getInstance() {
 		return instance;
@@ -66,14 +68,15 @@ public class Weather {
 	}
 
 	// interpolate between the lowest and highest temperatures of the day to get the temperature of a given minute in the day
-	public static double getOutsideTemperatureAtMinute(final double[] outsideTemperatureRange, final int minute) {
-		return outsideTemperatureRange[1] + (outsideTemperatureRange[0] - outsideTemperatureRange[1]) * Math.abs(minute / 720.0 - 1);
+	public double getOutsideTemperatureAtMinute(final double tmax, final double tmin, final int minute) {
+		return 0.5 * (tmax + tmin) - 0.5 * (tmax - tmin) * Math.cos(OMEGA_DAY * (minute - dailyLagInMinutes));
+		// return tmax + (tmin - tmax) * Math.abs(minute / 720.0 - 1);
 	}
 
 	public double getCurrentOutsideTemperature() {
 		Calendar now = Heliodon.getInstance().getCalender();
-		final double[] outsideTemperatureRange = computeOutsideTemperature(now, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
-		return getOutsideTemperatureAtMinute(outsideTemperatureRange, now.get(Calendar.MINUTE) + now.get(Calendar.HOUR_OF_DAY) * 60);
+		final double[] t = computeOutsideTemperature(now, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+		return getOutsideTemperatureAtMinute(t[1], t[0], now.get(Calendar.MINUTE) + now.get(Calendar.HOUR_OF_DAY) * 60);
 	}
 
 }

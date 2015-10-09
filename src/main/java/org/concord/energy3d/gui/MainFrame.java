@@ -873,16 +873,14 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
-			analysisMenu.add(getMaterialCostAnalysisMenuItem());
-			analysisMenu.addSeparator();
-			analysisMenu.add(getAnnualEnvironmentalTemperatureMenuItem());
-			analysisMenu.add(getDailyEnvironmentalTemperatureMenuItem());
-			analysisMenu.addSeparator();
 			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
 			analysisMenu.add(getAnnualEnergyAnalysisForSelectionMenuItem());
 			analysisMenu.add(getDailyAnalysisMenuItem());
 			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			analysisMenu.addSeparator();
+			analysisMenu.add(getMaterialCostAnalysisMenuItem());
+			analysisMenu.add(getAnnualEnvironmentalTemperatureMenuItem());
+			analysisMenu.add(getDailyEnvironmentalTemperatureMenuItem());
 			analysisMenu.add(getSensorMenuItem());
 			if (!Config.isRestrictMode()) {
 				analysisMenu.addSeparator();

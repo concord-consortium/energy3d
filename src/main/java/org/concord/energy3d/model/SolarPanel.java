@@ -25,8 +25,8 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarPanel extends HousePart {
 
-	public static final double WIDTH = 0.7;
-	public static final double HEIGHT = 1.6;
+	public static final double WIDTH = 1.0;
+	public static final double HEIGHT = 1.65;
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;

@@ -92,7 +92,7 @@ public class HeatLoad {
 		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
 			iMinute = minute / timeStep;
 			for (final HousePart part : Scene.getInstance().getParts()) {
-				final double outsideTemperature = Weather.getOutsideTemperatureAtMinute(outsideTemperatureRange, minute);
+				final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], minute);
 				final float absorption = part instanceof Window ? 0 : 1 - part.getAlbedo();
 				if (part instanceof Roof) { // need to compute piece by piece for a roof because sun affects outside temperature of roof part
 					final Roof roof = (Roof) part;
