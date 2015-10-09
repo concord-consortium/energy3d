@@ -37,13 +37,13 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
 /**
- * This graph shows the annual variation of air and ground temperatures for the current location.
+ * This graph shows the daily variation of air and ground temperatures for the current day and location.
  * 
  * @author Charles Xie
  * 
  */
 
-public class EnvironmentalTemperature extends JPanel {
+public class DailyEnvironmentalTemperature extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private static final int CIRCLE = 0;
@@ -54,36 +54,31 @@ public class EnvironmentalTemperature extends JPanel {
 
 	private int top = 50, right = 50, bottom = 80, left = 90;
 	private double xmin = 0;
-	private double xmax = 11;
+	private double xmax = 24;
 	private double ymin = 1000;
 	private double ymax = -1000;
 	private double dx;
 	private double dy;
 	private int symbolSize = 8;
-	private int numberOfTicks = 12;
-	private String xAxisLabel = "Month";
+	private int numberOfTicks = 25;
+	private String xAxisLabel = "Hour";
 	private String yAxisLabel = "Temperature (\u00b0C)";
 	private BasicStroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 2f }, 0.0f);
 	private BasicStroke thin = new BasicStroke(1);
 	private BasicStroke thick = new BasicStroke(2);
 	private String city;
 
-	private double[] lowestAirTemperature;
-	private double[] highestAirTemperature;
-	private double[] averageAirTemperature;
+	private double lowestAirTemperature;
+	private double highestAirTemperature;
 
 	private double[] depth;
-	private double[][] lowestGroundTemperature;
-	private double[][] highestGroundTemperature;
-	private double[][] averageGroundTemperature;
+	private double[][] groundTemperature;
 
 	private int[] symbol;
 	private BasicStroke[] stroke;
-
-	private boolean showAverage = false;
 	private Map<double[], Boolean> hideData;
 
-	public EnvironmentalTemperature() {
+	public DailyEnvironmentalTemperature() {
 
 		super();
 		setPreferredSize(new Dimension(600, 400));
@@ -91,49 +86,26 @@ public class EnvironmentalTemperature extends JPanel {
 
 		hideData = new HashMap<double[], Boolean>();
 
-		int n = AnnualAnalysis.MONTHS.length;
-		lowestAirTemperature = new double[n];
-		highestAirTemperature = new double[n];
-		averageAirTemperature = new double[n];
-
 		depth = new double[] { 0.5, 1, 2, 6 };
 		symbol = new int[] { CIRCLE, DIAMOND, SQUARE, -1 };
 		stroke = new BasicStroke[] { thick, thick, thick, dashed };
 		int m = depth.length;
-		lowestGroundTemperature = new double[m][n];
-		highestGroundTemperature = new double[m][n];
-		averageGroundTemperature = new double[m][n];
+		groundTemperature = new double[m][24];
 
-		hideData.put(lowestAirTemperature, false);
 		for (int i = 0; i < m; i++)
-			hideData.put(lowestGroundTemperature[i], false);
+			hideData.put(groundTemperature[i], false);
 
 		city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-		Calendar today = (Calendar) Heliodon.getInstance().getCalender().clone();
-		today.set(Calendar.SECOND, 0);
-		today.set(Calendar.MINUTE, 0);
-		today.set(Calendar.HOUR_OF_DAY, 0);
-		today.set(Calendar.DAY_OF_MONTH, 1);
-		int count = 0;
-		int lag = Ground.getInstance().getDailyLagInMinutes();
-		for (int x : AnnualAnalysis.MONTHS) {
-			today.set(Calendar.MONTH, x);
-			double[] r = Weather.computeOutsideTemperature(today, city);
-			lowestAirTemperature[count] = r[0];
-			highestAirTemperature[count] = r[1];
-			double amp = 0.5 * (r[1] - r[0]);
-			int day = today.get(Calendar.DAY_OF_YEAR);
+		Calendar today = Heliodon.getInstance().getCalender();
+		int day = today.get(Calendar.DAY_OF_YEAR);
+		double[] r = Weather.computeOutsideTemperature(today, city);
+		lowestAirTemperature = r[0];
+		highestAirTemperature = r[1];
+		double amp = 0.5 * (highestAirTemperature - lowestAirTemperature);
+		for (int h = 0; h < 24; h++) {
 			for (int i = 0; i < m; i++) {
-				lowestGroundTemperature[i][count] = Ground.getInstance().getTemperatureMinuteOfDay(day, lag, amp, depth[i]); // (12 am + lag) is the coldest time
-				highestGroundTemperature[i][count] = Ground.getInstance().getTemperatureMinuteOfDay(day, lag + 720, amp, depth[i]); // (12 pm + lag) is the hottest time
+				groundTemperature[i][h] = Ground.getInstance().getTemperatureMinuteOfDay(day, h * 60, amp, depth[i]);
 			}
-			count++;
-		}
-
-		for (int i = 0; i < count; i++) {
-			averageAirTemperature[i] = 0.5 * (lowestAirTemperature[i] + highestAirTemperature[i]);
-			for (int j = 0; j < m; j++)
-				averageGroundTemperature[j][i] = 0.5 * (lowestGroundTemperature[j][i] + highestGroundTemperature[j][i]);
 		}
 
 	}
@@ -162,7 +134,7 @@ public class EnvironmentalTemperature extends JPanel {
 		float tickWidth = (float) (width - left - right) / (float) (numberOfTicks - 1);
 		float xTick;
 		for (int i = 0; i < numberOfTicks; i++) {
-			String s = AnnualGraph.THREE_LETTER_MONTH[i];
+			String s = i + "";
 			int sWidth = g2.getFontMetrics().stringWidth(s);
 			xTick = left + tickWidth * i;
 			g2.drawString(s, xTick - sWidth / 2, height - bottom / 2 + 16);
@@ -189,22 +161,9 @@ public class EnvironmentalTemperature extends JPanel {
 				drawHorizontalLine(g2, hPos, Integer.toString(hVal));
 		}
 
-		if (!hideData.get(lowestAirTemperature)) {
-			if (showAverage) {
-				drawCurve(g2, averageAirTemperature, Color.MAGENTA, -1, thick);
-			} else {
-				drawCurve(g2, lowestAirTemperature, Color.BLUE, -1, thick);
-				drawCurve(g2, highestAirTemperature, Color.RED, -1, thick);
-			}
-		}
 		for (int i = 0; i < depth.length; i++) {
-			if (!hideData.get(lowestGroundTemperature[i])) {
-				if (showAverage) {
-					drawCurve(g2, averageGroundTemperature[i], Color.MAGENTA, symbol[i], stroke[i]);
-				} else {
-					drawCurve(g2, lowestGroundTemperature[i], Color.BLUE, symbol[i], stroke[i]);
-					drawCurve(g2, highestGroundTemperature[i], Color.RED, symbol[i], stroke[i]);
-				}
+			if (!hideData.get(groundTemperature[i])) {
+				drawCurve(g2, groundTemperature[i], Color.GRAY, symbol[i], stroke[i]);
 			}
 		}
 
@@ -223,61 +182,20 @@ public class EnvironmentalTemperature extends JPanel {
 		int x0 = left / 2 + 20;
 		int y0 = top - 10;
 
-		if (!hideData.get(lowestAirTemperature)) {
-			if (showAverage) {
-				g2.setColor(Color.MAGENTA);
-				g2.setStroke(thick);
-				g2.drawLine(x0 - 7, y0 + 3, x0 + 13, y0 + 3);
-				g2.setColor(Color.BLACK);
-				g2.drawString("Air (average)", x0 + 20, y0 + 8);
-				y0 += 14;
-			} else {
-				g2.setColor(Color.RED);
-				g2.setStroke(thick);
-				g2.drawLine(x0 - 7, y0 + 3, x0 + 13, y0 + 3);
-				g2.setColor(Color.BLACK);
-				g2.drawString("Air (highest)", x0 + 20, y0 + 8);
-				y0 += 14;
-				g2.setColor(Color.BLUE);
-				g2.setStroke(thick);
-				g2.drawLine(x0 - 7, y0 + 3, x0 + 13, y0 + 3);
-				g2.setColor(Color.BLACK);
-				g2.drawString("Air (lowest)", x0 + 20, y0 + 8);
-				y0 += 14;
-			}
-		}
-
 		for (int i = 0; i < depth.length - 1; i++) {
-			if (!hideData.get(lowestGroundTemperature[i])) {
-				if (showAverage) {
-					g2.setColor(Color.MAGENTA);
-					g2.setStroke(stroke[i]);
-					g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
-					g2.setStroke(thin);
-					drawSymbol(g2, symbol[i], x0, y0);
-					g2.drawString("Ground (" + depth[i] + "m deep, average)", x0 + 20, y0 + 8);
-					y0 += 14;
-				} else {
-					g2.setColor(Color.RED);
-					g2.setStroke(stroke[i]);
-					g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
-					g2.setStroke(thin);
-					drawSymbol(g2, symbol[i], x0, y0);
-					g2.drawString("Ground (" + depth[i] + "m deep, highest)", x0 + 20, y0 + 8);
-					y0 += 14;
-					g2.setColor(Color.BLUE);
-					g2.setStroke(stroke[i]);
-					g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
-					g2.setStroke(thin);
-					drawSymbol(g2, symbol[i], x0, y0);
-					g2.drawString("Ground (" + depth[i] + "m deep, lowest)", x0 + 20, y0 + 8);
-					y0 += 14;
-				}
+			if (!hideData.get(groundTemperature[i])) {
+				g2.setColor(Color.GRAY);
+				g2.setStroke(stroke[i]);
+				g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
+				g2.setStroke(thin);
+				drawSymbol(g2, symbol[i], x0, y0);
+				g2.drawString("Ground (" + depth[i] + "m deep)", x0 + 20, y0 + 8);
+				y0 += 14;
 			}
 		}
 
-		if (!hideData.get(lowestGroundTemperature[depth.length - 1])) {
-			g2.setColor(Color.MAGENTA);
+		if (!hideData.get(groundTemperature[depth.length - 1])) {
+			g2.setColor(Color.GRAY);
 			g2.setStroke(dashed);
 			g2.drawLine(x0 - 7, y0 + 4, x0 + 13, y0 + 4);
 			g2.setColor(Color.BLACK);
@@ -360,23 +278,15 @@ public class EnvironmentalTemperature extends JPanel {
 	}
 
 	private void calculateBounds() {
-		for (double t : lowestAirTemperature) {
-			if (t < ymin)
-				ymin = t;
-		}
-		for (double t : highestAirTemperature) {
-			if (t > ymax)
-				ymax = t;
-		}
 		dx = (double) (getWidth() - left - right) / (xmax - xmin);
-		dy = (double) (getHeight() - top - bottom) / (ymax - ymin);
+		dy = (double) (getHeight() - top - bottom) / (highestAirTemperature - lowestAirTemperature);
 	}
 
 	public void show() {
 
 		EnergyPanel.getInstance().requestDisableActions(this);
 
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Environmental Temperature", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Daily Environmental Temperature", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		final JPanel contentPane = new JPanel(new BorderLayout());
@@ -386,24 +296,19 @@ public class EnvironmentalTemperature extends JPanel {
 		dialog.setJMenuBar(menuBar);
 
 		final JCheckBoxMenuItem cbmiAirTemperature = new JCheckBoxMenuItem("Air Temperature");
-		Util.selectSilently(cbmiAirTemperature, !hideData.get(lowestAirTemperature));
 		final JCheckBoxMenuItem[] cbmiGroundTemperature = new JCheckBoxMenuItem[depth.length];
 		for (int i = 0; i < depth.length; i++) {
 			cbmiGroundTemperature[i] = new JCheckBoxMenuItem("Ground Temperature (" + depth[i] + "m)");
-			Util.selectSilently(cbmiGroundTemperature[i], !hideData.get(lowestGroundTemperature[i]));
+			Util.selectSilently(cbmiGroundTemperature[i], !hideData.get(groundTemperature[i]));
 		}
-		final JCheckBoxMenuItem cbmiShowAverage = new JCheckBoxMenuItem("Show Average");
-		Util.selectSilently(cbmiShowAverage, showAverage);
 
 		final JMenu menuView = new JMenu("View");
 		menuBar.add(menuView);
 		menuView.addMenuListener(new MenuListener() {
 			@Override
 			public void menuSelected(MenuEvent e) {
-				Util.selectSilently(cbmiAirTemperature, !hideData.get(lowestAirTemperature));
 				for (int i = 0; i < depth.length; i++)
-					Util.selectSilently(cbmiGroundTemperature[i], !hideData.get(lowestGroundTemperature[i]));
-				Util.selectSilently(cbmiShowAverage, showAverage);
+					Util.selectSilently(cbmiGroundTemperature[i], !hideData.get(groundTemperature[i]));
 			}
 
 			@Override
@@ -415,14 +320,6 @@ public class EnvironmentalTemperature extends JPanel {
 			}
 		});
 
-		cbmiAirTemperature.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
-				hideData.put(lowestAirTemperature, !source.isSelected());
-				EnvironmentalTemperature.this.repaint();
-			}
-		});
 		menuView.add(cbmiAirTemperature);
 
 		for (int i = 0; i < depth.length; i++) {
@@ -431,24 +328,12 @@ public class EnvironmentalTemperature extends JPanel {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
-					hideData.put(lowestGroundTemperature[i2], !source.isSelected());
-					EnvironmentalTemperature.this.repaint();
+					hideData.put(groundTemperature[i2], !source.isSelected());
+					DailyEnvironmentalTemperature.this.repaint();
 				}
 			});
 			menuView.add(cbmiGroundTemperature[i]);
 		}
-
-		menuView.addSeparator();
-
-		cbmiShowAverage.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
-				showAverage = source.isSelected();
-				EnvironmentalTemperature.this.repaint();
-			}
-		});
-		menuView.add(cbmiShowAverage);
 
 		final JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createEtchedBorder());

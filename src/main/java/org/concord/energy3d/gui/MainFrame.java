@@ -72,8 +72,9 @@ import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.simulation.AnnualSensorData;
-import org.concord.energy3d.simulation.EnvironmentalTemperature;
+import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
@@ -125,7 +126,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem sensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem materialCostAnalysisMenuItem;
-	private JMenuItem environmentalTemperatureMenuItem;
+	private JMenuItem annualEnvironmentalTemperatureMenuItem;
+	private JMenuItem dailyEnvironmentalTemperatureMenuItem;
 	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem solarHeatMapMenuItem;
 	private JCheckBoxMenuItem onlyAbsorptionInSolarMapMenuItem;
@@ -873,7 +875,8 @@ public class MainFrame extends JFrame {
 			});
 			analysisMenu.add(getMaterialCostAnalysisMenuItem());
 			analysisMenu.addSeparator();
-			analysisMenu.add(getEnvironmentalTemperatureMenuItem());
+			analysisMenu.add(getAnnualEnvironmentalTemperatureMenuItem());
+			analysisMenu.add(getDailyEnvironmentalTemperatureMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
 			analysisMenu.add(getAnnualEnergyAnalysisForSelectionMenuItem());
@@ -917,8 +920,8 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
-			viewMenu.add(getUnitsMenu());
-			viewMenu.addSeparator();
+			// viewMenu.add(getUnitsMenu()); // disable temporarily because it doesn't work to expectation
+			// viewMenu.addSeparator();
 			viewMenu.add(getNoTextureMenuItem());
 			viewMenu.add(getSimpleTextureMenuItem());
 			viewMenu.add(getFullTextureMenuItem());
@@ -1229,10 +1232,10 @@ public class MainFrame extends JFrame {
 		return materialCostAnalysisMenuItem;
 	}
 
-	private JMenuItem getEnvironmentalTemperatureMenuItem() {
-		if (environmentalTemperatureMenuItem == null) {
-			environmentalTemperatureMenuItem = new JMenuItem("Show Annual Environmental Temperature...");
-			environmentalTemperatureMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getAnnualEnvironmentalTemperatureMenuItem() {
+		if (annualEnvironmentalTemperatureMenuItem == null) {
+			annualEnvironmentalTemperatureMenuItem = new JMenuItem("Show Annual Environmental Temperature...");
+			annualEnvironmentalTemperatureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
@@ -1240,11 +1243,29 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					new EnvironmentalTemperature().show();
+					new AnnualEnvironmentalTemperature().show();
 				}
 			});
 		}
-		return environmentalTemperatureMenuItem;
+		return annualEnvironmentalTemperatureMenuItem;
+	}
+
+	private JMenuItem getDailyEnvironmentalTemperatureMenuItem() {
+		if (dailyEnvironmentalTemperatureMenuItem == null) {
+			dailyEnvironmentalTemperatureMenuItem = new JMenuItem("Show Daily Environmental Temperature...");
+			dailyEnvironmentalTemperatureMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					new DailyEnvironmentalTemperature().show();
+				}
+			});
+		}
+		return dailyEnvironmentalTemperatureMenuItem;
 	}
 
 	private JCheckBoxMenuItem getAnnotationsInwardMenuItem() {

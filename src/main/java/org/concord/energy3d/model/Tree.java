@@ -36,7 +36,7 @@ public class Tree extends HousePart {
 	public static final int PINE = 3;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
-	private transient Mesh sphere;
+	private transient Mesh crown;
 	private final int treeType;
 
 	public Tree(final int treeType) {
@@ -52,16 +52,16 @@ public class Tree extends HousePart {
 		final double height;
 		switch (treeType) {
 		case OAK:
-			height = 60;
+			height = 75;
 			break;
 		case MAPLE:
-			height = 45;
+			height = 60;
 			break;
 		case PINE:
-			height = 50;
+			height = 80;
 			break;
 		default:
-			height = 30;
+			height = 40;
 		}
 		mesh = new Quad("Tree Quad", 30, height);
 		mesh.setModelBound(new BoundingBox());
@@ -85,42 +85,42 @@ public class Tree extends HousePart {
 		root.attachChild(billboard);
 
 		if (treeType == PINE)
-			sphere = new Cone("Tree Sphere", 2, 6, 15, 20, false);
+			crown = new Cone("Tree Crown", 2, 6, 18, 20, false); // axis samples, radial samples, radius, height, closed
 		else
-			sphere = new Sphere("Tree Sphere", 4, 6, 14);
-		sphere.setModelBound(new BoundingSphere());
-		sphere.updateModelBound();
-		final Cylinder cylinder = new Cylinder("Tree Cylinder", 10, 10, 1, 20);
-		cylinder.setModelBound(new BoundingBox());
-		cylinder.updateModelBound();
+			crown = new Sphere("Tree Crown", 4, 6, 14); // z samples, radial samples, radius
+		crown.setModelBound(new BoundingSphere());
+		crown.updateModelBound();
+		final Cylinder trunk = new Cylinder("Tree Trunk", 10, 10, 1, 20);
+		trunk.setModelBound(new BoundingBox());
+		trunk.updateModelBound();
 
 		switch (treeType) {
 		case OAK:
-			sphere.setScale(1, 1, 1.8);
-			sphere.setTranslation(0, 0, 33);
-			cylinder.setScale(1, 1, 2);
-			cylinder.setTranslation(0, 0, 20);
+			crown.setScale(1, 1.2, 2.5);
+			crown.setTranslation(0, 0, 40);
+			trunk.setScale(1, 1, 2);
+			trunk.setTranslation(0, 0, 20);
 			break;
 		case MAPLE:
-			sphere.setScale(1, 1, 1.2);
-			sphere.setTranslation(0, 0, 26);
-			cylinder.setTranslation(0, 0, 10);
+			crown.setScale(1, 1, 2.1);
+			crown.setTranslation(0, 0, 32);
+			trunk.setTranslation(0, 0, 10);
 			break;
 		case PINE:
-			sphere.setScale(1, 1, -2.3);
-			sphere.setTranslation(0, 0, 28);
-			cylinder.setTranslation(0, 0, 10);
+			crown.setScale(1, 1, -4.0);
+			crown.setTranslation(0, 0, 45);
+			trunk.setTranslation(0, 0, 10);
 			break;
 		default:
-			sphere.setScale(1, 1, 0.7);
-			sphere.setTranslation(0, 0, 19);
-			cylinder.setTranslation(0, 0, 10);
+			crown.setScale(1, 1.2, 1.2);
+			crown.setTranslation(0, 0, 24);
+			trunk.setTranslation(0, 0, 10);
 			break;
 		}
 
 		collisionRoot = new Node("Tree Collision Root");
-		collisionRoot.attachChild(sphere);
-		collisionRoot.attachChild(cylinder);
+		collisionRoot.attachChild(crown);
+		collisionRoot.attachChild(trunk);
 		if (points.size() > 0)
 			collisionRoot.setTranslation(getAbsPoint(0));
 		collisionRoot.updateWorldTransform(true);
@@ -128,8 +128,8 @@ public class Tree extends HousePart {
 		collisionRoot.getSceneHints().setCullHint(CullHint.Always);
 		root.attachChild(collisionRoot);
 
-		sphere.setUserData(new UserData(this));
-		cylinder.setUserData(new UserData(this, 0, true));
+		crown.setUserData(new UserData(this));
+		trunk.setUserData(new UserData(this, 0, true));
 
 		updateTextureAndColor();
 
@@ -207,12 +207,12 @@ public class Tree extends HousePart {
 
 	@Override
 	public Spatial getCollisionSpatial() {
-		if (sphere == null)
+		if (crown == null)
 			init();
 		if (isShedded())
-			sphere.removeFromParent();
+			crown.removeFromParent();
 		else
-			collisionRoot.attachChild(sphere);
+			collisionRoot.attachChild(crown);
 		collisionRoot.updateWorldBound(true);
 		return collisionRoot;
 	}
