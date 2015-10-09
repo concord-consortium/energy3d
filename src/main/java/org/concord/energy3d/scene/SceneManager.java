@@ -1217,6 +1217,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
 				((Foundation) selectedHousePart).move(d, houseMovePoints);
 			}
+		} else if (houseMoveStartPoint != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Tree) {
+			final PickedHousePart pick = SelectUtil.pickPart(x, y, houseMoveCollisionPlate);
+			if (pick != null) {
+				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
+				((Tree) selectedHousePart).move(d, houseMovePoints);
+			}
 		} else if (houseMoveStartPoint != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Window) {
 			final Wall wall = (Wall) selectedHousePart.getContainer();
 			final PickedHousePart pick = SelectUtil.pickPart(x, y, wall);
@@ -1370,7 +1376,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								selectedHousePart = selectedHousePart.getTopContainer();
 							}
 						}
-						if (selectedHousePart instanceof Window || (operation == Operation.RESIZE && selectedHousePart instanceof Foundation)) {
+						if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || (operation == Operation.RESIZE && selectedHousePart instanceof Foundation)) {
 							cameraControl.setLeftMouseButtonEnabled(false);
 							houseMoveStartPoint = selectHousePart.getPoint();
 							houseMoveCollisionPlate.setTranslation(0, 0, houseMoveStartPoint.getZ());

@@ -1,5 +1,6 @@
 package org.concord.energy3d.model;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.concord.energy3d.gui.EnergyPanel;
@@ -129,7 +130,7 @@ public class Tree extends HousePart {
 		root.attachChild(collisionRoot);
 
 		crown.setUserData(new UserData(this));
-		trunk.setUserData(new UserData(this, 0, true));
+		trunk.setUserData(new UserData(this));
 
 		updateTextureAndColor();
 
@@ -247,6 +248,12 @@ public class Tree extends HousePart {
 	@Override
 	protected void computeArea() {
 		area = 0.0;
+	}
+
+	public void move(Vector3 d, ArrayList<Vector3> houseMovePoints) {
+		final Vector3 newP = houseMovePoints.get(0).add(d, null);
+		points.set(0, newP);
+		draw();
 	}
 
 }
