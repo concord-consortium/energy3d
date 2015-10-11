@@ -35,9 +35,9 @@ class PieChart extends JComponent {
 	private String details;
 
 	public PieChart(float[] data, Color[] colors, String[] legends, String unit, String info, String details) {
-		setPreferredSize(new Dimension(400, 300));
+		setPreferredSize(new Dimension(450, 300));
 		format = NumberFormat.getNumberInstance();
-		format.setMaximumFractionDigits(1);
+		format.setMaximumFractionDigits(2);
 		this.data = data;
 		this.colors = colors;
 		this.legends = legends;

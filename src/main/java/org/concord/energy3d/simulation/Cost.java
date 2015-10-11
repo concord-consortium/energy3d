@@ -165,6 +165,18 @@ public class Cost {
 
 	private void show() {
 
+		String details = "";
+		int count = 0;
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Foundation) {
+				count++;
+				Foundation foundation = (Foundation) p;
+				details += "#" + foundation.getId() + ":$" + getBuildingCost(foundation) + "/";
+			}
+		}
+		if (count > 0)
+			details = details.substring(0, details.length() - 1);
+
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		final Foundation selectedBuilding;
 		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
@@ -179,12 +191,14 @@ public class Cost {
 		int wallSum = 0;
 		int windowSum = 0;
 		int roofSum = 0;
+		int foundationSum = 0;
 		int doorSum = 0;
 		int solarPanelSum = 0;
 		int treeSum = 0;
 		String info;
 		if (selectedBuilding != null) {
 			info = "Building #" + selectedBuilding.getId();
+			foundationSum = getPartCost(selectedBuilding);
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p.getTopContainer() == selectedBuilding) {
 					if (p instanceof Wall)
@@ -198,14 +212,13 @@ public class Cost {
 					else if (p instanceof SolarPanel)
 						solarPanelSum += getPartCost(p);
 				}
+				if (count <= 1) {
+					if (p instanceof Tree && !p.isFrozen())
+						treeSum += getPartCost(p);
+				}
 			}
 		} else {
-			int buildingCount = 0;
-			for (final HousePart p : Scene.getInstance().getParts()) {
-				if (p instanceof Foundation)
-					buildingCount++;
-			}
-			info = buildingCount + " buildings";
+			info = count + " buildings";
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Wall)
 					wallSum += getPartCost(p);
@@ -213,6 +226,8 @@ public class Cost {
 					windowSum += getPartCost(p);
 				else if (p instanceof Roof)
 					roofSum += getPartCost(p);
+				else if (p instanceof Foundation)
+					foundationSum += getPartCost(p);
 				else if (p instanceof Door)
 					doorSum += getPartCost(p);
 				else if (p instanceof SolarPanel)
@@ -222,21 +237,9 @@ public class Cost {
 			}
 		}
 
-		final float[] data = new float[] { wallSum, windowSum, roofSum, doorSum, solarPanelSum, treeSum };
-		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Doors", "Solar Panels", "Trees" };
-		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.PINK, Color.YELLOW, Color.GREEN };
-
-		String details = "";
-		int count = 0;
-		for (HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Foundation) {
-				count++;
-				Foundation foundation = (Foundation) p;
-				details += "#" + foundation.getId() + ":$" + getBuildingCost(foundation) + "/";
-			}
-		}
-		if (count > 0)
-			details = details.substring(0, details.length() - 1);
+		final float[] data = new float[] { wallSum, windowSum, roofSum, foundationSum, doorSum, solarPanelSum, treeSum };
+		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation Floor", "Doors", "Solar Panels", "Trees" };
+		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.PINK, Color.YELLOW, Color.GREEN };
 
 		// show them in a popup window
 		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null);

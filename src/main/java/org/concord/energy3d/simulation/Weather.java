@@ -16,7 +16,6 @@ public class Weather {
 
 	private static final Weather instance = new Weather();
 	private static final double OMEGA_DAY = Math.PI / 720.0; // the daily cycle is 1440 minutes
-	private int dailyLagInMinutes = 120;
 
 	public static Weather getInstance() {
 		return instance;
@@ -69,7 +68,7 @@ public class Weather {
 
 	// interpolate between the lowest and highest temperatures of the day to get the temperature of a given minute in the day
 	public double getOutsideTemperatureAtMinute(final double tmax, final double tmin, final int minute) {
-		return 0.5 * (tmax + tmin) - 0.5 * (tmax - tmin) * Math.cos(OMEGA_DAY * (minute - dailyLagInMinutes));
+		return 0.5 * (tmax + tmin) - 0.5 * (tmax - tmin) * Math.cos(OMEGA_DAY * minute);
 		// return tmax + (tmin - tmax) * Math.abs(minute / 720.0 - 1);
 	}
 
