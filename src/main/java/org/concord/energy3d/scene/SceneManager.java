@@ -436,9 +436,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (cameraNode == null) {
 			initCamera();
 			return false;
-		}		
-		float[] f = new float[2]; 
-		((JoglSwingCanvas)canvas).getRequestedSurfaceScale(f);
+		}
+		float[] f = new float[2];
+		((JoglSwingCanvas) canvas).getRequestedSurfaceScale(f);
 		passManager.renderPasses(renderer);
 		try {
 			if (!Heliodon.getInstance().isNightTime())
@@ -1392,7 +1392,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 						if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
 							selectedHousePart.setEditPointsVisible(true);
-							if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedHousePart instanceof Window) {
+							if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedHousePart instanceof Window || selectedHousePart instanceof Tree) {
 								selectedHousePart.setGridsVisible(true);
 								if (selectedHousePart instanceof Foundation)
 									editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart, !pick.isEditPoint());
