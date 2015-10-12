@@ -42,8 +42,11 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
+import org.concord.energy3d.simulation.DailySensorData;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
+import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.AnimateSunCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
@@ -392,11 +395,35 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				if (analysisRequesterCopy instanceof AnnualSensorData) {
 					AnnualSensorData asd = (AnnualSensorData) analysisRequesterCopy;
 					line += "{\"Months\": " + asd.getNumberOfDataPoints() + "}";
+				} else if (analysisRequesterCopy instanceof DailySensorData) {
+					DailySensorData asd = (DailySensorData) analysisRequesterCopy;
+					line += "{\"Hours\": " + asd.getNumberOfDataPoints() + "}";
 				} else {
 					if (analyzedPart != null && !(analyzedPart instanceof Tree) && !(analyzedPart instanceof Human)) { // if something analyzable is selected
 						line += "{";
 						String part = analyzedPart.toString().substring(0, analyzedPart.toString().indexOf(')') + 1);
-						if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
+						if (analysisRequesterCopy instanceof EnergyDailyAnalysis) {
+							EnergyDailyAnalysis eda = (EnergyDailyAnalysis) analysisRequesterCopy;
+							if (analyzedPart instanceof Foundation) {
+								line += "\"Building\": " + analyzedPart.getId();
+								String name = "Net";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
+								name = "AC";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
+								name = "Heater";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
+								name = "Windows";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
+								name = "Solar Panels";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
+							} else {
+								line += "\"Part\": \"" + part + "\"";
+								String name = "Solar";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
+								name = "Heat Gain";
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
+							}
+						} else if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
 							EnergyAnnualAnalysis eaa = (EnergyAnnualAnalysis) analysisRequesterCopy;
 							line += "\"Months\": " + eaa.getNumberOfDataPoints();
 							if (analyzedPart instanceof Foundation) {
@@ -443,7 +470,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 							if (count > 0)
 								line = line.substring(0, line.length() - 2);
 							line += "]";
-						} else if (analysisRequesterCopy instanceof AnnualEnvironmentalTemperature) {
+						} else if (analysisRequesterCopy instanceof AnnualEnvironmentalTemperature || analysisRequesterCopy instanceof DailyEnvironmentalTemperature) {
 							line += "{}";
 						}
 					}
