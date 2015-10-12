@@ -11,7 +11,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,7 +36,6 @@ import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.shapes.Heliodon;
 
 /**
  * @author Charles Xie
@@ -48,7 +46,7 @@ public class EnergyDailyAnalysis extends Analysis {
 	public EnergyDailyAnalysis() {
 		super();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		graph = selectedPart instanceof Foundation ? new BuildingEnergyAnnualGraph() : new PartEnergyAnnualGraph();
+		graph = selectedPart instanceof Foundation ? new BuildingEnergyDailyGraph() : new PartEnergyDailyGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
 		graph.setBackground(Color.WHITE);
 	}
@@ -57,13 +55,19 @@ public class EnergyDailyAnalysis extends Analysis {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
+				final Throwable t = compute();
+				if (t != null) {
+					EventQueue.invokeLater(new Runnable() {
+						public void run() {
+							JOptionPane.showMessageDialog(parent, "Daily analysis failed. Please restart the program.\n" + t.getMessage(), "Analysis Error", JOptionPane.ERROR_MESSAGE);
+						}
+					});
+				}
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						onCompletion();
-						if (graph instanceof BuildingEnergyAnnualGraph) {
-							if (Heliodon.getInstance().getCalender().get(Calendar.MONTH) != Calendar.DECEMBER)
-								return; // annual calculation aborted
+						if (graph instanceof BuildingEnergyDailyGraph) {
 							int net = (int) Math.round(getResult("Net"));
 							String previousRuns = "";
 							Map<String, Double> recordedResults = getRecordedResults("Net");
@@ -71,10 +75,10 @@ public class EnergyDailyAnalysis extends Analysis {
 							if (n > 0) {
 								Object[] keys = recordedResults.keySet().toArray();
 								for (int i = n - 1; i >= 0; i--) {
-									previousRuns += keys[i] + " : " + Math.round(recordedResults.get(keys[i]) * 365.0 / 12.0) + " kWh<br>";
+									previousRuns += keys[i] + " : " + Math.round(recordedResults.get(keys[i])) + " kWh<br>";
 								}
 							}
-							JOptionPane.showMessageDialog(parent, "<html>The calculated annual net energy is <b>" + net + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Annual Net Energy", JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(parent, "<html>The calculated daily net energy is <b>" + net + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Daily Net Energy", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}
 				});
@@ -84,42 +88,45 @@ public class EnergyDailyAnalysis extends Analysis {
 
 	@Override
 	void updateGraph() {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart instanceof Foundation) {
-			if (graph instanceof BuildingEnergyAnnualGraph) {
-				final Foundation selectedBuilding = (Foundation) selectedPart;
-				final double window = selectedBuilding.getPassiveSolarToday();
-				final double solarPanel = selectedBuilding.getPhotovoltaicToday();
-				final double heater = selectedBuilding.getHeatingToday();
-				final double ac = selectedBuilding.getCoolingToday();
-				final double net = selectedBuilding.getTotalEnergyToday();
-				graph.addData("Windows", window);
-				graph.addData("Solar Panels", solarPanel);
-				graph.addData("Heater", heater);
-				graph.addData("AC", ac);
-				graph.addData("Net", net);
-			} else {
-				graph.addData("Solar", selectedPart.getSolarPotentialToday());
+		for (int i = 0; i < 24; i++) {
+			SolarRadiation.getInstance().computeEnergyAtHour(i);
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof Foundation) {
+				if (graph instanceof BuildingEnergyDailyGraph) {
+					final Foundation selectedBuilding = (Foundation) selectedPart;
+					final double window = selectedBuilding.getPassiveSolarNow();
+					final double solarPanel = selectedBuilding.getPhotovoltaicNow();
+					final double heater = selectedBuilding.getHeatingNow();
+					final double ac = selectedBuilding.getCoolingNow();
+					final double net = selectedBuilding.getTotalEnergyNow();
+					graph.addData("Windows", window);
+					graph.addData("Solar Panels", solarPanel);
+					graph.addData("Heater", heater);
+					graph.addData("AC", ac);
+					graph.addData("Net", net);
+				} else {
+					graph.addData("Solar", selectedPart.getSolarPotentialNow());
+				}
+			} else if (selectedPart instanceof Window) {
+				Window window = (Window) selectedPart;
+				final double solar = selectedPart.getSolarPotentialNow() * window.getSolarHeatGainCoefficientNotPercentage();
+				graph.addData("Solar", solar);
+				final double[] loss = selectedPart.getHeatLoss();
+				double sum = 0;
+				for (final double x : loss)
+					sum += x;
+				graph.addData("Heat Gain", -sum);
+			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
+				final double[] loss = selectedPart.getHeatLoss();
+				double sum = 0;
+				for (final double x : loss)
+					sum += x;
+				graph.addData("Heat Gain", -sum);
+			} else if (selectedPart instanceof SolarPanel) {
+				final SolarPanel solarPanel = (SolarPanel) selectedPart;
+				final double solar = solarPanel.getSolarPotentialNow() * solarPanel.getEfficiencyNotPercentage();
+				graph.addData("Solar", solar);
 			}
-		} else if (selectedPart instanceof Window) {
-			Window window = (Window) selectedPart;
-			final double solar = selectedPart.getSolarPotentialToday() * window.getSolarHeatGainCoefficientNotPercentage();
-			graph.addData("Solar", solar);
-			final double[] loss = selectedPart.getHeatLoss();
-			double sum = 0;
-			for (final double x : loss)
-				sum += x;
-			graph.addData("Heat Gain", -sum);
-		} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
-			final double[] loss = selectedPart.getHeatLoss();
-			double sum = 0;
-			for (final double x : loss)
-				sum += x;
-			graph.addData("Heat Gain", -sum);
-		} else if (selectedPart instanceof SolarPanel) {
-			final SolarPanel solarPanel = (SolarPanel) selectedPart;
-			final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getEfficiencyNotPercentage();
-			graph.addData("Solar", solar);
 		}
 		graph.repaint();
 	}
@@ -253,12 +260,12 @@ public class EnergyDailyAnalysis extends Analysis {
 			@Override
 			public void menuSelected(MenuEvent e) {
 				showRunsMenu.removeAll();
-				if (!AnnualGraph.records.isEmpty()) {
+				if (!DailyGraph.records.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							for (Results r : AnnualGraph.records)
+							for (Results r : DailyGraph.records)
 								graph.hideRun(r.getID(), false);
 							graph.repaint();
 						}
@@ -268,7 +275,7 @@ public class EnergyDailyAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							for (Results r : AnnualGraph.records)
+							for (Results r : DailyGraph.records)
 								graph.hideRun(r.getID(), true);
 							graph.repaint();
 						}
@@ -276,10 +283,10 @@ public class EnergyDailyAnalysis extends Analysis {
 					showRunsMenu.add(mi);
 					showRunsMenu.addSeparator();
 					Map<String, Double> recordedResults = getRecordedResults("Net");
-					for (final Results r : AnnualGraph.records) {
+					for (final Results r : DailyGraph.records) {
 						String key = r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")");
 						Double result = recordedResults.get(key);
-						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(r.getID() + ":" + r.getFileName() + (result == null ? "" : " - " + Math.round(recordedResults.get(key) * 365.0 / 12.0) + " kWh"), !graph.isRunHidden(r.getID()));
+						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(r.getID() + ":" + r.getFileName() + (result == null ? "" : " - " + Math.round(recordedResults.get(key)) + " kWh"), !graph.isRunHidden(r.getID()));
 						cbmi.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(final ItemEvent e) {

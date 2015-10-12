@@ -153,7 +153,7 @@ abstract class Graph extends JPanel {
 		double sum = 0;
 		for (double a : x)
 			sum += a;
-		return sum * 365.0 / 12.0;
+		return this instanceof DailyGraph ? sum : sum * 365.0 / 12.0;
 	}
 
 	int getLength() {

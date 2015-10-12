@@ -84,6 +84,7 @@ public abstract class HousePart implements Serializable {
 	protected transient double area;
 	private transient double[] solarPotential;
 	private transient double[] heatLoss;
+	private transient double solarPotentialNow; // solar potential of current hour
 	private transient double solarPotentialToday;
 	private transient boolean isPrintVertical;
 
@@ -920,6 +921,14 @@ public abstract class HousePart implements Serializable {
 		for (final double x : heatLoss)
 			sum += x;
 		return sum;
+	}
+
+	public double getSolarPotentialNow() {
+		return solarPotentialNow;
+	}
+
+	public void setSolarPotentialNow(final double solarPotentialNow) {
+		this.solarPotentialNow = solarPotentialNow;
 	}
 
 	public double getSolarPotentialToday() {

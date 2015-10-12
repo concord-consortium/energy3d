@@ -47,6 +47,11 @@ public class Foundation extends HousePart {
 	private transient double minY;
 	private transient double maxX;
 	private transient double maxY;
+	private transient double passiveSolarNow;
+	private transient double photovoltaicNow;
+	private transient double heatingNow;
+	private transient double coolingNow;
+	private transient double totalEnergyNow;
 	private transient double passiveSolarToday;
 	private transient double photovoltaicToday;
 	private transient double heatingToday;
@@ -931,6 +936,46 @@ public class Foundation extends HousePart {
 
 		return new double[] { height, area, height * area, cx, cy };
 
+	}
+
+	public double getPassiveSolarNow() {
+		return passiveSolarNow;
+	}
+
+	public void setPassiveSolarNow(final double passiveSolarNow) {
+		this.passiveSolarNow = passiveSolarNow;
+	}
+
+	public double getPhotovoltaicNow() {
+		return photovoltaicNow;
+	}
+
+	public void setPhotovoltaicNow(final double photovoltaicNow) {
+		this.photovoltaicNow = photovoltaicNow;
+	}
+
+	public double getHeatingNow() {
+		return heatingNow;
+	}
+
+	public void setHeatingNow(final double heatingNow) {
+		this.heatingNow = heatingNow;
+	}
+
+	public double getCoolingNow() {
+		return coolingNow;
+	}
+
+	public void setCoolingNow(final double coolingNow) {
+		this.coolingNow = coolingNow;
+	}
+
+	public double getTotalEnergyNow() {
+		return totalEnergyNow;
+	}
+
+	public void setTotalEnergyNow(final double totalEnergyNow) {
+		this.totalEnergyNow = totalEnergyNow;
 	}
 
 	public double getPassiveSolarToday() {

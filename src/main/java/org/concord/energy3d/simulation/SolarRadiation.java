@@ -611,6 +611,81 @@ public class SolarRadiation {
 				foundation.setHeatingToday(heatingTotal);
 				foundation.setCoolingToday(coolingTotal);
 				foundation.setTotalEnergyToday(heatingTotal + coolingTotal - photovoltaicTotal);
+
+			}
+
+		}
+
+	}
+
+	public void computeEnergyAtHour(int hour) {
+
+		final Calendar today = Heliodon.getInstance().getCalender();
+		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, city);
+
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation) {
+				final Foundation foundation = (Foundation) part;
+				int n = (int) Math.round(60.0 / timeStep);
+				final double[] heatLoss = new double[n];
+				final double[] passiveSolar = new double[n];
+				final double[] photovoltaic = new double[n];
+				int t0 = n * hour;
+				for (int i = 0; i < n; i++) {
+					double groundHeatLoss = foundation.getHeatLoss()[t0 + i];
+					if (groundHeatLoss > 0 && outsideTemperatureRange[0] >= HeatLoad.LOWEST_TEMPERATURE_OF_WARM_DAY) {
+						heatLoss[i] -= groundHeatLoss;
+					} else {
+						heatLoss[i] += groundHeatLoss;
+					}
+				}
+				double solarPotentialTotal = 0.0;
+				for (final HousePart houseChild : Scene.getInstance().getParts()) {
+					if (houseChild.getTopContainer() == foundation) {
+						houseChild.setSolarPotentialNow(0);
+						for (int i = 0; i < n; i++) {
+							solarPotentialTotal += houseChild.getSolarPotential()[t0 + i];
+							houseChild.setSolarPotentialNow(houseChild.getSolarPotentialNow() + houseChild.getSolarPotential()[t0 + i]);
+							if (houseChild instanceof Wall || houseChild instanceof Door || houseChild instanceof Window || houseChild instanceof Roof)
+								heatLoss[i] += houseChild.getHeatLoss()[t0 + i];
+							if (houseChild instanceof Window) {
+								final Window window = (Window) houseChild;
+								passiveSolar[i] += houseChild.getSolarPotential()[t0 + i] * window.getSolarHeatGainCoefficientNotPercentage();
+							} else if (houseChild instanceof SolarPanel) {
+								final SolarPanel solarPanel = (SolarPanel) houseChild;
+								photovoltaic[i] += houseChild.getSolarPotential()[t0 + i] * solarPanel.getEfficiencyNotPercentage();
+							}
+						}
+					}
+				}
+
+				double heatingTotal = 0.0;
+				double coolingTotal = 0.0;
+				double passiveSolarTotal = 0.0;
+				double photovoltaicTotal = 0.0;
+				for (int i = 0; i < n; i++) {
+					if (heatLoss[i] < 0) {
+						heatLoss[i] -= passiveSolar[i];
+					} else {
+						heatLoss[i] = Math.max(0, heatLoss[i] - passiveSolar[i]);
+					}
+					if (heatLoss[i] > 0) {
+						heatingTotal += heatLoss[i];
+					} else {
+						coolingTotal -= heatLoss[i];
+					}
+					passiveSolarTotal += passiveSolar[i];
+					photovoltaicTotal += photovoltaic[i];
+				}
+
+				foundation.setSolarPotentialNow(solarPotentialTotal);
+				foundation.setPassiveSolarNow(passiveSolarTotal);
+				foundation.setPhotovoltaicNow(photovoltaicTotal);
+				foundation.setHeatingNow(heatingTotal);
+				foundation.setCoolingNow(coolingTotal);
+				foundation.setTotalEnergyNow(heatingTotal + coolingTotal - photovoltaicTotal);
+
 			}
 
 		}
