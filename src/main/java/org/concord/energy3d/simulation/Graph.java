@@ -47,6 +47,7 @@ abstract class Graph extends JPanel {
 	double ymax = 1;
 	double dx;
 	double dy;
+	String info = "No new data";
 	int symbolSize = 8;
 	int numberOfTicks = 12;
 	String xAxisLabel = "Month";
@@ -238,7 +239,6 @@ abstract class Graph extends JPanel {
 		if (data.isEmpty()) {
 			g2.setColor(Color.LIGHT_GRAY);
 			g2.setFont(new Font("Arial", Font.PLAIN, 20));
-			String info = "No new data";
 			int infoWidth = g2.getFontMetrics().stringWidth(info);
 			g2.drawString(info, (width - infoWidth) / 2, height / 2);
 		} else {

@@ -74,6 +74,8 @@ public class EnergyAnnualAnalysis extends Analysis {
 	}
 
 	private void runAnalysis(final JDialog parent) {
+		graph.info = "Calculating...";
+		graph.repaint();
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {

@@ -15,6 +15,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -74,13 +75,41 @@ class DataViewer {
 
 	static void viewRawData(final JDialog parent, Graph graph) {
 		String[] header = null;
-		if (graph instanceof BuildingEnergyAnnualGraph) {
+		if (graph instanceof BuildingEnergyDailyGraph) {
+			header = new String[] { "Hour", "Windows", "Solar Panels", "Heater", "AC", "Net" };
+		} else if (graph instanceof BuildingEnergyAnnualGraph) {
 			header = new String[] { "Month", "Windows", "Solar Panels", "Heater", "AC", "Net" };
+		} else if (graph instanceof PartEnergyDailyGraph) {
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof SolarPanel) {
+				header = new String[] { "Hour", "Solar" };
+			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
+				header = new String[] { "Hour", "Heat Gain" };
+			} else if (selectedPart instanceof Window) {
+				header = new String[] { "Hour", "Solar", "Heat Gain" };
+			}
+			if (graph.type == Graph.SENSOR) {
+				List<HousePart> parts = Scene.getInstance().getParts();
+				List<String> sensorList = new ArrayList<String>();
+				for (HousePart p : parts) {
+					if (p instanceof Sensor) {
+						Sensor sensor = (Sensor) p;
+						sensorList.add("Light: #" + sensor.getId());
+						sensorList.add("Heat Flux: #" + sensor.getId());
+					}
+				}
+				if (!sensorList.isEmpty()) {
+					header = new String[1 + sensorList.size()];
+					header[0] = "Hour";
+					for (int i = 1; i < header.length; i++)
+						header[i] = sensorList.get(i - 1);
+				}
+			}
 		} else if (graph instanceof PartEnergyAnnualGraph) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof SolarPanel) {
 				header = new String[] { "Month", "Solar" };
-			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof) {
+			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
 				header = new String[] { "Month", "Heat Gain" };
 			} else if (selectedPart instanceof Window) {
 				header = new String[] { "Month", "Solar", "Heat Gain" };
@@ -108,7 +137,7 @@ class DataViewer {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof SolarPanel) {
 				header = new String[] { "Degree", "Solar" };
-			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof) {
+			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
 				header = new String[] { "Degree", "Heat Gain" };
 			} else if (selectedPart instanceof Window) {
 				header = new String[] { "Degree", "Solar", "Heat Gain" };

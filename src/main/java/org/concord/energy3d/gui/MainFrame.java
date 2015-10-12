@@ -75,6 +75,7 @@ import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
+import org.concord.energy3d.simulation.DailySensorData;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
@@ -126,7 +127,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem annualEnergyAnalysisForSelectionMenuItem;
 	private JMenuItem dailyEnergyAnalysisMenuItem;
 	private JMenuItem dailyEnergyAnalysisForSelectionMenuItem;
-	private JMenuItem sensorMenuItem;
+	private JMenuItem annualSensorMenuItem;
+	private JMenuItem dailySensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem constructionCostAnalysisMenuItem;
 	private JMenuItem annualEnvironmentalTemperatureMenuItem;
@@ -883,7 +885,8 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
 			analysisMenu.add(getAnnualEnvironmentalTemperatureMenuItem());
 			analysisMenu.add(getDailyEnvironmentalTemperatureMenuItem());
-			analysisMenu.add(getSensorMenuItem());
+			analysisMenu.add(getAnnualSensorMenuItem());
+			analysisMenu.add(getDailySensorMenuItem());
 			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			if (!Config.isRestrictMode()) {
 				analysisMenu.addSeparator();
@@ -1150,21 +1153,36 @@ public class MainFrame extends JFrame {
 		return dailyEnergyAnalysisForSelectionMenuItem;
 	}
 
-	private JMenuItem getSensorMenuItem() {
-		if (sensorMenuItem == null) {
-			sensorMenuItem = new JMenuItem("Collect Sensor Data...");
-			sensorMenuItem.setAccelerator(KeyStroke.getKeyStroke("F9"));
-			sensorMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getAnnualSensorMenuItem() {
+		if (annualSensorMenuItem == null) {
+			annualSensorMenuItem = new JMenuItem("Collect Annual Sensor Data...");
+			annualSensorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (Scene.getInstance().hasSensor())
-						new AnnualSensorData().show("Sensor Data");
+						new AnnualSensorData().show("Annual Sensor Data");
 					else
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 		}
-		return sensorMenuItem;
+		return annualSensorMenuItem;
+	}
+
+	private JMenuItem getDailySensorMenuItem() {
+		if (dailySensorMenuItem == null) {
+			dailySensorMenuItem = new JMenuItem("Collect Daily Sensor Data...");
+			dailySensorMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (Scene.getInstance().hasSensor())
+						new DailySensorData().show("Daily Sensor Data");
+					else
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
+		}
+		return dailySensorMenuItem;
 	}
 
 	private JCheckBoxMenuItem getSolarHeatMapMenuItem() {
