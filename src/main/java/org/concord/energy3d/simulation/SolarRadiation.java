@@ -146,14 +146,14 @@ public class SolarRadiation {
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (part.isDrawCompleted())
 						if (part instanceof Foundation || part instanceof Wall || part instanceof Window)
-							computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getFaceDirection(), true);
+							computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getFaceDirection());
 						else if (part instanceof SolarPanel || part instanceof Sensor)
-							computeOnMeshSolarPanel(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getFaceDirection(), true);
+							computeOnMeshSolarPanel(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getFaceDirection());
 						else if (part instanceof Roof)
 							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 								final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
 								final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-								computeOnMesh(minute, dayLength, directionTowardSun, part, mesh, mesh, faceDirection, false);
+								computeOnMesh(minute, dayLength, directionTowardSun, part, mesh, mesh, faceDirection);
 							}
 				}
 				computeOnLand(dayLength, directionTowardSun);
@@ -196,7 +196,7 @@ public class SolarRadiation {
 	}
 
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
-	private void computeOnMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
+	private void computeOnMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
 
 		MeshData data = onMesh.get(drawMesh);
 		if (data == null)
@@ -264,7 +264,7 @@ public class SolarRadiation {
 
 	}
 
-	private void computeOnMeshSolarPanel(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean addToTotal) {
+	private void computeOnMeshSolarPanel(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
 
 		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent. This is a temporary fix.
 			return;

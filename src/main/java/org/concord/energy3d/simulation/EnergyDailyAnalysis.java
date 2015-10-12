@@ -1,19 +1,8 @@
 package org.concord.energy3d.simulation;
 
-import static java.util.Calendar.APRIL;
-import static java.util.Calendar.AUGUST;
-import static java.util.Calendar.DECEMBER;
-import static java.util.Calendar.FEBRUARY;
-import static java.util.Calendar.JANUARY;
-import static java.util.Calendar.JULY;
-import static java.util.Calendar.JUNE;
-import static java.util.Calendar.MARCH;
-import static java.util.Calendar.MAY;
-import static java.util.Calendar.NOVEMBER;
-import static java.util.Calendar.OCTOBER;
-import static java.util.Calendar.SEPTEMBER;
-
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -38,11 +27,15 @@ import javax.swing.JPanel;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
+import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 
@@ -50,35 +43,20 @@ import org.concord.energy3d.shapes.Heliodon;
  * @author Charles Xie
  * 
  */
-public abstract class AnnualAnalysis extends Analysis {
+public class EnergyDailyAnalysis extends Analysis {
 
-	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
+	public EnergyDailyAnalysis() {
+		super();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		graph = selectedPart instanceof Foundation ? new BuildingEnergyAnnualGraph() : new PartEnergyAnnualGraph();
+		graph.setPreferredSize(new Dimension(600, 400));
+		graph.setBackground(Color.WHITE);
+	}
 
 	private void runAnalysis(final JDialog parent) {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
-				for (final int m : MONTHS) {
-					if (!analysisStopped) {
-						Heliodon.getInstance().getCalender().set(Calendar.MONTH, m);
-						final Throwable t = compute();
-						if (t != null) {
-							stopAnalysis();
-							EventQueue.invokeLater(new Runnable() {
-								public void run() {
-									JOptionPane.showMessageDialog(parent, "Annual analysis failed. Please restart the program.\n" + t.getMessage(), "Analysis Error", JOptionPane.ERROR_MESSAGE);
-								}
-							});
-							break;
-						}
-						EventQueue.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalender().getTime());
-							}
-						});
-					}
-				}
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -102,6 +80,48 @@ public abstract class AnnualAnalysis extends Analysis {
 				});
 			}
 		});
+	}
+
+	@Override
+	void updateGraph() {
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart instanceof Foundation) {
+			if (graph instanceof BuildingEnergyAnnualGraph) {
+				final Foundation selectedBuilding = (Foundation) selectedPart;
+				final double window = selectedBuilding.getPassiveSolarToday();
+				final double solarPanel = selectedBuilding.getPhotovoltaicToday();
+				final double heater = selectedBuilding.getHeatingToday();
+				final double ac = selectedBuilding.getCoolingToday();
+				final double net = selectedBuilding.getTotalEnergyToday();
+				graph.addData("Windows", window);
+				graph.addData("Solar Panels", solarPanel);
+				graph.addData("Heater", heater);
+				graph.addData("AC", ac);
+				graph.addData("Net", net);
+			} else {
+				graph.addData("Solar", selectedPart.getSolarPotentialToday());
+			}
+		} else if (selectedPart instanceof Window) {
+			Window window = (Window) selectedPart;
+			final double solar = selectedPart.getSolarPotentialToday() * window.getSolarHeatGainCoefficientNotPercentage();
+			graph.addData("Solar", solar);
+			final double[] loss = selectedPart.getHeatLoss();
+			double sum = 0;
+			for (final double x : loss)
+				sum += x;
+			graph.addData("Heat Gain", -sum);
+		} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
+			final double[] loss = selectedPart.getHeatLoss();
+			double sum = 0;
+			for (final double x : loss)
+				sum += x;
+			graph.addData("Heat Gain", -sum);
+		} else if (selectedPart instanceof SolarPanel) {
+			final SolarPanel solarPanel = (SolarPanel) selectedPart;
+			final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getEfficiencyNotPercentage();
+			graph.addData("Solar", solar);
+		}
+		graph.repaint();
 	}
 
 	public void show(String title) {

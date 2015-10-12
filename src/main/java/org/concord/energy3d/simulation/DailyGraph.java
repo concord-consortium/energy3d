@@ -22,6 +22,17 @@ abstract class DailyGraph extends Graph {
 	DailyGraph() {
 		super();
 		xAxisLabel = "Hour";
+		xmin = 0;
+		xmax = 23;
+		numberOfTicks = 24;
+	}
+
+	double getXAxisLabelScalingFactor() {
+		return 1.0;
+	}
+
+	String getXAxisUnit() {
+		return "";
 	}
 
 }

@@ -92,7 +92,7 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 
 		hideData = new HashMap<double[], Boolean>();
 
-		int n = AnnualAnalysis.MONTHS.length;
+		int n = EnergyAnnualAnalysis.MONTHS.length;
 		lowestAirTemperature = new double[n];
 		highestAirTemperature = new double[n];
 		averageAirTemperature = new double[n];
@@ -118,7 +118,7 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 		today.set(Calendar.DAY_OF_MONTH, 1);
 		int count = 0;
 		int lag = Ground.getInstance().getDailyLagInMinutes();
-		for (int x : AnnualAnalysis.MONTHS) {
+		for (int x : EnergyAnnualAnalysis.MONTHS) {
 			today.set(Calendar.MONTH, x);
 			double[] r = Weather.computeOutsideTemperature(today, city);
 			lowestAirTemperature[count] = r[0];

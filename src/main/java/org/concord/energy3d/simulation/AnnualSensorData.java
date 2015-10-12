@@ -17,7 +17,7 @@ import org.concord.energy3d.scene.Scene;
  *
  */
 
-public class AnnualSensorData extends AnnualAnalysis {
+public class AnnualSensorData extends EnergyAnnualAnalysis {
 
 	public AnnualSensorData() {
 		super();

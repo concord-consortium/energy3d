@@ -24,11 +24,11 @@ abstract class AngularGraph extends Graph {
 		xAxisLabel = "Rotation Angle";
 		xmin = 0;
 		xmax = 7;
-		numberOfTicks = AngularAnalysis.nRotation;
+		numberOfTicks = EnergyAngularAnalysis.nRotation;
 	}
 
 	double getXAxisLabelScalingFactor() {
-		return Math.toDegrees(2.0 * Math.PI / AngularAnalysis.nRotation);
+		return Math.toDegrees(2.0 * Math.PI / EnergyAngularAnalysis.nRotation);
 	}
 
 	String getXAxisUnit() {

@@ -77,6 +77,7 @@ import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
+import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
@@ -123,12 +124,13 @@ public class MainFrame extends JFrame {
 	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem annualEnergyAnalysisMenuItem;
 	private JMenuItem annualEnergyAnalysisForSelectionMenuItem;
+	private JMenuItem dailyEnergyAnalysisMenuItem;
+	private JMenuItem dailyEnergyAnalysisForSelectionMenuItem;
 	private JMenuItem sensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
-	private JMenuItem materialCostAnalysisMenuItem;
+	private JMenuItem constructionCostAnalysisMenuItem;
 	private JMenuItem annualEnvironmentalTemperatureMenuItem;
 	private JMenuItem dailyEnvironmentalTemperatureMenuItem;
-	private JMenuItem dailyAnalysisMenuItem;
 	private JCheckBoxMenuItem solarHeatMapMenuItem;
 	private JCheckBoxMenuItem onlyAbsorptionInSolarMapMenuItem;
 	private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
@@ -875,13 +877,14 @@ public class MainFrame extends JFrame {
 			});
 			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
 			analysisMenu.add(getAnnualEnergyAnalysisForSelectionMenuItem());
-			analysisMenu.add(getDailyAnalysisMenuItem());
-			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
+			analysisMenu.add(getDailyEnergyAnalysisMenuItem());
+			analysisMenu.add(getDailyEnergyAnalysisForSelectionMenuItem());
 			analysisMenu.addSeparator();
-			analysisMenu.add(getMaterialCostAnalysisMenuItem());
+			analysisMenu.add(getConstructionCostAnalysisMenuItem());
 			analysisMenu.add(getAnnualEnvironmentalTemperatureMenuItem());
 			analysisMenu.add(getDailyEnvironmentalTemperatureMenuItem());
 			analysisMenu.add(getSensorMenuItem());
+			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			if (!Config.isRestrictMode()) {
 				analysisMenu.addSeparator();
 				analysisMenu.add(getSimulationSettingsMenuItem());
@@ -1093,7 +1096,7 @@ public class MainFrame extends JFrame {
 						return;
 					}
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel) {
+					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Foundation) {
 						new EnergyAnnualAnalysis().show("Annual Energy for Selected Part");
 					} else {
 						JOptionPane.showMessageDialog(MainFrame.this, "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
@@ -1102,6 +1105,49 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return annualEnergyAnalysisForSelectionMenuItem;
+	}
+
+	private JMenuItem getDailyEnergyAnalysisMenuItem() {
+		if (dailyEnergyAnalysisMenuItem == null) {
+			dailyEnergyAnalysisMenuItem = new JMenuItem("Run Daily Energy Analysis for Building...");
+			dailyEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
+			dailyEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if (autoSelectBuilding(true) instanceof Foundation)
+						new EnergyDailyAnalysis().show("Daily Energy");
+				}
+			});
+		}
+		return dailyEnergyAnalysisMenuItem;
+	}
+
+	private JMenuItem getDailyEnergyAnalysisForSelectionMenuItem() {
+		if (dailyEnergyAnalysisForSelectionMenuItem == null) {
+			dailyEnergyAnalysisForSelectionMenuItem = new JMenuItem("Run Daily Energy Analysis for Selected Part...");
+			dailyEnergyAnalysisForSelectionMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Foundation) {
+						new EnergyDailyAnalysis().show("Daily Energy for Selected Part");
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.this, "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+					}
+				}
+			});
+		}
+		return dailyEnergyAnalysisForSelectionMenuItem;
 	}
 
 	private JMenuItem getSensorMenuItem() {
@@ -1163,28 +1209,9 @@ public class MainFrame extends JFrame {
 		return showHeatFluxVectorsMenuItem;
 	}
 
-	private JMenuItem getDailyAnalysisMenuItem() {
-		if (dailyAnalysisMenuItem == null) {
-			dailyAnalysisMenuItem = new JMenuItem("Run Daily Energy Analysis...");
-			dailyAnalysisMenuItem.setEnabled(false);
-			dailyAnalysisMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null) {
-						JOptionPane.showMessageDialog(MainFrame.this, "You must select a building or a component first.", "No selection", JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-				}
-			});
-		}
-		return dailyAnalysisMenuItem;
-	}
-
 	private JMenuItem getOrientationalEnergyAnalysisMenuItem() {
 		if (orientationalEnergyAnalysisMenuItem == null) {
 			orientationalEnergyAnalysisMenuItem = new JMenuItem("Run Orientation Analysis...");
-			orientationalEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
 			orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1217,17 +1244,18 @@ public class MainFrame extends JFrame {
 		return orientationalEnergyAnalysisMenuItem;
 	}
 
-	private JMenuItem getMaterialCostAnalysisMenuItem() {
-		if (materialCostAnalysisMenuItem == null) {
-			materialCostAnalysisMenuItem = new JMenuItem("Show Costs...");
-			materialCostAnalysisMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getConstructionCostAnalysisMenuItem() {
+		if (constructionCostAnalysisMenuItem == null) {
+			constructionCostAnalysisMenuItem = new JMenuItem("Show Construction Costs...");
+			constructionCostAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F6"));
+			constructionCostAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Cost.getInstance().showGraph();
 				}
 			});
 		}
-		return materialCostAnalysisMenuItem;
+		return constructionCostAnalysisMenuItem;
 	}
 
 	private JMenuItem getAnnualEnvironmentalTemperatureMenuItem() {
