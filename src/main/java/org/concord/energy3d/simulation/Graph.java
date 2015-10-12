@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ abstract class Graph extends JPanel {
 	static final byte DEFAULT = 0;
 	static final byte SENSOR = 1;
 
+	DecimalFormat twoDecimals = new DecimalFormat();
 	int top = 50, right = 50, bottom = 80, left = 90;
 	BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 2f }, 0.0f);
 	BasicStroke thin = new BasicStroke(1);
@@ -69,6 +71,7 @@ abstract class Graph extends JPanel {
 		hideData = new HashMap<String, Boolean>();
 		hideRuns = new HashMap<Integer, Boolean>();
 		hideData("Windows", true);
+		twoDecimals.setMaximumFractionDigits(2);
 	}
 
 	/* keep the records by their class types */
@@ -537,13 +540,13 @@ abstract class Graph extends JPanel {
 			boolean isAngularGraph = this instanceof AngularGraph;
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));
-				g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+				g2.drawString(isAngularGraph ? s : s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 			}
 			s = "Heat Gain";
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				y0 += 14;
 				drawSquare(g2, x0, y0, 8, colors.get(s));
-				g2.drawString(isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")", x0 + 14, y0 + 8);
+				g2.drawString(isAngularGraph ? s : s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 			}
 		}
 

@@ -47,12 +47,12 @@ public class Foundation extends HousePart {
 	private transient double minY;
 	private transient double maxX;
 	private transient double maxY;
-	private transient double passiveSolarNow;
+	private transient double passiveSolarNow; // energy terms of current hour
 	private transient double photovoltaicNow;
 	private transient double heatingNow;
 	private transient double coolingNow;
 	private transient double totalEnergyNow;
-	private transient double passiveSolarToday;
+	private transient double passiveSolarToday; // energy terms of current day
 	private transient double photovoltaicToday;
 	private transient double heatingToday;
 	private transient double coolingToday;
