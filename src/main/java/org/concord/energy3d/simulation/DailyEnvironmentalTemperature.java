@@ -174,7 +174,8 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 		g2.setFont(new Font("Arial", Font.BOLD, 14));
 		FontMetrics fm = g2.getFontMetrics();
-		g2.drawString(city + " - " + (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.DAY_OF_MONTH), (width - fm.stringWidth(city)) / 2, 20);
+		String cityAndDate = city + " - " + (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.DAY_OF_MONTH);
+		g2.drawString(cityAndDate, (width - fm.stringWidth(cityAndDate)) / 2, 20);
 
 		g2.setColor(Color.LIGHT_GRAY);
 		g2.setStroke(thin);

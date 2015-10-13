@@ -12,6 +12,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.Set;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.shapes.Heliodon;
 
 /**
  * @author Charles Xie
@@ -265,7 +267,9 @@ abstract class Graph extends JPanel {
 			g2.setColor(Color.BLACK);
 			g2.setFont(new Font("Arial", Font.BOLD, 14));
 			FontMetrics fm = g2.getFontMetrics();
-			g2.drawString(city, (width - fm.stringWidth(city)) / 2, 20);
+			Calendar today = Heliodon.getInstance().getCalender();
+			String cityAndDate = city + (this instanceof DailyGraph ? " - " + (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.DAY_OF_MONTH) : "");
+			g2.drawString(cityAndDate, (width - fm.stringWidth(cityAndDate)) / 2, 20);
 		}
 
 	}

@@ -27,6 +27,10 @@ abstract class DailyGraph extends Graph {
 		numberOfTicks = 24;
 	}
 
+	String getXAxisLabel(int i) {
+		return Math.round(i * getXAxisLabelScalingFactor()) + getXAxisUnit();
+	}
+
 	double getXAxisLabelScalingFactor() {
 		return 1.0;
 	}
