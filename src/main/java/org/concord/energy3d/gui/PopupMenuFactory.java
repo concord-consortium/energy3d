@@ -2,6 +2,8 @@ package org.concord.energy3d.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -10,6 +12,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.event.PopupMenuEvent;
@@ -30,6 +33,7 @@ import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.ChangePartVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
+import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -88,6 +92,15 @@ public class PopupMenuFactory {
 
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
+
+			final JMenuItem miCut = new JMenuItem("Cut");
+			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCut.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().deleteCurrentHousePart();
+				}
+			});
 
 			final JMenu muntinMenu = new JMenu("Muntins");
 
@@ -249,6 +262,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForWindow.add(miInfo);
+			popupMenuForWindow.add(miCut);
 			popupMenuForWindow.add(muntinMenu);
 			popupMenuForWindow.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WINDOW, CHANGE_U_FACTOR));
 			popupMenuForWindow.add(shgcMenu);
@@ -262,13 +276,27 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForWall() {
 
 		if (popupMenuForWall == null) {
+
 			popupMenuForWall = createPopupMenu();
+
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
+
+			final JMenuItem miCut = new JMenuItem("Cut");
+			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCut.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().deleteCurrentHousePart();
+				}
+			});
+
 			popupMenuForWall.add(miInfo);
+			popupMenuForWall.add(miCut);
 			popupMenuForWall.add(colorAction);
 			popupMenuForWall.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WALL, CHANGE_U_FACTOR));
 			popupMenuForWall.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_WALL, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
+
 		}
 
 		return popupMenuForWall;
@@ -278,13 +306,27 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForRoof() {
 
 		if (popupMenuForRoof == null) {
+
 			popupMenuForRoof = createPopupMenu();
+
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
+
+			final JMenuItem miCut = new JMenuItem("Cut");
+			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCut.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().deleteCurrentHousePart();
+				}
+			});
+
 			popupMenuForRoof.add(miInfo);
+			popupMenuForRoof.add(miCut);
 			popupMenuForRoof.add(colorAction);
 			popupMenuForRoof.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_ROOF, CHANGE_U_FACTOR));
 			popupMenuForRoof.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
+
 		}
 
 		return popupMenuForRoof;
@@ -294,12 +336,26 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForDoor() {
 
 		if (popupMenuForDoor == null) {
+
 			popupMenuForDoor = createPopupMenu();
+
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
+
+			final JMenuItem miCut = new JMenuItem("Cut");
+			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCut.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().deleteCurrentHousePart();
+				}
+			});
+
 			popupMenuForDoor.add(miInfo);
+			popupMenuForDoor.add(miCut);
 			popupMenuForDoor.add(colorAction);
 			popupMenuForDoor.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_DOOR, CHANGE_U_FACTOR));
+
 		}
 
 		return popupMenuForDoor;
@@ -309,13 +365,27 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForFoundation() {
 
 		if (popupMenuForFoundation == null) {
+
 			popupMenuForFoundation = createPopupMenu();
+
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
+
+			final JMenuItem miCut = new JMenuItem("Cut");
+			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCut.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().deleteCurrentHousePart();
+				}
+			});
+
 			popupMenuForFoundation.add(miInfo);
+			popupMenuForFoundation.add(miCut);
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 			popupMenuForFoundation.add(createPropertyMenu("Floor U-Factor", EnergyPanel.U_FACTOR_CHOICES_FLOOR, CHANGE_U_FACTOR));
+
 		}
 
 		return popupMenuForFoundation;
@@ -392,7 +462,18 @@ public class PopupMenuFactory {
 
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
+
+			final JMenuItem miCut = new JMenuItem("Cut");
+			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCut.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().deleteCurrentHousePart();
+				}
+			});
+
 			popupMenuForSolarPanel.add(miInfo);
+			popupMenuForSolarPanel.add(miCut);
 			popupMenuForSolarPanel.add(efficiencyMenu);
 
 		}

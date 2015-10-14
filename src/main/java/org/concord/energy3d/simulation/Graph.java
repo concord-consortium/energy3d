@@ -456,6 +456,8 @@ abstract class Graph extends JPanel {
 				g2.setColor(Color.BLACK);
 				path.reset();
 				double dataX, dataY;
+				double xLabel = 0;
+				double yLabel = Double.MAX_VALUE;
 				for (int i = 0; i < list.size(); i++) {
 					dataX = left + dx * i;
 					dataY = getHeight() - top - (list.get(i) - ymin) * dy;
@@ -464,9 +466,20 @@ abstract class Graph extends JPanel {
 					} else {
 						path.lineTo(dataX, dataY);
 					}
+					if (dataY < yLabel) {
+						yLabel = dataY;
+						xLabel = dataX;
+					}
 				}
 				g2.setStroke(thin);
 				g2.draw(path);
+
+				if (!(this instanceof DailyGraph)) {
+					xLabel = left - 30;
+					yLabel = getHeight() - top - (list.get(0) - ymin) * dy + 5;
+				} else {
+					yLabel -= 8;
+				}
 
 				g2.setStroke(thin);
 				switch (type) {
@@ -474,16 +487,15 @@ abstract class Graph extends JPanel {
 					for (int i = 0; i < list.size(); i++) {
 						dataX = left + dx * i;
 						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-						if (i == 0) {
-							int pound = key.indexOf("#");
-							String s = key.substring(pound);
-							g2.drawString(s, (int) dataX - 28, (int) dataY + 5);
-						}
 						if (key.startsWith("Light"))
 							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get("Solar"));
 						else if (key.startsWith("Heat Flux"))
 							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get("Heat Gain"));
 					}
+					int pound = key.indexOf("#");
+					String s = key.substring(pound);
+					FontMetrics fm = g2.getFontMetrics();
+					g2.drawString(s, (int) (xLabel - 0.5 * fm.stringWidth(s)), (int) yLabel);
 					break;
 				default:
 					Color c = colors.get(key);

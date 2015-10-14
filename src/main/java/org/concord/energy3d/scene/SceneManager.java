@@ -1506,7 +1506,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			mousePressed(lastSelectedEditPointMouseState);
 	}
 
-	private void deleteCurrentHousePart() {
+	public void deleteCurrentHousePart() {
 		if (selectedHousePart instanceof Foundation) {
 			if (((Foundation) selectedHousePart).getLockEdit())
 				return;

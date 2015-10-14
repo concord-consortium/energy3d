@@ -96,6 +96,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class MainFrame extends JFrame {
+
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
 	private JMenuBar appMenuBar = null;
@@ -149,6 +150,9 @@ public class MainFrame extends JFrame {
 	private JMenu editMenu;
 	private JMenuItem undoMenuItem;
 	private JMenuItem redoMenuItem;
+	private JMenuItem cutMenuItem;
+	private JMenuItem copyMenuItem;
+	private JMenuItem pasteMenuItem;
 	private JMenuItem pageSetupMenuItem;
 	private JRadioButtonMenuItem scaleToFitRadioButtonMenuItem;
 	private JRadioButtonMenuItem exactSizeRadioButtonMenuItem;
@@ -1369,6 +1373,10 @@ public class MainFrame extends JFrame {
 			editMenu.add(getUndoMenuItem());
 			editMenu.add(getRedoMenuItem());
 			editMenu.addSeparator();
+			editMenu.add(getCutMenuItem());
+			editMenu.add(getCopyMenuItem());
+			editMenu.add(getPasteMenuItem());
+			editMenu.addSeparator();
 			editMenu.add(getRescaleMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getGridsMenuItem());
@@ -1437,6 +1445,48 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return redoMenuItem;
+	}
+
+	private JMenuItem getCutMenuItem() {
+		if (cutMenuItem == null) {
+			cutMenuItem = new JMenuItem("Cut");
+			cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			cutMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().deleteCurrentHousePart();
+				}
+			});
+		}
+		return cutMenuItem;
+	}
+
+	private JMenuItem getCopyMenuItem() {
+		if (copyMenuItem == null) {
+			copyMenuItem = new JMenuItem("Copy");
+			copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			copyMenuItem.setEnabled(false);
+			copyMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+				}
+			});
+		}
+		return copyMenuItem;
+	}
+
+	private JMenuItem getPasteMenuItem() {
+		if (pasteMenuItem == null) {
+			pasteMenuItem = new JMenuItem("Paste");
+			pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			pasteMenuItem.setEnabled(false);
+			pasteMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+				}
+			});
+		}
+		return pasteMenuItem;
 	}
 
 	private void saveFile() {
