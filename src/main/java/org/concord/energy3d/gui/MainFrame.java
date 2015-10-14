@@ -762,11 +762,11 @@ public class MainFrame extends JFrame {
 		if (helpMenu == null) {
 			helpMenu = new JMenu();
 			helpMenu.setText("Help");
-			JMenuItem mi = new JMenuItem("Download Models...");
+			JMenuItem mi = new JMenuItem("Download PDF User's Guide...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Util.openBrowser("http://energy.concord.org/energy3d/models.html");
+					Util.openBrowser("http://energy.concord.org/energy3d/Energy3D-Guide.pdf");
 				}
 			});
 			helpMenu.add(mi);
@@ -775,6 +775,14 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Util.openBrowser("http://energy.concord.org/energy3d");
+				}
+			});
+			helpMenu.add(mi);
+			mi = new JMenuItem("View Examples...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Util.openBrowser("http://energy.concord.org/energy3d/models.html");
 				}
 			});
 			helpMenu.add(mi);
@@ -821,8 +829,8 @@ public class MainFrame extends JFrame {
 			aboutDialog.setTitle("About");
 			final JPanel p = new JPanel(new BorderLayout(10, 10));
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			p.add(new JLabel("<html><h1>Energy3D</h1><h3><i>Learning to build a sustainable future</i></h3><br>Version: " + Config.VERSION + ", Copyright 2011-2015<br>The Intelligent Learning Environments Laboratory, Concord Consortium<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, developer of 3D user interface and graphics<li>Dr. Charles Xie, developer of simulation and analysis engines</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D. Funding of this program is provided by the National<br>Science Foundation through grants #0918449, #1304485, #1348530, <br>and #1503196.</html>"), BorderLayout.CENTER);
-			final JButton button = new JButton("Thanks!");
+			p.add(new JLabel("<html><h1>Energy3D</h1><h3><i>Learning to build a sustainable future</i></h3><br>Version: " + Config.VERSION + ", Copyright 2011-2016<br>The Intelligent Learning Technology Laboratory, Concord Consortium<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, developer of 3D user interface and graphics<li>Dr. Charles Xie, developer of simulation and analysis engines</ul><p>This program is licensed under the GNU Lesser General Public License V3.0<br>and based on Ardor3D and JOGL. Funding of this program is provided by<br>the National Science Foundation through grants 0918449, 1304485, 1348530,<br>1503196, and 1512868.</html>"), BorderLayout.CENTER);
+			final JButton button = new JButton("Close");
 			button.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent arg0) {

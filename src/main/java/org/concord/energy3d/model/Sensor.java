@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.OrientedBoundingBox;
@@ -21,6 +22,9 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Sensor extends HousePart {
@@ -32,6 +36,7 @@ public class Sensor extends HousePart {
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
+	private transient BMText label;
 
 	public Sensor() {
 		super(1, 1, 0.0);
@@ -62,7 +67,14 @@ public class Sensor extends HousePart {
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
 
+		label = new BMText("" + getId(), "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+		Util.initHousePartLabel(label);
+		label.setFontScale(0.6);
+		label.setVisible(true);
+		root.attachChild(label);
+
 		updateTextureAndColor();
+
 	}
 
 	@Override
@@ -154,6 +166,12 @@ public class Sensor extends HousePart {
 
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
+
+		ReadOnlyVector3 translation = mesh.getTranslation();
+		label.setText("" + getId());
+		double labelOffset = 1.0;
+		label.setTranslation(translation.getX() + labelOffset * normal.getX(), translation.getY() + labelOffset * normal.getY(), translation.getZ() + labelOffset * normal.getZ());
+
 	}
 
 	@Override

@@ -342,8 +342,11 @@ public class EnergyDailyAnalysis extends Analysis {
 			public void actionPerformed(final ActionEvent e) {
 				stopAnalysis();
 				if (graph.hasData()) {
-					final Object[] options = { "Yes", "No" };
-					if (JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]) == JOptionPane.YES_OPTION)
+					final Object[] options = { "Yes", "No", "Cancel" };
+					int i = JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+					if (i == JOptionPane.CANCEL_OPTION)
+						return;
+					if (i == JOptionPane.YES_OPTION)
 						graph.keepResults();
 				}
 				windowLocation.setLocation(dialog.getLocationOnScreen());
