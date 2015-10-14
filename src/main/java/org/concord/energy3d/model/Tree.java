@@ -39,6 +39,7 @@ public class Tree extends HousePart {
 	private transient Node collisionRoot;
 	private transient Mesh crown;
 	private final int treeType;
+	private boolean showPolygon;
 
 	public Tree(final int treeType) {
 		super(1, 1, 1);
@@ -50,21 +51,25 @@ public class Tree extends HousePart {
 	protected void init() {
 		super.init();
 
-		final double height;
+		final double width, height;
 		switch (treeType) {
 		case OAK:
+			width = 60;
 			height = 75;
 			break;
 		case MAPLE:
+			width = 30;
 			height = 60;
 			break;
 		case PINE:
+			width = 30;
 			height = 80;
 			break;
 		default:
+			width = 30;
 			height = 40;
 		}
-		mesh = new Quad("Tree Quad", 30, height);
+		mesh = new Quad("Tree Quad", width, height);
 		mesh.setModelBound(new BoundingBox());
 		mesh.updateModelBound();
 		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
@@ -85,10 +90,13 @@ public class Tree extends HousePart {
 		billboard.attachChild(mesh);
 		root.attachChild(billboard);
 
-		if (treeType == PINE)
+		switch (treeType) {
+		case PINE:
 			crown = new Cone("Tree Crown", 2, 6, 18, 20, false); // axis samples, radial samples, radius, height, closed
-		else
-			crown = new Sphere("Tree Crown", 4, 6, 14); // z samples, radial samples, radius
+			break;
+		default:
+			crown = new Sphere("Tree Crown", 4, 8, 14); // z samples, radial samples, radius
+		}
 		crown.setModelBound(new BoundingSphere());
 		crown.updateModelBound();
 		final Cylinder trunk = new Cylinder("Tree Trunk", 10, 10, 1, 20);
@@ -97,9 +105,9 @@ public class Tree extends HousePart {
 
 		switch (treeType) {
 		case OAK:
-			crown.setScale(1, 1.2, 2.5);
+			crown.setScale(2, 2, 2.5);
 			crown.setTranslation(0, 0, 40);
-			trunk.setScale(1, 1, 2);
+			trunk.setScale(1, 2, 2);
 			trunk.setTranslation(0, 0, 20);
 			break;
 		case MAPLE:
@@ -126,7 +134,7 @@ public class Tree extends HousePart {
 			collisionRoot.setTranslation(getAbsPoint(0));
 		collisionRoot.updateWorldTransform(true);
 		collisionRoot.updateWorldBound(true);
-		collisionRoot.getSceneHints().setCullHint(CullHint.Always);
+		collisionRoot.getSceneHints().setCullHint(showPolygon ? CullHint.Never : CullHint.Always);
 		root.attachChild(collisionRoot);
 
 		crown.setUserData(new UserData(this));
@@ -134,6 +142,15 @@ public class Tree extends HousePart {
 
 		updateTextureAndColor();
 
+	}
+
+	public void setShowPolygon(boolean showPolygon) {
+		this.showPolygon = showPolygon;
+		collisionRoot.getSceneHints().setCullHint(showPolygon ? CullHint.Never : CullHint.Always);
+	}
+
+	public boolean getShowPolygon() {
+		return showPolygon;
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import javax.swing.JPopupMenu;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.PopupMenuFactory;
 import org.concord.energy3d.logger.PlayControl;
@@ -683,6 +684,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
+
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				refresh = true;
@@ -1510,6 +1512,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (selectedHousePart instanceof Foundation) {
 			if (((Foundation) selectedHousePart).getLockEdit())
 				return;
+			if (!selectedHousePart.getChildren().isEmpty())
+				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Deleting the platform also deletes the building on it. Are you sure?", "Confirmation", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
+					return;
 		}
 		if (selectedHousePart != null)
 			taskManager.update(new Callable<Object>() {
@@ -1598,6 +1603,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public boolean areBuildingLabelsVisible() {
 		return showBuildingLabels;
+	}
+
+	public void setShowTreePolygons(final boolean b) {
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Tree)
+				((Tree) part).setShowPolygon(b);
+		}
+	}
+
+	public boolean getShowTreePolygons() {
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Tree)
+				return ((Tree) part).getShowPolygon();
+		}
+		return false;
 	}
 
 	public void resetBuildingRotationAngleRecorded() {
