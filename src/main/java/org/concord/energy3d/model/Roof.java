@@ -116,6 +116,19 @@ public abstract class Roof extends HousePart {
 			}
 	}
 
+	/** Do not call: For UNDO only */
+	public Map<Integer, List<Wall>> getGableEditPointToWallMap() {
+		return gableEditPointToWallMap;
+	}
+
+	/** Do not call: For UNDO only */
+	public void setGableEditPointToWallMap(Map<Integer, List<Wall>> m) {
+		gableEditPointToWallMap = new HashMap<Integer, List<Wall>>();
+		for (Map.Entry<Integer, List<Wall>> entry : m.entrySet()) {
+			gableEditPointToWallMap.put(entry.getKey(), new ArrayList<Wall>(entry.getValue()));
+		}
+	}
+
 	@Override
 	protected void drawMesh() {
 		/* undo the effect of wall stretch on all walls if roof is moved to new walls */

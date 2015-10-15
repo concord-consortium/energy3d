@@ -1070,7 +1070,7 @@ public class Wall extends HousePart {
 		super.setOriginal(original);
 	}
 
-	public HousePart getRoof() {
+	public Roof getRoof() {
 		return roof;
 	}
 

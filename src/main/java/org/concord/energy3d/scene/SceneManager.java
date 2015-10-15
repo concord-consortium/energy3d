@@ -11,6 +11,8 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1520,7 +1522,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			taskManager.update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					undoManager.addEdit(new RemovePartCommand(selectedHousePart));
+					RemovePartCommand command = new RemovePartCommand(selectedHousePart);
+					if (selectedHousePart instanceof Wall) { // undo/redo a gable roof
+						Roof roof = ((Wall) selectedHousePart).getRoof();
+						if (roof != null) {
+							List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
+							gableInfo.add(roof.getGableEditPointToWallMap());
+							command.setGableInfo(gableInfo);
+						}
+					} else if (selectedHousePart instanceof Foundation) { // undo/redo all the gable roofs
+
+					}
+					undoManager.addEdit(command);
 					Scene.getInstance().remove(selectedHousePart, true);
 					selectedHousePart = null;
 					EventQueue.invokeLater(new Runnable() {
