@@ -140,7 +140,6 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
-	private JCheckBoxMenuItem showTreePolygonsMenuItem;
 	protected Object lastSelection;
 	private JMenuItem exitMenuItem = null;
 	private JMenu helpMenu = null;
@@ -929,7 +928,6 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
-					Util.selectSilently(showTreePolygonsMenuItem, SceneManager.getInstance().getShowTreePolygons());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
 					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
 					Util.selectSilently(simpleTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
@@ -951,7 +949,6 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
-			viewMenu.add(getShowTreePolygonsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
 			// viewMenu.add(getWallThicknessMenuItem());
 
@@ -982,19 +979,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return axesMenuItem;
-	}
-
-	public JCheckBoxMenuItem getShowTreePolygonsMenuItem() {
-		if (showTreePolygonsMenuItem == null) {
-			showTreePolygonsMenuItem = new JCheckBoxMenuItem("Show Tree Polygons", true);
-			showTreePolygonsMenuItem.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().setShowTreePolygons(showTreePolygonsMenuItem.isSelected());
-				}
-			});
-		}
-		return showTreePolygonsMenuItem;
 	}
 
 	public JCheckBoxMenuItem getBuildingLabelsMenuItem() {

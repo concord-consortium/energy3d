@@ -39,7 +39,7 @@ public class Tree extends HousePart {
 	private transient Node collisionRoot;
 	private transient Mesh crown;
 	private final int treeType;
-	private boolean showPolygon;
+	private boolean showPolygons;
 
 	public Tree(final int treeType) {
 		super(1, 1, 1);
@@ -134,7 +134,7 @@ public class Tree extends HousePart {
 			collisionRoot.setTranslation(getAbsPoint(0));
 		collisionRoot.updateWorldTransform(true);
 		collisionRoot.updateWorldBound(true);
-		collisionRoot.getSceneHints().setCullHint(showPolygon ? CullHint.Never : CullHint.Always);
+		collisionRoot.getSceneHints().setCullHint(showPolygons ? CullHint.Never : CullHint.Always);
 		root.attachChild(collisionRoot);
 
 		crown.setUserData(new UserData(this));
@@ -144,13 +144,13 @@ public class Tree extends HousePart {
 
 	}
 
-	public void setShowPolygon(boolean showPolygon) {
-		this.showPolygon = showPolygon;
-		collisionRoot.getSceneHints().setCullHint(showPolygon ? CullHint.Never : CullHint.Always);
+	public void setShowPolygons(boolean showPolygons) {
+		this.showPolygons = showPolygons;
+		collisionRoot.getSceneHints().setCullHint(showPolygons ? CullHint.Never : CullHint.Always);
 	}
 
-	public boolean getShowPolygon() {
-		return showPolygon;
+	public boolean getShowPolygons() {
+		return showPolygons;
 	}
 
 	@Override

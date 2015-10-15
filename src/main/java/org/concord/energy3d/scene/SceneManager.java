@@ -1605,21 +1605,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return showBuildingLabels;
 	}
 
-	public void setShowTreePolygons(final boolean b) {
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Tree)
-				((Tree) part).setShowPolygon(b);
-		}
-	}
-
-	public boolean getShowTreePolygons() {
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Tree)
-				return ((Tree) part).getShowPolygon();
-		}
-		return false;
-	}
-
 	public void resetBuildingRotationAngleRecorded() {
 		buildingRotationAngleRecorded = 0;
 	}

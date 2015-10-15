@@ -3,11 +3,14 @@ package org.concord.energy3d.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -24,6 +27,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -52,6 +56,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForWall;
 	private static JPopupMenu popupMenuForRoof;
 	private static JPopupMenu popupMenuForDoor;
+	private static JPopupMenu popupMenuForTree;
 	private static JPopupMenu popupMenuForFoundation;
 	private static JPopupMenu popupMenuForSolarPanel;
 
@@ -81,6 +86,8 @@ public class PopupMenuFactory {
 			return getPopupMenuForFoundation();
 		if (selectedPart instanceof SolarPanel)
 			return getPopupMenuForSolarPanel();
+		if (selectedPart instanceof Tree)
+			return getPopupMenuForTree();
 		return null;
 	}
 
@@ -88,7 +95,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForWindow == null) {
 
-			popupMenuForWindow = createPopupMenu();
+			popupMenuForWindow = createPopupMenu(null);
 
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
@@ -277,7 +284,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForWall == null) {
 
-			popupMenuForWall = createPopupMenu();
+			popupMenuForWall = createPopupMenu(null);
 
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
@@ -307,7 +314,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForRoof == null) {
 
-			popupMenuForRoof = createPopupMenu();
+			popupMenuForRoof = createPopupMenu(null);
 
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
@@ -337,7 +344,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForDoor == null) {
 
-			popupMenuForDoor = createPopupMenu();
+			popupMenuForDoor = createPopupMenu(null);
 
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
@@ -366,7 +373,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForFoundation == null) {
 
-			popupMenuForFoundation = createPopupMenu();
+			popupMenuForFoundation = createPopupMenu(null);
 
 			final JMenuItem miInfo = new JMenuItem();
 			miInfo.setEnabled(false);
@@ -396,7 +403,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForSolarPanel == null) {
 
-			popupMenuForSolarPanel = createPopupMenu();
+			popupMenuForSolarPanel = createPopupMenu(null);
 
 			final JMenu efficiencyMenu = new JMenu("Energy Conversion Efficiency");
 
@@ -482,7 +489,52 @@ public class PopupMenuFactory {
 
 	}
 
-	private static JPopupMenu createPopupMenu() {
+	private static JPopupMenu getPopupMenuForTree() {
+
+		if (popupMenuForTree == null) {
+
+			final JMenuItem miInfo = new JMenuItem();
+			miInfo.setEnabled(false);
+
+			final JMenuItem miCut = new JMenuItem("Cut");
+			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCut.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().deleteCurrentHousePart();
+				}
+			});
+
+			final JCheckBoxMenuItem miPolygon = new JCheckBoxMenuItem("Show Polygon");
+			miPolygon.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					HousePart p = SceneManager.getInstance().getSelectedPart();
+					if (p instanceof Tree)
+						((Tree) p).setShowPolygons(miPolygon.isSelected());
+				}
+			});
+
+			popupMenuForTree = createPopupMenu(new Runnable() {
+				@Override
+				public void run() {
+					HousePart p = SceneManager.getInstance().getSelectedPart();
+					if (p instanceof Tree)
+						Util.selectSilently(miPolygon, ((Tree) p).getShowPolygons());
+				}
+			});
+
+			popupMenuForTree.add(miInfo);
+			popupMenuForTree.add(miCut);
+			popupMenuForTree.add(miPolygon);
+
+		}
+
+		return popupMenuForTree;
+
+	}
+
+	private static JPopupMenu createPopupMenu(final Runnable runWhenBecomingVisible) {
 
 		final JPopupMenu popupMenu = new JPopupMenu();
 		popupMenu.setInvoker(MainPanel.getInstance().getCanvasPanel());
@@ -495,6 +547,8 @@ public class PopupMenuFactory {
 					return;
 				String s = selectedPart.toString();
 				((JMenuItem) popupMenu.getComponent(0)).setText(s.substring(0, s.indexOf(')') + 1));
+				if (runWhenBecomingVisible != null)
+					runWhenBecomingVisible.run();
 			}
 
 			@Override
