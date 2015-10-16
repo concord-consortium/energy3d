@@ -42,7 +42,6 @@ public class RemovePartCommand extends AbstractUndoableEdit {
 			}
 			gableInfo.add(a);
 		}
-		System.out.println("&&&&&&&&&&&&&&&&&" + gableInfo);
 	}
 
 	// for action logging
@@ -65,7 +64,20 @@ public class RemovePartCommand extends AbstractUndoableEdit {
 				roof.setGableEditPointToWallMap(gableInfo.get(0));
 			}
 		} else if (housePart instanceof Foundation) {
-
+			List<Roof> roofs = new ArrayList<Roof>();
+			for (final HousePart part : Scene.getInstance().getParts()) {
+				if (part instanceof Wall) {
+					for (final HousePart child : part.getChildren()) {
+						if (child instanceof Roof && !roofs.contains(child))
+							roofs.add((Roof) child);
+					}
+				}
+			}
+			if (!roofs.isEmpty()) {
+				for (int i = 0; i < roofs.size(); i++) {
+					roofs.get(i).setGableEditPointToWallMap(gableInfo.get(i));
+				}
+			}
 		}
 		SceneManager.getInstance().setSelectedPart(housePart);
 		EnergyPanel.getInstance().clearRadiationHeatMap();
