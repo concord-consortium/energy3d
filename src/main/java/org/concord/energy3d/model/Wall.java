@@ -1225,7 +1225,10 @@ public class Wall extends HousePart {
 
 	@Override
 	public Spatial getCollisionSpatial() {
-		return invisibleMesh;
+		if (SceneManager.getInstance().isTopView())
+			return root;
+		else
+			return invisibleMesh;
 	}
 
 	@Override
