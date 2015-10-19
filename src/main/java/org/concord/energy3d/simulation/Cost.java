@@ -53,6 +53,8 @@ public class Cost {
 	}
 
 	public int getBuildingCost(final Foundation foundation) {
+		if (foundation == null)
+			return 0;
 		int buildingCount = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation)
@@ -61,10 +63,12 @@ public class Cost {
 		int sum = 0;
 		if (buildingCount == 1) {
 			for (final HousePart p : Scene.getInstance().getParts()) { // if there is only one building, trees are included in its cost
-				if (p.getTopContainer() == foundation && !p.isFrozen())
-					sum += getPartCost(p);
+				if (p.isFrozen() && p instanceof Tree)
+					continue;
+				sum += getPartCost(p);
 			}
 		} else {
+			sum = getPartCost(foundation);
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p.getTopContainer() == foundation) {
 					sum += getPartCost(p);
