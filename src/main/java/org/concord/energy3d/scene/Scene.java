@@ -131,6 +131,7 @@ public class Scene implements Serializable {
 	private boolean alwaysComputeHeatFluxVectors = false;
 	private boolean fullEnergyInSolarMap = false;
 	private int insideTemperature = 20;
+	private HousePart copyBuffer;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -298,6 +299,7 @@ public class Scene implements Serializable {
 		MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
 		SceneManager.getInstance().getUndoManager().die();
 		Scene.getInstance().setEdited(false);
+		Scene.getInstance().setCopyBuffer(null);
 	}
 
 	public static void initEnergy() {
@@ -639,6 +641,20 @@ public class Scene implements Serializable {
 		// originalHouseRoot.detachChild(housePart.getRoot());
 		housePart.getRoot().removeFromParent();
 		housePart.delete();
+	}
+
+	public void setCopyBuffer(HousePart p) {
+		copyBuffer = p;
+	}
+
+	public HousePart getCopyBuffer() {
+		return copyBuffer;
+	}
+
+	public void paste() {
+		if (copyBuffer == null)
+			return;
+		add(copyBuffer.copy(), true);
 	}
 
 	public List<HousePart> getParts() {

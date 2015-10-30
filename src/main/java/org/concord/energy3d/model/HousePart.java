@@ -17,6 +17,7 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.util.FontManager;
+import org.concord.energy3d.util.ObjectCloner;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
@@ -1121,6 +1122,12 @@ public abstract class HousePart implements Serializable {
 
 	public void updateHeatFluxVisibility() {
 		heatFlux.setVisible(Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsVisible());
+	}
+
+	public HousePart copy() {
+		HousePart c = (HousePart) ObjectCloner.deepCopy(this);
+		c.container = this.container;
+		return c;
 	}
 
 }

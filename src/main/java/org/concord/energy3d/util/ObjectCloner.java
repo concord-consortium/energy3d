@@ -1,24 +1,27 @@
 package org.concord.energy3d.util;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class ObjectCloner {
 
 	public static Object deepCopy(Object oldObj) {
+
 		ObjectOutputStream oos = null;
 		ObjectInputStream ois = null;
 		try {
-			ByteArrayOutputStream bos = new ByteArrayOutputStream(); // A
-			oos = new ObjectOutputStream(bos); // B
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			oos = new ObjectOutputStream(bos);
 			// serialize and pass the object
-			oos.writeObject(oldObj); // C
-			oos.flush(); // D
-			ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray()); // E
-			ois = new ObjectInputStream(bin); // F
+			oos.writeObject(oldObj);
+			oos.flush();
+			ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray());
+			ois = new ObjectInputStream(bin);
 			// return the new object
-			return ois.readObject(); // G
+			return ois.readObject();
 		} catch (Exception e) {
-			System.out.println("Exception in ObjectCloner = " + e);
 			e.printStackTrace();
 			return null;
 		} finally {
@@ -30,4 +33,5 @@ public class ObjectCloner {
 			}
 		}
 	}
+
 }

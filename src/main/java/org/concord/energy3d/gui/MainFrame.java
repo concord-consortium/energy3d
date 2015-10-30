@@ -1353,6 +1353,8 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
+					copyMenuItem.setEnabled(SceneManager.getInstance().getSelectedPart() != null);
+					pasteMenuItem.setEnabled(Scene.getInstance().getCopyBuffer() != null);
 					if (lockSelectionMenuItem != null)
 						lockSelectionMenuItem.setEnabled(SceneManager.getInstance().getSelectedPart() != null);
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
@@ -1454,7 +1456,11 @@ public class MainFrame extends JFrame {
 			cutMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().deleteCurrentHousePart();
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null) {
+						Scene.getInstance().setCopyBuffer(selectedPart);
+						SceneManager.getInstance().deleteCurrentHousePart();
+					}
 				}
 			});
 		}
@@ -1465,10 +1471,12 @@ public class MainFrame extends JFrame {
 		if (copyMenuItem == null) {
 			copyMenuItem = new JMenuItem("Copy");
 			copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			copyMenuItem.setEnabled(false);
 			copyMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null)
+						Scene.getInstance().setCopyBuffer(selectedPart);
 				}
 			});
 		}
@@ -1479,10 +1487,10 @@ public class MainFrame extends JFrame {
 		if (pasteMenuItem == null) {
 			pasteMenuItem = new JMenuItem("Paste");
 			pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			pasteMenuItem.setEnabled(false);
 			pasteMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().paste();
 				}
 			});
 		}

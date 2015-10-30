@@ -109,6 +109,18 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miCopy = new JMenuItem("Copy");
+			miCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCopy.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						Scene.getInstance().setCopyBuffer(((Window) selectedPart).copy());
+					}
+				}
+			});
+
 			final JMenu muntinMenu = new JMenu("Muntins");
 
 			ButtonGroup muntinButtonGroup = new ButtonGroup();
@@ -270,6 +282,7 @@ public class PopupMenuFactory {
 
 			popupMenuForWindow.add(miInfo);
 			popupMenuForWindow.add(miCut);
+			popupMenuForWindow.add(miCopy);
 			popupMenuForWindow.add(muntinMenu);
 			popupMenuForWindow.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WINDOW, CHANGE_U_FACTOR));
 			popupMenuForWindow.add(shgcMenu);

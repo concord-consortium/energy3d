@@ -686,7 +686,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
-
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				refresh = true;
