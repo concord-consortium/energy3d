@@ -1127,6 +1127,7 @@ public abstract class HousePart implements Serializable {
 	public HousePart copy() {
 		HousePart c = (HousePart) ObjectCloner.deepCopy(this);
 		c.container = this.container;
+		c.id = Scene.getInstance().nextID();
 		return c;
 	}
 

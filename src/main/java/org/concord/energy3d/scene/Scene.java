@@ -37,6 +37,7 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
+import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Specifications;
@@ -654,7 +655,9 @@ public class Scene implements Serializable {
 	public void paste() {
 		if (copyBuffer == null)
 			return;
-		add(copyBuffer.copy(), true);
+		HousePart c = copyBuffer.copy();
+		add(c, true);
+		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
 	}
 
 	public List<HousePart> getParts() {

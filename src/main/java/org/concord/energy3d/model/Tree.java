@@ -273,4 +273,10 @@ public class Tree extends HousePart {
 		draw();
 	}
 
+	public HousePart copy() {
+		Tree c = (Tree) super.copy();
+		// shift the position of the copy
+		return c;
+	}
+
 }

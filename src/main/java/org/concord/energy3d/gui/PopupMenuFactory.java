@@ -97,30 +97,6 @@ public class PopupMenuFactory {
 
 			popupMenuForWindow = createPopupMenu(null);
 
-			final JMenuItem miInfo = new JMenuItem();
-			miInfo.setEnabled(false);
-
-			final JMenuItem miCut = new JMenuItem("Cut");
-			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			miCut.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					SceneManager.getInstance().deleteCurrentHousePart();
-				}
-			});
-
-			final JMenuItem miCopy = new JMenuItem("Copy");
-			miCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			miCopy.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						Scene.getInstance().setCopyBuffer(((Window) selectedPart).copy());
-					}
-				}
-			});
-
 			final JMenu muntinMenu = new JMenu("Muntins");
 
 			ButtonGroup muntinButtonGroup = new ButtonGroup();
@@ -280,9 +256,6 @@ public class PopupMenuFactory {
 
 			});
 
-			popupMenuForWindow.add(miInfo);
-			popupMenuForWindow.add(miCut);
-			popupMenuForWindow.add(miCopy);
 			popupMenuForWindow.add(muntinMenu);
 			popupMenuForWindow.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WINDOW, CHANGE_U_FACTOR));
 			popupMenuForWindow.add(shgcMenu);
@@ -296,27 +269,10 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForWall() {
 
 		if (popupMenuForWall == null) {
-
 			popupMenuForWall = createPopupMenu(null);
-
-			final JMenuItem miInfo = new JMenuItem();
-			miInfo.setEnabled(false);
-
-			final JMenuItem miCut = new JMenuItem("Cut");
-			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			miCut.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					SceneManager.getInstance().deleteCurrentHousePart();
-				}
-			});
-
-			popupMenuForWall.add(miInfo);
-			popupMenuForWall.add(miCut);
 			popupMenuForWall.add(colorAction);
 			popupMenuForWall.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WALL, CHANGE_U_FACTOR));
 			popupMenuForWall.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_WALL, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
-
 		}
 
 		return popupMenuForWall;
@@ -326,27 +282,10 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForRoof() {
 
 		if (popupMenuForRoof == null) {
-
 			popupMenuForRoof = createPopupMenu(null);
-
-			final JMenuItem miInfo = new JMenuItem();
-			miInfo.setEnabled(false);
-
-			final JMenuItem miCut = new JMenuItem("Cut");
-			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			miCut.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					SceneManager.getInstance().deleteCurrentHousePart();
-				}
-			});
-
-			popupMenuForRoof.add(miInfo);
-			popupMenuForRoof.add(miCut);
 			popupMenuForRoof.add(colorAction);
 			popupMenuForRoof.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_ROOF, CHANGE_U_FACTOR));
 			popupMenuForRoof.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
-
 		}
 
 		return popupMenuForRoof;
@@ -356,26 +295,9 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForDoor() {
 
 		if (popupMenuForDoor == null) {
-
 			popupMenuForDoor = createPopupMenu(null);
-
-			final JMenuItem miInfo = new JMenuItem();
-			miInfo.setEnabled(false);
-
-			final JMenuItem miCut = new JMenuItem("Cut");
-			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			miCut.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					SceneManager.getInstance().deleteCurrentHousePart();
-				}
-			});
-
-			popupMenuForDoor.add(miInfo);
-			popupMenuForDoor.add(miCut);
 			popupMenuForDoor.add(colorAction);
 			popupMenuForDoor.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_DOOR, CHANGE_U_FACTOR));
-
 		}
 
 		return popupMenuForDoor;
@@ -385,27 +307,10 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForFoundation() {
 
 		if (popupMenuForFoundation == null) {
-
 			popupMenuForFoundation = createPopupMenu(null);
-
-			final JMenuItem miInfo = new JMenuItem();
-			miInfo.setEnabled(false);
-
-			final JMenuItem miCut = new JMenuItem("Cut");
-			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			miCut.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					SceneManager.getInstance().deleteCurrentHousePart();
-				}
-			});
-
-			popupMenuForFoundation.add(miInfo);
-			popupMenuForFoundation.add(miCut);
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 			popupMenuForFoundation.add(createPropertyMenu("Floor U-Factor", EnergyPanel.U_FACTOR_CHOICES_FLOOR, CHANGE_U_FACTOR));
-
 		}
 
 		return popupMenuForFoundation;
@@ -480,20 +385,6 @@ public class PopupMenuFactory {
 
 			});
 
-			final JMenuItem miInfo = new JMenuItem();
-			miInfo.setEnabled(false);
-
-			final JMenuItem miCut = new JMenuItem("Cut");
-			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			miCut.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					SceneManager.getInstance().deleteCurrentHousePart();
-				}
-			});
-
-			popupMenuForSolarPanel.add(miInfo);
-			popupMenuForSolarPanel.add(miCut);
 			popupMenuForSolarPanel.add(efficiencyMenu);
 
 		}
@@ -505,18 +396,6 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForTree() {
 
 		if (popupMenuForTree == null) {
-
-			final JMenuItem miInfo = new JMenuItem();
-			miInfo.setEnabled(false);
-
-			final JMenuItem miCut = new JMenuItem("Cut");
-			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			miCut.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					SceneManager.getInstance().deleteCurrentHousePart();
-				}
-			});
 
 			final JCheckBoxMenuItem miPolygon = new JCheckBoxMenuItem("Show Polygon");
 			miPolygon.addItemListener(new ItemListener() {
@@ -537,8 +416,6 @@ public class PopupMenuFactory {
 				}
 			});
 
-			popupMenuForTree.add(miInfo);
-			popupMenuForTree.add(miCut);
 			popupMenuForTree.add(miPolygon);
 
 		}
@@ -548,6 +425,9 @@ public class PopupMenuFactory {
 	}
 
 	private static JPopupMenu createPopupMenu(final Runnable runWhenBecomingVisible) {
+
+		final JMenuItem miInfo = new JMenuItem();
+		miInfo.setEnabled(false);
 
 		final JPopupMenu popupMenu = new JPopupMenu();
 		popupMenu.setInvoker(MainPanel.getInstance().getCanvasPanel());
@@ -559,7 +439,7 @@ public class PopupMenuFactory {
 				if (selectedPart == null)
 					return;
 				String s = selectedPart.toString();
-				((JMenuItem) popupMenu.getComponent(0)).setText(s.substring(0, s.indexOf(')') + 1));
+				miInfo.setText(s.substring(0, s.indexOf(')') + 1));
 				if (runWhenBecomingVisible != null)
 					runWhenBecomingVisible.run();
 			}
@@ -573,6 +453,35 @@ public class PopupMenuFactory {
 			}
 
 		});
+
+		final JMenuItem miCut = new JMenuItem("Cut");
+		miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+		miCut.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart != null) {
+					Scene.getInstance().setCopyBuffer(selectedPart);
+					SceneManager.getInstance().deleteCurrentHousePart();
+				}
+			}
+		});
+
+		final JMenuItem miCopy = new JMenuItem("Copy");
+		miCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+		miCopy.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart != null) {
+					Scene.getInstance().setCopyBuffer(selectedPart.copy());
+				}
+			}
+		});
+
+		popupMenu.add(miInfo);
+		popupMenu.add(miCut);
+		popupMenu.add(miCopy);
 
 		return popupMenu;
 
