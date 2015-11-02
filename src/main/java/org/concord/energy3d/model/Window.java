@@ -301,10 +301,7 @@ public class Window extends HousePart {
 
 	@Override
 	public Vector3 getAbsPoint(final int index) {
-		if (container != null)
-			return container.getRoot().getTransform().applyForward(super.getAbsPoint(index));
-		else
-			return super.getAbsPoint(index);
+		return container != null ? container.getRoot().getTransform().applyForward(super.getAbsPoint(index)) : super.getAbsPoint(index);
 	}
 
 	@Override
@@ -340,6 +337,29 @@ public class Window extends HousePart {
 
 		draw();
 		container.draw();
+	}
+
+	public void moveToWall(Wall target) {
+		double w1 = target.getAbsPoint(0).distance(target.getAbsPoint(2));
+		double h1 = target.getAbsPoint(0).distance(target.getAbsPoint(1));
+		double w2 = container.getAbsPoint(0).distance(container.getAbsPoint(2));
+		double h2 = container.getAbsPoint(0).distance(container.getAbsPoint(1));
+		double ratioW = w2 / w1;
+		double ratioH = h2 / h1;
+		Vector3 v0 = points.get(0);
+		Vector3 v1 = points.get(1);
+		v1.setX(v0.getX() + (v1.getX() - v0.getX()) * ratioW);
+		v1.setY(v0.getY() + (v1.getY() - v0.getY()) * ratioW);
+		v1.setZ(v0.getZ() + (v1.getZ() - v0.getZ()) * ratioH);
+		Vector3 v2 = points.get(2);
+		v2.setX(v0.getX() + (v2.getX() - v0.getX()) * ratioW);
+		v2.setY(v0.getY() + (v2.getY() - v0.getY()) * ratioW);
+		v2.setZ(v0.getZ() + (v2.getZ() - v0.getZ()) * ratioH);
+		Vector3 v3 = points.get(3);
+		v3.setX(v0.getX() + (v3.getX() - v0.getX()) * ratioW);
+		v3.setY(v0.getY() + (v3.getY() - v0.getY()) * ratioW);
+		v3.setZ(v0.getZ() + (v3.getZ() - v0.getZ()) * ratioH);
+		setContainer(target);
 	}
 
 	public void setStyle(final int style) {

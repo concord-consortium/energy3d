@@ -299,8 +299,8 @@ public class Scene implements Serializable {
 		Util.setSilently(MainPanel.getInstance().getNoteTextArea(), instance.note == null ? "" : instance.note);
 		MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
 		SceneManager.getInstance().getUndoManager().die();
-		Scene.getInstance().setEdited(false);
-		Scene.getInstance().setCopyBuffer(null);
+		instance.setEdited(false);
+		instance.setCopyBuffer(null);
 	}
 
 	public static void initEnergy() {
@@ -656,7 +656,14 @@ public class Scene implements Serializable {
 		if (copyBuffer == null)
 			return;
 		HousePart c = copyBuffer.copy();
+		if (c instanceof Window) { // special case: window can be pasted to a different parent
+			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof Wall && selectedPart != c.getContainer()) {
+				((Window) c).moveToWall((Wall) selectedPart);
+			}
+		}
 		add(c, true);
+		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
 	}
 
@@ -751,13 +758,15 @@ public class Scene implements Serializable {
 		}
 		connectWalls();
 		Snap.clearAnnotationDrawn();
-		for (final HousePart part : parts)
-			if (part instanceof Roof)
-				part.draw();
-		for (final HousePart part : parts)
-			if (!(part instanceof Roof))
-				part.draw();
-		// no need for redrawing printparts because they will be regenerated from original parts anyways
+		synchronized (parts) { // XIE: This lock is needed as we often run into ConcurrentModificationException here
+			for (final HousePart part : parts)
+				if (part instanceof Roof)
+					part.draw();
+			for (final HousePart part : parts)
+				if (!(part instanceof Roof))
+					part.draw();
+		}
+		// no need for redrawing print parts because they will be regenerated from original parts anyways
 		redrawAll = false;
 	}
 

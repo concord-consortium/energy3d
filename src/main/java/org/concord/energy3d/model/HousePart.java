@@ -374,7 +374,7 @@ public abstract class HousePart implements Serializable {
 		return true;
 	}
 
-	protected Vector3 toRelative(final ReadOnlyVector3 p) {
+	public Vector3 toRelative(final ReadOnlyVector3 p) {
 		final HousePart container = getContainerRelative();
 		if (container == null)
 			return new Vector3(p);
@@ -778,6 +778,10 @@ public abstract class HousePart implements Serializable {
 			cachedGrayTextures.put(filename + ":grayout", texture);
 		}
 		return texture;
+	}
+
+	public void setContainer(HousePart container) {
+		this.container = container;
 	}
 
 	public HousePart getContainer() {
