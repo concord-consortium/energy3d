@@ -230,4 +230,26 @@ public class Sensor extends HousePart {
 		// this method is left empty on purpose -- don't draw heat flux
 	}
 
+	public void moveTo(HousePart target) {
+		setContainer(target);
+	}
+
+	public HousePart copy() {
+		Sensor c = (Sensor) super.copy();
+		if (container instanceof Window || container instanceof Wall) {
+			Vector3 p0 = container.points.get(0);
+			Vector3 p2 = container.points.get(2);
+			double dx = 0.2 * (p2.getX() - p0.getX());
+			double dy = 0.2 * (p2.getY() - p0.getY());
+			double dz = 0.2 * (p2.getZ() - p0.getZ());
+			// shift the position of the copy
+			for (int i = 0; i < c.points.size(); i++) {
+				c.points.get(i).setX(c.points.get(i).getX() + dx);
+				c.points.get(i).setY(c.points.get(i).getY() + dy);
+				c.points.get(i).setZ(c.points.get(i).getZ() + dz);
+			}
+		}
+		return c;
+	}
+
 }

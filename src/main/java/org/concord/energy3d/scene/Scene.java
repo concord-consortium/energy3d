@@ -645,6 +645,9 @@ public class Scene implements Serializable {
 	}
 
 	public void setCopyBuffer(HousePart p) {
+		// reject the following types of house parts
+		if (p instanceof Roof || p instanceof Floor)
+			return;
 		copyBuffer = p;
 	}
 
@@ -656,10 +659,15 @@ public class Scene implements Serializable {
 		if (copyBuffer == null)
 			return;
 		HousePart c = copyBuffer.copy();
-		if (c instanceof Window) { // special case: window can be pasted to a different parent
+		if (c instanceof Window) { // window can be pasted to a different parent
 			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Wall && selectedPart != c.getContainer()) {
-				((Window) c).moveToWall((Wall) selectedPart);
+				((Window) c).moveTo(selectedPart);
+			}
+		} else if (c instanceof Sensor) { // sensor can be pasted to a different parent
+			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart != c.getContainer()) {
+				((Sensor) c).moveTo(selectedPart);
 			}
 		}
 		add(c, true);

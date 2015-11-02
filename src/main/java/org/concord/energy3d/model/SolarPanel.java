@@ -233,4 +233,10 @@ public class SolarPanel extends HousePart {
 		// this method is left empty on purpose -- don't draw heat flux
 	}
 
+	public HousePart copy() {
+		SolarPanel c = (SolarPanel) super.copy();
+		c.points.get(0).setX(points.get(0).getX() + 0.01); // shift the position of the copy
+		return c;
+	}
+
 }

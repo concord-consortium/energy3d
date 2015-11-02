@@ -339,29 +339,6 @@ public class Window extends HousePart {
 		container.draw();
 	}
 
-	public void moveToWall(Wall target) {
-		double w1 = target.getAbsPoint(0).distance(target.getAbsPoint(2));
-		double h1 = target.getAbsPoint(0).distance(target.getAbsPoint(1));
-		double w2 = container.getAbsPoint(0).distance(container.getAbsPoint(2));
-		double h2 = container.getAbsPoint(0).distance(container.getAbsPoint(1));
-		double ratioW = w2 / w1;
-		double ratioH = h2 / h1;
-		Vector3 v0 = points.get(0);
-		Vector3 v1 = points.get(1);
-		v1.setX(v0.getX() + (v1.getX() - v0.getX()) * ratioW);
-		v1.setY(v0.getY() + (v1.getY() - v0.getY()) * ratioW);
-		v1.setZ(v0.getZ() + (v1.getZ() - v0.getZ()) * ratioH);
-		Vector3 v2 = points.get(2);
-		v2.setX(v0.getX() + (v2.getX() - v0.getX()) * ratioW);
-		v2.setY(v0.getY() + (v2.getY() - v0.getY()) * ratioW);
-		v2.setZ(v0.getZ() + (v2.getZ() - v0.getZ()) * ratioH);
-		Vector3 v3 = points.get(3);
-		v3.setX(v0.getX() + (v3.getX() - v0.getX()) * ratioW);
-		v3.setY(v0.getY() + (v3.getY() - v0.getY()) * ratioW);
-		v3.setZ(v0.getZ() + (v3.getZ() - v0.getZ()) * ratioH);
-		setContainer(target);
-	}
-
 	public void setStyle(final int style) {
 		this.style = style;
 	}
@@ -393,6 +370,45 @@ public class Window extends HousePart {
 			area = Math.round(Math.round(p2.subtract(p0, null).length() * annotationScale * C) / C * Math.round(p1.subtract(p0, null).length() * annotationScale * C) / C * C) / C;
 		} else
 			area = 0.0;
+	}
+
+	public void moveTo(HousePart target) {
+		double w1 = target.getAbsPoint(0).distance(target.getAbsPoint(2));
+		double h1 = target.getAbsPoint(0).distance(target.getAbsPoint(1));
+		double w2 = container.getAbsPoint(0).distance(container.getAbsPoint(2));
+		double h2 = container.getAbsPoint(0).distance(container.getAbsPoint(1));
+		double ratioW = w2 / w1;
+		double ratioH = h2 / h1;
+		Vector3 v0 = points.get(0);
+		Vector3 v1 = points.get(1);
+		v1.setX(v0.getX() + (v1.getX() - v0.getX()) * ratioW);
+		v1.setY(v0.getY() + (v1.getY() - v0.getY()) * ratioW);
+		v1.setZ(v0.getZ() + (v1.getZ() - v0.getZ()) * ratioH);
+		Vector3 v2 = points.get(2);
+		v2.setX(v0.getX() + (v2.getX() - v0.getX()) * ratioW);
+		v2.setY(v0.getY() + (v2.getY() - v0.getY()) * ratioW);
+		v2.setZ(v0.getZ() + (v2.getZ() - v0.getZ()) * ratioH);
+		Vector3 v3 = points.get(3);
+		v3.setX(v0.getX() + (v3.getX() - v0.getX()) * ratioW);
+		v3.setY(v0.getY() + (v3.getY() - v0.getY()) * ratioW);
+		v3.setZ(v0.getZ() + (v3.getZ() - v0.getZ()) * ratioH);
+		setContainer(target);
+	}
+
+	public HousePart copy() {
+		Window c = (Window) super.copy();
+		Vector3 p0 = container.points.get(0);
+		Vector3 p2 = container.points.get(2);
+		double dx = 0.1 * (p2.getX() - p0.getX());
+		double dy = 0.1 * (p2.getY() - p0.getY());
+		double dz = 0.1 * (p2.getZ() - p0.getZ());
+		// shift the position of the copy
+		for (int i = 0; i < c.points.size(); i++) {
+			c.points.get(i).setX(c.points.get(i).getX() + dx);
+			c.points.get(i).setY(c.points.get(i).getY() + dy);
+			c.points.get(i).setZ(c.points.get(i).getZ() + dz);
+		}
+		return c;
 	}
 
 }
