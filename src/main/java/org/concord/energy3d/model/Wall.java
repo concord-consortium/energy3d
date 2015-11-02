@@ -1311,4 +1311,8 @@ public class Wall extends HousePart {
 		}
 	}
 
+	public Snap[] getNeighbors() {
+		return neighbors;
+	}
+
 }

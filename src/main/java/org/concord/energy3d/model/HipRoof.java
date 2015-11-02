@@ -12,18 +12,15 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class HipRoof extends Roof {
 	private static final long serialVersionUID = 1L;
-	private transient boolean recalculateEditPoints;
-	private int type = 1; // 1 -- ridge in south-north direction; 2 -- ridget in west-east direction
+	protected transient boolean recalculateEditPoints;
 
-	public HipRoof(int type) {
+	public HipRoof() {
 		super(3);
-		this.type = type;
 	}
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
 		final EditState editState = new EditState();
-
 		if (editPointIndex == -1) {
 			pickContainer(x, y, Wall.class);
 			recalculateEditPoints = true;
@@ -33,9 +30,9 @@ public class HipRoof extends Roof {
 			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - base.getZ());
 		} else if (editPointIndex == 1 || editPointIndex == 2) {
-			final Vector3 dir = getContainerRelative().getAbsPoint(1).subtractLocal(getContainerRelative().getAbsPoint(0));
-			final Vector3 p = Util.closestPoint(getAbsPoint(editPointIndex), dir, x, y);
-			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
+			final Vector3 hipDirection = container.getAbsPoint(2).subtractLocal(container.getAbsPoint(0)).normalizeLocal();
+			final Vector3 p = Util.closestPoint(getAbsPoint(0), hipDirection, x, y);
+//			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
 			if (insideWallsPolygon(p))
 				points.get(editPointIndex).set(toRelative(p));
 		}
@@ -58,22 +55,25 @@ public class HipRoof extends Roof {
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
 			points.get(0).set(toRelative(center));
-			if (editPointIndex == -1) {
-				final Vector3 dir = getContainerRelative().getAbsPoint(type).subtractLocal(getContainerRelative().getAbsPoint(0)).normalizeLocal();
-				Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(dir.multiply(-50, null), null));
+//			if (editPointIndex == -1) {
+				recalculateEditPoints = false;
+				points.add(toRelative(getCenter()));
+				final Vector3 hipDirection = container.getAbsPoint(2).subtractLocal(container.getAbsPoint(0)).normalizeLocal();
+				Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(-50, null), null));
+				Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(50, null), null));
 				if (point1 == null)
 					point1 = center.clone();
-				point1.addLocal(dir.multiply(2, null));
-				points.get(1).set(toRelative(point1));
-
-				Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(dir.multiply(50, null), null));
 				if (point2 == null)
 					point2 = center.clone();
-				point2.addLocal(dir.multiply(-2, null));
+
+				point1.addLocal(hipDirection.multiply(point1.distance(center) * 0.5, null));
+				point2.addLocal(hipDirection.multiply(-point2.distance(center) * 0.5, null));
+				points.get(1).set(toRelative(point1));
 				points.get(2).set(toRelative(point2));
-			}
-			computeHeight(wallUpperPoints);
-			applyHeight();
+				
+				computeHeight(wallUpperPoints);
+				applyHeight();
+//			}
 		} else {
 			applyHeight();
 		}

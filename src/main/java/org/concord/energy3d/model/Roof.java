@@ -63,7 +63,7 @@ public abstract class Roof extends HousePart {
 	private transient List<Wall> walls;
 	private transient List<ReadOnlyVector3> wallUpperPointsWithoutOverhang;
 	private transient HousePart previousContainer;
-	private Map<Integer, List<Wall>> gableEditPointToWallMap = null;
+	protected Map<Integer, List<Wall>> gableEditPointToWallMap = null;
 
 	protected class EditState {
 		final boolean fitTestRequired;
@@ -595,6 +595,7 @@ public abstract class Roof extends HousePart {
 	public void setGable(final int roofPartIndex, final boolean isGable, final UndoManager undoManager) {
 		final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints = new ArrayList<ReadOnlyVector3>();
 		final Wall wall = findGableWall(roofPartIndex, roofPartMeshUpperPoints);
+		if (undoManager != null)
 		undoManager.addEdit(new MakeGableCommand(this, wall, roofPartMeshUpperPoints));
 		setGable(wall, isGable, true, roofPartMeshUpperPoints);
 	}
@@ -947,7 +948,7 @@ public abstract class Roof extends HousePart {
 		for (final ReadOnlyVector3 p : wallUpperPoints)
 			maxZ = Math.max(maxZ, p.getZ());
 		// to make height relative to container wall so that applyHeight() runs the same way
-		height = 5.0 + maxZ - container.getPoints().get(1).getZ();
+		height = 15.0 + maxZ - container.getPoints().get(1).getZ();
 		// height = height + maxZ - container.getPoints().get(1).getZ(); // avoid this because it will result in increasing height when hovering mouse from one wall contain to another before fully inserting the roof
 	}
 
