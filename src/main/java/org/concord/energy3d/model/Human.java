@@ -68,6 +68,7 @@ public class Human extends HousePart {
 			height = 8;
 		}
 		mesh = new Quad("Human Quad", width, height);
+		mesh.setVisible(false);
 		mesh.setModelBound(new BoundingBox());
 		mesh.updateModelBound();
 		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
@@ -129,6 +130,7 @@ public class Human extends HousePart {
 		billboard.setTranslation(getAbsPoint(0));
 		final double scale = 1 / (Scene.getInstance().getAnnotationScale() / 0.2);
 		billboard.setScale(scale);
+		mesh.setVisible(true);
 	}
 
 	@Override

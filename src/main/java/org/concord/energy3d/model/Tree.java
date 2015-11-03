@@ -44,7 +44,6 @@ public class Tree extends HousePart {
 	public Tree(final int treeType) {
 		super(1, 1, 1);
 		this.treeType = treeType;
-		init();
 	}
 
 	@Override
@@ -70,6 +69,7 @@ public class Tree extends HousePart {
 			height = 40;
 		}
 		mesh = new Quad("Tree Quad", width, height);
+		mesh.setVisible(false);
 		mesh.setModelBound(new BoundingBox());
 		mesh.updateModelBound();
 		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
@@ -193,6 +193,7 @@ public class Tree extends HousePart {
 		final double scale = 1 / (Scene.getInstance().getAnnotationScale() / 0.2);
 		billboard.setScale(scale);
 		collisionRoot.setScale(scale);
+		mesh.setVisible(true);
 	}
 
 	@Override
