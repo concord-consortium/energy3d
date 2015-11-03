@@ -25,7 +25,9 @@ import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
@@ -57,8 +59,10 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForRoof;
 	private static JPopupMenu popupMenuForDoor;
 	private static JPopupMenu popupMenuForTree;
+	private static JPopupMenu popupMenuForHuman;
 	private static JPopupMenu popupMenuForFoundation;
 	private static JPopupMenu popupMenuForSolarPanel;
+	private static JPopupMenu popupMenuForEnvironment;
 
 	private static Action colorAction = new AbstractAction("Color") {
 		private static final long serialVersionUID = 1L;
@@ -88,7 +92,54 @@ public class PopupMenuFactory {
 			return getPopupMenuForSolarPanel();
 		if (selectedPart instanceof Tree)
 			return getPopupMenuForTree();
-		return null;
+		if (selectedPart instanceof Human)
+			return getPopupMenuForHuman();
+		return getPopupMenuForEnvironment();
+	}
+
+	private static JPopupMenu getPopupMenuForEnvironment() {
+
+		if (popupMenuForEnvironment == null) {
+
+			final JMenuItem miInfo = new JMenuItem("Environment");
+			miInfo.setEnabled(false);
+
+			final JMenuItem miPaste = new JMenuItem("Paste");
+			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miPaste.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Scene.getInstance().pasteAtClickedPosition();
+				}
+			});
+
+			popupMenuForEnvironment = new JPopupMenu();
+			popupMenuForEnvironment.setInvoker(MainPanel.getInstance().getCanvasPanel());
+			popupMenuForEnvironment.addPopupMenuListener(new PopupMenuListener() {
+
+				@Override
+				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+					HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
+					miPaste.setEnabled(copyBuffer instanceof Tree || copyBuffer instanceof Human);
+				}
+
+				@Override
+				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				}
+
+				@Override
+				public void popupMenuCanceled(PopupMenuEvent e) {
+				}
+
+			});
+
+			popupMenuForEnvironment.add(miInfo);
+			popupMenuForEnvironment.add(miPaste);
+
+		}
+
+		return popupMenuForEnvironment;
+
 	}
 
 	private static JPopupMenu getPopupMenuForWindow() {
@@ -257,7 +308,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForWindow.add(muntinMenu);
-			popupMenuForWindow.add(createPropertyMenu("U-Factor", EnergyPanel.U_VALUE_CHOICES_WINDOW, CHANGE_U_FACTOR));
+			popupMenuForWindow.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_WINDOW, CHANGE_U_FACTOR));
 			popupMenuForWindow.add(shgcMenu);
 
 		}
@@ -269,10 +320,30 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForWall() {
 
 		if (popupMenuForWall == null) {
-			popupMenuForWall = createPopupMenu(null);
+
+			final JMenuItem miPaste = new JMenuItem("Paste");
+			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miPaste.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Scene.getInstance().paste();
+				}
+			});
+
+			popupMenuForWall = createPopupMenu(new Runnable() {
+				@Override
+				public void run() {
+					HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
+					miPaste.setEnabled(copyBuffer instanceof Window || copyBuffer instanceof Sensor);
+				}
+			});
+
+			popupMenuForWall.add(miPaste);
+			popupMenuForWall.addSeparator();
 			popupMenuForWall.add(colorAction);
-			popupMenuForWall.add(createPropertyMenu("U-Factor", EnergyPanel.U_VALUE_CHOICES_WALL, CHANGE_U_FACTOR));
+			popupMenuForWall.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_WALL, CHANGE_U_FACTOR));
 			popupMenuForWall.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_WALL, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
+
 		}
 
 		return popupMenuForWall;
@@ -284,7 +355,7 @@ public class PopupMenuFactory {
 		if (popupMenuForRoof == null) {
 			popupMenuForRoof = createPopupMenu(null);
 			popupMenuForRoof.add(colorAction);
-			popupMenuForRoof.add(createPropertyMenu("U-Factor", EnergyPanel.U_VALUE_CHOICES_ROOF, CHANGE_U_FACTOR));
+			popupMenuForRoof.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_ROOF, CHANGE_U_FACTOR));
 			popupMenuForRoof.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
 		}
 
@@ -297,7 +368,7 @@ public class PopupMenuFactory {
 		if (popupMenuForDoor == null) {
 			popupMenuForDoor = createPopupMenu(null);
 			popupMenuForDoor.add(colorAction);
-			popupMenuForDoor.add(createPropertyMenu("U-Factor", EnergyPanel.U_VALUE_CHOICES_DOOR, CHANGE_U_FACTOR));
+			popupMenuForDoor.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_DOOR, CHANGE_U_FACTOR));
 		}
 
 		return popupMenuForDoor;
@@ -310,7 +381,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation = createPopupMenu(null);
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
-			popupMenuForFoundation.add(createPropertyMenu("Floor U-Factor", EnergyPanel.U_VALUE_CHOICES_FLOOR, CHANGE_U_FACTOR));
+			popupMenuForFoundation.add(createPropertyMenu("Floor U-Value", EnergyPanel.U_VALUE_CHOICES_FLOOR, CHANGE_U_FACTOR));
 		}
 
 		return popupMenuForFoundation;
@@ -421,6 +492,15 @@ public class PopupMenuFactory {
 		}
 
 		return popupMenuForTree;
+
+	}
+
+	private static JPopupMenu getPopupMenuForHuman() {
+
+		if (popupMenuForHuman == null) {
+			popupMenuForHuman = createPopupMenu(null);
+		}
+		return popupMenuForHuman;
 
 	}
 

@@ -646,7 +646,7 @@ public class Scene implements Serializable {
 
 	public void setCopyBuffer(HousePart p) {
 		// reject the following types of house parts
-		if (p instanceof Roof || p instanceof Floor)
+		if (p instanceof Roof || p instanceof Floor || p instanceof Foundation)
 			return;
 		copyBuffer = p;
 	}
@@ -668,6 +668,21 @@ public class Scene implements Serializable {
 			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart != c.getContainer()) {
 				((Sensor) c).moveTo(selectedPart);
+			}
+		}
+		add(c, true);
+		copyBuffer = c;
+		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+	}
+
+	public void pasteAtClickedPosition() {
+		if (copyBuffer == null)
+			return;
+		HousePart c = copyBuffer.copy();
+		Vector3 position = SceneManager.getInstance().getPickLocation();
+		if (position != null) {
+			if (c instanceof Tree || c instanceof Human) {
+				c.getPoints().set(0, position);
 			}
 		}
 		add(c, true);
