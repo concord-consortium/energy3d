@@ -32,9 +32,10 @@ public class Tree extends HousePart {
 
 	private static final long serialVersionUID = 1L;
 	public static final int DOGWOOD = 0;
-	public static final int OAK = 1;
-	public static final int MAPLE = 2;
-	public static final int PINE = 3;
+	public static final int ELM = 1;
+	public static final int OAK = 2;
+	public static final int MAPLE = 3;
+	public static final int PINE = 4;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
 	private transient Mesh crown;
