@@ -368,6 +368,7 @@ public class MainPanel extends JPanel {
 			selectButton.setSelected(true);
 			selectButton.setToolTipText("Select");
 			selectButton.setIcon(new ImageIcon(MainPanel.class.getResource("icons/select.png")));
+			selectButton.setFocusable(false);
 			selectButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -384,6 +385,7 @@ public class MainPanel extends JPanel {
 			wallButton = new JToggleButton();
 			wallButton.setIcon(new ImageIcon(getClass().getResource("icons/wall.png")));
 			wallButton.setToolTipText("Draw wall");
+			wallButton.setFocusable(false);
 			wallButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -402,6 +404,7 @@ public class MainPanel extends JPanel {
 			miscButton.setText("");
 			miscButton.setToolTipText("Draw door");
 			miscButton.setIcon(new ImageIcon(getClass().getResource("icons/door.png")));
+			miscButton.setFocusable(false);
 			miscButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -417,6 +420,7 @@ public class MainPanel extends JPanel {
 	private JButton getMiscArrowButton() {
 		if (miscArrowButton == null) {
 			miscArrowButton = new JButton();
+			miscArrowButton.setFocusable(false);
 			final Dimension d = new Dimension(12, miscButton.getMaximumSize().height);
 			miscArrowButton.setMaximumSize(d);
 			miscArrowButton.setIcon(new Symbol.Arrow(Color.BLACK, d.width, d.height));
@@ -437,6 +441,7 @@ public class MainPanel extends JPanel {
 			windowButton = new JToggleButton();
 			windowButton.setIcon(new ImageIcon(getClass().getResource("icons/window.png")));
 			windowButton.setToolTipText("Draw window");
+			windowButton.setFocusable(false);
 			windowButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -454,6 +459,7 @@ public class MainPanel extends JPanel {
 			platformButton = new JToggleButton();
 			platformButton.setIcon(new ImageIcon(getClass().getResource("icons/foundation.png")));
 			platformButton.setToolTipText("Draw platform");
+			platformButton.setFocusable(false);
 			platformButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -472,6 +478,7 @@ public class MainPanel extends JPanel {
 			shadowButton.addMouseListener(refreshUponMouseExit);
 			shadowButton.setIcon(new ImageIcon(getClass().getResource("icons/shadow.png")));
 			shadowButton.setToolTipText("Show shadows");
+			shadowButton.setFocusable(false);
 			shadowButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -496,6 +503,7 @@ public class MainPanel extends JPanel {
 			spinViewButton.addMouseListener(refreshUponMouseExit);
 			spinViewButton.setIcon(new ImageIcon(getClass().getResource("icons/spin.png")));
 			spinViewButton.setToolTipText("Spin view");
+			spinViewButton.setFocusable(false);
 			spinViewButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -514,6 +522,7 @@ public class MainPanel extends JPanel {
 			heliodonButton.addMouseListener(refreshUponMouseExit);
 			heliodonButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_heliodon.png")));
 			heliodonButton.setToolTipText("Show heliodon");
+			heliodonButton.setFocusable(false);
 			heliodonButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
@@ -535,6 +544,7 @@ public class MainPanel extends JPanel {
 			sunAnimButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_anim.png")));
 			sunAnimButton.setEnabled(false);
 			sunAnimButton.setToolTipText("Animate sun path");
+			sunAnimButton.setFocusable(false);
 			sunAnimButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
@@ -555,6 +565,7 @@ public class MainPanel extends JPanel {
 			previewButton.addMouseListener(refreshUponMouseExit);
 			previewButton.setIcon(new ImageIcon(getClass().getResource("icons/print_preview.png")));
 			previewButton.setToolTipText("Preview printable parts");
+			previewButton.setFocusable(false);
 			// must be ItemListner to be triggered when selection is changed by code
 			previewButton.addItemListener(new ItemListener() {
 				@Override
@@ -585,6 +596,7 @@ public class MainPanel extends JPanel {
 			annotationToggleButton.addMouseListener(refreshUponMouseExit);
 			annotationToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/annotation.png")));
 			annotationToggleButton.setToolTipText("Show annotations");
+			annotationToggleButton.setFocusable(false);
 			annotationToggleButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -604,6 +616,7 @@ public class MainPanel extends JPanel {
 			zoomButton.addMouseListener(refreshUponMouseExit);
 			zoomButton.setIcon(new ImageIcon(getClass().getResource("icons/zoom.png")));
 			zoomButton.setToolTipText("Zoom");
+			zoomButton.setFocusable(false);
 			zoomButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
@@ -658,6 +671,7 @@ public class MainPanel extends JPanel {
 			energyPanelToggleButton.setToolTipText("Show properties panel");
 			energyPanelToggleButton.setSelected(true);
 			energyPanelToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/chart.png")));
+			energyPanelToggleButton.setFocusable(false);
 			energyPanelToggleButton.addMouseListener(refreshUponMouseExit);
 			energyPanelToggleButton.addActionListener(new ActionListener() {
 				@Override
@@ -676,6 +690,7 @@ public class MainPanel extends JPanel {
 			energyViewButton.setToolTipText("Calculate energy of the day");
 			energyViewButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
 			energyViewButton.addMouseListener(refreshUponMouseExit);
+			energyViewButton.setFocusable(false);
 			energyViewButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
@@ -780,6 +795,7 @@ public class MainPanel extends JPanel {
 			solarPanelButton = new JToggleButton("");
 			solarPanelButton.setToolTipText("Add solar panel");
 			solarPanelButton.setIcon(new ImageIcon(getClass().getResource("icons/solarpanel.png")));
+			solarPanelButton.setFocusable(false);
 			solarPanelButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -797,6 +813,7 @@ public class MainPanel extends JPanel {
 			sensorButton = new JToggleButton("");
 			sensorButton.setToolTipText("Add sensor module");
 			sensorButton.setIcon(new ImageIcon(getClass().getResource("icons/sensor.png")));
+			sensorButton.setFocusable(false);
 			sensorButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -814,6 +831,7 @@ public class MainPanel extends JPanel {
 			treeButton = new JToggleButton();
 			treeButton.setToolTipText("Insert a dogwood tree");
 			treeButton.setIcon(new ImageIcon(getClass().getResource("icons/dogwood.png")));
+			treeButton.setFocusable(false);
 			treeButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -829,6 +847,7 @@ public class MainPanel extends JPanel {
 	private JButton getTreeArrowButton() {
 		if (treeArrowButton == null) {
 			treeArrowButton = new JButton();
+			treeArrowButton.setFocusable(false);
 			final Dimension d = new Dimension(12, treeButton.getMaximumSize().height);
 			treeArrowButton.setMaximumSize(d);
 			treeArrowButton.setIcon(new Symbol.Arrow(Color.BLACK, d.width, d.height));
@@ -849,6 +868,7 @@ public class MainPanel extends JPanel {
 			roofButton = new JToggleButton();
 			roofButton.setIcon(new ImageIcon(getClass().getResource("icons/roof_pyramid.png")));
 			roofButton.setToolTipText("Draw pyramid roof");
+			roofButton.setFocusable(false);
 			roofButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -864,6 +884,7 @@ public class MainPanel extends JPanel {
 	private JButton getRoofArrowButton() {
 		if (roofArrowButton == null) {
 			roofArrowButton = new JButton();
+			roofArrowButton.setFocusable(false);
 			final Dimension d = new Dimension(12, roofButton.getMaximumSize().height);
 			roofArrowButton.setMaximumSize(d);
 			roofArrowButton.setIcon(new Symbol.Arrow(Color.BLACK, d.width, d.height));
@@ -885,6 +906,7 @@ public class MainPanel extends JPanel {
 			resizeButton.addMouseListener(refreshUponMouseExit);
 			resizeButton.setIcon(new ImageIcon(getClass().getResource("icons/resize.png")));
 			resizeButton.setToolTipText("Resize or move a building");
+			resizeButton.setFocusable(false);
 			resizeButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -902,6 +924,7 @@ public class MainPanel extends JPanel {
 			rotateButton.addMouseListener(refreshUponMouseExit);
 			rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
 			rotateButton.setToolTipText("<html>Rotate a building clockwisely; <br>Hold down the SHIFT key and press this button to rotate counter-clockwisely.</html>");
+			rotateButton.setFocusable(false);
 			rotateButton.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyPressed(final KeyEvent e) {
@@ -983,6 +1006,7 @@ public class MainPanel extends JPanel {
 			noteButton = new JToggleButton();
 			noteButton.setToolTipText("Show note");
 			noteButton.setIcon(new ImageIcon(MainPanel.class.getResource("icons/note.png")));
+			noteButton.setFocusable(false);
 			noteButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
