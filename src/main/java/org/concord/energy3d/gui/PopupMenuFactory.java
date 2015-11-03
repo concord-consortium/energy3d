@@ -257,7 +257,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForWindow.add(muntinMenu);
-			popupMenuForWindow.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WINDOW, CHANGE_U_FACTOR));
+			popupMenuForWindow.add(createPropertyMenu("U-Factor", EnergyPanel.U_VALUE_CHOICES_WINDOW, CHANGE_U_FACTOR));
 			popupMenuForWindow.add(shgcMenu);
 
 		}
@@ -271,7 +271,7 @@ public class PopupMenuFactory {
 		if (popupMenuForWall == null) {
 			popupMenuForWall = createPopupMenu(null);
 			popupMenuForWall.add(colorAction);
-			popupMenuForWall.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_WALL, CHANGE_U_FACTOR));
+			popupMenuForWall.add(createPropertyMenu("U-Factor", EnergyPanel.U_VALUE_CHOICES_WALL, CHANGE_U_FACTOR));
 			popupMenuForWall.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_WALL, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
 		}
 
@@ -284,7 +284,7 @@ public class PopupMenuFactory {
 		if (popupMenuForRoof == null) {
 			popupMenuForRoof = createPopupMenu(null);
 			popupMenuForRoof.add(colorAction);
-			popupMenuForRoof.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_ROOF, CHANGE_U_FACTOR));
+			popupMenuForRoof.add(createPropertyMenu("U-Factor", EnergyPanel.U_VALUE_CHOICES_ROOF, CHANGE_U_FACTOR));
 			popupMenuForRoof.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
 		}
 
@@ -297,7 +297,7 @@ public class PopupMenuFactory {
 		if (popupMenuForDoor == null) {
 			popupMenuForDoor = createPopupMenu(null);
 			popupMenuForDoor.add(colorAction);
-			popupMenuForDoor.add(createPropertyMenu("U-Factor", EnergyPanel.U_FACTOR_CHOICES_DOOR, CHANGE_U_FACTOR));
+			popupMenuForDoor.add(createPropertyMenu("U-Factor", EnergyPanel.U_VALUE_CHOICES_DOOR, CHANGE_U_FACTOR));
 		}
 
 		return popupMenuForDoor;
@@ -310,7 +310,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation = createPopupMenu(null);
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
-			popupMenuForFoundation.add(createPropertyMenu("Floor U-Factor", EnergyPanel.U_FACTOR_CHOICES_FLOOR, CHANGE_U_FACTOR));
+			popupMenuForFoundation.add(createPropertyMenu("Floor U-Factor", EnergyPanel.U_VALUE_CHOICES_FLOOR, CHANGE_U_FACTOR));
 		}
 
 		return popupMenuForFoundation;
