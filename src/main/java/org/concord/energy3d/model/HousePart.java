@@ -601,7 +601,7 @@ public abstract class HousePart implements Serializable {
 
 		final Vector3 offset;
 		if (original == null)
-			offset = getFaceDirection().multiply(0.5, null);
+			offset = getNormal().multiply(0.5, null);
 		else {
 			offset = new Vector3(0, labelOffset, 0);
 		}
@@ -630,7 +630,7 @@ public abstract class HousePart implements Serializable {
 		return label;
 	}
 
-	public ReadOnlyVector3 getFaceDirection() {
+	public ReadOnlyVector3 getNormal() {
 		return Vector3.UNIT_Z;
 	}
 
@@ -705,7 +705,7 @@ public abstract class HousePart implements Serializable {
 		} else {
 			if (SceneManager.getInstance().getSolarHeatMap()) {
 				if (isDrawable() && (this instanceof Foundation || this instanceof Wall || this instanceof Roof))
-					SolarRadiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getFaceDirection());
+					SolarRadiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getNormal());
 			} else if (isFrozen()) {
 				mesh.clearRenderState(StateType.Texture);
 				mesh.setDefaultColor(Scene.GRAY);
@@ -1038,7 +1038,7 @@ public abstract class HousePart implements Serializable {
 			final ReadOnlyVector3 o = getAbsPoint(0);
 			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
 			final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
-			final ReadOnlyVector3 normal = getFaceDirection();
+			final ReadOnlyVector3 normal = getNormal();
 			final Vector3 a = new Vector3();
 			double g, h;
 			for (int j = 0; j < cols; j++) {

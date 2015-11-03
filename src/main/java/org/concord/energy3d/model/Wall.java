@@ -450,7 +450,7 @@ public class Wall extends HousePart {
 		outlineVertexBuffer.limit(outlineVertexBuffer.position());
 		outlineMesh.getMeshData().updateVertexCount();
 		outlineMesh.updateModelBound();
-		outlineMesh.setTranslation(getFaceDirection().multiply(0.001, null));
+		outlineMesh.setTranslation(getNormal().multiply(0.001, null));
 	}
 
 	public List<List<Vector3>> computeWallAndWindowPolygon(final boolean backMesh) {
@@ -824,7 +824,7 @@ public class Wall extends HousePart {
 
 	@Override
 	public void flatten(final double flattenTime) {
-		final ReadOnlyVector3 n = getFaceDirection();
+		final ReadOnlyVector3 n = getNormal();
 		double angle = n.smallestAngleBetween(Vector3.NEG_UNIT_Y);
 
 		if (n.dot(Vector3.UNIT_X) < 0)
@@ -842,7 +842,7 @@ public class Wall extends HousePart {
 	}
 
 	@Override
-	public ReadOnlyVector3 getFaceDirection() {
+	public ReadOnlyVector3 getNormal() {
 		if (thicknessNormal == null)
 			thicknessNormal = getThicknessNormal();
 		return thicknessNormal.negate(null).normalizeLocal();
@@ -852,14 +852,14 @@ public class Wall extends HousePart {
 	public void drawAnnotations() {
 		if (points.size() < 4)
 			return;
-		final ReadOnlyVector3 faceDirection = getFaceDirection();
+		final ReadOnlyVector3 faceDirection = getNormal();
 		int annotCounter = 0;
 		int angleAnnotCounter = 0;
 
 		if (wallAndWindowsPoints != null) {
 			final List<Vector3> wallPolygonPoints = wallAndWindowsPoints.get(0);
 			final Vector3 actualNormal = wallPolygonPoints.get(0).subtract(wallPolygonPoints.get(1), null).normalizeLocal().crossLocal(wallPolygonPoints.get(2).subtract(wallPolygonPoints.get(1), null).normalizeLocal()).negateLocal();
-			final boolean reverse = actualNormal.dot(getFaceDirection()) < 0;
+			final boolean reverse = actualNormal.dot(getNormal()) < 0;
 
 			final double lowestWallZ = Math.min(wallPolygonPoints.get(0).getZ(), wallPolygonPoints.get(3).getZ());
 			double low = lowestWallZ;
@@ -891,10 +891,10 @@ public class Wall extends HousePart {
 				for (int i = 0; i < annotCounter; i++)
 					fetchSizeAnnot(i).setLineWidth(lineWidth);
 
-				fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p1, p3, getFaceDirection());
-				fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p2, p4, getFaceDirection());
-				fetchAngleAnnot(angleAnnotCounter++).setRange(p4, p3, p1, getFaceDirection());
-				fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p4, p2, getFaceDirection());
+				fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p1, p3, getNormal());
+				fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p2, p4, getNormal());
+				fetchAngleAnnot(angleAnnotCounter++).setRange(p4, p3, p1, getNormal());
+				fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p4, p2, getNormal());
 
 				for (int i = 0; i < annotCounter; i++)
 					fetchAngleAnnot(i).setLineWidth(lineWidth);
@@ -916,7 +916,7 @@ public class Wall extends HousePart {
 					}
 					if (p1.distance(p2) > minLength && p2.distance(p3) > minLength) {
 						final AngleAnnotation angleAnnot = fetchAngleAnnot(angleAnnotCounter++);
-						angleAnnot.setRange(p2, p1, p3, getFaceDirection());
+						angleAnnot.setRange(p2, p1, p3, getNormal());
 						angleAnnot.setLineWidth(lineWidth);
 					}
 				}
@@ -1276,7 +1276,7 @@ public class Wall extends HousePart {
 			final ReadOnlyVector3 o = getAbsPoint(0);
 			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
 			final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
-			final ReadOnlyVector3 normal = getFaceDirection();
+			final ReadOnlyVector3 normal = getNormal();
 			final Vector3 a = new Vector3();
 			double g, h;
 			for (int j = 0; j < cols; j++) {

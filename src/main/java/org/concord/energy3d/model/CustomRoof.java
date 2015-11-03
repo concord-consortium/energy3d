@@ -86,7 +86,7 @@ public class CustomRoof extends Roof {
 				// add -normal*0.2 to middle point of wall
 				final HousePart wall = findGableWall(p1, p2);
 				if (wall != null) {
-					final ReadOnlyVector3 normal = wall.getFaceDirection();
+					final ReadOnlyVector3 normal = wall.getNormal();
 					v.addLocal(normal.multiply(0.2, null).negateLocal());
 				}
 				v.set(toRelative(v));

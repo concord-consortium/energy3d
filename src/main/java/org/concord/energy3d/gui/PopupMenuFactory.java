@@ -146,7 +146,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForWindow == null) {
 
-			popupMenuForWindow = createPopupMenu(null);
+			popupMenuForWindow = createPopupMenu(true, null);
 
 			final JMenu muntinMenu = new JMenu("Muntins");
 
@@ -330,7 +330,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			popupMenuForWall = createPopupMenu(new Runnable() {
+			popupMenuForWall = createPopupMenu(false, new Runnable() {
 				@Override
 				public void run() {
 					HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
@@ -353,7 +353,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForRoof() {
 
 		if (popupMenuForRoof == null) {
-			popupMenuForRoof = createPopupMenu(null);
+			popupMenuForRoof = createPopupMenu(false, null);
 			popupMenuForRoof.add(colorAction);
 			popupMenuForRoof.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_ROOF, CHANGE_U_FACTOR));
 			popupMenuForRoof.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
@@ -366,7 +366,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForDoor() {
 
 		if (popupMenuForDoor == null) {
-			popupMenuForDoor = createPopupMenu(null);
+			popupMenuForDoor = createPopupMenu(false, null);
 			popupMenuForDoor.add(colorAction);
 			popupMenuForDoor.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_DOOR, CHANGE_U_FACTOR));
 		}
@@ -378,7 +378,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForFoundation() {
 
 		if (popupMenuForFoundation == null) {
-			popupMenuForFoundation = createPopupMenu(null);
+			popupMenuForFoundation = createPopupMenu(false, null);
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 			popupMenuForFoundation.add(createPropertyMenu("Floor U-Value", EnergyPanel.U_VALUE_CHOICES_FLOOR, CHANGE_U_FACTOR));
@@ -392,7 +392,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForSolarPanel == null) {
 
-			popupMenuForSolarPanel = createPopupMenu(null);
+			popupMenuForSolarPanel = createPopupMenu(true, null);
 
 			final JMenu efficiencyMenu = new JMenu("Energy Conversion Efficiency");
 
@@ -478,7 +478,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			popupMenuForTree = createPopupMenu(new Runnable() {
+			popupMenuForTree = createPopupMenu(true, new Runnable() {
 				@Override
 				public void run() {
 					HousePart p = SceneManager.getInstance().getSelectedPart();
@@ -498,13 +498,13 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForHuman() {
 
 		if (popupMenuForHuman == null) {
-			popupMenuForHuman = createPopupMenu(null);
+			popupMenuForHuman = createPopupMenu(true, null);
 		}
 		return popupMenuForHuman;
 
 	}
 
-	private static JPopupMenu createPopupMenu(final Runnable runWhenBecomingVisible) {
+	private static JPopupMenu createPopupMenu(boolean hasCopyMenu, final Runnable runWhenBecomingVisible) {
 
 		final JMenuItem miInfo = new JMenuItem();
 		miInfo.setEnabled(false);
@@ -547,21 +547,23 @@ public class PopupMenuFactory {
 			}
 		});
 
-		final JMenuItem miCopy = new JMenuItem("Copy");
-		miCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-		miCopy.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart != null) {
-					Scene.getInstance().setCopyBuffer(selectedPart.copy());
-				}
-			}
-		});
-
 		popupMenu.add(miInfo);
 		popupMenu.add(miCut);
-		popupMenu.add(miCopy);
+
+		if (hasCopyMenu) {
+			final JMenuItem miCopy = new JMenuItem("Copy");
+			miCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCopy.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null) {
+						Scene.getInstance().setCopyBuffer(selectedPart.copy());
+					}
+				}
+			});
+			popupMenu.add(miCopy);
+		}
 
 		return popupMenu;
 

@@ -142,7 +142,7 @@ public class Floor extends HousePart {
 			p = wallUpperPoints.get((i + 1) % wallUpperPoints.size());
 			final Vector3 b = new Vector3(p.getX(), p.getY(), p.getZ());
 			final SizeAnnotation sizeAnnot = fetchSizeAnnot(annotCounter++);
-			sizeAnnot.setRange(a, b, getCenter(), getFaceDirection(), original == null, Align.Center, true, false, Scene.isDrawAnnotationsInside());
+			sizeAnnot.setRange(a, b, getCenter(), getNormal(), original == null, Align.Center, true, false, Scene.isDrawAnnotationsInside());
 			sizeAnnot.setLineWidth(original == null ? 1f : 2f);
 		}
 	}
@@ -174,7 +174,7 @@ public class Floor extends HousePart {
 		buf.limit(buf.position());
 		outlineMesh.getMeshData().updateVertexCount();
 		outlineMesh.updateModelBound();
-		outlineMesh.setTranslation(getFaceDirection().multiply(0.001, null));
+		outlineMesh.setTranslation(getNormal().multiply(0.001, null));
 	}
 
 	@Override

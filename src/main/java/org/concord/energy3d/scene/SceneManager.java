@@ -142,7 +142,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_OAK, DRAW_MAPLE, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_MAPLE, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
 	}
 
 	public enum CameraMode {
@@ -162,9 +162,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Node root = new Node("Root");
 	private final Node backgroundRoot = new Node("Scenary Root");
 	private final BasicPassManager passManager = new BasicPassManager();
-	private final Mesh land = new Quad("Floor", 2000, 2000);
-	private final Mesh solarLand = new Quad("Floor", 256, 256);
-	private final Mesh houseMoveCollisionPlate = new Quad("Floor", 2000, 2000);
+	private final Mesh land = new Quad("Land", 2000, 2000);
+	private final Mesh solarLand = new Quad("Solar Land", 256, 256);
+	private final Mesh collisionLand = new Quad("Collision Land", 2000, 2000);
 	private final Mesh gridsMesh = new Line("Floor Grids");
 	private final LightState lightState = new LightState();
 	private final UndoManager undoManager = new UndoManager();
@@ -295,9 +295,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		backgroundRoot.attachChild(createLand());
 		solarLand.setVisible(false);
 		backgroundRoot.attachChild(solarLand);
-		houseMoveCollisionPlate.setModelBound(new BoundingBox());
-		houseMoveCollisionPlate.getSceneHints().setCullHint(CullHint.Always);
-		root.attachChild(houseMoveCollisionPlate);
+		collisionLand.setModelBound(new BoundingBox());
+		collisionLand.getSceneHints().setCullHint(CullHint.Always);
+		root.attachChild(collisionLand);
 		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
 		drawGrids(5);
 		backgroundRoot.attachChild(gridsMesh);
@@ -1216,13 +1216,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
 		} else if (houseMoveStartPoint != null && operation == Operation.RESIZE && selectedHousePart.isDrawCompleted()) {
-			final PickedHousePart pick = SelectUtil.pickPart(x, y, houseMoveCollisionPlate);
+			final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
 			if (pick != null) {
 				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
 				((Foundation) selectedHousePart).move(d, houseMovePoints);
 			}
 		} else if (houseMoveStartPoint != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Tree) {
-			final PickedHousePart pick = SelectUtil.pickPart(x, y, houseMoveCollisionPlate);
+			final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
 			if (pick != null) {
 				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
 				((Tree) selectedHousePart).move(d, houseMovePoints);
@@ -1382,7 +1382,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || (operation == Operation.RESIZE && selectedHousePart instanceof Foundation)) {
 							cameraControl.setLeftMouseButtonEnabled(false);
 							houseMoveStartPoint = selectHousePart.getPoint();
-							houseMoveCollisionPlate.setTranslation(0, 0, houseMoveStartPoint.getZ());
+							collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
 							final ArrayList<Vector3> points = selectedHousePart.getPoints();
 							houseMovePoints = new ArrayList<Vector3>(points.size());
 							for (final Vector3 p : points)
@@ -1677,11 +1677,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	Vector3 getPickLocation() {
-		if (pasteMouseState == null)
-			return null;
-		final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), houseMoveCollisionPlate);
-		if (pick != null)
-			return pick.getPoint().multiply(1, 1, 0, null);
+		if (pasteMouseState != null) {
+			final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), land);
+			if (pick != null)
+				return pick.getPoint().multiply(1, 1, 0, null);
+			pasteMouseState = null;
+		}
 		return null;
 	}
 

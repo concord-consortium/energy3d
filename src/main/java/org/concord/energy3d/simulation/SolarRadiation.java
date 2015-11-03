@@ -146,9 +146,9 @@ public class SolarRadiation {
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (part.isDrawCompleted())
 						if (part instanceof Foundation || part instanceof Wall || part instanceof Window)
-							computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getFaceDirection());
+							computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 						else if (part instanceof SolarPanel || part instanceof Sensor)
-							computeOnMeshSolarPanel(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getFaceDirection());
+							computeOnMeshSolarPanel(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 						else if (part instanceof Roof)
 							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 								final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();

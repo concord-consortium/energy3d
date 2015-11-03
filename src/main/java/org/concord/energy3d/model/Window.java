@@ -210,7 +210,7 @@ public class Window extends HousePart {
 
 		final ReadOnlyVector3 v02 = container.getAbsPoint(2).subtract(container.getAbsPoint(0), null);
 
-		final boolean reversedFace = v02.normalize(null).crossLocal(container.getFaceDirection()).dot(Vector3.NEG_UNIT_Z) < 0.0;
+		final boolean reversedFace = v02.normalize(null).crossLocal(container.getNormal()).dot(Vector3.NEG_UNIT_Z) < 0.0;
 		final boolean reversedH;
 		if (points.get(0).getX() > points.get(2).getX())
 			reversedH = !reversedFace;
@@ -245,7 +245,7 @@ public class Window extends HousePart {
 		label1.setText("(" + Math.round(Scene.getInstance().getAnnotationScale() * 10 * xy) / 10.0 + ", " + Math.round(Scene.getInstance().getAnnotationScale() * 10.0 * (getAbsPoint(i0).getZ() - container.getAbsPoint(0).getZ())) / 10.0 + ")");
 
 		final ReadOnlyTransform trans = container.getRoot().getTransform();
-		final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getFaceDirection(), null);
+		final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getNormal(), null);
 		label1.setTranslation(getAbsPoint(i0));
 		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 
@@ -315,8 +315,8 @@ public class Window extends HousePart {
 	}
 
 	@Override
-	public ReadOnlyVector3 getFaceDirection() {
-		return container.getFaceDirection();
+	public ReadOnlyVector3 getNormal() {
+		return container.getNormal();
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMoveStartPoints) {

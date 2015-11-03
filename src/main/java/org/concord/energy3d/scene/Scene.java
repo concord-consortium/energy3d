@@ -271,6 +271,7 @@ public class Scene implements Serializable {
 		}
 
 		MainFrame.getInstance().updateTitleBar();
+
 	}
 
 	public static void initSceneNow() {

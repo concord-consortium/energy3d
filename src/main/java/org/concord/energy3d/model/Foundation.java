@@ -717,7 +717,7 @@ public class Foundation extends HousePart {
 		int annotCounter = 0;
 		for (int i = 0; i < order.length - 1; i++, annotCounter++) {
 			final SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
-			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), getCenter(), getFaceDirection(), false, Align.Center, true, true, false);
+			annot.setRange(getAbsPoint(order[i]), getAbsPoint(order[i + 1]), getCenter(), getNormal(), false, Align.Center, true, true, false);
 			annot.setLineWidth(original == null ? 1f : 2f);
 		}
 	}
@@ -1061,7 +1061,7 @@ public class Foundation extends HousePart {
 			final ReadOnlyVector3 o = getAbsPoint(0);
 			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
 			final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
-			final ReadOnlyVector3 normal = getFaceDirection().negate(null);
+			final ReadOnlyVector3 normal = getNormal().negate(null);
 			final Vector3 a = new Vector3();
 			double g, h;
 			boolean init = true;
