@@ -18,7 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
@@ -200,6 +199,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private Sphere kinectPointer;
 	private MouseState lastSelectedEditPointMouseState;
+	private MouseState pasteMouseState;
 	private Node newImport;
 	private Vector3 houseMoveStartPoint;
 	private ArrayList<Vector3> houseMovePoints;
@@ -1320,6 +1320,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private void mouseRightClicked(final MouseState mouseState) {
+		pasteMouseState = mouseState;
 		refresh = true;
 		taskManager.update(new Callable<Object>() {
 			@Override
@@ -1338,10 +1339,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						selectedHousePart.complete(); // to undo edit flag set by SelectUtil above
 						if (!PrintController.getInstance().isPrintPreview())
 							selectedHousePart.setEditPointsVisible(true);
-						final JPopupMenu popupMenu = PopupMenuFactory.getPopupMenu();
-						if (popupMenu != null)
-							popupMenu.show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
 					}
+					PopupMenuFactory.getPopupMenu().show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
 				}
 				return null;
 			}
@@ -1675,6 +1674,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setRefreshOnlyMode(final boolean refreshOnlyMode) {
 		this.refreshOnlyMode = refreshOnlyMode;
+	}
+
+	Vector3 getPickLocation() {
+		if (pasteMouseState == null)
+			return null;
+		final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), houseMoveCollisionPlate);
+		if (pick != null)
+			return pick.getPoint().multiply(1, 1, 0, null);
+		return null;
 	}
 
 }

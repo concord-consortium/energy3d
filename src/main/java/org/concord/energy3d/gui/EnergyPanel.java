@@ -88,12 +88,12 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 public class EnergyPanel extends JPanel {
 
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
-	final static String[] U_FACTOR_CHOICES_WALL = { "1.42 (R4, 16\" brick masonry)", "0.44 (R13, 2x4 w/cellulose/fiberglass)", "0.32 (R18, 2x4 w/cellulose/fiberglass & 1\" rigid foam exterior)", "0.28 (R20, 2x6 w/cellulose/fiberglass)", "0.23 (R25, 2x6 w/cellulose/fiberglass & 1\" rigid foam exterior)" };
-	final static String[] U_FACTOR_CHOICES_ROOF = { "1.0 (R6, old house)", "0.26 (R22, cellulose/fiberglass)", "0.15 (R38, cellulose/fiberglass)", "0.11 (R50, cellulose/fiberglass)", "0.09 (R60, cellulose/fiberglass)" };
-	final static String[] U_FACTOR_CHOICES_FLOOR = { "2.0 (R3)", "0.44 (R13)", "0.30 (R19)", "0.19 (R30)", "0.15 (R38)" };
-	final static String[] U_FACTOR_CHOICES_DOOR = { "2.0 (R3, wood)", "0.6 (R10, insulated)" };
-	final static String[] U_FACTOR_CHOICES_WINDOW = { "5.91 (U1.0, single pane, 3 mm glass)", "3.12 (U0.55, double pane, 6 mm airspace)", "2.66 (U0.47, double pane, 6 mm argon space)", "1.53 (U0.27, triple pane, 13 mm argon space)" };
-	final static String[] WINDOW_SHGC_CHOICES = { "25", "50", "80" };
+	final static String[] U_VALUE_CHOICES_WALL = { "1.89 (R3)", "1.42 (R4)", "0.95 (R6)", "0.52 (R11)", "0.44 (R13)", "0.38 (R15)", "0.32 (R18)", "0.28 (R20)", "0.23 (R25)", "0.19 (R30)", "0.15 (R38)" };
+	final static String[] U_VALUE_CHOICES_ROOF = { "1.89 (R3)", "1.42 (R4)", "0.95 (R6)", "0.26 (R22)", "0.23 (R25)", "0.15 (R38)", "0.11 (R50)", "0.09 (R60)" };
+	final static String[] U_VALUE_CHOICES_FLOOR = { "1.89 (R3)", "0.44 (R13)", "0.30 (R19)", "0.23 (R25)", "0.19 (R30)", "0.15 (R38)" };
+	final static String[] U_VALUE_CHOICES_WINDOW = { "6.08 (U1.07)", "3.52 (U0.62)", "2.95 (U0.52)", "2.73 (U0.48)", "2.21 (U0.39)", "1.93 (U0.34)", "1.31 (U0.23)", "1.25 (U0.22)" };
+	final static String[] U_VALUE_CHOICES_DOOR = { "1.89 (R3)", "0.57 (R10)" };
+	final static String[] WINDOW_SHGC_CHOICES = { "25", "30", "35", "40", "45", "50", "55", "60", "65", "70" };
 	final static String[] SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES = { "10", "15", "20" };
 	final static String[] VOLUMETRIC_HEAT_CAPACITY_CHOICES_WALL = { "0.5 (Default)", "0.25 (Oak Wood)", "0.37 (Brick)", "0.58 (Stone)" };
 	final static String[] VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF = { "0.5 (Default)", "0.03 (Fiberglass)", "0.18 (Asphalt)", "0.25 (Oak Wood)", "0.33 (Light Concrete)" };
@@ -396,8 +396,8 @@ public class EnergyPanel extends JPanel {
 		conditionPanel.add(sunshineHoursField, gbc_sunshineHoursField);
 
 		final JPanel uFactorPanel = new JPanel();
-		uFactorPanel.setToolTipText("<html><b>U-factor</b><br>measures how well a building element conducts heat.</html>");
-		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Factor W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP));
+		uFactorPanel.setToolTipText("<html><b>U-value</b><br>measures how well a building element conducts heat.</html>");
+		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Value W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(uFactorPanel);
 		final GridBagLayout gbl_uFactorPanel = new GridBagLayout();
 		uFactorPanel.setLayout(gbl_uFactorPanel);
@@ -412,7 +412,7 @@ public class EnergyPanel extends JPanel {
 
 		wallsComboBox = new WideComboBox();
 		wallsComboBox.setEditable(true);
-		wallsComboBox.setModel(new DefaultComboBoxModel<String>(U_FACTOR_CHOICES_WALL));
+		wallsComboBox.setModel(new DefaultComboBoxModel<String>(U_VALUE_CHOICES_WALL));
 		wallsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -420,7 +420,7 @@ public class EnergyPanel extends JPanel {
 				if (foundation != null) {
 					final int count = Scene.getInstance().countParts(foundation, Wall.class);
 					if (count > 0)
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factors of " + count + " existing walls of<br>the selected building (#" + foundation.getId() + ") to " + wallsComboBox.getSelectedItem() + "?</html>", "U-factor of Walls", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-values of " + count + " existing walls of<br>the selected building (#" + foundation.getId() + ") to " + wallsComboBox.getSelectedItem() + "?</html>", "U-value of Walls", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_WALL));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Wall && p.getTopContainer() == foundation)
@@ -458,7 +458,7 @@ public class EnergyPanel extends JPanel {
 
 		roofsComboBox = new WideComboBox();
 		roofsComboBox.setEditable(true);
-		roofsComboBox.setModel(new DefaultComboBoxModel<String>(U_FACTOR_CHOICES_ROOF));
+		roofsComboBox.setModel(new DefaultComboBoxModel<String>(U_VALUE_CHOICES_ROOF));
 		roofsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -466,7 +466,7 @@ public class EnergyPanel extends JPanel {
 				if (foundation != null) {
 					final int count = Scene.getInstance().countParts(foundation, Roof.class);
 					if (count > 0)
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factor of the roof<br>of the selected building (#" + foundation.getId() + ") to " + roofsComboBox.getSelectedItem() + "?</html>", "U-factor of Roof", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-value of the roof<br>of the selected building (#" + foundation.getId() + ") to " + roofsComboBox.getSelectedItem() + "?</html>", "U-value of Roof", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_ROOF_PYRAMID));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Roof && p.getTopContainer() == foundation)
@@ -503,7 +503,7 @@ public class EnergyPanel extends JPanel {
 
 		windowsComboBox = new WideComboBox();
 		windowsComboBox.setEditable(true);
-		windowsComboBox.setModel(new DefaultComboBoxModel<String>(U_FACTOR_CHOICES_WINDOW));
+		windowsComboBox.setModel(new DefaultComboBoxModel<String>(U_VALUE_CHOICES_WINDOW));
 		windowsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -511,7 +511,7 @@ public class EnergyPanel extends JPanel {
 				if (foundation != null) {
 					final int count = Scene.getInstance().countParts(foundation, Window.class);
 					if (count > 0)
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factors of " + count + " existing windows of<br>the selected building (#" + foundation.getId() + ") to " + windowsComboBox.getSelectedItem() + "?</html>", "U-factor of Windows", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-values of " + count + " existing windows of<br>the selected building (#" + foundation.getId() + ") to " + windowsComboBox.getSelectedItem() + "?</html>", "U-value of Windows", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_WINDOW));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Window && p.getTopContainer() == foundation)
@@ -552,7 +552,7 @@ public class EnergyPanel extends JPanel {
 
 		doorsComboBox = new WideComboBox();
 		doorsComboBox.setEditable(true);
-		doorsComboBox.setModel(new DefaultComboBoxModel<String>(U_FACTOR_CHOICES_DOOR));
+		doorsComboBox.setModel(new DefaultComboBoxModel<String>(U_VALUE_CHOICES_DOOR));
 		doorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -560,7 +560,7 @@ public class EnergyPanel extends JPanel {
 				if (foundation != null) {
 					final int count = Scene.getInstance().countParts(foundation, Door.class);
 					if (count > 0)
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-factors of " + count + " existing doors of<br>the selected building (#" + foundation.getId() + ") to " + doorsComboBox.getSelectedItem() + "?</html>", "U-factor of Doors", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-values of " + count + " existing doors of<br>the selected building (#" + foundation.getId() + ") to " + doorsComboBox.getSelectedItem() + "?</html>", "U-value of Doors", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_DOOR));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Door && p.getTopContainer() == foundation)
@@ -598,7 +598,7 @@ public class EnergyPanel extends JPanel {
 
 		floorsComboBox = new WideComboBox();
 		floorsComboBox.setEditable(true);
-		floorsComboBox.setModel(new DefaultComboBoxModel<String>(U_FACTOR_CHOICES_FLOOR));
+		floorsComboBox.setModel(new DefaultComboBoxModel<String>(U_VALUE_CHOICES_FLOOR));
 		floorsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -1157,7 +1157,7 @@ public class EnergyPanel extends JPanel {
 		if (selectedPart instanceof Wall) {
 			final int n = wallsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_WALL[i]);
+				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_WALL[i]);
 				if (Util.isZero(choice - selectedPart.getUFactor())) {
 					Util.selectSilently(wallsComboBox, i);
 					break;
@@ -1166,7 +1166,7 @@ public class EnergyPanel extends JPanel {
 		} else if (selectedPart instanceof Roof) {
 			final int n = roofsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_ROOF[i]);
+				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_ROOF[i]);
 				if (Util.isZero(choice - selectedPart.getUFactor())) {
 					Util.selectSilently(roofsComboBox, i);
 					break;
@@ -1175,7 +1175,7 @@ public class EnergyPanel extends JPanel {
 		} else if (selectedPart instanceof Door) {
 			final int n = doorsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_DOOR[i]);
+				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_DOOR[i]);
 				if (Util.isZero(choice - selectedPart.getUFactor())) {
 					Util.selectSilently(doorsComboBox, i);
 					break;
@@ -1184,7 +1184,7 @@ public class EnergyPanel extends JPanel {
 		} else if (selectedPart instanceof Foundation) {
 			final int n = floorsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_FLOOR[i]);
+				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_FLOOR[i]);
 				if (Util.isZero(choice - selectedPart.getUFactor())) {
 					Util.selectSilently(floorsComboBox, i);
 					break;
@@ -1193,7 +1193,7 @@ public class EnergyPanel extends JPanel {
 		} else if (selectedPart instanceof Window) {
 			int n = windowsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(U_FACTOR_CHOICES_WINDOW[i]);
+				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_WINDOW[i]);
 				if (Util.isZero(choice - selectedPart.getUFactor())) {
 					Util.selectSilently(windowsComboBox, i);
 					break;
