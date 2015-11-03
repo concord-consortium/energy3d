@@ -117,7 +117,7 @@ public class SolarPanel extends HousePart {
 				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
 			}
 		} else
-			normal = container.getFaceDirection();
+			normal = container.getNormal();
 
 		if (normal == null)
 			normal = Vector3.UNIT_Z;
@@ -204,7 +204,7 @@ public class SolarPanel extends HousePart {
 	}
 
 	@Override
-	public ReadOnlyVector3 getFaceDirection() {
+	public ReadOnlyVector3 getNormal() {
 		return normal;
 	}
 
@@ -235,7 +235,16 @@ public class SolarPanel extends HousePart {
 
 	public HousePart copy() {
 		SolarPanel c = (SolarPanel) super.copy();
-		c.points.get(0).setX(points.get(0).getX() + 0.01); // shift the position of the copy
+		Vector3 d = normal.cross(Vector3.UNIT_Z, null);
+		d.normalizeLocal();
+		if (Util.isZero(d.length()))
+			d.set(1, 0, 0);
+		d.multiplyLocal(WIDTH / Scene.getInstance().getAnnotationScale());
+		d.addLocal(getContainerRelative().getPoints().get(0));
+		Vector3 v = toRelative(d);
+		c.points.get(0).setX(points.get(0).getX() + v.getX());
+		c.points.get(0).setY(points.get(0).getY() + v.getY());
+		c.points.get(0).setZ(points.get(0).getZ() + v.getZ());
 		return c;
 	}
 

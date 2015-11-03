@@ -368,7 +368,7 @@ public abstract class Roof extends HousePart {
 					final int pointIndex1 = pointIndex2 == 1 ? 3 : 1;
 					final Vector3 p1 = currentWall.getAbsPoint(pointIndex1);
 					final Vector3 p2 = currentWall.getAbsPoint(pointIndex2);
-					final ReadOnlyVector3 normal = currentWall.getFaceDirection();
+					final ReadOnlyVector3 normal = currentWall.getNormal();
 					addPointToPolygon(p1, normal, wallUpperPoints, wallNormals);
 					addPointToPolygon(p2, normal, wallUpperPoints, wallNormals);
 				}
@@ -664,8 +664,8 @@ public abstract class Roof extends HousePart {
 			final List<ReadOnlyVector3> wallPoints = new ArrayList<ReadOnlyVector3>(gableWalls.size() * 2);
 			final List<ReadOnlyVector3> wallNormals = new ArrayList<ReadOnlyVector3>(gableWalls.size() * 2);
 			for (final HousePart wall : gableWalls) {
-				addPointToPolygon(wall.getAbsPoint(0), wall.getFaceDirection(), wallPoints, wallNormals);
-				addPointToPolygon(wall.getAbsPoint(2), wall.getFaceDirection(), wallPoints, wallNormals);
+				addPointToPolygon(wall.getAbsPoint(0), wall.getNormal(), wallPoints, wallNormals);
+				addPointToPolygon(wall.getAbsPoint(2), wall.getNormal(), wallPoints, wallNormals);
 			}
 			applyOverhang(wallPoints, wallNormals);
 			if (gableWalls.size() == 1) {
@@ -713,7 +713,7 @@ public abstract class Roof extends HousePart {
 				editPoint.setX(p2D.getX());
 				editPoint.setY(p2D.getY());
 				if (closestIndex < walls.size())
-					editPoint.subtractLocal(walls.get(closestIndex).getFaceDirection().multiply(0.01, null));
+					editPoint.subtractLocal(walls.get(closestIndex).getNormal().multiply(0.01, null));
 				points.get(i).set(toRelative(editPoint));
 			}
 		}

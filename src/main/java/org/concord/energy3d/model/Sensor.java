@@ -110,7 +110,7 @@ public class Sensor extends HousePart {
 				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
 			}
 		} else
-			normal = container.getFaceDirection();
+			normal = container.getNormal();
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
@@ -201,7 +201,7 @@ public class Sensor extends HousePart {
 	}
 
 	@Override
-	public ReadOnlyVector3 getFaceDirection() {
+	public ReadOnlyVector3 getNormal() {
 		return normal;
 	}
 
@@ -236,19 +236,16 @@ public class Sensor extends HousePart {
 
 	public HousePart copy() {
 		Sensor c = (Sensor) super.copy();
-		if (container instanceof Window || container instanceof Wall) {
-			Vector3 p0 = container.points.get(0);
-			Vector3 p2 = container.points.get(2);
-			double dx = 0.2 * (p2.getX() - p0.getX());
-			double dy = 0.2 * (p2.getY() - p0.getY());
-			double dz = 0.2 * (p2.getZ() - p0.getZ());
-			// shift the position of the copy
-			for (int i = 0; i < c.points.size(); i++) {
-				c.points.get(i).setX(c.points.get(i).getX() + dx);
-				c.points.get(i).setY(c.points.get(i).getY() + dy);
-				c.points.get(i).setZ(c.points.get(i).getZ() + dz);
-			}
-		}
+		Vector3 d = normal.cross(Vector3.UNIT_Z, null);
+		d.normalizeLocal();
+		if (Util.isZero(d.length()))
+			d.set(1, 0, 0);
+		d.multiplyLocal(WIDTH / Scene.getInstance().getAnnotationScale());
+		d.addLocal(getContainerRelative().getPoints().get(0));
+		Vector3 v = toRelative(d);
+		c.points.get(0).setX(points.get(0).getX() + v.getX());
+		c.points.get(0).setY(points.get(0).getY() + v.getY());
+		c.points.get(0).setZ(points.get(0).getZ() + v.getZ());
 		return c;
 	}
 

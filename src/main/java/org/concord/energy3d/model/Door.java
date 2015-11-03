@@ -74,8 +74,8 @@ public class Door extends HousePart {
 	}
 
 	@Override
-	public ReadOnlyVector3 getFaceDirection() {
-		return container.getFaceDirection();
+	public ReadOnlyVector3 getNormal() {
+		return container.getNormal();
 	}
 
 	@Override
