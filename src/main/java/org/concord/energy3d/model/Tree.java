@@ -33,9 +33,9 @@ public class Tree extends HousePart {
 	private static final long serialVersionUID = 1L;
 	public static final int DOGWOOD = 0;
 	public static final int ELM = 1;
-	public static final int OAK = 2;
-	public static final int MAPLE = 3;
-	public static final int PINE = 4;
+	public static final int MAPLE = 2;
+	public static final int PINE = 3;
+	public static final int OAK = 4;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
 	private transient Mesh crown;
@@ -45,6 +45,7 @@ public class Tree extends HousePart {
 	public Tree(final int treeType) {
 		super(1, 1, 1);
 		this.treeType = treeType;
+		init();
 	}
 
 	@Override
@@ -54,6 +55,10 @@ public class Tree extends HousePart {
 		final double width, height;
 		switch (treeType) {
 		case OAK:
+			width = 70;
+			height = 85;
+			break;
+		case ELM:
 			width = 60;
 			height = 75;
 			break;
@@ -106,6 +111,12 @@ public class Tree extends HousePart {
 
 		switch (treeType) {
 		case OAK:
+			crown.setScale(2, 2, 2.5);
+			crown.setTranslation(0, 0, 40);
+			trunk.setScale(1, 2, 2);
+			trunk.setTranslation(0, 0, 20);
+			break;
+		case ELM:
 			crown.setScale(2, 2, 2.5);
 			crown.setTranslation(0, 0, 40);
 			trunk.setScale(1, 2, 2);
@@ -202,6 +213,8 @@ public class Tree extends HousePart {
 		switch (treeType) {
 		case OAK:
 			return isShedded() ? "oak_shedded.png" : "oak.png";
+		case ELM:
+			return isShedded() ? "elm_shedded.png" : "elm.png";
 		case MAPLE:
 			return isShedded() ? "maple_shedded.png" : "maple.png";
 		case PINE:
@@ -250,6 +263,8 @@ public class Tree extends HousePart {
 		switch (treeType) {
 		case OAK:
 			return "Oak";
+		case ELM:
+			return "Elm";
 		case MAPLE:
 			return "Maple";
 		case PINE:

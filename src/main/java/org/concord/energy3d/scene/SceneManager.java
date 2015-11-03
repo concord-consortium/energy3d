@@ -995,6 +995,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (operation == Operation.DRAW_DOGWOOD) {
 			drawn = new Tree(Tree.DOGWOOD);
 			setGridsVisible(true);
+		} else if (operation == Operation.DRAW_ELM) {
+			drawn = new Tree(Tree.ELM);
+			setGridsVisible(true);
 		} else if (operation == Operation.DRAW_OAK) {
 			drawn = new Tree(Tree.OAK);
 			setGridsVisible(true);
