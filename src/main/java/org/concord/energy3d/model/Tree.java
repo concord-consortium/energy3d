@@ -290,8 +290,8 @@ public class Tree extends HousePart {
 		draw();
 	}
 
-	public HousePart copy() {
-		Tree c = (Tree) super.copy();
+	public HousePart copy(boolean check) {
+		Tree c = (Tree) super.copy(false);
 		c.points.get(0).setX(points.get(0).getX() + 10); // shift the position of the copy
 		return c;
 	}

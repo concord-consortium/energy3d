@@ -395,10 +395,16 @@ public class Window extends HousePart {
 		setContainer(target);
 	}
 
-	public HousePart copy() {
-		Window c = (Window) super.copy();
+	public HousePart copy(boolean check) {
+		Window c = (Window) super.copy(false);
 		double width = points.get(0).distance(points.get(2)) + 0.01; // give it a small gap
 		int n = c.getPoints().size();
+		if (check) {
+			for (int i = 0; i < n; i++) {
+				if (points.get(i).getX() + width > 1) // reject it if out of range
+					return null;
+			}
+		}
 		for (int i = 0; i < n; i++) {
 			c.points.get(i).setX(points.get(i).getX() + width);
 		}
