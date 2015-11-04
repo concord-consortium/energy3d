@@ -141,7 +141,6 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.ardor3d.util.resource.URLResourceSource;
-import com.jogamp.newt.event.MouseEvent;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
@@ -1695,11 +1694,24 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.refreshOnlyMode = refreshOnlyMode;
 	}
 
-	Vector3 getPickLocation() {
+	Vector3 getPickedLocationOnLand() {
 		if (pasteMouseState != null) {
 			final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), land);
 			if (pick != null)
 				return pick.getPoint().multiply(1, 1, 0, null);
+			pasteMouseState = null;
+		}
+		return null;
+	}
+
+	Vector3 getPickedLocationOnWall() {
+		if (pasteMouseState != null) {
+			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof Wall) {
+				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), (Wall) selectedPart);
+				if (pick != null)
+					return pick.getPoint();
+			}
 			pasteMouseState = null;
 		}
 		return null;

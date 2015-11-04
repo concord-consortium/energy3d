@@ -1135,4 +1135,16 @@ public abstract class HousePart implements Serializable {
 		return c;
 	}
 
+	public Vector3 getAbsCenter() {
+		double x = 0, y = 0, z = 0;
+		int n = points.size();
+		for (int i = 0; i < n; i++) {
+			Vector3 v = getAbsPoint(i);
+			x += v.getX();
+			y += v.getY();
+			z += v.getZ();
+		}
+		return new Vector3(x / n, y / n, z / n);
+	}
+
 }

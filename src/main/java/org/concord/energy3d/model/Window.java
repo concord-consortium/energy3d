@@ -262,7 +262,7 @@ public class Window extends HousePart {
 	}
 
 	@Override
-	protected ReadOnlyVector3 getCenter() {
+	public ReadOnlyVector3 getCenter() {
 		return bars.getModelBound().getCenter();
 	}
 
@@ -397,16 +397,18 @@ public class Window extends HousePart {
 
 	public HousePart copy() {
 		Window c = (Window) super.copy();
-		Vector3 p0 = container.points.get(0);
-		Vector3 p2 = container.points.get(2);
-		double dx = 0.1 * (p2.getX() - p0.getX());
-		double dy = 0.1 * (p2.getY() - p0.getY());
-		double dz = 0.1 * (p2.getZ() - p0.getZ());
-		// shift the position of the copy
-		for (int i = 0; i < c.points.size(); i++) {
-			c.points.get(i).setX(c.points.get(i).getX() + dx);
-			c.points.get(i).setY(c.points.get(i).getY() + dy);
-			c.points.get(i).setZ(c.points.get(i).getZ() + dz);
+		Vector3 d = getNormal().cross(Vector3.UNIT_Z, null);
+		d.normalizeLocal();
+		if (Util.isZero(d.length()))
+			d.set(1, 0, 0);
+		d.multiplyLocal(points.get(0).distance(points.get(2)));
+		d = c.toRelative(d);
+		System.out.println(d + "**********" + c.points.get(0));
+		int n = c.getPoints().size();
+		for (int i = 0; i < n; i++) {
+			c.points.get(i).setX(points.get(i).getX() + d.getX());
+			c.points.get(i).setY(points.get(i).getY() + d.getY());
+			c.points.get(i).setZ(points.get(i).getZ() + d.getZ());
 		}
 		return c;
 	}

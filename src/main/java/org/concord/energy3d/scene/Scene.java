@@ -676,15 +676,40 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
 	}
 
-	public void pasteAtClickedPosition() {
+	public void pasteToPickedLocationOnLand() {
 		if (copyBuffer == null)
 			return;
 		HousePart c = copyBuffer.copy();
-		Vector3 position = SceneManager.getInstance().getPickLocation();
+		Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
 		if (position != null) {
 			if (c instanceof Tree || c instanceof Human) {
 				c.getPoints().set(0, position);
 			}
+		}
+		add(c, true);
+		copyBuffer = c;
+		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+	}
+
+	public void pasteToPickedLocationOnWall() {
+		if (copyBuffer == null)
+			return;
+		Vector3 position = SceneManager.getInstance().getPickedLocationOnWall();
+		if (position == null)
+			return;
+		HousePart c = copyBuffer.copy();
+		if (c instanceof Window) { // window can be pasted to a different parent
+			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof Wall && selectedPart != c.getContainer()) {
+				((Window) c).moveTo(selectedPart);
+			}
+		}
+		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
+		Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
+		position = position.subtractLocal(center);
+		int n = c.getPoints().size();
+		for (int i = 0; i < n; i++) {
+			c.getPoints().get(i).addLocal(position);
 		}
 		add(c, true);
 		copyBuffer = c;

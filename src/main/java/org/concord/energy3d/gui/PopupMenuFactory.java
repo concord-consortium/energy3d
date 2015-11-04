@@ -112,7 +112,7 @@ public class PopupMenuFactory {
 			miPaste.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					Scene.getInstance().pasteAtClickedPosition();
+					Scene.getInstance().pasteToPickedLocationOnLand();
 				}
 			});
 
@@ -329,7 +329,7 @@ public class PopupMenuFactory {
 			miPaste.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					Scene.getInstance().paste();
+					Scene.getInstance().pasteToPickedLocationOnWall();
 				}
 			});
 
