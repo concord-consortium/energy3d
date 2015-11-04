@@ -397,18 +397,10 @@ public class Window extends HousePart {
 
 	public HousePart copy() {
 		Window c = (Window) super.copy();
-		Vector3 d = getNormal().cross(Vector3.UNIT_Z, null);
-		d.normalizeLocal();
-		if (Util.isZero(d.length()))
-			d.set(1, 0, 0);
-		d.multiplyLocal(points.get(0).distance(points.get(2)));
-		d = c.toRelative(d);
-		System.out.println(d + "**********" + c.points.get(0));
+		double width = points.get(0).distance(points.get(2)) + 0.01; // give it a small gap
 		int n = c.getPoints().size();
 		for (int i = 0; i < n; i++) {
-			c.points.get(i).setX(points.get(i).getX() + d.getX());
-			c.points.get(i).setY(points.get(i).getY() + d.getY());
-			c.points.get(i).setZ(points.get(i).getZ() + d.getZ());
+			c.points.get(i).setX(points.get(i).getX() + width);
 		}
 		return c;
 	}
