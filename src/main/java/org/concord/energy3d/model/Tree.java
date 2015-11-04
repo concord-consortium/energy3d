@@ -57,7 +57,7 @@ public class Tree extends HousePart {
 		switch (treeType) {
 		case OAK:
 			width = 70;
-			height = 85;
+			height = 80;
 			break;
 		case ELM:
 			width = 60;
@@ -111,15 +111,15 @@ public class Tree extends HousePart {
 
 		switch (treeType) {
 		case OAK:
-			crown.setScale(2, 2, 2.5);
-			crown.setTranslation(0, 0, 40);
-			trunk.setScale(1, 2, 2);
+			crown.setScale(2.5, 2.5, 3);
+			crown.setTranslation(0, 0, 45);
+			trunk.setScale(5, 5, 2);
 			trunk.setTranslation(0, 0, 20);
 			break;
 		case ELM:
 			crown.setScale(2, 2, 2.5);
 			crown.setTranslation(0, 0, 40);
-			trunk.setScale(1, 2, 2);
+			trunk.setScale(2, 2, 2);
 			trunk.setTranslation(0, 0, 20);
 			break;
 		case MAPLE:
@@ -133,7 +133,7 @@ public class Tree extends HousePart {
 			trunk.setTranslation(0, 0, 10);
 			break;
 		default:
-			crown.setScale(1, 1.2, 1.2);
+			crown.setScale(1, 1, 1.2);
 			crown.setTranslation(0, 0, 24);
 			trunk.setTranslation(0, 0, 10);
 			break;
@@ -205,7 +205,7 @@ public class Tree extends HousePart {
 		collisionRoot.setTranslation(getAbsPoint(0));
 		final double scale = 1 / (Scene.getInstance().getAnnotationScale() / 0.2);
 		billboard.setScale(scale);
-		collisionRoot.setScale(scale);		
+		collisionRoot.setScale(scale);
 	}
 
 	@Override
@@ -217,10 +217,10 @@ public class Tree extends HousePart {
 			return isShedded() ? "elm_shedded.png" : "elm.png";
 		case MAPLE:
 			return isShedded() ? "maple_shedded.png" : "maple.png";
-		case PINE:
-			return "pine.png";
-		default:
+		case DOGWOOD:
 			return isShedded() ? "dogwood_shedded.png" : "dogwood.png";
+		default:
+			return "pine.png";
 		}
 	}
 

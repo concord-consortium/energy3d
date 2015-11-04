@@ -62,6 +62,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForHuman;
 	private static JPopupMenu popupMenuForFoundation;
 	private static JPopupMenu popupMenuForSolarPanel;
+	private static JPopupMenu popupMenuForSensor;
 	private static JPopupMenu popupMenuForEnvironment;
 
 	private static Action colorAction = new AbstractAction("Color") {
@@ -90,6 +91,8 @@ public class PopupMenuFactory {
 			return getPopupMenuForFoundation();
 		if (selectedPart instanceof SolarPanel)
 			return getPopupMenuForSolarPanel();
+		if (selectedPart instanceof Sensor)
+			return getPopupMenuForSensor();
 		if (selectedPart instanceof Tree)
 			return getPopupMenuForTree();
 		if (selectedPart instanceof Human)
@@ -386,6 +389,13 @@ public class PopupMenuFactory {
 
 		return popupMenuForFoundation;
 
+	}
+
+	private static JPopupMenu getPopupMenuForSensor() {
+		if (popupMenuForSensor == null) {
+			popupMenuForSensor = createPopupMenu(false, null);
+		}
+		return popupMenuForSensor;
 	}
 
 	private static JPopupMenu getPopupMenuForSolarPanel() {

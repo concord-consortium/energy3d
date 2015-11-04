@@ -192,7 +192,7 @@ public class MainPanel extends JPanel {
 		final JCheckBoxMenuItem miTree1 = new JCheckBoxMenuItem("Dogwood (Deciduous, Height=8m)", new ImageIcon(getClass().getResource("icons/dogwood.png")), true);
 		final JCheckBoxMenuItem miTree2 = new JCheckBoxMenuItem("Maple (Deciduous, Height=12m)", new ImageIcon(getClass().getResource("icons/maple.png")));
 		final JCheckBoxMenuItem miTree3 = new JCheckBoxMenuItem("Elm (Deciduous, Height=15m)", new ImageIcon(getClass().getResource("icons/elm.png")));
-		final JCheckBoxMenuItem miTree4 = new JCheckBoxMenuItem("Oak (Deciduous, Height=18m)", new ImageIcon(getClass().getResource("icons/oak.png")));
+		final JCheckBoxMenuItem miTree4 = new JCheckBoxMenuItem("Oak (Deciduous, Height=16m)", new ImageIcon(getClass().getResource("icons/oak.png")));
 		final JCheckBoxMenuItem miTree5 = new JCheckBoxMenuItem("Pine (Evergreen, Height=16m)", new ImageIcon(getClass().getResource("icons/pine.png")));
 		final ActionListener treeAction = new ActionListener() {
 			@Override
@@ -210,7 +210,7 @@ public class MainPanel extends JPanel {
 					treeButton.setToolTipText("Insert an elm tree (deciduous, height=15m)");
 				} else if (selected == miTree4) {
 					treeCommand = SceneManager.Operation.DRAW_OAK;
-					treeButton.setToolTipText("Insert an oak tree (deciduous, height=18m)");
+					treeButton.setToolTipText("Insert an oak tree (deciduous, height=16m)");
 				} else {
 					treeCommand = SceneManager.Operation.DRAW_PINE;
 					treeButton.setToolTipText("Insert a pine tree (evergreen, height=16m)");

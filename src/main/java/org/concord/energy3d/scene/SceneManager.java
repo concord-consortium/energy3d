@@ -3,8 +3,11 @@ package org.concord.energy3d.scene;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -138,6 +141,7 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.ardor3d.util.resource.URLResourceSource;
+import com.jogamp.newt.event.MouseEvent;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
@@ -253,9 +257,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		frameHandler.addUpdater(PrintController.getInstance());
 		frameHandler.addUpdater(Blinker.getInstance());
 
-		panel.addComponentListener(new java.awt.event.ComponentAdapter() {
+		panel.addComponentListener(new ComponentAdapter() {
 			@Override
-			public void componentResized(final java.awt.event.ComponentEvent e) {
+			public void componentResized(final ComponentEvent e) {
 				resizeCamera();
 				refresh(1);
 				if (Heliodon.getInstance() != null)
@@ -1251,6 +1255,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				hoveredHousePart = null;
 		}
 		mouseState = null;
+
+		Component canvasComponent = (Component) canvas;
+		if (operation == Operation.SELECT) {
+			if (hoveredHousePart instanceof SolarPanel || hoveredHousePart instanceof Sensor || hoveredHousePart instanceof Window || hoveredHousePart instanceof Tree || hoveredHousePart instanceof Human) {
+				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+			} else {
+				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			}
+		} else {
+			canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		}
+
 	}
 
 	public void setMouseControlEnabled(final boolean enabled) {
