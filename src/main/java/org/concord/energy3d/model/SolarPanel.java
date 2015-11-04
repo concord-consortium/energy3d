@@ -233,8 +233,8 @@ public class SolarPanel extends HousePart {
 		// this method is left empty on purpose -- don't draw heat flux
 	}
 
-	public HousePart copy() {
-		SolarPanel c = (SolarPanel) super.copy();
+	public HousePart copy(boolean check) {
+		SolarPanel c = (SolarPanel) super.copy(false);
 		Vector3 d = normal.cross(Vector3.UNIT_Z, null);
 		d.normalizeLocal();
 		if (Util.isZero(d.length()))

@@ -568,7 +568,7 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart != null) {
-						Scene.getInstance().setCopyBuffer(selectedPart.copy());
+						Scene.getInstance().setCopyBuffer(selectedPart.copy(false));
 					}
 				}
 			});

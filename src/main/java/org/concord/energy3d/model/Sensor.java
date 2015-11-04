@@ -234,8 +234,8 @@ public class Sensor extends HousePart {
 		setContainer(target);
 	}
 
-	public HousePart copy() {
-		Sensor c = (Sensor) super.copy();
+	public HousePart copy(boolean check) {
+		Sensor c = (Sensor) super.copy(false);
 		Vector3 d = normal.cross(Vector3.UNIT_Z, null);
 		d.normalizeLocal();
 		if (Util.isZero(d.length()))

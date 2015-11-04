@@ -1128,7 +1128,7 @@ public abstract class HousePart implements Serializable {
 		heatFlux.setVisible(Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsVisible());
 	}
 
-	public HousePart copy() {
+	public HousePart copy(boolean check) {
 		HousePart c = (HousePart) ObjectCloner.deepCopy(this);
 		c.container = this.container;
 		c.id = Scene.getInstance().nextID();
