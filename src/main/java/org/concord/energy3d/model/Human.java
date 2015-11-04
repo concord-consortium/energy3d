@@ -12,6 +12,7 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.TestFunction;
 import com.ardor3d.scenegraph.extension.BillboardNode;
 import com.ardor3d.scenegraph.extension.BillboardNode.BillboardAlignment;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Quad;
 
 public class Human extends HousePart {
@@ -30,7 +31,7 @@ public class Human extends HousePart {
 		super(1, 1, 1);
 		this.humanType = humanType;
 		init();
-		mesh.setVisible(false);
+		root.getSceneHints().setCullHint(CullHint.Always);
 	}
 
 	@Override
@@ -100,7 +101,7 @@ public class Human extends HousePart {
 			final Vector3 p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
 			points.get(index).set(toRelative(p));
-			mesh.setVisible(true);
+			root.getSceneHints().setCullHint(CullHint.Never);
 		}
 		draw();
 		setEditPointsVisible(true);

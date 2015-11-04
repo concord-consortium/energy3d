@@ -46,7 +46,7 @@ public class Tree extends HousePart {
 		super(1, 1, 1);
 		this.treeType = treeType;
 		init();
-		mesh.setVisible(false);
+		root.getSceneHints().setCullHint(CullHint.Always);
 	}
 
 	@Override
@@ -173,7 +173,7 @@ public class Tree extends HousePart {
 			final Vector3 p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
 			points.get(index).set(toRelative(p));
-			mesh.setVisible(true);
+			root.getSceneHints().setCullHint(CullHint.Never);
 		}
 		draw();
 		setEditPointsVisible(true);

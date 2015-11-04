@@ -68,6 +68,7 @@ public class Foundation extends HousePart {
 
 	public Foundation() {
 		super(2, 8, 1);
+		root.getSceneHints().setCullHint(CullHint.Always);
 	}
 
 	public Foundation(final double xLength, final double yLength) {
@@ -222,6 +223,7 @@ public class Foundation extends HousePart {
 		if (pick != null && index < 4) {
 			p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
+			root.getSceneHints().setCullHint(CullHint.Never);
 		} else
 			p = points.get(index).clone();
 
