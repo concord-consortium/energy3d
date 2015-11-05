@@ -305,7 +305,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		dy = (double) (getHeight() - top - bottom) / (ymax - ymin);
 	}
 
-	public void show() {
+	public void showDialog() {
 
 		EnergyPanel.getInstance().requestDisableActions(this);
 

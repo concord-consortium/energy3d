@@ -1299,7 +1299,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					new AnnualEnvironmentalTemperature().show();
+					new AnnualEnvironmentalTemperature().showDialog();
 				}
 			});
 		}
@@ -1317,7 +1317,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					new DailyEnvironmentalTemperature().show();
+					new DailyEnvironmentalTemperature().showDialog();
 				}
 			});
 		}
