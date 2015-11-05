@@ -132,7 +132,7 @@ public class Scene implements Serializable {
 	private boolean alwaysComputeHeatFluxVectors = false;
 	private boolean fullEnergyInSolarMap = false;
 	private int insideTemperature = 20;
-	private HousePart copyBuffer;
+	private HousePart copyBuffer, originalCopy;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
@@ -650,10 +650,15 @@ public class Scene implements Serializable {
 		if (p instanceof Roof || p instanceof Floor || p instanceof Foundation)
 			return;
 		copyBuffer = p;
+		originalCopy = p;
 	}
 
 	public HousePart getCopyBuffer() {
 		return copyBuffer;
+	}
+
+	public HousePart getOriginalCopy() {
+		return originalCopy;
 	}
 
 	public void paste() {
