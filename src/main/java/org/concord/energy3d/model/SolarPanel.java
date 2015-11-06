@@ -259,7 +259,7 @@ public class SolarPanel extends HousePart {
 				c.points.get(0).setY(points.get(0).getY() + s * v.getY());
 				c.points.get(0).setZ(points.get(0).getZ() + s * v.getZ());
 				Vector3 center = c.getAbsCenter();
-				return c.getTopContainer().insideBuilding(center.getX(), center.getY(), true) ? c : null;
+				return ((Roof) c.container).insideWallsPolygon(center) ? c : null;
 			} else if (container instanceof Wall) {
 				double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
 				double shift = WIDTH / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());

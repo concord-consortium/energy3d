@@ -1358,7 +1358,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (!PrintController.getInstance().isPrintPreview())
 							selectedHousePart.setEditPointsVisible(true);
 					}
-					PopupMenuFactory.getPopupMenu(getPickedLocationOnLand() != null).show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
+					PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
 				}
 				return null;
 			}
@@ -1692,6 +1692,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void setRefreshOnlyMode(final boolean refreshOnlyMode) {
 		this.refreshOnlyMode = refreshOnlyMode;
+	}
+
+	private boolean onLand(int x, int y) {
+		return SelectUtil.pickPart(x, y, land) != null;
 	}
 
 	Vector3 getPickedLocationOnLand() {

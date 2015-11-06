@@ -712,6 +712,9 @@ public class Scene implements Serializable {
 	}
 
 	public void pasteToPickedLocationOnWall() {
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (!(selectedPart instanceof Wall))
+			return;
 		if (copyBuffer == null)
 			return;
 		if (copyBuffer instanceof Foundation) // cannot paste a foundation to a wall
@@ -722,15 +725,14 @@ public class Scene implements Serializable {
 		Vector3 position = SceneManager.getInstance().getPickedLocationOnWall();
 		if (position == null)
 			return;
+		Wall wall = (Wall) selectedPart;
 		if (c instanceof Window) { // windows can be pasted to a different wall
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart instanceof Wall && selectedPart != c.getContainer()) {
-				((Window) c).moveTo(selectedPart);
+			if (wall != c.getContainer()) {
+				((Window) c).moveTo(wall);
 			}
 		} else if (c instanceof SolarPanel) { // solar panels can be pasted to a different parent
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart instanceof Wall && selectedPart != c.getContainer()) {
-				((SolarPanel) c).moveTo(selectedPart);
+			if (wall != c.getContainer()) {
+				((SolarPanel) c).moveTo(wall);
 			}
 		}
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
@@ -740,7 +742,21 @@ public class Scene implements Serializable {
 		for (int i = 0; i < n; i++) {
 			Vector3 v = c.getPoints().get(i);
 			v.addLocal(position);
-			if (v.getX() > 1 || v.getX() < 0 || v.getY() > 1 || v.getY() < 0 || v.getZ() > 1 || v.getZ() < 0) // reject it if out of range
+		}
+		// out of boundary check
+		List<Vector3> polygon = wall.getWallPolygonPoints();
+		List<Vector3> relativePolygon = new ArrayList<Vector3>();
+		for (Vector3 p : polygon) {
+			relativePolygon.add(c.toRelative(p));
+		}
+		for (Vector3 p : relativePolygon) {
+			double y = p.getY();
+			p.setY(p.getZ());
+			p.setZ(y);
+		}
+		for (int i = 0; i < n; i++) {
+			Vector3 v = c.getPoints().get(i);
+			if (!Util.insidePolygon(new Vector3(v.getX(), v.getZ(), v.getY()), relativePolygon)) // reject it if out of range
 				return;
 		}
 		add(c, true);
