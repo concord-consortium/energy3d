@@ -1221,7 +1221,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 			selectedHousePart.setPreviewPoint(x, y);
-		} else if (houseMoveStartPoint != null && operation == Operation.RESIZE && selectedHousePart.isDrawCompleted()) {
+		} else if (houseMoveStartPoint != null && (operation == Operation.RESIZE || selectedHousePart instanceof Foundation) && selectedHousePart.isDrawCompleted()) {
 			final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
 			if (pick != null) {
 				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
@@ -1257,7 +1257,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		Component canvasComponent = (Component) canvas;
 		if (operation == Operation.SELECT) {
-			if (hoveredHousePart instanceof SolarPanel || hoveredHousePart instanceof Sensor || hoveredHousePart instanceof Window || hoveredHousePart instanceof Tree || hoveredHousePart instanceof Human) {
+			if (hoveredHousePart instanceof Foundation || hoveredHousePart instanceof SolarPanel || hoveredHousePart instanceof Sensor || hoveredHousePart instanceof Window || hoveredHousePart instanceof Tree || hoveredHousePart instanceof Human) {
 				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 			} else {
 				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -1397,7 +1397,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								selectedHousePart = selectedHousePart.getTopContainer();
 							}
 						}
-						if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || (operation == Operation.RESIZE && selectedHousePart instanceof Foundation)) {
+						if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || (operation == Operation.RESIZE || selectedHousePart instanceof Foundation)) {
 							cameraControl.setLeftMouseButtonEnabled(false);
 							houseMoveStartPoint = selectHousePart.getPoint();
 							collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
