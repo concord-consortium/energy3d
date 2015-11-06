@@ -1358,7 +1358,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (!PrintController.getInstance().isPrintPreview())
 							selectedHousePart.setEditPointsVisible(true);
 					}
-					PopupMenuFactory.getPopupMenu().show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
+					PopupMenuFactory.getPopupMenu(getPickedLocationOnLand() != null).show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
 				}
 				return null;
 			}

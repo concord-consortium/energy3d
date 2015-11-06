@@ -1356,17 +1356,17 @@ public class MainFrame extends JFrame {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					cutMenuItem.setEnabled(selectedPart != null);
 					copyMenuItem.setEnabled(selectedPart != null && selectedPart.isCopyable());
-					pasteMenuItem.setEnabled(Scene.getInstance().getCopyBuffer() != null);
+					HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
+					pasteMenuItem.setEnabled(copyBuffer != null && !(copyBuffer instanceof Foundation));
 					if (lockSelectionMenuItem != null)
 						lockSelectionMenuItem.setEnabled(selectedPart != null);
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-					final HousePart selected = SceneManager.getInstance().getSelectedPart();
 					if (disableFoundationCheckBoxMenuItem != null) {
-						if (selected instanceof Foundation) {
+						if (selectedPart instanceof Foundation) {
 							disableFoundationCheckBoxMenuItem.setEnabled(true);
-							Util.selectSilently(disableFoundationCheckBoxMenuItem, ((Foundation) selected).getLockEdit());
+							Util.selectSilently(disableFoundationCheckBoxMenuItem, ((Foundation) selectedPart).getLockEdit());
 						} else {
 							disableFoundationCheckBoxMenuItem.setEnabled(false);
 							Util.selectSilently(disableFoundationCheckBoxMenuItem, false);

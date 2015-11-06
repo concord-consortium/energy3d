@@ -63,7 +63,8 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForFoundation;
 	private static JPopupMenu popupMenuForSolarPanel;
 	private static JPopupMenu popupMenuForSensor;
-	private static JPopupMenu popupMenuForEnvironment;
+	private static JPopupMenu popupMenuForLand;
+	private static JPopupMenu popupMenuForSky;
 
 	private static Action colorAction = new AbstractAction("Color") {
 		private static final long serialVersionUID = 1L;
@@ -77,7 +78,7 @@ public class PopupMenuFactory {
 	private PopupMenuFactory() {
 	}
 
-	public static JPopupMenu getPopupMenu() {
+	public static JPopupMenu getPopupMenu(boolean onLand) {
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Window)
 			return getPopupMenuForWindow();
@@ -97,14 +98,14 @@ public class PopupMenuFactory {
 			return getPopupMenuForTree();
 		if (selectedPart instanceof Human)
 			return getPopupMenuForHuman();
-		return getPopupMenuForEnvironment();
+		return onLand ? getPopupMenuForLand() : getPopupMenuForSky();
 	}
 
-	private static JPopupMenu getPopupMenuForEnvironment() {
+	private static JPopupMenu getPopupMenuForLand() {
 
-		if (popupMenuForEnvironment == null) {
+		if (popupMenuForLand == null) {
 
-			final JMenuItem miInfo = new JMenuItem("Environment");
+			final JMenuItem miInfo = new JMenuItem("Land");
 			miInfo.setEnabled(false);
 
 			final JMenuItem miPaste = new JMenuItem("Paste");
@@ -116,14 +117,14 @@ public class PopupMenuFactory {
 				}
 			});
 
-			popupMenuForEnvironment = new JPopupMenu();
-			popupMenuForEnvironment.setInvoker(MainPanel.getInstance().getCanvasPanel());
-			popupMenuForEnvironment.addPopupMenuListener(new PopupMenuListener() {
+			popupMenuForLand = new JPopupMenu();
+			popupMenuForLand.setInvoker(MainPanel.getInstance().getCanvasPanel());
+			popupMenuForLand.addPopupMenuListener(new PopupMenuListener() {
 
 				@Override
 				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 					HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
-					miPaste.setEnabled(copyBuffer instanceof Tree || copyBuffer instanceof Human);
+					miPaste.setEnabled(copyBuffer instanceof Tree || copyBuffer instanceof Human || copyBuffer instanceof Foundation);
 				}
 
 				@Override
@@ -136,12 +137,45 @@ public class PopupMenuFactory {
 
 			});
 
-			popupMenuForEnvironment.add(miInfo);
-			popupMenuForEnvironment.add(miPaste);
+			popupMenuForLand.add(miInfo);
+			popupMenuForLand.add(miPaste);
 
 		}
 
-		return popupMenuForEnvironment;
+		return popupMenuForLand;
+
+	}
+
+	private static JPopupMenu getPopupMenuForSky() {
+
+		if (popupMenuForSky == null) {
+
+			final JMenuItem miInfo = new JMenuItem("Sky");
+			miInfo.setEnabled(false);
+
+			popupMenuForSky = new JPopupMenu();
+			popupMenuForSky.setInvoker(MainPanel.getInstance().getCanvasPanel());
+			popupMenuForSky.addPopupMenuListener(new PopupMenuListener() {
+
+				@Override
+				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				}
+
+				@Override
+				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				}
+
+				@Override
+				public void popupMenuCanceled(PopupMenuEvent e) {
+				}
+
+			});
+
+			popupMenuForSky.add(miInfo);
+
+		}
+
+		return popupMenuForSky;
 
 	}
 
@@ -401,6 +435,18 @@ public class PopupMenuFactory {
 
 		if (popupMenuForFoundation == null) {
 			popupMenuForFoundation = createPopupMenu(false, null);
+			final JMenuItem miCopyBuilding = new JMenuItem("Copy Building");
+			miCopyBuilding.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						Scene.getInstance().setCopyBuffer(selectedPart.copy(false));
+					}
+				}
+			});
+			popupMenuForFoundation.add(miCopyBuilding);
+			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 			popupMenuForFoundation.add(createPropertyMenu("Floor U-Value", EnergyPanel.U_VALUE_CHOICES_FLOOR, CHANGE_U_FACTOR));

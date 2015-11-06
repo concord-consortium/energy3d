@@ -646,8 +646,8 @@ public class Scene implements Serializable {
 	}
 
 	public void setCopyBuffer(HousePart p) {
-		// reject the following types of house parts
-		if (p instanceof Roof || p instanceof Floor || p instanceof Foundation || p instanceof Sensor)
+		// exclude the following types of house parts
+		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor)
 			return;
 		copyBuffer = p;
 		originalCopy = p;
@@ -663,6 +663,8 @@ public class Scene implements Serializable {
 
 	public void paste() {
 		if (copyBuffer == null)
+			return;
+		if (copyBuffer instanceof Foundation) // copying a foundation copies the entire building above it, which requires a different treatment elsewhere
 			return;
 		HousePart c = copyBuffer.copy(true);
 		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
@@ -686,11 +688,33 @@ public class Scene implements Serializable {
 			add(c, true);
 			copyBuffer = c;
 			SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		} else if (c instanceof Foundation) { // pasting a foundation also clones the building above it
+			Vector3 shift = position.subtractLocal(c.getAbsCenter()).multiplyLocal(1, 1, 0);
+			int n = c.getPoints().size();
+			for (int i = 0; i < n; i++) {
+				c.getPoints().get(i).addLocal(shift);
+			}
+			add(c, true);
+			copyBuffer = c;
+			setIdOfChildren(c);
+			SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		}
+	}
+
+	private static void setIdOfChildren(HousePart p) {
+		ArrayList<HousePart> children = p.getChildren();
+		for (HousePart c : children) {
+			c.setId(Scene.getInstance().nextID());
+			if (!c.getChildren().isEmpty()) {
+				setIdOfChildren(c);
+			}
 		}
 	}
 
 	public void pasteToPickedLocationOnWall() {
 		if (copyBuffer == null)
+			return;
+		if (copyBuffer instanceof Foundation) // cannot paste a foundation to a wall
 			return;
 		HousePart c = copyBuffer.copy(false);
 		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
@@ -726,6 +750,8 @@ public class Scene implements Serializable {
 
 	public void pasteToPickedLocationOnRoof() {
 		if (copyBuffer == null)
+			return;
+		if (copyBuffer instanceof Foundation) // cannot paste a foundation to a roof
 			return;
 		HousePart c = copyBuffer.copy(false);
 		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
