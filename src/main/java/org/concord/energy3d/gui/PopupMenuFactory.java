@@ -356,7 +356,26 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForRoof() {
 
 		if (popupMenuForRoof == null) {
-			popupMenuForRoof = createPopupMenu(false, null);
+
+			final JMenuItem miPaste = new JMenuItem("Paste");
+			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miPaste.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Scene.getInstance().pasteToPickedLocationOnRoof();
+				}
+			});
+
+			popupMenuForRoof = createPopupMenu(false, new Runnable() {
+				@Override
+				public void run() {
+					HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
+					miPaste.setEnabled(copyBuffer instanceof SolarPanel);
+				}
+			});
+
+			popupMenuForRoof.add(miPaste);
+			popupMenuForRoof.addSeparator();
 			popupMenuForRoof.add(colorAction);
 			popupMenuForRoof.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_ROOF, CHANGE_U_FACTOR));
 			popupMenuForRoof.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
