@@ -595,9 +595,11 @@ public abstract class Roof extends HousePart {
 	public void setGable(final int roofPartIndex, final boolean isGable, final UndoManager undoManager) {
 		final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints = new ArrayList<ReadOnlyVector3>();
 		final Wall wall = findGableWall(roofPartIndex, roofPartMeshUpperPoints);
-		if (undoManager != null)
-		undoManager.addEdit(new MakeGableCommand(this, wall, roofPartMeshUpperPoints));
-		setGable(wall, isGable, true, roofPartMeshUpperPoints);
+		if (wall != null) {
+			if (undoManager != null)
+				undoManager.addEdit(new MakeGableCommand(this, wall, roofPartMeshUpperPoints));
+			setGable(wall, isGable, true, roofPartMeshUpperPoints);
+		}
 	}
 
 	public Wall findGableWall(final int roofPartIndex, final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints) {
