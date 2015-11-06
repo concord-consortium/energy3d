@@ -240,19 +240,23 @@ public class Tree extends HousePart {
 
 	@Override
 	public Spatial getCollisionSpatial() {
-		if (crown == null)
-			init();
+		if (showPolygons)
+			return getRadiationCollisionSpatial();
+		else {
+			crown.removeFromParent();
+			collisionRoot.updateWorldBound(true);
+			return collisionRoot;
+		}
+	}
+
+	@Override
+	public Spatial getRadiationCollisionSpatial() {
 		if (isShedded())
 			crown.removeFromParent();
 		else
 			collisionRoot.attachChild(crown);
 		collisionRoot.updateWorldBound(true);
 		return collisionRoot;
-	}
-
-	@Override
-	public Spatial getRadiationCollisionSpatial() {
-		return getCollisionSpatial();
 	}
 
 	public int getTreeType() {
