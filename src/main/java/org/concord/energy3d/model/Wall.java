@@ -1315,4 +1315,8 @@ public class Wall extends HousePart {
 		return neighbors;
 	}
 
+	public boolean isCopyable() {
+		return false;
+	}
+
 }

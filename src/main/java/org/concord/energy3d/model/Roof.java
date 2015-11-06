@@ -596,7 +596,7 @@ public abstract class Roof extends HousePart {
 		final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints = new ArrayList<ReadOnlyVector3>();
 		final Wall wall = findGableWall(roofPartIndex, roofPartMeshUpperPoints);
 		if (undoManager != null)
-		undoManager.addEdit(new MakeGableCommand(this, wall, roofPartMeshUpperPoints));
+			undoManager.addEdit(new MakeGableCommand(this, wall, roofPartMeshUpperPoints));
 		setGable(wall, isGable, true, roofPartMeshUpperPoints);
 	}
 
@@ -1159,6 +1159,10 @@ public abstract class Roof extends HousePart {
 		if (gableEditPointToWallMap != null)
 			for (final List<Wall> wallList : gableEditPointToWallMap.values())
 				wallList.remove(wall);
+	}
+
+	public boolean isCopyable() {
+		return false;
 	}
 
 }

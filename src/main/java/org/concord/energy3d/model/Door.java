@@ -139,4 +139,8 @@ public class Door extends HousePart {
 			area = 0.0;
 	}
 
+	public boolean isCopyable() {
+		return false;
+	}
+
 }

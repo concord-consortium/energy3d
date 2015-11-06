@@ -395,6 +395,10 @@ public class Window extends HousePart {
 		setContainer(target);
 	}
 
+	public boolean isCopyable() {
+		return true;
+	}
+
 	public HousePart copy(boolean check) {
 		Window c = (Window) super.copy(false);
 		if (check) {

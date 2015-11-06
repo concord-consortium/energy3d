@@ -1353,10 +1353,12 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					copyMenuItem.setEnabled(SceneManager.getInstance().getSelectedPart() != null);
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					cutMenuItem.setEnabled(selectedPart != null);
+					copyMenuItem.setEnabled(selectedPart != null && selectedPart.isCopyable());
 					pasteMenuItem.setEnabled(Scene.getInstance().getCopyBuffer() != null);
 					if (lockSelectionMenuItem != null)
-						lockSelectionMenuItem.setEnabled(SceneManager.getInstance().getSelectedPart() != null);
+						lockSelectionMenuItem.setEnabled(selectedPart != null);
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);

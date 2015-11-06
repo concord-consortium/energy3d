@@ -233,6 +233,14 @@ public class SolarPanel extends HousePart {
 		// this method is left empty on purpose -- don't draw heat flux
 	}
 
+	public void moveTo(HousePart target) {
+		setContainer(target);
+	}
+
+	public boolean isCopyable() {
+		return true;
+	}
+
 	public HousePart copy(boolean check) {
 		SolarPanel c = (SolarPanel) super.copy(false);
 		if (check) {

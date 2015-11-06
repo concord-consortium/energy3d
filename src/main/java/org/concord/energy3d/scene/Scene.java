@@ -647,7 +647,7 @@ public class Scene implements Serializable {
 
 	public void setCopyBuffer(HousePart p) {
 		// reject the following types of house parts
-		if (p instanceof Roof || p instanceof Floor || p instanceof Foundation)
+		if (p instanceof Roof || p instanceof Floor || p instanceof Foundation || p instanceof Sensor)
 			return;
 		copyBuffer = p;
 		originalCopy = p;
@@ -667,17 +667,6 @@ public class Scene implements Serializable {
 		HousePart c = copyBuffer.copy(true);
 		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
 			return;
-		if (c instanceof Window) { // window can be pasted to a different parent
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart instanceof Wall && selectedPart != c.getContainer()) {
-				((Window) c).moveTo(selectedPart);
-			}
-		} else if (c instanceof Sensor) { // sensor can be pasted to a different parent
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart != c.getContainer()) {
-				((Sensor) c).moveTo(selectedPart);
-			}
-		}
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
@@ -709,10 +698,15 @@ public class Scene implements Serializable {
 		Vector3 position = SceneManager.getInstance().getPickedLocationOnWall();
 		if (position == null)
 			return;
-		if (c instanceof Window) { // window can be pasted to a different parent
+		if (c instanceof Window) { // windows can be pasted to a different wall
 			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Wall && selectedPart != c.getContainer()) {
 				((Window) c).moveTo(selectedPart);
+			}
+		} else if (c instanceof SolarPanel) { // solar panels can be pasted to a different wall
+			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof Wall && selectedPart != c.getContainer()) {
+				((SolarPanel) c).moveTo(selectedPart);
 			}
 		}
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
