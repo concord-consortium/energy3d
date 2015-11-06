@@ -395,19 +395,23 @@ public class Window extends HousePart {
 		setContainer(target);
 	}
 
+	public boolean isCopyable() {
+		return true;
+	}
+
 	public HousePart copy(boolean check) {
 		Window c = (Window) super.copy(false);
 		if (check) {
 			double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
-			double width = points.get(0).distance(points.get(2)) + 0.01; // give it a small gap
+			double shift = s * (points.get(0).distance(points.get(2)) + 0.01); // give it a small gap
 			int n = c.getPoints().size();
 			for (int i = 0; i < n; i++) {
-				double newX = points.get(i).getX() + s * width;
-				if (newX > 1 || newX < 0) // reject it if out of range
+				double newX = points.get(i).getX() + shift;
+				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
 					return null;
 			}
 			for (int i = 0; i < n; i++) {
-				c.points.get(i).setX(points.get(i).getX() + s * width);
+				c.points.get(i).setX(points.get(i).getX() + shift);
 			}
 		}
 		return c;

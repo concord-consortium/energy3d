@@ -1358,7 +1358,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (!PrintController.getInstance().isPrintPreview())
 							selectedHousePart.setEditPointsVisible(true);
 					}
-					PopupMenuFactory.getPopupMenu().show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
+					PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
 				}
 				return null;
 			}
@@ -1694,6 +1694,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.refreshOnlyMode = refreshOnlyMode;
 	}
 
+	private boolean onLand(int x, int y) {
+		return SelectUtil.pickPart(x, y, land) != null;
+	}
+
 	Vector3 getPickedLocationOnLand() {
 		if (pasteMouseState != null) {
 			final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), land);
@@ -1709,6 +1713,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Wall) {
 				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), (Wall) selectedPart);
+				if (pick != null)
+					return pick.getPoint();
+			}
+			pasteMouseState = null;
+		}
+		return null;
+	}
+
+	Vector3 getPickedLocationOnRoof() {
+		if (pasteMouseState != null) {
+			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof Roof) {
+				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), (Roof) selectedPart);
 				if (pick != null)
 					return pick.getPoint();
 			}

@@ -646,8 +646,8 @@ public class Scene implements Serializable {
 	}
 
 	public void setCopyBuffer(HousePart p) {
-		// reject the following types of house parts
-		if (p instanceof Roof || p instanceof Floor || p instanceof Foundation)
+		// exclude the following types of house parts
+		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor)
 			return;
 		copyBuffer = p;
 		originalCopy = p;
@@ -664,20 +664,11 @@ public class Scene implements Serializable {
 	public void paste() {
 		if (copyBuffer == null)
 			return;
+		if (copyBuffer instanceof Foundation) // copying a foundation copies the entire building above it, which requires a different treatment elsewhere
+			return;
 		HousePart c = copyBuffer.copy(true);
 		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
 			return;
-		if (c instanceof Window) { // window can be pasted to a different parent
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart instanceof Wall && selectedPart != c.getContainer()) {
-				((Window) c).moveTo(selectedPart);
-			}
-		} else if (c instanceof Sensor) { // sensor can be pasted to a different parent
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart != c.getContainer()) {
-				((Sensor) c).moveTo(selectedPart);
-			}
-		}
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
@@ -697,11 +688,36 @@ public class Scene implements Serializable {
 			add(c, true);
 			copyBuffer = c;
 			SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		} else if (c instanceof Foundation) { // pasting a foundation also clones the building above it
+			Vector3 shift = position.subtractLocal(c.getAbsCenter()).multiplyLocal(1, 1, 0);
+			int n = c.getPoints().size();
+			for (int i = 0; i < n; i++) {
+				c.getPoints().get(i).addLocal(shift);
+			}
+			add(c, true);
+			copyBuffer = c;
+			setIdOfChildren(c);
+			SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		}
+	}
+
+	private static void setIdOfChildren(HousePart p) {
+		ArrayList<HousePart> children = p.getChildren();
+		for (HousePart c : children) {
+			c.setId(Scene.getInstance().nextID());
+			if (!c.getChildren().isEmpty()) {
+				setIdOfChildren(c);
+			}
 		}
 	}
 
 	public void pasteToPickedLocationOnWall() {
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (!(selectedPart instanceof Wall))
+			return;
 		if (copyBuffer == null)
+			return;
+		if (copyBuffer instanceof Foundation) // cannot paste a foundation to a wall
 			return;
 		HousePart c = copyBuffer.copy(false);
 		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
@@ -709,10 +725,14 @@ public class Scene implements Serializable {
 		Vector3 position = SceneManager.getInstance().getPickedLocationOnWall();
 		if (position == null)
 			return;
-		if (c instanceof Window) { // window can be pasted to a different parent
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart instanceof Wall && selectedPart != c.getContainer()) {
-				((Window) c).moveTo(selectedPart);
+		Wall wall = (Wall) selectedPart;
+		if (c instanceof Window) { // windows can be pasted to a different wall
+			if (wall != c.getContainer()) {
+				((Window) c).moveTo(wall);
+			}
+		} else if (c instanceof SolarPanel) { // solar panels can be pasted to a different parent
+			if (wall != c.getContainer()) {
+				((SolarPanel) c).moveTo(wall);
 			}
 		}
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
@@ -722,8 +742,52 @@ public class Scene implements Serializable {
 		for (int i = 0; i < n; i++) {
 			Vector3 v = c.getPoints().get(i);
 			v.addLocal(position);
-			if (v.getX() > 1 || v.getX() < 0 || v.getY() > 1 || v.getY() < 0 || v.getZ() > 1 || v.getZ() < 0) // reject it if out of range
+		}
+		// out of boundary check
+		List<Vector3> polygon = wall.getWallPolygonPoints();
+		List<Vector3> relativePolygon = new ArrayList<Vector3>();
+		for (Vector3 p : polygon) {
+			relativePolygon.add(c.toRelative(p));
+		}
+		for (Vector3 p : relativePolygon) {
+			double y = p.getY();
+			p.setY(p.getZ());
+			p.setZ(y);
+		}
+		for (int i = 0; i < n; i++) {
+			Vector3 v = c.getPoints().get(i);
+			if (!Util.insidePolygon(new Vector3(v.getX(), v.getZ(), v.getY()), relativePolygon)) // reject it if out of range
 				return;
+		}
+		add(c, true);
+		copyBuffer = c;
+		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+	}
+
+	public void pasteToPickedLocationOnRoof() {
+		if (copyBuffer == null)
+			return;
+		if (copyBuffer instanceof Foundation) // cannot paste a foundation to a roof
+			return;
+		HousePart c = copyBuffer.copy(false);
+		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
+			return;
+		Vector3 position = SceneManager.getInstance().getPickedLocationOnRoof();
+		if (position == null)
+			return;
+		if (c instanceof SolarPanel) { // solar panels can be pasted to a different parent
+			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof Roof && selectedPart != c.getContainer()) {
+				((SolarPanel) c).moveTo(selectedPart);
+			}
+		}
+		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
+		Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
+		position = position.subtractLocal(center);
+		int n = c.getPoints().size();
+		for (int i = 0; i < n; i++) {
+			Vector3 v = c.getPoints().get(i);
+			v.addLocal(position);
 		}
 		add(c, true);
 		copyBuffer = c;

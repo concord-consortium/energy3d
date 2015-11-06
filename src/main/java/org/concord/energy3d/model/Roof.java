@@ -665,7 +665,7 @@ public abstract class Roof extends HousePart {
 			final List<Wall> gableWalls = gableEditPointToWallMap.get(editPointIndex);
 			final List<ReadOnlyVector3> wallPoints = new ArrayList<ReadOnlyVector3>(gableWalls.size() * 2);
 			final List<ReadOnlyVector3> wallNormals = new ArrayList<ReadOnlyVector3>(gableWalls.size() * 2);
-			for (final HousePart wall : gableWalls) {
+			for (final Wall wall : gableWalls) {
 				addPointToPolygon(wall.getAbsPoint(0), wall.getNormal(), wallPoints, wallNormals);
 				addPointToPolygon(wall.getAbsPoint(2), wall.getNormal(), wallPoints, wallNormals);
 			}
@@ -1161,6 +1161,10 @@ public abstract class Roof extends HousePart {
 		if (gableEditPointToWallMap != null)
 			for (final List<Wall> wallList : gableEditPointToWallMap.values())
 				wallList.remove(wall);
+	}
+
+	public boolean isCopyable() {
+		return false;
 	}
 
 }

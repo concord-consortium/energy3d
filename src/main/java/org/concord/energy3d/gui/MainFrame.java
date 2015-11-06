@@ -1353,18 +1353,20 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					copyMenuItem.setEnabled(SceneManager.getInstance().getSelectedPart() != null);
-					pasteMenuItem.setEnabled(Scene.getInstance().getCopyBuffer() != null);
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					cutMenuItem.setEnabled(selectedPart != null);
+					copyMenuItem.setEnabled(selectedPart != null && selectedPart.isCopyable());
+					HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
+					pasteMenuItem.setEnabled(copyBuffer != null && !(copyBuffer instanceof Foundation));
 					if (lockSelectionMenuItem != null)
-						lockSelectionMenuItem.setEnabled(SceneManager.getInstance().getSelectedPart() != null);
+						lockSelectionMenuItem.setEnabled(selectedPart != null);
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-					final HousePart selected = SceneManager.getInstance().getSelectedPart();
 					if (disableFoundationCheckBoxMenuItem != null) {
-						if (selected instanceof Foundation) {
+						if (selectedPart instanceof Foundation) {
 							disableFoundationCheckBoxMenuItem.setEnabled(true);
-							Util.selectSilently(disableFoundationCheckBoxMenuItem, ((Foundation) selected).getLockEdit());
+							Util.selectSilently(disableFoundationCheckBoxMenuItem, ((Foundation) selectedPart).getLockEdit());
 						} else {
 							disableFoundationCheckBoxMenuItem.setEnabled(false);
 							Util.selectSilently(disableFoundationCheckBoxMenuItem, false);

@@ -192,6 +192,10 @@ public class Human extends HousePart {
 		area = 0.0;
 	}
 
+	public boolean isCopyable() {
+		return true;
+	}
+
 	public HousePart copy(boolean check) {
 		Human c = (Human) super.copy(false);
 		c.points.get(0).setX(points.get(0).getX() + 2); // shift the position of the copy
