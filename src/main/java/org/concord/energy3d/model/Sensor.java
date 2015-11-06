@@ -236,16 +236,22 @@ public class Sensor extends HousePart {
 
 	public HousePart copy(boolean check) {
 		Sensor c = (Sensor) super.copy(false);
-		Vector3 d = normal.cross(Vector3.UNIT_Z, null);
-		d.normalizeLocal();
-		if (Util.isZero(d.length()))
-			d.set(1, 0, 0);
-		d.multiplyLocal(WIDTH / Scene.getInstance().getAnnotationScale());
-		d.addLocal(getContainerRelative().getPoints().get(0));
-		Vector3 v = toRelative(d);
-		c.points.get(0).setX(points.get(0).getX() + v.getX());
-		c.points.get(0).setY(points.get(0).getY() + v.getY());
-		c.points.get(0).setZ(points.get(0).getZ() + v.getZ());
+		if (container instanceof Roof) {
+			if (normal == null)
+				return null;
+			Vector3 d = normal.cross(Vector3.UNIT_Z, null);
+			d.normalizeLocal();
+			if (Util.isZero(d.length()))
+				d.set(1, 0, 0);
+			d.multiplyLocal(WIDTH / Scene.getInstance().getAnnotationScale());
+			d.addLocal(getContainerRelative().getPoints().get(0));
+			Vector3 v = toRelative(d);
+			c.points.get(0).setX(points.get(0).getX() + v.getX());
+			c.points.get(0).setY(points.get(0).getY() + v.getY());
+			c.points.get(0).setZ(points.get(0).getZ() + v.getZ());
+		} else if (container instanceof Wall) {
+
+		}
 		return c;
 	}
 

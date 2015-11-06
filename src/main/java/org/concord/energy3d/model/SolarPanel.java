@@ -236,21 +236,30 @@ public class SolarPanel extends HousePart {
 	public HousePart copy(boolean check) {
 		SolarPanel c = (SolarPanel) super.copy(false);
 		if (check) {
-			if (normal == null)
-				return null;
-			Vector3 d = normal.cross(Vector3.UNIT_Z, null);
-			d.normalizeLocal();
-			if (Util.isZero(d.length()))
-				d.set(1, 0, 0);
-			d.multiplyLocal(WIDTH / Scene.getInstance().getAnnotationScale());
-			d.addLocal(getContainerRelative().getPoints().get(0));
-			Vector3 v = toRelative(d);
-			double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
-			c.points.get(0).setX(points.get(0).getX() + s * v.getX());
-			c.points.get(0).setY(points.get(0).getY() + s * v.getY());
-			c.points.get(0).setZ(points.get(0).getZ() + s * v.getZ());
-			Vector3 center = c.getAbsCenter();
-			return c.getTopContainer().insideBuilding(center.getX(), center.getY(), true) ? c : null;
+			if (container instanceof Roof) {
+				if (normal == null)
+					return null;
+				Vector3 d = normal.cross(Vector3.UNIT_Z, null);
+				d.normalizeLocal();
+				if (Util.isZero(d.length()))
+					d.set(1, 0, 0);
+				d.multiplyLocal(WIDTH / Scene.getInstance().getAnnotationScale());
+				d.addLocal(getContainerRelative().getPoints().get(0));
+				Vector3 v = toRelative(d);
+				double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
+				c.points.get(0).setX(points.get(0).getX() + s * v.getX());
+				c.points.get(0).setY(points.get(0).getY() + s * v.getY());
+				c.points.get(0).setZ(points.get(0).getZ() + s * v.getZ());
+				Vector3 center = c.getAbsCenter();
+				return c.getTopContainer().insideBuilding(center.getX(), center.getY(), true) ? c : null;
+			} else if (container instanceof Wall) {
+				double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
+				double shift = WIDTH / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
+				double newX = points.get(0).getX() + s * shift;
+				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
+					return null;
+				c.points.get(0).setX(newX);
+			}
 		}
 		return c;
 	}
