@@ -1259,7 +1259,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		mouseState = null;
 
 		Component canvasComponent = (Component) canvas;
-		if (operation == Operation.SELECT) {
+		if (operation == Operation.SELECT && !zoomLock) {
 			if (hoveredHousePart instanceof Foundation || hoveredHousePart instanceof SolarPanel || hoveredHousePart instanceof Sensor || hoveredHousePart instanceof Window || hoveredHousePart instanceof Tree || hoveredHousePart instanceof Human) {
 				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 			} else {
@@ -1416,7 +1416,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 						if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
 							selectedHousePart.setEditPointsVisible(true);
-							if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedHousePart instanceof Window || selectedHousePart instanceof Tree) {
+							if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedHousePart instanceof Window || selectedHousePart instanceof Tree || selectedHousePart instanceof Foundation) {
 								selectedHousePart.setGridsVisible(true);
 								if (selectedHousePart instanceof Foundation)
 									editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart, !pick.isEditPoint());

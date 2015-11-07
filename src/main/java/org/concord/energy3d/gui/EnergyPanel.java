@@ -1220,7 +1220,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updatePartEnergy() {
-		final boolean iradiationEnabled = MainPanel.getInstance().getEnergyViewButton().isSelected();
+		final boolean energyViewShown = MainPanel.getInstance().getEnergyViewButton().isSelected();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 
 		if (selectedPart instanceof Foundation) {
@@ -1248,7 +1248,7 @@ public class EnergyPanel extends JPanel {
 		((TitledBorder) partPanel.getBorder()).setTitle("Part" + (selectedPart == null ? "" : (" - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1))));
 		partPanel.repaint();
 
-		if (!iradiationEnabled || selectedPart == null || selectedPart instanceof Door || selectedPart instanceof Foundation)
+		if (!energyViewShown || selectedPart == null || selectedPart instanceof Door || selectedPart instanceof Foundation)
 			partProperty3TextField.setText("");
 		else {
 			if (selectedPart instanceof Sensor) {
@@ -1287,7 +1287,7 @@ public class EnergyPanel extends JPanel {
 			selectedBuilding = selectedPart.getTopContainer();
 
 		if (selectedBuilding != null) {
-			if (iradiationEnabled) {
+			if (energyViewShown) {
 				windowTextField.setText(twoDecimals.format(selectedBuilding.getPassiveSolarToday()));
 				solarPanelTextField.setText(twoDecimals.format(selectedBuilding.getPhotovoltaicToday()));
 				heatingTextField.setText(twoDecimals.format(selectedBuilding.getHeatingToday()));

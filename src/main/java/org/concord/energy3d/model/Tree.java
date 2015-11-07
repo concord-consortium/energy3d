@@ -57,8 +57,8 @@ public class Tree extends HousePart {
 		final double width, height;
 		switch (treeType) {
 		case LINDEN:
-			width = 70;
-			height = 80;
+			width = 80;
+			height = 100;
 			break;
 		case OAK:
 			width = 70;
@@ -116,8 +116,8 @@ public class Tree extends HousePart {
 
 		switch (treeType) {
 		case LINDEN:
-			crown.setScale(2.5, 2.5, 3);
-			crown.setTranslation(0, 0, 45);
+			crown.setScale(3, 3, 3.2);
+			crown.setTranslation(0, 0, 55);
 			trunk.setScale(5, 5, 2);
 			trunk.setTranslation(0, 0, 20);
 			break;
