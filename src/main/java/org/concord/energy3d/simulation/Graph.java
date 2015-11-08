@@ -378,9 +378,9 @@ abstract class Graph extends JPanel {
 					} else if ("Solar Panels".equals(key)) {
 						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					} else if ("Heater".equals(key)) {
-						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+						drawTriangleUp(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					} else if ("AC".equals(key)) {
-						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+						drawTriangleDown(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					} else if ("Net".equals(key)) {
 						drawCircle(g2, (int) Math.round(dataX - symbolSize / 2 + 1), (int) Math.round(dataY - symbolSize / 2 + 1), symbolSize - 2, c);
 					}
@@ -416,14 +416,14 @@ abstract class Graph extends JPanel {
 		s = "Heater";
 		y0 += 12;
 		if (!isDataHidden(s)) {
-			drawSquare(g2, x0, y0, 8, colors.get(s));
+			drawTriangleUp(g2, x0, y0, 8, colors.get(s));
 			g2.drawString("\u002b " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 
 		s = "AC";
 		y0 += 12;
 		if (!isDataHidden(s)) {
-			drawSquare(g2, x0, y0, 8, colors.get(s));
+			drawTriangleDown(g2, x0, y0, 8, colors.get(s));
 			g2.drawString("\u002b " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 

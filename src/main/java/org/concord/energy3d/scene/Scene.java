@@ -404,8 +404,6 @@ public class Scene implements Serializable {
 			instance.volumetricHeatCapacity = 0.5;
 		if (Util.isZero(instance.groundThermalDiffusivity))
 			instance.groundThermalDiffusivity = 0.01;
-		if (Util.isZero(instance.backgroundAlbedo))
-			instance.backgroundAlbedo = 0.3;
 		if (Util.isZero(instance.heatVectorLength))
 			instance.heatVectorLength = 5000;
 		Ground.getInstance().setThermalDiffusivity(instance.groundThermalDiffusivity);
