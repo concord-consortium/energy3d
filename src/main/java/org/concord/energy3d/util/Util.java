@@ -497,6 +497,24 @@ public class Util {
 		return area;
 	}
 
+	/** Approximately calculate the center of a mesh using the averange of all the triangle vertices */
+	public static Vector3 computeCenter(final Mesh mesh) {
+		double x = 0, y = 0, z = 0;
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		buf.rewind();
+		int count = 0;
+		while (buf.hasRemaining()) {
+			final Vector3 p1 = new Vector3(buf.get(), buf.get(), buf.get());
+			final Vector3 p2 = new Vector3(buf.get(), buf.get(), buf.get());
+			final Vector3 p3 = new Vector3(buf.get(), buf.get(), buf.get());
+			x += (p1.getX() + p2.getX() + p3.getX()) / 3;
+			y += (p1.getY() + p2.getY() + p3.getY()) / 3;
+			z += (p1.getZ() + p2.getZ() + p3.getZ()) / 3;
+			count++;
+		}
+		return new Vector3(x / count, y / count, z / count);
+	}
+
 	private static double computeTriangleArea(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		return p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;

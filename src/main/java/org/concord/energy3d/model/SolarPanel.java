@@ -19,6 +19,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.geom.BufferUtils;
@@ -251,10 +252,12 @@ public class SolarPanel extends HousePart {
 				d.normalizeLocal();
 				if (Util.isZero(d.length()))
 					d.set(1, 0, 0);
+				Vector3 d0 = d.clone();
 				d.multiplyLocal(WIDTH / Scene.getInstance().getAnnotationScale());
 				d.addLocal(getContainerRelative().getPoints().get(0));
 				Vector3 v = toRelative(d);
-				double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
+				Vector3 originalCenter = Scene.getInstance().getOriginalCopy().getAbsCenter();
+				double s = Math.signum(container.getAbsCenter().subtractLocal(originalCenter).dot(d0));
 				c.points.get(0).setX(points.get(0).getX() + s * v.getX());
 				c.points.get(0).setY(points.get(0).getY() + s * v.getY());
 				c.points.get(0).setZ(points.get(0).getZ() + s * v.getZ());
