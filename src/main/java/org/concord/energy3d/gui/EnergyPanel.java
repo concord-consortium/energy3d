@@ -397,7 +397,7 @@ public class EnergyPanel extends JPanel {
 
 		final JPanel uFactorPanel = new JPanel();
 		uFactorPanel.setToolTipText("<html><b>U-value</b><br>measures how well a building element conducts heat.</html>");
-		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Value W/(m\u00B2.\u00B0C)", TitledBorder.LEADING, TitledBorder.TOP));
+		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Value of All [W/(m\u00B2.\u00B0C)]", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(uFactorPanel);
 		final GridBagLayout gbl_uFactorPanel = new GridBagLayout();
 		uFactorPanel.setLayout(gbl_uFactorPanel);
@@ -631,10 +631,10 @@ public class EnergyPanel extends JPanel {
 
 		final JPanel solarConversionPercentagePanel = new JPanel();
 		solarConversionPercentagePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, solarConversionPercentagePanel.getPreferredSize().height));
-		solarConversionPercentagePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Solar Conversion (%)", TitledBorder.LEADING, TitledBorder.TOP));
+		solarConversionPercentagePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Solar Conversion of All (%)", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(solarConversionPercentagePanel);
 
-		final JLabel labelSHGC = new JLabel("Window (SHGC): ");
+		final JLabel labelSHGC = new JLabel("Windows (SHGC): ");
 		labelSHGC.setToolTipText("<html><b>SHGC - Solar heat gain coefficient</b><br>measures the fraction of solar energy transmitted through a window.</html>");
 		solarConversionPercentagePanel.add(labelSHGC);
 
@@ -685,7 +685,7 @@ public class EnergyPanel extends JPanel {
 		}
 		solarConversionPercentagePanel.add(windowSHGCComboBox);
 
-		final JLabel labelPV = new JLabel("Solar Panel: ");
+		final JLabel labelPV = new JLabel("Solar Panels: ");
 		labelPV.setToolTipText("<html><b>Solar photovoltaic efficiency</b><br>measures the fraction of solar energy converted into electricity by a solar panel.</html>");
 		solarConversionPercentagePanel.add(labelPV);
 
