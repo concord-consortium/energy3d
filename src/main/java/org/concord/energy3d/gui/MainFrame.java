@@ -190,6 +190,7 @@ public class MainFrame extends JFrame {
 	private final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
 	private JCheckBoxMenuItem autoRecomputeEnergyMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
+	private JMenuItem removeAllSolarPanelsMenuItem;
 
 	private static class ExtensionFileFilter extends FileFilter {
 		String description;
@@ -1391,6 +1392,7 @@ public class MainFrame extends JFrame {
 			editMenu.addSeparator();
 			editMenu.add(getRoofOverhangLengthMenuItem());
 			editMenu.add(getRemoveAllRoofsMenuItem());
+			editMenu.add(getRemoveAllSolarPanelsMenuItem());
 			editMenu.addSeparator();
 			if (!Config.isRestrictMode()) {
 				editMenu.add(getDisableFoundationCheckBoxMenuItem());
@@ -2261,4 +2263,24 @@ public class MainFrame extends JFrame {
 		}
 		return removeAllRoofsMenuItem;
 	}
+
+	private JMenuItem getRemoveAllSolarPanelsMenuItem() {
+		if (removeAllSolarPanelsMenuItem == null) {
+			removeAllSolarPanelsMenuItem = new JMenuItem("Remove All Solar Panels");
+			removeAllSolarPanelsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().removeAllSolarPanels();
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						}
+					});
+				}
+			});
+		}
+		return removeAllSolarPanelsMenuItem;
+	}
+
 }

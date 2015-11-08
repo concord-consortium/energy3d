@@ -16,6 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.swing.JOptionPane;
+
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
@@ -938,9 +940,37 @@ public class Scene implements Serializable {
 		for (final HousePart part : parts)
 			if (part instanceof Roof && !part.isFrozen())
 				roofs.add(part);
-
+		if (roofs.isEmpty())
+			return;
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
 		for (final HousePart part : roofs)
 			remove(part, false);
+		edited = true;
+	}
+
+	public void removeAllSolarPanels() {
+		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
+		for (final HousePart part : parts)
+			if (part instanceof SolarPanel && !part.isFrozen())
+				panels.add(part);
+		if (panels.isEmpty())
+			return;
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all solar panels?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : panels) {
+				if (part.getTopContainer() == foundation)
+					remove(part, false);
+			}
+		} else {
+			for (final HousePart part : panels) {
+				remove(part, false);
+			}
+		}
+		edited = true;
 	}
 
 	public static boolean isRedrawAll() {
