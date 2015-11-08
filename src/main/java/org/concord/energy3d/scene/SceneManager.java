@@ -1737,4 +1737,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return null;
 	}
 
+	public void computeEnergyView(boolean b) {
+		setHeatFluxDaily(true);
+		setSolarHeatMap(b);
+		setHeatFluxVectorsVisible(b);
+		((Component) canvas).requestFocusInWindow();
+	}
+
 }

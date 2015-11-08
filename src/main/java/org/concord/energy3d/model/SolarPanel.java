@@ -2,6 +2,9 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 
+import javax.swing.JOptionPane;
+
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
@@ -245,8 +248,10 @@ public class SolarPanel extends HousePart {
 		SolarPanel c = (SolarPanel) super.copy(false);
 		if (check) {
 			if (container instanceof Roof) {
-				if (normal == null)
+				if (normal == null) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Normal of solar panel [" + c + "] is null. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
+				}
 				Vector3 d = normal.cross(Vector3.UNIT_Z, null);
 				d.normalizeLocal();
 				if (Util.isZero(d.length()))
@@ -260,8 +265,10 @@ public class SolarPanel extends HousePart {
 				c.points.get(0).setX(points.get(0).getX() + s * v.getX());
 				c.points.get(0).setY(points.get(0).getY() + s * v.getY());
 				c.points.get(0).setZ(points.get(0).getZ() + s * v.getZ());
-				Vector3 center = c.getAbsCenter();
-				return ((Roof) c.container).insideWallsPolygon(center) ? c : null;
+				if (!((Roof) c.container).insideWallsPolygon(c.getAbsCenter())) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel [" + c + "] is not inside roof. Please select the object to copy again.", "Error", JOptionPane.ERROR_MESSAGE);
+					return null;
+				}
 			} else if (container instanceof Wall) {
 				double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
 				double shift = WIDTH / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());

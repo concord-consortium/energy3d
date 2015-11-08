@@ -711,18 +711,11 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().getUndoManager().addEdit(new ComputeEnergyCommand());
 					if (energyViewButton.isSelected())
 						MainFrame.getInstance().autoSelectBuilding(false);
-					computeEnergyView(energyViewButton.isSelected());
+					SceneManager.getInstance().computeEnergyView(energyViewButton.isSelected());
 				}
 			});
 		}
 		return energyViewButton;
-	}
-
-	public void computeEnergyView(boolean b) {
-		SceneManager.getInstance().setHeatFluxDaily(true);
-		SceneManager.getInstance().setSolarHeatMap(b);
-		SceneManager.getInstance().setHeatFluxVectorsVisible(b);
-		((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 	}
 
 	private JSplitPane getCanvasNoteSplitPane() {

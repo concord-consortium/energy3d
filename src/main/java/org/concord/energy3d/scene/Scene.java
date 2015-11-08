@@ -648,8 +648,9 @@ public class Scene implements Serializable {
 
 	public void setCopyBuffer(HousePart p) {
 		// exclude the following types of house parts
-		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor)
+		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor) {
 			return;
+		}
 		copyBuffer = p;
 		originalCopy = p;
 	}
@@ -673,6 +674,14 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		clearEnergyView();
+	}
+
+	private void clearEnergyView() {
+		if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
+			SceneManager.getInstance().computeEnergyView(false);
+			Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), false);
+		}
 	}
 
 	public void pasteToPickedLocationOnLand() {
@@ -699,6 +708,7 @@ public class Scene implements Serializable {
 			copyBuffer = c;
 			setIdOfChildren(c);
 			SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+			clearEnergyView();
 		}
 	}
 
@@ -763,6 +773,7 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		clearEnergyView();
 	}
 
 	public void pasteToPickedLocationOnRoof() {
@@ -793,6 +804,7 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		clearEnergyView();
 	}
 
 	public List<HousePart> getParts() {
