@@ -40,6 +40,7 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.undo.AddPartCommand;
+import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Specifications;
@@ -936,40 +937,43 @@ public class Scene implements Serializable {
 	}
 
 	public void removeAllRoofs() {
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
 		final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
 		for (final HousePart part : parts)
 			if (part instanceof Roof && !part.isFrozen())
 				roofs.add(part);
 		if (roofs.isEmpty())
 			return;
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
-			return;
 		for (final HousePart part : roofs)
 			remove(part, false);
+		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(roofs));
 		edited = true;
 	}
 
 	public void removeAllSolarPanels() {
-		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
-		for (final HousePart part : parts)
-			if (part instanceof SolarPanel && !part.isFrozen())
-				panels.add(part);
-		if (panels.isEmpty())
-			return;
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all solar panels?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
+		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null) {
 			Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
-			for (final HousePart part : panels) {
-				if (part.getTopContainer() == foundation)
-					remove(part, false);
+			for (final HousePart part : parts) {
+				if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation)
+					panels.add(part);
 			}
 		} else {
-			for (final HousePart part : panels) {
-				remove(part, false);
+			for (final HousePart part : parts) {
+				if (part instanceof SolarPanel && !part.isFrozen())
+					panels.add(part);
 			}
 		}
+		if (panels.isEmpty())
+			return;
+		for (final HousePart part : panels) {
+			remove(part, false);
+		}
+		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(panels));
 		edited = true;
 	}
 
