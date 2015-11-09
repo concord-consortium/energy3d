@@ -89,10 +89,7 @@ public class SolarPanel extends HousePart {
 		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class });
 		if (picked != null) {
 			final Vector3 p = picked.getPoint();
-			if (container instanceof Wall)
-				snapToGrid(p, getAbsPoint(0), getGridSize());
-			else
-				getTopContainer().snapToGrid(p, getAbsPoint(0), getGridSize());
+			snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
 			points.get(0).set(toRelative(p));
 		}
 		if (container != null) {
@@ -187,7 +184,7 @@ public class SolarPanel extends HousePart {
 		if (mesh.getWorldBound() == null)
 			return true;
 		final OrientedBoundingBox bound = (OrientedBoundingBox) mesh.getWorldBound().clone(null);
-		bound.setExtent(bound.getExtent().divide(1.1, null));
+		bound.setExtent(bound.getExtent().divide(1.1, null).addLocal(0, 0, 1));
 		for (final HousePart child : container.getChildren()) {
 			if (child != this && child instanceof SolarPanel && bound.intersects(child.mesh.getWorldBound())) {
 				return false;
