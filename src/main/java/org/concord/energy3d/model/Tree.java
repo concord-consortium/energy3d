@@ -255,6 +255,7 @@ public class Tree extends HousePart {
 			crown.removeFromParent();
 		else
 			collisionRoot.attachChild(crown);
+		collisionRoot.updateWorldTransform(true);
 		collisionRoot.updateWorldBound(true);
 		return collisionRoot;
 	}
