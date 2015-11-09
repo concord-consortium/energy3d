@@ -191,6 +191,8 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem autoRecomputeEnergyMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
 	private JMenuItem removeAllSolarPanelsMenuItem;
+	private JMenuItem removeAllWindowsMenuItem;
+	private JMenuItem removeAllTreesMenuItem;
 
 	private static class ExtensionFileFilter extends FileFilter {
 		String description;
@@ -1391,8 +1393,10 @@ public class MainFrame extends JFrame {
 			}
 			editMenu.addSeparator();
 			editMenu.add(getRoofOverhangLengthMenuItem());
-			editMenu.add(getRemoveAllRoofsMenuItem());
+			editMenu.add(getRemoveAllWindowsMenuItem());
 			editMenu.add(getRemoveAllSolarPanelsMenuItem());
+			editMenu.add(getRemoveAllTreesMenuItem());
+			editMenu.add(getRemoveAllRoofsMenuItem());
 			editMenu.addSeparator();
 			if (!Config.isRestrictMode()) {
 				editMenu.add(getDisableFoundationCheckBoxMenuItem());
@@ -2281,6 +2285,44 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllSolarPanelsMenuItem;
+	}
+
+	private JMenuItem getRemoveAllWindowsMenuItem() {
+		if (removeAllWindowsMenuItem == null) {
+			removeAllWindowsMenuItem = new JMenuItem("Remove All Windows");
+			removeAllWindowsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().removeAllWindows();
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						}
+					});
+				}
+			});
+		}
+		return removeAllWindowsMenuItem;
+	}
+
+	private JMenuItem getRemoveAllTreesMenuItem() {
+		if (removeAllTreesMenuItem == null) {
+			removeAllTreesMenuItem = new JMenuItem("Remove All Trees");
+			removeAllTreesMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().removeAllTrees();
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						}
+					});
+				}
+			});
+		}
+		return removeAllTreesMenuItem;
 	}
 
 }

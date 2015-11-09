@@ -948,6 +948,22 @@ public class Scene implements Serializable {
 					((Roof) part).updateDashLinesColor();
 	}
 
+	public void removeAllTrees() {
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all trees?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		final ArrayList<HousePart> trees = new ArrayList<HousePart>();
+		for (final HousePart part : parts)
+			if (part instanceof Tree && !part.isFrozen())
+				trees.add(part);
+		if (trees.isEmpty())
+			return;
+		for (final HousePart part : trees)
+			remove(part, false);
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(trees));
+		edited = true;
+	}
+
 	public void removeAllRoofs() {
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
@@ -959,6 +975,7 @@ public class Scene implements Serializable {
 			return;
 		for (final HousePart part : roofs)
 			remove(part, false);
+		redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(roofs));
 		edited = true;
 	}
@@ -985,7 +1002,35 @@ public class Scene implements Serializable {
 		for (final HousePart part : panels) {
 			remove(part, false);
 		}
+		redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(panels));
+		edited = true;
+	}
+
+	public void removeAllWindows() {
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all windows?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		final ArrayList<HousePart> windows = new ArrayList<HousePart>();
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : parts) {
+				if (part instanceof Window && !part.isFrozen() && part.getTopContainer() == foundation)
+					windows.add(part);
+			}
+		} else {
+			for (final HousePart part : parts) {
+				if (part instanceof Window && !part.isFrozen())
+					windows.add(part);
+			}
+		}
+		if (windows.isEmpty())
+			return;
+		for (final HousePart part : windows) {
+			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(windows));
 		edited = true;
 	}
 
