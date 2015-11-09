@@ -67,6 +67,7 @@ import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ComputeEnergyCommand;
 import org.concord.energy3d.undo.EditPartCommand;
+import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.SaveCommand;
@@ -210,6 +211,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				actedPart = ((EditPartCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof RemovePartCommand) {
 				actedPart = ((RemovePartCommand) lastEdit).getHousePart();
+			} else if (lastEdit instanceof RemoveMultiplePartsOfSameTypeCommand) {
+				actedPart = ((RemoveMultiplePartsOfSameTypeCommand) lastEdit).getFoundation();
 			} else if (lastEdit instanceof RotateBuildingCommand) {
 				RotateBuildingCommand c = (RotateBuildingCommand) lastEdit;
 				stateValue = "{\"Building\":" + c.getFoundation().getId() + ", \"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";

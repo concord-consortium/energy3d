@@ -134,8 +134,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem constructionCostAnalysisMenuItem;
 	private JMenuItem annualEnvironmentalTemperatureMenuItem;
 	private JMenuItem dailyEnvironmentalTemperatureMenuItem;
-	private JCheckBoxMenuItem solarHeatMapMenuItem;
-	private JCheckBoxMenuItem onlyAbsorptionInSolarMapMenuItem;
+	private JCheckBoxMenuItem solarRadiationHeatMapMenuItem;
+	private JCheckBoxMenuItem solarAbsorptionHeatMapMenuItem;
 	private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
@@ -190,6 +190,9 @@ public class MainFrame extends JFrame {
 	private final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
 	private JCheckBoxMenuItem autoRecomputeEnergyMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
+	private JMenuItem removeAllSolarPanelsMenuItem;
+	private JMenuItem removeAllWindowsMenuItem;
+	private JMenuItem removeAllTreesMenuItem;
 
 	private static class ExtensionFileFilter extends FileFilter {
 		String description;
@@ -923,8 +926,8 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(solarHeatMapMenuItem, SceneManager.getInstance().getSolarHeatMap());
-					Util.selectSilently(onlyAbsorptionInSolarMapMenuItem, Scene.getInstance().getOnlyAbsorptionInSolarMap());
+					Util.selectSilently(solarRadiationHeatMapMenuItem, SceneManager.getInstance().getSolarHeatMap());
+					Util.selectSilently(solarAbsorptionHeatMapMenuItem, Scene.getInstance().getOnlyAbsorptionInSolarMap());
 					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
@@ -943,8 +946,8 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getFullTextureMenuItem());
 			viewMenu.add(getColorMenu());
 			viewMenu.addSeparator();
-			viewMenu.add(getSolarHeatMapMenuItem());
-			viewMenu.add(getSolarAbsorptionMapMenuItem());
+			viewMenu.add(getSolarRadiationHeatMapMenuItem());
+			viewMenu.add(getSolarAbsorptionHeatMapMenuItem());
 			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
@@ -1197,33 +1200,33 @@ public class MainFrame extends JFrame {
 		return dailySensorMenuItem;
 	}
 
-	private JCheckBoxMenuItem getSolarHeatMapMenuItem() {
-		if (solarHeatMapMenuItem == null) {
-			solarHeatMapMenuItem = new JCheckBoxMenuItem("Solar Heat Map");
-			solarHeatMapMenuItem.addActionListener(new ActionListener() {
+	private JCheckBoxMenuItem getSolarRadiationHeatMapMenuItem() {
+		if (solarRadiationHeatMapMenuItem == null) {
+			solarRadiationHeatMapMenuItem = new JCheckBoxMenuItem("Solar Heat Map");
+			solarRadiationHeatMapMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setSolarHeatMap(solarHeatMapMenuItem.isSelected());
-					Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), solarHeatMapMenuItem.isSelected());
+					SceneManager.getInstance().setSolarHeatMap(solarRadiationHeatMapMenuItem.isSelected());
+					Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), solarRadiationHeatMapMenuItem.isSelected());
 				}
 			});
 		}
-		return solarHeatMapMenuItem;
+		return solarRadiationHeatMapMenuItem;
 	}
 
-	private JCheckBoxMenuItem getSolarAbsorptionMapMenuItem() {
-		if (onlyAbsorptionInSolarMapMenuItem == null) {
-			onlyAbsorptionInSolarMapMenuItem = new JCheckBoxMenuItem("Show Only Absorption in Solar Heat Map");
-			onlyAbsorptionInSolarMapMenuItem.addActionListener(new ActionListener() {
+	private JCheckBoxMenuItem getSolarAbsorptionHeatMapMenuItem() {
+		if (solarAbsorptionHeatMapMenuItem == null) {
+			solarAbsorptionHeatMapMenuItem = new JCheckBoxMenuItem("Show Only Absorbed Energy in Solar Heat Map");
+			solarAbsorptionHeatMapMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setOnlyAbsorptionInSolarMap(onlyAbsorptionInSolarMapMenuItem.isSelected());
+					Scene.getInstance().setOnlyAbsorptionInSolarMap(solarAbsorptionHeatMapMenuItem.isSelected());
 					if (SceneManager.getInstance().getSolarHeatMap())
 						SceneManager.getInstance().setSolarHeatMap(true);
 				}
 			});
 		}
-		return onlyAbsorptionInSolarMapMenuItem;
+		return solarAbsorptionHeatMapMenuItem;
 	}
 
 	private JCheckBoxMenuItem getHeatFluxMenuItem() {
@@ -1390,6 +1393,9 @@ public class MainFrame extends JFrame {
 			}
 			editMenu.addSeparator();
 			editMenu.add(getRoofOverhangLengthMenuItem());
+			editMenu.add(getRemoveAllWindowsMenuItem());
+			editMenu.add(getRemoveAllSolarPanelsMenuItem());
+			editMenu.add(getRemoveAllTreesMenuItem());
 			editMenu.add(getRemoveAllRoofsMenuItem());
 			editMenu.addSeparator();
 			if (!Config.isRestrictMode()) {
@@ -2261,4 +2267,62 @@ public class MainFrame extends JFrame {
 		}
 		return removeAllRoofsMenuItem;
 	}
+
+	private JMenuItem getRemoveAllSolarPanelsMenuItem() {
+		if (removeAllSolarPanelsMenuItem == null) {
+			removeAllSolarPanelsMenuItem = new JMenuItem("Remove All Solar Panels");
+			removeAllSolarPanelsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().removeAllSolarPanels();
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						}
+					});
+				}
+			});
+		}
+		return removeAllSolarPanelsMenuItem;
+	}
+
+	private JMenuItem getRemoveAllWindowsMenuItem() {
+		if (removeAllWindowsMenuItem == null) {
+			removeAllWindowsMenuItem = new JMenuItem("Remove All Windows");
+			removeAllWindowsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().removeAllWindows();
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						}
+					});
+				}
+			});
+		}
+		return removeAllWindowsMenuItem;
+	}
+
+	private JMenuItem getRemoveAllTreesMenuItem() {
+		if (removeAllTreesMenuItem == null) {
+			removeAllTreesMenuItem = new JMenuItem("Remove All Trees");
+			removeAllTreesMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().removeAllTrees();
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						}
+					});
+				}
+			});
+		}
+		return removeAllTreesMenuItem;
+	}
+
 }

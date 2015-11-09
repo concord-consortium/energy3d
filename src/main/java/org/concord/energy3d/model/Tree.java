@@ -36,6 +36,7 @@ public class Tree extends HousePart {
 	public static final int MAPLE = 2;
 	public static final int PINE = 3;
 	public static final int OAK = 4;
+	public static final int LINDEN = 5;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
 	private transient Mesh crown;
@@ -55,6 +56,10 @@ public class Tree extends HousePart {
 
 		final double width, height;
 		switch (treeType) {
+		case LINDEN:
+			width = 80;
+			height = 100;
+			break;
 		case OAK:
 			width = 70;
 			height = 80;
@@ -110,6 +115,12 @@ public class Tree extends HousePart {
 		trunk.updateModelBound();
 
 		switch (treeType) {
+		case LINDEN:
+			crown.setScale(3, 3, 3.2);
+			crown.setTranslation(0, 0, 55);
+			trunk.setScale(5, 5, 2);
+			trunk.setTranslation(0, 0, 20);
+			break;
 		case OAK:
 			crown.setScale(2.5, 2.5, 3);
 			crown.setTranslation(0, 0, 45);
@@ -211,6 +222,8 @@ public class Tree extends HousePart {
 	@Override
 	protected String getTextureFileName() {
 		switch (treeType) {
+		case LINDEN:
+			return isShedded() ? "linden_shedded.png" : "linden.png";
 		case OAK:
 			return isShedded() ? "oak_shedded.png" : "oak.png";
 		case ELM:
@@ -266,6 +279,8 @@ public class Tree extends HousePart {
 
 	public String getTreeName() {
 		switch (treeType) {
+		case LINDEN:
+			return "Linden";
 		case OAK:
 			return "Oak";
 		case ELM:

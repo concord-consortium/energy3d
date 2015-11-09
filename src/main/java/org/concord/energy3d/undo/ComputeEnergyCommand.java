@@ -21,14 +21,14 @@ public class ComputeEnergyCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		newValue = SceneManager.getInstance().getSolarHeatMap();
-		MainPanel.getInstance().computeEnergyView(oldValue);
+		SceneManager.getInstance().computeEnergyView(oldValue);
 		Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		MainPanel.getInstance().computeEnergyView(newValue);
+		SceneManager.getInstance().computeEnergyView(newValue);
 		Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), newValue);
 	}
 

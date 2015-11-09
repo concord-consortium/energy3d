@@ -16,6 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.swing.JOptionPane;
+
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
@@ -38,6 +40,7 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.undo.AddPartCommand;
+import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Specifications;
@@ -404,8 +407,6 @@ public class Scene implements Serializable {
 			instance.volumetricHeatCapacity = 0.5;
 		if (Util.isZero(instance.groundThermalDiffusivity))
 			instance.groundThermalDiffusivity = 0.01;
-		if (Util.isZero(instance.backgroundAlbedo))
-			instance.backgroundAlbedo = 0.3;
 		if (Util.isZero(instance.heatVectorLength))
 			instance.heatVectorLength = 5000;
 		Ground.getInstance().setThermalDiffusivity(instance.groundThermalDiffusivity);
@@ -647,8 +648,9 @@ public class Scene implements Serializable {
 
 	public void setCopyBuffer(HousePart p) {
 		// exclude the following types of house parts
-		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor)
+		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor) {
 			return;
+		}
 		copyBuffer = p;
 		originalCopy = p;
 	}
@@ -672,6 +674,14 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		clearEnergyView();
+	}
+
+	private void clearEnergyView() {
+		if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
+			SceneManager.getInstance().computeEnergyView(false);
+			Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), false);
+		}
 	}
 
 	public void pasteToPickedLocationOnLand() {
@@ -698,6 +708,7 @@ public class Scene implements Serializable {
 			copyBuffer = c;
 			setIdOfChildren(c);
 			SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+			clearEnergyView();
 		}
 	}
 
@@ -762,6 +773,7 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		clearEnergyView();
 	}
 
 	public void pasteToPickedLocationOnRoof() {
@@ -792,6 +804,7 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		clearEnergyView();
 	}
 
 	public List<HousePart> getParts() {
@@ -935,14 +948,90 @@ public class Scene implements Serializable {
 					((Roof) part).updateDashLinesColor();
 	}
 
+	public void removeAllTrees() {
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all trees?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		final ArrayList<HousePart> trees = new ArrayList<HousePart>();
+		for (final HousePart part : parts)
+			if (part instanceof Tree && !part.isFrozen())
+				trees.add(part);
+		if (trees.isEmpty())
+			return;
+		for (final HousePart part : trees)
+			remove(part, false);
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(trees));
+		edited = true;
+	}
+
 	public void removeAllRoofs() {
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
 		final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
 		for (final HousePart part : parts)
 			if (part instanceof Roof && !part.isFrozen())
 				roofs.add(part);
-
+		if (roofs.isEmpty())
+			return;
 		for (final HousePart part : roofs)
 			remove(part, false);
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(roofs));
+		edited = true;
+	}
+
+	public void removeAllSolarPanels() {
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all solar panels?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : parts) {
+				if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation)
+					panels.add(part);
+			}
+		} else {
+			for (final HousePart part : parts) {
+				if (part instanceof SolarPanel && !part.isFrozen())
+					panels.add(part);
+			}
+		}
+		if (panels.isEmpty())
+			return;
+		for (final HousePart part : panels) {
+			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(panels));
+		edited = true;
+	}
+
+	public void removeAllWindows() {
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all windows?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		final ArrayList<HousePart> windows = new ArrayList<HousePart>();
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : parts) {
+				if (part instanceof Window && !part.isFrozen() && part.getTopContainer() == foundation)
+					windows.add(part);
+			}
+		} else {
+			for (final HousePart part : parts) {
+				if (part instanceof Window && !part.isFrozen())
+					windows.add(part);
+			}
+		}
+		if (windows.isEmpty())
+			return;
+		for (final HousePart part : windows) {
+			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(windows));
+		edited = true;
 	}
 
 	public static boolean isRedrawAll() {

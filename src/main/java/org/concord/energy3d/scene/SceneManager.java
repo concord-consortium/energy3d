@@ -145,7 +145,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_MAPLE, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_LINDEN, DRAW_MAPLE, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
 	}
 
 	public enum CameraMode {
@@ -1004,6 +1004,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (operation == Operation.DRAW_OAK) {
 			drawn = new Tree(Tree.OAK);
 			setGridsVisible(true);
+		} else if (operation == Operation.DRAW_LINDEN) {
+			drawn = new Tree(Tree.LINDEN);
+			setGridsVisible(true);
 		} else if (operation == Operation.DRAW_MAPLE) {
 			drawn = new Tree(Tree.MAPLE);
 			setGridsVisible(true);
@@ -1256,7 +1259,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		mouseState = null;
 
 		Component canvasComponent = (Component) canvas;
-		if (operation == Operation.SELECT) {
+		if (operation == Operation.SELECT && !zoomLock) {
 			if (hoveredHousePart instanceof Foundation || hoveredHousePart instanceof SolarPanel || hoveredHousePart instanceof Sensor || hoveredHousePart instanceof Window || hoveredHousePart instanceof Tree || hoveredHousePart instanceof Human) {
 				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 			} else {
@@ -1413,7 +1416,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 						if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
 							selectedHousePart.setEditPointsVisible(true);
-							if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedHousePart instanceof Window || selectedHousePart instanceof Tree) {
+							if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedHousePart instanceof Window || selectedHousePart instanceof Tree || selectedHousePart instanceof Foundation) {
 								selectedHousePart.setGridsVisible(true);
 								if (selectedHousePart instanceof Foundation)
 									editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart, !pick.isEditPoint());
@@ -1732,6 +1735,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			pasteMouseState = null;
 		}
 		return null;
+	}
+
+	public void computeEnergyView(boolean b) {
+		setHeatFluxDaily(true);
+		setSolarHeatMap(b);
+		setHeatFluxVectorsVisible(b);
+		((Component) canvas).requestFocusInWindow();
 	}
 
 }

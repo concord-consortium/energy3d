@@ -190,7 +190,7 @@ public class SolarRadiation {
 				for (final Spatial spatial : collidables)
 					PickingUtil.findPick(spatial, pickRay, pickResults, false);
 				if (pickResults.getNumber() == 0)
-					data.dailySolarIntensity[row][col] += radiation * absorption;
+					data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? radiation * absorption : radiation;
 			}
 		}
 	}
@@ -208,14 +208,12 @@ public class SolarRadiation {
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
-		double directRadiation = 0;
-		if (dot > 0)
-			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
+		double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
-		final float absorption = Scene.getInstance().getOnlyAbsorptionInSolarMap() ? (housePart instanceof Window ? 1 : 1 - housePart.getAlbedo()) : 1;
+		final float absorption = housePart instanceof Window ? 1 : 1 - housePart.getAlbedo(); // a window itself doesn't really absorb solar energy, but it passes the energy into the house to be absorbed
 
 		if (housePart instanceof Roof) { // for now, only store this for roofs that have different meshes
 			if (data.solarPotential == null)
@@ -240,7 +238,7 @@ public class SolarRadiation {
 					h = solarStep;
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
-				double radiation = indirectRadiation;
+				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {
 					boolean collision = false;
 					for (final Spatial spatial : collidables) {
@@ -255,7 +253,7 @@ public class SolarRadiation {
 					if (!collision)
 						radiation += directRadiation;
 				}
-				data.dailySolarIntensity[row][col] += absorption * radiation;
+				data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? absorption * radiation : radiation;
 				if (data.solarPotential != null)
 					data.solarPotential[minute / timeStep] += absorption * radiation * w * h * scaleFactor;
 				housePart.getSolarPotential()[minute / timeStep] += absorption * radiation * w * h * scaleFactor;
@@ -302,7 +300,7 @@ public class SolarRadiation {
 				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(point).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
-				double radiation = indirectRadiation;
+				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {
 					boolean collision = false;
 					for (final Spatial spatial : collidables) {
@@ -325,6 +323,7 @@ public class SolarRadiation {
 				else if (housePart instanceof Sensor)
 					area = Sensor.WIDTH * Sensor.HEIGHT;
 				housePart.getSolarPotential()[minute / timeStep] += radiation * area / 240.0 * timeStep;
+				// ABOVE: 4x60: 4 is to get the 1/4 area of the 2x2 grid; 60 is to convert the unit of timeStep from minute to kWh
 
 			}
 
