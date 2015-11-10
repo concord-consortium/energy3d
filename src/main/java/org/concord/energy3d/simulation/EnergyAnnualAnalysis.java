@@ -171,12 +171,15 @@ public class EnergyAnnualAnalysis extends Analysis {
 
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
+		int cost = -1;
 		if (selectedPart != null) {
+			cost = Cost.getInstance().getPartCost(selectedPart);
 			if (graph.type == Graph.SENSOR) {
 				SceneManager.getInstance().setSelectedPart(null);
 			} else {
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				if (selectedPart instanceof Foundation) {
+					cost = Cost.getInstance().getTotalCost();
 					s = s.replaceAll("Foundation", "Building");
 					if (selectedPart.getChildren().isEmpty()) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
@@ -192,7 +195,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 				}
 			}
 		}
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s, true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Construction cost: $" + cost + ")", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		final JMenuBar menuBar = new JMenuBar();

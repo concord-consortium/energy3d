@@ -38,6 +38,7 @@ public class Tree extends HousePart {
 	public static final int OAK = 4;
 	public static final int LINDEN = 5;
 	public static final int COTTONWOOD = 6;
+	private double treeWidth, treeHeight;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
 	private transient Mesh crown;
@@ -55,41 +56,40 @@ public class Tree extends HousePart {
 	protected void init() {
 		super.init();
 
-		final double width, height;
 		switch (treeType) {
 		case COTTONWOOD:
-			width = 80;
-			height = 100;
+			treeWidth = 80;
+			treeHeight = 100;
 			break;
 		case LINDEN:
-			width = 80;
-			height = 100;
+			treeWidth = 90;
+			treeHeight = 120;
 			break;
 		case OAK:
-			width = 70;
-			height = 80;
+			treeWidth = 70;
+			treeHeight = 80;
 			break;
 		case ELM:
-			width = 60;
-			height = 75;
+			treeWidth = 60;
+			treeHeight = 75;
 			break;
 		case MAPLE:
-			width = 30;
-			height = 60;
+			treeWidth = 30;
+			treeHeight = 60;
 			break;
 		case PINE:
-			width = 30;
-			height = 80;
+			treeWidth = 30;
+			treeHeight = 80;
 			break;
 		default:
-			width = 30;
-			height = 40;
+			treeWidth = 30;
+			treeHeight = 40;
 		}
-		mesh = new Quad("Tree Quad", width, height);
+		mesh = new Quad("Tree Quad", treeWidth, treeHeight);
 		mesh.setModelBound(new BoundingBox());
 		mesh.updateModelBound();
 		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-		mesh.setTranslation(0, 0, height / 2.0);
+		mesh.setTranslation(0, 0, treeHeight / 2.0);
 		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 
 		final BlendState bs = new BlendState();
@@ -121,14 +121,14 @@ public class Tree extends HousePart {
 
 		switch (treeType) {
 		case COTTONWOOD:
-			crown.setScale(3, 3, 3.2);
+			crown.setScale(3, 3, 3.5);
 			crown.setTranslation(0, 0, 55);
-			trunk.setScale(5, 5, 2);
+			trunk.setScale(8, 8, 2);
 			trunk.setTranslation(0, 0, 20);
 			break;
 		case LINDEN:
-			crown.setScale(3, 3, 3.2);
-			crown.setTranslation(0, 0, 55);
+			crown.setScale(3.5, 3.5, 4);
+			crown.setTranslation(0, 0, 65);
 			trunk.setScale(5, 5, 2);
 			trunk.setTranslation(0, 0, 20);
 			break;
@@ -176,6 +176,14 @@ public class Tree extends HousePart {
 
 		updateTextureAndColor();
 
+	}
+
+	public double getHeight() {
+		return treeHeight;
+	}
+
+	public double getWidth() {
+		return treeWidth;
 	}
 
 	public void setShowPolygons(boolean showPolygons) {

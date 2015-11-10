@@ -152,12 +152,8 @@ public class EnergyAngularAnalysis extends Analysis {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), title + ": " + s, true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), title + ": " + s + " (Construction cost: $" + Cost.getInstance().getTotalCost() + ")", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		// if (GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isWindowTranslucencySupported(TRANSLUCENT)) {
-		// dialog.setUndecorated(true);
-		// dialog.setOpacity(System.getProperty("os.name").startsWith("Mac") ? 0.5f : 0.75f);
-		// }
 
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);

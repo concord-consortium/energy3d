@@ -78,7 +78,7 @@ public class Cost {
 		return sum;
 	}
 
-	private int getPartCost(final HousePart part) {
+	public int getPartCost(final HousePart part) {
 		if (part instanceof Wall) {
 			double uFactor = part.getUFactor();
 			if (uFactor == 0)

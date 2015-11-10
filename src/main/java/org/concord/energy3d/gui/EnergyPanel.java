@@ -1229,6 +1229,12 @@ public class EnergyPanel extends JPanel {
 			partProperty3Label.setText("Insolation:");
 			partPropertiesPanel.remove(partProperty4Label);
 			partPropertiesPanel.remove(partProperty4TextField);
+		} else if (selectedPart instanceof Tree) {
+			partProperty1Label.setText("Spread:");
+			partProperty2Label.setText("Height:");
+			partProperty3Label.setText("Species:");
+			partPropertiesPanel.remove(partProperty4Label);
+			partPropertiesPanel.remove(partProperty4TextField);
 		} else if (selectedPart instanceof Sensor) {
 			partProperty1Label.setText("X:");
 			partProperty2Label.setText("Y:");
@@ -1260,7 +1266,7 @@ public class EnergyPanel extends JPanel {
 				partProperty3TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
 		}
 
-		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof Tree || selectedPart instanceof Human)) {
+		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof Human)) {
 			if (selectedPart instanceof SolarPanel) {
 				partProperty1TextField.setText(twoDecimals.format(SolarPanel.WIDTH));
 				partProperty2TextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
@@ -1269,6 +1275,11 @@ public class EnergyPanel extends JPanel {
 				partProperty1TextField.setText(twoDecimals.format(v.getX() * Scene.getInstance().getAnnotationScale()));
 				partProperty2TextField.setText(twoDecimals.format(v.getY() * Scene.getInstance().getAnnotationScale()));
 				partProperty3TextField.setText(twoDecimals.format(v.getZ() * Scene.getInstance().getAnnotationScale()));
+			} else if (selectedPart instanceof Tree) {
+				Tree tree = (Tree) selectedPart;
+				partProperty1TextField.setText(twoDecimals.format(tree.getWidth() * Scene.getInstance().getAnnotationScale()));
+				partProperty2TextField.setText(twoDecimals.format(tree.getHeight() * Scene.getInstance().getAnnotationScale()));
+				partProperty3TextField.setText(tree.getTreeName());
 			} else {
 				partProperty1TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale()));
 				partProperty2TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale()));
