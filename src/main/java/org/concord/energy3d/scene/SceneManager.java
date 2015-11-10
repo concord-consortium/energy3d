@@ -145,7 +145,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_LINDEN, DRAW_MAPLE, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_LINDEN, DRAW_MAPLE, DRAW_COTTONWOOD, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
 	}
 
 	public enum CameraMode {
@@ -1006,6 +1006,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			setGridsVisible(true);
 		} else if (operation == Operation.DRAW_LINDEN) {
 			drawn = new Tree(Tree.LINDEN);
+			setGridsVisible(true);
+		} else if (operation == Operation.DRAW_COTTONWOOD) {
+			drawn = new Tree(Tree.COTTONWOOD);
 			setGridsVisible(true);
 		} else if (operation == Operation.DRAW_MAPLE) {
 			drawn = new Tree(Tree.MAPLE);

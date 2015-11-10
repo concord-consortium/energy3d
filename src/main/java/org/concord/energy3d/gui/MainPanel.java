@@ -194,7 +194,8 @@ public class MainPanel extends JPanel {
 		final JCheckBoxMenuItem miTree3 = new JCheckBoxMenuItem("Elm (Deciduous, Height=15m)", new ImageIcon(getClass().getResource("icons/elm.png")));
 		final JCheckBoxMenuItem miTree4 = new JCheckBoxMenuItem("Oak (Deciduous, Height=16m)", new ImageIcon(getClass().getResource("icons/oak.png")));
 		final JCheckBoxMenuItem miTree5 = new JCheckBoxMenuItem("Linden (Deciduous, Height=20m)", new ImageIcon(getClass().getResource("icons/linden.png")));
-		final JCheckBoxMenuItem miTree6 = new JCheckBoxMenuItem("Pine (Evergreen, Height=16m)", new ImageIcon(getClass().getResource("icons/pine.png")));
+		final JCheckBoxMenuItem miTree6 = new JCheckBoxMenuItem("Cottonwood (Deciduous, Height=20m)", new ImageIcon(getClass().getResource("icons/cottonwood.png")));
+		final JCheckBoxMenuItem miTree7 = new JCheckBoxMenuItem("Pine (Evergreen, Height=16m)", new ImageIcon(getClass().getResource("icons/pine.png")));
 		final ActionListener treeAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -215,6 +216,9 @@ public class MainPanel extends JPanel {
 				} else if (selected == miTree5) {
 					treeCommand = SceneManager.Operation.DRAW_LINDEN;
 					treeButton.setToolTipText("Insert a linden tree (deciduous, height=20m)");
+				} else if (selected == miTree6) {
+					treeCommand = SceneManager.Operation.DRAW_COTTONWOOD;
+					treeButton.setToolTipText("Insert a cottonwood tree (deciduous, height=20m)");
 				} else {
 					treeCommand = SceneManager.Operation.DRAW_PINE;
 					treeButton.setToolTipText("Insert a pine tree (evergreen, height=16m)");
@@ -230,6 +234,7 @@ public class MainPanel extends JPanel {
 		miTree4.addActionListener(treeAction);
 		miTree5.addActionListener(treeAction);
 		miTree6.addActionListener(treeAction);
+		miTree7.addActionListener(treeAction);
 		treeMenu = new JPopupMenu();
 		treeMenu.add(miTree1);
 		treeMenu.add(miTree2);
@@ -237,6 +242,7 @@ public class MainPanel extends JPanel {
 		treeMenu.add(miTree4);
 		treeMenu.add(miTree5);
 		treeMenu.add(miTree6);
+		treeMenu.add(miTree7);
 		bg = new ButtonGroup();
 		bg.add(miTree1);
 		bg.add(miTree2);
@@ -244,6 +250,7 @@ public class MainPanel extends JPanel {
 		bg.add(miTree4);
 		bg.add(miTree5);
 		bg.add(miTree6);
+		bg.add(miTree7);
 
 		// create misc menu
 		final JCheckBoxMenuItem miDoor = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
