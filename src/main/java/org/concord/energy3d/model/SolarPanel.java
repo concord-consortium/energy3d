@@ -99,11 +99,9 @@ public class SolarPanel extends HousePart {
 		}
 	}
 
-	@Override
-	protected void drawMesh() {
+	private void computeNormal() {
 		if (container == null)
 			return;
-
 		if (container instanceof Roof) {
 			final PickResults pickResults = new PrimitivePickResults();
 			final Ray3 ray = new Ray3(getAbsPoint(0).addLocal(0, 0, 1000), Vector3.NEG_UNIT_Z);
@@ -116,12 +114,19 @@ public class SolarPanel extends HousePart {
 				final int roofPartIndex = userData.getIndex();
 				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
 			}
-		} else
+		} else {
 			normal = container.getNormal();
-
+		}
 		if (normal == null)
 			normal = Vector3.UNIT_Z;
+	}
 
+	@Override
+	protected void drawMesh() {
+		if (container == null)
+			return;
+
+		computeNormal();
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
@@ -244,8 +249,10 @@ public class SolarPanel extends HousePart {
 	public HousePart copy(boolean check) {
 		SolarPanel c = (SolarPanel) super.copy(false);
 		if (check) {
+			c.computeNormal();
 			if (container instanceof Roof) {
 				if (normal == null) {
+					// don't remove this error message just in case this happens again
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Normal of solar panel [" + c + "] is null. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}

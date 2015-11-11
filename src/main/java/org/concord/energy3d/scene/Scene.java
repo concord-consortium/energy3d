@@ -133,7 +133,7 @@ public class Scene implements Serializable {
 	private double groundThermalDiffusivity = 0.01; // unit: m^2/s
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
-	private boolean fullEnergyInSolarMap = false;
+	private boolean fullEnergyInSolarMap = true;
 	private int insideTemperature = 20;
 	private HousePart copyBuffer, originalCopy;
 
