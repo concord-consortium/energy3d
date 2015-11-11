@@ -251,7 +251,7 @@ public class SolarPanel extends HousePart {
 		tolerance *= WIDTH / Scene.getInstance().getAnnotationScale();
 		Vector3 center = getAbsCenter();
 		for (HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof SolarPanel && p.getContainer() == container) {
+			if (p instanceof SolarPanel && p != this && p.getContainer() == container) {
 				if (p.getAbsCenter().distance(center) < tolerance)
 					return true;
 			}
@@ -297,6 +297,10 @@ public class SolarPanel extends HousePart {
 				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
 					return null;
 				c.points.get(0).setX(newX);
+				if (c.overlap(0.1)) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new solar panel is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
+					return null;
+				}
 			}
 		}
 		return c;

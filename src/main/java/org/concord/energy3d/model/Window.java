@@ -4,6 +4,9 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
@@ -337,6 +340,7 @@ public class Window extends HousePart {
 
 		draw();
 		container.draw();
+
 	}
 
 	public void setStyle(final int style) {
@@ -399,6 +403,19 @@ public class Window extends HousePart {
 		return true;
 	}
 
+	/** tolerance is a fraction relative to the width of a solar panel */
+	private boolean overlap(double tolerance) {
+		tolerance *= getAbsPoint(0).distance(getAbsPoint(2));
+		Vector3 center = getAbsCenter();
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Window && p != this && p.getContainer() == container) {
+				if (p.getAbsCenter().distance(center) < tolerance)
+					return true;
+			}
+		}
+		return false;
+	}
+
 	public HousePart copy(boolean check) {
 		Window c = (Window) super.copy(false);
 		if (check) {
@@ -412,6 +429,10 @@ public class Window extends HousePart {
 			}
 			for (int i = 0; i < n; i++) {
 				c.points.get(i).setX(points.get(i).getX() + shift);
+			}
+			if (c.overlap(0.1)) {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new window is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
+				return null;
 			}
 		}
 		return c;
