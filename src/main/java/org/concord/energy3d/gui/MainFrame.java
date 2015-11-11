@@ -1352,6 +1352,10 @@ public class MainFrame extends JFrame {
 				@Override
 				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().refresh();
+					// enable the cut-copy-paste menu items when the menu disappears, otherwise the keystrokes will be disabled with the menu items
+					cutMenuItem.setEnabled(true);
+					copyMenuItem.setEnabled(true);
+					pasteMenuItem.setEnabled(true);
 				}
 
 				@Override
