@@ -161,7 +161,6 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem snapMenuItem;
 	private JCheckBoxMenuItem gridsMenuItem;
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
-	private JMenuItem roofOverhangLengthMenuItem;
 	private JRadioButtonMenuItem noTextureMenuItem;
 	private JRadioButtonMenuItem simpleTextureMenuItem;
 	private JRadioButtonMenuItem fullTextureMenuItem;
@@ -1396,7 +1395,6 @@ public class MainFrame extends JFrame {
 				editMenu.add(getAutoRecomputeEnergyMenuItem());
 			}
 			editMenu.addSeparator();
-			editMenu.add(getRoofOverhangLengthMenuItem());
 			editMenu.add(getRemoveAllWindowsMenuItem());
 			editMenu.add(getRemoveAllSolarPanelsMenuItem());
 			editMenu.add(getRemoveAllTreesMenuItem());
@@ -1680,46 +1678,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return topViewCheckBoxMenuItem;
-	}
-
-	private JMenuItem getRoofOverhangLengthMenuItem() {
-		if (roofOverhangLengthMenuItem == null) {
-			roofOverhangLengthMenuItem = new JMenuItem("Roof Overhang Length...");
-			roofOverhangLengthMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					while (true) {
-						SceneManager.getInstance().refresh(1);
-						final String newValue = JOptionPane.showInputDialog(MainFrame.this, "What is the length of roof overhang?", Scene.getInstance().getOverhangLength() * Scene.getInstance().getAnnotationScale());
-						if (newValue == null)
-							break;
-						else {
-							try {
-								final double val = Double.parseDouble(newValue);
-								if (val < 0 || val > 5)
-									JOptionPane.showMessageDialog(MainFrame.this, "Overhang value must be between 0 and 5.", "Error", JOptionPane.ERROR_MESSAGE);
-								else {
-									Scene.getInstance().setOverhangLength(val / Scene.getInstance().getAnnotationScale());
-									Scene.getInstance().redrawAll();
-									EventQueue.invokeLater(new Runnable() {
-										@Override
-										public void run() {
-											MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-										}
-									});
-									Scene.getInstance().setEdited(true);
-									break;
-								}
-							} catch (final NumberFormatException e1) {
-								e1.printStackTrace();
-								JOptionPane.showMessageDialog(MainFrame.this, "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-							}
-						}
-					}
-				}
-			});
-		}
-		return roofOverhangLengthMenuItem;
 	}
 
 	public JRadioButtonMenuItem getNoTextureMenuItem() {

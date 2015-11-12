@@ -74,7 +74,6 @@ public class Scene implements Serializable {
 
 	public static final ReadOnlyColorRGBA WHITE = ColorRGBA.WHITE;
 	public static final ReadOnlyColorRGBA GRAY = ColorRGBA.LIGHT_GRAY;
-	public static final double OVERHANG_MIN = 0.01;
 
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
@@ -97,7 +96,6 @@ public class Scene implements Serializable {
 	private ReadOnlyColorRGBA doorColor;
 	private ReadOnlyColorRGBA floorColor;
 	private ReadOnlyColorRGBA roofColor;
-	private double overhangLength = 2.0;
 	private double annotationScale = 0.2;
 	private int version = currentVersion;
 	private boolean isAnnotationsVisible = true;
@@ -201,6 +199,7 @@ public class Scene implements Serializable {
 				initSceneNow();
 				instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
 				initEnergy();
+				instance.redrawAll(); // need to call this to at least redraw the overhangs
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				EnergyPanel.getInstance().update();
 				EventQueue.invokeLater(new Runnable() {
@@ -338,7 +337,16 @@ public class Scene implements Serializable {
 			instance.insideTemperature = 20;
 		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.insideTemperature);
 
-		// TODO: Remove this backward compatibility soon
+		for (final HousePart p : instance.parts) {
+			if (p instanceof Roof) {
+				final Roof r = (Roof) p;
+				if (r.getOverhangLength() < Roof.OVERHANG_MIN)
+					r.setOverhangLength(2);
+			}
+		}
+
+		// TODO: Remove the following checks for backward compatibility soon (perhaps the end of 2016)
+
 		if (instance.windowUFactor != null) {
 			final double defaultWindowUFactor = parsePropertyString(instance.windowUFactor);
 			for (final HousePart p : instance.parts) {
@@ -507,7 +515,11 @@ public class Scene implements Serializable {
 	private void upgradeSceneToNewVersion() {
 		if (textureMode == null) {
 			textureMode = TextureMode.Full;
-			overhangLength = 0.2;
+			for (HousePart p : parts) {
+				if (p instanceof Roof) {
+					((Roof) p).setOverhangLength(0.2);
+				}
+			}
 		}
 
 		if (version < 1) {
@@ -515,7 +527,7 @@ public class Scene implements Serializable {
 				if (part instanceof Foundation)
 					((Foundation) part).scaleHouse(10);
 			cameraLocation = cameraLocation.multiply(10, null);
-			setOverhangLength(getOverhangLength() * 10);
+			// setOverhangLength(getOverhangLength() * 10);
 			setAnnotationScale(1.0);
 		}
 
@@ -1062,16 +1074,6 @@ public class Scene implements Serializable {
 		for (final HousePart part : parts)
 			if (part instanceof Roof)
 				((Roof) part).removeAllGables();
-	}
-
-	public double getOverhangLength() {
-		if (overhangLength < OVERHANG_MIN)
-			return OVERHANG_MIN;
-		return overhangLength;
-	}
-
-	public void setOverhangLength(final double overhangLength) {
-		this.overhangLength = overhangLength;
 	}
 
 	/** get the default color for foundations */

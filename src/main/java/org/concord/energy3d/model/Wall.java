@@ -540,9 +540,9 @@ public class Wall extends HousePart {
 		final PickResults pickResults = new PrimitivePickResults();
 		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ()), direction), pickResults, false);
 		if (pickResults.getNumber() > 0) {
-			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(Scene.getInstance().getOverhangLength() > 0.05 ? offset : 0, null), null);
-		} else
-			return p;
+			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
+		}
+		return p;
 	}
 
 	public boolean isPerpendicularToNeighbor(final int neighbor) {

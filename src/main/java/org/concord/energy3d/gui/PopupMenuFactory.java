@@ -1,5 +1,6 @@
 package org.concord.energy3d.gui;
 
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -13,6 +14,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
@@ -400,6 +402,46 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miOverhang = new JMenuItem("Overhang Length...");
+			miOverhang.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Roof))
+						return;
+					final Roof roof = (Roof) selectedPart;
+					while (true) {
+						SceneManager.getInstance().refresh(1);
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "What is the length of roof overhang?", roof.getOverhangLength() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								double min = Roof.OVERHANG_MIN * Scene.getInstance().getAnnotationScale();
+								if (val < min || val > 5) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Overhang value must be between " + min + " and 5.", "Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
+									Scene.getInstance().redrawAll();
+									EventQueue.invokeLater(new Runnable() {
+										@Override
+										public void run() {
+											MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+										}
+									});
+									Scene.getInstance().setEdited(true);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								exception.printStackTrace();
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
 			popupMenuForRoof = createPopupMenu(false, new Runnable() {
 				@Override
 				public void run() {
@@ -410,6 +452,7 @@ public class PopupMenuFactory {
 
 			popupMenuForRoof.add(miPaste);
 			popupMenuForRoof.addSeparator();
+			popupMenuForRoof.add(miOverhang);
 			popupMenuForRoof.add(colorAction);
 			popupMenuForRoof.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_ROOF, CHANGE_U_FACTOR));
 			popupMenuForRoof.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF, CHANGE_VOLUMETRIC_HEAT_CAPACITY));

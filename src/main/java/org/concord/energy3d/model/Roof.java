@@ -53,7 +53,10 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class Roof extends HousePart {
+
 	private static final long serialVersionUID = 1L;
+	public static final double OVERHANG_MIN = 0.01;
+
 	protected transient Node roofPartsRoot;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
@@ -64,6 +67,7 @@ public abstract class Roof extends HousePart {
 	private transient List<ReadOnlyVector3> wallUpperPointsWithoutOverhang;
 	private transient HousePart previousContainer;
 	protected Map<Integer, List<Wall>> gableEditPointToWallMap = null;
+	private double overhangLength = 2.0;
 
 	protected class EditState {
 		final boolean fitTestRequired;
@@ -587,7 +591,7 @@ public abstract class Roof extends HousePart {
 
 	private void applyOverhang(final List<ReadOnlyVector3> wallUpperPoints, final List<ReadOnlyVector3> wallNormals) {
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
-			final Vector3 overhang = wallNormals.get(i).multiply(Scene.getInstance().getOverhangLength(), null);
+			final Vector3 overhang = wallNormals.get(i).multiply(overhangLength, null);
 			wallUpperPoints.set(i, overhang.addLocal(wallUpperPoints.get(i)));
 		}
 	}
@@ -783,7 +787,7 @@ public abstract class Roof extends HousePart {
 	}
 
 	public boolean isSameBasePoints(final ReadOnlyVector3 a1, final ReadOnlyVector3 a2, final ReadOnlyVector3 b1, final ReadOnlyVector3 b2) {
-		final double maxOverhangDistance = MathUtils.sqrt(2 * Scene.getInstance().getOverhangLength() * Scene.getInstance().getOverhangLength()) * 2;
+		final double maxOverhangDistance = MathUtils.sqrt(2 * overhangLength * overhangLength) * 2;
 		final Vector2 p1a = new Vector2(a1.getX(), a1.getY());
 		final Vector2 p1b = new Vector2(a2.getX(), a2.getY());
 		final Vector2 p2a = new Vector2(b1.getX(), b1.getY());
@@ -993,7 +997,7 @@ public abstract class Roof extends HousePart {
 			final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
 			final FloatBuffer vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
 			final Vector3 p = new Vector3();
-			if (Scene.getInstance().getOverhangLength() <= Scene.OVERHANG_MIN) {
+			if (overhangLength <= OVERHANG_MIN) {
 				final double area = Util.computeArea(roofPartMesh);
 				areaByPart.put(roofPartMesh, area);
 				this.area += area;
@@ -1165,6 +1169,14 @@ public abstract class Roof extends HousePart {
 
 	public boolean isCopyable() {
 		return false;
+	}
+
+	public double getOverhangLength() {
+		return overhangLength;
+	}
+
+	public void setOverhangLength(final double overhangLength) {
+		this.overhangLength = overhangLength;
 	}
 
 }
