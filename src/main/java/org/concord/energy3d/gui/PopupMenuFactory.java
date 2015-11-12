@@ -39,6 +39,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.ChangePartVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.util.Config;
@@ -422,6 +423,7 @@ public class PopupMenuFactory {
 								if (val < min || val > 5) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Overhang value must be between " + min + " and 5.", "Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									SceneManager.getInstance().getUndoManager().addEdit(new ChangeRoofOverhangCommand(roof));
 									roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
 									Scene.getInstance().redrawAll();
 									EventQueue.invokeLater(new Runnable() {

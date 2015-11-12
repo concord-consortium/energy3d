@@ -60,6 +60,7 @@ import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.ChangePartVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
@@ -220,6 +221,10 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				ChangeSolarPanelEfficiencyCommand c = (ChangeSolarPanelEfficiencyCommand) lastEdit;
 				SolarPanel sp = c.getSolarPanel();
 				stateValue = "{\"Building\":" + sp.getTopContainer().getId() + ", \"ID\":" + sp.getId() + ", \"Value\": " + sp.getEfficiency() + "}";
+			} else if (lastEdit instanceof ChangeRoofOverhangCommand) {
+				ChangeRoofOverhangCommand c = (ChangeRoofOverhangCommand) lastEdit;
+				Roof r = c.getRoof();
+				stateValue = "{\"Building\":" + r.getTopContainer().getId() + ", \"ID\":" + r.getId() + ", \"Value\": " + r.getOverhangLength() * Scene.getInstance().getAnnotationScale() + "}";
 			} else if (lastEdit instanceof ChangeBuildingSolarPanelEfficiencyCommand) {
 				ChangeBuildingSolarPanelEfficiencyCommand c = (ChangeBuildingSolarPanelEfficiencyCommand) lastEdit;
 				stateValue = "{\"Building\":" + c.getFoundation().getId() + ", \"Value\": " + Scene.getInstance().getSolarPanelEfficiencyForWholeBuilding(c.getFoundation()) + "}";
