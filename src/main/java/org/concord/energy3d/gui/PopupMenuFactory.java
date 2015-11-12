@@ -37,6 +37,8 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.HeatLoad;
+import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
+import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.ChangePartVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
@@ -69,7 +71,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForLand;
 	private static JPopupMenu popupMenuForSky;
 
-	private static Action colorAction = new AbstractAction("Color") {
+	private static Action colorAction = new AbstractAction("Color...") {
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -120,6 +122,60 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miAlbedo = new JMenuItem("Albedo...");
+			miAlbedo.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Background Albedo (dimensionless [0, 1])", Scene.getInstance().getBackgroundAlbedo());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < 0 || val > 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Albedo value must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									SceneManager.getInstance().getUndoManager().addEdit(new ChangeBackgroundAlbedoCommand());
+									Scene.getInstance().setBackgroundAlbedo(val);
+									Scene.getInstance().setEdited(true);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miThermalDiffusivity = new JMenuItem("Ground Thermal Diffusivity...");
+			miThermalDiffusivity.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "<html>Ground Thermal Diffusivity (m<sup>2</sup>/s)</html>", Scene.getInstance().getGroundThermalDiffusivity());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Ground thermal diffusivity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									SceneManager.getInstance().getUndoManager().addEdit(new ChangeGroundThermalDiffusivityCommand());
+									Scene.getInstance().setGroundThermalDiffusivity(val);
+									Scene.getInstance().setEdited(true);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
 			popupMenuForLand = new JPopupMenu();
 			popupMenuForLand.setInvoker(MainPanel.getInstance().getCanvasPanel());
 			popupMenuForLand.addPopupMenuListener(new PopupMenuListener() {
@@ -142,6 +198,8 @@ public class PopupMenuFactory {
 
 			popupMenuForLand.add(miInfo);
 			popupMenuForLand.add(miPaste);
+			popupMenuForLand.add(miAlbedo);
+			popupMenuForLand.add(miThermalDiffusivity);
 
 		}
 
@@ -413,7 +471,7 @@ public class PopupMenuFactory {
 					final Roof roof = (Roof) selectedPart;
 					while (true) {
 						SceneManager.getInstance().refresh(1);
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "What is the length of roof overhang?", roof.getOverhangLength() * Scene.getInstance().getAnnotationScale());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Overhang Length (m)", roof.getOverhangLength() * Scene.getInstance().getAnnotationScale());
 						if (newValue == null)
 							break;
 						else {

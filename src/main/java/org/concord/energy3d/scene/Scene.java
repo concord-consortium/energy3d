@@ -961,13 +961,15 @@ public class Scene implements Serializable {
 	}
 
 	public void removeAllTrees() {
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all trees?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
-			return;
 		final ArrayList<HousePart> trees = new ArrayList<HousePart>();
 		for (final HousePart part : parts)
 			if (part instanceof Tree && !part.isFrozen())
 				trees.add(part);
-		if (trees.isEmpty())
+		if (trees.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no tree to remove.", "No Tree", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + trees.size() + " trees?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
 		for (final HousePart part : trees)
 			remove(part, false);
@@ -977,13 +979,15 @@ public class Scene implements Serializable {
 	}
 
 	public void removeAllRoofs() {
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
-			return;
 		final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
 		for (final HousePart part : parts)
 			if (part instanceof Roof && !part.isFrozen())
 				roofs.add(part);
-		if (roofs.isEmpty())
+		if (roofs.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no roof to remove.", "No Roof", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + roofs.size() + " roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
 		for (final HousePart part : roofs)
 			remove(part, false);
@@ -993,8 +997,6 @@ public class Scene implements Serializable {
 	}
 
 	public void removeAllSolarPanels() {
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all solar panels?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
-			return;
 		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null) {
@@ -1009,7 +1011,11 @@ public class Scene implements Serializable {
 					panels.add(part);
 			}
 		}
-		if (panels.isEmpty())
+		if (panels.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel to remove.", "No Solar Panel", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + panels.size() + " solar panels" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
 		for (final HousePart part : panels) {
 			remove(part, false);
@@ -1020,8 +1026,6 @@ public class Scene implements Serializable {
 	}
 
 	public void removeAllWindows() {
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all windows?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
-			return;
 		final ArrayList<HousePart> windows = new ArrayList<HousePart>();
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null) {
@@ -1036,7 +1040,11 @@ public class Scene implements Serializable {
 					windows.add(part);
 			}
 		}
-		if (windows.isEmpty())
+		if (windows.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no window to remove.", "No Window", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + windows.size() + " windows" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
 		for (final HousePart part : windows) {
 			remove(part, false);
