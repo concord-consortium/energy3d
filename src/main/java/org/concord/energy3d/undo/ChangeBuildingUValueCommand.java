@@ -8,14 +8,14 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager.Operation;
 
-public class ChangeBuildingUFactorCommand extends AbstractUndoableEdit {
+public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double orgUFactor, newUFactor;
 	private Foundation foundation;
 	private Operation operation;
 
-	public ChangeBuildingUFactorCommand(Foundation foundation, Operation operation) {
+	public ChangeBuildingUValueCommand(Foundation foundation, Operation operation) {
 		this.foundation = foundation;
 		this.operation = operation;
 		orgUFactor = Scene.getInstance().getPartUFactorForWholeBuilding(foundation, operation);

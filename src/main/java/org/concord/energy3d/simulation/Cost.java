@@ -80,7 +80,7 @@ public class Cost {
 
 	public int getPartCost(final HousePart part) {
 		if (part instanceof Wall) {
-			double uFactor = part.getUFactor();
+			double uFactor = ((Wall) part).getUValue();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
 			// According to http://www.homewyse.com/services/cost_to_insulate_your_home.html
@@ -92,7 +92,7 @@ public class Cost {
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Window) {
-			double uFactor = part.getUFactor();
+			double uFactor = ((Window) part).getUValue();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWindowsComboBox());
 			// According to http://www.homewyse.com/costs/cost_of_double_pane_windows.html
@@ -101,7 +101,7 @@ public class Cost {
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Roof) {
-			double uFactor = part.getUFactor();
+			double uFactor = ((Roof) part).getUValue();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
 			// According to http://www.homewyse.com/services/cost_to_insulate_attic.html
@@ -114,7 +114,7 @@ public class Cost {
 		}
 		if (part instanceof Foundation) {
 			Foundation foundation = (Foundation) part;
-			double uFactor = foundation.getUFactor();
+			double uFactor = foundation.getUValue();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getFloorsComboBox());
 			// http://www.homewyse.com/costs/cost_of_floor_insulation.html
@@ -130,7 +130,7 @@ public class Cost {
 			return 0; // the building is incomplete yet, so we can assume the floor insulation isn't there yet
 		}
 		if (part instanceof Door) {
-			double uFactor = part.getUFactor();
+			double uFactor = ((Door) part).getUValue();
 			if (uFactor == 0)
 				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getDoorsComboBox());
 			// According to http://www.homewyse.com/costs/cost_of_exterior_doors.html

@@ -69,7 +69,7 @@ import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Weather;
-import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
+import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
@@ -414,10 +414,10 @@ public class EnergyPanel extends JPanel {
 					final int count = Scene.getInstance().countParts(foundation, Wall.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-values of " + count + " existing walls of<br>the selected building (#" + foundation.getId() + ") to " + wallsComboBox.getSelectedItem() + "?</html>", "U-value of Walls", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_WALL));
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(foundation, Operation.DRAW_WALL));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Wall && p.getTopContainer() == foundation)
-									((Wall) p).setUFactor(uFactor);
+									((Wall) p).setUValue(uFactor);
 							}
 						}
 				}
@@ -460,10 +460,10 @@ public class EnergyPanel extends JPanel {
 					final int count = Scene.getInstance().countParts(foundation, Roof.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-value of the roof<br>of the selected building (#" + foundation.getId() + ") to " + roofsComboBox.getSelectedItem() + "?</html>", "U-value of Roof", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_ROOF_PYRAMID));
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(foundation, Operation.DRAW_ROOF_PYRAMID));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Roof && p.getTopContainer() == foundation)
-									((Roof) p).setUFactor(uFactor);
+									((Roof) p).setUValue(uFactor);
 							}
 						}
 				}
@@ -505,10 +505,10 @@ public class EnergyPanel extends JPanel {
 					final int count = Scene.getInstance().countParts(foundation, Window.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-values of " + count + " existing windows of<br>the selected building (#" + foundation.getId() + ") to " + windowsComboBox.getSelectedItem() + "?</html>", "U-value of Windows", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_WINDOW));
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(foundation, Operation.DRAW_WINDOW));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Window && p.getTopContainer() == foundation)
-									((Window) p).setUFactor(uFactor);
+									((Window) p).setUValue(uFactor);
 							}
 						}
 				}
@@ -554,10 +554,10 @@ public class EnergyPanel extends JPanel {
 					final int count = Scene.getInstance().countParts(foundation, Door.class);
 					if (count > 0)
 						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-values of " + count + " existing doors of<br>the selected building (#" + foundation.getId() + ") to " + doorsComboBox.getSelectedItem() + "?</html>", "U-value of Doors", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_DOOR));
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(foundation, Operation.DRAW_DOOR));
 							for (final HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Door && p.getTopContainer() == foundation)
-									((Door) p).setUFactor(uFactor);
+									((Door) p).setUValue(uFactor);
 							}
 						}
 				}
@@ -597,8 +597,8 @@ public class EnergyPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				final double uFactor = HeatLoad.parseValue(floorsComboBox);
 				if (foundation != null) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUFactorCommand(foundation, Operation.DRAW_FLOOR));
-					foundation.setUFactor(uFactor);
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(foundation, Operation.DRAW_FLOOR));
+					foundation.setUValue(uFactor);
 				}
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				updateCost();
@@ -1045,7 +1045,7 @@ public class EnergyPanel extends JPanel {
 			final int n = wallsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
 				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_WALL[i]);
-				if (Util.isZero(choice - selectedPart.getUFactor())) {
+				if (Util.isZero(choice - ((Wall) selectedPart).getUValue())) {
 					Util.selectSilently(wallsComboBox, i);
 					break;
 				}
@@ -1054,7 +1054,7 @@ public class EnergyPanel extends JPanel {
 			final int n = roofsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
 				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_ROOF[i]);
-				if (Util.isZero(choice - selectedPart.getUFactor())) {
+				if (Util.isZero(choice - ((Roof) selectedPart).getUValue())) {
 					Util.selectSilently(roofsComboBox, i);
 					break;
 				}
@@ -1063,7 +1063,7 @@ public class EnergyPanel extends JPanel {
 			final int n = doorsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
 				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_DOOR[i]);
-				if (Util.isZero(choice - selectedPart.getUFactor())) {
+				if (Util.isZero(choice - ((Door) selectedPart).getUValue())) {
 					Util.selectSilently(doorsComboBox, i);
 					break;
 				}
@@ -1072,7 +1072,7 @@ public class EnergyPanel extends JPanel {
 			final int n = floorsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
 				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_FLOOR[i]);
-				if (Util.isZero(choice - selectedPart.getUFactor())) {
+				if (Util.isZero(choice - ((Foundation) selectedPart).getUValue())) {
 					Util.selectSilently(floorsComboBox, i);
 					break;
 				}
@@ -1081,7 +1081,7 @@ public class EnergyPanel extends JPanel {
 			int n = windowsComboBox.getItemCount();
 			for (int i = 0; i < n; i++) {
 				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_WINDOW[i]);
-				if (Util.isZero(choice - selectedPart.getUFactor())) {
+				if (Util.isZero(choice - ((Window) selectedPart).getUValue())) {
 					Util.selectSilently(windowsComboBox, i);
 					break;
 				}

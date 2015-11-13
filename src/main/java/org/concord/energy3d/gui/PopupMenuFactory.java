@@ -1,23 +1,34 @@
 package org.concord.energy3d.gui;
 
+import java.awt.Component;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.event.PopupMenuEvent;
@@ -37,12 +48,11 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
-import org.concord.energy3d.undo.ChangePartUFactorCommand;
+import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeWallWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
@@ -60,8 +70,11 @@ import org.concord.energy3d.util.Util;
 
 public class PopupMenuFactory {
 
-	private final static int CHANGE_U_FACTOR = 0;
-	private final static int CHANGE_VOLUMETRIC_HEAT_CAPACITY = 1;
+	private static DecimalFormat twoDecimals = new DecimalFormat();
+
+	static {
+		twoDecimals.setMaximumFractionDigits(2);
+	}
 
 	private static JPopupMenu popupMenuForWindow;
 	private static JPopupMenu popupMenuForWall;
@@ -203,6 +216,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForLand.add(miInfo);
+			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miPaste);
 			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miAlbedo);
@@ -359,15 +373,21 @@ public class PopupMenuFactory {
 						return;
 					final Window window = (Window) selectedPart;
 					final String title = "<html>Solar Heat Gain Coefficient (%)</html>";
-					final String footnote = "<html><hr><font size=2>Some reference values:<br><table><tr><td><font size=2>Single glass (clear)</td><td><font size=2>66</td></tr><tr><td><font size=2>Single glass (green tint)</td><td><font size=2>55</td></tr><tr><td><font size=2>Triple glass (air spaces)</td><td><font size=2>39</td></tr></table><hr></html>";
-					final JRadioButton rb1 = new JRadioButton("Apply to only this window", true);
-					final JRadioButton rb2 = new JRadioButton("Apply to all windows on this wall");
-					final JRadioButton rb3 = new JRadioButton("Apply to all windows of this building");
+					final String footnote = "<html><hr><font size=2>Examples:<br><table><tr><td><font size=2>Single glass (clear)</td><td><font size=2>66%</td></tr><tr><td><font size=2>Single glass (green tint)</td><td><font size=2>55%</td></tr><tr><td><font size=2>Triple glass (air spaces)</td><td><font size=2>39%</td></tr></table><hr></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this window", true);
+					final JRadioButton rb2 = new JRadioButton("All windows on this wall");
+					final JRadioButton rb3 = new JRadioButton("All windows of this building");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
 					ButtonGroup bg = new ButtonGroup();
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					Object[] params = { title, footnote, rb1, rb2, rb3 };
+					Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, window.getSolarHeatGainCoefficient());
 						if (newValue == null)
@@ -404,7 +424,7 @@ public class PopupMenuFactory {
 
 			popupMenuForWindow.addSeparator();
 			popupMenuForWindow.add(miShgc);
-			popupMenuForWindow.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_WINDOW, CHANGE_U_FACTOR));
+			popupMenuForWindow.add(createUValueMenuItem(true));
 			popupMenuForWindow.add(muntinMenu);
 
 		}
@@ -437,8 +457,8 @@ public class PopupMenuFactory {
 			popupMenuForWall.add(miPaste);
 			popupMenuForWall.addSeparator();
 			popupMenuForWall.add(colorAction);
+			popupMenuForWall.add(createUValueMenuItem(false));
 			popupMenuForWall.add(createVolumetricHeatCapacityMenuItem());
-			popupMenuForWall.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_WALL, CHANGE_U_FACTOR));
 
 		}
 
@@ -507,8 +527,8 @@ public class PopupMenuFactory {
 			popupMenuForRoof.addSeparator();
 			popupMenuForRoof.add(miOverhang);
 			popupMenuForRoof.add(colorAction);
+			popupMenuForRoof.add(createUValueMenuItem(false));
 			popupMenuForRoof.add(createVolumetricHeatCapacityMenuItem());
-			popupMenuForRoof.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_ROOF, CHANGE_U_FACTOR));
 		}
 
 		return popupMenuForRoof;
@@ -521,8 +541,8 @@ public class PopupMenuFactory {
 			popupMenuForDoor = createPopupMenu(false, null);
 			popupMenuForDoor.addSeparator();
 			popupMenuForDoor.add(colorAction);
+			popupMenuForDoor.add(createUValueMenuItem(true));
 			popupMenuForDoor.add(createVolumetricHeatCapacityMenuItem());
-			popupMenuForDoor.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_DOOR, CHANGE_U_FACTOR));
 		}
 
 		return popupMenuForDoor;
@@ -547,8 +567,8 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
+			popupMenuForFoundation.add(createUValueMenuItem(false));
 			popupMenuForFoundation.add(createVolumetricHeatCapacityMenuItem());
-			popupMenuForFoundation.add(createPropertyMenu("Floor U-Value", EnergyPanel.U_VALUE_CHOICES_FLOOR, CHANGE_U_FACTOR));
 		}
 
 		return popupMenuForFoundation;
@@ -577,13 +597,18 @@ public class PopupMenuFactory {
 						return;
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
 					final String title = "<html>Energy Conversion Efficiency (%)</html>";
-					final String footnote = "<html><hr><font size=2>The Shockley–Queisser limit is 34%, but the theoretical limit for multilayer cells is 86%.<hr></html>";
-					final JRadioButton rb1 = new JRadioButton("Apply to only this solar panel", true);
-					final JRadioButton rb2 = new JRadioButton("Apply to all solar panels of this building");
+					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley–Queisser limit is 34%, but the theoretical limit for multilayer cells is 86%.<hr></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this solar panel", true);
+					final JRadioButton rb2 = new JRadioButton("All solar panels of this building");
+					panel.add(rb1);
+					panel.add(rb2);
 					ButtonGroup bg = new ButtonGroup();
 					bg.add(rb1);
 					bg.add(rb2);
-					Object[] params = { title, footnote, rb1, rb2 };
+					Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getEfficiency());
 						if (newValue == null)
@@ -663,6 +688,198 @@ public class PopupMenuFactory {
 
 	}
 
+	private static JMenuItem createUValueMenuItem(final boolean useUValue) {
+		final JMenuItem mi = new JMenuItem("U-Value...");
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (!(selectedPart instanceof Thermalizable))
+					return;
+				final Thermalizable t = (Thermalizable) selectedPart;
+
+				JPanel panel = new JPanel();
+				panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+				JLabel label = new JLabel("<html>Insulation Property<hr><font size=2>Examples:<br></html>");
+				label.setAlignmentX(Component.LEFT_ALIGNMENT);
+				panel.add(label);
+				panel.add(Box.createVerticalStrut(15));
+				JPanel unitPanel = new JPanel(new GridLayout(2, 3, 5, 5));
+				unitPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+				panel.add(unitPanel);
+
+				unitPanel.add(new JLabel("U-Value in SI Unit:"));
+				final JTextField siField = new JTextField("" + t.getUValue(), 10);
+				unitPanel.add(siField);
+				unitPanel.add(new JLabel("<html>W/(m<sup>2</sup>&middot;&deg;C)</html>"));
+
+				if (useUValue) {
+
+					unitPanel.add(new JLabel("U-Value in US Unit:"));
+					final JTextField uValueField = new JTextField(twoDecimals.format(Util.toUsUValue(t.getUValue())), 10);
+					uValueField.setAlignmentX(Component.LEFT_ALIGNMENT);
+					unitPanel.add(uValueField);
+					unitPanel.add(new JLabel("<html>Btu/(h&middot;ft<sup>2</sup>&middot;&deg;F)</html>"));
+
+					siField.getDocument().addDocumentListener(new DocumentListener() {
+
+						private void update() {
+							if (!siField.hasFocus())
+								return;
+							String newValue = siField.getText();
+							if ("".equals(newValue))
+								return;
+							try {
+								uValueField.setText(twoDecimals.format(Util.toUsUValue(Double.parseDouble(newValue))));
+							} catch (Exception exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+
+						@Override
+						public void removeUpdate(DocumentEvent e) {
+							update();
+						}
+
+						@Override
+						public void insertUpdate(DocumentEvent e) {
+							update();
+						}
+
+						@Override
+						public void changedUpdate(DocumentEvent e) {
+							update();
+						}
+					});
+					uValueField.getDocument().addDocumentListener(new DocumentListener() {
+
+						private void update() {
+							if (!uValueField.hasFocus())
+								return;
+							String newValue = uValueField.getText();
+							if ("".equals(newValue))
+								return;
+							try {
+								siField.setText(twoDecimals.format(1.0 / (Util.toSiRValue(1.0 / Double.parseDouble(newValue)))));
+							} catch (Exception exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+
+						@Override
+						public void removeUpdate(DocumentEvent e) {
+							update();
+						}
+
+						@Override
+						public void insertUpdate(DocumentEvent e) {
+							update();
+						}
+
+						@Override
+						public void changedUpdate(DocumentEvent e) {
+							update();
+						}
+					});
+
+				} else {
+
+					unitPanel.add(new JLabel("R-Value in US Unit:"));
+					final JTextField rValueField = new JTextField(twoDecimals.format(Util.toUsRValue(t.getUValue())), 10);
+					rValueField.setAlignmentX(Component.LEFT_ALIGNMENT);
+					unitPanel.add(rValueField);
+					unitPanel.add(new JLabel("<html>h&middot;ft<sup>2</sup>&middot;&deg;F/Btu</html>"));
+
+					siField.getDocument().addDocumentListener(new DocumentListener() {
+
+						private void update() {
+							if (!siField.hasFocus())
+								return;
+							String newValue = siField.getText();
+							if ("".equals(newValue))
+								return;
+							try {
+								rValueField.setText(twoDecimals.format(Util.toUsRValue(Double.parseDouble(newValue))));
+							} catch (Exception exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+
+						@Override
+						public void removeUpdate(DocumentEvent e) {
+							update();
+						}
+
+						@Override
+						public void insertUpdate(DocumentEvent e) {
+							update();
+						}
+
+						@Override
+						public void changedUpdate(DocumentEvent e) {
+							update();
+						}
+					});
+					rValueField.getDocument().addDocumentListener(new DocumentListener() {
+
+						private void update() {
+							if (!rValueField.hasFocus())
+								return;
+							String newValue = rValueField.getText();
+							if ("".equals(newValue))
+								return;
+							try {
+								siField.setText(twoDecimals.format(1.0 / Util.toSiRValue(Double.parseDouble(newValue))));
+							} catch (Exception exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+
+						@Override
+						public void removeUpdate(DocumentEvent e) {
+							update();
+						}
+
+						@Override
+						public void insertUpdate(DocumentEvent e) {
+							update();
+						}
+
+						@Override
+						public void changedUpdate(DocumentEvent e) {
+							update();
+						}
+					});
+
+				}
+
+				while (true) {
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+						String newValue = siField.getText();
+						try {
+							final double val = Double.parseDouble(newValue);
+							if (val <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "U-value must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							} else {
+								SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUValueCommand(selectedPart));
+								t.setUValue(val);
+								Scene.getInstance().setEdited(true);
+								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								break;
+							}
+						} catch (final NumberFormatException exception) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						}
+					} else {
+						break;
+					}
+				}
+
+			}
+		});
+		return mi;
+	}
+
 	private static JMenuItem createVolumetricHeatCapacityMenuItem() {
 		final JMenuItem mi = new JMenuItem("Volumeric Heat Capacity...");
 		mi.addActionListener(new ActionListener() {
@@ -672,7 +889,7 @@ public class PopupMenuFactory {
 				if (!(selectedPart instanceof Thermalizable))
 					return;
 				final Thermalizable t = (Thermalizable) selectedPart;
-				final String title = "<html>Volumeric Heat Capacity [kWh/(m<sup>3</sup>&times;C)]<hr><font size=2>Some reference values:<br>0.03 (fiberglass), 0.18 (asphalt), 0.25(oak wood), 0.33 (concrete), 0.37 (brick), 0.58 (stone)</html>";
+				final String title = "<html>Volumeric Heat Capacity [kWh/(m<sup>3</sup>&middot;&deg;C)]<hr><font size=2>Some reference values:<br>0.03 (fiberglass), 0.18 (asphalt), 0.25(oak wood), 0.33 (concrete), 0.37 (brick), 0.58 (stone)</html>";
 				while (true) {
 					final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, t.getVolumetricHeatCapacity());
 					if (newValue == null)
@@ -743,6 +960,7 @@ public class PopupMenuFactory {
 		});
 
 		popupMenu.add(miInfo);
+		popupMenu.addSeparator();
 		popupMenu.add(miCut);
 
 		if (hasCopyMenu) {
@@ -761,118 +979,6 @@ public class PopupMenuFactory {
 		}
 
 		return popupMenu;
-
-	}
-
-	private static JMenu createPropertyMenu(final String title, final String[] items, final int type) {
-
-		final JMenu menu = new JMenu(title);
-
-		ButtonGroup buttonGroup = new ButtonGroup();
-
-		final int itemCount = items.length;
-		final JRadioButtonMenuItem[] mi = new JRadioButtonMenuItem[itemCount + 1];
-		mi[itemCount] = new JRadioButtonMenuItem();
-		buttonGroup.add(mi[itemCount]);
-
-		for (int i = 0; i < itemCount; i++) {
-			mi[i] = new JRadioButtonMenuItem(items[i]);
-			final int i2 = i;
-			mi[i].addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					switch (type) {
-					case CHANGE_U_FACTOR:
-						SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUFactorCommand(selectedPart));
-						selectedPart.setUFactor(Scene.parsePropertyString(mi[i2].getText()));
-						break;
-					case CHANGE_VOLUMETRIC_HEAT_CAPACITY:
-						if (selectedPart instanceof Thermalizable) {
-							Thermalizable t = (Thermalizable) selectedPart;
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeVolumetricHeatCapacityCommand(selectedPart));
-							t.setVolumetricHeatCapacity(Scene.parsePropertyString(mi[i2].getText()));
-						}
-						break;
-					}
-					Scene.getInstance().setEdited(true);
-					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				}
-			});
-			buttonGroup.add(mi[i]);
-			menu.add(mi[i]);
-		}
-
-		menu.addMenuListener(new MenuListener() {
-
-			@Override
-			public void menuSelected(MenuEvent e) {
-				boolean b = false;
-				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				switch (type) {
-				case CHANGE_U_FACTOR:
-					for (int i = 0; i < itemCount; i++) {
-						if (Util.isZero(selectedPart.getUFactor() - Scene.parsePropertyString(mi[i].getText()))) {
-							Util.selectSilently(mi[i], true);
-							b = true;
-							break;
-						}
-					}
-					if (!b) {
-						if (Util.isZero(selectedPart.getUFactor())) {
-							double defaultWallUFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
-							for (int i = 0; i < itemCount; i++) {
-								if (Util.isZero(defaultWallUFactor - Scene.parsePropertyString(mi[i].getText()))) {
-									Util.selectSilently(mi[i], true);
-									b = true;
-									break;
-								}
-							}
-						}
-						if (!b)
-							mi[itemCount].setSelected(true);
-					}
-					break;
-				case CHANGE_VOLUMETRIC_HEAT_CAPACITY:
-					if (selectedPart instanceof Thermalizable) {
-						Thermalizable t = (Thermalizable) selectedPart;
-						for (int i = 0; i < itemCount; i++) {
-							if (Util.isZero(t.getVolumetricHeatCapacity() - Scene.parsePropertyString(mi[i].getText()))) {
-								Util.selectSilently(mi[i], true);
-								b = true;
-								break;
-							}
-						}
-						if (!b) {
-							if (Util.isZero(t.getVolumetricHeatCapacity())) {
-								double defaultWallVolumetricHeatCapacity = 0.25;
-								for (int i = 0; i < itemCount; i++) {
-									if (Util.isZero(defaultWallVolumetricHeatCapacity - Scene.parsePropertyString(mi[i].getText()))) {
-										Util.selectSilently(mi[i], true);
-										b = true;
-										break;
-									}
-								}
-							}
-							if (!b)
-								mi[itemCount].setSelected(true);
-						}
-					}
-					break;
-				}
-			}
-
-			@Override
-			public void menuDeselected(MenuEvent e) {
-			}
-
-			@Override
-			public void menuCanceled(MenuEvent e) {
-			}
-
-		});
-
-		return menu;
 
 	}
 

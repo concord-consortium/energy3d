@@ -45,6 +45,18 @@ import com.ardor3d.ui.text.BMText.AutoScale;
 
 public class Util {
 
+	public static double toUsUValue(double siUValue) {
+		return siUValue / 5.67826;
+	}
+
+	public static double toSiRValue(double usRValue) {
+		return usRValue / 5.67826;
+	}
+
+	public static double toUsRValue(double siUValue) {
+		return 5.67826 / siUValue;
+	}
+
 	public static double findBoundLength(final BoundingVolume bounds) {
 		return 2 * bounds.asType(Type.Sphere).getRadius();
 	}

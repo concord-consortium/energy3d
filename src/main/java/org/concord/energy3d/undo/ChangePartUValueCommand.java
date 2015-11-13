@@ -5,29 +5,34 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Thermalizable;
 
-public class ChangePartUFactorCommand extends AbstractUndoableEdit {
+public class ChangePartUValueCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double orgUFactor, newUFactor;
+	private double orgUValue, newUValue;
 	private HousePart selectedPart;
 
-	public ChangePartUFactorCommand(HousePart selectedPart) {
+	public ChangePartUValueCommand(HousePart selectedPart) {
 		this.selectedPart = selectedPart;
-		orgUFactor = selectedPart.getUFactor();
+		if (selectedPart instanceof Thermalizable)
+			orgUValue = ((Thermalizable) selectedPart).getUValue();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newUFactor = selectedPart.getUFactor();
-		selectedPart.setUFactor(orgUFactor);
+		if (selectedPart instanceof Thermalizable) {
+			newUValue = ((Thermalizable) selectedPart).getUValue();
+			((Thermalizable) selectedPart).setUValue(orgUValue);
+		}
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		selectedPart.setUFactor(newUFactor);
+		if (selectedPart instanceof Thermalizable)
+			((Thermalizable) selectedPart).setUValue(newUValue);
 	}
 
 	// for action logging
@@ -37,7 +42,7 @@ public class ChangePartUFactorCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "U-Factor Change for Selected Part";
+		return "U-Value Change for Selected Part";
 	}
 
 }

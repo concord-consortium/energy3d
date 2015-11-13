@@ -69,6 +69,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	protected Map<Integer, List<Wall>> gableEditPointToWallMap = null;
 	private double overhangLength = 2.0;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
+	private double uValue = 1.89; // by default, set it to R3;
 
 	protected class EditState {
 		final boolean fitTestRequired;
@@ -1178,6 +1179,14 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	public void setOverhangLength(final double overhangLength) {
 		this.overhangLength = overhangLength;
+	}
+
+	public void setUValue(final double uValue) {
+		this.uValue = uValue;
+	}
+
+	public double getUValue() {
+		return uValue;
 	}
 
 	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {

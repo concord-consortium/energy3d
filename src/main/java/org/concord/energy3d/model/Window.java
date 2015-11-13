@@ -26,7 +26,7 @@ import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Window extends HousePart {
+public class Window extends HousePart implements Thermalizable {
 
 	public static final int NO_MUNTIN_BAR = -1;
 	public static final int MORE_MUNTIN_BARS = 0;
@@ -40,6 +40,8 @@ public class Window extends HousePart {
 
 	// range: 25%-80% (we choose 50% by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
 	private double solarHeatGainCoefficient = 50;
+	private double uValue = 6.08; // by default, set it to U1.07;
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 
 	public Window() {
 		super(2, 4, 30.0);
@@ -436,6 +438,22 @@ public class Window extends HousePart {
 			}
 		}
 		return c;
+	}
+
+	public void setUValue(final double uValue) {
+		this.uValue = uValue;
+	}
+
+	public double getUValue() {
+		return uValue;
+	}
+
+	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
+		this.volumetricHeatCapacity = volumetricHeatCapacity;
+	}
+
+	public double getVolumetricHeatCapacity() {
+		return volumetricHeatCapacity;
 	}
 
 }

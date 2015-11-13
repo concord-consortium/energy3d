@@ -61,6 +61,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient boolean useOrgPoints = false;
 	private boolean lockEdit = false;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
+	private double uValue = 1.89; // by default, set it to R3;
 
 	static {
 		format.setGroupingUsed(true);
@@ -1105,6 +1106,14 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public boolean isCopyable() {
 		return false;
+	}
+
+	public void setUValue(final double uValue) {
+		this.uValue = uValue;
+	}
+
+	public double getUValue() {
+		return uValue;
 	}
 
 	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {

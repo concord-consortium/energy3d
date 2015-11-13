@@ -373,40 +373,55 @@ public class Scene implements Serializable {
 		if (instance.windowUFactor != null) {
 			final double defaultWindowUFactor = parsePropertyString(instance.windowUFactor);
 			for (final HousePart p : instance.parts) {
-				if (p.getUFactor() <= 0 && p instanceof Window)
-					p.setUFactor(defaultWindowUFactor);
+				if (p instanceof Window) {
+					Window w = (Window) p;
+					if (w.getUValue() <= 0)
+						w.setUValue(defaultWindowUFactor);
+				}
 			}
 			energyPanel.getWindowsComboBox().setSelectedItem(instance.windowUFactor);
 		}
 		if (instance.wallUFactor != null) {
 			final double defaultWallUFactor = parsePropertyString(instance.wallUFactor);
 			for (final HousePart p : instance.parts) {
-				if (p.getUFactor() <= 0 && p instanceof Wall)
-					p.setUFactor(defaultWallUFactor);
+				if (p instanceof Wall) {
+					Wall w = (Wall) p;
+					if (w.getUValue() <= 0)
+						w.setUValue(defaultWallUFactor);
+				}
 			}
 			energyPanel.getWallsComboBox().setSelectedItem(instance.wallUFactor);
 		}
 		if (instance.doorUFactor != null) {
 			final double defaultDoorUFactor = parsePropertyString(instance.doorUFactor);
 			for (final HousePart p : instance.parts) {
-				if (p.getUFactor() <= 0 && p instanceof Door)
-					p.setUFactor(defaultDoorUFactor);
+				if (p instanceof Door) {
+					Door d = (Door) p;
+					if (d.getUValue() <= 0)
+						d.setUValue(defaultDoorUFactor);
+				}
 			}
 			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
 		}
 		if (instance.floorUFactor != null) {
 			final double defaultFloorUFactor = parsePropertyString(instance.floorUFactor);
 			for (final HousePart p : instance.parts) {
-				if (p.getUFactor() <= 0 && p instanceof Foundation)
-					p.setUFactor(defaultFloorUFactor);
+				if (p instanceof Foundation) {
+					Foundation f = (Foundation) p;
+					if (f.getUValue() <= 0)
+						f.setUValue(defaultFloorUFactor);
+				}
 			}
 			energyPanel.getFloorsComboBox().setSelectedItem(instance.floorUFactor);
 		}
 		if (instance.roofUFactor != null) {
 			final double defaultRoofUFactor = parsePropertyString(instance.roofUFactor);
 			for (final HousePart p : instance.parts) {
-				if (p.getUFactor() <= 0 && p instanceof Roof)
-					p.setUFactor(defaultRoofUFactor);
+				if (p instanceof Roof) {
+					Roof r = (Roof) p;
+					if (r.getUValue() <= 0)
+						r.setUValue(defaultRoofUFactor);
+				}
 			}
 			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
 		}
@@ -1217,37 +1232,30 @@ public class Scene implements Serializable {
 	public void setPartUFactorForWholeBuilding(Foundation foundation, Operation operation, double uFactor) {
 		switch (operation) {
 		case DRAW_FOUNDATION:
-			foundation.setUFactor(uFactor);
+			foundation.setUValue(uFactor);
 			break;
 		case DRAW_WALL:
 			for (final HousePart p : parts) {
 				if (p instanceof Wall && p.getTopContainer() == foundation)
-					p.setUFactor(uFactor);
+					((Wall) p).setUValue(uFactor);
 			}
 			break;
 		case DRAW_WINDOW:
 			for (final HousePart p : parts) {
 				if (p instanceof Window && p.getTopContainer() == foundation)
-					p.setUFactor(uFactor);
+					((Window) p).setUValue(uFactor);
 			}
 			break;
 		case DRAW_DOOR:
 			for (final HousePart p : parts) {
 				if (p instanceof Door && p.getTopContainer() == foundation)
-					p.setUFactor(uFactor);
-				;
-			}
-			break;
-		case DRAW_FLOOR:
-			for (final HousePart p : parts) {
-				if (p instanceof Floor && p.getTopContainer() == foundation)
-					p.setUFactor(uFactor);
+					((Door) p).setUValue(uFactor);
 			}
 			break;
 		case DRAW_ROOF_PYRAMID:
 			for (final HousePart p : parts) {
 				if (p instanceof Roof && p.getTopContainer() == foundation)
-					p.setUFactor(uFactor);
+					((Roof) p).setUValue(uFactor);
 			}
 			break;
 		default:
@@ -1259,35 +1267,29 @@ public class Scene implements Serializable {
 	public double getPartUFactorForWholeBuilding(Foundation foundation, Operation operation) {
 		switch (operation) {
 		case DRAW_FOUNDATION:
-			return foundation.getUFactor();
+			return foundation.getUValue();
 		case DRAW_WALL:
 			for (final HousePart p : parts) {
 				if (p instanceof Wall && p.getTopContainer() == foundation)
-					return p.getUFactor();
+					return ((Wall) p).getUValue();
 			}
 			break;
 		case DRAW_WINDOW:
 			for (final HousePart p : parts) {
 				if (p instanceof Window && p.getTopContainer() == foundation)
-					return p.getUFactor();
+					return ((Window) p).getUValue();
 			}
 			break;
 		case DRAW_DOOR:
 			for (final HousePart p : parts) {
 				if (p instanceof Door && p.getTopContainer() == foundation)
-					return p.getUFactor();
-			}
-			break;
-		case DRAW_FLOOR:
-			for (final HousePart p : parts) {
-				if (p instanceof Floor && p.getTopContainer() == foundation)
-					return p.getUFactor();
+					return ((Door) p).getUValue();
 			}
 			break;
 		case DRAW_ROOF_PYRAMID:
 			for (final HousePart p : parts) {
 				if (p instanceof Roof && p.getTopContainer() == foundation)
-					return p.getUFactor();
+					return ((Roof) p).getUValue();
 			}
 			break;
 		default:

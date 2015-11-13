@@ -100,7 +100,6 @@ public abstract class HousePart implements Serializable {
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
-	private double uFactor = 0;
 
 	transient Line heatFlux;
 	transient static float heatFluxUnitArea = 2;
@@ -955,14 +954,6 @@ public abstract class HousePart implements Serializable {
 
 	public Spatial getCollisionSpatial() {
 		return mesh;
-	}
-
-	public void setUFactor(final double uFactor) {
-		this.uFactor = uFactor;
-	}
-
-	public double getUFactor() {
-		return uFactor;
 	}
 
 	/** use the lightness of color to approximate albedo */

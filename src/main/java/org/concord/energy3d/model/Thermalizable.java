@@ -1,8 +1,7 @@
 package org.concord.energy3d.model;
 
 /**
- * HousePart implementing this interface will have more complex heat transfer model. This interface also excludes objects such as trees, 
- * which should not have been derived from HousePart, from heat transfer calculation.
+ * HousePart implementing this interface does thermal physics. This interface also excludes objects such as trees, which should not have been derived from HousePart, from thermal calculation.
  * 
  * @author Charles Xie
  * 
@@ -10,7 +9,11 @@ package org.concord.energy3d.model;
 
 public interface Thermalizable {
 
-	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity);
+	public void setUValue(double uValue);
+
+	public double getUValue();
+
+	public void setVolumetricHeatCapacity(double volumetricHeatCapacity);
 
 	public double getVolumetricHeatCapacity();
 

@@ -54,14 +54,14 @@ import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
-import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
+import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
-import org.concord.energy3d.undo.ChangePartUFactorCommand;
+import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeWallWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
@@ -245,23 +245,25 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				Foundation foundation = ((ChangeBuildingWindowShgcCommand) lastEdit).getFoundation();
 				List<Window> windows = Scene.getInstance().getWindowsOfBuilding(foundation);
 				stateValue = "{\"Building\":" + foundation.getId() + ", \"Value\": " + (windows.isEmpty() ? -1 : windows.get(0).getSolarHeatGainCoefficient()) + "}";
-			} else if (lastEdit instanceof ChangePartUFactorCommand) {
-				HousePart p = ((ChangePartUFactorCommand) lastEdit).getHousePart();
-				Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
-				String s = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
-				if (p instanceof Wall) {
-					s += ", \"Type\": \"Wall\"";
-				} else if (p instanceof Door) {
-					s += ", \"Type\": \"Door\"";
-				} else if (p instanceof Window) {
-					s += ", \"Type\": \"Window\"";
-				} else if (p instanceof Roof) {
-					s += ", \"Type\": \"Roof\"";
-				} else if (p instanceof Foundation) {
-					s += ", \"Type\": \"Floor\"";
+			} else if (lastEdit instanceof ChangePartUValueCommand) {
+				HousePart p = ((ChangePartUValueCommand) lastEdit).getHousePart();
+				if (p instanceof Thermalizable) {
+					Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
+					String s = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
+					if (p instanceof Wall) {
+						s += ", \"Type\": \"Wall\"";
+					} else if (p instanceof Door) {
+						s += ", \"Type\": \"Door\"";
+					} else if (p instanceof Window) {
+						s += ", \"Type\": \"Window\"";
+					} else if (p instanceof Roof) {
+						s += ", \"Type\": \"Roof\"";
+					} else if (p instanceof Foundation) {
+						s += ", \"Type\": \"Floor\"";
+					}
+					s += ", \"Value\": " + ((Thermalizable) p).getUValue() + "}";
+					stateValue = s;
 				}
-				s += ", \"Value\": " + p.getUFactor() + "}";
-				stateValue = s;
 			} else if (lastEdit instanceof ChangeVolumetricHeatCapacityCommand) {
 				HousePart p = ((ChangeVolumetricHeatCapacityCommand) lastEdit).getHousePart();
 				if (p instanceof Thermalizable) {
@@ -281,8 +283,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					s += ", \"Value\": " + ((Thermalizable) p).getVolumetricHeatCapacity() + "}";
 					stateValue = s;
 				}
-			} else if (lastEdit instanceof ChangeBuildingUFactorCommand) {
-				ChangeBuildingUFactorCommand c = (ChangeBuildingUFactorCommand) lastEdit;
+			} else if (lastEdit instanceof ChangeBuildingUValueCommand) {
+				ChangeBuildingUValueCommand c = (ChangeBuildingUValueCommand) lastEdit;
 				String s = "{\"Building\":" + c.getFoundation().getId();
 				Operation o = c.getOperation();
 				if (o == Operation.DRAW_WALL) {
