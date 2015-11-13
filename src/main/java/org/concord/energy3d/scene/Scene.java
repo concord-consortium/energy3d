@@ -124,8 +124,6 @@ public class Scene implements Serializable {
 	private String windowUFactor;
 	private String roofUFactor;
 	private String floorUFactor; // floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
-	private double solarPanelEfficiency;
-	private double windowSolarHeatGainCoefficient; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
 	private double backgroundAlbedo = 0.3;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double groundThermalDiffusivity = 0.01; // unit: m^2/s
@@ -358,7 +356,16 @@ public class Scene implements Serializable {
 				final Door d = (Door) p;
 				if (Util.isZero(d.getVolumetricHeatCapacity()))
 					d.setVolumetricHeatCapacity(0.5);
+			} else if (p instanceof SolarPanel) {
+				final SolarPanel sp = (SolarPanel) p;
+				if (Util.isZero(sp.getEfficiency()))
+					sp.setEfficiency(10);
+			} else if (p instanceof Window) {
+				final Window w = (Window) p;
+				if (Util.isZero(w.getSolarHeatGainCoefficient()))
+					w.setSolarHeatGainCoefficient(50);
 			}
+
 		}
 
 		// TODO: Remove the following checks for backward compatibility soon (perhaps the end of 2016)
@@ -404,29 +411,6 @@ public class Scene implements Serializable {
 			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
 		}
 
-		if (Util.isZero(instance.solarPanelEfficiency))
-			instance.solarPanelEfficiency = 10;
-		for (final HousePart p : instance.parts) {
-			if (p instanceof SolarPanel) {
-				final SolarPanel sp = (SolarPanel) p;
-				if (Util.isZero(sp.getEfficiency())) // backward compatibility
-					sp.setEfficiency(instance.solarPanelEfficiency);
-			}
-		}
-		Util.selectSilently(energyPanel.getSolarPanelEfficiencyComboBox(), Double.toString(instance.solarPanelEfficiency));
-
-		if (Util.isZero(instance.windowSolarHeatGainCoefficient)) // not set
-			instance.windowSolarHeatGainCoefficient = 50;
-		else if (instance.windowSolarHeatGainCoefficient < 1)
-			instance.windowSolarHeatGainCoefficient *= 100; // backward compatibility (when SHGC < 1)
-		for (final HousePart p : instance.parts) {
-			if (p instanceof Window) {
-				final Window w = (Window) p;
-				if (Util.isZero(w.getSolarHeatGainCoefficient())) // backward compatibility
-					w.setSolarHeatGainCoefficient(instance.windowSolarHeatGainCoefficient);
-			}
-		}
-		Util.selectSilently(energyPanel.getWindowSHGCComboBox(), Double.toString(instance.windowSolarHeatGainCoefficient));
 		if (Util.isZero(instance.volumetricHeatCapacity))
 			instance.volumetricHeatCapacity = 0.5;
 		if (Util.isZero(instance.groundThermalDiffusivity))
@@ -601,7 +585,6 @@ public class Scene implements Serializable {
 				instance.floorUFactor = (String) EnergyPanel.getInstance().getFloorsComboBox().getSelectedItem();
 				instance.doorUFactor = (String) EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem();
 				instance.roofUFactor = (String) EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem();
-				instance.solarPanelEfficiency = Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
 
 				if (setAsCurrentFile)
 					Scene.url = url;
@@ -1345,19 +1328,20 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public void setSolarPanelEfficiencyForWholeBuilding(Foundation foundation, double eff) {
+	public List<SolarPanel> getSolarPanelsOfBuilding(Foundation foundation) {
+		List<SolarPanel> list = new ArrayList<SolarPanel>();
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
+				list.add((SolarPanel) p);
+		}
+		return list;
+	}
+
+	public void setSolarPanelEfficiencyOfBuilding(Foundation foundation, double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
 				((SolarPanel) p).setEfficiency(eff);
 		}
-	}
-
-	public double getSolarPanelEfficiencyForWholeBuilding(Foundation foundation) {
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
-				return ((SolarPanel) p).getEfficiency();
-		}
-		return 0;
 	}
 
 	public boolean isEdited() {
@@ -1447,28 +1431,6 @@ public class Scene implements Serializable {
 
 	public int getInsideTemperature() {
 		return insideTemperature;
-	}
-
-	/**
-	 * @return the solar panel efficiency (not in percentage)
-	 */
-	public double getSolarPanelEfficiencyNotPercentage() {
-		return solarPanelEfficiency * 0.01;
-	}
-
-	public void setSolarPanelEfficiency(final double solarPanelEfficiency) {
-		this.solarPanelEfficiency = solarPanelEfficiency;
-	}
-
-	/**
-	 * @return the window SHGC (not in percentage)
-	 */
-	public double getWindowSolarHeatGainCoefficientNotPercentage() {
-		return windowSolarHeatGainCoefficient * 0.01;
-	}
-
-	public void setWindowSolarHeatGainCoefficient(final double windowSolarHeatGainCoefficient) {
-		this.windowSolarHeatGainCoefficient = windowSolarHeatGainCoefficient;
 	}
 
 	public void setBackgroundAlbedo(final double backgroundAlbedo) {

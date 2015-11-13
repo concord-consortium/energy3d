@@ -69,9 +69,7 @@ import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Weather;
-import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingUFactorCommand;
-import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
@@ -93,8 +91,6 @@ public class EnergyPanel extends JPanel {
 	final static String[] U_VALUE_CHOICES_FLOOR = { "1.89 (R3)", "0.44 (R13)", "0.30 (R19)", "0.23 (R25)", "0.19 (R30)", "0.15 (R38)" };
 	final static String[] U_VALUE_CHOICES_WINDOW = { "6.08 (U1.07)", "3.52 (U0.62)", "2.95 (U0.52)", "2.73 (U0.48)", "2.21 (U0.39)", "1.93 (U0.34)", "1.31 (U0.23)", "1.25 (U0.22)" };
 	final static String[] U_VALUE_CHOICES_DOOR = { "1.89 (R3)", "0.57 (R10)" };
-	final static String[] WINDOW_SHGC_CHOICES = { "25", "30", "35", "40", "45", "50", "55", "60", "65", "70" };
-	final static String[] SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES = { "10", "15", "20" };
 
 	private static final long serialVersionUID = 1L;
 	private static final EnergyPanel instance = new EnergyPanel();
@@ -113,14 +109,13 @@ public class EnergyPanel extends JPanel {
 		ALWAYS, ONLY_IF_SLECTED_IN_GUI
 	};
 
+	private final JPanel dataPanel;
 	private final JComboBox<String> wallsComboBox;
 	private final JComboBox<String> floorsComboBox; // floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 	private final JComboBox<String> doorsComboBox;
 	private final JComboBox<String> windowsComboBox;
 	private final JComboBox<String> roofsComboBox;
 	private final JComboBox<String> cityComboBox;
-	private final JComboBox<String> solarPanelEfficiencyComboBox;
-	private final JComboBox<String> windowSHGCComboBox;
 	private final JTextField heatingTextField;
 	private final JTextField coolingTextField;
 	private final JTextField netEnergyTextField;
@@ -164,7 +159,7 @@ public class EnergyPanel extends JPanel {
 		noDecimals.setMaximumFractionDigits(0);
 
 		setLayout(new BorderLayout());
-		final JPanel dataPanel = new JPanel();
+		dataPanel = new JPanel();
 		dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
 		add(new JScrollPane(dataPanel), BorderLayout.CENTER);
 
@@ -627,115 +622,9 @@ public class EnergyPanel extends JPanel {
 
 		uFactorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, uFactorPanel.getPreferredSize().height));
 
-		final JPanel solarConversionPercentagePanel = new JPanel();
-		solarConversionPercentagePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, solarConversionPercentagePanel.getPreferredSize().height));
-		solarConversionPercentagePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Solar Conversion of All (%)", TitledBorder.LEADING, TitledBorder.TOP));
-		dataPanel.add(solarConversionPercentagePanel);
-
-		final JLabel labelSHGC = new JLabel("Windows (SHGC): ");
-		labelSHGC.setToolTipText("<html><b>SHGC - Solar heat gain coefficient</b><br>measures the fraction of solar energy transmitted through a window.</html>");
-		solarConversionPercentagePanel.add(labelSHGC);
-
-		windowSHGCComboBox = new WideComboBox();
-		windowSHGCComboBox.setEditable(true);
-		windowSHGCComboBox.setModel(new DefaultComboBoxModel<String>(WINDOW_SHGC_CHOICES));
-		windowSHGCComboBox.setSelectedIndex(1);
-		windowSHGCComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				// validate the input
-				final String s = (String) windowSHGCComboBox.getSelectedItem();
-				double shgc = 50;
-				try {
-					shgc = Float.parseFloat(s);
-				} catch (final NumberFormatException ex) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be 25-80.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				if (shgc < 25 || shgc > 80) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be 25-80.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				if (foundation != null) {
-					final int count = Scene.getInstance().countParts(foundation, Window.class);
-					if (count > 0)
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the solar heat gain coefficient of " + count + " existing windows<br>of the selected building (#" + foundation.getId() + ") to " + windowSHGCComboBox.getSelectedItem() + "%?</html>", "Solar Heat Gain Coffficient of Windows", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingWindowShgcCommand(foundation));
-							for (final HousePart p : Scene.getInstance().getParts()) {
-								if (p instanceof Window && p.getTopContainer() == foundation)
-									((Window) p).setSolarHeatGainCoefficient(shgc);
-							}
-						}
-				}
-				Scene.getInstance().setWindowSolarHeatGainCoefficient(shgc);
-				updateCost();
-				Scene.getInstance().setEdited(true);
-			}
-		});
-		arrowButton = Util.getButtonSubComponent(windowSHGCComboBox);
-		if (arrowButton != null) {
-			arrowButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					foundation = MainFrame.getInstance().autoSelectBuilding(true);
-				}
-			});
-		}
-		solarConversionPercentagePanel.add(windowSHGCComboBox);
-
-		final JLabel labelPV = new JLabel("Solar Panels: ");
-		labelPV.setToolTipText("<html><b>Solar photovoltaic efficiency</b><br>measures the fraction of solar energy converted into electricity by a solar panel.</html>");
-		solarConversionPercentagePanel.add(labelPV);
-
-		solarPanelEfficiencyComboBox = new WideComboBox();
-		solarPanelEfficiencyComboBox.setEditable(true);
-		solarPanelEfficiencyComboBox.setModel(new DefaultComboBoxModel<String>(SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES));
-		solarPanelEfficiencyComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				// validate the input
-				final String s = (String) solarPanelEfficiencyComboBox.getSelectedItem();
-				double eff = 10;
-				try {
-					eff = Float.parseFloat(s);
-				} catch (final NumberFormatException ex) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong format: must be 10-20.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				if (eff < 10 || eff > 30) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Wrong range: must be 10-30.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				if (foundation != null) {
-					final int count = Scene.getInstance().countParts(foundation, SolarPanel.class);
-					if (count > 0)
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the efficiency of " + count + " existing solar panels<br>of the selected building (#" + foundation.getId() + ") to " + solarPanelEfficiencyComboBox.getSelectedItem() + "%?</html>", "Solar Panel Conversion Efficiency", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingSolarPanelEfficiencyCommand(foundation));
-							for (final HousePart p : Scene.getInstance().getParts()) {
-								if (p instanceof SolarPanel && p.getTopContainer() == foundation)
-									((SolarPanel) p).setEfficiency(eff);
-							}
-						}
-				}
-				Scene.getInstance().setSolarPanelEfficiency(eff);
-				updateCost();
-				Scene.getInstance().setEdited(true);
-			}
-		});
-		arrowButton = Util.getButtonSubComponent(solarPanelEfficiencyComboBox);
-		if (arrowButton != null) {
-			arrowButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					foundation = MainFrame.getInstance().autoSelectBuilding(true);
-				}
-			});
-		}
-		solarConversionPercentagePanel.add(solarPanelEfficiencyComboBox);
-
 		heatMapPanel = new JPanel(new BorderLayout());
 		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP));
-		dataPanel.add(heatMapPanel);
+		// dataPanel.add(heatMapPanel);
 
 		colorMapSlider = new MySlider();
 		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the solar heat map.</html>");
@@ -1197,23 +1086,6 @@ public class EnergyPanel extends JPanel {
 					break;
 				}
 			}
-			n = windowSHGCComboBox.getItemCount();
-			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(WINDOW_SHGC_CHOICES[i]);
-				if (Util.isZero(choice - ((Window) selectedPart).getSolarHeatGainCoefficient())) {
-					Util.selectSilently(windowSHGCComboBox, i);
-					break;
-				}
-			}
-		} else if (selectedPart instanceof SolarPanel) {
-			final int n = solarPanelEfficiencyComboBox.getItemCount();
-			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES[i]);
-				if (Util.isZero(choice - ((SolarPanel) selectedPart).getEfficiency())) {
-					Util.selectSilently(solarPanelEfficiencyComboBox, i);
-					break;
-				}
-			}
 		}
 	}
 
@@ -1397,14 +1269,6 @@ public class EnergyPanel extends JPanel {
 		return cityComboBox;
 	}
 
-	public JComboBox<String> getSolarPanelEfficiencyComboBox() {
-		return solarPanelEfficiencyComboBox;
-	}
-
-	public JComboBox<String> getWindowSHGCComboBox() {
-		return windowSHGCComboBox;
-	}
-
 	public void updateBudgetBar() {
 		String t = "Cost (";
 		t += Specifications.getInstance().isBudgetEnabled() ? "\u2264 $" + noDecimals.format(Specifications.getInstance().getMaximumBudget()) : "$";
@@ -1437,6 +1301,14 @@ public class EnergyPanel extends JPanel {
 		heightBar.setMinimum(Specifications.getInstance().getMinimumHeight());
 		heightBar.setMaximum(Specifications.getInstance().getMaximumHeight());
 		heightBar.repaint();
+	}
+
+	public void showHeatMapContrastSlider(boolean b) {
+		if (b)
+			dataPanel.add(heatMapPanel);
+		else
+			dataPanel.remove(heatMapPanel);
+		dataPanel.repaint();
 	}
 
 	public void turnOffCompute() {

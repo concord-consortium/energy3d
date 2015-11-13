@@ -1,34 +1,50 @@
 package org.concord.energy3d.undo;
 
+import java.util.List;
+
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 
 public class ChangeBuildingSolarPanelEfficiencyCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double orgEfficiency, newEfficiency;
+	private double[] orgEfficiency, newEfficiency;
 	private Foundation foundation;
+	private List<SolarPanel> panels;
 
 	public ChangeBuildingSolarPanelEfficiencyCommand(Foundation foundation) {
 		this.foundation = foundation;
-		orgEfficiency = Scene.getInstance().getSolarPanelEfficiencyForWholeBuilding(foundation);
+		panels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
+		int n = panels.size();
+		orgEfficiency = new double[n];
+		for (int i = 0; i < n; i++) {
+			orgEfficiency[i] = panels.get(i).getEfficiency();
+		}
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newEfficiency = Scene.getInstance().getSolarPanelEfficiencyForWholeBuilding(foundation);
-		Scene.getInstance().setSolarPanelEfficiencyForWholeBuilding(foundation, orgEfficiency);
+		int n = panels.size();
+		newEfficiency = new double[n];
+		for (int i = 0; i < n; i++) {
+			newEfficiency[i] = panels.get(i).getEfficiency();
+			panels.get(i).setEfficiency(orgEfficiency[i]);
+		}
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setSolarPanelEfficiencyForWholeBuilding(foundation, newEfficiency);
+		int n = panels.size();
+		for (int i = 0; i < n; i++) {
+			panels.get(i).setEfficiency(newEfficiency[i]);
+		}
 	}
 
 	// for action logging

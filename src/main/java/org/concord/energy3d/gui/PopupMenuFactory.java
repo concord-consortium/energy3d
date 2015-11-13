@@ -39,6 +39,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
+import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
@@ -374,8 +375,8 @@ public class PopupMenuFactory {
 						else {
 							try {
 								final double val = Double.parseDouble(newValue);
-								if (val < 0 || val > 100) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar heat gain coefficient must be between 0 and 100.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (val < 10 || val > 90) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar heat gain coefficient must be between 10% and 90%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeWindowShgcCommand(window));
@@ -567,69 +568,54 @@ public class PopupMenuFactory {
 
 			popupMenuForSolarPanel = createPopupMenu(true, null);
 
-			final JMenu efficiencyMenu = new JMenu("Energy Conversion Efficiency");
-
-			ButtonGroup efficiencyButtonGroup = new ButtonGroup();
-
-			final int nEfficiency = EnergyPanel.SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES.length;
-			final int[] efficiencyValues = new int[nEfficiency];
-			for (int i = 0; i < nEfficiency; i++)
-				efficiencyValues[i] = Integer.parseInt(EnergyPanel.SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES[i]);
-			final JRadioButtonMenuItem[] miEfficiency = new JRadioButtonMenuItem[nEfficiency + 1];
-
-			for (int i = 0; i < nEfficiency; i++) {
-				miEfficiency[i] = new JRadioButtonMenuItem(efficiencyValues[i] + "%");
-				final int i2 = i;
-				miEfficiency[i].addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof SolarPanel) {
-							SolarPanel sp = (SolarPanel) selectedPart;
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeSolarPanelEfficiencyCommand(sp));
-							sp.setEfficiency(efficiencyValues[i2]);
-							Scene.getInstance().setEdited(true);
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-						}
-					}
-				});
-				efficiencyButtonGroup.add(miEfficiency[i]);
-				efficiencyMenu.add(miEfficiency[i]);
-			}
-			miEfficiency[nEfficiency] = new JRadioButtonMenuItem();
-			efficiencyButtonGroup.add(miEfficiency[nEfficiency]);
-
-			efficiencyMenu.addMenuListener(new MenuListener() {
-
+			final JMenuItem miEff = new JMenuItem("Energy Conversion Efficiency...");
+			miEff.addActionListener(new ActionListener() {
 				@Override
-				public void menuSelected(MenuEvent e) {
-					boolean b = false;
+				public void actionPerformed(final ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof SolarPanel) {
-						SolarPanel sp = (SolarPanel) selectedPart;
-						for (int i = 0; i < nEfficiency; i++) {
-							if (Util.isZero(sp.getEfficiency() - efficiencyValues[i])) {
-								Util.selectSilently(miEfficiency[i], true);
-								b = true;
-								break;
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final SolarPanel solarPanel = (SolarPanel) selectedPart;
+					final String title = "<html>Energy Conversion Efficiency (%)</html>";
+					final String footnote = "<html><hr><font size=2>The Shockley–Queisser limit is 34%, but the theoretical limit for multilayer cells is 86%.<hr></html>";
+					final JRadioButton rb1 = new JRadioButton("Apply to only this solar panel", true);
+					final JRadioButton rb2 = new JRadioButton("Apply to all solar panels of this building");
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					Object[] params = { title, footnote, rb1, rb2 };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getEfficiency());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < 10 || val > 86) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Conversion efficiency must be between 10% and 86%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										SceneManager.getInstance().getUndoManager().addEdit(new ChangeSolarPanelEfficiencyCommand(solarPanel));
+										solarPanel.setEfficiency(val);
+									} else if (rb2.isSelected()) {
+										Foundation foundation = solarPanel.getTopContainer();
+										SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingSolarPanelEfficiencyCommand(foundation));
+										Scene.getInstance().setSolarPanelEfficiencyOfBuilding(foundation, val);
+									}
+									Scene.getInstance().setEdited(true);
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
-						if (!b)
-							miEfficiency[nEfficiency].setSelected(true);
 					}
 				}
-
-				@Override
-				public void menuDeselected(MenuEvent e) {
-				}
-
-				@Override
-				public void menuCanceled(MenuEvent e) {
-				}
-
 			});
 
-			popupMenuForSolarPanel.add(efficiencyMenu);
+			popupMenuForSolarPanel.addSeparator();
+			popupMenuForSolarPanel.add(miEff);
 
 		}
 

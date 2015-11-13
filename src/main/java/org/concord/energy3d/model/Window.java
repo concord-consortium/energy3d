@@ -36,13 +36,13 @@ public class Window extends HousePart {
 	private static final long serialVersionUID = 1L;
 	private transient BMText label1;
 	private transient Line bars;
-
-	private double solarHeatGainCoefficient; // a percentage number between 0 and 100
 	private int style = MORE_MUNTIN_BARS;
+
+	// range: 25%-80% (we choose 50% by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
+	private double solarHeatGainCoefficient = 50;
 
 	public Window() {
 		super(2, 4, 30.0);
-		solarHeatGainCoefficient = Scene.getInstance().getWindowSolarHeatGainCoefficientNotPercentage() * 100;
 	}
 
 	@Override
@@ -360,7 +360,7 @@ public class Window extends HousePart {
 	}
 
 	public double getSolarHeatGainCoefficientNotPercentage() {
-		return Util.isZero(solarHeatGainCoefficient) ? Scene.getInstance().getWindowSolarHeatGainCoefficientNotPercentage() : solarHeatGainCoefficient * 0.01;
+		return solarHeatGainCoefficient * 0.01;
 	}
 
 	@Override

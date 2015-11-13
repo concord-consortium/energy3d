@@ -34,11 +34,10 @@ public class SolarPanel extends HousePart {
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
-	private double efficiency = 0; // between 0 and 100
+	private double efficiency = 10; // percentage, not (0, 1)
 
 	public SolarPanel() {
 		super(1, 1, 0.0);
-		efficiency = Scene.getInstance().getSolarPanelEfficiencyNotPercentage() * 100;
 	}
 
 	/** a percentage number between 0 and 100 */
@@ -53,7 +52,7 @@ public class SolarPanel extends HousePart {
 
 	/** a number between 0 and 1 for calculation */
 	public double getEfficiencyNotPercentage() {
-		return Util.isZero(efficiency) ? Scene.getInstance().getSolarPanelEfficiencyNotPercentage() : efficiency * 0.01;
+		return efficiency * 0.01;
 	}
 
 	@Override

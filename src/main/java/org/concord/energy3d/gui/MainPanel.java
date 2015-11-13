@@ -56,20 +56,20 @@ public class MainPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final MainPanel instance = new MainPanel();
 	private MainFrame mainFrame;
-	private JToolBar appToolbar = null;
-	private JToggleButton selectButton = null;
-	private JToggleButton wallButton = null;
-	private JToggleButton roofButton = null;
-	private JToggleButton windowButton = null;
-	private JToggleButton platformButton = null;
-	private JToggleButton shadowButton = null;
-	private JToggleButton spinViewButton = null;
-	private JToggleButton resizeButton = null;
-	private JToggleButton heliodonButton = null;
-	private JToggleButton sunAnimButton = null;
+	private JToolBar appToolbar;
+	private JToggleButton selectButton;
+	private JToggleButton wallButton;
+	private JToggleButton roofButton;
+	private JToggleButton windowButton;
+	private JToggleButton platformButton;
+	private JToggleButton shadowButton;
+	private JToggleButton spinViewButton;
+	private JToggleButton resizeButton;
+	private JToggleButton heliodonButton;
+	private JToggleButton sunAnimButton;
 	private JToggleButton annotationToggleButton;
-	private JToggleButton previewButton = null;
-	private JToggleButton zoomButton = null;
+	private JToggleButton previewButton;
+	private JToggleButton zoomButton;
 	private JToggleButton noteButton;
 	private JSplitPane energyCanvasNoteSplitPane;
 	private EnergyPanel energyPanel;
@@ -719,6 +719,7 @@ public class MainPanel extends JPanel {
 					if (energyViewButton.isSelected())
 						MainFrame.getInstance().autoSelectBuilding(false);
 					SceneManager.getInstance().computeEnergyView(energyViewButton.isSelected());
+					EnergyPanel.getInstance().showHeatMapContrastSlider(energyViewButton.isSelected());
 				}
 			});
 		}

@@ -138,10 +138,7 @@ public class Cost {
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof SolarPanel) {
-			final double efficiency = ((SolarPanel) part).getEfficiency();
-			if (efficiency == 0)
-				Double.parseDouble((String) EnergyPanel.getInstance().getSolarPanelEfficiencyComboBox().getSelectedItem());
-			return (int) efficiency * 50;
+			return (int) ((SolarPanel) part).getEfficiency() * 50;
 		}
 		if (part instanceof Tree) {
 			Tree tree = (Tree) part;

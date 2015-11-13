@@ -231,7 +231,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				stateValue = "{\"Building\":" + r.getTopContainer().getId() + ", \"ID\":" + r.getId() + ", \"Value\": " + r.getOverhangLength() * Scene.getInstance().getAnnotationScale() + "}";
 			} else if (lastEdit instanceof ChangeBuildingSolarPanelEfficiencyCommand) {
 				Foundation foundation = ((ChangeBuildingSolarPanelEfficiencyCommand) lastEdit).getFoundation();
-				stateValue = "{\"Building\":" + foundation.getId() + ", \"Value\": " + Scene.getInstance().getSolarPanelEfficiencyForWholeBuilding(foundation) + "}";
+				List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
+				stateValue = "{\"Building\":" + foundation.getId() + ", \"Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getEfficiency()) + "}";
 			} else if (lastEdit instanceof ChangeWindowShgcCommand) {
 				Window w = ((ChangeWindowShgcCommand) lastEdit).getWindow();
 				stateValue = "{\"Building\":" + w.getTopContainer().getId() + ", \"ID\":" + w.getId() + ", \"Value\": " + w.getSolarHeatGainCoefficient() + "}";
@@ -241,8 +242,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				List<Window> windows = Scene.getInstance().getWindowsOnWall(wall);
 				stateValue = "{\"Wall\":" + wall.getId() + ", \"Value\": " + (windows.isEmpty() ? -1 : windows.get(0).getSolarHeatGainCoefficient()) + "}";
 			} else if (lastEdit instanceof ChangeBuildingWindowShgcCommand) {
-				ChangeBuildingWindowShgcCommand c = (ChangeBuildingWindowShgcCommand) lastEdit;
-				Foundation foundation = c.getFoundation();
+				Foundation foundation = ((ChangeBuildingWindowShgcCommand) lastEdit).getFoundation();
 				List<Window> windows = Scene.getInstance().getWindowsOfBuilding(foundation);
 				stateValue = "{\"Building\":" + foundation.getId() + ", \"Value\": " + (windows.isEmpty() ? -1 : windows.get(0).getSolarHeatGainCoefficient()) + "}";
 			} else if (lastEdit instanceof ChangePartUFactorCommand) {
