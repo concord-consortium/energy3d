@@ -81,8 +81,6 @@ public class Cost {
 	public int getPartCost(final HousePart part) {
 		if (part instanceof Wall) {
 			double uFactor = ((Wall) part).getUValue();
-			if (uFactor == 0)
-				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWallsComboBox());
 			// According to http://www.homewyse.com/services/cost_to_insulate_your_home.html
 			// As of 2015, a 1000 square feet wall insulation will cost as high as $1500 to insulate in Boston.
 			// This translates into $16/m^2. We don't know what R-value this insulation will be. But let's assume it is R13 material that has a U-value of 0.44 W/m^2/C.
@@ -93,8 +91,6 @@ public class Cost {
 		}
 		if (part instanceof Window) {
 			double uFactor = ((Window) part).getUValue();
-			if (uFactor == 0)
-				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getWindowsComboBox());
 			// According to http://www.homewyse.com/costs/cost_of_double_pane_windows.html
 			// A storm window of about 1 m^2 costs about $500. A double-pane window of about 1 m^2 costs about $700.
 			double unitPrice = 500 + 600 / uFactor;
@@ -102,8 +98,6 @@ public class Cost {
 		}
 		if (part instanceof Roof) {
 			double uFactor = ((Roof) part).getUValue();
-			if (uFactor == 0)
-				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getRoofsComboBox());
 			// According to http://www.homewyse.com/services/cost_to_insulate_attic.html
 			// As of 2015, a 1000 square feet of attic area costs as high as $3200 to insulate in Boston.
 			// This translates into $34/m^2. We don't know the R-value of this insulation. But let's assume it is R22 material that has a U-value of 0.26 W/m^2/C.
@@ -115,8 +109,6 @@ public class Cost {
 		if (part instanceof Foundation) {
 			Foundation foundation = (Foundation) part;
 			double uFactor = foundation.getUValue();
-			if (uFactor == 0)
-				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getFloorsComboBox());
 			// http://www.homewyse.com/costs/cost_of_floor_insulation.html
 			// As of 2015, a 1000 square feet of floor area costs as high as $3000 to insulate in Boston. This translates into $32/m^2.
 			// Now, we don't know what R-value this insulation is. But let's assume it is R25 material (minimum insulation recommended
@@ -131,8 +123,6 @@ public class Cost {
 		}
 		if (part instanceof Door) {
 			double uFactor = ((Door) part).getUValue();
-			if (uFactor == 0)
-				uFactor = HeatLoad.parseValue(EnergyPanel.getInstance().getDoorsComboBox());
 			// According to http://www.homewyse.com/costs/cost_of_exterior_doors.html
 			double unitPrice = 500 + 100 / uFactor;
 			return (int) (part.getArea() * unitPrice);

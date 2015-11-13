@@ -70,10 +70,12 @@ import org.concord.energy3d.util.Util;
 
 public class PopupMenuFactory {
 
-	private static DecimalFormat twoDecimals = new DecimalFormat();
+	private static DecimalFormat integerFormat = new DecimalFormat();
+	private static DecimalFormat twoDecimalsFormat = new DecimalFormat();
 
 	static {
-		twoDecimals.setMaximumFractionDigits(2);
+		integerFormat.setMaximumFractionDigits(0);
+		twoDecimalsFormat.setMaximumFractionDigits(3);
 	}
 
 	private static JPopupMenu popupMenuForWindow;
@@ -423,8 +425,8 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForWindow.addSeparator();
-			popupMenuForWindow.add(miShgc);
 			popupMenuForWindow.add(createUValueMenuItem(true));
+			popupMenuForWindow.add(miShgc);
 			popupMenuForWindow.add(muntinMenu);
 
 		}
@@ -716,7 +718,7 @@ public class PopupMenuFactory {
 				if (useUValue) {
 
 					unitPanel.add(new JLabel("U-Value in US Unit:"));
-					final JTextField uValueField = new JTextField(twoDecimals.format(Util.toUsUValue(t.getUValue())), 10);
+					final JTextField uValueField = new JTextField(twoDecimalsFormat.format(Util.toUsUValue(t.getUValue())), 10);
 					uValueField.setAlignmentX(Component.LEFT_ALIGNMENT);
 					unitPanel.add(uValueField);
 					unitPanel.add(new JLabel("<html>Btu/(h&middot;ft<sup>2</sup>&middot;&deg;F)</html>"));
@@ -730,7 +732,7 @@ public class PopupMenuFactory {
 							if ("".equals(newValue))
 								return;
 							try {
-								uValueField.setText(twoDecimals.format(Util.toUsUValue(Double.parseDouble(newValue))));
+								uValueField.setText(twoDecimalsFormat.format(Util.toUsUValue(Double.parseDouble(newValue))));
 							} catch (Exception exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
@@ -760,7 +762,7 @@ public class PopupMenuFactory {
 							if ("".equals(newValue))
 								return;
 							try {
-								siField.setText(twoDecimals.format(1.0 / (Util.toSiRValue(1.0 / Double.parseDouble(newValue)))));
+								siField.setText(twoDecimalsFormat.format(1.0 / (Util.toSiRValue(1.0 / Double.parseDouble(newValue)))));
 							} catch (Exception exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
@@ -785,7 +787,7 @@ public class PopupMenuFactory {
 				} else {
 
 					unitPanel.add(new JLabel("R-Value in US Unit:"));
-					final JTextField rValueField = new JTextField(twoDecimals.format(Util.toUsRValue(t.getUValue())), 10);
+					final JTextField rValueField = new JTextField(integerFormat.format(Util.toUsRValue(t.getUValue())), 10);
 					rValueField.setAlignmentX(Component.LEFT_ALIGNMENT);
 					unitPanel.add(rValueField);
 					unitPanel.add(new JLabel("<html>h&middot;ft<sup>2</sup>&middot;&deg;F/Btu</html>"));
@@ -799,7 +801,7 @@ public class PopupMenuFactory {
 							if ("".equals(newValue))
 								return;
 							try {
-								rValueField.setText(twoDecimals.format(Util.toUsRValue(Double.parseDouble(newValue))));
+								rValueField.setText(integerFormat.format(Util.toUsRValue(Double.parseDouble(newValue))));
 							} catch (Exception exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
@@ -829,7 +831,7 @@ public class PopupMenuFactory {
 							if ("".equals(newValue))
 								return;
 							try {
-								siField.setText(twoDecimals.format(1.0 / Util.toSiRValue(Double.parseDouble(newValue))));
+								siField.setText(twoDecimalsFormat.format(1.0 / Util.toSiRValue(Double.parseDouble(newValue))));
 							} catch (Exception exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}

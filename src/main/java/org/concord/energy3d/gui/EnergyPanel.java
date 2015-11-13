@@ -30,7 +30,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -58,18 +57,14 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
-import org.concord.energy3d.model.Wall;
-import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Weather;
-import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
@@ -86,11 +81,6 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 public class EnergyPanel extends JPanel {
 
 	public static final ReadOnlyColorRGBA[] solarColors = { ColorRGBA.BLUE, ColorRGBA.GREEN, ColorRGBA.YELLOW, ColorRGBA.RED };
-	final static String[] U_VALUE_CHOICES_WALL = { "1.89 (R3)", "1.42 (R4)", "0.95 (R6)", "0.52 (R11)", "0.44 (R13)", "0.38 (R15)", "0.32 (R18)", "0.28 (R20)", "0.23 (R25)", "0.19 (R30)", "0.15 (R38)" };
-	final static String[] U_VALUE_CHOICES_ROOF = { "1.89 (R3)", "1.42 (R4)", "0.95 (R6)", "0.26 (R22)", "0.23 (R25)", "0.15 (R38)", "0.11 (R50)", "0.09 (R60)" };
-	final static String[] U_VALUE_CHOICES_FLOOR = { "1.89 (R3)", "0.44 (R13)", "0.30 (R19)", "0.23 (R25)", "0.19 (R30)", "0.15 (R38)" };
-	final static String[] U_VALUE_CHOICES_WINDOW = { "6.08 (U1.07)", "3.52 (U0.62)", "2.95 (U0.52)", "2.73 (U0.48)", "2.21 (U0.39)", "1.93 (U0.34)", "1.31 (U0.23)", "1.25 (U0.22)" };
-	final static String[] U_VALUE_CHOICES_DOOR = { "1.89 (R3)", "0.57 (R10)" };
 
 	private static final long serialVersionUID = 1L;
 	private static final EnergyPanel instance = new EnergyPanel();
@@ -110,11 +100,6 @@ public class EnergyPanel extends JPanel {
 	};
 
 	private final JPanel dataPanel;
-	private final JComboBox<String> wallsComboBox;
-	private final JComboBox<String> floorsComboBox; // floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
-	private final JComboBox<String> doorsComboBox;
-	private final JComboBox<String> windowsComboBox;
-	private final JComboBox<String> roofsComboBox;
 	private final JComboBox<String> cityComboBox;
 	private final JTextField heatingTextField;
 	private final JTextField coolingTextField;
@@ -147,7 +132,6 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty3TextField;
 	private JTextField partProperty4TextField;
 	private ChangeListener latitudeChangeListener;
-	private Foundation foundation;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -387,240 +371,6 @@ public class EnergyPanel extends JPanel {
 		gbc_sunshineHoursField.gridx = 6;
 		gbc_sunshineHoursField.gridy = 0;
 		conditionPanel.add(sunshineHoursField, gbc_sunshineHoursField);
-
-		final JPanel uFactorPanel = new JPanel();
-		uFactorPanel.setToolTipText("<html><b>U-value</b><br>measures how well a building element conducts heat.</html>");
-		uFactorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "U-Value of All [W/(m\u00B2.\u00B0C)]", TitledBorder.LEADING, TitledBorder.TOP));
-		dataPanel.add(uFactorPanel);
-		final GridBagLayout gbl_uFactorPanel = new GridBagLayout();
-		uFactorPanel.setLayout(gbl_uFactorPanel);
-
-		final JLabel wallsLabel = new JLabel("Walls:");
-		final GridBagConstraints gbc_wallsLabel = new GridBagConstraints();
-		gbc_wallsLabel.anchor = GridBagConstraints.EAST;
-		gbc_wallsLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_wallsLabel.gridx = 0;
-		gbc_wallsLabel.gridy = 0;
-		uFactorPanel.add(wallsLabel, gbc_wallsLabel);
-
-		wallsComboBox = new WideComboBox();
-		wallsComboBox.setEditable(true);
-		wallsComboBox.setModel(new DefaultComboBoxModel<String>(U_VALUE_CHOICES_WALL));
-		wallsComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final double uFactor = HeatLoad.parseValue(wallsComboBox);
-				if (foundation != null) {
-					final int count = Scene.getInstance().countParts(foundation, Wall.class);
-					if (count > 0)
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-values of " + count + " existing walls of<br>the selected building (#" + foundation.getId() + ") to " + wallsComboBox.getSelectedItem() + "?</html>", "U-value of Walls", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(foundation, Operation.DRAW_WALL));
-							for (final HousePart p : Scene.getInstance().getParts()) {
-								if (p instanceof Wall && p.getTopContainer() == foundation)
-									((Wall) p).setUValue(uFactor);
-							}
-						}
-				}
-				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				updateCost();
-				Scene.getInstance().setEdited(true);
-			}
-		});
-		JButton arrowButton = Util.getButtonSubComponent(wallsComboBox);
-		if (arrowButton != null) {
-			arrowButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					foundation = MainFrame.getInstance().autoSelectBuilding(true);
-				}
-			});
-		}
-		final GridBagConstraints gbc_wallsComboBox = new GridBagConstraints();
-		gbc_wallsComboBox.insets = new Insets(0, 0, 5, 5);
-		gbc_wallsComboBox.gridx = 1;
-		gbc_wallsComboBox.gridy = 0;
-		uFactorPanel.add(wallsComboBox, gbc_wallsComboBox);
-
-		final JLabel roofsLabel = new JLabel("Roofs:");
-		final GridBagConstraints gbc_roofsLabel = new GridBagConstraints();
-		gbc_roofsLabel.anchor = GridBagConstraints.EAST;
-		gbc_roofsLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_roofsLabel.gridx = 2;
-		gbc_roofsLabel.gridy = 0;
-		uFactorPanel.add(roofsLabel, gbc_roofsLabel);
-
-		roofsComboBox = new WideComboBox();
-		roofsComboBox.setEditable(true);
-		roofsComboBox.setModel(new DefaultComboBoxModel<String>(U_VALUE_CHOICES_ROOF));
-		roofsComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final double uFactor = HeatLoad.parseValue(roofsComboBox);
-				if (foundation != null) {
-					final int count = Scene.getInstance().countParts(foundation, Roof.class);
-					if (count > 0)
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-value of the roof<br>of the selected building (#" + foundation.getId() + ") to " + roofsComboBox.getSelectedItem() + "?</html>", "U-value of Roof", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(foundation, Operation.DRAW_ROOF_PYRAMID));
-							for (final HousePart p : Scene.getInstance().getParts()) {
-								if (p instanceof Roof && p.getTopContainer() == foundation)
-									((Roof) p).setUValue(uFactor);
-							}
-						}
-				}
-				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				updateCost();
-				Scene.getInstance().setEdited(true);
-			}
-		});
-		arrowButton = Util.getButtonSubComponent(roofsComboBox);
-		if (arrowButton != null) {
-			arrowButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					foundation = MainFrame.getInstance().autoSelectBuilding(true);
-				}
-			});
-		}
-		final GridBagConstraints gbc_roofsComboBox = new GridBagConstraints();
-		gbc_roofsComboBox.gridx = 3;
-		gbc_roofsComboBox.gridy = 0;
-		uFactorPanel.add(roofsComboBox, gbc_roofsComboBox);
-
-		final JLabel windowsLabel = new JLabel("Windows:");
-		final GridBagConstraints gbc_windowsLabel = new GridBagConstraints();
-		gbc_windowsLabel.anchor = GridBagConstraints.EAST;
-		gbc_windowsLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_windowsLabel.gridx = 0;
-		gbc_windowsLabel.gridy = 1;
-		uFactorPanel.add(windowsLabel, gbc_windowsLabel);
-
-		windowsComboBox = new WideComboBox();
-		windowsComboBox.setEditable(true);
-		windowsComboBox.setModel(new DefaultComboBoxModel<String>(U_VALUE_CHOICES_WINDOW));
-		windowsComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final double uFactor = HeatLoad.parseValue(windowsComboBox);
-				if (foundation != null) {
-					final int count = Scene.getInstance().countParts(foundation, Window.class);
-					if (count > 0)
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-values of " + count + " existing windows of<br>the selected building (#" + foundation.getId() + ") to " + windowsComboBox.getSelectedItem() + "?</html>", "U-value of Windows", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(foundation, Operation.DRAW_WINDOW));
-							for (final HousePart p : Scene.getInstance().getParts()) {
-								if (p instanceof Window && p.getTopContainer() == foundation)
-									((Window) p).setUValue(uFactor);
-							}
-						}
-				}
-				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				updateCost();
-				Scene.getInstance().setEdited(true);
-			}
-		});
-		arrowButton = Util.getButtonSubComponent(windowsComboBox);
-		if (arrowButton != null) {
-			arrowButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					foundation = MainFrame.getInstance().autoSelectBuilding(true);
-				}
-			});
-		}
-		final GridBagConstraints gbc_windowsComboBox = new GridBagConstraints();
-		gbc_windowsComboBox.insets = new Insets(0, 0, 0, 5);
-		gbc_windowsComboBox.gridx = 1;
-		gbc_windowsComboBox.gridy = 1;
-		uFactorPanel.add(windowsComboBox, gbc_windowsComboBox);
-
-		// Temporarily remove the door combobox from the GUI to save space for the more important floor combobox. When we revamp the GUI, we will put this back.
-		// For now, the U-value of a door can be changed using the pop-up menu of the door.
-
-		// final JLabel doorsLabel = new JLabel("Doors:");
-		// final GridBagConstraints gbc_doorsLabel = new GridBagConstraints();
-		// gbc_doorsLabel.anchor = GridBagConstraints.EAST;
-		// gbc_doorsLabel.insets = new Insets(0, 0, 5, 5);
-		// gbc_doorsLabel.gridx = 2;
-		// gbc_doorsLabel.gridy = 1;
-		// uFactorPanel.add(doorsLabel, gbc_doorsLabel);
-
-		doorsComboBox = new WideComboBox();
-		doorsComboBox.setEditable(true);
-		doorsComboBox.setModel(new DefaultComboBoxModel<String>(U_VALUE_CHOICES_DOOR));
-		doorsComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final double uFactor = HeatLoad.parseValue(doorsComboBox);
-				if (foundation != null) {
-					final int count = Scene.getInstance().countParts(foundation, Door.class);
-					if (count > 0)
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you want to set the U-values of " + count + " existing doors of<br>the selected building (#" + foundation.getId() + ") to " + doorsComboBox.getSelectedItem() + "?</html>", "U-value of Doors", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(foundation, Operation.DRAW_DOOR));
-							for (final HousePart p : Scene.getInstance().getParts()) {
-								if (p instanceof Door && p.getTopContainer() == foundation)
-									((Door) p).setUValue(uFactor);
-							}
-						}
-				}
-				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				updateCost();
-				Scene.getInstance().setEdited(true);
-			}
-		});
-		arrowButton = Util.getButtonSubComponent(doorsComboBox);
-		if (arrowButton != null) {
-			arrowButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					foundation = MainFrame.getInstance().autoSelectBuilding(true);
-				}
-			});
-		}
-		final GridBagConstraints gbc_doorsComboBox = new GridBagConstraints();
-		gbc_doorsComboBox.insets = new Insets(0, 0, 5, 0);
-		gbc_doorsComboBox.gridx = 3;
-		gbc_doorsComboBox.gridy = 1;
-		// uFactorPanel.add(doorsComboBox, gbc_doorsComboBox);
-
-		final JLabel floorsLabel = new JLabel("Floors:");
-		final GridBagConstraints gbc_floorLabel = new GridBagConstraints();
-		gbc_floorLabel.anchor = GridBagConstraints.EAST;
-		gbc_floorLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_floorLabel.gridx = 2;
-		gbc_floorLabel.gridy = 1;
-		uFactorPanel.add(floorsLabel, gbc_floorLabel);
-
-		floorsComboBox = new WideComboBox();
-		floorsComboBox.setEditable(true);
-		floorsComboBox.setModel(new DefaultComboBoxModel<String>(U_VALUE_CHOICES_FLOOR));
-		floorsComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final double uFactor = HeatLoad.parseValue(floorsComboBox);
-				if (foundation != null) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(foundation, Operation.DRAW_FLOOR));
-					foundation.setUValue(uFactor);
-				}
-				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				updateCost();
-				Scene.getInstance().setEdited(true);
-			}
-		});
-		arrowButton = Util.getButtonSubComponent(floorsComboBox);
-		if (arrowButton != null) {
-			arrowButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					foundation = MainFrame.getInstance().autoSelectBuilding(true);
-				}
-			});
-		}
-		final GridBagConstraints gbc_floorComboBox = new GridBagConstraints();
-		gbc_floorComboBox.insets = new Insets(0, 0, 5, 0);
-		gbc_floorComboBox.gridx = 3;
-		gbc_floorComboBox.gridy = 1;
-		uFactorPanel.add(floorsComboBox, gbc_floorComboBox);
-
-		uFactorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, uFactorPanel.getPreferredSize().height));
 
 		heatMapPanel = new JPanel(new BorderLayout());
 		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP));
@@ -1039,56 +789,6 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	public void updatePartProperties() {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart instanceof Wall) {
-			final int n = wallsComboBox.getItemCount();
-			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_WALL[i]);
-				if (Util.isZero(choice - ((Wall) selectedPart).getUValue())) {
-					Util.selectSilently(wallsComboBox, i);
-					break;
-				}
-			}
-		} else if (selectedPart instanceof Roof) {
-			final int n = roofsComboBox.getItemCount();
-			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_ROOF[i]);
-				if (Util.isZero(choice - ((Roof) selectedPart).getUValue())) {
-					Util.selectSilently(roofsComboBox, i);
-					break;
-				}
-			}
-		} else if (selectedPart instanceof Door) {
-			final int n = doorsComboBox.getItemCount();
-			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_DOOR[i]);
-				if (Util.isZero(choice - ((Door) selectedPart).getUValue())) {
-					Util.selectSilently(doorsComboBox, i);
-					break;
-				}
-			}
-		} else if (selectedPart instanceof Foundation) {
-			final int n = floorsComboBox.getItemCount();
-			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_FLOOR[i]);
-				if (Util.isZero(choice - ((Foundation) selectedPart).getUValue())) {
-					Util.selectSilently(floorsComboBox, i);
-					break;
-				}
-			}
-		} else if (selectedPart instanceof Window) {
-			int n = windowsComboBox.getItemCount();
-			for (int i = 0; i < n; i++) {
-				final double choice = Scene.parsePropertyString(U_VALUE_CHOICES_WINDOW[i]);
-				if (Util.isZero(choice - ((Window) selectedPart).getUValue())) {
-					Util.selectSilently(windowsComboBox, i);
-					break;
-				}
-			}
-		}
-	}
-
 	public void updatePartEnergy() {
 		final boolean energyViewShown = MainPanel.getInstance().getEnergyViewButton().isSelected();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -1243,26 +943,6 @@ public class EnergyPanel extends JPanel {
 
 	public void cancel() {
 		cancel = true;
-	}
-
-	public JComboBox<String> getWallsComboBox() {
-		return wallsComboBox;
-	}
-
-	public JComboBox<String> getDoorsComboBox() {
-		return doorsComboBox;
-	}
-
-	public JComboBox<String> getFloorsComboBox() {
-		return floorsComboBox;
-	}
-
-	public JComboBox<String> getWindowsComboBox() {
-		return windowsComboBox;
-	}
-
-	public JComboBox<String> getRoofsComboBox() {
-		return roofsComboBox;
 	}
 
 	public JComboBox<String> getCityComboBox() {

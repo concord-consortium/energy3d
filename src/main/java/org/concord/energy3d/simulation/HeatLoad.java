@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -17,6 +15,7 @@ import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
@@ -27,57 +26,41 @@ public class HeatLoad {
 
 	public final static double LOWEST_TEMPERATURE_OF_WARM_DAY = 15;
 	private final static HeatLoad instance = new HeatLoad();
-	private double wallUValue, doorUValue, windowUValue, roofUValue, floorUValue;
 
 	public static HeatLoad getInstance() {
 		return instance;
 	}
 
-	private static boolean isZero(final double x) {
-		return Math.abs(x) < 0.000001;
-	}
-
 	private double getUValue(final HousePart part) {
 		if (part instanceof Foundation)
-			return isZero(((Foundation) part).getUValue()) ? floorUValue : ((Foundation) part).getUValue();
+			return ((Foundation) part).getUValue();
 		if (part instanceof Wall)
-			return isZero(((Wall) part).getUValue()) ? wallUValue : ((Wall) part).getUValue();
+			return ((Wall) part).getUValue();
 		if (part instanceof Door)
-			return isZero(((Door) part).getUValue()) ? doorUValue : ((Door) part).getUValue();
+			return ((Door) part).getUValue();
 		if (part instanceof Roof)
-			return isZero(((Roof) part).getUValue()) ? roofUValue : ((Roof) part).getUValue();
+			return ((Roof) part).getUValue();
 		if (part instanceof Window)
-			return isZero(((Window) part).getUValue()) ? windowUValue : ((Window) part).getUValue();
+			return ((Window) part).getUValue();
 		if (part instanceof Sensor) {
 			final HousePart container = part.getContainer();
 			if (container instanceof Wall) {
 				final HousePart x = insideChild(part.getPoints().get(0), container);
 				if (x instanceof Window)
-					return isZero(((Window) x).getUValue()) ? windowUValue : ((Window) x).getUValue();
+					return ((Window) x).getUValue();
 				if (x instanceof Door)
-					return isZero(((Door) x).getUValue()) ? doorUValue : ((Door) x).getUValue();
-				return isZero(((Wall) container).getUValue()) ? wallUValue : ((Wall) container).getUValue();
+					return ((Door) x).getUValue();
+				return ((Wall) container).getUValue();
 			}
 			if (container instanceof Roof)
-				return isZero(((Roof) container).getUValue()) ? roofUValue : ((Roof) container).getUValue();
+				return ((Roof) container).getUValue();
 			if (container instanceof Foundation)
-				return isZero(((Foundation) container).getUValue()) ? floorUValue : ((Foundation) container).getUValue();
+				return ((Foundation) container).getUValue();
 		}
 		return 0;
 	}
 
 	public void computeEnergyToday(final Calendar today, final double insideTemperature) {
-		try {
-			wallUValue = parseValue(EnergyPanel.getInstance().getWallsComboBox());
-			doorUValue = parseValue(EnergyPanel.getInstance().getDoorsComboBox());
-			windowUValue = parseValue(EnergyPanel.getInstance().getWindowsComboBox());
-			roofUValue = parseValue(EnergyPanel.getInstance().getRoofsComboBox());
-			floorUValue = parseValue(EnergyPanel.getInstance().getFloorsComboBox());
-		} catch (final Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(MainPanel.getInstance(), "Invalid U-Factor value: " + e.getMessage(), "Invalid U-Factor", JOptionPane.WARNING_MESSAGE);
-			return;
-		}
 
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
@@ -104,7 +87,7 @@ public class HeatLoad {
 						final double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 						if (part.isDrawCompleted()) {
 							final double uValue = getUValue(part);
-							if (isZero(uValue))
+							if (Util.isZero(uValue))
 								continue;
 							double heatloss = roof.getArea(mesh) * uValue * deltaT / 1000.0 / 60 * timeStep;
 							// if the lowest outside temperature is high enough, there is no need to turn on the heater hence no heat loss
@@ -121,8 +104,8 @@ public class HeatLoad {
 					double deltaT = insideTemperature - groundTemperature;
 					Foundation foundation = (Foundation) part;
 					if (foundation.isDrawCompleted()) {
-						final double uValue = getUValue(foundation);
-						if (isZero(uValue))
+						final double uValue = getUValue(part);
+						if (Util.isZero(uValue))
 							continue;
 						double[] buildingGeometry = foundation.getBuildingGeometry();
 						double area = buildingGeometry != null ? buildingGeometry[1] : foundation.getArea();
@@ -137,7 +120,7 @@ public class HeatLoad {
 					final double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 					if (part.isDrawCompleted()) {
 						final double uValue = getUValue(part);
-						if (isZero(uValue))
+						if (Util.isZero(uValue))
 							continue;
 						double heatloss = part.getArea() * uValue * deltaT / 1000.0 / 60 * timeStep;
 						// if outside is warm enough, there is no need to turn on the heater hence no heat loss

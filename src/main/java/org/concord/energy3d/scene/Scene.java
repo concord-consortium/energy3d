@@ -119,11 +119,6 @@ public class Scene implements Serializable {
 	private boolean areaEnabled;
 	private boolean heightEnabled;
 	private boolean cleanup = false;
-	private String wallUFactor;
-	private String doorUFactor;
-	private String windowUFactor;
-	private String roofUFactor;
-	private String floorUFactor; // floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 	private double backgroundAlbedo = 0.3;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double groundThermalDiffusivity = 0.01; // unit: m^2/s
@@ -340,20 +335,28 @@ public class Scene implements Serializable {
 		for (final HousePart p : instance.parts) {
 			if (p instanceof Roof) {
 				final Roof r = (Roof) p;
+				if (Util.isZero(r.getUValue()))
+					r.setUValue(1.89);
 				if (Util.isZero(r.getOverhangLength()))
 					r.setOverhangLength(2);
 				if (Util.isZero(r.getVolumetricHeatCapacity()))
 					r.setVolumetricHeatCapacity(0.5);
 			} else if (p instanceof Foundation) {
 				final Foundation f = (Foundation) p;
+				if (Util.isZero(f.getUValue()))
+					f.setUValue(1.89);
 				if (Util.isZero(f.getVolumetricHeatCapacity()))
 					f.setVolumetricHeatCapacity(0.5);
 			} else if (p instanceof Wall) {
 				final Wall w = (Wall) p;
+				if (Util.isZero(w.getUValue()))
+					w.setUValue(1.89);
 				if (Util.isZero(w.getVolumetricHeatCapacity()))
 					w.setVolumetricHeatCapacity(0.5);
 			} else if (p instanceof Door) {
 				final Door d = (Door) p;
+				if (Util.isZero(d.getUValue()))
+					d.setUValue(1.89);
 				if (Util.isZero(d.getVolumetricHeatCapacity()))
 					d.setVolumetricHeatCapacity(0.5);
 			} else if (p instanceof SolarPanel) {
@@ -362,68 +365,14 @@ public class Scene implements Serializable {
 					sp.setEfficiency(10);
 			} else if (p instanceof Window) {
 				final Window w = (Window) p;
+				if (Util.isZero(w.getUValue()))
+					w.setUValue(1.89);
 				if (Util.isZero(w.getSolarHeatGainCoefficient()))
 					w.setSolarHeatGainCoefficient(50);
+				if (Util.isZero(w.getVolumetricHeatCapacity()))
+					w.setVolumetricHeatCapacity(0.5);
 			}
 
-		}
-
-		// TODO: Remove the following checks for backward compatibility soon (perhaps the end of 2016)
-
-		if (instance.windowUFactor != null) {
-			final double defaultWindowUFactor = parsePropertyString(instance.windowUFactor);
-			for (final HousePart p : instance.parts) {
-				if (p instanceof Window) {
-					Window w = (Window) p;
-					if (w.getUValue() <= 0)
-						w.setUValue(defaultWindowUFactor);
-				}
-			}
-			energyPanel.getWindowsComboBox().setSelectedItem(instance.windowUFactor);
-		}
-		if (instance.wallUFactor != null) {
-			final double defaultWallUFactor = parsePropertyString(instance.wallUFactor);
-			for (final HousePart p : instance.parts) {
-				if (p instanceof Wall) {
-					Wall w = (Wall) p;
-					if (w.getUValue() <= 0)
-						w.setUValue(defaultWallUFactor);
-				}
-			}
-			energyPanel.getWallsComboBox().setSelectedItem(instance.wallUFactor);
-		}
-		if (instance.doorUFactor != null) {
-			final double defaultDoorUFactor = parsePropertyString(instance.doorUFactor);
-			for (final HousePart p : instance.parts) {
-				if (p instanceof Door) {
-					Door d = (Door) p;
-					if (d.getUValue() <= 0)
-						d.setUValue(defaultDoorUFactor);
-				}
-			}
-			energyPanel.getDoorsComboBox().setSelectedItem(instance.doorUFactor);
-		}
-		if (instance.floorUFactor != null) {
-			final double defaultFloorUFactor = parsePropertyString(instance.floorUFactor);
-			for (final HousePart p : instance.parts) {
-				if (p instanceof Foundation) {
-					Foundation f = (Foundation) p;
-					if (f.getUValue() <= 0)
-						f.setUValue(defaultFloorUFactor);
-				}
-			}
-			energyPanel.getFloorsComboBox().setSelectedItem(instance.floorUFactor);
-		}
-		if (instance.roofUFactor != null) {
-			final double defaultRoofUFactor = parsePropertyString(instance.roofUFactor);
-			for (final HousePart p : instance.parts) {
-				if (p instanceof Roof) {
-					Roof r = (Roof) p;
-					if (r.getUValue() <= 0)
-						r.setUValue(defaultRoofUFactor);
-				}
-			}
-			energyPanel.getRoofsComboBox().setSelectedItem(instance.roofUFactor);
 		}
 
 		if (Util.isZero(instance.volumetricHeatCapacity))
@@ -595,11 +544,6 @@ public class Scene implements Serializable {
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
 				instance.solarStep = SolarRadiation.getInstance().getSolarStep();
 				instance.timeStep = SolarRadiation.getInstance().getTimeStep();
-				instance.wallUFactor = (String) EnergyPanel.getInstance().getWallsComboBox().getSelectedItem();
-				instance.windowUFactor = (String) EnergyPanel.getInstance().getWindowsComboBox().getSelectedItem();
-				instance.floorUFactor = (String) EnergyPanel.getInstance().getFloorsComboBox().getSelectedItem();
-				instance.doorUFactor = (String) EnergyPanel.getInstance().getDoorsComboBox().getSelectedItem();
-				instance.roofUFactor = (String) EnergyPanel.getInstance().getRoofsComboBox().getSelectedItem();
 
 				if (setAsCurrentFile)
 					Scene.url = url;
