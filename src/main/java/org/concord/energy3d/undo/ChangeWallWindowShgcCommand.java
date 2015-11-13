@@ -6,20 +6,20 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeBuildingWindowShgcCommand extends AbstractUndoableEdit {
+public class ChangeWallWindowShgcCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double[] orgShgc, newShgc;
-	private Foundation foundation;
+	private Wall wall;
 	private List<Window> windows;
 
-	public ChangeBuildingWindowShgcCommand(Foundation foundation) {
-		this.foundation = foundation;
-		windows = Scene.getInstance().getWindowsOfBuilding(foundation);
+	public ChangeWallWindowShgcCommand(Wall wall) {
+		this.wall = wall;
+		windows = Scene.getInstance().getWindowsOnWall(wall);
 		int n = windows.size();
 		orgShgc = new double[n];
 		for (int i = 0; i < n; i++) {
@@ -48,13 +48,13 @@ public class ChangeBuildingWindowShgcCommand extends AbstractUndoableEdit {
 	}
 
 	// for action logging
-	public Foundation getFoundation() {
-		return foundation;
+	public Wall getWall() {
+		return wall;
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "SHGC Change for All Windows of Selected Building";
+		return "SHGC Change for All Windows on Wall";
 	}
 
 }

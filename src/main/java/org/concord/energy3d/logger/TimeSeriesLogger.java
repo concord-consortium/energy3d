@@ -63,6 +63,7 @@ import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeWallWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
@@ -234,9 +235,16 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			} else if (lastEdit instanceof ChangeWindowShgcCommand) {
 				Window w = ((ChangeWindowShgcCommand) lastEdit).getWindow();
 				stateValue = "{\"Building\":" + w.getTopContainer().getId() + ", \"ID\":" + w.getId() + ", \"Value\": " + w.getSolarHeatGainCoefficient() + "}";
+			} else if (lastEdit instanceof ChangeWallWindowShgcCommand) {
+				ChangeWallWindowShgcCommand c = (ChangeWallWindowShgcCommand) lastEdit;
+				Wall wall = c.getWall();
+				List<Window> windows = Scene.getInstance().getWindowsOnWall(wall);
+				stateValue = "{\"Wall\":" + wall.getId() + ", \"Value\": " + (windows.isEmpty() ? -1 : windows.get(0).getSolarHeatGainCoefficient()) + "}";
 			} else if (lastEdit instanceof ChangeBuildingWindowShgcCommand) {
-				Foundation foundation = ((ChangeBuildingWindowShgcCommand) lastEdit).getFoundation();
-				stateValue = "{\"Building\":" + foundation.getId() + ", \"Value\": " + Scene.getInstance().getWindowShgcForWholeBuilding(foundation) + "}";
+				ChangeBuildingWindowShgcCommand c = (ChangeBuildingWindowShgcCommand) lastEdit;
+				Foundation foundation = c.getFoundation();
+				List<Window> windows = Scene.getInstance().getWindowsOfBuilding(foundation);
+				stateValue = "{\"Building\":" + foundation.getId() + ", \"Value\": " + (windows.isEmpty() ? -1 : windows.get(0).getSolarHeatGainCoefficient()) + "}";
 			} else if (lastEdit instanceof ChangePartUFactorCommand) {
 				HousePart p = ((ChangePartUFactorCommand) lastEdit).getHousePart();
 				Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();

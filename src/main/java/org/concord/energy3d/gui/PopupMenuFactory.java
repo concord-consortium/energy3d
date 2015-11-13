@@ -1,6 +1,5 @@
 package org.concord.energy3d.gui;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -16,6 +15,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
@@ -39,9 +39,11 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
+import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeWallWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
@@ -127,8 +129,9 @@ public class PopupMenuFactory {
 			miAlbedo.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					final String title = "<html>Background Albedo (dimensionless [0, 1])<hr><font size=2>Some reference values:<br>0.17 (soil), 0.25 (grass), 0.40 (sand), 0.55 (concrete), snow (0.9)</html>";
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Background Albedo (dimensionless [0, 1])", Scene.getInstance().getBackgroundAlbedo());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getBackgroundAlbedo());
 						if (newValue == null)
 							break;
 						else {
@@ -154,8 +157,9 @@ public class PopupMenuFactory {
 			miThermalDiffusivity.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					final String title = "<html>Ground Thermal Diffusivity (m<sup>2</sup>/s)<hr><font size=2>Some reference values:<br>0.039 (sand), 0.046 (clay), 0.05 (silt)</html>";
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "<html>Ground Thermal Diffusivity (m<sup>2</sup>/s)</html>", Scene.getInstance().getGroundThermalDiffusivity());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGroundThermalDiffusivity());
 						if (newValue == null)
 							break;
 						else {
@@ -345,71 +349,62 @@ public class PopupMenuFactory {
 
 			});
 
-			final JMenu shgcMenu = new JMenu("Solar Heat Gain Coefficient");
-
-			ButtonGroup shgcButtonGroup = new ButtonGroup();
-
-			final int nShgc = EnergyPanel.WINDOW_SHGC_CHOICES.length;
-			final int[] shgcValues = new int[nShgc];
-			for (int i = 0; i < nShgc; i++)
-				shgcValues[i] = Integer.parseInt(EnergyPanel.WINDOW_SHGC_CHOICES[i]);
-			final JRadioButtonMenuItem[] miShgc = new JRadioButtonMenuItem[nShgc + 1];
-
-			for (int i = 0; i < nShgc; i++) {
-				miShgc[i] = new JRadioButtonMenuItem(shgcValues[i] + "%");
-				final int i2 = i;
-				miShgc[i].addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Window) {
-							Window window = (Window) selectedPart;
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeWindowShgcCommand(window));
-							window.setSolarHeatGainCoefficient(shgcValues[i2]);
-							Scene.getInstance().setEdited(true);
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-						}
-					}
-				});
-				shgcButtonGroup.add(miShgc[i]);
-				shgcMenu.add(miShgc[i]);
-			}
-			miShgc[nShgc] = new JRadioButtonMenuItem();
-			shgcButtonGroup.add(miShgc[nShgc]);
-
-			shgcMenu.addMenuListener(new MenuListener() {
-
+			final JMenuItem miShgc = new JMenuItem("Solar Heat Gain Coefficient...");
+			miShgc.addActionListener(new ActionListener() {
 				@Override
-				public void menuSelected(MenuEvent e) {
-					boolean b = false;
+				public void actionPerformed(final ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						Window window = (Window) selectedPart;
-						for (int i = 0; i < nShgc; i++) {
-							if (Util.isZero(window.getSolarHeatGainCoefficient() - shgcValues[i])) {
-								Util.selectSilently(miShgc[i], true);
-								b = true;
-								break;
+					if (!(selectedPart instanceof Window))
+						return;
+					final Window window = (Window) selectedPart;
+					final String title = "<html>Solar Heat Gain Coefficient (%)</html>";
+					final String footnote = "<html><hr><font size=2>Some reference values:<br><table><tr><td><font size=2>Single glass (clear)</td><td><font size=2>66</td></tr><tr><td><font size=2>Single glass (green tint)</td><td><font size=2>55</td></tr><tr><td><font size=2>Triple glass (air spaces)</td><td><font size=2>39</td></tr></table><hr></html>";
+					final JRadioButton rb1 = new JRadioButton("Apply to only this window", true);
+					final JRadioButton rb2 = new JRadioButton("Apply to all windows on this wall");
+					final JRadioButton rb3 = new JRadioButton("Apply to all windows of this building");
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, rb1, rb2, rb3 };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, window.getSolarHeatGainCoefficient());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < 0 || val > 100) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar heat gain coefficient must be between 0 and 100.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										SceneManager.getInstance().getUndoManager().addEdit(new ChangeWindowShgcCommand(window));
+										window.setSolarHeatGainCoefficient(val);
+									} else if (rb2.isSelected()) {
+										Wall wall = (Wall) window.getContainer();
+										SceneManager.getInstance().getUndoManager().addEdit(new ChangeWallWindowShgcCommand(wall));
+										Scene.getInstance().setWindowShgcOnWall(wall, val);
+									} else if (rb3.isSelected()) {
+										Foundation foundation = window.getTopContainer();
+										SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingWindowShgcCommand(foundation));
+										Scene.getInstance().setWindowShgcOfBuilding(foundation, val);
+									}
+									Scene.getInstance().setEdited(true);
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
-						if (!b)
-							miShgc[nShgc].setSelected(true);
 					}
 				}
-
-				@Override
-				public void menuDeselected(MenuEvent e) {
-				}
-
-				@Override
-				public void menuCanceled(MenuEvent e) {
-				}
-
 			});
 
-			popupMenuForWindow.add(muntinMenu);
+			popupMenuForWindow.addSeparator();
+			popupMenuForWindow.add(miShgc);
 			popupMenuForWindow.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_WINDOW, CHANGE_U_FACTOR));
-			popupMenuForWindow.add(shgcMenu);
+			popupMenuForWindow.add(muntinMenu);
 
 		}
 
@@ -486,13 +481,8 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(new ChangeRoofOverhangCommand(roof));
 									roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
 									Scene.getInstance().redrawAll();
-									EventQueue.invokeLater(new Runnable() {
-										@Override
-										public void run() {
-											MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-										}
-									});
 									Scene.getInstance().setEdited(true);
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 									break;
 								}
 							} catch (final NumberFormatException exception) {
@@ -710,6 +700,7 @@ public class PopupMenuFactory {
 								SceneManager.getInstance().getUndoManager().addEdit(new ChangeVolumetricHeatCapacityCommand(selectedPart));
 								t.setVolumetricHeatCapacity(val);
 								Scene.getInstance().setEdited(true);
+								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 								break;
 							}
 						} catch (final NumberFormatException exception) {

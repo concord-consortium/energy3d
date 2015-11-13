@@ -1313,19 +1313,36 @@ public class Scene implements Serializable {
 		return 0;
 	}
 
-	public void setWindowShgcForWholeBuilding(Foundation foundation, double shgc) {
+	public List<Window> getWindowsOnWall(Wall wall) {
+		List<Window> list = new ArrayList<Window>();
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getTopContainer() == foundation)
+			if (p instanceof Window && p.getContainer() == wall)
+				list.add((Window) p);
+		}
+		return list;
+	}
+
+	public void setWindowShgcOnWall(Wall wall, double shgc) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getContainer() == wall)
 				((Window) p).setSolarHeatGainCoefficient(shgc);
 		}
 	}
 
-	public double getWindowShgcForWholeBuilding(Foundation foundation) {
+	public List<Window> getWindowsOfBuilding(Foundation foundation) {
+		List<Window> list = new ArrayList<Window>();
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getTopContainer() == foundation)
-				return ((Window) p).getSolarHeatGainCoefficient();
+				list.add((Window) p);
 		}
-		return 0;
+		return list;
+	}
+
+	public void setWindowShgcOfBuilding(Foundation foundation, double shgc) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getTopContainer() == foundation)
+				((Window) p).setSolarHeatGainCoefficient(shgc);
+		}
 	}
 
 	public void setSolarPanelEfficiencyForWholeBuilding(Foundation foundation, double eff) {
