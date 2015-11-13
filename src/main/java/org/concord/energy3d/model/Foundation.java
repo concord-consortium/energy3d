@@ -31,7 +31,7 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Foundation extends HousePart {
+public class Foundation extends HousePart implements Thermalizable {
 
 	private static final long serialVersionUID = 1L;
 	private static DecimalFormat format = new DecimalFormat();
@@ -60,6 +60,7 @@ public class Foundation extends HousePart {
 	private transient boolean resizeHouseMode = false;
 	private transient boolean useOrgPoints = false;
 	private boolean lockEdit = false;
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 
 	static {
 		format.setGroupingUsed(true);
@@ -1104,6 +1105,14 @@ public class Foundation extends HousePart {
 
 	public boolean isCopyable() {
 		return false;
+	}
+
+	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
+		this.volumetricHeatCapacity = volumetricHeatCapacity;
+	}
+
+	public double getVolumetricHeatCapacity() {
+		return volumetricHeatCapacity;
 	}
 
 }

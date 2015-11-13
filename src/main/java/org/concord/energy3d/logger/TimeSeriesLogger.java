@@ -30,6 +30,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -61,7 +62,7 @@ import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
-import org.concord.energy3d.undo.ChangePartVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
@@ -253,23 +254,25 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				}
 				s += ", \"Value\": " + p.getUFactor() + "}";
 				stateValue = s;
-			} else if (lastEdit instanceof ChangePartVolumetricHeatCapacityCommand) {
-				HousePart p = ((ChangePartVolumetricHeatCapacityCommand) lastEdit).getHousePart();
-				Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
-				String s = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
-				if (p instanceof Wall) {
-					s += ", \"Type\": \"Wall\"";
-				} else if (p instanceof Door) {
-					s += ", \"Type\": \"Door\"";
-				} else if (p instanceof Window) {
-					s += ", \"Type\": \"Window\"";
-				} else if (p instanceof Roof) {
-					s += ", \"Type\": \"Roof\"";
-				} else if (p instanceof Foundation) {
-					s += ", \"Type\": \"Floor\"";
+			} else if (lastEdit instanceof ChangeVolumetricHeatCapacityCommand) {
+				HousePart p = ((ChangeVolumetricHeatCapacityCommand) lastEdit).getHousePart();
+				if (p instanceof Thermalizable) {
+					Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
+					String s = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
+					if (p instanceof Wall) {
+						s += ", \"Type\": \"Wall\"";
+					} else if (p instanceof Door) {
+						s += ", \"Type\": \"Door\"";
+					} else if (p instanceof Window) {
+						s += ", \"Type\": \"Window\"";
+					} else if (p instanceof Roof) {
+						s += ", \"Type\": \"Roof\"";
+					} else if (p instanceof Foundation) {
+						s += ", \"Type\": \"Floor\"";
+					}
+					s += ", \"Value\": " + ((Thermalizable) p).getVolumetricHeatCapacity() + "}";
+					stateValue = s;
 				}
-				s += ", \"Value\": " + p.getVolumetricHeatCapacity() + "}";
-				stateValue = s;
 			} else if (lastEdit instanceof ChangeBuildingUFactorCommand) {
 				ChangeBuildingUFactorCommand c = (ChangeBuildingUFactorCommand) lastEdit;
 				String s = "{\"Building\":" + c.getFoundation().getId();

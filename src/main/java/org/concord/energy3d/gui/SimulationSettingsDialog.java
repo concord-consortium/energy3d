@@ -37,14 +37,13 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(5, 3, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(4, 3, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(SolarRadiation.getInstance().getSolarStep()));
 		final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(SolarRadiation.getInstance().getTimeStep()));
-		final JTextField volumetricHeatCapacityTextField = new JTextField(FORMAT1.format(Scene.getInstance().getVolumetricHeatCapacity()));
 		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
 
 		ActionListener okListener = new ActionListener() {
@@ -52,13 +51,11 @@ class SimulationSettingsDialog extends JDialog {
 			public void actionPerformed(final ActionEvent e) {
 				double cellSize;
 				int timeStep;
-				double volumetricHeatCapacity;
 				double heatVectorLength;
 				try {
 					cellSize = Double.parseDouble(cellSizeTextField.getText());
 					heatVectorLength = Double.parseDouble(heatVectorLengthTextField.getText());
 					timeStep = (int) Double.parseDouble(timeStepTextField.getText());
-					volumetricHeatCapacity = Double.parseDouble(volumetricHeatCapacityTextField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
@@ -77,15 +74,10 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Time step must be in 5-30.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (volumetricHeatCapacity <= 0) {
-					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Volumetric heat capacity cannot be zero or negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
 				SolarRadiation.getInstance().setSolarStep(cellSize);
 				SolarRadiation.getInstance().setTimeStep(timeStep);
 				SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
 				Scene.getInstance().setHeatVectorLength(heatVectorLength);
-				Scene.getInstance().setVolumetricHeatCapacity(volumetricHeatCapacity);
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				SimulationSettingsDialog.this.dispose();
@@ -114,11 +106,6 @@ class SimulationSettingsDialog extends JDialog {
 		airMassComboBox.setSelectedIndex(SolarRadiation.getInstance().getAirMassSelection() + 1);
 		panel.add(airMassComboBox);
 		panel.add(new JLabel("Dimensionless"));
-
-		// set the default volumetric heat capacity
-		panel.add(new JLabel("Volumetric Heat Capacity: "));
-		panel.add(volumetricHeatCapacityTextField);
-		panel.add(new JLabel("<html>kWh/(m<sup>3</sup>&times;C)</html>"));
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

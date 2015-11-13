@@ -337,11 +337,27 @@ public class Scene implements Serializable {
 			instance.insideTemperature = 20;
 		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.insideTemperature);
 
+		// set default properties of parts (object serialization initializes every number field to zero, forcing us to do this ugly thing)
+
 		for (final HousePart p : instance.parts) {
 			if (p instanceof Roof) {
 				final Roof r = (Roof) p;
-				if (r.getOverhangLength() < Roof.OVERHANG_MIN)
+				if (Util.isZero(r.getOverhangLength()))
 					r.setOverhangLength(2);
+				if (Util.isZero(r.getVolumetricHeatCapacity()))
+					r.setVolumetricHeatCapacity(0.5);
+			} else if (p instanceof Foundation) {
+				final Foundation f = (Foundation) p;
+				if (Util.isZero(f.getVolumetricHeatCapacity()))
+					f.setVolumetricHeatCapacity(0.5);
+			} else if (p instanceof Wall) {
+				final Wall w = (Wall) p;
+				if (Util.isZero(w.getVolumetricHeatCapacity()))
+					w.setVolumetricHeatCapacity(0.5);
+			} else if (p instanceof Door) {
+				final Door d = (Door) p;
+				if (Util.isZero(d.getVolumetricHeatCapacity()))
+					d.setVolumetricHeatCapacity(0.5);
 			}
 		}
 
@@ -1444,16 +1460,6 @@ public class Scene implements Serializable {
 
 	public double getBackgroundAlbedo() {
 		return backgroundAlbedo;
-	}
-
-	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
-		this.volumetricHeatCapacity = volumetricHeatCapacity;
-		for (HousePart p : parts)
-			p.setVolumetricHeatCapacity(volumetricHeatCapacity);
-	}
-
-	public double getVolumetricHeatCapacity() {
-		return volumetricHeatCapacity;
 	}
 
 	public void setGroundThermalDiffusivity(final double groundThermalDiffusivity) {

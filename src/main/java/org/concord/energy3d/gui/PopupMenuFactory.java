@@ -31,6 +31,7 @@ import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -40,7 +41,7 @@ import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangePartUFactorCommand;
-import org.concord.energy3d.undo.ChangePartVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
@@ -160,7 +161,7 @@ public class PopupMenuFactory {
 						else {
 							try {
 								final double val = Double.parseDouble(newValue);
-								if (val < 0) {
+								if (val <= 0) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Ground thermal diffusivity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									SceneManager.getInstance().getUndoManager().addEdit(new ChangeGroundThermalDiffusivityCommand());
@@ -198,6 +199,7 @@ public class PopupMenuFactory {
 
 			popupMenuForLand.add(miInfo);
 			popupMenuForLand.add(miPaste);
+			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miAlbedo);
 			popupMenuForLand.add(miThermalDiffusivity);
 
@@ -439,8 +441,8 @@ public class PopupMenuFactory {
 			popupMenuForWall.add(miPaste);
 			popupMenuForWall.addSeparator();
 			popupMenuForWall.add(colorAction);
+			popupMenuForWall.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForWall.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_WALL, CHANGE_U_FACTOR));
-			popupMenuForWall.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_WALL, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
 
 		}
 
@@ -514,8 +516,8 @@ public class PopupMenuFactory {
 			popupMenuForRoof.addSeparator();
 			popupMenuForRoof.add(miOverhang);
 			popupMenuForRoof.add(colorAction);
+			popupMenuForRoof.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForRoof.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_ROOF, CHANGE_U_FACTOR));
-			popupMenuForRoof.add(createPropertyMenu("Volumetric Heat Capacity", EnergyPanel.VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF, CHANGE_VOLUMETRIC_HEAT_CAPACITY));
 		}
 
 		return popupMenuForRoof;
@@ -526,7 +528,9 @@ public class PopupMenuFactory {
 
 		if (popupMenuForDoor == null) {
 			popupMenuForDoor = createPopupMenu(false, null);
+			popupMenuForDoor.addSeparator();
 			popupMenuForDoor.add(colorAction);
+			popupMenuForDoor.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForDoor.add(createPropertyMenu("U-Value", EnergyPanel.U_VALUE_CHOICES_DOOR, CHANGE_U_FACTOR));
 		}
 
@@ -552,6 +556,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
+			popupMenuForFoundation.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForFoundation.add(createPropertyMenu("Floor U-Value", EnergyPanel.U_VALUE_CHOICES_FLOOR, CHANGE_U_FACTOR));
 		}
 
@@ -682,6 +687,41 @@ public class PopupMenuFactory {
 
 	}
 
+	private static JMenuItem createVolumetricHeatCapacityMenuItem() {
+		final JMenuItem mi = new JMenuItem("Volumeric Heat Capacity...");
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (!(selectedPart instanceof Thermalizable))
+					return;
+				final Thermalizable t = (Thermalizable) selectedPart;
+				final String title = "<html>Volumeric Heat Capacity [kWh/(m<sup>3</sup>&times;C)]<hr><font size=2>Some reference values:<br>0.03 (fiberglass), 0.18 (asphalt), 0.25(oak wood), 0.33 (concrete), 0.37 (brick), 0.58 (stone)</html>";
+				while (true) {
+					final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, t.getVolumetricHeatCapacity());
+					if (newValue == null)
+						break;
+					else {
+						try {
+							final double val = Double.parseDouble(newValue);
+							if (val <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Volumeric heat capacity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							} else {
+								SceneManager.getInstance().getUndoManager().addEdit(new ChangeVolumetricHeatCapacityCommand(selectedPart));
+								t.setVolumetricHeatCapacity(val);
+								Scene.getInstance().setEdited(true);
+								break;
+							}
+						} catch (final NumberFormatException exception) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				}
+			}
+		});
+		return mi;
+	}
+
 	private static JPopupMenu createPopupMenu(boolean hasCopyMenu, final Runnable runWhenBecomingVisible) {
 
 		final JMenuItem miInfo = new JMenuItem();
@@ -771,8 +811,11 @@ public class PopupMenuFactory {
 						selectedPart.setUFactor(Scene.parsePropertyString(mi[i2].getText()));
 						break;
 					case CHANGE_VOLUMETRIC_HEAT_CAPACITY:
-						SceneManager.getInstance().getUndoManager().addEdit(new ChangePartVolumetricHeatCapacityCommand(selectedPart));
-						selectedPart.setVolumetricHeatCapacity(Scene.parsePropertyString(mi[i2].getText()));
+						if (selectedPart instanceof Thermalizable) {
+							Thermalizable t = (Thermalizable) selectedPart;
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeVolumetricHeatCapacityCommand(selectedPart));
+							t.setVolumetricHeatCapacity(Scene.parsePropertyString(mi[i2].getText()));
+						}
 						break;
 					}
 					Scene.getInstance().setEdited(true);
@@ -814,26 +857,29 @@ public class PopupMenuFactory {
 					}
 					break;
 				case CHANGE_VOLUMETRIC_HEAT_CAPACITY:
-					for (int i = 0; i < itemCount; i++) {
-						if (Util.isZero(selectedPart.getVolumetricHeatCapacity() - Scene.parsePropertyString(mi[i].getText()))) {
-							Util.selectSilently(mi[i], true);
-							b = true;
-							break;
-						}
-					}
-					if (!b) {
-						if (Util.isZero(selectedPart.getVolumetricHeatCapacity())) {
-							double defaultWallVolumetricHeatCapacity = 0.25;
-							for (int i = 0; i < itemCount; i++) {
-								if (Util.isZero(defaultWallVolumetricHeatCapacity - Scene.parsePropertyString(mi[i].getText()))) {
-									Util.selectSilently(mi[i], true);
-									b = true;
-									break;
-								}
+					if (selectedPart instanceof Thermalizable) {
+						Thermalizable t = (Thermalizable) selectedPart;
+						for (int i = 0; i < itemCount; i++) {
+							if (Util.isZero(t.getVolumetricHeatCapacity() - Scene.parsePropertyString(mi[i].getText()))) {
+								Util.selectSilently(mi[i], true);
+								b = true;
+								break;
 							}
 						}
-						if (!b)
-							mi[itemCount].setSelected(true);
+						if (!b) {
+							if (Util.isZero(t.getVolumetricHeatCapacity())) {
+								double defaultWallVolumetricHeatCapacity = 0.25;
+								for (int i = 0; i < itemCount; i++) {
+									if (Util.isZero(defaultWallVolumetricHeatCapacity - Scene.parsePropertyString(mi[i].getText()))) {
+										Util.selectSilently(mi[i], true);
+										b = true;
+										break;
+									}
+								}
+							}
+							if (!b)
+								mi[itemCount].setSelected(true);
+						}
 					}
 					break;
 				}

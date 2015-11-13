@@ -52,7 +52,7 @@ import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
-public abstract class Roof extends HousePart {
+public abstract class Roof extends HousePart implements Thermalizable {
 
 	private static final long serialVersionUID = 1L;
 	public static final double OVERHANG_MIN = 0.01;
@@ -68,6 +68,7 @@ public abstract class Roof extends HousePart {
 	private transient HousePart previousContainer;
 	protected Map<Integer, List<Wall>> gableEditPointToWallMap = null;
 	private double overhangLength = 2.0;
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 
 	protected class EditState {
 		final boolean fitTestRequired;
@@ -1177,6 +1178,14 @@ public abstract class Roof extends HousePart {
 
 	public void setOverhangLength(final double overhangLength) {
 		this.overhangLength = overhangLength;
+	}
+
+	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
+		this.volumetricHeatCapacity = volumetricHeatCapacity;
+	}
+
+	public double getVolumetricHeatCapacity() {
+		return volumetricHeatCapacity;
 	}
 
 }

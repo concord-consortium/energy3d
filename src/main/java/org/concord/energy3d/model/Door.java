@@ -13,9 +13,11 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Door extends HousePart {
+public class Door extends HousePart implements Thermalizable {
+
 	private static final long serialVersionUID = 1L;
 	private static final double DEFAULT_DOOR_HEIGHT = 10;
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 
 	public Door() {
 		super(2, 4, DEFAULT_DOOR_HEIGHT);
@@ -141,6 +143,14 @@ public class Door extends HousePart {
 
 	public boolean isCopyable() {
 		return false;
+	}
+
+	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
+		this.volumetricHeatCapacity = volumetricHeatCapacity;
+	}
+
+	public double getVolumetricHeatCapacity() {
+		return volumetricHeatCapacity;
 	}
 
 }

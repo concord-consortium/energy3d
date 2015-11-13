@@ -13,6 +13,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
+import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -99,7 +100,7 @@ public class HeatLoad {
 					for (final Spatial child : roof.getRoofPartsRoot().getChildren()) {
 						final Mesh mesh = (Mesh) ((Node) child).getChild(0);
 						final double[] solarPotential = SolarRadiation.getInstance().getSolarPotential(mesh);
-						final double solarHeat = solarPotential != null ? solarPotential[iMinute] * absorption / part.getVolumetricHeatCapacity() : 0;
+						final double solarHeat = solarPotential != null ? solarPotential[iMinute] * absorption / roof.getVolumetricHeatCapacity() : 0;
 						final double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 						if (part.isDrawCompleted()) {
 							final double uFactor = getUFactor(part);
@@ -130,7 +131,9 @@ public class HeatLoad {
 						foundation.getHeatLoss()[iMinute] += heatloss;
 					}
 				} else {
-					final double solarHeat = part.getSolarPotential()[iMinute] * absorption / part.getVolumetricHeatCapacity();
+					double solarHeat = part.getSolarPotential()[iMinute] * absorption;
+					if (part instanceof Thermalizable)
+						solarHeat /= ((Thermalizable) part).getVolumetricHeatCapacity();
 					final double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 					if (part.isDrawCompleted()) {
 						final double uFactor = getUFactor(part);

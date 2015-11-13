@@ -95,8 +95,6 @@ public class EnergyPanel extends JPanel {
 	final static String[] U_VALUE_CHOICES_DOOR = { "1.89 (R3)", "0.57 (R10)" };
 	final static String[] WINDOW_SHGC_CHOICES = { "25", "30", "35", "40", "45", "50", "55", "60", "65", "70" };
 	final static String[] SOLAR_PANEL_CONVERSION_EFFICIENCY_CHOICES = { "10", "15", "20" };
-	final static String[] VOLUMETRIC_HEAT_CAPACITY_CHOICES_WALL = { "0.5 (Default)", "0.25 (Oak Wood)", "0.37 (Brick)", "0.58 (Stone)" };
-	final static String[] VOLUMETRIC_HEAT_CAPACITY_CHOICES_ROOF = { "0.5 (Default)", "0.03 (Fiberglass)", "0.18 (Asphalt)", "0.25 (Oak Wood)", "0.33 (Light Concrete)" };
 
 	private static final long serialVersionUID = 1L;
 	private static final EnergyPanel instance = new EnergyPanel();

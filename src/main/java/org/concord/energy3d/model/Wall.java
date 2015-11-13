@@ -44,7 +44,8 @@ import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Wall extends HousePart {
+public class Wall extends HousePart implements Thermalizable {
+
 	private static final long serialVersionUID = 1L;
 	private static final double DEFAULT_WALL_HEIGHT = 30.0; // the recommended default wall height is 6m
 	private static double userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
@@ -65,6 +66,7 @@ public class Wall extends HousePart {
 	private transient Snap[] neighbors;
 	private transient Vector3 thicknessNormal;
 	private boolean isShortWall;
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 
 	public static void resetDefaultWallHeight() {
 		userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
@@ -1317,6 +1319,14 @@ public class Wall extends HousePart {
 
 	public boolean isCopyable() {
 		return false;
+	}
+
+	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
+		this.volumetricHeatCapacity = volumetricHeatCapacity;
+	}
+
+	public double getVolumetricHeatCapacity() {
+		return volumetricHeatCapacity;
 	}
 
 }
