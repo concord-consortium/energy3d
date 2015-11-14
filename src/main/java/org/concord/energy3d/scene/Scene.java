@@ -31,6 +31,7 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -336,7 +337,7 @@ public class Scene implements Serializable {
 			if (p instanceof Roof) {
 				final Roof r = (Roof) p;
 				if (Util.isZero(r.getUValue()))
-					r.setUValue(1.89);
+					r.setUValue(0.15);
 				if (Util.isZero(r.getOverhangLength()))
 					r.setOverhangLength(2);
 				if (Util.isZero(r.getVolumetricHeatCapacity()))
@@ -344,33 +345,33 @@ public class Scene implements Serializable {
 			} else if (p instanceof Foundation) {
 				final Foundation f = (Foundation) p;
 				if (Util.isZero(f.getUValue()))
-					f.setUValue(1.89);
+					f.setUValue(0.19);
 				if (Util.isZero(f.getVolumetricHeatCapacity()))
 					f.setVolumetricHeatCapacity(0.5);
 			} else if (p instanceof Wall) {
 				final Wall w = (Wall) p;
 				if (Util.isZero(w.getUValue()))
-					w.setUValue(1.89);
+					w.setUValue(0.28);
 				if (Util.isZero(w.getVolumetricHeatCapacity()))
 					w.setVolumetricHeatCapacity(0.5);
 			} else if (p instanceof Door) {
 				final Door d = (Door) p;
 				if (Util.isZero(d.getUValue()))
-					d.setUValue(1.89);
+					d.setUValue(2);
 				if (Util.isZero(d.getVolumetricHeatCapacity()))
 					d.setVolumetricHeatCapacity(0.5);
-			} else if (p instanceof SolarPanel) {
-				final SolarPanel sp = (SolarPanel) p;
-				if (Util.isZero(sp.getEfficiency()))
-					sp.setEfficiency(10);
 			} else if (p instanceof Window) {
 				final Window w = (Window) p;
 				if (Util.isZero(w.getUValue()))
-					w.setUValue(1.89);
+					w.setUValue(2);
 				if (Util.isZero(w.getSolarHeatGainCoefficient()))
 					w.setSolarHeatGainCoefficient(50);
 				if (Util.isZero(w.getVolumetricHeatCapacity()))
 					w.setVolumetricHeatCapacity(0.5);
+			} else if (p instanceof SolarPanel) {
+				final SolarPanel sp = (SolarPanel) p;
+				if (Util.isZero(sp.getEfficiency()))
+					sp.setEfficiency(10);
 			}
 
 		}
@@ -616,6 +617,16 @@ public class Scene implements Serializable {
 		housePart.delete();
 	}
 
+	private static void setIdOfChildren(HousePart p) {
+		ArrayList<HousePart> children = p.getChildren();
+		for (HousePart c : children) {
+			c.setId(Scene.getInstance().nextID());
+			if (!c.getChildren().isEmpty()) {
+				setIdOfChildren(c);
+			}
+		}
+	}
+
 	public void setCopyBuffer(HousePart p) {
 		// exclude the following types of house parts
 		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor) {
@@ -644,15 +655,9 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
-		clearEnergyView();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
-	private void clearEnergyView() {
-		if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
-			SceneManager.getInstance().computeEnergyView(false);
-			Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), false);
-		}
-	}
 
 	public void pasteToPickedLocationOnLand() {
 		if (copyBuffer == null)
@@ -678,17 +683,7 @@ public class Scene implements Serializable {
 			copyBuffer = c;
 			setIdOfChildren(c);
 			SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
-			clearEnergyView();
-		}
-	}
-
-	private static void setIdOfChildren(HousePart p) {
-		ArrayList<HousePart> children = p.getChildren();
-		for (HousePart c : children) {
-			c.setId(Scene.getInstance().nextID());
-			if (!c.getChildren().isEmpty()) {
-				setIdOfChildren(c);
-			}
+			EnergyPanel.getInstance().clearRadiationHeatMap();
 		}
 	}
 
@@ -743,7 +738,7 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
-		clearEnergyView();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	public void pasteToPickedLocationOnRoof() {
@@ -774,7 +769,7 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
-		clearEnergyView();
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	public List<HousePart> getParts() {
@@ -1103,7 +1098,7 @@ public class Scene implements Serializable {
 	}
 
 	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
-	public void setPartColorForWholeBuilding(Foundation foundation, Operation operation, ReadOnlyColorRGBA color) {
+	public void setPartColorOfBuilding(Foundation foundation, Operation operation, ReadOnlyColorRGBA color) {
 		switch (operation) {
 		case DRAW_FOUNDATION:
 			foundation.setColor(color);
@@ -1138,7 +1133,7 @@ public class Scene implements Serializable {
 	}
 
 	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
-	public ReadOnlyColorRGBA getPartColorForWholeBuilding(Foundation foundation, Operation operation) {
+	public ReadOnlyColorRGBA getPartColorOfBuilding(Foundation foundation, Operation operation) {
 		switch (operation) {
 		case DRAW_FOUNDATION:
 			return foundation.getColor();
@@ -1172,74 +1167,30 @@ public class Scene implements Serializable {
 		return null;
 	}
 
-	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
-	public void setPartUFactorForWholeBuilding(Foundation foundation, Operation operation, double uFactor) {
-		switch (operation) {
-		case DRAW_FOUNDATION:
-			foundation.setUValue(uFactor);
-			break;
-		case DRAW_WALL:
+	public List<HousePart> getHousePartsOfSameTypeInBuilding(HousePart x) {
+		List<HousePart> list = new ArrayList<HousePart>();
+		if (x instanceof Foundation) {
+			list.add(x);
+		} else {
 			for (final HousePart p : parts) {
-				if (p instanceof Wall && p.getTopContainer() == foundation)
-					((Wall) p).setUValue(uFactor);
+				if (p.getClass().equals(x.getClass()) && p.getTopContainer() == x.getTopContainer())
+					list.add(p);
 			}
-			break;
-		case DRAW_WINDOW:
-			for (final HousePart p : parts) {
-				if (p instanceof Window && p.getTopContainer() == foundation)
-					((Window) p).setUValue(uFactor);
-			}
-			break;
-		case DRAW_DOOR:
-			for (final HousePart p : parts) {
-				if (p instanceof Door && p.getTopContainer() == foundation)
-					((Door) p).setUValue(uFactor);
-			}
-			break;
-		case DRAW_ROOF_PYRAMID:
-			for (final HousePart p : parts) {
-				if (p instanceof Roof && p.getTopContainer() == foundation)
-					((Roof) p).setUValue(uFactor);
-			}
-			break;
-		default:
-			break;
 		}
+		return list;
 	}
 
-	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
-	public double getPartUFactorForWholeBuilding(Foundation foundation, Operation operation) {
-		switch (operation) {
-		case DRAW_FOUNDATION:
-			return foundation.getUValue();
-		case DRAW_WALL:
-			for (final HousePart p : parts) {
-				if (p instanceof Wall && p.getTopContainer() == foundation)
-					return ((Wall) p).getUValue();
+	public void setUValuesOfSameTypeInBuilding(HousePart x, double uValue) {
+		if (x instanceof Thermalizable) {
+			if (x instanceof Foundation) {
+				((Foundation) x).setUValue(uValue);
+			} else {
+				for (final HousePart p : parts) {
+					if (p.getClass().equals(x.getClass()) && p.getTopContainer() == x.getTopContainer())
+						((Thermalizable) p).setUValue(uValue);
+				}
 			}
-			break;
-		case DRAW_WINDOW:
-			for (final HousePart p : parts) {
-				if (p instanceof Window && p.getTopContainer() == foundation)
-					return ((Window) p).getUValue();
-			}
-			break;
-		case DRAW_DOOR:
-			for (final HousePart p : parts) {
-				if (p instanceof Door && p.getTopContainer() == foundation)
-					return ((Door) p).getUValue();
-			}
-			break;
-		case DRAW_ROOF_PYRAMID:
-			for (final HousePart p : parts) {
-				if (p instanceof Roof && p.getTopContainer() == foundation)
-					return ((Roof) p).getUValue();
-			}
-			break;
-		default:
-			break;
 		}
-		return 0;
 	}
 
 	public List<Window> getWindowsOnWall(Wall wall) {

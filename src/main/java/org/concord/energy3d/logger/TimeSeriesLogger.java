@@ -284,22 +284,24 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					stateValue = s;
 				}
 			} else if (lastEdit instanceof ChangeBuildingUValueCommand) {
-				ChangeBuildingUValueCommand c = (ChangeBuildingUValueCommand) lastEdit;
-				String s = "{\"Building\":" + c.getFoundation().getId();
-				Operation o = c.getOperation();
-				if (o == Operation.DRAW_WALL) {
-					s += ", \"Type\": \"Wall\"";
-				} else if (o == Operation.DRAW_DOOR) {
-					s += ", \"Type\": \"Door\"";
-				} else if (o == Operation.DRAW_FLOOR) {
-					s += ", \"Type\": \"Floor\"";
-				} else if (o == Operation.DRAW_WINDOW) {
-					s += ", \"Type\": \"Window\"";
-				} else if (o == Operation.DRAW_ROOF_PYRAMID) {
-					s += ", \"Type\": \"Roof\"";
+				HousePart p = ((ChangeBuildingUValueCommand) lastEdit).getHousePart();
+				if (p instanceof Thermalizable) {
+					Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
+					String s = "{\"Building\":" + foundation.getId();
+					if (p instanceof Wall) {
+						s += ", \"Type\": \"Wall\"";
+					} else if (p instanceof Door) {
+						s += ", \"Type\": \"Door\"";
+					} else if (p instanceof Foundation) {
+						s += ", \"Type\": \"Floor\"";
+					} else if (p instanceof Window) {
+						s += ", \"Type\": \"Window\"";
+					} else if (p instanceof Roof) {
+						s += ", \"Type\": \"Roof\"";
+					}
+					s += ", \"Value\": " + ((Thermalizable) p).getUValue() + "}";
+					stateValue = s;
 				}
-				s += ", \"Value\": " + Scene.getInstance().getPartUFactorForWholeBuilding(c.getFoundation(), o) + "}";
-				stateValue = s;
 			} else if (lastEdit instanceof ChangePartColorCommand) {
 				HousePart p = ((ChangePartColorCommand) lastEdit).getHousePart();
 				Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
@@ -335,7 +337,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				} else if (o == Operation.DRAW_ROOF_PYRAMID) {
 					s += ", \"Type\": \"Roof\"";
 				}
-				ReadOnlyColorRGBA color = Scene.getInstance().getPartColorForWholeBuilding(c.getFoundation(), o);
+				ReadOnlyColorRGBA color = Scene.getInstance().getPartColorOfBuilding(c.getFoundation(), o);
 				if (color != null)
 					s += ", \"Color\": \"" + String.format("#%02x%02x%02x", (int) Math.round(color.getRed() * 255), (int) Math.round(color.getGreen() * 255), (int) Math.round(color.getBlue() * 255)) + "\"";
 				s += "}";

@@ -40,7 +40,7 @@ public class Window extends HousePart implements Thermalizable {
 
 	// range: 25%-80% (we choose 50% by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
 	private double solarHeatGainCoefficient = 50;
-	private double uValue = 6.08; // by default, set it to U1.07;
+	private double uValue = 2.0; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 
 	public Window() {

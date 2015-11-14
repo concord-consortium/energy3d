@@ -50,6 +50,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
@@ -145,7 +146,7 @@ public class PopupMenuFactory {
 			miAlbedo.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String title = "<html>Background Albedo (dimensionless [0, 1])<hr><font size=2>Some reference values:<br>0.17 (soil), 0.25 (grass), 0.40 (sand), 0.55 (concrete), snow (0.9)</html>";
+					final String title = "<html>Background Albedo (dimensionless [0, 1])<hr><font size=2>Examples:<br>0.17 (soil), 0.25 (grass), 0.40 (sand), 0.55 (concrete), snow (0.9)</html>";
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getBackgroundAlbedo());
 						if (newValue == null)
@@ -173,7 +174,7 @@ public class PopupMenuFactory {
 			miThermalDiffusivity.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String title = "<html>Ground Thermal Diffusivity (m<sup>2</sup>/s)<hr><font size=2>Some reference values:<br>0.039 (sand), 0.046 (clay), 0.05 (silt)</html>";
+					final String title = "<html>Ground Thermal Diffusivity (m<sup>2</sup>/s)<hr><font size=2>Examples:<br>0.039 (sand), 0.046 (clay), 0.05 (silt)</html>";
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGroundThermalDiffusivity());
 						if (newValue == null)
@@ -373,15 +374,16 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof Window))
 						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Window window = (Window) selectedPart;
-					final String title = "<html>Solar Heat Gain Coefficient (%)</html>";
+					final String title = "<html>Solar Heat Gain Coefficient (%) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>Examples:<br><table><tr><td><font size=2>Single glass (clear)</td><td><font size=2>66%</td></tr><tr><td><font size=2>Single glass (green tint)</td><td><font size=2>55%</td></tr><tr><td><font size=2>Triple glass (air spaces)</td><td><font size=2>39%</td></tr></table><hr></html>";
 					JPanel panel = new JPanel();
-					panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this window", true);
-					final JRadioButton rb2 = new JRadioButton("All windows on this wall");
-					final JRadioButton rb3 = new JRadioButton("All windows of this building");
+					final JRadioButton rb1 = new JRadioButton("Only this Window", true);
+					final JRadioButton rb2 = new JRadioButton("All Windows on this Wall");
+					final JRadioButton rb3 = new JRadioButton("All Windows of this Building");
 					panel.add(rb1);
 					panel.add(rb2);
 					panel.add(rb3);
@@ -425,7 +427,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForWindow.addSeparator();
-			popupMenuForWindow.add(createUValueMenuItem(true));
+			popupMenuForWindow.add(createInsulationMenuItem(true));
 			popupMenuForWindow.add(miShgc);
 			popupMenuForWindow.add(muntinMenu);
 
@@ -459,7 +461,7 @@ public class PopupMenuFactory {
 			popupMenuForWall.add(miPaste);
 			popupMenuForWall.addSeparator();
 			popupMenuForWall.add(colorAction);
-			popupMenuForWall.add(createUValueMenuItem(false));
+			popupMenuForWall.add(createInsulationMenuItem(false));
 			popupMenuForWall.add(createVolumetricHeatCapacityMenuItem());
 
 		}
@@ -529,7 +531,7 @@ public class PopupMenuFactory {
 			popupMenuForRoof.addSeparator();
 			popupMenuForRoof.add(miOverhang);
 			popupMenuForRoof.add(colorAction);
-			popupMenuForRoof.add(createUValueMenuItem(false));
+			popupMenuForRoof.add(createInsulationMenuItem(false));
 			popupMenuForRoof.add(createVolumetricHeatCapacityMenuItem());
 		}
 
@@ -543,7 +545,7 @@ public class PopupMenuFactory {
 			popupMenuForDoor = createPopupMenu(false, null);
 			popupMenuForDoor.addSeparator();
 			popupMenuForDoor.add(colorAction);
-			popupMenuForDoor.add(createUValueMenuItem(true));
+			popupMenuForDoor.add(createInsulationMenuItem(true));
 			popupMenuForDoor.add(createVolumetricHeatCapacityMenuItem());
 		}
 
@@ -569,7 +571,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
-			popupMenuForFoundation.add(createUValueMenuItem(false));
+			popupMenuForFoundation.add(createInsulationMenuItem(false));
 			popupMenuForFoundation.add(createVolumetricHeatCapacityMenuItem());
 		}
 
@@ -597,14 +599,15 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof SolarPanel))
 						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
-					final String title = "<html>Energy Conversion Efficiency (%)</html>";
+					final String title = "<html>Energy Conversion Efficiency (%) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley–Queisser limit is 34%, but the theoretical limit for multilayer cells is 86%.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this solar panel", true);
-					final JRadioButton rb2 = new JRadioButton("All solar panels of this building");
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
 					panel.add(rb1);
 					panel.add(rb2);
 					ButtonGroup bg = new ButtonGroup();
@@ -690,22 +693,41 @@ public class PopupMenuFactory {
 
 	}
 
-	private static JMenuItem createUValueMenuItem(final boolean useUValue) {
-		final JMenuItem mi = new JMenuItem("U-Value...");
+	private static JMenuItem createInsulationMenuItem(final boolean useUValue) {
+		final JMenuItem mi = new JMenuItem("Insulation...");
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (!(selectedPart instanceof Thermalizable))
 					return;
+				final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				final Thermalizable t = (Thermalizable) selectedPart;
 
 				JPanel panel = new JPanel();
 				panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-				JLabel label = new JLabel("<html>Insulation Property<hr><font size=2>Examples:<br></html>");
+				JLabel label = new JLabel("<html>Insulation Value of " + partInfo + "<hr><font size=2>Examples:<br>US R13 (cellulose, 3.5\"), US R16 (mineral wool, 5.25\"), US R31 (fiberglass, 10\")</html>");
 				label.setAlignmentX(Component.LEFT_ALIGNMENT);
 				panel.add(label);
 				panel.add(Box.createVerticalStrut(15));
+
+				final String partName = selectedPart.getClass().getSimpleName();
+				final JRadioButton rb1 = new JRadioButton("Only this " + partName, true);
+				final JRadioButton rb2 = new JRadioButton("All " + partName + "s of this Building");
+				if (selectedPart instanceof Wall || selectedPart instanceof Window) {
+					JPanel scopePanel = new JPanel();
+					scopePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					panel.add(scopePanel);
+					panel.add(Box.createVerticalStrut(5));
+				}
+
 				JPanel unitPanel = new JPanel(new GridLayout(2, 3, 5, 5));
 				unitPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 				panel.add(unitPanel);
@@ -856,15 +878,20 @@ public class PopupMenuFactory {
 				}
 
 				while (true) {
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input: " + partInfo, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 						String newValue = siField.getText();
 						try {
 							final double val = Double.parseDouble(newValue);
 							if (val <= 0) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "U-value must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
 							} else {
-								SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUValueCommand(selectedPart));
-								t.setUValue(val);
+								if (rb1.isSelected()) {
+									SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUValueCommand(selectedPart));
+									t.setUValue(val);
+								} else {
+									SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(selectedPart));
+									Scene.getInstance().setUValuesOfSameTypeInBuilding(selectedPart, val);
+								}
 								Scene.getInstance().setEdited(true);
 								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 								break;
@@ -890,8 +917,9 @@ public class PopupMenuFactory {
 				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (!(selectedPart instanceof Thermalizable))
 					return;
+				final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				final Thermalizable t = (Thermalizable) selectedPart;
-				final String title = "<html>Volumeric Heat Capacity [kWh/(m<sup>3</sup>&middot;&deg;C)]<hr><font size=2>Some reference values:<br>0.03 (fiberglass), 0.18 (asphalt), 0.25(oak wood), 0.33 (concrete), 0.37 (brick), 0.58 (stone)</html>";
+				final String title = "<html>Volumeric Heat Capacity of " + partInfo + " [kWh/(m<sup>3</sup>&middot;&deg;C)]<hr><font size=2>Examples:<br>0.03 (fiberglass), 0.18 (asphalt), 0.25(oak wood), 0.33 (concrete), 0.37 (brick), 0.58 (stone)</html>";
 				while (true) {
 					final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, t.getVolumetricHeatCapacity());
 					if (newValue == null)

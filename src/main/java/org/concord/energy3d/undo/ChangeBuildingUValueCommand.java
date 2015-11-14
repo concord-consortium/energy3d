@@ -1,47 +1,57 @@
 package org.concord.energy3d.undo;
 
+import java.util.List;
+
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager.Operation;
 
 public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double orgUFactor, newUFactor;
-	private Foundation foundation;
-	private Operation operation;
+	private double[] orgUValues, newUValues;
+	private HousePart selectedPart;
+	private List<HousePart> parts;
 
-	public ChangeBuildingUValueCommand(Foundation foundation, Operation operation) {
-		this.foundation = foundation;
-		this.operation = operation;
-		orgUFactor = Scene.getInstance().getPartUFactorForWholeBuilding(foundation, operation);
+	public ChangeBuildingUValueCommand(HousePart selectedPart) {
+		this.selectedPart = selectedPart;
+		if (!(selectedPart instanceof Thermalizable))
+			throw new IllegalArgumentException(selectedPart + "is not thermalizable!");
+		parts = Scene.getInstance().getHousePartsOfSameTypeInBuilding(selectedPart);
+		int n = parts.size();
+		orgUValues = new double[n];
+		for (int i = 0; i < n; i++) {
+			orgUValues[i] = ((Thermalizable) parts.get(i)).getUValue();
+		}
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newUFactor = Scene.getInstance().getPartUFactorForWholeBuilding(foundation, operation);
-		Scene.getInstance().setPartUFactorForWholeBuilding(foundation, operation, orgUFactor);
+		int n = parts.size();
+		newUValues = new double[n];
+		for (int i = 0; i < n; i++) {
+			newUValues[i] = ((Thermalizable) parts.get(i)).getUValue();
+			((Thermalizable) parts.get(i)).setUValue(orgUValues[i]);
+		}
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setPartUFactorForWholeBuilding(foundation, operation, newUFactor);
+		int n = parts.size();
+		for (int i = 0; i < n; i++) {
+			((Thermalizable) parts.get(i)).setUValue(newUValues[i]);
+		}
 	}
 
 	// for action logging
-	public Foundation getFoundation() {
-		return foundation;
-	}
-
-	// for action logging
-	public Operation getOperation() {
-		return operation;
+	public HousePart getHousePart() {
+		return selectedPart;
 	}
 
 	@Override

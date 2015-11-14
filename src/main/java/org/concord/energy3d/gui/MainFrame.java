@@ -1939,7 +1939,7 @@ public class MainFrame extends JFrame {
 			break;
 		}
 
-		ReadOnlyColorRGBA color = Scene.getInstance().getPartColorForWholeBuilding(foundation, operation);
+		ReadOnlyColorRGBA color = Scene.getInstance().getPartColorOfBuilding(foundation, operation);
 		if (color != null)
 			colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final ActionListener actionListener = new ActionListener() {
@@ -1950,7 +1950,7 @@ public class MainFrame extends JFrame {
 				final float[] newColor = c.getComponents(null);
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
-				Scene.getInstance().setPartColorForWholeBuilding(foundation, operation, color);
+				Scene.getInstance().setPartColorOfBuilding(foundation, operation, color);
 				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
 					PrintController.getInstance().restartAnimation();

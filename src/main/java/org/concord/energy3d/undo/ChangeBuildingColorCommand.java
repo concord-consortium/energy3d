@@ -20,21 +20,21 @@ public class ChangeBuildingColorCommand extends AbstractUndoableEdit {
 	public ChangeBuildingColorCommand(Foundation foundation, Operation operation) {
 		this.foundation = foundation;
 		this.operation = operation;
-		orgColor = Scene.getInstance().getPartColorForWholeBuilding(foundation, operation);
+		orgColor = Scene.getInstance().getPartColorOfBuilding(foundation, operation);
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newColor = Scene.getInstance().getPartColorForWholeBuilding(foundation, operation);
-		Scene.getInstance().setPartColorForWholeBuilding(foundation, operation, orgColor);
+		newColor = Scene.getInstance().getPartColorOfBuilding(foundation, operation);
+		Scene.getInstance().setPartColorOfBuilding(foundation, operation, orgColor);
 		Scene.getInstance().redrawAll();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setPartColorForWholeBuilding(foundation, operation, newColor);
+		Scene.getInstance().setPartColorOfBuilding(foundation, operation, newColor);
 		Scene.getInstance().redrawAll();
 	}
 

@@ -67,7 +67,7 @@ public class Wall extends HousePart implements Thermalizable {
 	private transient Vector3 thicknessNormal;
 	private boolean isShortWall;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
-	private double uValue = 1.89; // by default, set it to R3;
+	private double uValue = 0.28; // default is R20 (IECC code for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 
 	public static void resetDefaultWallHeight() {
 		userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
