@@ -472,7 +472,7 @@ public class EnergyPanel extends JPanel {
 
 		final JPanel energyTodayPanel = new JPanel();
 		buildingPanel.add(energyTodayPanel);
-		energyTodayPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy Today (kWh)", TitledBorder.LEADING, TitledBorder.TOP));
+		energyTodayPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy of the Day (kWh)", TitledBorder.LEADING, TitledBorder.TOP));
 		final GridBagLayout gbl_panel_1 = new GridBagLayout();
 		energyTodayPanel.setLayout(gbl_panel_1);
 

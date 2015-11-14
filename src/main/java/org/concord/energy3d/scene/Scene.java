@@ -628,6 +628,7 @@ public class Scene implements Serializable {
 	}
 
 	public void setCopyBuffer(HousePart p) {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		// exclude the following types of house parts
 		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor) {
 			return;
@@ -645,6 +646,7 @@ public class Scene implements Serializable {
 	}
 
 	public void paste() {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		if (copyBuffer == null)
 			return;
 		if (copyBuffer instanceof Foundation) // copying a foundation copies the entire building above it, which requires a different treatment elsewhere
@@ -658,8 +660,8 @@ public class Scene implements Serializable {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
-
 	public void pasteToPickedLocationOnLand() {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		if (copyBuffer == null)
 			return;
 		HousePart c = copyBuffer.copy(false);
@@ -683,11 +685,11 @@ public class Scene implements Serializable {
 			copyBuffer = c;
 			setIdOfChildren(c);
 			SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
-			EnergyPanel.getInstance().clearRadiationHeatMap();
 		}
 	}
 
 	public void pasteToPickedLocationOnWall() {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (!(selectedPart instanceof Wall))
 			return;
@@ -738,10 +740,10 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
-		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	public void pasteToPickedLocationOnRoof() {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		if (copyBuffer == null)
 			return;
 		if (copyBuffer instanceof Foundation) // cannot paste a foundation to a roof
@@ -769,7 +771,6 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
-		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	public List<HousePart> getParts() {
