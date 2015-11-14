@@ -44,6 +44,24 @@ public class Tree extends HousePart {
 	private transient Mesh crown;
 	private final int treeType;
 	private boolean showPolygons;
+	private static Calendar leaf_shed_northern_hemisphere, leaf_grow_northern_hemisphere;
+	private static Calendar leaf_shed_southern_hemisphere, leaf_grow_southern_hemisphere;
+
+	static {
+		leaf_grow_northern_hemisphere = (Calendar) Calendar.getInstance().clone();
+		leaf_grow_northern_hemisphere.set(Calendar.MONTH, Calendar.APRIL);
+		leaf_grow_northern_hemisphere.set(Calendar.DAY_OF_MONTH, 15);
+		leaf_shed_northern_hemisphere = (Calendar) Calendar.getInstance().clone();
+		leaf_shed_northern_hemisphere.set(Calendar.MONTH, Calendar.NOVEMBER);
+		leaf_shed_northern_hemisphere.set(Calendar.DAY_OF_MONTH, 15);
+
+		leaf_grow_southern_hemisphere = (Calendar) Calendar.getInstance().clone();
+		leaf_grow_southern_hemisphere.set(Calendar.MONTH, Calendar.OCTOBER);
+		leaf_grow_southern_hemisphere.set(Calendar.DAY_OF_MONTH, 1);
+		leaf_shed_southern_hemisphere = (Calendar) Calendar.getInstance().clone();
+		leaf_shed_southern_hemisphere.set(Calendar.MONTH, Calendar.MAY);
+		leaf_shed_southern_hemisphere.set(Calendar.DAY_OF_MONTH, 1);
+	}
 
 	public Tree(final int treeType) {
 		super(1, 1, 1);
@@ -261,10 +279,17 @@ public class Tree extends HousePart {
 	private boolean isShedded() {
 		if (treeType == PINE)
 			return false;
-		final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
-		final boolean northHemisphereWinter = month > 10 || month < 4;
-		final boolean southHemisphereWinter = month > 4 && month < 10;
-		return EnergyPanel.getInstance().getLatitude() > 0 ? northHemisphereWinter : southHemisphereWinter;
+		Calendar c = Heliodon.getInstance().getCalender();
+		int year = c.get(Calendar.YEAR);
+		if (EnergyPanel.getInstance().getLatitude() > 0) {
+			leaf_grow_northern_hemisphere.set(Calendar.YEAR, year); // make sure that the year is the same
+			leaf_shed_northern_hemisphere.set(Calendar.YEAR, year);
+			return !(c.before(leaf_shed_northern_hemisphere) && c.after(leaf_grow_northern_hemisphere));
+		} else {
+			leaf_grow_southern_hemisphere.set(Calendar.YEAR, year); // make sure that the year is the same
+			leaf_shed_southern_hemisphere.set(Calendar.YEAR, year);
+			return !(c.before(leaf_shed_southern_hemisphere) || c.after(leaf_grow_southern_hemisphere));
+		}
 	}
 
 	@Override

@@ -676,6 +676,7 @@ public class PopupMenuFactory {
 				}
 			});
 
+			popupMenuForTree.addSeparator();
 			popupMenuForTree.add(miPolygon);
 
 		}
