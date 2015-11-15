@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -670,7 +671,11 @@ public class EnergyPanel extends JPanel {
 							e.printStackTrace();
 							Util.reportError(e);
 						}
-						progress(0);
+						EventQueue.invokeLater(new Runnable() { // must run this Swing UI update in the event queue to avoid a possible deadlock
+							public void run() {
+								progress(0);
+							}
+						});
 					} while (computeRequest);
 					thread = null;
 				}

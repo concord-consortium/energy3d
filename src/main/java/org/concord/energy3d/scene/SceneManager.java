@@ -1514,7 +1514,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 		if (selectedHousePart instanceof Foundation) {
 			EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) selectedHousePart);
-			EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedHousePart);
+			if (solarHeatMap)
+				EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedHousePart);
 		} else {
 			EnergyPanel.getInstance().getConstructionCostGraph().removeGraph();
 			EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();

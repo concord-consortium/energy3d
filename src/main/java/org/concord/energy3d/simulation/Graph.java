@@ -56,6 +56,7 @@ public abstract class Graph extends JPanel {
 	String yAxisLabel = "Energy (kWh)";
 	byte type = DEFAULT;
 	static Map<String, Color> colors;
+	boolean popup = true;
 
 	static {
 		colors = new HashMap<String, Color>();
@@ -75,6 +76,24 @@ public abstract class Graph extends JPanel {
 		hideRuns = new HashMap<Integer, Boolean>();
 		hideData("Windows", true);
 		twoDecimals.setMaximumFractionDigits(2);
+	}
+
+	/** Is this graph going to be in a popup window that allows for more drawing space? */
+	public void setPopup(boolean popup) {
+		this.popup = popup;
+		if (popup) {
+			symbolSize = 8;
+			top = 50;
+			right = 50;
+			bottom = 80;
+			left = 90;
+		} else {
+			symbolSize = 4;
+			top = 25;
+			right = 25;
+			bottom = 40;
+			left = 65;
+		}
 	}
 
 	/* keep the records by their class types */
@@ -177,7 +196,7 @@ public abstract class Graph extends JPanel {
 		return !data.isEmpty();
 	}
 
-	void clearData() {
+	public void clearData() {
 		data.clear();
 	}
 
@@ -211,20 +230,20 @@ public abstract class Graph extends JPanel {
 
 		g2.setColor(Color.BLACK);
 		g2.setStroke(thin);
-		g2.setFont(new Font("Arial", Font.PLAIN, 8));
+		g2.setFont(new Font("Arial", Font.PLAIN, popup ? 8 : 6));
 		float tickWidth = (float) (width - left - right) / (float) (numberOfTicks - 1);
 		float xTick;
 		for (int i = 0; i < numberOfTicks; i++) {
 			String s = getXAxisLabel(i);
 			int sWidth = g2.getFontMetrics().stringWidth(s);
 			xTick = left + tickWidth * i;
-			g2.drawString(s, xTick - sWidth / 2, height - bottom / 2 + 16);
+			g2.drawString(s, xTick - sWidth / 2, height - bottom / 2 + (popup ? 16 : 8));
 			g2.drawLine((int) xTick, height - bottom / 2, (int) xTick, height - bottom / 2 - 4);
 		}
-		g2.setFont(new Font("Arial", Font.PLAIN, 10));
+		g2.setFont(new Font("Arial", Font.PLAIN, popup ? 10 : 8));
 		int xAxisLabelWidth = g2.getFontMetrics().stringWidth(xAxisLabel);
 		int yAxisLabelWidth = g2.getFontMetrics().stringWidth(yAxisLabel);
-		g2.drawString(xAxisLabel, (width - xAxisLabelWidth) / 2, height - 8);
+		g2.drawString(xAxisLabel, (width - xAxisLabelWidth) / 2, height - (popup ? 8 : 4));
 		g2.rotate(-Math.PI / 2, 16, (height + yAxisLabelWidth) / 2);
 		g2.drawString(yAxisLabel, 16, (height + yAxisLabelWidth) / 2);
 		g2.rotate(Math.PI / 2, 16, (height + yAxisLabelWidth) / 2);
@@ -265,11 +284,11 @@ public abstract class Graph extends JPanel {
 		String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		if (!"".equals(city)) {
 			g2.setColor(Color.BLACK);
-			g2.setFont(new Font("Arial", Font.BOLD, 14));
+			g2.setFont(new Font("Arial", Font.BOLD, popup ? 14 : 8));
 			FontMetrics fm = g2.getFontMetrics();
 			Calendar today = Heliodon.getInstance().getCalender();
 			String cityAndDate = city + (this instanceof DailyGraph ? " - " + (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.DAY_OF_MONTH) : "");
-			g2.drawString(cityAndDate, (width - fm.stringWidth(cityAndDate)) / 2, 20);
+			g2.drawString(cityAndDate, (width - fm.stringWidth(cityAndDate)) / 2, popup ? 20 : 10);
 		}
 
 	}
@@ -394,44 +413,44 @@ public abstract class Graph extends JPanel {
 
 	void drawBuildingLegends(Graphics2D g2) {
 
-		g2.setFont(new Font("Arial", Font.PLAIN, 10));
+		g2.setFont(new Font("Arial", Font.PLAIN, popup ? 10 : 8));
 		g2.setStroke(thin);
-		int x0 = getWidth() - 100 - right;
+		int x0 = getWidth() - (popup ? 100 : 80) - right;
 
 		boolean isAngularGraph = this instanceof AngularGraph;
 		String s = "Windows";
 		int y0 = top - 10;
 		if (!isDataHidden(s)) {
-			drawDiamond(g2, x0 + 4, y0 + 3, 5, colors.get(s));
+			drawDiamond(g2, x0 + 4, y0 + 3, popup ? 5 : 2, colors.get(s));
 			g2.drawString("* " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 
 		s = "Solar Panels";
 		y0 += 12;
 		if (!isDataHidden(s)) {
-			drawSquare(g2, x0, y0, 8, colors.get(s));
+			drawSquare(g2, x0, y0, popup ? 8 : 4, colors.get(s));
 			g2.drawString("\u2212 " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 
 		s = "Heater";
 		y0 += 12;
 		if (!isDataHidden(s)) {
-			drawTriangleUp(g2, x0, y0, 8, colors.get(s));
+			drawTriangleUp(g2, x0, y0, popup ? 8 : 4, colors.get(s));
 			g2.drawString("\u002b " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 
 		s = "AC";
 		y0 += 12;
 		if (!isDataHidden(s)) {
-			drawTriangleDown(g2, x0, y0, 8, colors.get(s));
+			drawTriangleDown(g2, x0, y0, popup ? 8 : 4, colors.get(s));
 			g2.drawString("\u002b " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 
 		s = "Net";
 		y0 += 13;
 		if (!isDataHidden(s)) {
-			drawCircle(g2, x0, y0, 8, colors.get(s));
-			g2.setFont(new Font("Arial", Font.BOLD, 11));
+			drawCircle(g2, x0, y0, popup ? 8 : 4, colors.get(s));
+			g2.setFont(new Font("Arial", Font.BOLD, popup ? 11 : 8));
 			g2.drawString("\u003d " + (isAngularGraph ? s : s + " (" + Math.round(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
 

@@ -10,6 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.BuildingEnergyDailyGraph;
 import org.concord.energy3d.simulation.SolarRadiation;
 
@@ -22,34 +23,12 @@ public class DailyEnergyGraph extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private BuildingEnergyDailyGraph graph;
+	private Foundation building;
 
 	public DailyEnergyGraph() {
 		super(new BorderLayout());
-	}
-
-	public void removeGraph() {
-		if (graph != null)
-			remove(graph);
-		repaint();
-	}
-
-	public void updateGraph(Foundation building) {
-		for (int i = 0; i < 24; i++) {
-			SolarRadiation.getInstance().computeEnergyAtHour(i);
-			graph.addData("Windows", building.getPassiveSolarNow());
-			graph.addData("Solar Panels", building.getPhotovoltaicNow());
-			graph.addData("Heater", building.getHeatingNow());
-			graph.addData("AC", building.getCoolingNow());
-			graph.addData("Net", building.getTotalEnergyNow());
-		}
-	}
-
-	public void addGraph(Foundation building) {
-
-		removeGraph();
-
 		graph = new BuildingEnergyDailyGraph();
-		graph.setPreferredSize(new Dimension(getWidth() - 10, getHeight()));
+		graph.setPopup(false);
 		graph.setBackground(Color.WHITE);
 		graph.setBorder(BorderFactory.createEtchedBorder());
 		graph.addMouseListener(new MouseAdapter() {
@@ -59,15 +38,37 @@ public class DailyEnergyGraph extends JPanel {
 				}
 			}
 		});
+	}
 
-		if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
-			updateGraph(building);
-		}
-
-		add(graph, BorderLayout.CENTER);
-
+	public void removeGraph() {
+		remove(graph);
 		repaint();
+	}
 
+	public void updateGraph() {
+		if (building == null)
+			return;
+		graph.clearData();
+		for (int i = 0; i < 24; i++) {
+			SolarRadiation.getInstance().computeEnergyAtHour(i);
+			graph.addData("Windows", building.getPassiveSolarNow());
+			graph.addData("Solar Panels", building.getPhotovoltaicNow());
+			graph.addData("Heater", building.getHeatingNow());
+			graph.addData("AC", building.getCoolingNow());
+			graph.addData("Net", building.getTotalEnergyNow());
+		}
+		repaint();
+	}
+
+	public void addGraph(Foundation building) {
+		this.building = building;
+		removeGraph();
+		graph.setPreferredSize(new Dimension(getWidth() - 10, getHeight()));
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			updateGraph();
+		}
+		add(graph, BorderLayout.CENTER);
+		repaint();
 	}
 
 }
