@@ -596,7 +596,7 @@ public class EnergyPanel extends JPanel {
 		tabbedPane.add("Construction Cost", constructionCostGraph);
 
 		dailyEnergyGraph = new DailyEnergyGraph();
-		tabbedPane.add("Daily Energy", dailyEnergyGraph);
+		tabbedPane.add("Hourly Energy", dailyEnergyGraph);
 
 		final Dimension size = heatingLabel.getMinimumSize();
 		windowLabel.setMinimumSize(size);
