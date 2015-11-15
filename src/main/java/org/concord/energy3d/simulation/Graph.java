@@ -28,7 +28,7 @@ import org.concord.energy3d.shapes.Heliodon;
  * @author Charles Xie
  * 
  */
-abstract class Graph extends JPanel {
+public abstract class Graph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -121,7 +121,7 @@ abstract class Graph extends JPanel {
 		return data.keySet();
 	}
 
-	void addData(String name, double d) {
+	public void addData(String name, double d) {
 		List<Double> list = data.get(name);
 		if (list == null) {
 			list = new ArrayList<Double>();

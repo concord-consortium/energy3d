@@ -133,7 +133,8 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty3TextField;
 	private JTextField partProperty4TextField;
 	private ChangeListener latitudeChangeListener;
-	private final CostGraph costGraph;
+	private final ConstructionCostGraph constructionCostGraph;
+	private final DailyEnergyGraph dailyEnergyGraph;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -590,8 +591,11 @@ public class EnergyPanel extends JPanel {
 		final Component verticalGlue = Box.createVerticalGlue();
 		dataPanel.add(verticalGlue);
 
-		costGraph = new CostGraph();
-		tabbedPane.add("Cost", costGraph);
+		constructionCostGraph = new ConstructionCostGraph();
+		tabbedPane.add("Construction Cost", constructionCostGraph);
+
+		dailyEnergyGraph = new DailyEnergyGraph();
+		tabbedPane.add("Daily Energy", dailyEnergyGraph);
 
 		final Dimension size = heatingLabel.getMinimumSize();
 		windowLabel.setMinimumSize(size);
@@ -736,13 +740,18 @@ public class EnergyPanel extends JPanel {
 		return insideTemperatureSpinner;
 	}
 
-	public CostGraph getCostGraph() {
-		return costGraph;
+	public ConstructionCostGraph getConstructionCostGraph() {
+		return constructionCostGraph;
+	}
+
+	public DailyEnergyGraph getDailyEnergyGraph() {
+		return dailyEnergyGraph;
 	}
 
 	/** call when loading a new file */
 	public void clearAllGraphs() {
-		costGraph.removeGraph();
+		constructionCostGraph.removeGraph();
+		dailyEnergyGraph.removeGraph();
 	}
 
 	public void progress(final int percentage) {

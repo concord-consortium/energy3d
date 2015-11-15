@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
@@ -28,13 +25,13 @@ import org.concord.energy3d.simulation.PieChart;
  * @author Charles Xie
  *
  */
-public class CostGraph extends JPanel {
+public class ConstructionCostGraph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	private PieChart pie;
 
-	public CostGraph() {
+	public ConstructionCostGraph() {
 		super(new BorderLayout());
 	}
 

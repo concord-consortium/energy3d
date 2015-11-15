@@ -1124,7 +1124,7 @@ public class MainFrame extends JFrame {
 		return annualEnergyAnalysisForSelectionMenuItem;
 	}
 
-	private JMenuItem getDailyEnergyAnalysisMenuItem() {
+	public JMenuItem getDailyEnergyAnalysisMenuItem() {
 		if (dailyEnergyAnalysisMenuItem == null) {
 			dailyEnergyAnalysisMenuItem = new JMenuItem("Run Daily Energy Analysis for Building...");
 			dailyEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));

@@ -8,11 +8,11 @@ import java.awt.Graphics2D;
  * @author Charles Xie
  * 
  */
-class BuildingEnergyDailyGraph extends DailyGraph {
+public class BuildingEnergyDailyGraph extends DailyGraph {
 
 	private static final long serialVersionUID = 1L;
 
-	BuildingEnergyDailyGraph() {
+	public BuildingEnergyDailyGraph() {
 		super();
 	}
 

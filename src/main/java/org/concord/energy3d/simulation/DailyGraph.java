@@ -9,7 +9,7 @@ import java.util.List;
  * @author Charles Xie
  * 
  */
-abstract class DailyGraph extends Graph {
+public abstract class DailyGraph extends Graph {
 
 	private static final long serialVersionUID = 1L;
 
