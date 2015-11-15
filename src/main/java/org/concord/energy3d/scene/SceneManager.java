@@ -1512,6 +1512,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				return null;
 			}
 		});
+		if (selectedHousePart instanceof Foundation) {
+			EnergyPanel.getInstance().getCostGraph().addGraph((Foundation) selectedHousePart);
+		} else {
+			EnergyPanel.getInstance().getCostGraph().removeGraph();
+		}
 	}
 
 	public void moveMouse(final float x, final float y) {

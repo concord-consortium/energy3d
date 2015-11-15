@@ -20,7 +20,7 @@ import javax.swing.JComponent;
  * 
  */
 
-class PieChart extends JComponent {
+public class PieChart extends JComponent {
 
 	private static final long serialVersionUID = 1L;
 	private NumberFormat format;
@@ -33,9 +33,12 @@ class PieChart extends JComponent {
 	private String unit;
 	private String info;
 	private String details;
+	private boolean popup;
 
-	public PieChart(float[] data, Color[] colors, String[] legends, String unit, String info, String details) {
-		setPreferredSize(new Dimension(450, 300));
+	public PieChart(float[] data, Color[] colors, String[] legends, String unit, String info, String details, boolean popup) {
+		if (popup)
+			setPreferredSize(new Dimension(450, 300));
+		this.popup = popup;
 		format = NumberFormat.getNumberInstance();
 		format.setMaximumFractionDigits(2);
 		this.data = data;
@@ -60,7 +63,7 @@ class PieChart extends JComponent {
 						return;
 					}
 				}
-				setToolTipText("Hover mouse over the pie chart to view the numbers");
+				setToolTipText("<html>Hover mouse over the pie chart to view the numbers" + (PieChart.this.popup ? "" : "<br>Double-click to enlarge this chart") + "</html>");
 			}
 		});
 	}
@@ -81,14 +84,13 @@ class PieChart extends JComponent {
 		int height = dim.height;
 		g2.setColor(getBackground());
 		g2.fillRect(0, 0, width, height);
-		g2.setFont(new Font("Arial", Font.PLAIN, 10));
+		g2.setFont(new Font("Arial", Font.PLAIN, popup ? 10 : 8));
 
-		Rectangle bound = new Rectangle(width / 20, height / 10, width / 2, width / 2);
-		int r = bound.x + bound.width + 20;
-		int s = bound.y + 10;
-
-		int legendX1 = width / 10;
+		int legendX1 = width / 20;
 		int legendX2 = width / 6;
+		Rectangle bound = new Rectangle(width / 20, height / 10, width / 2, width / 2);
+		int r = bound.x + bound.width + legendX1;
+		int s = bound.y + 10;
 
 		float t = 0.0f;
 		int n = percents.length;
@@ -104,18 +106,20 @@ class PieChart extends JComponent {
 			g2.setColor(colors[i]);
 			arcs[i].setArc(bound, t, percents[i] * 360.0f, Arc2D.PIE);
 			g2.fill(arcs[i]);
-			g2.fillRect(r, s + i * 20, 20, 10);
+			g2.fillRect(r, s + i * 20, 10, 10);
 			g2.setColor(Color.black);
 			g2.draw(arcs[i]);
-			g2.drawRect(r, s + i * 20, 20, 10);
+			g2.drawRect(r, s + i * 20, 10, 10);
 			g2.drawString(legends[i], r + legendX1, s + 10 + i * 20);
 			g2.drawString(format.format(percents[i] * 100.0) + "%", r + legendX2, s + 10 + i * 20);
 			t += percents[i] * 360.0f;
 		}
 
 		g2.setFont(new Font("Arial", Font.PLAIN | Font.BOLD, 11));
-		String total = info + ", Total: " + unit + (int) sum;
-		g2.drawString(total, (width - fm.stringWidth(total)) / 2, height - 30);
+		if (info != null) {
+			String total = info + ", Total: " + unit + (int) sum;
+			g2.drawString(total, (width - fm.stringWidth(total)) / 2, height - 30);
+		}
 		if (details != null) {
 			g2.setFont(new Font("Arial", Font.PLAIN, 11));
 			g2.drawString(details, (width - fm.stringWidth(details)) / 2, height - 15);

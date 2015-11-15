@@ -39,6 +39,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
@@ -132,6 +133,7 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty3TextField;
 	private JTextField partProperty4TextField;
 	private ChangeListener latitudeChangeListener;
+	private final CostGraph costGraph;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -461,9 +463,6 @@ public class EnergyPanel extends JPanel {
 		});
 		budgetPanel.add(budgetBar, BorderLayout.CENTER);
 
-		final Component verticalGlue = Box.createVerticalGlue();
-		dataPanel.add(verticalGlue);
-
 		progressBar = new JProgressBar();
 		add(progressBar, BorderLayout.SOUTH);
 
@@ -473,6 +472,7 @@ public class EnergyPanel extends JPanel {
 		final JPanel energyTodayPanel = new JPanel();
 		buildingPanel.add(energyTodayPanel);
 		energyTodayPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Energy of the Day (kWh)", TitledBorder.LEADING, TitledBorder.TOP));
+		energyTodayPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, energyTodayPanel.getPreferredSize().height));
 		final GridBagLayout gbl_panel_1 = new GridBagLayout();
 		energyTodayPanel.setLayout(gbl_panel_1);
 
@@ -585,7 +585,13 @@ public class EnergyPanel extends JPanel {
 		energyTodayPanel.add(netEnergyTextField, gbc_netEnergyTextField);
 		netEnergyTextField.setColumns(5);
 
-		energyTodayPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, energyTodayPanel.getPreferredSize().height));
+		JTabbedPane tabbedPane = new JTabbedPane();
+		dataPanel.add(tabbedPane);
+		final Component verticalGlue = Box.createVerticalGlue();
+		dataPanel.add(verticalGlue);
+
+		costGraph = new CostGraph();
+		tabbedPane.add("Cost", costGraph);
 
 		final Dimension size = heatingLabel.getMinimumSize();
 		windowLabel.setMinimumSize(size);
@@ -728,6 +734,15 @@ public class EnergyPanel extends JPanel {
 
 	public JSpinner getInsideTemperatureSpinner() {
 		return insideTemperatureSpinner;
+	}
+
+	public CostGraph getCostGraph() {
+		return costGraph;
+	}
+
+	/** call when loading a new file */
+	public void clearAllGraphs() {
+		costGraph.removeGraph();
 	}
 
 	public void progress(final int percentage) {

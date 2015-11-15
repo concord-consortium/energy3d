@@ -229,11 +229,11 @@ public class Cost {
 		}
 
 		final float[] data = new float[] { wallSum, windowSum, roofSum, foundationSum, doorSum, solarPanelSum, treeSum };
-		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation Floor", "Doors", "Solar Panels", "Trees" };
+		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Ground Floor", "Doors", "Solar Panels", "Trees" };
 		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.PINK, Color.YELLOW, Color.GREEN };
 
 		// show them in a popup window
-		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null);
+		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null, true);
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Costs by Category", true);

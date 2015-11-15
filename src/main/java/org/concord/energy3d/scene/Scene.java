@@ -167,6 +167,7 @@ public class Scene implements Serializable {
 		});
 		EnergyPanel.getInstance().updatePartEnergy();
 		EnergyPanel.getInstance().updateCost();
+		EnergyPanel.getInstance().clearAllGraphs();
 	}
 
 	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
@@ -196,6 +197,7 @@ public class Scene implements Serializable {
 				instance.redrawAll(); // need to call this to at least redraw the overhangs
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				EnergyPanel.getInstance().update();
+				EnergyPanel.getInstance().clearAllGraphs();
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
