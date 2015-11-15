@@ -63,7 +63,7 @@ public class DailyEnergyGraph extends JPanel {
 	public void addGraph(Foundation building) {
 		this.building = building;
 		removeGraph();
-		graph.setPreferredSize(new Dimension(getWidth() - 10, getHeight()));
+		graph.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - 5));
 		if (SceneManager.getInstance().getSolarHeatMap()) {
 			updateGraph();
 		}

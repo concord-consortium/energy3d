@@ -197,10 +197,15 @@ public class Scene implements Serializable {
 				instance.redrawAll(); // need to call this to at least redraw the overhangs
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				EnergyPanel.getInstance().update();
-				EnergyPanel.getInstance().clearAllGraphs();
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
+						EnergyPanel.getInstance().clearAllGraphs();
+						HousePart p = SceneManager.getInstance().getSelectedPart();
+						if (p instanceof Foundation) {
+							EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
+							EnergyPanel.getInstance().validate();
+						}
 						if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
 							MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
 							SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
@@ -225,7 +230,6 @@ public class Scene implements Serializable {
 
 			MainPanel.getInstance().getHeliodonButton().setSelected(false);
 			MainPanel.getInstance().getSunAnimationButton().setSelected(false);
-			// MainPanel.getInstance().getSolarButton().setSelected(false);
 			SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
 			Wall.resetDefaultWallHeight();
 
@@ -286,7 +290,7 @@ public class Scene implements Serializable {
 					(b ? notReceivingShadowRoot : originalHouseRoot).attachChild(housePart.getRoot());
 				}
 			}
-			System.out.println("done");
+			System.out.println("initSceneNow done");
 			/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
 			// instance.redrawAllNow();
 		}

@@ -90,7 +90,7 @@ public class PieChart extends JComponent {
 		int legendX2 = width / 6;
 		Rectangle bound = new Rectangle(width / 20, height / 10, width / 2, width / 2);
 		int r = bound.x + bound.width + legendX1;
-		int s = bound.y + 10;
+		int s = bound.y + (popup ? 10 : 0);
 
 		float t = 0.0f;
 		int n = percents.length;

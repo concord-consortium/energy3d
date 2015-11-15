@@ -587,7 +587,22 @@ public class EnergyPanel extends JPanel {
 		energyTodayPanel.add(netEnergyTextField, gbc_netEnergyTextField);
 		netEnergyTextField.setColumns(5);
 
-		JTabbedPane tabbedPane = new JTabbedPane();
+		final JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (tabbedPane.getSelectedComponent() == dailyEnergyGraph) {
+					if (SceneManager.getInstance().getSolarHeatMap()) {
+						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) {
+							EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
+						} else {
+							EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();
+						}
+					}
+				}
+			}
+		});
 		dataPanel.add(tabbedPane);
 		final Component verticalGlue = Box.createVerticalGlue();
 		dataPanel.add(verticalGlue);
@@ -674,6 +689,15 @@ public class EnergyPanel extends JPanel {
 						EventQueue.invokeLater(new Runnable() { // must run this Swing UI update in the event queue to avoid a possible deadlock
 							public void run() {
 								progress(0);
+								if (dailyEnergyGraph.isShowing()) {
+									if (SceneManager.getInstance().getSolarHeatMap()) {
+										HousePart p = SceneManager.getInstance().getSelectedPart();
+										if (p instanceof Foundation) {
+											dailyEnergyGraph.addGraph((Foundation) p);
+											validate();
+										}
+									}
+								}
 							}
 						});
 					} while (computeRequest);
