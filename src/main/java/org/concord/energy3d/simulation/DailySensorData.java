@@ -29,7 +29,7 @@ public class DailySensorData extends EnergyDailyAnalysis {
 	}
 
 	@Override
-	void updateGraph() {
+	public void updateGraph() {
 		final List<HousePart> parts = Scene.getInstance().getParts();
 		for (final HousePart p : parts) {
 			if (p instanceof Sensor) {

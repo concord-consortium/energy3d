@@ -73,7 +73,7 @@ class DataViewer {
 		dataWindow.setVisible(true);
 	}
 
-	static void viewRawData(final JDialog parent, Graph graph) {
+	static void viewRawData(final java.awt.Window parent, Graph graph) {
 		String[] header = null;
 		if (graph instanceof BuildingEnergyDailyGraph) {
 			header = new String[] { "Hour", "Windows", "Solar Panels", "Heater", "AC", "Net" };

@@ -7,11 +7,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.BuildingEnergyDailyGraph;
+import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.SolarRadiation;
 
 /**
@@ -34,7 +36,16 @@ public class DailyEnergyGraph extends JPanel {
 		graph.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() >= 2) {
-					MainFrame.getInstance().getDailyEnergyAnalysisMenuItem().doClick();
+					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
+						EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
+						analysis.updateGraph();
+						analysis.show("Daily Energy");
+					}
 				}
 			}
 		});

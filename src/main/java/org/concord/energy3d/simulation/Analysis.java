@@ -74,7 +74,7 @@ public abstract class Analysis {
 		return null;
 	}
 
-	abstract void updateGraph();
+	public abstract void updateGraph();
 
 	void onCompletion() {
 		EnergyPanel.getInstance().requestDisableActions(null);

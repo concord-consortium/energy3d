@@ -126,7 +126,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 	}
 
 	@Override
-	void updateGraph() {
+	public void updateGraph() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Foundation) {
 			if (graph instanceof BuildingEnergyAnnualGraph) {
@@ -197,12 +197,13 @@ public class EnergyAnnualAnalysis extends Analysis {
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Construction cost: $" + cost + ")", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		graph.parent = dialog;
 
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
 
 		final JMenuItem miClear = new JMenuItem("Clear Previous Results");
-		final JMenuItem miView = new JMenuItem("View Raw Data");
+		final JMenuItem miView = new JMenuItem("View Raw Data...");
 
 		final JMenu menu = new JMenu("Options");
 		menu.addMenuListener(new MenuListener() {

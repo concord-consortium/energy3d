@@ -1755,4 +1755,40 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		((Component) canvas).requestFocusInWindow();
 	}
 
+	public Foundation autoSelectBuilding(final boolean ask) {
+		Foundation foundation = null;
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
+			SceneManager.getInstance().setSelectedPart(null);
+			int count = 0;
+			HousePart hp = null;
+			for (final HousePart x : Scene.getInstance().getParts()) {
+				if (x instanceof Foundation) {
+					count++;
+					hp = x;
+				}
+			}
+			if (count == 1) {
+				SceneManager.getInstance().setSelectedPart(hp);
+				foundation = (Foundation) hp;
+			} else {
+				if (ask)
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+			}
+		} else {
+			final HousePart topContainer = selectedPart.getTopContainer();
+			if (selectedPart instanceof Foundation) {
+				foundation = (Foundation) selectedPart;
+			} else if (topContainer instanceof Foundation) {
+				selectedPart.setEditPointsVisible(false);
+				SceneManager.getInstance().setSelectedPart(topContainer);
+				foundation = (Foundation) topContainer;
+			} else {
+				if (ask)
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+		return foundation;
+	}
+
 }

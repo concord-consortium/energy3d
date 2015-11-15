@@ -57,10 +57,8 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.PrintController;
@@ -1093,7 +1091,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					if (autoSelectBuilding(true) instanceof Foundation)
+					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation)
 						new EnergyAnnualAnalysis().show("Annual Energy");
 				}
 			});
@@ -1136,8 +1134,12 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					if (autoSelectBuilding(true) instanceof Foundation)
-						new EnergyDailyAnalysis().show("Daily Energy");
+					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
+						EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap())
+							analysis.updateGraph();
+						analysis.show("Daily Energy");
+					}
 				}
 			});
 		}
@@ -1812,42 +1814,6 @@ public class MainFrame extends JFrame {
 		return roofColorMenuItem;
 	}
 
-	Foundation autoSelectBuilding(final boolean ask) {
-		Foundation foundation = null;
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
-			SceneManager.getInstance().setSelectedPart(null);
-			int count = 0;
-			HousePart hp = null;
-			for (final HousePart x : Scene.getInstance().getParts()) {
-				if (x instanceof Foundation) {
-					count++;
-					hp = x;
-				}
-			}
-			if (count == 1) {
-				SceneManager.getInstance().setSelectedPart(hp);
-				foundation = (Foundation) hp;
-			} else {
-				if (ask)
-					JOptionPane.showMessageDialog(this, "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-			}
-		} else {
-			final HousePart topContainer = selectedPart.getTopContainer();
-			if (selectedPart instanceof Foundation) {
-				foundation = (Foundation) selectedPart;
-			} else if (topContainer instanceof Foundation) {
-				selectedPart.setEditPointsVisible(false);
-				SceneManager.getInstance().setSelectedPart(topContainer);
-				foundation = (Foundation) topContainer;
-			} else {
-				if (ask)
-					JOptionPane.showMessageDialog(this, "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-			}
-		}
-		return foundation;
-	}
-
 	private int countFloors(final Foundation foundation) {
 		int n = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
@@ -1909,7 +1875,7 @@ public class MainFrame extends JFrame {
 			noTextureMenuItem.setSelected(true);
 			Scene.getInstance().setTextureMode(TextureMode.None);
 		}
-		final Foundation foundation = autoSelectBuilding(true);
+		final Foundation foundation = SceneManager.getInstance().autoSelectBuilding(true);
 		if (foundation == null)
 			return;
 		switch (operation) {

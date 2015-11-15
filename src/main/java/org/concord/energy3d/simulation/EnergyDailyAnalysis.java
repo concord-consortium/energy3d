@@ -89,7 +89,7 @@ public class EnergyDailyAnalysis extends Analysis {
 	}
 
 	@Override
-	void updateGraph() {
+	public void updateGraph() {
 		int n = (int) Math.round(60.0 / SolarRadiation.getInstance().getTimeStep());
 		for (int i = 0; i < 24; i++) {
 			SolarRadiation.getInstance().computeEnergyAtHour(i);
@@ -166,12 +166,13 @@ public class EnergyDailyAnalysis extends Analysis {
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Construction cost: $" + cost + ")", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		graph.parent = dialog;
 
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
 
 		final JMenuItem miClear = new JMenuItem("Clear Previous Results");
-		final JMenuItem miView = new JMenuItem("View Raw Data");
+		final JMenuItem miView = new JMenuItem("View Raw Data...");
 
 		final JMenu menu = new JMenu("Options");
 		menu.addMenuListener(new MenuListener() {

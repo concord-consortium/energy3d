@@ -9,6 +9,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -19,10 +25,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
@@ -57,6 +71,8 @@ public abstract class Graph extends JPanel {
 	byte type = DEFAULT;
 	static Map<String, Color> colors;
 	boolean popup = true;
+	JPopupMenu popupMenu;
+	JDialog parent;
 
 	static {
 		colors = new HashMap<String, Color>();
@@ -76,6 +92,66 @@ public abstract class Graph extends JPanel {
 		hideRuns = new HashMap<Integer, Boolean>();
 		hideData("Windows", true);
 		twoDecimals.setMaximumFractionDigits(2);
+
+		popupMenu = new JPopupMenu();
+		popupMenu.setInvoker(this);
+		popupMenu.addPopupMenuListener(new PopupMenuListener() {
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				popupMenu.removeAll();
+				JMenuItem mi = new JMenuItem("View Raw Data...");
+				mi.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						DataViewer.viewRawData(popup ? parent : MainFrame.getInstance(), Graph.this);
+					}
+				});
+				popupMenu.add(mi);
+				popupMenu.addSeparator();
+				for (final String name : data.keySet()) {
+					final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(name, !isDataHidden(name));
+					cbmi.addItemListener(new ItemListener() {
+						@Override
+						public void itemStateChanged(final ItemEvent e) {
+							hideData(name, !cbmi.isSelected());
+							Graph.this.repaint();
+						}
+					});
+					popupMenu.add(cbmi);
+				}
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+			}
+
+		});
+
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				processMousePressed(e);
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (Util.isRightClick(e))
+					processMouseReleased(e);
+			}
+		});
+
+	}
+
+	private void processMousePressed(MouseEvent e) {
+	}
+
+	private void processMouseReleased(MouseEvent e) {
+		popupMenu.show(this, e.getX(), e.getY());
 	}
 
 	/** Is this graph going to be in a popup window that allows for more drawing space? */
@@ -238,7 +314,8 @@ public abstract class Graph extends JPanel {
 			int sWidth = g2.getFontMetrics().stringWidth(s);
 			xTick = left + tickWidth * i;
 			g2.drawString(s, xTick - sWidth / 2, height - bottom / 2 + (popup ? 16 : 8));
-			g2.drawLine((int) xTick, height - bottom / 2, (int) xTick, height - bottom / 2 - 4);
+			if (popup)
+				g2.drawLine((int) xTick, height - bottom / 2, (int) xTick, height - bottom / 2 - 4);
 		}
 		g2.setFont(new Font("Arial", Font.PLAIN, popup ? 10 : 8));
 		int xAxisLabelWidth = g2.getFontMetrics().stringWidth(xAxisLabel);

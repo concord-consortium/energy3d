@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -44,6 +45,17 @@ import com.ardor3d.ui.text.BMText.AutoFade;
 import com.ardor3d.ui.text.BMText.AutoScale;
 
 public class Util {
+
+	/**
+	 * platform-independent check for Windows' equivalent of right click of mouse button. This can be used as an alternative as MouseEvent.isPopupTrigger(), which requires checking within both mousePressed() and mouseReleased() methods.
+	 */
+	public static boolean isRightClick(MouseEvent e) {
+		if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0)
+			return true;
+		if (System.getProperty("os.name").startsWith("Mac") && e.isControlDown())
+			return true;
+		return false;
+	}
 
 	public static double toUsUValue(double siUValue) {
 		return siUValue / 5.67826;

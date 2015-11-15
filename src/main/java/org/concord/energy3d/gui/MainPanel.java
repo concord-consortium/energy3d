@@ -717,7 +717,7 @@ public class MainPanel extends JPanel {
 				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ComputeEnergyCommand());
 					if (energyViewButton.isSelected()) {
-						MainFrame.getInstance().autoSelectBuilding(false);
+						SceneManager.getInstance().autoSelectBuilding(false);
 					} else {
 						EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();
 					}
