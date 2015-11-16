@@ -12,25 +12,25 @@ public class ChangeBackgroundAlbedoCommand extends AbstractUndoableEdit {
 	private double orgAlbedo, newAlbedo;
 
 	public ChangeBackgroundAlbedoCommand() {
-		orgAlbedo = Scene.getInstance().getBackgroundAlbedo();
+		orgAlbedo = Scene.getInstance().getGround().getAlbedo();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newAlbedo = Scene.getInstance().getBackgroundAlbedo();
-		Scene.getInstance().setBackgroundAlbedo(orgAlbedo);
+		newAlbedo = Scene.getInstance().getGround().getAlbedo();
+		Scene.getInstance().getGround().setAlbedo(orgAlbedo);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setBackgroundAlbedo(newAlbedo);
+		Scene.getInstance().getGround().setAlbedo(newAlbedo);
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Change Background Albedo";
+		return "Change Ground Albedo";
 	}
 
 }

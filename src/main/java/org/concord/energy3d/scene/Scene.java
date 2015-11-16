@@ -40,6 +40,7 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
+import org.concord.energy3d.simulation.Thermostat;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.SaveCommand;
@@ -120,13 +121,11 @@ public class Scene implements Serializable {
 	private boolean areaEnabled;
 	private boolean heightEnabled;
 	private boolean cleanup = false;
-	private double backgroundAlbedo = 0.3;
-	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
-	private double groundThermalDiffusivity = 0.01; // unit: m^2/s
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
 	private boolean fullEnergyInSolarMap = true;
-	private int insideTemperature = 20;
+	private Ground ground = new Ground();
+	private Thermostat thermostat = new Thermostat();
 	private HousePart copyBuffer, originalCopy;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
@@ -333,9 +332,12 @@ public class Scene implements Serializable {
 			instance.solarContrast = 50;
 		Util.setSilently(energyPanel.getColorMapSlider(), instance.solarContrast);
 
-		if (Util.isZero(instance.insideTemperature)) // if inside temperature has not been set, set it to 20
-			instance.insideTemperature = 20;
-		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.insideTemperature);
+		if (instance.thermostat == null) // previous versions do not have Thermostat
+			instance.thermostat = new Thermostat();
+		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.thermostat.getTemperature());
+
+		if (instance.ground == null)
+			instance.ground = new Ground(); // previous versions do not have Ground
 
 		// set default properties of parts (object serialization initializes every number field to zero, forcing us to do this ugly thing)
 
@@ -382,13 +384,8 @@ public class Scene implements Serializable {
 
 		}
 
-		if (Util.isZero(instance.volumetricHeatCapacity))
-			instance.volumetricHeatCapacity = 0.5;
-		if (Util.isZero(instance.groundThermalDiffusivity))
-			instance.groundThermalDiffusivity = 0.01;
 		if (Util.isZero(instance.heatVectorLength))
 			instance.heatVectorLength = 5000;
-		Ground.getInstance().setThermalDiffusivity(instance.groundThermalDiffusivity);
 		SolarRadiation.getInstance().setSolarStep(Util.isZero(instance.solarStep) ? 2 : instance.solarStep);
 		SolarRadiation.getInstance().setTimeStep(Util.isZero(instance.timeStep) ? 15 : instance.timeStep);
 		instance.setEdited(false);
@@ -545,7 +542,7 @@ public class Scene implements Serializable {
 				instance.calendar = Heliodon.getInstance().getCalender();
 				instance.latitude = EnergyPanel.getInstance().getLatitude();
 				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-				instance.insideTemperature = (Integer) EnergyPanel.getInstance().getInsideTemperatureSpinner().getValue();
+				instance.thermostat.setTemperature((Integer) EnergyPanel.getInstance().getInsideTemperatureSpinner().getValue());
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
@@ -1329,30 +1326,6 @@ public class Scene implements Serializable {
 		return Heliodon.getInstance().getCalender().getTime();
 	}
 
-	public void setInsideTemperature(int insideTemperature) {
-		this.insideTemperature = insideTemperature;
-	}
-
-	public int getInsideTemperature() {
-		return insideTemperature;
-	}
-
-	public void setBackgroundAlbedo(final double backgroundAlbedo) {
-		this.backgroundAlbedo = backgroundAlbedo;
-	}
-
-	public double getBackgroundAlbedo() {
-		return backgroundAlbedo;
-	}
-
-	public void setGroundThermalDiffusivity(final double groundThermalDiffusivity) {
-		this.groundThermalDiffusivity = groundThermalDiffusivity;
-	}
-
-	public double getGroundThermalDiffusivity() {
-		return groundThermalDiffusivity;
-	}
-
 	public void setHeatVectorLength(final double heatVectorLength) {
 		this.heatVectorLength = heatVectorLength;
 	}
@@ -1401,6 +1374,14 @@ public class Scene implements Serializable {
 		for (final HousePart p : Scene.getInstance().getParts())
 			if (p instanceof Tree)
 				p.updateTextureAndColor();
+	}
+
+	public Ground getGround() {
+		return ground;
+	}
+
+	public Thermostat getThermostat() {
+		return thermostat;
 	}
 
 }

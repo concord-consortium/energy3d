@@ -12,20 +12,20 @@ public class ChangeGroundThermalDiffusivityCommand extends AbstractUndoableEdit 
 	private double orgThermalDiffusivity, newThermalDiffusivity;
 
 	public ChangeGroundThermalDiffusivityCommand() {
-		orgThermalDiffusivity = Scene.getInstance().getGroundThermalDiffusivity();
+		orgThermalDiffusivity = Scene.getInstance().getGround().getThermalDiffusivity();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newThermalDiffusivity = Scene.getInstance().getGroundThermalDiffusivity();
-		Scene.getInstance().setGroundThermalDiffusivity(orgThermalDiffusivity);
+		newThermalDiffusivity = Scene.getInstance().getGround().getThermalDiffusivity();
+		Scene.getInstance().getGround().setThermalDiffusivity(orgThermalDiffusivity);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setGroundThermalDiffusivity(newThermalDiffusivity);
+		Scene.getInstance().getGround().setThermalDiffusivity(newThermalDiffusivity);
 	}
 
 	@Override

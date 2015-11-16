@@ -170,6 +170,8 @@ public abstract class Graph extends JPanel {
 			bottom = 40;
 			left = 65;
 		}
+		if (!popup)
+			setToolTipText("Double-click to enlarge this graph");
 	}
 
 	/* keep the records by their class types */

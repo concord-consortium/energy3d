@@ -178,7 +178,7 @@ public class SolarRadiation {
 			onMesh.put(SceneManager.getInstance().getSolarLand(), data);
 		}
 		final Vector3 p = new Vector3();
-		final double absorption = 1 - Scene.getInstance().getBackgroundAlbedo();
+		final double absorption = 1 - Scene.getInstance().getGround().getAlbedo();
 		for (int col = 0; col < cols; col++) {
 			p.setX((col - cols / 2) * step + step / 2.0);
 			for (int row = 0; row < rows; row++) {
@@ -510,7 +510,7 @@ public class SolarRadiation {
 				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * peakRadiation;
 			}
 			if (viewFactorWithGround > 0) { // short-wave reflection from the ground
-				result += Scene.getInstance().getBackgroundAlbedo() * viewFactorWithGround * peakRadiation;
+				result += Scene.getInstance().getGround().getAlbedo() * viewFactorWithGround * peakRadiation;
 			}
 		}
 		return result;
@@ -635,7 +635,7 @@ public class SolarRadiation {
 				for (int i = 0; i < n; i++) {
 					double groundHeatLoss = foundation.getHeatLoss()[t0 + i];
 					if (groundHeatLoss > 0) {
-						if (outsideTemperature >= Scene.getInstance().getInsideTemperature()) {
+						if (outsideTemperature >= Scene.getInstance().getThermostat().getTemperature()) {
 							heatLoss[i] -= groundHeatLoss;
 						}
 					} else {

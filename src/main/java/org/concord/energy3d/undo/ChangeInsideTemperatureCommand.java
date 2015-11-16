@@ -14,21 +14,21 @@ public class ChangeInsideTemperatureCommand extends AbstractUndoableEdit {
 	private int orgTemperature, newTemperature;
 
 	public ChangeInsideTemperatureCommand() {
-		orgTemperature = Scene.getInstance().getInsideTemperature();
+		orgTemperature = Scene.getInstance().getThermostat().getTemperature();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newTemperature = Scene.getInstance().getInsideTemperature();
-		Scene.getInstance().setInsideTemperature(orgTemperature);
+		newTemperature = Scene.getInstance().getThermostat().getTemperature();
+		Scene.getInstance().getThermostat().setTemperature(orgTemperature);
 		Util.setSilently(EnergyPanel.getInstance().getInsideTemperatureSpinner(), orgTemperature);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setInsideTemperature(newTemperature);
+		Scene.getInstance().getThermostat().setTemperature(newTemperature);
 		Util.setSilently(EnergyPanel.getInstance().getInsideTemperatureSpinner(), newTemperature);
 	}
 

@@ -333,7 +333,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				SceneManager.getInstance().getUndoManager().addEdit(new ChangeInsideTemperatureCommand());
-				Scene.getInstance().setInsideTemperature((Integer) insideTemperatureSpinner.getValue());
+				Scene.getInstance().getThermostat().setTemperature((Integer) insideTemperatureSpinner.getValue());
 				if (disableActionsRequester == null)
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);
@@ -720,7 +720,7 @@ public class EnergyPanel extends JPanel {
 				for (final HousePart part : Scene.getInstance().getParts())
 					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
 				SolarRadiation.getInstance().compute();
-				HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), Scene.getInstance().getInsideTemperature());
+				HeatLoad.getInstance().computeEnergyToday((Calendar) Heliodon.getInstance().getCalender().clone(), Scene.getInstance().getThermostat().getTemperature());
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Energy calculation completed", 0, 1));
 				updatePartEnergy();

@@ -33,6 +33,7 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
@@ -117,7 +118,8 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		today.set(Calendar.DAY_OF_MONTH, 1);
 		int count = 0;
-		int lag = Ground.getInstance().getDailyLagInMinutes();
+		Ground ground = Scene.getInstance().getGround();
+		int lag = ground.getDailyLagInMinutes();
 		for (int x : EnergyAnnualAnalysis.MONTHS) {
 			today.set(Calendar.MONTH, x);
 			double[] r = Weather.computeOutsideTemperature(today, city);
@@ -126,8 +128,8 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 			double amp = 0.5 * (r[1] - r[0]);
 			int day = today.get(Calendar.DAY_OF_YEAR);
 			for (int i = 0; i < m; i++) {
-				lowestGroundTemperature[i][count] = Ground.getInstance().getTemperatureMinuteOfDay(day, lag, amp, depth[i]); // (12 am + lag) is the coldest time
-				highestGroundTemperature[i][count] = Ground.getInstance().getTemperatureMinuteOfDay(day, lag + 720, amp, depth[i]); // (12 pm + lag) is the hottest time
+				lowestGroundTemperature[i][count] = ground.getTemperatureMinuteOfDay(day, lag, amp, depth[i]); // (12 am + lag) is the coldest time
+				highestGroundTemperature[i][count] = ground.getTemperatureMinuteOfDay(day, lag + 720, amp, depth[i]); // (12 pm + lag) is the hottest time
 			}
 			count++;
 		}

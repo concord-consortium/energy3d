@@ -148,7 +148,7 @@ public class PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final String title = "<html>Background Albedo (dimensionless [0, 1])<hr><font size=2>Examples:<br>0.17 (soil), 0.25 (grass), 0.40 (sand), 0.55 (concrete), snow (0.9)</html>";
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getBackgroundAlbedo());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGround().getAlbedo());
 						if (newValue == null)
 							break;
 						else {
@@ -158,7 +158,7 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Albedo value must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									SceneManager.getInstance().getUndoManager().addEdit(new ChangeBackgroundAlbedoCommand());
-									Scene.getInstance().setBackgroundAlbedo(val);
+									Scene.getInstance().getGround().setAlbedo(val);
 									Scene.getInstance().setEdited(true);
 									break;
 								}
@@ -176,7 +176,7 @@ public class PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final String title = "<html>Ground Thermal Diffusivity (m<sup>2</sup>/s)<hr><font size=2>Examples:<br>0.039 (sand), 0.046 (clay), 0.05 (silt)</html>";
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGroundThermalDiffusivity());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGround().getThermalDiffusivity());
 						if (newValue == null)
 							break;
 						else {
@@ -186,7 +186,7 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Ground thermal diffusivity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									SceneManager.getInstance().getUndoManager().addEdit(new ChangeGroundThermalDiffusivityCommand());
-									Scene.getInstance().setGroundThermalDiffusivity(val);
+									Scene.getInstance().getGround().setThermalDiffusivity(val);
 									Scene.getInstance().setEdited(true);
 									break;
 								}

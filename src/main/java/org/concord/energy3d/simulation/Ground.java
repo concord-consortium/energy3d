@@ -1,5 +1,7 @@
 package org.concord.energy3d.simulation;
 
+import java.io.Serializable;
+
 import org.concord.energy3d.gui.EnergyPanel;
 
 /**
@@ -9,24 +11,29 @@ import org.concord.energy3d.gui.EnergyPanel;
  * 
  */
 
-public class Ground {
+public class Ground implements Serializable {
 
-	private static final Ground instance = new Ground();
+	private static final long serialVersionUID = 1L;
 
 	private static final double OMEGA_YEAR = Math.PI / 182.5; // the annual cycle is 365 days
 	private static final double OMEGA_DAY = Math.PI / 720.0; // the daily cycle is 1440 minutes
 
-	private double thermalDiffusivity = 0.01; // the larger the thermal diffusivity is, the more the ground temperature is affected by air temperature
+	private double albedo = 0.3;
+	private double thermalDiffusivity = 0.05; // the larger the thermal diffusivity is, the more the ground temperature is affected by air temperature, unit: m^2/s
 	private double foundationDepth = 1;
 
 	private int yearlyLagInDays = 30;
 	private int dailyLagInMinutes = 120;
 
-	public static Ground getInstance() {
-		return instance;
+	public Ground() {
 	}
 
-	private Ground() {
+	public void setAlbedo(double albedo) {
+		this.albedo = albedo;
+	}
+
+	public double getAlbedo() {
+		return albedo;
 	}
 
 	public void setThermalDiffusivity(double thermalDiffusivity) {

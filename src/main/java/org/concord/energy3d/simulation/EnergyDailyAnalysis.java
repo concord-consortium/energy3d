@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
@@ -80,6 +81,9 @@ public class EnergyDailyAnalysis extends Analysis {
 									previousRuns += keys[i] + " : " + Math.round(recordedResults.get(keys[i])) + " kWh<br>";
 								}
 							}
+							final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+							if (selectedPart instanceof Foundation)
+								EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
 							JOptionPane.showMessageDialog(parent, "<html>The calculated daily net energy is <b>" + net + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Daily Net Energy", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}

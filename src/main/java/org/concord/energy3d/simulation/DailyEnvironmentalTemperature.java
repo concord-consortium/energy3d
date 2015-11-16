@@ -33,6 +33,7 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
@@ -107,7 +108,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		double amp = 0.5 * (highestAirTemperature - lowestAirTemperature);
 		for (int h = 0; h < 24; h++) {
 			for (int i = 0; i < m; i++) {
-				groundTemperature[i][h] = i == 0 ? Weather.getInstance().getOutsideTemperatureAtMinute(highestAirTemperature, lowestAirTemperature, h * 60) : Ground.getInstance().getTemperatureMinuteOfDay(day, h * 60, amp, depth[i]);
+				groundTemperature[i][h] = i == 0 ? Weather.getInstance().getOutsideTemperatureAtMinute(highestAirTemperature, lowestAirTemperature, h * 60) : Scene.getInstance().getGround().getTemperatureMinuteOfDay(day, h * 60, amp, depth[i]);
 			}
 		}
 
