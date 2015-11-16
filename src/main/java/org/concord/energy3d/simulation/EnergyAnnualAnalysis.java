@@ -96,7 +96,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Foundation) { // synchronize with daily graph
-							if (EnergyPanel.getInstance().getDailyEnergyGraph().getBuilding() != null) {
+							if (EnergyPanel.getInstance().getDailyEnergyGraph().hasGraph()) {
 								EnergyPanel.getInstance().getDailyEnergyGraph().updateGraph();
 							}
 						}
@@ -107,7 +107,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 								Util.setSilently(EnergyPanel.getInstance().getInsideTemperatureSpinner(), Scene.getInstance().getThermostat().getTemperature(m));
 								if (selectedPart instanceof Foundation) {
 									EnergyPanel.getInstance().getGraphTabbedPane().setSelectedComponent(EnergyPanel.getInstance().getDailyEnergyGraph());
-									if (EnergyPanel.getInstance().getDailyEnergyGraph().getBuilding() == null) {
+									if (!EnergyPanel.getInstance().getDailyEnergyGraph().hasGraph()) {
 										EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
 									}
 								}

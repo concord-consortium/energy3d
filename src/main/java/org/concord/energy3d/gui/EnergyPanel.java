@@ -43,7 +43,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -102,9 +101,6 @@ public class EnergyPanel extends JPanel {
 
 	private final JPanel dataPanel;
 	private final JComboBox<String> cityComboBox;
-	private final JTextField heatingTextField;
-	private final JTextField coolingTextField;
-	private final JTextField netEnergyTextField;
 	private final JSpinner insideTemperatureSpinner;
 	private final JTextField outsideTemperatureField;
 	private final JTextField sunshineHoursField;
@@ -121,8 +117,6 @@ public class EnergyPanel extends JPanel {
 	private final JPanel budgetPanel, heightPanel, areaPanel;
 	private JPanel partPanel;
 	private JPanel buildingPanel;
-	private JTextField windowTextField;
-	private JTextField solarPanelTextField;
 	private JPanel partPropertiesPanel;
 	private JLabel partProperty1Label;
 	private JLabel partProperty2Label;
@@ -469,122 +463,6 @@ public class EnergyPanel extends JPanel {
 		JPanel target = buildingPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
 
-		final JPanel energyTodayPanel = new JPanel();
-		buildingPanel.add(energyTodayPanel);
-		energyTodayPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Daily Energy (kWh)", TitledBorder.LEADING, TitledBorder.TOP));
-		energyTodayPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, energyTodayPanel.getPreferredSize().height));
-		final GridBagLayout gbl_panel_1 = new GridBagLayout();
-		energyTodayPanel.setLayout(gbl_panel_1);
-
-		final JLabel windowLabel = new JLabel("Windows");
-		windowLabel.setToolTipText("Renewable energy gained through windows");
-		windowLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		final GridBagConstraints gbc_windowLabel = new GridBagConstraints();
-		gbc_windowLabel.fill = GridBagConstraints.HORIZONTAL;
-		gbc_windowLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_windowLabel.gridx = 0;
-		gbc_windowLabel.gridy = 0;
-		energyTodayPanel.add(windowLabel, gbc_windowLabel);
-
-		final JLabel solarPanelLabel = new JLabel("Solar Panels");
-		solarPanelLabel.setToolTipText("Renewable energy harvested from solar panels");
-		solarPanelLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		final GridBagConstraints gbc_solarPanelLabel = new GridBagConstraints();
-		gbc_solarPanelLabel.fill = GridBagConstraints.HORIZONTAL;
-		gbc_solarPanelLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_solarPanelLabel.gridx = 1;
-		gbc_solarPanelLabel.gridy = 0;
-		energyTodayPanel.add(solarPanelLabel, gbc_solarPanelLabel);
-
-		final JLabel heatingLabel = new JLabel("Heater");
-		heatingLabel.setToolTipText("Nonrenewable energy for heating the building");
-		heatingLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		final GridBagConstraints gbc_heatingLabel = new GridBagConstraints();
-		gbc_heatingLabel.fill = GridBagConstraints.HORIZONTAL;
-		gbc_heatingLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_heatingLabel.gridx = 2;
-		gbc_heatingLabel.gridy = 0;
-		energyTodayPanel.add(heatingLabel, gbc_heatingLabel);
-
-		final JLabel coolingLabel = new JLabel("AC");
-		coolingLabel.setToolTipText("Nonrenewable energy for cooling the building");
-		coolingLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		final GridBagConstraints gbc_coolingLabel = new GridBagConstraints();
-		gbc_coolingLabel.fill = GridBagConstraints.HORIZONTAL;
-		gbc_coolingLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_coolingLabel.gridx = 3;
-		gbc_coolingLabel.gridy = 0;
-		energyTodayPanel.add(coolingLabel, gbc_coolingLabel);
-
-		final JLabel netEnergyLabel = new JLabel("Net");
-		netEnergyLabel.setToolTipText("<html><b>Net energy cost for this building</b><br>Negative if the energy it generates exceeds the energy it consumes.</html>");
-		netEnergyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		final GridBagConstraints gbc_netEnergyLabel = new GridBagConstraints();
-		gbc_netEnergyLabel.fill = GridBagConstraints.HORIZONTAL;
-		gbc_netEnergyLabel.insets = new Insets(0, 0, 5, 0);
-		gbc_netEnergyLabel.gridx = 4;
-		gbc_netEnergyLabel.gridy = 0;
-		energyTodayPanel.add(netEnergyLabel, gbc_netEnergyLabel);
-
-		windowTextField = new JTextField();
-		windowTextField.setToolTipText(windowLabel.getToolTipText());
-		final GridBagConstraints gbc_windowTextField = new GridBagConstraints();
-		gbc_windowTextField.weightx = 1.0;
-		gbc_windowTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_windowTextField.insets = new Insets(0, 0, 0, 5);
-		gbc_windowTextField.gridx = 0;
-		gbc_windowTextField.gridy = 1;
-		energyTodayPanel.add(windowTextField, gbc_windowTextField);
-		windowTextField.setEditable(false);
-		windowTextField.setColumns(5);
-
-		solarPanelTextField = new JTextField();
-		solarPanelTextField.setToolTipText(solarPanelLabel.getToolTipText());
-		final GridBagConstraints gbc_solarPanelTextField = new GridBagConstraints();
-		gbc_solarPanelTextField.weightx = 1.0;
-		gbc_solarPanelTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_solarPanelTextField.insets = new Insets(0, 0, 0, 5);
-		gbc_solarPanelTextField.gridx = 1;
-		gbc_solarPanelTextField.gridy = 1;
-		energyTodayPanel.add(solarPanelTextField, gbc_solarPanelTextField);
-		solarPanelTextField.setEditable(false);
-		solarPanelTextField.setColumns(5);
-
-		heatingTextField = new JTextField();
-		heatingTextField.setToolTipText(heatingLabel.getToolTipText());
-		heatingTextField.setEditable(false);
-		final GridBagConstraints gbc_heatingTextField = new GridBagConstraints();
-		gbc_heatingTextField.weightx = 1.0;
-		gbc_heatingTextField.insets = new Insets(0, 0, 0, 5);
-		gbc_heatingTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_heatingTextField.gridx = 2;
-		gbc_heatingTextField.gridy = 1;
-		energyTodayPanel.add(heatingTextField, gbc_heatingTextField);
-		heatingTextField.setColumns(5);
-
-		coolingTextField = new JTextField();
-		coolingTextField.setToolTipText(coolingLabel.getToolTipText());
-		coolingTextField.setEditable(false);
-		final GridBagConstraints gbc_coolingTextField = new GridBagConstraints();
-		gbc_coolingTextField.weightx = 1.0;
-		gbc_coolingTextField.insets = new Insets(0, 0, 0, 5);
-		gbc_coolingTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_coolingTextField.gridx = 3;
-		gbc_coolingTextField.gridy = 1;
-		energyTodayPanel.add(coolingTextField, gbc_coolingTextField);
-		coolingTextField.setColumns(5);
-
-		netEnergyTextField = new JTextField();
-		netEnergyTextField.setToolTipText(netEnergyLabel.getToolTipText());
-		netEnergyTextField.setEditable(false);
-		final GridBagConstraints gbc_netEnergyTextField = new GridBagConstraints();
-		gbc_netEnergyTextField.weightx = 1.0;
-		gbc_netEnergyTextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_netEnergyTextField.gridx = 4;
-		gbc_netEnergyTextField.gridy = 1;
-		energyTodayPanel.add(netEnergyTextField, gbc_netEnergyTextField);
-		netEnergyTextField.setColumns(5);
-
 		graphTabbedPane = new JTabbedPane();
 		graphTabbedPane.addChangeListener(new ChangeListener() {
 			@Override
@@ -610,11 +488,6 @@ public class EnergyPanel extends JPanel {
 		dailyEnergyGraph = new DailyEnergyGraph();
 		graphTabbedPane.add("Hourly Energy", dailyEnergyGraph);
 
-		final Dimension size = heatingLabel.getMinimumSize();
-		windowLabel.setMinimumSize(size);
-		solarPanelLabel.setMinimumSize(size);
-		coolingLabel.setMinimumSize(size);
-		netEnergyLabel.setMinimumSize(size);
 		target = partPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
 		partPanel.setLayout(new BoxLayout(partPanel, BoxLayout.Y_AXIS));
@@ -922,19 +795,6 @@ public class EnergyPanel extends JPanel {
 			selectedBuilding = selectedPart.getTopContainer();
 
 		if (selectedBuilding != null) {
-			if (energyViewShown) {
-				windowTextField.setText(twoDecimals.format(selectedBuilding.getPassiveSolarToday()));
-				solarPanelTextField.setText(twoDecimals.format(selectedBuilding.getPhotovoltaicToday()));
-				heatingTextField.setText(twoDecimals.format(selectedBuilding.getHeatingToday()));
-				coolingTextField.setText(twoDecimals.format(selectedBuilding.getCoolingToday()));
-				netEnergyTextField.setText(twoDecimals.format(selectedBuilding.getTotalEnergyToday()));
-			} else {
-				windowTextField.setText("");
-				solarPanelTextField.setText("");
-				heatingTextField.setText("");
-				coolingTextField.setText("");
-				netEnergyTextField.setText("");
-			}
 			final double[] buildingGeometry = selectedBuilding.getBuildingGeometry();
 			if (buildingGeometry != null) {
 				heightBar.setValue((float) buildingGeometry[0]);
@@ -944,11 +804,6 @@ public class EnergyPanel extends JPanel {
 				areaBar.setValue(0);
 			}
 		} else {
-			windowTextField.setText("");
-			solarPanelTextField.setText("");
-			heatingTextField.setText("");
-			coolingTextField.setText("");
-			netEnergyTextField.setText("");
 			heightBar.setValue(0);
 			areaBar.setValue(0);
 		}

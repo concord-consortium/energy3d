@@ -57,8 +57,8 @@ public class DailyEnergyGraph extends JPanel {
 		EnergyPanel.getInstance().validate();
 	}
 
-	public Foundation getBuilding() {
-		return building;
+	public boolean hasGraph() {
+		return getComponentCount() > 0 && getComponent(0) == graph;
 	}
 
 	public void updateGraph() {

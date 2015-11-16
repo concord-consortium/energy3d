@@ -95,7 +95,7 @@ public class SolarRadiation {
 		initCollidables();
 		onMesh.clear();
 		for (final HousePart part : Scene.getInstance().getParts())
-			part.setSolarPotential(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
+			part.setSolarPotential(new double[MINUTES_OF_DAY / timeStep]);
 		maxValue = 1;
 		computeToday((Calendar) Heliodon.getInstance().getCalender().clone());
 		for (final HousePart part : Scene.getInstance().getParts())
@@ -558,8 +558,11 @@ public class SolarRadiation {
 					double groundHeatLoss = foundation.getHeatLoss()[i];
 					// In most cases, the inside temperature is always higher than the ground temperature. In this winter, this adds to heating load, but in the summer, this reduces cooling load.
 					// In other words, geothermal energy is good in hot conditions. This is similar to passive solar energy, which is good in the winter but bad in the summer.
-					if (groundHeatLoss > 0 && outsideTemperatureRange[0] >= HeatLoad.LOWEST_TEMPERATURE_OF_WARM_DAY) {
-						heatLoss[i] -= groundHeatLoss;
+					if (groundHeatLoss > 0) {
+						final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], i * timeStep);
+						if (outsideTemperature >= Scene.getInstance().getThermostat().getTemperature(today.get(Calendar.MONTH))) {
+							heatLoss[i] -= groundHeatLoss;
+						}
 					} else {
 						heatLoss[i] += groundHeatLoss;
 					}
