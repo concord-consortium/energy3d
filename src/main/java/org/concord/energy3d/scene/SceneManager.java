@@ -1351,6 +1351,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() {
 				if (operation == Operation.SELECT) {
 					final HousePart previousSelectedHousePart = selectedHousePart;
+					if (mouseState == null) // for some reason, there is a small chance that mouseState is nullified here
+						mouseState = new MouseState(x, y, 0, 0, 0, null, null);
 					final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
 					final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
 					selectedHousePart = pick == null ? null : pick.getHousePart();

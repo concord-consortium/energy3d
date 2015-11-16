@@ -59,6 +59,7 @@ import org.concord.energy3d.undo.ChangeWallWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
+import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
@@ -556,7 +557,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForFoundation() {
 
 		if (popupMenuForFoundation == null) {
-			popupMenuForFoundation = createPopupMenu(false, null);
+
 			final JMenuItem miCopyBuilding = new JMenuItem("Copy Building");
 			miCopyBuilding.addActionListener(new ActionListener() {
 				@Override
@@ -567,12 +568,60 @@ public class PopupMenuFactory {
 					}
 				}
 			});
+
+			final JCheckBoxMenuItem miLock = new JCheckBoxMenuItem("Lock");
+			miLock.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						Foundation foundation = (Foundation) selectedPart;
+						SceneManager.getInstance().getUndoManager().addEdit(new LockPartCommand(foundation));
+						boolean lock = miLock.isSelected();
+						foundation.setFreeze(lock);
+						for (final HousePart p : Scene.getInstance().getParts()) {
+							if (p.getTopContainer() == foundation)
+								p.setFreeze(lock);
+						}
+						if (lock)
+							SceneManager.getInstance().hideAllEditPoints();
+						Scene.getInstance().redrawAll();
+					}
+				}
+			});
+
+			final JCheckBoxMenuItem miDisableEdits = new JCheckBoxMenuItem("Disable Edits");
+			miDisableEdits.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						((Foundation) selectedPart).setLockEdit(miDisableEdits.isSelected());
+					}
+				}
+			});
+
+			popupMenuForFoundation = createPopupMenu(false, new Runnable() {
+				@Override
+				public void run() {
+					HousePart p = SceneManager.getInstance().getSelectedPart();
+					if (p instanceof Foundation) {
+						Util.selectSilently(miLock, p.isFrozen());
+						Util.selectSilently(miDisableEdits, ((Foundation) p).getLockEdit());
+					}
+				}
+			});
+
 			popupMenuForFoundation.add(miCopyBuilding);
+			popupMenuForFoundation.addSeparator();
+			popupMenuForFoundation.add(miLock);
+			popupMenuForFoundation.add(miDisableEdits);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 			popupMenuForFoundation.add(createInsulationMenuItem(false));
 			popupMenuForFoundation.add(createVolumetricHeatCapacityMenuItem());
+
 		}
 
 		return popupMenuForFoundation;
@@ -667,16 +716,36 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JCheckBoxMenuItem miLock = new JCheckBoxMenuItem("Lock");
+			miLock.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Tree) {
+						Tree tree = (Tree) selectedPart;
+						SceneManager.getInstance().getUndoManager().addEdit(new LockPartCommand(tree));
+						boolean lock = miLock.isSelected();
+						tree.setFreeze(lock);
+						if (lock)
+							SceneManager.getInstance().hideAllEditPoints();
+						Scene.getInstance().redrawAll();
+					}
+				}
+			});
+
 			popupMenuForTree = createPopupMenu(true, new Runnable() {
 				@Override
 				public void run() {
 					HousePart p = SceneManager.getInstance().getSelectedPart();
-					if (p instanceof Tree)
+					if (p instanceof Tree) {
 						Util.selectSilently(miPolygon, ((Tree) p).getShowPolygons());
+						Util.selectSilently(miLock, p.isFrozen());
+					}
 				}
 			});
 
 			popupMenuForTree.addSeparator();
+			popupMenuForTree.add(miLock);
 			popupMenuForTree.add(miPolygon);
 
 		}

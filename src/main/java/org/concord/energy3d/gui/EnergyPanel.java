@@ -691,7 +691,6 @@ public class EnergyPanel extends JPanel {
 										HousePart p = SceneManager.getInstance().getSelectedPart();
 										if (p instanceof Foundation) {
 											dailyEnergyGraph.addGraph((Foundation) p);
-											validate();
 										}
 									}
 								}

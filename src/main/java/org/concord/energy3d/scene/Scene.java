@@ -990,6 +990,28 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
+	public void lockAll(final boolean freeze) {
+		int lockCount = 0;
+		for (final HousePart part : parts) {
+			if (part.isFrozen())
+				lockCount++;
+		}
+		if (!freeze) {
+			if (lockCount > 0) {
+				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>A lock prevents a component from being edited.<br>Do you really want to remove all the existing " + lockCount + " locks?</html>", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+					return;
+			} else {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>A lock prevents a component from being edited.<br>There is no lock to remove.</html>");
+				return;
+			}
+		}
+		for (final HousePart part : parts)
+			part.setFreeze(freeze);
+		if (freeze)
+			SceneManager.getInstance().hideAllEditPoints();
+		redrawAll();
+	}
+
 	public static boolean isRedrawAll() {
 		return redrawAll;
 	}
@@ -1245,32 +1267,6 @@ public class Scene implements Serializable {
 	public void updateEditShapes() {
 		for (final HousePart part : parts)
 			part.updateEditShapes();
-	}
-
-	public void lockAll(final boolean freeze) {
-		for (final HousePart part : parts)
-			part.setFreeze(freeze);
-		if (freeze)
-			SceneManager.getInstance().hideAllEditPoints();
-		redrawAll();
-	}
-
-	public void lockSelection(final boolean freeze) {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart == null)
-			return;
-		selectedPart.setFreeze(freeze);
-		final HousePart foundation = selectedPart.getTopContainer();
-		if (foundation != null) {
-			foundation.setFreeze(freeze);
-			for (final HousePart p : parts) {
-				if (p.getTopContainer() == foundation)
-					p.setFreeze(freeze);
-			}
-		}
-		if (freeze)
-			SceneManager.getInstance().hideAllEditPoints();
-		redrawAll();
 	}
 
 	public long nextID() {

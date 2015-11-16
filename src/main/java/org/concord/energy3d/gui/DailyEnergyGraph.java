@@ -54,6 +54,7 @@ public class DailyEnergyGraph extends JPanel {
 	public void removeGraph() {
 		remove(graph);
 		repaint();
+		EnergyPanel.getInstance().validate();
 	}
 
 	public Foundation getBuilding() {
@@ -84,6 +85,7 @@ public class DailyEnergyGraph extends JPanel {
 		}
 		add(graph, BorderLayout.CENTER);
 		repaint();
+		EnergyPanel.getInstance().validate();
 	}
 
 }

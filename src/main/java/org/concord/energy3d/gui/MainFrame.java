@@ -172,10 +172,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem importColladaMenuItem;
 	private JMenuItem exportImageMenuItem;
 	private JMenuItem exportLogMenuItem;
-	private JMenuItem lockAllMenuItem;
-	private JMenuItem unlockAllMenuItem;
-	private JMenuItem lockSelectionMenuItem;
-	private JCheckBoxMenuItem disableFoundationCheckBoxMenuItem;
+	private JMenuItem removeAllLocksMenuItem;
 	private JMenuItem specificationsMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
@@ -1366,20 +1363,9 @@ public class MainFrame extends JFrame {
 					copyMenuItem.setEnabled(selectedPart != null && selectedPart.isCopyable());
 					HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					pasteMenuItem.setEnabled(copyBuffer != null && !(copyBuffer instanceof Foundation));
-					if (lockSelectionMenuItem != null)
-						lockSelectionMenuItem.setEnabled(selectedPart != null);
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
 					mainPanel.getSelectButton().setSelected(true);
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-					if (disableFoundationCheckBoxMenuItem != null) {
-						if (selectedPart instanceof Foundation) {
-							disableFoundationCheckBoxMenuItem.setEnabled(true);
-							Util.selectSilently(disableFoundationCheckBoxMenuItem, ((Foundation) selectedPart).getLockEdit());
-						} else {
-							disableFoundationCheckBoxMenuItem.setEnabled(false);
-							Util.selectSilently(disableFoundationCheckBoxMenuItem, false);
-						}
-					}
 				}
 			});
 			editMenu.add(getUndoMenuItem());
@@ -1401,16 +1387,12 @@ public class MainFrame extends JFrame {
 			editMenu.add(getRemoveAllSolarPanelsMenuItem());
 			editMenu.add(getRemoveAllTreesMenuItem());
 			editMenu.add(getRemoveAllRoofsMenuItem());
-			editMenu.addSeparator();
 			if (!Config.isRestrictMode()) {
-				editMenu.add(getDisableFoundationCheckBoxMenuItem());
-				editMenu.add(getLockSelectionMenuItem());
-				editMenu.add(getLockAllMenuItem());
-				editMenu.add(getUnlockAllMenuItem());
+				editMenu.add(getRemoveAllLocksMenuItem());
 				editMenu.addSeparator();
 				editMenu.add(getSpecificationsMenuItem());
-				editMenu.addSeparator();
 			}
+			editMenu.addSeparator();
 			editMenu.add(getNoteCheckBoxMenuItem());
 		}
 		return editMenu;
@@ -2081,61 +2063,6 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private JMenuItem getLockAllMenuItem() {
-		if (lockAllMenuItem == null) {
-			lockAllMenuItem = new JMenuItem("Lock All");
-			lockAllMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().lockAll(true);
-				}
-			});
-		}
-		return lockAllMenuItem;
-	}
-
-	private JMenuItem getUnlockAllMenuItem() {
-		if (unlockAllMenuItem == null) {
-			unlockAllMenuItem = new JMenuItem("Unlock All");
-			unlockAllMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().lockAll(false);
-				}
-			});
-		}
-		return unlockAllMenuItem;
-	}
-
-	private JMenuItem getLockSelectionMenuItem() {
-		if (lockSelectionMenuItem == null) {
-			lockSelectionMenuItem = new JMenuItem("Lock Selection");
-			lockSelectionMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().lockSelection(true);
-				}
-			});
-		}
-		return lockSelectionMenuItem;
-	}
-
-	private JCheckBoxMenuItem getDisableFoundationCheckBoxMenuItem() {
-		if (disableFoundationCheckBoxMenuItem == null) {
-			disableFoundationCheckBoxMenuItem = new JCheckBoxMenuItem("Disable Foundation Edits");
-			disableFoundationCheckBoxMenuItem.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					final HousePart selected = SceneManager.getInstance().getSelectedPart();
-					if (selected instanceof Foundation) {
-						((Foundation) selected).setLockEdit(disableFoundationCheckBoxMenuItem.isSelected());
-					}
-				}
-			});
-		}
-		return disableFoundationCheckBoxMenuItem;
-	}
-
 	private JMenuItem getSpecificationsMenuItem() {
 		if (specificationsMenuItem == null) {
 			specificationsMenuItem = new JMenuItem("Specifications");
@@ -2251,6 +2178,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllTreesMenuItem;
+	}
+
+	private JMenuItem getRemoveAllLocksMenuItem() {
+		if (removeAllLocksMenuItem == null) {
+			removeAllLocksMenuItem = new JMenuItem("Remove All Locks");
+			removeAllLocksMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().lockAll(false);
+				}
+			});
+		}
+		return removeAllLocksMenuItem;
 	}
 
 }

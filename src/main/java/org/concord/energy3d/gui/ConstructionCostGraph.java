@@ -65,6 +65,7 @@ public class ConstructionCostGraph extends JPanel {
 			remove(pie);
 		repaint();
 		add(buttonPanel, BorderLayout.CENTER);
+		EnergyPanel.getInstance().validate();
 	}
 
 	public void addGraph(Foundation building) {
@@ -124,6 +125,8 @@ public class ConstructionCostGraph extends JPanel {
 		add(pie, BorderLayout.CENTER);
 
 		repaint();
+
+		EnergyPanel.getInstance().validate();
 
 	}
 
