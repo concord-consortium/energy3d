@@ -134,8 +134,9 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty3TextField;
 	private JTextField partProperty4TextField;
 	private ChangeListener latitudeChangeListener;
-	private final ConstructionCostGraph constructionCostGraph;
-	private final DailyEnergyGraph dailyEnergyGraph;
+	private ConstructionCostGraph constructionCostGraph;
+	private DailyEnergyGraph dailyEnergyGraph;
+	private JTabbedPane graphTabbedPane;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -585,11 +586,11 @@ public class EnergyPanel extends JPanel {
 		energyTodayPanel.add(netEnergyTextField, gbc_netEnergyTextField);
 		netEnergyTextField.setColumns(5);
 
-		final JTabbedPane tabbedPane = new JTabbedPane();
-		tabbedPane.addChangeListener(new ChangeListener() {
+		graphTabbedPane = new JTabbedPane();
+		graphTabbedPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				if (tabbedPane.getSelectedComponent() == dailyEnergyGraph) {
+				if (graphTabbedPane.getSelectedComponent() == dailyEnergyGraph) {
 					if (SceneManager.getInstance().getSolarHeatMap()) {
 						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Foundation) {
@@ -601,15 +602,15 @@ public class EnergyPanel extends JPanel {
 				}
 			}
 		});
-		dataPanel.add(tabbedPane);
+		dataPanel.add(graphTabbedPane);
 		final Component verticalGlue = Box.createVerticalGlue();
 		dataPanel.add(verticalGlue);
 
 		constructionCostGraph = new ConstructionCostGraph();
-		tabbedPane.add("Construction Cost", constructionCostGraph);
+		graphTabbedPane.add("Construction Cost", constructionCostGraph);
 
 		dailyEnergyGraph = new DailyEnergyGraph();
-		tabbedPane.add("Hourly Energy", dailyEnergyGraph);
+		graphTabbedPane.add("Hourly Energy", dailyEnergyGraph);
 
 		final Dimension size = heatingLabel.getMinimumSize();
 		windowLabel.setMinimumSize(size);
@@ -750,6 +751,10 @@ public class EnergyPanel extends JPanel {
 			final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
 			sunshineHoursField.setText(Math.round(sunshineHours.get(city)[month] / 30.0) + "hrs");
 		}
+	}
+
+	public JTabbedPane getGraphTabbedPane() {
+		return graphTabbedPane;
 	}
 
 	public JSpinner getDateSpinner() {
