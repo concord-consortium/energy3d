@@ -94,18 +94,21 @@ public class EnergyAnnualAnalysis extends Analysis {
 							});
 							break;
 						}
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) { // synchronize with daily graph
+							if (EnergyPanel.getInstance().getDailyEnergyGraph().getBuilding() != null) {
+								EnergyPanel.getInstance().getDailyEnergyGraph().updateGraph();
+							}
+						}
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
 								EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalender().getTime());
 								Util.setSilently(EnergyPanel.getInstance().getInsideTemperatureSpinner(), Scene.getInstance().getThermostat().getTemperature(m));
-								final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 								if (selectedPart instanceof Foundation) {
 									EnergyPanel.getInstance().getGraphTabbedPane().setSelectedComponent(EnergyPanel.getInstance().getDailyEnergyGraph());
 									if (EnergyPanel.getInstance().getDailyEnergyGraph().getBuilding() == null) {
 										EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
-									} else {
-										EnergyPanel.getInstance().getDailyEnergyGraph().updateGraph();
 									}
 								}
 							}

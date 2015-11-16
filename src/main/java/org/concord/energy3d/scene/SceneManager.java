@@ -8,6 +8,8 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -21,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
@@ -638,13 +641,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (Config.isMac()) { // control-click is mouse right-click on the Mac
-						final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
-						if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL)) {
-							mouseRightClicked(inputStates.getCurrent().getMouseState());
-							return;
-						}
-					}
 					if (firstClickState == null) {
 						firstClickState = inputStates;
 						mousePressed(inputStates.getCurrent().getMouseState());
@@ -680,12 +676,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}));
 
-			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.RIGHT), new TriggerAction() {
-				@Override
-				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					mouseRightClicked(inputStates.getCurrent().getMouseState());
+			((Component) canvas).addMouseListener(new MouseAdapter() {
+				public void mouseReleased(MouseEvent e) {
+					if (Util.isRightClick(e)) {
+						JPanel cp = MainPanel.getInstance().getCanvasPanel();
+						mouseRightClicked(e.getX(), cp.getHeight() - e.getY());
+					}
 				}
-			}));
+			});
 
 		}
 
@@ -1343,7 +1341,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return cameraControl;
 	}
 
-	private void mouseRightClicked(final MouseState mouseState) {
+	// the x and y coordinates come from MouseEvent, not MouseState.
+	private void mouseRightClicked(final int x, final int y) {
+		mouseState = new MouseState(x, y, 0, 0, 0, null, null);
 		pasteMouseState = mouseState;
 		refresh = true;
 		taskManager.update(new Callable<Object>() {
@@ -1364,7 +1364,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (!PrintController.getInstance().isPrintPreview())
 							selectedHousePart.setEditPointsVisible(true);
 					}
-					PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(MainPanel.getInstance().getCanvasPanel(), mouseState.getX(), MainPanel.getInstance().getCanvasPanel().getHeight() - mouseState.getY());
+					JPanel cp = MainPanel.getInstance().getCanvasPanel();
+					PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
 				}
 				return null;
 			}

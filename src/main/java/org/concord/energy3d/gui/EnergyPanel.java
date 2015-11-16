@@ -2,7 +2,6 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -603,8 +602,7 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		dataPanel.add(graphTabbedPane);
-		final Component verticalGlue = Box.createVerticalGlue();
-		dataPanel.add(verticalGlue);
+		dataPanel.add(Box.createVerticalGlue());
 
 		constructionCostGraph = new ConstructionCostGraph();
 		graphTabbedPane.add("Construction Cost", constructionCostGraph);

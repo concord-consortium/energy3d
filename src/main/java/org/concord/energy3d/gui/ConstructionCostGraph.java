@@ -3,10 +3,15 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Door;
@@ -18,6 +23,7 @@ import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.PieChart;
 
@@ -30,20 +36,42 @@ public class ConstructionCostGraph extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private PieChart pie;
+	private Box buttonPanel;
 
 	public ConstructionCostGraph() {
 		super(new BorderLayout());
+		buttonPanel = new Box(BoxLayout.Y_AXIS);
+		buttonPanel.setBackground(Color.WHITE);
+		buttonPanel.add(Box.createVerticalGlue());
+		JButton button = new JButton("Show");
+		button.setAlignmentX(CENTER_ALIGNMENT);
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SceneManager.getInstance().autoSelectBuilding(true);
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart instanceof Foundation) {
+					addGraph((Foundation) selectedPart);
+					EnergyPanel.getInstance().validate();
+				}
+			}
+		});
+		buttonPanel.add(button);
+		buttonPanel.add(Box.createVerticalGlue());
 	}
 
 	public void removeGraph() {
 		if (pie != null)
 			remove(pie);
 		repaint();
+		add(buttonPanel, BorderLayout.CENTER);
 	}
 
 	public void addGraph(Foundation building) {
 
-		removeGraph();
+		if (pie != null)
+			remove(pie);
+		remove(buttonPanel);
 
 		int countBuildings = 0;
 		for (HousePart p : Scene.getInstance().getParts()) {
