@@ -1405,12 +1405,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 						if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || (operation == Operation.RESIZE || selectedHousePart instanceof Foundation)) {
 							cameraControl.setLeftMouseButtonEnabled(false);
-							houseMoveStartPoint = selectHousePart.getPoint();
-							collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
-							final ArrayList<Vector3> points = selectedHousePart.getPoints();
-							houseMovePoints = new ArrayList<Vector3>(points.size());
-							for (final Vector3 p : points)
-								houseMovePoints.add(p.clone());
+							if (selectedHousePart != null) { // there is a chance that selectedHousePart = null
+								houseMoveStartPoint = selectHousePart.getPoint();
+								collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
+								final ArrayList<Vector3> points = selectedHousePart.getPoints();
+								houseMovePoints = new ArrayList<Vector3>(points.size());
+								for (final Vector3 p : points)
+									houseMovePoints.add(p.clone());
+							}
 						}
 
 						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {

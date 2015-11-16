@@ -38,6 +38,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Thermostat;
@@ -45,7 +46,6 @@ import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
-import org.concord.energy3d.util.Specifications;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
@@ -112,20 +112,13 @@ public class Scene implements Serializable {
 	private boolean showBuildingLabels;
 	private double solarStep = 2.0;
 	private int timeStep = 15; // in minutes
-	private int budget = 100000; // in US dollars
-	private double minimumArea = 100;
-	private double maximumArea = 150;
-	private double minimumHeight = 8;
-	private double maximumHeight = 10;
-	private boolean budgetEnabled;
-	private boolean areaEnabled;
-	private boolean heightEnabled;
 	private boolean cleanup = false;
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
 	private boolean fullEnergyInSolarMap = true;
 	private Ground ground = new Ground();
 	private Thermostat thermostat = new Thermostat();
+	private DesignSpecs designSpecs = new DesignSpecs();
 	private HousePart copyBuffer, originalCopy;
 
 	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
@@ -319,25 +312,20 @@ public class Scene implements Serializable {
 			Scene.getInstance().setTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
-		Specifications.getInstance().setMaximumBudget(instance.budget == 0 ? 100000 : instance.budget);
-		Specifications.getInstance().setMinimumArea(instance.minimumArea == 0 ? 100 : instance.minimumArea);
-		Specifications.getInstance().setMaximumArea(instance.maximumArea == 0 ? 150 : instance.maximumArea);
-		Specifications.getInstance().setMinimumHeight(instance.minimumHeight == 0 ? 8 : instance.minimumHeight);
-		Specifications.getInstance().setMaximumHeight(instance.maximumHeight == 0 ? 10 : instance.maximumHeight);
-		Specifications.getInstance().setBudgetEnabled(instance.budgetEnabled);
-		Specifications.getInstance().setAreaEnabled(instance.areaEnabled);
-		Specifications.getInstance().setHeightEnabled(instance.heightEnabled);
 
 		if (Util.isZero(instance.solarContrast)) // if the solar map color contrast has not been set, set it to 50
 			instance.solarContrast = 50;
 		Util.setSilently(energyPanel.getColorMapSlider(), instance.solarContrast);
 
-		if (instance.thermostat == null) // previous versions do not have Thermostat
+		// previous versions do not have the following classes
+
+		if (instance.designSpecs == null)
+			instance.designSpecs = new DesignSpecs();
+		if (instance.ground == null)
+			instance.ground = new Ground();
+		if (instance.thermostat == null)
 			instance.thermostat = new Thermostat();
 		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.thermostat.getTemperature());
-
-		if (instance.ground == null)
-			instance.ground = new Ground(); // previous versions do not have Ground
 
 		// set default properties of parts (object serialization initializes every number field to zero, forcing us to do this ugly thing)
 
@@ -529,14 +517,6 @@ public class Scene implements Serializable {
 				// save camera to file
 				saveCameraLocation();
 
-				instance.budget = Specifications.getInstance().getMaximumBudget();
-				instance.maximumArea = Specifications.getInstance().getMaximumArea();
-				instance.minimumArea = Specifications.getInstance().getMinimumArea();
-				instance.maximumHeight = Specifications.getInstance().getMaximumHeight();
-				instance.minimumHeight = Specifications.getInstance().getMinimumHeight();
-				instance.budgetEnabled = Specifications.getInstance().isBudgetEnabled();
-				instance.areaEnabled = Specifications.getInstance().isAreaEnabled();
-				instance.heightEnabled = Specifications.getInstance().isHeightEnabled();
 				instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
 				instance.calendar = Heliodon.getInstance().getCalender();
@@ -1382,6 +1362,10 @@ public class Scene implements Serializable {
 
 	public Thermostat getThermostat() {
 		return thermostat;
+	}
+
+	public DesignSpecs getDesignSpecs() {
+		return designSpecs;
 	}
 
 }

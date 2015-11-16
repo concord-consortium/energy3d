@@ -64,6 +64,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Weather;
@@ -73,7 +74,6 @@ import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
-import org.concord.energy3d.util.Specifications;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
@@ -427,7 +427,6 @@ public class EnergyPanel extends JPanel {
 		areaBar.setDecimalDigits(1);
 		areaBar.setToolTipText(areaPanel.getToolTipText());
 		areaBar.setPreferredSize(new Dimension(100, 16));
-		areaBar.setMaximum(Specifications.getInstance().getMaximumArea());
 		areaPanel.add(areaBar, BorderLayout.CENTER);
 
 		// height for the selected building
@@ -443,7 +442,6 @@ public class EnergyPanel extends JPanel {
 		heightBar.setDecimalDigits(1);
 		heightBar.setToolTipText(heightPanel.getToolTipText());
 		heightBar.setPreferredSize(new Dimension(100, 16));
-		heightBar.setMaximum(Specifications.getInstance().getMaximumHeight());
 		heightPanel.add(heightBar, BorderLayout.CENTER);
 
 		// cost for the selected building
@@ -455,7 +453,6 @@ public class EnergyPanel extends JPanel {
 		budgetBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		budgetBar.setToolTipText(budgetPanel.getToolTipText());
 		budgetBar.setPreferredSize(new Dimension(200, 16));
-		budgetBar.setMaximum(Specifications.getInstance().getMaximumBudget());
 		budgetBar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent e) {
@@ -1003,36 +1000,39 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateBudgetBar() {
+		DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Cost (";
-		t += Specifications.getInstance().isBudgetEnabled() ? "\u2264 $" + noDecimals.format(Specifications.getInstance().getMaximumBudget()) : "$";
+		t += specs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(specs.getMaximumBudget()) : "$";
 		t += ")";
 		budgetPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
-		budgetBar.setEnabled(Specifications.getInstance().isBudgetEnabled());
-		budgetBar.setMaximum(Specifications.getInstance().getMaximumBudget());
+		budgetBar.setEnabled(specs.isBudgetEnabled());
+		budgetBar.setMaximum(specs.getMaximumBudget());
 		budgetBar.repaint();
 	}
 
 	public void updateAreaBar() {
+		DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Area (";
-		if (Specifications.getInstance().isAreaEnabled())
-			t += twoDecimals.format(Specifications.getInstance().getMinimumArea()) + " - " + twoDecimals.format(Specifications.getInstance().getMaximumArea());
+		if (specs.isAreaEnabled())
+			t += twoDecimals.format(specs.getMinimumArea()) + " - " + twoDecimals.format(specs.getMaximumArea());
 		t += "\u33A1)";
 		areaPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
-		areaBar.setEnabled(Specifications.getInstance().isAreaEnabled());
-		areaBar.setMinimum(Specifications.getInstance().getMinimumArea());
-		areaBar.setMaximum(Specifications.getInstance().getMaximumArea());
+		areaBar.setEnabled(specs.isAreaEnabled());
+		areaBar.setMinimum(specs.getMinimumArea());
+		areaBar.setMaximum(specs.getMaximumArea());
 		areaBar.repaint();
 	}
 
 	public void updateHeightBar() {
+		DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Height (";
-		if (Specifications.getInstance().isHeightEnabled())
-			t += twoDecimals.format(Specifications.getInstance().getMinimumHeight()) + " - " + twoDecimals.format(Specifications.getInstance().getMaximumHeight());
+		if (specs.isHeightEnabled())
+			t += twoDecimals.format(specs.getMinimumHeight()) + " - " + twoDecimals.format(specs.getMaximumHeight());
 		t += "m)";
 		heightPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
-		heightBar.setEnabled(Specifications.getInstance().isHeightEnabled());
-		heightBar.setMinimum(Specifications.getInstance().getMinimumHeight());
-		heightBar.setMaximum(Specifications.getInstance().getMaximumHeight());
+		heightBar.setEnabled(specs.isHeightEnabled());
+		heightBar.setMinimum(specs.getMinimumHeight());
+		heightBar.setMaximum(specs.getMaximumHeight());
 		heightBar.repaint();
 	}
 

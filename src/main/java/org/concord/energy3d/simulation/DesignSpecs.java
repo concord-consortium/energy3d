@@ -1,4 +1,7 @@
-package org.concord.energy3d.util;
+package org.concord.energy3d.simulation;
+
+import java.awt.EventQueue;
+import java.io.Serializable;
 
 import org.concord.energy3d.gui.EnergyPanel;
 
@@ -8,30 +11,30 @@ import org.concord.energy3d.gui.EnergyPanel;
  * @author Charles Xie
  * 
  */
-public class Specifications {
+public class DesignSpecs implements Serializable {
 
-	private static Specifications instance = new Specifications();
+	private static final long serialVersionUID = 1L;
 
 	private boolean budgetEnabled = true;
 	private boolean heightEnabled = false;
 	private boolean areaEnabled = false;
 
-	private int maximumBudget = 100000;
+	private int maximumBudget = 200000;
 	private double minimumHeight = 8;
 	private double maximumHeight = 10;
 	private double minimumArea = 100;
 	private double maximumArea = 150;
 
-	private Specifications() {
-	}
-
-	public static Specifications getInstance() {
-		return instance;
+	public DesignSpecs() {
 	}
 
 	public void setBudgetEnabled(boolean budgetEnabled) {
 		this.budgetEnabled = budgetEnabled;
-		EnergyPanel.getInstance().updateBudgetBar();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().updateBudgetBar();
+			}
+		});
 	}
 
 	public boolean isBudgetEnabled() {
@@ -40,7 +43,11 @@ public class Specifications {
 
 	public void setMaximumBudget(int maximumBudget) {
 		this.maximumBudget = maximumBudget;
-		EnergyPanel.getInstance().updateBudgetBar();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().updateBudgetBar();
+			}
+		});
 	}
 
 	public int getMaximumBudget() {
@@ -49,7 +56,11 @@ public class Specifications {
 
 	public void setHeightEnabled(boolean heightEnabled) {
 		this.heightEnabled = heightEnabled;
-		EnergyPanel.getInstance().updateHeightBar();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().updateHeightBar();
+			}
+		});
 	}
 
 	public boolean isHeightEnabled() {
@@ -58,7 +69,11 @@ public class Specifications {
 
 	public void setMaximumHeight(double maximumHeight) {
 		this.maximumHeight = maximumHeight;
-		EnergyPanel.getInstance().updateHeightBar();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().updateHeightBar();
+			}
+		});
 	}
 
 	public double getMaximumHeight() {
@@ -67,7 +82,11 @@ public class Specifications {
 
 	public void setMinimumHeight(double minimumHeight) {
 		this.minimumHeight = minimumHeight;
-		EnergyPanel.getInstance().updateHeightBar();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().updateHeightBar();
+			}
+		});
 	}
 
 	public double getMinimumHeight() {
@@ -76,7 +95,11 @@ public class Specifications {
 
 	public void setAreaEnabled(boolean areaEnabled) {
 		this.areaEnabled = areaEnabled;
-		EnergyPanel.getInstance().updateAreaBar();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().updateAreaBar();
+			}
+		});
 	}
 
 	public boolean isAreaEnabled() {
@@ -85,7 +108,11 @@ public class Specifications {
 
 	public void setMaximumArea(double maximumArea) {
 		this.maximumArea = maximumArea;
-		EnergyPanel.getInstance().updateAreaBar();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().updateAreaBar();
+			}
+		});
 	}
 
 	public double getMaximumArea() {
@@ -94,7 +121,11 @@ public class Specifications {
 
 	public void setMinimumArea(double minimumArea) {
 		this.minimumArea = minimumArea;
-		EnergyPanel.getInstance().updateAreaBar();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().updateAreaBar();
+			}
+		});
 	}
 
 	public double getMinimumArea() {
