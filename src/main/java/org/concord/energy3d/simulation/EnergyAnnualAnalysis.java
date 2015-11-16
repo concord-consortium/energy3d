@@ -50,8 +50,10 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.Util;
 
 /**
  * This calculates and visualizes the seasonal trend and the yearly sum of all energy items for any selected part or building.
@@ -96,6 +98,15 @@ public class EnergyAnnualAnalysis extends Analysis {
 							@Override
 							public void run() {
 								EnergyPanel.getInstance().getDateSpinner().setValue(Heliodon.getInstance().getCalender().getTime());
+								Util.setSilently(EnergyPanel.getInstance().getInsideTemperatureSpinner(), Scene.getInstance().getThermostat().getTemperature(m));
+								final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+								if (selectedPart instanceof Foundation) {
+									if (EnergyPanel.getInstance().getDailyEnergyGraph().getBuilding() == null) {
+										EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
+									} else {
+										EnergyPanel.getInstance().getDailyEnergyGraph().updateGraph();
+									}
+								}
 							}
 						});
 					}

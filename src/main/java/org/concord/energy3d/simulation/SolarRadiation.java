@@ -635,7 +635,7 @@ public class SolarRadiation {
 				for (int i = 0; i < n; i++) {
 					double groundHeatLoss = foundation.getHeatLoss()[t0 + i];
 					if (groundHeatLoss > 0) {
-						if (outsideTemperature >= Scene.getInstance().getThermostat().getTemperature()) {
+						if (outsideTemperature >= Scene.getInstance().getThermostat().getTemperature(today.get(Calendar.MONTH))) {
 							heatLoss[i] -= groundHeatLoss;
 						}
 					} else {

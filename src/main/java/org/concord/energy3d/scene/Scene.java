@@ -325,7 +325,7 @@ public class Scene implements Serializable {
 			instance.ground = new Ground();
 		if (instance.thermostat == null)
 			instance.thermostat = new Thermostat();
-		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.thermostat.getTemperature());
+		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.thermostat.getTemperature(Heliodon.getInstance().getCalender().get(Calendar.MONTH)));
 
 		// set default properties of parts (object serialization initializes every number field to zero, forcing us to do this ugly thing)
 
@@ -522,7 +522,6 @@ public class Scene implements Serializable {
 				instance.calendar = Heliodon.getInstance().getCalender();
 				instance.latitude = EnergyPanel.getInstance().getLatitude();
 				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-				instance.thermostat.setTemperature((Integer) EnergyPanel.getInstance().getInsideTemperatureSpinner().getValue());
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();

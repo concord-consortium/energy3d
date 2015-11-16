@@ -56,6 +56,10 @@ public class DailyEnergyGraph extends JPanel {
 		repaint();
 	}
 
+	public Foundation getBuilding() {
+		return building;
+	}
+
 	public void updateGraph() {
 		if (building == null)
 			return;
