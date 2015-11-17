@@ -28,6 +28,7 @@ import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -43,6 +44,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
@@ -54,7 +56,6 @@ import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.Door;
-import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
@@ -163,12 +164,6 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem simpleTextureMenuItem;
 	private JRadioButtonMenuItem fullTextureMenuItem;
 	private final ButtonGroup textureButtonGroup = new ButtonGroup();
-	private JMenu colorMenu;
-	private JMenuItem platformColorMenuItem;
-	private JMenuItem wallColorMenuItem;
-	private JMenuItem doorColorMenuItem;
-	private JMenuItem floorColorMenuItem;
-	private JMenuItem roofColorMenuItem;
 	private JMenuItem importColladaMenuItem;
 	private JMenuItem exportImageMenuItem;
 	private JMenuItem exportLogMenuItem;
@@ -938,7 +933,6 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getNoTextureMenuItem());
 			viewMenu.add(getSimpleTextureMenuItem());
 			viewMenu.add(getFullTextureMenuItem());
-			viewMenu.add(getColorMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(getSolarAbsorptionHeatMapMenuItem());
@@ -948,6 +942,8 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getBuildingLabelsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
 			// viewMenu.add(getWallThicknessMenuItem());
+			viewMenu.addSeparator();
+			viewMenu.add(getNoteCheckBoxMenuItem());
 
 		}
 		return viewMenu;
@@ -1392,8 +1388,6 @@ public class MainFrame extends JFrame {
 				editMenu.addSeparator();
 				editMenu.add(getSpecificationsMenuItem());
 			}
-			editMenu.addSeparator();
-			editMenu.add(getNoteCheckBoxMenuItem());
 		}
 		return editMenu;
 	}
@@ -1719,102 +1713,7 @@ public class MainFrame extends JFrame {
 		return fullTextureMenuItem;
 	}
 
-	private JMenu getColorMenu() {
-		if (colorMenu == null) {
-			colorMenu = new JMenu("Building Colors");
-			colorMenu.add(getWallColorMenuItem());
-			colorMenu.add(getRoofColorMenuItem());
-			colorMenu.add(getPlatformColorMenuItem());
-			colorMenu.add(getDoorColorMenuItem());
-			colorMenu.add(getFloorColorMenuItem());
-		}
-		return colorMenu;
-	}
-
-	private JMenuItem getPlatformColorMenuItem() {
-		if (platformColorMenuItem == null) {
-			platformColorMenuItem = new JMenuItem("Platform Color...");
-			platformColorMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForWholeBuilding(Operation.DRAW_FOUNDATION);
-				}
-			});
-		}
-		return platformColorMenuItem;
-	}
-
-	private JMenuItem getWallColorMenuItem() {
-		if (wallColorMenuItem == null) {
-			wallColorMenuItem = new JMenuItem("Wall Color...");
-			wallColorMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForWholeBuilding(Operation.DRAW_WALL);
-				}
-			});
-		}
-		return wallColorMenuItem;
-	}
-
-	private JMenuItem getDoorColorMenuItem() {
-		if (doorColorMenuItem == null) {
-			doorColorMenuItem = new JMenuItem("Door Color...");
-			doorColorMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForWholeBuilding(Operation.DRAW_DOOR);
-				}
-			});
-		}
-		return doorColorMenuItem;
-	}
-
-	private JMenuItem getFloorColorMenuItem() {
-		if (floorColorMenuItem == null) {
-			floorColorMenuItem = new JMenuItem("Floor Color...");
-			floorColorMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForWholeBuilding(Operation.DRAW_FLOOR);
-				}
-			});
-		}
-		return floorColorMenuItem;
-	}
-
-	private JMenuItem getRoofColorMenuItem() {
-		if (roofColorMenuItem == null) {
-			roofColorMenuItem = new JMenuItem("Roof Color...");
-			roofColorMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					showColorDialogForWholeBuilding(Operation.DRAW_ROOF_PYRAMID);
-				}
-			});
-		}
-		return roofColorMenuItem;
-	}
-
-	private int countFloors(final Foundation foundation) {
-		int n = 0;
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.getTopContainer() == foundation && p instanceof Floor)
-				n++;
-		}
-		return n;
-	}
-
-	private int countDoors(final Foundation foundation) {
-		int n = 0;
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.getTopContainer() == foundation && p instanceof Door)
-				n++;
-		}
-		return n;
-	}
-
-	void showColorDialogForIndividualPart() {
+	void showColorDialogForParts() {
 		if (!noTextureMenuItem.isSelected()) { // when the user wants to set the color, automatically switch to no texture
 			if (JOptionPane.showConfirmDialog(this, "To set color for an individual part, we have to remove the texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
 				return;
@@ -1833,72 +1732,38 @@ public class MainFrame extends JFrame {
 		final ActionListener actionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(selectedPart));
-				final Color c = colorChooser.getColor();
-				final float[] newColor = c.getComponents(null);
-				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
-				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				selectedPart.setColor(color);
-				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
-				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
-					PrintController.getInstance().restartAnimation();
-				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-				Scene.getInstance().setEdited(true);
-			}
-		};
-		JColorChooser.createDialog(this, "Select Color", true, colorChooser, actionListener, null).setVisible(true);
-	}
-
-	private void showColorDialogForWholeBuilding(final Operation operation) {
-		if (fullTextureMenuItem.isSelected()) { // when the user wants to set the color, remove the texture first
-			if (JOptionPane.showConfirmDialog(this, "To set colors for this building, we have to remove the full texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
-				return;
-			noTextureMenuItem.setSelected(true);
-			Scene.getInstance().setTextureMode(TextureMode.None);
-		}
-		final Foundation foundation = SceneManager.getInstance().autoSelectBuilding(true);
-		if (foundation == null)
-			return;
-		switch (operation) {
-		case DRAW_WALL:
-			if (JOptionPane.showConfirmDialog(this, "<html>This will set color for all walls of the selected building.<br>Do you want to continue?</html>", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.NO_OPTION)
-				return;
-			break;
-		case DRAW_DOOR:
-			if (countDoors(foundation) == 0) {
-				JOptionPane.showMessageDialog(this, "<html>There is no door for the selected building.</html>", "Message", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			} else if (countDoors(foundation) > 1) {
-				if (JOptionPane.showConfirmDialog(this, "<html>This will set color for all doors of the selected building.<br>Do you want to continue?</html>", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.NO_OPTION)
+				if (selectedPart == null)
 					return;
-			}
-			break;
-		case DRAW_FLOOR:
-			if (countFloors(foundation) == 0) {
-				JOptionPane.showMessageDialog(this, "<html>There is no floor for the selected building.</html>", "Message", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			} else if (countFloors(foundation) > 1) {
-				if (JOptionPane.showConfirmDialog(this, "<html>This will set color for all floors of the selected building.<br>Do you want to continue?</html>", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.NO_OPTION)
-					return;
-			}
-			break;
-		default:
-			break;
-		}
-
-		ReadOnlyColorRGBA color = Scene.getInstance().getPartColorOfBuilding(foundation, operation);
-		if (color != null)
-			colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
-		final ActionListener actionListener = new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingColorCommand(foundation, operation));
 				final Color c = colorChooser.getColor();
 				final float[] newColor = c.getComponents(null);
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
-				Scene.getInstance().setPartColorOfBuilding(foundation, operation, color);
+				if (selectedPart instanceof Wall) {
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
+					final JRadioButton rb2 = new JRadioButton("All Walls of this Building");
+					panel.add(rb1);
+					panel.add(rb2);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						return;
+					if (rb1.isSelected()) { // apply to only this part
+						SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(selectedPart));
+						selectedPart.setColor(color);
+					} else {
+						Foundation foundation = selectedPart.getTopContainer();
+						SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingColorCommand(foundation, Operation.DRAW_WALL));
+						Scene.getInstance().setPartColorOfBuilding(foundation, Operation.DRAW_WALL, color);
+					}
+				} else {
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(selectedPart));
+					selectedPart.setColor(color);
+				}
 				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
 					PrintController.getInstance().restartAnimation();

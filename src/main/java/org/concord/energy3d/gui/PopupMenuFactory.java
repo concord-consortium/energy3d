@@ -97,7 +97,7 @@ public class PopupMenuFactory {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			MainFrame.getInstance().showColorDialogForIndividualPart();
+			MainFrame.getInstance().showColorDialogForParts();
 		}
 	};
 
@@ -164,7 +164,7 @@ public class PopupMenuFactory {
 									break;
 								}
 							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -192,7 +192,7 @@ public class PopupMenuFactory {
 									break;
 								}
 							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -420,7 +420,7 @@ public class PopupMenuFactory {
 									break;
 								}
 							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -513,7 +513,7 @@ public class PopupMenuFactory {
 								}
 							} catch (final NumberFormatException exception) {
 								exception.printStackTrace();
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -653,7 +653,7 @@ public class PopupMenuFactory {
 					final String title = "<html>Energy Conversion Efficiency (%) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley–Queisser limit is 34%, but the theoretical limit for multilayer cells is 86%.<hr></html>";
 					JPanel panel = new JPanel();
-					panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
 					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
@@ -686,7 +686,7 @@ public class PopupMenuFactory {
 									break;
 								}
 							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -826,7 +826,7 @@ public class PopupMenuFactory {
 							try {
 								uValueField.setText(twoDecimalsFormat.format(Util.toUsUValue(Double.parseDouble(newValue))));
 							} catch (Exception exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 
@@ -856,7 +856,7 @@ public class PopupMenuFactory {
 							try {
 								siField.setText(twoDecimalsFormat.format(1.0 / (Util.toSiRValue(1.0 / Double.parseDouble(newValue)))));
 							} catch (Exception exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 
@@ -895,7 +895,7 @@ public class PopupMenuFactory {
 							try {
 								rValueField.setText(integerFormat.format(Util.toUsRValue(Double.parseDouble(newValue))));
 							} catch (Exception exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 
@@ -925,7 +925,7 @@ public class PopupMenuFactory {
 							try {
 								siField.setText(twoDecimalsFormat.format(1.0 / Util.toSiRValue(Double.parseDouble(newValue))));
 							} catch (Exception exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 
@@ -967,7 +967,7 @@ public class PopupMenuFactory {
 								break;
 							}
 						} catch (final NumberFormatException exception) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 						}
 					} else {
 						break;
@@ -1007,7 +1007,7 @@ public class PopupMenuFactory {
 								break;
 							}
 						} catch (final NumberFormatException exception) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "" + newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}
