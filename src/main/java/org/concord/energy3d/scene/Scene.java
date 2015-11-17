@@ -361,13 +361,17 @@ public class Scene implements Serializable {
 				if (Util.isZero(w.getUValue()))
 					w.setUValue(2);
 				if (Util.isZero(w.getSolarHeatGainCoefficient()))
-					w.setSolarHeatGainCoefficient(50);
+					w.setSolarHeatGainCoefficient(0.5);
+				else if (w.getSolarHeatGainCoefficient() > 1) // backward compatibility, SHGC used to range from 0 to 100
+					w.setSolarHeatGainCoefficient(w.getSolarHeatGainCoefficient() * 0.01);
 				if (Util.isZero(w.getVolumetricHeatCapacity()))
 					w.setVolumetricHeatCapacity(0.5);
 			} else if (p instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) p;
 				if (Util.isZero(sp.getEfficiency()))
-					sp.setEfficiency(10);
+					sp.setEfficiency(0.1);
+				else if (sp.getEfficiency() > 1) // backward compatibility, efficiency used to range from 0 to 100
+					sp.setEfficiency(sp.getEfficiency() * 0.01);
 			}
 
 		}

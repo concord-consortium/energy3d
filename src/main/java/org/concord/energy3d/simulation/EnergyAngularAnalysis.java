@@ -113,7 +113,7 @@ public class EnergyAngularAnalysis extends Analysis {
 			}
 		} else if (selectedPart instanceof Window) {
 			Window window = (Window) selectedPart;
-			final double solar = selectedPart.getSolarPotentialToday() * window.getSolarHeatGainCoefficientNotPercentage();
+			final double solar = selectedPart.getSolarPotentialToday() * window.getSolarHeatGainCoefficient();
 			graph.addData("Solar", solar);
 			final double[] loss = selectedPart.getHeatLoss();
 			double sum = 0;
@@ -128,7 +128,7 @@ public class EnergyAngularAnalysis extends Analysis {
 			graph.addData("Heat Gain", -sum);
 		} else if (selectedPart instanceof SolarPanel) {
 			final SolarPanel solarPanel = (SolarPanel) selectedPart;
-			final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getEfficiencyNotPercentage();
+			final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getEfficiency();
 			graph.addData("Solar", solar);
 		}
 		graph.repaint();

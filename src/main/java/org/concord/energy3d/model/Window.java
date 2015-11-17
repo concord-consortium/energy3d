@@ -38,8 +38,8 @@ public class Window extends HousePart implements Thermalizable {
 	private transient Line bars;
 	private int style = MORE_MUNTIN_BARS;
 
-	// range: 25%-80% (we choose 50% by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
-	private double solarHeatGainCoefficient = 50;
+	// range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
+	private double solarHeatGainCoefficient = 0.5;
 	private double uValue = 2.0; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 
@@ -359,10 +359,6 @@ public class Window extends HousePart implements Thermalizable {
 
 	public double getSolarHeatGainCoefficient() {
 		return solarHeatGainCoefficient;
-	}
-
-	public double getSolarHeatGainCoefficientNotPercentage() {
-		return solarHeatGainCoefficient * 0.01;
 	}
 
 	@Override

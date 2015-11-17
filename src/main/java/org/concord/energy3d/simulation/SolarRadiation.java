@@ -582,10 +582,10 @@ public class SolarRadiation {
 								heatLoss[i] += houseChild.getHeatLoss()[i];
 							if (houseChild instanceof Window) {
 								final Window window = (Window) houseChild;
-								passiveSolar[i] += houseChild.getSolarPotential()[i] * window.getSolarHeatGainCoefficientNotPercentage();
+								passiveSolar[i] += houseChild.getSolarPotential()[i] * window.getSolarHeatGainCoefficient();
 							} else if (houseChild instanceof SolarPanel) {
 								final SolarPanel solarPanel = (SolarPanel) houseChild;
-								photovoltaic[i] += houseChild.getSolarPotential()[i] * solarPanel.getEfficiencyNotPercentage();
+								photovoltaic[i] += houseChild.getSolarPotential()[i] * solarPanel.getEfficiency();
 							}
 						}
 					}
@@ -660,10 +660,10 @@ public class SolarRadiation {
 								heatLoss[i] += houseChild.getHeatLoss()[t0 + i];
 							if (houseChild instanceof Window) {
 								final Window window = (Window) houseChild;
-								passiveSolar[i] += houseChild.getSolarPotential()[t0 + i] * window.getSolarHeatGainCoefficientNotPercentage();
+								passiveSolar[i] += houseChild.getSolarPotential()[t0 + i] * window.getSolarHeatGainCoefficient();
 							} else if (houseChild instanceof SolarPanel) {
 								final SolarPanel solarPanel = (SolarPanel) houseChild;
-								photovoltaic[i] += houseChild.getSolarPotential()[t0 + i] * solarPanel.getEfficiencyNotPercentage();
+								photovoltaic[i] += houseChild.getSolarPotential()[t0 + i] * solarPanel.getEfficiency();
 							}
 						}
 					}

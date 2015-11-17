@@ -34,25 +34,20 @@ public class SolarPanel extends HousePart {
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
-	private double efficiency = 10; // percentage, not (0, 1)
+	private double efficiency = 0.1; // a number in (0, 1)
 
 	public SolarPanel() {
 		super(1, 1, 0.0);
 	}
 
-	/** a percentage number between 0 and 100 */
+	/** a number between 0 and 1 */
 	public void setEfficiency(final double efficiency) {
 		this.efficiency = efficiency;
 	}
 
-	/** a percentage number between 0 and 100 */
+	/** a number between 0 and 1 */
 	public double getEfficiency() {
 		return efficiency;
-	}
-
-	/** a number between 0 and 1 for calculation */
-	public double getEfficiencyNotPercentage() {
-		return efficiency * 0.01;
 	}
 
 	@Override

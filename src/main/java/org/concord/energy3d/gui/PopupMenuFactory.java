@@ -377,8 +377,8 @@ public class PopupMenuFactory {
 						return;
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Window window = (Window) selectedPart;
-					final String title = "<html>Solar Heat Gain Coefficient (%) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>Examples:<br><table><tr><td><font size=2>Single glass (clear)</td><td><font size=2>66%</td></tr><tr><td><font size=2>Single glass (green tint)</td><td><font size=2>55%</td></tr><tr><td><font size=2>Triple glass (air spaces)</td><td><font size=2>39%</td></tr></table><hr></html>";
+					final String title = "<html>Solar Heat Gain Coefficient of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Examples:<br><table><tr><td><font size=2>Single glass (clear)</td><td><font size=2>0.66</td></tr><tr><td><font size=2>Single glass (green tint)</td><td><font size=2>0.55</td></tr><tr><td><font size=2>Triple glass (air spaces)</td><td><font size=2>0.39</td></tr></table><hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -400,8 +400,8 @@ public class PopupMenuFactory {
 						else {
 							try {
 								final double val = Double.parseDouble(newValue);
-								if (val < 10 || val > 90) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar heat gain coefficient must be between 10% and 90%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (val < 0.1 || val > 0.9) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar heat gain coefficient must be between 0.1 and 0.9.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeWindowShgcCommand(window));
@@ -664,7 +664,7 @@ public class PopupMenuFactory {
 					bg.add(rb2);
 					Object[] params = { title, footnote, panel };
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getEfficiency());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getEfficiency() * 100);
 						if (newValue == null)
 							break;
 						else {
@@ -675,7 +675,7 @@ public class PopupMenuFactory {
 								} else {
 									if (rb1.isSelected()) {
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeSolarPanelEfficiencyCommand(solarPanel));
-										solarPanel.setEfficiency(val);
+										solarPanel.setEfficiency(val * 0.01);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = solarPanel.getTopContainer();
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingSolarPanelEfficiencyCommand(foundation));
