@@ -43,6 +43,7 @@ import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Thermostat;
 import org.concord.energy3d.undo.AddPartCommand;
+import org.concord.energy3d.undo.LockAllCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
@@ -995,6 +996,8 @@ public class Scene implements Serializable {
 	}
 
 	public void lockAll(final boolean freeze) {
+		if (parts.isEmpty())
+			return;
 		int lockCount = 0;
 		for (final HousePart part : parts) {
 			if (part.isFrozen())
@@ -1009,11 +1012,13 @@ public class Scene implements Serializable {
 				return;
 			}
 		}
+		SceneManager.getInstance().getUndoManager().addEdit(new LockAllCommand());
 		for (final HousePart part : parts)
 			part.setFreeze(freeze);
 		if (freeze)
 			SceneManager.getInstance().hideAllEditPoints();
 		redrawAll();
+		edited = true;
 	}
 
 	public static boolean isRedrawAll() {

@@ -15,6 +15,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Path2D;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -74,6 +75,9 @@ public abstract class Graph extends JPanel {
 	boolean popup = true;
 	JPopupMenu popupMenu;
 	JDialog parent;
+
+	private int legendX, legendY, legendWidth, legendHeight;
+	private String legendText = "";
 
 	static {
 		colors = new HashMap<String, Color>();
@@ -147,6 +151,23 @@ public abstract class Graph extends JPanel {
 			}
 		});
 
+		addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				processMouseMoved(e);
+			}
+		});
+
+	}
+
+	private void processMouseMoved(MouseEvent e) {
+		int x = e.getX();
+		int y = e.getY();
+		if (x > legendX && x < legendX + legendWidth && y > legendY && y < legendY + legendHeight) {
+			setToolTipText("xxxx");
+		} else {
+			setToolTipText(popup ? "" : "Double-click to enlarge this graph");
+		}
 	}
 
 	private void processMousePressed(MouseEvent e) {
@@ -497,10 +518,12 @@ public abstract class Graph extends JPanel {
 		g2.setFont(new Font("Arial", Font.PLAIN, popup ? 10 : 8));
 		g2.setStroke(thin);
 		int x0 = getWidth() - (popup ? 100 : 80) - right;
+		int y0 = top - 10;
+		legendX = x0;
+		legendY = y0;
 
 		boolean isAngularGraph = this instanceof AngularGraph;
 		String s = "Windows";
-		int y0 = top - 10;
 		if (!isDataHidden(s)) {
 			drawDiamond(g2, x0 + 4, y0 + 3, popup ? 5 : 2, colors.get(s));
 			g2.drawString("* " + (isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")"), x0 + 14, y0 + 8);
@@ -534,6 +557,9 @@ public abstract class Graph extends JPanel {
 			g2.setFont(new Font("Arial", Font.BOLD, popup ? 11 : 8));
 			g2.drawString("\u003d " + (isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")"), x0 + 14, y0 + 8);
 		}
+
+		legendWidth = 50;
+		legendHeight = y0 - legendY;
 
 	}
 

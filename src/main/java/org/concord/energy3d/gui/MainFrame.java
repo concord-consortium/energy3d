@@ -168,6 +168,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem exportImageMenuItem;
 	private JMenuItem exportLogMenuItem;
 	private JMenuItem removeAllLocksMenuItem;
+	private JMenuItem lockAllMenuItem;
 	private JMenuItem specificationsMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
@@ -1377,6 +1378,7 @@ public class MainFrame extends JFrame {
 			editMenu.add(getSnapMenuItem());
 			if (!Config.isRestrictMode()) {
 				editMenu.add(getAutoRecomputeEnergyMenuItem());
+				editMenu.add(getLockAllMenuItem());
 			}
 			editMenu.addSeparator();
 			editMenu.add(getRemoveAllWindowsMenuItem());
@@ -2056,6 +2058,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllLocksMenuItem;
+	}
+
+	private JMenuItem getLockAllMenuItem() {
+		if (lockAllMenuItem == null) {
+			lockAllMenuItem = new JMenuItem("Lock All");
+			lockAllMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().lockAll(true);
+				}
+			});
+		}
+		return lockAllMenuItem;
 	}
 
 }

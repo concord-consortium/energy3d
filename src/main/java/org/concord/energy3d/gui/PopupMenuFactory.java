@@ -597,6 +597,7 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						((Foundation) selectedPart).setLockEdit(miDisableEdits.isSelected());
+						Scene.getInstance().setEdited(true);
 					}
 				}
 			});
