@@ -63,6 +63,10 @@
 			<fx:application name="${app.name}" mainClass="org.concord.energy3d.MainApplication" version="${app.version}" />
 			<fx:preferences shortcut="true" menu="true" />
 			<fx:bundleArgument arg="win.menuGroup" value="${app.name}" />
+			<fx:bundleargument arg="mac.category" value="public.app-category.graphics-design"/>
+			<fx:bundleargument arg="mac.CFBundleIdentifier" value="org.concord.Energy3D"/>
+			<fx:bundleargument arg="mac.CFBundleVersion" value="5.0.0"/>
+			<fx:bundleargument arg="mac.signing-key-developer-id-app" value="Developer ID Application: Concord Consortium"/>
 			<fx:info title="${app.name}" vendor="Concord Consortium Inc." copyright="2010-2015 Concord Consortium Inc.">
 				<fx:association extension="ng3" description="${app.name} File" mimetype="application/energy3d">
 				</fx:association>
