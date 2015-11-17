@@ -380,6 +380,10 @@ public class EnergyPanel extends JPanel {
 		colorMapSlider.setMinimum(15);
 		colorMapSlider.setMaximum(95);
 		colorMapSlider.setMinimumSize(colorMapSlider.getPreferredSize());
+		colorMapSlider.setSnapToTicks(true);
+		colorMapSlider.setMinorTickSpacing(1);
+		colorMapSlider.setMajorTickSpacing(5);
+		colorMapSlider.setFocusable(false);
 		colorMapSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
@@ -390,10 +394,7 @@ public class EnergyPanel extends JPanel {
 					Scene.getInstance().setEdited(true, false);
 				}
 			}
-		});
-		colorMapSlider.setSnapToTicks(true);
-		colorMapSlider.setMinorTickSpacing(1);
-		colorMapSlider.setMajorTickSpacing(5);
+		});		
 		heatMapPanel.add(colorMapSlider, BorderLayout.CENTER);
 		heatMapPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, heatMapPanel.getPreferredSize().height));
 
