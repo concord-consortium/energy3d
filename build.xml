@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
+	<property name="app.name" value="Energy3D"/>
+	<property name="app.version" value="5.0"/>
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="dist" />
@@ -52,21 +54,23 @@
 		<pathelement path="${build.classes.dir}" />
 	</path>
 
-	<target name="default" depends="jar,deploy">
+	<target name="default" depends="clean,compile,jar,deploy">
 	</target>
 
 	<target name="deploy">
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath=".:${JAVA_HOME}/lib/ant-javafx.jar" />
 		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="${bundle_type}" verbose="false">
-			<fx:application name="Energy3D" mainClass="org.concord.energy3d.MainApplication" version="4.8" />
+			<fx:application name="${app.name}" mainClass="org.concord.energy3d.MainApplication" version="${app.version}" />
 			<fx:preferences shortcut="true" menu="true" />
-			<fx:bundleArgument arg="win.menuGroup" value="Energy3D" />
-			<fx:info title="Energy3D" vendor="Concord Consortium Inc." copyright="2010-2015 Concord Consortium Inc.">
-				<fx:association extension="ng3" description="Energy3D File" mimetype="application/energy3d">
+			<fx:bundleArgument arg="win.menuGroup" value="${app.name}" />
+			<fx:info title="${app.name}" vendor="Concord Consortium Inc." copyright="2010-2015 Concord Consortium Inc.">
+				<fx:association extension="ng3" description="${app.name} File" mimetype="application/energy3d">
 				</fx:association>
 			</fx:info>
 			<fx:platform basedir="${JAVA_HOME}">
 				<fx:property name="java.library.path" value="./lib/jogl/native/${os}" />
+				<fx:property name="java.ext.dirs" value=""/>
+				<fx:jvmarg value="-Xdock:name=${app.name}"/>				
 			</fx:platform>
 			<fx:resources>
 				<fx:fileset dir="exe" includes="energy3d.jar" />
@@ -75,6 +79,7 @@
 					<include name="getdown.txt" />
 					<include name="digest.txt" />
 					<include name="lib/jogl/native/${os}/*.*" />
+					
 				</fx:fileset>
 			</fx:resources>
 		</fx:deploy>
@@ -87,10 +92,10 @@
 		</fx:signjar>
 	</target>
 
-	<target name="jar" depends="compile">
+	<target name="jar">
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath=".:${JAVA_HOME}/lib/ant-javafx.jar" />
 		<fx:jar destfile="exe/energy3d.jar">
-			<fx:application name="Energy3D" mainClass="org.concord.energy3d.MainApplication" version="4.8" />
+			<fx:application name="${app.name}" mainClass="org.concord.energy3d.MainApplication" version="${app.version}" />
 			<fx:resources>
 				<fx:fileset dir="exe">
 					<patternset refid="jars.no.source" />
@@ -98,7 +103,7 @@
 			</fx:resources>
 			<fileset dir="${build.classes.dir}" />
 			<manifest>
-				<attribute name="Application-Name" value="Energy3D" />
+				<attribute name="Application-Name" value="${app.name}" />
 				<attribute name="Permissions" value="all-permissions" />
 			</manifest>
 		</fx:jar>
