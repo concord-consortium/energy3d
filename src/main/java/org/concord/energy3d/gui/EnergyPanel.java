@@ -559,12 +559,11 @@ public class EnergyPanel extends JPanel {
 						EventQueue.invokeLater(new Runnable() { // must run this Swing UI update in the event queue to avoid a possible deadlock
 							public void run() {
 								progress(0);
-								if (dailyEnergyGraph.isShowing()) {
-									if (SceneManager.getInstance().getSolarHeatMap()) {
-										HousePart p = SceneManager.getInstance().getSelectedPart();
-										if (p instanceof Foundation) {
-											dailyEnergyGraph.addGraph((Foundation) p);
-										}
+								if (SceneManager.getInstance().getSolarHeatMap()) {
+									EnergyPanel.getInstance().getGraphTabbedPane().setSelectedComponent(EnergyPanel.getInstance().getDailyEnergyGraph());
+									HousePart p = SceneManager.getInstance().getSelectedPart();
+									if (p instanceof Foundation) {
+										dailyEnergyGraph.addGraph((Foundation) p);
 									}
 								}
 							}

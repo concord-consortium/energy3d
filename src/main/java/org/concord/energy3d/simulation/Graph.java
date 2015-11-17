@@ -164,7 +164,7 @@ public abstract class Graph extends JPanel {
 		int x = e.getX();
 		int y = e.getY();
 		if (x > legendX && x < legendX + legendWidth && y > legendY && y < legendY + legendHeight) {
-			setToolTipText("xxxx");
+			setToolTipText(legendText);
 		} else {
 			setToolTipText(popup ? "" : "Double-click to enlarge this graph");
 		}
@@ -521,33 +521,42 @@ public abstract class Graph extends JPanel {
 		int y0 = top - 10;
 		legendX = x0;
 		legendY = y0;
+		legendText = "<html><h4>Energy (kWh):</h4><hr>";
 
 		boolean isAngularGraph = this instanceof AngularGraph;
 		String s = "Windows";
 		if (!isDataHidden(s)) {
 			drawDiamond(g2, x0 + 4, y0 + 3, popup ? 5 : 2, colors.get(s));
-			g2.drawString("* " + (isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")"), x0 + 14, y0 + 8);
+			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
+			g2.drawString("* " + t, x0 + 14, y0 + 8);
+			legendText += t;
 		}
 
 		s = "Solar Panels";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, popup ? 8 : 4, colors.get(s));
-			g2.drawString("\u2212 " + (isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")"), x0 + 14, y0 + 8);
+			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
+			g2.drawString("\u2212 " + t, x0 + 14, y0 + 8);
+			legendText += "<br>" + t;
 		}
 
 		s = "Heater";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawTriangleUp(g2, x0, y0, popup ? 8 : 4, colors.get(s));
-			g2.drawString("\u002b " + (isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")"), x0 + 14, y0 + 8);
+			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
+			g2.drawString("\u002b " + t, x0 + 14, y0 + 8);
+			legendText += "<br>" + t;
 		}
 
 		s = "AC";
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawTriangleDown(g2, x0, y0, popup ? 8 : 4, colors.get(s));
-			g2.drawString("\u002b " + (isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")"), x0 + 14, y0 + 8);
+			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
+			g2.drawString("\u002b " + t, x0 + 14, y0 + 8);
+			legendText += "<br>" + t;
 		}
 
 		s = "Net";
@@ -555,11 +564,15 @@ public abstract class Graph extends JPanel {
 		if (!isDataHidden(s)) {
 			drawCircle(g2, x0, y0, popup ? 8 : 4, colors.get(s));
 			g2.setFont(new Font("Arial", Font.BOLD, popup ? 11 : 8));
-			g2.drawString("\u003d " + (isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")"), x0 + 14, y0 + 8);
+			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
+			g2.drawString("\u003d " + t, x0 + 14, y0 + 8);
+			legendText += "<br>" + t;
 		}
 
 		legendWidth = 50;
 		legendHeight = y0 - legendY;
+
+		legendText += "</html>";
 
 	}
 
