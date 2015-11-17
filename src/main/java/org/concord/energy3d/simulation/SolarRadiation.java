@@ -167,7 +167,8 @@ public class SolarRadiation {
 
 	private void computeOnLand(final double dayLength, final ReadOnlyVector3 directionTowardSun) {
 		calculatePeakRadiation(directionTowardSun, dayLength);
-		final double radiation = calculateDirectRadiation(directionTowardSun, Vector3.UNIT_Z) + calculateDiffuseAndReflectedRadiation(directionTowardSun, Vector3.UNIT_Z);
+		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, Vector3.UNIT_Z);
+		final double totalRadiation = calculateDirectRadiation(directionTowardSun, Vector3.UNIT_Z) + indirectRadiation;
 		final double step = solarStep * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
@@ -189,8 +190,11 @@ public class SolarRadiation {
 				final PickResults pickResults = new PrimitivePickResults();
 				for (final Spatial spatial : collidables)
 					PickingUtil.findPick(spatial, pickRay, pickResults, false);
-				if (pickResults.getNumber() == 0)
-					data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? radiation * absorption : radiation;
+				if (pickResults.getNumber() == 0) {
+					data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? totalRadiation * absorption : totalRadiation;
+				} else { // if shaded, it still receives indirect radiation
+					data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? indirectRadiation * absorption : indirectRadiation;
+				}
 			}
 		}
 	}
