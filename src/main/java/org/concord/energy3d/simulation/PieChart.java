@@ -1,5 +1,6 @@
 package org.concord.energy3d.simulation;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -24,7 +25,6 @@ public class PieChart extends JComponent {
 
 	private static final long serialVersionUID = 1L;
 	private NumberFormat format;
-	private float[] data;
 	private Color[] colors;
 	private String[] legends;
 	private float sum;
@@ -34,14 +34,18 @@ public class PieChart extends JComponent {
 	private String info;
 	private String details;
 	private boolean popup;
+	private BasicStroke thinStroke = new BasicStroke(1);
+	private BasicStroke thickStroke = new BasicStroke(2);
+	private Color normalColor = Color.BLACK;
+	private Color highlightColor = Color.YELLOW;
+	private int selectedIndex = -1;
 
-	public PieChart(float[] data, Color[] colors, String[] legends, String unit, String info, String details, boolean popup) {
+	public PieChart(final float[] data, final Color[] colors, final String[] legends, final String unit, final String info, final String details, final boolean popup) {
 		if (popup)
 			setPreferredSize(new Dimension(450, 300));
 		this.popup = popup;
 		format = NumberFormat.getNumberInstance();
 		format.setMaximumFractionDigits(2);
-		this.data = data;
 		this.colors = colors;
 		this.legends = legends;
 		this.unit = unit;
@@ -57,13 +61,22 @@ public class PieChart extends JComponent {
 		}
 		addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseMoved(MouseEvent e) {
+				selectedIndex = -1;
 				for (int i = 0; i < arcs.length; i++) {
 					if (arcs[i].contains(e.getX(), e.getY())) {
-						setToolTipText(PieChart.this.legends[i] + ": " + PieChart.this.unit + Math.round(PieChart.this.data[i]));
+						selectedIndex = i;
+						repaint();
+						setToolTipText(legends[i] + ": " + unit + Math.round(data[i]));
 						return;
 					}
 				}
-				setToolTipText("<html>Hover mouse over the pie chart to view the numbers" + (PieChart.this.popup ? "" : "<br>Double-click to enlarge this chart") + "</html>");
+				String toolTipText = "<html><h4>Data:</h4><hr>";
+				for (int i = 0; i < data.length; i++) {
+					toolTipText += legends[i] + ": " + unit + data[i] + "<br>";
+				}
+				toolTipText += "<hr>Hover mouse over the pie chart to view the numbers.";
+				setToolTipText(toolTipText + (popup ? "" : "<br>Double-click to enlarge this chart.") + "</html>");
+				repaint();
 			}
 		});
 	}
@@ -107,8 +120,15 @@ public class PieChart extends JComponent {
 			arcs[i].setArc(bound, t, percents[i] * 360.0f, Arc2D.PIE);
 			g2.fill(arcs[i]);
 			g2.fillRect(r, s + i * 20, 10, 10);
-			g2.setColor(Color.black);
+			if (i == selectedIndex) {
+				g2.setColor(highlightColor);
+				g2.setStroke(thickStroke);
+			} else {
+				g2.setColor(normalColor);
+				g2.setStroke(thinStroke);
+			}
 			g2.draw(arcs[i]);
+			g2.setColor(Color.BLACK);
 			g2.drawRect(r, s + i * 20, 10, 10);
 			g2.drawString(legends[i], r + legendX1, s + 10 + i * 20);
 			g2.drawString(format.format(percents[i] * 100.0) + "%", r + legendX2, s + 10 + i * 20);

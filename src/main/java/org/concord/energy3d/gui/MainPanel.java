@@ -43,7 +43,6 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AnimateSunCommand;
-import org.concord.energy3d.undo.ComputeEnergyCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowHeliodonCommand;
@@ -715,7 +714,6 @@ public class MainPanel extends JPanel {
 			energyViewButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ComputeEnergyCommand());
 					if (energyViewButton.isSelected()) {
 						SceneManager.getInstance().autoSelectBuilding(false);
 					} else {

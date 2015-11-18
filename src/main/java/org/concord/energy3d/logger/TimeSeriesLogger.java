@@ -70,7 +70,6 @@ import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
-import org.concord.energy3d.undo.ComputeEnergyCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
@@ -365,8 +364,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				stateValue = Scene.getInstance().areAnnotationsVisible();
 			} else if (lastEdit instanceof ShowHeliodonCommand) {
 				stateValue = SceneManager.getInstance().isHeliodonVisible();
-			} else if (lastEdit instanceof ComputeEnergyCommand) {
-				stateValue = SceneManager.getInstance().getSolarHeatMap();
 			} else if (lastEdit instanceof ChangeBackgroundAlbedoCommand) {
 				stateValue = Scene.getInstance().getGround().getAlbedo();
 			} else if (lastEdit instanceof ChangeGroundThermalDiffusivityCommand) {

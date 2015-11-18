@@ -239,12 +239,21 @@ public class PopupMenuFactory {
 			final JMenuItem miInfo = new JMenuItem("Sky");
 			miInfo.setEnabled(false);
 
+			final JCheckBoxMenuItem miHeliodon = new JCheckBoxMenuItem("Heliodon");
+			miHeliodon.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					MainPanel.getInstance().getHeliodonButton().doClick();
+				}
+			});
+
 			popupMenuForSky = new JPopupMenu();
 			popupMenuForSky.setInvoker(MainPanel.getInstance().getCanvasPanel());
 			popupMenuForSky.addPopupMenuListener(new PopupMenuListener() {
 
 				@Override
 				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+					Util.selectSilently(miHeliodon, MainPanel.getInstance().getHeliodonButton().isSelected());
 				}
 
 				@Override
@@ -258,6 +267,8 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForSky.add(miInfo);
+			popupMenuForSky.addSeparator();
+			popupMenuForSky.add(miHeliodon);
 
 		}
 
@@ -394,7 +405,7 @@ public class PopupMenuFactory {
 					bg.add(rb3);
 					Object[] params = { title, footnote, panel };
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, window.getSolarHeatGainCoefficient());
+						final String newValue = (String) JOptionPane.showInputDialog(MainFrame.getInstance(), params, "Input: " + partInfo, JOptionPane.QUESTION_MESSAGE, null, null, window.getSolarHeatGainCoefficient());
 						if (newValue == null)
 							break;
 						else {
@@ -992,7 +1003,8 @@ public class PopupMenuFactory {
 				final Thermalizable t = (Thermalizable) selectedPart;
 				final String title = "<html>Volumeric Heat Capacity of " + partInfo + " [kWh/(m<sup>3</sup>&middot;&deg;C)]<hr><font size=2>Examples:<br>0.03 (fiberglass), 0.18 (asphalt), 0.25(oak wood), 0.33 (concrete), 0.37 (brick), 0.58 (stone)</html>";
 				while (true) {
-					final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, t.getVolumetricHeatCapacity());
+					// final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, t.getVolumetricHeatCapacity());
+					final String newValue = (String) JOptionPane.showInputDialog(MainFrame.getInstance(), title, "Input: " + partInfo, JOptionPane.QUESTION_MESSAGE, null, null, t.getVolumetricHeatCapacity());
 					if (newValue == null)
 						break;
 					else {

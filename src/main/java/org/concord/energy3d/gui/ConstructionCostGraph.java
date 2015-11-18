@@ -110,7 +110,7 @@ public class ConstructionCostGraph extends JPanel {
 		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Ground Floor", "Doors", "Solar Panels", "Trees" };
 		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.PINK, Color.YELLOW, Color.GREEN };
 
-		pie = new PieChart(data, colors, legends, "$", null, null, false);
+		pie = new PieChart(data, colors, legends, "$", null, "Move mouse for more info", false);
 		pie.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - 5));
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());

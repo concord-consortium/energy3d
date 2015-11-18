@@ -166,7 +166,7 @@ public abstract class Graph extends JPanel {
 		if (x > legendX && x < legendX + legendWidth && y > legendY && y < legendY + legendHeight) {
 			setToolTipText(legendText);
 		} else {
-			setToolTipText(popup ? "" : "Double-click to enlarge this graph");
+			setToolTipText(popup ? "" : "<html>Move mouse for more information.<br>Right-click for more options.<br>Double-click to enlarge this graph.</html>");
 		}
 	}
 
@@ -521,7 +521,7 @@ public abstract class Graph extends JPanel {
 		int y0 = top - 10;
 		legendX = x0;
 		legendY = y0;
-		legendText = "<html><h4>Energy (kWh):</h4><hr>";
+		legendText = "<html><h4>Energy (kWh):</h4><hr><ul>";
 
 		boolean isAngularGraph = this instanceof AngularGraph;
 		String s = "Windows";
@@ -529,7 +529,7 @@ public abstract class Graph extends JPanel {
 			drawDiamond(g2, x0 + 4, y0 + 3, popup ? 5 : 2, colors.get(s));
 			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
 			g2.drawString("* " + t, x0 + 14, y0 + 8);
-			legendText += t;
+			legendText += "<li>" + t;
 		}
 
 		s = "Solar Panels";
@@ -538,7 +538,7 @@ public abstract class Graph extends JPanel {
 			drawSquare(g2, x0, y0, popup ? 8 : 4, colors.get(s));
 			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
 			g2.drawString("\u2212 " + t, x0 + 14, y0 + 8);
-			legendText += "<br>" + t;
+			legendText += "<li>" + t;
 		}
 
 		s = "Heater";
@@ -547,7 +547,7 @@ public abstract class Graph extends JPanel {
 			drawTriangleUp(g2, x0, y0, popup ? 8 : 4, colors.get(s));
 			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
 			g2.drawString("\u002b " + t, x0 + 14, y0 + 8);
-			legendText += "<br>" + t;
+			legendText += "<li>" + t;
 		}
 
 		s = "AC";
@@ -556,7 +556,7 @@ public abstract class Graph extends JPanel {
 			drawTriangleDown(g2, x0, y0, popup ? 8 : 4, colors.get(s));
 			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
 			g2.drawString("\u002b " + t, x0 + 14, y0 + 8);
-			legendText += "<br>" + t;
+			legendText += "<li>" + t;
 		}
 
 		s = "Net";
@@ -566,10 +566,10 @@ public abstract class Graph extends JPanel {
 			g2.setFont(new Font("Arial", Font.BOLD, popup ? 11 : 8));
 			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
 			g2.drawString("\u003d " + t, x0 + 14, y0 + 8);
-			legendText += "<br>" + t;
+			legendText += "<li>" + t;
 		}
 
-		legendWidth = 50;
+		legendWidth = getWidth() - x0;
 		legendHeight = y0 - legendY;
 
 		legendText += "</html>";
