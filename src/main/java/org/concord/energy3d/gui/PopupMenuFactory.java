@@ -161,6 +161,7 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(new ChangeBackgroundAlbedoCommand());
 									Scene.getInstance().getGround().setAlbedo(val);
 									Scene.getInstance().setEdited(true);
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 									break;
 								}
 							} catch (final NumberFormatException exception) {
@@ -510,10 +511,12 @@ public class PopupMenuFactory {
 							break;
 						else {
 							try {
-								final double val = Double.parseDouble(newValue);
+								double val = Double.parseDouble(newValue);
 								double min = Roof.OVERHANG_MIN * Scene.getInstance().getAnnotationScale();
-								if (val < min || val > 5) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Overhang value must be between " + min + " and 5.", "Error", JOptionPane.ERROR_MESSAGE);
+								if (val < min && val >= 0)
+									val = min;
+								if (val < 0 || val > 10) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Overhang value must be between " + min + " and 10.", "Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									SceneManager.getInstance().getUndoManager().addEdit(new ChangeRoofOverhangCommand(roof));
 									roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());

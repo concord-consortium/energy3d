@@ -677,7 +677,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}));
 
 			((Component) canvas).addMouseListener(new MouseAdapter() {
-				public void mouseReleased(MouseEvent e) {
+				public void mouseClicked(MouseEvent e) {
 					if (Util.isRightClick(e)) {
 						JPanel cp = MainPanel.getInstance().getCanvasPanel();
 						mouseRightClicked(e.getX(), cp.getHeight() - e.getY());

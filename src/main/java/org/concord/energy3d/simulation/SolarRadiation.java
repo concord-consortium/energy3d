@@ -67,6 +67,7 @@ public class SolarRadiation {
 	private static SolarRadiation instance = new SolarRadiation();
 	private final Map<Mesh, MeshData> onMesh = new HashMap<Mesh, MeshData>();
 	private final List<Spatial> collidables = new ArrayList<Spatial>();
+	private final Map<Spatial, HousePart> collidablesToParts = new HashMap<Spatial, HousePart>();
 	private int timeStep = 15;
 	private double solarStep = 2.0;
 	private long maxValue;
@@ -114,12 +115,19 @@ public class SolarRadiation {
 
 	private void initCollidables() {
 		collidables.clear();
+		collidablesToParts.clear();
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor)
-				collidables.add(part.getRadiationCollisionSpatial());
-			else if (part instanceof Roof)
-				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren())
-					collidables.add(((Node) roofPart).getChild(0));
+			if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor) {
+				Spatial s = part.getRadiationCollisionSpatial();
+				collidables.add(s);
+				collidablesToParts.put(s, part);
+			} else if (part instanceof Roof) {
+				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
+					Spatial s = ((Node) roofPart).getChild(0);
+					collidables.add(s);
+					collidablesToParts.put(s, part);
+				}
+			}
 		}
 	}
 
@@ -245,17 +253,27 @@ public class SolarRadiation {
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {
 					boolean collision = false;
+					Window collisionWindow = null;
 					for (final Spatial spatial : collidables) {
 						if (spatial != collisionMesh) {
 							PickingUtil.findPick(spatial, pickRay, pickResults, false);
 							if (pickResults.getNumber() != 0) {
 								collision = true;
+								HousePart collidableOwner = collidablesToParts.get(spatial);
+								if (collidableOwner instanceof Window) {
+									collisionWindow = (Window) collidableOwner;
+								}
 								break;
 							}
 						}
 					}
-					if (!collision)
+					if (collision) {
+						if (collisionWindow != null) {
+							radiation += directRadiation * collisionWindow.getSolarHeatGainCoefficient();
+						}
+					} else {
 						radiation += directRadiation;
+					}
 				}
 				data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? absorption * radiation : radiation;
 				if (data.solarPotential != null)
