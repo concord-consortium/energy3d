@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -30,6 +32,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
@@ -140,7 +143,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem shadowMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
 	protected Object lastSelection;
-	private JMenuItem exitMenuItem = null;
+	private JMenuItem exitMenuItem;
 	private JMenu helpMenu = null;
 	private JMenuItem aboutMenuItem = null;
 	private JDialog aboutDialog = null;
@@ -256,6 +259,22 @@ public class MainFrame extends JFrame {
 		initialize();
 		setMinimumSize(new Dimension(800, 600));
 		System.out.println("done");
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+			@Override
+			public boolean dispatchKeyEvent(KeyEvent e) {
+				switch (e.getID()) {
+				case KeyEvent.KEY_PRESSED:
+					MainPanel.getInstance().getRotateButton().setIcon(new ImageIcon(MainPanel.class.getResource("icons/" + (e.isShiftDown() ? "rotate_ccw.png" : "rotate_cw.png"))));
+					MainPanel.getInstance().setBuildingRotationAngle(e.isShiftDown() ? MainPanel.getInstance().getBuildingRotationAngleAbsolute() : -MainPanel.getInstance().getBuildingRotationAngleAbsolute());
+					break;
+				case KeyEvent.KEY_RELEASED:
+					MainPanel.getInstance().getRotateButton().setIcon(new ImageIcon(MainPanel.class.getResource("icons/rotate_cw.png")));
+					MainPanel.getInstance().setBuildingRotationAngle(-MainPanel.getInstance().getBuildingRotationAngleAbsolute());
+					break;
+				}
+				return false;
+			}
+		});
 	}
 
 	private void initialize() {

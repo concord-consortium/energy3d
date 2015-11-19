@@ -512,7 +512,7 @@ public class PopupMenuFactory {
 						else {
 							try {
 								double val = Double.parseDouble(newValue);
-								double min = Roof.OVERHANG_MIN * Scene.getInstance().getAnnotationScale();
+								double min = Roof.OVERHANG_MIN * Scene.getInstance().getAnnotationScale() * 10;
 								if (val < min && val >= 0)
 									val = min;
 								if (val < 0 || val > 10) {

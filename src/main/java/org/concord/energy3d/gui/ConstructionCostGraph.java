@@ -3,16 +3,29 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.table.DefaultTableModel;
 
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
@@ -26,6 +39,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.PieChart;
+import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
@@ -37,6 +51,8 @@ public class ConstructionCostGraph extends JPanel {
 
 	private PieChart pie;
 	private Box buttonPanel;
+	private JPopupMenu popupMenu;
+	private static Point windowLocation = new Point();
 
 	public ConstructionCostGraph() {
 		super(new BorderLayout());
@@ -58,6 +74,115 @@ public class ConstructionCostGraph extends JPanel {
 		});
 		buttonPanel.add(button);
 		buttonPanel.add(Box.createVerticalGlue());
+		popupMenu = new JPopupMenu();
+		popupMenu.setInvoker(this);
+		popupMenu.addPopupMenuListener(new PopupMenuListener() {
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+			}
+
+		});
+		JMenuItem mi = new JMenuItem("View Itemized Cost...");
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showItemizedCost();
+			}
+		});
+		popupMenu.add(mi);
+	}
+
+	@SuppressWarnings("serial")
+	private void showItemizedCost() {
+
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Itemized Construction Cost", true);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		final JPanel contentPane = new JPanel(new BorderLayout());
+		dialog.setContentPane(contentPane);
+
+		final JPanel panel = new JPanel(new BorderLayout());
+		panel.setBorder(BorderFactory.createEtchedBorder());
+		contentPane.add(panel, BorderLayout.CENTER);
+
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		Foundation foundation = null;
+		if (selectedPart instanceof Foundation)
+			foundation = (Foundation) selectedPart;
+
+		String[] header = new String[] { "ID", "Type", "Cost" };
+		final int m = header.length;
+		final List<HousePart> parts = Scene.getInstance().getParts();
+		int n = 0;
+		int foundationCount = 0;
+		for (HousePart p : parts) {
+			if (p instanceof Foundation)
+				foundationCount++;
+		}
+		for (HousePart p : parts) {
+			if (p == foundation || p.getTopContainer() == foundation || (foundationCount == 1 && p instanceof Tree)) {
+				n++;
+			}
+		}
+		final Object[][] column = new Object[n][m];
+		int i = 0;
+		for (HousePart p : parts) {
+			if (p == foundation || p.getTopContainer() == foundation || (foundationCount == 1 && p instanceof Tree)) {
+				column[i][0] = p.getId();
+				String partName = p.toString().substring(0, p.toString().indexOf(')') + 1);
+				int beg = partName.indexOf("(");
+				if (beg != -1)
+					partName = partName.substring(0, beg);
+				column[i][1] = partName;
+				column[i][2] = "$" + Cost.getInstance().getPartCost(p);
+				i++;
+			}
+		}
+
+		JTable table = new JTable(column, header);
+		table.setModel(new DefaultTableModel(column, header) {
+			public boolean isCellEditable(int row, int col) {
+				return false;
+			}
+		});
+		panel.add(new JScrollPane(table), BorderLayout.CENTER);
+
+		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		contentPane.add(buttonPanel, BorderLayout.SOUTH);
+
+		JButton button = new JButton("Close");
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				windowLocation.setLocation(dialog.getLocationOnScreen());
+				dialog.dispose();
+			}
+		});
+		buttonPanel.add(button);
+
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(final WindowEvent e) {
+				windowLocation.setLocation(dialog.getLocationOnScreen());
+				dialog.dispose();
+			}
+		});
+
+		dialog.pack();
+		if (windowLocation.x > 0 && windowLocation.y > 0)
+			dialog.setLocation(windowLocation);
+		else
+			dialog.setLocationRelativeTo(MainFrame.getInstance());
+		dialog.setVisible(true);
+
 	}
 
 	public void removeGraph() {
@@ -118,6 +243,10 @@ public class ConstructionCostGraph extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() >= 2) {
 					Cost.getInstance().showGraph();
+				} else {
+					if (Util.isRightClick(e)) {
+						popupMenu.show(ConstructionCostGraph.this, e.getX(), e.getY());
+					}
 				}
 			}
 		});

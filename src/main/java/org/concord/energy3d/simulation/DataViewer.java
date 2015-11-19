@@ -152,10 +152,11 @@ class DataViewer {
 		final Object[][] column = new Object[n][m + 1];
 		for (int i = 0; i < n; i++)
 			column[i][0] = (i + 1);
-		for (int j = 1; j < header.length; j++) {
+		for (int j = 1; j < m; j++) {
 			final List<Double> list = graph.getData(header[j]);
-			for (int i = 0; i < n; i++)
+			for (int i = 0; i < n; i++) {
 				column[i][j] = list.get(i);
+			}
 		}
 		showDataWindow("Data", column, header, parent);
 	}

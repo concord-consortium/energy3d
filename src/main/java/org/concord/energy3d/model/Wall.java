@@ -1210,6 +1210,8 @@ public class Wall extends HousePart implements Thermalizable {
 		for (final HousePart child : children)
 			if (child instanceof Window || child instanceof Door)
 				areaWithoutWindows -= child.getArea();
+		if (areaWithoutWindows < 0)
+			areaWithoutWindows = 0;
 		return areaWithoutWindows;
 	}
 

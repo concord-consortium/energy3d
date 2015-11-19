@@ -9,8 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.concurrent.Callable;
@@ -934,26 +932,13 @@ public class MainPanel extends JPanel {
 		return resizeButton;
 	}
 
-	private JButton getRotateButton() {
+	public JButton getRotateButton() {
 		if (rotateButton == null) {
 			rotateButton = new JButton();
 			rotateButton.addMouseListener(refreshUponMouseExit);
 			rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
-			rotateButton.setToolTipText("<html>Rotate a building clockwisely; <br>Hold down the SHIFT key and press this button to rotate counter-clockwisely.</html>");
+			rotateButton.setToolTipText("<html>Rotate building in the clockwise direction; <br>Hold down the SHIFT key and press this button for counter-clockwise rotation.</html>");
 			rotateButton.setFocusable(false);
-			rotateButton.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyPressed(final KeyEvent e) {
-					rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/" + (e.isShiftDown() ? "rotate_ccw.png" : "rotate_cw.png"))));
-					buildingRotationAngle = e.isShiftDown() ? buildingRotationAngleAbsolute : -buildingRotationAngleAbsolute;
-				}
-
-				@Override
-				public void keyReleased(final KeyEvent e) {
-					buildingRotationAngle = -buildingRotationAngleAbsolute;
-					rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
-				}
-			});
 			rotateButton.addMouseListener(new MouseAdapter() {
 				private boolean mousePressed = false;
 
@@ -1033,6 +1018,14 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return noteButton;
+	}
+
+	public void setBuildingRotationAngle(double x) {
+		buildingRotationAngle = x;
+	}
+
+	public double getBuildingRotationAngleAbsolute() {
+		return buildingRotationAngleAbsolute;
 	}
 
 }

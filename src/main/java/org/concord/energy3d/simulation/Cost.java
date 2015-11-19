@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -104,7 +105,7 @@ public class Cost {
 			// Let's also assume that the insulation cost is inversely proportional to the U-value.
 			// The baseline (that is, the structure without insulation) cost for a roof is set to be $100/m^2.
 			double unitPrice = 100 + 9 / uFactor;
-			return (int) (part.getArea() * unitPrice);
+			return (int) (((Roof) part).getAreaWithOverhang() * unitPrice);
 		}
 		if (part instanceof Foundation) {
 			Foundation foundation = (Foundation) part;
@@ -119,7 +120,13 @@ public class Cost {
 			final double[] buildingGeometry = foundation.getBuildingGeometry();
 			if (buildingGeometry != null)
 				return (int) (buildingGeometry[1] * unitPrice);
-			return 0; // the building is incomplete yet, so we can assume the floor insulation isn't there yet
+			return -1; // the building is incomplete yet, so we can assume the floor insulation isn't there yet
+		}
+		if (part instanceof Floor) {
+			double area = part.getArea();
+			if (area > 0)
+				return (int) (part.getArea() * 100);
+			return -1;
 		}
 		if (part instanceof Door) {
 			double uFactor = ((Door) part).getUValue();
@@ -128,18 +135,30 @@ public class Cost {
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof SolarPanel) {
-			return (int) ((SolarPanel) part).getEfficiency() * 50;
+			return (int) (((SolarPanel) part).getEfficiency() * 1000);
 		}
 		if (part instanceof Tree) {
 			Tree tree = (Tree) part;
 			int price;
 			switch (tree.getTreeType()) {
+			case Tree.LINDEN:
+				price = 3000;
+				break;
+			case Tree.COTTONWOOD:
+				price = 2500;
+				break;
+			case Tree.ELM:
+				price = 2000;
+				break;
 			case Tree.OAK:
 				price = 2000;
+				break;
 			case Tree.PINE:
 				price = 1500;
+				break;
 			case Tree.MAPLE:
 				price = 1000;
+				break;
 			default:
 				price = 500;
 			}

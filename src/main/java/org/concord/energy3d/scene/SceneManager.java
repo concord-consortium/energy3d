@@ -641,6 +641,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+					((Component) canvas).requestFocusInWindow();
 					if (firstClickState == null) {
 						firstClickState = inputStates;
 						mousePressed(inputStates.getCurrent().getMouseState());
@@ -818,7 +819,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void setCameraControl(final CameraMode type) {
 		if (cameraControl != null)
 			cameraControl.removeTriggers(logicalLayer);
-
 		if (type == CameraMode.ORBIT)
 			cameraControl = new OrbitControl(Vector3.UNIT_Z);
 		else if (type == CameraMode.FIRST_PERSON)
@@ -826,6 +826,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		cameraControl.setupMouseTriggers(logicalLayer, true);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
 		cameraControl.setKeyRotateSpeed(1);
+	}
+
+	public CameraControl getCameraControl() {
+		return cameraControl;
 	}
 
 	public void hideAllEditPoints() {
@@ -1228,8 +1232,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (houseMoveStartPoint != null && (operation == Operation.RESIZE || selectedHousePart instanceof Foundation) && selectedHousePart.isDrawCompleted()) {
 			final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
 			if (pick != null) {
-				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
-				((Foundation) selectedHousePart).move(d, houseMovePoints);
+				if (selectedHousePart instanceof Foundation) {
+					Foundation foundation = (Foundation) selectedHousePart;
+					Vector3 pickPoint = pick.getPoint();
+					// if (!foundation.insideBuilding(pickPoint.getX(), pickPoint.getY(), true)) { // only move the building when clicking outside
+					final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
+					foundation.move(d, houseMovePoints);
+				}
 			}
 		} else if (houseMoveStartPoint != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Tree) {
 			final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
@@ -1335,10 +1344,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public boolean isHeliodonVisible() {
 		return heliodonControl;
-	}
-
-	public CameraControl getCameraControl() {
-		return cameraControl;
 	}
 
 	// the x and y coordinates come from MouseEvent, not MouseState.

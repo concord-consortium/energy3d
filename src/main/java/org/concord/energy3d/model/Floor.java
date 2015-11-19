@@ -220,7 +220,12 @@ public class Floor extends HousePart {
 
 	@Override
 	protected void computeArea() {
-		area = 0.0;
+		final double[] buildingGeometry = getTopContainer().getBuildingGeometry();
+		if (buildingGeometry != null) {
+			area = buildingGeometry[1];
+		} else {
+			area = -1; // return a negative number to indicate problems
+		}
 	}
 
 	public boolean isCopyable() {
