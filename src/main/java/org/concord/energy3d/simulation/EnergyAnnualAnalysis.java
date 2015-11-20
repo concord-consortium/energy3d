@@ -81,9 +81,11 @@ public class EnergyAnnualAnalysis extends Analysis {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
+				Calendar today;
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
 						Heliodon.getInstance().getCalender().set(Calendar.MONTH, m);
+						today = (Calendar) Heliodon.getInstance().getCalender().clone();
 						final Throwable t = compute();
 						if (t != null) {
 							stopAnalysis();
@@ -97,9 +99,11 @@ public class EnergyAnnualAnalysis extends Analysis {
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Foundation) { // synchronize with daily graph
 							if (EnergyPanel.getInstance().getDailyEnergyGraph().hasGraph()) {
+								EnergyPanel.getInstance().getDailyEnergyGraph().setCalendar(today);
 								EnergyPanel.getInstance().getDailyEnergyGraph().updateGraph();
 							}
 						}
+						final Calendar today2 = today;
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
@@ -108,6 +112,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 								if (selectedPart instanceof Foundation) {
 									EnergyPanel.getInstance().getGraphTabbedPane().setSelectedComponent(EnergyPanel.getInstance().getDailyEnergyGraph());
 									if (!EnergyPanel.getInstance().getDailyEnergyGraph().hasGraph()) {
+										EnergyPanel.getInstance().getDailyEnergyGraph().setCalendar(today2);
 										EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
 									}
 								}

@@ -23,6 +23,7 @@ public abstract class AnnualGraph extends Graph {
 	AnnualGraph() {
 		super();
 		xAxisLabel = "Month";
+		yAxisLabel = "Energy per Day (kWh)";
 		xmin = 0;
 		xmax = 11;
 		numberOfTicks = 12;

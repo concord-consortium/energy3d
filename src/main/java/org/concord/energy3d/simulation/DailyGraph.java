@@ -22,6 +22,7 @@ public abstract class DailyGraph extends Graph {
 	DailyGraph() {
 		super();
 		xAxisLabel = "Hour";
+		yAxisLabel = "Energy per Hour (kWh)";
 		xmin = 0;
 		xmax = 23;
 		numberOfTicks = 24;

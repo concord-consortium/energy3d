@@ -75,6 +75,7 @@ public abstract class Graph extends JPanel {
 	boolean popup = true;
 	JPopupMenu popupMenu;
 	JDialog parent;
+	Calendar today;
 
 	private int legendX, legendY, legendWidth, legendHeight;
 	private String legendText = "";
@@ -195,6 +196,10 @@ public abstract class Graph extends JPanel {
 		}
 		if (!popup)
 			setToolTipText("Double-click to enlarge this graph");
+	}
+
+	public void setCalendar(Calendar today) {
+		this.today = today;
 	}
 
 	/* keep the records by their class types */
@@ -388,7 +393,8 @@ public abstract class Graph extends JPanel {
 			g2.setColor(Color.BLACK);
 			g2.setFont(new Font("Arial", Font.BOLD, popup ? 14 : 8));
 			FontMetrics fm = g2.getFontMetrics();
-			Calendar today = Heliodon.getInstance().getCalender();
+			if (today == null)
+				today = Heliodon.getInstance().getCalender();
 			String cityAndDate = city + (this instanceof DailyGraph ? " - " + (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.DAY_OF_MONTH) : "");
 			g2.drawString(cityAndDate, (width - fm.stringWidth(cityAndDate)) / 2, popup ? 20 : 10);
 		}

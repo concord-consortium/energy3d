@@ -1,7 +1,6 @@
 package org.concord.energy3d.simulation;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Calendar;
 
 /**
@@ -17,7 +16,18 @@ public class Thermostat implements Serializable {
 
 	public Thermostat() {
 		monthlyTemperatures = new int[12];
-		Arrays.fill(monthlyTemperatures, 20);
+		monthlyTemperatures[0] = 20;
+		monthlyTemperatures[1] = 20;
+		monthlyTemperatures[2] = 20;
+		monthlyTemperatures[3] = 20;
+		monthlyTemperatures[4] = 21;
+		monthlyTemperatures[5] = 22;
+		monthlyTemperatures[6] = 22;
+		monthlyTemperatures[7] = 22;
+		monthlyTemperatures[8] = 22;
+		monthlyTemperatures[9] = 22;
+		monthlyTemperatures[10] = 21;
+		monthlyTemperatures[11] = 20;
 	}
 
 	public void setTemperature(int month, int temperature) {

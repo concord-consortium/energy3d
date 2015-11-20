@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Calendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
@@ -49,6 +50,10 @@ public class DailyEnergyGraph extends JPanel {
 				}
 			}
 		});
+	}
+	
+	public void setCalendar(Calendar today){
+		graph.setCalendar(today);
 	}
 
 	public void removeGraph() {
