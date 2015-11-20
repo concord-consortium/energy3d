@@ -161,7 +161,7 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.add(dateLabel, gbc_dateLabel);
 
 		dateSpinner = new JSpinner();
-		dateSpinner.setModel(new SpinnerDateModel(new Date(1380427200000L), null, null, Calendar.MONTH));
+		dateSpinner.setModel(new SpinnerDateModel(Calendar.getInstance().getTime(), null, null, Calendar.MONTH));
 		dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
 		dateSpinner.addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
 			@Override
@@ -184,9 +184,10 @@ public class EnergyPanel extends JPanel {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeDateCommand());
 					final Heliodon heliodon = Heliodon.getInstance();
 					heliodon.setDate((Date) dateSpinner.getValue());
-					Util.setSilently(insideTemperatureSpinner, Scene.getInstance().getThermostat().getTemperature(heliodon.getCalender().get(Calendar.MONTH)));
+					Calendar c = heliodon.getCalender();
+					Util.setSilently(insideTemperatureSpinner, Scene.getInstance().getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)));
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					Scene.getInstance().setDate(heliodon.getCalender().getTime());
+					Scene.getInstance().setDate(c.getTime());
 					Scene.getInstance().setTreeLeaves();
 					Scene.getInstance().setEdited(true);
 				}
@@ -264,7 +265,9 @@ public class EnergyPanel extends JPanel {
 				SceneManager.getInstance().getUndoManager().addEdit(new ChangeTimeCommand());
 				final Heliodon heliodon = Heliodon.getInstance();
 				heliodon.setTime((Date) timeSpinner.getValue());
-				Scene.getInstance().setDate(heliodon.getCalender().getTime());
+				Calendar c = heliodon.getCalender();
+				Scene.getInstance().setDate(c.getTime());
+				Util.setSilently(insideTemperatureSpinner, Scene.getInstance().getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)));
 				updateWeatherData();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().changeSkyTexture();
@@ -330,7 +333,8 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				SceneManager.getInstance().getUndoManager().addEdit(new ChangeInsideTemperatureCommand());
-				Scene.getInstance().getThermostat().setTemperature(Heliodon.getInstance().getCalender().get(Calendar.MONTH), (Integer) insideTemperatureSpinner.getValue());
+				Calendar c = Heliodon.getInstance().getCalender();
+				Scene.getInstance().getThermostat().setTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY), (Integer) insideTemperatureSpinner.getValue());
 				if (disableActionsRequester == null)
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);
@@ -595,7 +599,7 @@ public class EnergyPanel extends JPanel {
 					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
 				SolarRadiation.getInstance().compute();
 				Calendar c = (Calendar) Heliodon.getInstance().getCalender().clone();
-				HeatLoad.getInstance().computeEnergyToday(c, Scene.getInstance().getThermostat().getTemperature(c.get(Calendar.MONTH)));
+				HeatLoad.getInstance().computeEnergyToday(c);
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Energy calculation completed", 0, 1));
 				updatePartEnergy();

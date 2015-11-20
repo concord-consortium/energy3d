@@ -656,8 +656,9 @@ public class Heliodon {
 
 	public void setDate(final Date date) {
 		final Calendar dateCalendar = Calendar.getInstance();
+		int year = dateCalendar.get(Calendar.YEAR); // keep the current year in case the year of date is wrong (1970)
 		dateCalendar.setTime(date);
-		calendar.set(dateCalendar.get(Calendar.YEAR), dateCalendar.get(Calendar.MONTH), dateCalendar.get(Calendar.DAY_OF_MONTH));
+		calendar.set(year, dateCalendar.get(Calendar.MONTH), dateCalendar.get(Calendar.DAY_OF_MONTH));
 		setDeclinationAngle(computeDeclinationAngle(calendar), true, false);
 		dirtySunPath = true;
 		if (SceneManager.getInstance() != null)

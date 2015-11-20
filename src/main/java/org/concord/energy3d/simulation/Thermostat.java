@@ -1,7 +1,7 @@
 package org.concord.energy3d.simulation;
 
 import java.io.Serializable;
-import java.util.Calendar;
+import java.util.Arrays;
 
 /**
  * @author Charles Xie
@@ -12,42 +12,38 @@ public class Thermostat implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private int[] monthlyTemperatures;
+	private int[][][] temperatures;
 
 	public Thermostat() {
-		monthlyTemperatures = new int[12];
-		monthlyTemperatures[0] = 20;
-		monthlyTemperatures[1] = 20;
-		monthlyTemperatures[2] = 20;
-		monthlyTemperatures[3] = 20;
-		monthlyTemperatures[4] = 21;
-		monthlyTemperatures[5] = 22;
-		monthlyTemperatures[6] = 22;
-		monthlyTemperatures[7] = 22;
-		monthlyTemperatures[8] = 22;
-		monthlyTemperatures[9] = 22;
-		monthlyTemperatures[10] = 21;
-		monthlyTemperatures[11] = 20;
+		init();
 	}
 
-	public void setTemperature(int month, int temperature) {
-		if (month < Calendar.JANUARY || month > Calendar.DECEMBER)
-			return;
-		monthlyTemperatures[month] = temperature;
+	private void init() {
+		temperatures = new int[12][7][24];
+		for (int i = 0; i < 7; i++) {
+			Arrays.fill(temperatures[0][i], 20);
+			Arrays.fill(temperatures[1][i], 20);
+			Arrays.fill(temperatures[2][i], 20);
+			Arrays.fill(temperatures[3][i], 21);
+			Arrays.fill(temperatures[4][i], 21);
+			Arrays.fill(temperatures[5][i], 22);
+			Arrays.fill(temperatures[6][i], 22);
+			Arrays.fill(temperatures[7][i], 22);
+			Arrays.fill(temperatures[8][i], 21);
+			Arrays.fill(temperatures[9][i], 21);
+			Arrays.fill(temperatures[10][i], 20);
+			Arrays.fill(temperatures[11][i], 20);
+		}
 	}
 
-	public int getTemperature(int month) {
-		if (month < Calendar.JANUARY || month > Calendar.DECEMBER)
-			return 20;
-		return monthlyTemperatures[month];
+	public void setTemperature(int monthOfYear, int dayOfWeek, int hourOfDay, int temperature) {
+		temperatures[monthOfYear][dayOfWeek][hourOfDay] = temperature;
 	}
 
-	public void setMonthlyTemperature(int[] monthlyTemperature) {
-		this.monthlyTemperatures = monthlyTemperature;
-	}
-
-	public int[] getMonthlyTemperature() {
-		return monthlyTemperatures;
+	public int getTemperature(int monthOfYear, int dayOfWeek, int hourOfDay) {
+		if (temperatures == null) // backward compatibility with object serialization
+			init();
+		return temperatures[monthOfYear][dayOfWeek][hourOfDay];
 	}
 
 }
