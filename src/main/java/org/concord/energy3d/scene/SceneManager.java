@@ -642,6 +642,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 					((Component) canvas).requestFocusInWindow();
+					if (Config.isMac()) { // control-click is mouse right-click on the Mac, skip
+						final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
+						if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL))
+							return;
+					}
 					if (firstClickState == null) {
 						firstClickState = inputStates;
 						mousePressed(inputStates.getCurrent().getMouseState());
@@ -1371,6 +1376,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (!PrintController.getInstance().isPrintPreview())
 							selectedHousePart.setEditPointsVisible(true);
 					}
+					EnergyPanel.getInstance().updateGraphs();
 					JPanel cp = MainPanel.getInstance().getCanvasPanel();
 					PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
 				}
@@ -1522,14 +1528,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				return null;
 			}
 		});
-		if (selectedHousePart instanceof Foundation) {
-			EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) selectedHousePart);
-			if (solarHeatMap)
-				EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedHousePart);
-		} else {
-			EnergyPanel.getInstance().getConstructionCostGraph().removeGraph();
-			EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();
-		}
+		EnergyPanel.getInstance().updateGraphs();
 	}
 
 	public void moveMouse(final float x, final float y) {

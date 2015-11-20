@@ -1066,10 +1066,12 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	public double getAreaWithOverhang() {
 		double a = 0;
-		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			final Node roofPartNode = (Node) roofPart;
-			final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
-			a += Util.computeArea(roofPartMesh);
+		synchronized (roofPartsRoot) {
+			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+				final Node roofPartNode = (Node) roofPart;
+				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
+				a += Util.computeArea(roofPartMesh);
+			}
 		}
 		return a;
 	}

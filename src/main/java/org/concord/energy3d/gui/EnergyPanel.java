@@ -2,6 +2,8 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -394,7 +396,7 @@ public class EnergyPanel extends JPanel {
 					Scene.getInstance().setEdited(true, false);
 				}
 			}
-		});		
+		});
 		heatMapPanel.add(colorMapSlider, BorderLayout.CENTER);
 		heatMapPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, heatMapPanel.getPreferredSize().height));
 
@@ -534,6 +536,7 @@ public class EnergyPanel extends JPanel {
 		if (thread != null && thread.isAlive())
 			computeRequest = true;
 		else {
+			((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			thread = new Thread("Energy Computer") {
 				@Override
 				public void run() {
@@ -556,6 +559,8 @@ public class EnergyPanel extends JPanel {
 						} catch (final Throwable e) {
 							e.printStackTrace();
 							Util.reportError(e);
+						} finally {
+							((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 						EventQueue.invokeLater(new Runnable() { // must run this Swing UI update in the event queue to avoid a possible deadlock
 							public void run() {
@@ -922,6 +927,19 @@ public class EnergyPanel extends JPanel {
 		if (SceneManager.getInstance().getSolarLand().isVisible()) {
 			SceneManager.getInstance().getSolarLand().setVisible(false);
 			Scene.getInstance().redrawAll();
+		}
+	}
+
+	public void updateGraphs() {
+		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart instanceof Foundation) {
+			Foundation foundation = (Foundation) selectedPart;
+			constructionCostGraph.addGraph(foundation);
+			if (SceneManager.getInstance().getSolarHeatMap())
+				dailyEnergyGraph.addGraph(foundation);
+		} else {
+			constructionCostGraph.removeGraph();
+			dailyEnergyGraph.removeGraph();
 		}
 	}
 

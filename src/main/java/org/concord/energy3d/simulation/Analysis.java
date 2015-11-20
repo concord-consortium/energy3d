@@ -1,5 +1,6 @@
 package org.concord.energy3d.simulation;
 
+import java.awt.Cursor;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,11 +64,14 @@ public abstract class Analysis {
 
 	// return the exception if unsuccessful
 	Throwable compute() {
+		graph.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		try {
 			EnergyPanel.getInstance().computeNow();
 		} catch (final Throwable e) {
 			e.printStackTrace();
 			return e;
+		} finally {
+			graph.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
 		updateGraph();
 		SceneManager.getInstance().refreshNow();
