@@ -636,6 +636,10 @@ public class EnergyPanel extends JPanel {
 		return graphTabbedPane;
 	}
 
+	public JTextField getOutsideTemperatureField() {
+		return outsideTemperatureField;
+	}
+
 	public JSpinner getDateSpinner() {
 		return dateSpinner;
 	}
