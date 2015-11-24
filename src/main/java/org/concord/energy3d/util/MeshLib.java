@@ -18,15 +18,18 @@ import org.poly2tri.transform.coordinate.CoordinateTransform;
 import org.poly2tri.transform.coordinate.XYToAnyTransform;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
-import org.poly2tri.triangulation.point.ardor3d.ArdorVector3Point;
 import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.LineSegment3;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector2;
@@ -270,12 +273,32 @@ public class MeshLib {
 			}
 			final PolygonWithHoles polygon = new PolygonWithHoles(points2D);
 			
-			final List<PolygonPoint> holePolygon = new ArrayList<PolygonPoint>();
-			holePolygon.add(new PolygonPoint(-10, 5, 39.474810643661));
-			holePolygon.add(new PolygonPoint(10, 5, 39.474810643661));
-			holePolygon.add(new PolygonPoint(10, 10, 39.474810643661));
-			holePolygon.add(new PolygonPoint(-10, 10, 39.474810643661));
-			polygon.addHole(new PolygonWithHoles(holePolygon));
+			roofPart.updateWorldBound(true);
+			for (final List<ReadOnlyVector3> hole : holes) {
+				final List<PolygonPoint> holePolygon = new ArrayList<PolygonPoint>();
+				boolean outside = false;
+				for (final ReadOnlyVector3 holePoint : hole) {
+					final PickResults pickResults = new PrimitivePickResults();
+					PickingUtil.findPick(roofPart, new Ray3(holePoint, Vector3.UNIT_Z), pickResults, false);
+					if (pickResults.getNumber() > 0) {
+						final ReadOnlyVector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
+						final PolygonPoint polygonPoint = new PolygonPoint(intersectionPoint.getX(), intersectionPoint.getY(), intersectionPoint.getZ());
+						toXY.transform(polygonPoint);
+						holePolygon.add(polygonPoint);
+					} else {
+						outside = true;
+						break;
+					}
+//					holePolygon.add(new PolygonPoint(-10, 5, 39.474810643661));
+//					holePolygon.add(new PolygonPoint(10, 5, 39.474810643661));
+//					holePolygon.add(new PolygonPoint(10, 10, 39.474810643661));
+//					holePolygon.add(new PolygonPoint(-10, 10, 39.474810643661));
+				}
+				if (!outside) {
+//					holePolygon.add(holePolygon.get(0));
+					polygon.addHole(new PolygonWithHoles(holePolygon));
+				}
+			}
 						
 			fillMeshWithPolygon(mesh, polygon, fromXY, true, null, null, null);
 
@@ -285,21 +308,22 @@ public class MeshLib {
 			float minU = Float.MAX_VALUE;
 			float minV = Float.MAX_VALUE;
 			final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-			final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
+			final FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(mesh.getMeshData().getVertexCount());
+			mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 			final Vector3 p = new Vector3();
 			for (int i = 0; i < mesh.getMeshData().getVertexCount(); i++) {
 				vertexBuffer.position(i * 3);
 				textureBuffer.position(i * 2);
 				p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 				matrix.applyPost(p, p);
-				final float v = (float) (p.getZ() * scale);
 				final float u = (float) (p.getX() * scale);
+				final float v = (float) (p.getZ() * scale);
 				textureBuffer.put(u);
 				textureBuffer.put(v);
-				if (minV > v)
-					minV = v;
 				if (minU > u)
 					minU = u;
+				if (minV > v)
+					minV = v;
 			}
 
 			for (int i = 0; i < mesh.getMeshData().getVertexCount(); i++) {

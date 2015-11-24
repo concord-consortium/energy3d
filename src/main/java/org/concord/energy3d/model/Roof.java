@@ -185,7 +185,18 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		final PolygonWithHoles polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
 		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
-		MeshLib.groupByPlanner(mesh, roofPartsRoot, null);
+		List<List<ReadOnlyVector3>> holes = new ArrayList<List<ReadOnlyVector3>>();
+		holes.add(new ArrayList<ReadOnlyVector3>());
+		holes.get(0).add(new Vector3(0, 0, 0));
+		holes.get(0).add(new Vector3(10, 0, 0));
+		holes.get(0).add(new Vector3(0, 10, 0));
+//		holes.get(0).add(new Vector3(-10, 10, 0));
+		
+//		holePolygon.add(new PolygonPoint(-10, 5, 39.474810643661));
+//		holePolygon.add(new PolygonPoint(10, 5, 39.474810643661));
+//		holePolygon.add(new PolygonPoint(10, 10, 39.474810643661));
+//		holePolygon.add(new PolygonPoint(-10, 10, 39.474810643661));
+		MeshLib.groupByPlanner(mesh, roofPartsRoot, holes);
 		setAnnotationsVisible(Scene.getInstance().areAnnotationsVisible());
 		hideGableRoofParts();
 	}
