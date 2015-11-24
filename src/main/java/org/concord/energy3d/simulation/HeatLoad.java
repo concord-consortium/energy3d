@@ -60,7 +60,7 @@ public class HeatLoad {
 		return 0;
 	}
 
-	public void computeEnergyToday(final Calendar today, final double insideTemperature) {
+	public void computeEnergyToday(final Calendar today) {
 
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
@@ -75,6 +75,7 @@ public class HeatLoad {
 		int iMinute = 0;
 		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
 			iMinute = minute / timeStep;
+			final double insideTemperature = Scene.getInstance().getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, minute / 60);
 			final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], minute);
 			for (final HousePart part : Scene.getInstance().getParts()) {
 				final float absorption = part instanceof Window ? 0 : 1 - part.getAlbedo();

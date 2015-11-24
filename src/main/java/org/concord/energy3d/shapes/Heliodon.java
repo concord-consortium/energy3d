@@ -1,5 +1,6 @@
 package org.concord.energy3d.shapes;
 
+import java.awt.EventQueue;
 import java.nio.FloatBuffer;
 import java.util.Calendar;
 import java.util.Date;
@@ -8,6 +9,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.simulation.Weather;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
@@ -391,13 +393,22 @@ public class Heliodon {
 		calendar.set(Calendar.MINUTE, minutes);
 
 		if (updateGUI) {
-			if (undoable) {
-				EnergyPanel.getInstance().getTimeSpinner().setValue(calendar.getTime());
-				EnergyPanel.getInstance().getDateSpinner().setValue(calendar.getTime());
-			} else {
-				Util.setSilently(EnergyPanel.getInstance().getTimeSpinner(), calendar.getTime());
-				Util.setSilently(EnergyPanel.getInstance().getDateSpinner(), calendar.getTime());
-			}
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					double t = Scene.getInstance().getThermostat().getTemperature(calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, calendar.get(Calendar.HOUR_OF_DAY));
+					Date d = calendar.getTime();
+					EnergyPanel.getInstance().getOutsideTemperatureField().setText(Math.round(Weather.getInstance().getCurrentOutsideTemperature()) + "\u00B0C");
+					if (undoable) {
+						EnergyPanel.getInstance().getTimeSpinner().setValue(d);
+						EnergyPanel.getInstance().getDateSpinner().setValue(d);
+						EnergyPanel.getInstance().getInsideTemperatureSpinner().setValue(t);
+					} else {
+						Util.setSilently(EnergyPanel.getInstance().getTimeSpinner(), d);
+						Util.setSilently(EnergyPanel.getInstance().getDateSpinner(), d);
+						Util.setSilently(EnergyPanel.getInstance().getInsideTemperatureSpinner(), t);
+					}
+				}
+			});
 		}
 
 		if (redrawHeliodon)
@@ -656,8 +667,9 @@ public class Heliodon {
 
 	public void setDate(final Date date) {
 		final Calendar dateCalendar = Calendar.getInstance();
+		int year = dateCalendar.get(Calendar.YEAR); // keep the current year in case the year of date is wrong (1970)
 		dateCalendar.setTime(date);
-		calendar.set(dateCalendar.get(Calendar.YEAR), dateCalendar.get(Calendar.MONTH), dateCalendar.get(Calendar.DAY_OF_MONTH));
+		calendar.set(year, dateCalendar.get(Calendar.MONTH), dateCalendar.get(Calendar.DAY_OF_MONTH));
 		setDeclinationAngle(computeDeclinationAngle(calendar), true, false);
 		dirtySunPath = true;
 		if (SceneManager.getInstance() != null)

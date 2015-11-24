@@ -144,7 +144,8 @@ public class Cost {
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof SolarPanel) {
-			return (int) (((SolarPanel) part).getEfficiency() * 1000);
+			// According to http://www.solartown.com/learning/solar-panels/solar-module-comparison
+			return 150 + (int) (((SolarPanel) part).getEfficiency() * 1000);
 		}
 		if (part instanceof Tree) {
 			Tree tree = (Tree) part;

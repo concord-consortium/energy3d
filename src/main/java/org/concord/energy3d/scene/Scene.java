@@ -313,6 +313,7 @@ public class Scene implements Serializable {
 			Scene.getInstance().setTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 		}
+		final Calendar calendar = Heliodon.getInstance().getCalender();
 
 		if (Util.isZero(instance.solarContrast)) // if the solar map color contrast has not been set, set it to 50
 			instance.solarContrast = 50;
@@ -326,7 +327,7 @@ public class Scene implements Serializable {
 			instance.ground = new Ground();
 		if (instance.thermostat == null)
 			instance.thermostat = new Thermostat();
-		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.thermostat.getTemperature(Heliodon.getInstance().getCalender().get(Calendar.MONTH)));
+		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.thermostat.getTemperature(calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, calendar.get(Calendar.HOUR_OF_DAY)));
 
 		// set default properties of parts (object serialization initializes every number field to zero, forcing us to do this ugly thing)
 

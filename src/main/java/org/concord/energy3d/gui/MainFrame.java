@@ -101,21 +101,21 @@ public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
-	private JMenuBar appMenuBar = null;
-	private JMenu fileMenu = null;
+	private JMenuBar appMenuBar;
+	private JMenu fileMenu;
 	private int fileMenuItemCount;
 	private final List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
-	private JMenuItem newMenuItem = null;
-	private JMenuItem openMenuItem = null;
-	private JMenuItem openFolderMenuItem = null;
-	private JMenuItem analyzeFolderMenuItem = null;
-	private JMenuItem saveMenuItem = null;
-	private JMenuItem printMenuItem = null;
-	private JCheckBoxMenuItem previewMenuItem = null;
-	private JMenu cameraMenu = null;
-	private JRadioButtonMenuItem orbitMenuItem = null;
-	private JRadioButtonMenuItem firstPersonMenuItem = null;
-	private JMenuItem resetCameraMenuItem = null;
+	private JMenuItem newMenuItem;
+	private JMenuItem openMenuItem;
+	private JMenuItem openFolderMenuItem;
+	private JMenuItem analyzeFolderMenuItem;
+	private JMenuItem saveMenuItem;
+	private JMenuItem printMenuItem;
+	private JCheckBoxMenuItem previewMenuItem;
+	private JMenu cameraMenu;
+	private JRadioButtonMenuItem orbitMenuItem;
+	private JRadioButtonMenuItem firstPersonMenuItem;
+	private JMenuItem resetCameraMenuItem;
 	private JMenuItem saveasMenuItem;
 	private JMenu viewMenu;
 	private JMenu analysisMenu;
@@ -144,10 +144,10 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
 	protected Object lastSelection;
 	private JMenuItem exitMenuItem;
-	private JMenu helpMenu = null;
-	private JMenuItem aboutMenuItem = null;
-	private JDialog aboutDialog = null;
-	private MainPanel mainPanel = null;
+	private JMenu helpMenu;
+	private JMenuItem aboutMenuItem;
+	private JDialog aboutDialog;
+	private MainPanel mainPanel;
 	private JCheckBoxMenuItem annotationsInwardMenuItem;
 	private JMenu editMenu;
 	private JMenuItem undoMenuItem;
@@ -173,6 +173,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllLocksMenuItem;
 	private JMenuItem lockAllMenuItem;
 	private JMenuItem specificationsMenuItem;
+	private JMenuItem thermostatMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
 	private final FileChooser fileChooser;
@@ -1408,7 +1409,10 @@ public class MainFrame extends JFrame {
 				editMenu.add(getRemoveAllLocksMenuItem());
 				editMenu.addSeparator();
 				editMenu.add(getSpecificationsMenuItem());
+			} else {
+				editMenu.addSeparator();
 			}
+			editMenu.add(getThermostatMenuItem());
 		}
 		return editMenu;
 	}
@@ -1960,6 +1964,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return specificationsMenuItem;
+	}
+
+	private JMenuItem getThermostatMenuItem() {
+		if (thermostatMenuItem == null) {
+			thermostatMenuItem = new JMenuItem("Thermostat");
+			thermostatMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new ThermostatDialog().setVisible(true);
+				}
+			});
+		}
+		return thermostatMenuItem;
 	}
 
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {
