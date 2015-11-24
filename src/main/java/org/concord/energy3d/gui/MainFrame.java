@@ -173,6 +173,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllLocksMenuItem;
 	private JMenuItem lockAllMenuItem;
 	private JMenuItem specificationsMenuItem;
+	private JMenuItem thermostatMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
 	private final FileChooser fileChooser;
@@ -1408,7 +1409,10 @@ public class MainFrame extends JFrame {
 				editMenu.add(getRemoveAllLocksMenuItem());
 				editMenu.addSeparator();
 				editMenu.add(getSpecificationsMenuItem());
+			} else {
+				editMenu.addSeparator();
 			}
+			editMenu.add(getThermostatMenuItem());
 		}
 		return editMenu;
 	}
@@ -1960,6 +1964,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return specificationsMenuItem;
+	}
+
+	private JMenuItem getThermostatMenuItem() {
+		if (thermostatMenuItem == null) {
+			thermostatMenuItem = new JMenuItem("Thermostat");
+			thermostatMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new ThermostatDialog().setVisible(true);
+				}
+			});
+		}
+		return thermostatMenuItem;
 	}
 
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {

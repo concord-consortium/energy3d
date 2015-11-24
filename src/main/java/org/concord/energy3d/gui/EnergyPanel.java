@@ -334,7 +334,8 @@ public class EnergyPanel extends JPanel {
 			public void stateChanged(final ChangeEvent e) {
 				SceneManager.getInstance().getUndoManager().addEdit(new ChangeInsideTemperatureCommand());
 				Calendar c = Heliodon.getInstance().getCalender();
-				Scene.getInstance().getThermostat().setTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY), (Integer) insideTemperatureSpinner.getValue());
+				int i = (int) Double.parseDouble(insideTemperatureSpinner.getValue().toString());
+				Scene.getInstance().getThermostat().setTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY), i);
 				if (disableActionsRequester == null)
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);
