@@ -3,6 +3,7 @@ package org.concord.energy3d.util;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.concord.energy3d.model.HousePart;
@@ -10,10 +11,15 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.poly2tri.Poly2Tri;
 import org.poly2tri.geometry.polygon.Polygon;
+import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.geometry.primitives.Point;
+import org.poly2tri.transform.coordinate.AnyToXYTransform;
 import org.poly2tri.transform.coordinate.CoordinateTransform;
+import org.poly2tri.transform.coordinate.XYToAnyTransform;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
+import org.poly2tri.triangulation.point.ardor3d.ArdorVector3Point;
+import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -28,6 +34,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -42,10 +49,11 @@ public class MeshLib {
 		final ArrayList<Vector2> textures = new ArrayList<Vector2>();
 	}
 
-	public static void groupByPlanner(final Mesh mesh, final Node root) {
+	public static void groupByPlanner(final Mesh mesh, final Node root, final List<List<ReadOnlyVector3>> holes) {
 		final ArrayList<GroupData> groups = extractGroups(mesh);
 		computeHorizontalTextureCoords(groups);
 		createMeshes(root, groups);
+		applyHoles(root, holes);
 	}
 
 	public static ArrayList<GroupData> extractGroups(final Mesh mesh) {
@@ -134,19 +142,7 @@ public class MeshLib {
 		for (final GroupData group : groups) {
 			final ReadOnlyVector3 normal = group.normals.get(0);
 
-			final Vector3 n1 = new Vector3(normal.getX(), normal.getY(), 0).normalizeLocal();
-			double angleZ = n1.smallestAngleBetween(Vector3.NEG_UNIT_Y);
-
-			if (n1.dot(Vector3.UNIT_X) > 0)
-				angleZ = -angleZ;
-
-			final Matrix3 matrixZ = new Matrix3().fromAngles(0, 0, angleZ);
-
-			final Vector3 n2 = new Vector3();
-			matrixZ.applyPost(normal, n2);
-			final double angleX = n2.smallestAngleBetween(Vector3.NEG_UNIT_Y);
-
-			final Matrix3 matrix = new Matrix3().fromAngles(angleX, 0, 0).multiplyLocal(matrixZ);
+			final Matrix3 matrix = toXYMatrix(normal);
 
 			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
 			double minV = Double.MAX_VALUE;
@@ -163,6 +159,23 @@ public class MeshLib {
 			for (final Vector2 t : group.textures)
 				t.addLocal(0, -minV);
 		}
+	}
+
+	private static Matrix3 toXYMatrix(final ReadOnlyVector3 normal) {
+		final Vector3 n1 = new Vector3(normal.getX(), normal.getY(), 0).normalizeLocal();
+		double angleZ = n1.smallestAngleBetween(Vector3.NEG_UNIT_Y);
+
+		if (n1.dot(Vector3.UNIT_X) > 0)
+			angleZ = -angleZ;
+
+		final Matrix3 matrixZ = new Matrix3().fromAngles(0, 0, angleZ);
+
+		final Vector3 n2 = new Vector3();
+		matrixZ.applyPost(normal, n2);
+		final double angleX = n2.smallestAngleBetween(Vector3.NEG_UNIT_Y);
+
+		final Matrix3 matrix = new Matrix3().fromAngles(angleX, 0, 0).multiplyLocal(matrixZ);
+		return matrix;
 	}
 
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
@@ -239,6 +252,65 @@ public class MeshLib {
 			meshIndex++;
 		}
 	}
+	
+	private static void applyHoles(Node root, List<List<ReadOnlyVector3>> holes) {		
+		for (final Spatial roofPart : root.getChildren()) {
+//			Spatial roofPart = root.getChild(3);
+			final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
+			final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
+			final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
+			
+			final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+			final ArrayList<ReadOnlyVector3> points3D = computeOutline(mesh.getMeshData().getVertexBuffer());			
+			final List<PolygonPoint> points2D = new ArrayList<PolygonPoint>();
+			for (final ReadOnlyVector3 p : points3D) {
+				final PolygonPoint xyPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+				toXY.transform(xyPoint);
+				points2D.add(xyPoint);
+			}
+			final PolygonWithHoles polygon = new PolygonWithHoles(points2D);
+			
+			final List<PolygonPoint> holePolygon = new ArrayList<PolygonPoint>();
+			holePolygon.add(new PolygonPoint(-10, 5, 39.474810643661));
+			holePolygon.add(new PolygonPoint(10, 5, 39.474810643661));
+			holePolygon.add(new PolygonPoint(10, 10, 39.474810643661));
+			holePolygon.add(new PolygonPoint(-10, 10, 39.474810643661));
+			polygon.addHole(new PolygonWithHoles(holePolygon));
+						
+			fillMeshWithPolygon(mesh, polygon, fromXY, true, null, null, null);
+
+			// Compute texture coordinates
+			final Matrix3 matrix = toXYMatrix(normal);
+			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
+			float minU = Float.MAX_VALUE;
+			float minV = Float.MAX_VALUE;
+			final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+			final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
+			final Vector3 p = new Vector3();
+			for (int i = 0; i < mesh.getMeshData().getVertexCount(); i++) {
+				vertexBuffer.position(i * 3);
+				textureBuffer.position(i * 2);
+				p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+				matrix.applyPost(p, p);
+				final float v = (float) (p.getZ() * scale);
+				final float u = (float) (p.getX() * scale);
+				textureBuffer.put(u);
+				textureBuffer.put(v);
+				if (minV > v)
+					minV = v;
+				if (minU > u)
+					minU = u;
+			}
+
+			for (int i = 0; i < mesh.getMeshData().getVertexCount(); i++) {
+				final int index = i * 2;
+				float u = textureBuffer.get(index);
+				textureBuffer.put(index, u - minU);				
+				float v = textureBuffer.get(index + 1);
+				textureBuffer.put(index + 1, v - minV);
+			}			
+		}
+	}		
 
 	public static void addConvexWireframe(final FloatBuffer wireframeVertexBuffer, final FloatBuffer vertexBuffer) {
 		vertexBuffer.rewind();
