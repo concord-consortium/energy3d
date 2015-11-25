@@ -1,10 +1,18 @@
 package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormatSymbols;
+import java.util.Calendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -12,6 +20,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.Thermostat;
+
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
 
@@ -31,13 +44,29 @@ class ThermostatDialog extends JDialog {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setTitle("Thermostat Settings");
+		Calendar calendar = Heliodon.getInstance().getCalender();
+		int month = calendar.get(Calendar.MONTH);
+		setTitle("Thermostat Schedule: " + new DateFormatSymbols().getMonths()[month]);
+		getContentPane().setLayout(new BorderLayout());
+
+		Color bgColor = new Color(225, 225, 225);
+
+		JLabel hourLabel = new JLabel();
+		HourPanel hourPanel = new HourPanel();
+		hourPanel.setPreferredSize(new Dimension(600, 20));
+		hourPanel.setBackground(bgColor);
+		hourPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 
 		sliders = new RangeSlider[7];
+		int numberOfSteps = 25;
+		Thermostat t = Scene.getInstance().getThermostat();
 		for (int i = 0; i < sliders.length; i++) {
-			sliders[i] = new RangeSlider();
-			sliders[i].setPreferredSize(new Dimension(300, 30));
-			sliders[i].setBorder(BorderFactory.createEtchedBorder());
+			sliders[i] = new RangeSlider(numberOfSteps);
+			sliders[i].setBackground(bgColor);
+			sliders[i].setPreferredSize(new Dimension(600, 30));
+			sliders[i].setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+			for (int j = 0; j < 24; j++)
+				sliders[i].setHandle((float) (j + 1) / numberOfSteps, t.getTemperature(month, i, j));
 		}
 
 		JLabel[] labels = new JLabel[7];
@@ -49,12 +78,11 @@ class ThermostatDialog extends JDialog {
 		labels[5] = new JLabel("Friday");
 		labels[6] = new JLabel("Saturday");
 		for (int i = 0; i < labels.length; i++) {
-			// labels[i].setBorder(BorderFactory.createEtchedBorder());
+			labels[i].setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 			labels[i].setMinimumSize(new Dimension(60, 30));
 			labels[i].setAlignmentX(CENTER_ALIGNMENT);
 		}
 
-		getContentPane().setLayout(new BorderLayout());
 		final JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		getContentPane().add(panel, BorderLayout.CENTER);
@@ -62,8 +90,7 @@ class ThermostatDialog extends JDialog {
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
 
-		// Turn on automatically adding gaps between components
-		layout.setAutoCreateGaps(true);
+		// layout.setAutoCreateGaps(true); // Turn on automatically adding gaps between components
 
 		// Turn on automatically creating gaps between components that touch the edge of the container and the container.
 		layout.setAutoCreateContainerGaps(true);
@@ -77,11 +104,13 @@ class ThermostatDialog extends JDialog {
 		for (int i = 0; i < labels.length; i++) {
 			pg = pg.addComponent(labels[i]);
 		}
+		pg = pg.addComponent(hourLabel);
 		hGroup.addGroup(pg);
 		pg = layout.createParallelGroup();
 		for (int i = 0; i < sliders.length; i++) {
 			pg = pg.addComponent(sliders[i]);
 		}
+		pg = pg.addComponent(hourPanel);
 		hGroup.addGroup(pg);
 		layout.setHorizontalGroup(hGroup);
 
@@ -93,6 +122,7 @@ class ThermostatDialog extends JDialog {
 		for (int i = 0; i < labels.length; i++) {
 			vGroup.addGroup(layout.createParallelGroup(Alignment.BASELINE).addComponent(labels[i]).addComponent(sliders[i]));
 		}
+		vGroup.addGroup(layout.createParallelGroup(Alignment.BASELINE).addComponent(hourLabel).addComponent(hourPanel));
 		layout.setVerticalGroup(vGroup);
 
 		final JPanel buttonPanel = new JPanel();
@@ -122,6 +152,40 @@ class ThermostatDialog extends JDialog {
 
 		pack();
 		setLocationRelativeTo(MainFrame.getInstance());
+
+	}
+
+	@SuppressWarnings("serial")
+	class HourPanel extends JPanel {
+
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			update(g);
+		}
+
+		public void update(Graphics g) {
+
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+			Dimension dim = getSize();
+			int width = dim.width;
+			int height = dim.height;
+			g2.setColor(getBackground());
+			g2.fillRect(0, 0, width, height);
+			g2.setFont(new Font("Arial", Font.PLAIN, 10));
+
+			float delta = width / 25.0f;
+			g2.setColor(Color.DARK_GRAY);
+			String hourString;
+			FontMetrics fm = g2.getFontMetrics();
+			for (int i = 0; i < 24; i++) {
+				hourString = i + "";
+				g2.drawString(hourString, (int) (delta * (i + 1) - fm.stringWidth(hourString) / 2), height - 5);
+			}
+
+		}
 
 	}
 
