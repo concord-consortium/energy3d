@@ -38,7 +38,7 @@ class ThermostatDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	private RangeSlider[] sliders;
+	private ThermostatView[] sliders;
 
 	public ThermostatDialog() {
 
@@ -53,17 +53,17 @@ class ThermostatDialog extends JDialog {
 
 		JLabel hourLabel = new JLabel();
 		HourPanel hourPanel = new HourPanel();
-		hourPanel.setPreferredSize(new Dimension(600, 20));
+		hourPanel.setPreferredSize(new Dimension(720, 20));
 		hourPanel.setBackground(bgColor);
 		hourPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 
-		sliders = new RangeSlider[7];
+		sliders = new ThermostatView[7];
 		int numberOfSteps = 25;
 		Thermostat t = Scene.getInstance().getThermostat();
 		for (int i = 0; i < sliders.length; i++) {
-			sliders[i] = new RangeSlider(numberOfSteps);
+			sliders[i] = new ThermostatView(month, i);
 			sliders[i].setBackground(bgColor);
-			sliders[i].setPreferredSize(new Dimension(600, 30));
+			sliders[i].setPreferredSize(new Dimension(720, 30));
 			sliders[i].setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 			for (int j = 0; j < 24; j++)
 				sliders[i].setHandle((float) (j + 1) / numberOfSteps, t.getTemperature(month, i, j));
