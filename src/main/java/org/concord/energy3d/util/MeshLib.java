@@ -260,15 +260,18 @@ public class MeshLib {
 		for (final Spatial roofPart : root.getChildren()) {
 //			Spatial roofPart = root.getChild(3);
 			final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
-			final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
-			final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
+			final Matrix3 matrix = toXYMatrix(normal);
+//			final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
+//			final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
 			
 			final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
 			final ArrayList<ReadOnlyVector3> points3D = computeOutline(mesh.getMeshData().getVertexBuffer());			
 			final List<PolygonPoint> points2D = new ArrayList<PolygonPoint>();
+			final Vector3 p2D = new Vector3();
 			for (final ReadOnlyVector3 p : points3D) {
-				final PolygonPoint xyPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-				toXY.transform(xyPoint);
+				matrix.applyPost(p, p2D);
+				final PolygonPoint xyPoint = new PolygonPoint(p2D.getX(), p2D.getY(), p2D.getZ());
+//				toXY.transform(xyPoint);
 				points2D.add(xyPoint);
 			}
 			final PolygonWithHoles polygon = new PolygonWithHoles(points2D);
@@ -282,8 +285,9 @@ public class MeshLib {
 					PickingUtil.findPick(roofPart, new Ray3(holePoint, Vector3.UNIT_Z), pickResults, false);
 					if (pickResults.getNumber() > 0) {
 						final ReadOnlyVector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
-						final PolygonPoint polygonPoint = new PolygonPoint(intersectionPoint.getX(), intersectionPoint.getY(), intersectionPoint.getZ());
-						toXY.transform(polygonPoint);
+						matrix.applyPost(intersectionPoint, p2D);
+						final PolygonPoint polygonPoint = new PolygonPoint(p2D.getX(), p2D.getY(), p2D.getZ());
+//						toXY.transform(polygonPoint);
 						holePolygon.add(polygonPoint);
 					} else {
 						outside = true;
@@ -296,42 +300,51 @@ public class MeshLib {
 				}
 				if (!outside) {
 //					holePolygon.add(holePolygon.get(0));
-					polygon.addHole(new PolygonWithHoles(holePolygon));
+//					polygon.addHole(new PolygonWithHoles(holePolygon));
 				}
 			}
 						
-			fillMeshWithPolygon(mesh, polygon, fromXY, true, null, null, null);
+//			fillMeshWithPolygon(mesh, polygon, fromXY, true, null, null, null);
+			fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
 
-			// Compute texture coordinates
-			final Matrix3 matrix = toXYMatrix(normal);
+			// Compute texture coordinates			
 			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
-			float minU = Float.MAX_VALUE;
-			float minV = Float.MAX_VALUE;
+			double minU = Double.MAX_VALUE;
+			double minV = Double.MAX_VALUE;
 			final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 			final FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(mesh.getMeshData().getVertexCount());
 			mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
 			final Vector3 p = new Vector3();
+			final Vector2 uv = new Vector2();
 			for (int i = 0; i < mesh.getMeshData().getVertexCount(); i++) {
-				vertexBuffer.position(i * 3);
+//				vertexBuffer.position(i * 3);
 				textureBuffer.position(i * 2);
-				p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-				matrix.applyPost(p, p);
-				final float u = (float) (p.getX() * scale);
-				final float v = (float) (p.getZ() * scale);
-				textureBuffer.put(u);
-				textureBuffer.put(v);
-				if (minU > u)
-					minU = u;
-				if (minV > v)
-					minV = v;
+				BufferUtils.populateFromBuffer(p, vertexBuffer, i);
+//				p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+//				matrix.applyPost(p, p);
+				uv.set(p.getX() * scale, p.getZ() * scale);
+//				final float u = (float) (p.getX() * scale);
+//				final float v = (float) (p.getZ() * scale);
+//				textureBuffer.put(u);
+//				textureBuffer.put(v);
+				BufferUtils.addInBuffer(uv, textureBuffer, i);
+				if (minU > uv.getX())
+					minU = uv.getX();
+				if (minV > uv.getY())
+					minV = uv.getY();
+				matrix.invertLocal().applyPre(p, p);
+				BufferUtils.addInBuffer(p, vertexBuffer, i);
 			}
 
 			for (int i = 0; i < mesh.getMeshData().getVertexCount(); i++) {
-				final int index = i * 2;
-				float u = textureBuffer.get(index);
-				textureBuffer.put(index, u - minU);				
-				float v = textureBuffer.get(index + 1);
-				textureBuffer.put(index + 1, v - minV);
+				BufferUtils.populateFromBuffer(uv, textureBuffer, i);
+//				final int index = i * 2;
+//				float u = textureBuffer.get(index);
+//				textureBuffer.put(index, u - minU);				
+//				float v = textureBuffer.get(index + 1);
+//				textureBuffer.put(index + 1, v - minV);
+				uv.subtractLocal(minU, minV);
+				BufferUtils.addInBuffer(uv, textureBuffer, i);
 			}			
 		}
 	}		
