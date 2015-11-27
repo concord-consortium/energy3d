@@ -49,8 +49,6 @@ class ThermostatView extends JPanel {
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				selectedHour = -1;
-				repaint();
 			}
 		});
 		addMouseMotionListener(new MouseMotionAdapter() {
@@ -64,6 +62,18 @@ class ThermostatView extends JPanel {
 				processMouseDragged(e);
 			}
 		});
+	}
+
+	public void removeSelectedHour() {
+		if (selectedHour > 0) {
+			Object key1 = hourlyTemperatures.keySet().toArray()[selectedHour - 1];
+			Object key2 = hourlyTemperatures.keySet().toArray()[selectedHour];
+			int earlyTemperature = hourlyTemperatures.get(key1);
+			hourlyTemperatures.put((Float) key2, earlyTemperature);
+			Scene.getInstance().getThermostat().setTemperature(monthOfYear, dayOfWeek, selectedHour, earlyTemperature);
+			selectedHour = -1;
+		}
+		repaint();
 	}
 
 	public void setHandle(float x, int y) {
@@ -126,7 +136,6 @@ class ThermostatView extends JPanel {
 		int y = e.getY();
 		int width = getWidth();
 		int height = getHeight();
-		selectedHour = -1;
 		setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		synchronized (hourlyTemperatures) {
 			Object[] keys = hourlyTemperatures.keySet().toArray();
@@ -135,7 +144,6 @@ class ThermostatView extends JPanel {
 				float hx = (Float) keys[i] * width;
 				float hy = height / 2;
 				if ((x - hx) * (x - hx) + (y - hy) * (y - hy) < hr * hr) {
-					selectedHour = i;
 					setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 					break;
 				}
@@ -149,6 +157,23 @@ class ThermostatView extends JPanel {
 	}
 
 	private void processMouseClicked(MouseEvent e) {
+		int x = e.getX();
+		int y = e.getY();
+		int width = getWidth();
+		int height = getHeight();
+		selectedHour = -1;
+		synchronized (hourlyTemperatures) {
+			Object[] keys = hourlyTemperatures.keySet().toArray();
+			for (int i = 0; i < keys.length; i++) {
+				float hr = 0.4f * height;
+				float hx = (Float) keys[i] * width;
+				float hy = height / 2;
+				if ((x - hx) * (x - hx) + (y - hy) * (y - hy) < hr * hr) {
+					selectedHour = i;
+					break;
+				}
+			}
+		}
 		if (e.getClickCount() >= 2) {
 			if (selectedHour >= 0) {
 				Object key = hourlyTemperatures.keySet().toArray()[selectedHour];

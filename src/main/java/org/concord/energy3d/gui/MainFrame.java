@@ -112,7 +112,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem saveMenuItem;
 	private JMenuItem printMenuItem;
 	private JCheckBoxMenuItem previewMenuItem;
-	private JMenu cameraMenu;
 	private JRadioButtonMenuItem orbitMenuItem;
 	private JRadioButtonMenuItem firstPersonMenuItem;
 	private JMenuItem resetCameraMenuItem;
@@ -349,7 +348,6 @@ public class MainFrame extends JFrame {
 			appMenuBar.add(getFileMenu());
 			appMenuBar.add(getEditMenu());
 			appMenuBar.add(getViewMenu());
-			appMenuBar.add(getCameraMenu());
 			appMenuBar.add(getAnalysisMenu());
 			appMenuBar.add(getHelpMenu());
 		}
@@ -684,38 +682,6 @@ public class MainFrame extends JFrame {
 		return previewMenuItem;
 	}
 
-	public JMenu getCameraMenu() {
-		if (cameraMenu == null) {
-			cameraMenu = new JMenu();
-			cameraMenu.addMenuListener(new MenuListener() {
-				@Override
-				public void menuCanceled(final MenuEvent e) {
-				}
-
-				@Override
-				public void menuDeselected(final MenuEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-
-				@Override
-				public void menuSelected(final MenuEvent e) {
-					mainPanel.getSelectButton().setSelected(true);
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-				}
-			});
-			cameraMenu.setText("Camera");
-			cameraMenu.add(getOrbitMenuItem());
-			cameraMenu.add(getFirstPersonMenuItem());
-			final ButtonGroup bg = new ButtonGroup();
-			bg.add(orbitMenuItem);
-			bg.add(firstPersonMenuItem);
-			cameraMenu.addSeparator();
-			cameraMenu.add(getTopViewCheckBoxMenuItem());
-			cameraMenu.add(getResetCameraMenuItem());
-		}
-		return cameraMenu;
-	}
-
 	private JRadioButtonMenuItem getOrbitMenuItem() {
 		if (orbitMenuItem == null) {
 			orbitMenuItem = new JRadioButtonMenuItem();
@@ -949,8 +915,17 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 				}
 			});
+
 			// viewMenu.add(getUnitsMenu()); // disable temporarily because it doesn't work to expectation
-			// viewMenu.addSeparator();
+			viewMenu.add(getOrbitMenuItem());
+			viewMenu.add(getFirstPersonMenuItem());
+			viewMenu.addSeparator();
+			final ButtonGroup bg = new ButtonGroup();
+			bg.add(orbitMenuItem);
+			bg.add(firstPersonMenuItem);
+			viewMenu.add(getTopViewCheckBoxMenuItem());
+			viewMenu.add(getResetCameraMenuItem());
+			viewMenu.addSeparator();
 			viewMenu.add(getNoTextureMenuItem());
 			viewMenu.add(getSimpleTextureMenuItem());
 			viewMenu.add(getFullTextureMenuItem());

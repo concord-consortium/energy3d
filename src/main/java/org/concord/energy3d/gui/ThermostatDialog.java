@@ -84,7 +84,6 @@ class ThermostatDialog extends JDialog {
 		}
 
 		final JPanel panel = new JPanel();
-		panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		GroupLayout layout = new GroupLayout(panel);
@@ -125,9 +124,25 @@ class ThermostatDialog extends JDialog {
 		vGroup.addGroup(layout.createParallelGroup(Alignment.BASELINE).addComponent(hourLabel).addComponent(hourPanel));
 		layout.setVerticalGroup(vGroup);
 
-		final JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		JPanel buttonPanel = new JPanel(new BorderLayout());
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
+		final JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		buttonPanel.add(actionPanel, BorderLayout.WEST);
+
+		JButton removeButton = new JButton("Remove");
+		removeButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for (int i = 0; i < sliders.length; i++) {
+					sliders[i].removeSelectedHour();
+				}
+			}
+		});
+		actionPanel.add(removeButton);
+
+		final JPanel okPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		buttonPanel.add(okPanel, BorderLayout.EAST);
 
 		final JButton okButton = new JButton("OK");
 		okButton.addActionListener(new ActionListener() {
@@ -137,7 +152,7 @@ class ThermostatDialog extends JDialog {
 			}
 		});
 		okButton.setActionCommand("OK");
-		buttonPanel.add(okButton);
+		okPanel.add(okButton);
 		getRootPane().setDefaultButton(okButton);
 
 		final JButton cancelButton = new JButton("Cancel");
@@ -148,7 +163,7 @@ class ThermostatDialog extends JDialog {
 			}
 		});
 		cancelButton.setActionCommand("Cancel");
-		buttonPanel.add(cancelButton);
+		okPanel.add(cancelButton);
 
 		pack();
 		setLocationRelativeTo(MainFrame.getInstance());

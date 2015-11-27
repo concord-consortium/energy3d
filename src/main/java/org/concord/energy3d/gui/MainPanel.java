@@ -591,7 +591,6 @@ public class MainPanel extends JPanel {
 					if (mainFrame != null) {
 						mainFrame.getPreviewMenuItem().setSelected(previewButton.isSelected());
 						mainFrame.getEditMenu().setEnabled(!previewButton.isSelected());
-						mainFrame.getCameraMenu().setEnabled(!previewButton.isSelected());
 					}
 					deselect();
 					PrintController.getInstance().setPrintPreview(previewButton.isSelected());
