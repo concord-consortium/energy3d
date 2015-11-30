@@ -38,7 +38,7 @@ class ThermostatDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	private RangeSlider[] sliders;
+	private ThermostatView[] sliders;
 
 	public ThermostatDialog() {
 
@@ -53,17 +53,17 @@ class ThermostatDialog extends JDialog {
 
 		JLabel hourLabel = new JLabel();
 		HourPanel hourPanel = new HourPanel();
-		hourPanel.setPreferredSize(new Dimension(600, 20));
+		hourPanel.setPreferredSize(new Dimension(720, 20));
 		hourPanel.setBackground(bgColor);
 		hourPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 
-		sliders = new RangeSlider[7];
+		sliders = new ThermostatView[7];
 		int numberOfSteps = 25;
 		Thermostat t = Scene.getInstance().getThermostat();
 		for (int i = 0; i < sliders.length; i++) {
-			sliders[i] = new RangeSlider(numberOfSteps);
+			sliders[i] = new ThermostatView(month, i);
 			sliders[i].setBackground(bgColor);
-			sliders[i].setPreferredSize(new Dimension(600, 30));
+			sliders[i].setPreferredSize(new Dimension(720, 30));
 			sliders[i].setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 			for (int j = 0; j < 24; j++)
 				sliders[i].setHandle((float) (j + 1) / numberOfSteps, t.getTemperature(month, i, j));
@@ -84,7 +84,6 @@ class ThermostatDialog extends JDialog {
 		}
 
 		final JPanel panel = new JPanel();
-		panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		GroupLayout layout = new GroupLayout(panel);
@@ -125,9 +124,25 @@ class ThermostatDialog extends JDialog {
 		vGroup.addGroup(layout.createParallelGroup(Alignment.BASELINE).addComponent(hourLabel).addComponent(hourPanel));
 		layout.setVerticalGroup(vGroup);
 
-		final JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		JPanel buttonPanel = new JPanel(new BorderLayout());
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
+		final JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		buttonPanel.add(actionPanel, BorderLayout.WEST);
+
+		JButton removeButton = new JButton("Remove");
+		removeButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for (int i = 0; i < sliders.length; i++) {
+					sliders[i].removeSelectedHour();
+				}
+			}
+		});
+		actionPanel.add(removeButton);
+
+		final JPanel okPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		buttonPanel.add(okPanel, BorderLayout.EAST);
 
 		final JButton okButton = new JButton("OK");
 		okButton.addActionListener(new ActionListener() {
@@ -137,7 +152,7 @@ class ThermostatDialog extends JDialog {
 			}
 		});
 		okButton.setActionCommand("OK");
-		buttonPanel.add(okButton);
+		okPanel.add(okButton);
 		getRootPane().setDefaultButton(okButton);
 
 		final JButton cancelButton = new JButton("Cancel");
@@ -148,7 +163,7 @@ class ThermostatDialog extends JDialog {
 			}
 		});
 		cancelButton.setActionCommand("Cancel");
-		buttonPanel.add(cancelButton);
+		okPanel.add(cancelButton);
 
 		pack();
 		setLocationRelativeTo(MainFrame.getInstance());

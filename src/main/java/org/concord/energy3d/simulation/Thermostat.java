@@ -36,10 +36,12 @@ public class Thermostat implements Serializable {
 		}
 	}
 
+	/** monthOfYear, dayOfWeek, and hourOfDay all starts from zero. */
 	public void setTemperature(int monthOfYear, int dayOfWeek, int hourOfDay, int temperature) {
 		temperatures[monthOfYear][dayOfWeek][hourOfDay] = temperature;
 	}
 
+	/** monthOfYear, dayOfWeek, and hourOfDay all starts from zero. */
 	public int getTemperature(int monthOfYear, int dayOfWeek, int hourOfDay) {
 		if (temperatures == null) // backward compatibility with object serialization
 			init();
