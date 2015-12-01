@@ -267,8 +267,28 @@ public class MeshLib {
 			final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
 			final ArrayList<ReadOnlyVector3> points3D = computeOutline(mesh.getMeshData().getVertexBuffer());			
 			final List<PolygonPoint> points2D = new ArrayList<PolygonPoint>();
+			
+			
+			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
+			TPoint o = new TPoint(points3D.get(0).getX(), points3D.get(0).getY(), points3D.get(0).getZ());
+			final ReadOnlyVector3 pU = normal.cross(Vector3.UNIT_Z, null).normalizeLocal();
+			final ReadOnlyVector3 pOU = pU.divide(scale, null).add(points3D.get(0), null);
+			final TPoint u = new TPoint(pOU.getX(), pOU.getY(), pOU.getZ());
+			final ReadOnlyVector3 pOV = normal.cross(pU, null).divide(scale, null).addLocal(points3D.get(0));
+			final TPoint v = new TPoint(pOV.getX(), pOV.getY(), pOV.getZ());
+			
+			toXY.transform(o);
+			toXY.transform(u);
+			toXY.transform(v);
+			
+			u.set(u.getX() - o.getX(), u.getY() - o.getY(), 0);
+			v.set(v.getX() - o.getX(), v.getY() - o.getY(), 0);
+			
+			
+			
 			final Vector3 p2D = new Vector3();
-			ReadOnlyVector3 lowestPoint = null;
+			final Vector3 topLeftPoint = new Vector3(Double.MAX_VALUE, 0, Double.MAX_VALUE);
+//			ReadOnlyVector3 highestPoint = null;
 			for (final ReadOnlyVector3 p : points3D) {
 //				matrix.applyPost(p, p2D);
 //				final PolygonPoint xyPoint = new PolygonPoint(p2D.getX(), p2D.getY(), p2D.getZ());
@@ -276,10 +296,17 @@ public class MeshLib {
 				toXY.transform(xyPoint);
 				points2D.add(xyPoint);
 				
-				if (lowestPoint == null || p.getZ() < lowestPoint.getZ())
-					lowestPoint = p;				
+//				if (highestPoint == null || p.getZ() > highestPoint.getZ())
+//					highestPoint = p;
+				
+				if (xyPoint.getY() > topLeftPoint.getY()) {
+					topLeftPoint.setY(xyPoint.getY());
+				}				
+				if (xyPoint.getX() < topLeftPoint.getX())
+					topLeftPoint.setX(xyPoint.getX());				
 			}
 			final PolygonWithHoles polygon = new PolygonWithHoles(points2D);
+			o = new TPoint(topLeftPoint.getX(), topLeftPoint.getY(), 0);
 			
 //			roofPart.updateWorldBound(true);
 //			for (final List<ReadOnlyVector3> hole : holes) {
@@ -309,22 +336,7 @@ public class MeshLib {
 //				}
 //			}
 			
-			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
-			final TPoint o = new TPoint(lowestPoint.getX(), lowestPoint.getY(), lowestPoint.getZ());
-			final ReadOnlyVector3 pU = normal.cross(Vector3.UNIT_Z, null).normalizeLocal();
-			final ReadOnlyVector3 pOU = pU.divide(scale, null).add(lowestPoint, null);
-			final TPoint u = new TPoint(pOU.getX(), pOU.getY(), pOU.getZ());
-			final ReadOnlyVector3 pOV = normal.cross(pU, null).divide(scale, null).addLocal(lowestPoint);
-			final TPoint v = new TPoint(pOV.getX(), pOV.getY(), pOV.getZ());
-			
-			toXY.transform(o);
-			toXY.transform(u);
-			toXY.transform(v);
-			
-			u.set(u.getX() - o.getX(), u.getY() - o.getY(), u.getZ()-o.getZ());
-			v.set(v.getX() - o.getX(), v.getY() - o.getY(), v.getZ()-o.getZ());
-
-			fillMeshWithPolygon(mesh, polygon, fromXY, true, o, v, u);
+			fillMeshWithPolygon(mesh, polygon, null, true, o, v, u);
 //			fillMeshWithPolygon(mesh, polygon, fromXY, true, null, null, null);
 //			fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
 
