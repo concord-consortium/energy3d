@@ -98,7 +98,7 @@ public class Floor extends HousePart {
 		}
 		mesh.getSceneHints().setCullHint(CullHint.Inherit);
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 2.0 : 10.0;
-		MeshLib.fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints), null, true, new TPoint(0, 0, 0), new TPoint(scale, 0, 0), new TPoint(0, scale, 0));
+		MeshLib.fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints), null, true, new TPoint(0, 0, 0), new TPoint(scale, 0, 0), new TPoint(0, scale, 0), false);
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 		drawOutline();
 		points.get(0).set(toRelative(getCenter()));

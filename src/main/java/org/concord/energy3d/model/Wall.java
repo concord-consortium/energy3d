@@ -415,9 +415,9 @@ public class Wall extends HousePart implements Thermalizable {
 			final TPoint v = new TPoint(p02.getX(), p02.getY(), p02.getZ());
 			toXY.transform(o);
 			toXY.transform(u);
-			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, o, u, v);
+			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, o, u, v, true);
 		} else
-			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, null, null, null);
+			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, null, null, null, true);
 	}
 
 	private void drawOutline(final List<List<Vector3>> wallAndWindowsPoints) {

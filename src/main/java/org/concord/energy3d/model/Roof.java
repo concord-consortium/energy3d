@@ -184,13 +184,18 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		ensureEditPointsInside();
 		final PolygonWithHoles polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
-		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null);
+		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null, false);
 		List<List<ReadOnlyVector3>> holes = new ArrayList<List<ReadOnlyVector3>>();
 		holes.add(new ArrayList<ReadOnlyVector3>());
-		holes.get(0).add(new Vector3(-10, 1, 0));
-		holes.get(0).add(new Vector3(10, 1, 0));
-		holes.get(0).add(new Vector3(10, 10, 0));
+//		holes.get(0).add(new Vector3(-5, 5, 0));
+//		holes.get(0).add(new Vector3(-20, 24, 0));
+//		holes.get(0).add(new Vector3(-30, 24, 0));
+//		holes.get(0).add(new Vector3(-5, 5, 0));
+//		holes.get(0).add(new Vector3(-0, 24, 0));
+//		holes.get(0).add(new Vector3(-30, 24, 0));
+		holes.get(0).add(new Vector3(0, 0, 0));
 		holes.get(0).add(new Vector3(0, 10, 0));
+		holes.get(0).add(new Vector3(10, 10, 0));		
 		
 //		holePolygon.add(new PolygonPoint(-10, 5, 39.474810643661));
 //		holePolygon.add(new PolygonPoint(10, 5, 39.474810643661));

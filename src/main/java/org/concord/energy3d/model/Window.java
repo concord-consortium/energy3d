@@ -82,14 +82,16 @@ public class Window extends HousePart implements Thermalizable {
 			else
 				index = 0;
 		}
-		final PickedHousePart pick = pickContainer(x, y, Wall.class);
+		final PickedHousePart pick = pickContainer(x, y, new Class[] { Wall.class, Roof.class });
 		Vector3 p = points.get(index);
 		if (pick != null) {
 			p = pick.getPoint();
 			snapToGrid(p, getAbsPoint(index), getGridSize(), false);
 			p = toRelative(p);
-			toAbsolute(p);
-			p = enforceContraints(p);
+			if (container instanceof Wall) {
+				toAbsolute(p);
+				p = enforceContraints(p);
+			}
 		} else
 			return;
 
@@ -101,7 +103,7 @@ public class Window extends HousePart implements Thermalizable {
 
 		if (!isFirstPointInserted()) {
 			points.get(1).set(p);
-		} else {
+		} else if (container instanceof Wall) {
 			if (index == 0 || index == 3) {
 				points.get(1).set(points.get(0).getX(), 0, points.get(3).getZ());
 				points.get(2).set(points.get(3).getX(), 0, points.get(0).getZ());
@@ -109,10 +111,18 @@ public class Window extends HousePart implements Thermalizable {
 				points.get(0).set(points.get(1).getX(), 0, points.get(2).getZ());
 				points.get(3).set(points.get(2).getX(), 0, points.get(1).getZ());
 			}
+		} else {
+			if (index == 0 || index == 3) {				
+				points.get(1).set(points.get(0).getX(), 0, points.get(3).getZ());
+				points.get(2).set(points.get(3).getX(), 0, points.get(0).getZ());
+			} else {
+				points.get(0).set(points.get(1).getX(), 0, points.get(2).getZ());
+				points.get(3).set(points.get(2).getX(), 0, points.get(1).getZ());
+			}			
 		}
 
 		if (isFirstPointInserted())
-			if (!((Wall) container).fits(this)) {
+			if (container instanceof Wall && !((Wall) container).fits(this)) {
 				for (int i = 0; i < points.size(); i++)
 					points.get(i).set(orgPoints.get(i));
 				return;
@@ -127,7 +137,6 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	protected void drawMesh() {
-
 		if (points.size() < 4)
 			return;
 
@@ -149,7 +158,7 @@ public class Window extends HousePart implements Thermalizable {
 		mesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 
-		if (style == NO_MUNTIN_BAR || isFrozen() || Util.isEqual(getAbsPoint(2), getAbsPoint(0)) || Util.isEqual(getAbsPoint(1), getAbsPoint(0)))
+		if (container instanceof Roof || style == NO_MUNTIN_BAR || isFrozen() || Util.isEqual(getAbsPoint(2), getAbsPoint(0)) || Util.isEqual(getAbsPoint(1), getAbsPoint(0)))
 			bars.getSceneHints().setCullHint(CullHint.Always);
 		else {
 			final double divisionLength = 3.0 + style * 3.0;
@@ -452,4 +461,8 @@ public class Window extends HousePart implements Thermalizable {
 		return volumetricHeatCapacity;
 	}
 
+	@Override
+	protected HousePart getContainerRelative() {
+		return container instanceof Roof ? container.getContainerRelative() : container;
+	}
 }

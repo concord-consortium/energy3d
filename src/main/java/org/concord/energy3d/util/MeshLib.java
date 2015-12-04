@@ -258,6 +258,10 @@ public class MeshLib {
 	
 	private static void applyHoles(Node root, List<List<ReadOnlyVector3>> holes) {		
 		for (final Spatial roofPart : root.getChildren()) {
+//			if (root.getChild(2) != roofPart) {
+//				roofPart.getSceneHints().setCullHint(CullHint.Always);
+//				continue;
+//			}
 //			Spatial roofPart = root.getChild(3);
 			final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
 			final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
@@ -325,11 +329,12 @@ public class MeshLib {
 				}
 				if (!outside) {
 //					holePolygon.add(holePolygon.get(0));
-//					polygon.addHole(new PolygonWithHoles(holePolygon));
+					polygon.addHole(new PolygonWithHoles(holePolygon));
 				}
 			}
 			
-			fillMeshWithPolygon(mesh, polygon, fromXY, true, o, v, u);
+//			fillMeshWithPolygon(mesh, polygon, null, true, o, v, u);
+			fillMeshWithPolygon(mesh, polygon, fromXY, true, o, v, u, false);
 		}
 	}		
 
@@ -443,7 +448,7 @@ public class MeshLib {
 		return Math.abs(p1.subtract(p2, null).normalizeLocal().smallestAngleBetween(p3.subtract(p1, null).normalizeLocal())) > Math.PI - Math.PI / 180.0;
 	}
 
-	public static void fillMeshWithPolygon(final Mesh mesh, final PolygonWithHoles polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v) {
+	public static void fillMeshWithPolygon(final Mesh mesh, final PolygonWithHoles polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v, boolean isWall) {
 		/* round all points */
 		for (final Point p : polygon.getPoints())
 			p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
@@ -453,7 +458,7 @@ public class MeshLib {
 					p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
 
 		/* remove holes that collide with polygon or other holes */
-		if (polygon.getHoles() != null) {
+		if (isWall && polygon.getHoles() != null) {
 			final TriangulationPoint tp1 = polygon.getPoints().get(0);
 			final TriangulationPoint tp0 = polygon.getPoints().get(1);
 			final TriangulationPoint tp2 = polygon.getPoints().get(2);
