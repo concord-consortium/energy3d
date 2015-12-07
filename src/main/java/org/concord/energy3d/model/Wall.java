@@ -169,7 +169,7 @@ public class Wall extends HousePart implements Thermalizable {
 
 			Vector3 p = null;
 			if (picked != null)
-				p = picked.getPoint();
+				p = picked.getPoint().clone();
 			else
 				p = findClosestPointOnFoundation(x, y);
 
@@ -216,7 +216,7 @@ public class Wall extends HousePart implements Thermalizable {
 	public Vector3 findClosestPointOnFoundation(final int x, final int y) {
 		final PickedHousePart floorPick = SelectUtil.pickPart(x, y, (HousePart) null);
 		if (floorPick != null) {
-			Vector3 p = floorPick.getPoint();
+			Vector3 p = floorPick.getPoint().clone();
 			ReadOnlyVector3 closesPoint = container.points.get(0);
 			for (int i = 1; i < 4; i++)
 				if (closesPoint.distance(p) > container.points.get(i).distance(p))

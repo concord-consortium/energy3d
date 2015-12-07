@@ -102,7 +102,7 @@ public class SelectUtil {
 			if (pickLayer != -1 && objCounter - 1 != pickLayer)
 				continue;
 			final Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
-			final PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint);
+			final PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint, pick.getIntersectionRecord().getIntersectionNormal(0));
 			final double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {

@@ -223,7 +223,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, (HousePart) null);
 		Vector3 p;
 		if (pick != null && index < 4) {
-			p = pick.getPoint();
+			p = pick.getPoint().clone();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
 			root.getSceneHints().setCullHint(CullHint.Never);
 		} else

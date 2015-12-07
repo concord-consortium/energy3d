@@ -1239,7 +1239,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (pick != null) {
 				if (selectedHousePart instanceof Foundation) {
 					Foundation foundation = (Foundation) selectedHousePart;
-					Vector3 pickPoint = pick.getPoint();
+					Vector3 pickPoint = pick.getPoint().clone();
 					// if (!foundation.insideBuilding(pickPoint.getX(), pickPoint.getY(), true)) { // only move the building when clicking outside
 					final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
 					foundation.move(d, houseMovePoints);
@@ -1255,7 +1255,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final Wall wall = (Wall) selectedHousePart.getContainer();
 			final PickedHousePart pick = SelectUtil.pickPart(x, y, wall);
 			if (pick != null) {
-				final Vector3 d = pick.getPoint().subtractLocal(houseMoveStartPoint);
+				final Vector3 d = pick.getPoint().clone().subtractLocal(houseMoveStartPoint);
 				((Window) selectedHousePart).move(d, houseMovePoints);
 			}
 		} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
@@ -1420,7 +1420,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || (operation == Operation.RESIZE || selectedHousePart instanceof Foundation)) {
 							cameraControl.setLeftMouseButtonEnabled(false);
 							if (selectedHousePart != null) { // there is a chance that selectedHousePart = null
-								houseMoveStartPoint = selectHousePart.getPoint();
+								houseMoveStartPoint = selectHousePart.getPoint().clone();
 								collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
 								final ArrayList<Vector3> points = selectedHousePart.getPoints();
 								houseMovePoints = new ArrayList<Vector3>(points.size());
@@ -1737,7 +1737,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (selectedPart instanceof Wall) {
 				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), (Wall) selectedPart);
 				if (pick != null)
-					return pick.getPoint();
+					return pick.getPoint().clone();
 			}
 			pasteMouseState = null;
 		}
@@ -1750,7 +1750,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (selectedPart instanceof Roof) {
 				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), (Roof) selectedPart);
 				if (pick != null)
-					return pick.getPoint();
+					return pick.getPoint().clone();
 			}
 			pasteMouseState = null;
 		}

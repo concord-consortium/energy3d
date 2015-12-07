@@ -98,7 +98,7 @@ public class Human extends HousePart {
 		final int index = 0;
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[] { Foundation.class, null });
 		if (pick != null) {
-			final Vector3 p = pick.getPoint();
+			final Vector3 p = pick.getPoint().clone();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
 			points.get(index).set(toRelative(p));
 			root.getSceneHints().setCullHint(CullHint.Never);

@@ -45,7 +45,7 @@ public class Door extends HousePart implements Thermalizable {
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			final PickedHousePart picked = pickContainer(x, y, Wall.class);
 			if (picked != null) {
-				Vector3 p = picked.getPoint();
+				Vector3 p = picked.getPoint().clone();
 				final Vector3 wallFirstPoint = container.getAbsPoint(0);
 				final Vector3 wallx = container.getAbsPoint(2).subtract(wallFirstPoint, null);
 				p = Util.closestPoint(wallFirstPoint, wallx, x, y);

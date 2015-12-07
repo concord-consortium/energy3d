@@ -42,6 +42,7 @@ public class Window extends HousePart implements Thermalizable {
 	private double solarHeatGainCoefficient = 0.5;
 	private double uValue = 2.0; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
+	private ReadOnlyVector3 normal;
 
 	public Window() {
 		super(2, 4, 30.0);
@@ -85,7 +86,7 @@ public class Window extends HousePart implements Thermalizable {
 		final PickedHousePart pick = pickContainer(x, y, new Class[] { Wall.class, Roof.class });
 		Vector3 p = points.get(index);
 		if (pick != null) {
-			p = pick.getPoint();
+			p.set(pick.getPoint());
 			snapToGrid(p, getAbsPoint(index), getGridSize(), false);
 			p = toRelative(p);
 			if (container instanceof Wall) {
@@ -103,6 +104,7 @@ public class Window extends HousePart implements Thermalizable {
 
 		if (!isFirstPointInserted()) {
 			points.get(1).set(p);
+			normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getIndex()).getUserData();
 		} else if (container instanceof Wall) {
 			if (index == 0 || index == 3) {
 				points.get(1).set(points.get(0).getX(), 0, points.get(3).getZ());
@@ -111,13 +113,19 @@ public class Window extends HousePart implements Thermalizable {
 				points.get(0).set(points.get(1).getX(), 0, points.get(2).getZ());
 				points.get(3).set(points.get(2).getX(), 0, points.get(1).getZ());
 			}
-		} else {
-			if (index == 0 || index == 3) {				
-				points.get(1).set(points.get(0).getX(), 0, points.get(3).getZ());
-				points.get(2).set(points.get(3).getX(), 0, points.get(0).getZ());
+		} else {			
+			final Vector3 u = Vector3.UNIT_Z.cross(normal, null);
+			final Vector3 v = normal.cross(u, null);
+			if (index == 0 || index == 3) {
+				final Vector3 p0 = getAbsPoint(0);
+				final Vector3 p3 = getAbsPoint(3);				
+				points.get(1).set(toRelative(Util.closestPoint(p0, v, p3, u)));
+				points.get(2).set(toRelative(Util.closestPoint(p0, u, p3, v)));
 			} else {
-				points.get(0).set(points.get(1).getX(), 0, points.get(2).getZ());
-				points.get(3).set(points.get(2).getX(), 0, points.get(1).getZ());
+				final Vector3 p1 = getAbsPoint(1);
+				final Vector3 p2 = getAbsPoint(2);				
+				points.get(0).set(toRelative(Util.closestPoint(p1, v, p2, u)));
+				points.get(3).set(toRelative(Util.closestPoint(p2, u, p1, v)));
 			}			
 		}
 

@@ -81,7 +81,7 @@ public class Sensor extends HousePart {
 	public void setPreviewPoint(final int x, final int y) {
 		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class, Foundation.class });
 		if (picked != null) {
-			final Vector3 p = picked.getPoint();
+			final Vector3 p = picked.getPoint().clone();
 			snapToGrid(p, getAbsPoint(0), getGridSize(), false);
 			points.get(0).set(toRelative(p));
 		}
