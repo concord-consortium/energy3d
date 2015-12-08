@@ -1252,8 +1252,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				((Tree) selectedHousePart).move(d, houseMovePoints);
 			}
 		} else if (houseMoveStartPoint != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Window) {
-			final Wall wall = (Wall) selectedHousePart.getContainer();
-			final PickedHousePart pick = SelectUtil.pickPart(x, y, wall);
+			final PickedHousePart pick = SelectUtil.pickPart(x, y, selectedHousePart.getContainer());
 			if (pick != null) {
 				final Vector3 d = pick.getPoint().clone().subtractLocal(houseMoveStartPoint);
 				((Window) selectedHousePart).move(d, houseMovePoints);

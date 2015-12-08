@@ -160,7 +160,7 @@ public class SolarRadiation {
 						else if (part instanceof Roof)
 							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 								final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
-								final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+								final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
 								computeOnMesh(minute, dayLength, directionTowardSun, part, mesh, mesh, faceDirection);
 							}
 				}
@@ -545,7 +545,7 @@ public class SolarRadiation {
 				applyTexture(part.getRadiationMesh());
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-					final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+					final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
 					applyTexture(mesh);
 				}
 			part.drawHeatFlux();

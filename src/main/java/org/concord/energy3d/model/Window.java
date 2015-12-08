@@ -126,7 +126,7 @@ public class Window extends HousePart implements Thermalizable {
 				final Vector3 p1 = getAbsPoint(1);
 				final Vector3 p2 = getAbsPoint(2);				
 				points.get(0).set(toRelative(Util.closestPoint(p1, v, p2, u)));
-				points.get(3).set(toRelative(Util.closestPoint(p2, u, p1, v)));
+				points.get(3).set(toRelative(Util.closestPoint(p1, u, p2, v)));
 			}			
 //			points.get(0).setX(0.51);
 //			points.get(0).setY(0.6);
@@ -356,14 +356,13 @@ public class Window extends HousePart implements Thermalizable {
 		for (int i = 0; i < points.size(); i++)
 			orgPoints.add(points.get(i));
 
-		final Wall wall = (Wall) container;
 		final ReadOnlyVector3 d_rel = toRelative(getAbsPoint(0).subtract(d, null)).subtractLocal(points.get(0)).negateLocal();
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 newP = houseMoveStartPoints.get(i).add(d_rel, null);
 			points.set(i, newP);
 		}
 
-		if (!wall.fits(this))
+		if (container instanceof Wall && !((Wall) container).fits(this))
 			for (int i = 0; i < points.size(); i++)
 				points.set(i, orgPoints.get(i));
 
