@@ -104,7 +104,8 @@ public class Window extends HousePart implements Thermalizable {
 
 		if (!isFirstPointInserted()) {
 			points.get(1).set(p);
-			normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getIndex()).getUserData();
+			if (container instanceof Roof)
+				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getIndex()).getUserData();
 		} else if (container instanceof Wall) {
 			if (index == 0 || index == 3) {
 				points.get(1).set(points.get(0).getX(), 0, points.get(3).getZ());
@@ -127,6 +128,15 @@ public class Window extends HousePart implements Thermalizable {
 				points.get(0).set(toRelative(Util.closestPoint(p1, v, p2, u)));
 				points.get(3).set(toRelative(Util.closestPoint(p2, u, p1, v)));
 			}			
+//			points.get(0).setX(0.51);
+//			points.get(0).setY(0.6);
+//			points.get(1).setX(0.51);
+//			points.get(1).setY(0.7);
+//			points.get(2).setX(0.6);
+//			points.get(2).setY(0.6);
+//			points.get(3).setX(0.6);
+//			points.get(3).setY(0.7);
+			
 		}
 
 		if (isFirstPointInserted())

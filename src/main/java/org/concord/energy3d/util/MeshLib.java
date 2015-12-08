@@ -39,6 +39,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -54,7 +55,7 @@ public class MeshLib {
 
 	public static void groupByPlanner(final Mesh mesh, final Node root, final List<List<ReadOnlyVector3>> holes) {
 		final ArrayList<GroupData> groups = extractGroups(mesh);
-		computeHorizontalTextureCoords(groups);
+//		computeHorizontalTextureCoords(groups);
 		createMeshes(root, groups);
 		applyHoles(root, holes);
 	}
@@ -187,17 +188,17 @@ public class MeshLib {
 		for (final GroupData group : groups) {
 			final Node node = new Node("Roof Part #" + meshIndex);
 			final Mesh mesh = new Mesh("Roof Mesh #" + meshIndex);
+			final Mesh meshWithHoles = new Mesh("Roof Mesh #" + meshIndex);
+			mesh.setVisible(false);
 			mesh.setRenderState(HousePart.offsetState);
 			mesh.setModelBound(new BoundingBox());
+			meshWithHoles.setModelBound(new BoundingBox());
+			meshWithHoles.getSceneHints().setAllPickingHints(false);
 
-			node.attachChild(mesh);
-			node.attachChild(new Node("Roof Size Annot"));
-			node.attachChild(new Node("Roof Angle Annot"));
 			final BMText label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.South, Justify.Center);
 			Util.initHousePartLabel(label);
-			label.setTranslation(group.key);
-			node.attachChild(label);
-			node.getChild(3).getSceneHints().setCullHint(CullHint.Always);
+//			label.setTranslation(group.key);
+			label.getSceneHints().setCullHint(CullHint.Always);
 
 			final Mesh wireframeMesh = new Line("Roof (wireframe)");
 			wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
@@ -206,14 +207,21 @@ public class MeshLib {
 			// offset to avoid z-fighting
 			wireframeMesh.setTranslation(group.key.multiply(0.001, null));
 			Util.disablePickShadowLight(wireframeMesh);
-			node.attachChild(wireframeMesh);
 
 			final Line dashLineMesh = new Line("Roof (dash line)");
 			dashLineMesh.setStipplePattern((short) 0xFF00);
 			dashLineMesh.setVisible(false);
 			dashLineMesh.setModelBound(new BoundingBox());
 			Util.disablePickShadowLight(dashLineMesh);
+			
+			node.attachChild(mesh);
+			node.attachChild(new Node("Roof Size Annot"));
+			node.attachChild(new Node("Roof Angle Annot"));
+			node.attachChild(label);
+			node.attachChild(wireframeMesh);
 			node.attachChild(dashLineMesh);
+			node.attachChild(meshWithHoles);
+			
 			root.attachChild(node);
 
 			final Vector3 normal = new Vector3();
@@ -232,25 +240,25 @@ public class MeshLib {
 				center.addLocal(v);
 			}
 			center.multiplyLocal(1.0 / group.vertices.size());
+			label.setTranslation(center.add(normal.multiply(0.1, null), null));
 
-			buf = mesh.getMeshData().getNormalBuffer();
-			n = group.normals.size();
-			buf = BufferUtils.createVector3Buffer(n);
-			mesh.getMeshData().setNormalBuffer(buf);
-			for (final ReadOnlyVector3 v : group.normals)
-				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
+//			buf = mesh.getMeshData().getNormalBuffer();
+//			n = group.normals.size();
+//			buf = BufferUtils.createVector3Buffer(n);
+//			mesh.getMeshData().setNormalBuffer(buf);
+//			for (final ReadOnlyVector3 v : group.normals)
+//				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
 
-			buf = mesh.getMeshData().getTextureBuffer(0);
-			n = group.textures.size();
-			buf = BufferUtils.createVector2Buffer(n);
-			mesh.getMeshData().setTextureBuffer(buf, 0);
-			for (final Vector2 v : group.textures)
-				buf.put(v.getXf()).put(v.getYf());
+//			buf = mesh.getMeshData().getTextureBuffer(0);
+//			n = group.textures.size();
+//			buf = BufferUtils.createVector2Buffer(n);
+//			mesh.getMeshData().setTextureBuffer(buf, 0);
+//			for (final Vector2 v : group.textures)
+//				buf.put(v.getXf()).put(v.getYf());
 
 			mesh.getMeshData().updateVertexCount();
-			CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
+//			CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 			mesh.updateModelBound();
-			node.getChild(3).setTranslation(center.add(normal.multiply(0.1, null), null));
 
 			meshIndex++;
 		}
@@ -316,7 +324,7 @@ public class MeshLib {
 				boolean outside = false;
 				for (final ReadOnlyVector3 holePoint : hole) {
 					final PickResults pickResults = new PrimitivePickResults();
-					PickingUtil.findPick(roofPart, new Ray3(holePoint, Vector3.UNIT_Z), pickResults, false);
+					PickingUtil.findPick(((Node) roofPart).getChild(0), new Ray3(holePoint, Vector3.UNIT_Z), pickResults, false);
 					if (pickResults.getNumber() > 0) {
 						final ReadOnlyVector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
 						final PolygonPoint polygonPoint = new PolygonPoint(intersectionPoint.getX(), intersectionPoint.getY(), intersectionPoint.getZ());
@@ -334,7 +342,10 @@ public class MeshLib {
 			}
 			
 //			fillMeshWithPolygon(mesh, polygon, null, true, o, v, u);
-			fillMeshWithPolygon(mesh, polygon, fromXY, true, o, v, u, false);
+//			mesh.setVisible(false);
+			final Mesh meshWithHoles = (Mesh) ((Node)roofPart).getChild(6);
+//			((Node)roofPart).attachChild(newMesh);
+			fillMeshWithPolygon(meshWithHoles, polygon, fromXY, true, o, v, u, false);
 		}
 	}		
 

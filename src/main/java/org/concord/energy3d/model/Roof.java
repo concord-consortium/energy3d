@@ -189,10 +189,10 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		for (HousePart part : children) {
 			if (part instanceof Window && part.isDrawable()) {
 				final ArrayList<ReadOnlyVector3> hole = new ArrayList<ReadOnlyVector3>();
-				hole.add(part.getAbsPoint(0));
-				hole.add(part.getAbsPoint(2));
-				hole.add(part.getAbsPoint(3));
-				hole.add(part.getAbsPoint(1));
+				hole.add(part.getAbsPoint(0).multiplyLocal(1, 1, 0));
+				hole.add(part.getAbsPoint(2).multiplyLocal(1, 1, 0));
+				hole.add(part.getAbsPoint(3).multiplyLocal(1, 1, 0));
+				hole.add(part.getAbsPoint(1).multiplyLocal(1, 1, 0));
 				holes.add(hole);
 			}
 		}
@@ -212,8 +212,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 //		holePolygon.add(new PolygonPoint(10, 10, 39.474810643661));
 //		holePolygon.add(new PolygonPoint(-10, 10, 39.474810643661));
 		MeshLib.groupByPlanner(mesh, roofPartsRoot, holes);
-//		setAnnotationsVisible(Scene.getInstance().areAnnotationsVisible());
-//		hideGableRoofParts();
+		setAnnotationsVisible(Scene.getInstance().areAnnotationsVisible());
+		hideGableRoofParts();
 	}
 
 	protected void drawWalls() {
@@ -600,7 +600,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		if (roofPartsRoot != null) {
 			synchronized (roofPartsRoot.getChildren()) {
 				for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
-					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(0), getColor() == null ? Scene.getInstance().getRoofColor() : getColor());
+					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(6), getColor() == null ? Scene.getInstance().getRoofColor() : getColor());
 				}
 			}
 		}
