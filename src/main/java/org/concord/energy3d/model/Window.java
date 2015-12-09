@@ -161,16 +161,17 @@ public class Window extends HousePart implements Thermalizable {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		{
-			ReadOnlyVector3 p = getAbsPoint(0);
+			Vector3 n = getNormal().multiply(0.1, null);
+			ReadOnlyVector3 p = getAbsPoint(0).addLocal(n);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(2);
+			p = getAbsPoint(2).addLocal(n);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(1);
+			p = getAbsPoint(1).addLocal(n);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(2);
+			p = getAbsPoint(2).addLocal(n);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(3);
+			p = getAbsPoint(3).addLocal(n);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 		mesh.updateModelBound();
@@ -348,7 +349,10 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	public ReadOnlyVector3 getNormal() {
-		return container.getNormal();
+		if (container instanceof Roof)
+			return normal;
+		else
+			return container.getNormal();
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMoveStartPoints) {
