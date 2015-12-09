@@ -42,7 +42,7 @@ public class Window extends HousePart implements Thermalizable {
 	private double solarHeatGainCoefficient = 0.5;
 	private double uValue = 2.0; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
-	private ReadOnlyVector3 normal;
+	private ReadOnlyVector3 roofNormal;
 
 	public Window() {
 		super(2, 4, 30.0);
@@ -105,7 +105,7 @@ public class Window extends HousePart implements Thermalizable {
 		if (!isFirstPointInserted()) {
 			points.get(1).set(p);
 			if (container instanceof Roof)
-				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getIndex()).getUserData();
+				roofNormal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getIndex()).getUserData();
 		} else if (container instanceof Wall) {
 			if (index == 0 || index == 3) {
 				points.get(1).set(points.get(0).getX(), 0, points.get(3).getZ());
@@ -114,9 +114,9 @@ public class Window extends HousePart implements Thermalizable {
 				points.get(0).set(points.get(1).getX(), 0, points.get(2).getZ());
 				points.get(3).set(points.get(2).getX(), 0, points.get(1).getZ());
 			}
-		} else {			
-			final Vector3 u = Vector3.UNIT_Z.cross(normal, null);
-			final Vector3 v = normal.cross(u, null);
+		} else {
+			final Vector3 u = Vector3.UNIT_Z.cross(roofNormal, null);
+			final Vector3 v = roofNormal.cross(u, null);
 			if (index == 0 || index == 3) {
 				final Vector3 p0 = getAbsPoint(0);
 				final Vector3 p3 = getAbsPoint(3);				
@@ -161,17 +161,16 @@ public class Window extends HousePart implements Thermalizable {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		{
-			Vector3 n = getNormal().multiply(0.1, null);
-			ReadOnlyVector3 p = getAbsPoint(0).addLocal(n);
+			ReadOnlyVector3 p = getAbsPoint(0);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(2).addLocal(n);
+			p = getAbsPoint(2);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(1).addLocal(n);
+			p = getAbsPoint(1);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(2).addLocal(n);
+			p = getAbsPoint(2);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(3).addLocal(n);
+			p = getAbsPoint(3);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 		mesh.updateModelBound();
@@ -350,7 +349,7 @@ public class Window extends HousePart implements Thermalizable {
 	@Override
 	public ReadOnlyVector3 getNormal() {
 		if (container instanceof Roof)
-			return normal;
+			return roofNormal;
 		else
 			return container.getNormal();
 	}
@@ -358,7 +357,7 @@ public class Window extends HousePart implements Thermalizable {
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMoveStartPoints) {
 		final List<Vector3> orgPoints = new ArrayList<Vector3>(points.size());
 		for (int i = 0; i < points.size(); i++)
-			orgPoints.add(points.get(i));
+			orgPoints.add(points.get(i));				
 
 		final ReadOnlyVector3 d_rel = toRelative(getAbsPoint(0).subtract(d, null)).subtractLocal(points.get(0)).negateLocal();
 		for (int i = 0; i < points.size(); i++) {

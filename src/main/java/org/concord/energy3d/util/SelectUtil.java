@@ -6,6 +6,7 @@ import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
@@ -103,7 +104,9 @@ public class SelectUtil {
 				continue;
 			final Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
 			final PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint, pick.getIntersectionRecord().getIntersectionNormal(0));
-			final double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
+			double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
+			if (userData != null && userData.getHousePart() instanceof Window)
+				polyDist_i -= 0.2;	// give more priority to window (specially skylight)
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {
 				for (int j = 0; j < userData.getHousePart().getPoints().size(); j++) {
@@ -125,7 +128,7 @@ public class SelectUtil {
 					}
 				}
 			}
-			if (pickedHousePart == null) {
+			if (pickedHousePart == null || polyDist_i < polyDist) {
 				pickedHousePart = picked_i;
 				polyDist = polyDist_i;
 				pointDist = pointDist_i;

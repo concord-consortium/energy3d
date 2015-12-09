@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -469,93 +471,40 @@ public class MeshLib {
 					p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
 
 		/* remove holes that collide with polygon or other holes */
-		if (isWall && polygon.getHoles() != null) {
-			final TriangulationPoint tp1 = polygon.getPoints().get(0);
-			final TriangulationPoint tp0 = polygon.getPoints().get(1);
-			final TriangulationPoint tp2 = polygon.getPoints().get(2);
-			final ReadOnlyVector2 p0 = new Vector2(tp0.getX(), tp0.getY());
-			final ReadOnlyVector2 p1 = new Vector2(tp1.getX(), tp1.getY());
-			final ReadOnlyVector2 p2 = new Vector2(tp2.getX(), tp2.getY());
-
-			double minX, minY, maxX, maxY;
-			minX = minY = Double.POSITIVE_INFINITY;
-			maxX = maxY = Double.NEGATIVE_INFINITY;
-			for (final Point tp : polygon.getPoints()) {
-				final ReadOnlyVector2 p = new Vector2(tp.getX(), tp.getY());
-				final double pX = Util.projectPointOnLine(p, p0, p2, false).distance(p0);
-				final double pY = Util.projectPointOnLine(p, p0, p1, false).distance(p0);
-				if (pX < minX)
-					minX = pX;
-				if (pX > maxX)
-					maxX = pX;
-				if (pY < minY)
-					minY = pY;
-				if (pY > maxY)
-					maxY = pY;
-			}
+		if (polygon.getHoles() != null) {
+			for (final Polygon hole : polygon.getHoles())
+				for (final Point p : hole.getPoints())
+					if (!Util.insidePolygon(p, polygon.getPoints())) {
+						polygon.getHoles().remove(hole);
+						break;
+					}			
 			for (int i = 0; i < polygon.getHoles().size(); i++) {
 				final Polygon hole1 = polygon.getHoles().get(i);
-				double minX1, minY1, maxX1, maxY1;
-				minX1 = minY1 = Double.POSITIVE_INFINITY;
-				maxX1 = maxY1 = Double.NEGATIVE_INFINITY;
-				for (final Point tp : hole1.getPoints()) {
-					/*
-					 * ensure p is within the rectangular boundaries of the polygon
-					 */
-					final Vector2 p = new Vector2(tp.getX(), tp.getY());
-					final double sX = Util.projectPointOnLineScale(p, p0, p2);
-					final double sY = Util.projectPointOnLineScale(p, p0, p1);
-					final double pX = Util.projectPointOnLine(p, p0, p2, false).distance(p0) * Math.signum(sX);
-					final double pY = Util.projectPointOnLine(p, p0, p1, false).distance(p0) * Math.signum(sY);
-					final ReadOnlyVector2 xDir = p2.subtract(p0, null).normalizeLocal();
-					final ReadOnlyVector2 yDir = p1.subtract(p0, null).normalizeLocal();
-
-					if (pX <= minX)
-						p.addLocal(xDir.multiply(minX - pX + 0.1, null));
-					else if (pX >= maxX)
-						p.addLocal(xDir.multiply(maxX - pX - 0.1, null));
-					if (pY <= minY)
-						p.addLocal(yDir.multiply(minY - pY + 0.1, null));
-					else if (pY >= maxY)
-						p.addLocal(yDir.multiply(maxY - pY - 0.1, null));
-
-					tp.set(p.getX(), p.getY(), tp.getZ());
-
-					if (pX < minX1)
-						minX1 = pX;
-					if (pX > maxX1)
-						maxX1 = pX;
-					if (pY < minY1)
-						minY1 = pY;
-					if (pY > maxY1)
-						maxY1 = pY;
-				}
-				for (int j = polygon.getHoles().size() - 1; j > i; j--) {
+				for (int j = i + 1; j < polygon.getHoles().size(); j++) {
 					final Polygon hole2 = polygon.getHoles().get(j);
-					double minX2, minY2, maxX2, maxY2;
-					minX2 = minY2 = Double.POSITIVE_INFINITY;
-					maxX2 = maxY2 = Double.NEGATIVE_INFINITY;
-					for (final Point tp : hole2.getPoints()) {
-						final ReadOnlyVector2 p = new Vector2(tp.getX(), tp.getY());
-						final double pX = Util.projectPointOnLine(p, p0, p2, false).distance(p0);
-						final double pY = Util.projectPointOnLine(p, p0, p1, false).distance(p0);
-						if (pX < minX2)
-							minX2 = pX;
-						if (pX > maxX2)
-							maxX2 = pX;
-						if (pY < minY2)
-							minY2 = pY;
-						if (pY > maxY2)
-							maxY2 = pY;
-					}
-					final boolean isOutside = (minX2 < minX1 && maxX2 < minX1 || minX2 > maxX1 && maxX2 > maxX1) || (minY2 < minY1 && maxY2 < minY1 || minY2 > maxY1 && maxY2 > maxY1);
-					if (!isOutside)
-						polygon.getHoles().remove(hole2);
+					for (final Point p : hole2.getPoints())
+						if (Util.insidePolygon(p, hole1.getPoints())) {
+							polygon.getHoles().remove(hole2);
+							break;
+						}
 				}
 			}
 		}
 
-		Poly2Tri.triangulate(polygon);
+		try {
+			Poly2Tri.triangulate(polygon);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("---------------------------");
+			for (final Point p : polygon.getPoints())
+				System.out.println(p.getX() + "\t" + p.getY());
+			for (final Polygon hole : polygon.getHoles()) {
+				System.out.println("--Hole-----");
+				for (final Point p : hole.getPoints())
+					System.out.println(p.getX() + "\t" + p.getY());
+			}
+			System.exit(0);
+		}
 		if (fromXY == null)
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 		else

@@ -27,6 +27,7 @@ import javax.swing.text.JTextComponent;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.poly2tri.geometry.primitives.Point;
 
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.BoundingVolume.Type;
@@ -105,6 +106,36 @@ public class Util {
 		int i;
 		double xinters;
 		ReadOnlyVector3 p1, p2;
+
+		final int n = polygon.size();
+		p1 = polygon.get(0);
+		for (i = 1; i <= n; i++) {
+			p2 = polygon.get(i % n);
+			if (p.getY() > Math.min(p1.getY(), p2.getY())) {
+				if (p.getY() <= Math.max(p1.getY(), p2.getY())) {
+					if (p.getX() <= Math.max(p1.getX(), p2.getX())) {
+						if (p1.getY() != p2.getY()) {
+							xinters = (p.getY() - p1.getY()) * (p2.getX() - p1.getX()) / (p2.getY() - p1.getY()) + p1.getX();
+							if (p1.getX() == p2.getX() || p.getX() <= xinters)
+								counter++;
+						}
+					}
+				}
+			}
+			p1 = p2;
+		}
+
+		if (counter % 2 == 0)
+			return false;
+		else
+			return true;
+	}
+	
+	public static boolean insidePolygon(final Point p, final List<? extends Point> polygon) {
+		int counter = 0;
+		int i;
+		double xinters;
+		Point p1, p2;
 
 		final int n = polygon.size();
 		p1 = polygon.get(0);
