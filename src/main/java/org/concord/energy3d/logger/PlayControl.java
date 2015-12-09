@@ -6,7 +6,7 @@ package org.concord.energy3d.logger;
  */
 public abstract class PlayControl {
 
-	public static boolean replaying = true;
-	public static boolean backward, forward;
+	public static volatile boolean replaying = true;
+	public static volatile boolean backward, forward;
 
 }
