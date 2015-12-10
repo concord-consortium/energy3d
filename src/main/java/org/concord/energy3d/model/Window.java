@@ -1,5 +1,6 @@
 package org.concord.energy3d.model;
 
+import java.awt.Component;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,17 +11,25 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
+import org.poly2tri.geometry.polygon.PolygonPoint;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -101,6 +110,9 @@ public class Window extends HousePart implements Thermalizable {
 			orgPoints.add(v.clone());
 
 		points.get(index).set(p);
+		
+		if (container instanceof Roof)
+			extendToRoof(index, false);
 
 		if (!isFirstPointInserted()) {
 			points.get(1).set(p);
@@ -127,7 +139,14 @@ public class Window extends HousePart implements Thermalizable {
 				final Vector3 p2 = getAbsPoint(2);				
 				points.get(0).set(toRelative(Util.closestPoint(p1, v, p2, u)));
 				points.get(3).set(toRelative(Util.closestPoint(p1, u, p2, v)));
-			}			
+			}
+			
+//			for (int i = 0; i < points.size(); i++) {
+//				final PickResults pickResults = new PrimitivePickResults();
+//				PickingUtil.findPick(container.getRoot(), new Ray3(getAbsPoint(i).multiplyLocal(1, 1, 0), Vector3.UNIT_Z), pickResults, false);
+//				if (pickResults.getNumber() > 0)
+//					points.get(i).setZ(pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).getZ());
+//			}
 //			points.get(0).setX(0.51);
 //			points.get(0).setY(0.6);
 //			points.get(1).setX(0.51);
@@ -364,6 +383,10 @@ public class Window extends HousePart implements Thermalizable {
 			final Vector3 newP = houseMoveStartPoints.get(i).add(d_rel, null);
 			points.set(i, newP);
 		}
+		
+		if (container instanceof Roof)
+			for (int i = 0; i < points.size(); i++)
+				extendToRoof(i, true);
 
 		if (container instanceof Wall && !((Wall) container).fits(this))
 			for (int i = 0; i < points.size(); i++)
@@ -372,6 +395,16 @@ public class Window extends HousePart implements Thermalizable {
 		draw();
 		container.draw();
 
+	}
+
+	private void extendToRoof(int pointIndex, boolean updateRoofNormal) {
+		final PickResults pickResults = new PrimitivePickResults();
+		PickingUtil.findPick(container.getRoot(), new Ray3(getAbsPoint(pointIndex).multiplyLocal(1, 1, 0), Vector3.UNIT_Z), pickResults, false);
+		if (pickResults.getNumber() > 0) {
+			points.get(pointIndex).setZ(pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).getZ());
+			if (updateRoofNormal)
+				roofNormal = (ReadOnlyVector3) ((Spatial) pickResults.getPickData(0).getTarget()).getParent().getUserData();
+		}
 	}
 
 	public void setStyle(final int style) {
