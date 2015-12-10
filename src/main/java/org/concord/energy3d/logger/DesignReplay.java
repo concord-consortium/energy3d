@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -32,9 +33,11 @@ public class DesignReplay extends PlayControl {
 		new Thread() {
 			@Override
 			public void run() {
+				MainPanel.getInstance().setToolbarEnabledForReplay(false);
 				Util.suppressReportError = true;
 				openFolder(files);
 				Util.suppressReportError = false;
+				MainPanel.getInstance().setToolbarEnabledForReplay(true);
 			}
 		}.start();
 	}

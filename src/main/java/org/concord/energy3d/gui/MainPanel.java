@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -646,13 +647,30 @@ public class MainPanel extends JPanel {
 		return zoomButton;
 	}
 
-	public void setToolbarEnabled(final boolean enabled) {
-		for (final Component c : getAppToolbar().getComponents()) {
-			if (c != getPreviewButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinViewButton()) {
-				if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected())
-					c.setEnabled(enabled);
+	public void setToolbarEnabledForPreview(final boolean enabled) {
+		EventQueue.invokeLater(new Runnable() { // must be run in the event queue as this method may be called in a custom thread
+			public void run() {
+				for (final Component c : getAppToolbar().getComponents()) {
+					if (c != getPreviewButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinViewButton()) {
+						if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected())
+							c.setEnabled(enabled);
+					}
+				}
 			}
-		}
+		});
+	}
+
+	public void setToolbarEnabledForReplay(final boolean enabled) {
+		EventQueue.invokeLater(new Runnable() { // must be run in the event queue as this method may be called in a custom thread
+			public void run() {
+				for (final Component c : getAppToolbar().getComponents()) {
+					if (c != getShadowButton() && c != getEnergyViewButton() && c != getHeliodonButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinViewButton()) {
+						if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected())
+							c.setEnabled(enabled);
+					}
+				}
+			}
+		});
 	}
 
 	private JSplitPane getEnergyCanvasNoteSplitPane() {

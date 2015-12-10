@@ -323,7 +323,7 @@ public class PrintController implements Updater {
 		MainPanel.getInstance().getPreviewButton().setEnabled(finished);
 		MainFrame.getInstance().getPreviewMenuItem().setEnabled(finished);
 		if (isPrintPreview() || finished)
-			MainPanel.getInstance().setToolbarEnabled(!isPrintPreview());
+			MainPanel.getInstance().setToolbarEnabledForPreview(!isPrintPreview());
 	}
 
 	public boolean isFinished() {
