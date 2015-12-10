@@ -1,5 +1,6 @@
 package org.concord.energy3d.util;
 
+import java.awt.geom.Line2D;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -482,11 +483,35 @@ public class MeshLib {
 				final Polygon hole1 = polygon.getHoles().get(i);
 				for (int j = i + 1; j < polygon.getHoles().size(); j++) {
 					final Polygon hole2 = polygon.getHoles().get(j);
+					boolean found = false;
 					for (final Point p : hole2.getPoints())
 						if (Util.insidePolygon(p, hole1.getPoints())) {
 							polygon.getHoles().remove(hole2);
+							found = true;
 							break;
 						}
+					if (!found) {
+						final int n1 = hole1.getPoints().size();
+						for (int i1 = 0; i1 < n1; i1++) {							
+							final Point l1p1 = hole1.getPoints().get(i1);
+							final Point l1p2 = hole1.getPoints().get((i1+1) % n1);
+							final Line2D line1 = new Line2D.Double(l1p1.getX(), l1p1.getY(), l1p2.getX(), l1p2.getY());
+							found = false;
+							final int n2 = hole2.getPoints().size();
+							for (int i2 = 0; i2 < n2; i2++) {
+								final Point l2p1 = hole2.getPoints().get(i2);
+								final Point l2p2 = hole2.getPoints().get((i2+1) % n2);
+								final Line2D line2 = new Line2D.Double(l2p1.getX(), l2p1.getY(), l2p2.getX(), l2p2.getY());
+								if (line2.intersectsLine(line1)) {
+									polygon.getHoles().remove(hole2);
+									found = true;
+									break;									
+								}
+							}
+							if (found)
+								break;
+						}
+					}
 				}
 			}
 		}
@@ -503,7 +528,7 @@ public class MeshLib {
 				for (final Point p : hole.getPoints())
 					System.out.println(p.getX() + "\t" + p.getY());
 			}
-			System.exit(0);
+//			System.exit(0);
 		}
 		if (fromXY == null)
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
