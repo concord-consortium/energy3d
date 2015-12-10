@@ -1,10 +1,13 @@
 package org.concord.energy3d.logger;
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.util.concurrent.Callable;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
@@ -16,12 +19,16 @@ import org.concord.energy3d.util.Util;
 public class DesignReplay extends PlayControl {
 
 	private final static int SLEEP = 250;
+	private final static DesignReplay instance = new DesignReplay();
 
 	private DesignReplay() {
-
 	}
 
-	public static void play(final File[] files) {
+	public static DesignReplay getInstance() {
+		return instance;
+	}
+
+	public void play(final File[] files) {
 		new Thread() {
 			@Override
 			public void run() {
@@ -32,8 +39,9 @@ public class DesignReplay extends PlayControl {
 		}.start();
 	}
 
-	private static void openFolder(final File[] files) {
+	private void openFolder(final File[] files) {
 
+		active = true;
 		final int n = files.length;
 		int i = -1;
 		while (i < n - 1) {
@@ -52,6 +60,17 @@ public class DesignReplay extends PlayControl {
 							Scene.initEnergy();
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 							EnergyPanel.getInstance().update();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									EnergyPanel.getInstance().clearAllGraphs();
+									HousePart p = SceneManager.getInstance().getSelectedPart();
+									if (p instanceof Foundation) {
+										EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
+										EnergyPanel.getInstance().validate();
+									}
+								}
+							});
 							return null;
 						}
 					});
@@ -88,6 +107,7 @@ public class DesignReplay extends PlayControl {
 				}
 			}
 		}
+		active = false;
 
 	}
 

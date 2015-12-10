@@ -338,13 +338,13 @@ public class MainPanel extends JPanel {
 			appToolbar.setFloatable(false);
 			appToolbar.add(getSelectButton());
 			appToolbar.add(getZoomButton());
-			appToolbar.add(getResizeButton());
-			appToolbar.add(getRotateButton());
 			appToolbar.add(getSpinViewButton());
-			appToolbar.addSeparator();
-			appToolbar.add(getAnnotationToggleButton());
 			appToolbar.add(getPreviewButton());
 			appToolbar.add(getNoteButton());
+			appToolbar.addSeparator();
+			appToolbar.add(getAnnotationToggleButton());
+			appToolbar.add(getResizeButton());
+			appToolbar.add(getRotateButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getPlatformButton());
 			appToolbar.add(getWallButton());

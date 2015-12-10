@@ -31,16 +31,21 @@ public class PostProcessor extends PlayControl {
 	private final static DecimalFormat FORMAT_TWO_DIGITS = new DecimalFormat("00");
 	private final static DecimalFormat FORMAT_THREE_DIGITS = new DecimalFormat("000");
 	private final static DecimalFormat FORMAT_TIME_COUNT = new DecimalFormat("000000000");
+	private final static PostProcessor instance = new PostProcessor();
 
 	private PostProcessor() {
-
 	}
 
-	public static void analyze(final File[] files, final File output, final Runnable update) {
+	public static PostProcessor getInstance() {
+		return instance;
+	}
+
+	public void analyze(final File[] files, final File output, final Runnable update) {
 
 		new Thread() {
 			@Override
 			public void run() {
+				active = true;
 				final int n = files.length;
 				PrintWriter logWriter = null;
 				try {
@@ -210,6 +215,7 @@ public class PostProcessor extends PlayControl {
 				}
 				pw.close();
 				EnergyPanel.getInstance().setComputeEnabled(true);
+				active = false;
 			}
 		}.start();
 	}

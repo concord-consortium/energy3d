@@ -369,7 +369,14 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
+
 					MainFrame.this.deselect();
+
+					// prevent multiple replay or postprocessing commands
+					openFolderMenuItem.setEnabled(!DesignReplay.getInstance().isActive());
+					analyzeFolderMenuItem.setEnabled(!PostProcessor.getInstance().isActive());
+
+					// recent files
 					if (!recentFileMenuItems.isEmpty()) {
 						for (final JComponent x : recentFileMenuItems)
 							fileMenu.remove(x);
@@ -419,6 +426,7 @@ public class MainFrame extends JFrame {
 							recentFileMenuItems.add(s);
 						}
 					}
+
 				}
 			});
 			fileMenu.setText("File");
@@ -564,7 +572,7 @@ public class MainFrame extends JFrame {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						final File dir = fileChooser.getSelectedFile();
 						if (dir.isDirectory()) {
-							PostProcessor.analyze(dir.listFiles(new FilenameFilter() {
+							PostProcessor.getInstance().analyze(dir.listFiles(new FilenameFilter() {
 								@Override
 								public boolean accept(final File dir, final String name) {
 									return name.endsWith(".ng3");
@@ -601,7 +609,7 @@ public class MainFrame extends JFrame {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						final File dir = fileChooser.getSelectedFile();
 						if (dir.isDirectory()) {
-							DesignReplay.play(dir.listFiles(new FilenameFilter() {
+							DesignReplay.getInstance().play(dir.listFiles(new FilenameFilter() {
 								@Override
 								public boolean accept(final File dir, final String name) {
 									return name.endsWith(".ng3");
