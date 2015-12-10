@@ -22,11 +22,17 @@ public class DesignReplay extends PlayControl {
 	private final static int SLEEP = 250;
 	private final static DesignReplay instance = new DesignReplay();
 
+	private File lastFolder;
+
 	private DesignReplay() {
 	}
 
 	public static DesignReplay getInstance() {
 		return instance;
+	}
+
+	public File getLastFolder() {
+		return lastFolder;
 	}
 
 	public void play(final File[] files) {
@@ -46,6 +52,8 @@ public class DesignReplay extends PlayControl {
 
 		active = true;
 		final int n = files.length;
+		if (n > 0)
+			lastFolder = files[0].getParentFile();
 		int i = -1;
 		while (i < n - 1) {
 			if (replaying) {

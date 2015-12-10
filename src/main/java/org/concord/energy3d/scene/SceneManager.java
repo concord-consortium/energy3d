@@ -10,6 +10,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -30,6 +31,7 @@ import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.PopupMenuFactory;
+import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PlayControl;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
@@ -694,6 +696,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
+
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				refresh = true;
@@ -800,21 +803,51 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					PlayControl.replaying = !PlayControl.replaying;
+					if (PlayControl.active) {
+						PlayControl.replaying = !PlayControl.replaying;
+					} else {
+						PlayControl.replaying = true;
+						File lastFolder = DesignReplay.getInstance().getLastFolder();
+						if (lastFolder != null) {
+							DesignReplay.getInstance().play(lastFolder.listFiles(MainFrame.ng3NameFilter));
+						}
+					}
 				}
 			}));
 			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LEFT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (!PlayControl.replaying)
+					if (PlayControl.active) {
+						PlayControl.replaying = false;
 						PlayControl.backward = true;
+					}
+				}
+			}));
+			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.UP), new TriggerAction() {
+				@Override
+				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+					if (PlayControl.active) {
+						PlayControl.replaying = false;
+						PlayControl.backward = true;
+					}
 				}
 			}));
 			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.RIGHT), new TriggerAction() {
 				@Override
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (!PlayControl.replaying)
+					if (PlayControl.active) {
+						PlayControl.replaying = false;
 						PlayControl.forward = true;
+					}
+				}
+			}));
+			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.DOWN), new TriggerAction() {
+				@Override
+				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+					if (PlayControl.active) {
+						PlayControl.replaying = false;
+						PlayControl.forward = true;
+					}
 				}
 			}));
 		}

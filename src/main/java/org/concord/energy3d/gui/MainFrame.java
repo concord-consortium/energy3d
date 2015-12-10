@@ -57,6 +57,7 @@ import javax.swing.filechooser.FileFilter;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.DesignReplay;
+import org.concord.energy3d.logger.PlayControl;
 import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
@@ -108,6 +109,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem newMenuItem;
 	private JMenuItem openMenuItem;
 	private JMenuItem openFolderMenuItem;
+	private JMenuItem reopenFolderMenuItem;
 	private JMenuItem analyzeFolderMenuItem;
 	private JMenuItem saveMenuItem;
 	private JMenuItem printMenuItem;
@@ -186,6 +188,13 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllSolarPanelsMenuItem;
 	private JMenuItem removeAllWindowsMenuItem;
 	private JMenuItem removeAllTreesMenuItem;
+
+	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
+		@Override
+		public boolean accept(final File dir, final String name) {
+			return name.endsWith(".ng3");
+		}
+	};
 
 	private static class ExtensionFileFilter extends FileFilter {
 		String description;
@@ -373,8 +382,10 @@ public class MainFrame extends JFrame {
 					MainFrame.this.deselect();
 
 					// prevent multiple replay or postprocessing commands
-					openFolderMenuItem.setEnabled(!DesignReplay.getInstance().isActive());
-					analyzeFolderMenuItem.setEnabled(!PostProcessor.getInstance().isActive());
+					boolean inactive = !PlayControl.active;
+					openFolderMenuItem.setEnabled(inactive);
+					reopenFolderMenuItem.setEnabled(DesignReplay.getInstance().getLastFolder() != null && inactive);
+					analyzeFolderMenuItem.setEnabled(inactive);
 
 					// recent files
 					if (!recentFileMenuItems.isEmpty()) {
@@ -442,6 +453,7 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(new JSeparator());
 			if (!Config.isRestrictMode()) {
 				addItemToFileMenu(getOpenFolderMenuItem());
+				addItemToFileMenu(getReopenFolderMenuItem());
 				addItemToFileMenu(getAnalyzeFolderMenuItem());
 				addItemToFileMenu(new JSeparator());
 			}
@@ -572,12 +584,7 @@ public class MainFrame extends JFrame {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						final File dir = fileChooser.getSelectedFile();
 						if (dir.isDirectory()) {
-							PostProcessor.getInstance().analyze(dir.listFiles(new FilenameFilter() {
-								@Override
-								public boolean accept(final File dir, final String name) {
-									return name.endsWith(".ng3");
-								}
-							}), new File(fileChooser.getCurrentDirectory() + System.getProperty("file.separator") + "prop.txt"), new Runnable() {
+							PostProcessor.getInstance().analyze(dir.listFiles(ng3NameFilter), new File(fileChooser.getCurrentDirectory() + System.getProperty("file.separator") + "prop.txt"), new Runnable() {
 								@Override
 								public void run() {
 									updateTitleBar();
@@ -609,18 +616,27 @@ public class MainFrame extends JFrame {
 						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 						final File dir = fileChooser.getSelectedFile();
 						if (dir.isDirectory()) {
-							DesignReplay.getInstance().play(dir.listFiles(new FilenameFilter() {
-								@Override
-								public boolean accept(final File dir, final String name) {
-									return name.endsWith(".ng3");
-								}
-							}));
+							DesignReplay.getInstance().play(dir.listFiles(ng3NameFilter));
 						}
 					}
 				}
 			});
 		}
 		return openFolderMenuItem;
+	}
+
+	private JMenuItem getReopenFolderMenuItem() {
+		if (reopenFolderMenuItem == null) {
+			reopenFolderMenuItem = new JMenuItem("Reopen Last Folder");
+			reopenFolderMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (DesignReplay.getInstance().getLastFolder() != null)
+						DesignReplay.getInstance().play(DesignReplay.getInstance().getLastFolder().listFiles(ng3NameFilter));
+				}
+			});
+		}
+		return reopenFolderMenuItem;
 	}
 
 	public void updateTitleBar() {
