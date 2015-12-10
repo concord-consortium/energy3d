@@ -10,7 +10,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -31,7 +30,6 @@ import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.PopupMenuFactory;
-import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PlayControl;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
@@ -805,12 +803,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 					if (PlayControl.active) {
 						PlayControl.replaying = !PlayControl.replaying;
-					} else {
-						PlayControl.replaying = true;
-						File lastFolder = DesignReplay.getInstance().getLastFolder();
-						if (lastFolder != null) {
-							DesignReplay.getInstance().play(lastFolder.listFiles(MainFrame.ng3NameFilter));
-						}
 					}
 				}
 			}));

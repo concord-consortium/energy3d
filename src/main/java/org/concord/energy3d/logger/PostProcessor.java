@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +47,7 @@ public class PostProcessor extends PlayControl {
 			@Override
 			public void run() {
 				active = true;
+				Arrays.sort(files, new FileComparator());
 				final int n = files.length;
 				PrintWriter logWriter = null;
 				try {

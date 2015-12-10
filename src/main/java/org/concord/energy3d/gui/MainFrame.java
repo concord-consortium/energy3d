@@ -108,8 +108,8 @@ public class MainFrame extends JFrame {
 	private final List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
 	private JMenuItem newMenuItem;
 	private JMenuItem openMenuItem;
-	private JMenuItem openFolderMenuItem;
-	private JMenuItem reopenFolderMenuItem;
+	private JMenuItem replayFolderMenuItem;
+	private JMenuItem replayLastFolderMenuItem;
 	private JMenuItem analyzeFolderMenuItem;
 	private JMenuItem saveMenuItem;
 	private JMenuItem printMenuItem;
@@ -383,8 +383,8 @@ public class MainFrame extends JFrame {
 
 					// prevent multiple replay or postprocessing commands
 					boolean inactive = !PlayControl.active;
-					openFolderMenuItem.setEnabled(inactive);
-					reopenFolderMenuItem.setEnabled(DesignReplay.getInstance().getLastFolder() != null && inactive);
+					replayFolderMenuItem.setEnabled(inactive);
+					replayLastFolderMenuItem.setEnabled(DesignReplay.getInstance().getLastFolder() != null && inactive);
 					analyzeFolderMenuItem.setEnabled(inactive);
 
 					// recent files
@@ -452,8 +452,8 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getImportColladaMenuItem());
 			addItemToFileMenu(new JSeparator());
 			if (!Config.isRestrictMode()) {
-				addItemToFileMenu(getOpenFolderMenuItem());
-				addItemToFileMenu(getReopenFolderMenuItem());
+				addItemToFileMenu(getReplayFolderMenuItem());
+				addItemToFileMenu(getReplayLastFolderMenuItem());
 				addItemToFileMenu(getAnalyzeFolderMenuItem());
 				addItemToFileMenu(new JSeparator());
 			}
@@ -598,10 +598,10 @@ public class MainFrame extends JFrame {
 		return analyzeFolderMenuItem;
 	}
 
-	private JMenuItem getOpenFolderMenuItem() {
-		if (openFolderMenuItem == null) {
-			openFolderMenuItem = new JMenuItem("Open Folder...");
-			openFolderMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getReplayFolderMenuItem() {
+		if (replayFolderMenuItem == null) {
+			replayFolderMenuItem = new JMenuItem("Replay Folder...");
+			replayFolderMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE))
@@ -622,13 +622,13 @@ public class MainFrame extends JFrame {
 				}
 			});
 		}
-		return openFolderMenuItem;
+		return replayFolderMenuItem;
 	}
 
-	private JMenuItem getReopenFolderMenuItem() {
-		if (reopenFolderMenuItem == null) {
-			reopenFolderMenuItem = new JMenuItem("Reopen Last Folder");
-			reopenFolderMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getReplayLastFolderMenuItem() {
+		if (replayLastFolderMenuItem == null) {
+			replayLastFolderMenuItem = new JMenuItem("Replay Last Folder");
+			replayLastFolderMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (DesignReplay.getInstance().getLastFolder() != null)
@@ -636,7 +636,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 		}
-		return reopenFolderMenuItem;
+		return replayLastFolderMenuItem;
 	}
 
 	public void updateTitleBar() {
