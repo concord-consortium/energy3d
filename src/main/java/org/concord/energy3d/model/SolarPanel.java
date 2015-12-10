@@ -98,12 +98,12 @@ public class SolarPanel extends HousePart {
 			return;
 		if (container instanceof Roof) {
 			final PickResults pickResults = new PrimitivePickResults();
-			final Ray3 ray = new Ray3(getAbsPoint(0).addLocal(0, 0, 1000), Vector3.NEG_UNIT_Z);
+			final Ray3 ray = new Ray3(getAbsPoint(0).multiplyLocal(1, 1, 0), Vector3.UNIT_Z);
 			PickingUtil.findPick(container.getRoot(), ray, pickResults);
 			if (pickResults.getNumber() != 0) {
 				final PickData pickData = pickResults.getPickData(0);
 				final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
-				points.get(0).setZ(p.getZ());
+				points.get(0).setZ(p.getZ() + 0.4);
 				final UserData userData = (UserData) ((Spatial) pickData.getTarget()).getUserData();
 				final int roofPartIndex = userData.getIndex();
 				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
